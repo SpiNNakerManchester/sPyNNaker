@@ -41,6 +41,13 @@ void neuron_recording_set_recorded_param(
 void neuron_recording_set_double_recorded_param(
         uint32_t recording_var_index, uint32_t neuron_index, double value);
 
+//! \brief stores a recording of a matrix based float value
+//! \param[in] recording_var_index: which recording variable to write this is
+//! \param[in] neuron_index: the neuron id for this recorded data
+//! \param[in] value: the results to record for this neuron.
+void neuron_recording_set_float_recorded_param(
+        uint32_t recording_var_index, uint32_t neuron_index, float value);
+
 //! \brief stores a recording of a bitfield based variable
 //! \param[in] neuron_index: which neuron to set the spike for
 void neuron_recording_set_spike(uint32_t neuron_index);

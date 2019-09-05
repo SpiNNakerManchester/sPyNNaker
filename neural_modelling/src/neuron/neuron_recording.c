@@ -131,7 +131,7 @@ void neuron_recording_set_double_recorded_param(
 //! \param[in] neuron_index: which neuron to set the spike for
 //! \param[in] value: the data to store
 void neuron_recording_set_float_recorded_param(
-        uint32_t recording_var_index, uint32_t neuron_index, double value){
+        uint32_t recording_var_index, uint32_t neuron_index, float value){
     uint32_t index = var_recording_indexes[recording_var_index][neuron_index];
     var_float_recording_values[recording_var_index]->states[index] = value;
 }

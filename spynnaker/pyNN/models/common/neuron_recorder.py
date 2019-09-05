@@ -186,8 +186,10 @@ class NeuronRecorder(object):
                 else:
                     fragment[i] = placement_data[local_indexes[0]]
             elif len(local_indexes[0]) > 1:
+                fragment[i] = (placement_data[local_indexes[0], 1:] /
+                               float(DataType.S1615.scale))
                 logger.warning(
-                    "Population {} on multiple recorded data for "
+                    "Population {} has multiple recorded data for "
                     "time {}".format(label, time))
             else:
                 # Set row to nan
@@ -267,8 +269,7 @@ class NeuronRecorder(object):
 
     def get_matrix_data(
             self, label, buffer_manager, region, placements, graph_mapper,
-            application_vertex, variable, n_machine_time_steps,
-            local_time_period_map):
+            application_vertex, variable, run_time, local_time_period_map):
         """ Reads raw data mapped to time and neuron IDs from the SpiNNaker\
             machine and converts to required data types with scaling if needed.
 
@@ -281,8 +282,7 @@ class NeuronRecorder(object):
         :param application_vertex:
         :param variable: PyNN name for the variable (V, gsy_inh etc.)
         :type variable: str
-        :param n_machine_time_steps: how many time steps were run this resume \
-        cycle.
+        :param run_time: how many ms were run this resume cycle.
         :param local_time_period_map: the map of vertex to local time period
         :type local_time_period_map: map of machine vertex to int
         :return:
@@ -298,13 +298,16 @@ class NeuronRecorder(object):
         progress = ProgressBar(
             vertices, "Getting {} for {}".format(variable, label))
         sampling_rate = self.__sampling_rates[variable]
-        expected_rows = int(math.ceil(n_machine_time_steps / sampling_rate))
         missing_str = ""
         pop_level_data = None
         sampling_interval = None
 
         indexes = []
         for vertex in progress.over(vertices):
+            expected_rows = int(
+                (run_time * MICRO_TO_MILLISECOND_CONVERSION) /
+                local_time_period_map[vertex])
+
             placement_data, sampling_interval = \
                 self._get_placement_matrix_data(
                     variable, placements, vertex, sampling_interval,

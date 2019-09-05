@@ -610,13 +610,13 @@ class AbstractPopulationVertex(
 
     @overrides(AbstractNeuronRecordable.get_data)
     def get_data(
-            self, variable, n_machine_time_steps, placements, graph_mapper,
+            self, variable, run_time, placements, graph_mapper,
             buffer_manager, local_time_period_map):
         # pylint: disable=too-many-arguments
         return self.__neuron_recorder.get_matrix_data(
             self.label, buffer_manager,
             self.__neuron_impl.get_recordable_variable_index(variable),
-            placements, graph_mapper, self, variable, n_machine_time_steps,
+            placements, graph_mapper, self, variable, run_time,
             local_time_period_map)
 
     @overrides(AbstractNeuronRecordable.get_neuron_sampling_interval)

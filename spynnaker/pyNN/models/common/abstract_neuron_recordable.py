@@ -68,12 +68,13 @@ class AbstractNeuronRecordable(object):
 
     @abstractmethod
     def get_data(
-            self, variable, n_machine_time_steps, placements, graph_mapper,
+            self, variable, run_time, placements, graph_mapper,
             buffer_manager, local_time_period_map):
         """ Get the recorded data
 
         :param variable: the variable name to get data for
-        :param n_machine_time_steps: how mnay time steps ran
+        :param run_time: how long the simulation ran for this step /
+        (not total runtime)
         :param placements: placements
         :param graph_mapper: mapping between app and machine graphs
         :param buffer_manager: buffer manager
