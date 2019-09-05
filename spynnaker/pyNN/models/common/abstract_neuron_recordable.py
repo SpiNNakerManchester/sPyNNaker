@@ -95,3 +95,15 @@ class AbstractNeuronRecordable(object):
             the map of machine vertex to local time period
         :return: Sampling interval in micro seconds
         """
+
+    @abstractmethod
+    def get_expected_n_rows(
+            self, run_time, local_time_period_map, sampling_rate, vertex):
+        """ Returns the number of expected rows for a given runtime
+        
+        :param run_time: 
+        :param local_time_period_map: 
+        :param sampling_rate: 
+        :param vertex:
+        :return: 
+        """

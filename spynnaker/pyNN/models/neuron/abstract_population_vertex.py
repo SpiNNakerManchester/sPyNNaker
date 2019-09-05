@@ -178,6 +178,12 @@ class AbstractPopulationVertex(
         self.__n_profile_samples = helpful_functions.read_config_int(
             config, "Reports", "n_profile_samples")
 
+    @overrides(AbstractNeuronRecordable.get_expected_n_rows)
+    def get_expected_n_rows(
+            self, run_time, local_time_period_map, sampling_rate, vertex):
+        return self._neuron_recorder.expected_rows_for_a_run_time(
+            run_time, local_time_period_map, vertex, sampling_rate)
+
     @overrides(AbstractSendsOutgoingSynapses.get_out_going_size)
     def get_out_going_size(self):
         return self.__n_atoms

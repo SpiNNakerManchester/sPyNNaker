@@ -267,6 +267,13 @@ class NeuronRecorder(object):
                 placement_data)
             return placement_data, sampling_interval
 
+    @staticmethod
+    def expected_rows_for_a_run_time(
+            run_time, local_time_period_map, vertex, sampling_rate):
+        return int(
+            (run_time * MICRO_TO_MILLISECOND_CONVERSION) /
+            local_time_period_map[vertex]) / sampling_rate
+
     def get_matrix_data(
             self, label, buffer_manager, region, placements, graph_mapper,
             application_vertex, variable, run_time, local_time_period_map):
@@ -304,9 +311,8 @@ class NeuronRecorder(object):
 
         indexes = []
         for vertex in progress.over(vertices):
-            expected_rows = int(
-                (run_time * MICRO_TO_MILLISECOND_CONVERSION) /
-                local_time_period_map[vertex])
+            expected_rows = application_vertex.get_expected_n_rows(
+                run_time, local_time_period_map, sampling_rate, vertex)
 
             placement_data, sampling_interval = \
                 self._get_placement_matrix_data(
