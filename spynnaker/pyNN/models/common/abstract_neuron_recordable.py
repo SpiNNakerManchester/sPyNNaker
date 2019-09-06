@@ -98,12 +98,23 @@ class AbstractNeuronRecordable(object):
 
     @abstractmethod
     def get_expected_n_rows(
-            self, run_time, local_time_period_map, sampling_rate, vertex):
+            self, run_time, local_time_period_map, sampling_rate, vertex,
+            variable):
         """ Returns the number of expected rows for a given runtime
         
         :param run_time: 
         :param local_time_period_map: 
         :param sampling_rate: 
+        :param vertex:
+        :param variable:
+        :return: 
+        """
+
+    @abstractmethod
+    def get_recording_slice(self, graph_mapper, vertex):
+        """
+        
+        :param graph_mapper: 
         :param vertex:
         :return: 
         """

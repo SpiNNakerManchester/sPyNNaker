@@ -198,8 +198,9 @@ class NeuronRecorder(object):
 
     def _get_placement_matrix_data(
             self, variable, placements, vertex, sampling_interval,
-            local_time_period_map, graph_mapper, indexes, region,
-            buffer_manager, expected_rows, missing_str, sampling_rate, label):
+            local_time_period_map, indexes, region, graph_mapper,
+            buffer_manager, expected_rows, missing_str, sampling_rate, label,
+            application_vertex):
         """"""
         needs_scaling = (
             self.__matrix_output_types[variable] !=
@@ -217,7 +218,8 @@ class NeuronRecorder(object):
                 "conflicting sampling intervals within a given recording"
                 "variable.")
 
-        vertex_slice = graph_mapper.get_slice(vertex)
+        vertex_slice = application_vertex.get_recording_slice(
+            graph_mapper, vertex)
         neurons = self._neurons_recording(variable, vertex_slice)
         n_neurons = len(neurons)
         if n_neurons == 0:
@@ -312,14 +314,15 @@ class NeuronRecorder(object):
         indexes = []
         for vertex in progress.over(vertices):
             expected_rows = application_vertex.get_expected_n_rows(
-                run_time, local_time_period_map, sampling_rate, vertex)
+                run_time, local_time_period_map, sampling_rate, vertex,
+                variable)
 
             placement_data, sampling_interval = \
                 self._get_placement_matrix_data(
                     variable, placements, vertex, sampling_interval,
-                    local_time_period_map, graph_mapper, indexes, region,
-                    buffer_manager, expected_rows, missing_str, sampling_rate,
-                    label)
+                    local_time_period_map, indexes, region,
+                    graph_mapper, buffer_manager, expected_rows, missing_str,
+                    sampling_rate, label, application_vertex)
             if placement_data is not None:
                 # append to the population data
                 if pop_level_data is None:
