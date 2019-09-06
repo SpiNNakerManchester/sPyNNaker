@@ -14,10 +14,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-import struct
 import math
 import numpy
 import scipy.stats
+import struct
+
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from pacman.executor.injection_decorator import inject_items
@@ -41,6 +42,7 @@ from spinn_front_end_common.utilities.constants import (
     SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
+from spinn_front_end_common.interface.profiling import profile_utils
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, MultiSpikeRecorder, SimplePopulationSettable)
 from spynnaker.pyNN.utilities import constants
@@ -59,18 +61,20 @@ logger = logging.getLogger(__name__)
 # bool has_key; uint32_t key; uint32_t set_rate_neuron_id_mask;
 # uint32_t random_backoff_us; uint32_t time_between_spikes;
 # UFRACT seconds_per_tick; REAL ticks_per_second;
-# REAL slow_rate_per_tick_cutoff; uint32_t first_source_id;
-# uint32_t n_spike_sources; mars_kiss64_seed_t (uint[4]) spike_source_seed;
-PARAMS_BASE_WORDS = 14
+# REAL slow_rate_per_tick_cutoff; REAL fast_rate_per_tick_cutoff;
+# uint32_t first_source_id; uint32_t n_spike_sources;
+# mars_kiss64_seed_t (uint[4]) spike_source_seed;
+PARAMS_BASE_WORDS = 15
 
 # start_scaled, end_scaled, next_scaled, is_fast_source, exp_minus_lambda,
-# isi_val, time_to_spike
-PARAMS_WORDS_PER_NEURON = 7
+# sqrt_lambda, isi_val, time_to_spike
+PARAMS_WORDS_PER_NEURON = 8
 
 START_OF_POISSON_GENERATOR_PARAMETERS = PARAMS_BASE_WORDS * 4
 MICROSECONDS_PER_SECOND = 1000000.0
 MICROSECONDS_PER_MILLISECOND = 1000.0
-SLOW_RATE_PER_TICK_CUTOFF = 0.01
+SLOW_RATE_PER_TICK_CUTOFF = 0.01  # as suggested by MH (between Exp and Knuth)
+FAST_RATE_PER_TICK_CUTOFF = 10  # between Knuth algorithm and Gaussian approx.
 _REGIONS = SpikeSourcePoissonMachineVertex.POISSON_SPIKE_SOURCE_REGIONS
 OVERFLOW_TIMESTEPS_FOR_SDRAM = 5
 
@@ -83,9 +87,10 @@ _PoissonStruct = Struct([
     DataType.UINT32,  # End Scaled
     DataType.UINT32,  # Next Scaled
     DataType.UINT32,  # is_fast_source
-    DataType.U032,    # exp^(-rate)
-    DataType.S1615,   # inter-spike-interval
-    DataType.S1615])  # timesteps to next spike
+    DataType.U032,    # exp^(-spikes_per_tick)
+    DataType.S1615,   # sqrt(spikes_per_tick)
+    DataType.UINT32,   # inter-spike-interval
+    DataType.UINT32])  # timesteps to next spike
 
 
 def _flatten(alist):
@@ -125,7 +130,9 @@ class SpikeSourcePoissonVertex(
         "__n_data_specs",
         "__max_rate",
         "__rate_change",
-        "_data"]
+        "__n_profile_samples",
+        "__data",
+        "__is_variable_rate"]
 
     SPIKE_RECORDING_REGION_ID = 0
 
@@ -152,7 +159,6 @@ class SpikeSourcePoissonVertex(
         self.__change_requires_mapping = True
         self.__change_requires_neuron_parameters_reload = False
 
-        # Prepare for recording, and to get spikes
         self.__spike_recorder = MultiSpikeRecorder()
 
         # Check for disallowed pairs of parameters
@@ -167,6 +173,7 @@ class SpikeSourcePoissonVertex(
             raise Exception("One of rate or rates must be specified")
 
         # Normalise the parameters
+        self.__is_variable_rate = rates is not None
         if rates is None:
             if hasattr(rate, "__len__"):
                 # Single rate per neuron for whole simulation
@@ -255,24 +262,32 @@ class SpikeSourcePoissonVertex(
         else:
             time_to_spike = numpy.array([0 for _ in range(len(rates))])
 
-        self._data = SpynnakerRangeDictionary(n_neurons)
-        self._data["rates"] = SpynnakerRangedList(
+        self.__data = SpynnakerRangeDictionary(n_neurons)
+        self.__data["rates"] = SpynnakerRangedList(
             n_neurons, rates,
             use_list_as_value=not hasattr(rates[0], "__len__"))
-        self._data["starts"] = SpynnakerRangedList(
+        self.__data["starts"] = SpynnakerRangedList(
             n_neurons, starts,
             use_list_as_value=not hasattr(starts[0], "__len__"))
-        self._data["durations"] = SpynnakerRangedList(
+        self.__data["durations"] = SpynnakerRangedList(
             n_neurons, durations,
             use_list_as_value=not hasattr(durations[0], "__len__"))
-        self._data["time_to_spike"] = SpynnakerRangedList(
+        self.__data["time_to_spike"] = SpynnakerRangedList(
             n_neurons, time_to_spike,
             use_list_as_value=not hasattr(time_to_spike[0], "__len__"))
         self.__rng = numpy.random.RandomState(seed)
         self.__rate_change = numpy.zeros(n_neurons)
         self.__machine_time_step = None
 
-        all_rates = list(_flatten(self._data["rates"]))
+        # get config from simulator
+        config = globals_variables.get_simulator().config
+        self.__n_profile_samples = helpful_functions.read_config_int(
+            config, "Reports", "n_profile_samples")
+
+        # Prepare for recording, and to get spikes
+        self.__spike_recorder = MultiSpikeRecorder()
+
+        all_rates = list(_flatten(self.__data["rates"]))
         self.__max_rate = max_rate
         if len(all_rates):
             self.__max_rate = numpy.amax(all_rates)
@@ -281,29 +296,31 @@ class SpikeSourcePoissonVertex(
 
     @property
     def rate(self):
-        return list(_flatten(self._data["rates"]))
+        if self.__is_variable_rate:
+            raise Exception("Get variable rate poisson rates with .rates")
+        return _flatten(self.__data["rates"])
 
     @rate.setter
     def rate(self, rate):
-        # TODO Fix _rate_change
-        # scalar - array TODO FIX THIS
-        self.__rate_change = rate - list(_flatten(self._data["rates"]))
+        if self.__is_variable_rate:
+            raise Exception("Cannot set rate of a variable rate poisson")
+        self.__rate_change = rate - numpy.array(
+            list(_flatten(self.__data["rates"])))
         # Normalise parameter
         if hasattr(rate, "__len__"):
             # Single rate per neuron for whole simulation
-            self._data["rates"].set_value([numpy.array([r]) for r in rate])
+            self.__data["rates"].set_value([numpy.array([r]) for r in rate])
         else:
             # Single rate for all neurons for whole simulation
-            self._data["rates"].set_value(
+            self.__data["rates"].set_value(
                 numpy.array([rate]), use_list_as_value=True)
-        all_rates = list(_flatten(self._data["rates"]))
+        all_rates = list(_flatten(self.__data["rates"]))
+        new_max = 0
         if len(all_rates):
             new_max = numpy.amax(all_rates)
-        elif self.__max_rate is None:
-            new_max = 0
         if self.__max_rate is None:
             self.__max_rate = new_max
-        # Setting record forces reset so ok to go over if not recording
+        # Setting record forces reset so OK to go over if not recording
         elif self.__spike_recorder.record and new_max > self.__max_rate:
             logger.info('Increasing spike rate while recording requires a '
                         '"reset unless additional_parameters "max_rate" is '
@@ -313,46 +330,46 @@ class SpikeSourcePoissonVertex(
 
     @property
     def start(self):
-        return self._data["starts"]
+        return self.__data["starts"]
 
     @start.setter
     def start(self, start):
         # Normalise parameter
         if hasattr(start, "__len__"):
             # Single start per neuron for whole simulation
-            self._data["starts"].set_value([numpy.array([s]) for s in start])
+            self.__data["starts"].set_value([numpy.array([s]) for s in start])
         else:
             # Single start for all neurons for whole simulation
-            self._data["starts"].set_value(
+            self.__data["starts"].set_value(
                 numpy.array([start]), use_list_as_value=True)
 
     @property
     def duration(self):
-        return self._data["durations"]
+        return self.__data["durations"]
 
     @duration.setter
     def duration(self, duration):
         # Normalise parameter
         if hasattr(duration, "__len__"):
             # Single duration per neuron for whole simulation
-            self._data["durations"].set_value(
+            self.__data["durations"].set_value(
                 [numpy.array([d]) for d in duration])
         else:
             # Single duration for all neurons for whole simulation
-            self._data["durations"].set_value(
+            self.__data["durations"].set_value(
                 numpy.array([duration]), use_list_as_value=True)
 
     @property
     def rates(self):
-        return self._data["rates"]
+        return self.__data["rates"]
 
     @property
     def starts(self):
-        return self._data["starts"]
+        return self.__data["starts"]
 
     @property
     def durations(self):
-        return self._data["durations"]
+        return self.__data["durations"]
 
     @property
     @overrides(AbstractChangableAfterRun.requires_mapping)
@@ -369,13 +386,12 @@ class SpikeSourcePoissonVertex(
         self.__change_requires_neuron_parameters_reload = True
 
     def _max_spikes_per_ts(self, machine_time_step):
-
         ts_per_second = MICROSECONDS_PER_SECOND / float(machine_time_step)
-        if float(self.__max_rate) / ts_per_second <= \
+        if float(self.__max_rate) / ts_per_second < \
                 SLOW_RATE_PER_TICK_CUTOFF:
             return 1
 
-        # experiement show at 1000 is result is typically higher than actual
+        # Experiments show at 1000 this result is typically higher than actual
         chance_ts = 1000
         max_spikes_per_ts = scipy.stats.poisson.ppf(
             1.0 - (1.0 / float(chance_ts)),
@@ -405,10 +421,11 @@ class SpikeSourcePoissonVertex(
             SpikeSourcePoissonMachineVertex.get_provenance_data_size(0) +
             poisson_params_sz +
             recording_utilities.get_recording_header_size(1) +
-            recording_utilities.get_recording_data_constant_size(1))
+            recording_utilities.get_recording_data_constant_size(1) +
+            profile_utils.get_profile_region_size(self.__n_profile_samples))
 
         recording = self.get_recording_sdram_usage(
-            vertex_slice,  machine_time_step)
+            vertex_slice, machine_time_step)
         # build resources as i currently know
         container = ResourceContainer(
             sdram=recording + other,
@@ -446,11 +463,11 @@ class SpikeSourcePoissonVertex(
         self.__rng = None
 
     def get_rates_bytes(self, vertex_slice):
-        """ Gets the size of the poisson parameters in bytes
+        """ Gets the size of the Poisson rates in bytes
 
         :param vertex_slice:
         """
-        n_rates = sum(len(self._data["rates"][i]) for i in range(
+        n_rates = sum(len(self.__data["rates"][i]) for i in range(
             vertex_slice.lo_atom, vertex_slice.hi_atom + 1))
         return (vertex_slice.n_atoms + (n_rates * PARAMS_WORDS_PER_NEURON)) * 4
 
@@ -479,6 +496,10 @@ class SpikeSourcePoissonVertex(
             region=_REGIONS.SPIKE_HISTORY_REGION.value,
             size=recording_utilities.get_recording_header_size(1),
             label="Recording")
+
+        profile_utils.reserve_profile_region(
+            spec, _REGIONS.PROFILER_REGION.value, self.__n_profile_samples)
+
         placement.vertex.reserve_provenance_data_region(spec)
 
     def _reserve_poisson_params_rates_region(
@@ -551,11 +572,13 @@ class SpikeSourcePoissonVertex(
         self.__n_data_specs += 1
 
         # Write the number of microseconds between sending spikes
-        all_rates = numpy.fromiter(_flatten(self._data["rates"]), numpy.float)
+        all_rates = numpy.fromiter(_flatten(self.__data["rates"]), numpy.float)
+        # Note we have to do this per rate, as the whole array is not numpy
+        max_rates = numpy.array([numpy.max(r) for r in self.__data["rates"]])
         total_mean_rate = numpy.sum(all_rates)
         if total_mean_rate > 0:
             max_spikes = numpy.sum(scipy.stats.poisson.ppf(
-                0.999, all_rates))
+                1.0 - (1.0 / max_rates), max_rates))
             spikes_per_timestep = (
                 max_spikes / (MICROSECONDS_PER_SECOND // machine_time_step))
             # avoid a possible division by zero / small number (which may
@@ -579,14 +602,17 @@ class SpikeSourcePoissonVertex(
             data=float(machine_time_step) / MICROSECONDS_PER_SECOND,
             data_type=DataType.U032)
 
-        # Write the number of timesteps per second (accum)
+        # Write the number of timesteps per second (integer)
         spec.write_value(
-            data=MICROSECONDS_PER_SECOND / float(machine_time_step),
-            data_type=DataType.S1615)
+            data=int(MICROSECONDS_PER_SECOND / float(machine_time_step)))
 
         # Write the slow-rate-per-tick-cutoff (accum)
         spec.write_value(
             data=SLOW_RATE_PER_TICK_CUTOFF, data_type=DataType.S1615)
+
+        # Write the fast-rate-per-tick-cutoff (accum)
+        spec.write_value(
+            data=FAST_RATE_PER_TICK_CUTOFF, data_type=DataType.S1615)
 
         # Write the lo_atom ID
         spec.write_value(data=vertex_slice.lo_atom)
@@ -622,15 +648,15 @@ class SpikeSourcePoissonVertex(
 
         # For each source, write the number of rates, followed by the rate data
         for i in range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1):
-            spec.write_value(len(self._data["rates"][i]))
+            spec.write_value(len(self.__data["rates"][i]))
 
             # Convert start times to start time steps
-            starts = self._data["starts"][i].astype("float")
+            starts = self.__data["starts"][i].astype("float")
             starts_scaled = self._convert_ms_to_n_timesteps(
                 starts, machine_time_step)
 
             # Convert durations to end time steps
-            durations = self._data["durations"][i].astype("float")
+            durations = self.__data["durations"][i].astype("float")
             ends_scaled = numpy.zeros(len(durations), dtype="uint32")
             none_positions = numpy.isnan(durations)
             positions = numpy.invert(none_positions)
@@ -642,12 +668,13 @@ class SpikeSourcePoissonVertex(
             next_scaled = numpy.append(starts_scaled[1:], 0xFFFFFFFF)
 
             # Compute the spikes per tick for each atom
-            rates = self._data["rates"][i].astype("float")
+            rates = self.__data["rates"][i].astype("float")
             spikes_per_tick = (
                 rates * (float(machine_time_step) / MICROSECONDS_PER_SECOND))
 
             # Determine which sources are fast and which are slow
-            is_fast_source = spikes_per_tick > SLOW_RATE_PER_TICK_CUTOFF
+            is_fast_source = spikes_per_tick >= SLOW_RATE_PER_TICK_CUTOFF
+            is_faster_source = spikes_per_tick >= FAST_RATE_PER_TICK_CUTOFF
 
             # Compute the e^-(spikes_per_tick) for fast sources to allow fast
             # computation of the Poisson distribution to get the number of
@@ -655,17 +682,25 @@ class SpikeSourcePoissonVertex(
             exp_minus_lambda = numpy.zeros(len(spikes_per_tick), dtype="float")
             exp_minus_lambda[is_fast_source] = numpy.exp(
                 -1.0 * spikes_per_tick[is_fast_source])
+
+            # Compute sqrt(lambda) for "faster" sources to allow Gaussian
+            # approximation of the Poisson distribution to get the number of
+            # spikes per timestep
+            sqrt_lambda = numpy.zeros(len(spikes_per_tick), dtype="float")
+            sqrt_lambda[is_faster_source] = numpy.sqrt(
+                spikes_per_tick[is_faster_source])
+
             # Compute the inter-spike-interval for slow sources to get the
             # average number of timesteps between spikes
-            isi_val = numpy.zeros(len(spikes_per_tick), dtype="float")
+            isi_val = numpy.zeros(len(spikes_per_tick), dtype="uint32")
             elements = numpy.logical_not(
                 is_fast_source) & (spikes_per_tick > 0)
-            isi_val[elements] = 1.0 / spikes_per_tick[elements]
+            isi_val[elements] = (1.0 / spikes_per_tick[elements]).astype(int)
 
             # Get the time to spike value
-            time_to_spike = self._data["time_to_spike"][i]
+            time_to_spike = self.__data["time_to_spike"][i]
             if self.__rate_change[i]:
-                time_to_spike = 0.0
+                time_to_spike = numpy.array([0.0])
 
             # Merge the arrays as parameters per atom
             data = numpy.dstack((
@@ -674,8 +709,9 @@ class SpikeSourcePoissonVertex(
                 next_scaled.astype("uint32"),
                 is_fast_source.astype("uint32"),
                 (exp_minus_lambda * (2 ** 32)).astype("uint32"),
-                (isi_val * (2 ** 15)).astype("uint32"),
-                (time_to_spike * (2 ** 15)).astype("uint32")
+                (sqrt_lambda * (2 ** 15)).astype("uint32"),
+                isi_val.astype("uint32"),
+                time_to_spike.astype("uint32")
             ))[0].flatten()
             spec.write_array(data)
 
@@ -785,29 +821,32 @@ class SpikeSourcePoissonVertex(
             n_values = struct.unpack_from("<I", byte_array, offset)[0]
             offset += 4
 
-            (_start, _end, _next, is_fast_source, exp_minus_lambda, isi,
-             time_to_next_spike) = _PoissonStruct.read_data(
+            (_start, _end, _next, is_fast_source, exp_minus_lambda,
+             sqrt_lambda, isi, time_to_next_spike) = _PoissonStruct.read_data(
                  byte_array, offset, n_values)
             offset += _PoissonStruct.get_size_in_whole_words(n_values) * 4
 
-            # Work out the spikes per tick depending on if the source is slow
-            # or fast
+            # Work out the spikes per tick depending on if the source is
+            # slow (isi), fast (exp) or faster (sqrt)
             is_fast_source = is_fast_source == 1.0
             spikes_per_tick = numpy.zeros(len(is_fast_source), dtype="float")
             spikes_per_tick[is_fast_source] = numpy.log(
                 exp_minus_lambda[is_fast_source]) * -1.0
+            is_faster_source = sqrt_lambda > 0
+            spikes_per_tick[is_faster_source] = numpy.square(
+                sqrt_lambda[is_faster_source])
             slow_elements = isi > 0
             spikes_per_tick[slow_elements] = 1.0 / isi[slow_elements]
 
             # Convert spikes per tick to rates
-            self._data["rates"].set_value_by_id(
+            self.__data["rates"].set_value_by_id(
                 i,
                 spikes_per_tick *
                 (MICROSECONDS_PER_SECOND / float(self.__machine_time_step)))
 
             # Store the updated time until next spike so that it can be
             # rewritten when the parameters are loaded
-            self._data["time_to_spike"].set_value_by_id(
+            self.__data["time_to_spike"].set_value_by_id(
                 i, time_to_next_spike)
 
     @inject_items({
@@ -859,6 +898,11 @@ class SpikeSourcePoissonVertex(
 
         # write rates
         self._write_poisson_rates(spec, vertex_slice, machine_time_step)
+
+        # write profile data
+        profile_utils.write_profile_region_data(
+            spec, _REGIONS.PROFILER_REGION.value,
+            self.__n_profile_samples)
 
         # End-of-Spec:
         spec.end_specification()

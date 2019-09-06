@@ -23,6 +23,7 @@
 #include <random.h>
 #include <spin1_api.h>
 #include <normal.h>
+#include "common_mem.h"
 
 /**
  *! \brief The Random number generator parameters
@@ -32,8 +33,8 @@ struct rng {
 };
 
 rng_t rng_init(address_t *region) {
-    struct rng *rng = (struct rng *) spin1_malloc(sizeof(struct rng));
-    spin1_memcpy(rng->seed, *region, sizeof(mars_kiss64_seed_t));
+    struct rng *rng = spin1_malloc(sizeof(struct rng));
+    fast_memcpy(rng->seed, *region, sizeof(mars_kiss64_seed_t));
     *region += sizeof(mars_kiss64_seed_t) >> 2;
     return rng;
 }

@@ -35,7 +35,6 @@
 #define GSYN_INHIBITORY_RECORDING_INDEX 2
 
 typedef struct input_type_current_semd_t {
-
     // multiplicator
     REAL multiplicator[NUM_INHIBITORY_RECEPTORS];
 
@@ -57,33 +56,31 @@ static threshold_type_pointer_t threshold_type_array;
 static synapse_param_t *neuron_synapse_shaping_params;
 
 static bool neuron_impl_initialise(uint32_t n_neurons) {
-
     // Allocate DTCM for neuron array
-    neuron_array = (neuron_t *) spin1_malloc(n_neurons * sizeof(neuron_t));
+    neuron_array = spin1_malloc(n_neurons * sizeof(neuron_t));
     if (neuron_array == NULL) {
         log_error("Unable to allocate neuron array - Out of DTCM");
         return false;
     }
 
     // Allocate DTCM for input type array and copy block of data
-    input_type_array = (input_type_current_semd_t *) spin1_malloc(
-        n_neurons * sizeof(input_type_current_semd_t));
+    input_type_array =
+            spin1_malloc(n_neurons * sizeof(input_type_current_semd_t));
     if (input_type_array == NULL) {
         log_error("Unable to allocate input type array - Out of DTCM");
         return false;
     }
 
     // Allocate DTCM for threshold type array and copy block of data
-    threshold_type_array = (threshold_type_t *) spin1_malloc(
-        n_neurons * sizeof(threshold_type_t));
+    threshold_type_array = spin1_malloc(n_neurons * sizeof(threshold_type_t));
     if (threshold_type_array == NULL) {
         log_error("Unable to allocate threshold type array - Out of DTCM");
         return false;
     }
 
     // Allocate DTCM for synapse shaping parameters
-    neuron_synapse_shaping_params = (synapse_param_t *) spin1_malloc(
-        n_neurons * sizeof(synapse_param_t));
+    neuron_synapse_shaping_params =
+            spin1_malloc(n_neurons * sizeof(synapse_param_t));
     if (neuron_synapse_shaping_params == NULL) {
         log_error("Unable to allocate synapse parameters array"
             " - Out of DTCM");
@@ -97,8 +94,7 @@ static void neuron_impl_add_inputs(
         index_t synapse_type_index, index_t neuron_index,
         input_t weights_this_timestep) {
     // simple wrapper to synapse type input function
-    synapse_param_t *parameters =
-            &(neuron_synapse_shaping_params[neuron_index]);
+    synapse_param_t *parameters = &neuron_synapse_shaping_params[neuron_index];
     synapse_types_add_neuron_input(synapse_type_index,
             parameters, weights_this_timestep);
 }
@@ -106,7 +102,7 @@ static void neuron_impl_add_inputs(
 static void neuron_impl_load_neuron_parameters(
         address_t address, uint32_t next, uint32_t n_neurons) {
     log_debug("writing parameters, next is %u, n_neurons is %u ",
-        next, n_neurons);
+            next, n_neurons);
 
     log_debug("writing neuron local parameters");
     spin1_memcpy(neuron_array, &address[next], n_neurons * sizeof(neuron_t));
@@ -119,17 +115,16 @@ static void neuron_impl_load_neuron_parameters(
 
     log_debug("writing threshold type parameters");
     spin1_memcpy(threshold_type_array, &address[next],
-           n_neurons * sizeof(threshold_type_t));
+            n_neurons * sizeof(threshold_type_t));
     next += (n_neurons * sizeof(threshold_type_t)) / 4;
 
     log_debug("writing synapse parameters");
     spin1_memcpy(neuron_synapse_shaping_params, &address[next],
-           n_neurons * sizeof(synapse_param_t));
+            n_neurons * sizeof(synapse_param_t));
 }
 
 static bool neuron_impl_do_timestep_update(index_t neuron_index,
         input_t external_bias, state_t *recorded_variable_values) {
-
     // Get the neuron itself
     neuron_pointer_t neuron = &neuron_array[neuron_index];
 
@@ -138,9 +133,9 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
     // Get threshold synapse parameters for this neuron
     threshold_type_pointer_t threshold_type =
-        &threshold_type_array[neuron_index];
+            &threshold_type_array[neuron_index];
     synapse_param_pointer_t synapse_type =
-        &neuron_synapse_shaping_params[neuron_index];
+            &neuron_synapse_shaping_params[neuron_index];
 
     // Get the voltage
     state_t voltage = neuron_model_get_membrane_voltage(neuron);
@@ -154,8 +149,9 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
     // Set the inhibitory multiplicator value
     for (int i = 0; i < NUM_INHIBITORY_RECEPTORS; i++) {
-        if (inh_input_values[i] >= 0.01 && input_type->multiplicator[i] == 0 &&
-                input_type->inh_input_previous[i] == 0) {
+        if ((inh_input_values[i] >= 0.01) &&
+                (input_type->multiplicator[i] == 0) &&
+                (input_type->inh_input_previous[i] == 0)) {
             input_type->multiplicator[i] = exc_input_values[i];
         } else if (inh_input_values[i] < 0.01) {
             input_type->multiplicator[i] = 0;
@@ -167,10 +163,10 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     REAL total_exc = 0;
     REAL total_inh = 0;
 
-    for (int i = 0; i < NUM_EXCITATORY_RECEPTORS; i++){
+    for (int i = 0; i < NUM_EXCITATORY_RECEPTORS; i++) {
         total_exc += exc_input_values[i];
     }
-    for (int i = 0; i < NUM_INHIBITORY_RECEPTORS; i++){
+    for (int i = 0; i < NUM_INHIBITORY_RECEPTORS; i++) {
         total_inh += inh_input_values[i];
     }
 
@@ -179,7 +175,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = total_inh;
 
     // This changes inhibitory to excitatory input
-    for (int i=0; i<NUM_INHIBITORY_RECEPTORS; i++){
+    for (int i = 0; i < NUM_INHIBITORY_RECEPTORS; i++) {
         inh_input_values[i] = -inh_input_values[i] * SCALING_FACTOR
                 * input_type->multiplicator[i];
     }
@@ -236,11 +232,9 @@ static void neuron_impl_store_neuron_parameters(
 void neuron_impl_print_inputs(uint32_t n_neurons) {
 	bool empty = true;
 	for (index_t i = 0; i < n_neurons; i++) {
-		empty = empty
-				&& (bitsk(synapse_types_get_excitatory_input(
-						&(neuron_synapse_shaping_params[i]))
-					- synapse_types_get_inhibitory_input(
-						&(neuron_synapse_shaping_params[i]))) == 0);
+		empty = empty && (0 == bitsk(
+		        synapse_types_get_excitatory_input(&neuron_synapse_shaping_params[i])
+		        - synapse_types_get_inhibitory_input(&neuron_synapse_shaping_params[i])));
 	}
 
 	if (!empty) {
@@ -248,14 +242,11 @@ void neuron_impl_print_inputs(uint32_t n_neurons) {
 
 		for (index_t i = 0; i < n_neurons; i++) {
 			input_t input =
-				synapse_types_get_excitatory_input(
-					&(neuron_synapse_shaping_params[i]))
-				- synapse_types_get_inhibitory_input(
-					&(neuron_synapse_shaping_params[i]));
+			        synapse_types_get_excitatory_input(&neuron_synapse_shaping_params[i])
+			        - synapse_types_get_inhibitory_input(&neuron_synapse_shaping_params[i]);
 			if (bitsk(input) != 0) {
 				log_debug("%3u: %12.6k (= ", i, input);
-				synapse_types_print_input(
-					&(neuron_synapse_shaping_params[i]));
+				synapse_types_print_input(&neuron_synapse_shaping_params[i]);
 				log_debug(")\n");
 			}
 		}
@@ -266,7 +257,7 @@ void neuron_impl_print_inputs(uint32_t n_neurons) {
 void neuron_impl_print_synapse_parameters(uint32_t n_neurons) {
 	log_debug("-------------------------------------\n");
 	for (index_t n = 0; n < n_neurons; n++) {
-	    synapse_types_print_parameters(&(neuron_synapse_shaping_params[n]));
+	    synapse_types_print_parameters(&neuron_synapse_shaping_params[n]);
 	}
 	log_debug("-------------------------------------\n");
 }
