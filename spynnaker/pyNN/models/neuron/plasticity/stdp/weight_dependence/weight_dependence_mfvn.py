@@ -30,6 +30,10 @@ class WeightDependenceMFVN(
     @property
     def pot_alpha(self):
         return self._pot_alpha
+    
+    @pot_alpha.setter
+    def pot_alpha(self, new_value):
+        self._pot_alpha = new_value
 
     @overrides(AbstractWeightDependence.is_same_as)
     def is_same_as(self, weight_dependence):

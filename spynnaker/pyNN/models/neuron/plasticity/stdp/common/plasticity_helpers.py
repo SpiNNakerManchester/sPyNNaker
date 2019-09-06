@@ -15,10 +15,9 @@
 
 import math
 import logging
-
 import matplotlib.pyplot as plt
 import numpy as np
-
+from __future__ import print function
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 
@@ -115,14 +114,14 @@ def write_pfpc_lut(spec, peak_time, lut_size, shift, time_probe,
                 out_float.append(exp_float)
                 out_fixed.append(exp_fix)
                 if i == time_probe:
-                    print "dt = {}, kernel value = {} (fixed-point = {})".format(
-                        time_probe, exp_float, exp_fix)
+                    print("dt = {}, kernel value = {} (fixed-point = {})".format(
+                        time_probe, exp_float, exp_fix))
 
             else: # at runtime, so write to spec
                 spec.write_value(data=exp_fix, data_type=DataType.INT16)
 
         if spec is None:
-            print "peak: time {}, value {}".format(peak_time, kernel_peak_value)
+            print("peak: time {}, value {}".format(peak_time, kernel_peak_value))
             t = np.arange(0,lut_size)
             plt.plot(t,out_float, label='float')
             # plt.plot(t,out_fixed, label='fixed')
@@ -170,14 +169,14 @@ def write_mfvn_lut(spec, sigma, beta, lut_size, shift, time_probe,
                 out_fixed.append(exp_fix)
                 plot_times.append(i)
                 if i == time_probe:
-                    print "dt = {}, kernel value = {} (fixed-point = {})".format(
-                        time_probe, exp_float, exp_fix)
+                    print("dt = {}, kernel value = {} (fixed-point = {})".format(
+                        time_probe, exp_float, exp_fix))
 
             else: # at runtime, so write to spec
                 spec.write_value(data=exp_fix, data_type=DataType.INT16)
 
         if spec is None:
-            print "peak: time {}, value {}".format(peak_time, kernel_peak_value)
+            print("peak: time {}, value {}".format(peak_time, kernel_peak_value))
             plt.plot(plot_times,out_float, label='float')
             # plt.plot(t,out_fixed, label='fixed')
             plt.legend()

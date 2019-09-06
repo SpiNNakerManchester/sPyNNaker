@@ -339,6 +339,7 @@ void timer_callback(uint timer_count, uint unused) {
 void c_main(void) {
     // initialise the model
     if (!initialise()) {
+    	io_printf(IO_BUF, "c_main initialise failed\n");
         rt_error(RTE_API);
     }
 

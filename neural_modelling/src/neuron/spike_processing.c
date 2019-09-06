@@ -257,6 +257,7 @@ bool spike_processing_initialise( // EXPORTED
 
     // Allocate incoming spike buffer
     if (!in_spikes_initialize_spike_buffer(incoming_spike_buffer_size)) {
+    	io_printf(IO_BUF, "Spike buffer failed to initialise - insufficient DTCM \n");
         return false;
     }
 

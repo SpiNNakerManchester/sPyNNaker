@@ -56,7 +56,7 @@ uint32_t *weight_initialise(uint32_t *address, uint32_t n_synapse_types,
             weight_multiply_right_shift[s]);
     }
 
-    io_printf(IO_BUF, "mfvn weight initialisation: completed successfully");
+    io_printf(IO_BUF, "mfvn weight initialisation: completed successfully\n");
 
     // Return end address of region
     return (address_t) plasticity_word;
