@@ -3,7 +3,7 @@ from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 
 _population_parameters = {"seed": None}
 
-DEFAULT_MAX_ATOMS_PER_CORE = 500
+DEFAULT_MAX_ATOMS_PER_CORE = 32
 
 
 class SpikeSourcePoissonVariable(AbstractPyNNModel):
