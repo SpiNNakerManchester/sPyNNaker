@@ -216,7 +216,7 @@ class SynapticManager(object):
 
         # 4 for address of direct addresses, and
         # 4 for the size of the direct addresses matrix in bytes
-        return 1 * _WORD_SIZE
+        return 2 * _WORD_SIZE
 
     def _get_max_row_info(
             self, synapse_info, post_vertex_slice, app_edge,
