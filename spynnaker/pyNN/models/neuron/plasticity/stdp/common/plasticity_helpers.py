@@ -12,12 +12,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+from __future__ import print_function
 import math
 import logging
 import matplotlib.pyplot as plt
 import numpy as np
-from __future__ import print function
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 
