@@ -185,16 +185,7 @@ bool neuron_reload_neuron_parameters(address_t address) { // EXPORTED
 bool neuron_initialise(address_t address, uint32_t *n_neurons_value, // EXPORTED
         uint32_t *n_synapse_types_value, uint32_t *incoming_spike_buffer_size,
         uint32_t *timer_offset) {
-    log_info("neuron_initialise: starting");
-    log_info("test -two %f", -2.0f);
-    log_info("test -one %f", -1.0f);
-    log_info("test zero %x", 0.0f);
-    log_info("test one %x", 1.0f);
-    log_info("test two %x", 2.0f);
-    log_info("test string comma %s fluff ", "Rowley, wins");
-    log_info("test string baclslash %s fluff", "Rowley \" wins");
-    log_info("test string %%s in string, %u fluff", 45);
-    log_info("test string quote \" in string, %u fluff", 45);
+    log_debug("neuron_initialise: starting");
 
     struct neuron_parameters *params = (void *) address;
 
