@@ -91,23 +91,28 @@ def _plan_expansion(app_graph, placements, synapse_expander_bin,
     gen_on_machine_vertices = list()
     for vertex in progress.over(app_graph.vertices, finish_at_end=False):
         # Find population vertices; only know how to expand these two
-        if isinstance(vertex, (
-                AbstractPopulationVertex, DelayExtensionVertex)):
+        if isinstance(vertex, AbstractPopulationVertex):
             # Add all machine vertices of the population vertex to ones
             # that need synapse expansion
             gen_on_machine = False
             for m_vertex in vertex.machine_vertices:
                 if vertex.gen_on_machine(m_vertex.vertex_slice):
                     placement = placements.get_placement_of_vertex(m_vertex)
-                    if isinstance(vertex, AbstractPopulationVertex):
-                        binary = synapse_expander_bin
-                        gen_on_machine = True
-                    else:
-                        binary = delay_expander_bin
                     expander_cores.add_processor(
-                        binary, placement.x, placement.y, placement.p)
+                        synapse_expander_bin,
+                        placement.x, placement.y, placement.p)
+                    gen_on_machine = True
             if gen_on_machine:
                 gen_on_machine_vertices.append(vertex)
+        elif isinstance(vertex, DelayExtensionVertex):
+            # Add all machine vertices of the delay vertex to ones
+            # that need synapse expansion
+            for m_vertex in vertex.machine_vertices:
+                if vertex.gen_on_machine(m_vertex.vertex_slice):
+                    placement = placements.get_placement_of_vertex(m_vertex)
+                    expander_cores.add_processor(
+                        delay_expander_bin,
+                        placement.x, placement.y, placement.p)
 
     return expander_cores, gen_on_machine_vertices
 
