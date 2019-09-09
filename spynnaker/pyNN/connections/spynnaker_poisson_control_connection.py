@@ -20,8 +20,6 @@ from data_specification.enums import DataType
 from spinn_front_end_common.utilities.connections import LiveEventConnection
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.constants import NOTIFY_PORT
-from spinnman.constants import SCP_SCAMP_PORT
-from decimal import Decimal
 
 _MAX_RATES_PER_PACKET = 32
 
@@ -104,7 +102,7 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
         control_label = label
         if not control_label.endswith(self.__control_label_extension):
             control_label = self._control_label(label)
-        self.set_rates(control_label, [(neuron_id, rate)])
+        self.__set_rates(label, control_label, [(neuron_id, rate)])
 
     def set_rates(self, label, neuron_id_rates):
         """ Set the rates of multiple Poisson neurons within a Poisson source
@@ -115,25 +113,21 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
         control_label = label
         if not control_label.endswith(self.__control_label_extension):
             control_label = self._control_label(label)
-        pos = 0
-        x, y, p, ip_address = self._send_address_details[label]
-        while pos < len(neuron_id_rates):
-            message, pos = self._assemble_message(
-                self._atom_id_to_key[control_label], neuron_id_rates, pos)
-            self._sender_connection.send_to(
-                self._get_sdp_data(message, x, y, p),
-                (ip_address, SCP_SCAMP_PORT))
+        self.__set_rates(label, control_label, neuron_id_rates)
 
     @staticmethod
-    def _assemble_message(id_to_key_map, neuron_id_rates, pos):
-        scale = DataType.S1615.scale  # @UndefinedVariable
-        message = EIEIODataMessage.create(EIEIOType.KEY_PAYLOAD_32_BIT)
-        for _ in range(_MAX_RATES_PER_PACKET):
-            neuron_id, rate = neuron_id_rates[pos]
-            key = id_to_key_map[neuron_id]
-            message.add_key_and_payload(
-                key, int(round(Decimal(str(rate)) * scale)))
-            pos += 1
-            if pos >= len(neuron_id_rates):
-                break
-        return message, pos
+    def __chunks(l, n):
+        """Yield successive n-sized chunks from l."""
+        # From top answer to https://stackoverflow.com/q/312443/301832
+        for i in range(0, len(l), n):
+            yield l[i:i + n]
+
+    def __set_rates(self, label, control_label, neuron_id_rates):
+        id_to_key_map = self._atom_id_to_key[control_label]
+        datatype = DataType.S1615
+        for chunk in self.__chunks(neuron_id_rates, _MAX_RATES_PER_PACKET):
+            message = EIEIODataMessage.create(EIEIOType.KEY_PAYLOAD_32_BIT)
+            for neuron_id, rate in chunk:
+                message.add_key_and_payload(
+                    id_to_key_map[neuron_id], datatype.encode(rate))
+            self.send_eieio_message(message, label)
