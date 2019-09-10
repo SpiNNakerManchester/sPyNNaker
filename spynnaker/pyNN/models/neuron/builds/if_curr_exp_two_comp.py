@@ -18,7 +18,7 @@ from spynnaker.pyNN.models.defaults import default_initial_values
 from spynnaker.pyNN.models.neuron.neuron_models import (
     NeuronModelLeakyIntegrateAndFireTwoComp)
 from spynnaker.pyNN.models.neuron.synapse_types import SynapseTypeExponentialTwoComp
-from spynnaker.pyNN.models.neuron.input_types import InputTypeCurrent
+from spynnaker.pyNN.models.neuron.input_types import InputTypeTwoComp
 from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeStatic
 
 
@@ -34,6 +34,8 @@ class IFCurrExpTwoComp(AbstractPyNNNeuronModelStandard):
     def __init__(
             self, tau_m=0.5, cm=1.0, u_rest=0, v_reset=0.0,
             v_thresh=10.0, tau_refrac=0.1, i_offset=0.0, u=0.0,
+
+            e_rev_E=10.0, e_rev_I=0.0,
 
             tau_syn_E_soma=5.0, tau_syn_I_soma=5.0,
             isyn_exc_soma =0.0, isyn_inh_soma=0.0,
@@ -53,7 +55,7 @@ class IFCurrExpTwoComp(AbstractPyNNNeuronModelStandard):
         synapse_type = SynapseTypeExponentialTwoComp(
             tau_syn_E_soma, tau_syn_E_dendrite, tau_syn_I_soma, tau_syn_I_dendrite,
             isyn_exc_soma, isyn_exc_dendrite, isyn_inh_soma, isyn_inh_dendrite)
-        input_type = InputTypeCurrent()
+        input_type = InputTypeTwoComp(e_rev_E, e_rev_I)
         threshold_type = ThresholdTypeStatic(v_thresh)
 
         super(IFCurrExpTwoComp, self).__init__(

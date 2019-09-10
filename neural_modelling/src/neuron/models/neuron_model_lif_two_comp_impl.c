@@ -45,20 +45,17 @@ state_t neuron_model_state_update(
     // If outside of the refractory period
     if (neuron->refract_timer <= 0) {
 
-        // Get the soma input in nA
-        input_t soma_input_this_timestep =
-                exc_input[0] - inh_input[0] + neuron->I_offset;
-
         // Get the dendrite input in nA
         input_t dendrite_input_this_timestep =
                 exc_input[1] - inh_input[1];
 
-
-
-
         // update dendrite
         neuron->V = neuron->exp_TC_dend * neuron->V + dendrite_input_this_timestep;
 //        neuron->V_star = neuron->V * neuron->V_star_cond;
+
+        // Get the soma input in nA
+        input_t soma_input_this_timestep =
+                exc_input[0] - inh_input[0] + neuron->I_offset;
 
         REAL R_m = 10.0k;
         REAL g_L = 0.1k;
