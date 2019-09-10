@@ -27,6 +27,10 @@ uint32_t neuron_recording_get_n_recorded_vars(void);
 //! \brief allows neurons to wait till recordings have completed
 void neuron_recording_wait_to_complete(void);
 
+//! \brief prints var recording indexes
+void neuron_recorder_print_var_recording_indexes(
+        uint32_t region, uint32_t n_neurons);
+
 //! \brief stores a recording of a matrix based variable
 //! \param[in] recording_var_index: which recording variable to write this is
 //! \param[in] neuron_index: the neuron id for this recorded data
