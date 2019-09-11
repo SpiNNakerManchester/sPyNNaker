@@ -39,34 +39,32 @@ extern uint16_t post_exp_dist_lookup[STDP_FIXED_POINT_ONE];
 
 static inline bool timing_recurrent_in_pre_window(
         uint32_t time_since_last_event, update_state_t previous_state) {
-    return (time_since_last_event < previous_state.window_length);
+    return time_since_last_event < previous_state.window_length;
 }
 
 static inline bool timing_recurrent_in_post_window(
         uint32_t time_since_last_event, update_state_t previous_state) {
-    return (time_since_last_event < previous_state.window_length);
+    return time_since_last_event < previous_state.window_length;
 }
 
 static inline update_state_t timing_recurrent_calculate_pre_window(
         update_state_t previous_state) {
-
     // Pick random number and use to draw from exponential distribution
     int32_t random = mars_kiss_fixed_point();
     previous_state.window_length = pre_exp_dist_lookup[random];
-    log_debug("\t\tRandom=%d, Exp dist=%u", random,
-              previous_state.window_length);
+    log_debug("\t\tRandom=%d, Exp dist=%u",
+            random, previous_state.window_length);
 
     return previous_state;
 }
 
 static inline update_state_t timing_recurrent_calculate_post_window(
         update_state_t previous_state) {
-
     // Pick random number and use to draw from exponential distribution
     int32_t random = mars_kiss_fixed_point();
     previous_state.window_length = post_exp_dist_lookup[random];
-    log_debug("\t\tRandom=%d, Exp dist=%u", random,
-              previous_state.window_length);
+    log_debug("\t\tRandom=%d, Exp dist=%u",
+            random, previous_state.window_length);
 
     return previous_state;
 }

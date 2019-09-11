@@ -30,7 +30,7 @@ uint16_t uidiv(uint16_t dividend, uint16_t divider, uint16_t *remainder) {
     uint16_t d = 0;
     *remainder = dividend;
     while (*remainder >= divider) {
-        d += 1;
+        d++;
         *remainder -= divider;
     }
     return d;
@@ -53,10 +53,10 @@ void pre_in_post_world(uint16_t in_row, uint16_t in_col, uint16_t start_row,
         *out_row = 1;
     } else if (d < 0) {
         d = (int16_t) uidiv((uint16_t) (-d), step_row, &r);
-        *out_row = (-d + 1);
+        *out_row = -d + 1;
     } else {
-        d = (int16_t) uidiv((uint16_t) (d), step_row, &r);
-        *out_row = (d + 1);
+        d = (int16_t) uidiv((uint16_t) d, step_row, &r);
+        *out_row = d + 1;
     }
 
     d = (int16_t) (in_col - start_col - 1);
@@ -64,9 +64,9 @@ void pre_in_post_world(uint16_t in_row, uint16_t in_col, uint16_t start_row,
         *out_col = 1;
     } else if (d < 0) {
         d = (int16_t) uidiv((uint16_t) (-d), step_col, &r);
-        *out_col = (-d + 1);
+        *out_col = -d + 1;
     } else {
-        d = (int16_t) uidiv((uint16_t) (d), step_col, &r);
-        *out_col = (d + 1);
+        d = (int16_t) uidiv((uint16_t) d, step_col, &r);
+        *out_col = d + 1;
     }
 }

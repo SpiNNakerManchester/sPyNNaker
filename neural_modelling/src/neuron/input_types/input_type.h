@@ -30,8 +30,8 @@ typedef struct input_type_t* input_type_pointer_t;
 //! \return Pointer to array of values of the receptor-based input after
 //!  scaling
 static input_t* input_type_get_input_value(
-    input_t* value, input_type_pointer_t input_type,
-    uint16_t num_receptors);
+        input_t* value, input_type_pointer_t input_type,
+        uint16_t num_receptors);
 
 //! \brief Converts an excitatory input into an excitatory current
 //! \param[in/out] exc_input Pointer to array of excitatory inputs from
@@ -41,8 +41,8 @@ static input_t* input_type_get_input_value(
 //! \param[in] membrane_voltage The membrane voltage to use for the input
 //! \return void
 static void input_type_convert_excitatory_input_to_current(
-    input_t* exc_input, input_type_pointer_t input_type,
-    state_t membrane_voltage);
+        input_t* exc_input, input_type_pointer_t input_type,
+        state_t membrane_voltage);
 
 //! \brief Converts an inhibitory input into an inhibitory current
 //! \param[in/out] inh_input Pointer to array of inhibitory inputs from
@@ -52,7 +52,7 @@ static void input_type_convert_excitatory_input_to_current(
 //! \param[in] membrane_voltage The membrane voltage to use for the input
 //! \return void
 static void input_type_convert_inhibitory_input_to_current(
-    input_t* inh_input, input_type_pointer_t input_type,
-    state_t membrane_voltage);
+        input_t* inh_input, input_type_pointer_t input_type,
+        state_t membrane_voltage);
 
 #endif // _INPUT_TYPE_H_
