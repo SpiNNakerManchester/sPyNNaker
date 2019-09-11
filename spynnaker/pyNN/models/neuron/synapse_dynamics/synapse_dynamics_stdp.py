@@ -17,6 +17,7 @@ import math
 import numpy
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.models.abstract_models import AbstractSettable
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
 from .abstract_generate_on_machine import (
@@ -25,7 +26,7 @@ from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 
 # How large are the time-stamps stored with each event
-TIME_STAMP_BYTES = 4
+TIME_STAMP_BYTES = BYTES_PER_WORD
 # When not using the MAD scheme, how many pre-synaptic events are buffered
 NUM_PRE_SYNAPTIC_EVENTS = 4
 
@@ -176,7 +177,7 @@ class SynapseDynamicsSTDP(
 
         # The actual number of bytes is in a word-aligned struct, so work out
         # the number of bytes as a number of words
-        return int(math.ceil(float(n_bytes) / 4.0)) * 4
+        return int(math.ceil(float(n_bytes) / BYTES_PER_WORD)) * BYTES_PER_WORD
 
     def get_n_words_for_plastic_connections(self, n_connections):
         synapse_structure = self.__timing_dependence.synaptic_structure
@@ -191,7 +192,7 @@ class SynapseDynamicsSTDP(
             self._n_header_bytes +
             (synapse_structure.get_n_half_words_per_connection() *
              2 * n_connections))
-        pp_size_words = int(math.ceil(float(pp_size_bytes) / 4.0))
+        pp_size_words = int(math.ceil(float(pp_size_bytes) / BYTES_PER_WORD))
 
         return fp_size_words + pp_size_words
 
@@ -256,7 +257,7 @@ class SynapseDynamicsSTDP(
             numpy.concatenate((
                 plastic_headers[i], plastic_plastic_row_data[i]))
             for i in range(n_rows)]
-        pp_size = self.get_n_items(plastic_plastic_rows, 4)
+        pp_size = self.get_n_items(plastic_plastic_rows, BYTES_PER_WORD)
         pp_data = self.get_words(plastic_plastic_rows)
 
         return fp_data, pp_data, fp_size, pp_size
@@ -371,7 +372,7 @@ class SynapseDynamicsSTDP(
     def get_max_synapses(self, n_words):
 
         # Subtract the header size that will always exist
-        n_header_words = self._n_header_bytes // 4
+        n_header_words = self._n_header_bytes // BYTES_PER_WORD
         n_words_space = n_words - n_header_words
 
         # Get plastic plastic size per connection
@@ -382,7 +383,8 @@ class SynapseDynamicsSTDP(
         bytes_per_fp = 2
 
         # Maximum possible connections, ignoring word alignment
-        n_connections = (n_words_space * 4) // (bytes_per_pp + bytes_per_fp)
+        n_connections = (n_words_space * BYTES_PER_WORD) // (
+            bytes_per_pp + bytes_per_fp)
 
         # Reduce until correct
         while (self.get_n_words_for_plastic_connections(n_connections) >
@@ -409,7 +411,7 @@ class SynapseDynamicsSTDP(
     @overrides(AbstractGenerateOnMachine.
                gen_matrix_params_size_in_bytes)
     def gen_matrix_params_size_in_bytes(self):
-        return 3 * 4
+        return 3 * BYTES_PER_WORD
 
     @property
     @overrides(AbstractPlasticSynapseDynamics.changes_during_run)

@@ -26,6 +26,7 @@ from spinn_utilities.helpful_functions import get_valid_components
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spynnaker.pyNN.models.neuron.generator_data import GeneratorData
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
@@ -46,10 +47,10 @@ from spynnaker.pyNN.utilities.utility_calls import (
     get_maximum_probable_value, get_n_bits)
 from spynnaker.pyNN.utilities.running_stats import RunningStats
 
-TIME_STAMP_BYTES = 4
+TIME_STAMP_BYTES = BYTES_PER_WORD
 
 # TODO: Make sure these values are correct (particularly CPU cycles)
-_SYNAPSES_BASE_DTCM_USAGE_IN_BYTES = 28
+_SYNAPSES_BASE_DTCM_USAGE_IN_BYTES = 7 * BYTES_PER_WORD
 _SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES = 0
 _SYNAPSES_BASE_N_CPU_CYCLES_PER_NEURON = 10
 _SYNAPSES_BASE_N_CPU_CYCLES = 8
@@ -59,7 +60,7 @@ _SYNAPSES_BASE_N_CPU_CYCLES = 8
 # 4 for n_synapse_types
 # 4 for n_synapse_type_bits
 # 4 for n_synapse_index_bits
-_SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES = 4 + 8 + 4 + 4 + 4
+_SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES = 6 * BYTES_PER_WORD
 
 # Amount to scale synapse SDRAM estimate by to make sure the synapses fit
 _SYNAPSE_SDRAM_OVERSCALE = 1.1
@@ -297,7 +298,7 @@ class SynapticManager(object):
                         size += gen_size * n_edge_vertices
         if gen_on_machine:
             size += _SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES
-            size += self.__n_synapse_types * 4
+            size += self.__n_synapse_types * BYTES_PER_WORD
         return size
 
     def _get_synapse_dynamics_parameter_size(self, vertex_slice,
@@ -319,8 +320,8 @@ class SynapticManager(object):
             self, vertex_slice, in_edges, machine_time_step):
         return (
             self._get_synapse_params_size() +
-            self._get_synapse_dynamics_parameter_size(vertex_slice,
-                                                      in_edges=in_edges) +
+            self._get_synapse_dynamics_parameter_size(
+                vertex_slice, in_edges=in_edges) +
             self._get_synaptic_blocks_size(
                 vertex_slice, in_edges, machine_time_step) +
             self.__poptable_type.get_master_population_table_size(
@@ -676,14 +677,15 @@ class SynapticManager(object):
             single_data = numpy.concatenate(single_synapses)
             spec.reserve_memory_region(
                 region=direct_matrix_region,
-                size=(len(single_data) * 4) + 4,
+                size=(len(single_data) + 1) * BYTES_PER_WORD,
                 label='DirectMatrix')
             spec.switch_write_focus(direct_matrix_region)
-            spec.write_value(len(single_data) * 4)
+            spec.write_value(len(single_data) * BYTES_PER_WORD)
             spec.write_array(single_data)
         else:
             spec.reserve_memory_region(
-                region=direct_matrix_region, size=4, label="DirectMatrix")
+                region=direct_matrix_region, size=BYTES_PER_WORD,
+                label="DirectMatrix")
             spec.switch_write_focus(direct_matrix_region)
             spec.write_value(0)
 
@@ -732,7 +734,7 @@ class SynapticManager(object):
             block_addr = synaptic_matrix_offset + n_bytes_undelayed
 
             # The synaptic matrix offset is in words for the generator
-            synaptic_matrix_offset = synaptic_matrix_offset // 4
+            synaptic_matrix_offset = synaptic_matrix_offset // BYTES_PER_WORD
         elif rinfo is not None:
             index = self.__poptable_type.update_master_population_table(
                 spec, 0, 0, rinfo.first_key_and_mask, master_pop_table_region)
@@ -767,7 +769,7 @@ class SynapticManager(object):
 
             # The delayed synaptic matrix offset is in words for the generator
             delayed_synaptic_matrix_offset = \
-                delayed_synaptic_matrix_offset // 4
+                delayed_synaptic_matrix_offset // BYTES_PER_WORD
         elif delay_rinfo is not None:
             d_index = self.__poptable_type.update_master_population_table(
                 spec, 0, 0, delay_rinfo.first_key_and_mask,
@@ -883,7 +885,7 @@ class SynapticManager(object):
         return (
             app_edge.n_delay_stages == 0 and
             isinstance(connector, OneToOneConnector) and
-            (single_addr + (pre_vertex_slice.n_atoms * 4) <=
+            (single_addr + (pre_vertex_slice.n_atoms * BYTES_PER_WORD) <=
                 self.__one_to_one_connection_dtcm_max_bytes) and
             (pre_vertex_slice.lo_atom == post_vertex_slice.lo_atom) and
             (pre_vertex_slice.hi_atom == post_vertex_slice.hi_atom))
@@ -901,7 +903,7 @@ class SynapticManager(object):
             index = self.__poptable_type.update_master_population_table(
                 spec, single_addr, 1, rinfo.first_key_and_mask,
                 master_pop_table_region, is_single=True)
-            single_addr += len(single_rows) * 4
+            single_addr += len(single_rows) * BYTES_PER_WORD
         else:
             block_addr = self._write_padding(
                 spec, synaptic_matrix_region, block_addr)
@@ -910,7 +912,7 @@ class SynapticManager(object):
             index = self.__poptable_type.update_master_population_table(
                 spec, block_addr, row_length,
                 rinfo.first_key_and_mask, master_pop_table_region)
-            block_addr += len(row_data) * 4
+            block_addr += len(row_data) * BYTES_PER_WORD
         return block_addr, single_addr, index
 
     def _get_ring_buffer_shifts(
@@ -1058,7 +1060,7 @@ class SynapticManager(object):
             transceiver)
         direct_synapses = locate_memory_region_for_placement(
             placement, POPULATION_BASED_REGIONS.DIRECT_MATRIX.value,
-            transceiver) + 4
+            transceiver) + BYTES_PER_WORD
         return master_pop_table, direct_synapses, synaptic_matrix
 
     def _extract_synaptic_matrix_data_location(
@@ -1147,7 +1149,7 @@ class SynapticManager(object):
         """ Read in a single synaptic block.
         """
         # The data is one per row
-        synaptic_block_size = n_rows * 4
+        synaptic_block_size = n_rows * BYTES_PER_WORD
 
         # read in the synaptic row data
         if using_monitors:
@@ -1158,7 +1160,7 @@ class SynapticManager(object):
                 placement.x, placement.y, address, synaptic_block_size)
 
         # Convert the block into a set of rows
-        numpy_block = numpy.zeros((n_rows, 4), dtype="uint32")
+        numpy_block = numpy.zeros((n_rows, BYTES_PER_WORD), dtype="uint32")
         numpy_block[:, 3] = numpy.asarray(
             single_block, dtype="uint8").view("uint32")
         numpy_block[:, 1] = 1
@@ -1181,7 +1183,7 @@ class SynapticManager(object):
 
         n_bytes = (
             _SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES +
-            (self.__n_synapse_types * 4))
+            (self.__n_synapse_types * BYTES_PER_WORD))
         for data in generator_data:
             n_bytes += data.size
 

@@ -17,6 +17,7 @@ import math
 import numpy
 from six import raise_from
 from spinn_utilities.overrides import overrides
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector)
 from spynnaker.pyNN.exceptions import SynapseRowTooBigException
@@ -44,8 +45,9 @@ class SynapseIORowBased(AbstractSynapseIO):
         # There are 16 slots, one per time step
         return 16 * (machine_time_step / 1000.0)
 
-    def _n_words(self, n_bytes):
-        return math.ceil(float(n_bytes) / 4.0)
+    @staticmethod
+    def _n_words(n_bytes):
+        return math.ceil(float(n_bytes) / BYTES_PER_WORD)
 
     def _get_max_row_length(
             self, size, dynamics, population_table, in_edge, row_length):
@@ -113,10 +115,12 @@ class SynapseIORowBased(AbstractSynapseIO):
 
         undelayed_max_bytes = 0
         if undelayed_max_n_words > 0:
-            undelayed_max_bytes = (undelayed_max_n_words + _N_HEADER_WORDS) * 4
+            undelayed_max_bytes = (undelayed_max_n_words + _N_HEADER_WORDS) * \
+                BYTES_PER_WORD
         delayed_max_bytes = 0
         if delayed_max_n_words > 0:
-            delayed_max_bytes = (delayed_max_n_words + _N_HEADER_WORDS) * 4
+            delayed_max_bytes = (delayed_max_n_words + _N_HEADER_WORDS) * \
+                BYTES_PER_WORD
 
         return MaxRowInfo(
             max_undelayed_n_synapses, max_delayed_n_synapses,
@@ -450,4 +454,4 @@ class SynapseIORowBased(AbstractSynapseIO):
 
     @overrides(AbstractSynapseIO.get_block_n_bytes)
     def get_block_n_bytes(self, max_row_length, n_rows):
-        return (_N_HEADER_WORDS + max_row_length) * 4 * n_rows
+        return (_N_HEADER_WORDS + max_row_length) * BYTES_PER_WORD * n_rows

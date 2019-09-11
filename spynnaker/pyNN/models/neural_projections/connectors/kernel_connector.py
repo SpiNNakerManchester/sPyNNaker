@@ -19,6 +19,7 @@ from spynnaker.pyNN.exceptions import SpynnakerException
 from spinn_front_end_common.utilities.globals_variables import get_simulator
 from pacman.model.decorators.overrides import overrides
 from data_specification.enums.data_type import DataType
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from .abstract_generate_connector_on_machine \
     import AbstractGenerateConnectorOnMachine, ConnectorIDs, PARAM_TYPE_KERNEL
 
@@ -342,7 +343,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
                gen_delay_params_size_in_bytes)
     def gen_delay_params_size_in_bytes(self, delays):
         if self._krn_delays is not None:
-            return (N_KERNEL_PARAMS + 1 + self._krn_delays.size) * 4
+            return (N_KERNEL_PARAMS + 1 + self._krn_delays.size) * \
+                BYTES_PER_WORD
         return super(KernelConnector, self).gen_delay_params_size_in_bytes(
             delays)
 
@@ -368,7 +370,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
                gen_weight_params_size_in_bytes)
     def gen_weight_params_size_in_bytes(self, weights):
         if self._krn_weights is not None:
-            return (N_KERNEL_PARAMS + 1 + self._krn_weights.size) * 4
+            return (N_KERNEL_PARAMS + 1 + self._krn_weights.size) * \
+                BYTES_PER_WORD
         return super(KernelConnector, self).gen_weight_params_size_in_bytes(
             weights)
 
@@ -401,4 +404,4 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
     @overrides(AbstractGenerateConnectorOnMachine.
                gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
-        return N_KERNEL_PARAMS * 4
+        return N_KERNEL_PARAMS * BYTES_PER_WORD

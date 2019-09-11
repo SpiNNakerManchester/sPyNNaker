@@ -19,6 +19,7 @@ import numpy.random
 from six import raise_from
 from spinn_utilities.abstract_base import abstractmethod
 from spinn_utilities.overrides import overrides
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.exceptions import SpynnakerException
 from .abstract_connector import AbstractConnector
@@ -222,4 +223,4 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
     @overrides(AbstractGenerateConnectorOnMachine.
                gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
-        return 16 + 16
+        return (4 + 4) * BYTES_PER_WORD

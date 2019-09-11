@@ -16,6 +16,7 @@
 import logging
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
     AbstractTimingDependence)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
@@ -73,7 +74,7 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
 
     @overrides(AbstractTimingDependence.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(self):
-        return 4 + (2 * LOOKUP_TAU_SIZE)
+        return BYTES_PER_WORD + (2 * LOOKUP_TAU_SIZE)
 
     @property
     def n_weight_terms(self):

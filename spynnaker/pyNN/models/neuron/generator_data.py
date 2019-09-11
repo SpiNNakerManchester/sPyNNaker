@@ -16,6 +16,7 @@
 import decimal
 import numpy
 from data_specification.enums.data_type import DataType
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
 
 class GeneratorData(object):
@@ -38,7 +39,7 @@ class GeneratorData(object):
         "__synapse_information",
         "__synaptic_matrix_offset"]
 
-    BASE_SIZE = 17 * 4
+    BASE_SIZE = 17 * BYTES_PER_WORD
 
     def __init__(
             self, synaptic_matrix_offset, delayed_synaptic_matrix_offset,

@@ -17,6 +17,7 @@ import collections
 import numpy as np
 from six import itervalues
 from data_specification.enums.data_type import DataType
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.models.neural_projections import ProjectionMachineEdge
 from .abstract_synapse_dynamics_structural import (
@@ -662,7 +663,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         total_words_written += post_to_pre_table.size
 
         self.actual_sdram_usage[
-            machine_vertex] = 4 * 27 + 4 * total_words_written
+            machine_vertex] = BYTES_PER_WORD * (27 + total_words_written)
 
     def get_extra_sdram_usage_in_bytes(self, machine_in_edges):
         """ Better approximation of SDRAM usage based on incoming machine edges
@@ -677,7 +678,8 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
             for synapse_info in edge._synapse_information:
                 if synapse_info.synapse_dynamics is self.__weight_dynamics:
                     relevant_edges.append(edge)
-        return int(self.__fudge_factor * 4 * 12 * len(relevant_edges))
+        return int(
+            self.__fudge_factor * BYTES_PER_WORD * 12 * len(relevant_edges))
 
     def get_parameters_sdram_usage_in_bytes(self, n_neurons, n_synapse_types,
                                             in_edges):
@@ -693,19 +695,21 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         :return: SDRAM usage
         :rtype: int
         """
-        structure_size = 27 * 4 + 4 * 4  # parameters + rng seed
-        post_to_pre_table_size = n_neurons * self.__s_max * 4
+        structure_size = (27 + 4) * BYTES_PER_WORD  # parameters + rng seed
+        post_to_pre_table_size = n_neurons * self.__s_max * BYTES_PER_WORD
         structure_size += post_to_pre_table_size
 
         initial_size = 0
         total_size = structure_size + initial_size
 
         # Approximation of the sizes of both probability vs distance tables
-        ff_lut = np.count_nonzero(self.__ff_distance_probabilities) * 4
-        lat_lut = np.count_nonzero(self.__lat_distance_probabilities) * 4
+        ff_lut = np.count_nonzero(
+            self.__ff_distance_probabilities) * BYTES_PER_WORD
+        lat_lut = np.count_nonzero(
+            self.__lat_distance_probabilities) * BYTES_PER_WORD
         total_size += ff_lut
         total_size += lat_lut
-        # total_size += (80 * 4)
+        # total_size += (80 * BYTES_PER_WORD)
         pop_size = 0
 
         # approximate the size of the pop -> subpop table
@@ -733,8 +737,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
 
         return int(self.__fudge_factor * (total_size + pop_size))  # bytes
 
-    def synaptic_data_update(self, connections,
-                             post_vertex_slice,
+    def synaptic_data_update(self, connections, post_vertex_slice,
                              app_edge, machine_edge):
         """ Get static synaptic data
         """

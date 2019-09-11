@@ -15,6 +15,7 @@
 
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from .abstract_has_a_plus_a_minus import AbstractHasAPlusAMinus
 from .abstract_weight_dependence import AbstractWeightDependence
 
@@ -59,7 +60,7 @@ class WeightDependenceAdditive(
         if n_weight_terms != 1:
             raise NotImplementedError(
                 "Additive weight dependence only supports one term")
-        return (4 * 4) * n_synapse_types
+        return (4 * BYTES_PER_WORD) * n_synapse_types
 
     @overrides(AbstractWeightDependence.write_parameters)
     def write_parameters(

@@ -37,7 +37,7 @@ from spinn_front_end_common.interface.buffer_management import (
 from spinn_front_end_common.utilities import (
     helpful_functions, globals_variables)
 from spinn_front_end_common.utilities.constants import (
-    SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES)
+    SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES, BYTES_PER_WORD)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.interface.profiling import profile_utils
@@ -64,7 +64,7 @@ PARAMS_BASE_WORDS = 15
 # isi_val, time_to_spike
 PARAMS_WORDS_PER_NEURON = 7
 
-START_OF_POISSON_GENERATOR_PARAMETERS = PARAMS_BASE_WORDS * 4
+START_OF_POISSON_GENERATOR_PARAMETERS = PARAMS_BASE_WORDS * BYTES_PER_WORD
 MICROSECONDS_PER_SECOND = 1000000.0
 MICROSECONDS_PER_MILLISECOND = 1000.0
 SLOW_RATE_PER_TICK_CUTOFF = 0.01  # as suggested by MH (between Exp and Knuth)
@@ -296,8 +296,8 @@ class SpikeSourcePoissonVertex(
 
         :param vertex_slice:
         """
-        return (PARAMS_BASE_WORDS +
-                (vertex_slice.n_atoms * PARAMS_WORDS_PER_NEURON)) * 4
+        return BYTES_PER_WORD * (PARAMS_BASE_WORDS +
+                (vertex_slice.n_atoms * PARAMS_WORDS_PER_NEURON))
 
     def reserve_memory_regions(self, spec, placement, graph_mapper):
         """ Reserve memory regions for poisson source parameters and output\
