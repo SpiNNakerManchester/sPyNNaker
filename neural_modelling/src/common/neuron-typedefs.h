@@ -114,8 +114,9 @@ typedef struct timed_state_t {
 //! \brief storage for doubles in recording
 typedef struct double_timed_state_t {
     uint32_t time;
+    uint32_t padding;
     double states[];
-} double_timed_state_t;
+} double_timed_state_t __attribute__((packed));
 
 //! \brief storage for floats in recording
 typedef struct float_timed_state_t {

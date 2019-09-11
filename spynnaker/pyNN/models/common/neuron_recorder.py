@@ -34,7 +34,6 @@ import math
 import numpy
 from six import raise_from, iteritems
 from six.moves import range, xrange
-from spinn_utilities.index_is_value import IndexIsValue
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.resources.variable_sdram import VariableSDRAM
 from data_specification.enums import DataType
@@ -106,6 +105,10 @@ class NeuronRecorder(object):
                ("FLOAT_64", 2),
                ("FLOAT_32", 3)])
 
+    PADDING_SIZES = {DATA_TYPE.INT32: 0,
+                     DataType.FLOAT_32: 0,
+                     DataType.FLOAT_64: 4}
+
     def __init__(
             self, allowed_variables, matrix_scalar_types,
             matrix_output_types, n_neurons):
@@ -155,9 +158,12 @@ class NeuronRecorder(object):
     def _convert_placement_matrix_data(
             self, row_data, n_rows, data_row_length, variable, n_neurons,
             needs_scaling):
-        data_byte = (
-            row_data[:, self.N_BYTES_FOR_TIMESTAMP:].reshape(
-                n_rows * data_row_length))
+
+        padding_size_in_bytes = (
+            self.PADDING_SIZES[self.__matrix_output_types[variable]])
+        surplus_bytes = self.N_BYTES_FOR_TIMESTAMP + padding_size_in_bytes
+        data_byte = (row_data[:, surplus_bytes:].reshape(
+            n_rows * data_row_length))
         placement_data = self.__matrix_output_types[
             variable].decode_array(data_byte).reshape(n_rows, n_neurons)
         if needs_scaling:
@@ -234,7 +240,9 @@ class NeuronRecorder(object):
         # There is one column for time and one for each neuron recording
         data_row_length = (
             n_neurons * self.__matrix_output_types[variable].size)
-        full_row_length = data_row_length + self.N_BYTES_FOR_TIMESTAMP
+        full_row_length = (
+            data_row_length + self.N_BYTES_FOR_TIMESTAMP +
+            self.PADDING_SIZES[self.__matrix_output_types[variable]])
 
         n_rows = record_length // full_row_length
         placement_data = None
