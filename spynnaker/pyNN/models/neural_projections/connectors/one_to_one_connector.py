@@ -79,11 +79,54 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
         # pylint: disable=too-many-arguments
-        max_lo_atom = max(
-            (pre_vertex_slice.lo_atom, post_vertex_slice.lo_atom))
-        min_hi_atom = min(
-            (pre_vertex_slice.hi_atom, post_vertex_slice.hi_atom))
+        print('onetoneconnector: create_synaptic_block')
+        if self._prepop_view:
+            # work out which atoms are on this slice
+            prepop = self.pre_population._indexes
+            view_lo = prepop[0]
+            view_hi = prepop[-1]
+            print('view ', view_lo, view_hi)
+            if ((view_lo > pre_vertex_slice.lo_atom) and
+                (view_lo < pre_vertex_slice.hi_atom)):
+                pre_lo = view_lo
+            else:
+                pre_lo = pre_vertex_slice.lo_atom
+            if ((view_hi > pre_vertex_slice.lo_atom) and
+                (view_hi < pre_vertex_slice.hi_atom)):
+                pre_hi = view_hi
+            else:
+                pre_hi = pre_vertex_slice.hi_atom
+        else:
+            pre_lo = pre_vertex_slice.lo_atom
+            pre_hi = pre_vertex_slice.hi_atom
+
+        if self._postpop_view:
+            # work out which atoms are on this slice
+            postpop = self.post_population._indexes
+            view_lo = postpop[0]
+            view_hi = postpop[-1]
+            if ((view_lo > post_vertex_slice.lo_atom) and
+                (view_lo < post_vertex_slice.hi_atom)):
+                post_lo = view_lo
+            else:
+                post_lo = post_vertex_slice.lo_atom
+            if ((view_hi > post_vertex_slice.lo_atom) and
+                (view_hi < post_vertex_slice.hi_atom)):
+                post_hi = view_hi
+            else:
+                post_hi = post_vertex_slice.hi_atom
+        else:
+            post_lo = post_vertex_slice.lo_atom
+            post_hi = post_vertex_slice.hi_atom
+
+        print('block limits: ', pre_lo, post_lo, pre_hi, post_hi)
+
+        max_lo_atom = max((pre_lo, post_lo))
+#             (pre_vertex_slice.lo_atom, post_vertex_slice.lo_atom))
+        min_hi_atom = min((pre_hi, post_hi))
+#             (pre_vertex_slice.hi_atom, post_vertex_slice.hi_atom))
         n_connections = max((0, (min_hi_atom - max_lo_atom) + 1))
+        print('double-check n_connections: ', n_connections)
         if n_connections <= 0:
             return numpy.zeros(0, dtype=self.NUMPY_SYNAPSES_DTYPE)
         connection_slice = slice(max_lo_atom, min_hi_atom + 1)
@@ -97,6 +140,7 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
             delays, n_connections, [connection_slice], pre_vertex_slice,
             post_vertex_slice)
         block["synapse_type"] = synapse_type
+        print('onetoone block: ', block)
         return block
 
     def __repr__(self):
