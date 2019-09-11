@@ -14,14 +14,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_utilities.overrides import overrides
-from spinnman.messages.eieio import EIEIOType
-from spinnman.messages.eieio.data_messages import EIEIODataMessage
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.connections import LiveEventConnection
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.constants import NOTIFY_PORT
-
-_MAX_RATES_PER_PACKET = 32
 
 
 class SpynnakerPoissonControlConnection(LiveEventConnection):
