@@ -48,10 +48,10 @@ typedef int16_t pre_trace_t;
 // Helper macros for looking up decays
 #define DECAY_LOOKUP_TAU_PLUS(time) \
     maths_lut_exponential_decay( \
-        time, TAU_PLUS_TIME_SHIFT, TAU_PLUS_SIZE, tau_plus_lookup)
+	        time, TAU_PLUS_TIME_SHIFT, TAU_PLUS_SIZE, tau_plus_lookup)
 #define DECAY_LOOKUP_TAU_MINUS(time) \
     maths_lut_exponential_decay( \
-        time, TAU_MINUS_TIME_SHIFT, TAU_MINUS_SIZE, tau_minus_lookup)
+            time, TAU_MINUS_TIME_SHIFT, TAU_MINUS_SIZE, tau_minus_lookup)
 
 //---------------------------------------
 // Externals
@@ -62,14 +62,13 @@ extern int16_t tau_minus_lookup[TAU_MINUS_SIZE];
 //---------------------------------------
 // Timing dependence inline functions
 //---------------------------------------
-static inline post_trace_t timing_get_initial_post_trace() {
+static inline post_trace_t timing_get_initial_post_trace(void) {
     return 0;
 }
 
 //---------------------------------------
 static inline post_trace_t timing_add_post_spike(
         uint32_t time, uint32_t last_time, post_trace_t last_trace) {
-
     // Get time since last spike
     uint32_t delta_time = time - last_time;
 
@@ -91,7 +90,6 @@ static inline post_trace_t timing_add_post_spike(
 //---------------------------------------
 static inline pre_trace_t timing_add_pre_spike(
         uint32_t time, uint32_t last_time, pre_trace_t last_trace) {
-
     // Get time since last spike
     uint32_t delta_time = time - last_time;
 
@@ -122,10 +120,10 @@ static inline update_state_t timing_apply_pre_spike(
     uint32_t time_since_last_post = time - last_post_time;
     if (time_since_last_post > 0) {
         int32_t decayed_o1 = STDP_FIXED_MUL_16X16(
-            last_post_trace, DECAY_LOOKUP_TAU_MINUS(time_since_last_post));
+                last_post_trace, DECAY_LOOKUP_TAU_MINUS(time_since_last_post));
 
         log_debug("\t\t\ttime_since_last_post_event=%u, decayed_o1=%d\n",
-                  time_since_last_post, decayed_o1);
+                time_since_last_post, decayed_o1);
 
         // Apply depression to state (which is a weight_state)
         return weight_one_term_apply_depression(previous_state, decayed_o1);
@@ -147,10 +145,10 @@ static inline update_state_t timing_apply_post_spike(
     uint32_t time_since_last_pre = time - last_pre_time;
     if (time_since_last_pre > 0) {
         int32_t decayed_r1 = STDP_FIXED_MUL_16X16(
-            last_pre_trace, DECAY_LOOKUP_TAU_PLUS(time_since_last_pre));
+                last_pre_trace, DECAY_LOOKUP_TAU_PLUS(time_since_last_pre));
 
         log_debug("\t\t\ttime_since_last_pre_event=%u, decayed_r1=%d\n",
-                  time_since_last_pre, decayed_r1);
+                time_since_last_pre, decayed_r1);
 
         // Apply potentiation to state (which is a weight_state)
         return weight_one_term_apply_potentiation(previous_state, decayed_r1);

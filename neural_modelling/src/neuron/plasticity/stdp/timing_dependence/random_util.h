@@ -16,8 +16,7 @@
  */
 
 // Utility function
-static inline int32_t mars_kiss_fixed_point() {
-
+static inline int32_t mars_kiss_fixed_point(void) {
     // **YUCK** copy and pasted rng to allow inlining and also to avoid
     // horrific executable bloat
 
