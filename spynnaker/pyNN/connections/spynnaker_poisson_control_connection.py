@@ -99,10 +99,7 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
         :param neuron_id: The neuron ID to set the rate of
         :param rate: The rate to set in Hz
         """
-        control_label = label
-        if not control_label.endswith(self.__control_label_extension):
-            control_label = self._control_label(label)
-        self.__set_rates(label, control_label, [(neuron_id, rate)])
+        self.set_rates(label, [(neuron_id, rate)])
 
     def set_rates(self, label, neuron_id_rates):
         """ Set the rates of multiple Poisson neurons within a Poisson source
@@ -113,21 +110,7 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
         control_label = label
         if not control_label.endswith(self.__control_label_extension):
             control_label = self._control_label(label)
-        self.__set_rates(label, control_label, neuron_id_rates)
-
-    @staticmethod
-    def __chunks(l, n):
-        """Yield successive n-sized chunks from l."""
-        # From top answer to https://stackoverflow.com/q/312443/301832
-        for i in range(0, len(l), n):
-            yield l[i:i + n]
-
-    def __set_rates(self, label, control_label, neuron_id_rates):
-        id_to_key_map = self._atom_id_to_key[control_label]
         datatype = DataType.S1615
-        for chunk in self.__chunks(neuron_id_rates, _MAX_RATES_PER_PACKET):
-            message = EIEIODataMessage.create(EIEIOType.KEY_PAYLOAD_32_BIT)
-            for neuron_id, rate in chunk:
-                message.add_key_and_payload(
-                    id_to_key_map[neuron_id], datatype.encode(rate))
-            self.send_eieio_message(message, label)
+        atom_ids_and_payloads = [(nid, datatype.encode_as_int(rate))
+                                 for nid, rate in neuron_id_rates]
+        self.send_events_with_payloads(label, atom_ids_and_payloads)
