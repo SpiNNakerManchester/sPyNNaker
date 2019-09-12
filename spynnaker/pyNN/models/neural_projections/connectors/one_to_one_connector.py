@@ -80,44 +80,9 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
             synapse_type):
         # pylint: disable=too-many-arguments
         print('onetoneconnector: create_synaptic_block')
-        if self._prepop_view:
-            # work out which atoms are on this slice
-            prepop = self.pre_population._indexes
-            view_lo = prepop[0]
-            view_hi = prepop[-1]
-            print('view ', view_lo, view_hi)
-            if ((view_lo > pre_vertex_slice.lo_atom) and
-                (view_lo < pre_vertex_slice.hi_atom)):
-                pre_lo = view_lo
-            else:
-                pre_lo = pre_vertex_slice.lo_atom
-            if ((view_hi > pre_vertex_slice.lo_atom) and
-                (view_hi < pre_vertex_slice.hi_atom)):
-                pre_hi = view_hi
-            else:
-                pre_hi = pre_vertex_slice.hi_atom
-        else:
-            pre_lo = pre_vertex_slice.lo_atom
-            pre_hi = pre_vertex_slice.hi_atom
 
-        if self._postpop_view:
-            # work out which atoms are on this slice
-            postpop = self.post_population._indexes
-            view_lo = postpop[0]
-            view_hi = postpop[-1]
-            if ((view_lo > post_vertex_slice.lo_atom) and
-                (view_lo < post_vertex_slice.hi_atom)):
-                post_lo = view_lo
-            else:
-                post_lo = post_vertex_slice.lo_atom
-            if ((view_hi > post_vertex_slice.lo_atom) and
-                (view_hi < post_vertex_slice.hi_atom)):
-                post_hi = view_hi
-            else:
-                post_hi = post_vertex_slice.hi_atom
-        else:
-            post_lo = post_vertex_slice.lo_atom
-            post_hi = post_vertex_slice.hi_atom
+        pre_lo, post_lo, pre_hi, post_hi = self._get_pre_post_limits(
+            pre_vertex_slice, post_vertex_slice)
 
         print('block limits: ', pre_lo, post_lo, pre_hi, post_hi)
 
@@ -146,7 +111,84 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
     def __repr__(self):
         return "OneToOneConnector()"
 
+    def _get_pre_post_limits(
+            self, pre_vertex_slice, post_vertex_slice):
+        if self._prepop_view:
+            # work out which atoms are on this slice
+            view_lo, view_hi = self._get_view_lo_hi(
+                self.pre_population._indexes)
+            print('view ', view_lo, view_hi)
+            if ((view_lo > pre_vertex_slice.lo_atom) and
+                (view_lo < pre_vertex_slice.hi_atom)):
+                pre_lo = view_lo
+            else:
+                pre_lo = pre_vertex_slice.lo_atom
+            if ((view_hi > pre_vertex_slice.lo_atom) and
+                (view_hi < pre_vertex_slice.hi_atom)):
+                pre_hi = view_hi
+            else:
+                pre_hi = pre_vertex_slice.hi_atom
+        else:
+            pre_lo = pre_vertex_slice.lo_atom
+            pre_hi = pre_vertex_slice.hi_atom
+
+        if self._postpop_view:
+            # work out which atoms are on this slice
+            view_lo, view_hi = self._get_view_lo_hi(
+                self.post_population._indexes)
+            if ((view_lo > post_vertex_slice.lo_atom) and
+                (view_lo < post_vertex_slice.hi_atom)):
+                post_lo = view_lo
+            else:
+                post_lo = post_vertex_slice.lo_atom
+            if ((view_hi > post_vertex_slice.lo_atom) and
+                (view_hi < post_vertex_slice.hi_atom)):
+                post_hi = view_hi
+            else:
+                post_hi = post_vertex_slice.hi_atom
+        else:
+            post_lo = post_vertex_slice.lo_atom
+            post_hi = post_vertex_slice.hi_atom
+
+        return pre_lo, post_lo, pre_hi, post_hi
+
+    def _get_view_lo_hi(self, indexes):
+        view_lo = indexes[0]
+        view_hi = indexes[-1]
+        return view_lo, view_hi
+
     @property
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_id)
     def gen_connector_id(self):
         return ConnectorIDs.ONE_TO_ONE_CONNECTOR.value
+
+    @overrides(AbstractGenerateConnectorOnMachine.
+               gen_connector_params)
+    def gen_connector_params(
+            self, pre_slices, pre_slice_index, post_slices,
+            post_slice_index, pre_vertex_slice, post_vertex_slice,
+            synapse_type):
+        params = []
+        pre_view_lo = 0
+        pre_view_hi = self._n_pre_neurons - 1 # not sure about -1
+        if self._prepop_view:
+            pre_view_lo, pre_view_hi = self._get_view_lo_hi(
+                self.pre_population._indexes)
+
+        params.extend([pre_view_lo, pre_view_hi])
+
+        post_view_lo = 0
+        post_view_hi = self._n_post_neurons - 1 # not sure about -1
+        if self._postpop_view:
+            post_view_lo, post_view_hi = self._get_view_lo_hi(
+                self.post_population._indexes)
+
+        params.extend([post_view_lo, post_view_hi])
+
+        return numpy.array(params, dtype="uint32")
+
+    @property
+    @overrides(AbstractGenerateConnectorOnMachine.
+               gen_connector_params_size_in_bytes)
+    def gen_connector_params_size_in_bytes(self):
+        return 16
