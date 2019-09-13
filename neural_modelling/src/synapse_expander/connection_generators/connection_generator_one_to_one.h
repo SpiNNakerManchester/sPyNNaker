@@ -26,6 +26,9 @@ static initialize_func connection_generator_one_to_one_initialise;
 static free_func connection_generator_one_to_one_free;
 static generate_connection_func connection_generator_one_to_one_generate;
 
+// Global counter for post-neurons
+uint32_t count_post;
+
 /**
  *! \brief The parameters to be passed around for this connector
  */
@@ -44,9 +47,13 @@ static void *connection_generator_one_to_one_initialise(address_t *region) {
     *params = *params_sdram++;
     *region = (void *) params_sdram;
 
-    log_debug("One to one connector, pre_lo = %u, pre_hi = %u"
-    		"post_lo = %u, post_hi = %u",
-            params->pre_lo, params->pre_hi, params->post_lo, params->post_hi);
+    count_post = 0;
+
+//    log_debug("One to one connector, pre_lo = %u, pre_hi = %u"
+    log_info("One to one connector, pre_lo = %u, pre_hi = %u, "
+    		"post_lo = %u, post_hi = %u, count_post = %u",
+            params->pre_lo, params->pre_hi, params->post_lo, params->post_hi,
+			count_post);
 
     return params;
 //    use(region);
@@ -66,25 +73,39 @@ static uint32_t connection_generator_one_to_one_generate(
     use(pre_slice_count);
 
     struct one_to_one *obj = data;
+    log_info("pre_neuron_index %u count_post %u",
+    		pre_neuron_index, count_post);
 
     // If no space, generate nothing
     if (max_row_length < 1) {
         return 0;
     }
 
-    // If out of range, don't generate anything
-    if ((pre_neuron_index < post_slice_start) ||
-            (pre_neuron_index >= post_slice_start + post_slice_count)) {
-        return 0;
-    }
+//    // If out of range, don't generate anything
+//    if ((pre_neuron_index < post_slice_start) ||
+//            (pre_neuron_index >= post_slice_start + post_slice_count)) {
+//        return 0;
+//    }
 
-    // If not in the population view range, then don't generate
+    // If not in the pre-population view range, then don't generate
     if ((pre_neuron_index < obj->pre_lo) ||
     		(pre_neuron_index > obj->pre_hi)) {
     	return 0;
     }
 
+    // If out of range of the post-population then don't generate
+    if ((obj->post_lo + count_post < post_slice_start) ||
+    		(obj->post_lo + count_post >= post_slice_start + post_slice_count)) {
+    	count_post++;
+    	return 0;
+    }
+
+//    count_post++;
+
     // Pre-index = (core-relative) post-index
-    indices[0] = pre_neuron_index - post_slice_start;
+    log_info("pre_neuron_index %u post_lo %u count_post %u",
+    		pre_neuron_index, obj->post_lo, count_post);
+    indices[0] = obj->post_lo + count_post - post_slice_start;
+    count_post++;
     return 1;
 }

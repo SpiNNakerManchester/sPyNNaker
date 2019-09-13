@@ -158,6 +158,13 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
         return view_lo, view_hi
 
     @property
+    @overrides(AbstractConnector.use_direct_matrix)
+    def use_direct_matrix(self):
+        if self._prepop_view or self._postpop_view:
+            return False
+        return True
+
+    @property
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_id)
     def gen_connector_id(self):
         return ConnectorIDs.ONE_TO_ONE_CONNECTOR.value
@@ -184,6 +191,8 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
                 self.post_population._indexes)
 
         params.extend([post_view_lo, post_view_hi])
+
+        print('gen machine params ', params)
 
         return numpy.array(params, dtype="uint32")
 

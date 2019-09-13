@@ -880,9 +880,10 @@ class SynapticManager(object):
         """ Determine if the given connection can be done with a "direct"\
             synaptic matrix - this must have an exactly 1 entry per row
         """
+        print('connector: ', connector)
         return (
             app_edge.n_delay_stages == 0 and
-            isinstance(connector, OneToOneConnector) and
+            connector.use_direct_matrix and
             (single_addr + (pre_vertex_slice.n_atoms * 4) <=
                 self.__one_to_one_connection_dtcm_max_bytes) and
             (pre_vertex_slice.lo_atom == post_vertex_slice.lo_atom) and

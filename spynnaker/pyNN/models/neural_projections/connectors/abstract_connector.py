@@ -411,3 +411,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
     @property
     def post_population(self):
         return self.__post_population
+
+    @property
+    def use_direct_matrix(self):
+        return False
