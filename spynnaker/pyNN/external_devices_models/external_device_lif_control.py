@@ -17,7 +17,8 @@ import logging
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModelStandard
-from spynnaker.pyNN.models.defaults import default_initial_values
+from spynnaker.pyNN.models.defaults import default_initial_values,\
+    default_parameters
 from spynnaker.pyNN.models.neuron.input_types import InputTypeCurrent
 from spynnaker.pyNN.models.neuron.neuron_models import (
     NeuronModelLeakyIntegrateAndFire)
@@ -40,6 +41,9 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
         "_translator"]
 
     @default_initial_values({"v", "isyn_exc", "isyn_inh"})
+    @default_parameters({
+        "tau_m", "cm", "v_rest", "v_reset", "tau_syn_E", "tau_syn_I",
+        "tau_refrac", "i_offset"})
     def __init__(
             self, devices, create_edges, translator=None,
 
