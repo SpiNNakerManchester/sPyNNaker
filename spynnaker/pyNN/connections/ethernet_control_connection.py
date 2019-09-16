@@ -24,7 +24,7 @@ class EthernetControlConnection(LiveEventConnection):
     """ A connection that can translate Ethernet control messages received\
         from a Population
     """
-    __slots__ = ["__translator"]
+    __slots__ = ["__translators"]
 
     def __init__(
             self, translator, label, live_packet_gather_label, local_host=None,
@@ -37,12 +37,17 @@ class EthernetControlConnection(LiveEventConnection):
         super(EthernetControlConnection, self).__init__(
             live_packet_gather_label, receive_labels=[label],
             local_host=local_host, local_port=local_port)
-        self.__translator = translator
+        self.__translators = dict()
+        self.__translators[label] = translator
         self.add_receive_callback(label, self._translate, translate_key=False)
 
-    def _translate(self, _label, key, payload=None):
+    def add_translator(self, label, translator):
+        super(EthernetControlConnection, self).add_receive_label(label)
+        self.__translators[label] = translator
+
+    def _translate(self, label, key, payload=None):
+        translator = self.__translators[label]
         if payload is None:
-            self.__translator.translate_control_packet(MultiCastCommand(key))
+            translator.translate_control_packet(MultiCastCommand(key))
         else:
-            self.__translator.translate_control_packet(
-                MultiCastCommand(key, payload))
+            translator.translate_control_packet(MultiCastCommand(key, payload))
