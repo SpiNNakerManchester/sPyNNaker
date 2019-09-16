@@ -79,7 +79,8 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
             self._control_label(label), init_callback)
 
     @overrides(LiveEventConnection.add_receive_callback)
-    def add_receive_callback(self, label, live_event_callback):
+    def add_receive_callback(self, label, live_event_callback,
+                             translate_key=False):
         raise ConfigurationException(
             "SpynnakerPoissonControlPopulation can't receive data")
 

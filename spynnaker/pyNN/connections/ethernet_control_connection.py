@@ -15,8 +15,6 @@
 
 import logging
 from spinn_front_end_common.utility_models import MultiCastCommand
-from spinnman.messages.eieio.data_messages import (
-    EIEIODataMessage, KeyDataElement, KeyPayloadDataElement)
 from spinn_front_end_common.utilities.connections import LiveEventConnection
 
 logger = logging.getLogger(__name__)
@@ -40,16 +38,11 @@ class EthernetControlConnection(LiveEventConnection):
             live_packet_gather_label, receive_labels=[label],
             local_host=local_host, local_port=local_port)
         self.__translator = translator
+        self.add_receive_callback(label, self._translate, translate_key=False)
 
-    def _receive_packet_callback(self, packet):
-        if isinstance(packet, EIEIODataMessage):
-            while packet.is_next_element:
-                self._translate(packet.next_element)
-
-    def _translate(self, element):
-        if isinstance(element, KeyDataElement):
+    def _translate(self, _label, key, payload=None):
+        if payload is None:
+            self.__translator.translate_control_packet(MultiCastCommand(key))
+        else:
             self.__translator.translate_control_packet(
-                MultiCastCommand(element.key))
-        elif isinstance(element, KeyPayloadDataElement):
-            self.__translator.translate_control_packet(
-                MultiCastCommand(element.key, element.payload))
+                MultiCastCommand(key, payload))
