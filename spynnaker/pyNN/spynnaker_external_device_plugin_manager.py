@@ -69,7 +69,8 @@ class SpynnakerExternalDevicePluginManager(object):
             prefix_type=None, message_type=EIEIOType.KEY_32_BIT,
             right_shift=0, payload_as_time_stamps=True, notify=True,
             use_payload_prefix=True, payload_prefix=None,
-            payload_right_shift=0, number_of_packets_sent_per_time_step=0):
+            payload_right_shift=0, number_of_packets_sent_per_time_step=0,
+            label="LiveSpikeReceiver"):
         """ Output the spikes from a given population from SpiNNaker as they\
             occur in the simulation.
 
@@ -130,6 +131,8 @@ class SpynnakerExternalDevicePluginManager(object):
             Determines if the spike packet will contain a common prefix for\
             the spikes
         :type use_prefix: bool
+        :param label: The label of the gatherer vertex
+        :type label: str
         """
         # pylint: disable=too-many-arguments, too-many-locals, protected-access
         config = get_simulator().config
@@ -141,10 +144,11 @@ class SpynnakerExternalDevicePluginManager(object):
 
         # add new edge and vertex if required to SpiNNaker graph
         SpynnakerExternalDevicePluginManager.update_live_packet_gather_tracker(
-            population._vertex, port, host, tag, board_address, strip_sdp,
-            use_prefix, key_prefix, prefix_type, message_type, right_shift,
-            payload_as_time_stamps, use_payload_prefix, payload_prefix,
-            payload_right_shift, number_of_packets_sent_per_time_step,
+            population._vertex, port, host, label, tag, board_address,
+            strip_sdp, use_prefix, key_prefix, prefix_type, message_type,
+            right_shift, payload_as_time_stamps, use_payload_prefix,
+            payload_prefix, payload_right_shift,
+            number_of_packets_sent_per_time_step,
             partition_id=constants.SPIKE_PARTITION_ID)
 
         if notify:
@@ -189,7 +193,7 @@ class SpynnakerExternalDevicePluginManager(object):
 
     @staticmethod
     def update_live_packet_gather_tracker(
-            vertex_to_record_from, port, hostname, tag=None,
+            vertex_to_record_from, port, hostname, label, tag=None,
             board_address=None,
             strip_sdp=True, use_prefix=False, key_prefix=None,
             prefix_type=None, message_type=EIEIOType.KEY_32_BIT,
@@ -212,7 +216,7 @@ class SpynnakerExternalDevicePluginManager(object):
             payload_right_shift=payload_right_shift,
             number_of_packets_sent_per_time_step=(
                 number_of_packets_sent_per_time_step),
-            partition_id=partition_id)
+            partition_id=partition_id, label=label)
 
         # add to the tracker
         get_simulator().add_live_packet_gatherer_parameters(
