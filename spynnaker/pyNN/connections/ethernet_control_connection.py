@@ -44,6 +44,7 @@ class EthernetControlConnection(LiveEventConnection):
     def add_translator(self, label, translator):
         super(EthernetControlConnection, self).add_receive_label(label)
         self.__translators[label] = translator
+        self.add_receive_callback(label, self._translate, translate_key=False)
 
     def _translate(self, label, key, payload=None):
         translator = self.__translators[label]
