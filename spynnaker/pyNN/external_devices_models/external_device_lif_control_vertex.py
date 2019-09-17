@@ -78,6 +78,11 @@ class ExternalDeviceLifControlVertex(
             (str(dev.device_control_partition_id), dev.device_control_key)
             for dev in devices)
 
+        # Check for same partition name
+        if len(self.__partition_id_to_key) != len(devices):
+            raise Exception(
+                "Partition names for each device must be different")
+
         # Create a partition to atom map
         self.__partition_id_to_atom = {
             partition: i
