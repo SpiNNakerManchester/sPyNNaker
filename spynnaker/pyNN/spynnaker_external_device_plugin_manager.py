@@ -217,11 +217,11 @@ class SpynnakerExternalDevicePluginManager(object):
             payload_right_shift=payload_right_shift,
             number_of_packets_sent_per_time_step=(
                 number_of_packets_sent_per_time_step),
-            partition_ids=partition_ids, label=lpg_label)
+            label=lpg_label)
 
         # add to the tracker
         get_simulator().add_live_packet_gatherer_parameters(
-            params, vertex_to_record_from)
+            params, vertex_to_record_from, partition_ids)
 
     @staticmethod
     def add_poisson_live_rate_control(
