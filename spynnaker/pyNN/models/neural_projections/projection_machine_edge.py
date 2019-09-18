@@ -66,9 +66,11 @@ class ProjectionMachineEdge(
                     self.pre_vertex)
                 pre_lo = machine_slice.lo_atom
                 pre_hi = machine_slice.hi_atom
+                pre_slices = pre_app_vertex.get_out_going_slices()
             else:
                 pre_lo = graph_mapper.get_slice(self.pre_vertex).lo_atom
                 pre_hi = graph_mapper.get_slice(self.pre_vertex).hi_atom
+                pre_slices = graph_mapper.get_slices(pre_app_vertex)
 
             # process post atoms
             if isinstance(post_app_vertex, AbstractControlsDestinationOfEdges):
@@ -76,23 +78,21 @@ class ProjectionMachineEdge(
                     self.post_vertex)
                 post_lo = machine_slice.lo_atom
                 post_hi = machine_slice.hi_atom
+                post_slices = post_app_vertex.get_in_coming_slices()
             else:
                 post_lo = graph_mapper.get_slice(self.post_vertex).lo_atom
                 post_hi = graph_mapper.get_slice(self.post_vertex).hi_atom
+                post_slices = graph_mapper.get_slices(post_app_vertex)
 
             # handle the different connectors
             if isinstance(synapse_info.connector, OneToOneConnector):
                 if pre_hi < post_lo or pre_lo > post_hi:
                     n_filtered += 1
             elif isinstance(synapse_info.connector, FromListConnector):
-                pre_hi = graph_mapper.get_slice(self.pre_vertex).hi_atom
-                post_hi = graph_mapper.get_slice(self.post_vertex).hi_atom
                 pre_app_vertex = graph_mapper.get_application_vertex(
                     self.pre_vertex)
                 post_app_vertex = graph_mapper.get_application_vertex(
                     self.post_vertex)
-                pre_slices = graph_mapper.get_slices(pre_app_vertex)
-                post_slices = graph_mapper.get_slices(post_app_vertex)
                 # run through connection list and check for any connections
                 # between the pre and post vertices that could be filtered
                 n_connections = synapse_info.connector.get_n_connections(
@@ -100,7 +100,7 @@ class ProjectionMachineEdge(
                 if n_connections == 0:
                     n_filtered += 1
 
-        return (n_filtered == len(self.__synapse_information))
+        return n_filtered == len(self.__synapse_information)
 
     @overrides(AbstractWeightUpdatable.update_weight)
     def update_weight(self, graph_mapper):

@@ -255,6 +255,8 @@ class FromListConnector(AbstractConnector):
 
     def get_n_connections(self, pre_slices, post_slices, pre_hi, post_hi):
         self._split_connections(pre_slices, post_slices)
+        if (pre_hi, post_hi) not in self.__split_conn_list:
+            print ("aaaa")
         return len(self.__split_conn_list[(pre_hi, post_hi)])
 
     @conn_list.setter

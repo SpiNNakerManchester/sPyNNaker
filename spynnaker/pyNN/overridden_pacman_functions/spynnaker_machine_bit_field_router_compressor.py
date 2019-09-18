@@ -125,6 +125,7 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
                         core_subset.x, core_subset.y, processor_id)
                     app_vertex = graph_mapper.get_application_vertex(vertex)
                     if isinstance(app_vertex, AbstractAcceptsIncomingSynapses):
+
                         if app_vertex.gen_on_machine(
                                 graph_mapper.get_slice(vertex)):
                             new_cores.add_processor(
