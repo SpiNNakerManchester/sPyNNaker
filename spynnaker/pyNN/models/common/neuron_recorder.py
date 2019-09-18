@@ -97,7 +97,7 @@ class NeuronRecorder(object):
 
     MAX_RATE = 2 ** 32 - 1  # To allow a unit32_t to be used to store the rate
 
-    # enum for code to know what state to hold
+    # enum for code to know what state to hold for c code
     DATA_TYPE = Enum(
         value="DATA_TYPE",
         names=[("NOT_MATRIX", 0),
@@ -105,9 +105,10 @@ class NeuronRecorder(object):
                ("FLOAT_64", 2),
                ("FLOAT_32", 3)])
 
-    PADDING_SIZES = {DATA_TYPE.INT32: 0,
-                     DataType.FLOAT_32: 0,
-                     DataType.FLOAT_64: 4}
+    # struct padding for the recording timed state structs. size is in bytes
+    PADDING_SIZES = {DataType.INT32.value: 0,
+                     DataType.FLOAT_32.value: 0,
+                     DataType.FLOAT_64.value: 4}
 
     def __init__(
             self, allowed_variables, matrix_scalar_types,
@@ -160,7 +161,7 @@ class NeuronRecorder(object):
             needs_scaling):
 
         padding_size_in_bytes = (
-            self.PADDING_SIZES[self.__matrix_output_types[variable]])
+            self.PADDING_SIZES[self.__matrix_output_types[variable].value])
         surplus_bytes = self.N_BYTES_FOR_TIMESTAMP + padding_size_in_bytes
         data_byte = (row_data[:, surplus_bytes:].reshape(
             n_rows * data_row_length))
@@ -242,7 +243,7 @@ class NeuronRecorder(object):
             n_neurons * self.__matrix_output_types[variable].size)
         full_row_length = (
             data_row_length + self.N_BYTES_FOR_TIMESTAMP +
-            self.PADDING_SIZES[self.__matrix_output_types[variable]])
+            self.PADDING_SIZES[self.__matrix_output_types[variable].value])
 
         n_rows = record_length // full_row_length
         placement_data = None

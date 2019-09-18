@@ -113,8 +113,9 @@ void neuron_recording_wait_to_complete(void){
 //! \param[in] value: the data to store
 void neuron_recording_set_recorded_param(
         uint32_t recording_var_index, uint32_t neuron_index, state_t value){
-    uint32_t index = var_recording_indexes[recording_var_index][neuron_index];
-    var_recording_values[recording_var_index]->states[index] = value;
+    uint32_t index = var_recording_indexes[
+        recording_var_index + 1][neuron_index];
+    var_recording_values[recording_var_index + 1]->states[index] = value;
 }
 
 void neuron_recorder_print_var_recording_indexes(
@@ -122,7 +123,7 @@ void neuron_recorder_print_var_recording_indexes(
     for (uint32_t index_index = 0; index_index < n_neurons; index_index++){
         uint32_t index_value =
             (uint32_t) var_recording_indexes[region][index_index];
-        log_debug(
+        log_info(
             "index value for neuron %d is %d", index_index, index_value);
     }
 }
@@ -251,7 +252,7 @@ void _reset_record_counter(void) {
         // Reset as first pass we record no matter what the rate is
         out_spikes_reset();
     }
-    for (uint32_t i = 0; i < n_recorded_vars + 1; i++) {
+    for (uint32_t i = 1; i < n_recorded_vars + 1; i++) {
         if (var_recording_rate[i] == 0) {
             // Setting increment to zero means count will never equal rate
             var_recording_increment[i] = 0;
@@ -356,7 +357,6 @@ bool _neuron_recording_read_in_elements(address_t address, uint32_t n_neurons) {
         spin1_memcpy(
             var_recording_indexes[i], &address[next],
             n_neurons * sizeof(uint8_t));
-        log_debug("assss");
 
         for (uint32_t index_index = 0; index_index < n_neurons; index_index++){
             uint32_t index_value =
@@ -468,7 +468,7 @@ bool neuron_recording_initialise(
 
     var_recording_values =
         (timed_state_t **) spin1_malloc(
-            n_recorded_vars * sizeof(timed_state_t *));
+            n_recorded_vars + 1 * sizeof(timed_state_t *));
     if (var_recording_values == NULL) {
         log_error("Could not allocate space for var_recording_values");
         return false;
