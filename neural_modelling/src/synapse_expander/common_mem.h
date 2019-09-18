@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017-2019 The University of Manchester
+ * Copyright (c) 2019 The University of Manchester
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,19 +15,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _THRESHOLD_TYPE_STATIC_H_
-#define _THRESHOLD_TYPE_STATIC_H_
+#ifndef INCLUDED_COMMON_MEM_H
+#define INCLUDED_COMMON_MEM_H
 
-#include "threshold_type.h"
+#include <common-typedefs.h>
 
-typedef struct threshold_type_t {
-    // The value of the static threshold
-    REAL threshold_value;
-} threshold_type_t;
-
-static inline bool threshold_type_is_above_threshold(
-        state_t value, threshold_type_pointer_t threshold_type) {
-    return REAL_COMPARE(value, >=, threshold_type->threshold_value);
+/**
+ *! \brief A small and fast version of memcpy; pointers must be aligned and a
+ *! whole number of words must be being copied.
+ */
+static inline void fast_memcpy(
+        void *restrict to, const void *restrict from, uint32_t num_bytes) {
+    uint32_t *to_ptr = to;
+    const uint32_t *from_ptr = from;
+    while (num_bytes) {
+        *to_ptr++ = *from_ptr++;
+        num_bytes -= sizeof(uint32_t);
+    }
 }
 
-#endif // _THRESHOLD_TYPE_STATIC_H_
+#endif // INCLUDED_COMMON_MEM_H

@@ -17,9 +17,7 @@
 
 /*! \file
  *
- *  \brief This file contains the main functions for a poisson spike generator.
- *
- *
+ * \brief This file contains the main functions for a Poisson spike generator.
  */
 
 #include <common/maths-util.h>
@@ -38,12 +36,12 @@
 #include <profiler.h>
 
 // Declare spin1_wfi
-extern void spin1_wfi();
+extern void spin1_wfi(void);
 
 // Spin1 API ticks - to know when the timer wraps
 extern uint ticks;
 
-//! data structure for poisson sources
+//! data structure for Poisson sources
 typedef struct spike_source_t {
     uint32_t start_ticks;
     uint32_t end_ticks;
@@ -57,7 +55,7 @@ typedef struct spike_source_t {
 } spike_source_t;
 
 //! \brief data structure for recording spikes
-typedef struct timed_out_spikes{
+typedef struct timed_out_spikes {
     uint32_t time;
     uint32_t n_buffers;
     uint32_t out_spikes[];
@@ -76,64 +74,56 @@ typedef enum region {
 //! A scale factor to allow the use of integers for "inter-spike intervals"
 #define ISI_SCALE_FACTOR 1000
 
-typedef enum callback_priorities{
-    MULTICAST = -1, SDP = 0, TIMER = 2, DMA = 1
+typedef enum callback_priorities {
+    MULTICAST = -1,
+    SDP = 0,
+    DMA = 1,
+    TIMER = 2
 } callback_priorities;
 
 //! Parameters of the SpikeSourcePoisson
-struct global_parameters {
-
+typedef struct global_parameters {
     //! True if there is a key to transmit, False otherwise
     uint32_t has_key;
-
     //! The base key to send with (neuron ID to be added to it), or 0 if no key
     uint32_t key;
-
     //! The mask to work out the neuron ID when setting the rate
     uint32_t set_rate_neuron_id_mask;
-
     //! The offset of the timer ticks to desynchronize sources
     uint32_t timer_offset;
-
     //! The expected time to wait between spikes
     uint32_t time_between_spikes;
-
     //! The time between ticks in seconds for setting the rate
     UFRACT seconds_per_tick;
-
     //! The number of ticks per second for setting the rate
     uint32_t ticks_per_second;
-
     //! The border rate between slow and fast sources
     REAL slow_rate_per_tick_cutoff;
-
     //! The border rate between fast and faster sources
     REAL fast_rate_per_tick_cutoff;
-
     //! The ID of the first source relative to the population as a whole
     uint32_t first_source_id;
-
     //! The number of sources in this sub-population
     uint32_t n_spike_sources;
-
     //! The seed for the Poisson generation process
     mars_kiss64_seed_t spike_source_seed;
-};
+} global_parameters;
 
 //! The global_parameters for the sub-population
-static struct global_parameters global_parameters;
+static global_parameters params;
 
-//! global variable which contains all the data for neuron current rates
-static spike_source_t *poisson_parameters = NULL;
+typedef struct source_info {
+    uint32_t n_rates;
+    uint32_t index;
+    spike_source_t poissons[];
+} source_info;
 
-//! global variable which contains all the data for neuron future rates
-static spike_source_t **future_parameters = NULL;
+struct config {
+    global_parameters globals;
+    source_info source_info[];
+};
 
-//! global variable which indicates which parameters are next
-static uint32_t *next_parameters_index = NULL;
-
-//! global variable that indicates that a rate has been changed manually
-static bool *rate_changed = NULL;
+static source_info **sources;
 
 //! The expected current clock tick of timer_1
 static uint32_t expected_time;
@@ -169,23 +159,27 @@ static bool recording_in_progress = false;
 //! The timer period
 static uint32_t timer_period;
 
+static inline spike_source_t *get_source(uint32_t id) {
+    return &sources[id]->poissons[sources[id]->index];
+}
+
 //! \brief Set specific spikes for recording
 //! \param[in] n is the spike array index
 //! \return bit field at the location n
-static inline bit_field_t _out_spikes(uint32_t n) {
-    return &(spikes->out_spikes[n * n_spike_buffer_words]);
+static inline bit_field_t out_spikes_bitfield(uint32_t n) {
+    return &spikes->out_spikes[n * n_spike_buffer_words];
 }
 
 //! \brief Reset the spike buffer by clearing the bit field
 //! \return None
-static inline void _reset_spikes() {
+static inline void reset_spikes(void) {
     spikes->n_buffers = 0;
     for (uint32_t n = n_spike_buffers_allocated; n > 0; n--) {
-        clear_bit_field(_out_spikes(n - 1), n_spike_buffer_words);
+        clear_bit_field(out_spikes_bitfield(n - 1), n_spike_buffer_words);
     }
 }
 
-//! \brief deduces the time in timer ticks multiplied by ISI_SCALE_FACTOR
+//! \brief Determines the time in timer ticks multiplied by ISI_SCALE_FACTOR
 //!        until the next spike is to occur given the mean inter-spike interval
 //! \param[in] mean_inter_spike_interval_in_ticks The mean number of ticks
 //!            before a spike is expected to occur in a slow process.
@@ -196,7 +190,7 @@ static inline uint32_t slow_spike_source_get_time_to_spike(
     // Round (dist variate * ISI_SCALE_FACTOR), convert to uint32
     int nbits = 15;
     uint32_t value = (uint32_t) roundk(exponential_dist_variate(
-            mars_kiss64_seed, global_parameters.spike_source_seed) * ISI_SCALE_FACTOR, nbits);
+            mars_kiss64_seed, params.spike_source_seed) * ISI_SCALE_FACTOR, nbits);
     // Now multiply by the mean ISI
     uint32_t exp_variate = value * mean_inter_spike_interval_in_ticks;
     // Note that this will be compared to ISI_SCALE_FACTOR in the main loop!
@@ -215,11 +209,8 @@ static inline uint32_t fast_spike_source_get_num_spikes(
     if (bitsulr(exp_minus_lambda) == bitsulr(UFRACT_CONST(0.0))) {
         return 0;
     }
-    else {
-        return poisson_dist_variate_exp_minus_lambda(
-            mars_kiss64_seed,
-            global_parameters.spike_source_seed, exp_minus_lambda);
-    }
+    return poisson_dist_variate_exp_minus_lambda(
+            mars_kiss64_seed, params.spike_source_seed, exp_minus_lambda);
 }
 
 //! \brief Determines how many spikes to transmit this timer tick, for a faster source
@@ -230,33 +221,33 @@ static inline uint32_t fast_spike_source_get_num_spikes(
 //!         this timer tick
 static inline uint32_t faster_spike_source_get_num_spikes(
         REAL sqrt_lambda) {
-    // First we do x = (invgausscdf(U(0,1)) * 0.5) + sqrt(lambda)
-    REAL x = (gaussian_dist_variate(
-            mars_kiss64_seed,
-            global_parameters.spike_source_seed) * REAL_CONST(0.5)) + sqrt_lambda;
-    // Then we return int(roundk(x^2))
+    // First we do x = (inv_gauss_cdf(U(0, 1)) * 0.5) + sqrt(lambda)
+    REAL x = (gaussian_dist_variate(mars_kiss64_seed, params.spike_source_seed)
+            * REAL_CONST(0.5)) + sqrt_lambda;
+    // Then we return int(roundk(x * x))
     int nbits = 15;
     return (uint32_t) roundk(x * x, nbits);
 }
 
 void print_spike_source(index_t s) {
+    spike_source_t *p = get_source(s);
     log_info("atom %d", s);
-    log_info("scaled_start = %u", poisson_parameters[s].start_ticks);
-    log_info("scaled end = %u", poisson_parameters[s].end_ticks);
-    log_info("scaled next = %u", poisson_parameters[s].next_ticks);
-    log_info("is_fast_source = %d", poisson_parameters[s].is_fast_source);
-    log_info(
-        "exp_minus_lamda = %k",
-        (REAL)(poisson_parameters[s].exp_minus_lambda));
-    log_info("isi_val = %k", poisson_parameters[s].mean_isi_ticks);
-    log_info(
-        "time_to_spike = %k", poisson_parameters[s].time_to_spike_ticks);
+    log_info("scaled_start = %u", p->start_ticks);
+    log_info("scaled end = %u", p->end_ticks);
+    log_info("scaled next = %u", p->next_ticks);
+    log_info("is_fast_source = %d", p->is_fast_source);
+    log_info("exp_minus_lamda = %k", (REAL) p->exp_minus_lambda);
+    log_info("isi_val = %k", p->mean_isi_ticks);
+    log_info("time_to_spike = %k", p->time_to_spike_ticks);
 }
 
-void print_spike_sources(){
-    for (index_t s = 0; s < global_parameters.n_spike_sources; s++) {
+static void print_spike_sources(void) {
+#ifdef PRINT_SPIKE_SOURCES
+    for (index_t s = 0; s < params.n_spike_sources; s++) {
+        spike_source_t *p = &poisson_parameters[s];
         print_spike_source(s);
     }
+#endif
 }
 
 //! \brief entry method for reading the global parameters stored in Poisson
@@ -265,135 +256,83 @@ void print_spike_sources(){
 //!            Poisson parameter region starts.
 //! \return a boolean which is True if the parameters were read successfully or
 //!         False otherwise
-bool read_global_parameters(address_t address) {
-
+static bool read_global_parameters(struct config *config) {
     log_info("read global_parameters: starting");
 
-    spin1_memcpy(&global_parameters, address, sizeof(global_parameters));
+    spin1_memcpy(&params, &config->globals, sizeof(params));
 
-    log_info(
-        "\t key = %08x, set rate mask = %08x, timer offset = %u",
-        global_parameters.key, global_parameters.set_rate_neuron_id_mask,
-        global_parameters.timer_offset);
+    log_info("\tkey = %08x, set rate mask = %08x, timer offset = %u",
+            params.key, params.set_rate_neuron_id_mask, params.timer_offset);
+    log_info("\tseed = %u %u %u %u", params.spike_source_seed[0],
+            params.spike_source_seed[1],
+            params.spike_source_seed[2],
+            params.spike_source_seed[3]);
 
-    log_info("\t seed = %u %u %u %u", global_parameters.spike_source_seed[0],
-        global_parameters.spike_source_seed[1],
-        global_parameters.spike_source_seed[2],
-        global_parameters.spike_source_seed[3]);
+    validate_mars_kiss64_seed(params.spike_source_seed);
 
-    validate_mars_kiss64_seed(global_parameters.spike_source_seed);
-
-    log_info(
-        "\t spike sources = %u, starting at %u",
-        global_parameters.n_spike_sources, global_parameters.first_source_id);
-    log_info(
-        "seconds_per_tick = %k\n",
-        (REAL)(global_parameters.seconds_per_tick));
-    log_info("ticks_per_second = %u\n", global_parameters.ticks_per_second);
-    log_info(
-        "slow_rate_per_tick_cutoff = %k\n",
-        global_parameters.slow_rate_per_tick_cutoff);
-    log_info(
-        "fast_rate_per_tick_cutoff = %k\n",
-        global_parameters.fast_rate_per_tick_cutoff);
+    log_info("\tspike sources = %u, starting at %u",
+            params.n_spike_sources, params.first_source_id);
+    log_info("seconds_per_tick = %k\n", (REAL) params.seconds_per_tick);
+    log_info("ticks_per_second = %k\n", params.ticks_per_second);
+    log_info("slow_rate_per_tick_cutoff = %k\n",
+            params.slow_rate_per_tick_cutoff);
+    log_info("fast_rate_per_tick_cutoff = %k\n",
+            params.fast_rate_per_tick_cutoff);
 
     log_info("read_global_parameters: completed successfully");
     return true;
 }
 
-static void read_next_rates(uint32_t index) {
-    log_debug(
-        "Reading next data for source %d at time %d of %d bytes from 0x%08x",
-        index, time, sizeof(spike_source_t),
-        &future_parameters[index][next_parameters_index[index]]);
-    if (next_parameters_index[index] > 0 && rate_changed[index]) {
-        spin1_memcpy(
-            &future_parameters[index][next_parameters_index[index] - 1],
-            &poisson_parameters[index], sizeof(spike_source_t));
-    }
-    rate_changed[index] = false;
-    spin1_memcpy(&poisson_parameters[index],
-        &future_parameters[index][next_parameters_index[index]],
-        sizeof(spike_source_t));
-    next_parameters_index[index] += 1;
-    if (!poisson_parameters[index].is_fast_source) {
-        poisson_parameters[index].time_to_spike_ticks =
-            slow_spike_source_get_time_to_spike(
-                poisson_parameters[index].mean_isi_ticks);
+static inline void read_next_rates(uint32_t id) {
+    if (sources[id]->index < sources[id]->n_rates) {
+        sources[id]->index++;
     }
     // print_spike_source(index);
 }
 
 //! \brief method for reading the rates of the Poisson
-//! \param[in] address the absolute SDRAM memory address to which the
-//!            rate region starts.
+//! \param[in] config the configuration in SDRAM
 //! \return a boolean which is True if the rates were read successfully or
 //!         False otherwise
-static bool read_rates(address_t address) {
-    log_info("Reading rates from 0x%08x", address);
+static bool read_rates(struct config *config) {
 
     // Allocate DTCM for array of spike sources and copy block of data
-    if (global_parameters.n_spike_sources > 0) {
-
+    if (params.n_spike_sources > 0) {
         // the first time around, the array is set to NULL, afterwards,
         // assuming all goes well, there's an address here.
-        if (poisson_parameters == NULL){
-            poisson_parameters = (spike_source_t*) spin1_malloc(
-                global_parameters.n_spike_sources * sizeof(spike_source_t));
-        }
-
-        // if failed to allocate memory, report and fail.
-        if (poisson_parameters == NULL) {
-            log_error("Failed to allocate poisson_parameters");
-            return false;
-        }
-
-        if (next_parameters_index == NULL) {
-            next_parameters_index = (uint32_t *) spin1_malloc(
-                global_parameters.n_spike_sources * sizeof(uint32_t));
-            if (next_parameters_index == NULL) {
-                log_error("Failed to allocate next_parameters_index");
+        bool alloc = false;
+        if (sources == NULL) {
+            sources = spin1_malloc(params.n_spike_sources * sizeof(source_info *));
+            // if failed to alloc memory, report and fail.
+            if (sources == NULL) {
+                log_error("Failed to allocate sources");
                 return false;
             }
+            alloc = true;
         }
 
-        if (rate_changed == NULL) {
-            rate_changed = (bool *) spin1_malloc(
-                global_parameters.n_spike_sources * sizeof(bool));
-            if (rate_changed == NULL) {
-                log_error("Failed to allocate rate_changed");
-                return false;
+        // The array is not well-defined, so we have to use pointers here
+        source_info *source = &(config->source_info[0]);
+        for (uint32_t i = 0; i < params.n_spike_sources; i++) {
+            uint32_t n_bytes = sizeof(source_info) +
+                    (source->n_rates * sizeof(spike_source_t));
+            if (alloc) {
+                sources[i] = spin1_malloc(n_bytes);
+                if (sources[i] == NULL) {
+                    log_error("Failed to allocate source %d", source);
+                    return false;
+                }
             }
-        }
+            spin1_memcpy(sources[i], source, n_bytes);
 
-        if (future_parameters == NULL) {
-            future_parameters = (spike_source_t**) spin1_malloc(
-                global_parameters.n_spike_sources * sizeof(spike_source_t *));
-            if (future_parameters == NULL) {
-                log_error("Failed to allocate future_parameters");
-                return false;
-            }
-        }
-
-        // For each neuron read the number of entries and then store the
-        // pointer to the list of parameters
-        uint32_t pos = 0;
-        for (uint32_t i = 0; i < global_parameters.n_spike_sources; i++) {
-            uint32_t n_items = address[pos++];
-            log_info("%d Parameters for %d start at %d", n_items, i, pos);
-            future_parameters[i] = (spike_source_t *) &address[pos];
-            pos += (sizeof(spike_source_t) >> 2) * n_items;
-
-            // Skip over the rates until the current time step
-            rate_changed[i] = false;
-            next_parameters_index[i] = 0;
-            while (future_parameters[next_parameters_index[i]]->next_ticks
-                    < time) {
-                next_parameters_index[i] += 1;
+            // Skip forward until the time is correct
+            while (get_source(i)->next_ticks < time) {
+                sources[i]->index++;
             }
 
-            // Deal with the current rates
-            read_next_rates(i);
+            // Move to the next source
+            source = (source_info *) &(source->poissons[source->n_rates]);
+
         }
     }
     log_info("read_poisson_parameters: completed successfully");
@@ -402,12 +341,7 @@ static bool read_rates(address_t address) {
 
 //! \brief Initialises the recording parts of the model
 //! \return True if recording initialisation is successful, false otherwise
-static bool initialise_recording(){
-
-    // Get the address this core's DTCM data starts at from SRAM
-    data_specification_metadata_t *ds_regions =
-            data_specification_get_data_address();
-
+static bool initialise_recording(data_specification_metadata_t *ds_regions) {
     // Get the system region
     address_t recording_region = data_specification_get_region(
             SPIKE_HISTORY_REGION, ds_regions);
@@ -426,7 +360,7 @@ static bool initialise_recording(){
 //!             updates
 //! \return boolean of True if it successfully read all the regions and set up
 //!         all its internal data structures. Otherwise returns False
-static bool initialize() {
+static bool initialize(void) {
     log_info("Initialise: started");
 
     // Get the address this core's DTCM data starts at from SRAM
@@ -449,7 +383,7 @@ static bool initialize() {
             data_specification_get_region(PROVENANCE_REGION, ds_regions));
 
     // setup recording region
-    if (!initialise_recording()){
+    if (!initialise_recording(ds_regions)) {
         return false;
     }
 
@@ -465,17 +399,16 @@ static bool initialize() {
     }
 
     // print spike sources for debug purposes
-    // print_spike_sources();
+    print_spike_sources();
 
     // Set up recording buffer
     n_spike_buffers_allocated = 0;
-    n_spike_buffer_words = get_bit_field_size(
-        global_parameters.n_spike_sources);
+    n_spike_buffer_words = get_bit_field_size(params.n_spike_sources);
     spike_buffer_size = n_spike_buffer_words * sizeof(uint32_t);
 
     // Setup profiler
     profiler_init(
-        data_specification_get_region(PROFILER_REGION, ds_regions));
+            data_specification_get_region(PROFILER_REGION, ds_regions));
 
     log_info("Initialise: completed successfully");
 
@@ -484,7 +417,7 @@ static bool initialize() {
 
 //! \brief runs any functions needed at resume time.
 //! \return None
-void resume_callback() {
+static void resume_callback(void) {
     recording_reset();
 
     data_specification_metadata_t *ds_regions =
@@ -504,46 +437,47 @@ void resume_callback() {
     }
 
     // Loop through slow spike sources and initialise 1st time to spike
-    for (index_t s = 0; s < global_parameters.n_spike_sources; s++) {
-        if (!poisson_parameters[s].is_fast_source &&
-                poisson_parameters[s].time_to_spike_ticks == 0) {
-            poisson_parameters[s].time_to_spike_ticks =
-                slow_spike_source_get_time_to_spike(
-                    poisson_parameters[s].mean_isi_ticks);
+    for (index_t s = 0; s < params.n_spike_sources; s++) {
+        spike_source_t *p = get_source(s);
+        if (!p->is_fast_source && p->time_to_spike_ticks == 0) {
+            p->time_to_spike_ticks =
+                    slow_spike_source_get_time_to_spike(p->mean_isi_ticks);
         }
     }
 
     log_info("Successfully resumed Poisson spike source at time: %u", time);
 
     // print spike sources for debug purposes
-    // print_spike_sources();
+    print_spike_sources();
 }
 
 //! \brief stores the Poisson parameters back into SDRAM for reading by the
 //! host when needed
 //! \return None
-bool store_poisson_parameters() {
-    log_info("stored_parameters: starting");
+static bool store_poisson_parameters(void) {
+    log_info("store_parameters: starting");
 
     // Get the address this core's DTCM data starts at from SRAM
-    data_specification_metadata_t *ds_regions =
-            data_specification_get_data_address();
-    address_t params_store = data_specification_get_region(
-        POISSON_PARAMS, ds_regions);
+    struct config *config = data_specification_get_region(
+        POISSON_PARAMS, data_specification_get_data_address());
 
     // Copy the global_parameters back to SDRAM
-    spin1_memcpy(params_store, &global_parameters, sizeof(global_parameters));
+    spin1_memcpy(&config->globals, &params, sizeof(params));
 
     // store spike source parameters into array into SDRAM for reading by
     // the host
-    for (uint32_t i = 0; i < global_parameters.n_spike_sources; i++) {
-        if (next_parameters_index[i] > 0 && rate_changed[i]) {
-            spin1_memcpy(&future_parameters[next_parameters_index[i] - 1],
-                &poisson_parameters[i], sizeof(spike_source_t));
-        }
+    source_info *source = &(config->source_info[0]);
+    for (uint32_t i = 0; i < params.n_spike_sources; i++) {
+        uint32_t n_bytes = sizeof(source_info) +
+                (sources[i]->n_rates * sizeof(spike_source_t));
+        spin1_memcpy(source, sources[i], n_bytes);
+
+        // Move to the next SDRAM source
+        source = (source_info *) &(source->poissons[source->n_rates]);
+
     }
 
-    log_info("stored_parameters : completed successfully");
+    log_info("store_parameters: completed successfully");
     return true;
 }
 
@@ -551,14 +485,12 @@ bool store_poisson_parameters() {
 //! destination
 //! \param[in] spike_key: the key to transmit
 //! \return None
-void _send_spike(uint spike_key, uint timer_count) {
-
+static void send_spike(uint32_t spike_key, uint32_t timer_count) {
     // Wait until the expected time to send
     while ((ticks == timer_count) && (tc[T1_COUNT] > expected_time)) {
-
         // Do Nothing
     }
-    expected_time -= global_parameters.time_between_spikes;
+    expected_time -= params.time_between_spikes;
 
     // Send the spike
     log_debug("Sending spike packet %x at %d\n", spike_key, time);
@@ -567,50 +499,58 @@ void _send_spike(uint spike_key, uint timer_count) {
     }
 }
 
+//! \brief Expand the space for recording spikes.
+static inline void expand_spike_recording_buffer(uint32_t n_spikes) {
+    uint32_t new_size = 8 + (n_spikes * spike_buffer_size);
+    timed_out_spikes *new_spikes = spin1_malloc(new_size);
+    if (new_spikes == NULL) {
+        log_error("Cannot reallocate spike buffer");
+        rt_error(RTE_SWERR);
+    }
+
+    // bzero the new buffer
+    uint32_t *data = (uint32_t *) new_spikes;
+    for (uint32_t n = new_size >> 2; n > 0; n--) {
+        data[n - 1] = 0;
+    }
+
+    // Copy over old buffer if we have it
+    if (spikes != NULL) {
+        spin1_memcpy(new_spikes, spikes,
+                8 + n_spike_buffers_allocated * spike_buffer_size);
+        sark_free(spikes);
+    }
+
+    spikes = new_spikes;
+    n_spike_buffers_allocated = n_spikes;
+}
+
 //! \brief records spikes as needed
 //! \param[in] neuron_id: the neurons to store spikes from
 //! \param[in] n_spikes: the number of times this neuron has spiked
 //!
-static inline void _mark_spike(uint32_t neuron_id, uint32_t n_spikes) {
+static inline void mark_spike(uint32_t neuron_id, uint32_t n_spikes) {
     if (recording_flags > 0) {
         if (n_spike_buffers_allocated < n_spikes) {
-            uint32_t new_size = 8 + (n_spikes * spike_buffer_size);
-            timed_out_spikes *new_spikes = (timed_out_spikes *) spin1_malloc(
-                new_size);
-            if (new_spikes == NULL) {
-                log_error("Cannot reallocate spike buffer");
-                rt_error(RTE_SWERR);
-            }
-            uint32_t *data = (uint32_t *) new_spikes;
-            for (uint32_t n = new_size >> 2; n > 0; n--) {
-                data[n - 1] = 0;
-            }
-            if (spikes != NULL) {
-                uint32_t old_size =
-                    8 + (n_spike_buffers_allocated * spike_buffer_size);
-                spin1_memcpy(new_spikes, spikes, old_size);
-                sark_free(spikes);
-            }
-            spikes = new_spikes;
-            n_spike_buffers_allocated = n_spikes;
+            expand_spike_recording_buffer(n_spikes);
         }
         if (spikes->n_buffers < n_spikes) {
             spikes->n_buffers = n_spikes;
         }
         for (uint32_t n = n_spikes; n > 0; n--) {
-            bit_field_set(_out_spikes(n - 1), neuron_id);
+            bit_field_set(out_spikes_bitfield(n - 1), neuron_id);
         }
     }
 }
 
 //! \brief callback for completed recording
-void recording_complete_callback() {
+static void recording_complete_callback(void) {
     recording_in_progress = false;
 }
 
 //! \brief writing spikes to SDRAM
 //! \param[in] time: the time to which these spikes are being recorded
-static inline void _record_spikes(uint32_t time) {
+static inline void record_spikes(uint32_t time) {
     while (recording_in_progress) {
         spin1_wfi();
     }
@@ -618,9 +558,76 @@ static inline void _record_spikes(uint32_t time) {
         recording_in_progress = true;
         spikes->time = time;
         recording_record_and_notify(
-            0, spikes, 8 + (spikes->n_buffers * spike_buffer_size),
-            recording_complete_callback);
-        _reset_spikes();
+                0, spikes, 8 + (spikes->n_buffers * spike_buffer_size),
+                recording_complete_callback);
+        reset_spikes();
+    }
+}
+
+//! \brief Handle a fast spike source
+static void process_fast_source(
+        index_t s_id, spike_source_t *source, uint timer_count) {
+    if ((time >= source->start_ticks) && (time < source->end_ticks)) {
+        // Get number of spikes to send this tick
+        uint32_t num_spikes = 0;
+
+        // If sqrt_lambda has been set then use the Gaussian algorithm for faster sources
+        if (REAL_COMPARE(source->sqrt_lambda, >, REAL_CONST(0.0))) {
+            profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_PROB_FUNC);
+            num_spikes = faster_spike_source_get_num_spikes(source->sqrt_lambda);
+            profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_PROB_FUNC);
+        } else {
+            // Call the fast source Poisson algorithm
+            profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_PROB_FUNC);
+            num_spikes = fast_spike_source_get_num_spikes(source->exp_minus_lambda);
+            profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_PROB_FUNC);
+        }
+
+        log_debug("Generating %d spikes", num_spikes);
+
+        // If there are any
+        if (num_spikes > 0) {
+            // Write spike to out spikes
+            mark_spike(s_id, num_spikes);
+
+            // If no key has been given, do not send spikes to fabric
+            if (params.has_key) {
+                // Send spikes
+                const uint32_t spike_key = params.key | s_id;
+                for (uint32_t index = 0; index < num_spikes; index++) {
+                    send_spike(spike_key, timer_count);
+                }
+            }
+        }
+    }
+}
+
+//! \brief Handle a slow spike source
+static void process_slow_source(
+        index_t s_id, spike_source_t *source, uint timer_count) {
+    if ((time >= source->start_ticks) && (time < source->end_ticks)
+            && (source->mean_isi_ticks != 0)) {
+        // Mark a spike while the "timer" is below the scale factor value
+        while (source->time_to_spike_ticks < ISI_SCALE_FACTOR) {
+            // Write spike to out_spikes
+            mark_spike(s_id, 1);
+
+            // if no key has been given, do not send spike to fabric.
+            if (params.has_key) {
+                // Send package
+                send_spike(params.key | s_id, timer_count);
+            }
+
+            // Update time to spike (note, this might not get us back above
+            // the scale factor, particularly if the mean_isi is smaller)
+            profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_PROB_FUNC);
+            source->time_to_spike_ticks +=
+                    slow_spike_source_get_time_to_spike(source->mean_isi_ticks);
+            profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_PROB_FUNC);
+        }
+
+        // Now we have finished for this tick, subtract the scale factor
+        source->time_to_spike_ticks -= ISI_SCALE_FACTOR;
     }
 }
 
@@ -631,7 +638,7 @@ static inline void _record_spikes(uint32_t time) {
 //!            parameters, this parameter has no semantics currently and thus
 //!            is set to 0
 //! \return None
-void timer_callback(uint timer_count, uint unused) {
+static void timer_callback(uint timer_count, uint unused) {
     use(unused);
 
     profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
@@ -642,12 +649,11 @@ void timer_callback(uint timer_count, uint unused) {
 
     // If a fixed number of simulation ticks are specified and these have passed
     if (infinite_run != TRUE && time >= simulation_ticks) {
-
         // go into pause and resume state to avoid another tick
         simulation_handle_pause_resume(resume_callback);
 
         // rewrite poisson params to SDRAM for reading out if needed
-        if (!store_poisson_parameters()){
+        if (!store_poisson_parameters()) {
             log_error("Failed to write poisson parameters to SDRAM");
             rt_error(RTE_SWERR);
         }
@@ -664,7 +670,7 @@ void timer_callback(uint timer_count, uint unused) {
 
         // Subtract 1 from the time so this tick gets done again on the next
         // run
-        time -= 1;
+        time--;
         simulation_ready_to_read();
         return;
     }
@@ -673,86 +679,17 @@ void timer_callback(uint timer_count, uint unused) {
     expected_time = sv->cpu_clk * timer_period;
 
     // Loop through spike sources
-    for (index_t s = 0; s < global_parameters.n_spike_sources; s++) {
-
+    for (index_t s_id = 0; s_id < params.n_spike_sources; s_id++) {
         // If this spike source is active this tick
-        spike_source_t *spike_source = &poisson_parameters[s];
-
-        // Choose between fast or slow spike sources
+        spike_source_t *spike_source = get_source(s_id);
         if (spike_source->is_fast_source) {
-            if (time >= spike_source->start_ticks
-                    && time < spike_source->end_ticks) {
-
-                // Get number of spikes to send this tick
-                uint32_t num_spikes = 0;
-                // If sqrt_lambda has been set then use the Gaussian algorithm for faster sources
-                if (REAL_COMPARE(spike_source->sqrt_lambda, >, REAL_CONST(0.0))) {
-                    profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_PROB_FUNC);
-                    num_spikes = faster_spike_source_get_num_spikes(
-                            spike_source->sqrt_lambda);
-                    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_PROB_FUNC);
-                } else {
-                    // Call the fast source Poisson algorithm
-                    profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_PROB_FUNC);
-                    num_spikes = fast_spike_source_get_num_spikes(
-                            spike_source->exp_minus_lambda);
-                    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_PROB_FUNC);
-                }
-
-                log_debug("Generating %d spikes", num_spikes);
-
-                // If there are any
-                if (num_spikes > 0) {
-
-                    // Write spikes to out spikes
-                    _mark_spike(s, num_spikes);
-
-                    // If no key has been given, do not send spikes to fabric
-                    if (global_parameters.has_key) {
-
-                        // Send spikes
-                        const uint32_t spike_key = global_parameters.key | s;
-                        for (uint32_t index = 0; index < num_spikes; index++) {
-                            _send_spike(spike_key, timer_count);
-                        }
-                    }
-                }
-            }
+            process_fast_source(s_id, spike_source, timer_count);
         } else {
-            // Handle slow sources
-            if ((time >= spike_source->start_ticks)
-                    && (time < spike_source->end_ticks)
-                    && (spike_source->mean_isi_ticks != 0)) {
-
-                // Mark a spike while the "timer" is below the scale factor value
-                while (spike_source->time_to_spike_ticks < ISI_SCALE_FACTOR) {
-
-                    // Write spike to out_spikes
-                    _mark_spike(s, 1);
-
-                    // if no key has been given, do not send spike to fabric.
-                    if (global_parameters.has_key) {
-
-                        // Send package
-                        _send_spike(global_parameters.key | s, timer_count);
-                    }
-
-                    // Update time to spike (note, this might not get us back above
-                    // the scale factor, particularly if the mean_isi is smaller)
-                    profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_PROB_FUNC);
-                    spike_source->time_to_spike_ticks +=
-                        slow_spike_source_get_time_to_spike(
-                            spike_source->mean_isi_ticks);
-                    profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_PROB_FUNC);
-                }
-
-                // Now we have finished for this tick, subtract the scale factor
-                spike_source->time_to_spike_ticks -= ISI_SCALE_FACTOR;
-            }
+            process_slow_source(s_id, spike_source, timer_count);
         }
 
         if ((time + 1) >= spike_source->next_ticks) {
-            read_next_rates(s);
+            read_next_rates(s_id);
         }
     }
 
@@ -760,10 +697,9 @@ void timer_callback(uint timer_count, uint unused) {
 
     // Record output spikes if required
     if (recording_flags > 0) {
-        _record_spikes(time);
+        record_spikes(time);
         recording_do_timestep_update(time);
     }
-
 }
 
 //! \brief set the spike source rate as required
@@ -771,61 +707,48 @@ void timer_callback(uint timer_count, uint unused) {
 //! \param[in] rate, the REAL-valued rate in Hz, to be multiplied
 //!            to get per_tick values
 void set_spike_source_rate(uint32_t id, REAL rate) {
-    if ((id >= global_parameters.first_source_id) &&
-            ((id - global_parameters.first_source_id) <
-             global_parameters.n_spike_sources)) {
-        rate_changed[id] = true;
-        uint32_t sub_id = id - global_parameters.first_source_id;
-        REAL rate_per_tick = rate * global_parameters.seconds_per_tick;
-        log_debug("Setting rate of %u (%u) to %kHz (%k per tick)",
-                id, sub_id, rate, rate_per_tick);
-        if (rate_per_tick >= global_parameters.slow_rate_per_tick_cutoff) {
-            poisson_parameters[sub_id].is_fast_source = true;
-            if (rate_per_tick >= global_parameters.fast_rate_per_tick_cutoff) {
-                poisson_parameters[sub_id].sqrt_lambda =
-                        SQRT(rate_per_tick); // warning: sqrtk is untested...
-            } else {
-                poisson_parameters[sub_id].exp_minus_lambda =
-                        (UFRACT) EXP(-rate_per_tick);
-                poisson_parameters[sub_id].sqrt_lambda = REAL_CONST(0.0);
-            }
+    if ((id < params.first_source_id) ||
+            (id - params.first_source_id >= params.n_spike_sources)) {
+        return;
+    }
+
+    uint32_t sub_id = id - params.first_source_id;
+    REAL rate_per_tick = rate * params.seconds_per_tick;
+    log_debug("Setting rate of %u (%u) to %kHz (%k per tick)",
+            id, sub_id, rate, rate_per_tick);
+    spike_source_t *spike_source = get_source(sub_id);
+
+    if (rate_per_tick >= params.slow_rate_per_tick_cutoff) {
+        spike_source->is_fast_source = true;
+        if (rate_per_tick >= params.fast_rate_per_tick_cutoff) {
+            spike_source->sqrt_lambda = SQRT(rate_per_tick);
+            // warning: sqrtk is untested...
         } else {
-            poisson_parameters[sub_id].is_fast_source = false;
-            poisson_parameters[sub_id].mean_isi_ticks =
-                    (uint32_t) (REAL_CONST(1.0) / rate_per_tick);
-            poisson_parameters[sub_id].time_to_spike_ticks =
-                    slow_spike_source_get_time_to_spike(
-                        poisson_parameters[sub_id].mean_isi_ticks);
+            spike_source->exp_minus_lambda = (UFRACT) EXP(-rate_per_tick);
+            spike_source->sqrt_lambda = REAL_CONST(0.0);
         }
+    } else if (rate_per_tick == 0) {
+        spike_source->is_fast_source = false;
+        spike_source->mean_isi_ticks = 0;
+        spike_source->time_to_spike_ticks = 0;
+    } else {
+        spike_source->is_fast_source = false;
+        spike_source->mean_isi_ticks =
+                (uint32_t) (REAL_CONST(1.0) / rate_per_tick);
+        spike_source->time_to_spike_ticks =
+                slow_spike_source_get_time_to_spike(spike_source->mean_isi_ticks);
     }
-}
-
-// Is this function actually used any more?
-void sdp_packet_callback(uint mailbox, uint port) {
-    use(port);
-    sdp_msg_t *msg = (sdp_msg_t *) mailbox;
-    uint32_t *data = (uint32_t *) &(msg->cmd_rc);
-
-    uint32_t n_items = data[0];
-    data = &(data[1]);
-    for (uint32_t item = 0; item < n_items; item++) {
-        uint32_t id = data[(item * 2)];
-        REAL rate = kbits(data[(item * 2) + 1]);
-        set_spike_source_rate(id, rate);
-    }
-    spin1_msg_free(msg);
 }
 
 //! multicast callback used to set rate when injected in a live example
-void multicast_packet_callback(uint key, uint payload) {
-    uint32_t id = key & global_parameters.set_rate_neuron_id_mask;
+static void multicast_packet_callback(uint key, uint payload) {
+    uint32_t id = key & params.set_rate_neuron_id_mask;
     REAL rate = kbits(payload);
     set_spike_source_rate(id, rate);
 }
 
 //! The entry point for this model
 void c_main(void) {
-
     // Load DTCM data
     if (!initialize()) {
         log_error("Error in initialisation - exiting!");
@@ -836,13 +759,12 @@ void c_main(void) {
     time = UINT32_MAX;
 
     // Set timer tick (in microseconds)
-    spin1_set_timer_tick_and_phase(
-        timer_period, global_parameters.timer_offset);
+    spin1_set_timer_tick_and_phase(timer_period, params.timer_offset);
 
     // Register callback
     spin1_callback_on(TIMER_TICK, timer_callback, TIMER);
     spin1_callback_on(
-        MCPL_PACKET_RECEIVED, multicast_packet_callback, MULTICAST);
+            MCPL_PACKET_RECEIVED, multicast_packet_callback, MULTICAST);
 
     simulation_run();
 }

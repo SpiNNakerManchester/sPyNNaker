@@ -35,7 +35,7 @@ typedef struct global_neuron_params_t* global_neuron_params_pointer_t;
 //! \brief set the global neuron parameters
 //! \param[in] params The parameters to set
 void neuron_model_set_global_neuron_params(
-    global_neuron_params_pointer_t params);
+        global_neuron_params_pointer_t params);
 
 //! \brief primary function called in timer loop after synaptic updates
 //! \param[in] num_excitatory_inputs Number of excitatory receptor types.

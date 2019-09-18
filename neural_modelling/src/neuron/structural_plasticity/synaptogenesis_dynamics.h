@@ -22,7 +22,6 @@
  *
  *
  * Author: Petrut Bogdan
- *
  */
 #ifndef _SYNAPTOGENESIS_DYNAMICS_H_
 #define _SYNAPTOGENESIS_DYNAMICS_H_
@@ -35,7 +34,7 @@
 //! which contains synaptic rewiring params.
 //! \return address_t Address after the final word read from SDRAM.
 address_t synaptogenesis_dynamics_initialise(
-    address_t sdram_sp_address);
+        address_t sdram_sp_address);
 
 //! \brief Function called (usually on a timer from c_main) to
 //! trigger the process of synaptic rewiring
@@ -45,8 +44,7 @@ address_t synaptogenesis_dynamics_initialise(
 //! \param[out] n_bytes: variable to hold the size of the row
 //! \return True if a row is to be transferred, false otherwise
 bool synaptogenesis_dynamics_rewire(uint32_t time,
-    spike_t *spike, address_t *synaptic_row_address, uint32_t *n_bytes);
-
+        spike_t *spike, address_t *synaptic_row_address, uint32_t *n_bytes);
 
 //! \brief Formation and elimination are structurally agnostic, i.e. they don't
 //! care how synaptic rows are organised in physical memory.
@@ -82,11 +80,11 @@ bool synaptogenesis_row_restructure(uint32_t time, address_t row);
 //! retrieve the period of rewiring
 //! based on is_fast(), this can either mean how many times rewiring happens
 //! in a timestep, or how many timesteps have to pass until rewiring happens.
-int32_t synaptogenesis_rewiring_period();
+int32_t synaptogenesis_rewiring_period(void);
 
 //! controls whether rewiring is attempted multiple times per timestep
 //! or after a number of timesteps.
-bool synaptogenesis_is_fast();
+bool synaptogenesis_is_fast(void);
 
 //! Indicates that a spike has been received
 void synaptogenesis_spike_received(uint32_t time, spike_t spike);

@@ -27,6 +27,6 @@ typedef struct threshold_type_t* threshold_type_pointer_t;
 //! \param[in] value The value to determine if it is above the threshold
 //! \param[in] params The parameters to use to determine the result
 static bool threshold_type_is_above_threshold(
-    state_t value, threshold_type_pointer_t threshold_type);
+        state_t value, threshold_type_pointer_t threshold_type);
 
 #endif // _THRESHOLD_TYPE_H_

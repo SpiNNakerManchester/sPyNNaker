@@ -76,8 +76,7 @@ struct elimination_params **elimination_params;
 //! \param[in] sdram_sp_address Address of the start of the SDRAM region
 //! which contains synaptic rewiring params.
 //! \return address_t Address after the final word read from SDRAM.
-address_t synaptogenesis_dynamics_initialise(address_t sdram_sp_address)
-{
+address_t synaptogenesis_dynamics_initialise(address_t sdram_sp_address) {
     log_info("SR init.");
 
     uint8_t *data = (uint8_t *) sdram_sp_address;
@@ -139,20 +138,20 @@ bool synaptogenesis_dynamics_rewire(
 
     // Randomly choose a postsynaptic (application neuron)
     uint32_t post_id = ulrbits(mars_kiss64_seed(rewiring_data.shared_seed)) *
-        rewiring_data.app_no_atoms;
+            rewiring_data.app_no_atoms;
 
     // Check if neuron is in the current machine vertex
     if (post_id < rewiring_data.low_atom ||
-        post_id > rewiring_data.high_atom) {
+            post_id > rewiring_data.high_atom) {
         return false;
     }
     post_id -= rewiring_data.low_atom;
 
     // Select an arbitrary synaptic element for the neurons
-    uint row_offset = post_id * rewiring_data.s_max;
-    uint column_offset = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) *
-        rewiring_data.s_max;
-    uint total_offset = row_offset + column_offset;
+    uint32_t row_offset = post_id * rewiring_data.s_max;
+    uint32_t column_offset = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) *
+            rewiring_data.s_max;
+    uint32_t total_offset = row_offset + column_offset;
     post_to_pre_entry entry = post_to_pre_table[total_offset];
     uint32_t pre_app_pop = 0, pre_sub_pop = 0, neuron_id = 0;
     if (entry.neuron_index == 0xFFFF) {
@@ -202,17 +201,17 @@ bool synaptogenesis_row_restructure(uint32_t time, address_t row) {
 
     // find the offset of the neuron in the current row
     bool search_hit = synapse_dynamics_find_neuron(
-        current_state.post_syn_id, row,
-        &(current_state.weight), &(current_state.delay),
-        &(current_state.offset));
+            current_state.post_syn_id, row,
+            &(current_state.weight), &(current_state.delay),
+            &(current_state.offset));
 
     if (current_state.element_exists && search_hit) {
         return synaptogenesis_elimination_rule(&current_state,
             elimination_params[current_state.post_to_pre.pop_index], time, row);
     } else {
         // Can't form if the row is full
-        uint no_elems = synapse_dynamics_n_connections_in_row(
-            synapse_row_fixed_region(row));
+        uint32_t no_elems = synapse_dynamics_n_connections_in_row(
+                synapse_row_fixed_region(row));
         if (no_elems >= rewiring_data.s_max) {
             log_debug("row is full");
             return false;

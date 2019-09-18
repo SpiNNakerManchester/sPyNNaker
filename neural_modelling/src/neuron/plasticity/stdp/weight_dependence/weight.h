@@ -27,7 +27,6 @@
  *
  *  - weight_get_final(new_state):
  *
- *
  */
 
 #ifndef _WEIGHT_H_
@@ -46,8 +45,9 @@
  * \return address_t: returns the end of the weight region as an absolute
  * SDRAM memory address.
  */
-address_t weight_initialise(address_t address, uint32_t n_synapse_types,
-                            uint32_t *ring_buffer_to_input_buffer_left_shifts);
+address_t weight_initialise(
+        address_t address, uint32_t n_synapse_types,
+        uint32_t *ring_buffer_to_input_buffer_left_shifts);
 
 /*!
  * \brief

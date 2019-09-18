@@ -70,8 +70,9 @@ void synapse_dynamics_process_post_synaptic_event(
 }
 
 //---------------------------------------
-bool synapse_dynamics_process_plastic_synapses(address_t plastic_region_address,
-        address_t fixed_region_address, weight_t *ring_buffer, uint32_t time) {
+bool synapse_dynamics_process_plastic_synapses(
+        address_t plastic_region_address, address_t fixed_region_address,
+        weight_t *ring_buffer, uint32_t time) {
     use(plastic_region_address);
     use(fixed_region_address);
     use(ring_buffer);
@@ -82,8 +83,8 @@ bool synapse_dynamics_process_plastic_synapses(address_t plastic_region_address,
 }
 
 //---------------------------------------
-input_t synapse_dynamics_get_intrinsic_bias(uint32_t time,
-                                            index_t neuron_index) {
+input_t synapse_dynamics_get_intrinsic_bias(
+        uint32_t time, index_t neuron_index) {
     use(time);
     use(neuron_index);
     return REAL_CONST(0.0);
@@ -97,11 +98,11 @@ void synapse_dynamics_print_plastic_synapses(
     use(ring_buffer_to_input_left_shifts);
 }
 
-uint32_t synapse_dynamics_get_plastic_pre_synaptic_events() {
+uint32_t synapse_dynamics_get_plastic_pre_synaptic_events(void) {
     return 0;
 }
 
-uint32_t synapse_dynamics_get_plastic_saturation_count(){
+uint32_t synapse_dynamics_get_plastic_saturation_count(void) {
     return 0;
 }
 

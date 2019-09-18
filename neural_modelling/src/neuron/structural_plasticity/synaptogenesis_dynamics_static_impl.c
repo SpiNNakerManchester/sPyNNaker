@@ -26,7 +26,7 @@
 #include <debug.h>
 
 address_t synaptogenesis_dynamics_initialise(
-    address_t sdram_sp_address){
+    address_t sdram_sp_address) {
     use(sdram_sp_address);
     return sdram_sp_address;
 }
@@ -58,11 +58,11 @@ bool synaptogenesis_dynamics_elimination_rule(uint32_t time, address_t row) {
     return false;
 }
 
-int32_t synaptogenesis_rewiring_period() {
+int32_t synaptogenesis_rewiring_period(void) {
     return -1;
 }
 
-bool synaptogenesis_is_fast() {
+bool synaptogenesis_is_fast(void) {
     return false;
 }
 

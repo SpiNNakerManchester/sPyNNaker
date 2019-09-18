@@ -27,13 +27,7 @@
 /**
  *! \brief Connection generator "object"
  */
-typedef struct connection_generator* connection_generator_t;
-
-/**
- *! \brief Register any connection generators to be used in the remaining
- *!        functions
- */
-void register_connection_generators();
+typedef struct connection_generator *connection_generator_t;
 
 /**
  *! \brief Initialise a specific connection generator
@@ -44,7 +38,7 @@ void register_connection_generators();
  *!         functions, or NULL if it couldn't be initialised for any reason
  */
 connection_generator_t connection_generator_init(
-    uint32_t hash, address_t *region);
+        uint32_t hash, address_t *region);
 
 /**
  *! \brief Finish with a connection generator
@@ -72,7 +66,7 @@ void connection_generator_free(connection_generator_t generator);
  *! \return The number of connections generated
  */
 uint32_t connection_generator_generate(
-    connection_generator_t generator, uint32_t pre_slice_start,
-    uint32_t pre_slice_count, uint32_t pre_neuron_index,
-    uint32_t post_slice_start, uint32_t post_slice_count,
-    uint32_t max_row_length, uint16_t *indices);
+        connection_generator_t generator, uint32_t pre_slice_start,
+        uint32_t pre_slice_count, uint32_t pre_neuron_index,
+        uint32_t post_slice_start, uint32_t post_slice_count,
+        uint32_t max_row_length, uint16_t *indices);

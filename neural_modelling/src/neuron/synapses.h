@@ -27,11 +27,10 @@
 static inline index_t synapses_get_ring_buffer_index(
         uint32_t simuation_timestep, uint32_t synapse_type_index,
         uint32_t neuron_index, uint32_t synapse_type_index_bits,
-        uint32_t synapse_index_bits){
-    return (((simuation_timestep & SYNAPSE_DELAY_MASK)
-             << synapse_type_index_bits)
+        uint32_t synapse_index_bits) {
+    return ((simuation_timestep & SYNAPSE_DELAY_MASK) << synapse_type_index_bits)
             | (synapse_type_index << synapse_index_bits)
-            | neuron_index);
+            | neuron_index;
 }
 
 // Get the index of the ring buffer for a given timestep and combined
@@ -40,9 +39,8 @@ static inline index_t synapses_get_ring_buffer_index_combined(
         uint32_t simulation_timestep,
         uint32_t combined_synapse_neuron_index,
         uint32_t synapse_type_index_bits) {
-    return (((simulation_timestep & SYNAPSE_DELAY_MASK)
-             << synapse_type_index_bits)
-            | combined_synapse_neuron_index);
+    return ((simulation_timestep & SYNAPSE_DELAY_MASK) << synapse_type_index_bits)
+            | combined_synapse_neuron_index;
 }
 
 // Converts a weight stored in a synapse row to an input
@@ -61,18 +59,18 @@ static inline input_t synapses_convert_weight_to_input(
 static inline void synapses_print_weight(
         weight_t weight, uint32_t left_shift) {
     if (weight != 0) {
-        io_printf(IO_BUF, "%12.6k", synapses_convert_weight_to_input(
-            weight, left_shift));
+        io_printf(IO_BUF, "%12.6k",
+                synapses_convert_weight_to_input(weight, left_shift));
     } else {
         io_printf(IO_BUF, "      ");
     }
 }
 
 bool synapses_initialise(
-    address_t synapse_params_address, address_t direct_matrix_address,
-    uint32_t n_neurons, uint32_t n_synapse_types,
-    uint32_t **ring_buffer_to_input_buffer_left_shifts,
-    address_t *direct_synapses_address);
+        address_t synapse_params_address, address_t direct_matrix_address,
+        uint32_t n_neurons, uint32_t n_synapse_types,
+        uint32_t **ring_buffer_to_input_buffer_left_shifts,
+        address_t *direct_synapses_address);
 
 void synapses_do_timestep_update(timer_t time);
 
@@ -87,12 +85,12 @@ bool synapses_process_synaptic_row(
 //! \brief returns the number of times the synapses have saturated their
 //!        weights.
 //! \return the number of times the synapses have saturated.
-uint32_t synapses_get_saturation_count();
+uint32_t synapses_get_saturation_count(void);
 
 //! \brief returns the counters for plastic and fixed pre synaptic events based
 //!        on (if the model was compiled with SYNAPSE_BENCHMARK parameter) or
 //!        returns 0
 //! \return the counter for plastic and fixed pre synaptic events or 0
-uint32_t synapses_get_pre_synaptic_events();
+uint32_t synapses_get_pre_synaptic_events(void);
 
 #endif // _SYNAPSES_H_
