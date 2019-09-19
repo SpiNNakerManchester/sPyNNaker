@@ -20,12 +20,14 @@
 
 #include "neuron_model.h"
 
+#define SYNAPSES_PER_NEURON 250
+
 
 typedef struct eprop_syn_state_t {
+	uint16_t delta_w; // weight change to apply
 	uint16_t z_bar; // low-pass filtered spike train
 	uint32_t ep_a; // adaptive component of eligibility vector
 	uint32_t e_bar; // low-pass filtered eligibility trace
-	uint16_t delta_w; // weight change to apply
 }eprop_syn_state_t;
 
 /////////////////////////////////////////////////////////////
@@ -57,8 +59,11 @@ typedef struct neuron_t {
     // refractory time of neuron [timesteps]
     int32_t  T_refract;
 
+    // pseudo derivative
+    REAL     psi;
+
     // array of synaptic states - peak fan-in of 250 for this case
-    eprop_syn_state_t syn_state[250];
+    eprop_syn_state_t syn_state[SYNAPSES_PER_NEURON];
 
 } neuron_t;
 

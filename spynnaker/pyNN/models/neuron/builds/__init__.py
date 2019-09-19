@@ -27,6 +27,7 @@ from .if_cond_exp_stoc import IFCondExpStoc
 from .if_curr_delta import IFCurrDelta
 from .if_curr_exp_ca2_adaptive import IFCurrExpCa2Adaptive
 from .if_curr_exp_semd_base import IFCurrExpSEMDBase
+from .eprop_adaptive import EPropAdaptive
 
 __all__ = ["EIFConductanceAlphaPopulation", "HHCondExp", "IFCondAlpha",
            "IFCondExpBase", "IFCurrAlpha", "IFCurrDualExpBase",

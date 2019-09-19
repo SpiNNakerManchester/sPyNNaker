@@ -20,7 +20,7 @@
 
 #include "threshold_type.h"
 
-typedef struct threshold_type_t {
+typedef struct threshold_type_adaptive_t {
     // The value of the static threshold
     REAL threshold_value;
 } threshold_type_t;
@@ -30,4 +30,4 @@ static inline bool threshold_type_is_above_threshold(
     return REAL_COMPARE(value, >=, threshold_type->threshold_value);
 }
 
-#endif // _THRESHOLD_TYPE_STATIC_H_
+#endif // _THRESHOLD_TYPE_ADAPTIVE_H_

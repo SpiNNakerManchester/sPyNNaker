@@ -19,6 +19,11 @@ from data_specification.enums import DataType
 from pacman.executor.injection_decorator import inject_items
 from .abstract_neuron_model import AbstractNeuronModel
 
+# constants
+SYNAPSES_PER_NEURON = 250
+
+
+
 V = "v"
 V_REST = "v_rest"
 TAU_M = "tau_m"
@@ -27,6 +32,7 @@ I_OFFSET = "i_offset"
 V_RESET = "v_reset"
 TAU_REFRAC = "tau_refrac"
 COUNT_REFRAC = "count_refrac"
+PSI = "psi"
 
 UNITS = {
     V: 'mV',
@@ -35,7 +41,8 @@ UNITS = {
     CM: 'nF',
     I_OFFSET: 'nA',
     V_RESET: 'mV',
-    TAU_REFRAC: 'ms'
+    TAU_REFRAC: 'ms',
+    PSI: 'N/A'
 }
 
 
@@ -47,19 +54,44 @@ class NeuronModelEProp(AbstractNeuronModel):
         "__cm",
         "__i_offset",
         "__v_reset",
-        "__tau_refrac"]
+        "__tau_refrac",
+        "__psi"]
 
     def __init__(
-            self, v_init, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac):
-        super(NeuronModelEProp, self).__init__(
-            [DataType.S1615,   # v
+            self, 
+            v_init, 
+            v_rest, 
+            tau_m, 
+            cm, 
+            i_offset, 
+            v_reset, 
+            tau_refrac,
+            psi
+            ):
+        
+        
+        datatype_list = [DataType.S1615,   # v
              DataType.S1615,   # v_rest
              DataType.S1615,   # r_membrane (= tau_m / cm)
              DataType.S1615,   # exp_tc (= e^(-ts / tau_m))
              DataType.S1615,   # i_offset
              DataType.INT32,   # count_refrac
              DataType.S1615,   # v_reset
-             DataType.INT32])  # tau_refrac
+             DataType.INT32,   # tau_refrac
+             DataType.S1615    # psi, pseuo_derivative
+             ] 
+        
+        # Synapse states - always initialise to zero
+        eprop_syn_state = [ # synaptic state, one per synapse (kept in DTCM)
+                DataType.INT16, # delta_w
+                DataType.INT16, # z_bar
+                DataType.INT32, # ep_a
+                DataType.INT32, # e_bar
+            ]
+        # Extend to include fan-in for each neuron
+        datatype_list.extend(eprop_syn_state * SYNAPSES_PER_NEURON)
+        
+        super(NeuronModelEProp, self).__init__(datatype_list)
 
         if v_init is None:
             v_init = v_rest
@@ -70,6 +102,8 @@ class NeuronModelEProp(AbstractNeuronModel):
         self.__i_offset = i_offset
         self.__v_reset = v_reset
         self.__tau_refrac = tau_refrac
+        self.__psi = psi # calculate from v and v_thresh (but will probably end up zero)
+        
 
     @overrides(AbstractNeuronModel.get_n_cpu_cycles)
     def get_n_cpu_cycles(self, n_neurons):
@@ -89,6 +123,7 @@ class NeuronModelEProp(AbstractNeuronModel):
     def add_state_variables(self, state_variables):
         state_variables[V] = self.__v_init
         state_variables[COUNT_REFRAC] = 0
+        state_variables[PSI] = self.__psi
 
     @overrides(AbstractNeuronModel.get_units)
     def get_units(self, variable):
@@ -103,25 +138,40 @@ class NeuronModelEProp(AbstractNeuronModel):
     def get_values(self, parameters, state_variables, vertex_slice, ts):
 
         # Add the rest of the data
-        return [state_variables[V], parameters[V_REST],
+        values = [state_variables[V], 
+                  parameters[V_REST],
                 parameters[TAU_M] / parameters[CM],
                 parameters[TAU_M].apply_operation(
                     operation=lambda x: numpy.exp(float(-ts) / (1000.0 * x))),
-                parameters[I_OFFSET], state_variables[COUNT_REFRAC],
+                parameters[I_OFFSET], 
+                state_variables[COUNT_REFRAC],
                 parameters[V_RESET],
                 parameters[TAU_REFRAC].apply_operation(
-                    operation=lambda x: int(numpy.ceil(x / (ts / 1000.0))))]
+                    operation=lambda x: int(numpy.ceil(x / (ts / 1000.0)))),
+                state_variables[PSI]
+                ]
+        
+        # create synaptic state - init to zero
+        eprop_syn_init = [0,
+                          0,
+                          0,
+                          0]
+        # extend to appropriate fan-in
+        values.extend(eprop_syn_init * SYNAPSES_PER_NEURON)
+        
+        return values
 
     @overrides(AbstractNeuronModel.update_values)
     def update_values(self, values, parameters, state_variables):
 
         # Read the data
         (v, _v_rest, _r_membrane, _exp_tc, _i_offset, count_refrac,
-         _v_reset, _tau_refrac) = values
+         _v_reset, _tau_refrac, psi) = values
 
         # Copy the changed data only
         state_variables[V] = v
         state_variables[COUNT_REFRAC] = count_refrac
+        state_vairables[PSI] = psi
 
     @property
     def v_init(self):
