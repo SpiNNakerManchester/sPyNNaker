@@ -58,7 +58,7 @@ from spynnaker.pyNN.utilities.ranged.spynnaker_ranged_list \
 
 logger = logging.getLogger(__name__)
 
-# bool has_key; uint32_t key; uint32_t set_rate_neuron_id_mask;
+# uint32_t has_key; uint32_t key; uint32_t set_rate_neuron_id_mask;
 # uint32_t random_backoff_us; uint32_t time_between_spikes;
 # UFRACT seconds_per_tick; REAL ticks_per_second;
 # REAL slow_rate_per_tick_cutoff; REAL fast_rate_per_tick_cutoff;
@@ -66,9 +66,12 @@ logger = logging.getLogger(__name__)
 # mars_kiss64_seed_t (uint[4]) spike_source_seed;
 PARAMS_BASE_WORDS = 15
 
+# uint32_t n_rates; uint32_t index
+PARAMS_WORDS_PER_NEURON = 2
+
 # start_scaled, end_scaled, next_scaled, is_fast_source, exp_minus_lambda,
 # sqrt_lambda, isi_val, time_to_spike
-PARAMS_WORDS_PER_NEURON = 8
+PARAMS_WORDS_PER_RATE = 8
 
 START_OF_POISSON_GENERATOR_PARAMETERS = PARAMS_BASE_WORDS * 4
 MICROSECONDS_PER_SECOND = 1000000.0
@@ -294,11 +297,14 @@ class SpikeSourcePoissonVertex(
         elif max_rate is None:
             self.__max_rate = 0
 
+        # Create the index of values in use
+        self.__data["index"] = SpynnakerRangedList(n_neurons, 0)
+
     @property
     def rate(self):
         if self.__is_variable_rate:
             raise Exception("Get variable rate poisson rates with .rates")
-        return _flatten(self.__data["rates"])
+        return list(_flatten(self.__data["rates"]))
 
     @rate.setter
     def rate(self, rate):
@@ -469,7 +475,8 @@ class SpikeSourcePoissonVertex(
         """
         n_rates = sum(len(self.__data["rates"][i]) for i in range(
             vertex_slice.lo_atom, vertex_slice.hi_atom + 1))
-        return (vertex_slice.n_atoms + (n_rates * PARAMS_WORDS_PER_NEURON)) * 4
+        return ((vertex_slice.n_atoms * PARAMS_WORDS_PER_NEURON) +
+                (n_rates * PARAMS_WORDS_PER_RATE)) * 4
 
     def reserve_memory_regions(self, spec, placement, graph_mapper):
         """ Reserve memory regions for Poisson source parameters and output\
@@ -650,6 +657,9 @@ class SpikeSourcePoissonVertex(
         for i in range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1):
             spec.write_value(len(self.__data["rates"][i]))
 
+            # Write the current index in use
+            spec.write_value(self.__data["index"][i])
+
             # Convert start times to start time steps
             starts = self.__data["starts"][i].astype("float")
             starts_scaled = self._convert_ms_to_n_timesteps(
@@ -820,6 +830,10 @@ class SpikeSourcePoissonVertex(
         for i in range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1):
             n_values = struct.unpack_from("<I", byte_array, offset)[0]
             offset += 4
+
+            index = struct.unpack_from("<I", byte_array, offset)[0]
+            offset += 4
+            self.__data["index"].set_value_by_id(i, index)
 
             (_start, _end, _next, is_fast_source, exp_minus_lambda,
              sqrt_lambda, isi, time_to_next_spike) = _PoissonStruct.read_data(

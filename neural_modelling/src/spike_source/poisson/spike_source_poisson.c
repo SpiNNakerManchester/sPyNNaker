@@ -118,11 +118,6 @@ typedef struct source_info {
     spike_source_t poissons[];
 } source_info;
 
-struct config {
-    global_parameters globals;
-    source_info source_info[];
-};
-
 static source_info **sources;
 
 //! The expected current clock tick of timer_1
@@ -256,10 +251,10 @@ static void print_spike_sources(void) {
 //!            Poisson parameter region starts.
 //! \return a boolean which is True if the parameters were read successfully or
 //!         False otherwise
-static bool read_global_parameters(struct config *config) {
+static bool read_global_parameters(global_parameters *sdram_globals) {
     log_info("read global_parameters: starting");
 
-    spin1_memcpy(&params, &config->globals, sizeof(params));
+    spin1_memcpy(&params, sdram_globals, sizeof(params));
 
     log_info("\tkey = %08x, set rate mask = %08x, timer offset = %u",
             params.key, params.set_rate_neuron_id_mask, params.timer_offset);
@@ -294,7 +289,7 @@ static inline void read_next_rates(uint32_t id) {
 //! \param[in] config the configuration in SDRAM
 //! \return a boolean which is True if the rates were read successfully or
 //!         False otherwise
-static bool read_rates(struct config *config) {
+static bool read_rates(source_info *sdram_sources) {
 
     // Allocate DTCM for array of spike sources and copy block of data
     if (params.n_spike_sources > 0) {
@@ -312,7 +307,7 @@ static bool read_rates(struct config *config) {
         }
 
         // The array is not well-defined, so we have to use pointers here
-        source_info *source = &(config->source_info[0]);
+        source_info *source = sdram_sources;
         for (uint32_t i = 0; i < params.n_spike_sources; i++) {
             uint32_t n_bytes = sizeof(source_info) +
                     (source->n_rates * sizeof(spike_source_t));
@@ -458,15 +453,16 @@ static bool store_poisson_parameters(void) {
     log_info("store_parameters: starting");
 
     // Get the address this core's DTCM data starts at from SRAM
-    struct config *config = data_specification_get_region(
+    global_parameters *sdram_globals = data_specification_get_region(
         POISSON_PARAMS, data_specification_get_data_address());
 
     // Copy the global_parameters back to SDRAM
-    spin1_memcpy(&config->globals, &params, sizeof(params));
+    spin1_memcpy(sdram_globals, &params, sizeof(params));
 
     // store spike source parameters into array into SDRAM for reading by
     // the host
-    source_info *source = &(config->source_info[0]);
+    source_info *source = data_specification_get_region(
+        RATES, data_specification_get_data_address());
     for (uint32_t i = 0; i < params.n_spike_sources; i++) {
         uint32_t n_bytes = sizeof(source_info) +
                 (sources[i]->n_rates * sizeof(spike_source_t));
@@ -474,7 +470,6 @@ static bool store_poisson_parameters(void) {
 
         // Move to the next SDRAM source
         source = (source_info *) &(source->poissons[source->n_rates]);
-
     }
 
     log_info("store_parameters: completed successfully");
