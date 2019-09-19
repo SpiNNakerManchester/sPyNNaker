@@ -13,10 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .abstract_neuron_model import AbstractNeuronModel
-from .neuron_model_izh import NeuronModelIzh
-from .neuron_model_leaky_integrate_and_fire import (
-    NeuronModelLeakyIntegrateAndFire)
+APP = $(notdir $(CURDIR))
 
-__all__ = ["AbstractNeuronModel", "NeuronModelIzh",
-           "NeuronModelLeakyIntegrateAndFire", "NeuronModelEProp"]
+OTHER_SOURCES = $(NEURON_DIR)/neuron/models/neuron_model_eprop_adaptive_impl.c
+NEURON_IMPL_H = $(NEURON_DIR)/neuron/implementations/neuron_impl_eprop_adaptive.h
+//SYNAPSE_DYNAMICS = $(NEURON_DIR)/neuron/plasticity/stdp/synapse_dynamics_eprop_adaptive_impl.c
+SYNAPSE_DYNAMICS = $(NEURON_DIR)/neuron/plasticity/synapse_dynamics_static_impl.c
+
+include ../neural_build.mk

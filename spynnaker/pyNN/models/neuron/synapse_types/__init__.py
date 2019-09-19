@@ -20,4 +20,5 @@ from .synapse_type_delta import SynapseTypeDelta
 from .synapse_type_alpha import SynapseTypeAlpha
 
 __all__ = ["AbstractSynapseType", "SynapseTypeDualExponential",
-           "SynapseTypeExponential", "SynapseTypeDelta", "SynapseTypeAlpha"]
+           "SynapseTypeExponential", "SynapseTypeDelta", "SynapseTypeAlpha",
+           "SynapseTypeEProp"]

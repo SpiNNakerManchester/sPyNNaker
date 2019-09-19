@@ -16,17 +16,14 @@
 from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModelStandard
 from spynnaker.pyNN.models.defaults import default_initial_values
 from spynnaker.pyNN.models.neuron.neuron_models import (
-    NeuronModelLeakyIntegrateAndFire)
+    NeuronModelEProp)
 from spynnaker.pyNN.models.neuron.synapse_types import (
-    SynapseTypeDualExponential)
+    SynapseTypeEProp)
 from spynnaker.pyNN.models.neuron.input_types import InputTypeCurrent
-from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeStatic
+from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeAdaptive
 
-
-class IFCurrDualExpBase(AbstractPyNNNeuronModelStandard):
-    """ Leaky integrate and fire neuron with two exponentially decaying \
-        excitatory current inputs, and one exponentially decaying inhibitory \
-        current input
+class EPropAdaptive(AbstractPyNNNeuronModelStandard):
+    """ Adaptive threshold neuron with eprop support
     """
 
     @default_initial_values({"v", "isyn_exc", "isyn_exc2", "isyn_inh"})
@@ -36,14 +33,14 @@ class IFCurrDualExpBase(AbstractPyNNNeuronModelStandard):
             tau_refrac=0.1, i_offset=0.0, v=-65.0, isyn_exc=0.0, isyn_inh=0.0,
             isyn_exc2=0.0):
         # pylint: disable=too-many-arguments, too-many-locals
-        neuron_model = NeuronModelLeakyIntegrateAndFire(
+        neuron_model = NeuronModelEProp(
             v, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac)
-                synapse_type = SynapseTypeDualExponential(
+        synapse_type = SynapseTypeEProp(
             tau_syn_E, tau_syn_E2, tau_syn_I, isyn_exc, isyn_exc2, isyn_inh)
-input_type = InputTypeCurrent()
-        threshold_type = ThresholdTypeStatic(v_thresh)
+        input_type = InputTypeCurrent()
+        threshold_type = ThresholdTypeAdaptive(v_thresh)
 
         super(IFCurrDualExpBase, self).__init__(
-            model_name="IF_curr_dual_exp", binary="IF_curr_exp_dual.aplx",
+            model_name="eprop_adaptive", binary="eprop_adaptive.aplx",
             neuron_model=neuron_model, input_type=input_type,
             synapse_type=synapse_type, threshold_type=threshold_type)
