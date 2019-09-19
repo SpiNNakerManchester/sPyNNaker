@@ -224,7 +224,7 @@ static inline uint32_t faster_spike_source_get_num_spikes(
     return (uint32_t) roundk(x * x, nbits);
 }
 
-void print_spike_source(index_t s) {
+static void print_spike_source(index_t s) {
     spike_source_t *p = get_source(s);
     log_info("atom %d", s);
     log_info("scaled_start = %u", p->start_ticks);
@@ -239,7 +239,6 @@ void print_spike_source(index_t s) {
 static void print_spike_sources(void) {
 #ifdef PRINT_SPIKE_SOURCES
     for (index_t s = 0; s < params.n_spike_sources; s++) {
-        spike_source_t *p = &poisson_parameters[s];
         print_spike_source(s);
     }
 #endif
@@ -282,7 +281,6 @@ static inline void read_next_rates(uint32_t id) {
     if (sources[id]->index < sources[id]->n_rates) {
         sources[id]->index++;
     }
-    // print_spike_source(index);
 }
 
 //! \brief method for reading the rates of the Poisson
@@ -684,7 +682,9 @@ static void timer_callback(uint timer_count, uint unused) {
         }
 
         if ((time + 1) >= spike_source->next_ticks) {
+            log_debug("Moving to next rate at time %d", time);
             read_next_rates(s_id);
+            print_spike_source(s_id);
         }
     }
 
