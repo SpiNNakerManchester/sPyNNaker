@@ -156,8 +156,8 @@ class SynapseDynamicsStructuralStatic(AbstractSynapseDynamicsStructural,
 
     @overrides(SynapseDynamicsStatic.get_parameters_sdram_usage_in_bytes,
                additional_arguments={"in_edges"})
-    def get_parameters_sdram_usage_in_bytes(self, n_neurons,
-                                            n_synapse_types, in_edges):
+    def get_parameters_sdram_usage_in_bytes(
+            self, n_neurons, n_synapse_types, in_edges):
         initial_size = \
             super(SynapseDynamicsStructuralStatic, self). \
             get_parameters_sdram_usage_in_bytes(
@@ -176,9 +176,9 @@ class SynapseDynamicsStructuralStatic(AbstractSynapseDynamicsStructural,
 
     @overrides(SynapseDynamicsStatic.get_static_synaptic_data,
                additional_arguments={"app_edge", "machine_edge"})
-    def get_static_synaptic_data(self, connections, connection_row_indices,
-                                 n_rows, post_vertex_slice,
-                                 n_synapse_types, app_edge, machine_edge):
+    def get_static_synaptic_data(
+            self, connections, connection_row_indices, n_rows,
+            post_vertex_slice, n_synapse_types, app_edge, machine_edge):
         self.__common_sp.synaptic_data_update(
             connections, post_vertex_slice,
             app_edge, machine_edge)

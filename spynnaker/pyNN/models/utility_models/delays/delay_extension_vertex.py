@@ -383,7 +383,7 @@ class DelayExtensionVertex(
 
     def get_dtcm_usage_for_atoms(self, vertex_slice):
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
-        words_per_atom = 11 +16
+        words_per_atom = 11 + 16
         return words_per_atom * BYTES_PER_WORD * n_atoms
 
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)

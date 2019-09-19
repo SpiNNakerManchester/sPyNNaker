@@ -15,6 +15,7 @@
 
 import logging
 from spinn_utilities.overrides import overrides
+from spinn_front_end_common.utilities.constants import BYTES_PER_SHORT
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
     plasticity_helpers)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
@@ -79,7 +80,7 @@ class TimingDependenceSpikeNearestPair(AbstractTimingDependence):
 
     @overrides(AbstractTimingDependence.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(self):
-        return 2 * (LOOKUP_TAU_PLUS_SIZE + LOOKUP_TAU_MINUS_SIZE)
+        return BYTES_PER_SHORT * (LOOKUP_TAU_PLUS_SIZE + LOOKUP_TAU_MINUS_SIZE)
 
     @property
     def n_weight_terms(self):

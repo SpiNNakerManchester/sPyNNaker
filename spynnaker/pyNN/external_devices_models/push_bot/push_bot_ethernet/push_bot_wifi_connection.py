@@ -21,6 +21,7 @@ import subprocess
 from six import raise_from
 from spinnman.connections.abstract_classes import Listenable, Connection
 from spinnman.exceptions import SpinnmanIOException, SpinnmanTimeoutException
+from spinn_front_end_common.utilities.constants import BYTES_PER_KB
 
 logger = logging.getLogger(__name__)
 # A set of connections that have already been made
@@ -50,6 +51,8 @@ class PushBotWIFIConnection(Connection, Listenable):
         "__remote_ip_address",
         "__remote_port",
         "__socket"]
+
+    RECV_SIZE = 1 * BYTES_PER_KB
 
     def __init__(self, remote_host, remote_port=56000):
         """
@@ -177,7 +180,7 @@ class PushBotWIFIConnection(Connection, Listenable):
         """
         try:
             self.__socket.settimeout(timeout)
-            return self.__socket.recv(1024)
+            return self.__socket.recv(self.RECV_SIZE)
         except socket.timeout:
             raise SpinnmanTimeoutException("receive", timeout)
         except Exception as e:

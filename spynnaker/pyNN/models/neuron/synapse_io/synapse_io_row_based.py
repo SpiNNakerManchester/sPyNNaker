@@ -326,12 +326,10 @@ class SynapseIORowBased(AbstractSynapseIO):
         connections = numpy.concatenate(connections)
 
         # Return the delays values to milliseconds
-        connections["delay"] = (
-                connections["delay"] / (1000.0 / machine_time_step))
+        connections["delay"] /= 1000.0 / machine_time_step
 
         # Undo the weight scaling
-        connections["weight"] = (connections["weight"] / weight_scales[
-            synapse_info.synapse_type])
+        connections["weight"] /= weight_scales[synapse_info.synapse_type]
 
         # Return the connections
         return connections

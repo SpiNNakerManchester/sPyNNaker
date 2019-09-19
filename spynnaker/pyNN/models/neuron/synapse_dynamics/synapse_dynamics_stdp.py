@@ -17,7 +17,8 @@ import math
 import numpy
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
-from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spinn_front_end_common.utilities.constants import (
+    BYTES_PER_WORD, BYTES_PER_SHORT)
 from spynnaker.pyNN.models.abstract_models import AbstractSettable
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
 from .abstract_generate_on_machine import (
@@ -185,13 +186,14 @@ class SynapseDynamicsSTDP(
             n_connections = max(n_connections, self.__pad_to_length)
         if n_connections == 0:
             return 0
+        # 2 == two half words per word
         fp_size_words = (
             n_connections // 2 if n_connections % 2 == 0
             else (n_connections + 1) // 2)
         pp_size_bytes = (
             self._n_header_bytes +
             (synapse_structure.get_n_half_words_per_connection() *
-             2 * n_connections))
+             BYTES_PER_SHORT * n_connections))
         pp_size_words = int(math.ceil(float(pp_size_bytes) / BYTES_PER_WORD))
 
         return fp_size_words + pp_size_words
@@ -223,10 +225,11 @@ class SynapseDynamicsSTDP(
         fixed_plastic_rows = self.convert_per_connection_data_to_rows(
             connection_row_indices, n_rows,
             fixed_plastic.view(dtype="uint8").reshape((-1, 2)))
-        fp_size = self.get_n_items(fixed_plastic_rows, 2)
+        fp_size = self.get_n_items(fixed_plastic_rows, BYTES_PER_SHORT)
         if self.__pad_to_length is not None:
             # Pad the data
-            fixed_plastic_rows = self._pad_row(fixed_plastic_rows, 2)
+            fixed_plastic_rows = self._pad_row(
+                fixed_plastic_rows, BYTES_PER_SHORT)
         fp_data = self.get_words(fixed_plastic_rows)
 
         # Get the plastic data by inserting the weight into the half-word
@@ -242,7 +245,7 @@ class SynapseDynamicsSTDP(
         # Convert the plastic data into groups of bytes per connection and
         # then into rows
         plastic_plastic = plastic_plastic.view(dtype="uint8").reshape(
-            (-1, n_half_words * 2))
+            (-1, n_half_words * BYTES_PER_SHORT))
         plastic_plastic_row_data = self.convert_per_connection_data_to_rows(
             connection_row_indices, n_rows, plastic_plastic)
 
@@ -250,7 +253,7 @@ class SynapseDynamicsSTDP(
         if self.__pad_to_length is not None:
             # Pad the data
             plastic_plastic_row_data = self._pad_row(
-                plastic_plastic_row_data, n_half_words * 2)
+                plastic_plastic_row_data, n_half_words * BYTES_PER_SHORT)
         plastic_headers = numpy.zeros(
             (n_rows, self._n_header_bytes), dtype="uint8")
         plastic_plastic_rows = [
@@ -312,7 +315,7 @@ class SynapseDynamicsSTDP(
         n_half_words = synapse_structure.get_n_half_words_per_connection()
         half_word = synapse_structure.get_weight_half_word()
         pp_half_words = numpy.concatenate([
-            pp[:size * n_half_words * 2].view("uint16")[
+            pp[:size * n_half_words * BYTES_PER_SHORT].view("uint16")[
                 half_word::n_half_words]
             for pp, size in zip(pp_without_headers, fp_size)])
 
@@ -377,10 +380,12 @@ class SynapseDynamicsSTDP(
 
         # Get plastic plastic size per connection
         synapse_structure = self.__timing_dependence.synaptic_structure
-        bytes_per_pp = synapse_structure.get_n_half_words_per_connection() * 2
+        bytes_per_pp = (
+            synapse_structure.get_n_half_words_per_connection() *
+            BYTES_PER_SHORT)
 
         # The fixed plastic size per connection is 2 bytes
-        bytes_per_fp = 2
+        bytes_per_fp = BYTES_PER_SHORT
 
         # Maximum possible connections, ignoring word alignment
         n_connections = (n_words_space * BYTES_PER_WORD) // (
@@ -403,7 +408,7 @@ class SynapseDynamicsSTDP(
     def gen_matrix_params(self):
         synapse_struct = self.__timing_dependence.synaptic_structure
         return numpy.array([
-            self._n_header_bytes // 2,
+            self._n_header_bytes // BYTES_PER_SHORT,
             synapse_struct.get_n_half_words_per_connection(),
             synapse_struct.get_weight_half_word()], dtype="uint32")
 

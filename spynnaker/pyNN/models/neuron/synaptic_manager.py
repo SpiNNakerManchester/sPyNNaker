@@ -208,13 +208,13 @@ class SynapticManager(object):
 
     def _get_synapse_params_size(self):
         return (_SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES +
-                (4 * self.__n_synapse_types))
+                (BYTES_PER_WORD * self.__n_synapse_types))
 
     def _get_static_synaptic_matrix_sdram_requirements(self):
 
         # 4 for address of direct addresses, and
         # 4 for the size of the direct addresses matrix in bytes
-        return 8
+        return 2 * BYTES_PER_WORD
 
     def _get_max_row_info(
             self, synapse_info, post_vertex_slice, app_edge,
@@ -734,7 +734,7 @@ class SynapticManager(object):
             block_addr = synaptic_matrix_offset + n_bytes_undelayed
 
             # The synaptic matrix offset is in words for the generator
-            synaptic_matrix_offset = synaptic_matrix_offset // BYTES_PER_WORD
+            synaptic_matrix_offset //= BYTES_PER_WORD
         elif rinfo is not None:
             index = self.__poptable_type.update_master_population_table(
                 spec, 0, 0, rinfo.first_key_and_mask, master_pop_table_region)
@@ -768,8 +768,7 @@ class SynapticManager(object):
             block_addr = delayed_synaptic_matrix_offset + n_bytes_delayed
 
             # The delayed synaptic matrix offset is in words for the generator
-            delayed_synaptic_matrix_offset = \
-                delayed_synaptic_matrix_offset // BYTES_PER_WORD
+            delayed_synaptic_matrix_offset //= BYTES_PER_WORD
         elif delay_rinfo is not None:
             d_index = self.__poptable_type.update_master_population_table(
                 spec, 0, 0, delay_rinfo.first_key_and_mask,

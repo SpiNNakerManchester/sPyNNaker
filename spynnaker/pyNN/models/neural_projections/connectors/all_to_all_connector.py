@@ -158,4 +158,4 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
     @overrides(AbstractGenerateConnectorOnMachine.
                gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
-        return BYTES_PER_WORD
+        return 1 * BYTES_PER_WORD

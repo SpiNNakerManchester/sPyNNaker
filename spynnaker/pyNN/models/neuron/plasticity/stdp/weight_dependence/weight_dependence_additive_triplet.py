@@ -18,6 +18,8 @@ from data_specification.enums import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from .abstract_has_a_plus_a_minus import AbstractHasAPlusAMinus
 from .abstract_weight_dependence import AbstractWeightDependence
+# Six words per synapse type
+_SPACE_PER_SYNAPSE_TYPE = 6 * BYTES_PER_WORD
 
 
 class WeightDependenceAdditiveTriplet(
@@ -81,7 +83,7 @@ class WeightDependenceAdditiveTriplet(
         if n_weight_terms != 2:
             raise NotImplementedError(
                 "Additive weight dependence only supports one or two terms")
-        return (6 * BYTES_PER_WORD) * n_synapse_types
+        return _SPACE_PER_SYNAPSE_TYPE * n_synapse_types
 
     @overrides(AbstractWeightDependence.write_parameters)
     def write_parameters(
