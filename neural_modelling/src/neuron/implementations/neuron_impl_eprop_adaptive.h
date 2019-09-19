@@ -22,10 +22,10 @@
 
 // Includes for model parts used in this implementation
 #include <neuron/synapse_types/synapse_type_eprop_adaptive.h>
+#include <neuron/threshold_types/threshold_type_adaptive.h>
 #include <neuron/models/neuron_model_eprop_adaptive_impl.h>
 #include <neuron/input_types/input_type_current.h>
 #include <neuron/additional_inputs/additional_input_none_impl.h>
-#include <neuron/threshold_types/threshold_type_adaptive.h>
 
 
 // Further includes
