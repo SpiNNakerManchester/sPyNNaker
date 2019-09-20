@@ -1,7 +1,21 @@
-from spinn_front_end_common.interface.interface_functions import \
-    GraphDataSpecificationWriter
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from spynnaker.pyNN.models.utility_models import DelayExtensionVertex
+from spinn_front_end_common.interface.interface_functions import (
+    GraphDataSpecificationWriter)
+from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 
 
 class SpynnakerDataSpecificationWriter(
@@ -12,9 +26,9 @@ class SpynnakerDataSpecificationWriter(
     __slots__ = ()
 
     def __call__(
-            self, placements, graph, hostname,
-            report_default_directory, write_text_specs,
-            app_data_runtime_folder, machine, graph_mapper=None):
+            self, placements, hostname,
+            report_default_directory, write_text_specs, machine,
+            data_n_timesteps, graph_mapper=None):
         # pylint: disable=too-many-arguments
 
         delay_extensions = list()
@@ -31,4 +45,5 @@ class SpynnakerDataSpecificationWriter(
 
         return super(SpynnakerDataSpecificationWriter, self).__call__(
             placements, hostname, report_default_directory, write_text_specs,
-            app_data_runtime_folder, machine, graph_mapper, placement_order)
+            machine, data_n_timesteps, graph_mapper,
+            placement_order)

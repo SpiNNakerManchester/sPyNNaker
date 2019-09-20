@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2017-2019 The University of Manchester
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #ifndef _NEURON_IMPL_H_
 #define _NEURON_IMPL_H_
 
@@ -27,11 +44,19 @@ static void neuron_impl_load_neuron_parameters(
 //! \param[in/out] recorded_variable_values The values to potentially record
 //! \return bool value for whether a spike has occurred
 static bool neuron_impl_do_timestep_update(
-    index_t neuron_index, input_t external_bias,
-    state_t *recorded_variable_values);
+        index_t neuron_index, input_t external_bias,
+        state_t *recorded_variable_values);
 
 //! \brief Store the neuron parameters to the given address
 static void neuron_impl_store_neuron_parameters(
         address_t address, uint32_t next, uint32_t n_neurons);
+
+#if LOG_LEVEL >= LOG_DEBUG
+void neuron_impl_print_inputs(uint32_t n_neurons);
+
+void neuron_impl_print_synapse_parameters(uint32_t n_neurons);
+
+const char *neuron_impl_get_synapse_type_char(uint32_t synapse_type);
+#endif // LOG_LEVEL >= LOG_DEBUG
 
 #endif // _NEURON_IMPL_H_

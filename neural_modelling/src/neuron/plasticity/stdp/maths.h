@@ -1,8 +1,26 @@
+/*
+ * Copyright (c) 2017-2019 The University of Manchester
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #ifndef MATHS_H
 #define MATHS_H
 
 // Standard includes
 #include <common/neuron-typedefs.h>
+#include <spin1_api.h>
 
 //---------------------------------------
 // Macros
@@ -14,11 +32,10 @@
 // Plasticity maths function inline implementation
 //---------------------------------------
 static inline address_t maths_copy_int16_lut(
-       address_t start_address, uint32_t num_entries, int16_t *lut) {
-
+        address_t start_address, uint32_t num_entries, int16_t *lut) {
     // Pad to number of words
-    const uint32_t num_words = (num_entries / 2)
-                               + (((num_entries & 1) != 0) ? 1 : 0);
+    const uint32_t num_words =
+            (num_entries / 2) + (((num_entries & 1) != 0) ? 1 : 0);
 
     // Copy entries to LUT
     spin1_memcpy(lut, start_address, sizeof(int16_t) * num_entries);
@@ -46,7 +63,6 @@ static inline int32_t maths_mul_16x16(int16_t x, int16_t y) {
 static inline int32_t maths_lut_exponential_decay(
         uint32_t time, const uint32_t time_shift, const uint32_t lut_size,
         const int16_t *lut) {
-
     // Calculate lut index
     uint32_t lut_index = time >> time_shift;
 
@@ -57,7 +73,6 @@ static inline int32_t maths_lut_exponential_decay(
 //---------------------------------------
 static inline int32_t maths_fixed_mul16(
         int32_t a, int32_t b, const int32_t fixed_point_position) {
-
     // Multiply lower 16-bits of a and b together
     int32_t mul = __smulbb(a, b);
 

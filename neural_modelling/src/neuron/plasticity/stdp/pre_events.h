@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2017-2019 The University of Manchester
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #ifndef _PRE_EVENTS_H_
 #define _PRE_EVENTS_H_
 
@@ -37,7 +54,6 @@ typedef struct {
 static inline pre_event_window_t pre_events_get_window(
         uint32_t time, const pre_event_history_t *events, uint32_t delay,
         uint32_t begin_time) {
-
     // Start at end event - beyond end of post-event history
     const uint32_t count = events->count_minus_one + 1;
     const uint32_t *end_event_time = events->times + count;
@@ -51,7 +67,6 @@ static inline pre_event_window_t pre_events_get_window(
     // Keep looping while event occured after start
     // Of window and we haven't hit beginning of array
     do {
-
         // Cache pointer to this event as potential
         // Next event and go back one event
         // **NOTE** next_time can be invalid
@@ -82,9 +97,8 @@ static inline pre_event_window_t pre_events_get_window(
 }
 
 //---------------------------------------
-static inline pre_event_window_t pre_events_next(pre_event_window_t window,
-                                                 uint32_t delayed_time) {
-
+static inline pre_event_window_t pre_events_next(
+        pre_event_window_t window, uint32_t delayed_time) {
     // Update previous time
     window.prev_time = delayed_time;
     window.prev_trace = *window.next_trace++;
@@ -98,15 +112,14 @@ static inline pre_event_window_t pre_events_next(pre_event_window_t window,
 }
 
 //---------------------------------------
-static inline void pre_events_add(uint32_t time, pre_event_history_t *events,
-                                  pre_trace_t trace) {
-    if (events->count_minus_one < (MAX_PRE_SYNAPTIC_EVENTS - 1)) {
+static inline void pre_events_add(
+        uint32_t time, pre_event_history_t *events, pre_trace_t trace) {
+    if (events->count_minus_one < MAX_PRE_SYNAPTIC_EVENTS - 1) {
         const uint32_t new_index = ++events->count_minus_one;
 
         events->times[new_index] = time;
         events->traces[new_index] = trace;
     } else {
-
         // **NOTE** 1st element is always an entry at time 0
         for (uint32_t i = 2; i < MAX_PRE_SYNAPTIC_EVENTS; i++) {
             events->times[i - 1] = events->times[i];
