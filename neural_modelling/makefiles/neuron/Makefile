@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-MODELS = ht \
-         patch_clamped \
-         #IF_cond_exp \
-=======
 # Copyright (c) 2017-2019 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,9 +13,10 @@ MODELS = ht \
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-MODELS = IF_curr_exp \
+MODELS = ht \
+         patch_clamped \
+         # IF_curr_exp \
          IF_cond_exp \
->>>>>>> refs/remotes/origin/master
          IZK_curr_exp \
          IZK_cond_exp \
          IF_curr_exp_dual \
@@ -39,18 +35,15 @@ MODELS = IF_curr_exp \
          IF_curr_exp_stdp_mad_nearest_pair_multiplicative \
          IF_curr_exp_stdp_mad_pfister_triplet_additive \
          IF_cond_exp_stdp_mad_nearest_pair_additive \
-	     IF_curr_alpha \
-	     IF_curr_alpha_stdp_mad_pair_additive \
+	 IF_curr_alpha \
+         IF_curr_alpha_stdp_mad_pair_additive \
          IF_cond_exp_structural \
          IF_curr_exp_stdp_mad_pair_additive_structural \
          IF_curr_exp_structural \
          IF_cond_exp_stdp_mad_pair_additive_structural \
          IF_curr_exp_sEMD \
-<<<<<<< HEAD
-=======
          IZK_curr_exp_stdp_mad_pair_additive \
          IZK_cond_exp_stdp_mad_pair_additive
->>>>>>> refs/remotes/origin/master
 
 all:
 	for d in $(MODELS); do $(MAKE) -C $$d || exit $$?; done
