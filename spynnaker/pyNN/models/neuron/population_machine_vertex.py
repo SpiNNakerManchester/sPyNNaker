@@ -62,8 +62,9 @@ class PopulationMachineVertex(
                ("FAILED_TO_READ_BIT_FIELDS", 6),
                ("DMA_COMPLETES", 7),
                ("SPIKE_PROGRESSING_COUNT", 8),
-               ("INVALID_MASTER_POP_HITS", 9),
-               ("BIT_FIELD_FILTERED_COUNT", 10)])
+               ("PACKETS_RECEIVED_COUNT", 9),
+               ("INVALID_MASTER_POP_HITS", 10),
+               ("BIT_FIELD_FILTERED_COUNT", 11)])
 
     PROFILE_TAG_LABELS = {
         0: "TIMER",
@@ -80,6 +81,7 @@ class PopulationMachineVertex(
         "How many packets were filtered by the bitfield filterer."
     INVALID_MASTER_POP_HITS = "Invalid Master Pop hits"
     SPIKES_PROCESSED = "how many spikes were processed"
+    PACKETS_RECEIVED = "How many packets were received"
     DMA_COMPLETE = "DMA's that were completed"
     BIT_FIELDS_NOT_READ = "N bit fields not able to be read into DTCM"
     GHOST_SEARCHES = "Number of failed pop table searches"
@@ -200,6 +202,8 @@ class PopulationMachineVertex(
             self.EXTRA_PROVENANCE_DATA_ENTRIES.INVALID_MASTER_POP_HITS.value]
         n_packets_filtered_by_bit_field_filter = provenance_data[
             self.EXTRA_PROVENANCE_DATA_ENTRIES.BIT_FIELD_FILTERED_COUNT.value]
+        n_packets_received = provenance_data[
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.PACKETS_RECEIVED_COUNT.value]
 
         label, x, y, p, names = self._get_placement_details(placement)
 
@@ -288,6 +292,9 @@ class PopulationMachineVertex(
                 "packets are filtered in the router to improve "
                 "performance.".format(
                     n_packets_filtered_by_bit_field_filter, x, y, p)))))
+        provenance_items.append((ProvenanceDataItem(
+            self._add_name(names, self.PACKETS_RECEIVED),
+            n_packets_received)))
 
         return provenance_items
 

@@ -70,6 +70,7 @@ struct neuron_provenance {
     uint32_t failed_to_read_bit_fields;
     uint32_t dma_completes;
     uint32_t spike_processing_count;
+    uint32_t packets_received_count;
     uint32_t invalid_master_pop_hits;
     uint32_t bit_field_filtered_count;
 } neuron_provenance;
@@ -137,6 +138,8 @@ void c_main_store_provenance_data(address_t provenance_region) {
         spike_processing_get_invalid_master_pop_table_hits();
     prov->bit_field_filtered_count =
         population_table_get_filtered_packet_count();
+    prov->packets_received_count =
+        spike_processing_get_packet_received_count();
     log_debug("finished other provenance data");
 }
 

@@ -57,10 +57,13 @@ static bool any_spike = false;
 uint32_t dma_read_count = 0;
 
 // the number of dma completes (used in provenance generation)
-static uint32_t dma_complete_count=0;
+static uint32_t dma_complete_count = 0;
 
 // the number of spikes that were processed (used in provenance generation)
-static uint32_t spike_processing_count=0;
+static uint32_t spike_processing_count = 0;
+
+// the number of packets received
+static uint32_t packets_received_count = 0;
 
 /* PRIVATE FUNCTIONS - static for inlining */
 
@@ -174,12 +177,12 @@ static inline void setup_synaptic_dma_write(uint32_t dma_buffer_index) {
 static void multicast_packet_received_callback(uint key, uint payload) {
     use(payload);
     any_spike = true;
-    log_debug("Received spike %x at %d, DMA Busy = %d", key, time, dma_busy);
+    log_info("Received spike %x at %d, DMA Busy = %d", key, time, dma_busy);
 
     // If there was space to add spike to incoming spike queue
     if (in_spikes_add_spike(key)) {
         // increment the spike count for provenance generation
-        spike_processing_count++;
+        packets_received_count++;
 
         // If we're not already processing synaptic DMAs,
         // flag pipeline as busy and trigger a feed event
@@ -315,6 +318,12 @@ uint32_t spike_processing_get_dma_complete_count(){
 //! \return the number of spikes that were processed
 uint32_t spike_processing_get_spike_processing_count(){
     return spike_processing_count;
+}
+
+//! \brief returns the number of packets that were received
+//! \return the number of packets that were received
+uint32_t spike_processing_get_packet_received_count(){
+    return packets_received_count;
 }
 
 //! \brief get the address of the circular buffer used for buffering received
