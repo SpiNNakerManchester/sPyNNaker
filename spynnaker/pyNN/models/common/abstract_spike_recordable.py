@@ -76,8 +76,8 @@ class AbstractSpikeRecordable(object):
 
     @abstractmethod
     def get_spike_machine_vertices(self, graph_mapper):
-        """ get the machine vertices from the app vertex 
-        
+        """ get the machine vertices from the app vertex
+
         :param graph_mapper: the graph mapper
         :return: iterable of machine vertices
         """
