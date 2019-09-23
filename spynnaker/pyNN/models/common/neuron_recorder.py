@@ -100,7 +100,7 @@ class NeuronRecorder(object):
     # enum for code to know what state to hold for c code
     DATA_TYPE = Enum(
         value="DATA_TYPE",
-        names=[("NOT_MATRIX", 0),
+        names=[("BIT_FIELD", 0),
                ("INT32", 1),
                ("FLOAT_64", 2),
                ("FLOAT_32", 3)])
@@ -631,8 +631,8 @@ class NeuronRecorder(object):
         spec.write_array(recording_utilities.get_recording_header_array(
             self._get_buffered_sdram(vertex_slice, data_n_time_steps)))
 
-        # Write the number of matrix variables that can be recorded
-        spec.write_value(data=len(self.__matrix_scalar_types))
+        # Write the number of recordable variables
+        spec.write_value(data=len(self.__sampling_rates))
 
         # Write the recording data
         recording_data = self._get_data(vertex_slice)
@@ -808,7 +808,7 @@ class NeuronRecorder(object):
             if variable in self.__matrix_output_types:
                 enum_index = self._determine_enum_value(variable)
             else:
-                enum_index = self.DATA_TYPE.NOT_MATRIX.value
+                enum_index = self.DATA_TYPE.BIT_FIELD.value
             rate = self.__sampling_rates[variable]
             n_recording = self._count_recording_per_slice(
                 variable, vertex_slice)

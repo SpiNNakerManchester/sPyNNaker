@@ -26,10 +26,10 @@
 #include <debug.h>
 
 // Globals
-typedef struct timed_out_spikes {
+typedef struct timed_out_spikes2 {
     uint32_t time;
     uint32_t out_spikes[];
-} timed_out_spikes;
+} timed_out_spikes2;
 
 static timed_out_spikes *spikes;
 bit_field_t out_spikes;
@@ -49,7 +49,7 @@ bool out_spikes_initialize(size_t max_spike_sources) {
     log_debug("Out spike size is %u words, allowing %u spike sources",
             out_spikes_size, max_spike_sources);
     spikes = spin1_malloc(
-            sizeof(timed_out_spikes) + (out_spikes_size * sizeof(uint32_t)));
+            sizeof(timed_out_spikes2) + (out_spikes_size * sizeof(uint32_t)));
     if (spikes == NULL) {
         log_error("Out of DTCM when allocating out_spikes");
         return false;

@@ -196,8 +196,7 @@ SYNAPTOGENESIS_DYNAMICS_O := $(BUILD_DIR)$(SYNAPTOGENESIS_DYNAMICS:%.c=%.o)
 OTHER_SOURCES_CONVERTED := $(call strip_source_dirs,$(OTHER_SOURCES))
 
 # List all the sources relative to one of SOURCE_DIRS
-SOURCES = common/out_spikes.c \
-          neuron/c_main.c \
+SOURCES = neuron/c_main.c \
           neuron/synapses.c \
           neuron/direct_synapses.c \
           neuron/neuron.c \

@@ -165,8 +165,11 @@ void neuron_do_timestep_update( // EXPORTED
     neuron_recording_wait_to_complete();
     neuron_recording_setup_for_next_recording();
 
-    // Set up an array for storing the recorded variable values
-    state_t recorded_variable_values[neuron_recording_get_n_recorded_vars()];
+    // Set up an array for storing the matrix recorded variable values
+    uint32_t n_matrix_vars = (
+        neuron_recording_get_n_recorded_vars() -
+        neuron_recording_get_n_bit_field_vars());
+    state_t recorded_variable_values[n_matrix_vars];
 
     // update each neuron individually
     for (index_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
@@ -180,17 +183,18 @@ void neuron_do_timestep_update( // EXPORTED
                 neuron_index, external_bias, recorded_variable_values);
 
         // Write the recorded variable values
-        for (uint32_t i = 0; i < neuron_recording_get_n_recorded_vars(); i++) {
-            neuron_recording_set_recorded_param(
-                i, neuron_index,  recorded_variable_values[i]);
+        for (uint32_t i = 0; i < n_matrix_vars; i++) {
+            neuron_recording_set_int32_recorded_param(
+                i +  neuron_recording_get_n_bit_field_vars(), neuron_index,
+                recorded_variable_values[i]);
         }
 
         // If the neuron has spiked
         if (spike) {
-            log_info("neuron %u spiked at time %u", neuron_index, time);
+            log_debug("neuron %u spiked at time %u", neuron_index, time);
 
             // Record the spike
-            neuron_recording_set_spike(neuron_index);
+            neuron_recording_set_spike(SPIKE_RECORDING_CHANNEL, neuron_index);
 
             // Do any required synapse processing
             synapse_dynamics_process_post_synaptic_event(time, neuron_index);
@@ -221,8 +225,7 @@ void neuron_do_timestep_update( // EXPORTED
     cpsr = spin1_int_disable();
 
     // Record the recorded variables
-    neuron_recording_matrix_record(time);
-    neuron_recording_spike_record(time, SPIKE_RECORDING_CHANNEL);
+    neuron_recording_record(time);
 
     // Re-enable interrupts
     spin1_mode_restore(cpsr);

@@ -24,18 +24,18 @@
 //! \return the number of recordable variables
 uint32_t neuron_recording_get_n_recorded_vars(void);
 
+//! \brief returns the number of variables that are of type bitfield.
+//! \return the number of bitfield vars
+uint32_t neuron_recording_get_n_bit_field_vars(void);
+
 //! \brief allows neurons to wait till recordings have completed
 void neuron_recording_wait_to_complete(void);
-
-//! \brief prints var recording indexes
-void neuron_recorder_print_var_recording_indexes(
-        uint32_t region, uint32_t n_neurons);
 
 //! \brief stores a recording of a matrix based variable
 //! \param[in] recording_var_index: which recording variable to write this is
 //! \param[in] neuron_index: the neuron id for this recorded data
 //! \param[in] value: the results to record for this neuron.
-void neuron_recording_set_recorded_param(
+void neuron_recording_set_int32_recorded_param(
         uint32_t recording_var_index, uint32_t neuron_index, state_t value);
 
 //! \brief stores a recording of a matrix based double value
@@ -54,19 +54,16 @@ void neuron_recording_set_float_recorded_param(
 
 //! \brief stores a recording of a bitfield based variable
 //! \param[in] neuron_index: which neuron to set the spike for
-void neuron_recording_set_spike(uint32_t neuron_index);
+//! \param[in] recording_var_index: which recording variable to write this is
+void neuron_recording_set_spike(
+        uint32_t recording_var_index, uint32_t neuron_index);
 
 //! \brief does the recording matrix process of handing over to basic recording
 //! \param[in] time: the time stamp for this recording
-void neuron_recording_matrix_record(uint32_t time);
-
-//! \brief does the recording spikes process of handing over to basic recording
-//! \param[in] time: the time stamp for this recording
-//! \param[in] channel The channel to record spikes to
-void neuron_recording_spike_record(uint32_t time, uint8_t spike_channel);
+void neuron_recording_record(uint32_t time);
 
 //! \brief sets up state for next recording.
-void neuron_recording_setup_for_next_recording();
+void neuron_recording_setup_for_next_recording(void);
 
 //! \brief reads recording data from sdram as reset.
 //! \param[in] recording_address: sdram location for the recording data
