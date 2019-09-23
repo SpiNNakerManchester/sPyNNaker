@@ -118,7 +118,9 @@ typedef struct source_info {
     spike_source_t poissons[];
 } source_info;
 
-static source_info **sources;
+static source_info **source_data;
+
+static spike_source_t *source;
 
 //! The expected current clock tick of timer_1
 static uint32_t expected_time;
@@ -154,8 +156,8 @@ static bool recording_in_progress = false;
 //! The timer period
 static uint32_t timer_period;
 
-static inline spike_source_t *get_source(uint32_t id) {
-    return &sources[id]->poissons[sources[id]->index];
+static inline spike_source_t *get_source_data(uint32_t id) {
+    return &source_data[id]->poissons[source_data[id]->index];
 }
 
 //! \brief Set specific spikes for recording
@@ -225,7 +227,7 @@ static inline uint32_t faster_spike_source_get_num_spikes(
 }
 
 static void print_spike_source(index_t s) {
-    spike_source_t *p = get_source(s);
+    spike_source_t *p = &source[s];
     log_info("atom %d", s);
     log_info("scaled_start = %u", p->start_ticks);
     log_info("scaled end = %u", p->end_ticks);
@@ -278,8 +280,9 @@ static bool read_global_parameters(global_parameters *sdram_globals) {
 }
 
 static inline void read_next_rates(uint32_t id) {
-    if (sources[id]->index < sources[id]->n_rates) {
-        sources[id]->index++;
+    if (source_data[id]->index < source_data[id]->n_rates) {
+        source_data[id]->index++;
+        spin1_memcpy(&source[id], get_source_data(id), sizeof(spike_source_t));
     }
 }
 
@@ -293,39 +296,37 @@ static bool read_rates(source_info *sdram_sources) {
     if (params.n_spike_sources > 0) {
         // the first time around, the array is set to NULL, afterwards,
         // assuming all goes well, there's an address here.
-        bool alloc = false;
-        if (sources == NULL) {
-            sources = spin1_malloc(params.n_spike_sources * sizeof(source_info *));
+        if (source == NULL) {
+            source = spin1_malloc(params.n_spike_sources * sizeof(spike_source_t));
             // if failed to alloc memory, report and fail.
-            if (sources == NULL) {
-                log_error("Failed to allocate sources");
+            if (source == NULL) {
+                log_error("Failed to allocate local sources");
                 return false;
             }
-            alloc = true;
+            source_data = spin1_malloc(params.n_spike_sources * sizeof(source_info *));
+            if (source_data == NULL) {
+                log_error("Failed to allocate SDRAM source links");
+                return false;
+            }
+
+            // Copy the address of each source
+            source_info *sdram_source = sdram_sources;
+            for (uint32_t i = 0; i < params.n_spike_sources; i++) {
+                source_data[i] = sdram_source;
+                sdram_source = (source_info *)
+                        &(sdram_source->poissons[sdram_source->n_rates]);
+            }
         }
 
-        // The array is not well-defined, so we have to use pointers here
-        source_info *source = sdram_sources;
+        // Put the correct values into the current source information
         for (uint32_t i = 0; i < params.n_spike_sources; i++) {
-            uint32_t n_bytes = sizeof(source_info) +
-                    (source->n_rates * sizeof(spike_source_t));
-            if (alloc) {
-                sources[i] = spin1_malloc(n_bytes);
-                if (sources[i] == NULL) {
-                    log_error("Failed to allocate source %d", source);
-                    return false;
-                }
-            }
-            spin1_memcpy(sources[i], source, n_bytes);
 
             // Skip forward until the time is correct
-            while (get_source(i)->next_ticks < time) {
-                sources[i]->index++;
+            while (get_source_data(i)->next_ticks < time) {
+                source_data[i]->index++;
             }
-
-            // Move to the next source
-            source = (source_info *) &(source->poissons[source->n_rates]);
-
+            // Copy the data
+            spin1_memcpy(&source[i], get_source_data(i), sizeof(spike_source_t));
         }
     }
     log_info("read_poisson_parameters: completed successfully");
@@ -431,7 +432,7 @@ static void resume_callback(void) {
 
     // Loop through slow spike sources and initialise 1st time to spike
     for (index_t s = 0; s < params.n_spike_sources; s++) {
-        spike_source_t *p = get_source(s);
+        spike_source_t *p = &source[s];
         if (!p->is_fast_source && p->time_to_spike_ticks == 0) {
             p->time_to_spike_ticks =
                     slow_spike_source_get_time_to_spike(p->mean_isi_ticks);
@@ -459,15 +460,8 @@ static bool store_poisson_parameters(void) {
 
     // store spike source parameters into array into SDRAM for reading by
     // the host
-    source_info *source = data_specification_get_region(
-        RATES, data_specification_get_data_address());
     for (uint32_t i = 0; i < params.n_spike_sources; i++) {
-        uint32_t n_bytes = sizeof(source_info) +
-                (sources[i]->n_rates * sizeof(spike_source_t));
-        spin1_memcpy(source, sources[i], n_bytes);
-
-        // Move to the next SDRAM source
-        source = (source_info *) &(source->poissons[source->n_rates]);
+        spin1_memcpy(get_source_data(i), &source[i], sizeof(spike_source_t));
     }
 
     log_info("store_parameters: completed successfully");
@@ -674,7 +668,7 @@ static void timer_callback(uint timer_count, uint unused) {
     // Loop through spike sources
     for (index_t s_id = 0; s_id < params.n_spike_sources; s_id++) {
         // If this spike source is active this tick
-        spike_source_t *spike_source = get_source(s_id);
+        spike_source_t *spike_source = &source[s_id];
         if (spike_source->is_fast_source) {
             process_fast_source(s_id, spike_source, timer_count);
         } else {
@@ -711,7 +705,7 @@ void set_spike_source_rate(uint32_t id, REAL rate) {
     REAL rate_per_tick = rate * params.seconds_per_tick;
     log_debug("Setting rate of %u (%u) to %kHz (%k per tick)",
             id, sub_id, rate, rate_per_tick);
-    spike_source_t *spike_source = get_source(sub_id);
+    spike_source_t *spike_source = &source[sub_id];
 
     if (rate_per_tick >= params.slow_rate_per_tick_cutoff) {
         spike_source->is_fast_source = true;
