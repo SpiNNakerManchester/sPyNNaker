@@ -188,6 +188,8 @@ class SynapticManager(object):
 
     @property
     def vertex_executable_suffix(self):
+        if self.__synapse_dynamics is None:
+            return ""
         return self.__synapse_dynamics.get_vertex_executable_suffix()
 
     def add_pre_run_connection_holder(
@@ -303,6 +305,9 @@ class SynapticManager(object):
             self, vertex_slice, application_graph, app_vertex):
         """ Get the size of the synapse dynamics region
         """
+        if self.__synapse_dynamics is None:
+            return 0
+
         # Does the size of the parameters area depend on presynaptic
         # connections in any way?
         if isinstance(self.__synapse_dynamics,
@@ -971,18 +976,19 @@ class SynapticManager(object):
             POPULATION_BASED_REGIONS.DIRECT_MATRIX.value,
             routing_info, graph_mapper, machine_graph, machine_time_step)
 
-        if isinstance(self.__synapse_dynamics,
-                      AbstractSynapseDynamicsStructural):
-            self.__synapse_dynamics.write_structural_parameters(
-                spec, POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value,
-                machine_time_step, weight_scales, application_graph,
-                application_vertex, post_vertex_slice, graph_mapper,
-                routing_info)
-        else:
-            self.__synapse_dynamics.write_parameters(
-                spec,
-                POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value,
-                machine_time_step, weight_scales)
+        if self.__synapse_dynamics is not None:
+            if isinstance(self.__synapse_dynamics,
+                          AbstractSynapseDynamicsStructural):
+                self.__synapse_dynamics.write_structural_parameters(
+                    spec, POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value,
+                    machine_time_step, weight_scales, application_graph,
+                    application_vertex, post_vertex_slice, graph_mapper,
+                    routing_info)
+            else:
+                self.__synapse_dynamics.write_parameters(
+                    spec,
+                    POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value,
+                    machine_time_step, weight_scales)
 
         self.__weight_scales[placement] = weight_scales
 
