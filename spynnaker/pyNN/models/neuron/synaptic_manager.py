@@ -28,15 +28,12 @@ from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
 from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spynnaker.pyNN.models.neuron.generator_data import GeneratorData
-from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.neural_projections.connectors import (
     OneToOneConnector, AbstractGenerateConnectorOnMachine)
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
-from spynnaker.pyNN.models.neuron import master_pop_table_generators
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    SynapseDynamicsStatic, AbstractSynapseDynamicsStructural,
-    AbstractGenerateOnMachine, SynapseDynamicsStructuralSTDP,
-    SynapseDynamicsStructuralStatic, SynapseDynamicsSTDP)
+from .synapse_dynamics import (
+    AbstractSynapseDynamicsStructural,
+    AbstractGenerateOnMachine, SynapseDynamicsStructuralSTDP)
 from spynnaker.pyNN.models.neuron.synapse_io import SynapseIORowBased
 from spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex import (
     SpikeSourcePoissonVertex)
@@ -46,6 +43,7 @@ from spynnaker.pyNN.utilities.constants import (
 from spynnaker.pyNN.utilities.utility_calls import (
     get_maximum_probable_value, get_n_bits)
 from spynnaker.pyNN.utilities.running_stats import RunningStats
+from spynnaker.pyNN.models.neuron import master_pop_table_generators
 
 TIME_STAMP_BYTES = 4
 
@@ -119,7 +117,7 @@ class SynapticManager(object):
 
         # Prepare for dealing with STDP - there can only be one (non-static)
         # synapse dynamics per vertex at present
-        self.__synapse_dynamics = SynapseDynamicsStatic()
+        self.__synapse_dynamics = None
 
         # Keep the details once computed to allow reading back
         self.__weight_scales = dict()
@@ -162,46 +160,11 @@ class SynapticManager(object):
     @synapse_dynamics.setter
     def synapse_dynamics(self, synapse_dynamics):
 
-        # We can always override static dynamics or None
-        if (self.__synapse_dynamics is None or
-                type(self.__synapse_dynamics) == SynapseDynamicsStatic):
+        if self.__synapse_dynamics is None:
             self.__synapse_dynamics = synapse_dynamics
-            return
-
-        # We can ignore a static dynamics trying to overwrite anything else
-        if type(synapse_dynamics) == SynapseDynamicsStatic:
-            return
-
-        # If we have a static structural and an STDP non-structural, they need
-        # to be combined
-        if (type(synapse_dynamics) == SynapseDynamicsStructuralStatic and
-                type(self.__synapse_dynamics) == SynapseDynamicsSTDP):
-            self.__synapse_dynamics = self.__combine_structural_stdp_dynamics(
-                synapse_dynamics, self.__synapse_dynamics)
-            return
-        if (type(self.__synapse_dynamics) ==
-                SynapseDynamicsStructuralStatic and
-                type(synapse_dynamics) == SynapseDynamicsSTDP):
-            self.__synapse_dynamics = self.__combine_structural_stdp_dynamics(
-                self.__synapse_dynamics, synapse_dynamics)
-            return
-
-        # If we are currently STDP, we can override that with StructuralSTDP if
-        # they are the same
-        if (type(self.__synapse_dynamics) == SynapseDynamicsSTDP and
-                type(synapse_dynamics) == SynapseDynamicsStructuralSTDP):
-            if not self.__synapse_dynamics.is_same_as(synapse_dynamics):
-                raise SynapticConfigurationException(
-                    "STDP rules must match exactly when using multiple edges"
-                    "to the same projection")
-            self.__synapse_dynamics = synapse_dynamics
-            return
-
-        # Otherwise, the dynamics must be generally equal
-        if not synapse_dynamics.is_same_as(self.__synapse_dynamics):
-            raise SynapticConfigurationException(
-                "Synapse dynamics must match exactly when using multiple edges"
-                "to the same population")
+        else:
+            self.__synapse_dynamics = self.__synapse_dynamics.merge(
+                synapse_dynamics)
 
     @property
     def ring_buffer_sigma(self):

@@ -19,9 +19,12 @@ from spinn_utilities.overrides import overrides
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spynnaker.pyNN.models.abstract_models import AbstractSettable
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
+from .abstract_synapse_dynamics_structural \
+    import AbstractSynapseDynamicsStructural
 from .abstract_generate_on_machine import (
     AbstractGenerateOnMachine, MatrixGeneratorID)
-from spynnaker.pyNN.exceptions import InvalidParameterType
+from spynnaker.pyNN.exceptions import InvalidParameterType,\
+    SynapticConfigurationException
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 
 # How large are the time-stamps stored with each event
@@ -74,6 +77,36 @@ class SynapseDynamicsSTDP(
         if voltage_dependence is not None:
             raise NotImplementedError(
                 "Voltage dependence has not been implemented")
+
+    @overrides(AbstractPlasticSynapseDynamics.merge)
+    def merge(self, synapse_dynamics):
+        # If dynamics is STDP, test if same as
+        if isinstance(synapse_dynamics, SynapseDynamicsSTDP):
+            if not self.is_same_as(synapse_dynamics):
+                raise SynapticConfigurationException(
+                    "Synapse dynamics must match exactly when using multiple"
+                    " edges to the same population")
+
+            # If STDP part matches, return the other, as it might also be
+            # structural
+            return synapse_dynamics
+
+        # If dynamics is structural but not STDP (as here), merge
+        from .synapse_dynamics_structural_stdp import (
+            SynapseDynamicsStructuralSTDP)
+        if isinstance(synapse_dynamics, AbstractSynapseDynamicsStructural):
+            return SynapseDynamicsStructuralSTDP(
+                synapse_dynamics.partner_selection, synapse_dynamics.formation,
+                synapse_dynamics.elimination,
+                self.timing_dependence, self.weight_dependence,
+                # voltage dependence is not supported
+                None, self.dendritic_delay_fraction,
+                synapse_dynamics.f_rew, synapse_dynamics.initial_weight,
+                synapse_dynamics.initial_delay, synapse_dynamics.s_max,
+                synapse_dynamics.seed)
+
+        # Otherwise, it is static, so return ourselves
+        return self
 
     @overrides(AbstractChangableAfterRun.requires_mapping)
     def requires_mapping(self):

@@ -43,6 +43,12 @@ class SynapseDynamicsStatic(
         self.__delay = delay
         self.__pad_to_length = pad_to_length
 
+    @overrides(AbstractStaticSynapseDynamics.merge)
+    def merge(self, synapse_dynamics):
+        # We can always override a static synapse dynamics with a more
+        # complex model
+        return synapse_dynamics
+
     @overrides(AbstractStaticSynapseDynamics.is_same_as)
     def is_same_as(self, synapse_dynamics):
         return isinstance(synapse_dynamics, SynapseDynamicsStatic)

@@ -14,11 +14,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_utilities.overrides import overrides
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractSynapseDynamicsStructural, SynapseDynamicsSTDP)
+from .synapse_dynamics_stdp import SynapseDynamicsSTDP
+from .abstract_synapse_dynamics_structural import (
+    AbstractSynapseDynamicsStructural)
 from .synapse_dynamics_structural_common import (
     SynapseDynamicsStructuralCommon as
     CommonSP)
+from spynnaker.pyNN.exceptions import SynapticConfigurationException
 
 
 class SynapseDynamicsStructuralSTDP(
@@ -88,6 +90,25 @@ class SynapseDynamicsStructuralSTDP(
         self.__common_sp = CommonSP(
             partner_selection, formation, elimination, f_rew, initial_weight,
             initial_delay, s_max, seed)
+
+    @overrides(SynapseDynamicsSTDP.merge)
+    def merge(self, synapse_dynamics):
+        # If other is structural, check structural matches
+        if isinstance(synapse_dynamics, AbstractSynapseDynamicsStructural):
+            if not self.__common_sp.is_same_as(synapse_dynamics):
+                raise SynapticConfigurationException(
+                    "Synapse dynamics must match exactly when using multiple"
+                    " edges to the same population")
+        # If other is STDP, check STDP matches
+        if isinstance(synapse_dynamics, SynapseDynamicsSTDP):
+            if not super(SynapseDynamicsStructuralSTDP, self).is_same_as(
+                    synapse_dynamics):
+                raise SynapticConfigurationException(
+                    "Synapse dynamics must match exactly when using multiple"
+                    " edges to the same population")
+
+        # If everything matches, return ourselves as supreme!
+        return self
 
     @overrides(AbstractSynapseDynamicsStructural.write_structural_parameters)
     def write_structural_parameters(

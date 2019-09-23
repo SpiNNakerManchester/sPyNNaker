@@ -29,6 +29,12 @@ class AbstractSynapseDynamics(object):
                               ("weight", "float64"), ("delay", "float64")]
 
     @abstractmethod
+    def merge(self, synapse_dynamics):
+        """ Merge with the given synapse_dynamics and return the result, or\
+            error if merge is not possible
+        """
+
+    @abstractmethod
     def is_same_as(self, synapse_dynamics):
         """ Determines if this synapse dynamics is the same as another
         """

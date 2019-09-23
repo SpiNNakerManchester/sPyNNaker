@@ -19,6 +19,9 @@ from .abstract_synapse_dynamics_structural import (
 from .synapse_dynamics_structural_common import (
     SynapseDynamicsStructuralCommon as CommonSP)
 from .synapse_dynamics_static import SynapseDynamicsStatic
+from .synapse_dynamics_stdp import SynapseDynamicsSTDP
+from .synapse_dynamics_structural_stdp import SynapseDynamicsStructuralSTDP
+from spynnaker.pyNN.exceptions import SynapticConfigurationException
 
 
 class SynapseDynamicsStructuralStatic(
@@ -82,6 +85,33 @@ class SynapseDynamicsStructuralStatic(
         self.__common_sp = CommonSP(
             partner_selection, formation, elimination, f_rew, initial_weight,
             initial_delay, s_max, seed)
+
+    @overrides(SynapseDynamicsStatic.merge)
+    def merge(self, synapse_dynamics):
+        # If the dynamics is structural, check if same as this
+        if isinstance(synapse_dynamics, AbstractSynapseDynamicsStructural):
+            if not self.is_same_as(synapse_dynamics):
+                raise SynapticConfigurationException(
+                    "Synapse dynamics must match exactly when using multiple"
+                    " edges to the same population")
+
+            # If structural part matches, return other as it might also be STDP
+            return synapse_dynamics
+
+        # If the dynamics is STDP but not Structural (as here), merge
+        if isinstance(synapse_dynamics, SynapseDynamicsSTDP):
+            return SynapseDynamicsStructuralSTDP(
+                self.partner_selection, self.formation,
+                self.elimination,
+                synapse_dynamics.timing_dependence,
+                synapse_dynamics.weight_dependence,
+                # voltage dependence is not supported
+                None, synapse_dynamics.dendritic_delay_fraction,
+                self.f_rew, self.initial_weight, self.initial_delay,
+                self.s_max, self.seed)
+
+        # Otherwise, it is static, so return ourselves
+        return self
 
     @overrides(AbstractSynapseDynamicsStructural.write_structural_parameters)
     def write_structural_parameters(
