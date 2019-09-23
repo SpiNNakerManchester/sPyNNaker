@@ -1216,3 +1216,9 @@ class SynapticManager(object):
         """
         key = (vertex_slice.lo_atom, vertex_slice.hi_atom)
         return self.__gen_on_machine.get(key, False)
+
+    @property
+    def changes_during_run(self):
+        if self.__synapse_dynamics is None:
+            return False
+        return self.__synapse_dynamics.changes_during_run

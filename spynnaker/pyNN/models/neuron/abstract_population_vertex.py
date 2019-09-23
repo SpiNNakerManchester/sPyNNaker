@@ -878,6 +878,6 @@ class AbstractPopulationVertex(
         self.__change_requires_neuron_parameters_reload = True
 
         # If synapses change during the run,
-        if self.__synapse_manager.synapse_dynamics.changes_during_run:
+        if self.__synapse_manager.changes_during_run:
             self.__change_requires_data_generation = True
             self.__change_requires_neuron_parameters_reload = False
