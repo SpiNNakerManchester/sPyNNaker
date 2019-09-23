@@ -122,7 +122,6 @@ void neuron_recording_set_int32_recorded_param(
 void neuron_recording_set_double_recorded_param(
         uint32_t recording_var_index, uint32_t neuron_index, double value){
     uint8_t index = var_recording_indexes[recording_var_index][neuron_index];
-    uint32_t index_index = (uint32_t) index;
     var_double_recording_values[recording_var_index]->states[index] = value;
 }
 
