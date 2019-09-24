@@ -93,9 +93,9 @@ static inline void do_dma_read(
     // Start a DMA transfer to fetch this synaptic row into current
     // buffer
     buffer_being_read = next_buffer_to_fill;
-    spin1_dma_transfer(
+    while (!spin1_dma_transfer(
             DMA_TAG_READ_SYNAPTIC_ROW, row_address, next_buffer->row, DMA_READ,
-            n_bytes_to_transfer);
+            n_bytes_to_transfer));
     next_buffer_to_fill = (next_buffer_to_fill + 1) % N_DMA_BUFFERS;
 }
 
@@ -210,18 +210,17 @@ static inline void setup_synaptic_dma_write(
     address_t sdram_start_address = buffer->sdram_writeback_address;
     address_t dtcm_start_address = buffer->row;
     if (plastic_only) {
-        write_size =
-            synapse_row_plastic_size(buffer->row) * sizeof(uint32_t);
+        write_size = synapse_row_plastic_size(buffer->row) * sizeof(uint32_t);
         sdram_start_address = synapse_row_plastic_region(sdram_start_address);
         dtcm_start_address = synapse_row_plastic_region(dtcm_start_address);
     }
 
-    log_debug("Writing back %u bytes of plastic region to %08x",
-              write_size, sdram_start_address);
+    log_debug("Writing back %u bytes of plastic region to %08x for spike %u",
+              write_size, sdram_start_address, buffer->originating_spike);
 
     // Start transfer
-    spin1_dma_transfer(DMA_TAG_WRITE_PLASTIC_REGION, sdram_start_address,
-        dtcm_start_address, DMA_WRITE, write_size);
+    while (!spin1_dma_transfer(DMA_TAG_WRITE_PLASTIC_REGION, sdram_start_address,
+            dtcm_start_address, DMA_WRITE, write_size));
 }
 
 // Called when a multicast packet is received
