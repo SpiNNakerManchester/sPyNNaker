@@ -49,8 +49,7 @@ static void *connection_generator_one_to_one_initialise(address_t *region) {
 
     count_post = 0;
 
-//    log_debug("One to one connector, pre_lo = %u, pre_hi = %u"
-    log_info("One to one connector, pre_lo = %u, pre_hi = %u, "
+    log_debug("One to one connector, pre_lo = %u, pre_hi = %u, "
     		"post_lo = %u, post_hi = %u, count_post = %u",
             params->pre_lo, params->pre_hi, params->post_lo, params->post_hi,
 			count_post);
@@ -81,12 +80,6 @@ static uint32_t connection_generator_one_to_one_generate(
         return 0;
     }
 
-//    // If out of range, don't generate anything
-//    if ((pre_neuron_index < post_slice_start) ||
-//            (pre_neuron_index >= post_slice_start + post_slice_count)) {
-//        return 0;
-//    }
-
     // If not in the pre-population view range, then don't generate
     if ((pre_neuron_index < obj->pre_lo) ||
     		(pre_neuron_index > obj->pre_hi)) {
@@ -99,8 +92,6 @@ static uint32_t connection_generator_one_to_one_generate(
     	count_post++;
     	return 0;
     }
-
-//    count_post++;
 
     // Pre-index = (core-relative) post-index
     log_info("pre_neuron_index %u post_lo %u count_post %u",
