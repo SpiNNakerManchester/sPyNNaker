@@ -77,6 +77,10 @@ class RedundantPacketCountReport(object):
                         data[key][
                             PopulationMachineVertex.INVALID_MASTER_POP_HITS])
 
+                    percentage = 0.0
+                    if total != 0:
+                        percentage = (100.0 / total) * redundant
+
                     output.write(
                         "core {} has received a total of {} packets. Of "
                         "these, {} were detected as redundant packets by the "
@@ -93,4 +97,4 @@ class RedundantPacketCountReport(object):
                             data[key][
                                 PopulationMachineVertex.
                                 INVALID_MASTER_POP_HITS],
-                            (100.0 / total) * redundant))
+                            percentage))

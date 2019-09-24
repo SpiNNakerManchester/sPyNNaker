@@ -282,8 +282,8 @@ class NeuronRecorder(object):
     def expected_rows_for_a_run_time(
             run_time, local_time_period_map, vertex, sampling_rate):
         return int(
-            (run_time * MICRO_TO_MILLISECOND_CONVERSION) /
-            local_time_period_map[vertex]) / sampling_rate
+            ((run_time * MICRO_TO_MILLISECOND_CONVERSION) /
+             local_time_period_map[vertex]) / sampling_rate)
 
     def get_matrix_data(
             self, label, buffer_manager, region, placements, graph_mapper,
