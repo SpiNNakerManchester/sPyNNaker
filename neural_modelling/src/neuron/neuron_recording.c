@@ -112,6 +112,11 @@ void neuron_recording_set_int32_recorded_param(
         uint32_t recording_var_index, uint32_t neuron_index, state_t value) {
     uint32_t index = var_recording_indexes[recording_var_index][neuron_index];
     var_int32_recording_values[recording_var_index]->states[index] = value;
+    if (recording_var_index == 1 && index != 4){
+        log_info(
+            "for region %d n %d it has value %k in index %d",
+            recording_var_index, neuron_index, value, index);
+   }
 }
 
 
@@ -139,9 +144,13 @@ void neuron_recording_set_float_recorded_param(
 void neuron_recording_set_spike(
         uint32_t recording_var_index, uint32_t neuron_index){
     // Record the spike
+    uint32_t index = var_recording_indexes[recording_var_index][neuron_index];
     bit_field_set(
         &var_bit_fields_recording_values[recording_var_index]->out_spikes[0],
-        neuron_index);
+        index);
+    if (index != 6){
+        log_info("setting spike for neuron %d goes to %d", neuron_index, index);
+    }
 }
 
 //! \brief does the recording process of handing over to basic recording
@@ -201,7 +210,7 @@ void neuron_recording_setup_for_next_recording(void){
     // if the bitfields are recording anything in the first place.
     for (uint32_t i = 0; i < n_recorded_vars; i++) {
         if (var_recording_type_index[i] == BIT_FIELD &&
-                var_recording_rate[i] != 0) {
+                var_recording_rate[i] != 0 && var_recording_count[i] == 1) {
             clear_bit_field(
                 &var_bit_fields_recording_values[i]->out_spikes[0],
                 var_recording_size[i] - TIME_STAMP_SIZE_IN_BYTES);
@@ -317,7 +326,6 @@ bool neuron_recording_reset(address_t address, uint32_t n_neurons){
         log_error("failed to reread in the new elements after reset");
         return false;
     }
-    _reset_record_counter();
     return true;
 }
 

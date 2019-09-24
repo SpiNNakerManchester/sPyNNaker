@@ -174,8 +174,7 @@ class NeuronRecorder(object):
 
     def _process_missing_data(
             self, missing_str, placement, expected_rows, n_neurons, times,
-            n_rows, sampling_rate, needs_scaling, label, variable,
-            placement_data):
+            sampling_rate, label, placement_data):
         missing_str += "({}, {}, {}); ".format(
             placement.x, placement.y, placement.p)
         # Start the fragment for this slice empty
@@ -185,16 +184,9 @@ class NeuronRecorder(object):
             # Check if there is data for this time step
             local_indexes = numpy.where(times == time)
             if len(local_indexes[0]) == 1:
-                if needs_scaling:
-                    fragment[i] = (
-                        placement_data[local_indexes[0]] /
-                        float(self.__matrix_scalar_types[
-                                  variable].scale))
-                else:
-                    fragment[i] = placement_data[local_indexes[0]]
+                fragment[i] = placement_data[local_indexes[0]]
             elif len(local_indexes[0]) > 1:
-                fragment[i] = (placement_data[local_indexes[0], 1:] /
-                               float(DataType.S1615.scale))
+                fragment[i] = placement_data[local_indexes[0], 1:]
                 logger.warning(
                     "Population {} has multiple recorded data for "
                     "time {}".format(label, time))
@@ -274,8 +266,7 @@ class NeuronRecorder(object):
             # process data from core for missing data
             placement_data = self._process_missing_data(
                 missing_str, placement, expected_rows, n_neurons, times,
-                n_rows, sampling_rate, needs_scaling, label, variable,
-                placement_data)
+                sampling_rate, label, placement_data)
             return placement_data, sampling_interval
 
     @staticmethod
@@ -289,7 +280,7 @@ class NeuronRecorder(object):
         :return: how many rows there should be. 
         """
         (_, point_gone_to) = current_run_timesteps_map[vertex]
-        return int(math.floor(point_gone_to / sampling_rate))
+        return int(math.ceil(point_gone_to / sampling_rate))
 
     def get_matrix_data(
             self, label, buffer_manager, region, placements, graph_mapper,
