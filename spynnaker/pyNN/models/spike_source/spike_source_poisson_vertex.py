@@ -296,8 +296,9 @@ class SpikeSourcePoissonVertex(
 
         :param vertex_slice:
         """
-        return BYTES_PER_WORD * (PARAMS_BASE_WORDS +
-                (vertex_slice.n_atoms * PARAMS_WORDS_PER_NEURON))
+        return BYTES_PER_WORD * (
+            (vertex_slice.n_atoms * PARAMS_WORDS_PER_NEURON) +
+            PARAMS_BASE_WORDS)
 
     def reserve_memory_regions(self, spec, placement, graph_mapper):
         """ Reserve memory regions for poisson source parameters and output\
