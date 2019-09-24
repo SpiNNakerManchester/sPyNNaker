@@ -283,6 +283,10 @@ static inline void read_next_rates(uint32_t id) {
     if (source_data[id]->index < source_data[id]->n_rates) {
         source_data[id]->index++;
         spin1_memcpy(&source[id], get_source_data(id), sizeof(spike_source_t));
+        if (!source[id].is_fast_source) {
+            source[id].time_to_spike_ticks =
+                    slow_spike_source_get_time_to_spike(source[id].mean_isi_ticks);
+        }
     }
 }
 
@@ -393,7 +397,7 @@ static bool initialize(void) {
     }
 
     // print spike sources for debug purposes
-    print_spike_sources();
+    // print_spike_sources();
 
     // Set up recording buffer
     n_spike_buffers_allocated = 0;
@@ -678,7 +682,7 @@ static void timer_callback(uint timer_count, uint unused) {
         if ((time + 1) >= spike_source->next_ticks) {
             log_debug("Moving to next rate at time %d", time);
             read_next_rates(s_id);
-            print_spike_source(s_id);
+            // print_spike_source(s_id);
         }
     }
 
