@@ -197,7 +197,7 @@ class RecordingCommon(object):
             # assuming we got here, everything is ok, so we should go get the
             # data
             results = self.__population._vertex.get_data(
-                variable, sim.get_generated_output("RunTime"), sim.placements,
+                variable, sim.current_run_timesteps_map, sim.placements,
                 sim.graph_mapper, sim.buffer_manager,
                 sim.local_timer_period_map)
             (data, indexes, sampling_interval) = results

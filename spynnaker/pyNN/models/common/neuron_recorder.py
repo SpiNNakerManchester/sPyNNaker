@@ -280,14 +280,21 @@ class NeuronRecorder(object):
 
     @staticmethod
     def expected_rows_for_a_run_time(
-            run_time, local_time_period_map, vertex, sampling_rate):
-        return int(
-            ((run_time * MICRO_TO_MILLISECOND_CONVERSION) /
-             local_time_period_map[vertex]) / sampling_rate)
+            current_run_timesteps_map, vertex, sampling_rate):
+        """ determines how mnay rows to see based off how long its ran for
+        
+        :param current_run_timesteps_map: map of vertex to time steps
+        :param vertex: the machine vertex
+        :param sampling_rate: the sampling rate for a given variable
+        :return: how many rows there should be. 
+        """
+        (_, point_gone_to) = current_run_timesteps_map[vertex]
+        return int(math.floor(point_gone_to / sampling_rate))
 
     def get_matrix_data(
             self, label, buffer_manager, region, placements, graph_mapper,
-            application_vertex, variable, run_time, local_time_period_map):
+            application_vertex, variable, current_run_timesteps_map,
+            local_time_period_map):
         """ Reads raw data mapped to time and neuron IDs from the SpiNNaker\
             machine and converts to required data types with scaling if needed.
 
@@ -300,7 +307,7 @@ class NeuronRecorder(object):
         :param application_vertex:
         :param variable: PyNN name for the variable (V, gsy_inh etc.)
         :type variable: str
-        :param run_time: how many ms were run this resume cycle.
+        :param current_run_timesteps_map: map of vertex to current and next step
         :param local_time_period_map: the map of vertex to local time period
         :type local_time_period_map: map of machine vertex to int
         :return:
@@ -323,8 +330,7 @@ class NeuronRecorder(object):
         indexes = []
         for vertex in progress.over(vertices):
             expected_rows = application_vertex.get_expected_n_rows(
-                run_time, local_time_period_map, sampling_rate, vertex,
-                variable)
+                current_run_timesteps_map, sampling_rate, vertex, variable)
 
             placement_data, sampling_interval = \
                 self._get_placement_matrix_data(

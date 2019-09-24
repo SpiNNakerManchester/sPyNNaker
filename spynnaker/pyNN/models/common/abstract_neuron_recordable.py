@@ -68,13 +68,12 @@ class AbstractNeuronRecordable(object):
 
     @abstractmethod
     def get_data(
-            self, variable, run_time, placements, graph_mapper,
-            buffer_manager, local_time_period_map):
+            self, variable, current_run_timesteps_map, placements,
+            graph_mapper, buffer_manager, local_time_period_map):
         """ Get the recorded data
 
         :param variable: the variable name to get data for
-        :param run_time: how long the simulation ran for this step /
-        (not total runtime)
+        :param current_run_timesteps_map: map of vertex to steps
         :param placements: placements
         :param graph_mapper: mapping between app and machine graphs
         :param buffer_manager: buffer manager
@@ -98,12 +97,10 @@ class AbstractNeuronRecordable(object):
 
     @abstractmethod
     def get_expected_n_rows(
-            self, run_time, local_time_period_map, sampling_rate, vertex,
-            variable):
+            self, current_run_timesteps_map, sampling_rate, vertex, variable):
         """ Returns the number of expected rows for a given runtime
 
-        :param run_time: runtime
-        :param local_time_period_map: map between vertex and time period
+        :param current_run_timesteps_map: map of vertex to steps.
         :param sampling_rate: the sampling rate for this vertex
         :param vertex: the machine vertex
         :param variable: the variable being recorded
