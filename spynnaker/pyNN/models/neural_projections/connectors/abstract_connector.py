@@ -48,6 +48,8 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         "__min_delay",
         "__pre_population",
         "__post_population",
+        "_prepop_is_view",
+        "_postpop_is_view",
         "__n_clipped_delays",
         "_n_post_neurons",
         "_n_pre_neurons",
@@ -65,6 +67,8 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
 
         self.__pre_population = None
         self.__post_population = None
+        self._prepop_is_view = False
+        self._prepop_is_view = False
         self._n_pre_neurons = None
         self._n_post_neurons = None
         self._rng = rng
