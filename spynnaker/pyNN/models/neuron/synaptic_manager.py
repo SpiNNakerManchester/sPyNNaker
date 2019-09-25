@@ -880,7 +880,6 @@ class SynapticManager(object):
         """ Determine if the given connection can be done with a "direct"\
             synaptic matrix - this must have an exactly 1 entry per row
         """
-        print('connector: ', connector)
         return (
             app_edge.n_delay_stages == 0 and
             connector.use_direct_matrix and
