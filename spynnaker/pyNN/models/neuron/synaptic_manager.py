@@ -30,7 +30,7 @@ from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spynnaker.pyNN.models.neuron.generator_data import GeneratorData
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.neural_projections.connectors import (
-    OneToOneConnector, AbstractGenerateConnectorOnMachine)
+    AbstractGenerateConnectorOnMachine)
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.models.neuron import master_pop_table_generators
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (

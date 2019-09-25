@@ -111,12 +111,12 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
             view_lo, view_hi = self._get_view_lo_hi(
                 self.pre_population._indexes)
             if ((view_lo > pre_vertex_slice.lo_atom) and
-                (view_lo < pre_vertex_slice.hi_atom)):
+                    (view_lo < pre_vertex_slice.hi_atom)):
                 pre_lo = view_lo
             else:
                 pre_lo = pre_vertex_slice.lo_atom
             if ((view_hi > pre_vertex_slice.lo_atom) and
-                (view_hi < pre_vertex_slice.hi_atom)):
+                    (view_hi < pre_vertex_slice.hi_atom)):
                 pre_hi = view_hi
             else:
                 pre_hi = pre_vertex_slice.hi_atom
@@ -129,12 +129,12 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
             view_lo, view_hi = self._get_view_lo_hi(
                 self.post_population._indexes)
             if ((view_lo > post_vertex_slice.lo_atom) and
-                (view_lo < post_vertex_slice.hi_atom)):
+                    (view_lo < post_vertex_slice.hi_atom)):
                 post_lo = view_lo
             else:
                 post_lo = post_vertex_slice.lo_atom
             if ((view_hi > post_vertex_slice.lo_atom) and
-                (view_hi < post_vertex_slice.hi_atom)):
+                    (view_hi < post_vertex_slice.hi_atom)):
                 post_hi = view_hi
             else:
                 post_hi = post_vertex_slice.hi_atom
