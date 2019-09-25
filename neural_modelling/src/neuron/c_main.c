@@ -258,18 +258,19 @@ static bool initialise(void) {
 //! \brief the function to call when resuming a simulation
 //! \return None
 void resume_callback(void) {
-    // try reloading neuron parameters
     data_specification_metadata_t *ds_regions =
             data_specification_get_data_address();
-    if (!neuron_reload_neuron_parameters(
-            data_specification_get_region(NEURON_PARAMS_REGION, ds_regions))) {
-        log_error("failed to reload the neuron parameters.");
-        rt_error(RTE_SWERR);
-    }
     if (!neuron_recording_reset(
             data_specification_get_region(NEURON_RECORDING_REGION, ds_regions),
             n_neurons)){
         log_error("failed to reload the neuron recording parameters");
+        rt_error(RTE_SWERR);
+    }
+
+    // try reloading neuron parameters
+    if (!neuron_reload_neuron_parameters(
+            data_specification_get_region(NEURON_PARAMS_REGION, ds_regions))) {
+        log_error("failed to reload the neuron parameters.");
         rt_error(RTE_SWERR);
     }
 }

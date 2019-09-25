@@ -112,11 +112,6 @@ void neuron_recording_set_int32_recorded_param(
         uint32_t recording_var_index, uint32_t neuron_index, state_t value) {
     uint32_t index = var_recording_indexes[recording_var_index][neuron_index];
     var_int32_recording_values[recording_var_index]->states[index] = value;
-    if (recording_var_index == 1 && index != 4){
-        log_info(
-            "for region %d n %d it has value %k in index %d",
-            recording_var_index, neuron_index, value, index);
-   }
 }
 
 
@@ -157,8 +152,10 @@ void neuron_recording_set_spike(
 //! \param[in] time: the time to put into the recording stamps.
 void neuron_recording_record(uint32_t time) {
     // go through all recordings
+
     for (uint32_t i = 0; i < n_recorded_vars; i++) {
         // if the rate says record
+
         if (var_recording_count[i] == var_recording_rate[i]) {
             var_recording_count[i] = 1;
             n_recordings_outstanding += 1;
@@ -265,6 +262,9 @@ bool _neuron_recording_read_in_elements(
 
     // determine how many words for the n neurons
     uint32_t n_words_for_n_neurons = (n_neurons + 3) >> 2;
+
+    // reset counter for safety when rereading the system
+    n_bit_field_based_vars = 0;
 
     // Load other variable recording details
     uint32_t next = basic_recording_words_read;
