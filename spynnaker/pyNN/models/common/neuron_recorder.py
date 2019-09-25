@@ -261,7 +261,7 @@ class NeuronRecorder(object):
 
         :param n_machine_time_steps: map of vertex to time steps
         :param sampling_rate: the sampling rate for a given variable
-        :return: how many rows there should be. 
+        :return: how many rows there should be.
         """
         return int(math.ceil(n_machine_time_steps / sampling_rate))
 
