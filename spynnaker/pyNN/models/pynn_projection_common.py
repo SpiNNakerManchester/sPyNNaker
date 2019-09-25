@@ -91,10 +91,10 @@ class PyNNProjectionCommon(object):
         # (otherwise SDRAM estimation calculations can go wrong)
         if not get_simulator().is_a_pynn_random(synapse_dynamics_stdp.delay):
             synapse_dynamics_stdp.delay = (
-                numpy.rint(numpy.array(
-                    synapse_dynamics_stdp.delay) *
+                numpy.rint(
+                    numpy.array(synapse_dynamics_stdp.delay) *
                     (MICRO_TO_MILLISECOND_CONVERSION / machine_time_step)) *
-                    (machine_time_step / MICRO_TO_MILLISECOND_CONVERSION))
+                (machine_time_step / MICRO_TO_MILLISECOND_CONVERSION))
 
         # set the plasticity dynamics for the post pop (allows plastic stuff
         #  when needed)

@@ -220,8 +220,8 @@ class SynapseIORowBased(AbstractSynapseIO):
 
         # Convert delays to timesteps
         connections["delay"] = numpy.rint(
-            connections["delay"] *
-                (MICRO_TO_MILLISECOND_CONVERSION / machine_time_step))
+            connections["delay"] * (
+                MICRO_TO_MILLISECOND_CONVERSION / machine_time_step))
 
         # Scale weights
         connections["weight"] = (connections["weight"] * weight_scales[
