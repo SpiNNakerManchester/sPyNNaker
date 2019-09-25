@@ -88,7 +88,8 @@ static uint32_t connection_generator_one_to_one_generate(
 
     // If out of range of the post-population then don't generate
     if ((obj->post_lo + count_post < post_slice_start) ||
-    		(obj->post_lo + count_post >= post_slice_start + post_slice_count)) {
+    		(obj->post_lo + count_post >= post_slice_start + post_slice_count) ||
+			(obj->post_lo + count_post > obj->post_hi)) {
     	count_post++;
     	return 0;
     }
