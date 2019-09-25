@@ -34,8 +34,7 @@ from spinn_front_end_common.utilities import (
     constants as common_constants, helpful_functions, globals_variables)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.interface.simulation import simulation_utilities
-from spinn_front_end_common.interface.buffer_management import (
-    recording_utilities)
+from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
 from spinn_front_end_common.interface.profiling import profile_utils
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, AbstractNeuronRecordable, NeuronRecorder)
