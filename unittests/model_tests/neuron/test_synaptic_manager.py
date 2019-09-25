@@ -215,13 +215,16 @@ class TestSynapticManager(unittest.TestCase):
         post_slice_index = 0
         one_to_one_connector_1 = OneToOneConnector(None)
         one_to_one_connector_1.set_projection_information(
-            pre_app_vertex, post_app_vertex, None, machine_time_step)
+            pre_app_vertex, post_app_vertex, None, machine_time_step,
+            False, False)
         one_to_one_connector_2 = OneToOneConnector(None)
         one_to_one_connector_2.set_projection_information(
-            pre_app_vertex, post_app_vertex, None, machine_time_step)
+            pre_app_vertex, post_app_vertex, None, machine_time_step,
+            False, False)
         all_to_all_connector = AllToAllConnector(None)
         all_to_all_connector.set_projection_information(
-            pre_app_vertex, post_app_vertex, None, machine_time_step)
+            pre_app_vertex, post_app_vertex, None, machine_time_step,
+            False, False)
         direct_synapse_information_1 = SynapseInformation(
             one_to_one_connector_1, SynapseDynamicsStatic(), 0, 1.5, 1.0)
         direct_synapse_information_2 = SynapseInformation(

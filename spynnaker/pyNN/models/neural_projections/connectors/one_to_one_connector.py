@@ -106,7 +106,7 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
 
     def _get_pre_post_limits(
             self, pre_vertex_slice, post_vertex_slice):
-        if self._prepop_view:
+        if self._prepop_is_view:
             # work out which atoms are on this pre-slice
             view_lo, view_hi = self._get_view_lo_hi(
                 self.pre_population._indexes)
@@ -124,7 +124,7 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
             pre_lo = pre_vertex_slice.lo_atom
             pre_hi = pre_vertex_slice.hi_atom
 
-        if self._postpop_view:
+        if self._postpop_is_view:
             # work out which atoms are on this post-slice
             view_lo, view_hi = self._get_view_lo_hi(
                 self.post_population._indexes)
@@ -152,7 +152,7 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
     @property
     @overrides(AbstractConnector.use_direct_matrix)
     def use_direct_matrix(self):
-        if self._prepop_view or self._postpop_view:
+        if self._prepop_is_view or self._postpop_is_view:
             return False
         return True
 
@@ -170,7 +170,7 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
         params = []
         pre_view_lo = 0
         pre_view_hi = self._n_pre_neurons - 1
-        if self._prepop_view:
+        if self._prepop_is_view:
             pre_view_lo, pre_view_hi = self._get_view_lo_hi(
                 self.pre_population._indexes)
 
@@ -178,7 +178,7 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
 
         post_view_lo = 0
         post_view_hi = self._n_post_neurons - 1
-        if self._postpop_view:
+        if self._postpop_is_view:
             post_view_lo, post_view_hi = self._get_view_lo_hi(
                 self.post_population._indexes)
 

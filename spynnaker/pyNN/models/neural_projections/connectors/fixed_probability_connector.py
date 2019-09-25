@@ -148,7 +148,7 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
         params = []
         pre_view_lo = 0
         pre_view_hi = self._n_pre_neurons - 1
-        if self._prepop_view:
+        if self._prepop_is_view:
             pre_view_lo, pre_view_hi = self._get_view_lo_hi(
                 self.pre_population._indexes)
 
@@ -156,7 +156,7 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
 
         post_view_lo = 0
         post_view_hi = self._n_post_neurons - 1
-        if self._postpop_view:
+        if self._postpop_is_view:
             post_view_lo, post_view_hi = self._get_view_lo_hi(
                 self.post_population._indexes)
 

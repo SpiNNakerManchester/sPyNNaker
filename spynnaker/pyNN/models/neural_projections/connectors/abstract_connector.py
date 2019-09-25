@@ -82,16 +82,16 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         self.__space = space
 
     def set_projection_information(
-            self, pre_population, post_population, prepop_view, postpop_view,
-            rng, machine_time_step):
+            self, pre_population, post_population, prepop_is_view,
+            postpop_is_view, rng, machine_time_step):
         self.__pre_population = pre_population
         self.__post_population = post_population
         self._n_pre_neurons = pre_population.size
         self._n_post_neurons = post_population.size
         self._rng = (self._rng or rng or get_simulator().get_pynn_NumpyRNG()())
         self.__min_delay = machine_time_step / 1000.0
-        self._prepop_view = prepop_view
-        self._postpop_view = postpop_view
+        self._prepop_is_view = prepop_is_view
+        self._postpop_is_view = postpop_is_view
 
     def _check_parameter(self, values, name, allow_lists):
         """ Check that the types of the values is supported.

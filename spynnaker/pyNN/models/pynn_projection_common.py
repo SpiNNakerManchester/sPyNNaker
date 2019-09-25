@@ -61,7 +61,7 @@ class PyNNProjectionCommon(object):
     def __init__(
             self, spinnaker_control, connector, synapse_dynamics_stdp,
             target, pre_synaptic_population, post_synaptic_population,
-            prepop_view, postpop_view,
+            prepop_is_view, postpop_is_view,
             rng, machine_time_step, user_max_delay, label, time_scale_factor):
         # pylint: disable=too-many-arguments, too-many-locals
         self.__spinnaker_control = spinnaker_control
@@ -105,7 +105,7 @@ class PyNNProjectionCommon(object):
         # Set projection information in connector
         connector.set_projection_information(
             pre_synaptic_population, post_synaptic_population,
-            prepop_view, postpop_view, rng, machine_time_step)
+            prepop_is_view, postpop_is_view, rng, machine_time_step)
 
         # handle max delay
         max_delay = synapse_dynamics_stdp.get_delay_maximum(
