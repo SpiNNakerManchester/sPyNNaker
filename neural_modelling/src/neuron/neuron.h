@@ -34,7 +34,6 @@
 #define _NEURON_H_
 
 #include <common/neuron-typedefs.h>
-#include "recording.h"
 
 //! \brief translate the data stored in the NEURON_PARAMS data region in SDRAM
 //!        and convert it into c based objects for use.

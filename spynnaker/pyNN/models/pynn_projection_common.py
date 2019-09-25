@@ -16,6 +16,9 @@
 import logging
 import math
 import numpy
+
+from spinn_front_end_common.utilities.constants import \
+    MICRO_TO_MILLISECOND_CONVERSION
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.constraints.partitioner_constraints import (
     SameAtomsAsVertexConstraint)
@@ -87,9 +90,11 @@ class PyNNProjectionCommon(object):
         # round the delays to multiples of full timesteps
         # (otherwise SDRAM estimation calculations can go wrong)
         if not get_simulator().is_a_pynn_random(synapse_dynamics_stdp.delay):
-            synapse_dynamics_stdp.delay = numpy.rint(numpy.array(
-                synapse_dynamics_stdp.delay) * (
-                    1000.0 / machine_time_step)) * (machine_time_step / 1000.0)
+            synapse_dynamics_stdp.delay = (
+                numpy.rint(numpy.array(
+                    synapse_dynamics_stdp.delay) *
+                    (MICRO_TO_MILLISECOND_CONVERSION / machine_time_step)) *
+                    (machine_time_step / MICRO_TO_MILLISECOND_CONVERSION))
 
         # set the plasticity dynamics for the post pop (allows plastic stuff
         #  when needed)
@@ -123,7 +128,8 @@ class PyNNProjectionCommon(object):
                 "The maximum delay {} for projection is not supported".format(
                     max_delay))
 
-        if max_delay > user_max_delay / (machine_time_step / 1000.0):
+        if max_delay > user_max_delay / (
+                machine_time_step / MICRO_TO_MILLISECOND_CONVERSION):
             logger.warning("The end user entered a max delay"
                            " for which the projection breaks")
 

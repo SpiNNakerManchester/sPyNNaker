@@ -16,6 +16,8 @@
 import decimal
 import numpy
 from data_specification.enums.data_type import DataType
+from spinn_front_end_common.utilities.constants import \
+    MICRO_TO_MILLISECOND_CONVERSION
 
 
 class GeneratorData(object):
@@ -98,8 +100,9 @@ class GeneratorData(object):
             self.__pre_vertex_slice.lo_atom,
             self.__pre_vertex_slice.n_atoms,
             self.__max_stage,
-            (decimal.Decimal(str(1000.0 / float(self.__machine_time_step))) *
-             DataType.S1615.scale),
+            (decimal.Decimal(str(
+                MICRO_TO_MILLISECOND_CONVERSION /
+                float(self.__machine_time_step))) * DataType.S1615.scale),
             self.__synapse_information.synapse_type,
             synapse_dynamics.gen_matrix_id,
             connector.gen_connector_id,

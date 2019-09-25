@@ -18,6 +18,9 @@ import math
 import re
 import numpy
 from six import string_types, with_metaclass
+
+from spinn_front_end_common.utilities.constants import \
+    MICRO_TO_MILLISECOND_CONVERSION
 from spinn_utilities import logger_utils
 from spinn_utilities.safe_eval import SafeEval
 from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
@@ -88,7 +91,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         self._n_pre_neurons = pre_population.size
         self._n_post_neurons = post_population.size
         self._rng = (self._rng or rng or get_simulator().get_pynn_NumpyRNG()())
-        self.__min_delay = machine_time_step / 1000.0
+        self.__min_delay = machine_time_step / MICRO_TO_MILLISECOND_CONVERSION
 
     def _check_parameter(self, values, name, allow_lists):
         """ Check that the types of the values is supported.
@@ -311,8 +314,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
             values, n_connections, connection_slices, pre_slice, post_slice)
         if self.__safe:
             if not weights.size:
-                logger_utils.warn_once(logger,
-                                       "No connection in " + str(self))
+                logger_utils.warn_once(logger, "No connection in " + str(self))
             elif numpy.amin(weights) < 0 < numpy.amax(weights):
                 raise Exception(
                     "Weights must be either all positive or all negative"

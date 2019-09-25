@@ -77,8 +77,7 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine):
             self, pre_population, post_population, rng, machine_time_step):
         AbstractConnector.set_projection_information(
             self, pre_population, post_population, rng, machine_time_step)
-        if (not self.__with_replacement and
-                self.__n_pre > self._n_pre_neurons):
+        if not self.__with_replacement and self.__n_pre > self._n_pre_neurons:
             raise SpynnakerException(
                 "FixedNumberPreConnector will not work when "
                 "with_replacement=False and n > n_pre_neurons")

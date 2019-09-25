@@ -13,7 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-BUILDS = spike_source/poisson delay_extension neuron robot_motor_control synapse_expander
+BUILDS = synapse_expander \
+         spike_source/poisson \
+         delay_extension \
+         neuron \
+         robot_motor_control
+
 DIRS = $(BUILDS:%=makefiles/%)
 
 all: $(DIRS)

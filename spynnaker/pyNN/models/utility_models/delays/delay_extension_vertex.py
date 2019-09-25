@@ -33,7 +33,8 @@ from spinn_front_end_common.abstract_models import (
     AbstractProvidesOutgoingPartitionConstraints, AbstractHasAssociatedBinary)
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities.constants import (
-    SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES)
+    SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES, BITS_PER_WORD,
+    BYTES_PER_WORS)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from .delay_block import DelayBlock
 from .delay_extension_machine_vertex import DelayExtensionMachineVertex
@@ -198,9 +199,11 @@ class DelayExtensionVertex(
         # ###################################################################
         # Reserve SDRAM space for memory areas:
         vertex_slice = graph_mapper.get_slice(vertex)
-        n_words_per_stage = int(math.ceil(vertex_slice.n_atoms / 32.0))
-        delay_params_sz = 4 * (_DELAY_PARAM_HEADER_WORDS +
-                               (self.__n_delay_stages * n_words_per_stage))
+        n_words_per_stage = int(
+            math.ceil(vertex_slice.n_atoms / BITS_PER_WORD))
+        delay_params_sz = BYTES_PER_WORS * (
+            _DELAY_PARAM_HEADER_WORDS +
+            (self.__n_delay_stages * n_words_per_stage))
 
         spec.reserve_memory_region(
             region=_DELEXT_REGIONS.SYSTEM.value,

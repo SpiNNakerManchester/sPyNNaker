@@ -15,6 +15,9 @@
 
 import logging
 import numpy
+
+from spinn_front_end_common.utilities.constants import \
+    MICRO_TO_MILLISECOND_CONVERSION
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utilities import globals_variables
 from .abstract_connector import AbstractConnector
@@ -135,7 +138,7 @@ class FromListConnector(AbstractConnector):
         pre_post_bins = [(pre - 1, post - 1) for pre in pre_bins[1:]
                          for post in post_bins[1:]]
         self.__split_conn_list = {
-            (pre_post): indices
+            pre_post: indices
             for pre_post, indices in zip(pre_post_bins, split_indices)
         }
 
@@ -312,9 +315,10 @@ class FromListConnector(AbstractConnector):
             delay_column = column_names.index('delay') + _FIRST_PARAM
             machine_time_step = globals_variables.get_simulator(
                 ).machine_time_step
-            self.__delays = numpy.rint(
+            self.__delays = (numpy.rint(
                 numpy.array(self.__conn_list[:, delay_column]) * (
-                    1000.0 / machine_time_step)) * (machine_time_step / 1000.0)
+                    MICRO_TO_MILLISECOND_CONVERSION / machine_time_step)) *
+                    (machine_time_step / MICRO_TO_MILLISECOND_CONVERSION))
         except ValueError:
             pass
 

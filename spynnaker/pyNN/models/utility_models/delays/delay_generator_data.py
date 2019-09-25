@@ -16,6 +16,8 @@
 import decimal
 import numpy
 from data_specification.enums.data_type import DataType
+from spinn_front_end_common.utilities.constants import \
+    MICRO_TO_MILLISECOND_CONVERSION
 
 
 class DelayGeneratorData(object):
@@ -80,8 +82,9 @@ class DelayGeneratorData(object):
             self.__post_vertex_slice.lo_atom,
             self.__post_vertex_slice.n_atoms,
             self.__max_stage,
-            (decimal.Decimal(str(1000.0 / float(self.__machine_time_step))) *
-             DataType.S1615.scale),
+            (decimal.Decimal(str(
+                MICRO_TO_MILLISECOND_CONVERSION /
+                float(self.__machine_time_step))) * DataType.S1615.scale),
             connector.gen_connector_id,
             connector.gen_delays_id(self.__synapse_information.delay)],
             dtype="uint32"))

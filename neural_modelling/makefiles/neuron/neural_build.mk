@@ -196,10 +196,10 @@ SYNAPTOGENESIS_DYNAMICS_O := $(BUILD_DIR)$(SYNAPTOGENESIS_DYNAMICS:%.c=%.o)
 OTHER_SOURCES_CONVERTED := $(call strip_source_dirs,$(OTHER_SOURCES))
 
 # List all the sources relative to one of SOURCE_DIRS
-SOURCES = common/out_spikes.c \
-          neuron/c_main.c \
+SOURCES = neuron/c_main.c \
           neuron/synapses.c \
           neuron/neuron.c \
+          neuron/neuron_recording.c \
           neuron/spike_processing.c \
           neuron/population_table/population_table_$(POPULATION_TABLE_IMPL)_impl.c \
           $(NEURON_MODEL) $(SYNAPSE_DYNAMICS) $(WEIGHT_DEPENDENCE) \
