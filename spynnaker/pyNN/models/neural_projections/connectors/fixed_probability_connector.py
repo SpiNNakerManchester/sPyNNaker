@@ -129,6 +129,11 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
     def __repr__(self):
         return "FixedProbabilityConnector({})".format(self._p_connect)
 
+    def _get_view_lo_hi(self, indexes):
+        view_lo = indexes[0]
+        view_hi = indexes[-1]
+        return view_lo, view_hi
+
     @property
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_id)
     def gen_connector_id(self):
@@ -140,6 +145,25 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
+        params = []
+        pre_view_lo = 0
+        pre_view_hi = self._n_pre_neurons - 1
+        if self._prepop_view:
+            pre_view_lo, pre_view_hi = self._get_view_lo_hi(
+                self.pre_population._indexes)
+
+        params.extend([pre_view_lo, pre_view_hi])
+
+        post_view_lo = 0
+        post_view_hi = self._n_post_neurons - 1
+        if self._postpop_view:
+            post_view_lo, post_view_hi = self._get_view_lo_hi(
+                self.post_population._indexes)
+
+        params.extend([post_view_lo, post_view_hi])
+
+        params.extend([self.__allow_self_connections])
+
         prob_value = round(decimal.Decimal(
             str(self._p_connect)) * DataType.U032.scale)
         # If prob=1.0 has been specified, take care when scaling value to
@@ -147,9 +171,8 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
         if (self._p_connect == 1.0):
             prob_value = round(decimal.Decimal(
                 str(self._p_connect)) * (DataType.U032.scale - 1))
-        params = [
-            self.__allow_self_connections,
-            prob_value]
+        params.extend([prob_value])
+
         params.extend(self._get_connector_seed(
             pre_vertex_slice, post_vertex_slice, self._rng))
         return numpy.array(params, dtype="uint32")
@@ -158,4 +181,4 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
     @overrides(AbstractGenerateConnectorOnMachine.
                gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
-        return 8 + 16
+        return 16 + 8 + 16  # view + params + seeds
