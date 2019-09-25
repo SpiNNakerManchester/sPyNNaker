@@ -204,8 +204,7 @@ class NeuronRecorder(object):
                 "conflicting sampling intervals within a given recording"
                 "variable.")
 
-        vertex_slice = application_vertex.get_recording_slice(
-            graph_mapper, vertex)
+        vertex_slice = graph_mapper.get_slice(vertex)
         neurons = self._neurons_recording(variable, vertex_slice)
         n_neurons = len(neurons)
         if n_neurons == 0:
