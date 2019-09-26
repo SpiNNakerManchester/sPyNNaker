@@ -205,6 +205,15 @@ static void neuron_impl_load_neuron_parameters(
 
 static bool neuron_impl_do_timestep_update(index_t neuron_index,
         input_t external_bias, state_t *recorded_variable_values) {
+
+
+	if (neuron_index == 0) {
+		// Decay global rate trace (only done once per core per timestep)
+		global_parameters->core_pop_rate = global_parameters->core_pop_rate
+				* global_parameters->rate_exp_TC;
+	}
+
+
     // Get the neuron itself
     neuron_pointer_t neuron = &neuron_array[neuron_index];
 
@@ -246,7 +255,8 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
     // Call functions to get the input values to be recorded
     recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = total_exc;
-    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = total_inh;
+    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
+    		global_parameters->core_pop_rate;
 
     // Call functions to convert exc_input and inh_input to current
     input_type_convert_excitatory_input_to_current(
@@ -274,6 +284,9 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
         // Tell the additional input
         additional_input_has_spiked(additional_input);
+
+        // Add contribution from this neuron's spike to global rate trace
+        global_parameters->core_pop_rate += 1.0k;
     }
 
     // Shape the existing input according to the included rule

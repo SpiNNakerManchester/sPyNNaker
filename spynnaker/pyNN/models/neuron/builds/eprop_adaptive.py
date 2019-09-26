@@ -26,7 +26,8 @@ class EPropAdaptive(AbstractPyNNNeuronModelStandard):
     """ Adaptive threshold neuron with eprop support
     """
 
-    @default_initial_values({"v", "isyn_exc", "isyn_exc2", "isyn_inh", "psi"})
+    @default_initial_values({"v", "isyn_exc", "isyn_exc2", "isyn_inh", 
+                             "isyn_inh2", "psi", "target_rate", "tau_err"})
     def __init__(
             self,
             # neuron model params
@@ -36,14 +37,22 @@ class EPropAdaptive(AbstractPyNNNeuronModelStandard):
             #synapse type params
             tau_syn_E=5.0, tau_syn_E2=5.0, tau_syn_I=5.0, tau_syn_I2=5.0,
             isyn_exc=0.0, isyn_exc2=0.0, isyn_inh=0.0, isyn_inh2=0.0,
-
+            
+            # Regularisation params
+            target_rate=10, tau_err=1000  #  fits with 1 ms timestep
+            
             ):
         # pylint: disable=too-many-arguments, too-many-locals
         neuron_model = NeuronModelEProp(
-            v, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac, psi)
+            v, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac, psi, 
+            target_rate, tau_err)
+        
         synapse_type = SynapseTypeEPropAdaptive(
-            tau_syn_E, tau_syn_E2, tau_syn_I, isyn_exc, isyn_exc2, isyn_inh)
+            tau_syn_E, tau_syn_E2, tau_syn_I, tau_syn_I2, 
+            isyn_exc, isyn_exc2, isyn_inh, isyn_inh2)
+        
         input_type = InputTypeCurrent()
+        
         threshold_type = ThresholdTypeAdaptive(v_thresh)
 
         super(EPropAdaptive, self).__init__(

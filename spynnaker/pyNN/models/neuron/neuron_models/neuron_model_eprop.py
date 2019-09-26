@@ -55,7 +55,9 @@ class NeuronModelEProp(AbstractNeuronModel):
         "__i_offset",
         "__v_reset",
         "__tau_refrac",
-        "__psi"]
+        "__psi",
+        "__target_rate",
+        "__tau_err"]
 
     def __init__(
             self, 
@@ -66,20 +68,23 @@ class NeuronModelEProp(AbstractNeuronModel):
             i_offset, 
             v_reset, 
             tau_refrac,
-            psi
+            psi,
+            # regularisation params
+            target_rate,
+            tau_err
             ):
         
-        
-        datatype_list = [DataType.S1615,   # v
-             DataType.S1615,   # v_rest
-             DataType.S1615,   # r_membrane (= tau_m / cm)
-             DataType.S1615,   # exp_tc (= e^(-ts / tau_m))
-             DataType.S1615,   # i_offset
-             DataType.INT32,   # count_refrac
-             DataType.S1615,   # v_reset
-             DataType.INT32,   # tau_refrac
-             DataType.S1615    # psi, pseuo_derivative
-             ] 
+        datatype_list = [
+            DataType.S1615,   #  v
+            DataType.S1615,   #  v_rest
+            DataType.S1615,   #  r_membrane (= tau_m / cm)
+            DataType.S1615,   #  exp_tc (= e^(-ts / tau_m))
+            DataType.S1615,   #  i_offset
+            DataType.INT32,   #  count_refrac
+            DataType.S1615,   #  v_reset
+            DataType.INT32,   #  tau_refrac
+            DataType.S1615    #  psi, pseuo_derivative
+            ] 
         
         # Synapse states - always initialise to zero
         eprop_syn_state = [ # synaptic state, one per synapse (kept in DTCM)
@@ -91,7 +96,15 @@ class NeuronModelEProp(AbstractNeuronModel):
         # Extend to include fan-in for each neuron
         datatype_list.extend(eprop_syn_state * SYNAPSES_PER_NEURON)
         
-        super(NeuronModelEProp, self).__init__(datatype_list)
+        
+        global_data_types = [
+            DataType.S1615,   #  core_pop_rate 
+            DataType.S1615,   #  core_target_rate
+            DataType.S1615    #  rate_exp_TC
+            ]
+        
+        super(NeuronModelEProp, self).__init__(data_types=datatype_list,
+                                               global_data_types=global_data_types)
 
         if v_init is None:
             v_init = v_rest
@@ -103,6 +116,9 @@ class NeuronModelEProp(AbstractNeuronModel):
         self.__v_reset = v_reset
         self.__tau_refrac = tau_refrac
         self.__psi = psi # calculate from v and v_thresh (but will probably end up zero)
+        
+        self.__target_rate = target_rate
+        self.__tau_err = tau_err
         
 
     @overrides(AbstractNeuronModel.get_n_cpu_cycles)
@@ -151,7 +167,7 @@ class NeuronModelEProp(AbstractNeuronModel):
                 state_variables[PSI]
                 ]
         
-        # create synaptic state - init to zero
+        # create synaptic state - init all state to zero
         eprop_syn_init = [0,
                           0,
                           0,
@@ -160,6 +176,23 @@ class NeuronModelEProp(AbstractNeuronModel):
         values.extend(eprop_syn_init * SYNAPSES_PER_NEURON)
         
         return values
+
+    @inject_items({"ts": "MachineTimeStep"})
+    @overrides(AbstractNeuronModel.get_global_values, 
+               additional_arguments={'ts'})
+    def get_global_values(self, ts):
+        glob_vals = [
+            self.__target_rate,     #  initialise global pop rate to the target
+            self.__target_rate,     #  set target rate
+            numpy.exp(-float(ts/1000)/self.__tau_err)
+            ]
+        
+        print("\n ")
+        print(glob_vals)
+        print(ts)
+        print("\n")
+        return glob_vals
+        
 
     @overrides(AbstractNeuronModel.update_values)
     def update_values(self, values, parameters, state_variables):
@@ -172,7 +205,10 @@ class NeuronModelEProp(AbstractNeuronModel):
         state_variables[V] = v
         state_variables[COUNT_REFRAC] = count_refrac
         state_vairables[PSI] = psi
+    
 
+    
+    
     @property
     def v_init(self):
         return self.__v_init

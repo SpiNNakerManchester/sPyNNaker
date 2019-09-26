@@ -68,6 +68,9 @@ typedef struct neuron_t {
 } neuron_t;
 
 typedef struct global_neuron_params_t {
+	REAL core_pop_rate;
+	REAL core_target_rate;
+	REAL rate_exp_TC;
 } global_neuron_params_t;
 
 #endif // _NEURON_MODEL_LIF_CURR_IMPL_H_
