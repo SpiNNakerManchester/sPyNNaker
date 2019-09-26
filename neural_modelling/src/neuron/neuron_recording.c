@@ -297,7 +297,7 @@ bool _neuron_recording_read_in_elements(
                 break;
             default:
                 log_error(
-                    "don't recognise this recording type index %d with rate
+                    "don't recognise this recording type index %d with rate"
                     " %d and n neurons %d",
                     var_recording_type_index[i],  var_recording_rate[i],
                     n_neurons_recording_var);
