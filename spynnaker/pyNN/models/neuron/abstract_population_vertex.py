@@ -108,8 +108,10 @@ class AbstractPopulationVertex(
     # the size of the runtime SDP port data region
     RUNTIME_SDP_PORT_SIZE = 4
 
-    # 8 elements before the start of global parameters
-    BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 32
+    # 7 elements before the start of global parameters
+    # 1. random back off, 2. micro secs before spike, 3. has key, 4. key,
+    # 5. n atoms, 6. n synapse types, 7. incoming spike buffer size.
+    BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 28
 
     # The Buffer traffic type
     TRAFFIC_IDENTIFIER = "BufferTraffic"
