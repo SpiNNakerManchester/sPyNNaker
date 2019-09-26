@@ -43,19 +43,19 @@ static uint32_t *var_recording_count;
 static uint32_t *var_recording_increment;
 
 //! The index to record each variable to for each neuron
-static uint8_t **var_recording_indexes;
+uint8_t **neuron_recording_indexes;
 
 //! The values of the recorded variables for bitfields
-static timed_out_spikes **var_bit_fields_recording_values;
+timed_out_spikes **neuron_recording_bit_field_values;
 
 //! The values of the recorded variables for uint32s
-static timed_state_t **var_int32_recording_values;
+timed_state_t **neuron_recording_int32_values;
 
 //! The values for the recorded variables for doubles
-static double_timed_state_t **var_double_recording_values;
+double_timed_state_t **neuron_recording_double_values;
 
 //! The values for the recorded variables for floats
-static float_timed_state_t **var_float_recording_values;
+float_timed_state_t **neuron_recording_float_values;
 
 //! The size of the recorded variables in bytes for a time step
 static uint32_t *var_recording_size;
@@ -104,50 +104,6 @@ void neuron_recording_wait_to_complete(void){
     }
 }
 
-//! \brief stores a recording of a matrix based variable
-//! \param[in] recording_var_index: which recording variable to write this is
-//! \param[in] neuron_index: which neuron to set the spike for
-//! \param[in] value: the data to store
-void neuron_recording_set_int32_recorded_param(
-        uint32_t recording_var_index, uint32_t neuron_index, state_t value) {
-    uint32_t index = var_recording_indexes[recording_var_index][neuron_index];
-    var_int32_recording_values[recording_var_index]->states[index] = value;
-}
-
-
-//! \brief stores a double recording of a matrix based variable
-//! \param[in] recording_var_index: which recording variable to write this is
-//! \param[in] neuron_index: which neuron to set the spike for
-//! \param[in] value: the data to store
-void neuron_recording_set_double_recorded_param(
-        uint32_t recording_var_index, uint32_t neuron_index, double value){
-    uint8_t index = var_recording_indexes[recording_var_index][neuron_index];
-    var_double_recording_values[recording_var_index]->states[index] = value;
-}
-
-//! \brief stores a double recording of a matrix based variable
-//! \param[in] recording_var_index: which recording variable to write this is
-//! \param[in] neuron_index: which neuron to set the spike for
-//! \param[in] value: the data to store
-void neuron_recording_set_float_recorded_param(
-        uint32_t recording_var_index, uint32_t neuron_index, float value){
-    uint32_t index = var_recording_indexes[recording_var_index][neuron_index];
-    var_float_recording_values[recording_var_index]->states[index] = value;
-}
-
-//! \brief stores a recording of a bitfield based variable
-void neuron_recording_set_spike(
-        uint32_t recording_var_index, uint32_t neuron_index){
-    // Record the spike
-    uint32_t index = var_recording_indexes[recording_var_index][neuron_index];
-    bit_field_set(
-        &var_bit_fields_recording_values[recording_var_index]->out_spikes[0],
-        index);
-    if (index != 6){
-        log_info("setting spike for neuron %d goes to %d", neuron_index, index);
-    }
-}
-
 //! \brief does the recording process of handing over to basic recording
 //! \param[in] time: the time to put into the recording stamps.
 void neuron_recording_record(uint32_t time) {
@@ -162,32 +118,32 @@ void neuron_recording_record(uint32_t time) {
 
             switch (var_recording_type_index[i]) {
                 case INT32:  // set the time and dump to recording
-                    var_int32_recording_values[i]->time = time;
+                    neuron_recording_int32_values[i]->time = time;
                     recording_record_and_notify(
-                        i, var_int32_recording_values[i], var_recording_size[i],
+                        i, neuron_recording_int32_values[i], var_recording_size[i],
                         _recording_done_callback);
                     break;
                 case DOUBLE:  // set the time and dump to recording
-                    var_double_recording_values[i]->time = time;
+                    neuron_recording_double_values[i]->time = time;
                     recording_record_and_notify(
-                        i, var_double_recording_values[i],
+                        i, neuron_recording_double_values[i],
                         var_recording_size[i], _recording_done_callback);
                     break;
                 case FLOAT:  // set the time and dump to recording
-                    var_float_recording_values[i]->time = time;
+                    neuron_recording_float_values[i]->time = time;
                     recording_record_and_notify(
-                        i, var_float_recording_values[i],
+                        i, neuron_recording_float_values[i],
                         var_recording_size[i], _recording_done_callback);
                     break;
                 case BIT_FIELD:  // only record if there is stuff to record
                     if (empty_bit_field(
-                            &var_bit_fields_recording_values[i]->out_spikes[0],
+                            &neuron_recording_bit_field_values[i]->out_spikes[0],
                             var_recording_size[i] - TIME_STAMP_SIZE_IN_BYTES)) {
                         n_recordings_outstanding -= 1;
                     } else {  // set the time and dump to recording
-                        var_bit_fields_recording_values[i]->time = time;
+                        neuron_recording_bit_field_values[i]->time = time;
                         recording_record_and_notify(
-                            i, var_bit_fields_recording_values[i],
+                            i, neuron_recording_bit_field_values[i],
                             var_recording_size[i], _recording_done_callback);
                     }
                     break;
@@ -209,7 +165,7 @@ void neuron_recording_setup_for_next_recording(void){
         if (var_recording_type_index[i] == BIT_FIELD &&
                 var_recording_rate[i] != 0 && var_recording_count[i] == 1) {
             clear_bit_field(
-                &var_bit_fields_recording_values[i]->out_spikes[0],
+                &neuron_recording_bit_field_values[i]->out_spikes[0],
                 var_recording_size[i] - TIME_STAMP_SIZE_IN_BYTES);
         }
     }
@@ -235,7 +191,7 @@ void _reset_record_counter(void) {
             if (var_recording_type_index[i] == BIT_FIELD) {
                 // Reset as first pass we record no matter what the rate is
                 clear_bit_field(
-                    &var_bit_fields_recording_values[i]->out_spikes[0],
+                    &neuron_recording_bit_field_values[i]->out_spikes[0],
                     var_recording_size[i] - TIME_STAMP_SIZE_IN_BYTES);
             }
         }
@@ -306,7 +262,7 @@ bool _neuron_recording_read_in_elements(
         }
         // copy over the indexes
         spin1_memcpy(
-            var_recording_indexes[i], &address[next],
+            neuron_recording_indexes[i], &address[next],
             n_neurons * sizeof(uint8_t));
 
         // move to next region data point
@@ -368,9 +324,9 @@ static inline bool _allocate_dtcm(
     }
 
     // allocate dtcm for the overall holder for indexes
-    var_recording_indexes =
+    neuron_recording_indexes =
         (uint8_t **) spin1_malloc(n_recorded_vars * sizeof(uint8_t *));
-    if (var_recording_indexes == NULL) {
+    if (neuron_recording_indexes == NULL) {
         log_error("Could not allocate space for var_recording_indexes");
         return false;
     }
@@ -385,45 +341,45 @@ static inline bool _allocate_dtcm(
 
     // allocate dtcm for indexes for each recording region
     for (uint32_t i = 0; i < n_recorded_vars; i++) {
-        var_recording_indexes[i] = (uint8_t *) spin1_malloc(
+        neuron_recording_indexes[i] = (uint8_t *) spin1_malloc(
             n_neurons * sizeof(uint8_t));
-        if (var_recording_indexes[i] == NULL){
+        if (neuron_recording_indexes[i] == NULL){
             log_error("failed to allocate memory for recording index %d", i);
             return false;
         }
     }
 
     // allocate dtcm for bitfields
-    var_bit_fields_recording_values = (timed_out_spikes **) spin1_malloc(
+    neuron_recording_bit_field_values = (timed_out_spikes **) spin1_malloc(
         n_recorded_vars * sizeof(timed_out_spikes *));
-    if (var_bit_fields_recording_values == NULL) {
+    if (neuron_recording_bit_field_values == NULL) {
         log_error(
             "Count not allocate space for var_bit_fields_recording_values");
         return false;
     }
 
     // allocate dtcm for uint32t pointers
-    var_int32_recording_values = (timed_state_t **) spin1_malloc(
+    neuron_recording_int32_values = (timed_state_t **) spin1_malloc(
         n_recorded_vars * sizeof(timed_state_t *));
-    if (var_int32_recording_values == NULL) {
+    if (neuron_recording_int32_values == NULL) {
         log_error("Could not allocate space for var_int32_recording_values");
         return false;
     }
 
     // allocate dtcm for double pointers
-    var_double_recording_values =
+    neuron_recording_double_values =
         (double_timed_state_t **) spin1_malloc(
             n_recorded_vars * sizeof(double_timed_state_t *));
-    if (var_double_recording_values == NULL) {
+    if (neuron_recording_double_values == NULL) {
         log_error("Could not allocate space for var_double_recording_values");
         return false;
     }
 
     // allocate for float pointers
-    var_float_recording_values =
+    neuron_recording_float_values =
         (float_timed_state_t **) spin1_malloc(
             n_recorded_vars * sizeof(float_timed_state_t *));
-    if (var_float_recording_values == NULL) {
+    if (neuron_recording_float_values == NULL) {
         log_error("Could not allocate space for var_float_recording_values");
         return false;
     }
@@ -468,9 +424,9 @@ bool neuron_recording_initialise(
     for (uint32_t i = 0; i < n_recorded_vars; i++) {
         switch (var_recording_type_index[i]) {
             case INT32:
-                var_int32_recording_values[i] = (timed_state_t *) spin1_malloc(
+                neuron_recording_int32_values[i] = (timed_state_t *) spin1_malloc(
                     TIME_STAMP_SIZE_IN_BYTES + (sizeof(state_t) * n_neurons));
-                if (var_int32_recording_values[i] == NULL) {
+                if (neuron_recording_int32_values[i] == NULL) {
                     log_error(
                         "Could not allocate space for "
                         "var_int32_recording_values[%d]", i);
@@ -478,11 +434,11 @@ bool neuron_recording_initialise(
                 }
                 break;
             case DOUBLE:
-                var_double_recording_values[i] =
+                neuron_recording_double_values[i] =
                     (double_timed_state_t *) spin1_malloc(
                         TIME_STAMP_SIZE_IN_BYTES +
                         (sizeof(double_timed_state_t) * n_neurons));
-                if (var_double_recording_values[i] == NULL) {
+                if (neuron_recording_double_values[i] == NULL) {
                     log_error(
                         "Could not allocate space for "
                         "var_double_recording_values[%d]", i);
@@ -490,11 +446,11 @@ bool neuron_recording_initialise(
                 }
                 break;
             case FLOAT:
-                var_float_recording_values[i] =
+                neuron_recording_float_values[i] =
                     (float_timed_state_t *) spin1_malloc(
                         TIME_STAMP_SIZE_IN_BYTES +
                         (sizeof(float_timed_state_t) * n_neurons));
-                if (var_float_recording_values[i] == NULL) {
+                if (neuron_recording_float_values[i] == NULL) {
                     log_error(
                         "Could not allocate space for "
                         "var_float_recording_values[%d]", i);
@@ -503,11 +459,11 @@ bool neuron_recording_initialise(
                 break;
             case BIT_FIELD:
                 // determine size of bitfield
-                var_bit_fields_recording_values[i] = spin1_malloc(
+                neuron_recording_bit_field_values[i] = spin1_malloc(
                     sizeof(timed_out_spikes) + (
                         (var_recording_size[i] - TIME_STAMP_SIZE_IN_BYTES) *
                         sizeof(uint32_t)));
-                if (var_bit_fields_recording_values[i] == NULL){
+                if (neuron_recording_bit_field_values[i] == NULL){
                     log_error(
                         "Could not allocate space for "
                         "var_bit_fields_recording_values[%d]", i);
@@ -516,7 +472,7 @@ bool neuron_recording_initialise(
 
                 // set all the bits to false
                 clear_bit_field(
-                    &var_bit_fields_recording_values[i]->out_spikes[0],
+                    &neuron_recording_bit_field_values[i]->out_spikes[0],
                     var_recording_size[i] - TIME_STAMP_SIZE_IN_BYTES);
                 break;
             default:

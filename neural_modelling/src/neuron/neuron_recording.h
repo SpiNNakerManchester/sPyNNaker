@@ -20,6 +20,21 @@
 
 #include <common/neuron-typedefs.h>
 
+//! The index to record each variable to for each neuron
+extern uint8_t **neuron_recording_indexes;
+
+//! The values of the recorded variables for bitfields
+extern timed_out_spikes **neuron_recording_bit_field_values;
+
+//! The values of the recorded variables for int32s
+extern timed_state_t **neuron_recording_int32_values;
+
+//! The values for the recorded variables for doubles
+extern double_timed_state_t **neuron_recording_double_values;
+
+//! The values for the recorded variables for floats
+extern float_timed_state_t **neuron_recording_float_values;
+
 //! \brief returns how many variables are able to be recorded
 //! \return the number of recordable variables
 uint32_t neuron_recording_get_n_recorded_vars(void);
@@ -31,32 +46,50 @@ uint32_t neuron_recording_get_n_bit_field_vars(void);
 //! \brief allows neurons to wait till recordings have completed
 void neuron_recording_wait_to_complete(void);
 
-//! \brief stores a recording of a matrix based variable
+//! \brief stores a recording of a matrix based int32_t variable
 //! \param[in] recording_var_index: which recording variable to write this is
 //! \param[in] neuron_index: the neuron id for this recorded data
 //! \param[in] value: the results to record for this neuron.
-void neuron_recording_set_int32_recorded_param(
-        uint32_t recording_var_index, uint32_t neuron_index, state_t value);
+static inline void neuron_recording_set_int32_recorded_param(
+        uint32_t recording_var_index, uint32_t neuron_index, state_t value) {
+    uint32_t index = neuron_recording_indexes[recording_var_index][neuron_index];
+    neuron_recording_int32_values[recording_var_index]->states[index] = value;
+}
 
-//! \brief stores a recording of a matrix based double value
+//! \brief stores a recording of a matrix based double variable
 //! \param[in] recording_var_index: which recording variable to write this is
 //! \param[in] neuron_index: the neuron id for this recorded data
 //! \param[in] value: the results to record for this neuron.
-void neuron_recording_set_double_recorded_param(
-        uint32_t recording_var_index, uint32_t neuron_index, double value);
+static inline void neuron_recording_set_double_recorded_param(
+        uint32_t recording_var_index, uint32_t neuron_index, double value) {
+    uint8_t index = neuron_recording_indexes[recording_var_index][neuron_index];
+    neuron_recording_double_values[recording_var_index]->states[index] = value;
+}
 
-//! \brief stores a recording of a matrix based float value
+//! \brief stores a recording of a matrix based float variable
 //! \param[in] recording_var_index: which recording variable to write this is
 //! \param[in] neuron_index: the neuron id for this recorded data
 //! \param[in] value: the results to record for this neuron.
-void neuron_recording_set_float_recorded_param(
-        uint32_t recording_var_index, uint32_t neuron_index, float value);
+static inline void neuron_recording_set_float_recorded_param(
+        uint32_t recording_var_index, uint32_t neuron_index, float value) {
+    uint32_t index = neuron_recording_indexes[recording_var_index][neuron_index];
+    neuron_recording_float_values[recording_var_index]->states[index] = value;
+}
 
 //! \brief stores a recording of a bitfield based variable
 //! \param[in] neuron_index: which neuron to set the spike for
 //! \param[in] recording_var_index: which recording variable to write this is
-void neuron_recording_set_spike(
-        uint32_t recording_var_index, uint32_t neuron_index);
+static inline void neuron_recording_set_spike(
+        uint32_t recording_var_index, uint32_t neuron_index) {
+    // Record the spike
+    uint32_t index = neuron_recording_indexes[recording_var_index][neuron_index];
+    bit_field_set(
+        &neuron_recording_bit_field_values[recording_var_index]->out_spikes[0],
+        index);
+    if (index != 6) {
+        log_info("setting spike for neuron %d goes to %d", neuron_index, index);
+    }
+}
 
 //! \brief does the recording matrix process of handing over to basic recording
 //! \param[in] time: the time stamp for this recording
