@@ -59,6 +59,13 @@ typedef struct neuron_t {
     // refractory time of neuron [timesteps]
     int32_t  T_refract;
 
+    // Neuron spike train
+    REAL z;
+
+    // refractory multiplier - to allow evolution of neuronal dynamics during
+    // refractory period
+    REAL A;
+
     // pseudo derivative
     REAL     psi;
 

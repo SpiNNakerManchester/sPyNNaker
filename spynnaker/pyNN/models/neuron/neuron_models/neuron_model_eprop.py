@@ -33,6 +33,8 @@ V_RESET = "v_reset"
 TAU_REFRAC = "tau_refrac"
 COUNT_REFRAC = "count_refrac"
 PSI = "psi"
+Z = "z"
+A = "a"
 
 UNITS = {
     V: 'mV',
@@ -42,6 +44,8 @@ UNITS = {
     I_OFFSET: 'nA',
     V_RESET: 'mV',
     TAU_REFRAC: 'ms',
+    Z: 'N/A',
+    A: 'N/A',
     PSI: 'N/A'
 }
 
@@ -55,9 +59,12 @@ class NeuronModelEProp(AbstractNeuronModel):
         "__i_offset",
         "__v_reset",
         "__tau_refrac",
+        "__z",
+        "__a",
         "__psi",
         "__target_rate",
-        "__tau_err"]
+        "__tau_err"
+        ]
 
     def __init__(
             self, 
@@ -83,6 +90,8 @@ class NeuronModelEProp(AbstractNeuronModel):
             DataType.INT32,   #  count_refrac
             DataType.S1615,   #  v_reset
             DataType.INT32,   #  tau_refrac
+            DataType.S1615,   # Z
+            DataType.S1615,    # A
             DataType.S1615    #  psi, pseuo_derivative
             ] 
         
@@ -115,7 +124,7 @@ class NeuronModelEProp(AbstractNeuronModel):
         self.__i_offset = i_offset
         self.__v_reset = v_reset
         self.__tau_refrac = tau_refrac
-        self.__psi = psi # calculate from v and v_thresh (but will probably end up zero)
+        self.__psi = psi  # calculate from v and v_thresh (but will probably end up zero)
         
         self.__target_rate = target_rate
         self.__tau_err = tau_err
@@ -140,6 +149,8 @@ class NeuronModelEProp(AbstractNeuronModel):
         state_variables[V] = self.__v_init
         state_variables[COUNT_REFRAC] = 0
         state_variables[PSI] = self.__psi
+        state_variables[Z] = 0
+        state_variables[A] = 0
 
     @overrides(AbstractNeuronModel.get_units)
     def get_units(self, variable):
@@ -164,6 +175,8 @@ class NeuronModelEProp(AbstractNeuronModel):
                 parameters[V_RESET],
                 parameters[TAU_REFRAC].apply_operation(
                     operation=lambda x: int(numpy.ceil(x / (ts / 1000.0)))),
+                state_variables[Z],
+                state_variables[A],
                 state_variables[PSI]
                 ]
         

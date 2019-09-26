@@ -14,23 +14,62 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_utilities.overrides import overrides
-from data_specification.enums import DataType
 from .abstract_threshold_type import AbstractThresholdType
+from pacman.executor.injection_decorator import inject_items
+from data_specification.enums import DataType
 
-V_THRESH = "v_thresh"
+import numpy
 
-UNITS = {V_THRESH: "mV"}
+BIG_B = "big_b"
+SMALL_B = "small_b"
+SMALL_B_0 = "small_b_0"
+TAU_A = "tau_a"
+BETA = "beta"
+ADPT = "adpt"
+SCALAR = "scalar"
+
+UNITS = {
+         BIG_B: "mV",
+         SMALL_B: "mV",
+         SMALL_B_0: "mV",
+         TAU_A: "ms",
+         BETA: "N/A",
+#          ADPT: "mV"
+         SCALAR: "dimensionless"
+         }
+
+
 
 
 class ThresholdTypeAdaptive(AbstractThresholdType):
     """ A threshold that is a static value
     """
-    __slots__ = ["__v_thresh"]
+    __slots__ = [
+        "_B",
+        "_small_b",
+        "_small_b_0",
+        "_tau_a",
+        "_beta",
+#         "_adpt"
+        "_scalar"
+        ]
 
-    def __init__(self, v_thresh):
+    def __init__(self,  B, small_b, small_b_0, tau_a, beta):
         super(ThresholdTypeAdaptive, self).__init__([
-            DataType.S1615])  # v_thresh
-        self.__v_thresh = v_thresh
+            DataType.S1615,
+            DataType.S1615,
+            DataType.S1615,
+            DataType.UINT32,
+            DataType.S1615,
+            DataType.UINT32,
+            DataType.S1615
+            ])
+        self._B = B
+        self._small_b = small_b
+        self._small_b_0 = small_b_0
+        self._tau_a = tau_a
+        self._beta = beta
+        self._scalar = 1000
 
     @overrides(AbstractThresholdType.get_n_cpu_cycles)
     def get_n_cpu_cycles(self, n_neurons):
@@ -39,11 +78,15 @@ class ThresholdTypeAdaptive(AbstractThresholdType):
 
     @overrides(AbstractThresholdType.add_parameters)
     def add_parameters(self, parameters):
-        parameters[V_THRESH] = self.__v_thresh
+        parameters[SMALL_B_0] = self._small_b_0
+        parameters[TAU_A] = self._tau_a
+        parameters[BETA] = self._beta
+        parameters[SCALAR] = self._scalar
 
     @overrides(AbstractThresholdType.add_state_variables)
     def add_state_variables(self, state_variables):
-        pass
+        state_variables[BIG_B] = self._B
+        state_variables[SMALL_B] = self._small_b
 
     @overrides(AbstractThresholdType.get_units)
     def get_units(self, variable):
@@ -53,22 +96,72 @@ class ThresholdTypeAdaptive(AbstractThresholdType):
     def has_variable(self, variable):
         return variable in UNITS
 
-    @overrides(AbstractThresholdType.get_values)
-    def get_values(self, parameters, state_variables, vertex_slice):
+    @inject_items({"ts": "MachineTimeStep"})
+    @overrides(AbstractThresholdType.get_values, additional_arguments={'ts'})
+    def get_values(self, parameters, state_variables, vertex_slice, ts):
+
+        ulfract = pow(2, 32)
 
         # Add the rest of the data
-        return [parameters[V_THRESH]]
+        return [
+            state_variables[BIG_B],
+            state_variables[SMALL_B],
+            parameters[SMALL_B_0],
+            parameters[TAU_A].apply_operation(
+                    operation=lambda
+                    x: numpy.exp(float(-ts) / (1000.0 * x)) * ulfract),
+            parameters[BETA],
+            parameters[TAU_A].apply_operation(
+                operation=lambda x: (1 - numpy.exp(
+                float(-ts) / (1000.0 * x))) * ulfract), # ADPT
+            parameters[SCALAR]
+            ]
 
     @overrides(AbstractThresholdType.update_values)
     def update_values(self, values, parameters, state_variables):
 
         # Read the data
-        (_v_thresh,) = values
+        (big_b, small_b, _small_b_0, _e_to_dt_on_tau_a, _beta, adpt, scalar) = values
+
+        state_variables[BIG_B] = big_b
+        state_variables[SMALL_B] = small_b
 
     @property
-    def v_thresh(self):
-        return self.__v_thresh
+    def B(self):
+        return self._B
 
-    @v_thresh.setter
-    def v_thresh(self, v_thresh):
-        self.__v_thresh = v_thresh
+    @B.setter
+    def B(self, new_value):
+        self._B = new_value
+
+    @property
+    def small_b(self):
+        return self._small_b
+
+    @small_b.setter
+    def small_b(self, new_value):
+        self._small_b = new_value
+
+    @property
+    def small_b_0(self):
+        return self._small_b_0
+
+    @small_b_0.setter
+    def small_b_0(self, new_value):
+        self._small_b_0 = new_value
+
+    @property
+    def tau_a(self):
+        return self._tau_a
+
+    @tau_a.setter
+    def tau_a(self, new_value):
+        self._tau_a = new_value
+
+    @property
+    def beta(self):
+        return self._beta
+
+    @beta.setter
+    def beta(self, new_value):
+        self._beta = new_value

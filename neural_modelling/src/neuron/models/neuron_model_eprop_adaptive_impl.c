@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "neuron_model_lif_impl.h"
+#include "neuron_model_eprop_adaptive_impl.h"
 
 #include <debug.h>
 
@@ -41,36 +41,43 @@ state_t neuron_model_state_update(
 	log_debug("Exc 1: %12.6k, Exc 2: %12.6k", exc_input[0], exc_input[1]);
 	log_debug("Inh 1: %12.6k, Inh 2: %12.6k", inh_input[0], inh_input[1]);
 
-    // If outside of the refractory period
-    if (neuron->refract_timer <= 0) {
-		REAL total_exc = 0;
-		REAL total_inh = 0;
 
-		for (int i=0; i < num_excitatory_inputs; i++) {
-			total_exc += exc_input[i];
-		}
-		for (int i=0; i< num_inhibitory_inputs; i++) {
-			total_inh += inh_input[i];
-		}
-        // Get the input in nA
-        input_t input_this_timestep =
-                total_exc - total_inh + external_bias + neuron->I_offset;
+	REAL total_exc = 0;
+	REAL total_inh = 0;
+
+	for (int i=0; i < num_excitatory_inputs; i++) {
+		total_exc += exc_input[i];
+	}
+	for (int i=0; i< num_inhibitory_inputs; i++) {
+		total_inh += inh_input[i];
+	}
+    // Get the input in nA
+    input_t input_this_timestep =
+    		exc_input[0] - inh_input[0] + external_bias + neuron->I_offset;
 
         lif_neuron_closed_form(
                 neuron, neuron->V_membrane, input_this_timestep);
+
+    // If outside of the refractory period
+    if (neuron->refract_timer <= 0) {
+      	// Allow spiking again
+       	neuron->A = 1;
     } else {
+       	// Neuron cannot fire, as neuron->A=0;
         // countdown refractory timer
-        neuron->refract_timer--;
+        neuron->refract_timer -= 1;
     }
+
     return neuron->V_membrane;
 }
 
 void neuron_model_has_spiked(neuron_pointer_t neuron) {
-    // reset membrane voltage
-    neuron->V_membrane = neuron->V_reset;
+    // reset z to zero
+    neuron->z = 0;
 
-    // reset refractory timer
-    neuron->refract_timer  = neuron->T_refract;
+    // Set refractory timer
+    neuron->refract_timer  = neuron->T_refract - 1;
+    neuron->A = 0;
 }
 
 state_t neuron_model_get_membrane_voltage(neuron_pointer_t neuron) {

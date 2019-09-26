@@ -230,7 +230,10 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
     // Get the voltage
     state_t voltage = neuron_model_get_membrane_voltage(neuron);
-    recorded_variable_values[V_RECORDING_INDEX] = voltage;
+    state_t B_t = threshold_type->B;
+    state_t z_t = neuron->z;
+
+//    recorded_variable_values[V_RECORDING_INDEX] = voltage;
 
     // Get the exc and inh values from the synapses
     input_t* exc_value = synapse_types_get_excitatory_input(synapse_type);
@@ -253,10 +256,10 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
         total_inh += inh_input_values[i];
     }
 
-    // Call functions to get the input values to be recorded
-    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = total_exc;
-    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
-    		global_parameters->core_pop_rate;
+//    // Call functions to get the input values to be recorded
+//    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = total_exc;
+//    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
+//    		global_parameters->core_pop_rate;
 
     // Call functions to convert exc_input and inh_input to current
     input_type_convert_excitatory_input_to_current(
@@ -274,7 +277,30 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
             external_bias, neuron);
 
     // determine if a spike should occur
-    bool spike = threshold_type_is_above_threshold(result, threshold_type);
+    threshold_type_update_threshold(neuron->z, threshold_type);
+
+
+    // Also update Z (including using refractory period information)
+    state_t nu = (voltage - threshold_type->B)/threshold_type->B;
+
+    if (nu > ZERO){
+    	neuron->z = 1 * neuron->A; // implements refractory period
+    }
+
+    bool spike = neuron->z;
+
+    // *********************************************************
+    // Record updated state
+    // Record  V (just as cheap to set then to gate later)
+    recorded_variable_values[V_RECORDING_INDEX] = voltage; // result;
+
+    // Record Z
+    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = z_t;
+
+    // Record B
+    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = B_t; // threshold_type->B;
+    // *********************************************************
+
 
     // If spike occurs, communicate to relevant parts of model
     if (spike) {
