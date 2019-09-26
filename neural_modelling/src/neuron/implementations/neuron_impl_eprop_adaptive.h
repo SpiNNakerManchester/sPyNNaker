@@ -270,24 +270,26 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     external_bias += additional_input_get_input_value_as_current(
             additional_input, voltage);
 
+    // determine if a spike should occur
+    threshold_type_update_threshold(neuron->z, threshold_type);
+
     // update neuron parameters
     state_t result = neuron_model_state_update(
             NUM_EXCITATORY_RECEPTORS, exc_input_values,
             NUM_INHIBITORY_RECEPTORS, inh_input_values,
-            external_bias, neuron);
+            external_bias, neuron, B_t);
 
-    // determine if a spike should occur
-    threshold_type_update_threshold(neuron->z, threshold_type);
+
 
 
     // Also update Z (including using refractory period information)
     state_t nu = (voltage - threshold_type->B)/threshold_type->B;
 
     if (nu > ZERO){
-    	neuron->z = 1 * neuron->A; // implements refractory period
+    	neuron->z = 1.0k * neuron->A; // implements refractory period
     }
 
-    bool spike = neuron->z;
+    bool spike = z_t;
 
     // *********************************************************
     // Record updated state
