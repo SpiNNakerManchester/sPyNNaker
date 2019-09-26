@@ -658,8 +658,8 @@ class NeuronRecorder(object):
         return data_size * records
 
     def get_sdram_usage_in_bytes(self, vertex_slice):
-        n_words_for_n_neurons = math.ceil(
-            vertex_slice.n_atoms // constants.WORD_TO_BYTE_MULTIPLIER)
+        n_words_for_n_neurons = int(math.ceil(
+            vertex_slice.n_atoms // constants.WORD_TO_BYTE_MULTIPLIER))
         n_bytes_for_n_neurons = (
             n_words_for_n_neurons * constants.WORD_TO_BYTE_MULTIPLIER)
         return ((self.N_BYTES_PER_RATE + self.N_BYTES_PER_SIZE +
@@ -684,7 +684,7 @@ class NeuronRecorder(object):
             recording_utilities.get_recording_header_size(n_record) +
             recording_utilities.get_recording_data_constant_size(n_record) +
             self.get_sdram_usage_in_bytes(vertex_slice))
-        return sdram
+        return int(sdram)
 
     def get_variable_sdram_usage(self, vertex_slice):
         fixed_sdram = 0
