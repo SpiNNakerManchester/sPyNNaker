@@ -19,6 +19,7 @@
 #define _NEURON_RECORDING_H_
 
 #include <common/neuron-typedefs.h>
+#include <bit_field.h>
 
 //! The index to record each variable to for each neuron
 extern uint8_t **neuron_recording_indexes;
