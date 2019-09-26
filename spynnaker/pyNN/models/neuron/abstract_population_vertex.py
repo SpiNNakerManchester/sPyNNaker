@@ -674,14 +674,9 @@ class AbstractPopulationVertex(
             placement.x, placement.y, neuron_parameters_sdram_address,
             size_of_region)
 
-        # Skip the recorder globals as these are not change on machine
-        # Just written out in case data is changed and written back
-        offset = self.__neuron_recorder.get_sdram_usage_in_bytes(
-            vertex_slice)
-
         # update python neuron parameters with the data
         self.__neuron_impl.read_data(
-            byte_array, offset, vertex_slice, self._parameters,
+            byte_array, 0, vertex_slice, self._parameters,
             self._state_variables)
 
     @property
