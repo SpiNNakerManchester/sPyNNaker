@@ -189,7 +189,7 @@ class NeuronRecorder(object):
             indexes, region, graph_mapper,
             buffer_manager, expected_rows, missing_str, sampling_rate, label):
         """ processes a placement for matrix data
-        
+
         :param variable: the variable to read
         :param placements: the placements object
         :param vertex: the vertex to read from
@@ -202,7 +202,7 @@ class NeuronRecorder(object):
         :param missing_str: string for reporting missing stuff
         :param sampling_rate: the rate of sampling
         :param label: the vertex label.
-        :return: 
+        :return: placement data and sampling interval.
         """
         needs_scaling = (
             self.__matrix_output_types[variable] !=
