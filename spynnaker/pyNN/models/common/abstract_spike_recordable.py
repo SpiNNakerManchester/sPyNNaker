@@ -79,8 +79,7 @@ class AbstractSpikeRecordable(object):
         """
 
     @abstractmethod
-    def get_spikes_sampling_interval(
-            self, graph_mapper, local_time_period_map):
+    def get_spikes_sampling_interval(self):
         """ Return the current sampling interval for spikes
 
         :return: Sampling interval in micro seconds
