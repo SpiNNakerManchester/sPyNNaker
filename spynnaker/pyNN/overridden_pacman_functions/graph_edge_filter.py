@@ -14,10 +14,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
+
+from pacman.model.graphs.impl.constant_sdram_machine_partition import \
+    ConstantSDRAMMachinePartition
+from pacman.model.graphs.impl.segmented_sdram_machine_partition import \
+    SegmentedSDRAMMachinePartition
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.graphs.application import ApplicationEdge
 from pacman.model.graphs.machine import MachineGraph
-from pacman.model.graphs.common import GraphMapper
+from pacman.model.graphs.common import GraphMapper, EdgeTrafficType
 from spynnaker.pyNN.exceptions import FilterableException
 from spynnaker.pyNN.models.abstract_models import AbstractFilterableEdge
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
@@ -82,6 +87,21 @@ class GraphEdgeFilter(object):
     @staticmethod
     def _add_edge_to_new_graph(
             edge, partition, old_mapper, new_graph, new_mapper):
+
+        # handle new partitions
+        if (isinstance(partition, ConstantSDRAMMachinePartition) and
+                new_graph.get_outgoing_edge_partition_starting_at_vertex(
+                    partition.pre_vertex, partition.identifier) is None):
+            new_partition = ConstantSDRAMMachinePartition(
+                partition.identifier, partition.pre_vertex, partition.label)
+            new_graph.add_outgoing_edge_partition(new_partition)
+        elif (isinstance(partition, SegmentedSDRAMMachinePartition) and
+                new_graph.get_outgoing_edge_partition_starting_at_vertex(
+                    partition.pre_vertex, partition.identifier) is None):
+            new_partition = SegmentedSDRAMMachinePartition(
+                partition.identifier, partition.pre_vertex, partition.label)
+            new_graph.add_outgoing_edge_partition(new_partition)
+
         new_graph.add_edge(edge, partition.identifier)
         new_mapper.add_edge_mapping(
             edge, old_mapper.get_application_edge(edge))
@@ -106,6 +126,8 @@ class GraphEdgeFilter(object):
         if isinstance(edge, AbstractFilterableEdge):
             return edge.filter_edge(graph_mapper)
         elif isinstance(app_edge, ApplicationEdge):
+            return False
+        elif edge.traffic_type == EdgeTrafficType.SDRAM:
             return False
         raise FilterableException(
             "cannot figure out if edge {} is prunable or not".format(edge))
