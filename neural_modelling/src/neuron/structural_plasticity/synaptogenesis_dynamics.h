@@ -46,31 +46,6 @@ address_t synaptogenesis_dynamics_initialise(
 bool synaptogenesis_dynamics_rewire(uint32_t time,
         spike_t *spike, address_t *synaptic_row_address, uint32_t *n_bytes);
 
-//! \brief Formation and elimination are structurally agnostic, i.e. they don't
-//! care how synaptic rows are organised in physical memory.
-//!
-//!  As such, they need to call functions that have a knowledge of how the
-//!  memory is physically organised to be able to modify Plastic-Plastic
-//!  synaptic regions.
-//!
-//!  The formation rule calls the add neuron function in the appropriate
-//!  module (STDP or static).
-//!  \return true if formation was successful
-bool synaptogenesis_dynamics_formation_rule(uint32_t time, address_t row);
-
-
-//! \brief Formation and elimination are structurally agnostic, i.e. they don't
-//! care how synaptic rows are organised in physical memory.
-//!
-//!  As such, they need to call functions that have a knowledge of how the
-//!  memory is physically organised to be able to modify Plastic-Plastic
-//!  synaptic regions.
-//!
-//!  The elimination rule calls the remove neuron function in the appropriate
-//!  module (STDP or static).
-//!  \return true if elimination was successful
-bool synaptogenesis_dynamics_elimination_rule(uint32_t time, address_t row);
-
 //! \brief Performs the actual restructuring of a row
 //! \param[in] time: The time of the restructure
 //! \param[in] row: The row to restructure

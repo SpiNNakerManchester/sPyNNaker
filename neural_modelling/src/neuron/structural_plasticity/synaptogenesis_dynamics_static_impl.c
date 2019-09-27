@@ -46,18 +46,6 @@ bool synaptogenesis_row_restructure(uint32_t time, address_t row) {
     return false;
 }
 
-bool synaptogenesis_dynamics_formation_rule(uint32_t time, address_t row) {
-    use(time);
-    use(row);
-    return false;
-}
-
-bool synaptogenesis_dynamics_elimination_rule(uint32_t time, address_t row) {
-    use(time);
-    use(row);
-    return false;
-}
-
 int32_t synaptogenesis_rewiring_period(void) {
     return -1;
 }

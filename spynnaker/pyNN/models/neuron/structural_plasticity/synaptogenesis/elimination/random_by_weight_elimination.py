@@ -57,10 +57,10 @@ class RandomByWeightElimination(AbstractElimination):
         return 3 * 4
 
     @overrides(AbstractElimination.write_parameters)
-    def write_parameters(self, spec):
-        spec.write_value(self.__prob_elim_depressed)
-        spec.write_value(self.__prob_elim_potentiatiated)
-        spec.write_value(self.__threshold)
+    def write_parameters(self, spec, weight_scale):
+        spec.write_value(int(self.__prob_elim_depressed * 0xFFFFFFFF))
+        spec.write_value(int(self.__prob_elim_potentiatiated * 0xFFFFFFFF))
+        spec.write_value(self.__threshold * weight_scale)
 
     @overrides(AbstractElimination.get_parameter_names)
     def get_parameter_names(self):

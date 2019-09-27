@@ -33,6 +33,7 @@ static uint32_t synapse_type_index_bits;
 static uint32_t synapse_index_bits;
 static uint32_t synapse_index_mask;
 static uint32_t synapse_type_bits;
+static uint32_t synapse_type_mask;
 
 address_t synapse_dynamics_initialise(
         address_t address, uint32_t n_neurons, uint32_t n_synapse_types,
@@ -59,6 +60,7 @@ address_t synapse_dynamics_initialise(
     synapse_type_index_bits = log_n_neurons + synapse_type_bits;
     synapse_index_bits = log_n_neurons;
     synapse_index_mask = (1 << synapse_index_bits) - 1;
+    synapse_type_mask = (1 << synapse_type_bits) - 1;
     return address;
 }
 
@@ -108,7 +110,7 @@ uint32_t synapse_dynamics_get_plastic_saturation_count(void) {
 
 bool synapse_dynamics_find_neuron(
         uint32_t id, address_t row, weight_t *weight, uint16_t *delay,
-        uint32_t *offset) {
+        uint32_t *offset, uint32_t *synapse_type) {
     address_t fixed_region = synapse_row_fixed_region(row);
     int32_t fixed_synapse = synapse_row_num_fixed_synapses(fixed_region);
     uint32_t *synaptic_words = synapse_row_fixed_weight_controls(
@@ -120,12 +122,13 @@ bool synapse_dynamics_find_neuron(
         // Get next control word (auto incrementing)
         // Check if index is the one I'm looking for
         uint32_t synaptic_word = *synaptic_words++;
-        *weight = synapse_row_sparse_weight(synaptic_word);
-        *delay = synapse_row_sparse_delay(
-            synaptic_word, synapse_type_index_bits);
         if (synapse_row_sparse_index(synaptic_word, synapse_index_mask) == id) {
             *offset = synapse_row_num_fixed_synapses(fixed_region) -
                     fixed_synapse;
+            *weight = synapse_row_sparse_weight(synaptic_word);
+            *delay = synapse_row_sparse_delay(synaptic_word, synapse_type_index_bits);
+            *synapse_type = synapse_row_sparse_type(
+                    synaptic_word, synapse_index_bits, synapse_type_mask);
             return true;
         }
     }

@@ -23,7 +23,7 @@
 struct elimination_params {
     uint32_t prob_elim_depression;
     uint32_t prob_elim_potentiation;
-    int32_t mid_weight;
+    uint32_t threshold;
 };
 
 static inline bool synaptogenesis_elimination_rule(
@@ -31,18 +31,15 @@ static inline bool synaptogenesis_elimination_rule(
         uint32_t time, address_t row) {
     use(time);
 
-    // Is synaptic weight <.5 g_max? (i.e. synapse is depressed)
     uint32_t r = mars_kiss64_seed(*(current_state->local_seed));
 
     // Is weight depressed?
-    if (current_state->weight < params->mid_weight &&
-            r > params->prob_elim_depression) {
+    if (current_state->weight < params->threshold && r > params->prob_elim_depression) {
         return false;
     }
 
     // Is weight potentiated or unchanged?
-    if (current_state->weight >= params->mid_weight &&
-            r > params->prob_elim_potentiation) {
+    if (current_state->weight >= params->threshold && r > params->prob_elim_potentiation) {
         return false;
     }
 

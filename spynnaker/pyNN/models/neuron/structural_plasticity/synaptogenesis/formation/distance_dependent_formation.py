@@ -152,10 +152,8 @@ class DistanceDependentFormation(AbstractFormation):
         spec.write_array(self.__grid)
         spec.write_value(len(self.__ff_distance_probabilities))
         spec.write_value(len(self.__lat_distance_probabilities))
-        spec.write_array(self.__ff_distance_probabilities.view(dtype="<u2"),
-                         data_type=DataType.UINT16)
-        spec.write_array(self.__lat_distance_probabilities.view(dtype="<u2"),
-                         data_type=DataType.UINT16)
+        spec.write_array(self.__ff_distance_probabilities.view("<u4"))
+        spec.write_array(self.__lat_distance_probabilities.view("<u4"))
 
     @overrides(AbstractFormation.get_parameter_names)
     def get_parameter_names(self):

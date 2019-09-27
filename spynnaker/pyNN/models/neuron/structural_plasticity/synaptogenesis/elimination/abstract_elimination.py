@@ -36,7 +36,7 @@ class AbstractElimination(object):
         """
 
     @abstractmethod
-    def write_parameters(self, spec):
+    def write_parameters(self, spec, weight_scale):
         """ Write the parameters of the rule to the spec
         """
 

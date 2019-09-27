@@ -251,10 +251,13 @@ address_t synapse_dynamics_initialise(
     }
 
     uint32_t n_synapse_types_power_2 = n_synapse_types;
-    if (!is_power_of_2(n_synapse_types)) {
-        n_synapse_types_power_2 = next_power_of_2(n_synapse_types);
+    uint32_t log_n_synapse_types = 1;
+    if (n_synapse_types != 1) {
+        if (!is_power_of_2(n_synapse_types)) {
+            n_synapse_types_power_2 = next_power_of_2(n_synapse_types);
+        }
+        log_n_synapse_types = ilog_2(n_synapse_types_power_2);
     }
-    uint32_t log_n_synapse_types = ilog_2(n_synapse_types_power_2);
 
     synapse_type_index_bits = log_n_neurons + log_n_synapse_types;
     synapse_type_index_mask = (1 << synapse_type_index_bits) - 1;
@@ -380,26 +383,25 @@ uint32_t synapse_dynamics_get_plastic_saturation_count(void) {
 
 bool synapse_dynamics_find_neuron(
         uint32_t id, address_t row, weight_t *weight, uint16_t *delay,
-        uint32_t *offset) {
+        uint32_t *offset, uint32_t *synapse_type) {
     address_t fixed_region = synapse_row_fixed_region(row);
     address_t plastic_region_address = synapse_row_plastic_region(row);
-    plastic_synapse_t *plastic_words =
-            plastic_synapses(plastic_region_address);
+    plastic_synapse_t *plastic_words = plastic_synapses(plastic_region_address);
     control_t *control_words = synapse_row_plastic_controls(fixed_region);
     int32_t plastic_synapse = synapse_row_num_plastic_controls(fixed_region);
 
     // Loop through plastic synapses
     for (; plastic_synapse > 0; plastic_synapse--) {
-        // Get next control word (auto incrementing)
+        // Take the weight anyway as this updates the plastic words
         *weight = synapse_structure_get_weight(*plastic_words++);
-        uint32_t control_word = *control_words++;
 
         // Check if index is the one I'm looking for
-        *delay = synapse_row_sparse_delay(
-            control_word, synapse_type_index_bits);
+        uint32_t control_word = *control_words++;
         if (synapse_row_sparse_index(control_word, synapse_index_mask) == id) {
-            *offset = synapse_row_num_plastic_controls(fixed_region) -
-                    plastic_synapse;
+            *offset = synapse_row_num_plastic_controls(fixed_region) - plastic_synapse;
+            *delay = synapse_row_sparse_delay(control_word, synapse_type_index_bits);
+            *synapse_type = synapse_row_sparse_type(
+                    control_word, synapse_index_bits, synapse_type_mask);
             return true;
         }
     }

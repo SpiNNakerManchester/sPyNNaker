@@ -97,6 +97,8 @@ typedef struct {
     uint16_t delay;
     // current weight (if exists)
     uint16_t weight;
+    // synapse type
+    uint32_t synapse_type;
 } current_state_t;
 
 // \!brief unpack the spike into key and identifying information for the neuron;

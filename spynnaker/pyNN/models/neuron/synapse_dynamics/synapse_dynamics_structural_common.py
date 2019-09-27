@@ -186,7 +186,7 @@ class SynapseDynamicsStructuralCommon(object):
         # Write the pre-population info
         pop_index = self.__write_prepopulation_info(
             spec, app_vertex, structural_edges, graph_mapper, routing_info,
-            weight_scales)
+            weight_scales, post_slice)
 
         # Write the post-to-pre table
         self.__write_post_to_pre_table(
@@ -199,7 +199,8 @@ class SynapseDynamicsStructuralCommon(object):
             dynamics.formation.write_parameters(spec)
         for _, synapse_info in structural_edges:
             dynamics = synapse_info.synapse_dynamics
-            dynamics.elimination.write_parameters(spec)
+            dynamics.elimination.write_parameters(
+                spec, weight_scales[synapse_info.synapse_type])
 
     def __get_structural_edges(self, application_graph, app_vertex):
         structural_application_edges = list()
@@ -273,13 +274,16 @@ class SynapseDynamicsStructuralCommon(object):
 
     def __write_prepopulation_info(
             self, spec, app_vertex, structural_edges, graph_mapper,
-            routing_info, weight_scales):
+            routing_info, weight_scales, post_slice):
         pop_index = dict()
         index = 0
         for app_edge, synapse_info in structural_edges:
             pop_index[app_edge.pre_vertex, synapse_info] = index
             index += 1
-            machine_edges = graph_mapper.get_machine_edges(app_edge)
+            all_machine_edges = graph_mapper.get_machine_edges(app_edge)
+            machine_edges = [
+                e for e in all_machine_edges
+                if graph_mapper.get_slice(e.post_vertex) == post_slice]
             dynamics = synapse_info.synapse_dynamics
             # Number of machine edges
             spec.write_value(len(machine_edges), data_type=DataType.UINT16)
@@ -392,7 +396,7 @@ class SynapseDynamicsStructuralCommon(object):
                    (self.PRE_POP_INFO_BASE_SIZE * len(structural_edges)) +
                    (self.KEY_ATOM_INFO_SIZE * n_sub_edges) +
                    (self.POST_TO_PRE_ENTRY_SIZE * n_neurons * self.__s_max) +
-                   param_sizes)*2)
+                   param_sizes))
 
     def synaptic_data_update(
             self, connections, post_vertex_slice, app_edge, synapse_info,

@@ -62,10 +62,11 @@ uint32_t synapse_dynamics_get_plastic_saturation_count(void);
 //! \param[out] weight: address to contain the weight of the connection
 //! \param[out] delay: address to contain the delay of the connection
 //! \param[out] offset: address to contain the offset of the connection
+//! \param[out] synapse_type: address to contain the synapse type of the connection
 //! \return bool: was the search successful?
 bool synapse_dynamics_find_neuron(
         uint32_t id, address_t row, weight_t *weight, uint16_t *delay,
-        uint32_t *offset);
+        uint32_t *offset, uint32_t *synapse_type);
 
 //! \brief  Remove the entry at the specified offset in the synaptic row
 //! \param[in] offset: the offset in the row at which to remove the entry
