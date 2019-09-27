@@ -194,6 +194,15 @@ static void neuron_impl_load_neuron_parameters(
 
     neuron_model_set_global_neuron_params(global_parameters);
 
+    // **********************************************
+    // ******** for eprop regularisation ************
+    // **********************************************
+    global_parameters->core_target_rate = global_parameters->core_target_rate
+    		* n_neurons; // scales target rate depending on number of neurons
+    global_parameters->core_pop_rate = global_parameters->core_pop_rate
+    		* n_neurons; // scale initial value, too
+
+
 #if LOG_LEVEL >= LOG_DEBUG
     log_debug("-------------------------------------\n");
     for (index_t n = 0; n < n_neurons; n++) {
@@ -291,13 +300,18 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
     bool spike = z_t;
 
+
+
     // *********************************************************
     // Record updated state
     // Record  V (just as cheap to set then to gate later)
     recorded_variable_values[V_RECORDING_INDEX] = voltage; // result;
 
     // Record Z
-    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = z_t;
+//    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = z_t;
+
+    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] =
+    		global_parameters->core_pop_rate;
 
     // Record B
     recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = B_t; // threshold_type->B;
