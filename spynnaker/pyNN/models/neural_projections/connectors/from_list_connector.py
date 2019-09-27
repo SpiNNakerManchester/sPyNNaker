@@ -135,7 +135,7 @@ class FromListConnector(AbstractConnector):
         pre_post_bins = [(pre - 1, post - 1) for pre in pre_bins[1:]
                          for post in post_bins[1:]]
         self.__split_conn_list = {
-            (pre_post): indices
+            pre_post: indices
             for pre_post, indices in zip(pre_post_bins, split_indices)
         }
 

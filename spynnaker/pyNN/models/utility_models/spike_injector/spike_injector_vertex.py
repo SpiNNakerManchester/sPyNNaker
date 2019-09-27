@@ -121,6 +121,10 @@ class SpikeInjectorVertex(
                 placement.x, placement.y, placement.p,
                 SpikeInjectorVertex.SPIKE_RECORDING_REGION_ID)
 
+    @overrides(AbstractSpikeRecordable.get_spike_machine_vertices)
+    def get_spike_machine_vertices(self, graph_mapper):
+        return graph_mapper.get_machine_vertices(self)
+
     @overrides(AbstractProvidesOutgoingPartitionConstraints.
                get_outgoing_partition_constraints)
     def get_outgoing_partition_constraints(self, partition):

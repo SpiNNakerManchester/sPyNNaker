@@ -71,7 +71,16 @@ class AbstractSpikeRecordable(object):
         """
 
     @abstractmethod
-    def get_spikes_sampling_interval(self):
+    def get_spike_machine_vertices(self, graph_mapper):
+        """ get the machine vertices from the app vertex
+
+        :param graph_mapper: the graph mapper
+        :return: iterable of machine vertices
+        """
+
+    @abstractmethod
+    def get_spikes_sampling_interval(
+            self, graph_mapper, local_time_period_map):
         """ Return the current sampling interval for spikes
 
         :return: Sampling interval in micro seconds

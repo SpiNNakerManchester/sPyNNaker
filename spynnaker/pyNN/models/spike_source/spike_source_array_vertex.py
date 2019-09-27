@@ -120,6 +120,10 @@ class SpikeSourceArrayVertex(
     def get_spikes_sampling_interval(self):
         return globals_variables.get_simulator().machine_time_step
 
+    @overrides(AbstractSpikeRecordable.get_spike_machine_vertices)
+    def get_spike_machine_vertices(self, graph_mapper):
+        return graph_mapper.get_machine_vertices(self)
+
     @overrides(AbstractSpikeRecordable.get_spikes)
     def get_spikes(
             self, placements, graph_mapper, buffer_manager, machine_time_step):

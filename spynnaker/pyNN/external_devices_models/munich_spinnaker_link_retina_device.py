@@ -76,7 +76,7 @@ class MunichRetinaDevice(
 
     def __init__(
             self, retina_key, spinnaker_link_id, position,
-            label=None,
+            label=default_parameters['label'],
             polarity=default_parameters['polarity'],
             board_address=default_parameters['board_address']):
         # pylint: disable=too-many-arguments

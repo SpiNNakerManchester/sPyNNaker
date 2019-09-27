@@ -17,6 +17,8 @@ import logging
 import os
 import math
 from spinn_utilities.overrides import overrides
+from pacman.model.partitioner_interfaces.splitter_by_atoms import \
+    SplitterByAtoms
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
 from pacman.executor.injection_decorator import inject_items
@@ -36,6 +38,8 @@ from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.interface.buffer_management import (
     recording_utilities)
+from spynnaker.pyNN.models.abstract_models.\
+    abstract_sends_outgoing_synapses import AbstractSendsOutgoingSynapses
 from spinn_front_end_common.interface.profiling import profile_utils
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, AbstractNeuronRecordable, NeuronRecorder)
@@ -74,10 +78,10 @@ class AbstractPopulationVertex(
         AbstractProvidesOutgoingPartitionConstraints,
         AbstractProvidesIncomingPartitionConstraints,
         AbstractPopulationInitializable, AbstractPopulationSettable,
-        AbstractChangableAfterRun,
+        AbstractChangableAfterRun, AbstractSendsOutgoingSynapses,
         AbstractRewritesDataSpecification, AbstractReadParametersBeforeSet,
         AbstractAcceptsIncomingSynapses, ProvidesKeyToAtomMappingImpl,
-        AbstractCanReset):
+        AbstractCanReset, SplitterByAtoms):
     """ Underlying vertex model for Neural Populations.
     """
     __slots__ = [
@@ -122,8 +126,8 @@ class AbstractPopulationVertex(
             spikes_per_second, ring_buffer_sigma, incoming_spike_buffer_size,
             neuron_impl, pynn_model):
         # pylint: disable=too-many-arguments, too-many-locals
-        super(AbstractPopulationVertex, self).__init__(
-            label, constraints, max_atoms_per_core)
+        ApplicationVertex.__init__(
+            self, label, constraints, max_atoms_per_core)
 
         self.__n_atoms = n_neurons
         self.__n_subvertices = 0
@@ -168,6 +172,24 @@ class AbstractPopulationVertex(
         self.__n_profile_samples = helpful_functions.read_config_int(
             config, "Reports", "n_profile_samples")
 
+    @overrides(AbstractNeuronRecordable.get_expected_n_rows)
+    def get_expected_n_rows(
+            self, current_run_timesteps_map, sampling_rate, vertex, variable):
+        return self._neuron_recorder.expected_rows_for_a_run_time(
+            current_run_timesteps_map, vertex, sampling_rate)
+
+    @overrides(AbstractNeuronRecordable.get_recording_slice)
+    def get_recording_slice(self, graph_mapper, vertex):
+        return graph_mapper.get_slice(vertex)
+
+    @overrides(AbstractSendsOutgoingSynapses.get_out_going_size)
+    def get_out_going_size(self):
+        return self.__n_atoms
+
+    @overrides(AbstractAcceptsIncomingSynapses.get_in_coming_size)
+    def get_in_coming_size(self):
+        return self.__n_atoms
+
     @property
     @overrides(ApplicationVertex.n_atoms)
     def n_atoms(self):
@@ -182,7 +204,7 @@ class AbstractPopulationVertex(
         "machine_time_step": "MachineTimeStep"
     })
     @overrides(
-        ApplicationVertex.get_resources_used_by_atoms,
+        SplitterByAtoms.get_resources_used_by_atoms,
         additional_arguments={
             "graph", "machine_time_step"
         }
@@ -222,26 +244,7 @@ class AbstractPopulationVertex(
         self.__change_requires_mapping = False
         self.__change_requires_data_generation = False
 
-    # CB: May be dead code
-    def _get_buffered_sdram_per_timestep(self, vertex_slice):
-        values = [self.__neuron_recorder.get_buffered_sdram_per_timestep(
-                "spikes", vertex_slice)]
-        for variable in self.__neuron_impl.get_recordable_variables():
-            values.append(
-                self.__neuron_recorder.get_buffered_sdram_per_timestep(
-                    variable, vertex_slice))
-        return values
-
-    def _get_buffered_sdram(self, vertex_slice, n_machine_time_steps):
-        values = [self.__neuron_recorder.get_buffered_sdram(
-                "spikes", vertex_slice, n_machine_time_steps)]
-        for variable in self.__neuron_impl.get_recordable_variables():
-            values.append(
-                self.__neuron_recorder.get_buffered_sdram(
-                    variable, vertex_slice, n_machine_time_steps))
-        return values
-
-    @overrides(ApplicationVertex.create_machine_vertex)
+    @overrides(SplitterByAtoms.create_machine_vertex)
     def create_machine_vertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
@@ -811,6 +814,14 @@ class AbstractPopulationVertex(
         self._clear_recording_region(
             buffer_manager, placements, graph_mapper,
             AbstractPopulationVertex.SPIKE_RECORDING_REGION)
+
+    @overrides(AbstractSpikeRecordable.get_spike_machine_vertices)
+    def get_spike_machine_vertices(self, graph_mapper):
+        return graph_mapper.get_machine_vertices(self)
+
+    @overrides(AbstractNeuronRecordable.get_machine_vertices_for)
+    def get_machine_vertices_for(self, variable, graph_mapper):
+        return graph_mapper.get_machine_vertices(self)
 
     def _clear_recording_region(
             self, buffer_manager, placements, graph_mapper,

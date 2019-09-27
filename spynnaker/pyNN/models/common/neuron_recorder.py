@@ -85,10 +85,10 @@ class NeuronRecorder(object):
         if self.__sampling_rates[variable] == 0:
             return []
         if self.__indexes[variable] is None:
-            return range(vertex_slice.lo_atom, vertex_slice.hi_atom+1)
+            return range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1)
         recording = []
         indexes = self.__indexes[variable]
-        for index in xrange(vertex_slice.lo_atom, vertex_slice.hi_atom+1):
+        for index in xrange(vertex_slice.lo_atom, vertex_slice.hi_atom + 1):
             if index in indexes:
                 recording.append(index)
         return recording
@@ -123,18 +123,23 @@ class NeuronRecorder(object):
         if variable == SPIKES:
             msg = "Variable {} is not supported use get_spikes".format(SPIKES)
             raise ConfigurationException(msg)
-        vertices = graph_mapper.get_machine_vertices(application_vertex)
+
+        vertices = application_vertex.get_machine_vertices_for(
+            variable, graph_mapper)
+
         progress = ProgressBar(
             vertices, "Getting {} for {}".format(variable, label))
         sampling_rate = self.__sampling_rates[variable]
-        expected_rows = int(math.ceil(
-            n_machine_time_steps / sampling_rate))
         missing_str = ""
         data = None
         indexes = []
         for vertex in progress.over(vertices):
+            expected_rows = application_vertex.get_expected_n_rows(
+                n_machine_time_steps, sampling_rate, vertex, variable)
+
             placement = placements.get_placement_of_vertex(vertex)
-            vertex_slice = graph_mapper.get_slice(vertex)
+            vertex_slice = application_vertex.get_recording_slice(
+                graph_mapper, vertex)
             neurons = self._neurons_recording(variable, vertex_slice)
             n_neurons = len(neurons)
             if n_neurons == 0:
@@ -199,7 +204,7 @@ class NeuronRecorder(object):
         spike_ids = list()
         ms_per_tick = machine_time_step / 1000.0
 
-        vertices = graph_mapper.get_machine_vertices(application_vertex)
+        vertices = application_vertex.get_spike_machine_vertices(graph_mapper)
         missing_str = ""
         progress = ProgressBar(vertices,
                                "Getting spikes for {}".format(label))
@@ -211,8 +216,7 @@ class NeuronRecorder(object):
                 neurons_recording = vertex_slice.n_atoms
             else:
                 neurons_recording = sum(
-                    (index >= vertex_slice.lo_atom and
-                     index <= vertex_slice.hi_atom)
+                    (vertex_slice.lo_atom <= index <= vertex_slice.hi_atom)
                     for index in self.__indexes[SPIKES])
                 if neurons_recording == 0:
                     continue
@@ -228,9 +232,9 @@ class NeuronRecorder(object):
                 missing_str += "({}, {}, {}); ".format(
                     placement.x, placement.y, placement.p)
             if len(record_raw) > 0:
-                raw_data = (numpy.asarray(record_raw, dtype="uint8").
-                            view(dtype="<i4")).reshape(
-                    [-1, n_words_with_timestamp])
+                raw_data = (
+                    numpy.asarray(record_raw, dtype="uint8").view(
+                        dtype="<i4")).reshape([-1, n_words_with_timestamp])
             else:
                 raw_data = record_raw
             if len(raw_data) > 0:
@@ -488,13 +492,14 @@ class NeuronRecorder(object):
         return overflow
 
     def get_buffered_sdram(self, variable, vertex_slice, n_machine_time_steps):
-        """ Returns the SDRAM used for this may timesteps
+        """ Returns the SDRAM used for this may time steps
 
         If required the total is rounded up so the space will always fit
 
-        :param variable: The
-        :param vertex_slice:
-        :return:
+        :param variable: The variable to get buffered sdram of
+        :param vertex_slice: vertex slice
+        :param n_machine_time_steps: how many machine time steps to run for
+        :return: data size
         """
         rate = self.__sampling_rates[variable]
         if rate == 0:
@@ -605,31 +610,6 @@ class NeuronRecorder(object):
             n_recording = self._count_recording_per_slice(
                 variable, vertex_slice)
             params.append(NeuronParameter(n_recording, DataType.UINT8))
-        return params
-
-    def get_index_parameters(self, vertex_slice):
-        params = []
-        for variable in self.__sampling_rates:
-            if self.__sampling_rates[variable] <= 0:
-                local_indexes = 0
-            elif self.__indexes[variable] is None:
-                local_indexes = IndexIsValue()
-            else:
-                local_indexes = []
-                n_recording = sum(
-                    vertex_slice.lo_atom <= index <= vertex_slice.hi_atom
-                    for index in self.__indexes[variable])
-                indexes = self.__indexes[variable]
-                local_index = 0
-                for index in xrange(
-                        vertex_slice.lo_atom, vertex_slice.hi_atom+1):
-                    if index in indexes:
-                        local_indexes.append(local_index)
-                        local_index += 1
-                    else:
-                        # write to one beyond recording range
-                        local_indexes.append(n_recording)
-            params.append(NeuronParameter(local_indexes, DataType.UINT8))
         return params
 
     @property

@@ -45,6 +45,16 @@ class AbstractNeuronRecordable(object):
         """
 
     @abstractmethod
+    def get_machine_vertices_for(self, variable, graph_mapper):
+        """ gives the machine vertices for a given variable from a given app \
+        vertex
+
+        :param variable: the variable to get
+        :param graph_mapper:  the mapping between graphs
+        :return: iterable of machine vertex
+        """
+
+    @abstractmethod
     def clear_recording(self, variable, buffer_manager, placements,
                         graph_mapper):
         """ Clear the recorded data from the object
@@ -76,4 +86,26 @@ class AbstractNeuronRecordable(object):
 
         :param variable: PyNN name of the variable
         :return: Sampling interval in micro seconds
+        """
+
+    @abstractmethod
+    def get_expected_n_rows(
+            self, current_run_timesteps_map, sampling_rate, vertex, variable):
+        """ Returns the number of expected rows for a given runtime
+
+        :param current_run_timesteps_map: map of vertex to steps.
+        :param sampling_rate: the sampling rate for this vertex
+        :param vertex: the machine vertex
+        :param variable: the variable being recorded
+        :return: the number of rows expected.
+        """
+
+    @abstractmethod
+    def get_recording_slice(self, graph_mapper, vertex):
+        """ returns the slice of vertex for this machine vertex in recording \
+        space.
+
+        :param graph_mapper: the graph mapper
+        :param vertex: the machine vertex
+        :return: the slice of recorded atoms.
         """

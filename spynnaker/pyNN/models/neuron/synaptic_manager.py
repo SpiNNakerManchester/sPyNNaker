@@ -23,6 +23,12 @@ import numpy
 import scipy.stats  # @UnresolvedImport
 from scipy import special  # @UnresolvedImport
 from spinn_utilities.helpful_functions import get_valid_components
+from pacman.model.partitioner_interfaces.\
+    abstract_controls_destination_of_edges import \
+    AbstractControlsDestinationOfEdges
+from pacman.model.partitioner_interfaces.\
+    abstract_controls_source_of_edges import \
+    AbstractControlsSourceOfEdges
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
@@ -610,10 +616,17 @@ class SynapticManager(object):
                 spec.comment("\nWriting matrix for m_edge:{}\n".format(
                     machine_edge.label))
 
-                pre_vertex_slice = graph_mapper.get_slice(
-                    machine_edge.pre_vertex)
-                pre_slices = graph_mapper.get_slices(app_edge.pre_vertex)
-                pre_slice_index = graph_mapper.get_machine_vertex_index(
+                if isinstance(
+                        app_edge.pre_vertex, AbstractControlsSourceOfEdges):
+                    pre_slices = app_edge.pre_vertex.get_out_going_slices()
+                    pre_vertex_slice = app_edge.pre_vertex.get_pre_slice_for(
+                        machine_edge.pre_vertex)
+                else:
+                    pre_slices = graph_mapper.get_slices(app_edge.pre_vertex)
+                    pre_vertex_slice = graph_mapper.get_slice(
+                        machine_edge.pre_vertex)
+
+                pre_slice_idx = graph_mapper.get_machine_vertex_index(
                     machine_edge.pre_vertex)
 
                 for synapse_info in app_edge.synapse_information:
@@ -635,11 +648,11 @@ class SynapticManager(object):
                                 post_vertex_slice, app_edge)):
                         generate_on_machine.append((
                             synapse_info, pre_slices, pre_vertex_slice,
-                            pre_slice_index, app_edge, rinfo))
+                            pre_slice_idx, app_edge, rinfo))
                     else:
                         block_addr, single_addr, index = self.__write_block(
                             spec, synaptic_matrix_region, synapse_info,
-                            pre_slices, pre_slice_index, post_slices,
+                            pre_slices, pre_slice_idx, post_slices,
                             post_slice_index, pre_vertex_slice,
                             post_vertex_slice, app_edge,
                             self.__n_synapse_types,
@@ -940,7 +953,10 @@ class SynapticManager(object):
                                        pre_vertex_slice.hi_atom] = \
                     routing_info.get_routing_info_for_edge(m_edge)
 
-        post_slices = graph_mapper.get_slices(application_vertex)
+        if isinstance(application_vertex, AbstractControlsDestinationOfEdges):
+            post_slices = application_vertex.get_in_coming_slices()
+        else:
+            post_slices = graph_mapper.get_slices(application_vertex)
         post_slice_idx = graph_mapper.get_machine_vertex_index(machine_vertex)
 
         # Reserve the memory

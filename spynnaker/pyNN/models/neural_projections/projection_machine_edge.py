@@ -16,6 +16,12 @@
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.utilities import utility_calls
 from pacman.model.graphs.machine import MachineEdge
+from pacman.model.partitioner_interfaces.\
+    abstract_controls_destination_of_edges import \
+    AbstractControlsDestinationOfEdges
+from pacman.model.partitioner_interfaces.\
+    abstract_controls_source_of_edges import \
+    AbstractControlsSourceOfEdges
 from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.interface.provenance import (
     AbstractProvidesLocalProvenanceData)
@@ -49,24 +55,44 @@ class ProjectionMachineEdge(
     def filter_edge(self, graph_mapper):
         # Filter one-to-one connections that are out of range
         # Note: there may be other connectors stored on the same edge!
+
+        pre_app_vertex = graph_mapper.get_application_vertex(self.pre_vertex)
+        post_app_vertex = graph_mapper.get_application_vertex(self.post_vertex)
         n_filtered = 0
         for synapse_info in self.__synapse_information:
-            if isinstance(synapse_info.connector, OneToOneConnector):
+            # process pre atoms
+            if isinstance(pre_app_vertex, AbstractControlsSourceOfEdges):
+                machine_slice = pre_app_vertex.get_pre_slice_for(
+                    self.pre_vertex)
+                pre_lo = machine_slice.lo_atom
+                pre_hi = machine_slice.hi_atom
+                pre_slices = pre_app_vertex.get_out_going_slices()
+            else:
                 pre_lo = graph_mapper.get_slice(self.pre_vertex).lo_atom
                 pre_hi = graph_mapper.get_slice(self.pre_vertex).hi_atom
+                pre_slices = graph_mapper.get_slices(pre_app_vertex)
+
+            # process post atoms
+            if isinstance(post_app_vertex, AbstractControlsDestinationOfEdges):
+                machine_slice = post_app_vertex.get_post_slice_for(
+                    self.post_vertex)
+                post_lo = machine_slice.lo_atom
+                post_hi = machine_slice.hi_atom
+                post_slices = post_app_vertex.get_in_coming_slices()
+            else:
                 post_lo = graph_mapper.get_slice(self.post_vertex).lo_atom
                 post_hi = graph_mapper.get_slice(self.post_vertex).hi_atom
+                post_slices = graph_mapper.get_slices(post_app_vertex)
+
+            # handle the different connectors
+            if isinstance(synapse_info.connector, OneToOneConnector):
                 if pre_hi < post_lo or pre_lo > post_hi:
                     n_filtered += 1
             elif isinstance(synapse_info.connector, FromListConnector):
-                pre_hi = graph_mapper.get_slice(self.pre_vertex).hi_atom
-                post_hi = graph_mapper.get_slice(self.post_vertex).hi_atom
                 pre_app_vertex = graph_mapper.get_application_vertex(
                     self.pre_vertex)
                 post_app_vertex = graph_mapper.get_application_vertex(
                     self.post_vertex)
-                pre_slices = graph_mapper.get_slices(pre_app_vertex)
-                post_slices = graph_mapper.get_slices(post_app_vertex)
                 # run through connection list and check for any connections
                 # between the pre and post vertices that could be filtered
                 n_connections = synapse_info.connector.get_n_connections(
@@ -74,7 +100,7 @@ class ProjectionMachineEdge(
                 if n_connections == 0:
                     n_filtered += 1
 
-        return (n_filtered == len(self.__synapse_information))
+        return n_filtered == len(self.__synapse_information)
 
     @overrides(AbstractWeightUpdatable.update_weight)
     def update_weight(self, graph_mapper):
