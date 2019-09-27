@@ -167,7 +167,7 @@ class DelayExtensionVertex(
             max_stage, machine_time_step):
         """ Add delays for a connection to be generated
         """
-        key = (pre_vertex_slice.lo_atom, pre_vertex_slice.hi_atom)
+        key = (post_vertex_slice.lo_atom, post_vertex_slice.hi_atom)
         self.__delay_generator_data[key].append(
             DelayGeneratorData(
                 max_row_n_synapses, max_delayed_row_n_synapses,
