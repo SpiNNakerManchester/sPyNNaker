@@ -187,9 +187,23 @@ class NeuronRecorder(object):
     def _get_placement_matrix_data(
             self, variable, placements, vertex, sampling_interval,
             indexes, region, graph_mapper,
-            buffer_manager, expected_rows, missing_str, sampling_rate, label,
-            application_vertex):
-        """"""
+            buffer_manager, expected_rows, missing_str, sampling_rate, label):
+        """ processes a placement for matrix data
+        
+        :param variable: the variable to read
+        :param placements: the placements object
+        :param vertex: the vertex to read from
+        :param sampling_interval: the interval of sampling
+        :param indexes: the indexs of neurons
+        :param region: the recording region id
+        :param graph_mapper: the graph mapper
+        :param buffer_manager: the buffer manager
+        :param expected_rows: how many rows the tools think should be recorded
+        :param missing_str: string for reporting missing stuff
+        :param sampling_rate: the rate of sampling
+        :param label: the vertex label.
+        :return: 
+        """
         needs_scaling = (
             self.__matrix_output_types[variable] !=
             self.__matrix_scalar_types[variable])
@@ -305,7 +319,7 @@ class NeuronRecorder(object):
                     variable, placements, vertex, sampling_interval,
                     indexes, region,
                     graph_mapper, buffer_manager, expected_rows, missing_str,
-                    sampling_rate, label, application_vertex)
+                    sampling_rate, label)
 
             if placement_data is not None:
                 # append to the population data
