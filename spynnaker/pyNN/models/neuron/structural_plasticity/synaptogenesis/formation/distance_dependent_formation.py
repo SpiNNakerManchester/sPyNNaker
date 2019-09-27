@@ -16,7 +16,6 @@
 import numpy
 from .abstract_formation import AbstractFormation
 from pacman.model.decorators.overrides import overrides
-from data_specification.enums import DataType
 
 
 class DistanceDependentFormation(AbstractFormation):
