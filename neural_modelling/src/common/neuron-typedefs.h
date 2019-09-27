@@ -125,10 +125,10 @@ typedef struct float_timed_state_t {
 } float_timed_state_t;
 
 //! \brief storage for bitfields
-typedef struct timed_out_spikes {
+typedef struct timed_bit_fields {
     uint32_t time;
     uint32_t out_spikes[];
-} timed_out_spikes;
+} timed_bit_fields;
 
 
 #endif /* __NEURON_TYPEDEFS_H__ */

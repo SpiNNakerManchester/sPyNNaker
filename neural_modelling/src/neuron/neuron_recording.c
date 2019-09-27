@@ -46,7 +46,7 @@ static uint32_t *var_recording_increment;
 uint8_t **neuron_recording_indexes;
 
 //! The values of the recorded variables for bitfields
-timed_out_spikes **neuron_recording_bit_field_values;
+timed_bit_fields **neuron_recording_bit_field_values;
 
 //! The values of the recorded variables for uint32s
 timed_state_t **neuron_recording_int32_values;
@@ -350,8 +350,8 @@ static inline bool _allocate_dtcm(
     }
 
     // allocate dtcm for bitfields
-    neuron_recording_bit_field_values = (timed_out_spikes **) spin1_malloc(
-        n_recorded_vars * sizeof(timed_out_spikes *));
+    neuron_recording_bit_field_values = (timed_bit_fields **) spin1_malloc(
+        n_recorded_vars * sizeof(timed_bit_fields *));
     if (neuron_recording_bit_field_values == NULL) {
         log_error(
             "Count not allocate space for var_bit_fields_recording_values");
@@ -460,7 +460,7 @@ bool neuron_recording_initialise(
             case BIT_FIELD:
                 // determine size of bitfield
                 neuron_recording_bit_field_values[i] = spin1_malloc(
-                    sizeof(timed_out_spikes) + (
+                    sizeof(timed_bit_fields) + (
                         (var_recording_size[i] - TIME_STAMP_SIZE_IN_BYTES) *
                         sizeof(uint32_t)));
                 if (neuron_recording_bit_field_values[i] == NULL){

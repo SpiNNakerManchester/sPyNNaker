@@ -25,7 +25,7 @@
 extern uint8_t **neuron_recording_indexes;
 
 //! The values of the recorded variables for bitfields
-extern timed_out_spikes **neuron_recording_bit_field_values;
+extern timed_bit_fields **neuron_recording_bit_field_values;
 
 //! The values of the recorded variables for int32s
 extern timed_state_t **neuron_recording_int32_values;
