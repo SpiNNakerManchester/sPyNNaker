@@ -43,7 +43,7 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
     OneToOneConnector, AllToAllConnector)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsStatic)
-from unittests.mocks import MockSimulator
+from unittests.mocks import MockSimulator, MockPopulation
 
 
 class MockSynapseIO(object):
@@ -207,22 +207,24 @@ class TestSynapticManager(unittest.TestCase):
 
         machine_time_step = 1000.0
 
+        pre_app_population = MockPopulation(10, "mock pop pre")
         pre_app_vertex = SimpleApplicationVertex(10)
         pre_vertex = SimpleMachineVertex(resources=None)
         pre_vertex_slice = Slice(0, 9)
+        post_app_population = MockPopulation(10, "mock pop post")
         post_app_vertex = SimpleApplicationVertex(10)
         post_vertex = SimpleMachineVertex(resources=None)
         post_vertex_slice = Slice(0, 9)
         post_slice_index = 0
         one_to_one_connector_1 = OneToOneConnector(None)
         one_to_one_connector_1.set_projection_information(
-            pre_app_vertex, post_app_vertex, None, machine_time_step)
+            pre_app_population, post_app_population, None, machine_time_step)
         one_to_one_connector_2 = OneToOneConnector(None)
         one_to_one_connector_2.set_projection_information(
-            pre_app_vertex, post_app_vertex, None, machine_time_step)
-        all_to_all_connector = AllToAllConnector(None)
+            pre_app_population, post_app_population, None, machine_time_step)
+        all_to_all_connector = AllToAllConnector()
         all_to_all_connector.set_projection_information(
-            pre_app_vertex, post_app_vertex, None, machine_time_step)
+            pre_app_population, post_app_population, None, machine_time_step)
         direct_synapse_information_1 = SynapseInformation(
             one_to_one_connector_1, SynapseDynamicsStatic(), 0, 1.5, 1.0)
         direct_synapse_information_2 = SynapseInformation(
