@@ -90,10 +90,10 @@ class AbstractNeuronRecordable(object):
 
     @abstractmethod
     def get_expected_n_rows(
-            self, current_run_timesteps_map, sampling_rate, vertex, variable):
+            self, n_machine_time_steps, sampling_rate, vertex, variable):
         """ Returns the number of expected rows for a given runtime
 
-        :param current_run_timesteps_map: map of vertex to steps.
+        :param n_machine_time_steps: map of vertex to steps.
         :param sampling_rate: the sampling rate for this vertex
         :param vertex: the machine vertex
         :param variable: the variable being recorded

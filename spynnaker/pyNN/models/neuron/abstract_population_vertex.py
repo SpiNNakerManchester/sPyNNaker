@@ -174,9 +174,9 @@ class AbstractPopulationVertex(
 
     @overrides(AbstractNeuronRecordable.get_expected_n_rows)
     def get_expected_n_rows(
-            self, current_run_timesteps_map, sampling_rate, vertex, variable):
+            self, n_machine_time_steps, sampling_rate, vertex, variable):
         return self._neuron_recorder.expected_rows_for_a_run_time(
-            current_run_timesteps_map, vertex, sampling_rate)
+            n_machine_time_steps, sampling_rate)
 
     @overrides(AbstractNeuronRecordable.get_recording_slice)
     def get_recording_slice(self, graph_mapper, vertex):

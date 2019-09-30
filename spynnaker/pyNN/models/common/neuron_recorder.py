@@ -23,7 +23,6 @@ import math
 import numpy
 from six import raise_from, iteritems
 from six.moves import range, xrange
-from spinn_utilities.index_is_value import IndexIsValue
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.resources.variable_sdram import VariableSDRAM
 from data_specification.enums import DataType
@@ -101,6 +100,16 @@ class NeuronRecorder(object):
         """
         step = globals_variables.get_simulator().machine_time_step / 1000
         return self.__sampling_rates[variable] * step
+
+    @staticmethod
+    def expected_rows_for_a_run_time(n_machine_time_steps, sampling_rate):
+        """ determines how many rows to see based off how long its ran for
+
+        :param n_machine_time_steps: how long ran for this time
+        :param sampling_rate: the sampling rate for a given variable
+        :return: how many rows there should be. 
+        """
+        return int(math.ceil(n_machine_time_steps / sampling_rate))
 
     def get_matrix_data(
             self, label, buffer_manager, region, placements, graph_mapper,
