@@ -34,8 +34,4 @@ uint32_t spike_processing_get_buffer_overflows(void);
 //! \return bool: currently, always true
 bool spike_processing_do_rewiring(int number_of_rew);
 
-//! \brief has this core received any spikes since the last batch of rewires?
-//! \return bool
-bool received_any_spike(void);
-
 #endif // _SPIKE_PROCESSING_H_

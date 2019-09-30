@@ -77,7 +77,6 @@ static uint32_t dma_n_rewires;
 // up, only this or dma_n_rewires can be 1 with the other being 0.
 static uint32_t dma_n_spikes;
 
-static bool any_spike = false;
 
 /* PRIVATE FUNCTIONS - static for inlining */
 
@@ -230,7 +229,6 @@ static inline void setup_synaptic_dma_write(
 // Called when a multicast packet is received
 static void multicast_packet_received_callback(uint key, uint payload) {
     use(payload);
-    any_spike = true;
     log_debug("Received spike %x at %d, DMA Busy = %d", key, time, dma_busy);
 
     // If there was space to add spike to incoming spike queue
@@ -282,6 +280,7 @@ static void dma_complete_callback(uint unused, uint tag) {
             plastic_only = false;
         }
     }
+
     // Process synaptic row repeatedly for any upcoming spikes
     while (n_spikes > 0) {
 
@@ -409,10 +408,4 @@ bool spike_processing_do_rewiring(int number_of_rewires) {
     // enable interrupts
     spin1_mode_restore(cpsr);
     return true;
-}
-
-//! \brief has this core received any spikes since the last batch of rewires?
-//! \return bool
-bool received_any_spike(void) { // EXPORTED
-    return any_spike;
 }
