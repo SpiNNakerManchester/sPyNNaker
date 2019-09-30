@@ -59,7 +59,7 @@ class MunichMotorDevice(
         ApplicationVertex, AbstractVertexWithEdgeToDependentVertices,
         AbstractGeneratesDataSpecification, AbstractHasAssociatedBinary,
         AbstractProvidesOutgoingPartitionConstraints,
-        ProvidesKeyToAtomMappingImpl):
+        ProvidesKeyToAtomMappingImpl, SplitterByAtoms):
     """ An Omnibot motor control device - has a real vertex and an external\
         device vertex
     """
@@ -95,15 +95,14 @@ class MunichMotorDevice(
             _MunichMotorDevice(spinnaker_link_id, board_address)]
 
     @property
-    @overrides(ApplicationVertex.n_atoms)
+    @overrides(SplitterByAtoms.n_atoms)
     def n_atoms(self):
         return 6
 
     @overrides(SplitterByAtoms.create_machine_vertex)
     def create_machine_vertex(self, vertex_slice, resources_required,
                               label=None, constraints=None):
-        return SimpleMachineVertex(
-            resources_required, label, constraints)
+        return SimpleMachineVertex(resources_required, label, constraints)
 
     @overrides(SplitterByAtoms.get_resources_used_by_atoms)
     def get_resources_used_by_atoms(self, vertex_slice):
