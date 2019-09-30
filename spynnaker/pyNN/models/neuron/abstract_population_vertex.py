@@ -17,8 +17,7 @@ import logging
 import os
 import math
 from spinn_utilities.overrides import overrides
-from pacman.model.partitioner_interfaces.splitter_by_atoms import \
-    SplitterByAtoms
+from pacman.model.partitioner_interfaces import SplitterByAtoms
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
 from pacman.executor.injection_decorator import inject_items

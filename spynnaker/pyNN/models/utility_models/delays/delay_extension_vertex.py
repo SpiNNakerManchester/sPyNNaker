@@ -28,8 +28,7 @@ from pacman.model.constraints.partitioner_constraints import (
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
-from pacman.model.partitioner_interfaces.splitter_by_atoms import \
-    SplitterByAtoms
+from pacman.model.partitioner_interfaces import SplitterByAtoms
 from spinn_front_end_common.abstract_models import (
     AbstractProvidesNKeysForPartition, AbstractGeneratesDataSpecification,
     AbstractProvidesOutgoingPartitionConstraints, AbstractHasAssociatedBinary)

@@ -17,8 +17,7 @@ import logging
 import math
 import numpy
 import scipy.stats
-from pacman.model.partitioner_interfaces.splitter_by_atoms import \
-    SplitterByAtoms
+from pacman.model.partitioner_interfaces import SplitterByAtoms
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from pacman.executor.injection_decorator import inject_items
