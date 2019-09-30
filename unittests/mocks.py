@@ -37,6 +37,9 @@ class MockPopulation(object):
     def outgoing_neurons(self):
         return self._size
 
+    def incoming_neurons(self):
+        return self._size
+
     def __repr__(self):
         return "Population {}".format(self._label)
 
