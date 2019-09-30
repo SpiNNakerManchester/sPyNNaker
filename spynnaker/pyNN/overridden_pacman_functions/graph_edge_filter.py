@@ -15,10 +15,8 @@
 
 import logging
 
-from pacman.model.graphs.impl.constant_sdram_machine_partition import \
-    ConstantSDRAMMachinePartition
-from pacman.model.graphs.impl.segmented_sdram_machine_partition import \
-    SegmentedSDRAMMachinePartition
+from pacman.model.graphs.impl import ConstantSDRAMMachinePartition
+from pacman.model.graphs.impl import SegmentedSDRAMMachinePartition
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.graphs.application import ApplicationEdge
 from pacman.model.graphs.machine import MachineGraph
