@@ -96,6 +96,7 @@ class SpikeSourcePoissonVertex(
         ProvidesKeyToAtomMappingImpl, SplitterByAtoms):
     """ A Poisson Spike source object
     """
+
     __slots__ = [
         "__change_requires_mapping",
         "__change_requires_neuron_parameters_reload",
@@ -769,3 +770,7 @@ class SpikeSourcePoissonVertex(
     @property
     def max_rate(self):
         return self.__max_rate
+
+    @overrides(AbstractSpikeRecordable.get_spike_machine_vertices)
+    def get_spike_machine_vertices(self, graph_mapper):
+        return graph_mapper.get_machine_vertices(self)
