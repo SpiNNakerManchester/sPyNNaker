@@ -87,14 +87,14 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
     def set_projection_information(
             self, pre_population, post_population, rng, machine_time_step):
         """ sets a connectors projection info
-        
+
         :param pre_population: source population
         :type post_population: pynn population
         :type pre_population: pynn population
         :param post_population: destination population
         :param rng: random number generator
         :param machine_time_step: machine time step
-        :rtype: None 
+        :rtype: None
         """
         self.__pre_population = pre_population
         self.__post_population = post_population
