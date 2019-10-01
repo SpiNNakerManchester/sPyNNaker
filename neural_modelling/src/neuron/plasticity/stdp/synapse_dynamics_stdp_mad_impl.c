@@ -86,8 +86,8 @@ uint32_t plastic_saturation_count = 0;
 // Structures
 //---------------------------------------
 typedef struct {
-    pre_trace_t prev_trace;
     uint32_t prev_time;
+    pre_trace_t prev_trace;
 } pre_event_history_t;
 
 post_event_history_t *post_event_history;
