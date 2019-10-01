@@ -200,7 +200,9 @@ class SynapseDynamicsSTDP(
         return name
 
     def get_parameters_sdram_usage_in_bytes(self, n_neurons, n_synapse_types):
-        size = self.__timing_dependence.get_parameters_sdram_usage_in_bytes()
+        # 32-bits for control of autapses
+        size = 4
+        size += self.__timing_dependence.get_parameters_sdram_usage_in_bytes()
         size += self.__weight_dependence.get_parameters_sdram_usage_in_bytes(
             n_synapse_types, self.__timing_dependence.n_weight_terms)
         return size
