@@ -342,19 +342,19 @@ bool synapse_dynamics_process_plastic_synapses(
         update_state_t current_state =
                 synapse_structure_get_update_state(*plastic_words, type);
 
+        // Convert into ring buffer offset
+        uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
+                delay_axonal + delay_dendritic + time, type_index,
+                synapse_type_index_bits);
+
         // Update the synapse state
-        if (self_connection && params.undelayed_autapses) {
+        if (is_self && params.undelayed_autapses) {
             delay_dendritic = 0;
         }
         final_state_t final_state = plasticity_update_synapse(
                 time, last_pre_time, last_pre_trace, event_history->prev_trace,
                 delay_dendritic, delay_axonal, current_state,
                 &post_event_history[index]);
-
-        // Convert into ring buffer offset
-        uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
-                delay_axonal + delay_dendritic + time, type_index,
-                synapse_type_index_bits);
 
         // Add weight to ring-buffer entry
         // **NOTE** Dave suspects that this could be a
