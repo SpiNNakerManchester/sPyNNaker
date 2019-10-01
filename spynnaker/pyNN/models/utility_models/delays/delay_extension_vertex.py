@@ -33,7 +33,8 @@ from spinn_front_end_common.abstract_models import (
     AbstractProvidesOutgoingPartitionConstraints, AbstractHasAssociatedBinary)
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities.constants import (
-    SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES)
+    SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES, BITS_PER_WORD,
+    BYTES_PER_WORS)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from .delay_block import DelayBlock
 from .delay_extension_machine_vertex import DelayExtensionMachineVertex
@@ -67,7 +68,6 @@ class DelayExtensionVertex(
     __slots__ = [
         "__delay_blocks",
         "__delay_per_stage",
-        "__machine_time_step",
         "__n_atoms",
         "__n_delay_stages",
         "__source_vertex",
@@ -76,14 +76,13 @@ class DelayExtensionVertex(
         "__n_subvertices",
         "__n_data_specs"]
 
-    def __init__(self, n_neurons, delay_per_stage, source_vertex,
-                 machine_time_step, timescale_factor, constraints=None,
-                 label="DelayExtension"):
+    def __init__(
+            self, n_neurons, delay_per_stage, source_vertex, timescale_factor,
+            constraints=None, label="DelayExtension"):
         """
         :param n_neurons: the number of neurons
         :param delay_per_stage: the delay per stage
         :param source_vertex: where messages are coming from
-        :param machine_time_step: how long is the machine time step
         :param timescale_factor: what slowdown factor has been applied
         :param constraints: the vertex constraints
         :param label: the vertex label
@@ -95,7 +94,6 @@ class DelayExtensionVertex(
         self.__n_delay_stages = 0
         self.__delay_per_stage = delay_per_stage
         self.__delay_generator_data = defaultdict(list)
-        self.__machine_time_step = machine_time_step
         self.__timescale_factor = timescale_factor
         self.__n_subvertices = 0
         self.__n_data_specs = 0
@@ -164,7 +162,7 @@ class DelayExtensionVertex(
             self, max_row_n_synapses, max_delayed_row_n_synapses,
             pre_slices, pre_slice_index, post_slices, post_slice_index,
             pre_vertex_slice, post_vertex_slice, synapse_information,
-            max_stage, machine_time_step):
+            max_stage, vertex_time_step):
         """ Add delays for a connection to be generated
         """
         key = (pre_vertex_slice.lo_atom, pre_vertex_slice.hi_atom)
@@ -173,21 +171,23 @@ class DelayExtensionVertex(
                 max_row_n_synapses, max_delayed_row_n_synapses,
                 pre_slices, pre_slice_index, post_slices, post_slice_index,
                 pre_vertex_slice, post_vertex_slice,
-                synapse_information, max_stage, machine_time_step))
+                synapse_information, max_stage, vertex_time_step))
 
     @inject_items({
         "machine_graph": "MemoryMachineGraph",
         "graph_mapper": "MemoryGraphMapper",
-        "routing_infos": "MemoryRoutingInfos"
+        "routing_infos": "MemoryRoutingInfos",
+        "local_time_step_map": "MachineTimeStepMap"
     })
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
         additional_arguments={
-            "machine_graph", "graph_mapper", "routing_infos"
-        })
+            "machine_graph", "graph_mapper", "routing_infos",
+            "local_time_step_map"})
     def generate_data_specification(
             self, spec, placement,
-            machine_graph, graph_mapper, routing_infos):
+            machine_graph, graph_mapper, routing_infos,
+            local_time_step_map):
         # pylint: disable=too-many-arguments, arguments-differ
 
         vertex = placement.vertex
@@ -198,9 +198,11 @@ class DelayExtensionVertex(
         # ###################################################################
         # Reserve SDRAM space for memory areas:
         vertex_slice = graph_mapper.get_slice(vertex)
-        n_words_per_stage = int(math.ceil(vertex_slice.n_atoms / 32.0))
-        delay_params_sz = 4 * (_DELAY_PARAM_HEADER_WORDS +
-                               (self.__n_delay_stages * n_words_per_stage))
+        n_words_per_stage = int(
+            math.ceil(vertex_slice.n_atoms / BITS_PER_WORD))
+        delay_params_sz = BYTES_PER_WORS * (
+            _DELAY_PARAM_HEADER_WORDS +
+            (self.__n_delay_stages * n_words_per_stage))
 
         spec.reserve_memory_region(
             region=_DELEXT_REGIONS.SYSTEM.value,
@@ -214,8 +216,8 @@ class DelayExtensionVertex(
         # reserve region for provenance
         vertex.reserve_provenance_data_region(spec)
 
-        self.write_setup_info(
-            spec, self.__machine_time_step, self.__timescale_factor)
+        self._write_setup_info(
+            spec, local_time_step_map, self.__timescale_factor, placement)
 
         spec.comment("\n*** Spec for Delay Extension Instance ***\n\n")
 
@@ -240,7 +242,7 @@ class DelayExtensionVertex(
             machine_graph.get_edges_starting_at_vertex(vertex))
         self.write_delay_parameters(
             spec, vertex_slice, key, incoming_key, incoming_mask,
-            self.__n_subvertices, self.__machine_time_step,
+            self.__n_subvertices, local_time_step_map[placement.vertex],
             self.__timescale_factor, n_outgoing_edges)
 
         key = (vertex_slice.lo_atom, vertex_slice.hi_atom)
@@ -261,17 +263,18 @@ class DelayExtensionVertex(
         # End-of-Spec:
         spec.end_specification()
 
-    def write_setup_info(self, spec, machine_time_step, time_scale_factor):
+    def _write_setup_info(
+            self, spec, local_time_step_map, time_scale_factor, placement):
 
         # Write this to the system region (to be picked up by the simulation):
         spec.switch_write_focus(_DELEXT_REGIONS.SYSTEM.value)
         spec.write_array(simulation_utilities.get_simulation_header_array(
-            self.get_binary_file_name(), machine_time_step,
+            self.get_binary_file_name(), local_time_step_map[placement.vertex],
             time_scale_factor))
 
     def write_delay_parameters(
             self, spec, vertex_slice, key, incoming_key, incoming_mask,
-            total_n_vertices, machine_time_step, time_scale_factor,
+            total_n_vertices, my_machine_time_step, time_scale_factor,
             n_outgoing_edges):
         """ Generate Delay Parameter data
         """
@@ -297,8 +300,9 @@ class DelayExtensionVertex(
         spec.write_value(data=self.__n_delay_stages)
 
         # Write the offset value
-        max_offset = (
-            machine_time_step * time_scale_factor) // _MAX_OFFSET_DENOMINATOR
+        max_offset = ((
+            my_machine_time_step * time_scale_factor) //
+            _MAX_OFFSET_DENOMINATOR)
         spec.write_value(
             int(math.ceil(max_offset / total_n_vertices)) *
             self.__n_data_specs)
@@ -307,7 +311,7 @@ class DelayExtensionVertex(
         # Write the time between spikes
         spikes_per_timestep = self.__n_delay_stages * vertex_slice.n_atoms
         time_between_spikes = (
-            (machine_time_step * time_scale_factor) /
+            (my_machine_time_step * time_scale_factor) /
             (spikes_per_timestep * 2.0))
         spec.write_value(data=int(time_between_spikes))
 

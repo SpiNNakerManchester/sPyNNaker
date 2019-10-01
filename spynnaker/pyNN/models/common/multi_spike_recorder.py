@@ -18,6 +18,8 @@ import logging
 import struct
 import numpy
 from pacman.model.resources.constant_sdram import ConstantSDRAM
+from spinn_front_end_common.utilities.constants import BITS_PER_WORD, \
+    MICRO_TO_MILLISECOND_CONVERSION
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.log import FormatAdapter
 from spynnaker.pyNN.models.common import recording_utils
@@ -61,11 +63,10 @@ class MultiSpikeRecorder(object):
 
     def get_spikes(
             self, label, buffer_manager, region,
-            placements, graph_mapper, application_vertex, machine_time_step):
+            placements, graph_mapper, application_vertex, local_time_step_map):
         # pylint: disable=too-many-arguments
         spike_times = list()
         spike_ids = list()
-        ms_per_tick = machine_time_step / 1000.0
 
         vertices = graph_mapper.get_machine_vertices(application_vertex)
         missing = []
@@ -75,6 +76,9 @@ class MultiSpikeRecorder(object):
             placement = placements.get_placement_of_vertex(vertex)
             vertex_slice = graph_mapper.get_slice(vertex)
 
+            ms_per_tick = (local_time_step_map[placement.vertex] /
+                           MICRO_TO_MILLISECOND_CONVERSION)
+
             # Read the spikes from the buffer manager
             neuron_param_data, data_missing = \
                 buffer_manager.get_data_by_placement(placement, region)
@@ -82,7 +86,7 @@ class MultiSpikeRecorder(object):
                 missing.append(placement)
             self._process_spike_data(
                 vertex_slice, ms_per_tick,
-                int(math.ceil(vertex_slice.n_atoms / 32.0)),
+                int(math.ceil(vertex_slice.n_atoms / BITS_PER_WORD)),
                 neuron_param_data, spike_ids, spike_times)
 
         if missing:

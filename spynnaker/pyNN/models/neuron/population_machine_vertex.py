@@ -14,6 +14,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from enum import Enum
+
+from spinn_front_end_common.abstract_models.impl.\
+    machine_supports_auto_pause_and_resume import \
+    MachineSupportsAutoPauseAndResume
+from spinn_front_end_common.utilities import helpful_functions
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.machine import MachineVertex
 from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
@@ -33,7 +38,7 @@ from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
 class PopulationMachineVertex(
         MachineVertex, AbstractReceiveBuffersToHost,
         ProvidesProvenanceDataFromMachineImpl, AbstractRecordable,
-        AbstractHasProfileData):
+        AbstractHasProfileData, MachineSupportsAutoPauseAndResume):
     __slots__ = [
         "__recorded_region_ids",
         "__resources"]
@@ -67,6 +72,7 @@ class PopulationMachineVertex(
         """
         MachineVertex.__init__(self, label, constraints)
         AbstractRecordable.__init__(self)
+        MachineSupportsAutoPauseAndResume.__init__(self)
         self.__recorded_region_ids = recorded_region_ids
         self.__resources = resources_required
 

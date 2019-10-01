@@ -17,6 +17,9 @@ import logging
 import math
 import os
 from six import with_metaclass
+
+from spinn_front_end_common.utilities.constants import \
+    MICRO_TO_MILLISECOND_CONVERSION
 from spinn_utilities.abstract_base import AbstractBase
 from spinn_utilities.log import FormatAdapter
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
@@ -156,29 +159,34 @@ class AbstractSpiNNakerCommon(with_metaclass(
 
         # get the machine time step
         logger.info("Setting machine time step to {} micro-seconds.",
-                    self._machine_time_step)
+                    self._default_machine_time_step)
 
     def _set_up_timings(
             self, timestep, min_delay, max_delay, config, time_scale_factor):
         # pylint: disable=too-many-arguments
 
         # Get the standard values
-        machine_time_step = None
+        default_machine_time_step = None
         if timestep is not None:
-            machine_time_step = math.ceil(timestep * 1000.0)
-        self.set_up_timings(machine_time_step, time_scale_factor)
+            default_machine_time_step = math.ceil(
+                timestep * MICRO_TO_MILLISECOND_CONVERSION)
+        self.set_up_timings(default_machine_time_step, time_scale_factor)
 
         # Sort out the minimum delay
         if (min_delay is not None and
-                min_delay * 1000.0 < self._machine_time_step):
+                min_delay * MICRO_TO_MILLISECOND_CONVERSION <
+                self._default_machine_time_step):
             raise ConfigurationException(
                 "Pacman does not support min delays below {} ms with the "
                 "current machine time step".format(
-                    constants.MIN_SUPPORTED_DELAY * self._machine_time_step))
+                    constants.MIN_SUPPORTED_DELAY *
+                    self._default_machine_time_step))
         if min_delay is not None:
             self.__min_delay = min_delay
         else:
-            self.__min_delay = self._machine_time_step / 1000.0
+            self.__min_delay = (
+                self._default_machine_time_step /
+                MICRO_TO_MILLISECOND_CONVERSION)
 
         # Sort out the maximum delay
         natively_supported_delay_for_models = \
@@ -189,23 +197,28 @@ class AbstractSpiNNakerCommon(with_metaclass(
         max_delay_tics_supported = \
             natively_supported_delay_for_models + \
             delay_extension_max_supported_delay
-        if (max_delay is not None and max_delay * 1000.0 >
-                max_delay_tics_supported * self._machine_time_step):
+        if (max_delay is not None and
+                max_delay * MICRO_TO_MILLISECOND_CONVERSION >
+                max_delay_tics_supported * self._default_machine_time_step):
             raise ConfigurationException(
                 "Pacman does not support max delays above {} ms with the "
                 "current machine time step".format(
-                    0.144 * self._machine_time_step))
+                    0.144 * self._default_machine_time_step))
         if max_delay is not None:
             self.__max_delay = max_delay
         else:
             self.__max_delay = (
-                max_delay_tics_supported * (self._machine_time_step / 1000.0))
+                max_delay_tics_supported * (
+                    self._default_machine_time_step /
+                    MICRO_TO_MILLISECOND_CONVERSION))
 
         # Sort out the time scale factor if not user specified
         # (including config)
         if self._time_scale_factor is None:
             self._time_scale_factor = max(
-                1.0, math.ceil(1000.0 / self._machine_time_step))
+                1.0, math.ceil(
+                    MICRO_TO_MILLISECOND_CONVERSION /
+                    self._default_machine_time_step))
             if self._time_scale_factor > 1:
                 logger.warning(
                     "A timestep was entered that has forced sPyNNaker to "
@@ -215,7 +228,8 @@ class AbstractSpiNNakerCommon(with_metaclass(
                     self._time_scale_factor, self.CONFIG_FILE_NAME)
 
         # Check the combination of machine time step and time scale factor
-        if self._machine_time_step * self._time_scale_factor < 1000:
+        if (self._default_machine_time_step * self._time_scale_factor <
+                MICRO_TO_MILLISECOND_CONVERSION):
             if not config.getboolean(
                     "Mode", "violate_1ms_wall_clock_restriction"):
                 raise ConfigurationException(

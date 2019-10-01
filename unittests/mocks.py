@@ -104,7 +104,7 @@ class MockSimulator(object):
         return False
 
     @property
-    def machine_time_step(self):
+    def default_machine_time_step(self):
         return 1000
 
     @property

@@ -16,6 +16,8 @@
 import decimal
 import numpy
 from data_specification.enums.data_type import DataType
+from spinn_front_end_common.utilities.constants import \
+    MICRO_TO_MILLISECOND_CONVERSION
 
 
 class GeneratorData(object):
@@ -23,7 +25,7 @@ class GeneratorData(object):
     """
     __slots__ = [
         "__delayed_synaptic_matrix_offset",
-        "__machine_time_step",
+        "__vertex_time_step",
         "__max_delayed_row_n_synapses",
         "__max_delayed_row_n_words",
         "__max_row_n_synapses",
@@ -45,7 +47,7 @@ class GeneratorData(object):
             max_row_n_words, max_delayed_row_n_words, max_row_n_synapses,
             max_delayed_row_n_synapses, pre_slices, pre_slice_index,
             post_slices, post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_information, max_stage, machine_time_step):
+            synapse_information, max_stage, vertex_time_step):
         self.__synaptic_matrix_offset = synaptic_matrix_offset
         self.__delayed_synaptic_matrix_offset = delayed_synaptic_matrix_offset
         self.__max_row_n_words = max_row_n_words
@@ -60,7 +62,7 @@ class GeneratorData(object):
         self.__post_vertex_slice = post_vertex_slice
         self.__synapse_information = synapse_information
         self.__max_stage = max_stage
-        self.__machine_time_step = machine_time_step
+        self.__vertex_time_step = vertex_time_step
 
     @property
     def size(self):
@@ -98,8 +100,9 @@ class GeneratorData(object):
             self.__pre_vertex_slice.lo_atom,
             self.__pre_vertex_slice.n_atoms,
             self.__max_stage,
-            (decimal.Decimal(str(1000.0 / float(self.__machine_time_step))) *
-             DataType.S1615.scale),
+            (decimal.Decimal(str(
+                MICRO_TO_MILLISECOND_CONVERSION /
+                float(self.__vertex_time_step))) * DataType.S1615.scale),
             self.__synapse_information.synapse_type,
             synapse_dynamics.gen_matrix_id,
             connector.gen_connector_id,

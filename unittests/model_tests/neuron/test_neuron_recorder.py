@@ -21,14 +21,8 @@ from spynnaker.pyNN.utilities.spynnaker_failed_state import (
     SpynnakerFailedState)
 
 
-class _MockBasicSimulator(object):
-    @property
-    def machine_time_step(self):
-        return 1000
-
-
 def test_simple_record():
-    simulator = _MockBasicSimulator()
+    simulator = MockSimulator()
     globals_variables.set_failed_state(SpynnakerFailedState())
     globals_variables.set_simulator(simulator)
 
@@ -36,7 +30,8 @@ def test_simple_record():
     assert(frozenset(["spikes", "v", "gsyn_exc", "gsyn_inh"]) ==
            frozenset(nr.get_recordable_variables()))
     assert([] == nr.recording_variables)
-    nr.set_recording("v", True)
+    nr.set_recording("v", None, None, None,
+                     simulator.default_machine_time_step, True)
     assert(["v"] == nr.recording_variables)
     _slice = Slice(0, 50)
     gps = nr.get_global_parameters(_slice)
@@ -53,7 +48,9 @@ def test_recording_variables():
 
     nr = NeuronRecorder(["spikes", "v", "gsyn_exc", "gsyn_inh"], 100)
     assert([] == nr.recording_variables)
-    nr.set_recording("v", True)
-    nr.set_recording("gsyn_inh", True)
+    nr.set_recording("v", None, None, None,
+                     simulator.default_machine_time_step, True)
+    nr.set_recording("gsyn_inh", None, None, None,
+                     simulator.default_machine_time_step, True)
     assert(["v", "gsyn_inh"] == nr.recording_variables)
     assert([1, 3] == nr.recorded_region_ids)

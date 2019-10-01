@@ -16,6 +16,9 @@
 import logging
 import math
 import numpy
+
+from spinn_front_end_common.utilities.constants import \
+    MICRO_TO_MILLISECOND_CONVERSION
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.constraints.partitioner_constraints import (
     SameAtomsAsVertexConstraint)
@@ -61,7 +64,8 @@ class PyNNProjectionCommon(object):
     def __init__(
             self, spinnaker_control, connector, synapse_dynamics_stdp,
             target, pre_synaptic_population, post_synaptic_population,
-            rng, machine_time_step, user_max_delay, label, time_scale_factor):
+            rng, default_machine_time_step, user_max_delay, label,
+            time_scale_factor):
         # pylint: disable=too-many-arguments, too-many-locals
         self.__spinnaker_control = spinnaker_control
         self.__projection_edge = None
@@ -87,9 +91,12 @@ class PyNNProjectionCommon(object):
         # round the delays to multiples of full timesteps
         # (otherwise SDRAM estimation calculations can go wrong)
         if not get_simulator().is_a_pynn_random(synapse_dynamics_stdp.delay):
-            synapse_dynamics_stdp.delay = numpy.rint(numpy.array(
-                synapse_dynamics_stdp.delay) * (
-                    1000.0 / machine_time_step)) * (machine_time_step / 1000.0)
+            synapse_dynamics_stdp.delay = (
+                numpy.rint(
+                    numpy.array(synapse_dynamics_stdp.delay) *
+                    (MICRO_TO_MILLISECOND_CONVERSION /
+                     default_machine_time_step)) *
+                (default_machine_time_step / MICRO_TO_MILLISECOND_CONVERSION))
 
         # set the plasticity dynamics for the post pop (allows plastic stuff
         #  when needed)
@@ -104,7 +111,7 @@ class PyNNProjectionCommon(object):
         # Set projection information in connector
         connector.set_projection_information(
             pre_synaptic_population, post_synaptic_population, rng,
-            machine_time_step)
+            default_machine_time_step)
 
         # handle max delay
         max_delay = synapse_dynamics_stdp.get_delay_maximum(
@@ -116,14 +123,15 @@ class PyNNProjectionCommon(object):
         # delays in the models
         post_vertex_max_supported_delay_ms = \
             post_synaptic_population._get_vertex \
-            .get_maximum_delay_supported_in_ms(machine_time_step)
+            .get_maximum_delay_supported_in_ms(default_machine_time_step)
         if max_delay > (post_vertex_max_supported_delay_ms +
                         _delay_extension_max_supported_delay):
             raise ConfigurationException(
                 "The maximum delay {} for projection is not supported".format(
                     max_delay))
 
-        if max_delay > user_max_delay / (machine_time_step / 1000.0):
+        if (max_delay > user_max_delay / (
+                default_machine_time_step / MICRO_TO_MILLISECOND_CONVERSION)):
             logger.warning("The end user entered a max delay"
                            " for which the projection breaks")
 
@@ -159,7 +167,7 @@ class PyNNProjectionCommon(object):
         if max_delay > post_vertex_max_supported_delay_ms:
             delay_edge = self._add_delay_extension(
                 pre_synaptic_population, post_synaptic_population, max_delay,
-                post_vertex_max_supported_delay_ms, machine_time_step,
+                post_vertex_max_supported_delay_ms, default_machine_time_step,
                 time_scale_factor)
             self.__projection_edge.delay_edge = delay_edge
 
@@ -222,7 +230,8 @@ class PyNNProjectionCommon(object):
 
     def _add_delay_extension(
             self, pre_synaptic_population, post_synaptic_population,
-            max_delay_for_projection, max_delay_per_neuron, machine_time_step,
+            max_delay_for_projection, max_delay_per_neuron,
+            default_machine_time_step,
             timescale_factor):
         """ Instantiate delay extension component
         """
@@ -235,7 +244,7 @@ class PyNNProjectionCommon(object):
             delay_name = "{}_delayed".format(pre_vertex.label)
             delay_vertex = DelayExtensionVertex(
                 pre_vertex.n_atoms, max_delay_per_neuron, pre_vertex,
-                machine_time_step, timescale_factor, label=delay_name)
+                timescale_factor, label=delay_name)
             pre_synaptic_population._internal_delay_vertex = delay_vertex
             pre_vertex.add_constraint(
                 SameAtomsAsVertexConstraint(delay_vertex))
@@ -353,7 +362,7 @@ class PyNNProjectionCommon(object):
             connections = post_vertex.get_connections_from_machine(
                 ctl.transceiver, placement, edge, ctl.graph_mapper,
                 ctl.routing_infos, self.__synapse_information,
-                ctl.machine_time_step, extra_monitors is not None,
+                ctl.local_time_step_map, extra_monitors is not None,
                 ctl.placements, receiver, sender_monitor_place,
                 extra_monitors, handle_time_out_configuration,
                 ctl.fixed_routes)

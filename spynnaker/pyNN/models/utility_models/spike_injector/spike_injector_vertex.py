@@ -20,7 +20,6 @@ from pacman.model.constraints.key_allocator_constraints import (
 from spinn_front_end_common.abstract_models import (
     AbstractProvidesOutgoingPartitionConstraints)
 from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
-from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, EIEIOSpikeRecorder, SimplePopulationSettable)
 
@@ -84,7 +83,8 @@ class SpikeInjectorVertex(
 
     @overrides(AbstractSpikeRecordable.set_recording_spikes)
     def set_recording_spikes(
-            self, new_state=True, sampling_interval=None, indexes=None):
+            self, default_machine_time_step, new_state=True,
+            sampling_interval=None, indexes=None):
         if sampling_interval is not None:
             logger.warning("Sampling interval currently not supported "
                            "so being ignored")
@@ -96,12 +96,15 @@ class SpikeInjectorVertex(
         self.__spike_recorder.record = new_state
 
     @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
-    def get_spikes_sampling_interval(self):
-        return get_simulator().machine_time_step
+    def get_spikes_sampling_interval(
+            self, graph_mapper, local_time_period_map):
+        machine_verts = graph_mapper.get_machine_vertices(self)
+        return local_time_period_map[machine_verts[0]]
 
     @overrides(AbstractSpikeRecordable.get_spikes)
     def get_spikes(
-            self, placements, graph_mapper, buffer_manager, machine_time_step):
+            self, placements, graph_mapper, buffer_manager,
+            local_timer_period_map):
         return self.__spike_recorder.get_spikes(
             self.label, buffer_manager,
             SpikeInjectorVertex.SPIKE_RECORDING_REGION_ID,
@@ -110,7 +113,7 @@ class SpikeInjectorVertex(
                 vertex.virtual_key
                 if vertex.virtual_key is not None
                 else 0,
-            machine_time_step)
+            local_timer_period_map[self])
 
     @overrides(AbstractSpikeRecordable.clear_spike_recording)
     def clear_spike_recording(self, buffer_manager, placements, graph_mapper):

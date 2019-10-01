@@ -14,6 +14,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from enum import Enum
+
+from spinn_front_end_common.abstract_models.impl.\
+    machine_supports_auto_pause_and_resume import \
+    MachineSupportsAutoPauseAndResume
 from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.graphs.machine import MachineVertex
@@ -36,7 +40,8 @@ from spynnaker.pyNN.utilities.constants import (
 class SpikeSourcePoissonMachineVertex(
         MachineVertex, AbstractReceiveBuffersToHost,
         ProvidesProvenanceDataFromMachineImpl, AbstractRecordable,
-        AbstractSupportsDatabaseInjection, AbstractHasProfileData):
+        AbstractSupportsDatabaseInjection, AbstractHasProfileData,
+        MachineSupportsAutoPauseAndResume):
 
     __slots__ = [
         "__buffered_sdram_per_timestep",
