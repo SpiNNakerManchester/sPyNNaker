@@ -349,6 +349,7 @@ bool synapse_dynamics_process_plastic_synapses(
 
         // Update the synapse state
         if (is_self && params.undelayed_autapses) {
+            delay_axonal = delay_dendritic;
             delay_dendritic = 0;
         }
         final_state_t final_state = plasticity_update_synapse(
