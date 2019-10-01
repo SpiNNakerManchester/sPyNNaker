@@ -313,10 +313,6 @@ bool synapse_dynamics_process_plastic_synapses(
     const uint32_t last_pre_time = event_history->prev_time & TIMESTAMP_MASK;
     const pre_trace_t last_pre_trace = event_history->prev_trace;
 
-    if (self_connection) {
-        log_info("Self connected vertex, pre_neuron=%u", pre_neuron_id);
-    }
-
     // Update pre-synaptic trace
     log_debug("Adding pre-synaptic event to trace at time:%u", time);
     event_history->prev_time = (time & TIMESTAMP_MASK) | self_connection;
@@ -348,7 +344,6 @@ bool synapse_dynamics_process_plastic_synapses(
 
         // Update the synapse state
         if (is_self && params.undelayed_autapses) {
-            log_info("Self connected; removing dendritic delay");
             delay_dendritic = 0;
         }
         final_state_t final_state = plasticity_update_synapse(
