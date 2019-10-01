@@ -184,7 +184,7 @@ static void setup_synaptic_dma_read(dma_buffer *current_buffer,
     // Keep looking if there is something to do until a DMA can be done
     bool setup_done = false;
     while (!setup_done && is_something_to_do(&row_address,
-            &n_bytes_to_transfer, &spike, &neuron_id,
+            &n_bytes_to_transfer, &neuron_id, &spike,
             &dma_n_rewires, &dma_n_spikes)) {
         if (current_buffer != NULL &&
                 current_buffer->sdram_writeback_address == row_address) {

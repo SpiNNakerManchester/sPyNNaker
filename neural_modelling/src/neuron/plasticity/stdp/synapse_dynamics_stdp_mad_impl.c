@@ -314,7 +314,7 @@ bool synapse_dynamics_process_plastic_synapses(
     const pre_trace_t last_pre_trace = event_history->prev_trace;
 
     if (self_connection) {
-        log_info("Self connected vertex, pre_neuron=%d", pre_neuron_id);
+        log_info("Self connected vertex, pre_neuron=%u", pre_neuron_id);
     }
 
     // Update pre-synaptic trace
@@ -339,9 +339,6 @@ bool synapse_dynamics_process_plastic_synapses(
         uint32_t index =
                 synapse_row_sparse_index(control_word, synapse_index_mask);
         uint32_t is_self = self_connection && (pre_neuron_id == index);
-        if (self_connection) {
-            log_info("    %d", index);
-        }
         uint32_t type_index = synapse_row_sparse_type_index(
                 control_word, synapse_type_index_mask);
 

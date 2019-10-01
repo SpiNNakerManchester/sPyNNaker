@@ -29,8 +29,10 @@ from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 
 # How large are the time-stamps stored with each event
 TIME_STAMP_BYTES = 4
-# Byte that identifies a self connection
+# The contents of the byte that identifies a self connection
 SELF_CONNECTION_BIT = 0x80
+# The index of the byte that identifies a self connection
+SELF_CONNECTION_BYTE = 3
 
 
 class SynapseDynamicsSTDP(
@@ -310,7 +312,7 @@ class SynapseDynamicsSTDP(
         plastic_headers = numpy.zeros(
             (n_rows, self._n_header_bytes), dtype="uint8")
         if self_connection:
-            plastic_headers[:, 0] = SELF_CONNECTION_BIT
+            plastic_headers[:, SELF_CONNECTION_BYTE] = SELF_CONNECTION_BIT
         plastic_plastic_rows = [
             numpy.concatenate((
                 plastic_headers[i], plastic_plastic_row_data[i]))
