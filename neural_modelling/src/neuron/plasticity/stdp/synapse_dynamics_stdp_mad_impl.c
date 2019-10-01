@@ -98,11 +98,12 @@ post_event_history_t *post_event_history;
 // Synapse update loop
 //---------------------------------------
 static inline final_state_t plasticity_update_synapse(
-        uint32_t time,
+        const uint32_t time,
         const uint32_t last_pre_time, const pre_trace_t last_pre_trace,
         const pre_trace_t new_pre_trace, const uint32_t delay_dendritic,
         const uint32_t delay_axonal, update_state_t current_state,
-        const post_event_history_t *post_event_history) {
+        const post_event_history_t *post_event_history,
+        const uint32_t is_autapse) {
     // Apply axonal delay to time of last presynaptic spike
     const uint32_t delayed_last_pre_time = last_pre_time + delay_axonal;
 
@@ -110,10 +111,10 @@ static inline final_state_t plasticity_update_synapse(
     const uint32_t window_begin_time =
             (delayed_last_pre_time >= delay_dendritic)
             ? (delayed_last_pre_time - delay_dendritic) : 0;
-    const uint32_t delayed_time = time + delay_axonal;
+    const uint32_t delayed_pre_time = time + delay_axonal;
     const uint32_t window_end_time =
-            (delayed_time >= delay_dendritic)
-            ? (delayed_time - delay_dendritic) : 0;
+            (delayed_pre_time >= delay_dendritic)
+            ? (delayed_pre_time - delay_dendritic) : 0;
     post_event_window_t post_window = post_events_get_window_delayed(
             post_event_history, window_begin_time, window_end_time);
 
@@ -127,9 +128,12 @@ static inline final_state_t plasticity_update_synapse(
     //		   window_end_time, delay_dendritic);
 
     // Process events in post-synaptic window
+    uint32_t post_delay = delay_dendritic;
+    if (is_autapse) {
+        post_delay = 0;
+    }
     while (post_window.num_events > 0) {
-        const uint32_t delayed_post_time =
-                *post_window.next_time + delay_dendritic;
+        const uint32_t delayed_post_time = *post_window.next_time + post_delay;
 
         log_debug("\t\tApplying post-synaptic event at delayed time:%u\n",
                 delayed_post_time);
@@ -144,7 +148,6 @@ static inline final_state_t plasticity_update_synapse(
         post_window = post_events_next_delayed(post_window, delayed_post_time);
     }
 
-    const uint32_t delayed_pre_time = time + delay_axonal;
     log_debug("\t\tApplying pre-synaptic event at time:%u last post time:%u\n",
             delayed_pre_time, post_window.prev_time);
 
@@ -348,14 +351,10 @@ bool synapse_dynamics_process_plastic_synapses(
                 synapse_type_index_bits);
 
         // Update the synapse state
-        if (is_self && params.undelayed_autapses) {
-            delay_axonal = delay_dendritic;
-            delay_dendritic = 0;
-        }
         final_state_t final_state = plasticity_update_synapse(
                 time, last_pre_time, last_pre_trace, event_history->prev_trace,
                 delay_dendritic, delay_axonal, current_state,
-                &post_event_history[index]);
+                &post_event_history[index], is_self && params.undelayed_autapses);
 
         // Add weight to ring-buffer entry
         // **NOTE** Dave suspects that this could be a
