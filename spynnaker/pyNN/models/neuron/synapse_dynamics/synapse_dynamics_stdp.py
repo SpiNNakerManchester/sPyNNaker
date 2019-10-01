@@ -310,7 +310,7 @@ class SynapseDynamicsSTDP(
         plastic_headers = numpy.zeros(
             (n_rows, self._n_header_bytes), dtype="uint8")
         if self_connection:
-            plastic_headers[0] = SELF_CONNECTION_BIT
+            plastic_headers[:, 0] = SELF_CONNECTION_BIT
         plastic_plastic_rows = [
             numpy.concatenate((
                 plastic_headers[i], plastic_plastic_row_data[i]))
