@@ -39,7 +39,7 @@ class AbstractAcceptsIncomingSynapses(object):
         """
 
     @abstractmethod
-    def get_maximum_delay_supported_in_ms(self, machine_time_step):
+    def get_maximum_delay_supported_in_ms(self, default_machine_time_step):
         """ Get the maximum delay supported by this vertex.
         """
 
@@ -53,10 +53,10 @@ class AbstractAcceptsIncomingSynapses(object):
     @abstractmethod
     def get_connections_from_machine(
             self, transceiver, placement, edge, graph_mapper, routing_infos,
-            synapse_information, machine_time_step, using_extra_monitor_cores,
-            placements=None, monitor_api=None, monitor_placement=None,
-            monitor_cores=None, handle_time_out_configuration=True,
-            fixed_routes=None):
+            synapse_information, local_time_step_map,
+            using_extra_monitor_cores, placements=None, monitor_api=None,
+            monitor_placement=None, monitor_cores=None,
+            handle_time_out_configuration=True, fixed_routes=None):
         # pylint: disable=too-many-arguments
         """ Get the connections from the machine post-run.
         """

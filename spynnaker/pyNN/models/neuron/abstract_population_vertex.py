@@ -225,6 +225,15 @@ class AbstractPopulationVertex(
         self.__change_requires_mapping = False
         self.__change_requires_data_generation = False
 
+    def _get_buffered_sdram(self, vertex_slice, n_machine_time_steps):
+        values = [self.__neuron_recorder.get_buffered_sdram(
+                "spikes", vertex_slice, n_machine_time_steps)]
+        for variable in self.__neuron_impl.get_recordable_variables():
+            values.append(
+                self.__neuron_recorder.get_buffered_sdram(
+                    variable, vertex_slice, n_machine_time_steps))
+        return values
+
     @overrides(ApplicationVertex.create_machine_vertex)
     def create_machine_vertex(
             self, vertex_slice, resources_required, label=None,

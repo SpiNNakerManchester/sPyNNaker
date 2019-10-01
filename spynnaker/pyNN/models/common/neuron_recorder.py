@@ -61,6 +61,8 @@ class NeuronRecorder(object):
 
     N_BYTES_FOR_TIMESTAMP = DataType.UINT32.size
 
+    N_BYTES_PER_VALUE = 4
+
     # how many time steps to wait between recordings
     N_BYTES_PER_RATE = DataType.UINT32.size  # uint32
 
@@ -165,6 +167,7 @@ class NeuronRecorder(object):
             (_, n_machine_time_steps) = current_run_timesteps_map[vertex]
             expected_rows = int(math.ceil(
                 n_machine_time_steps / sampling_rate))
+            placement = placements.get_placement_of_vertex(vertex)
 
             if sampling_interval is None:
                 sampling_interval = self.get_neuron_sampling_interval(
@@ -175,7 +178,6 @@ class NeuronRecorder(object):
                     "conflicting sampling intervals within a given recording"
                     "variable.")
 
-            placement = placements.get_placement_of_vertex(vertex)
             vertex_slice = graph_mapper.get_slice(vertex)
             neurons = self._neurons_recording(variable, vertex_slice)
             n_neurons = len(neurons)
@@ -628,7 +630,7 @@ class NeuronRecorder(object):
 
         # out_spikes, *_values
         for variable in self.__sampling_rates:
-            if variable == self.SPIKES:
+            if variable == SPIKES:
                 out_spike_words = int(math.ceil(vertex_slice.n_atoms /
                                                 constants.BITS_PER_WORD))
                 out_spike_bytes = (
