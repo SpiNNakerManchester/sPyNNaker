@@ -226,6 +226,8 @@ class SynapseIORowBased(AbstractSynapseIO):
         row_data = numpy.zeros(0, dtype="uint32")
         max_row_length = 0
         self_connection = machine_edge.pre_vertex == machine_edge.post_vertex
+        if self_connection:
+            print("Self connection to {}".format(machine_edge.pre_vertex))
         if undelayed_connections.size or \
                 isinstance(synapse_info.synapse_dynamics,
                            AbstractSynapseDynamicsStructural):
