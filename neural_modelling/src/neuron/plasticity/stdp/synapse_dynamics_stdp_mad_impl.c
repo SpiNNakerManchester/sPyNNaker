@@ -344,6 +344,7 @@ bool synapse_dynamics_process_plastic_synapses(
 
         // Update the synapse state
         if (is_self && params.undelayed_autapses) {
+            log_info("Self connected; removing dendritic delay");
             delay_dendritic = 0;
         }
         final_state_t final_state = plasticity_update_synapse(
