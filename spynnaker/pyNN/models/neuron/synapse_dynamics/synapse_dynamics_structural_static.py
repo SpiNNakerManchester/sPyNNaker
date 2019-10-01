@@ -108,7 +108,8 @@ class SynapseDynamicsStructuralStatic(
                 # voltage dependence is not supported
                 None, synapse_dynamics.dendritic_delay_fraction,
                 self.f_rew, self.initial_weight, self.initial_delay,
-                self.s_max, self.seed)
+                self.s_max, self.seed,
+                delay_autapses=synapse_dynamics.delay_autapses)
 
         # Otherwise, it is static, so return ourselves
         return self
@@ -117,12 +118,13 @@ class SynapseDynamicsStructuralStatic(
     def write_structural_parameters(
             self, spec, region, machine_time_step, weight_scales,
             application_graph, app_vertex, post_slice, graph_mapper,
-            routing_info):
+            routing_info, synapse_indices):
         super(SynapseDynamicsStructuralStatic, self).write_parameters(
             spec, region, machine_time_step, weight_scales)
         self.__common_sp.write_parameters(
             spec, region, machine_time_step, weight_scales, application_graph,
-            app_vertex, post_slice, graph_mapper, routing_info)
+            app_vertex, post_slice, graph_mapper, routing_info,
+            synapse_indices)
 
     def set_projection_parameter(self, projection, param, value):
         self.__common_sp.set_projection_parameter(projection, param, value)

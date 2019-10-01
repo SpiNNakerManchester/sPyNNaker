@@ -42,9 +42,11 @@ address_t synaptogenesis_dynamics_initialise(
 //! \param[out] spike: variable to hold the spike
 //! \param[out] synaptic_row_address: variable to hold the address of the row
 //! \param[out] n_bytes: variable to hold the size of the row
+//! \param[out] neuron_id: The ID of the neuron of the spike
 //! \return True if a row is to be transferred, false otherwise
 bool synaptogenesis_dynamics_rewire(uint32_t time,
-        spike_t *spike, address_t *synaptic_row_address, uint32_t *n_bytes);
+        spike_t *spike, address_t *synaptic_row_address, uint32_t *n_bytes,
+        uint32_t *neuron_id);
 
 //! \brief Performs the actual restructuring of a row
 //! \param[in] time: The time of the restructure

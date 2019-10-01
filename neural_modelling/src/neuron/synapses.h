@@ -77,10 +77,12 @@ void synapses_do_timestep_update(timer_t time);
 //! \brief process a synaptic row
 //! \param[in] time: the simulated time
 //! \param[in] row: the synaptic row in question
+//! \param[in] pre_neuron_id: the ID of the source neuron
 //! \param[out] write_back: bool saying if to write back to SDRAM
 //! \return bool if successful or not
 bool synapses_process_synaptic_row(
-    uint32_t time, synaptic_row_t row, bool *write_back);
+    uint32_t time, synaptic_row_t row, uint32_t pre_neuron_id,
+    bool *write_back);
 
 //! \brief returns the number of times the synapses have saturated their
 //!        weights.

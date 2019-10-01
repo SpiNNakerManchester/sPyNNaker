@@ -19,6 +19,7 @@ from data_specification.enums.data_type import DataType
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
+from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.utilities import constants
 import math
 
@@ -76,8 +77,8 @@ class SynapseDynamicsStructuralCommon(object):
     # + 3 32-bit numbers (weight; connection_type; total_no_atoms)
     PRE_POP_INFO_BASE_SIZE = (4 * 2) + (3 * 4)
 
-    # 4 32-bit numbers (key; mask; n_atoms; lo_atom)
-    KEY_ATOM_INFO_SIZE = (4 * 4)
+    # 5 32-bit numbers (key; mask; n_atoms; lo_atom; m_pop_index)
+    KEY_ATOM_INFO_SIZE = (5 * 4)
 
     # 1 16-bit number (neuron_index)
     # + 2 8-bit numbers (sub_pop_index; pop_index)
@@ -166,7 +167,7 @@ class SynapseDynamicsStructuralCommon(object):
     def write_parameters(
             self, spec, region, machine_time_step, weight_scales,
             application_graph, app_vertex, post_slice, graph_mapper,
-            routing_info):
+            routing_info, synapse_indices):
         """ Write the synapse parameters to the spec.
         """
         spec.comment("Writing structural plasticity parameters")
@@ -186,7 +187,7 @@ class SynapseDynamicsStructuralCommon(object):
         # Write the pre-population info
         pop_index = self.__write_prepopulation_info(
             spec, app_vertex, structural_edges, graph_mapper, routing_info,
-            weight_scales, post_slice)
+            weight_scales, post_slice, synapse_indices)
 
         # Write the post-to-pre table
         self.__write_post_to_pre_table(
@@ -207,9 +208,15 @@ class SynapseDynamicsStructuralCommon(object):
         for app_edge in application_graph.get_edges_ending_at_vertex(
                 app_vertex):
             if isinstance(app_edge, ProjectionApplicationEdge):
+                found = False
                 for synapse_info in app_edge.synapse_information:
                     if isinstance(synapse_info.synapse_dynamics,
                                   AbstractSynapseDynamicsStructural):
+                        if found:
+                            raise SynapticConfigurationException(
+                                "Only one Projection between each pair of"
+                                " Populations can use structural plasticity ")
+                        found = True
                         structural_application_edges.append(
                             (app_edge, synapse_info))
 
@@ -274,7 +281,7 @@ class SynapseDynamicsStructuralCommon(object):
 
     def __write_prepopulation_info(
             self, spec, app_vertex, structural_edges, graph_mapper,
-            routing_info, weight_scales, post_slice):
+            routing_info, weight_scales, post_slice, synapse_indices):
         pop_index = dict()
         index = 0
         for app_edge, synapse_info in structural_edges:
@@ -285,6 +292,7 @@ class SynapseDynamicsStructuralCommon(object):
                 e for e in all_machine_edges
                 if graph_mapper.get_slice(e.post_vertex) == post_slice]
             dynamics = synapse_info.synapse_dynamics
+
             # Number of machine edges
             spec.write_value(len(machine_edges), data_type=DataType.UINT16)
             # Controls - currently just if this is a self connection or not
@@ -312,10 +320,12 @@ class SynapseDynamicsStructuralCommon(object):
             for machine_edge in machine_edges:
                 r_info = routing_info.get_routing_info_for_edge(machine_edge)
                 vertex_slice = graph_mapper.get_slice(machine_edge.pre_vertex)
+                skey = (synapse_info, vertex_slice.lo_atom, post_slice.lo_atom)
                 spec.write_value(r_info.first_key)
                 spec.write_value(r_info.first_mask)
                 spec.write_value(vertex_slice.n_atoms)
                 spec.write_value(vertex_slice.lo_atom)
+                spec.write_value(synapse_indices[skey])
         return pop_index
 
     def __write_post_to_pre_table(

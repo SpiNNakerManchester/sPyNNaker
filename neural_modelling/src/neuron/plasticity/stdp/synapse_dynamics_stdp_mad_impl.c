@@ -38,6 +38,12 @@ static uint32_t synapse_type_index_mask;
 static uint32_t synapse_delay_index_type_bits;
 static uint32_t synapse_type_mask;
 
+typedef struct stdp_params {
+    uint32_t undelayed_autapses;
+} stdp_params;
+
+static stdp_params params;
+
 uint32_t num_plastic_pre_synaptic_events = 0;
 uint32_t plastic_saturation_count = 0;
 
@@ -70,6 +76,12 @@ uint32_t plastic_saturation_count = 0;
 #define SYNAPSE_AXONAL_DELAY_MASK \
     ((1 << SYNAPSE_AXONAL_DELAY_BITS) - 1)
 
+// Bit in timestamp that is used to identify a self-connection
+#define SELF_CONNECTION_BIT 0x80000000
+
+// The mask of the timestamp in the header word
+#define TIMESTAMP_MASK 0x7FFFFFFF
+
 //---------------------------------------
 // Structures
 //---------------------------------------
@@ -98,7 +110,10 @@ static inline final_state_t plasticity_update_synapse(
     const uint32_t window_begin_time =
             (delayed_last_pre_time >= delay_dendritic)
             ? (delayed_last_pre_time - delay_dendritic) : 0;
-    const uint32_t window_end_time = time + delay_axonal - delay_dendritic;
+    const uint32_t delayed_time = time + delay_axonal;
+    const uint32_t window_end_time =
+            (delayed_time >= delay_dendritic)
+            ? (delayed_time - delay_dendritic) : 0;
     post_event_window_t post_window = post_events_get_window_delayed(
             post_event_history, window_begin_time, window_end_time);
 
@@ -222,6 +237,11 @@ static inline index_t sparse_axonal_delay(uint32_t x) {
 address_t synapse_dynamics_initialise(
         address_t address, uint32_t n_neurons, uint32_t n_synapse_types,
         uint32_t *ring_buffer_to_input_buffer_left_shifts) {
+
+    stdp_params *sdram_params = (stdp_params *) address;
+    spin1_memcpy(&params, sdram_params, sizeof(stdp_params));
+    address = (address_t) &sdram_params[1];
+
     // Load timing dependence data
     address_t weight_region_address = timing_initialise(address);
     if (address == NULL) {
@@ -272,7 +292,7 @@ address_t synapse_dynamics_initialise(
 
 bool synapse_dynamics_process_plastic_synapses(
         address_t plastic_region_address, address_t fixed_region_address,
-        weight_t *ring_buffers, uint32_t time) {
+        weight_t *ring_buffers, uint32_t time, uint32_t pre_neuron_id) {
     // Extract separate arrays of plastic synapses (from plastic region),
     // Control words (from fixed region) and number of plastic synapses
     plastic_synapse_t *plastic_words =
@@ -289,12 +309,13 @@ bool synapse_dynamics_process_plastic_synapses(
             plastic_event_history(plastic_region_address);
 
     // Get last pre-synaptic event from event history
-    const uint32_t last_pre_time = event_history->prev_time;
+    const uint32_t self_connection = event_history->prev_time & SELF_CONNECTION_BIT;
+    const uint32_t last_pre_time = event_history->prev_time & TIMESTAMP_MASK;
     const pre_trace_t last_pre_trace = event_history->prev_trace;
 
     // Update pre-synaptic trace
     log_debug("Adding pre-synaptic event to trace at time:%u", time);
-    event_history->prev_time = time;
+    event_history->prev_time = (time & TIMESTAMP_MASK) | self_connection;
     event_history->prev_trace =
             timing_add_pre_spike(time, last_pre_time, last_pre_trace);
 
@@ -313,6 +334,7 @@ bool synapse_dynamics_process_plastic_synapses(
                 control_word, synapse_index_bits, synapse_type_mask);
         uint32_t index =
                 synapse_row_sparse_index(control_word, synapse_index_mask);
+        uint32_t is_self = self_connection && (pre_neuron_id == index);
         uint32_t type_index = synapse_row_sparse_type_index(
                 control_word, synapse_type_index_mask);
 
@@ -321,6 +343,9 @@ bool synapse_dynamics_process_plastic_synapses(
                 synapse_structure_get_update_state(*plastic_words, type);
 
         // Update the synapse state
+        if (is_self && params.undelayed_autapses) {
+            delay_dendritic = 0;
+        }
         final_state_t final_state = plasticity_update_synapse(
                 time, last_pre_time, last_pre_trace, event_history->prev_trace,
                 delay_dendritic, delay_axonal, current_state,

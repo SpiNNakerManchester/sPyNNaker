@@ -83,10 +83,11 @@ class SynapseDynamicsStructuralSTDP(
             initial_weight=CommonSP.DEFAULT_INITIAL_WEIGHT,
             initial_delay=CommonSP.DEFAULT_INITIAL_DELAY,
             s_max=CommonSP.DEFAULT_S_MAX, seed=None,
-            weight=0.0, delay=1.0):
+            weight=0.0, delay=1.0, delay_autapses=True):
         super(SynapseDynamicsStructuralSTDP, self).__init__(
             timing_dependence, weight_dependence, voltage_dependence,
-            dendritic_delay_fraction, weight, delay, pad_to_length=s_max)
+            dendritic_delay_fraction, weight, delay, pad_to_length=s_max,
+            delay_autapses=delay_autapses)
         self.__common_sp = CommonSP(
             partner_selection, formation, elimination, f_rew, initial_weight,
             initial_delay, s_max, seed)
@@ -114,12 +115,13 @@ class SynapseDynamicsStructuralSTDP(
     def write_structural_parameters(
             self, spec, region, machine_time_step, weight_scales,
             application_graph, app_vertex, post_slice, graph_mapper,
-            routing_info):
+            routing_info, synapse_indices):
         super(SynapseDynamicsStructuralSTDP, self).write_parameters(
             spec, region, machine_time_step, weight_scales)
         self.__common_sp.write_parameters(
             spec, region, machine_time_step, weight_scales, application_graph,
-            app_vertex, post_slice, graph_mapper, routing_info)
+            app_vertex, post_slice, graph_mapper, routing_info,
+            synapse_indices)
 
     def set_projection_parameter(self, projection, param, value):
         self.__common_sp.set_projection_parameter(projection, param, value)

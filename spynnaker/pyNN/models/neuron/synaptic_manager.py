@@ -983,7 +983,7 @@ class SynapticManager(object):
                     spec, POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value,
                     machine_time_step, weight_scales, application_graph,
                     application_vertex, post_vertex_slice, graph_mapper,
-                    routing_info)
+                    routing_info, self.__synapse_indices)
             else:
                 self.__synapse_dynamics.write_parameters(
                     spec,

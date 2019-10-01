@@ -37,16 +37,21 @@ bool population_table_initialise(
 //! \param[in] spike The spike received
 //! \param[out] row_address Updated with the address of the row
 //! \param[out] n_bytes_to_transfer Updated with the number of bytes to read
+//! \param[out] neuron_id Updated with the neuron ID of the spike
 //! \return True if there is a row to read, False if not
 bool population_table_get_first_address(
-        spike_t spike, address_t* row_address, size_t* n_bytes_to_transfer);
+        spike_t spike, address_t* row_address, size_t* n_bytes_to_transfer,
+        uint32_t *neuron_id);
 
 //! \brief Get the next row data for a previously given spike.  If no spike has
 //!        been given, return False.
+//! \param[out] spike The initiating spike
 //! \param[out] row_address Updated with the address of the row
 //! \param[out] n_bytes_to_transfer Updated with the number of bytes to read
+//! \param[out] neuron_id The neuron ID of the spike
 //! \return True if there is a row to read, False if not
 bool population_table_get_next_address(
-        address_t* row_address, size_t* n_bytes_to_transfer);
+        spike_t *spike, address_t* row_address, size_t* n_bytes_to_transfer,
+        uint32_t *neuron_id);
 
 #endif // _POPULATION_TABLE_H_

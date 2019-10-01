@@ -34,7 +34,7 @@ extern pre_pop_info_table_t pre_info;
 
 static inline bool potential_presynaptic_partner(
         uint32_t time, uint32_t *population_id, uint32_t *sub_population_id,
-        uint32_t *neuron_id, spike_t *spike) {
+        uint32_t *neuron_id, spike_t *spike, uint32_t *m_pop_index) {
     use(time);
     *population_id = ulrbits(mars_kiss64_seed(rewiring_data.local_seed))
                 * pre_info.no_pre_pops;
@@ -58,6 +58,8 @@ static inline bool potential_presynaptic_partner(
         preapppop_info->key_atom_info[*sub_population_id].n_atoms;
 
     *spike = preapppop_info->key_atom_info[*sub_population_id].key | *neuron_id;
+
+    *m_pop_index = preapppop_info->key_atom_info[*sub_population_id].m_pop_index;
     return true;
 }
 

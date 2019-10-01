@@ -124,7 +124,8 @@ class SynapseIORowBased(AbstractSynapseIO):
     @staticmethod
     def _get_max_row_length_and_row_data(
             connections, row_indices, n_rows, post_vertex_slice,
-            n_synapse_types, population_table, synapse_dynamics):
+            n_synapse_types, population_table, synapse_dynamics,
+            self_connection):
         # pylint: disable=too-many-arguments, too-many-locals
         row_ids = range(n_rows)
         ff_data, ff_size = None, None
@@ -151,7 +152,7 @@ class SynapseIORowBased(AbstractSynapseIO):
             fp_data, pp_data, fp_size, pp_size = \
                 synapse_dynamics.get_plastic_synaptic_data(
                     connections, row_indices, n_rows, post_vertex_slice,
-                    n_synapse_types)
+                    n_synapse_types, self_connection)
 
         # Add some padding
         row_lengths = [
@@ -224,6 +225,7 @@ class SynapseIORowBased(AbstractSynapseIO):
         # Get the data for the connections
         row_data = numpy.zeros(0, dtype="uint32")
         max_row_length = 0
+        self_connection = machine_edge.pre_vertex == machine_edge.post_vertex
         if undelayed_connections.size or \
                 isinstance(synapse_info.synapse_dynamics,
                            AbstractSynapseDynamicsStructural):
@@ -233,7 +235,8 @@ class SynapseIORowBased(AbstractSynapseIO):
             max_row_length, row_data = self._get_max_row_length_and_row_data(
                 undelayed_connections, undelayed_row_indices,
                 pre_vertex_slice.n_atoms, post_vertex_slice, n_synapse_types,
-                population_table, synapse_info.synapse_dynamics)
+                population_table, synapse_info.synapse_dynamics,
+                self_connection)
 
             del undelayed_row_indices
         del undelayed_connections
@@ -263,7 +266,7 @@ class SynapseIORowBased(AbstractSynapseIO):
                     delayed_connections, delayed_row_indices,
                     pre_vertex_slice.n_atoms * n_delay_stages,
                     post_vertex_slice, n_synapse_types, population_table,
-                    synapse_info.synapse_dynamics)
+                    synapse_info.synapse_dynamics, self_connection)
             del delayed_row_indices
         del delayed_connections
 

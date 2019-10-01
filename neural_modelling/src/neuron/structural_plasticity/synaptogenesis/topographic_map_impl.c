@@ -161,7 +161,7 @@ address_t synaptogenesis_dynamics_initialise(address_t sdram_sp_address) {
 
 bool synaptogenesis_dynamics_rewire(
         uint32_t time, spike_t *spike, address_t *synaptic_row_address,
-        uint32_t *n_bytes) {
+        uint32_t *n_bytes, uint32_t *neuron_id) {
 
     // Randomly choose a postsynaptic (application neuron)
     uint32_t post_id = ulrbits(mars_kiss64_seed(rewiring_data.shared_seed)) *
@@ -180,26 +180,38 @@ bool synaptogenesis_dynamics_rewire(
             rewiring_data.s_max;
     uint32_t total_offset = row_offset + column_offset;
     post_to_pre_entry entry = post_to_pre_table[total_offset];
-    uint32_t pre_app_pop = 0, pre_sub_pop = 0, neuron_id = 0;
+    uint32_t pre_app_pop = 0, pre_sub_pop = 0, m_pop_index = 0;
     if (entry.neuron_index == 0xFFFF) {
         if (!potential_presynaptic_partner(time, &pre_app_pop, &pre_sub_pop,
-                &neuron_id, spike)) {
+                neuron_id, spike, &m_pop_index)) {
             return false;
         }
     } else {
         pre_app_pop = entry.pop_index;
         pre_sub_pop = entry.sub_pop_index;
-        neuron_id = entry.neuron_index;
+        *neuron_id = entry.neuron_index;
     }
     pre_info_t *prepop_info = pre_info.prepop_info[pre_app_pop];
     key_atom_info_t *key_atom_info = &prepop_info->key_atom_info[pre_sub_pop];
     if (entry.neuron_index != 0xFFFF) {
-        *spike = key_atom_info->key | neuron_id;
+        *spike = key_atom_info->key | *neuron_id;
+        m_pop_index = key_atom_info->m_pop_index;
     }
 
-    if (!population_table_get_first_address(*spike, synaptic_row_address, n_bytes)) {
+    if (!population_table_get_first_address(
+            *spike, synaptic_row_address, n_bytes, neuron_id)) {
         log_error("FAIL@key %d", *spike);
         rt_error(RTE_SWERR);
+    }
+    uint32_t index = 0;
+    while (index < m_pop_index) {
+        if (!population_table_get_next_address(
+                spike, synaptic_row_address, n_bytes, neuron_id)) {
+            log_error("FAIL@key %d, index %d (failed at %d)",
+                *spike, m_pop_index, index);
+            rt_error(RTE_SWERR);
+        }
+        index++;
     }
 
     // Saving current state
@@ -208,13 +220,13 @@ bool synaptogenesis_dynamics_rewire(
         log_error("Ran out of states!");
         rt_error(RTE_SWERR);
     }
-    current_state->pre_syn_id = neuron_id;
+    current_state->pre_syn_id = *neuron_id;
     current_state->post_syn_id = post_id;
     current_state->element_exists = entry.neuron_index != 0xFFFF;
     current_state->post_to_pre_table_entry = &post_to_pre_table[total_offset];
     current_state->pre_population_info = prepop_info;
     current_state->key_atom_info = key_atom_info;
-    current_state->post_to_pre.neuron_index = neuron_id;
+    current_state->post_to_pre.neuron_index = *neuron_id;
     current_state->post_to_pre.pop_index = pre_app_pop;
     current_state->post_to_pre.sub_pop_index = pre_sub_pop;
     current_state->local_seed = &rewiring_data.local_seed;

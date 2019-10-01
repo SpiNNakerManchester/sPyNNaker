@@ -45,7 +45,7 @@ static inline void partner_spike_received(uint32_t time, spike_t spike) {
 //! randomly (with uniform probability) select one of the last received spikes
 static inline bool potential_presynaptic_partner(
         uint32_t time, uint32_t *population_id, uint32_t *sub_population_id,
-        uint32_t *neuron_id, spike_t *spike) {
+        uint32_t *neuron_id, spike_t *spike, uint32_t *m_pop_index) {
     uint32_t buffer = (time - 1) & 0x1;
     if (!n_spikes[buffer]) {
         return false;
@@ -54,7 +54,7 @@ static inline bool potential_presynaptic_partner(
         n_spikes[buffer];
     *spike = last_spikes_buffer[buffer][offset];
     return sp_structs_find_by_spike(&pre_info, *spike, neuron_id,
-            population_id, sub_population_id);
+            population_id, sub_population_id, m_pop_index);
 }
 
 #endif // _LAST_NEURON_SELECTION_IMPL_H_

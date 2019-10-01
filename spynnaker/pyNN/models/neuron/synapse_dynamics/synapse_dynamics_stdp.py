@@ -29,8 +29,8 @@ from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 
 # How large are the time-stamps stored with each event
 TIME_STAMP_BYTES = 4
-# When not using the MAD scheme, how many pre-synaptic events are buffered
-NUM_PRE_SYNAPTIC_EVENTS = 4
+# Byte that identifies a self connection
+SELF_CONNECTION_BIT = 0x80
 
 
 class SynapseDynamicsSTDP(
@@ -51,12 +51,15 @@ class SynapseDynamicsSTDP(
         # Weight of connections formed by connector
         "__weight",
         # Delay of connections formed by connector
-        "__delay"]
+        "__delay",
+        # Whether to delay autapses or not
+        "__delay_autapses"]
 
     def __init__(
             self, timing_dependence=None, weight_dependence=None,
             voltage_dependence=None, dendritic_delay_fraction=1.0,
-            weight=0.0, delay=1.0, pad_to_length=None):
+            weight=0.0, delay=1.0, pad_to_length=None,
+            delay_autapses=True):
         self.__timing_dependence = timing_dependence
         self.__weight_dependence = weight_dependence
         self.__dendritic_delay_fraction = float(dendritic_delay_fraction)
@@ -64,6 +67,7 @@ class SynapseDynamicsSTDP(
         self.__pad_to_length = pad_to_length
         self.__weight = weight
         self.__delay = delay
+        self.__delay_autapses = delay_autapses
 
         if not (0.5 <= self.__dendritic_delay_fraction <= 1.0):
             raise NotImplementedError(
@@ -104,7 +108,7 @@ class SynapseDynamicsSTDP(
                 None, self.dendritic_delay_fraction,
                 synapse_dynamics.f_rew, synapse_dynamics.initial_weight,
                 synapse_dynamics.initial_delay, synapse_dynamics.s_max,
-                synapse_dynamics.seed)
+                synapse_dynamics.seed, delay_autapses=self.delay_autapses)
 
         # Otherwise, it is static, so return ourselves
         return self
@@ -166,6 +170,14 @@ class SynapseDynamicsSTDP(
     def dendritic_delay_fraction(self, new_value):
         self.__dendritic_delay_fraction = new_value
 
+    @property
+    def delay_autapses(self):
+        return self.__delay_autapses
+
+    @delay_autapses.setter
+    def delay_autapses(self, delay_autapses):
+        self.__delay_autapses = delay_autapses
+
     def is_same_as(self, synapse_dynamics):
         # pylint: disable=protected-access
         if not isinstance(synapse_dynamics, SynapseDynamicsSTDP):
@@ -198,6 +210,9 @@ class SynapseDynamicsSTDP(
 
         # Switch focus to the region:
         spec.switch_write_focus(region)
+
+        # Whether to *remove* delay from autapses (note opposite sense)
+        spec.write_value(int(not self.__delay_autapses))
 
         # Write timing dependence parameters to region
         self.__timing_dependence.write_parameters(
@@ -238,7 +253,7 @@ class SynapseDynamicsSTDP(
     @overrides(AbstractPlasticSynapseDynamics.get_plastic_synaptic_data)
     def get_plastic_synaptic_data(
             self, connections, connection_row_indices, n_rows,
-            post_vertex_slice, n_synapse_types):
+            post_vertex_slice, n_synapse_types, self_connection):
         # pylint: disable=too-many-arguments
         n_synapse_type_bits = get_n_bits(n_synapse_types)
         n_neuron_id_bits = get_n_bits(post_vertex_slice.n_atoms)
@@ -292,6 +307,8 @@ class SynapseDynamicsSTDP(
                 plastic_plastic_row_data, n_half_words * 2)
         plastic_headers = numpy.zeros(
             (n_rows, self._n_header_bytes), dtype="uint8")
+        if self_connection:
+            plastic_headers[0] = SELF_CONNECTION_BIT
         plastic_plastic_rows = [
             numpy.concatenate((
                 plastic_headers[i], plastic_plastic_row_data[i]))

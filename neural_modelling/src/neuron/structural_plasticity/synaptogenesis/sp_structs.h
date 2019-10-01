@@ -40,6 +40,7 @@ typedef struct {
     uint32_t mask;
     uint32_t n_atoms;
     uint32_t lo_atom;
+    uint32_t m_pop_index;
 } key_atom_info_t;
 
 //! individual pre-synaptic sub-population information
@@ -106,7 +107,7 @@ typedef struct {
 static inline bool sp_structs_find_by_spike(
         pre_pop_info_table_t *pre_pop_info_table, spike_t spike,
         uint32_t *neuron_id, uint32_t *population_id,
-        uint32_t *sub_population_id) {
+        uint32_t *sub_population_id, uint32_t *m_pop_index) {
     // Amazing linear search inc.
     // Loop over all populations
     for (uint32_t i = 0; i < pre_pop_info_table->no_pre_pops; i++) {
@@ -120,6 +121,7 @@ static inline bool sp_structs_find_by_spike(
                 *population_id = i;
                 *sub_population_id = j;
                 *neuron_id = spike & ~kai->mask;
+                *m_pop_index = kai->m_pop_index;
                 return true;
             }
         }
