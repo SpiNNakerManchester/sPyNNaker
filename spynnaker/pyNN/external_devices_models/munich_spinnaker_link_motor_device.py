@@ -141,7 +141,7 @@ class MunichMotorDevice(
         # handle simulation data
         spec.switch_write_focus(self.SYSTEM_REGION)
         spec.write_array(simulation_utilities.get_simulation_header_array(
-            self.get_binary_file_name(), local_time_step_map[self],
+            self.get_binary_file_name(), local_time_step_map[placement.vertex],
             time_scale_factor))
 
         # Get the key
