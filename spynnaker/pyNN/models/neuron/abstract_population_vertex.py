@@ -602,9 +602,9 @@ class AbstractPopulationVertex(
     @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
     def get_spikes_sampling_interval(
             self, graph_mapper, local_time_period_map):
-        machine_verts = list(graph_mapper.get_machine_vertices(self))
+        machine_verts = graph_mapper.get_machine_vertices(self)
         return self.__neuron_recorder.get_neuron_sampling_interval(
-            "spikes", machine_verts[0], local_time_period_map)
+            "spikes", machine_verts.peek(), local_time_period_map)
 
     @overrides(AbstractPopulationInitializable.initialize)
     def initialize(self, variable, value):
