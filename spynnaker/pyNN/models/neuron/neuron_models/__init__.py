@@ -18,6 +18,8 @@ from .neuron_model_izh import NeuronModelIzh
 from .neuron_model_leaky_integrate_and_fire import (
     NeuronModelLeakyIntegrateAndFire)
 from .neuron_model_eprop import NeuronModelEProp
+from .neuron_model_store_recall_readout import NeuronModelStoreRecallReadout
 
 __all__ = ["AbstractNeuronModel", "NeuronModelIzh",
-           "NeuronModelLeakyIntegrateAndFire", "NeuronModelEProp"]
+           "NeuronModelLeakyIntegrateAndFire", "NeuronModelEProp",
+           "NeuronModelStoreRecallReadout"]
