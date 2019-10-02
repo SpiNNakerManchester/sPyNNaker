@@ -597,7 +597,7 @@ class AbstractPopulationVertex(
             self, variable, graph_mapper, local_time_period_map):
         machine_verts = graph_mapper.get_machine_vertices(self)
         return self.__neuron_recorder.get_neuron_sampling_interval(
-            variable, machine_verts[0], local_time_period_map)
+            variable, machine_verts.peek(), local_time_period_map)
 
     @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
     def get_spikes_sampling_interval(
