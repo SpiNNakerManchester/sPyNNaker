@@ -702,13 +702,13 @@ class SpikeSourcePoissonVertex(
         # write setup data
         spec.switch_write_focus(_REGIONS.SYSTEM_REGION.value)
         spec.write_array(simulation_utilities.get_simulation_header_array(
-            self.get_binary_file_name(), local_time_step_map[self],
+            self.get_binary_file_name(), local_time_step_map[vertex],
             time_scale_factor))
 
         # write recording data
         spec.switch_write_focus(_REGIONS.SPIKE_HISTORY_REGION.value)
         sdram = self._get_recording_sdram_usage(
-            vertex_slice, local_time_step_map[self])
+            vertex_slice, local_time_step_map[vertex])
         recorded_region_sizes = [sdram.get_total_sdram(data_n_time_steps)]
         spec.write_array(recording_utilities.get_recording_header_array(
             recorded_region_sizes))
@@ -716,7 +716,7 @@ class SpikeSourcePoissonVertex(
         # write parameters
         self._write_poisson_parameters(
             spec, graph, placement, routing_info, vertex_slice,
-            local_time_step_map[self], time_scale_factor)
+            local_time_step_map[vertex], time_scale_factor)
 
         # write profile data
         profile_utils.write_profile_region_data(
