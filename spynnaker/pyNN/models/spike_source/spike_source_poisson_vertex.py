@@ -559,7 +559,7 @@ class SpikeSourcePoissonVertex(
     def get_spikes_sampling_interval(
             self, graph_mapper, local_time_period_map):
         machine_verts = graph_mapper.get_machine_vertices(self)
-        return local_time_period_map[machine_verts[0]]
+        return local_time_period_map[machine_verts.peek()]
 
     @staticmethod
     def get_dtcm_usage_for_atoms():
