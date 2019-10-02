@@ -124,9 +124,9 @@ class NeuronRecorder(object):
         :param variable: PyNN name of the variable
         :param local_time_period_map: map between machine vertex and timer\
         period
+        :param vertex: the machine vertex to get local time period for.
         :return: Sampling interval in micro seconds
         """
-
         step = (local_time_period_map[vertex] /
                 constants.MICRO_TO_MILLISECOND_CONVERSION)
         return self.__sampling_rates[variable] * step
