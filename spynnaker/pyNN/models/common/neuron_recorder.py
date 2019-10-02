@@ -147,7 +147,8 @@ class NeuronRecorder(object):
         :param application_vertex:
         :param variable: PyNN name for the variable (V, gsy_inh etc.)
         :type variable: str
-        :param current_run_timesteps_map: map of vertex to current and next step
+        :param current_run_timesteps_map: map of vertex to current and next \
+        step
         :param local_time_period_map: the map of vertex to local time period
         :type local_time_period_map: map of machine vertex to int
         :return:

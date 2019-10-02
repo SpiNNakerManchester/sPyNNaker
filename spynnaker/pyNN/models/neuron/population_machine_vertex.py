@@ -18,7 +18,6 @@ from enum import Enum
 from spinn_front_end_common.abstract_models.impl.\
     machine_supports_auto_pause_and_resume import \
     MachineSupportsAutoPauseAndResume
-from spinn_front_end_common.utilities import helpful_functions
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.machine import MachineVertex
 from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
