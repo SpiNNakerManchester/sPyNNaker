@@ -16,6 +16,7 @@
 #include <recording.h>
 #include <debug.h>
 #include <random.h>
+#include "random.h"
 
 #define V_RECORDING_INDEX 0
 #define GSYN_EXCITATORY_RECORDING_INDEX 1
@@ -56,11 +57,10 @@ static uint32_t timer = 0;
 static uint32_t target_ind = 0;
 
 // Store recall parameters
-uint32_t store_recall_state = 0; //0: idle, 1: storing, 2:stored, 3:recall
+uint32_t store_recall_state = 0; // 0: idle, 1: storing, 2:stored, 3:recall
 uint32_t stored_value = 0;
-accum softmax_0 = 0;
-accum softmax_1 = 0;
-accum cross_entropy = 0;
+uint32_t broacast_value = 0;
+REAL ticks_for_mean = 0;
 
 static bool neuron_impl_initialise(uint32_t n_neurons) {
 
@@ -125,6 +125,9 @@ static bool neuron_impl_initialise(uint32_t n_neurons) {
             return false;
         }
     }
+
+    // Seed the random input
+    validate_mars_kiss64_seed(kiss_seed);
 
     // Initialise pointers to Neuron parameters in STDP code
     synapse_dynamics_set_neuron_array(neuron_array);
@@ -209,117 +212,33 @@ static void neuron_impl_load_neuron_parameters(
     #endif // LOG_LEVEL >= LOG_DEBUG
 }
 
-
-// &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-
-// Poisson Spike Source Functions
-
-static inline REAL slow_spike_source_get_time_to_spike(
-        REAL mean_inter_spike_interval_in_ticks, neuron_pointer_t neuron) {
-    return exponential_dist_variate(
-            mars_kiss64_seed,
-//			neuron->spike_source_seed
-			global_parameters->spike_source_seed
-			)
-        * mean_inter_spike_interval_in_ticks;
-}
-
-
-
-void set_spike_source_rate(neuron_pointer_t neuron, REAL rate,
-		threshold_type_pointer_t threshold_type) {
-
-	// clip rate to ensure divde by 0 and overflow don't occur
-	if (rate < 0.25){
-		rate = 0.25;
-	} else if (rate > threshold_type->threshold_value) {
-		rate = threshold_type->threshold_value;
-	}
-
-	REAL rate_diff = neuron->rate_at_last_setting - rate;
-
-	// ensure rate_diff is absolute
-	if REAL_COMPARE(rate_diff, <, REAL_CONST(0.0)) {
-		rate_diff = -rate_diff;
-	}
-
-	// Has rate changed by more than a predefined threshold since it was last
-	// used to update the mean isi ticks?
-	if ((rate_diff) > neuron->rate_update_threshold){
-		// then update the rate
-		neuron->rate_at_last_setting = rate;
-
-		// Update isi ticks based on new rate
-		neuron->mean_isi_ticks =
-		//                rate *
-		////				global_parameters->ticks_per_second; // shouldn't this be ticks_per_second/rate?
-		//				neuron->ticks_per_second   ; // shouldn't this be ticks_per_second/rate?
-		    		(global_parameters->ticks_per_second / rate); // shouldn't this be ticks_per_second/rate?
-
-		// Account for time that's already passed since previous spike
-	    neuron->time_to_spike_ticks = neuron->mean_isi_ticks
-	    		- neuron->time_since_last_spike;
-	} // else stick with existing rate and isi ticks - they're within threshold
-}
-
-
-bool timer_update_determine_poisson_spiked(neuron_pointer_t neuron) {
-	// NOTE: ALL SOURCES TREATED AS SLOW SOURCES!!!
-	// NOTE: NO SOURCE CAN SPIKE MORE THAN ONCE PER TIMESTEP
-    // If this spike source should spike now
-
-	bool has_spiked = false;
-
-	// Advance by one timestep
-	// Subtract tick
-    neuron->time_to_spike_ticks -= REAL_CONST(1.0);
-
-    // Add tick to time since last spike (to enable for dynamic rate change)
-    neuron->time_since_last_spike += 1.0k;
-
-//	io_printf(IO_BUF, " 				Time to next spike: %k\n",
-//			neuron->time_to_spike_ticks);
-
-    if (REAL_COMPARE(
-            neuron->time_to_spike_ticks, <=,
-            REAL_CONST(0.0))) {
-
-        // Update time to spike
-    	next_spike_time = slow_spike_source_get_time_to_spike(
-                neuron->mean_isi_ticks, neuron);
-
-        neuron->time_to_spike_ticks += next_spike_time;
-
-        // Set time since last spike to zero, so we start counting from here
-        neuron->time_since_last_spike = 0;
-
-        has_spiked = true;
-    }
-
-    return has_spiked;
-}
-
-// &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-
-
 static bool neuron_impl_do_timestep_update(index_t neuron_index,
         input_t external_bias, state_t *recorded_variable_values) {
 
     // Get the neuron itself
     neuron_pointer_t neuron = &neuron_array[neuron_index];
-    bool spike = false;
 
-    target_ind = timer & 0x3ff; // repeats on a cycle of 1024 entries in array
-
+    // Change broadcasted value and state with probability
+    // State - 0: idle, 1: storing, 2:stored-idle, 3:recall
     if (timer % 200 == 0){
-        if (rand() < global_parameters->prob_command){
+        if (store_recall_state == 3 || store_recall_state == 1){
             store_recall_state = (store_recall_state + 1) % 4;
         }
+        else{
+            REAL random_number = (REAL)(mars_kiss64_seed(global_parameters->spike_source_seed) / (REAL)0xffffffff);
+            if (random_number < global_parameters->prob_command){
+                store_recall_state = (store_recall_state + 1) % 4;
+            }
+        }
+        REAL switch_value = (REAL)(mars_kiss64_seed(global_parameters->spike_source_seed) / (REAL)0xffffffff);
+        if (switch_value < 0.5){
+            broacast_value = (broacast_value + 1) % 2;
+        }
+        if (store_recall_state == 1){
+            stored_value = broacast_value;
+        }
+        // send packets to the variable poissons with the updated states
     }
-
-//    io_printf(IO_BUF, "Updating Neuron Index: %u\n", neuron_index);
-//    io_printf(IO_BUF, "Target: %k\n\n",
-//    		global_parameters->target_V[target_ind]);
 
     // Get the input_type parameters and voltage for this neuron
     input_type_pointer_t input_type = &input_type_array[neuron_index];
@@ -361,20 +280,6 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = total_exc;
     recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = total_inh;
 
-    // Softmax of the exc and inh inputs representing 1 and 0 respectively
-    // may need to keep a running total of choice over the recall command
-    accum exp_0 = exp(total_inh);
-    accum exp_1 = exp(total_exc);
-    softmax_0 = exp_0 / (exp_1 + exp_0);
-    softmax_1 = exp_1 / (exp_1 + exp_0);
-    // What to do if log(0)
-    if (stored_value){
-        cross_entropy = -log(softmax_1);
-    }
-    else{
-        cross_entropy = -log(softmax_0);
-    }
-
     // Call functions to convert exc_input and inh_input to current
     input_type_convert_excitatory_input_to_current(
     		exc_input_values, input_type, voltage);
@@ -384,6 +289,32 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     external_bias += additional_input_get_input_value_as_current(
     		additional_input, voltage);
 
+    // If during recall calculate error
+    if (neuron_index == 2 && store_recall_state == 3){
+        ticks_for_mean += 1;
+        // Softmax of the exc and inh inputs representing 1 and 0 respectively
+        // may need to scale to stop huge numbers going in the exp
+        global_parameters->mean_0 += global_parameters->readout_V_0;
+        global_parameters->mean_1 += global_parameters->readout_V_1;
+        accum exp_0 = exp(global_parameters->mean_0 / ticks_for_mean);
+        accum exp_1 = exp(global_parameters->mean_1 / ticks_for_mean);
+        accum softmax_0 = exp_0 / (exp_1 + exp_0);
+        accum softmax_1 = exp_1 / (exp_1 + exp_0);
+        // What to do if log(0)?
+        if (stored_value){
+            global_parameters->cross_entropy = -log(softmax_1);
+        }
+        else{
+            global_parameters->cross_entropy = -log(softmax_0);
+        }
+    }
+    // Reset values after recall
+    if (store_recall_state == 0){
+        ticks_for_mean = 0;
+        global_parameters->mean_0 == 0;
+        global_parameters->mean_1 == 0;
+    }
+
     if (neuron_index == 0){
     	recorded_variable_values[V_RECORDING_INDEX] = voltage;
     	// update neuron parameters
@@ -391,73 +322,37 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     			NUM_EXCITATORY_RECEPTORS, exc_input_values,
 				NUM_INHIBITORY_RECEPTORS, inh_input_values,
 				external_bias, neuron, -50k);
-//    	io_printf(IO_BUF, "Readout membrane pot: %k\n", voltage);
-    // determine if a spike should occur
-    // bool spike = threshold_type_is_above_threshold(result, threshold_type);
+    	// Finally, set global membrane potential to updated value
+    	global_parameters->readout_V_0 = result;
+
+    } else if (neuron_index == 1){
+    	recorded_variable_values[V_RECORDING_INDEX] = voltage;
+    	// update neuron parameters
+    	state_t result = neuron_model_state_update(
+    			NUM_EXCITATORY_RECEPTORS, exc_input_values,
+				NUM_INHIBITORY_RECEPTORS, inh_input_values,
+				external_bias, neuron, -50k);
 
     	// Finally, set global membrane potential to updated value
-    	global_parameters->readout_V = result;
+    	global_parameters->readout_V_1 = result;
+    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&//
+    //         maybe sign of the error isn't important anymore?         //
+    //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&//
+    } else if (neuron_index == 2){ // this is the excitatory error source
 
-    } else if (neuron_index == 1) { // this is the excitatory error source
+    	recorded_variable_values[V_RECORDING_INDEX] = stored_value;
+    	// Boundary of -0.7 because ln(0.5) =~= -0.7 representing random choice point, > -0.7 is more correct than not
+    	if (global_parameters->cross_entropy > -0.7){
+            // it's correct so keep doing what you're doing or boost synapses?
+    	}
 
-    	recorded_variable_values[V_RECORDING_INDEX] =
-    			global_parameters->target_V[target_ind];
+    } else if (neuron_index == 3){ // this is the inhibitory error source
 
-    	// Update Poisson neuron rate based on updated V
-        REAL rate = (global_parameters->target_V[target_ind]
-							 - global_parameters->readout_V); // calc difference to
-//        io_printf(IO_BUF, "New Rate: %k", rate);
-//        rate = rate * 10;
-        rate = rate * 5.0k;
-        if (rate > 0) { // readout is below target, so set rate = diff.
-        	// This will cause potentiation of excitatory synapses,
-        	// and depression of inhibitory synapses
-        	set_spike_source_rate(neuron, rate,
-        			threshold_type);
-        } else { // readout is above target, so set rate = zero
-        	set_spike_source_rate(neuron, 0,
-        			threshold_type);
-        }
-
-        // judge whether poisson neuron should have fired
-        spike = timer_update_determine_poisson_spiked(neuron);
-
-    } else if (neuron_index == 2){
-    	// Update Poisson neuron rate based on updated V
-        REAL rate = (global_parameters->target_V[target_ind]
-							- global_parameters->readout_V); // calc difference to
-//        io_printf(IO_BUF, "New Rate: %k", rate);
-
-        recorded_variable_values[V_RECORDING_INDEX] = rate;
-//        rate = rate * 10;
-
-        rate = rate * 5.0k;
-        if (rate < 0) {
-        	// readout is above target, send spikes from inhibitory neuron with rate = -diff:
-        	// this will depress excitatory synapses, and potenitate inhibitory synapses
-        	set_spike_source_rate(neuron, -rate,
-        			threshold_type);
-        } else { // readout is below target, so set rate = 0;
-        	set_spike_source_rate(neuron, 0,
-        			threshold_type);
-        }
-
-        // judge whether poisson neuron should have fired
-        spike = timer_update_determine_poisson_spiked(neuron);
+    	// Boundary of -0.7 because ln(0.5) =~= -0.7 representing random choice point, > -0.7 is more correct than not
+    	if (global_parameters->cross_entropy < -0.7){
+            // it's incorrect so change doing what you're doing or suppress synapses?
+    	}
         timer++; // update this here, as needs to be done once per iteration over all the neurons
-
-    }
-
-
-
-    // If spike occurs, communicate to relevant parts of model
-    if (spike) {
-        // Call relevant model-based functions
-        // Tell the neuron model
-//        neuron_model_has_spiked(neuron);
-
-        // Tell the additional input
-        additional_input_has_spiked(additional_input);
     }
 
     // Shape the existing input according to the included rule
@@ -468,12 +363,8 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     #endif // LOG_LEVEL >= LOG_DEBUG
 
     // Return the boolean to the model timestep update
-    return spike;
+    return false;
 }
-
-
-
-
 
 //! \brief stores neuron parameter back into sdram
 //! \param[in] address: the address in sdram to start the store

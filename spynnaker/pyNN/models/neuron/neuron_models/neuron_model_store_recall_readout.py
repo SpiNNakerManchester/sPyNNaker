@@ -131,9 +131,9 @@ class NeuronModelStoreRecallReadout(AbstractNeuronModel):
         parameters[SEED3] = 3634
         parameters[SEED4] = 4877
 
-        parameters[PROB_COMMAND] = 1./6.
-        parameters[RATE_ON] = 50
-        parameters[RATE_OFF] = 0
+        parameters[PROB_COMMAND] = self._prob_command
+        parameters[RATE_ON] = self._rate_on
+        parameters[RATE_OFF] = self._rate_off
 
         parameters[TICKS_PER_SECOND] = 0 # set in get_valuers()
         parameters[RATE_UPDATE_THRESHOLD] = self._rate_update_threshold
