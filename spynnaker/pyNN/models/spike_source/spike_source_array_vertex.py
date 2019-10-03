@@ -19,8 +19,6 @@ import numpy
 from spinn_front_end_common.abstract_models.impl.\
     application_supports_auto_pause_and_resume import \
     ApplicationSupportsAutoPauseAndResume
-from spinn_front_end_common.utilities.constants import \
-    MICRO_TO_MILLISECOND_CONVERSION
 from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
