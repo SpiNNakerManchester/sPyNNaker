@@ -17,6 +17,8 @@ import logging
 import math
 import numpy
 import scipy.stats
+
+from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from pacman.executor.injection_decorator import inject_items
@@ -40,7 +42,8 @@ from spinn_front_end_common.interface.buffer_management import (
 from spinn_front_end_common.utilities import (
     helpful_functions, globals_variables)
 from spinn_front_end_common.utilities.constants import (
-    SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES)
+    SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES,
+    MICRO_TO_MILLISECOND_CONVERSION)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.interface.profiling import profile_utils
@@ -558,6 +561,13 @@ class SpikeSourcePoissonVertex(
     @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
     def get_spikes_sampling_interval(
             self, graph_mapper, local_time_period_map):
+        if graph_mapper is None or local_time_period_map is None:
+            sampling_rate = (
+                self.__neuron_recorder.get_sampling_rate_for("spikes"))
+            step = (
+                get_simulator().default_machine_time_step /
+                MICRO_TO_MILLISECOND_CONVERSION)
+            return sampling_rate * step
         machine_verts = graph_mapper.get_machine_vertices(self)
         return local_time_period_map[machine_verts.peek()]
 

@@ -20,6 +20,9 @@ import math
 from spinn_front_end_common.abstract_models.impl.\
     application_supports_auto_pause_and_resume import \
     ApplicationSupportsAutoPauseAndResume
+from spinn_front_end_common.utilities.constants import \
+    MICRO_TO_MILLISECOND_CONVERSION
+from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
@@ -595,6 +598,13 @@ class AbstractPopulationVertex(
     @overrides(AbstractNeuronRecordable.get_neuron_sampling_interval)
     def get_neuron_sampling_interval(
             self, variable, graph_mapper, local_time_period_map):
+        if graph_mapper is None or local_time_period_map is None:
+            sampling_rate = (
+                self.__neuron_recorder.get_sampling_rate_for("spikes"))
+            step = (
+                get_simulator().default_machine_time_step /
+                MICRO_TO_MILLISECOND_CONVERSION)
+            return sampling_rate * step
         machine_verts = graph_mapper.get_machine_vertices(self)
         return self.__neuron_recorder.get_neuron_sampling_interval(
             variable, machine_verts.peek(), local_time_period_map)
@@ -602,6 +612,13 @@ class AbstractPopulationVertex(
     @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
     def get_spikes_sampling_interval(
             self, graph_mapper, local_time_period_map):
+        if graph_mapper is None or local_time_period_map is None:
+            sampling_rate = (
+                self.__neuron_recorder.get_sampling_rate_for("spikes"))
+            step = (
+                get_simulator().default_machine_time_step /
+                MICRO_TO_MILLISECOND_CONVERSION)
+            return sampling_rate * step
         machine_verts = graph_mapper.get_machine_vertices(self)
         return self.__neuron_recorder.get_neuron_sampling_interval(
             "spikes", machine_verts.peek(), local_time_period_map)

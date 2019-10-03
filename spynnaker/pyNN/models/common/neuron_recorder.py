@@ -97,6 +97,11 @@ class NeuronRecorder(object):
             self.__sampling_rates[variable] = 0
             self.__indexes[variable] = None
 
+    def get_sampling_rate_for(self, variable):
+        if variable in self.__sampling_rates:
+            return self.__sampling_rates[variable]
+        raise Exception("the variable {} has no samplign rate.", variable)
+
     def _count_recording_per_slice(self, variable, vertex_slice):
         if self.__sampling_rates[variable] == 0:
             return 0

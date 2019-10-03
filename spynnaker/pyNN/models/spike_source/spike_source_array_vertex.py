@@ -19,6 +19,9 @@ import numpy
 from spinn_front_end_common.abstract_models.impl.\
     application_supports_auto_pause_and_resume import \
     ApplicationSupportsAutoPauseAndResume
+from spinn_front_end_common.utilities.constants import \
+    MICRO_TO_MILLISECOND_CONVERSION
+from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
@@ -99,7 +102,9 @@ class SpikeSourceArrayVertex(
             actual change
 
         """
-        time_step = self.get_spikes_sampling_interval()
+        time_step = self.get_spikes_sampling_interval(
+            get_simulator().graph_mapper,
+            get_simulator().local_timer_period_map)
         self.send_buffer_times = _send_buffer_times(spike_times, time_step)
         self._spike_times = spike_times
 
@@ -124,8 +129,9 @@ class SpikeSourceArrayVertex(
     @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
     def get_spikes_sampling_interval(
             self, graph_mapper, local_time_period_map):
-        machine_verts = graph_mapper.get_machine_vertices(self)
-        return local_time_period_map[machine_verts.peek()]
+        return (
+            get_simulator().default_machine_time_step /
+            MICRO_TO_MILLISECOND_CONVERSION)
 
     @overrides(AbstractSpikeRecordable.get_spikes)
     def get_spikes(
