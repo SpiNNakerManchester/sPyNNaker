@@ -129,9 +129,7 @@ class SpikeSourceArrayVertex(
     @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
     def get_spikes_sampling_interval(
             self, graph_mapper, local_time_period_map):
-        return (
-            get_simulator().default_machine_time_step /
-            MICRO_TO_MILLISECOND_CONVERSION)
+        return get_simulator().default_machine_time_step
 
     @overrides(AbstractSpikeRecordable.get_spikes)
     def get_spikes(
