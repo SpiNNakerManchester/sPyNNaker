@@ -53,7 +53,7 @@ static inline input_t* input_type_get_input_value(
         input_t* value, input_type_pointer_t input_type, uint16_t num_receptors) {
     use(input_type);
     for (int i = 0; i < num_receptors; i++) {
-        value[i] = value[i] >> 10;
+        value[i] = value[i] >> 10; //? THIS IS THE SAME AS CONDUCTANCE, BUT SHOULDN'T WE ACT AS CURRENT BASED?
     }
     return &value[0];
 }
