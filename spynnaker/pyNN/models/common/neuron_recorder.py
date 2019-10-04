@@ -368,7 +368,7 @@ class NeuronRecorder(object):
             # Read the spikes
             n_words = int(
                 math.ceil(neurons_recording / constants.BITS_PER_WORD))
-            n_bytes = n_words * constants.WORD_TO_BYTE_MULTIPLIER
+            n_bytes = n_words * constants.BYTES_PER_WORDS
             n_words_with_timestamp = n_words + 1
 
             # for buffering output info is taken form the buffer manager
@@ -621,7 +621,7 @@ class NeuronRecorder(object):
             out_spike_words = (
                 int(math.ceil(n_neurons / constants.BITS_PER_WORD)))
             out_spike_bytes = (
-                out_spike_words * constants.WORD_TO_BYTE_MULTIPLIER)
+                out_spike_words * constants.BYTES_PER_WORDS)
             return self.N_BYTES_FOR_TIMESTAMP + out_spike_bytes
         else:
             return (
@@ -673,9 +673,9 @@ class NeuronRecorder(object):
 
     def get_sdram_usage_in_bytes(self, vertex_slice):
         n_words_for_n_neurons = int(math.ceil(
-            vertex_slice.n_atoms // constants.WORD_TO_BYTE_MULTIPLIER))
+            vertex_slice.n_atoms // constants.BYTES_PER_WORDS))
         n_bytes_for_n_neurons = (
-            n_words_for_n_neurons * constants.WORD_TO_BYTE_MULTIPLIER)
+            n_words_for_n_neurons * constants.BYTES_PER_WORDS)
         return ((self.N_BYTES_PER_RATE + self.N_BYTES_PER_SIZE +
                  self.N_BYTES_PER_ENUM + n_bytes_for_n_neurons) *
                 len(self.__sampling_rates))
@@ -736,7 +736,7 @@ class NeuronRecorder(object):
                 out_spike_words = int(
                     math.ceil(vertex_slice.n_atoms / constants.BITS_PER_WORD))
                 out_spike_bytes = (
-                    out_spike_words * constants.WORD_TO_BYTE_MULTIPLIER)
+                    out_spike_words * constants.BYTES_PER_WORDS)
                 usage += self.N_BYTES_FOR_TIMESTAMP + out_spike_bytes
             else:
                 usage += (
@@ -769,9 +769,9 @@ class NeuronRecorder(object):
     def _get_data(self, vertex_slice):
         data = list()
         n_words_for_n_neurons = int(math.ceil(
-            vertex_slice.n_atoms / constants.WORD_TO_BYTE_MULTIPLIER))
+            vertex_slice.n_atoms / constants.BYTES_PER_WORDS))
         n_bytes_for_n_neurons = (
-            n_words_for_n_neurons * constants.WORD_TO_BYTE_MULTIPLIER)
+            n_words_for_n_neurons * constants.BYTES_PER_WORDS)
         for variable in self.__sampling_rates:
             if variable in self.__matrix_output_types:
                 enum_index = self._determine_enum_value(variable)

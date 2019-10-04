@@ -18,7 +18,7 @@ import numpy
 from six import raise_from
 
 from spinn_front_end_common.utilities.constants import \
-    MICRO_TO_MILLISECOND_CONVERSION, BYTES_PER_WORS
+    MICRO_TO_MILLISECOND_CONVERSION, BYTES_PER_WORDS
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector)
@@ -50,7 +50,7 @@ class SynapseIORowBased(AbstractSynapseIO):
             machine_time_step / MICRO_TO_MILLISECOND_CONVERSION)
 
     def _n_words(self, n_bytes):
-        return math.ceil(float(n_bytes) / BYTES_PER_WORS)
+        return math.ceil(float(n_bytes) / BYTES_PER_WORDS)
 
     def _get_max_row_length(
             self, size, dynamics, population_table, in_edge, row_length):
@@ -119,11 +119,11 @@ class SynapseIORowBased(AbstractSynapseIO):
         undelayed_max_bytes = 0
         if undelayed_max_n_words > 0:
             undelayed_max_bytes = (
-                undelayed_max_n_words + _N_HEADER_WORDS) * BYTES_PER_WORS
+                undelayed_max_n_words + _N_HEADER_WORDS) * BYTES_PER_WORDS
         delayed_max_bytes = 0
         if delayed_max_n_words > 0:
             delayed_max_bytes = (
-                delayed_max_n_words + _N_HEADER_WORDS) * BYTES_PER_WORS
+                delayed_max_n_words + _N_HEADER_WORDS) * BYTES_PER_WORDS
 
         return MaxRowInfo(
             max_undelayed_n_synapses, max_delayed_n_synapses,
