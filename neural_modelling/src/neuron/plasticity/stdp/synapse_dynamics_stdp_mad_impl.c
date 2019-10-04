@@ -39,7 +39,7 @@ static uint32_t synapse_delay_index_type_bits;
 static uint32_t synapse_type_mask;
 
 typedef struct stdp_params {
-    uint32_t no_backprop_delay;
+    uint32_t backprop_delay;
 } stdp_params;
 
 static stdp_params params;
@@ -350,7 +350,7 @@ bool synapse_dynamics_process_plastic_synapses(
 
         // Update the synapse state
         uint32_t post_delay = delay_dendritic;
-        if (params.no_backprop_delay) {
+        if (!params.backprop_delay) {
             post_delay = 0;
         }
         final_state_t final_state = plasticity_update_synapse(

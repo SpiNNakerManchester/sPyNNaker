@@ -55,13 +55,13 @@ class SynapseDynamicsSTDP(
         # Delay of connections formed by connector
         "__delay",
         # Whether to use back-propagation delay or not
-        "__no_backprop_delay"]
+        "__backprop_delay"]
 
     def __init__(
             self, timing_dependence=None, weight_dependence=None,
             voltage_dependence=None, dendritic_delay_fraction=1.0,
             weight=0.0, delay=1.0, pad_to_length=None,
-            no_backprop_delay=False):
+            backprop_delay=True):
         self.__timing_dependence = timing_dependence
         self.__weight_dependence = weight_dependence
         self.__dendritic_delay_fraction = float(dendritic_delay_fraction)
@@ -69,7 +69,7 @@ class SynapseDynamicsSTDP(
         self.__pad_to_length = pad_to_length
         self.__weight = weight
         self.__delay = delay
-        self.__no_backprop_delay = no_backprop_delay
+        self.__backprop_delay = backprop_delay
 
         if not (0.5 <= self.__dendritic_delay_fraction <= 1.0):
             raise NotImplementedError(
@@ -111,7 +111,7 @@ class SynapseDynamicsSTDP(
                 synapse_dynamics.f_rew, synapse_dynamics.initial_weight,
                 synapse_dynamics.initial_delay, synapse_dynamics.s_max,
                 synapse_dynamics.seed,
-                no_backprop_delay=self.no_backprop_delay)
+                backprop_delay=self.backprop_delay)
 
         # Otherwise, it is static, so return ourselves
         return self
@@ -174,12 +174,12 @@ class SynapseDynamicsSTDP(
         self.__dendritic_delay_fraction = new_value
 
     @property
-    def no_backprop_delay(self):
-        return self.__no_backprop_delay
+    def backprop_delay(self):
+        return self.__backprop_delay
 
-    @no_backprop_delay.setter
-    def no_backprop_delay(self, no_backprop_delay):
-        self.__no_backprop_delay = no_backprop_delay
+    @backprop_delay.setter
+    def backprop_delay(self, backprop_delay):
+        self.__backprop_delay = backprop_delay
 
     def is_same_as(self, synapse_dynamics):
         # pylint: disable=protected-access
@@ -217,7 +217,7 @@ class SynapseDynamicsSTDP(
         spec.switch_write_focus(region)
 
         # Whether to use back-prop delay
-        spec.write_value(int(self.__no_backprop_delay))
+        spec.write_value(int(self.__backprop_delay))
 
         # Write timing dependence parameters to region
         self.__timing_dependence.write_parameters(

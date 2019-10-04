@@ -109,7 +109,7 @@ class SynapseDynamicsStructuralStatic(
                 None, synapse_dynamics.dendritic_delay_fraction,
                 self.f_rew, self.initial_weight, self.initial_delay,
                 self.s_max, self.seed,
-                no_backprop_delay=synapse_dynamics.no_backprop_delay)
+                backprop_delay=synapse_dynamics.backprop_delay)
 
         # Otherwise, it is static, so return ourselves
         return self
