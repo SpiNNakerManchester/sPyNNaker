@@ -749,7 +749,8 @@ class SpikeSourcePoissonVertex(
 
             # Find the index to start at
             index = 0
-            while ends_scaled[index] < first_machine_time_step:
+            while (ends_scaled[index] < first_machine_time_step and
+                   (index + 1) < len(ends_scaled)):
                 index += 1
 
             # Write the values to the spec
