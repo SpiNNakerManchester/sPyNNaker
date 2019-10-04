@@ -338,15 +338,12 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&//
     //         maybe sign of the error isn't important anymore?         //
     //&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&//
-    } else if (neuron_index == 2){ // this is the excitatory error source
+    } else if (neuron_index == 2){ // this is the error source
 
     	recorded_variable_values[V_RECORDING_INDEX] = stored_value;
-    	// Boundary of -0.7 because ln(0.5) =~= -0.7 representing random choice point, > -0.7 is more correct than not
-    	if (global_parameters->cross_entropy > -0.7){
-            // it's correct so keep doing what you're doing or boost synapses?
-    	}
+    	// Switched to always broadcasting error but with packet
 
-    } else if (neuron_index == 3){ // this is the inhibitory error source
+    } else if (neuron_index == 3){ // this is the deprecated
 
     	// Boundary of -0.7 because ln(0.5) =~= -0.7 representing random choice point, > -0.7 is more correct than not
     	if (global_parameters->cross_entropy < -0.7){
