@@ -104,6 +104,8 @@ static inline final_state_t plasticity_update_synapse(
         const uint32_t delay_axonal, update_state_t current_state,
         const post_event_history_t *post_event_history,
         const uint32_t is_autapse) {
+    use(is_autapse);
+
     // Apply axonal delay to time of last presynaptic spike
     const uint32_t delayed_last_pre_time = last_pre_time + delay_axonal;
 

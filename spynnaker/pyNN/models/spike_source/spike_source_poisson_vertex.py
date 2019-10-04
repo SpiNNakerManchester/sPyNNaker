@@ -297,9 +297,6 @@ class SpikeSourcePoissonVertex(
         elif max_rate is None:
             self.__max_rate = 0
 
-        # Create the index of values in use
-        self.__data["index"] = SpynnakerRangedList(n_neurons, 0)
-
     @property
     def rate(self):
         if self.__is_variable_rate:
@@ -336,10 +333,14 @@ class SpikeSourcePoissonVertex(
 
     @property
     def start(self):
+        if self.__is_variable_rate:
+            raise Exception("Get variable rate poisson starts with .starts")
         return self.__data["starts"]
 
     @start.setter
     def start(self, start):
+        if self.__is_variable_rate:
+            raise Exception("Cannot set start of a variable rate poisson")
         # Normalise parameter
         if hasattr(start, "__len__"):
             # Single start per neuron for whole simulation
@@ -351,10 +352,15 @@ class SpikeSourcePoissonVertex(
 
     @property
     def duration(self):
+        if self.__is_variable_rate:
+            raise Exception(
+                "Get variable rate poisson durations with .durations")
         return self.__data["durations"]
 
     @duration.setter
     def duration(self, duration):
+        if self.__is_variable_rate:
+            raise Exception("Cannot set duration of a variable rate poisson")
         # Normalise parameter
         if hasattr(duration, "__len__"):
             # Single duration per neuron for whole simulation
@@ -369,13 +375,31 @@ class SpikeSourcePoissonVertex(
     def rates(self):
         return self.__data["rates"]
 
+    @rates.setter
+    def rates(self, _rates):
+        if self.__is_variable_rate:
+            raise Exception("Cannot set rates of a variable rate poisson")
+        raise Exception("Set the rate of a Poisson source using rate")
+
     @property
     def starts(self):
         return self.__data["starts"]
 
+    @starts.setter
+    def starts(self, _starts):
+        if self.__is_variable_rate:
+            raise Exception("Cannot set starts of a variable rate poisson")
+        raise Exception("Set the start of a Poisson source using start")
+
     @property
     def durations(self):
         return self.__data["durations"]
+
+    @durations.setter
+    def durations(self, _durations):
+        if self.__is_variable_rate:
+            raise Exception("Cannot set durations of a variable rate poisson")
+        raise Exception("Set the duration of a Poisson source using duration")
 
     @property
     @overrides(AbstractChangableAfterRun.requires_mapping)
@@ -638,7 +662,8 @@ class SpikeSourcePoissonVertex(
         for value in self.__kiss_seed[kiss_key]:
             spec.write_value(data=value)
 
-    def _write_poisson_rates(self, spec, vertex_slice, machine_time_step):
+    def _write_poisson_rates(self, spec, vertex_slice, machine_time_step,
+                             first_machine_time_step):
         """ Generate Rate data for Poisson spike sources
 
         :param spec: the data specification writer
@@ -646,6 +671,8 @@ class SpikeSourcePoissonVertex(
             the slice of atoms a machine vertex holds from its application\
             vertex
         :param machine_time_step: the time between timer tick updates.
+        :param first_machine_time_step:\
+            First machine time step to start from the correct index
         """
         spec.comment("\nWriting Rates for {} poisson sources:\n"
                      .format(vertex_slice.n_atoms))
@@ -655,10 +682,6 @@ class SpikeSourcePoissonVertex(
 
         # For each source, write the number of rates, followed by the rate data
         for i in range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1):
-            spec.write_value(len(self.__data["rates"][i]))
-
-            # Write the current index in use
-            spec.write_value(self.__data["index"][i])
 
             # Convert start times to start time steps
             starts = self.__data["starts"][i].astype("float")
@@ -723,6 +746,15 @@ class SpikeSourcePoissonVertex(
                 isi_val.astype("uint32"),
                 time_to_spike.astype("uint32")
             ))[0].flatten()
+
+            # Find the index to start at
+            index = 0
+            while ends_scaled[index] < first_machine_time_step:
+                index += 1
+
+            # Write the values to the spec
+            spec.write_value(len(self.__data["rates"][i]))
+            spec.write_value(index)
             spec.write_array(data)
 
     @staticmethod
@@ -769,15 +801,16 @@ class SpikeSourcePoissonVertex(
         "time_scale_factor": "TimeScaleFactor",
         "graph_mapper": "MemoryGraphMapper",
         "routing_info": "MemoryRoutingInfos",
-        "graph": "MemoryMachineGraph"})
+        "graph": "MemoryMachineGraph",
+        "first_machine_time_step": "FirstMachineTimeStep"})
     @overrides(
         AbstractRewritesDataSpecification.regenerate_data_specification,
         additional_arguments={
             "machine_time_step", "time_scale_factor", "graph_mapper",
-            "routing_info", "graph"})
+            "routing_info", "graph", "first_machine_time_step"})
     def regenerate_data_specification(
             self, spec, placement, machine_time_step, time_scale_factor,
-            graph_mapper, routing_info, graph):
+            graph_mapper, routing_info, graph, first_machine_time_step):
         # pylint: disable=too-many-arguments, arguments-differ
 
         # reserve the neuron parameters data region
@@ -794,7 +827,8 @@ class SpikeSourcePoissonVertex(
             time_scale_factor=time_scale_factor)
 
         # write rates
-        self._write_poisson_rates(spec, vertex_slice, machine_time_step)
+        self._write_poisson_rates(spec, vertex_slice, machine_time_step,
+                                  first_machine_time_step)
 
         # end spec
         spec.end_specification()
@@ -831,9 +865,8 @@ class SpikeSourcePoissonVertex(
             n_values = struct.unpack_from("<I", byte_array, offset)[0]
             offset += 4
 
-            index = struct.unpack_from("<I", byte_array, offset)[0]
+            # Skip reading the index, as it will be recalculated on data write
             offset += 4
-            self.__data["index"].set_value_by_id(i, index)
 
             (_start, _end, _next, is_fast_source, exp_minus_lambda,
              sqrt_lambda, isi, time_to_next_spike) = _PoissonStruct.read_data(
@@ -869,18 +902,21 @@ class SpikeSourcePoissonVertex(
         "graph_mapper": "MemoryGraphMapper",
         "routing_info": "MemoryRoutingInfos",
         "data_n_time_steps": "DataNTimeSteps",
-        "graph": "MemoryMachineGraph"
+        "graph": "MemoryMachineGraph",
+        "first_machine_time_step": "FirstMachineTimeStep"
     })
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
         additional_arguments={
             "machine_time_step", "time_scale_factor", "graph_mapper",
-            "routing_info", "data_n_time_steps", "graph"
+            "routing_info", "data_n_time_steps", "graph",
+            "first_machine_time_step"
         }
     )
     def generate_data_specification(
             self, spec, placement, machine_time_step, time_scale_factor,
-            graph_mapper, routing_info, data_n_time_steps, graph):
+            graph_mapper, routing_info, data_n_time_steps, graph,
+            first_machine_time_step):
         # pylint: disable=too-many-arguments, arguments-differ
         self.__machine_time_step = machine_time_step
         vertex = placement.vertex
@@ -911,7 +947,8 @@ class SpikeSourcePoissonVertex(
             machine_time_step, time_scale_factor)
 
         # write rates
-        self._write_poisson_rates(spec, vertex_slice, machine_time_step)
+        self._write_poisson_rates(spec, vertex_slice, machine_time_step,
+                                  first_machine_time_step)
 
         # write profile data
         profile_utils.write_profile_region_data(

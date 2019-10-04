@@ -226,6 +226,7 @@ static inline uint32_t faster_spike_source_get_num_spikes(
     return (uint32_t) roundk(x * x, nbits);
 }
 
+#ifdef PRINT_SPIKE_SOURCES
 static void print_spike_source(index_t s) {
     spike_source_t *p = &source[s];
     log_info("atom %d", s);
@@ -237,6 +238,7 @@ static void print_spike_source(index_t s) {
     log_info("isi_val = %k", p->mean_isi_ticks);
     log_info("time_to_spike = %k", p->time_to_spike_ticks);
 }
+#endif
 
 static void print_spike_sources(void) {
 #ifdef PRINT_SPIKE_SOURCES
@@ -324,12 +326,6 @@ static bool read_rates(source_info *sdram_sources) {
 
         // Put the correct values into the current source information
         for (uint32_t i = 0; i < params.n_spike_sources; i++) {
-
-            // Skip forward until the time is correct
-            while (get_source_data(i)->next_ticks < time) {
-                source_data[i]->index++;
-            }
-            // Copy the data
             spin1_memcpy(&source[i], get_source_data(i), sizeof(spike_source_t));
         }
     }
