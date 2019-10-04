@@ -110,7 +110,8 @@ class SynapseDynamicsSTDP(
                 None, self.dendritic_delay_fraction,
                 synapse_dynamics.f_rew, synapse_dynamics.initial_weight,
                 synapse_dynamics.initial_delay, synapse_dynamics.s_max,
-                synapse_dynamics.seed, delay_autapses=self.delay_autapses)
+                synapse_dynamics.seed,
+                no_backprop_delay=self.no_backprop_delay)
 
         # Otherwise, it is static, so return ourselves
         return self
