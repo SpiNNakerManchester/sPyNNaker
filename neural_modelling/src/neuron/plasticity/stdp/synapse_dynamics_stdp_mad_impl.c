@@ -39,7 +39,7 @@ static uint32_t synapse_delay_index_type_bits;
 static uint32_t synapse_type_mask;
 
 typedef struct stdp_params {
-    uint32_t undelayed_autapses;
+    uint32_t no_backprop_delay;
 } stdp_params;
 
 static stdp_params params;
@@ -128,15 +128,11 @@ static inline final_state_t plasticity_update_synapse(
     //		   window_end_time, delay_dendritic);
 
     // Process events in post-synaptic window
-    uint32_t post_delay = delay_dendritic;
-    if (is_autapse) {
-        post_delay = 0;
-    }
     while (post_window.num_events > 0) {
-        const uint32_t delayed_post_time = *post_window.next_time + post_delay;
+        const uint32_t delayed_post_time = *post_window.next_time + delay_dendritic;
 
-        log_debug("\t\tApplying post-synaptic event at delayed time:%u\n",
-                delayed_post_time);
+        log_debug("\t\tApplying post-synaptic event at delayed time:%u, pre:%u\n",
+                delayed_post_time, delayed_last_pre_time);
 
         // Apply spike to state
         current_state = timing_apply_post_spike(
@@ -337,7 +333,7 @@ bool synapse_dynamics_process_plastic_synapses(
                 control_word, synapse_index_bits, synapse_type_mask);
         uint32_t index =
                 synapse_row_sparse_index(control_word, synapse_index_mask);
-        uint32_t is_self = self_connection && (pre_neuron_id == index);
+        uint32_t is_autapse = self_connection && (pre_neuron_id == index);
         uint32_t type_index = synapse_row_sparse_type_index(
                 control_word, synapse_type_index_mask);
 
@@ -351,10 +347,14 @@ bool synapse_dynamics_process_plastic_synapses(
                 synapse_type_index_bits);
 
         // Update the synapse state
+        uint32_t post_delay = delay_dendritic;
+        if (params.no_backprop_delay) {
+            post_delay = 0;
+        }
         final_state_t final_state = plasticity_update_synapse(
                 time, last_pre_time, last_pre_trace, event_history->prev_trace,
-                delay_dendritic, delay_axonal, current_state,
-                &post_event_history[index], is_self && params.undelayed_autapses);
+                post_delay, delay_axonal, current_state,
+                &post_event_history[index], is_autapse);
 
         // Add weight to ring-buffer entry
         // **NOTE** Dave suspects that this could be a

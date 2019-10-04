@@ -54,14 +54,14 @@ class SynapseDynamicsSTDP(
         "__weight",
         # Delay of connections formed by connector
         "__delay",
-        # Whether to delay autapses or not
-        "__delay_autapses"]
+        # Whether to use back-propagation delay or not
+        "__no_backprop_delay"]
 
     def __init__(
             self, timing_dependence=None, weight_dependence=None,
             voltage_dependence=None, dendritic_delay_fraction=1.0,
             weight=0.0, delay=1.0, pad_to_length=None,
-            delay_autapses=True):
+            no_backprop_delay=False):
         self.__timing_dependence = timing_dependence
         self.__weight_dependence = weight_dependence
         self.__dendritic_delay_fraction = float(dendritic_delay_fraction)
@@ -69,7 +69,7 @@ class SynapseDynamicsSTDP(
         self.__pad_to_length = pad_to_length
         self.__weight = weight
         self.__delay = delay
-        self.__delay_autapses = delay_autapses
+        self.__no_backprop_delay = no_backprop_delay
 
         if not (0.5 <= self.__dendritic_delay_fraction <= 1.0):
             raise NotImplementedError(
@@ -173,12 +173,12 @@ class SynapseDynamicsSTDP(
         self.__dendritic_delay_fraction = new_value
 
     @property
-    def delay_autapses(self):
-        return self.__delay_autapses
+    def no_backprop_delay(self):
+        return self.__no_backprop_delay
 
-    @delay_autapses.setter
-    def delay_autapses(self, delay_autapses):
-        self.__delay_autapses = delay_autapses
+    @no_backprop_delay.setter
+    def no_backprop_delay(self, no_backprop_delay):
+        self.__no_backprop_delay = no_backprop_delay
 
     def is_same_as(self, synapse_dynamics):
         # pylint: disable=protected-access
@@ -202,7 +202,7 @@ class SynapseDynamicsSTDP(
         return name
 
     def get_parameters_sdram_usage_in_bytes(self, n_neurons, n_synapse_types):
-        # 32-bits for control of autapses
+        # 32-bits for back-prop delay
         size = 4
         size += self.__timing_dependence.get_parameters_sdram_usage_in_bytes()
         size += self.__weight_dependence.get_parameters_sdram_usage_in_bytes(
@@ -215,8 +215,8 @@ class SynapseDynamicsSTDP(
         # Switch focus to the region:
         spec.switch_write_focus(region)
 
-        # Whether to *remove* delay from autapses (note opposite sense)
-        spec.write_value(int(not self.__delay_autapses))
+        # Whether to use back-prop delay
+        spec.write_value(int(self.__no_backprop_delay))
 
         # Write timing dependence parameters to region
         self.__timing_dependence.write_parameters(

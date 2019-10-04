@@ -48,7 +48,7 @@ typedef int16_t pre_trace_t;
 // Helper macros for looking up decays
 #define DECAY_LOOKUP_TAU_PLUS(time) \
     maths_lut_exponential_decay( \
-	        time, TAU_PLUS_TIME_SHIFT, TAU_PLUS_SIZE, tau_plus_lookup)
+            time, TAU_PLUS_TIME_SHIFT, TAU_PLUS_SIZE, tau_plus_lookup)
 #define DECAY_LOOKUP_TAU_MINUS(time) \
     maths_lut_exponential_decay( \
             time, TAU_MINUS_TIME_SHIFT, TAU_MINUS_SIZE, tau_minus_lookup)
@@ -118,18 +118,14 @@ static inline update_state_t timing_apply_pre_spike(
 
     // Get time of event relative to last post-synaptic event
     uint32_t time_since_last_post = time - last_post_time;
-    if (time_since_last_post > 0) {
-        int32_t decayed_o1 = STDP_FIXED_MUL_16X16(
-                last_post_trace, DECAY_LOOKUP_TAU_MINUS(time_since_last_post));
+    int32_t decayed_o1 = STDP_FIXED_MUL_16X16(
+            last_post_trace, DECAY_LOOKUP_TAU_MINUS(time_since_last_post));
 
-        log_debug("\t\t\ttime_since_last_post_event=%u, decayed_o1=%d\n",
-                time_since_last_post, decayed_o1);
+    log_debug("\t\t\ttime_since_last_post_event=%u, decayed_o1=%d\n",
+            time_since_last_post, decayed_o1);
 
-        // Apply depression to state (which is a weight_state)
-        return weight_one_term_apply_depression(previous_state, decayed_o1);
-    } else {
-        return previous_state;
-    }
+    // Apply depression to state (which is a weight_state)
+    return weight_one_term_apply_depression(previous_state, decayed_o1);
 }
 
 //---------------------------------------
