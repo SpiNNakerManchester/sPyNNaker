@@ -113,7 +113,7 @@ class SpikeInjectorVertex(
                 vertex.virtual_key
                 if vertex.virtual_key is not None
                 else 0,
-            local_timer_period_map[self])
+            local_timer_period_map)
 
     @overrides(AbstractSpikeRecordable.clear_spike_recording)
     def clear_spike_recording(self, buffer_manager, placements, graph_mapper):

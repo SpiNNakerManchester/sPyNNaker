@@ -618,12 +618,13 @@ class SpikeSourcePoissonVertex(
     def mark_regions_reloaded(self):
         self.__change_requires_neuron_parameters_reload = False
 
-    @inject_items({"local_time_step_map": "MachineTimeStepMap"})
     @overrides(
-        AbstractReadParametersBeforeSet.read_parameters_from_machine,
-        additional_arguments=["local_time_step_map"])
+        AbstractReadParametersBeforeSet.read_parameters_from_machine)
     def read_parameters_from_machine(
-            self, transceiver, placement, vertex_slice, local_time_step_map):
+            self, transceiver, placement, vertex_slice):
+
+        # get the default machine time step and set up accordingly
+        default_machine_time_step = get_simulator().default_machine_time_step
 
         # locate sdram address to where the neuron parameters are stored
         poisson_parameter_region_sdram_address = \
@@ -652,12 +653,11 @@ class SpikeSourcePoissonVertex(
 
         # Convert start values as timesteps into milliseconds
         self.__start[vertex_slice.as_slice] = self._convert_n_timesteps_to_ms(
-            start, local_time_step_map[placement.vertex])
+            start, default_machine_time_step)
 
         # Convert end values as timesteps to durations in milliseconds
         self.__duration[vertex_slice.as_slice] = (
-            self._convert_n_timesteps_to_ms(
-                end, local_time_step_map[placement.vertex]) -
+            self._convert_n_timesteps_to_ms(end, default_machine_time_step) -
             self.__start[vertex_slice.as_slice])
 
         # Work out the spikes per tick depending on if the source is
@@ -675,7 +675,7 @@ class SpikeSourcePoissonVertex(
         # Convert spikes per tick to rates
         self.__rate[vertex_slice.as_slice] = (
             spikes_per_tick * (MICROSECONDS_PER_SECOND / float(
-                local_time_step_map[placement.vertex])))
+                default_machine_time_step)))
 
         # Store the updated time until next spike so that it can be
         # rewritten when the parameters are loaded
