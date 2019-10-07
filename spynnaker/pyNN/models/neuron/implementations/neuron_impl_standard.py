@@ -36,7 +36,7 @@ class NeuronImplStandard(AbstractNeuronImpl):
         "__components"
     ]
 
-    _RECORDABLES = ["spikes", "v", "gsyn_exc", "gsyn_inh"]
+    _RECORDABLES = ["v", "gsyn_exc", "gsyn_inh"]
 
     _MATRIX_RECORDABLE_SCALAR_TYPES = {
         "v": DataType.S1615,
@@ -51,7 +51,6 @@ class NeuronImplStandard(AbstractNeuronImpl):
     }
 
     _RECORDABLE_UNITS = {
-        'spikes': 'spikes',
         'v': 'mV',
         'gsyn_exc': "uS",
         'gsyn_inh': "uS"}

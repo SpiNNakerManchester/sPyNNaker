@@ -87,9 +87,6 @@ static inline void neuron_recording_set_spike(
     bit_field_set(
         &neuron_recording_bit_field_values[recording_var_index]->out_spikes[0],
         index);
-    if (index != 6) {
-        log_info("setting spike for neuron %d goes to %d", neuron_index, index);
-    }
 }
 
 //! \brief does the recording matrix process of handing over to basic recording
