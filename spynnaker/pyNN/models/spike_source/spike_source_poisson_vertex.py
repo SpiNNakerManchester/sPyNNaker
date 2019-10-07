@@ -296,7 +296,7 @@ class SpikeSourcePoissonVertex(
 
         all_rates = list(_flatten(self.__data["rates"]))
         self.__max_rate = max_rate
-        if len(all_rates):
+        if max_rate is None and len(all_rates):
             self.__max_rate = numpy.amax(all_rates)
         elif max_rate is None:
             self.__max_rate = 0
