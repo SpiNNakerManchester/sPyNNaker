@@ -351,7 +351,6 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
             additional_input, voltage);
 
     // update neuron parameters
-    // APPARENTLY HERE WE ARE PASSING THE SOMA INPUT (?), BUT IN THE FUNCTIONS THEY ARE TREATED AS DENDRITE INPUTS!!!!!!
     state_t result = neuron_model_state_update(
             NUM_EXCITATORY_RECEPTORS, exc_input_values,
             NUM_INHIBITORY_RECEPTORS, inh_input_values,

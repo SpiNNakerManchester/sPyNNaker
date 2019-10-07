@@ -58,7 +58,7 @@ state_t neuron_model_state_update(
         // Get the soma input in nA
         //Isyn
         input_t soma_input_this_timestep =
-                exc_input[0] - inh_input[0] + neuron->I_offset;
+                exc_input[0] - inh_input[0] + neuron->I_offset; //ISN'T THIS Ileak???
 
         // Leaky conductance for the soma
         REAL g_L = 0.1k;
@@ -88,10 +88,10 @@ state_t neuron_model_state_update(
 
 void neuron_model_has_spiked(neuron_pointer_t neuron) {
     // reset membrane voltage
-    neuron->U_membrane = neuron->U_reset;
+    //neuron->U_membrane = neuron->U_reset;
 
     // reset refractory timer
-    neuron->refract_timer  = neuron->T_refract;
+    //neuron->refract_timer  = neuron->T_refract;
 }
 
 state_t neuron_model_get_membrane_voltage(neuron_pointer_t neuron) {
