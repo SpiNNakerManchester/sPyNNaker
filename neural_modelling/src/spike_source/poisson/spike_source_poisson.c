@@ -266,8 +266,6 @@ static bool read_global_parameters(global_parameters *sdram_globals) {
             params.spike_source_seed[2],
             params.spike_source_seed[3]);
 
-    validate_mars_kiss64_seed(params.spike_source_seed);
-
     log_info("\tspike sources = %u, starting at %u",
             params.n_spike_sources, params.first_source_id);
     log_info("seconds_per_tick = %k\n", (REAL) params.seconds_per_tick);
@@ -326,7 +324,12 @@ static bool read_rates(source_info *sdram_sources) {
 
         // Put the correct values into the current source information
         for (uint32_t i = 0; i < params.n_spike_sources; i++) {
-            spin1_memcpy(&source[i], get_source_data(i), sizeof(spike_source_t));
+            spike_source_t *p = &source[i];
+            spin1_memcpy(p, get_source_data(i), sizeof(spike_source_t));
+            if (!p->is_fast_source && p->time_to_spike_ticks == 0) {
+                p->time_to_spike_ticks =
+                        slow_spike_source_get_time_to_spike(p->mean_isi_ticks);
+            }
         }
     }
     log_info("read_poisson_parameters: completed successfully");

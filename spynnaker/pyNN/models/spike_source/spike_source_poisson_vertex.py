@@ -51,6 +51,7 @@ from spynnaker.pyNN.models.abstract_models import (
 from spynnaker.pyNN.models.neuron.implementations import Struct
 from .spike_source_poisson_machine_vertex import (
     SpikeSourcePoissonMachineVertex)
+from spynnaker.pyNN.utilities.utility_calls import validate_mars_kiss_64_seed
 from spynnaker.pyNN.utilities.ranged.spynnaker_ranged_dict \
     import SpynnakerRangeDictionary
 from spynnaker.pyNN.utilities.ranged.spynnaker_ranged_list \
@@ -66,6 +67,10 @@ logger = logging.getLogger(__name__)
 # mars_kiss64_seed_t (uint[4]) spike_source_seed;
 PARAMS_BASE_WORDS = 15
 
+# Seed offset in parameters and size on bytes
+SEED_OFFSET_BYTES = 11 * 4
+SEED_SIZE_BYTES = 4 * 4
+
 # uint32_t n_rates; uint32_t index
 PARAMS_WORDS_PER_NEURON = 2
 
@@ -73,7 +78,6 @@ PARAMS_WORDS_PER_NEURON = 2
 # sqrt_lambda, isi_val, time_to_spike
 PARAMS_WORDS_PER_RATE = 8
 
-START_OF_POISSON_GENERATOR_PARAMETERS = PARAMS_BASE_WORDS * 4
 MICROSECONDS_PER_SECOND = 1000000.0
 MICROSECONDS_PER_MILLISECOND = 1000.0
 SLOW_RATE_PER_TICK_CUTOFF = 0.01  # as suggested by MH (between Exp and Knuth)
@@ -656,9 +660,9 @@ class SpikeSourcePoissonVertex(
         if kiss_key not in self.__kiss_seed:
             if self.__rng is None:
                 self.__rng = numpy.random.RandomState(self.__seed)
-            self.__kiss_seed[kiss_key] = [
+            self.__kiss_seed[kiss_key] = validate_mars_kiss_64_seed([
                 self.__rng.randint(-0x80000000, 0x7FFFFFFF) + 0x80000000
-                for _ in range(4)]
+                for _ in range(4)])
         for value in self.__kiss_seed[kiss_key]:
             spec.write_value(data=value)
 
@@ -834,10 +838,13 @@ class SpikeSourcePoissonVertex(
         # end spec
         spec.end_specification()
 
+    @inject_items({"first_machine_time_step": "FirstMachineTimeStep"})
     @overrides(AbstractRewritesDataSpecification
-               .requires_memory_regions_to_be_reloaded)
-    def requires_memory_regions_to_be_reloaded(self):
-        return self.__change_requires_neuron_parameters_reload
+               .requires_memory_regions_to_be_reloaded,
+               additional_arguments={"first_machine_time_step"})
+    def requires_memory_regions_to_be_reloaded(self, first_machine_time_step):
+        return (self.__change_requires_neuron_parameters_reload or
+                first_machine_time_step == 0)
 
     @overrides(AbstractRewritesDataSpecification.mark_regions_reloaded)
     def mark_regions_reloaded(self):
@@ -847,7 +854,17 @@ class SpikeSourcePoissonVertex(
     def read_parameters_from_machine(
             self, transceiver, placement, vertex_slice):
 
-        # locate SDRAM address to where the neuron parameters are stored
+        # locate SDRAM address where parameters are stored
+        poisson_params = \
+            helpful_functions.locate_memory_region_for_placement(
+                placement, _REGIONS.POISSON_PARAMS_REGION.value, transceiver)
+        seed_array = transceiver.read_memory(
+            placement.x, placement.y, poisson_params + SEED_OFFSET_BYTES,
+            SEED_SIZE_BYTES)
+        kiss_key = (vertex_slice.lo_atom, vertex_slice.hi_atom)
+        self.__kiss_seed[kiss_key] = struct.unpack_from("<4I", seed_array)
+
+        # locate SDRAM address where the rates are stored
         poisson_rate_region_sdram_address = \
             helpful_functions.locate_memory_region_for_placement(
                 placement, _REGIONS.RATES_REGION.value, transceiver)
