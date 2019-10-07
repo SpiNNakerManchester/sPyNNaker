@@ -580,7 +580,7 @@ class SpikeSourcePoissonVertex(
         return 0
 
     @inject_items({
-        "machine_time_step": "MachineTimeStep",
+        "machine_time_step": "DefaultMachineTimeStep",
         "time_scale_factor": "TimeScaleFactor",
         "graph_mapper": "MemoryGraphMapper",
         "routing_info": "MemoryRoutingInfos",

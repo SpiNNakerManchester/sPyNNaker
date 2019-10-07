@@ -67,7 +67,7 @@ class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
     def has_variable(self, variable):
         return variable in UNITS
 
-    @inject_items({"ts": "MachineTimeStep"})
+    @inject_items({"ts": "DefaultMachineTimeStep"})
     @overrides(AbstractAdditionalInput.get_values, additional_arguments={'ts'})
     def get_values(self, parameters, state_variables, vertex_slice, ts):
 
