@@ -66,9 +66,6 @@ class NeuronRecorder(object):
     # how many time steps to wait between recordings
     N_BYTES_PER_RATE = DataType.UINT32.size  # uint32
 
-    # the enum type for the state struct
-    N_BYTES_PER_ENUM = DataType.UINT32.size
-
     # size of a index in terms of position into recording array
     N_BYTES_PER_INDEX = DataType.UINT8.size  # currently uint8
 
@@ -585,12 +582,11 @@ class NeuronRecorder(object):
 
     def get_sdram_usage_in_bytes(self, vertex_slice):
         n_words_for_n_neurons = int(math.ceil(
-            vertex_slice.n_atoms // constants.WORD_TO_BYTE_MULTIPLIER))
+            vertex_slice.n_atoms / constants.WORD_TO_BYTE_MULTIPLIER))
         n_bytes_for_n_neurons = (
             n_words_for_n_neurons * constants.WORD_TO_BYTE_MULTIPLIER)
         return ((self.N_BYTES_PER_RATE + self.N_BYTES_PER_SIZE +
-                 self.N_BYTES_PER_ENUM + n_bytes_for_n_neurons) *
-                len(self.__sampling_rates))
+                 n_bytes_for_n_neurons) * len(self.__sampling_rates))
 
     def _get_fixed_sdram_usage(self, vertex_slice):
         total_neurons = vertex_slice.hi_atom - vertex_slice.lo_atom + 1
