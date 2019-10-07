@@ -55,13 +55,18 @@ class NeuronModelStoreRecallReadout(AbstractNeuronModel):
         "_rate_update_threshold",
         "_prob_command",
         "_rate_on",
-        "_rate_off"
+        "_rate_off",
+        "_mean_0",
+        "_mean_1",
+        "_cross_entropy",
+        "_poisson_key",
+        "_poisson_pop_size"
         ]
 
     def __init__(
             self, v_init, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac,
             mean_isi_ticks, time_to_spike_ticks, rate_update_threshold,
-            prob_command, rate_on, rate_off):
+            prob_command, rate_on, rate_off, poisson_pop_size):
 
         global_data_types=[
                     DataType.UINT32,  # MARS KISS seed
@@ -69,7 +74,14 @@ class NeuronModelStoreRecallReadout(AbstractNeuronModel):
                     DataType.UINT32,  # MARS KISS seed
                     DataType.UINT32,  # MARS KISS seed
                     DataType.S1615,    # ticks_per_second
-                    DataType.S1615    # global mem pot
+                    DataType.S1615,    # global mem pot
+                    DataType.S1615,    # global mem pot 2
+                    DataType.S1615,    # rate on
+                    DataType.S1615,    # rate off
+                    DataType.S1615,    # mean 0 activation
+                    DataType.S1615,    # mean 0 activation
+                    DataType.S1615,    # cross entropy
+                    DataType.UINT32   # poisson key
                     ]
         global_data_types.extend([DataType.S1615 for i in range(1024)])
 
@@ -112,6 +124,14 @@ class NeuronModelStoreRecallReadout(AbstractNeuronModel):
         self._prob_command = prob_command
         self._rate_off = rate_off
         self._rate_on = rate_on
+        self._mean_0 = 0.0
+        self._mean_1 = 0.0
+        self._cross_entropy = 0.0
+        self._poisson_key = None
+        self._poisson_pop_size = poisson_pop_size
+
+    def set_poisson_key(self, p_key):
+        self._poisson_key = p_key
 
     @overrides(AbstractNeuronModel.get_n_cpu_cycles)
     def get_n_cpu_cycles(self, n_neurons):
@@ -209,6 +229,7 @@ class NeuronModelStoreRecallReadout(AbstractNeuronModel):
                 4, # seed 4
                 MICROSECONDS_PER_SECOND / float(machine_time_step), # ticks_per_second
                 0.0, # set to 0, as will be set in first timestep of model anyway
+                0.0, # set to 0, as will be set in first timestep of model anyway
                 ]
 
 #         target_data = []
@@ -222,6 +243,11 @@ class NeuronModelStoreRecallReadout(AbstractNeuronModel):
         vals.extend(self._prob_command)
         vals.extend(self._rate_on)
         vals.extend(self._rate_off)
+        vals.extend(self._mean_0)
+        vals.extend(self._mean_1)
+        vals.extend(self._cross_entropy)
+        vals.extend(self._poisson_key)
+        vals.extend(self._poisson_pop_size)
         return vals
 
     @property

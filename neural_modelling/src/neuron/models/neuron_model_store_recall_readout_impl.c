@@ -1,4 +1,4 @@
-#include "neuron_model_lif_poisson_readout_impl.h"
+#include "neuron_model_store_recall_readout_impl.h"
 
 #include <debug.h>
 

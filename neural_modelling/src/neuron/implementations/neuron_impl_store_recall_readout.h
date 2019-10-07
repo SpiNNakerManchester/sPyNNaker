@@ -4,19 +4,20 @@
 #include "neuron_impl.h"
 
 // Includes for model parts used in this implementation
-#include <neuron/synapse_types/synapse_types_erbp_impl.h>
-#include <neuron/models/neuron_model_lif_poisson_readout_impl.h>
+#include <neuron/synapse_types/synapse_types_exponential_impl.h>
+#include <neuron/models/neuron_model_store_recall_readout_impl.h>
 #include <neuron/input_types/input_type_current.h>
 #include <neuron/additional_inputs/additional_input_none_impl.h>
 #include <neuron/threshold_types/threshold_type_static.h>
 
 // Further includes
 #include <common/out_spikes.h>
-#include <common/math-util.h>
+#include <common/maths-util.h>
 #include <recording.h>
 #include <debug.h>
 #include <random.h>
-#include "random.h"
+//#include "random.h"
+#include <log.h>
 
 #define V_RECORDING_INDEX 0
 #define GSYN_EXCITATORY_RECORDING_INDEX 1
@@ -57,7 +58,16 @@ static uint32_t timer = 0;
 static uint32_t target_ind = 0;
 
 // Store recall parameters
-uint32_t store_recall_state = 0; // 0: idle, 1: storing, 2:stored, 3:recall
+typedef enum
+{
+    STATE_IDLE,
+    STATE_STORING,
+    STATE_STORED,
+    STATE_RECALL,
+    STATE_SHIFT,
+} current_state_t;
+
+uint32_t store_recall_state = STATE_IDLE; // 0: idle, 1: storing, 2:stored, 3:recall
 uint32_t stored_value = 0;
 uint32_t broacast_value = 0;
 REAL ticks_for_mean = 0;
@@ -127,10 +137,10 @@ static bool neuron_impl_initialise(uint32_t n_neurons) {
     }
 
     // Seed the random input
-    validate_mars_kiss64_seed(kiss_seed);
+    validate_mars_kiss64_seed(global_parameters->kiss_seed);
 
     // Initialise pointers to Neuron parameters in STDP code
-    synapse_dynamics_set_neuron_array(neuron_array);
+//    synapse_dynamics_set_neuron_array(neuron_array);
     log_info("set pointer to neuron array in stdp code");
 
     return true;
@@ -183,14 +193,18 @@ static void neuron_impl_load_neuron_parameters(
     neuron_model_set_global_neuron_params(global_parameters);
 
     io_printf(IO_BUF, "\nPrinting global params\n");
-    io_printf(IO_BUF, "seed 1: %u \n", global_parameters->spike_source_seed[0]);
-    io_printf(IO_BUF, "seed 2: %u \n", global_parameters->spike_source_seed[1]);
-    io_printf(IO_BUF, "seed 3: %u \n", global_parameters->spike_source_seed[2]);
-    io_printf(IO_BUF, "seed 4: %u \n", global_parameters->spike_source_seed[3]);
+    io_printf(IO_BUF, "seed 1: %u \n", global_parameters->kiss_seed[0]);
+    io_printf(IO_BUF, "seed 2: %u \n", global_parameters->kiss_seed[1]);
+    io_printf(IO_BUF, "seed 3: %u \n", global_parameters->kiss_seed[2]);
+    io_printf(IO_BUF, "seed 4: %u \n", global_parameters->kiss_seed[3]);
     io_printf(IO_BUF, "ticks_per_second: %k \n\n", global_parameters->ticks_per_second);
     io_printf(IO_BUF, "prob_command: %k \n\n", global_parameters->prob_command);
     io_printf(IO_BUF, "rate on: %k \n\n", global_parameters->rate_on);
     io_printf(IO_BUF, "rate off: %k \n\n", global_parameters->rate_off);
+    io_printf(IO_BUF, "mean 0: %k \n\n", global_parameters->mean_0);
+    io_printf(IO_BUF, "mean 1: %k \n\n", global_parameters->mean_1);
+    io_printf(IO_BUF, "poisson key: %k \n\n", global_parameters->p_key);
+    io_printf(IO_BUF, "poisson pop size: %k \n\n", global_parameters->p_pop_size);
 
 
     for (index_t n = 0; n < n_neurons; n++) {
@@ -221,23 +235,38 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     // Change broadcasted value and state with probability
     // State - 0: idle, 1: storing, 2:stored-idle, 3:recall
     if (timer % 200 == 0){
-        if (store_recall_state == 3 || store_recall_state == 1){
-            store_recall_state = (store_recall_state + 1) % 4;
+        if (store_recall_state == STATE_RECALL || store_recall_state == STATE_STORING){
+            store_recall_state = (store_recall_state + 1) % STATE_SHIFT;
         }
         else{
-            REAL random_number = (REAL)(mars_kiss64_seed(global_parameters->spike_source_seed) / (REAL)0xffffffff);
+            REAL random_number = (REAL)(mars_kiss64_seed(global_parameters->kiss_seed) / (REAL)0xffffffff);
             if (random_number < global_parameters->prob_command){
-                store_recall_state = (store_recall_state + 1) % 4;
+                store_recall_state = (store_recall_state + 1) % STATE_SHIFT;
             }
         }
-        REAL switch_value = (REAL)(mars_kiss64_seed(global_parameters->spike_source_seed) / (REAL)0xffffffff);
+        REAL switch_value = (REAL)(mars_kiss64_seed(global_parameters->kiss_seed) / (REAL)0xffffffff);
         if (switch_value < 0.5){
             broacast_value = (broacast_value + 1) % 2;
         }
-        if (store_recall_state == 1){
+        if (store_recall_state == STATE_STORING){
             stored_value = broacast_value;
         }
         // send packets to the variable poissons with the updated states
+        for (int i = 0; i < 4; i++){
+            REAL payload = 10;
+            if ((broacast_value == i && i < 2) ||
+                (i == 2 && store_recall_state == STATE_STORING) ||
+                (i == 3 && store_recall_state == STATE_RECALL)){
+                payload = global_parameters->rate_on;
+            }
+            else {
+                payload = global_parameters->rate_off;
+            }
+            for (int j = i*global_parameters->p_pop_size;
+                    j < i*global_parameters->p_pop_size + global_parameters->p_pop_size; j++){
+                spin1_send_mc_packet(global_parameters->p_key | j, payload, WITH_PAYLOAD);
+            }
+        }
     }
 
     // Get the input_type parameters and voltage for this neuron
@@ -290,26 +319,26 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     		additional_input, voltage);
 
     // If during recall calculate error
-    if (neuron_index == 2 && store_recall_state == 3){
+    if (neuron_index == 2 && store_recall_state == STATE_RECALL){
         ticks_for_mean += 1;
         // Softmax of the exc and inh inputs representing 1 and 0 respectively
         // may need to scale to stop huge numbers going in the exp
         global_parameters->mean_0 += global_parameters->readout_V_0;
         global_parameters->mean_1 += global_parameters->readout_V_1;
-        accum exp_0 = exp(global_parameters->mean_0 / ticks_for_mean);
-        accum exp_1 = exp(global_parameters->mean_1 / ticks_for_mean);
+        accum exp_0 = expk(global_parameters->mean_0 / ticks_for_mean);
+        accum exp_1 = expk(global_parameters->mean_1 / ticks_for_mean);
         accum softmax_0 = exp_0 / (exp_1 + exp_0);
         accum softmax_1 = exp_1 / (exp_1 + exp_0);
         // What to do if log(0)?
         if (stored_value){
-            global_parameters->cross_entropy = -log(softmax_1);
+            global_parameters->cross_entropy = -logk(softmax_1);
         }
         else{
-            global_parameters->cross_entropy = -log(softmax_0);
+            global_parameters->cross_entropy = -logk(softmax_0);
         }
     }
     // Reset values after recall
-    if (store_recall_state == 0){
+    if (store_recall_state == STATE_IDLE){
         ticks_for_mean = 0;
         global_parameters->mean_0 == 0;
         global_parameters->mean_1 == 0;
@@ -342,6 +371,9 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
     	recorded_variable_values[V_RECORDING_INDEX] = stored_value;
     	// Switched to always broadcasting error but with packet
+    	if (store_recall_state == STATE_RECALL){
+    	    // Broadcast error
+    	}
 
     } else if (neuron_index == 3){ // this is the deprecated
 

@@ -23,12 +23,12 @@ class StoreRecallReadout(AbstractPyNNNeuronModelStandard):
             tau_syn_E=5.0, tau_syn_E2=5.0, tau_syn_I=5.0, tau_syn_I2=5.0,
             mean_isi_ticks=65000, time_to_spike_ticks=65000,
             i_offset=0.0, v=50, rate_update_threshold=0.25,
-            prob_command=1./6., rate_on=50, rate_off=0):
+            prob_command=1./6., rate_on=50, rate_off=0, poisson_pop_size=25):
         # pylint: disable=too-many-arguments, too-many-locals
         neuron_model = NeuronModelStoreRecallReadout(
             v, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac,
             mean_isi_ticks, time_to_spike_ticks, rate_update_threshold,
-            prob_command, rate_on, rate_off)
+            prob_command, rate_on, rate_off, poisson_pop_size)
         synapse_type = SynapseTypeEPropAdaptive(
             tau_syn_E, tau_syn_E2, tau_syn_I, tau_syn_I2,
             isyn_exc, isyn_exc2, isyn_inh, isyn_inh2)

@@ -51,7 +51,7 @@ typedef struct neuron_t {
 } neuron_t;
 
 typedef struct global_neuron_params_t {
- 	mars_kiss64_seed_t spike_source_seed; // array of 4 values
+ 	mars_kiss64_seed_t kiss_seed; // array of 4 values
 	REAL ticks_per_second;
 	REAL readout_V_0;
 	REAL readout_V_1;
@@ -61,6 +61,8 @@ typedef struct global_neuron_params_t {
 	REAL mean_0;
 	REAL mean_1;
 	REAL cross_entropy;
+	uint32_t p_key;
+	REAL p_pop_size;
 } global_neuron_params_t;
 
 #endif // _NEURON_MODEL_LIF_CURR_POISSON_READOUT_IMPL_H_

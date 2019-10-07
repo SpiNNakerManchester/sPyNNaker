@@ -27,7 +27,7 @@ from spinn_front_end_common.abstract_models import (
     AbstractChangableAfterRun, AbstractProvidesIncomingPartitionConstraints,
     AbstractProvidesOutgoingPartitionConstraints, AbstractHasAssociatedBinary,
     AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification,
-    AbstractCanReset)
+    AbstractCanReset, AbstractProvidesNKeysForPartition)
 from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl)
 from spinn_front_end_common.utilities import (
@@ -77,7 +77,7 @@ class AbstractPopulationVertex(
         AbstractChangableAfterRun,
         AbstractRewritesDataSpecification, AbstractReadParametersBeforeSet,
         AbstractAcceptsIncomingSynapses, ProvidesKeyToAtomMappingImpl,
-        AbstractCanReset):
+        AbstractCanReset, AbstractProvidesNKeysForPartition):
     """ Underlying vertex model for Neural Populations.
     """
     __slots__ = [
@@ -499,6 +499,12 @@ class AbstractPopulationVertex(
         key = routing_info.get_first_key_from_pre_vertex(
             vertex, constants.SPIKE_PARTITION_ID)
 
+        # Get the poisson key
+        p_key = routing_info.get_first_key_from_pre_vertex(
+            vertex, constants.LIVE_POISSON_CONTROL_PARTITION_ID)
+        if hasattr(self.__neuron_impl, "set_poisson_key"):
+            self.__neuron_impl.set_poisson_key(p_key)
+
         # Write the setup region
         spec.switch_write_focus(
             constants.POPULATION_BASED_REGIONS.SYSTEM.value)
@@ -882,3 +888,13 @@ class AbstractPopulationVertex(
         if self.__synapse_manager.synapse_dynamics.changes_during_run:
             self.__change_requires_data_generation = True
             self.__change_requires_neuron_parameters_reload = False
+
+    def get_n_keys_for_partition(self, partition, graph_mapper):
+        if partition.identifier == constants.LIVE_POISSON_CONTROL_PARTITION_ID:
+            n_keys = 0
+            for edge in partition.edges:
+                slice = graph_mapper.get_slice(edge.post_vertex)
+                n_keys += slice.n_atoms
+            return n_keys
+        else:
+            return self.n_atoms
