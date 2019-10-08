@@ -89,7 +89,7 @@ bool neuron_reload_neuron_parameters(address_t address) { // EXPORTED
 bool neuron_initialise(address_t address, uint32_t *n_neurons_value, // EXPORTED
         uint32_t *n_synapse_types_value, uint32_t *incoming_spike_buffer_size,
         uint32_t *timer_offset) {
-    log_debug("neuron_initialise: starting");
+    log_info("neuron_initialise: starting");
     struct neuron_parameters *params = (void *) address;
 
     *timer_offset = params->timer_start_offset;
