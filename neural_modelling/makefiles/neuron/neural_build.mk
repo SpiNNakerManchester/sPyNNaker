@@ -205,10 +205,10 @@ endif
 NEURON_O := $(BUILD_DIR)$(NEURON_MAIN:%.c=%.o)
 
 # List all the sources relative to one of SOURCE_DIRS
-SOURCES = common/out_spikes.c \
-          neuron/c_main.c \
+SOURCES = neuron/c_main.c \
           neuron/synapses.c \
           $(NEURON_MAIN) \
+          neuron/neuron_recording.c \
           neuron/spike_processing.c \
           neuron/population_table/population_table_$(POPULATION_TABLE_IMPL)_impl.c \
           $(NEURON_MODEL) $(SYNAPSE_DYNAMICS) $(WEIGHT_DEPENDENCE) \
