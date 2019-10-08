@@ -219,6 +219,6 @@ class SynapseDynamicsStructuralSTDP(
 
     @overrides(SynapseDynamicsSTDP.get_weight_maximum)
     def get_weight_maximum(self, connector, weights):
-        w_max = super(SynapseDynamicsStructuralSTDP, self).get_weight_mean(
+        w_max = super(SynapseDynamicsStructuralSTDP, self).get_weight_maximum(
             connector, weights)
         return max(w_max, self.__common_sp.initial_weight)
