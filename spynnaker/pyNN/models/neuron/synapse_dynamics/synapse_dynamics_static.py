@@ -134,7 +134,7 @@ class SynapseDynamicsStatic(
             [numpy.repeat(i, ff_size[i]) for i in range(len(ff_size))])
         connections["target"] = (
             (data & neuron_id_mask) + post_vertex_slice.lo_atom)
-        connections["weight"] = (data >> 16) & 0xFFFF
+        connections["weight"] = ((data >> 16) & 0xFFFF).astype("int16")
         connections["delay"] = (data >> (n_neuron_id_bits +
                                          n_synapse_type_bits)) & 0xF
         connections["delay"][connections["delay"] == 0] = 16
