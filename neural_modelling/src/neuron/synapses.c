@@ -178,7 +178,9 @@ static inline void process_fixed_synapses(
                 synapse_row_sparse_delay(synaptic_word, synapse_type_index_bits);
         uint32_t combined_synapse_neuron_index = synapse_row_sparse_type_index(
                 synaptic_word, synapse_type_index_mask);
-        uint32_t weight = synapse_row_sparse_weight(synaptic_word);
+        int32_t weight = synapse_row_sparse_weight(synaptic_word);
+
+        io_printf(IO_BUF, "signed w: %d \n", weight);
 
         // Convert into ring buffer offset
         uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
@@ -186,17 +188,17 @@ static inline void process_fixed_synapses(
                 synapse_type_index_bits);
 
         // Add weight to current ring buffer value
-        uint32_t accumulation = ring_buffers[ring_buffer_index] + weight;
+        int32_t accumulation = ring_buffers[ring_buffer_index] + weight;
 
         // If 17th bit is set, saturate accumulator at UINT16_MAX (0xFFFF)
         // **NOTE** 0x10000 can be expressed as an ARM literal,
         //          but 0xFFFF cannot.  Therefore, we use (0x10000 - 1)
         //          to obtain this value
-        uint32_t sat_test = accumulation & 0x10000;
-        if (sat_test) {
-            accumulation = sat_test - 1;
-            saturation_count++;
-        }
+//        uint32_t sat_test = accumulation & 0x10000;
+//        if (sat_test) {
+//            accumulation = sat_test - 1;
+//            saturation_count++;
+//        }
 
         // Store saturated value back in ring-buffer
         ring_buffers[ring_buffer_index] = accumulation;

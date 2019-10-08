@@ -58,15 +58,23 @@
 //! the mask for the synapse delay in the row
 #define SYNAPSE_DELAY_MASK      ((1 << SYNAPSE_DELAY_BITS) - 1)
 
+#define SYNAPSE_WEIGHTS_SIGNED true
+
+
+
 // Define the type of the weights
 #ifdef SYNAPSE_WEIGHTS_SIGNED
 typedef __int_t(SYNAPSE_WEIGHT_BITS) weight_t;
 #else
+io_printf(IO_BUF, "Using signed weights!! \n ");
 typedef __uint_t(SYNAPSE_WEIGHT_BITS) weight_t;
 #endif
 typedef uint16_t control_t;
 
 #define N_SYNAPSE_ROW_HEADER_WORDS 3
+
+
+
 
 
 // The data structure layout supported by this API is designed for

@@ -314,7 +314,9 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     		global_parameters->core_pop_rate;
 
     // Record B
-    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = B_t; // threshold_type->B;
+    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
+    		//B_t; // threshold_type->B;
+    		total_exc; // total synaptic input from input layer
     // *********************************************************
 
 
