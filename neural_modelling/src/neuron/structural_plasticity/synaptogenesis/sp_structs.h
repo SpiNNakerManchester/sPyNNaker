@@ -162,10 +162,10 @@ static inline bool sp_structs_remove_synapse(
 
 static inline bool sp_structs_add_synapse(
         current_state_t *current_state, address_t row) {
-    int appr_scaled_weight = current_state->pre_population_info->weight;
+    uint32_t appr_scaled_weight = current_state->pre_population_info->weight;
 
-    uint actual_delay;
-    int offset = current_state->pre_population_info->delay_hi -
+    uint32_t actual_delay;
+    uint32_t offset = current_state->pre_population_info->delay_hi -
             current_state->pre_population_info->delay_lo;
     actual_delay = ulrbits(mars_kiss64_seed(*(current_state->local_seed))) *
         offset + current_state->pre_population_info->delay_lo;

@@ -389,26 +389,23 @@ class SynapseDynamicsSTDP(
         connections["delay"][connections["delay"] == 0] = 16
         return connections
 
+    @overrides(AbstractPlasticSynapseDynamics.get_weight_mean)
     def get_weight_mean(self, connector, weights):
-        # pylint: disable=too-many-arguments
+        return self.get_weight_maximum(connector, weights)
 
-        # Because the weights could all be changed to the maximum, the mean
-        # has to be given as the maximum for scaling
-        return self.__weight_dependence.weight_maximum
-
+    @overrides(AbstractPlasticSynapseDynamics.get_weight_variance)
     def get_weight_variance(self, connector, weights):
-        # pylint: disable=too-many-arguments
-
         # Because the weights could all be changed to the maximum, the variance
         # has to be given as no variance
         return 0.0
 
+    @overrides(AbstractPlasticSynapseDynamics.get_weight_maximum)
     def get_weight_maximum(self, connector, weights):
-        # pylint: disable=too-many-arguments
-
+        w_max = super(SynapseDynamicsSTDP, self).get_weight_maximum(
+            connector, weights)
         # The maximum weight is the largest that it could be set to from
         # the weight dependence
-        return self.__weight_dependence.weight_maximum
+        return max(w_max, self.__weight_dependence.weight_maximum)
 
     def get_provenance_data(self, pre_population_label, post_population_label):
         prov_data = list()

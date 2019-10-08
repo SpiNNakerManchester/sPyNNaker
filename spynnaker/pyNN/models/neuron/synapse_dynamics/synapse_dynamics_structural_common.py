@@ -310,8 +310,8 @@ class SynapseDynamicsStructuralCommon(object):
                 spec.write_value(dynamics.initial_delay,
                                  data_type=DataType.UINT16)
             # Weight
-            spec.write_value(dynamics.initial_weight *
-                             weight_scales[synapse_info.synapse_type])
+            spec.write_value(round(dynamics.initial_weight *
+                                   weight_scales[synapse_info.synapse_type]))
             # Connection type
             spec.write_value(synapse_info.synapse_type)
             # Total number of atoms in pre-vertex

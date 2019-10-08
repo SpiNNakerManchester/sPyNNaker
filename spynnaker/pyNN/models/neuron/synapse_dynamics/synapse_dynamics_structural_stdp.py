@@ -212,3 +212,13 @@ class SynapseDynamicsStructuralSTDP(
     @overrides(AbstractSynapseDynamicsStructural.elimination)
     def elimination(self):
         return self.__common_sp.elimination
+
+    @overrides(SynapseDynamicsSTDP.get_weight_mean)
+    def get_weight_mean(self, connector, weights):
+        return self.get_weight_maximum(connector, weights)
+
+    @overrides(SynapseDynamicsSTDP.get_weight_maximum)
+    def get_weight_maximum(self, connector, weights):
+        w_max = super(SynapseDynamicsStructuralSTDP, self).get_weight_mean(
+            connector, weights)
+        return max(w_max, self.__common_sp.initial_weight)
