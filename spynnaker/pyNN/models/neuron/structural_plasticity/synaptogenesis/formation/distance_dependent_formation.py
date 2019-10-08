@@ -97,7 +97,7 @@ class DistanceDependentFormation(AbstractFormation):
                 euclidian_distances[row, column] = self.distance(
                     pre, post, type='euclidian')
         largest_squared_distance = numpy.max(euclidian_distances ** 2)
-        squared_distances = numpy.arange(largest_squared_distance)
+        squared_distances = numpy.arange(largest_squared_distance + 1)
         raw_probabilities = probability * (
             numpy.exp(-squared_distances / (2 * sigma ** 2)))
         quantised_probabilities = raw_probabilities * ((2 ** 16) - 1)
