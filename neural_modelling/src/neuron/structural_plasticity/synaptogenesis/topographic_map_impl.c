@@ -116,12 +116,16 @@ address_t synaptogenesis_dynamics_initialise(address_t sdram_sp_address) {
     if (rewiring_data.fast) {
         n_states = rewiring_data.p_rew;
     }
-    current_state_queue = circular_buffer_initialize(n_states);
+    log_info("Rewiring period %u, fast=%u, n_states=%u",
+            rewiring_data.p_rew, rewiring_data.fast, n_states);
+    // Add one to number of states as buffer wastes an entry
+    current_state_queue = circular_buffer_initialize(n_states + 1);
     if (current_state_queue == NULL) {
         log_error("Could not allocate current state queue");
         rt_error(RTE_SWERR);
     }
-    free_states = circular_buffer_initialize(n_states);
+    // Add one to number of states as buffer wastes an entry
+    free_states = circular_buffer_initialize(n_states + 1);
     if (free_states == NULL) {
         log_error("Could not allocate free state queue");
     }
@@ -131,7 +135,10 @@ address_t synaptogenesis_dynamics_initialise(address_t sdram_sp_address) {
         rt_error(RTE_SWERR);
     }
     for (uint32_t i = 0; i < n_states; i++) {
-        circular_buffer_add(free_states, (uint32_t) &states[i]);
+        if (!circular_buffer_add(free_states, (uint32_t) &states[i])) {
+            log_error("Could not add state %u to free states", i);
+            rt_error(RTE_SWERR);
+        }
     }
 
     partner_init(&data);
