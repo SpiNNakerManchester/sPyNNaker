@@ -195,11 +195,18 @@ SYNAPTOGENESIS_DYNAMICS_O := $(BUILD_DIR)$(SYNAPTOGENESIS_DYNAMICS:%.c=%.o)
 
 OTHER_SOURCES_CONVERTED := $(call strip_source_dirs,$(OTHER_SOURCES))
 
+ifndef NEURON_C
+    NEURON_C = neuron/neuron.c
+#else
+#    NEURON_C := $(call replace_source_dirs,$(NEURON_C))
+#    NEURON_O := $(BUILD_DIR)$(NEURON_C:%.c=%.o)
+endif
+
 # List all the sources relative to one of SOURCE_DIRS
 SOURCES = common/out_spikes.c \
           neuron/c_main.c \
           neuron/synapses.c \
-          neuron/neuron.c \
+          $(NEURON_C) \
           neuron/spike_processing.c \
           neuron/population_table/population_table_$(POPULATION_TABLE_IMPL)_impl.c \
           $(NEURON_MODEL) $(SYNAPSE_DYNAMICS) $(WEIGHT_DEPENDENCE) \
@@ -281,6 +288,12 @@ $(TIMING_DEPENDENCE_O): $(TIMING_DEPENDENCE_C) $(SYNAPSE_TYPE_H) \
 $(BUILD_DIR)neuron/neuron.o: $(MODIFIED_DIR)neuron/neuron.c $(NEURON_MODEL_H) \
                              $(SYNAPSE_TYPE_H)
 	# neuron.o
+	-@mkdir -p $(dir $@)
+	$(CC) -DLOG_LEVEL=$(NEURON_DEBUG) $(CFLAGS) $(NEURON_INCLUDES) -o $@ $<
+
+$(BUILD_DIR)neuron/neuron2.o: $(MODIFIED_DIR)neuron/neuron2.c $(NEURON_MODEL_H) \
+                             $(SYNAPSE_TYPE_H)
+	# neuron2.o
 	-@mkdir -p $(dir $@)
 	$(CC) -DLOG_LEVEL=$(NEURON_DEBUG) $(CFLAGS) $(NEURON_INCLUDES) -o $@ $<
 
