@@ -23,7 +23,7 @@
 
 #include "neuron.h"
 #include "neuron_recording.h"
-#include "implementations/neuron_impl.h"
+#include "implementations/neuron_impl2.h"
 #include "plasticity/synapse_dynamics.h"
 #include <debug.h>
 
@@ -155,12 +155,6 @@ void neuron_do_timestep_update( // EXPORTED
     neuron_recording_wait_to_complete();
     neuron_recording_setup_for_next_recording();
 
-    // Set up an array for storing the matrix recorded variable values
-    uint32_t n_matrix_vars = (
-        neuron_recording_get_n_recorded_vars() -
-        neuron_recording_get_n_bit_field_vars());
-    state_t recorded_variable_values[n_matrix_vars];
-
     // update each neuron individually
     for (index_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
 
@@ -170,14 +164,7 @@ void neuron_do_timestep_update( // EXPORTED
 
         // call the implementation function (boolean for spike)
         bool spike = neuron_impl_do_timestep_update(
-                neuron_index, external_bias, recorded_variable_values);
-
-        // Write the recorded variable values
-        for (uint32_t i = 0; i < n_matrix_vars; i++) {
-            neuron_recording_set_int32_recorded_param(
-                i +  neuron_recording_get_n_bit_field_vars(), neuron_index,
-                recorded_variable_values[i]);
-        }
+                neuron_index, external_bias);
 
         // If the neuron has spiked
         if (spike) {
