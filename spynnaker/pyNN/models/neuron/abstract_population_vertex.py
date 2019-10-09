@@ -119,6 +119,8 @@ class AbstractPopulationVertex(
     # named constant for spikes
     SPIKES = "spikes"
 
+    SPIKES_FUDGE_FACTOR = 1
+
     _n_vertices = 0
 
     def __init__(
@@ -153,7 +155,8 @@ class AbstractPopulationVertex(
         self.__updated_state_variables = set()
 
         # Set up for recording
-        recordable_variables = self.__neuron_impl.get_recordable_variables()
+        recordable_variables = list(
+            self.__neuron_impl.get_recordable_variables())
         recordable_variables.insert(0, self.SPIKES)
         self.__neuron_recorder = NeuronRecorder(
             recordable_variables,
@@ -561,7 +564,8 @@ class AbstractPopulationVertex(
         # pylint: disable=too-many-arguments
         return self.__neuron_recorder.get_matrix_data(
             self.label, buffer_manager,
-            self.__neuron_impl.get_recordable_variable_index(variable) + 1,
+            self.__neuron_impl.get_recordable_variable_index(variable) +
+            self.SPIKES_FUDGE_FACTOR,
             placements, graph_mapper, self, variable, n_machine_time_steps)
 
     @overrides(AbstractNeuronRecordable.get_neuron_sampling_interval)
