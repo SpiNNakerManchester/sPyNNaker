@@ -46,6 +46,7 @@ typedef struct {
     const post_trace_t *next_trace;
     const uint32_t *next_time;
     uint32_t num_events;
+    uint32_t prev_time_valid;
 } post_event_window_t;
 
 //---------------------------------------
@@ -110,6 +111,7 @@ static inline post_event_window_t post_events_get_window_delayed(
 
     // Deference event to use as previous
     window.prev_time = *event_time;
+    window.prev_time_valid = event_time != events->times;
 
     // Calculate number of events
     window.num_events = (end_event_time - window.next_time);
@@ -124,14 +126,14 @@ static inline post_event_window_t post_events_get_window_delayed(
 }
 
 //---------------------------------------
-static inline post_event_window_t post_events_next_delayed(
-        post_event_window_t window, uint32_t delayed_time) {
+static inline post_event_window_t post_events_next(
+        post_event_window_t window) {
     // Update previous time and increment next time
-    window.prev_time = delayed_time;
+    window.prev_time = *window.next_time++;
     window.prev_trace = *window.next_trace++;
 
-    // Go onto next event
-    window.next_time++;
+    // Time will now be valid for sure!
+    window.prev_time_valid = 1;
 
     // Decrement remaining events
     window.num_events--;
@@ -175,7 +177,7 @@ static inline void print_delayed_window_events(
                 post_window.num_events, delayed_post_time,
                 *post_window.next_trace);
 
-        post_window = post_events_next_delayed(post_window, delayed_post_time);
+        post_window = post_events_next(post_window);
     }
 }
 

@@ -121,9 +121,9 @@ static inline final_state_t plasticity_update_synapse(
             post_event_history, window_begin_time, window_end_time);
 
     log_debug("\tPerforming deferred synapse update at time:%u", time);
-    log_debug("\t\tbegin_time:%u, end_time:%u - prev_time:%u, num_events:%u",
+    log_debug("\t\tbegin_time:%u, end_time:%u - prev_time:%u (valid %u), num_events:%u",
             window_begin_time, window_end_time, post_window.prev_time,
-            post_window.num_events);
+            post_window.prev_time_valid, post_window.num_events);
 
     // print_event_history(post_event_history);
     // print_delayed_window_events(post_event_history, window_begin_time,
@@ -143,17 +143,18 @@ static inline final_state_t plasticity_update_synapse(
                 current_state);
 
         // Go onto next event
-        post_window = post_events_next_delayed(post_window, delayed_post_time);
+        post_window = post_events_next(post_window);
     }
 
-    log_debug("\t\tApplying pre-synaptic event at time:%u last post time:%u\n",
-            delayed_pre_time, post_window.prev_time);
-
-    // Apply spike to state
-    // **NOTE** dendritic delay is subtracted
-    current_state = timing_apply_pre_spike(
-            delayed_pre_time, new_pre_trace, delayed_last_pre_time, last_pre_trace,
-            post_window.prev_time, post_window.prev_trace, current_state);
+    // Apply spike to state only if there has been a post spike ever
+    if (post_window.prev_time_valid) {
+        const uint32_t delayed_last_post = post_window.prev_time + delay_dendritic;
+        log_debug("\t\tApplying pre-synaptic event at time:%u last post time:%u\n",
+                delayed_pre_time, delayed_last_post);
+        current_state = timing_apply_pre_spike(
+                delayed_pre_time, new_pre_trace, delayed_last_pre_time, last_pre_trace,
+                delayed_last_post, post_window.prev_trace, current_state);
+    }
 
     // Return final synaptic word and weight
     return synapse_structure_get_final_state(current_state);
