@@ -156,9 +156,8 @@ void neuron_do_timestep_update( // EXPORTED
     neuron_recording_setup_for_next_recording();
 
     // Set up an array for storing the matrix recorded variable values
-    uint32_t n_matrix_vars = (
-        neuron_recording_get_n_recorded_vars() -
-        neuron_recording_get_n_bit_field_vars());
+    uint32_t n_matrix_vars = neuron_recording_get_n_recorded_vars() - 1;
+    log_info("n_matrix_vars: %u", n_matrix_vars);
     state_t recorded_variable_values[n_matrix_vars];
 
     // update each neuron individually
@@ -175,7 +174,7 @@ void neuron_do_timestep_update( // EXPORTED
         // Write the recorded variable values
         for (uint32_t i = 0; i < n_matrix_vars; i++) {
             neuron_recording_set_int32_recorded_param(
-                i +  neuron_recording_get_n_bit_field_vars(), neuron_index,
+                i, neuron_index,
                 recorded_variable_values[i]);
         }
 
@@ -184,7 +183,7 @@ void neuron_do_timestep_update( // EXPORTED
             log_debug("neuron %u spiked at time %u", neuron_index, time);
 
             // Record the spike
-            neuron_recording_set_spike(SPIKE_RECORDING_CHANNEL, neuron_index);
+            neuron_recording_set_spike(n_matrix_vars, neuron_index);
 
             // Do any required synapse processing
             synapse_dynamics_process_post_synaptic_event(time, neuron_index);
