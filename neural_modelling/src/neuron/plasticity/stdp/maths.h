@@ -47,10 +47,6 @@ static inline int16_lut *maths_copy_int16_lut(address_t *address) {
         rt_error(RTE_SWERR);
     }
     spin1_memcpy(lut, sdram_lut, size);
-    log_info("LUT table size %u shift %u values:", lut->size, lut->shift);
-    for (uint32_t i = 0; i < lut->size; i++) {
-        log_info("    %u", lut->values[i]);
-    }
 
     // Pad to number of words (+ 1 for size / shift header)
     const uint32_t num_words = (lut->size / 2) + (((lut->size & 1) != 0) ? 1 : 0);
