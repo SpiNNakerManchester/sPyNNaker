@@ -35,6 +35,8 @@
 #define NUM_EXCITATORY_RECEPTORS 2
 #define NUM_INHIBITORY_RECEPTORS 1
 
+#define SCALING_FACTOR 100.0k
+
 #include <neuron/decay.h>
 #include <debug.h>
 #include "synapse_types.h"
@@ -127,8 +129,19 @@ static inline void synapse_types_add_neuron_input(
 //! \return the excitatory input buffers for a given neuron ID.
 static inline input_t* synapse_types_get_excitatory_input(
         synapse_param_pointer_t parameter) {
-    excitatory_response[0] = parameter->exc.synaptic_input_value;
-    excitatory_response[1] = parameter->exc2.synaptic_input_value;
+
+	if (parameter->exc2.synaptic_input_value >= 0.001 && parameter->multiplicator == 0
+			&& parameter->exc2_old == 0) {
+		parameter->multiplicator = parameter->exc.synaptic_input_value;
+	} else if (parameter->exc2.synaptic_input_value < 0.001) {
+		parameter->multiplicator = 0;
+	}
+
+	parameter->exc2_old = parameter->exc2.synaptic_input_value;
+
+    excitatory_response[0] = 0; // I think?
+    excitatory_response[1] =
+    		parameter->exc2.synaptic_input_value * parameter->multiplicator * SCALING_FACTOR;
     return &excitatory_response[0];
 }
 
@@ -190,6 +203,8 @@ static inline void synapse_types_print_parameters(
             parameter->exc2.synaptic_input_value);
     log_info("gsyn_inhibitory_initial_value = %11.4k\n",
             parameter->inh.synaptic_input_value);
+    log_info("multiplicator = %11.4k\n", parameter->multiplicator);
+    log_info("exc2_old      = %11.4k\n", parameter->exc2_old);
 }
 
 #endif  // _SYNAPSE_TYPES_SEMD_IMPL_H_
