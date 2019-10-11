@@ -204,7 +204,7 @@ class SynapseTypeSEMD(AbstractSynapseType):
     def multiplicator(self):
         return self.__multiplicator
 
-    @isyn_exc2.setter
+    @multiplicator.setter
     def multiplicator(self, multiplicator):
         self.__multiplicator = multiplicator
 
@@ -212,6 +212,6 @@ class SynapseTypeSEMD(AbstractSynapseType):
     def exc2_old(self):
         return self.__exc2_old
 
-    @isyn_exc2.setter
+    @exc2_old.setter
     def exc2_old(self, exc2_old):
         self.__exc2_old = exc2_old
