@@ -23,7 +23,7 @@
 // Includes for model parts used in this implementation
 #include <neuron/models/neuron_model_lif_impl.h>
 #include <neuron/threshold_types/threshold_type_static.h>
-#include <neuron/synapse_types/synapse_types_exponential_impl.h>
+#include <neuron/synapse_types/synapse_types_semd_impl.h>
 
 // Further includes
 #include <common/out_spikes.h>
@@ -182,7 +182,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
     // update neuron parameters
     state_t result = neuron_model_state_update(
-            NUM_EXCITATORY_RECEPTORS, exc_input_values,
+            0, exc_input_values,
             NUM_INHIBITORY_RECEPTORS, inh_input_values, external_bias, neuron);
 
     // determine if a spike should occur

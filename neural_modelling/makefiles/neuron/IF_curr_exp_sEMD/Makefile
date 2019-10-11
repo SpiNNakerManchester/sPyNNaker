@@ -16,6 +16,7 @@
 APP = $(notdir $(CURDIR))
 
 OTHER_SOURCES = $(NEURON_DIR)/neuron/models/neuron_model_lif_impl.c
+# This might need the semd synapse, but it might not if it's just included in the neuron_impl
 NEURON_IMPL_H = $(NEURON_DIR)/neuron/implementations/neuron_impl_semd.h
 SYNAPSE_DYNAMICS = $(NEURON_DIR)/neuron/plasticity/synapse_dynamics_static_impl.c
 
