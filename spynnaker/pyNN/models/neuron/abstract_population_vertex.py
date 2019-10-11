@@ -102,9 +102,6 @@ class AbstractPopulationVertex(
 
     BASIC_MALLOC_USAGE = 2
 
-    # recording region IDs
-    SPIKE_RECORDING_REGION = 0
-
     # the size of the runtime SDP port data region
     RUNTIME_SDP_PORT_SIZE = 4
 
@@ -157,7 +154,7 @@ class AbstractPopulationVertex(
         # Set up for recording
         recordable_variables = list(
             self.__neuron_impl.get_recordable_variables())
-        recordable_variables.insert(0, self.SPIKES)
+        recordable_variables.append(self.SPIKES)
         self.__neuron_recorder = NeuronRecorder(
             recordable_variables,
             self.__neuron_impl.get_matrix_scalar_data_types(),
@@ -540,7 +537,8 @@ class AbstractPopulationVertex(
     def get_spikes(
             self, placements, graph_mapper, buffer_manager, machine_time_step):
         return self.__neuron_recorder.get_spikes(
-            self.label, buffer_manager, self.SPIKE_RECORDING_REGION,
+            self.label, buffer_manager,
+            len(self.__neuron_impl.get_recordable_variables()),
             placements, graph_mapper, self, machine_time_step)
 
     @overrides(AbstractNeuronRecordable.get_recordable_variables)
@@ -564,8 +562,7 @@ class AbstractPopulationVertex(
         # pylint: disable=too-many-arguments
         return self.__neuron_recorder.get_matrix_data(
             self.label, buffer_manager,
-            self.__neuron_impl.get_recordable_variable_index(variable) +
-            self.SPIKES_FUDGE_FACTOR,
+            self.__neuron_impl.get_recordable_variable_index(variable),
             placements, graph_mapper, self, variable, n_machine_time_steps)
 
     @overrides(AbstractNeuronRecordable.get_neuron_sampling_interval)
@@ -770,10 +767,10 @@ class AbstractPopulationVertex(
     def clear_recording(
             self, variable, buffer_manager, placements, graph_mapper):
         if variable == self.SPIKES:
-            index = 0
+            index = len(self.__neuron_impl.get_recordable_variables())
         else:
             index = (
-                self.__neuron_impl.get_recordable_variable_index(variable) + 1)
+                self.__neuron_impl.get_recordable_variable_index(variable))
         self._clear_recording_region(
             buffer_manager, placements, graph_mapper, index)
 
@@ -781,7 +778,7 @@ class AbstractPopulationVertex(
     def clear_spike_recording(self, buffer_manager, placements, graph_mapper):
         self._clear_recording_region(
             buffer_manager, placements, graph_mapper,
-            AbstractPopulationVertex.SPIKE_RECORDING_REGION)
+            len(self.__neuron_impl.get_recordable_variables()))
 
     def _clear_recording_region(
             self, buffer_manager, placements, graph_mapper,
