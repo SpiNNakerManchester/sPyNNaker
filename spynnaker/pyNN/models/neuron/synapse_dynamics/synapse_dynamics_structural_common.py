@@ -468,8 +468,9 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
 
         for subpopulation_list in itervalues(
                 population_to_subpopulation_information):
-            max_subpartitions = np.maximum(max_subpartitions,
-                                           len(subpopulation_list))
+            # pylint: disable=assignment-from-no-return
+            max_subpartitions = np.maximum(
+                max_subpartitions, len(subpopulation_list))
 
         # Current machine vertex key (for future checks)
         current_key = routing_info.get_routing_info_from_pre_vertex(

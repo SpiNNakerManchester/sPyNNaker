@@ -406,6 +406,7 @@ class SynapticManager(object):
         weight_variance = 0.0
 
         if weight_std_dev > 0:
+            # pylint: disable=no-member
             lngamma = special.gammaln(1 + upper_bound)
             gammai = special.gammaincc(
                 1 + upper_bound, average_spikes_per_timestep)
