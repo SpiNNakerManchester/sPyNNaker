@@ -19,9 +19,11 @@ from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
 try:
     import csa
-    csa_exception = False
+    csa_found = True
+    csa_exception = ModuleNotFoundError
 except ModuleNotFoundError as ex:  # noqa: F821
     # Importing csa causes problems with readthedocs so allowing it to fail
+    csa_found = False
     csa_exception = ex
 
 logger = logging.getLogger(__name__)
@@ -44,7 +46,7 @@ class CSAConnector(AbstractConnector):
         :param '?' cset:
             A description of the connection set between populations
         """
-        if csa_exception:
+        if not csa_found:
             raise csa_exception
         super(CSAConnector, self).__init__(safe, verbose)
         self.__cset = cset
