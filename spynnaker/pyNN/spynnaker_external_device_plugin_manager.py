@@ -282,8 +282,8 @@ class SpynnakerExternalDevicePluginManager(object):
         _spinnaker.add_application_edge(edge, partition_id)
 
     @staticmethod
-    def add_application_vertex(vertex, prefix=None):
-        get_simulator().add_application_vertex(vertex, prefix)
+    def add_application_vertex(vertex):
+        get_simulator().add_application_vertex(vertex)
 
     @staticmethod
     def machine_time_step():
