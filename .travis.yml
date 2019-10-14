@@ -80,7 +80,7 @@ script:
   - py.test unittests --cov spynnaker
   - flake8 examples spynnaker pyNN-spiNNaker-src
   - flake8 unittests
-  - ( pylint --output-format=colorized --disable=R,C data_specification; exit $(($? & 35)) )
+  - ( pylint --output-format=colorized --disable=R,C spynnaker; exit $(($? & 35)) )
   # XML
   - find spynnaker -name '*.xml' | xargs -n 1 support/validate-xml.sh
   # C 
