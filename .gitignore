@@ -14,4 +14,3 @@ MANIFEST
 .DS_Store
 .coverage
 /.pytest_cache
-/.pylintrc
