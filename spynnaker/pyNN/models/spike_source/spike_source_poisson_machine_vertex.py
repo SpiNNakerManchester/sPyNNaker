@@ -37,20 +37,18 @@ class SpikeSourcePoissonMachineVertex(
         MachineVertex, AbstractReceiveBuffersToHost,
         ProvidesProvenanceDataFromMachineImpl, AbstractRecordable,
         AbstractSupportsDatabaseInjection, AbstractHasProfileData):
-
     __slots__ = [
         "__buffered_sdram_per_timestep",
         "__is_recording",
         "__minimum_buffer_sdram",
         "__resources"]
 
-    POISSON_SPIKE_SOURCE_REGIONS = Enum(
-        value="POISSON_SPIKE_SOURCE_REGIONS",
-        names=[('SYSTEM_REGION', 0),
-               ('POISSON_PARAMS_REGION', 1),
-               ('SPIKE_HISTORY_REGION', 2),
-               ('PROVENANCE_REGION', 3),
-               ('PROFILER_REGION', 4)])
+    class POISSON_SPIKE_SOURCE_REGIONS(Enum):
+        SYSTEM_REGION = 0
+        POISSON_PARAMS_REGION = 1
+        SPIKE_HISTORY_REGION = 2
+        PROVENANCE_REGION = 3
+        PROFILER_REGION = 4
 
     PROFILE_TAG_LABELS = {
         0: "TIMER",

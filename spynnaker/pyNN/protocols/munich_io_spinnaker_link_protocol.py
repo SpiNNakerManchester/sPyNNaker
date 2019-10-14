@@ -262,15 +262,14 @@ class MunichIoSpiNNakerLinkProtocol(object):
     """
     __slots__ = ["__instance_key", "__mode", "__uart_id"]
 
-    # types of modes supported by this protocol
-    MODES = Enum(
-        value="MODES",
-        names=[('RESET_TO_DEFAULT', 0),
-               ('PUSH_BOT', 1),
-               ('SPOMNIBOT', 2),
-               ('BALL_BALANCER', 3),
-               ('MY_ORO_BOTICS', 4),
-               ('FREE', 5)])
+    class MODES(Enum):
+        """types of modes supported by this protocol"""
+        RESET_TO_DEFAULT = 0
+        PUSH_BOT = 1
+        SPOMNIBOT = 2
+        BALL_BALANCER = 3
+        MY_ORO_BOTICS = 4
+        FREE = 5
 
     # The instance of the protocol in use, to ensure that each vertex that is
     # to send commands to the PushBot uses a different outgoing key; the top
