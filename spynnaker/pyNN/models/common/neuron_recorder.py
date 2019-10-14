@@ -554,7 +554,13 @@ class NeuronRecorder(object):
             self.__indexes[variable] = None
         else:
             # make sure indexes is not a generator like range
-            indexes = list(indexes)
+            try:
+                indexes = list(indexes)
+            except TypeError:
+                if isinstance(indexes, int):
+                    indexes = [indexes]
+                else:
+                    raise
             self.check_indexes(indexes)
             if self.__indexes[variable] is not None:
                 # merge the two indexes
