@@ -191,7 +191,7 @@ class SynapseDynamicsStructuralCommon(object):
 
         # Write the post-to-pre table
         self.__write_post_to_pre_table(
-            spec, pop_index, post_slice, graph_mapper)
+            spec, pop_index, app_vertex, post_slice, graph_mapper)
 
         # Write the component parameters
         self.__partner_selection.write_parameters(spec)
@@ -329,17 +329,21 @@ class SynapseDynamicsStructuralCommon(object):
         return pop_index
 
     def __write_post_to_pre_table(
-            self, spec, pop_index, post_slice, graph_mapper):
+            self, spec, pop_index, app_vertex, post_slice, graph_mapper):
         """ Post to pre table is basically the transpose of the synaptic\
             matrix
         """
         # Get connections for this post slice
-        slice_conns = self.__connections[post_slice.lo_atom]
+        key = (app_vertex, post_slice.lo_atom)
+        slice_conns = self.__connections[key]
         # Make a single large array of connections
         connections = numpy.concatenate(
             [conn for (conn, _, _, _) in slice_conns])
         # Make a single large array of population index
         conn_lens = [len(conn) for (conn, _, _, _) in slice_conns]
+        for (_, a_edge, _, s_info) in slice_conns:
+            if (a_edge.pre_vertex, s_info) not in pop_index:
+                print("Help!")
         pop_indices = numpy.repeat(
             [pop_index[a_edge.pre_vertex, s_info]
              for (_, a_edge, _, s_info) in slice_conns], conn_lens)
@@ -416,9 +420,10 @@ class SynapseDynamicsStructuralCommon(object):
         if not isinstance(synapse_info.synapse_dynamics,
                           AbstractSynapseDynamicsStructural):
             return
-        if post_vertex_slice.lo_atom not in self.__connections.keys():
-            self.__connections[post_vertex_slice.lo_atom] = []
-        self.__connections[post_vertex_slice.lo_atom].append(
+        key = (app_edge.post_vertex, post_vertex_slice.lo_atom)
+        if key not in self.__connections.keys():
+            self.__connections[key] = []
+        self.__connections[key].append(
             (connections, app_edge, machine_edge, synapse_info))
 
     def n_words_for_plastic_connections(self, value):
