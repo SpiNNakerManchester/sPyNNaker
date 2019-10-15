@@ -135,6 +135,7 @@ class SynapseDynamicsStructuralSTDP(AbstractSynapseDynamicsStructural,
             self, spec, region, machine_time_step, weight_scales,
             application_graph, machine_graph, app_vertex, post_slice,
             machine_vertex, graph_mapper, routing_info):
+        # pylint: disable=arguments-differ
         super(SynapseDynamicsStructuralSTDP, self).write_parameters(
             spec, region, machine_time_step, weight_scales)
         self.__common_sp.write_parameters(
@@ -157,8 +158,9 @@ class SynapseDynamicsStructuralSTDP(AbstractSynapseDynamicsStructural,
 
     @overrides(SynapseDynamicsSTDP.get_parameters_sdram_usage_in_bytes,
                additional_arguments={"in_edges"})
-    def get_parameters_sdram_usage_in_bytes(self, n_neurons,
-                                            n_synapse_types, in_edges):
+    def get_parameters_sdram_usage_in_bytes(
+            self, n_neurons, n_synapse_types, in_edges):
+        # pylint: disable=arguments-differ
         initial_size = super(SynapseDynamicsStructuralSTDP, self). \
             get_parameters_sdram_usage_in_bytes(n_neurons, n_synapse_types)
         initial_size += self.__common_sp.get_parameters_sdram_usage_in_bytes(
@@ -177,6 +179,7 @@ class SynapseDynamicsStructuralSTDP(AbstractSynapseDynamicsStructural,
     def get_plastic_synaptic_data(self, connections, connection_row_indices,
                                   n_rows, post_vertex_slice,
                                   n_synapse_types, app_edge, machine_edge):
+        # pylint: disable=arguments-differ
         self.__common_sp.synaptic_data_update(
             connections, post_vertex_slice, app_edge, machine_edge)
         return super(SynapseDynamicsStructuralSTDP,

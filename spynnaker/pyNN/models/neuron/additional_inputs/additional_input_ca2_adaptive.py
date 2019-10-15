@@ -70,6 +70,7 @@ class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
     @inject_items({"ts": "MachineTimeStep"})
     @overrides(AbstractAdditionalInput.get_values, additional_arguments={'ts'})
     def get_values(self, parameters, state_variables, vertex_slice, ts):
+        # pylint: disable=arguments-differ
 
         # Add the rest of the data
         return [parameters[TAU_CA2].apply_operation(
