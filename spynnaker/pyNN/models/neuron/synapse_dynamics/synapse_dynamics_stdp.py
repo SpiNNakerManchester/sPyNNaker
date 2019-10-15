@@ -69,6 +69,7 @@ class SynapseDynamicsSTDP(
             raise NotImplementedError(
                 "Voltage dependence has not been implemented")
 
+    @property
     @overrides(AbstractChangableAfterRun.requires_mapping)
     def requires_mapping(self):
         """ True if changes that have been made require that mapping be\

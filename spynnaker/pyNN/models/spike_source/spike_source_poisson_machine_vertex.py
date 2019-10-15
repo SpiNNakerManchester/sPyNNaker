@@ -96,11 +96,14 @@ class SpikeSourcePoissonMachineVertex(
             self.POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value,
             txrx)
 
+    @property
+    @overrides(AbstractSupportsDatabaseInjection.is_in_injection_mode)
+    def is_in_injection_mode(self):
+        # pylint: disable=no-value-for-parameter
+        return self._is_in_injection_mode()
+
     @inject_items({"graph": "MemoryMachineGraph"})
-    @overrides(
-        AbstractSupportsDatabaseInjection.is_in_injection_mode,
-        additional_arguments=["graph"])
-    def is_in_injection_mode(self, graph):
+    def _is_in_injection_mode(self, graph):
         # pylint: disable=arguments-differ
         in_edges = graph.get_edges_ending_at_vertex_with_partition_name(
             self, LIVE_POISSON_CONTROL_PARTITION_ID)
