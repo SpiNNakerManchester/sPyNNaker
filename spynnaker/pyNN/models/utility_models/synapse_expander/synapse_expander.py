@@ -89,7 +89,7 @@ def synapse_expander(
             gen_on_machine_vertices, graph_mapper, placements, transceiver)
         _extract_iobuf(expander_cores, transceiver, provenance_file_path)
         progress.end()
-    except Exception:
+    except Exception:  # pylint: disable=broad-except
         logger.exception("Synapse expander has failed")
         _handle_failure(
             expander_cores, transceiver, provenance_file_path)

@@ -654,7 +654,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
                         synaptic_entry = np.argmax(
                             post_to_pre_table[target - post_slice.lo_atom] ==
                             -1).ravel()[0]
-                    except Exception:
+                    except Exception:  # pylint: disable=broad-except
                         break
                     post_to_pre_table[
                         target - post_slice.lo_atom, synaptic_entry] = \
