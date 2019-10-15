@@ -174,7 +174,7 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
             chosen = numpy.random.choice(
                 pairs.shape[0], size=n_connections,
                 replace=self.__with_replacement)
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-except
             raise_from(SpynnakerException(
                 "MultapseConnector: The number of connections is too large "
                 "for sampling without replacement; "

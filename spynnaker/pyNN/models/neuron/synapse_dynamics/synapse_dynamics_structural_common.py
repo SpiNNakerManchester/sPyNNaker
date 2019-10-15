@@ -201,6 +201,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         :return: the distance
         :rtype: float
         """
+        # pylint: disable=redefined-builtin
         x0 = np.asarray(x0)
         x1 = np.asarray(x1)
         delta = np.abs(x0 - x1)
