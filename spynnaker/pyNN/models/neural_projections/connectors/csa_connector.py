@@ -19,12 +19,10 @@ from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
 try:
     import csa
-    csa_found = True
-    csa_exception = ModuleNotFoundError
-except ModuleNotFoundError as ex:  # noqa: F821
+    _csa_found = (True, ModuleNotFoundError)
+except ModuleNotFoundError as _ex:  # noqa: F821
     # Importing csa causes problems with readthedocs so allowing it to fail
-    csa_found = False
-    csa_exception = ex
+    _csa_found = (False, _ex)
 
 logger = logging.getLogger(__name__)
 
@@ -40,15 +38,17 @@ class CSAConnector(AbstractConnector):
         "__cset", "__full_connection_set", "__full_cset"]
 
     def __init__(
-            self, cset,
-            safe=True, callback=None, verbose=False):
+            self, cset, safe=True,
+            callback=None,  # pylint: disable=unused-argument
+            verbose=False):
         """
         :param '?' cset:
             A description of the connection set between populations
         """
-        if not csa_found:
-            raise csa_exception
         super(CSAConnector, self).__init__(safe, verbose)
+        found, ex = _csa_found
+        if not found:
+            raise ex
         self.__cset = cset
 
         # Storage for full connection sets
