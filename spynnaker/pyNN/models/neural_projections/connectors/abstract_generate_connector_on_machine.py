@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import decimal
-from distutils.version import StrictVersion
+from distutils.version import StrictVersion  # pylint: disable=all
 from enum import Enum
 import numpy
 from six import with_metaclass
