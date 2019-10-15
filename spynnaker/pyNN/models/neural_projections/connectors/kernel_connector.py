@@ -313,14 +313,6 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
         return block
 
     @property
-    def generate_on_machine(self):
-        super_generate = super(KernelConnector, self).generate_on_machine
-
-        # This connector can also cope with "listed" weights and delays
-        return super_generate or (isinstance(self._delays, numpy.ndarray) and
-                                  isinstance(self._weights, numpy.ndarray))
-
-    @property
     def _kernel_properties(self):
         return [
             shape2word(self._common_w, self._common_h),
