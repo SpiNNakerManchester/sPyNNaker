@@ -80,6 +80,7 @@ class AbstractSynapseDynamics(object):
     def get_provenance_data(self, pre_population_label, post_population_label):
         """ Get the provenance data from this synapse dynamics object
         """
+        # pylint: disable=unused-argument
         return list()
 
     def get_delay_maximum(self, connector, delays):

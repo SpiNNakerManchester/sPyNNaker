@@ -69,7 +69,7 @@ class GraphEdgeFilter(object):
 
         # returned the pruned graph and graph_mapper
         logger.debug("prune_count:{} no_prune_count:{}",
-            prune_count, no_prune_count)
+                     prune_count, no_prune_count)
         return new_machine_graph, new_graph_mapper
 
     @staticmethod
