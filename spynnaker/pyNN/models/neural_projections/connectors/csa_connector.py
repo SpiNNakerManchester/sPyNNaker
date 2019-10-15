@@ -19,8 +19,8 @@ from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
 try:
     import csa
-    _csa_found = (True, ModuleNotFoundError)
-except ModuleNotFoundError as _ex:  # noqa: F821
+    _csa_found = (True, ImportError)
+except ImportError as _ex:  # noqa: F821
     # Importing csa causes problems with readthedocs so allowing it to fail
     _csa_found = (False, _ex)
 
