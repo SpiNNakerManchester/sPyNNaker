@@ -225,6 +225,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         :rtype: numpy.ndarray(float)
         """
         euclidian_distances = np.ones(self.__grid ** 2) * np.nan
+        # pylint: disable=unsubscriptable-object
         for row in range(euclidian_distances.shape[0]):
             for column in range(euclidian_distances.shape[1]):
                 if self.__grid[0] > 1:

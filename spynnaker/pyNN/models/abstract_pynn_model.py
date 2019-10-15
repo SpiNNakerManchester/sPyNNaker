@@ -89,7 +89,7 @@ class AbstractPyNNModel(object):
 
         :rtype: list(str)
         """
-        return cls.default_parameters.keys()  #pylint: disable=no-member
+        return cls.default_parameters.keys()  # pylint: disable=no-member
 
     @classmethod
     def has_parameter(cls, name):

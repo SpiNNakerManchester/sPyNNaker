@@ -68,7 +68,7 @@ class PushBotSpiNNakerLinkRetinaDevice(
         # Note this is not undefined, it is just a property so, it can't
         # be statically analysed
         sr_cmds = AbstractPushBotRetinaDevice.start_resume_commands
-        commands = sr_cmds.fget(self)  #pylint: disable=no-member
+        commands = sr_cmds.fget(self)  # pylint: disable=no-member
 
         # Update the commands with the additional one to set the key
         new_commands = list()
