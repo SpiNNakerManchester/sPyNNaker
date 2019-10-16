@@ -682,14 +682,11 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
                     relevant_edges.append(edge)
         return int(self.__fudge_factor * 4 * 12 * len(relevant_edges))
 
-    def get_parameters_sdram_usage_in_bytes(self, n_neurons, n_synapse_types,
-                                            in_edges):
-        """ Approximate SDRAM usage
+    def get_parameters_sdram_usage(self, n_neurons, in_edges):
+        """ Approximate SDRAM usage, in bytes
 
         :param n_neurons: number of neurons
         :type n_neurons: int
-        :param n_synapse_types: \
-            number of synapse types (i.e. excitatory and inhibitory)
         :type n_synapse_types: int
         :param in_edges: incoming edges
         :type in_edges: edges

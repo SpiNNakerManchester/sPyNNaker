@@ -163,8 +163,8 @@ class SynapseDynamicsStructuralSTDP(AbstractSynapseDynamicsStructural,
         # pylint: disable=arguments-differ
         initial_size = super(SynapseDynamicsStructuralSTDP, self). \
             get_parameters_sdram_usage_in_bytes(n_neurons, n_synapse_types)
-        initial_size += self.__common_sp.get_parameters_sdram_usage_in_bytes(
-            n_neurons, n_synapse_types, in_edges)
+        initial_size += self.__common_sp.get_parameters_sdram_usage(
+            n_neurons, in_edges)
         return initial_size
 
     @overrides(SynapseDynamicsSTDP.get_n_words_for_plastic_connections)

@@ -165,8 +165,7 @@ class SynapseDynamicsStructuralStatic(AbstractSynapseDynamicsStructural,
             get_parameters_sdram_usage_in_bytes(
                 n_neurons, n_synapse_types)
         initial_size += \
-            self.__common_sp.get_parameters_sdram_usage_in_bytes(
-                n_neurons, n_synapse_types, in_edges)
+            self.__common_sp.get_parameters_sdram_usage(n_neurons, in_edges)
         return initial_size
 
     @overrides(SynapseDynamicsStatic.get_n_words_for_static_connections)
