@@ -75,11 +75,11 @@ static volatile uint32_t rewires_to_do = 0;
 
 // The number of rewires to do when the DMA completes.  When a DMA is first set
 // up, only this or dma_n_spikes can be 1 with the other being 0.
-static volatile uint32_t dma_n_rewires;
+static uint32_t dma_n_rewires;
 
 // The number of spikes to do when the DMA completes.  When a DMA is first set
 // up, only this or dma_n_rewires can be 1 with the other being 0.
-static volatile uint32_t dma_n_spikes;
+static uint32_t dma_n_spikes;
 
 
 /* PRIVATE FUNCTIONS - static for inlining */
