@@ -37,6 +37,10 @@ typedef struct int16_lut {
 //---------------------------------------
 // Plasticity maths function inline implementation
 //---------------------------------------
+//! \brief Copy a Lookup Table from SDRAM to DTCM, updating the address
+//! \param[in/out] address Pointer to the SDRAM address to copy from.  This is
+//!                        updated to point to the space after the structure.
+//! \return A pointer to the copied lookup table
 static inline int16_lut *maths_copy_int16_lut(address_t *address) {
     int16_lut *sdram_lut = (int16_lut *) *address;
     uint32_t size = sizeof(int16_lut) + (sdram_lut->size * sizeof(int16_t));

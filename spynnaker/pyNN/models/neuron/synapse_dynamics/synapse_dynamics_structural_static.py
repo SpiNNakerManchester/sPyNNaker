@@ -26,32 +26,12 @@ from spynnaker.pyNN.exceptions import SynapticConfigurationException
 
 class SynapseDynamicsStructuralStatic(
         SynapseDynamicsStatic, AbstractSynapseDynamicsStructural):
-    """ Class that enables synaptic rewiring. It acts as a wrapper\
-        around SynapseDynamicsStatic.
-        This means rewiring can operate in parallel with these\
-        types of synapses.
+    """ Class that enables synaptic rewiring in the absence of STDP.
+
+        It acts as a wrapper around SynapseDynamicsStatic, meaning that \
+        rewiring can operate in parallel with static synapses.
 
         Written by Petrut Bogdan.
-
-        Example usage to allow rewiring in parallel with STDP::
-
-            stdp_model = sim.STDPMechanism(...)
-
-            structure_model_with_stdp = sim.StructuralMechanismStatic(
-                weight=0,
-                s_max=32,
-                grid=[np.sqrt(pop_size), np.sqrt(pop_size)],
-                random_partner=True,
-                f_rew=10 ** 4,  # Hz
-                sigma_form_forward=1.,
-                delay=10
-            )
-            plastic_projection = sim.Projection(
-                ...,
-                synapse_dynamics=sim.SynapseDynamics(
-                    slow=structure_model_with_stdp
-                )
-            )
 
     :param partner_selection: The partner selection rule
     :param formation: The formation rule
@@ -60,8 +40,11 @@ class SynapseDynamicsStructuralStatic(
     :type f_rew: int
     :param initial_weight: Weight assigned to a newly formed connection
     :type initial_weight: float
-    :param initial_delay: Delay assigned to a newly formed connection
-    :type initial_delay: int or (int, int)
+    :param initial_delay:\
+        Delay assigned to a newly formed connection; a single value means a\
+        fixed delay value, or a tuple of two values means the delay will be\
+        chosen at random from a uniform distribution between the given values
+    :type initial_delay: float or (float, float)
     :param s_max: Maximum fan-in per target layer neuron
     :type s_max: int
     :param seed: seed the random number generators

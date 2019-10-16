@@ -25,10 +25,8 @@ import math
 
 
 class SynapseDynamicsStructuralCommon(object):
-    """ Common class that enables synaptic rewiring. It acts as a wrapper\
-        around SynapseDynamicsStatic or SynapseDynamicsSTDP.\
-        This means rewiring can operate in parallel with these\
-        types of synapses.
+    """ Utility class that holds properties of synaptic rewiring\
+        both in the presence and absence of STDP.
 
         Written by Petrut Bogdan.
     """
@@ -187,7 +185,7 @@ class SynapseDynamicsStructuralCommon(object):
         # Write the pre-population info
         pop_index = self.__write_prepopulation_info(
             spec, app_vertex, structural_edges, graph_mapper, routing_info,
-            weight_scales, post_slice, synapse_indices)
+            weight_scales, post_slice, synapse_indices, machine_time_step)
 
         # Write the post-to-pre table
         self.__write_post_to_pre_table(
@@ -281,7 +279,8 @@ class SynapseDynamicsStructuralCommon(object):
 
     def __write_prepopulation_info(
             self, spec, app_vertex, structural_edges, graph_mapper,
-            routing_info, weight_scales, post_slice, synapse_indices):
+            routing_info, weight_scales, post_slice, synapse_indices,
+            machine_time_step):
         pop_index = dict()
         index = 0
         for app_edge, synapse_info in structural_edges:
@@ -299,16 +298,17 @@ class SynapseDynamicsStructuralCommon(object):
             self_connected = app_vertex == app_edge.pre_vertex
             spec.write_value(int(self_connected), data_type=DataType.UINT16)
             # Delay
+            delay_scale = 1000.0 / machine_time_step
             if isinstance(dynamics.initial_delay, collections.Iterable):
-                spec.write_value(dynamics.initial_delay[0],
+                spec.write_value(int(dynamics.initial_delay[0] * delay_scale),
                                  data_type=DataType.UINT16)
-                spec.write_value(dynamics.initial_delay[1],
+                spec.write_value(int(dynamics.initial_delay[1] * delay_scale),
                                  data_type=DataType.UINT16)
             else:
-                spec.write_value(dynamics.initial_delay,
-                                 data_type=DataType.UINT16)
-                spec.write_value(dynamics.initial_delay,
-                                 data_type=DataType.UINT16)
+                scaled_delay = dynamics.initial_delay * delay_scale
+                spec.write_value(scaled_delay, data_type=DataType.UINT16)
+                spec.write_value(scaled_delay, data_type=DataType.UINT16)
+
             # Weight
             spec.write_value(round(dynamics.initial_weight *
                                    weight_scales[synapse_info.synapse_type]))

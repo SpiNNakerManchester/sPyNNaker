@@ -23,7 +23,8 @@
 #include <simulation.h>
 #include <debug.h>
 
-//! DMA buffer structure combines the row read from SDRAM with
+//! DMA buffer structure combines the row read from SDRAM with information
+//! about the read.
 typedef struct dma_buffer {
 
     // Address in SDRAM to write back plastic region to
@@ -55,7 +56,7 @@ enum spike_processing_dma_tags {
 extern uint32_t time;
 
 // True if the DMA "loop" is currently running
-static bool dma_busy;
+static volatile bool dma_busy;
 
 // The DTCM buffers for the synapse rows
 static dma_buffer dma_buffers[N_DMA_BUFFERS];
@@ -70,15 +71,15 @@ static uint32_t max_n_words;
 
 static uint32_t single_fixed_synapse[4];
 
-static uint32_t rewires_to_do = 0;
+static volatile uint32_t rewires_to_do = 0;
 
 // The number of rewires to do when the DMA completes.  When a DMA is first set
 // up, only this or dma_n_spikes can be 1 with the other being 0.
-static uint32_t dma_n_rewires;
+static volatile uint32_t dma_n_rewires;
 
-// The number of rewires to do when the DMA completes.  When a DMA is first set
+// The number of spikes to do when the DMA completes.  When a DMA is first set
 // up, only this or dma_n_rewires can be 1 with the other being 0.
-static uint32_t dma_n_spikes;
+static volatile uint32_t dma_n_spikes;
 
 
 /* PRIVATE FUNCTIONS - static for inlining */
