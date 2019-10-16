@@ -76,12 +76,6 @@ uint32_t plastic_saturation_count = 0;
 #define SYNAPSE_AXONAL_DELAY_MASK \
     ((1 << SYNAPSE_AXONAL_DELAY_BITS) - 1)
 
-// Bit in timestamp that is used to identify a self-connection
-#define SELF_CONNECTION_BIT 0x80000000
-
-// The mask of the timestamp in the header word
-#define TIMESTAMP_MASK 0x7FFFFFFF
-
 //---------------------------------------
 // Structures
 //---------------------------------------
@@ -102,9 +96,7 @@ static inline final_state_t plasticity_update_synapse(
         const uint32_t last_pre_time, const pre_trace_t last_pre_trace,
         const pre_trace_t new_pre_trace, const uint32_t delay_dendritic,
         const uint32_t delay_axonal, update_state_t current_state,
-        const post_event_history_t *post_event_history,
-        const uint32_t is_autapse) {
-    use(is_autapse);
+        const post_event_history_t *post_event_history) {
 
     // Apply axonal delay to time of last presynaptic spike
     const uint32_t delayed_last_pre_time = last_pre_time + delay_axonal;
@@ -311,13 +303,12 @@ bool synapse_dynamics_process_plastic_synapses(
             plastic_event_history(plastic_region_address);
 
     // Get last pre-synaptic event from event history
-    const uint32_t self_connection = event_history->prev_time & SELF_CONNECTION_BIT;
-    const uint32_t last_pre_time = event_history->prev_time & TIMESTAMP_MASK;
+    const uint32_t last_pre_time = event_history->prev_time;
     const pre_trace_t last_pre_trace = event_history->prev_trace;
 
     // Update pre-synaptic trace
     log_debug("Adding pre-synaptic event to trace at time:%u", time);
-    event_history->prev_time = (time & TIMESTAMP_MASK) | self_connection;
+    event_history->prev_time = time;
     event_history->prev_trace =
             timing_add_pre_spike(time, last_pre_time, last_pre_trace);
 
@@ -336,7 +327,6 @@ bool synapse_dynamics_process_plastic_synapses(
                 control_word, synapse_index_bits, synapse_type_mask);
         uint32_t index =
                 synapse_row_sparse_index(control_word, synapse_index_mask);
-        uint32_t is_autapse = self_connection && (pre_neuron_id == index);
         uint32_t type_index = synapse_row_sparse_type_index(
                 control_word, synapse_type_index_mask);
 
@@ -357,7 +347,7 @@ bool synapse_dynamics_process_plastic_synapses(
         final_state_t final_state = plasticity_update_synapse(
                 time, last_pre_time, last_pre_trace, event_history->prev_trace,
                 post_delay, delay_axonal, current_state,
-                &post_event_history[index], is_autapse);
+                &post_event_history[index]);
 
         // Add weight to ring-buffer entry
         // **NOTE** Dave suspects that this could be a

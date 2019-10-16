@@ -29,10 +29,6 @@ from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 
 # How large are the time-stamps stored with each event
 TIME_STAMP_BYTES = 4
-# The contents of the byte that identifies a self connection
-SELF_CONNECTION_BIT = 0x80
-# The index of the byte that identifies a self connection
-SELF_CONNECTION_BYTE = 3
 
 
 class SynapseDynamicsSTDP(
@@ -258,7 +254,7 @@ class SynapseDynamicsSTDP(
     @overrides(AbstractPlasticSynapseDynamics.get_plastic_synaptic_data)
     def get_plastic_synaptic_data(
             self, connections, connection_row_indices, n_rows,
-            post_vertex_slice, n_synapse_types, self_connection):
+            post_vertex_slice, n_synapse_types):
         # pylint: disable=too-many-arguments
         n_synapse_type_bits = get_n_bits(n_synapse_types)
         n_neuron_id_bits = get_n_bits(post_vertex_slice.n_atoms)
@@ -312,8 +308,6 @@ class SynapseDynamicsSTDP(
                 plastic_plastic_row_data, n_half_words * 2)
         plastic_headers = numpy.zeros(
             (n_rows, self._n_header_bytes), dtype="uint8")
-        if self_connection:
-            plastic_headers[:, SELF_CONNECTION_BYTE] = SELF_CONNECTION_BIT
         plastic_plastic_rows = [
             numpy.concatenate((
                 plastic_headers[i], plastic_plastic_row_data[i]))
