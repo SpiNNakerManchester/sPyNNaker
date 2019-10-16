@@ -47,7 +47,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
     def __init__(
             self, shape_pre, shape_post, shape_kernel, weight_kernel,
             delay_kernel, shape_common, pre_sample_steps, pre_start_coords,
-            post_sample_steps, post_start_coords, safe, space, verbose):
+            post_sample_steps, post_start_coords, safe, space, verbose,
+            callback=None):
         """
         :param shape_pre:\
             2D shape of the pre population (rows/height, cols/width, usually \
@@ -70,7 +71,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
             Starting row/col for pre/post sampling <=> (_startX_, endX, stepX)
             None or 2-item array
         """
-        super(KernelConnector, self).__init__(safe=safe, verbose=verbose)
+        super(KernelConnector, self).__init__(
+            safe=safe, callback=callback, verbose=verbose)
 
         # Get the kernel size
         self._kernel_w = shape_kernel[WIDTH]

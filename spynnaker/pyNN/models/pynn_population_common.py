@@ -16,6 +16,7 @@
 import logging
 import numpy
 from six import string_types, iteritems
+from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.log import FormatAdapter
 from pacman.model.constraints import AbstractConstraint
 from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
@@ -201,17 +202,22 @@ class PyNNPopulationCommon(object):
         # TODO: Used to get a single cell - not yet supported
         raise NotImplementedError
 
-    def get(self, parameter_names, gather=False):
+    def get(self, parameter_names, gather=True):
         """ Get the values of a parameter for every local cell in the\
             population.
 
         :param parameter_names: Name of parameter. This is either a single\
             string or a list of strings
+        :param gather: pointless on sPyNNaker
         :return: A single list of values (or possibly a single value) if\
             paramter_names is a string, or a dict of these if parameter names\
             is a list.
         :rtype: str or list(str) or dict(str,str) or dict(str,list(str))
         """
+        if not gather:
+            warn_once(
+                logger, "sPyNNaker only supports gather=True. We will run "
+                "as if gather was set to True.")
         if not self._vertex_population_settable:
             raise KeyError("Population does not support setting")
         if isinstance(parameter_names, string_types):
@@ -452,7 +458,13 @@ class PyNNPopulationCommon(object):
 
     def get_spike_counts(self, spikes, gather=True):
         """ Return the number of spikes for each neuron.
+
+        :param gather: pointless on sPyNNaker
         """
+        if not gather:
+            warn_once(
+                logger, "sPyNNaker only supports gather=True. We will run "
+                "as if gather was set to True.")
         n_spikes = {}
         counts = numpy.bincount(spikes[:, 0].astype(dtype=numpy.int32),
                                 minlength=self.__vertex.n_atoms)

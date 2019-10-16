@@ -30,12 +30,12 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
     """
     __slots__ = ["__random_number_class"]
 
-    def __init__(
-            self, random_number_class, safe=True, verbose=False):
+    def __init__(self, random_number_class,
+                 safe=True, callback=None, verbose=False):
         """
         """
         self.__random_number_class = random_number_class
-        super(OneToOneConnector, self).__init__(safe, verbose)
+        super(OneToOneConnector, self).__init__(safe, callback, verbose)
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, delays):

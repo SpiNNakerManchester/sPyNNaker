@@ -452,8 +452,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
     def generic_motor_total_period_key(self):
         return self._get_key(MOTOR_RUN_FOR_PERIOD_KEY, RETINA_UART_SHIFT)
 
-    def generic_motor_total_period(
-            self, time_in_ms, uart_id=0, time=None):
+    def generic_motor_total_period(self, time_in_ms, time=None):
         return MultiCastCommand(
             key=self.generic_motor_total_period_key,
             payload=time_in_ms, time=time)

@@ -37,15 +37,12 @@ class CSAConnector(AbstractConnector):
     __slots = [
         "__cset", "__full_connection_set", "__full_cset"]
 
-    def __init__(
-            self, cset, safe=True,
-            callback=None,  # pylint: disable=unused-argument
-            verbose=False):
+    def __init__(self, cset, safe=True, callback=None, verbose=False):
         """
         :param '?' cset:
             A description of the connection set between populations
         """
-        super(CSAConnector, self).__init__(safe, verbose)
+        super(CSAConnector, self).__init__(safe, callback, verbose)
         found, ex = _csa_found
         if not found:
             raise ex
