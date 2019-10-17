@@ -32,13 +32,11 @@ address_t synaptogenesis_dynamics_initialise(
 }
 
 bool synaptogenesis_dynamics_rewire(uint32_t time,
-        spike_t *spike, address_t *synaptic_row_address, uint32_t *n_bytes,
-        uint32_t *neuron_id) {
+        spike_t *spike, address_t *synaptic_row_address, uint32_t *n_bytes) {
     use(time);
     use(spike);
     use(synaptic_row_address);
     use(n_bytes);
-    use(neuron_id);
     return false;
 }
 

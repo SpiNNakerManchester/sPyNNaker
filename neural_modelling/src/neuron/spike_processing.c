@@ -34,9 +34,6 @@ typedef struct dma_buffer {
     // (used to allow row data to be re-used for multiple spikes)
     spike_t originating_spike;
 
-    // Neuron ID of spike
-    uint32_t neuron_id;
-
     uint32_t n_bytes_transferred;
 
     // Row data
@@ -85,14 +82,12 @@ static uint32_t dma_n_spikes;
 /* PRIVATE FUNCTIONS - static for inlining */
 
 static inline void do_dma_read(
-        address_t row_address, size_t n_bytes_to_transfer, spike_t spike,
-        uint32_t neuron_id) {
+        address_t row_address, size_t n_bytes_to_transfer, spike_t spike) {
     // Write the SDRAM address of the plastic region and the
     // Key of the originating spike to the beginning of DMA buffer
     dma_buffer *next_buffer = &dma_buffers[next_buffer_to_fill];
     next_buffer->sdram_writeback_address = row_address;
     next_buffer->originating_spike = spike;
-    next_buffer->neuron_id = neuron_id;
     next_buffer->n_bytes_transferred = n_bytes_to_transfer;
 
     // Start a DMA transfer to fetch this synaptic row into current
@@ -107,18 +102,17 @@ static inline void do_dma_read(
 }
 
 
-static inline void do_direct_row(address_t row_address, uint32_t neuron_id) {
+static inline void do_direct_row(address_t row_address) {
     single_fixed_synapse[3] = (uint32_t) row_address[0];
     // Write back should be False by definition as single rows don't have STDP
     bool write_back;
-    synapses_process_synaptic_row(time, single_fixed_synapse, neuron_id, &write_back);
+    synapses_process_synaptic_row(time, single_fixed_synapse, &write_back);
 }
 
 // Check if there is anything to do - if not, DMA is not busy
 static inline bool is_something_to_do(
         address_t *row_address, size_t *n_bytes_to_transfer,
-        uint32_t *neuron_id, spike_t *spike,
-        uint32_t *n_rewire, uint32_t *n_process_spike) {
+        spike_t *spike, uint32_t *n_rewire, uint32_t *n_process_spike) {
     // Disable interrupts here as dma_busy modification is a critical section
     uint cpsr = spin1_int_disable();
 
@@ -127,7 +121,7 @@ static inline bool is_something_to_do(
         rewires_to_do--;
         spin1_mode_restore(cpsr);
         if (synaptogenesis_dynamics_rewire(time, spike, row_address,
-                n_bytes_to_transfer, neuron_id)) {
+                n_bytes_to_transfer)) {
             *n_rewire += 1;
             return true;
         }
@@ -137,7 +131,7 @@ static inline bool is_something_to_do(
     // Is there another address in the population table?
     spin1_mode_restore(cpsr);
     if (population_table_get_next_address(
-            spike, row_address, n_bytes_to_transfer, neuron_id)) {
+            spike, row_address, n_bytes_to_transfer)) {
         *n_process_spike += 1;
         return true;
     }
@@ -148,7 +142,7 @@ static inline bool is_something_to_do(
         // as this can be slow
         spin1_mode_restore(cpsr);
         if (population_table_get_first_address(
-                *spike, row_address, n_bytes_to_transfer, neuron_id)) {
+                *spike, row_address, n_bytes_to_transfer)) {
             synaptogenesis_spike_received(time, *spike);
             *n_process_spike += 1;
             return true;
@@ -178,15 +172,13 @@ static void setup_synaptic_dma_read(dma_buffer *current_buffer,
     address_t row_address;
     size_t n_bytes_to_transfer;
     spike_t spike;
-    uint32_t neuron_id;
     dma_n_spikes = 0;
     dma_n_rewires = 0;
 
     // Keep looking if there is something to do until a DMA can be done
     bool setup_done = false;
     while (!setup_done && is_something_to_do(&row_address,
-            &n_bytes_to_transfer, &neuron_id, &spike,
-            &dma_n_rewires, &dma_n_spikes)) {
+            &n_bytes_to_transfer, &spike, &dma_n_rewires, &dma_n_spikes)) {
         if (current_buffer != NULL &&
                 current_buffer->sdram_writeback_address == row_address) {
             // If we can reuse the row, add on what we can use it for
@@ -198,12 +190,12 @@ static void setup_synaptic_dma_read(dma_buffer *current_buffer,
             dma_n_spikes = 0;
         } else if (n_bytes_to_transfer == 0) {
             // If the row is in DTCM, process the row now
-            do_direct_row(row_address, neuron_id);
+            do_direct_row(row_address);
             dma_n_rewires = 0;
             dma_n_spikes = 0;
         } else {
             // If the row is in SDRAM, set up the transfer and we are done
-            do_dma_read(row_address, n_bytes_to_transfer, spike, neuron_id);
+            do_dma_read(row_address, n_bytes_to_transfer, spike);
             setup_done = true;
         }
     }
@@ -297,8 +289,8 @@ static void dma_complete_callback(uint unused, uint tag) {
         // Process synaptic row, writing it back if it's the last time
         // it's going to be processed
         bool write_back_now = false;
-        if (!synapses_process_synaptic_row(time, current_buffer->row,
-                current_buffer->neuron_id, &write_back_now)) {
+        if (!synapses_process_synaptic_row(
+                time, current_buffer->row, &write_back_now)) {
             log_error(
                     "Error processing spike 0x%.8x for address 0x%.8x"
                     " (local=0x%.8x)",

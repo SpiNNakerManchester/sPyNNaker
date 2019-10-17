@@ -156,8 +156,7 @@ bool population_table_initialise(
 }
 
 bool population_table_get_first_address(
-        spike_t spike, address_t* row_address, size_t* n_bytes_to_transfer,
-        uint32_t *neuron_id) {
+        spike_t spike, address_t* row_address, size_t* n_bytes_to_transfer) {
     uint32_t imin = 0;
     uint32_t imax = master_population_table_length;
 
@@ -180,8 +179,7 @@ bool population_table_get_first_address(
 
             uint32_t local_spike_id;
             return population_table_get_next_address(
-                    &local_spike_id, row_address, n_bytes_to_transfer,
-                    neuron_id);
+                    &local_spike_id, row_address, n_bytes_to_transfer);
         } else if (entry.key < spike) {
             // Entry must be in upper part of the table
             imin = imid + 1;
@@ -196,8 +194,7 @@ bool population_table_get_first_address(
 }
 
 bool population_table_get_next_address(
-        spike_t *spike, address_t *row_address, size_t *n_bytes_to_transfer,
-        uint32_t *neuron_id) {
+        spike_t *spike, address_t *row_address, size_t *n_bytes_to_transfer) {
     // If there are no more items in the list, return false
     if (items_to_go <= 0) {
         return false;
@@ -215,7 +212,6 @@ bool population_table_get_next_address(
                     (last_neuron_id * sizeof(uint32_t)));
             *n_bytes_to_transfer = 0;
             *spike = last_spike;
-            *neuron_id = last_neuron_id;
             is_valid = true;
         } else {
             uint32_t row_length = get_row_length(item);
@@ -233,7 +229,6 @@ bool population_table_get_next_address(
                         last_neuron_id, block_address, row_length, *row_address,
                         *n_bytes_to_transfer);
                 *spike = last_spike;
-                *neuron_id = last_neuron_id;
                 is_valid = true;
             }
         }
