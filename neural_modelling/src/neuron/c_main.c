@@ -52,29 +52,29 @@
 #include <filter_info.h>
 
 /* validates that the model being compiled does indeed contain a application
-   magic number*/
+ * magic number*/
 #ifndef APPLICATION_NAME_HASH
 #define APPLICATION_NAME_HASH 0
 #error APPLICATION_NAME_HASH was undefined.  Make sure you define this\
-       constant
+    constant
 #endif
 
-typedef enum extra_provenance_data_region_entries{
-    NUMBER_OF_PRE_SYNAPTIC_EVENT_COUNT = 0,
-    SYNAPTIC_WEIGHT_SATURATION_COUNT = 1,
-    INPUT_BUFFER_OVERFLOW_COUNT = 2,
-    CURRENT_TIMER_TICK = 3,
-    PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT = 4,
-	GHOST_POP_TABLE_SEARCHES = 5,
-	FAILED_TO_READ_BIT_FIELDS = 6,
-	DMA_COMPLETES = 7,
-	SPIKE_PROGRESSING_COUNT = 8,
-	INVALID_MASTER_POP_HITS = 9,
-	BIT_FIELD_FILTERED_COUNT = 10
-} extra_provenance_data_region_entries;
+struct neuron_provenance {
+    uint32_t n_pre_synaptic_events;
+    uint32_t n_synaptic_weight_saturations;
+    uint32_t n_input_buffer_overflows;
+    uint32_t current_timer_tick;
+    uint32_t n_plastic_synaptic_weight_saturations;
+    uint32_t n_ghost_pop_table_searches;
+    uint32_t n_failed_bitfield_reads;
+    uint32_t n_dmas_complete;
+    uint32_t n_spikes_processed;
+    uint32_t n_invalid_master_pop_table_hits;
+    uint32_t n_filtered_by_bitfield;
+};
 
 //! values for the priority for each callback
-typedef enum callback_priorities{
+typedef enum callback_priorities {
     MC = -1, DMA = 0, USER = 0, SDP = 1, TIMER = 2
 } callback_priorities;
 
@@ -116,36 +116,31 @@ uint32_t count_rewires = 0;
 //! \param[in] recording_address: the address in SDRAM where to store
 //! recordings
 //! \return True if recording initialisation is successful, false otherwise
-static bool initialise_recording(address_t recording_address){
+static bool initialise_recording(address_t recording_address) {
     bool success = recording_initialize(recording_address, &recording_flags);
     log_debug("Recording flags = 0x%08x", recording_flags);
     return success;
 }
 
-void c_main_store_provenance_data(address_t provenance_region){
+void c_main_store_provenance_data(address_t provenance_region) {
     log_debug("writing other provenance data");
+    struct neuron_provenance *prov = (void *) provenance_region;
 
     // store the data into the provenance data region
-    provenance_region[NUMBER_OF_PRE_SYNAPTIC_EVENT_COUNT] =
-        synapses_get_pre_synaptic_events();
-    provenance_region[SYNAPTIC_WEIGHT_SATURATION_COUNT] =
-        synapses_get_saturation_count();
-    provenance_region[INPUT_BUFFER_OVERFLOW_COUNT] =
-        spike_processing_get_buffer_overflows();
-    provenance_region[CURRENT_TIMER_TICK] = time;
-    provenance_region[PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT] =
+    prov->n_pre_synaptic_events = synapses_get_pre_synaptic_events();
+    prov->n_synaptic_weight_saturations = synapses_get_saturation_count();
+    prov->n_input_buffer_overflows = spike_processing_get_buffer_overflows();
+    prov->current_timer_tick = time;
+    prov->n_plastic_synaptic_weight_saturations =
         synapse_dynamics_get_plastic_saturation_count();
-    provenance_region[GHOST_POP_TABLE_SEARCHES] =
-    	spike_processing_get_ghost_pop_table_searches();
-    provenance_region[FAILED_TO_READ_BIT_FIELDS] = failed_bit_field_reads;
-    provenance_region[DMA_COMPLETES] =
-        spike_processing_get_dma_complete_count();
-    provenance_region[SPIKE_PROGRESSING_COUNT] =
-        spike_processing_get_spike_processing_count();
-    provenance_region[INVALID_MASTER_POP_HITS] =
+    prov->n_ghost_pop_table_searches =
+        spike_processing_get_ghost_pop_table_searches();
+    prov->n_failed_bitfield_reads = failed_bit_field_reads;
+    prov->n_dmas_complete = spike_processing_get_dma_complete_count();
+    prov->n_spikes_processed = spike_processing_get_spike_processing_count();
+    prov->n_invalid_master_pop_table_hits =
         spike_processing_get_invalid_master_pop_table_hits();
-    provenance_region[BIT_FIELD_FILTERED_COUNT] =
-        population_table_get_filtered_packet_count();
+    prov->n_filtered_by_bitfield = population_table_get_filtered_packet_count();
 
     log_debug("finished other provenance data");
 }
@@ -155,7 +150,7 @@ void c_main_store_provenance_data(address_t provenance_region){
 //! \param[in] timer_period a pointer for the memory address where the timer
 //!            period should be stored during the function.
 //! \return True if it successfully initialised, false otherwise
-static bool initialise() {
+static bool initialise(void) {
     log_debug("Initialise: started");
 
     // Get the address this core's DTCM data starts at from SRAM
@@ -180,7 +175,7 @@ static bool initialise() {
 
     // setup recording region
     if (!initialise_recording(
-            data_specification_get_region(RECORDING_REGION, ds_regions))){
+            data_specification_get_region(RECORDING_REGION, ds_regions))) {
         return false;
     }
 
@@ -233,7 +228,7 @@ static bool initialise() {
 
     // Set up structural plasticity dynamics
     if (synapse_dynamics_region_address &&
-        !synaptogenesis_dynamics_initialise(syn_dyn_end_address)){
+            !synaptogenesis_dynamics_initialise(syn_dyn_end_address)) {
         return false;
     }
 
@@ -241,8 +236,7 @@ static bool initialise() {
     rewiring = rewiring_period != -1;
 
     if (!spike_processing_initialise(
-            row_max_n_words, MC, USER,
-            incoming_spike_buffer_size)) {
+            row_max_n_words, MC, USER, incoming_spike_buffer_size)) {
         return false;
     }
 
@@ -262,7 +256,7 @@ static bool initialise() {
 
 //! \brief the function to call when resuming a simulation
 //! \return None
-void resume_callback() {
+void resume_callback(void) {
     recording_reset();
 
     // try reloading neuron parameters
@@ -295,9 +289,8 @@ void timer_callback(uint timer_count, uint unused) {
     log_debug("Timer tick %u \n", time);
 
     /* if a fixed number of simulation ticks that were specified at startup
-       then do reporting for finishing */
+     * then do reporting for finishing */
     if (infinite_run != TRUE && time >= simulation_ticks) {
-
         // Enter pause and resume state to avoid another tick
         simulation_handle_pause_resume(resume_callback);
 
@@ -312,8 +305,8 @@ void timer_callback(uint timer_count, uint unused) {
 
         profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
 
-        // Finalise any recordings that are in progress, writing back the final
-        // amounts of samples recorded to SDRAM
+        /* Finalise any recordings that are in progress, writing back the final
+         * amounts of samples recorded to SDRAM */
         if (recording_flags > 0) {
             log_debug("updating recording regions");
             recording_finalise();
@@ -322,23 +315,23 @@ void timer_callback(uint timer_count, uint unused) {
 
         // Subtract 1 from the time so this tick gets done again on the next
         // run
-        time -= 1;
+        time--;
 
         log_debug("Rewire tries = %d", count_rewires);
-
         simulation_ready_to_read();
-
         return;
     }
 
     uint cpsr = 0;
     // Do rewiring
     if (rewiring &&
-        ((last_rewiring_time >= rewiring_period && !is_fast()) || is_fast())) {
+            ((last_rewiring_time >= rewiring_period && !is_fast()) || is_fast())) {
         update_goal_posts(time);
         last_rewiring_time = 0;
         // put flag in spike processing to do synaptic rewiring
-//        synaptogenesis_dynamics_rewire(time);
+#if 0
+        synaptogenesis_dynamics_rewire(time);
+#endif
         if (is_fast()) {
             do_rewiring(rewiring_period);
         } else {
@@ -346,8 +339,8 @@ void timer_callback(uint timer_count, uint unused) {
         }
         // disable interrupts
         cpsr = spin1_int_disable();
-//       // If we're not already processing synaptic DMAs,
-//        // flag pipeline as busy and trigger a feed event
+        /* If we're not already processing synaptic DMAs,
+         * flag pipeline as busy and trigger a feed event */
         if (!get_dma_busy()) {
             log_debug("Sending user event for new spike");
             if (spin1_trigger_user_event(0, 0)) {
@@ -374,9 +367,8 @@ void timer_callback(uint timer_count, uint unused) {
 
 //! \brief The entry point for this model.
 void c_main(void) {
-
     // initialise the model
-    if (!initialise()){
+    if (!initialise()) {
         rt_error(RTE_API);
     }
 
@@ -385,7 +377,7 @@ void c_main(void) {
 
     // Set timer tick (in microseconds)
     log_debug("setting timer tick callback for %d microseconds",
-              timer_period);
+            timer_period);
     spin1_set_timer_tick_and_phase(timer_period, timer_offset);
 
     // Set up the timer tick callback (others are handled elsewhere)
