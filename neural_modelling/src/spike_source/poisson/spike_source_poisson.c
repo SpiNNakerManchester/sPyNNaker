@@ -226,7 +226,6 @@ static inline uint32_t faster_spike_source_get_num_spikes(
     return (uint32_t) roundk(x * x, nbits);
 }
 
-#ifdef PRINT_SPIKE_SOURCES
 static void print_spike_source(index_t s) {
     spike_source_t *p = &source[s];
     log_info("atom %d", s);
@@ -238,14 +237,11 @@ static void print_spike_source(index_t s) {
     log_info("isi_val = %k", p->mean_isi_ticks);
     log_info("time_to_spike = %k", p->time_to_spike_ticks);
 }
-#endif
 
 static void print_spike_sources(void) {
-#ifdef PRINT_SPIKE_SOURCES
     for (index_t s = 0; s < params.n_spike_sources; s++) {
         print_spike_source(s);
     }
-#endif
 }
 
 //! \brief entry method for reading the global parameters stored in Poisson
@@ -396,7 +392,9 @@ static bool initialize(void) {
     }
 
     // print spike sources for debug purposes
-    // print_spike_sources();
+#if LOG_LEVEL >= LOG_DEBUG
+    print_spike_sources();
+#endif
 
     // Set up recording buffer
     n_spike_buffers_allocated = 0;
@@ -445,7 +443,9 @@ static void resume_callback(void) {
     log_info("Successfully resumed Poisson spike source at time: %u", time);
 
     // print spike sources for debug purposes
+#if LOG_LEVEL >= LOG_DEBUG
     print_spike_sources();
+#endif
 }
 
 //! \brief stores the Poisson parameters back into SDRAM for reading by the

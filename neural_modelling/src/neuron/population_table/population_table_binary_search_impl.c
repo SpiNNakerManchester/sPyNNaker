@@ -177,6 +177,8 @@ bool population_table_get_first_address(
             log_debug("spike = %08x, entry_index = %u, start = %u, count = %u",
                     spike, imid, next_item, items_to_go);
 
+            // A local address is used here as the interface requires something
+            // to be passed in but using the address of an argument is odd!
             uint32_t local_spike_id;
             return population_table_get_next_address(
                     &local_spike_id, row_address, n_bytes_to_transfer);
