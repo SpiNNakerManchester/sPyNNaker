@@ -35,6 +35,11 @@ from .abstract_pynn_model import AbstractPyNNModel
 logger = FormatAdapter(logging.getLogger(__file__))
 
 
+def _we_dont_do_this_now(*args):  # pylint: disable=unused-argument
+    # pragma: no cover
+    raise NotImplementedError("sPyNNaker8 does not currently do this")
+
+
 class PyNNPopulationCommon(object):
     __slots__ = [
         "_all_ids",
@@ -181,13 +186,13 @@ class PyNNPopulationCommon(object):
         """ Merges populations
         """
         # TODO: Make this add the neurons from another population to this one
-        raise NotImplementedError
+        _we_dont_do_this_now(other)
 
     def all(self):
         """ Iterator over cell IDs on all nodes.
         """
         # TODO: Return the cells when we have such a thing
-        raise NotImplementedError
+        _we_dont_do_this_now()
 
     @property
     def conductance_based(self):
@@ -307,25 +312,23 @@ class PyNNPopulationCommon(object):
 
         Note: This is supported by sPyNNaker8
         """
-
         # TODO: Needs a more precise recording mechanism (coming soon)
-        raise NotImplementedError
+        _we_dont_do_this_now(variable)
 
     def inject(self, current_source):
         """ Connect a current source to all cells in the Population.
         """
 
         # TODO:
-        raise NotImplementedError
+        _we_dont_do_this_now(current_source)
 
     def __iter__(self):
         """ Iterate over local cells
 
         Note: This is supported by sPyNNaker8
         """
-
         # TODO:
-        raise NotImplementedError
+        _we_dont_do_this_now()
 
     def __len__(self):
         """ Get the total number of cells in the population.
