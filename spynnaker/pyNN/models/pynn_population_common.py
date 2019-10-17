@@ -291,7 +291,7 @@ class PyNNPopulationCommon(object):
             MPI node.
         """
         # TODO: Need __getitem__
-        raise NotImplementedError
+        _we_dont_do_this_now(cell_id)
 
     def _initialize(self, variable, value):
         """ Set the initial value of one of the state variables of the neurons\
