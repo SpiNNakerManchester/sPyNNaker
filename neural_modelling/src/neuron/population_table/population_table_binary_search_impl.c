@@ -126,7 +126,7 @@ bool population_table_initialise(
         address_t table_address, address_t synapse_rows_address,
         address_t direct_rows_address, uint32_t *row_max_n_words) {
     log_debug("population_table_initialise: starting");
-    
+
     log_debug("master pop base address is %d", &table_address[0]);
     master_population_table_length = table_address[0];
     log_debug("master pop table length is %d\n", master_population_table_length);
@@ -198,11 +198,11 @@ bool population_table_get_first_address(
         if (entry.count == 0) {
             log_debug(
                 "spike %u (= %x): population found in master population"
-                "table but count is 0");
+                "table but count is 0", spike, spike);
         }
 
         log_debug("about to try to find neuron id");
-        last_neuron_id = _get_neuron_id(entry, spike);
+        last_neuron_id = get_neuron_id(entry, spike);
         log_debug("found neuron id of %d", last_neuron_id);
 
         // check we have a entry in the bit field for this (possible not to due
@@ -332,7 +332,7 @@ bool population_table_get_next_address(
 //! \brief generates how many dma's were pointless
 //! \return uint of how many were done
 uint32_t population_table_get_ghost_pop_table_searches(){
-	return ghost_pop_table_searches;
+    return ghost_pop_table_searches;
 }
 
 //! \brief get the number of master pop table key misses

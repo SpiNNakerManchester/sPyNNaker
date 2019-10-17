@@ -18,7 +18,7 @@ from spinn_front_end_common.utilities.constants import WORD_TO_BYTE_MULTIPLIER
 from pacman.utilities.algorithm_utilities. \
     partition_algorithm_utilities import determine_max_atoms_for_vertex
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
-from spynnaker.pyNN.models.utility_models import DelayExtensionVertex
+from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 
 # number of elements
 ELEMENTS_USED_IN_EACH_BIT_FIELD = 3  # n words, key, pointer to bitfield
