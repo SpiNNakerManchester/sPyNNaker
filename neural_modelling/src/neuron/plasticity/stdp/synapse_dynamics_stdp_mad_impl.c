@@ -117,9 +117,11 @@ static inline final_state_t plasticity_update_synapse(
             window_begin_time, window_end_time, post_window.prev_time,
             post_window.prev_time_valid, post_window.num_events);
 
-    // print_event_history(post_event_history);
-    // print_delayed_window_events(post_event_history, window_begin_time,
-    //		   window_end_time, delay_dendritic);
+#if LOG_LEVEL >= LOG_DEBUG
+    print_event_history(post_event_history);
+    print_delayed_window_events(post_event_history, window_begin_time,
+            window_end_time, delay_dendritic);
+#endif
 
     // Process events in post-synaptic window
     while (post_window.num_events > 0) {

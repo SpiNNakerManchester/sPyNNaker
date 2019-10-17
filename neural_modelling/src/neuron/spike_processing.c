@@ -34,6 +34,7 @@ typedef struct dma_buffer {
     // (used to allow row data to be re-used for multiple spikes)
     spike_t originating_spike;
 
+    // Number of bytes transferred in the read
     uint32_t n_bytes_transferred;
 
     // Row data

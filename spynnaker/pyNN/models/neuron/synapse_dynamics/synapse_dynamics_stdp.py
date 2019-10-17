@@ -385,6 +385,8 @@ class SynapseDynamicsSTDP(
 
     @overrides(AbstractPlasticSynapseDynamics.get_weight_mean)
     def get_weight_mean(self, connector, weights):
+        # Because the weights could all be changed to the maximum, the mean
+        # has to be given as the maximum for scaling
         return self.get_weight_maximum(connector, weights)
 
     @overrides(AbstractPlasticSynapseDynamics.get_weight_variance)
