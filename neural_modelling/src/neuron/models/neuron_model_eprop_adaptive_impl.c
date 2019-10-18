@@ -72,6 +72,46 @@ state_t neuron_model_state_update(
         neuron->refract_timer -= 1;
     }
 
+
+    // ******************************************************************
+    // Update Psi (pseudo-derivative) (done once for each postsynaptic neuron)
+    // ******************************************************************
+    // REAL temp1 = (neuron->V_membrane - v_threshold_baseline) * (1/v_thresh)
+    // REAL temp2 = ((1/v_th) * 0.3 * 1-(abs(temp1))
+    // neuron->psi =  (temp2 > 0)? temp2 , 0;
+
+    // All operations now need doing once per eprop synapse
+//    for (int syn=0; syn < total_synapses_per_neuron; syn++){
+    // ******************************************************************
+    // Update eligibility vector
+    // ******************************************************************
+//    neuron->syn_state[syn_ind].ep_a; = neuron->psi * neuron->syn_state[syn_ind].z_bar +
+//    		(global_params->rho - neuron->psi * global_params->beta) *
+//    			neuron->syn_state[syn_ind].ep_a;
+
+
+    // ******************************************************************
+    // Update eligibility trace
+    // ******************************************************************
+//    REAL temp_elig_trace = neuron->psi * (neuron->syn_state[syn_ind].z_bar -
+//    		global_params->beta * neuron->syn_state[syn_ind].ep_a);
+//    neuron->syn_state[syn_ind].e_bar = "low pass filtered temp_elig_trace"
+
+
+    // ******************************************************************
+    // Update total weight change
+    // ******************************************************************
+//    uint16_t this_dt_weight_change = -global_params->eta * neuron->learning_sig * neuron->syn_state[syn_ind].e_bar;
+//    neuron->syn_state[syn_ind].delta_w +=this_dt_weight_change;
+
+//    }
+
+
+
+
+
+
+
     return neuron->V_membrane;
 }
 

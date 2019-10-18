@@ -69,6 +69,8 @@ typedef struct neuron_t {
     // pseudo derivative
     REAL     psi;
 
+    REAL    L; // learning signal
+
     // array of synaptic states - peak fan-in of 250 for this case
     eprop_syn_state_t syn_state[SYNAPSES_PER_NEURON];
 
