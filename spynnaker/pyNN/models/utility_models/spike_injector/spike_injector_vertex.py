@@ -1,3 +1,18 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import logging
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
@@ -20,10 +35,10 @@ class SpikeInjectorVertex(
         to specify the virtual_key of the population to identify the population
     """
     __slots__ = [
-        "_receive_port",
-        "_requires_mapping",
-        "_spike_recorder",
-        "_virtual_key"]
+        "__receive_port",
+        "__requires_mapping",
+        "__spike_recorder",
+        "__virtual_key"]
 
     default_parameters = {
         'label': "spikeInjector", 'port': None, 'virtual_key': None}
@@ -31,36 +46,41 @@ class SpikeInjectorVertex(
     SPIKE_RECORDING_REGION_ID = 0
 
     def __init__(
-            self, n_neurons, label, constraints, port, virtual_key):
+            self, n_neurons, label, constraints, port, virtual_key,
+            reserve_reverse_ip_tag):
         # pylint: disable=too-many-arguments
+        self.__requires_mapping = True
+        self.__receive_port = None
+        self.__virtual_key = None
 
         super(SpikeInjectorVertex, self).__init__(
             n_keys=n_neurons, label=label, receive_port=port,
-            virtual_key=virtual_key, reserve_reverse_ip_tag=True,
+            virtual_key=virtual_key,
+            reserve_reverse_ip_tag=reserve_reverse_ip_tag,
             constraints=constraints)
 
         # Set up for recording
-        self._spike_recorder = EIEIOSpikeRecorder()
+        self.__spike_recorder = EIEIOSpikeRecorder()
 
     @property
     def port(self):
-        return self._receive_port
+        return self.__receive_port
 
     @port.setter
     def port(self, port):
-        self._receive_port = port
+        self.__receive_port = port
 
     @property
     def virtual_key(self):
-        return self._virtual_key
+        return self.__virtual_key
 
     @virtual_key.setter
     def virtual_key(self, virtual_key):
-        self._virtual_key = virtual_key
+        self.__virtual_key = virtual_key
 
     @overrides(AbstractSpikeRecordable.is_recording_spikes)
     def is_recording_spikes(self):
-        return self._spike_recorder.record
+        return self.__spike_recorder.record
 
     @overrides(AbstractSpikeRecordable.set_recording_spikes)
     def set_recording_spikes(
@@ -72,8 +92,8 @@ class SpikeInjectorVertex(
             logger.warning("Indexes currently not supported "
                            "so being ignored")
         self.enable_recording(new_state)
-        self._requires_mapping = not self._spike_recorder.record
-        self._spike_recorder.record = new_state
+        self.__requires_mapping = not self.__spike_recorder.record
+        self.__spike_recorder.record = new_state
 
     @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
     def get_spikes_sampling_interval(self):
@@ -82,7 +102,7 @@ class SpikeInjectorVertex(
     @overrides(AbstractSpikeRecordable.get_spikes)
     def get_spikes(
             self, placements, graph_mapper, buffer_manager, machine_time_step):
-        return self._spike_recorder.get_spikes(
+        return self.__spike_recorder.get_spikes(
             self.label, buffer_manager,
             SpikeInjectorVertex.SPIKE_RECORDING_REGION_ID,
             placements, graph_mapper, self,

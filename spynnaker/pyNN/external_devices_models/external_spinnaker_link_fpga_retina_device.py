@@ -1,3 +1,18 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import logging
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
@@ -57,9 +72,9 @@ class ExternalFPGARetinaDevice(
         AbstractProvidesOutgoingPartitionConstraints,
         ProvidesKeyToAtomMappingImpl):
     __slots__ = [
-        "_fixed_key",
-        "_fixed_mask",
-        "_polarity"]
+        "__fixed_key",
+        "__fixed_mask",
+        "__polarity"]
 
     MODE_128 = "128"
     MODE_64 = "64"
@@ -82,14 +97,14 @@ class ExternalFPGARetinaDevice(
         :param board_address:
         """
         # pylint: disable=too-many-arguments
-        self._polarity = polarity
-        self._fixed_key = (retina_key & 0xFFFF) << 16
-        self._fixed_mask = 0xFFFF8000
+        self.__polarity = polarity
+        self.__fixed_key = (retina_key & 0xFFFF) << 16
+        self.__fixed_mask = 0xFFFF8000
         if polarity == self.UP_POLARITY:
-            self._fixed_key |= 0x4000
+            self.__fixed_key |= 0x4000
 
         fixed_n_neurons = self.get_n_neurons(mode, polarity)
-        self._fixed_mask = self._get_mask(mode)
+        self.__fixed_mask = self._get_mask(mode)
 
         super(ExternalFPGARetinaDevice, self).__init__(
             n_atoms=fixed_n_neurons, spinnaker_link_id=spinnaker_link_id,
@@ -152,4 +167,4 @@ class ExternalFPGARetinaDevice(
 
     def get_outgoing_partition_constraints(self, partition):
         return [FixedKeyAndMaskConstraint([
-            BaseKeyAndMask(self._fixed_key, self._fixed_mask)])]
+            BaseKeyAndMask(self.__fixed_key, self.__fixed_mask)])]

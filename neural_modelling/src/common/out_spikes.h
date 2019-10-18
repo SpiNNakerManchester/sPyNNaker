@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2017-2019 The University of Manchester
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 /*! \file
  *
  *  \brief utility class which ensures that format of spikes being recorded is
@@ -43,7 +60,7 @@
 extern bit_field_t out_spikes;
 
 //! \brief clears the currently recorded spikes
-void out_spikes_reset();
+void out_spikes_reset(void);
 
 //! \brief initialise the recording of spikes
 //! \param[in] max_spike_sources the number of spike sources to be recorded
@@ -59,12 +76,12 @@ bool out_spikes_initialize(size_t max_spike_sources);
 //! \param[in] callback Callback to call when the recording is done
 //                      (can be NULL)
 bool out_spikes_record(
-    uint8_t channel, uint32_t time, uint32_t n_words,
-    recording_complete_callback_t callback);
+        uint8_t channel, uint32_t time, uint32_t n_words,
+        recording_complete_callback_t callback);
 
 //! \brief Check if any spikes have been recorded
 //! \return True if no spikes have been recorded, false otherwise
-bool out_spikes_is_empty();
+bool out_spikes_is_empty(void);
 
 //! \brief Check if a given neuron has been recorded to spike
 //! \param[in] spike_source_index The index of the neuron.
@@ -72,7 +89,7 @@ bool out_spikes_is_empty();
 bool out_spikes_is_spike(index_t spike_source_index);
 
 //! \brief print out the contents of the output spikes (in DEBUG only)
-void out_spikes_print();
+void out_spikes_print(void);
 
 //! \brief Indicates that a neuron has spiked
 //! \param[in] spike_source_index The index of the neuron that has spiked

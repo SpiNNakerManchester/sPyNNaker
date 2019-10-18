@@ -1,3 +1,18 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import configparser
 import numpy
 from spinn_front_end_common.utilities import globals_variables
@@ -35,6 +50,17 @@ class MockRNG(object):
         return getattr(self._rng, name)
 
 
+class MockRandomDistribution(object):
+
+    def __init__(self, name, rng, **kwargs):
+        self._name = name
+        self._kwargs = kwargs
+        self._rng = rng
+
+    def next(self, n=1):
+        return self._rng.next(n)
+
+
 class MockSimulator(object):
 
     def __init__(self):
@@ -57,12 +83,15 @@ class MockSimulator(object):
         return isinstance(values, MockRNG)
 
     def get_pynn_NumpyRNG(self):
-        return MockRNG()
+        return MockRNG
+
+    def get_random_distribution(self):
+        return MockRandomDistribution
 
     def add_population(self, pop):
         pass
 
-    def add_application_vertex(self, vertex):
+    def add_application_vertex(self, vertex, prefix=None):
         pass
 
     def verify_not_running(self):
@@ -73,6 +102,10 @@ class MockSimulator(object):
 
     def has_reset_last(self):
         return False
+
+    @property
+    def machine_time_step(self):
+        return 1000
 
     @property
     def id_counter(self):
@@ -88,3 +121,7 @@ class MockSimulator(object):
         globals_variables.set_failed_state(SpynnakerFailedState())
         globals_variables.set_simulator(simulator)
         return simulator
+
+    @property
+    def use_virtual_board(self):
+        return True

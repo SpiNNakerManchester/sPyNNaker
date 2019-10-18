@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2017-2019 The University of Manchester
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #ifndef _TIMING_RECURRENT_FIXED_IMPL_H_
 #define _TIMING_RECURRENT_FIXED_IMPL_H_
 
@@ -20,14 +37,14 @@ typedef struct {
 
 static inline bool timing_recurrent_in_pre_window(
         uint32_t time_since_last_event, update_state_t previous_state) {
-    return (time_since_last_event
-            < plasticity_trace_region_data.pre_window_length);
+    return (time_since_last_event <
+            plasticity_trace_region_data.pre_window_length);
 }
 
 static inline bool timing_recurrent_in_post_window(
         uint32_t time_since_last_event, update_state_t previous_state) {
-    return (time_since_last_event
-            < plasticity_trace_region_data.post_window_length);
+    return (time_since_last_event <
+            plasticity_trace_region_data.post_window_length);
 }
 
 static inline update_state_t timing_recurrent_calculate_pre_window(

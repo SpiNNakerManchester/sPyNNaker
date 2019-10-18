@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2017-2019 The University of Manchester
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 /*!
  * \file
  * \brief implementation for handling the processing of synapse rows.
@@ -79,12 +96,12 @@ static inline size_t synapse_row_plastic_size(address_t row) {
 
 // Returns the address of the plastic region
 static inline address_t synapse_row_plastic_region(address_t row) {
-    return ((address_t) (&(row[1])));
+    return (address_t) &row[1];
 }
 
 // Returns the address of the non-plastic (or fixed) region
 static inline address_t synapse_row_fixed_region(address_t row) {
-    return ((address_t) (&(row[synapse_row_plastic_size(row) + 1])));
+    return (address_t) &row[synapse_row_plastic_size(row) + 1];
 }
 
 // Within the fixed-region extracted using the above API, fixed[0]
@@ -101,44 +118,44 @@ static inline address_t synapse_row_fixed_region(address_t row) {
 //   ...
 // F+1+ceil(P/2): [ Last word of fixed region                                 ]
 static inline size_t synapse_row_num_fixed_synapses(address_t fixed) {
-    return ((size_t) (fixed[0]));
+    return (size_t) fixed[0];
 }
 
 static inline size_t synapse_row_num_plastic_controls(address_t fixed) {
-    return ((size_t) (fixed[1]));
+    return (size_t) fixed[1];
 }
 
 static inline control_t* synapse_row_plastic_controls(address_t fixed) {
-    return (control_t*) (&fixed[2 + synapse_row_num_fixed_synapses(fixed)]);
+    return (control_t*) &fixed[2 + synapse_row_num_fixed_synapses(fixed)];
 }
 
 static inline uint32_t *synapse_row_fixed_weight_controls(address_t fixed) {
-    return (&(fixed[2]));
+    return &fixed[2];
 }
 
 // The following are offset calculations into the ring buffers
 static inline index_t synapse_row_sparse_index(
         uint32_t x, uint32_t synapse_index_mask) {
-    return (x & synapse_index_mask);
+    return x & synapse_index_mask;
 }
 
 static inline index_t synapse_row_sparse_type(
         uint32_t x, uint32_t synapse_index_bits, uint32_t synapse_type_mask) {
-    return ((x >> synapse_index_bits) & synapse_type_mask);
+    return (x >> synapse_index_bits) & synapse_type_mask;
 }
 
 static inline index_t synapse_row_sparse_type_index(
         uint32_t x, uint32_t synapse_type_index_mask) {
-    return (x & synapse_type_index_mask);
+    return x & synapse_type_index_mask;
 }
 
 static inline index_t synapse_row_sparse_delay(
         uint32_t x, uint32_t synapse_type_index_bits) {
-    return ((x >> synapse_type_index_bits) & SYNAPSE_DELAY_MASK);
+    return (x >> synapse_type_index_bits) & SYNAPSE_DELAY_MASK;
 }
 
 static inline weight_t synapse_row_sparse_weight(uint32_t x) {
-    return (x >> (32 - SYNAPSE_WEIGHT_BITS));
+    return x >> (32 - SYNAPSE_WEIGHT_BITS);
 }
 
 #endif  // SYNAPSE_ROW_H

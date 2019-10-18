@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2017-2019 The University of Manchester
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include "weight_erbp_impl.h"
 
 //---------------------------------------
@@ -18,13 +35,14 @@ address_t weight_initialise(address_t address, uint32_t n_synapse_types,
 
     // Copy plasticity region data from address
     // **NOTE** this seems somewhat safer than relying on sizeof
-    int32_t *plasticity_word = (int32_t*) address;
-    plasticity_weight_region_data = (plasticity_weight_region_data_t *)
-        spin1_malloc(sizeof(plasticity_weight_region_data_t) * n_synapse_types);
+    plasticity_weight_region_data =
+            spin1_malloc(sizeof(plasticity_weight_region_data_t) * n_synapse_types);
     if (plasticity_weight_region_data == NULL) {
         log_error("Could not initialise weight region data");
         return NULL;
     }
+
+    int32_t *plasticity_word = (int32_t *) address;
     for (uint32_t s = 0; s < n_synapse_types; s++) {
         plasticity_weight_region_data[s].min_weight = *plasticity_word++;
         plasticity_weight_region_data[s].max_weight = *plasticity_word++;

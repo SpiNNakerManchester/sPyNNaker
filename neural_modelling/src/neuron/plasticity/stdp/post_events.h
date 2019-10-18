@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2017-2019 The University of Manchester
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #ifndef _POST_EVENTS_H_
 #define _POST_EVENTS_H_
 
@@ -38,20 +55,16 @@ typedef struct {
 static inline post_event_history_t *post_events_init_buffers(
         uint32_t n_neurons) {
     post_event_history_t *post_event_history =
-        (post_event_history_t*) spin1_malloc(
-            n_neurons * sizeof(post_event_history_t));
-
+            spin1_malloc(n_neurons * sizeof(post_event_history_t));
     // Check allocations succeeded
     if (post_event_history == NULL) {
-        log_error(
-            "Unable to allocate global STDP structures - Out of DTCM: Try "
-            "reducing the number of neurons per core to fix this problem ");
+        log_error("Unable to allocate global STDP structures - Out of DTCM: Try "
+                "reducing the number of neurons per core to fix this problem ");
         return NULL;
     }
 
     // Loop through neurons
     for (uint32_t n = 0; n < n_neurons; n++) {
-
         // Add initial placeholder entry to buffer
         post_event_history[n].times[0] = 0;
         post_event_history[n].traces[0] = timing_get_initial_post_trace();
@@ -63,7 +76,6 @@ static inline post_event_history_t *post_events_init_buffers(
 
 static inline post_event_window_t post_events_get_window(
         const post_event_history_t *events, uint32_t begin_time) {
-
     // Start at end event - beyond end of post-event history
     const uint32_t count = events->count_minus_one + 1;
     const uint32_t *end_event_time = events->times + count;
@@ -71,16 +83,13 @@ static inline post_event_window_t post_events_get_window(
     const uint32_t *event_time = end_event_time;
     post_event_window_t window;
     do {
-
         // Cache pointer to this event as potential
         // Next event and go back one event
         // **NOTE** next_time can be invalid
         window.next_time = event_time--;
-    }
-
     // Keep looping while event occurred after start
     // Of window and we haven't hit beginning of array
-    while (*event_time > begin_time && event_time != events->times);
+    } while (*event_time > begin_time && event_time != events->times);
 
     // Deference event to use as previous
     window.prev_time = *event_time;
@@ -100,7 +109,6 @@ static inline post_event_window_t post_events_get_window(
 static inline post_event_window_t post_events_get_window_delayed(
         const post_event_history_t *events, uint32_t begin_time,
         uint32_t end_time) {
-
     // Start at end event - beyond end of post-event history
     const uint32_t count = events->count_minus_one + 1;
     const uint32_t *end_event_time = events->times + count;
@@ -140,7 +148,6 @@ static inline post_event_window_t post_events_get_window_delayed(
 
 //---------------------------------------
 static inline post_event_window_t post_events_next(post_event_window_t window) {
-
     // Update previous time and increment next time
     window.prev_time = *window.next_time++;
     window.prev_trace = *window.next_trace++;
@@ -153,7 +160,6 @@ static inline post_event_window_t post_events_next(post_event_window_t window) {
 //---------------------------------------
 static inline post_event_window_t post_events_next_delayed(
         post_event_window_t window, uint32_t delayed_time) {
-
     // Update previous time and increment next time
     window.prev_time = delayed_time;
     window.prev_trace = *window.next_trace++;
@@ -167,18 +173,15 @@ static inline post_event_window_t post_events_next_delayed(
 }
 
 //---------------------------------------
-static inline void post_events_add(uint32_t time, post_event_history_t *events,
-                                   post_trace_t trace) {
-
-    if (events->count_minus_one < (MAX_POST_SYNAPTIC_EVENTS - 1)) {
-
+static inline void post_events_add(
+        uint32_t time, post_event_history_t *events, post_trace_t trace) {
+    if (events->count_minus_one < MAX_POST_SYNAPTIC_EVENTS - 1) {
         // If there's still space, store time at current end
         // and increment count minus 1
         const uint32_t new_index = ++events->count_minus_one;
         events->times[new_index] = time;
         events->traces[new_index] = trace;
     } else {
-
         // Otherwise Shuffle down elements
         // **NOTE** 1st element is always an entry at time 0
         for (uint32_t e = 2; e < MAX_POST_SYNAPTIC_EVENTS; e++) {
@@ -196,12 +199,9 @@ static inline void post_events_add(uint32_t time, post_event_history_t *events,
 static inline void print_event_history(const post_event_history_t *events){
 
 	io_printf(IO_BUF, "		##  printing entire post event history  ##\n");
-	for (uint i = 0; i <= events->count_minus_one; i++){
+	for (uint32_t i = 0; i <= events->count_minus_one; i++) {
 		io_printf(IO_BUF, "post event: %u, time: %u, trace: %d",
-				i,
-				events->times[i],
-				events->traces[i]
-				);
+		        i, events->times[i], events->traces[i]);
 	}
 }
 
@@ -212,8 +212,8 @@ static inline void print_delayed_window_events(const post_event_history_t *post_
             post_event_history, begin_time, end_time);
 
     while (post_window.num_events > 0) {
-    	const uint32_t delayed_post_time = *post_window.next_time
-    	                                           + delay_dendritic;
+    	const uint32_t delayed_post_time =
+    	        *post_window.next_time + delay_dendritic;
     	io_printf(IO_BUF, "            post spike: %u, time: %u, trace: %d\n",
     			post_window.num_events, delayed_post_time,
 				*post_window.next_trace);

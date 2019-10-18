@@ -1,3 +1,18 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
     FixedKeyAndMaskConstraint)
@@ -31,10 +46,10 @@ class MunichRetinaDevice(
         AbstractProvidesOutgoingPartitionConstraints,
         ProvidesKeyToAtomMappingImpl):
     __slots__ = [
-        "_fixed_key",
-        "_fixed_mask",
-        "_polarity",
-        "_position"]
+        "__fixed_key",
+        "__fixed_mask",
+        "__polarity",
+        "__position"]
 
     # key codes for the robot retina
     MANAGEMENT_BIT = 0x400
@@ -68,10 +83,10 @@ class MunichRetinaDevice(
         if polarity is None:
             polarity = MunichRetinaDevice.MERGED_POLARITY
 
-        self._fixed_key = (retina_key & 0xFFFF) << 16
-        self._fixed_mask = 0xFFFF8000
+        self.__fixed_key = (retina_key & 0xFFFF) << 16
+        self.__fixed_mask = 0xFFFF8000
         if polarity == MunichRetinaDevice.UP_POLARITY:
-            self._fixed_key |= 0x4000
+            self.__fixed_key |= 0x4000
 
         if polarity == MunichRetinaDevice.MERGED_POLARITY:
             # There are 128 x 128 retina "pixels" x 2 polarities
@@ -79,23 +94,23 @@ class MunichRetinaDevice(
         else:
             # There are 128 x 128 retina "pixels"
             fixed_n_neurons = 128 * 128
-            self._fixed_mask = 0xFFFFC000
+            self.__fixed_mask = 0xFFFFC000
 
-        self._polarity = polarity
-        self._position = position
+        self.__polarity = polarity
+        self.__position = position
 
         super(MunichRetinaDevice, self).__init__(
             n_atoms=fixed_n_neurons, spinnaker_link_id=spinnaker_link_id,
             max_atoms_per_core=fixed_n_neurons, label=label,
             board_address=board_address)
 
-        if self._position not in self._RETINAS:
+        if self.__position not in self._RETINAS:
             raise SpynnakerException(
                 "The external Retina does not recognise this _position")
 
     def get_outgoing_partition_constraints(self, partition):
         return [FixedKeyAndMaskConstraint([
-            BaseKeyAndMask(self._fixed_key, self._fixed_mask)])]
+            BaseKeyAndMask(self.__fixed_key, self.__fixed_mask)])]
 
     @property
     @overrides(AbstractSendMeMulticastCommandsVertex.start_resume_commands)
@@ -103,7 +118,7 @@ class MunichRetinaDevice(
         commands = list()
         # change the retina key it transmits with
         # (based off if its right or left)
-        if self._position == self.RIGHT_RETINA:
+        if self.__position == self.RIGHT_RETINA:
             key_set_command = self.MANAGEMENT_BIT | self.RIGHT_RETINA_KEY_SET
         else:
             key_set_command = self.MANAGEMENT_BIT | self.LEFT_RETINA_KEY_SET
@@ -118,7 +133,7 @@ class MunichRetinaDevice(
             delay_between_repeats=1000))
 
         # make retina enabled (dependent on if its a left or right retina
-        if self._position == self.RIGHT_RETINA:
+        if self.__position == self.RIGHT_RETINA:
             enable_command = self.MANAGEMENT_BIT | self.RIGHT_RETINA_ENABLE
         else:
             enable_command = self.MANAGEMENT_BIT | self.LEFT_RETINA_ENABLE
@@ -132,7 +147,7 @@ class MunichRetinaDevice(
     @overrides(AbstractSendMeMulticastCommandsVertex.pause_stop_commands)
     def pause_stop_commands(self):
         # disable retina
-        if self._position == self.RIGHT_RETINA:
+        if self.__position == self.RIGHT_RETINA:
             disable_command = self.MANAGEMENT_BIT | self.RIGHT_RETINA_DISABLE
         else:
             disable_command = self.MANAGEMENT_BIT | self.LEFT_RETINA_DISABLE

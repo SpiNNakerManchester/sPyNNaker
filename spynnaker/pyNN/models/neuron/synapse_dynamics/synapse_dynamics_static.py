@@ -1,3 +1,18 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import numpy
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
@@ -15,13 +30,13 @@ class SynapseDynamicsStatic(
         AbstractChangableAfterRun, AbstractGenerateOnMachine):
     __slots__ = [
         # ??????????
-        "_change_requires_mapping",
+        "__change_requires_mapping",
         # padding to add to a synaptic row for synaptic rewiring
-        "_pad_to_length"]
+        "__pad_to_length"]
 
     def __init__(self, pad_to_length=None):
-        self._change_requires_mapping = True
-        self._pad_to_length = pad_to_length
+        self.__change_requires_mapping = True
+        self.__pad_to_length = pad_to_length
 
     @overrides(AbstractSynapseDynamics.is_same_as)
     def is_same_as(self, synapse_dynamics):
@@ -47,9 +62,9 @@ class SynapseDynamicsStatic(
     @overrides(
         AbstractStaticSynapseDynamics.get_n_words_for_static_connections)
     def get_n_words_for_static_connections(self, n_connections):
-        if (self._pad_to_length is not None and
-                n_connections < self._pad_to_length):
-            n_connections = self._pad_to_length
+        if (self.__pad_to_length is not None and
+                n_connections < self.__pad_to_length):
+            n_connections = self.__pad_to_length
         return n_connections
 
     @overrides(AbstractStaticSynapseDynamics.get_static_synaptic_data)
@@ -74,7 +89,7 @@ class SynapseDynamicsStatic(
             connection_row_indices, n_rows,
             fixed_fixed.view(dtype="uint8").reshape((-1, 4)))
         ff_size = self.get_n_items(fixed_fixed_rows, 4)
-        if self._pad_to_length is not None:
+        if self.__pad_to_length is not None:
             # Pad the data
             fixed_fixed_rows = self._pad_row(fixed_fixed_rows, 4)
         ff_data = [fixed_row.view("uint32") for fixed_row in fixed_fixed_rows]
@@ -87,7 +102,7 @@ class SynapseDynamicsStatic(
             padded_rows.append(
                 numpy.concatenate((
                     row, numpy.zeros(numpy.clip(
-                        no_bytes_per_connection * self._pad_to_length -
+                        no_bytes_per_connection * self.__pad_to_length -
                         row.size, 0, None)).astype(
                             dtype="uint8"))).view(dtype="uint8"))
 
@@ -133,14 +148,14 @@ class SynapseDynamicsStatic(
             is called, as the vertex must require mapping as it has been\
             created!
         """
-        return self._change_requires_mapping
+        return self.__change_requires_mapping
 
     @overrides(AbstractChangableAfterRun.mark_no_changes)
     def mark_no_changes(self):
         """ Marks the point after which changes are reported.  Immediately\
             after calling this method, requires_mapping should return False.
         """
-        self._change_requires_mapping = False
+        self.__change_requires_mapping = False
 
     @overrides(AbstractSettable.get_value)
     def get_value(self, key):
@@ -160,7 +175,7 @@ class SynapseDynamicsStatic(
         """
         if hasattr(self, key):
             setattr(self, key, value)
-            self._change_requires_mapping = True
+            self.__change_requires_mapping = True
         raise InvalidParameterType(
             "Type {} does not have parameter {}".format(type(self), key))
 
@@ -176,3 +191,8 @@ class SynapseDynamicsStatic(
     @overrides(AbstractGenerateOnMachine.gen_matrix_id)
     def gen_matrix_id(self):
         return MatrixGeneratorID.STATIC_MATRIX.value
+
+    @property
+    @overrides(AbstractSynapseDynamics.changes_during_run)
+    def changes_during_run(self):
+        return False

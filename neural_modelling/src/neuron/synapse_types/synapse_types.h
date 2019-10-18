@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2017-2019 The University of Manchester
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #ifndef _SYNAPSE_TYPES_H_
 #define _SYNAPSE_TYPES_H_
 
@@ -25,22 +42,22 @@ static void synapse_types_shape_input(synapse_param_pointer_t parameter);
 //! \param[in] input: the inputs for that given synapse_type.
 //! \return None
 static void synapse_types_add_neuron_input(
-    index_t synapse_type_index, synapse_param_pointer_t parameter,
-    input_t input);
+        index_t synapse_type_index, synapse_param_pointer_t parameter,
+        input_t input);
 
 //! \brief extracts the excitatory input buffers from the buffers available
 //! for a given neuron ID
 //! \param[in] parameters: the pointer to the parameters to use
 //! \return Pointer to array of excitatory input buffers for a given neuron ID.
 static input_t* synapse_types_get_excitatory_input(
-    synapse_param_pointer_t parameter);
+        synapse_param_pointer_t parameter);
 
 //! \brief extracts the inhibitory input buffers from the buffers available
 //! for a given neuron ID
 //! \param[in]  parameters: the pointer to the parameters to use
 //! \return Pointer to array of inhibitory input buffers for a given neuron ID.
 static input_t* synapse_types_get_inhibitory_input(
-    synapse_param_pointer_t parameter);
+        synapse_param_pointer_t parameter);
 
 //! \brief returns a human readable character for the type of synapse.
 //! examples would be X = excitatory types, I = inhibitory types etc etc.
@@ -52,11 +69,11 @@ static const char *synapse_types_get_type_char(index_t synapse_type_index);
 //! \brief prints the parameters of the synapse type
 //! \param[in] parameters: the pointer to the parameters to print
 static void synapse_types_print_parameters(
-    synapse_param_pointer_t parameters);
+        synapse_param_pointer_t parameters);
 
 //! \brief prints the input for a neuron ID given the available inputs
 //! currently only executed when the models are in debug mode, as the prints
-//! are controlled from the synapses.c _print_inputs method.
+//! are controlled from the synapses.c print_inputs() method.
 //! \param[in] parameters: the pointer to the parameters to print
 //! \return Nothing
 static void synapse_types_print_input(synapse_param_pointer_t parameters);

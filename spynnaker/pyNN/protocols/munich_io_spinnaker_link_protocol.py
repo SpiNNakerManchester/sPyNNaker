@@ -1,3 +1,18 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from enum import Enum
 import logging
 from spinn_front_end_common.utility_models import MultiCastCommand
@@ -201,7 +216,6 @@ _PAYLOAD_MASTER_SLAVE_SET_MASTER_CLOCK_ACTIVE = 4
 
 
 class RetinaKey(Enum):
-
     FIXED_KEY = (0, 128, 7)
     NATIVE_128_X_128 = (1, 128, 7)
     DOWNSAMPLE_64_X_64 = (2, 64, 6)
@@ -227,7 +241,6 @@ class RetinaKey(Enum):
 
 
 class RetinaPayload(Enum):
-
     NO_PAYLOAD = (0, 0)
     EVENTS_IN_PAYLOAD = (0, 4)
     DELTA_TIMESTAMPS = (1, 4)
@@ -247,6 +260,7 @@ class RetinaPayload(Enum):
 class MunichIoSpiNNakerLinkProtocol(object):
     """ Provides Multicast commands for the Munich SpiNNaker-Link protocol
     """
+    __slots__ = ["__instance_key", "__mode", "__uart_id"]
 
     # types of modes supported by this protocol
     MODES = Enum(
@@ -264,7 +278,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
     protocol_instance = 0
 
     # Keeps track of whether the mode has been configured already
-    _sent_mode_command = False
+    __sent_mode_command = False
 
     def __init__(self, mode, instance_key=None, uart_id=0):
         """
@@ -273,47 +287,47 @@ class MunichIoSpiNNakerLinkProtocol(object):
         :param instance_key: The optional instance key to use
         :param uart_id: The ID of the UART when needed
         """
-        self._mode = mode
+        self.__mode = mode
 
         # Create a key for this instance of the protocol
         # - see above for reasoning
         if instance_key is None:
-            self._instance_key = (
+            self.__instance_key = (
                 MunichIoSpiNNakerLinkProtocol.protocol_instance <<
                 _OFFSET_TO_IGNORED_KEY
             )
             MunichIoSpiNNakerLinkProtocol.protocol_instance += 1
         else:
-            self._instance_key = instance_key
+            self.__instance_key = instance_key
 
-        self._uart_id = uart_id
+        self.__uart_id = uart_id
 
     @property
     def mode(self):
-        return self._mode
+        return self.__mode
 
     @property
     def uart_id(self):
-        return self._uart_id
+        return self.__uart_id
 
     @staticmethod
     def sent_mode_command():
         """ True if the mode command has ever been requested by any instance
         """
-        return MunichIoSpiNNakerLinkProtocol._sent_mode_command
+        return MunichIoSpiNNakerLinkProtocol.__sent_mode_command
 
     @property
     def instance_key(self):
         """ The key of this instance of the protocol
         """
-        return self._instance_key
+        return self.__instance_key
 
     def _get_key(self, command, offset_to_uart_id=None):
         if offset_to_uart_id is None:
-            return command | self._instance_key
+            return command | self.__instance_key
         return (
-            command | self._instance_key |
-            (self._uart_id << offset_to_uart_id)
+            command | self.__instance_key |
+            (self.__uart_id << offset_to_uart_id)
         )
 
     @property
@@ -329,9 +343,9 @@ class MunichIoSpiNNakerLinkProtocol(object):
         return self._get_key(CHANGE_MODE)
 
     def set_mode(self, time=None):
-        MunichIoSpiNNakerLinkProtocol._sent_mode_command = True
+        MunichIoSpiNNakerLinkProtocol.__sent_mode_command = True
         return MultiCastCommand(
-            key=self.set_mode_key, payload=self._mode.value, time=time)
+            key=self.set_mode_key, payload=self.__mode.value, time=time)
 
     @property
     def set_retina_key_key(self):
@@ -611,10 +625,10 @@ class MunichIoSpiNNakerLinkProtocol(object):
             payload=payload, time=time)
 
     def _check_for_pushbot_mode(self):
-        if self._mode is not self.MODES.PUSH_BOT:
+        if self.__mode is not self.MODES.PUSH_BOT:
             raise ConfigurationException(
                 "The mode you configured is not the PushBot, and so this "
-                "message is invalid for mode {}".format(self._mode))
+                "message is invalid for mode {}".format(self.__mode))
 
     @property
     def push_bot_laser_config_total_period_key(self):
@@ -788,7 +802,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
     def sensor_transmission_key(self, sensor_id):
         return ((sensor_id << _SENSOR_OUTGOING_OFFSET_TO_D) |
-                (self._uart_id << _SENSOR_OUTGOING_OFFSET_TO_I))
+                (self.__uart_id << _SENSOR_OUTGOING_OFFSET_TO_I))
 
     @property
     def set_retina_transmission_key(self):
