@@ -52,5 +52,6 @@ class SpikeSourcePoisson(AbstractPyNNModel):
         # pylint: disable=arguments-differ
         max_atoms = self.get_max_atoms_per_core()
         return SpikeSourcePoissonVertex(
-            n_neurons, constraints, label, self.__rate, max_rate, self.__start,
-            self.__duration, seed, max_atoms, self)
+            n_neurons, constraints, label, seed, max_atoms, self,
+            rate=self.__rate, start=self.__start, duration=self.__duration,
+            max_rate=max_rate)

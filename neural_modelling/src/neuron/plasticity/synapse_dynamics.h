@@ -20,7 +20,6 @@
 
 #include <common/neuron-typedefs.h>
 #include <neuron/synapse_row.h>
-#include <neuron/structural_plasticity/sp_structs.h>
 
 address_t synapse_dynamics_initialise(
         address_t address, uint32_t n_neurons, uint32_t n_synapse_types,
@@ -60,26 +59,35 @@ uint32_t synapse_dynamics_get_plastic_saturation_count(void);
 //! \param[in] id: the (core-local) ID of the neuron to search for in the
 //! synaptic row
 //! \param[in] row: the core-local address of the synaptic row
-//! \param[out] sp_data: the address of a struct through which to return
-//! weight, delay information
+//! \param[out] weight: address to contain the weight of the connection
+//! \param[out] delay: address to contain the delay of the connection
+//! \param[out] offset: address to contain the offset of the connection
+//! \param[out] synapse_type: address to contain the synapse type of the connection
 //! \return bool: was the search successful?
-bool find_plastic_neuron_with_id(
-        uint32_t id, address_t row, structural_plasticity_data_t *sp_data);
+bool synapse_dynamics_find_neuron(
+        uint32_t id, address_t row, weight_t *weight, uint16_t *delay,
+        uint32_t *offset, uint32_t *synapse_type);
 
 //! \brief  Remove the entry at the specified offset in the synaptic row
 //! \param[in] offset: the offset in the row at which to remove the entry
 //! \param[in] row: the core-local address of the synaptic row
 //! \return bool: was the removal successful?
-bool remove_plastic_neuron_at_offset(uint32_t offset, address_t row);
+bool synapse_dynamics_remove_neuron(uint32_t offset, address_t row);
 
-//! \brief  Add a plastic entry in the synaptic row
+//! \brief  Add an entry in the synaptic row
 //! \param[in] id: the (core-local) ID of the post-synaptic neuron to be added
 //! \param[in] row: the core-local address of the synaptic row
 //! \param[in] weight: the initial weight associated with the connection
 //! \param[in] delay: the delay associated with the connection
 //! \param[in] type: the type of the connection (e.g. inhibitory)
 //! \return bool: was the addition successful?
-bool add_plastic_neuron_with_id(
-        uint32_t id, address_t row, uint32_t weight, uint32_t delay, uint32_t type);
+bool synapse_dynamics_add_neuron(
+        uint32_t id, address_t row, weight_t weight,
+        uint32_t delay, uint32_t type);
+
+//! \brief Get the number of connections in the given row
+//! \param[in] fixed: the fixed region of the synaptic row
+//! \return uint32_t: The number of connections in the row
+uint32_t synapse_dynamics_n_connections_in_row(address_t fixed);
 
 #endif // _SYNAPSE_DYNAMICS_H_
