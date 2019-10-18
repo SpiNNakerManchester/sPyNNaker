@@ -129,6 +129,7 @@ class DistanceDependentFormation(AbstractFormation):
         :return: the distance
         :rtype: float
         """
+        # pylint: disable=assignment-from-no-return
         x0 = numpy.asarray(x0)
         x1 = numpy.asarray(x1)
         delta = numpy.abs(x0 - x1)
@@ -143,7 +144,6 @@ class DistanceDependentFormation(AbstractFormation):
         elif metric == 'equidistant':
             p = 4
             exponents = numpy.power(delta, [p] * delta.size)
-            # pylint: disable=assignment-from-no-return
             return numpy.floor(numpy.power(exponents.sum(axis=-1), [1. / p]))
         return numpy.sqrt((delta ** 2).sum(axis=-1))
 
