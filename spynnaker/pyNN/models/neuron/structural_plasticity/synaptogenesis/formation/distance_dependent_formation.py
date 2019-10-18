@@ -143,6 +143,7 @@ class DistanceDependentFormation(AbstractFormation):
         elif metric == 'equidistant':
             p = 4
             exponents = numpy.power(delta, [p] * delta.size)
+            # pylint: disable=assignment-from-no-return
             return numpy.floor(numpy.power(exponents.sum(axis=-1), [1. / p]))
         return numpy.sqrt((delta ** 2).sum(axis=-1))
 
