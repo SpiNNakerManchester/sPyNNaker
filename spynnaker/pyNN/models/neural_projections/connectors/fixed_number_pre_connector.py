@@ -72,6 +72,7 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine):
         self.__pre_neurons_set = False
         self.__pre_neurons = None
         self.__pre_connector_seed = dict()
+        self._rng = rng
 
     def set_projection_information(
             self, pre_population, post_population, rng, machine_time_step):

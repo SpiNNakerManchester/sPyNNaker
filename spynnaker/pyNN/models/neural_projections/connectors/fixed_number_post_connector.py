@@ -68,6 +68,7 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine):
         self.__post_neurons = None
         self.__post_neurons_set = False
         self.__post_connector_seed = dict()
+        self._rng = rng
 
     def set_projection_information(
             self, pre_population, post_population, rng, machine_time_step):

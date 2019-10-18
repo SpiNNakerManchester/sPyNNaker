@@ -47,7 +47,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
     def __init__(
             self, shape_pre, shape_post, shape_kernel, weight_kernel,
             delay_kernel, shape_common, pre_sample_steps, pre_start_coords,
-            post_sample_steps, post_start_coords, safe, space, verbose,
+            post_sample_steps, post_start_coords, safe, verbose,
             callback=None):
         """
         :param shape_pre:\

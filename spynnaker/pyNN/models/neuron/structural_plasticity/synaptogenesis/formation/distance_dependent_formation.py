@@ -95,7 +95,7 @@ class DistanceDependentFormation(AbstractFormation):
 
                 # TODO Make distance metric "type" controllable
                 euclidian_distances[row, column] = self.distance(
-                    pre, post, type='euclidian')
+                    pre, post, metric='euclidian')
         largest_squared_distance = numpy.max(euclidian_distances ** 2)
         squared_distances = numpy.arange(largest_squared_distance + 1)
         raw_probabilities = probability * (
@@ -114,7 +114,7 @@ class DistanceDependentFormation(AbstractFormation):
 
         return filtered_probabilities
 
-    def distance(self, x0, x1, type):  # @ReservedAssignment
+    def distance(self, x0, x1, metric):
         """ Compute the distance between points x0 and x1 place on the grid\
             using periodic boundary conditions.
 
@@ -124,8 +124,8 @@ class DistanceDependentFormation(AbstractFormation):
         :type x1: np.ndarray of ints
         :param grid: shape of grid
         :type grid: np.ndarray of ints
-        :param type: distance metric, i.e. euclidian or manhattan
-        :type type: str
+        :param metric: distance metric, i.e. euclidian or manhattan
+        :type metric: str
         :return: the distance
         :rtype: float
         """
@@ -138,9 +138,9 @@ class DistanceDependentFormation(AbstractFormation):
         if (delta[1] > self.__grid[1] * .5) and self.__grid[1] > 0:
             delta[1] -= self.__grid[1]
 
-        if type == 'manhattan':
+        if metric == 'manhattan':
             return numpy.abs(delta).sum(axis=-1)
-        elif type == 'equidistant':
+        elif metric == 'equidistant':
             p = 4
             exponents = numpy.power(delta, [p] * delta.size)
             return numpy.floor(numpy.power(exponents.sum(axis=-1), [1. / p]))
