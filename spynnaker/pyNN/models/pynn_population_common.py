@@ -207,7 +207,7 @@ class PyNNPopulationCommon(object):
         # TODO: Used to get a single cell - not yet supported
         raise NotImplementedError
 
-    def get(self, parameter_names, gather=True):
+    def get(self, parameter_names, gather=True, simplify=True):
         """ Get the values of a parameter for every local cell in the\
             population.
 
@@ -223,6 +223,9 @@ class PyNNPopulationCommon(object):
             warn_once(
                 logger, "sPyNNaker only supports gather=True. We will run "
                 "as if gather was set to True.")
+        if simplify is not True:
+            warn_once(
+                logger, "The simplify value is ignored if not set to true")
         if not self._vertex_population_settable:
             raise KeyError("Population does not support setting")
         if isinstance(parameter_names, string_types):
