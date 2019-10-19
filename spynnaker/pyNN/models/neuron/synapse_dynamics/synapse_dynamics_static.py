@@ -153,6 +153,7 @@ class SynapseDynamicsStatic(
 
         return connections
 
+    @property
     @overrides(AbstractChangableAfterRun.requires_mapping)
     def requires_mapping(self):
         """ True if changes that have been made require that mapping be\

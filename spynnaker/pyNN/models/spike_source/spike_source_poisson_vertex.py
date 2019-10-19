@@ -843,6 +843,7 @@ class SpikeSourcePoissonVertex(
                .requires_memory_regions_to_be_reloaded,
                additional_arguments={"first_machine_time_step"})
     def requires_memory_regions_to_be_reloaded(self, first_machine_time_step):
+        # pylint: disable=arguments-differ
         return (self.__change_requires_neuron_parameters_reload or
                 first_machine_time_step == 0)
 
@@ -898,6 +899,7 @@ class SpikeSourcePoissonVertex(
             spikes_per_tick[is_fast_source] = numpy.log(
                 exp_minus_lambda[is_fast_source]) * -1.0
             is_faster_source = sqrt_lambda > 0
+            # pylint: disable=assignment-from-no-return
             spikes_per_tick[is_faster_source] = numpy.square(
                 sqrt_lambda[is_faster_source])
             slow_elements = isi > 0
