@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import decimal
-from distutils.version import StrictVersion
+from distutils.version import StrictVersion  # pylint: disable=all
 from enum import Enum
 import numpy
 from six import with_metaclass
@@ -75,8 +75,9 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         "__connector_seed"
     ]
 
-    def __init__(self, safe=True, verbose=False):
-        AbstractConnector.__init__(self, safe=safe, verbose=verbose)
+    def __init__(self, safe=True, callback=None, verbose=False):
+        AbstractConnector.__init__(
+            self, safe=safe, callback=callback, verbose=verbose)
         self.__delay_seed = dict()
         self.__weight_seed = dict()
         self.__connector_seed = dict()

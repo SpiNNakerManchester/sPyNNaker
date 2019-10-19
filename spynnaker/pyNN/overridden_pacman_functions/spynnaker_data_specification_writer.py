@@ -29,7 +29,7 @@ class SpynnakerDataSpecificationWriter(
             self, placements, hostname,
             report_default_directory, write_text_specs, machine,
             data_n_timesteps, graph_mapper=None):
-        # pylint: disable=too-many-arguments
+        # pylint: disable=too-many-arguments, signature-differs
 
         delay_extensions = list()
         placement_order = list()

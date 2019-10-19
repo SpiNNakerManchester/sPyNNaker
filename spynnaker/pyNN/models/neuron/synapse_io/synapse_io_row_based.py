@@ -182,6 +182,7 @@ class SynapseIORowBased(AbstractSynapseIO):
             n_synapse_types, weight_scales, machine_time_step,
             app_edge, machine_edge):
         # pylint: disable=too-many-arguments, too-many-locals, arguments-differ
+        # pylint: disable=assignment-from-no-return
         # Get delays in timesteps
         max_delay = self.get_maximum_delay_supported_in_ms(machine_time_step)
         if max_delay is not None:

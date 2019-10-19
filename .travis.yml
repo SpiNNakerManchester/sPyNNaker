@@ -59,7 +59,7 @@ before_install:
 
 install:
   - pip install -r requirements-test.txt
-  - pip install python-coveralls 'coverage>=4.4'
+  - pip install pylint python-coveralls 'coverage>=4.4'
   - python ./setup.py install
 
 before_script:
@@ -77,9 +77,10 @@ before_script:
 
 script:
   # Python
-  - py.test unittests --cov spynnaker
+  - py.test --cov-report= unittests --cov spynnaker
   - flake8 examples spynnaker pyNN-spiNNaker-src
   - flake8 unittests
+  - ( pylint --output-format=colorized --disable=R,C spynnaker; exit $(($? & 35)) )
   # XML
   - find spynnaker -name '*.xml' | xargs -n 1 support/validate-xml.sh
   # C 

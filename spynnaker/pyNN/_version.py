@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+# pylint: disable=unused-import
 from spynnaker._version import __version__  # NOQA
 from spynnaker._version import __version_name__  # NOQA
 from spynnaker._version import __version_month__  # NOQA

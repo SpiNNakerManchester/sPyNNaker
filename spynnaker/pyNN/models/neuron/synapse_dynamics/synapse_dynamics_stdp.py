@@ -112,6 +112,7 @@ class SynapseDynamicsSTDP(
         # Otherwise, it is static, so return ourselves
         return self
 
+    @property
     @overrides(AbstractChangableAfterRun.requires_mapping)
     def requires_mapping(self):
         """ True if changes that have been made require that mapping be\

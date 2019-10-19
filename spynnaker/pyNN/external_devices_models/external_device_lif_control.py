@@ -50,7 +50,7 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
             # default params for the neuron model type
             tau_m=20.0, cm=1.0, v_rest=0.0, v_reset=0.0, tau_syn_E=5.0,
             tau_syn_I=5.0, tau_refrac=0.1, i_offset=0.0, v=0.0,
-            isyn_inh=0.0, isyn_exc=0.0):
+            isyn_exc=0.0, isyn_inh=0.0):
         """
         :param devices:\
             The AbstractMulticastControllableDevice instances to be controlled\
@@ -70,7 +70,7 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
         neuron_model = NeuronModelLeakyIntegrateAndFire(
             v, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac)
         synapse_type = SynapseTypeExponential(
-            tau_syn_E, tau_syn_I, isyn_inh, isyn_exc)
+            tau_syn_E, tau_syn_I, isyn_exc, isyn_inh)
         input_type = InputTypeCurrent()
         threshold_type = ThresholdTypeMulticastDeviceControl(devices)
 

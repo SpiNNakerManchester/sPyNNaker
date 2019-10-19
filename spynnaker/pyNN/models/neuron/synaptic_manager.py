@@ -412,6 +412,7 @@ class SynapticManager(object):
         weight_variance = 0.0
 
         if weight_std_dev > 0:
+            # pylint: disable=no-member
             lngamma = special.gammaln(1 + upper_bound)
             gammai = special.gammaincc(
                 1 + upper_bound, average_spikes_per_timestep)
@@ -549,17 +550,17 @@ class SynapticManager(object):
         return float(math.pow(2, 16 - (ring_buffer_to_input_left_shift + 1)))
 
     def _write_synapse_parameters(
-            self, spec, ring_buffer_shifts, post_vertex_slice, weight_scale):
-        # Get the ring buffer shifts and scaling factors
+            self, spec, ring_buffer_shifts, weight_scale):
+        """Get the ring buffer shifts and scaling factors."""
 
+        # Write the ring buffer shifts
         spec.switch_write_focus(POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value)
-
         spec.write_array(ring_buffer_shifts)
 
-        weight_scales = numpy.array([
+        # Return the weight scaling factors
+        return numpy.array([
             self._get_weight_scale(r) * weight_scale
             for r in ring_buffer_shifts])
-        return weight_scales
 
     def _write_padding(
             self, spec, synaptic_matrix_region, next_block_start_address):
@@ -598,7 +599,7 @@ class SynapticManager(object):
         in_edges = machine_graph.get_edges_ending_at_vertex(machine_vertex)
 
         # Set up the master population table
-        self.__poptable_type.initialise_table(spec, master_pop_table_region)
+        self.__poptable_type.initialise_table()
 
         # Set up for single synapses - write the offset of the single synapses
         # initially 0
@@ -966,7 +967,7 @@ class SynapticManager(object):
             application_vertex, application_graph, machine_time_step,
             weight_scale)
         weight_scales = self._write_synapse_parameters(
-            spec, ring_buffer_shifts, post_vertex_slice, weight_scale)
+            spec, ring_buffer_shifts, weight_scale)
 
         gen_data = self._write_synaptic_matrix_and_master_population_table(
             spec, post_slices, post_slice_idx, machine_vertex,

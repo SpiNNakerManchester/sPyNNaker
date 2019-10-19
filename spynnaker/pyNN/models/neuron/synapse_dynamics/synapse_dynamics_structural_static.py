@@ -109,8 +109,8 @@ class SynapseDynamicsStructuralStatic(
             app_vertex, post_slice, graph_mapper, routing_info,
             synapse_indices)
 
-    def set_projection_parameter(self, projection, param, value):
-        self.__common_sp.set_projection_parameter(projection, param, value)
+    def set_projection_parameter(self, param, value):
+        self.__common_sp.set_projection_parameter(param, value)
 
     @overrides(SynapseDynamicsStatic.is_same_as)
     def is_same_as(self, synapse_dynamics):

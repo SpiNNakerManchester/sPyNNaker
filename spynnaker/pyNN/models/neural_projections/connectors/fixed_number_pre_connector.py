@@ -41,7 +41,7 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine):
 
     def __init__(
             self, n, allow_self_connections=True, with_replacement=False,
-            safe=True, verbose=False, rng=None):
+            safe=True, callback=None, verbose=False, rng=None):
         """
         :param n: \
             number of random pre-synaptic neurons connected to output
@@ -65,13 +65,14 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine):
         # a Space object, needed if you wish to specify distance-dependent\
         # weights or delays - not implemented
         # :type space: pyNN.Space
-        super(FixedNumberPreConnector, self).__init__(safe, verbose)
+        super(FixedNumberPreConnector, self).__init__(safe, callback, verbose)
         self.__n_pre = n
         self.__allow_self_connections = allow_self_connections
         self.__with_replacement = with_replacement
         self.__pre_neurons_set = False
         self.__pre_neurons = None
         self.__pre_connector_seed = dict()
+        self._rng = rng
 
     def set_projection_information(
             self, pre_population, post_population, rng, machine_time_step):

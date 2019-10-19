@@ -25,7 +25,7 @@ class SpikeSourcePoissonVariable(AbstractPyNNModel):
 
     default_population_parameters = _population_parameters
 
-    def __init__(self, rates=[1.0], starts=[0], durations=None):
+    def __init__(self, rates, starts, durations=None):
         self._rates = rates
         self._starts = starts
         self._durations = durations
@@ -43,6 +43,7 @@ class SpikeSourcePoissonVariable(AbstractPyNNModel):
         return super(SpikeSourcePoissonVariable, cls).get_max_atoms_per_core()
 
     def create_vertex(self, n_neurons, label, constraints, seed):
+        # pylint: disable=arguments-differ
         max_atoms = self.get_max_atoms_per_core()
         return SpikeSourcePoissonVertex(
             n_neurons, constraints, label, seed, max_atoms, self,
