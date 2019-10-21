@@ -47,7 +47,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
     def __init__(
             self, shape_pre, shape_post, shape_kernel, weight_kernel,
             delay_kernel, shape_common, pre_sample_steps, pre_start_coords,
-            post_sample_steps, post_start_coords, safe, space, verbose):
+            post_sample_steps, post_start_coords, safe, verbose,
+            callback=None):
         """
         :param shape_pre:\
             2D shape of the pre population (rows/height, cols/width, usually \
@@ -70,7 +71,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
             Starting row/col for pre/post sampling <=> (_startX_, endX, stepX)
             None or 2-item array
         """
-        super(KernelConnector, self).__init__(safe=safe, verbose=verbose)
+        super(KernelConnector, self).__init__(
+            safe=safe, callback=callback, verbose=verbose)
 
         # Get the kernel size
         self._kernel_w = shape_kernel[WIDTH]
@@ -311,14 +313,6 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
         block["delay"] = all_pre_in_range_delays
         block["synapse_type"] = syn_type.astype('uint8')
         return block
-
-    @property
-    def generate_on_machine(self):
-        super_generate = super(KernelConnector, self).generate_on_machine
-
-        # This connector can also cope with "listed" weights and delays
-        return super_generate or (isinstance(self._delays, numpy.ndarray) and
-                                  isinstance(self._weights, numpy.ndarray))
 
     @property
     def _kernel_properties(self):

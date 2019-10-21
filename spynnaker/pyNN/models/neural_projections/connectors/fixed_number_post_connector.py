@@ -42,7 +42,7 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine):
 
     def __init__(
             self, n, allow_self_connections=True, with_replacement=False,
-            safe=True, verbose=False, rng=None):
+            safe=True, callback=None, verbose=False, rng=None):
         """
         :param n: \
             number of random post-synaptic neurons connected to pre-neurons.
@@ -61,13 +61,14 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine):
             be connected again.
         :type with_replacement: bool
         """
-        super(FixedNumberPostConnector, self).__init__(safe, verbose)
+        super(FixedNumberPostConnector, self).__init__(safe, callback, verbose)
         self.__n_post = n
         self.__allow_self_connections = allow_self_connections
         self.__with_replacement = with_replacement
         self.__post_neurons = None
         self.__post_neurons_set = False
         self.__post_connector_seed = dict()
+        self._rng = rng
 
     def set_projection_information(
             self, pre_population, post_population, rng, machine_time_step):

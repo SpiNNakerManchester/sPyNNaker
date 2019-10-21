@@ -18,7 +18,7 @@ import math
 import re
 import numpy
 from six import string_types, with_metaclass
-from spinn_utilities import logger_utils
+from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.safe_eval import SafeEval
 from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
@@ -58,7 +58,9 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         "_weights",
         "__param_seeds"]
 
-    def __init__(self, safe=True, verbose=False, rng=None):
+    def __init__(self, safe=True, callback=None, verbose=False, rng=None):
+        if callback is not None:
+            warn_once(logger, "sPyNNaker ignores connector callbacks.")
         self.__safe = safe
         self.__space = None
         self.__verbose = verbose
@@ -311,8 +313,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
             values, n_connections, connection_slices, pre_slice, post_slice)
         if self.__safe:
             if not weights.size:
-                logger_utils.warn_once(logger,
-                                       "No connection in " + str(self))
+                warn_once(logger, "No connection in " + str(self))
             elif numpy.amin(weights) < 0 < numpy.amax(weights):
                 raise Exception(
                     "Weights must be either all positive or all negative"

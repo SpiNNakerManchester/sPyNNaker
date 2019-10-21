@@ -26,21 +26,20 @@ class DelayExtensionMachineVertex(
     __slots__ = [
         "__resources"]
 
-    _DELAY_EXTENSION_REGIONS = Enum(
-        value="DELAY_EXTENSION_REGIONS",
-        names=[('SYSTEM', 0),
-               ('DELAY_PARAMS', 1),
-               ('PROVENANCE_REGION', 2),
-               ('EXPANDER_REGION', 3)])
+    class _DELAY_EXTENSION_REGIONS(Enum):
+        SYSTEM = 0
+        DELAY_PARAMS = 1
+        PROVENANCE_REGION = 2
+        EXPANDER_REGION = 3
 
-    EXTRA_PROVENANCE_DATA_ENTRIES = Enum(
-        value="EXTRA_PROVENANCE_DATA_ENTRIES",
-        names=[("N_PACKETS_RECEIVED", 0),
-               ("N_PACKETS_PROCESSED", 1),
-               ("N_PACKETS_ADDED", 2),
-               ("N_PACKETS_SENT", 3),
-               ("N_BUFFER_OVERFLOWS", 4),
-               ("N_DELAYS", 5)])
+    class EXTRA_PROVENANCE_DATA_ENTRIES(Enum):
+        N_PACKETS_RECEIVED = 0
+        N_PACKETS_PROCESSED = 1
+        N_PACKETS_ADDED = 2
+        N_PACKETS_SENT = 3
+        N_BUFFER_OVERFLOWS = 4
+        N_DELAYS = 5
+
     N_EXTRA_PROVENANCE_DATA_ENTRIES = len(EXTRA_PROVENANCE_DATA_ENTRIES)
 
     def __init__(self, resources_required, label, constraints=None):

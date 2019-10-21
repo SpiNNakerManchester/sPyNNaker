@@ -182,12 +182,9 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
                     hex(next_address)))
         return next_address
 
-    def initialise_table(self, spec, master_population_table_region):
-        """ Initialise the master pop data structure
+    def initialise_table(self):
+        """ Initialise the master pop data structure.
 
-        :param spec: the DSG writer
-        :param master_population_table_region: \
-            the region in memory that the master pop table will be written in
         :rtype: None
         """
         self.__entries = dict()

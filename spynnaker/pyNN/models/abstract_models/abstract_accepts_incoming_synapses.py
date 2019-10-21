@@ -14,8 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from six import add_metaclass
-from spinn_utilities.abstract_base import (
-    AbstractBase, abstractproperty, abstractmethod)
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
 @add_metaclass(AbstractBase)
@@ -24,7 +23,7 @@ class AbstractAcceptsIncomingSynapses(object):
     """
     __slots__ = ()
 
-    @abstractproperty
+    @abstractmethod
     def get_synapse_id_by_target(self, target):
         """ Get the ID of a synapse given the name.
 

@@ -23,9 +23,8 @@ from spynnaker.pyNN.exceptions import SynapseRowTooBigException
 from .abstract_synapse_io import AbstractSynapseIO
 from .max_row_info import MaxRowInfo
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    SynapseDynamicsStructuralStatic, SynapseDynamicsStructuralSTDP,
     AbstractStaticSynapseDynamics, AbstractSynapseDynamicsStructural,
-    SynapseDynamicsSTDP, AbstractSynapseDynamics)
+    AbstractSynapseDynamics)
 
 _N_HEADER_WORDS = 3
 
@@ -91,8 +90,7 @@ class SynapseIORowBased(AbstractSynapseIO):
 
         # Get the row sizes
         dynamics = synapse_info.synapse_dynamics
-        if (isinstance(dynamics, AbstractStaticSynapseDynamics) or
-                isinstance(dynamics, SynapseDynamicsStructuralStatic)):
+        if isinstance(dynamics, AbstractStaticSynapseDynamics):
             undelayed_n_words = dynamics.get_n_words_for_static_connections(
                 max_undelayed_n_synapses)
             delayed_n_words = dynamics.get_n_words_for_static_connections(
@@ -126,50 +124,34 @@ class SynapseIORowBased(AbstractSynapseIO):
     @staticmethod
     def _get_max_row_length_and_row_data(
             connections, row_indices, n_rows, post_vertex_slice,
-            n_synapse_types, population_table, synapse_dynamics,
-            app_edge, machine_edge):
+            n_synapse_types, population_table, synapse_dynamics):
         # pylint: disable=too-many-arguments, too-many-locals
         row_ids = range(n_rows)
         ff_data, ff_size = None, None
         fp_data, pp_data, fp_size, pp_size = None, None, None, None
-        if (isinstance(synapse_dynamics, AbstractStaticSynapseDynamics) or
-                isinstance(synapse_dynamics, SynapseDynamicsStructuralStatic)):
+        if isinstance(synapse_dynamics, AbstractStaticSynapseDynamics):
 
             # Get the static data
-            if isinstance(synapse_dynamics, AbstractSynapseDynamicsStructural):
-                ff_data, ff_size = synapse_dynamics.get_static_synaptic_data(
-                    connections, row_indices, n_rows, post_vertex_slice,
-                    n_synapse_types, app_edge=app_edge,
-                    machine_edge=machine_edge)
-            else:
-                ff_data, ff_size = synapse_dynamics.get_static_synaptic_data(
-                    connections, row_indices, n_rows, post_vertex_slice,
-                    n_synapse_types)
+            ff_data, ff_size = synapse_dynamics.get_static_synaptic_data(
+                connections, row_indices, n_rows, post_vertex_slice,
+                n_synapse_types)
 
             # Blank the plastic data
             fp_data = [numpy.zeros(0, dtype="uint32") for _ in range(n_rows)]
             pp_data = [numpy.zeros(0, dtype="uint32") for _ in range(n_rows)]
             fp_size = [numpy.zeros(1, dtype="uint32") for _ in range(n_rows)]
             pp_size = [numpy.zeros(1, dtype="uint32") for _ in range(n_rows)]
-        elif (isinstance(synapse_dynamics, SynapseDynamicsSTDP) or
-              isinstance(synapse_dynamics, SynapseDynamicsStructuralSTDP)):
+        else:
 
             # Blank the static data
             ff_data = [numpy.zeros(0, dtype="uint32") for _ in row_ids]
             ff_size = [numpy.zeros(1, dtype="uint32") for _ in row_ids]
 
             # Get the plastic data
-            if isinstance(synapse_dynamics, AbstractSynapseDynamicsStructural):
-                fp_data, pp_data, fp_size, pp_size = \
-                    synapse_dynamics.get_plastic_synaptic_data(
-                        connections, row_indices, n_rows, post_vertex_slice,
-                        n_synapse_types, app_edge=app_edge,
-                        machine_edge=machine_edge)
-            else:
-                fp_data, pp_data, fp_size, pp_size = \
-                    synapse_dynamics.get_plastic_synaptic_data(
-                        connections, row_indices, n_rows, post_vertex_slice,
-                        n_synapse_types)
+            fp_data, pp_data, fp_size, pp_size = \
+                synapse_dynamics.get_plastic_synaptic_data(
+                    connections, row_indices, n_rows, post_vertex_slice,
+                    n_synapse_types)
 
         # Add some padding
         row_lengths = [
@@ -200,6 +182,7 @@ class SynapseIORowBased(AbstractSynapseIO):
             n_synapse_types, weight_scales, machine_time_step,
             app_edge, machine_edge):
         # pylint: disable=too-many-arguments, too-many-locals, arguments-differ
+        # pylint: disable=assignment-from-no-return
         # Get delays in timesteps
         max_delay = self.get_maximum_delay_supported_in_ms(machine_time_step)
         if max_delay is not None:
@@ -218,6 +201,13 @@ class SynapseIORowBased(AbstractSynapseIO):
         # Scale weights
         connections["weight"] = (connections["weight"] * weight_scales[
             synapse_info.synapse_type])
+
+        # Set connections for structural plasticity
+        if isinstance(synapse_info.synapse_dynamics,
+                      AbstractSynapseDynamicsStructural):
+            synapse_info.synapse_dynamics.set_connections(
+                connections, post_vertex_slice, app_edge, synapse_info,
+                machine_edge)
 
         # Split the connections up based on the delays
         if max_delay is not None:
@@ -244,8 +234,7 @@ class SynapseIORowBased(AbstractSynapseIO):
             max_row_length, row_data = self._get_max_row_length_and_row_data(
                 undelayed_connections, undelayed_row_indices,
                 pre_vertex_slice.n_atoms, post_vertex_slice, n_synapse_types,
-                population_table, synapse_info.synapse_dynamics,
-                app_edge, machine_edge)
+                population_table, synapse_info.synapse_dynamics)
 
             del undelayed_row_indices
         del undelayed_connections
@@ -275,7 +264,7 @@ class SynapseIORowBased(AbstractSynapseIO):
                     delayed_connections, delayed_row_indices,
                     pre_vertex_slice.n_atoms * n_delay_stages,
                     post_vertex_slice, n_synapse_types, population_table,
-                    synapse_info.synapse_dynamics, app_edge, machine_edge)
+                    synapse_info.synapse_dynamics)
             del delayed_row_indices
         del delayed_connections
 
@@ -302,8 +291,7 @@ class SynapseIORowBased(AbstractSynapseIO):
                 -1, (delayed_max_row_length + _N_HEADER_WORDS))
 
         dynamics = synapse_info.synapse_dynamics
-        if (isinstance(dynamics, AbstractStaticSynapseDynamics) or
-                isinstance(dynamics, SynapseDynamicsStructuralStatic)):
+        if isinstance(dynamics, AbstractStaticSynapseDynamics):
             # Read static data
             connections = self._read_static_data(
                 dynamics, pre_vertex_slice, post_vertex_slice, n_synapse_types,

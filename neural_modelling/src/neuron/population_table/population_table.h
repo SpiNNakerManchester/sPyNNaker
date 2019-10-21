@@ -49,11 +49,12 @@ int population_table_position_in_the_master_pop_array(spike_t spike);
 
 //! \brief Get the next row data for a previously given spike.  If no spike has
 //!        been given, return False.
+//! \param[out] spike The initiating spike
 //! \param[out] row_address Updated with the address of the row
 //! \param[out] n_bytes_to_transfer Updated with the number of bytes to read
 //! \return True if there is a row to read, False if not
 bool population_table_get_next_address(
-        address_t* row_address, size_t* n_bytes_to_transfer);
+        spike_t *spike, address_t* row_address, size_t* n_bytes_to_transfer);
 
 //! \brief generates how many dma's were pointless
 //! \return uint of how many were done
