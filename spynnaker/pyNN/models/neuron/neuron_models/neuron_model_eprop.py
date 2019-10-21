@@ -35,6 +35,7 @@ COUNT_REFRAC = "count_refrac"
 PSI = "psi"
 Z = "z"
 A = "a"
+L = "learning_signal"
 
 UNITS = {
     V: 'mV',
@@ -63,7 +64,8 @@ class NeuronModelEProp(AbstractNeuronModel):
         "__a",
         "__psi",
         "__target_rate",
-        "__tau_err"
+        "__tau_err",
+        "__l"
         ]
 
     def __init__(
@@ -78,7 +80,8 @@ class NeuronModelEProp(AbstractNeuronModel):
             psi,
             # regularisation params
             target_rate,
-            tau_err
+            tau_err,
+            l
             ):
         
         datatype_list = [
@@ -90,9 +93,10 @@ class NeuronModelEProp(AbstractNeuronModel):
             DataType.INT32,   #  count_refrac
             DataType.S1615,   #  v_reset
             DataType.INT32,   #  tau_refrac
-            DataType.S1615,   # Z
-            DataType.S1615,    # A
-            DataType.S1615    #  psi, pseuo_derivative
+            DataType.S1615,   #  Z
+            DataType.S1615,   #  A
+            DataType.S1615,   #  psi, pseuo_derivative
+            DataType.S1615    #  L
             ] 
         
         # Synapse states - always initialise to zero
@@ -128,6 +132,7 @@ class NeuronModelEProp(AbstractNeuronModel):
         
         self.__target_rate = target_rate
         self.__tau_err = tau_err
+        self.__l = l
         
 
     @overrides(AbstractNeuronModel.get_n_cpu_cycles)
@@ -151,6 +156,7 @@ class NeuronModelEProp(AbstractNeuronModel):
         state_variables[PSI] = self.__psi
         state_variables[Z] = 0
         state_variables[A] = 0
+        state_variables[L] = 0
 
     @overrides(AbstractNeuronModel.get_units)
     def get_units(self, variable):
@@ -177,7 +183,8 @@ class NeuronModelEProp(AbstractNeuronModel):
                     operation=lambda x: int(numpy.ceil(x / (ts / 1000.0)))),
                 state_variables[Z],
                 state_variables[A],
-                state_variables[PSI]
+                state_variables[PSI],
+                state_variables[L]
                 ]
         
         # create synaptic state - init all state to zero
@@ -212,12 +219,13 @@ class NeuronModelEProp(AbstractNeuronModel):
 
         # Read the data
         (v, _v_rest, _r_membrane, _exp_tc, _i_offset, count_refrac,
-         _v_reset, _tau_refrac, psi) = values
+         _v_reset, _tau_refrac, psi, l) = values # Not sure this will work with the new array of synapse!!!
 
         # Copy the changed data only
         state_variables[V] = v
         state_variables[COUNT_REFRAC] = count_refrac
         state_vairables[PSI] = psi
+        state_variables[L] = l
     
 
     
