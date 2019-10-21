@@ -77,7 +77,7 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
 
     @overrides(AbstractTimingDependence.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(self):
-        BYTES_PER_WORD + BYTES_PER_WORD * len(self.__tau_data)
+        return BYTES_PER_WORD + BYTES_PER_WORD * len(self.__tau_data)
 
     @property
     def n_weight_terms(self):
