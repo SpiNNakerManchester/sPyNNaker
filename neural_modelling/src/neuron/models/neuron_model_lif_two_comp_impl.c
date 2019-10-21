@@ -58,7 +58,7 @@ state_t neuron_model_state_update(
         // Get the soma input in nA
         //Isyn
         input_t soma_input_this_timestep =
-                exc_input[0] - inh_input[0] + neuron->I_offset; //ISN'T THIS Ileak???
+                exc_input[0] - inh_input[0] + neuron->I_offset; //SHOULDN'T THIS BE A SUM SINCE INHIBITORY REV POTENTIAL IS NEGATIVE?
 
         // Leaky conductance for the soma
         REAL g_L = 0.1k;

@@ -316,8 +316,8 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
             &neuron_synapse_shaping_params[neuron_index];
 
     // Get the voltage
-    state_t voltage = neuron_model_get_membrane_voltage(neuron);
-    recorded_variable_values[V_RECORDING_INDEX] = voltage;
+    //state_t voltage = neuron_model_get_membrane_voltage(neuron);
+    state_t voltage = neuron->U_membrane;
 
     // Get the exc and inh values from the synapses
     input_t* exc_value = synapse_types_get_excitatory_input(synapse_type);
@@ -357,6 +357,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
             external_bias, neuron);
 
     // Call functions to get the input values to be recorded
+    recorded_variable_values[V_RECORDING_INDEX] = neuron->U_membrane;
     recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->V;
     recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->rate_at_last_setting;
 
