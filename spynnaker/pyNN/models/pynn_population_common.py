@@ -126,7 +126,7 @@ class PyNNPopulationCommon(object):
         # add objects to the SpiNNaker control class
         self.__spinnaker_control.add_population(self)
         self.__spinnaker_control.add_application_vertex(
-            self.__vertex, "Population ")
+            self.__vertex)
 
         # initialise common stuff
         self._size = size

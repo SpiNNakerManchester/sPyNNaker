@@ -275,11 +275,11 @@ class AbstractSpiNNakerCommon(with_metaclass(
         """
         return self.__max_delay
 
-    def add_application_vertex(self, vertex, prefix=None):
+    def add_application_vertex(self, vertex):
         if isinstance(vertex, CommandSender):
             self._command_sender = vertex
 
-        AbstractSpinnakerBase.add_application_vertex(self, vertex, prefix)
+        AbstractSpinnakerBase.add_application_vertex(self, vertex)
 
     @staticmethod
     def _count_unique_keys(commands):
