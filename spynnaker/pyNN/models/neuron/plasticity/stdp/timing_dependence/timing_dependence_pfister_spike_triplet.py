@@ -15,8 +15,7 @@
 
 import logging
 from spinn_utilities.overrides import overrides
-from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, BYTES_PER_SHORT)
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common\
     .plasticity_helpers import get_exp_lut_array
 from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence\

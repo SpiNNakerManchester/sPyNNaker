@@ -15,7 +15,8 @@
 
 import logging
 from spinn_utilities.overrides import overrides
-from spinn_front_end_common.utilities.constants import BYTES_PER_SHORT
+from spinn_front_end_common.utilities.constants import (
+    BYTES_PER_SHORT, BYTES_PER_WORD)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common\
     .plasticity_helpers import get_exp_lut_array
 from .abstract_timing_dependence import AbstractTimingDependence
@@ -73,7 +74,8 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
 
     @overrides(AbstractTimingDependence.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(self):
-        return BYTES_PER_WORD * (len(self.__tau_plus_data) + len(self.__tau_minus_data))
+        return BYTES_PER_WORD * (len(self.__tau_plus_data) +
+                                 len(self.__tau_minus_data))
 
     @property
     def n_weight_terms(self):
