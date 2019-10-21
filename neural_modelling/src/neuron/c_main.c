@@ -210,7 +210,7 @@ static bool initialise(void) {
         return false;
     }
 
-    rewiring_period = get_p_rew();
+    rewiring_period = synaptogenesis_rewiring_period();
     rewiring = rewiring_period != -1;
 
     if (!spike_processing_initialise(
@@ -292,35 +292,17 @@ void timer_callback(uint timer_count, uint unused) {
         return;
     }
 
-    uint cpsr = 0;
     // Do rewiring
     if (rewiring &&
-            ((last_rewiring_time >= rewiring_period && !is_fast()) || is_fast())) {
-        update_goal_posts(time);
+            ((last_rewiring_time >= rewiring_period && !synaptogenesis_is_fast())
+                || synaptogenesis_is_fast())) {
         last_rewiring_time = 0;
         // put flag in spike processing to do synaptic rewiring
-#if 0
-        synaptogenesis_dynamics_rewire(time);
-#endif
-        if (is_fast()) {
-            do_rewiring(rewiring_period);
+        if (synaptogenesis_is_fast()) {
+            spike_processing_do_rewiring(rewiring_period);
         } else {
-            do_rewiring(1);
+            spike_processing_do_rewiring(1);
         }
-        // disable interrupts
-        cpsr = spin1_int_disable();
-        /* If we're not already processing synaptic DMAs,
-         * flag pipeline as busy and trigger a feed event */
-        if (!get_dma_busy()) {
-            log_debug("Sending user event for new spike");
-            if (spin1_trigger_user_event(0, 0)) {
-                set_dma_busy(true);
-            } else {
-                log_debug("Could not trigger user event\n");
-            }
-        }
-        // enable interrupts
-        spin1_mode_restore(cpsr);
         count_rewires++;
     }
     // otherwise do synapse and neuron time step updates

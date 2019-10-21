@@ -14,13 +14,14 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.graphs.application import ApplicationEdge
 from pacman.model.graphs.machine import MachineGraph
 from spynnaker.pyNN.exceptions import FilterableException
 from spynnaker.pyNN.models.abstract_models import AbstractFilterableEdge
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class GraphEdgeFilter(object):
@@ -53,18 +54,17 @@ class GraphEdgeFilter(object):
         for partition in progress.over(machine_graph.outgoing_edge_partitions):
             for edge in partition.edges:
                 if self._is_filterable(edge):
-                    logger.debug("this edge was pruned: %s", edge)
+                    logger.debug("this edge was pruned {}", edge)
                     prune_count += 1
                     continue
-                logger.debug("this edge was not pruned: %s", edge)
+                logger.debug("this edge was not pruned {}", edge)
                 no_prune_count += 1
                 self._add_edge_to_new_graph(edge, partition, new_machine_graph)
 
-        logger.debug(
-            "prune_count:%d no_prune_count:%d", prune_count, no_prune_count)
-
-        # returned the pruned graph after remembering that it is the graph that
+        # return the pruned graph after remembering that it is the graph that
         # the application graph maps to now
+        logger.debug("prune_count:{} no_prune_count:{}",
+                     prune_count, no_prune_count)
         machine_graph.application_graph.machine_graph = new_machine_graph
         return new_machine_graph
 

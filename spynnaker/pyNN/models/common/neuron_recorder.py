@@ -24,6 +24,7 @@ import numpy
 from six import raise_from, iteritems
 from six.moves import range, xrange
 from spinn_utilities.index_is_value import IndexIsValue
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.resources.variable_sdram import VariableSDRAM
 from data_specification.enums import DataType
@@ -31,12 +32,12 @@ from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities import globals_variables
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 SPIKES = "spikes"
 
 
 class _ReadOnlyDict(dict):
-    def __readonly__(self, *args, **kwargs):
+    def __readonly__(self, *args, **kwargs):  # pylint: disable=unused-argument
         raise RuntimeError("Cannot modify ReadOnlyDict")
 
     __setitem__ = __readonly__
@@ -173,7 +174,7 @@ class NeuronRecorder(object):
                     elif len(local_indexes[0]) > 1:
                         logger.warning(
                             "Population {} on multiple recorded data for "
-                            "time {}".format(label, time))
+                            "time {}", label, time)
                     else:
                         # Set row to nan
                         fragment[i] = numpy.full(n_neurons, numpy.nan)
@@ -185,7 +186,7 @@ class NeuronRecorder(object):
         if len(missing_str) > 0:
             logger.warning(
                 "Population {} is missing recorded data in region {} from the"
-                " following cores: {}".format(label, region, missing_str))
+                " following cores: {}", label, region, missing_str)
         sampling_interval = self.get_neuron_sampling_interval(variable)
         return (data, indexes, sampling_interval)
 
@@ -252,7 +253,7 @@ class NeuronRecorder(object):
         if len(missing_str) > 0:
             logger.warning(
                 "Population {} is missing spike data in region {} from the"
-                " following cores: {}".format(label, region, missing_str))
+                " following cores: {}", label, region, missing_str)
 
         if len(spike_ids) == 0:
             return numpy.zeros((0, 2), dtype="float")

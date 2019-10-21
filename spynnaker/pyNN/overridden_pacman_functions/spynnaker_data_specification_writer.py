@@ -27,7 +27,7 @@ class SpynnakerDataSpecificationWriter(GraphDataSpecificationWriter):
     def __call__(
             self, placements, hostname, report_default_directory,
             write_text_specs, machine, data_n_timesteps):
-        # pylint: disable=too-many-arguments
+        # pylint: disable=too-many-arguments, signature-differs
 
         delay_extensions = list()
         placement_order = list()

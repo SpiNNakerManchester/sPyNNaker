@@ -38,19 +38,17 @@ DELAY_EXPANDER = "delay_expander.aplx"
 def synapse_expander(
         app_graph, placements, transceiver, provenance_file_path,
         executable_finder):
-    """ Run the synapse expander - needs to be done after data has been loaded.
-
-    Note that this is an algorithm.
+    """ Run the synapse expander - needs to be done after data has been loaded
     """
 
-    synapse_expander = executable_finder.get_executable_path(SYNAPSE_EXPANDER)
-    delay_expander = executable_finder.get_executable_path(DELAY_EXPANDER)
+    synapse_bin = executable_finder.get_executable_path(SYNAPSE_EXPANDER)
+    delay_bin = executable_finder.get_executable_path(DELAY_EXPANDER)
 
     progress = ProgressBar(len(app_graph.vertices) + 2, "Expanding Synapses")
 
     # Find the places where the synapse expander and delay receivers should run
     expander_cores, expanded_pop_vertices = _plan_expansion(
-        app_graph, placements, synapse_expander, delay_expander, progress)
+        app_graph, placements, synapse_bin, delay_bin, progress)
 
     # Launch the delay receivers
     expander_app_id = transceiver.app_id_tracker.get_new_id()
@@ -69,7 +67,7 @@ def synapse_expander(
             expanded_pop_vertices, placements, transceiver)
         _extract_iobuf(expander_cores, transceiver, provenance_file_path)
         progress.end()
-    except Exception:
+    except Exception:  # pylint: disable=broad-except
         logger.exception("Synapse expander has failed")
         _handle_failure(
             expander_cores, transceiver, provenance_file_path)
@@ -84,35 +82,32 @@ def synapse_expander(
 
 def _plan_expansion(app_graph, placements, synapse_expander_bin,
                     delay_expander_bin, progress):
-    """ Works out exactly where we are going to be running expanders,\
-        and exactly which expander to run in each of those places.
-    """
     expander_cores = ExecutableTargets()
-    gen_on_machine_vertices = list()
+    expanded_pop_vertices = list()
+
     for vertex in progress.over(app_graph.vertices, finish_at_end=False):
-        # Find population vertices; only know how to expand these two
+        # Add all machine vertices of the population vertex to ones
+        # that need synapse expansion
         if isinstance(vertex, AbstractPopulationVertex):
-            # Add all machine vertices of the population vertex to ones
-            # that need synapse expansion
             gen_on_machine = False
             for m_vertex in vertex.machine_vertices:
                 if vertex.gen_on_machine(m_vertex.vertex_slice):
-                    expander_cores.place_binary(
+                    placement = placements.get_placement_of_vertex(m_vertex)
+                    expander_cores.add_processor(
                         synapse_expander_bin,
-                        placements.get_placement_of_vertex(m_vertex))
+                        placement.x, placement.y, placement.p)
                     gen_on_machine = True
             if gen_on_machine:
-                gen_on_machine_vertices.append(vertex)
+                expanded_pop_vertices.append(vertex)
         elif isinstance(vertex, DelayExtensionVertex):
-            # Add all machine vertices of the delay vertex to ones
-            # that need synapse expansion
             for m_vertex in vertex.machine_vertices:
                 if vertex.gen_on_machine(m_vertex.vertex_slice):
-                    expander_cores.place_binary(
+                    placement = placements.get_placement_of_vertex(m_vertex)
+                    expander_cores.add_processor(
                         delay_expander_bin,
-                        placements.get_placement_of_vertex(m_vertex))
+                        placement.x, placement.y, placement.p)
 
-    return expander_cores, gen_on_machine_vertices
+    return expander_cores, expanded_pop_vertices
 
 
 def _extract_iobuf(expander_cores, transceiver, provenance_file_path,
@@ -161,34 +156,37 @@ def _handle_failure(expander_cores, transceiver, provenance_file_path):
 
 def _fill_in_connection_data(expanded_pop_vertices, placements, transceiver):
     """ Once expander has run, fill in the connection data
-
+    :param app_graph
     :rtype: None
     """
     ctl = globals_variables.get_simulator()
+    use_extra_monitors = False
 
     for vertex in expanded_pop_vertices:
+        conn_holders = vertex.get_connection_holders()
         for (app_edge, synapse_info), conn_holder_list in iteritems(
-                vertex.get_connection_holders()):
-            # Only do this if this synapse_info has been generated on the
-            # machine using the expander
+                conn_holders):
+            # Only do this if this synapse_info has been generated
+            # on the machine using the expander
             if _synapses_were_generated_on_machine(synapse_info):
-                for machine_edge in app_edge.machine_edges:
+                machine_edges = app_edge.machine_edges
+                for machine_edge in machine_edges:
                     placement = placements.get_placement_of_vertex(
                         machine_edge.post_vertex)
                     conns = vertex.get_connections_from_machine(
                         transceiver, placement, machine_edge,
                         ctl.routing_infos, synapse_info, ctl.machine_time_step,
-                        using_extra_monitor_cores=False)
+                        use_extra_monitors)
                     for conn_holder in conn_holder_list:
                         conn_holder.add_connections(conns)
 
 
-def _synapses_were_generated_on_machine(si):
-    """
-    :param si: The synapse_info for the connection
-    """
-    connector_gen = isinstance(
-        si.connector, AbstractGenerateConnectorOnMachine) and \
-        si.connector.generate_on_machine(si.weight, si.delay)
-    synapse_gen = isinstance(si.synapse_dynamics, AbstractGenerateOnMachine)
+def _synapses_were_generated_on_machine(synapse_info):
+    connector_gen = (
+        isinstance(synapse_info.connector,
+                   AbstractGenerateConnectorOnMachine) and
+        synapse_info.connector.generate_on_machine(
+            synapse_info.weight, synapse_info.delay))
+    synapse_gen = isinstance(synapse_info.synapse_dynamics,
+                             AbstractGenerateOnMachine)
     return connector_gen and synapse_gen

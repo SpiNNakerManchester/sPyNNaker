@@ -122,6 +122,7 @@ class DelayExtensionVertex(
     @overrides(ApplicationVertex.get_resources_used_by_atoms,
                additional_arguments={"graph"})
     def get_resources_used_by_atoms(self, vertex_slice, graph):
+        # pylint: disable=arguments-differ
         out_edges = graph.get_edges_starting_at_vertex(self)
         return ResourceContainer(
             sdram=ConstantSDRAM(
