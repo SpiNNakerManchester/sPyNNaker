@@ -24,6 +24,7 @@ _DISPLAY_MAX = 33.0
 _FRAME_TIME_MS = 10
 # Time constant of pixel decay
 _DECAY_TIME_CONSTANT_MS = 100
+_BUFFER_SIZE = 512
 
 
 class PushBotRetinaViewer(Thread):
@@ -80,30 +81,31 @@ class PushBotRetinaViewer(Thread):
     def local_port(self):
         return self.__local_port
 
-    def _recv_data(self, size=512):
+    def __recv_data(self, size=_BUFFER_SIZE):
         return self.__spike_socket.recv(size)
 
     def _close(self):
         self.__spike_socket.close()
 
-    def _updatefig(self, frame):  # @UnusedVariable
+    def _parse_raw_data(self, raw_data):
+        # Slice off EIEIO header and timestamp, and convert to numpy
+        # array of uint32
+        payload = numpy.fromstring(raw_data[6:], dtype="uint32")
+
+        # Mask out x, y coordinates
+        payload &= self.__coordinate_mask
+
+        # Increment these pixels
+        self.__image_data[payload] += 1.0
+
+    def _updatefig(self):
         # Read all UDP messages received during last frame
         while True:
             try:
-                raw_data = self._recv_data()
+                self._parse_raw_data(self.__recv_data())
             except socket.error:
                 # Stop reading
                 break
-            else:
-                # Slice off eieio header and timestamp, and convert to numpy
-                # array of uint32
-                payload = numpy.fromstring(raw_data[6:], dtype="uint32")
-
-                # Mask out x, y coordinates
-                payload &= self.__coordinate_mask
-
-                # Increment these pixels
-                self.__image_data[payload] += 1.0
 
         # Decay image data
         self.__image_data *= self.__decay_proportion
@@ -121,6 +123,6 @@ class PushBotRetinaViewer(Thread):
 
         # Play animation
         self.__ani = self.__animation.FuncAnimation(
-            fig, self._updatefig, interval=self.__frame_time_ms,
-            blit=True)
+            fig, (lambda _frame: self._updatefig()),
+            interval=self.__frame_time_ms, blit=True)
         self.__pyplot.show()

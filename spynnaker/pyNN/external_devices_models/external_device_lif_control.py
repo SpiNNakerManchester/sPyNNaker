@@ -17,7 +17,8 @@ import logging
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModelStandard
-from spynnaker.pyNN.models.defaults import default_initial_values
+from spynnaker.pyNN.models.defaults import default_initial_values,\
+    default_parameters
 from spynnaker.pyNN.models.neuron.input_types import InputTypeCurrent
 from spynnaker.pyNN.models.neuron.neuron_models import (
     NeuronModelLeakyIntegrateAndFire)
@@ -40,13 +41,16 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
         "_translator"]
 
     @default_initial_values({"v", "isyn_exc", "isyn_inh"})
+    @default_parameters({
+        "tau_m", "cm", "v_rest", "v_reset", "tau_syn_E", "tau_syn_I",
+        "tau_refrac", "i_offset"})
     def __init__(
             self, devices, create_edges, translator=None,
 
             # default params for the neuron model type
             tau_m=20.0, cm=1.0, v_rest=0.0, v_reset=0.0, tau_syn_E=5.0,
             tau_syn_I=5.0, tau_refrac=0.1, i_offset=0.0, v=0.0,
-            isyn_inh=0.0, isyn_exc=0.0):
+            isyn_exc=0.0, isyn_inh=0.0):
         """
         :param devices:\
             The AbstractMulticastControllableDevice instances to be controlled\
@@ -66,7 +70,7 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
         neuron_model = NeuronModelLeakyIntegrateAndFire(
             v, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac)
         synapse_type = SynapseTypeExponential(
-            tau_syn_E, tau_syn_I, isyn_inh, isyn_exc)
+            tau_syn_E, tau_syn_I, isyn_exc, isyn_inh)
         input_type = InputTypeCurrent()
         threshold_type = ThresholdTypeMulticastDeviceControl(devices)
 

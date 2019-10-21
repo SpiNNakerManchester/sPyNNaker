@@ -13,10 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-try:
-    from collections.abc import defaultdict
-except ImportError:
-    from collections import defaultdict
+from collections import defaultdict
 import logging
 import math
 from spinn_utilities.overrides import overrides
@@ -122,6 +119,7 @@ class DelayExtensionVertex(
     @overrides(ApplicationVertex.get_resources_used_by_atoms,
                additional_arguments={"graph"})
     def get_resources_used_by_atoms(self, vertex_slice, graph):
+        # pylint: disable=arguments-differ
         out_edges = graph.get_edges_starting_at_vertex(self)
         return ResourceContainer(
             sdram=ConstantSDRAM(

@@ -106,25 +106,21 @@ static inline update_state_t timing_apply_pre_spike(
     log_debug("\t\t\ttime_since_last_post:%u, post_window_length:%u",
             time_since_last_post, last_post_trace);
 
-    // If spikes don't coincide
-    if (time_since_last_post > 0) {
-        // If this pre-spike has arrived within the last post window
-        if (time_since_last_post < last_post_trace) {
-            if (previous_state.accumulator >
-                    plasticity_trace_region_data.accumulator_depression_plus_one) {
-                // If accumulator's not going to hit depression limit,
-                // decrement it
-                previous_state.accumulator--;
-                log_debug("\t\t\t\tDecrementing accumulator=%d",
-                        previous_state.accumulator);
-            } else {
-                // Otherwise, reset accumulator and apply depression
-                log_debug("\t\t\t\tApplying depression");
+    if (time_since_last_post < last_post_trace) {
+        if (previous_state.accumulator >
+                plasticity_trace_region_data.accumulator_depression_plus_one) {
+            // If accumulator's not going to hit depression limit,
+            // decrement it
+            previous_state.accumulator--;
+            log_debug("\t\t\t\tDecrementing accumulator=%d",
+                    previous_state.accumulator);
+        } else {
+            // Otherwise, reset accumulator and apply depression
+            log_debug("\t\t\t\tApplying depression");
 
-                previous_state.accumulator = 0;
-                previous_state.weight_state = weight_one_term_apply_depression(
-                        previous_state.weight_state, STDP_FIXED_POINT_ONE);
-            }
+            previous_state.accumulator = 0;
+            previous_state.weight_state = weight_one_term_apply_depression(
+                    previous_state.weight_state, STDP_FIXED_POINT_ONE);
         }
     }
 

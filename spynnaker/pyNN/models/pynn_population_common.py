@@ -16,6 +16,7 @@
 import logging
 import numpy
 from six import string_types, iteritems
+from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.log import FormatAdapter
 from pacman.model.constraints import AbstractConstraint
 from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
@@ -32,6 +33,11 @@ from spynnaker.pyNN.models.abstract_models import (
 from .abstract_pynn_model import AbstractPyNNModel
 
 logger = FormatAdapter(logging.getLogger(__file__))
+
+
+def _we_dont_do_this_now(*args):  # pylint: disable=unused-argument
+    # pragma: no cover
+    raise NotImplementedError("sPyNNaker8 does not currently do this")
 
 
 class PyNNPopulationCommon(object):
@@ -120,7 +126,7 @@ class PyNNPopulationCommon(object):
         # add objects to the SpiNNaker control class
         self.__spinnaker_control.add_population(self)
         self.__spinnaker_control.add_application_vertex(
-            self.__vertex, "Population ")
+            self.__vertex)
 
         # initialise common stuff
         self._size = size
@@ -180,13 +186,13 @@ class PyNNPopulationCommon(object):
         """ Merges populations
         """
         # TODO: Make this add the neurons from another population to this one
-        raise NotImplementedError
+        _we_dont_do_this_now(other)
 
     def all(self):
         """ Iterator over cell IDs on all nodes.
         """
         # TODO: Return the cells when we have such a thing
-        raise NotImplementedError
+        _we_dont_do_this_now()
 
     @property
     def conductance_based(self):
@@ -201,17 +207,25 @@ class PyNNPopulationCommon(object):
         # TODO: Used to get a single cell - not yet supported
         raise NotImplementedError
 
-    def get(self, parameter_names, gather=False):
+    def get(self, parameter_names, gather=True, simplify=True):
         """ Get the values of a parameter for every local cell in the\
             population.
 
         :param parameter_names: Name of parameter. This is either a single\
             string or a list of strings
+        :param gather: pointless on sPyNNaker
         :return: A single list of values (or possibly a single value) if\
             paramter_names is a string, or a dict of these if parameter names\
             is a list.
         :rtype: str or list(str) or dict(str,str) or dict(str,list(str))
         """
+        if not gather:
+            warn_once(
+                logger, "sPyNNaker only supports gather=True. We will run "
+                "as if gather was set to True.")
+        if simplify is not True:
+            warn_once(
+                logger, "The simplify value is ignored if not set to true")
         if not self._vertex_population_settable:
             raise KeyError("Population does not support setting")
         if isinstance(parameter_names, string_types):
@@ -280,7 +294,7 @@ class PyNNPopulationCommon(object):
             MPI node.
         """
         # TODO: Need __getitem__
-        raise NotImplementedError
+        _we_dont_do_this_now(cell_id)
 
     def _initialize(self, variable, value):
         """ Set the initial value of one of the state variables of the neurons\
@@ -301,25 +315,23 @@ class PyNNPopulationCommon(object):
 
         Note: This is supported by sPyNNaker8
         """
-
         # TODO: Needs a more precise recording mechanism (coming soon)
-        raise NotImplementedError
+        _we_dont_do_this_now(variable)
 
     def inject(self, current_source):
         """ Connect a current source to all cells in the Population.
         """
 
         # TODO:
-        raise NotImplementedError
+        _we_dont_do_this_now(current_source)
 
     def __iter__(self):
         """ Iterate over local cells
 
         Note: This is supported by sPyNNaker8
         """
-
         # TODO:
-        raise NotImplementedError
+        _we_dont_do_this_now()
 
     def __len__(self):
         """ Get the total number of cells in the population.
@@ -452,7 +464,13 @@ class PyNNPopulationCommon(object):
 
     def get_spike_counts(self, spikes, gather=True):
         """ Return the number of spikes for each neuron.
+
+        :param gather: pointless on sPyNNaker
         """
+        if not gather:
+            warn_once(
+                logger, "sPyNNaker only supports gather=True. We will run "
+                "as if gather was set to True.")
         n_spikes = {}
         counts = numpy.bincount(spikes[:, 0].astype(dtype=numpy.int32),
                                 minlength=self.__vertex.n_atoms)

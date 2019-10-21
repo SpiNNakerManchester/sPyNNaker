@@ -36,10 +36,11 @@ def get_pushbot_wifi_connection(remote_host, remote_port=56000):
     :param remote_port: The port number of the PushBot (default 56000)
     :type remote_port: int
     """
-    if (remote_host, remote_port) not in _existing_connections:
-        _existing_connections[(remote_host, remote_port)] = \
+    key = (remote_host, remote_port)
+    if key not in _existing_connections:
+        _existing_connections[key] = \
             PushBotWIFIConnection(remote_host, remote_port)
-    return _existing_connections[(remote_host, remote_port)]
+    return _existing_connections[key]
 
 
 class PushBotWIFIConnection(Connection, Listenable):
@@ -66,7 +67,7 @@ class PushBotWIFIConnection(Connection, Listenable):
         try:
             # Create a TCP Socket
             self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-except
             raise_from(SpinnmanIOException(
                 "Error setting up socket: {}".format(e)), e)
 
@@ -83,7 +84,7 @@ class PushBotWIFIConnection(Connection, Listenable):
                 (self.__remote_ip_address, self.__remote_port))
             logger.info("Succeeded in connecting to PushBot via Wi-Fi")
 
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-except
             raise_from(SpinnmanIOException(
                 "Error binding socket to {}:{}: {}".format(
                     self.__remote_ip_address, self.__remote_port, e)), e)
@@ -98,7 +99,7 @@ class PushBotWIFIConnection(Connection, Listenable):
             if (self.__local_ip_address is None
                     or self.__local_ip_address == ""):
                 self.__local_ip_address = "0.0.0.0"
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-except
             raise_from(SpinnmanIOException(
                 "Error querying socket: {}".format(e)), e)
 
@@ -183,7 +184,7 @@ class PushBotWIFIConnection(Connection, Listenable):
             return self.__socket.recv(self.RECV_SIZE)
         except socket.timeout:
             raise SpinnmanTimeoutException("receive", timeout)
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-except
             raise_from(SpinnmanIOException(str(e)), e)
 
     def send(self, data):
@@ -195,7 +196,7 @@ class PushBotWIFIConnection(Connection, Listenable):
         """
         try:
             self.__socket.send(data)
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-except
             raise_from(SpinnmanIOException(str(e)), e)
 
     def close(self):
@@ -204,7 +205,7 @@ class PushBotWIFIConnection(Connection, Listenable):
         """
         try:
             self.__socket.shutdown(socket.SHUT_WR)
-        except Exception:
+        except Exception:  # pylint: disable=broad-except
             pass
         self.__socket.close()
 

@@ -37,20 +37,19 @@ class SpikeSourcePoissonMachineVertex(
         MachineVertex, AbstractReceiveBuffersToHost,
         ProvidesProvenanceDataFromMachineImpl, AbstractRecordable,
         AbstractSupportsDatabaseInjection, AbstractHasProfileData):
-
     __slots__ = [
         "__buffered_sdram_per_timestep",
         "__is_recording",
         "__minimum_buffer_sdram",
         "__resources"]
 
-    POISSON_SPIKE_SOURCE_REGIONS = Enum(
-        value="POISSON_SPIKE_SOURCE_REGIONS",
-        names=[('SYSTEM_REGION', 0),
-               ('POISSON_PARAMS_REGION', 1),
-               ('SPIKE_HISTORY_REGION', 2),
-               ('PROVENANCE_REGION', 3),
-               ('PROFILER_REGION', 4)])
+    class POISSON_SPIKE_SOURCE_REGIONS(Enum):
+        SYSTEM_REGION = 0
+        POISSON_PARAMS_REGION = 1
+        RATES_REGION = 2
+        SPIKE_HISTORY_REGION = 3
+        PROVENANCE_REGION = 4
+        PROFILER_REGION = 5
 
     PROFILE_TAG_LABELS = {
         0: "TIMER",
@@ -98,11 +97,14 @@ class SpikeSourcePoissonMachineVertex(
             self.POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value,
             txrx)
 
+    @property
+    @overrides(AbstractSupportsDatabaseInjection.is_in_injection_mode)
+    def is_in_injection_mode(self):
+        # pylint: disable=no-value-for-parameter
+        return self._is_in_injection_mode()
+
     @inject_items({"graph": "MemoryMachineGraph"})
-    @overrides(
-        AbstractSupportsDatabaseInjection.is_in_injection_mode,
-        additional_arguments=["graph"])
-    def is_in_injection_mode(self, graph):
+    def _is_in_injection_mode(self, graph):
         # pylint: disable=arguments-differ
         in_edges = graph.get_edges_ending_at_vertex_with_partition_name(
             self, LIVE_POISSON_CONTROL_PARTITION_ID)
