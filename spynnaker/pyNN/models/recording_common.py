@@ -114,45 +114,20 @@ class RecordingCommon(object):
                     "conductance from a model which does not use conductance "
                     "input. You will receive current measurements instead.")
 
-    def _set_v_recording(self):
-        """ Set the parameters etc that are used by the voltage recording.
-
-        :return: None
-        """
-        self.__population._vertex.set_recording("v")
-
-    def _set_spikes_recording(self, sampling_interval, indexes=None):
-        """ Set the parameters, etc., that are used by the spikes recording.
-
-        :return: None
-        """
-
-    @staticmethod
-    def pynn7_format(data, ids, sampling_interval, data2=None):
-        n_machine_time_steps = len(data)
-        n_neurons = len(ids)
-        column_length = n_machine_time_steps * n_neurons
-        times = [i * sampling_interval
-                 for i in xrange(0, n_machine_time_steps)]
-        if data2 is None:
-            pynn7 = numpy.column_stack((
-                numpy.repeat(ids, n_machine_time_steps, 0),
-                numpy.tile(times, n_neurons),
-                numpy.transpose(data).reshape(column_length)))
-        else:
-            pynn7 = numpy.column_stack((
-                numpy.repeat(ids, n_machine_time_steps, 0),
-                numpy.tile(times, n_neurons),
-                numpy.transpose(data).reshape(column_length),
-                numpy.transpose(data2).reshape(column_length)))
-        return pynn7
-
     def _get_recorded_pynn7(self, variable):
         if variable == "spikes":
             data = self._get_spikes()
 
         (data, ids, sampling_interval) = self._get_recorded_matrix(variable)
-        return self.pynn7_format(data, ids, sampling_interval)
+        n_machine_time_steps = len(data)
+        n_neurons = len(ids)
+        column_length = n_machine_time_steps * n_neurons
+        times = [i * sampling_interval
+                 for i in xrange(0, n_machine_time_steps)]
+        return numpy.column_stack((
+                numpy.repeat(ids, n_machine_time_steps, 0),
+                numpy.tile(times, n_neurons),
+                numpy.transpose(data).reshape(column_length)))
 
     def _get_recorded_matrix(self, variable):
         """ Perform safety checks and get the recorded data from the vertex\
