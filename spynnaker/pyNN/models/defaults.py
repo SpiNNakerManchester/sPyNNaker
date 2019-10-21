@@ -25,6 +25,11 @@ import logging
 logger = FormatAdapter(logging.getLogger(__name__))
 
 
+def _get_args(func):
+    # So we have a disable in one place, not many
+    return getfullargspec(func)  # pylint: disable=deprecated-method
+
+
 def _check_args(args_to_find, default_args, init):
     for arg in args_to_find:
         if arg not in default_args:
@@ -34,7 +39,7 @@ def _check_args(args_to_find, default_args, init):
 
 
 def get_dict_from_init(init, skip=None, include=None):
-    init_args = getfullargspec(init)
+    init_args = _get_args(init)
     n_defaults = 0 if init_args.defaults is None else len(init_args.defaults)
     n_args = 0 if init_args.args is None else len(init_args.args)
     default_args = ([] if init_args.args is None else
@@ -70,7 +75,7 @@ def default_parameters(parameters):
 
         # Set the parameters of the method to be used later
         method._parameters = parameters
-        method_args = getfullargspec(method)
+        method_args = _get_args(method)
 
         def wrapper(*args, **kwargs):
             # Check for state variables that have been specified in cell_params
@@ -106,7 +111,7 @@ def default_initial_values(state_variables):
 
         # Store the state variables of the method to be used later
         method._state_variables = state_variables
-        method_args = getfullargspec(method)
+        method_args = _get_args(method)
 
         def wrapper(*args, **kwargs):
             # Check for state variables that have been specified in cell_params

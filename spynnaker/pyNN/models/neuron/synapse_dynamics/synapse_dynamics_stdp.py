@@ -19,15 +19,16 @@ from spinn_utilities.overrides import overrides
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spynnaker.pyNN.models.abstract_models import AbstractSettable
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
+from .abstract_synapse_dynamics_structural \
+    import AbstractSynapseDynamicsStructural
 from .abstract_generate_on_machine import (
     AbstractGenerateOnMachine, MatrixGeneratorID)
-from spynnaker.pyNN.exceptions import InvalidParameterType
+from spynnaker.pyNN.exceptions import InvalidParameterType,\
+    SynapticConfigurationException
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 
 # How large are the time-stamps stored with each event
 TIME_STAMP_BYTES = 4
-# When not using the MAD scheme, how many pre-synaptic events are buffered
-NUM_PRE_SYNAPTIC_EVENTS = 4
 
 
 class SynapseDynamicsSTDP(
@@ -44,17 +45,27 @@ class SynapseDynamicsSTDP(
         # weight dependence to use for the STDP rule
         "__weight_dependence",
         # padding to add to a synaptic row for synaptic rewiring
-        "__pad_to_length"]
+        "__pad_to_length",
+        # Weight of connections formed by connector
+        "__weight",
+        # Delay of connections formed by connector
+        "__delay",
+        # Whether to use back-propagation delay or not
+        "__backprop_delay"]
 
     def __init__(
             self, timing_dependence=None, weight_dependence=None,
             voltage_dependence=None, dendritic_delay_fraction=1.0,
-            pad_to_length=None):
+            weight=0.0, delay=1.0, pad_to_length=None,
+            backprop_delay=True):
         self.__timing_dependence = timing_dependence
         self.__weight_dependence = weight_dependence
         self.__dendritic_delay_fraction = float(dendritic_delay_fraction)
         self.__change_requires_mapping = True
         self.__pad_to_length = pad_to_length
+        self.__weight = weight
+        self.__delay = delay
+        self.__backprop_delay = backprop_delay
 
         if not (0.5 <= self.__dendritic_delay_fraction <= 1.0):
             raise NotImplementedError(
@@ -69,6 +80,39 @@ class SynapseDynamicsSTDP(
             raise NotImplementedError(
                 "Voltage dependence has not been implemented")
 
+    @overrides(AbstractPlasticSynapseDynamics.merge)
+    def merge(self, synapse_dynamics):
+        # If dynamics is STDP, test if same as
+        if isinstance(synapse_dynamics, SynapseDynamicsSTDP):
+            if not self.is_same_as(synapse_dynamics):
+                raise SynapticConfigurationException(
+                    "Synapse dynamics must match exactly when using multiple"
+                    " edges to the same population")
+
+            # If STDP part matches, return the other, as it might also be
+            # structural
+            return synapse_dynamics
+
+        # If dynamics is structural but not STDP (as here), merge
+        # NOTE: Import here as otherwise we get a circular dependency
+        from .synapse_dynamics_structural_stdp import (
+            SynapseDynamicsStructuralSTDP)
+        if isinstance(synapse_dynamics, AbstractSynapseDynamicsStructural):
+            return SynapseDynamicsStructuralSTDP(
+                synapse_dynamics.partner_selection, synapse_dynamics.formation,
+                synapse_dynamics.elimination,
+                self.timing_dependence, self.weight_dependence,
+                # voltage dependence is not supported
+                None, self.dendritic_delay_fraction,
+                synapse_dynamics.f_rew, synapse_dynamics.initial_weight,
+                synapse_dynamics.initial_delay, synapse_dynamics.s_max,
+                synapse_dynamics.seed,
+                backprop_delay=self.backprop_delay)
+
+        # Otherwise, it is static, so return ourselves
+        return self
+
+    @property
     @overrides(AbstractChangableAfterRun.requires_mapping)
     def requires_mapping(self):
         """ True if changes that have been made require that mapping be\
@@ -126,6 +170,14 @@ class SynapseDynamicsSTDP(
     def dendritic_delay_fraction(self, new_value):
         self.__dendritic_delay_fraction = new_value
 
+    @property
+    def backprop_delay(self):
+        return self.__backprop_delay
+
+    @backprop_delay.setter
+    def backprop_delay(self, backprop_delay):
+        self.__backprop_delay = backprop_delay
+
     def is_same_as(self, synapse_dynamics):
         # pylint: disable=protected-access
         if not isinstance(synapse_dynamics, SynapseDynamicsSTDP):
@@ -148,7 +200,9 @@ class SynapseDynamicsSTDP(
         return name
 
     def get_parameters_sdram_usage_in_bytes(self, n_neurons, n_synapse_types):
-        size = self.__timing_dependence.get_parameters_sdram_usage_in_bytes()
+        # 32-bits for back-prop delay
+        size = 4
+        size += self.__timing_dependence.get_parameters_sdram_usage_in_bytes()
         size += self.__weight_dependence.get_parameters_sdram_usage_in_bytes(
             n_synapse_types, self.__timing_dependence.n_weight_terms)
         return size
@@ -158,6 +212,9 @@ class SynapseDynamicsSTDP(
 
         # Switch focus to the region:
         spec.switch_write_focus(region)
+
+        # Whether to use back-prop delay
+        spec.write_value(int(self.__backprop_delay))
 
         # Write timing dependence parameters to region
         self.__timing_dependence.write_parameters(
@@ -327,26 +384,25 @@ class SynapseDynamicsSTDP(
         connections["delay"][connections["delay"] == 0] = 16
         return connections
 
+    @overrides(AbstractPlasticSynapseDynamics.get_weight_mean)
     def get_weight_mean(self, connector, weights):
-        # pylint: disable=too-many-arguments
-
         # Because the weights could all be changed to the maximum, the mean
         # has to be given as the maximum for scaling
-        return self.__weight_dependence.weight_maximum
+        return self.get_weight_maximum(connector, weights)
 
+    @overrides(AbstractPlasticSynapseDynamics.get_weight_variance)
     def get_weight_variance(self, connector, weights):
-        # pylint: disable=too-many-arguments
-
         # Because the weights could all be changed to the maximum, the variance
         # has to be given as no variance
         return 0.0
 
+    @overrides(AbstractPlasticSynapseDynamics.get_weight_maximum)
     def get_weight_maximum(self, connector, weights):
-        # pylint: disable=too-many-arguments
-
+        w_max = super(SynapseDynamicsSTDP, self).get_weight_maximum(
+            connector, weights)
         # The maximum weight is the largest that it could be set to from
         # the weight dependence
-        return self.__weight_dependence.weight_maximum
+        return max(w_max, self.__weight_dependence.weight_maximum)
 
     def get_provenance_data(self, pre_population_label, post_population_label):
         prov_data = list()
@@ -415,3 +471,17 @@ class SynapseDynamicsSTDP(
     @overrides(AbstractPlasticSynapseDynamics.changes_during_run)
     def changes_during_run(self):
         return True
+
+    @property
+    @overrides(AbstractPlasticSynapseDynamics.weight)
+    def weight(self):
+        return self.__weight
+
+    @property
+    @overrides(AbstractPlasticSynapseDynamics.delay)
+    def delay(self):
+        return self.__delay
+
+    @overrides(AbstractPlasticSynapseDynamics.set_delay)
+    def set_delay(self, delay):
+        self.__delay = delay

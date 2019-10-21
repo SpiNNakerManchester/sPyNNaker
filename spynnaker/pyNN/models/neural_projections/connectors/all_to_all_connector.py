@@ -31,7 +31,8 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
     __slots__ = [
         "__allow_self_connections"]
 
-    def __init__(self, allow_self_connections=True, safe=True, verbose=None):
+    def __init__(self, allow_self_connections=True, safe=True, callback=None,
+                 verbose=None):
         """
         :param allow_self_connections:
             if the connector is used to connect a\
@@ -40,7 +41,7 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
             Population.
         :type allow_self_connections: bool
         """
-        super(AllToAllConnector, self).__init__(safe, verbose)
+        super(AllToAllConnector, self).__init__(safe, callback, verbose)
         self.__allow_self_connections = allow_self_connections
 
     def _connection_slices(self, pre_vertex_slice, post_vertex_slice):

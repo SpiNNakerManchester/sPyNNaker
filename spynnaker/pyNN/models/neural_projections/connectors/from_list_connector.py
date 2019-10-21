@@ -44,7 +44,8 @@ class FromListConnector(AbstractConnector):
         "__split_pre_slices",
         "__split_post_slices"]
 
-    def __init__(self, conn_list, safe=True, verbose=False, column_names=None):
+    def __init__(self, conn_list, safe=True, callback=None, verbose=False,
+                 column_names=None):
         """
         :param: conn_list:
             a list of tuples, one tuple for each connection. Each\
@@ -59,7 +60,7 @@ class FromListConnector(AbstractConnector):
             Additional items per synapse are acceptable but all synapses\
             should have the same number of items.
         """
-        super(FromListConnector, self).__init__(safe, verbose)
+        super(FromListConnector, self).__init__(safe, callback, verbose)
 
         # Need to set column names first, as setter uses this
         self.__column_names = column_names

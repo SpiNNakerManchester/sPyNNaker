@@ -44,7 +44,7 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
 
     def __init__(
             self, d_expression, allow_self_connections=True, safe=True,
-            verbose=False, n_connections=None, rng=None):
+            callback=None, verbose=False, n_connections=None, rng=None):
         """
         :param d_expression:\
             the right-hand side of a valid python expression for\
@@ -67,7 +67,7 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
         """
         # pylint: disable=too-many-arguments
         super(DistanceDependentProbabilityConnector, self).__init__(
-            safe, verbose)
+            safe, callback, verbose)
         self.__d_expression = d_expression
         self.__allow_self_connections = allow_self_connections
         self._rng = rng
