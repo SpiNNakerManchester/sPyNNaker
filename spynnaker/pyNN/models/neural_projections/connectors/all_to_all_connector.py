@@ -16,6 +16,7 @@
 import logging
 import numpy
 from spinn_utilities.overrides import overrides
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
@@ -180,4 +181,5 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
     @overrides(AbstractGenerateConnectorOnMachine.
                gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
-        return 16 + 4  # view parameters + allow_self_connections
+        # view parameters + allow_self_connections
+        return (4 + 1) * BYTES_PER_WORD
