@@ -23,8 +23,9 @@ from spinn_utilities.logger_utils import warn_once
 from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.exceptions import InvalidParameterType
-from spynnaker.pyNN.models.connectors import  FromListConnector, OneToOneConnector,\
-    AllToAllConnector, FixedProbabilityConnector
+from spynnaker.pyNN.models.connectors import (
+    FromListConnector, OneToOneConnector,
+    AllToAllConnector, FixedProbabilityConnector)
 from spynnaker.pyNN.models.synapse_dynamics import SynapseDynamicsStatic
 # This line has to come in this order as it otherwise causes a circular
 # dependency
