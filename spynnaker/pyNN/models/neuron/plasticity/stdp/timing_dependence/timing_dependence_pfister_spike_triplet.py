@@ -15,6 +15,7 @@
 
 import logging
 from spinn_utilities.overrides import overrides
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common\
     .plasticity_helpers import get_exp_lut_array
 from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence\
@@ -86,16 +87,15 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
 
     @property
     def pre_trace_n_bytes(self):
-
         # Triplet rule trace entries consists of two 16-bit traces - R1 and R2
-        return 4
+        return BYTES_PER_WORD
 
     @overrides(AbstractTimingDependence.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(self):
         lut_array_words = (
             len(self.__tau_plus_data) + len(self.__tau_minus_data) +
             len(self.__tau_x_data) + len(self.__tau_y_data))
-        return lut_array_words * 4
+        return lut_array_words * BYTES_PER_WORD
 
     @property
     def n_weight_terms(self):

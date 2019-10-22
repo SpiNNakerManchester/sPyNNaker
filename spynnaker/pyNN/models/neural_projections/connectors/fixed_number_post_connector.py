@@ -18,6 +18,7 @@ import logging
 import math
 import numpy
 from spinn_utilities.overrides import overrides
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
@@ -71,9 +72,11 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine):
         self._rng = rng
 
     def set_projection_information(
-            self, pre_population, post_population, rng, machine_time_step):
+            self, pre_population, post_population, prepop_is_view,
+            postpop_is_view, rng, machine_time_step):
         AbstractConnector.set_projection_information(
-            self, pre_population, post_population, rng, machine_time_step)
+            self, pre_population, post_population, prepop_is_view,
+            postpop_is_view, rng, machine_time_step)
         if (not self.__with_replacement and
                 self.__n_post > self._n_post_neurons):
             raise SpynnakerException(
@@ -160,8 +163,9 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine):
         prob_in_slice = (
             post_vertex_slice.n_atoms / float(self._n_post_neurons))
         n_connections = utility_calls.get_probable_maximum_selected(
-            self._n_pre_neurons * self._n_pre_neurons,
-            self.__n_post, prob_in_slice, chance=1.0/10000.0)
+            self._n_pre_neurons * self._n_post_neurons,
+            self.__n_post * self._n_pre_neurons, prob_in_slice,
+            chance=1.0/100000.0)
 
         if min_delay is None or max_delay is None:
             return int(math.ceil(n_connections))
@@ -176,7 +180,7 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine):
         selection_prob = 1.0 / float(self._n_post_neurons)
         n_connections = utility_calls.get_probable_maximum_selected(
             self._n_post_neurons * self._n_pre_neurons,
-            self.__n_post * self._n_pre_neurons, selection_prob,
+            self.__n_post, selection_prob,
             chance=1.0/100000.0)
         return int(math.ceil(n_connections))
 
@@ -270,4 +274,4 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine):
     @overrides(AbstractGenerateConnectorOnMachine.
                gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
-        return 16 + 16
+        return (4 + 4) * BYTES_PER_WORD

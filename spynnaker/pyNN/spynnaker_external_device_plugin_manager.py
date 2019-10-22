@@ -130,6 +130,10 @@ class SpynnakerExternalDevicePluginManager(object):
             Determines if the spike packet will contain a common prefix for\
             the spikes
         :type use_prefix: bool
+        :param label: The label of the gatherer vertex
+        :type label: str
+        :param partition_ids: The names of the partitions to create edges for
+        :type partition_ids: list(str)
         """
         # pylint: disable=too-many-arguments, too-many-locals, protected-access
         config = get_simulator().config
@@ -141,11 +145,12 @@ class SpynnakerExternalDevicePluginManager(object):
 
         # add new edge and vertex if required to SpiNNaker graph
         SpynnakerExternalDevicePluginManager.update_live_packet_gather_tracker(
-            population._vertex, port, host, tag, board_address, strip_sdp,
-            use_prefix, key_prefix, prefix_type, message_type, right_shift,
-            payload_as_time_stamps, use_payload_prefix, payload_prefix,
-            payload_right_shift, number_of_packets_sent_per_time_step,
-            partition_id=constants.SPIKE_PARTITION_ID)
+            population._vertex, "LiveSpikeReceiver", port, host, tag,
+            board_address, strip_sdp, use_prefix, key_prefix, prefix_type,
+            message_type, right_shift, payload_as_time_stamps,
+            use_payload_prefix, payload_prefix, payload_right_shift,
+            number_of_packets_sent_per_time_step,
+            partition_ids=[constants.SPIKE_PARTITION_ID])
 
         if notify:
             SpynnakerExternalDevicePluginManager.add_database_socket_address(
@@ -189,14 +194,14 @@ class SpynnakerExternalDevicePluginManager(object):
 
     @staticmethod
     def update_live_packet_gather_tracker(
-            vertex_to_record_from, port, hostname, tag=None,
-            board_address=None,
-            strip_sdp=True, use_prefix=False, key_prefix=None,
-            prefix_type=None, message_type=EIEIOType.KEY_32_BIT,
+            vertex_to_record_from, lpg_label, port=None, hostname=None,
+            board_address=None, tag=None, strip_sdp=True, use_prefix=False,
+            key_prefix=None, prefix_type=None,
+            message_type=EIEIOType.KEY_32_BIT,
             right_shift=0, payload_as_time_stamps=True,
             use_payload_prefix=True, payload_prefix=None,
             payload_right_shift=0, number_of_packets_sent_per_time_step=0,
-            partition_id=None):
+            partition_ids=None):
         """ Add an edge from a vertex to the live packet gatherer, builds as\
             needed and has all the parameters for the creation of the live\
             packet gatherer if needed.
@@ -212,11 +217,11 @@ class SpynnakerExternalDevicePluginManager(object):
             payload_right_shift=payload_right_shift,
             number_of_packets_sent_per_time_step=(
                 number_of_packets_sent_per_time_step),
-            partition_id=partition_id)
+            label=lpg_label)
 
         # add to the tracker
         get_simulator().add_live_packet_gatherer_parameters(
-            params, vertex_to_record_from)
+            params, vertex_to_record_from, partition_ids)
 
     @staticmethod
     def add_poisson_live_rate_control(
@@ -282,8 +287,8 @@ class SpynnakerExternalDevicePluginManager(object):
         _spinnaker.add_application_edge(edge, partition_id)
 
     @staticmethod
-    def add_application_vertex(vertex, prefix=None):
-        get_simulator().add_application_vertex(vertex, prefix)
+    def add_application_vertex(vertex):
+        get_simulator().add_application_vertex(vertex)
 
     @staticmethod
     def machine_time_step():
