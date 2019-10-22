@@ -13,6 +13,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .id import ID
+from pyNN import common as PyNNCommon
 
-__all__ = ["ID"]
+
+class ID(int, PyNNCommon.IDMixin):
+    """ A filter container for allowing random setters of values
+    """
+
+    def __init__(self, n):
+        """ Create an ID object with numerical value `n`.
+        """
+        int.__init__(n)
+        PyNNCommon.IDMixin.__init__(self)

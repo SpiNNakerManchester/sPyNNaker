@@ -13,6 +13,23 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .id import ID
+from spynnaker.pyNN.models.neural_projections.connectors import (
+    CSAConnector as
+    CommonCSAConnector)
 
-__all__ = ["ID"]
+
+class CSAConnector(CommonCSAConnector):
+    """
+    Create an CSA (Connection Set Algebra, Djurfeldt 2012) connector.
+
+    :param cset: a connection set description
+    :type cset: string
+    """
+    __slots__ = []
+
+    def __init__(
+            self, cset, safe=True, callback=None, verbose=False):
+        # pylint: disable=too-many-arguments
+        super(CSAConnector, self).__init__(
+            cset=cset,
+            safe=safe, callback=callback, verbose=verbose)

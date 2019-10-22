@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .id import ID
+from .synapse_dynamics_static import SynapseDynamicsStatic
+from .synapse_dynamics_stdp import SynapseDynamicsSTDP
 
-__all__ = ["ID"]
+__all__ = ["SynapseDynamicsStatic", "SynapseDynamicsSTDP"]

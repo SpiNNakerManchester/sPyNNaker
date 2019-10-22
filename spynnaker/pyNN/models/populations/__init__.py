@@ -13,6 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .id import ID
+from .assembly import Assembly
+from .idmixin import IDMixin
+from .population_base import PopulationBase
+from .population import Population
+from .population_view import PopulationView
 
-__all__ = ["ID"]
+
+__all__ = ["Assembly", "IDMixin", "Population", "PopulationBase",
+           "PopulationView"]

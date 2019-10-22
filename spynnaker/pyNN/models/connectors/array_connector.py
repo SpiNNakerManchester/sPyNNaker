@@ -13,6 +13,22 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .id import ID
+from spynnaker.pyNN.models.neural_projections.connectors import (
+    ArrayConnector as CommonArrayConnector)
 
-__all__ = ["ID"]
+
+class ArrayConnector(CommonArrayConnector):
+    """
+    Create an array connector.
+
+    :param array: an array of integers
+    :type array: integer
+    """
+    __slots__ = []
+
+    def __init__(
+            self, array, safe=True, callback=None, verbose=False):
+        # pylint: disable=too-many-arguments
+        super(ArrayConnector, self).__init__(
+            array=array,
+            safe=safe, callback=callback, verbose=verbose)

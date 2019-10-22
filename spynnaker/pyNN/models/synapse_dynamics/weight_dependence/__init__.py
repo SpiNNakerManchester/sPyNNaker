@@ -13,6 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .id import ID
+from .weight_dependence_additive import WeightDependenceAdditive
+from .weight_dependence_multiplicative import WeightDependenceMultiplicative
+from .weight_dependence_additive_triplet import WeightDependenceAdditiveTriplet
 
-__all__ = ["ID"]
+__all__ = ["WeightDependenceAdditive", "WeightDependenceMultiplicative",
+           "WeightDependenceAdditiveTriplet"]

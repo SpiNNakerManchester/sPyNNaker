@@ -13,6 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .id import ID
+from pyNN import common as pynn_common
+from spinn_front_end_common.utilities import globals_variables
 
-__all__ = ["ID"]
+
+class Assembly(pynn_common.Assembly):
+
+    @property
+    def _simulator(self):
+        return globals_variables.get_simulator()
