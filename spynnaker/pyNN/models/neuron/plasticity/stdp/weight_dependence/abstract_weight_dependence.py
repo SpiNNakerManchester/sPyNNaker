@@ -29,6 +29,7 @@ class AbstractWeightDependence(object):
         :param post_population_label: label of post.
         :return: the provenance data of the weight dependency
         """
+        # pylint: disable=unused-argument
         return list()
 
     @abstractmethod

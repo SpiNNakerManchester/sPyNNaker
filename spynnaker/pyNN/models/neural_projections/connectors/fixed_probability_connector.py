@@ -35,7 +35,7 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
 
     def __init__(
             self, p_connect, allow_self_connections=True, safe=True,
-            verbose=False, rng=None):
+            callback=None, verbose=False, rng=None):
         """
         :param p_connect:
             a float between zero and one. Each potential connection is created\
@@ -50,7 +50,8 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
             a Space object, needed if you wish to specify distance-dependent\
             weights or delays - not implemented
         """
-        super(FixedProbabilityConnector, self).__init__(safe, verbose)
+        super(FixedProbabilityConnector, self).__init__(
+            safe, callback, verbose)
         self._p_connect = p_connect
         self.__allow_self_connections = allow_self_connections
         self._rng = rng

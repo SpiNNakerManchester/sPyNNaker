@@ -15,8 +15,7 @@
 
 import math
 import logging
-from data_specification.enums import DataType
-from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
+import numpy
 
 logger = logging.getLogger(__name__)
 # Default value of fixed-point one for STDP
@@ -27,17 +26,21 @@ def float_to_fixed(value, fixed_point_one):
     return int(round(float(value) * float(fixed_point_one)))
 
 
-def write_exp_lut(spec, time_constant, size, shift,
-                  fixed_point_one=STDP_FIXED_POINT_ONE):
+def get_exp_lut_values(
+        time_step, time_constant, shift=0,
+        fixed_point_one=STDP_FIXED_POINT_ONE, size=None):
     # Calculate time constant reciprocal
-    time_constant_reciprocal = 1.0 / float(time_constant)
+    time_constant_reciprocal = time_step / float(time_constant)
 
     # Generate LUT
-    last_value = None
-    for i in range(size):
+    last_value = 1.0
+    index = 0
+    values = list()
+    while last_value > 0.0 and (size is None or len(values) < size):
 
         # Apply shift to get time from index
-        time = (i << shift)
+        time = (index << shift)
+        index += 1
 
         # Multiply by time constant and calculate negative exponential
         value = float(time) * time_constant_reciprocal
@@ -45,28 +48,20 @@ def write_exp_lut(spec, time_constant, size, shift,
 
         # Convert to fixed-point and write to spec
         last_value = float_to_fixed(exp_float, fixed_point_one)
-        spec.write_value(data=last_value, data_type=DataType.INT16)
+        if last_value > 0.0:
+            values.append(last_value)
+    if size is not None and size > len(values):
+        values.extend([0] * (size - len(values)))
+    return values
 
-    # return last value reverted to float (should be 0 if correct)
-    return float(last_value) / float(fixed_point_one)
 
-
-def get_lut_provenance(
-        pre_population_label, post_population_label, rule_name, entry_name,
-        param_name, last_entry):
-    # pylint: disable=too-many-arguments
-    top_level_name = "{}_{}_STDP_{}".format(
-        pre_population_label, post_population_label, rule_name)
-    report = False
-    if last_entry is not None:
-        report = last_entry > 0
-    return ProvenanceDataItem(
-        [top_level_name, entry_name], last_entry, report=report,
-        message=(
-            "The last entry in the STDP exponential lookup table for the {}"
-            " parameter of the {} between {} and {} was {} rather than 0,"
-            " indicating that the lookup table was not big enough at this"
-            " timestep and value.  Try reducing the parameter value, or"
-            " increasing the timestep".format(
-                param_name, rule_name, pre_population_label,
-                post_population_label, last_entry)))
+def get_exp_lut_array(
+        time_step, time_constant, shift=0,
+        fixed_point_one=STDP_FIXED_POINT_ONE, size=None):
+    values = get_exp_lut_values(
+        time_step, time_constant, shift, fixed_point_one, size)
+    values_size = len(values)
+    if len(values) % 2 != 0:
+        values.append(0)
+    return numpy.concatenate(
+        ([values_size, shift], values)).astype("uint16").view("uint32")

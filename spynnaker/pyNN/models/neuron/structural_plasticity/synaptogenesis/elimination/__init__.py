@@ -13,15 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-APP = $(notdir $(CURDIR))
+from .abstract_elimination import AbstractElimination
+from .random_by_weight_elimination import RandomByWeightElimination
 
-NEURON_MODEL = $(NEURON_DIR)/neuron/models/neuron_model_lif_impl.c
-NEURON_MODEL_H = $(NEURON_DIR)/neuron/models/neuron_model_lif_impl.h
-INPUT_TYPE_H = $(NEURON_DIR)/neuron/input_types/input_type_current.h
-NEURON_IMPL_H = $(NEURON_DIR)/neuron/implementations/neuron_impl_standard.h
-THRESHOLD_TYPE_H = $(NEURON_DIR)/neuron/threshold_types/threshold_type_static.h
-SYNAPSE_TYPE_H = $(NEURON_DIR)/neuron/synapse_types/synapse_types_exponential_impl.h
-SYNAPSE_DYNAMICS = $(NEURON_DIR)/neuron/plasticity/synapse_dynamics_static_impl.c
-SYNAPTOGENESIS_DYNAMICS = $(NEURON_DIR)/neuron/structural_plasticity/synaptogenesis/topographic_map_impl.c
-
-include ../neural_build.mk
+__all__ = ["AbstractElimination", "RandomByWeightElimination"]
