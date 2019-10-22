@@ -19,6 +19,7 @@ from spynnaker.pyNN.exceptions import SpynnakerException
 from spinn_front_end_common.utilities.globals_variables import get_simulator
 from pacman.model.decorators.overrides import overrides
 from data_specification.enums.data_type import DataType
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from .abstract_generate_connector_on_machine \
     import AbstractGenerateConnectorOnMachine, ConnectorIDs, PARAM_TYPE_KERNEL
 
@@ -136,7 +137,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
         post = numpy.arange(
             post_vertex_slice.lo_atom, post_vertex_slice.hi_atom + 1)
 
-        return post // self._post_w, post % self._post_w
+        return numpy.divmod(post, self._post_w)
 
     # Get a map from post to pre coords
     def map_to_pre_coords(self, post_r, post_c):
@@ -201,8 +202,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
         # Loop over pre-vertices
         for pre_idx in range(
                 pre_vertex_slice.lo_atom, pre_vertex_slice.hi_atom + 1):
-            pre_r = pre_idx // self._pre_w
-            pre_c = pre_idx % self._pre_w
+            pre_r, pre_c = divmod(pre_idx, self._pre_w)
             coords[pre_idx] = []
             # Loop over post-vertices
             for post_idx in range(
@@ -211,8 +211,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
                 # convert to common coord system
                 r = post_as_pre_r[post_idx - post_lo]
                 c = post_as_pre_c[post_idx - post_lo]
-                if r < 0 or r >= self._common_h or \
-                   c < 0 or c >= self._common_w:
+                if not (0 <= r < self._common_h and 0 <= c < self._common_w):
                     continue
 
                 r, c = self.pre_as_post((r, c))
@@ -223,9 +222,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
                 dc = c - pre_c
                 kc = hw - dc
 
-                if 0 <= kr and kr < self._kernel_h and \
-                   0 <= kc and kc < self._kernel_w:
-
+                if 0 <= kr < self._kernel_h and 0 <= kc < self._kernel_w:
                     if post_idx in coords[pre_idx]:
                         continue
 
@@ -336,7 +333,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
                gen_delay_params_size_in_bytes)
     def gen_delay_params_size_in_bytes(self, delays):
         if self._krn_delays is not None:
-            return (N_KERNEL_PARAMS + 1 + self._krn_delays.size) * 4
+            return (N_KERNEL_PARAMS + 1 + self._krn_delays.size) * \
+                BYTES_PER_WORD
         return super(KernelConnector, self).gen_delay_params_size_in_bytes(
             delays)
 
@@ -362,7 +360,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
                gen_weight_params_size_in_bytes)
     def gen_weight_params_size_in_bytes(self, weights):
         if self._krn_weights is not None:
-            return (N_KERNEL_PARAMS + 1 + self._krn_weights.size) * 4
+            return (N_KERNEL_PARAMS + 1 + self._krn_weights.size) * \
+                BYTES_PER_WORD
         return super(KernelConnector, self).gen_weight_params_size_in_bytes(
             weights)
 
@@ -395,4 +394,4 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
     @overrides(AbstractGenerateConnectorOnMachine.
                gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
-        return N_KERNEL_PARAMS * 4
+        return N_KERNEL_PARAMS * BYTES_PER_WORD

@@ -30,7 +30,7 @@ from spinn_front_end_common.abstract_models import (
     AbstractProvidesOutgoingPartitionConstraints, AbstractHasAssociatedBinary)
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities.constants import (
-    SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES)
+    SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES, BYTES_PER_WORD)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from .delay_block import DelayBlock
 from .delay_extension_machine_vertex import DelayExtensionMachineVertex
@@ -47,7 +47,7 @@ logger = logging.getLogger(__name__)
 _DELAY_PARAM_HEADER_WORDS = 8
 # pylint: disable=protected-access
 _DELEXT_REGIONS = DelayExtensionMachineVertex._DELAY_EXTENSION_REGIONS
-_EXPANDER_BASE_PARAMS_SIZE = 3 * 4
+_EXPANDER_BASE_PARAMS_SIZE = 3 * BYTES_PER_WORD
 
 # The microseconds per timestep will be divided by this for the max offset
 _MAX_OFFSET_DENOMINATOR = 10
@@ -196,9 +196,11 @@ class DelayExtensionVertex(
         # ###################################################################
         # Reserve SDRAM space for memory areas:
         vertex_slice = graph_mapper.get_slice(vertex)
-        n_words_per_stage = int(math.ceil(vertex_slice.n_atoms / 32.0))
-        delay_params_sz = 4 * (_DELAY_PARAM_HEADER_WORDS +
-                               (self.__n_delay_stages * n_words_per_stage))
+        n_words_per_stage = int(math.ceil(
+            vertex_slice.n_atoms / float(8 * BYTES_PER_WORD)))
+        delay_params_sz = BYTES_PER_WORD * (
+            _DELAY_PARAM_HEADER_WORDS +
+            (self.__n_delay_stages * n_words_per_stage))
 
         spec.reserve_memory_region(
             region=_DELEXT_REGIONS.SYSTEM.value,
@@ -379,7 +381,8 @@ class DelayExtensionVertex(
 
     def get_dtcm_usage_for_atoms(self, vertex_slice):
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
-        return (44 + (16 * 4)) * n_atoms
+        words_per_atom = 11 + 16
+        return words_per_atom * BYTES_PER_WORD * n_atoms
 
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
     def get_binary_file_name(self):

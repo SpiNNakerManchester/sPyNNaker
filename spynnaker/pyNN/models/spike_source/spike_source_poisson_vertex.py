@@ -39,7 +39,7 @@ from spinn_front_end_common.interface.buffer_management import (
 from spinn_front_end_common.utilities import (
     helpful_functions, globals_variables)
 from spinn_front_end_common.utilities.constants import (
-    SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES)
+    SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES, BYTES_PER_WORD)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.interface.profiling import profile_utils
@@ -504,7 +504,7 @@ class SpikeSourcePoissonVertex(
         n_rates = sum(len(self.__data["rates"][i]) for i in range(
             vertex_slice.lo_atom, vertex_slice.hi_atom + 1))
         return ((vertex_slice.n_atoms * PARAMS_WORDS_PER_NEURON) +
-                (n_rates * PARAMS_WORDS_PER_RATE)) * 4
+                (n_rates * PARAMS_WORDS_PER_RATE)) * BYTES_PER_WORD
 
     def reserve_memory_regions(self, spec, placement, graph_mapper):
         """ Reserve memory regions for Poisson source parameters and output\

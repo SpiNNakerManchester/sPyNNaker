@@ -27,6 +27,7 @@ from pacman.model.resources.variable_sdram import VariableSDRAM
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities import globals_variables
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
 
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -51,15 +52,14 @@ class NeuronRecorder(object):
     __slots__ = [
         "__indexes", "__n_neurons", "__sampling_rates"]
 
-    N_BYTES_FOR_TIMESTAMP = 4
-    N_BYTES_PER_VALUE = 4
-    N_BYTES_PER_RATE = 4  # uint32
+    N_BYTES_FOR_TIMESTAMP = BYTES_PER_WORD
+    N_BYTES_PER_VALUE = BYTES_PER_WORD
+    N_BYTES_PER_RATE = BYTES_PER_WORD  # uint32
     N_BYTES_PER_INDEX = 1  # currently uint8
-    N_BYTES_PER_SIZE = 4
+    N_BYTES_PER_SIZE = BYTES_PER_WORD
     N_CPU_CYCLES_PER_NEURON = 8
-    N_BYTES_PER_WORD = 4
-    N_BYTES_PER_POINTER = 4
-    SARK_BLOCK_SIZE = 8  # Seen in sark.c
+    N_BYTES_PER_POINTER = BYTES_PER_WORD
+    SARK_BLOCK_SIZE = 2 * BYTES_PER_WORD  # Seen in sark.c
 
     MAX_RATE = 2 ** 32 - 1  # To allow a unit32_t to be used to store the rate
 
@@ -216,7 +216,7 @@ class NeuronRecorder(object):
                     continue
             # Read the spikes
             n_words = int(math.ceil(neurons_recording / 32.0))
-            n_bytes = n_words * self.N_BYTES_PER_WORD
+            n_bytes = n_words * BYTES_PER_WORD
             n_words_with_timestamp = n_words + 1
 
             # for buffering output info is taken form the buffer manager
@@ -435,7 +435,7 @@ class NeuronRecorder(object):
         if variable == SPIKES:
             # Overflow can be ignored as it is not save if in an extra word
             out_spike_words = int(math.ceil(n_neurons / 32.0))
-            out_spike_bytes = out_spike_words * self.N_BYTES_PER_WORD
+            out_spike_bytes = out_spike_words * BYTES_PER_WORD
             return self.N_BYTES_FOR_TIMESTAMP + out_spike_bytes
         else:
             return self.N_BYTES_FOR_TIMESTAMP + \
@@ -503,10 +503,15 @@ class NeuronRecorder(object):
             records = records + 1
         return data_size * records
 
+    @staticmethod
+    def __n_bytes_to_n_words(n_bytes):
+        return (n_bytes + (BYTES_PER_WORD - 1)) // BYTES_PER_WORD
+
     def get_sdram_usage_in_bytes(self, vertex_slice):
-        n_words_for_n_neurons = (vertex_slice.n_atoms + 3) // 4
-        n_bytes_for_n_neurons = n_words_for_n_neurons * 4
-        return (8 + n_bytes_for_n_neurons) * len(self.__sampling_rates)
+        n_words_for_n_neurons = self.__n_bytes_to_n_words(vertex_slice.n_atoms)
+        n_bytes_for_n_neurons = n_words_for_n_neurons * BYTES_PER_WORD
+        return (2 * BYTES_PER_WORD + n_bytes_for_n_neurons) * \
+            len(self.__sampling_rates)
 
     def _get_fixed_sdram_usage(self, vertex_slice):
         total_neurons = vertex_slice.hi_atom - vertex_slice.lo_atom + 1
@@ -550,7 +555,7 @@ class NeuronRecorder(object):
         for variable in self.__sampling_rates:
             if variable == SPIKES:
                 out_spike_words = int(math.ceil(vertex_slice.n_atoms / 32.0))
-                out_spike_bytes = out_spike_words * self.N_BYTES_PER_WORD
+                out_spike_bytes = out_spike_words * BYTES_PER_WORD
                 usage += self.N_BYTES_FOR_TIMESTAMP + out_spike_bytes
             else:
                 usage += (self.N_BYTES_FOR_TIMESTAMP +
@@ -558,7 +563,7 @@ class NeuronRecorder(object):
         # *_size
         usage += len(self.__sampling_rates) * self.N_BYTES_PER_SIZE
         # n_recordings_outstanding
-        usage += self.N_BYTES_PER_WORD * 4
+        usage += BYTES_PER_WORD * 4
         return usage
 
     def get_n_cpu_cycles(self, n_neurons):
@@ -567,8 +572,8 @@ class NeuronRecorder(object):
 
     def get_data(self, vertex_slice):
         data = list()
-        n_words_for_n_neurons = (vertex_slice.n_atoms + 3) // 4
-        n_bytes_for_n_neurons = n_words_for_n_neurons * 4
+        n_words_for_n_neurons = self.__n_bytes_to_n_words(vertex_slice.n_atoms)
+        n_bytes_for_n_neurons = n_words_for_n_neurons * BYTES_PER_WORD
         for variable in self.__sampling_rates:
             rate = self.__sampling_rates[variable]
             n_recording = self._count_recording_per_slice(

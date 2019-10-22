@@ -16,6 +16,7 @@
 import decimal
 import numpy
 from data_specification.enums.data_type import DataType
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
 
 class DelayGeneratorData(object):
@@ -34,7 +35,7 @@ class DelayGeneratorData(object):
         "__pre_vertex_slice",
         "__synapse_information")
 
-    BASE_SIZE = 8 * 4
+    BASE_SIZE = 8 * BYTES_PER_WORD
 
     def __init__(
             self, max_row_n_synapses, max_delayed_row_n_synapses,
@@ -61,10 +62,10 @@ class DelayGeneratorData(object):
         """
         connector = self.__synapse_information.connector
 
-        return sum((self.BASE_SIZE,
-                    connector.gen_connector_params_size_in_bytes,
-                    connector.gen_delay_params_size_in_bytes(
-                        self.__synapse_information.delay)))
+        return (
+            self.BASE_SIZE + connector.gen_connector_params_size_in_bytes +
+            connector.gen_delay_params_size_in_bytes(
+                self.__synapse_information.delay))
 
     @property
     def gen_data(self):

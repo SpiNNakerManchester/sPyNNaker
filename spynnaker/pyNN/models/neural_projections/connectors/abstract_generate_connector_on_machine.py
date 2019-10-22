@@ -21,6 +21,7 @@ from six import with_metaclass
 from spinn_utilities.abstract_base import abstractproperty, AbstractBase
 from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.globals_variables import get_simulator
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector)
 
@@ -150,11 +151,11 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         """ Get the size of the parameter generator parameters in bytes
         """
         if numpy.isscalar(values):
-            return 4
+            return BYTES_PER_WORD
 
         if IS_PYNN_8 and get_simulator().is_a_pynn_random(values):
             parameters = random.available_distributions[values.name]
-            return (len(parameters) + 4) * 4
+            return (len(parameters) + 4) * BYTES_PER_WORD
 
         raise ValueError("Unexpected value {}".format(values))
 
