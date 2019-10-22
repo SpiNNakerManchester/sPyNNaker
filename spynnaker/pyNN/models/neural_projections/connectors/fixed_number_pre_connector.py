@@ -171,7 +171,7 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine):
             float(post_vertex_slice.n_atoms) / float(self._n_post_neurons))
         n_connections = utility_calls.get_probable_maximum_selected(
             self._n_pre_neurons * self._n_post_neurons,
-            n_connections_total, prob_in_slice)
+            n_connections_total, prob_in_slice, chance=1.0/100000.0)
 
         if min_delay is None or max_delay is None:
             return int(math.ceil(n_connections))
@@ -256,7 +256,7 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine):
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
         # The same seed needs to be sent to each of the slices
-        key = (id(pre_slices), id(post_slices))
+        key = (id(pre_slices), id(post_vertex_slice))
         if key not in self.__pre_connector_seed:
             self.__pre_connector_seed[key] = [
                 int(i * 0xFFFFFFFF) for i in self._rng.next(n=4)]
