@@ -82,16 +82,14 @@ class GraphEdgeFilter(object):
     @staticmethod
     def _add_edge_to_new_graph(
             edge, partition, old_mapper, new_graph, new_mapper):
+
+        if (not new_graph.outgoing_partition_exists(
+                edge.pre_vertex, partition.identifier)):
+            new_partition = partition.clone_for_graph_move()
+            new_graph.add_outgoing_edge_partition(new_partition)
         new_graph.add_edge(edge, partition.identifier)
         new_mapper.add_edge_mapping(
             edge, old_mapper.get_application_edge(edge))
-
-        # add partition constraints from the original graph to the new graph
-        # add constraints from the application partition
-        new_partition = new_graph. \
-            get_outgoing_edge_partition_starting_at_vertex(
-                edge.pre_vertex, partition.identifier)
-        new_partition.add_constraints(partition.constraints)
 
     @staticmethod
     def _is_filterable(edge, graph_mapper):

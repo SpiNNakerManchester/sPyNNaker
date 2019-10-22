@@ -16,6 +16,8 @@
 import logging
 import math
 import numpy
+
+from pacman.model.graphs.application import ApplicationOutgoingEdgePartition
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.constraints.partitioner_constraints import (
     SameAtomsAsVertexConstraint)
@@ -150,8 +152,13 @@ class PyNNProjectionCommon(object):
                 pre_synaptic_population._get_vertex,
                 post_synaptic_population._get_vertex,
                 self.__synapse_information, label=label)
+            outgoing_partition = ApplicationOutgoingEdgePartition(
+                identifier=constants.SPIKE_PARTITION_ID,
+                pre_vertex=pre_synaptic_population._get_vertex)
 
             # add edge to the graph
+            spinnaker_control.add_application_outgoing_partition(
+                outgoing_partition)
             spinnaker_control.add_application_edge(
                 self.__projection_edge, constants.SPIKE_PARTITION_ID)
 
@@ -245,6 +252,12 @@ class PyNNProjectionCommon(object):
             delay_afferent_edge = DelayAfferentApplicationEdge(
                 pre_vertex, delay_vertex, label="{}_to_DelayExtension".format(
                     pre_vertex.label))
+            if (not self.__spinnaker_control.application_partition_exists(
+                    pre_vertex, constants.SPIKE_PARTITION_ID)):
+                delay_outgoing_partition = ApplicationOutgoingEdgePartition(
+                    constants.SPIKE_PARTITION_ID, pre_vertex)
+                self.__spinnaker_control.add_application_outgoing_partition(
+                    delay_outgoing_partition)
             self.__spinnaker_control.add_application_edge(
                 delay_afferent_edge, constants.SPIKE_PARTITION_ID)
 
@@ -264,6 +277,10 @@ class PyNNProjectionCommon(object):
                 delay_vertex, post_vertex, self.__synapse_information,
                 label="{}_delayed_to_{}".format(
                     pre_vertex.label, post_vertex.label))
+            delay_outgoing_partition = ApplicationOutgoingEdgePartition(
+                constants.SPIKE_PARTITION_ID, delay_vertex)
+            self.__spinnaker_control.add_application_outgoing_partition(
+                delay_outgoing_partition)
             self.__spinnaker_control.add_application_edge(
                 delay_edge, constants.SPIKE_PARTITION_ID)
         else:

@@ -13,7 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from pacman.model.graphs.application import ApplicationEdge
+from pacman.model.graphs.application import ApplicationEdge, \
+    ApplicationOutgoingEdgePartition
 from spinnman.messages.eieio import EIEIOType
 from spinn_front_end_common.utilities import helpful_functions
 from spinn_front_end_common.utilities.globals_variables import get_simulator
@@ -279,6 +280,9 @@ class SpynnakerExternalDevicePluginManager(object):
         """
         _spinnaker = get_simulator()
         edge = ApplicationEdge(vertex, device_vertex)
+        outgoing_partition = ApplicationOutgoingEdgePartition(
+                partition_id, vertex)
+        _spinnaker.add_outgoing_edge_partition(outgoing_partition)
         _spinnaker.add_application_edge(edge, partition_id)
 
     @staticmethod
