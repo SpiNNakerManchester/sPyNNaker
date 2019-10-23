@@ -193,7 +193,7 @@ __all__ = [
     'get_current_time', 'create', 'connect', 'get_time_step', 'get_min_delay',
     'get_max_delay', 'initialize', 'list_standard_models', 'name',
     'num_processes', 'record', 'record_v', 'record_gsyn',
-    '__version__ ', '__version_name__', '__version_month__',
+    '__version__', '__version_name__', '__version_month__',
     '__version_month__'
     ]
 
