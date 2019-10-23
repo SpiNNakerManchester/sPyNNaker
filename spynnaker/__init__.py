@@ -18,13 +18,13 @@ import numpy as __numpy
 from six import iteritems
 
 # pynn imports
-from pyNN import common as pynn_common
 from pyNN.common import control as _pynn_control
 from pyNN.recording import get_io
 from pyNN.random import NumpyRNG, RandomDistribution as _PynnRandomDistribution
 from pyNN.space import \
     Space, Line, Grid2D, Grid3D, Cuboid, Sphere, RandomStructure
 from pyNN.space import distance as _pynn_distance
+import pyNN.common as pynn_common
 
 # fec imports
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
