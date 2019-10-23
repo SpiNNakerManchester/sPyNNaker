@@ -97,6 +97,7 @@ def test_connectors(
         connector.set_projection_information(
             pre_population=MockPopulation(n_pre, "Pre"),
             post_population=MockPopulation(n_post, "Post"),
+            prepop_is_view=False, postpop_is_view=False,
             rng=None, machine_time_step=1000)
 
         pre_slices = [

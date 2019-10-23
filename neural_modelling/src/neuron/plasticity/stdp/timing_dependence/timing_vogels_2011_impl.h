@@ -36,17 +36,6 @@ typedef int16_t pre_trace_t;
 #include <neuron/plasticity/stdp/stdp_typedefs.h>
 
 //---------------------------------------
-// Macros
-//---------------------------------------
-// Exponential decay lookup parameters
-#define TAU_TIME_SHIFT 0
-#define TAU_SIZE 256
-
-// Helper macros for looking up decays
-#define DECAY_LOOKUP_TAU(time) \
-	maths_lut_exponential_decay(time, TAU_TIME_SHIFT, TAU_SIZE, tau_lookup)
-
-//---------------------------------------
 // Structures
 //---------------------------------------
 typedef struct {
@@ -56,7 +45,7 @@ typedef struct {
 //---------------------------------------
 // Externals
 //---------------------------------------
-extern int16_t tau_lookup[TAU_SIZE];
+extern int16_lut *tau_lookup;
 extern plasticity_trace_region_data_t plasticity_trace_region_data;
 
 //---------------------------------------
@@ -74,7 +63,7 @@ static inline int16_t timing_add_spike(
 
     // Decay previous trace
     int32_t decayed_trace = STDP_FIXED_MUL_16X16(last_trace,
-        DECAY_LOOKUP_TAU(delta_time));
+        maths_lut_exponential_decay(delta_time, tau_lookup));
 
     // Add new spike to trace
     int32_t new_trace = decayed_trace + STDP_FIXED_POINT_ONE;
@@ -110,7 +99,8 @@ static inline update_state_t timing_apply_pre_spike(
 
     // Get time of event relative to last post-synaptic event
     uint32_t time_since_last_post = time - last_post_time;
-    int32_t exponential_decay = DECAY_LOOKUP_TAU(time_since_last_post);
+    int32_t exponential_decay = maths_lut_exponential_decay(
+            time_since_last_post, tau_lookup);
     int32_t decayed_o1 = STDP_FIXED_MUL_16X16(last_post_trace, exponential_decay)
             - plasticity_trace_region_data.alpha;
 
@@ -132,7 +122,8 @@ static inline update_state_t timing_apply_post_spike(
 
     // Get time of event relative to last pre-synaptic event
     uint32_t time_since_last_pre = time - last_pre_time;
-    int32_t exponential_decay = DECAY_LOOKUP_TAU(time_since_last_pre);
+    int32_t exponential_decay = maths_lut_exponential_decay(
+            time_since_last_pre, tau_lookup);
     int32_t decayed_r1 = STDP_FIXED_MUL_16X16(last_pre_trace, exponential_decay);
 
     log_debug("\t\t\ttime_since_last_pre_event=%u, decayed_r1=%d\n",

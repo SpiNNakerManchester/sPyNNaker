@@ -19,7 +19,6 @@
 #define _SYNAPSES_H_
 
 #include <common/neuron-typedefs.h>
-#include <neuron/structural_plasticity/sp_structs.h>
 #include "synapse_row.h"
 #include "neuron.h"
 
@@ -78,11 +77,10 @@ void synapses_do_timestep_update(timer_t time);
 //! \brief process a synaptic row
 //! \param[in] time: the simulated time
 //! \param[in] row: the synaptic row in question
-//! \param[in] write: bool saying if to write this back to SDRAM
-//! \param[in] process_id: ??????????????????
+//! \param[out] write_back: bool saying if to write back to SDRAM
 //! \return bool if successful or not
 bool synapses_process_synaptic_row(
-        uint32_t time, synaptic_row_t row, bool write, uint32_t process_id);
+    uint32_t time, synaptic_row_t row, bool *write_back);
 
 //! \brief returns the number of times the synapses have saturated their
 //!        weights.
@@ -94,38 +92,5 @@ uint32_t synapses_get_saturation_count(void);
 //!        returns 0
 //! \return the counter for plastic and fixed pre synaptic events or 0
 uint32_t synapses_get_pre_synaptic_events(void);
-
-
-//------------------------------------------------------------------------------
-// Synaptic rewiring functions
-//------------------------------------------------------------------------------
-
-//! \brief  Searches the synaptic row for the the connection with the
-//!         specified post-synaptic ID
-//! \param[in] id: the (core-local) ID of the neuron to search for in the
-//! synaptic row
-//! \param[in] row: the core-local address of the synaptic row
-//! \param[out] sp_data: the address of a struct through which to return
-//! weight, delay information
-//! \return bool: was the search successful?
-bool find_static_neuron_with_id(
-        uint32_t id, address_t row, structural_plasticity_data_t *sp_data);
-
-//! \brief  Remove the entry at the specified offset in the synaptic row
-//! \param[in] offset: the offset in the row at which to remove the entry
-//! \param[in] row: the core-local address of the synaptic row
-//! \return bool: was the removal successful?
-bool remove_static_neuron_at_offset(uint32_t offset, address_t row);
-
-//! \brief  Add a static entry in the synaptic row
-//! \param[in] id: the (core-local) ID of the post-synaptic neuron to be added
-//! \param[in] row: the core-local address of the synaptic row
-//! \param[in] weight: the initial weight associated with the connection
-//! \param[in] delay: the delay associated with the connection
-//! \param[in] type: the type of the connection (e.g. inhibitory)
-//! \return bool: was the addition successful?
-bool add_static_neuron_with_id(
-        uint32_t id, address_t row, uint32_t weight, uint32_t delay,
-        uint32_t type);
 
 #endif // _SYNAPSES_H_

@@ -13,10 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-try:
-    from collections.abc import defaultdict
-except ImportError:
-    from collections import defaultdict
+from collections import defaultdict
 import sys
 from six import add_metaclass
 from spinn_utilities.classproperty import classproperty
@@ -51,8 +48,8 @@ class AbstractPyNNModel(object):
         return AbstractPyNNModel._max_atoms_per_core[cls]
 
     @staticmethod
-    def _get_init_params_and_svars(cls):
-        init = getattr(cls, "__init__")
+    def __get_init_params_and_svars(the_cls):
+        init = getattr(the_cls, "__init__")
         while hasattr(init, "_method"):
             init = getattr(init, "_method")
         params = None
@@ -64,21 +61,21 @@ class AbstractPyNNModel(object):
         return init, params, svars
 
     @classproperty
-    def default_parameters(cls):
+    def default_parameters(cls):  # pylint: disable=no-self-argument
         """ Get the default values for the parameters of the model.
 
         :rtype: dict(str, object)
         """
-        init, params, svars = cls._get_init_params_and_svars(cls)
+        init, params, svars = cls.__get_init_params_and_svars(cls)
         return get_dict_from_init(init, skip=svars, include=params)
 
     @classproperty
-    def default_initial_values(cls):
+    def default_initial_values(cls):  # pylint: disable=no-self-argument
         """ Get the default initial values for the state variables of the model
 
         :rtype: dict(str, object)
         """
-        init, params, svars = cls._get_init_params_and_svars(cls)
+        init, params, svars = cls.__get_init_params_and_svars(cls)
         if params is None and svars is None:
             return {}
         return get_dict_from_init(init, skip=params, include=svars)
@@ -89,7 +86,7 @@ class AbstractPyNNModel(object):
 
         :rtype: list(str)
         """
-        return cls.default_parameters.keys()
+        return cls.default_parameters.keys()  # pylint: disable=no-member
 
     @classmethod
     def has_parameter(cls, name):
@@ -102,7 +99,7 @@ class AbstractPyNNModel(object):
         return name in cls.default_parameters
 
     @abstractproperty
-    def default_population_parameters():
+    def default_population_parameters(self):
         """ Get the default values for the parameters at the population level
             These are parameters that can be passed in to the Population\
             constructor in addition to the standard PyNN options
