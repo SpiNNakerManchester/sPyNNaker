@@ -54,6 +54,8 @@ before_install:
   - support/gitclone.sh https://github.com/SpiNNakerManchester/spinnaker_tools.git
   - support/gitclone.sh https://github.com/SpiNNakerManchester/spinn_common.git
   - support/gitclone.sh https://github.com/SpiNNakerManchester/SpiNNFrontEndCommon.git
+  - support/gitclone.sh https://github.com/SpiNNakerManchester/IntroLab.git
+  - support/gitclone.sh https://github.com/SpiNNakerManchester/PyNN8Examples.git
   - export SPINN_DIRS=$PWD/spinnaker_tools
   - export NEURAL_MODELLING_DIRS=$PWD/neural_modelling
 
