@@ -16,13 +16,16 @@
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.failed_state import (
     FailedState, FAILED_STATE_MSG)
-from spynnaker.pyNN.spynnaker_simulator_interface import (
-    SpynnakerSimulatorInterface)
+from spynnaker.pyNN.spynnaker8_simulator_interface import (
+    Spynnaker8SimulatorInterface)
 
 
-class SpynnakerFailedState(SpynnakerSimulatorInterface, FailedState, object):
+class SpynnakerFailedState(Spynnaker8SimulatorInterface, FailedState, object):
 
-    __slots__ = ()
+    __slots__ = ("write_on_end")
+
+    def __init__(self):
+        self.write_on_end = []
 
     def get_distribution_to_stats(self):
         raise ConfigurationException(FAILED_STATE_MSG)
@@ -56,4 +59,32 @@ class SpynnakerFailedState(SpynnakerSimulatorInterface, FailedState, object):
         raise ConfigurationException(FAILED_STATE_MSG)
 
     def set_number_of_neurons_per_core(self, neuron_type, max_permitted):
+        raise ConfigurationException(FAILED_STATE_MSG)
+
+    @property
+    def dt(self):
+        raise ConfigurationException(FAILED_STATE_MSG)
+
+    @property
+    def mpi_rank(self):
+        raise ConfigurationException(FAILED_STATE_MSG)
+
+    @property
+    def name(self):
+        return "SpynnakerFailedState"
+
+    @property
+    def num_processes(self):
+        raise ConfigurationException(FAILED_STATE_MSG)
+
+    @property
+    def recorders(self):
+        raise ConfigurationException(FAILED_STATE_MSG)
+
+    @property
+    def segment_counter(self):
+        raise ConfigurationException(FAILED_STATE_MSG)
+
+    @property
+    def t(self):
         raise ConfigurationException(FAILED_STATE_MSG)

@@ -346,42 +346,5 @@ class SpiNNaker(AbstractSpiNNakerCommon, pynn_control.BaseState,
         return NumpyRNG
 
 
-# Defined in this file to prevent an import loop
-class Spynnaker8FailedState(SpynnakerFailedState,
-                            Spynnaker8SimulatorInterface):
-    __slots__ = ("write_on_end")
-
-    def __init__(self):
-        self.write_on_end = []
-
-    @property
-    def dt(self):
-        raise ConfigurationException(FAILED_STATE_MSG)
-
-    @property
-    def mpi_rank(self):
-        raise ConfigurationException(FAILED_STATE_MSG)
-
-    @property
-    def name(self):
-        return NAME
-
-    @property
-    def num_processes(self):
-        raise ConfigurationException(FAILED_STATE_MSG)
-
-    @property
-    def recorders(self):
-        raise ConfigurationException(FAILED_STATE_MSG)
-
-    @property
-    def segment_counter(self):
-        raise ConfigurationException(FAILED_STATE_MSG)
-
-    @property
-    def t(self):
-        raise ConfigurationException(FAILED_STATE_MSG)
-
-
 # At import time change the default FailedState
-globals_variables.set_failed_state(Spynnaker8FailedState())
+globals_variables.set_failed_state(SpynnakerFailedState())
