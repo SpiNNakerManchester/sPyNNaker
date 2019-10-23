@@ -24,7 +24,7 @@ def version_satisfies(module, requirement):
     return Version(module.__version__) >= Version(requirement)
 
 
-def install_sPyNNaker8_into(module):
+def install_sPyNNaker_into(module):
     """ Do the actual installation by creating a package within the given\
         module's implementation. This is very nasty!
     """
@@ -34,7 +34,7 @@ def install_sPyNNaker8_into(module):
 
     spinnaker_init = os.path.join(spinnaker_dir, "__init__.py")
     with open(spinnaker_init, "w") as spinn_file:
-        spinn_file.write("from spynnaker8 import *\n")
+        spinn_file.write("from spynnaker import *\n")
 
     print("Created {}".format(spinnaker_init))
 
@@ -46,4 +46,4 @@ if not version_satisfies(pyNN, "0.9"):
             pyNN.__version__))
 
 # Perform the installation
-install_sPyNNaker8_into(pyNN)
+install_sPyNNaker_into(pyNN)
