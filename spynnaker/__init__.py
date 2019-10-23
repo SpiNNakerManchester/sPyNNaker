@@ -42,7 +42,8 @@ from spynnaker.pyNN.models.connectors.array_connector import ArrayConnector
 # noinspection PyUnresolvedReferences
 from spynnaker.pyNN.models.connectors.csa_connector import CSAConnector
 # noinspection PyUnresolvedReferences
-from spynnaker.pyNN.models.connectors.distance_dependent_probability_connector \
+from spynnaker.pyNN.models.connectors.\
+    distance_dependent_probability_connector \
     import DistanceDependentProbabilityConnector
 # noinspection PyUnresolvedReferences
 from spynnaker.pyNN.models.connectors.fixed_number_post_connector import \
@@ -54,15 +55,17 @@ from spynnaker.pyNN.models.connectors.fixed_number_pre_connector import \
 from spynnaker.pyNN.models.connectors.fixed_probability_connector import \
     FixedProbabilityConnector
 # noinspection PyUnresolvedReferences
-from spynnaker.pyNN.models.connectors.from_file_connector import FromFileConnector
+from spynnaker.pyNN.models.connectors.from_file_connector import \
+    FromFileConnector
 # noinspection PyUnresolvedReferences
-from spynnaker.pyNN.models.connectors.from_list_connector import FromListConnector
+from spynnaker.pyNN.models.connectors.from_list_connector import \
+    FromListConnector
 # noinspection PyUnresolvedReferences
 from spynnaker.pyNN.models.connectors.index_based_probability_connector import\
     IndexBasedProbabilityConnector
 # noinspection PyUnresolvedReferences
-from spynnaker.pyNN.models.connectors.multapse_connector import MultapseConnector \
-    as FixedTotalNumberConnector
+from spynnaker.pyNN.models.connectors.multapse_connector import \
+    MultapseConnector as FixedTotalNumberConnector
 # noinspection PyUnresolvedReferences
 from spynnaker.pyNN.models.connectors.one_to_one_connector import \
     OneToOneConnector
@@ -80,8 +83,9 @@ from spynnaker.pyNN.models.synapse_dynamics.synapse_dynamics_static import \
 # plastic stuff
 from spynnaker.pyNN.models.synapse_dynamics.synapse_dynamics_stdp import \
     SynapseDynamicsSTDP as STDPMechanism
-from spynnaker.pyNN.models.synapse_dynamics.synapse_dynamics_structural_static \
-    import SynapseDynamicsStructuralStatic as StructuralMechanismStatic
+from spynnaker.pyNN.models.synapse_dynamics.\
+    synapse_dynamics_structural_static import \
+    SynapseDynamicsStructuralStatic as StructuralMechanismStatic
 from spynnaker.pyNN.models.synapse_dynamics.synapse_dynamics_structural_stdp \
     import SynapseDynamicsStructuralSTDP as StructuralMechanismSTDP
 from spynnaker.pyNN.models.synapse_dynamics.weight_dependence\

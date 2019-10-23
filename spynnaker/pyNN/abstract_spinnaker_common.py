@@ -31,7 +31,7 @@ from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.spynnaker_simulator_interface import (
     SpynnakerSimulatorInterface)
 from spynnaker.pyNN.utilities.extracted_data import ExtractedData
-from spynnaker._version import __version__  as version
+from spynnaker._version import __version__ as version
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
