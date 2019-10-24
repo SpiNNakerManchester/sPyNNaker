@@ -122,8 +122,8 @@ class BaseTestCase(unittest.TestCase):
     def report(self, message, file_name):
         if not message.endswith("\n"):
             message += "\n"
-        p8_integration_tests_directory = os.path.dirname(__file__)
-        test_dir = os.path.dirname(p8_integration_tests_directory)
+        spynnaker_integration_tests_directory = os.path.dirname(__file__)
+        test_dir = os.path.dirname(spynnaker_integration_tests_directory)
         report_dir = os.path.join(test_dir, "reports")
         if not os.path.exists(report_dir):
             os.makedirs(report_dir)
@@ -160,13 +160,13 @@ class BaseTestCase(unittest.TestCase):
         raise SkipTest(issue)
 
     def destory_path(self):
-        p8_integration_tests_directory = os.path.dirname(__file__)
-        test_dir = os.path.dirname(p8_integration_tests_directory)
+        spynnaker_integration_tests_directory = os.path.dirname(__file__)
+        test_dir = os.path.dirname(spynnaker_integration_tests_directory)
         return os.path.join(test_dir, "JobDestroyedError.txt")
 
     def spinnman_exception_path(self):
-        p8_integration_tests_directory = os.path.dirname(__file__)
-        test_dir = os.path.dirname(p8_integration_tests_directory)
+        spynnaker_integration_tests_directory = os.path.dirname(__file__)
+        test_dir = os.path.dirname(spynnaker_integration_tests_directory)
         return os.path.join(test_dir, "JobDestroyedError.txt")
 
     def runsafe(self, method, retry_delay=3.0):

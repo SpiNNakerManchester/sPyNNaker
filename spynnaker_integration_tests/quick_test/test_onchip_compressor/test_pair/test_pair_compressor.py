@@ -14,8 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spynnaker_integration_tests.base_test_case import BaseTestCase
-from p8_integration_tests.quick_test.test_onchip_compressor.many_routes \
-    import do_run
+from spynnaker_integration_tests.quick_test.test_onchip_compressor.\
+    many_routes import do_run
 
 
 class TestPairCompressor(BaseTestCase):

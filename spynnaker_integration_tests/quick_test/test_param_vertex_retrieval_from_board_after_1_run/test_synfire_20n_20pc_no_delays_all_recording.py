@@ -21,9 +21,9 @@ import matplotlib.pyplot as plt
 import numpy
 from pyNN.utility.plotting import Figure
 import spynnaker.spike_checker as spike_checker
-from spynnaker.pyNNspynnaker_plotting import SpynnakerPanel
+from spynnaker.pyNN.spynnaker_plotting import SpynnakerPanel
 from spynnaker_integration_tests.base_test_case import BaseTestCase
-from p8_integration_tests.scripts.synfire_run import SynfireRunner
+from spynnaker_integration_tests.scripts.synfire_run import SynfireRunner
 """
 Synfirechain-like example
 """

@@ -15,7 +15,7 @@
 
 import random
 import spynnaker as sim
-from p8_integration_tests.base_test_case import BaseTestCase
+from spynnaker_integration_tests.base_test_case import BaseTestCase
 
 
 class TestBigConnection(BaseTestCase):

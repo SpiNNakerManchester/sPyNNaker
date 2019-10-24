@@ -15,7 +15,7 @@
 
 import spynnaker as sim
 from spynnaker_integration_tests.base_test_case import BaseTestCase
-from p8_integration_tests.scripts.patternSpiker import PatternSpiker
+from spynnaker_integration_tests.scripts.patternSpiker import PatternSpiker
 
 
 class TestSampling(BaseTestCase):

@@ -15,7 +15,7 @@
 
 import time
 from spynnaker_integration_tests.base_test_case import BaseTestCase
-from p8_integration_tests.scripts.manyBoards import ManyBoards
+from spynnaker_integration_tests.scripts.manyBoards import ManyBoards
 
 
 class TestJavaAdvanced(BaseTestCase):

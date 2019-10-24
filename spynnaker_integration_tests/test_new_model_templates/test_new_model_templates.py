@@ -13,7 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from p8_integration_tests.scripts_test.script_checker import ScriptChecker
+from spynnaker_integration_tests.scripts_test.script_checker import (
+    ScriptChecker)
 import os
 import sys
 
