@@ -23,8 +23,6 @@ from pyNN.random import RandomDistribution, NumpyRNG
 from pyNN import __version__ as pynn_version
 from spinn_utilities.log import FormatAdapter
 from spinn_front_end_common.utilities import globals_variables
-from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from spinn_front_end_common.utilities.failed_state import FAILED_STATE_MSG
 from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION)
 from spynnaker.pyNN.abstract_spinnaker_common import AbstractSpiNNakerCommon
