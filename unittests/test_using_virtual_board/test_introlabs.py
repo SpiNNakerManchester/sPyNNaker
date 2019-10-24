@@ -28,11 +28,11 @@ class TestScripts(BaseTestCase):
         super(TestScripts, self).setUp()
         introllab_tests_dir = os.path.dirname(__file__)
         unittest_dir = os.path.dirname(introllab_tests_dir)
-        spynnaker8_dir = os.path.dirname(unittest_dir)
-        self._introlab_dir = os.path.join(spynnaker8_dir, "IntroLab")
+        spynnaker_dir = os.path.dirname(unittest_dir)
+        self._introlab_dir = os.path.join(spynnaker_dir, "IntroLab")
         # Jenkins appears to place Introlabs here otherwise keep looking
         if not os.path.exists(self._introlab_dir):
-            parent_dir = os.path.dirname(spynnaker8_dir)
+            parent_dir = os.path.dirname(spynnaker_dir)
             self._introlab_dir = os.path.join(parent_dir, "IntroLab")
 
     def mockshow(self):
