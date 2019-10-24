@@ -23,7 +23,8 @@ from spinn_machine import SDRAM
 from pacman.model.placements import Placement
 from pacman.model.resources import ResourceContainer
 from pacman.model.graphs.common import GraphMapper, Slice
-from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex
+from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex, \
+    MachineOutgoingEdgePartition
 from pacman.model.routing_info import (
     RoutingInfo, PartitionRoutingInfo, BaseKeyAndMask)
 from pacman.model.graphs.application import ApplicationVertex
@@ -254,6 +255,9 @@ class TestSynapticManager(unittest.TestCase):
         graph = MachineGraph("Test")
         graph.add_vertex(pre_vertex)
         graph.add_vertex(post_vertex)
+
+        graph.add_outgoing_edge_partition(
+            MachineOutgoingEdgePartition(partition_name, pre_vertex))
         graph.add_edge(machine_edge, partition_name)
 
         graph_mapper = GraphMapper()
