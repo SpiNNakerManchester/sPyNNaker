@@ -18,7 +18,7 @@ from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.graphs.application import ApplicationEdge
 from pacman.model.graphs.machine import MachineGraph
-from pacman.model.graphs.common import GraphMapper
+from pacman.model.graphs.common import GraphMapper, EdgeTrafficType
 from spynnaker.pyNN.exceptions import FilterableException
 from spynnaker.pyNN.models.abstract_models import AbstractFilterableEdge
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
@@ -105,6 +105,8 @@ class GraphEdgeFilter(object):
         if isinstance(edge, AbstractFilterableEdge):
             return edge.filter_edge(graph_mapper)
         elif isinstance(app_edge, ApplicationEdge):
+            return False
+        elif edge.traffic_type == EdgeTrafficType.SDRAM:
             return False
         raise FilterableException(
             "cannot figure out if edge {} is prunable or not".format(edge))
