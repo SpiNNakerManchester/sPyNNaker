@@ -27,3 +27,10 @@ from pyNN.space import \
     Space, Line, Grid2D, Grid3D, Cuboid, Sphere, RandomStructure  # NOQA
 from pyNN.space import distance as _pynn_distance  # NOQA
 import pyNN.common as pynn_common  # NOQA
+
+__all__ = [
+    "_pynn_control", "get_io", "NumpyRNG", "_PynnRandomDistribution", "Space",
+    "Line", "Grid2D", "Grid3D", "Cuboid", "Sphere", "RandomStructure",
+    "_pynn_distance", "pynn_common", '__version__', '__version_name__',
+    '__version_month__', '__version_year__'
+    ]

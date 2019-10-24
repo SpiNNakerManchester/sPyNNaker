@@ -191,7 +191,7 @@ __all__ = [
     'get_max_delay', 'initialize', 'list_standard_models', 'name',
     'num_processes', 'record', 'record_v', 'record_gsyn',
     '__version__', '__version_name__', '__version_month__',
-    '__version_month__'
+    '__version_year__'
     ]
 
 # Dynamically-extracted operations from PyNN
