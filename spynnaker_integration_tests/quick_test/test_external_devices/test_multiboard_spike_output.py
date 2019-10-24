@@ -17,7 +17,7 @@ import unittest
 from unittest import SkipTest
 from spynnaker.pyNN.exceptions import ConfigurationException
 import spynnaker as p
-import spynnaker.pyNNexternal_devices as e
+import spynnaker.pyNN.external_devices as e
 from spynnaker_integration_tests.base_test_case import BaseTestCase
 
 
