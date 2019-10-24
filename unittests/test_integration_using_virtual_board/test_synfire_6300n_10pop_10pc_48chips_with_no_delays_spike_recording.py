@@ -13,8 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from p8_integration_tests.base_test_case import BaseTestCase
-import p8_integration_tests.scripts.synfire_npop_run as synfire_npop_run
+from spynnaker_integration_tests.base_test_case import BaseTestCase
+import spynnaker_integration_tests.scripts.synfire_npop_run as synfire_npop_run
 
 n_neurons = 10  # number of neurons in each population
 n_pops = 630
