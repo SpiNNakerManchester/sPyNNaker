@@ -14,7 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-from spynnaker_integration_tests.scripts_test.script_checker import ScriptChecker
+from spynnaker_integration_tests.scripts_test.script_checker import (
+    ScriptChecker)
 
 
 class TestExamples(ScriptChecker):
