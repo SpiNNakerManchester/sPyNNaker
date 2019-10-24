@@ -15,7 +15,7 @@
 
 import pytest
 import spynnaker as sim
-from spynnaker_integeration_tests.base_test_case import BaseTestCase
+from spynnaker_integration_tests.base_test_case import BaseTestCase
 
 N_NEURONS = 4
 LABEL = "pop_1"

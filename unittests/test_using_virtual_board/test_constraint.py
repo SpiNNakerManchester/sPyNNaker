@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import spynnaker as sim
-from spynnaker_integeration_tests.base_test_case import BaseTestCase
+from spynnaker_integration_tests.base_test_case import BaseTestCase
 
 
 class TestConstraint(BaseTestCase):

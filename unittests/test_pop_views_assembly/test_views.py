@@ -18,7 +18,7 @@ from pyNN.random import RandomDistribution, NumpyRNG
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 import spynnaker as sim
 from spynnaker.pyNN.models.populations import PopulationView
-from spynnaker_integeration_tests.base_test_case import BaseTestCase
+from spynnaker_integration_tests.base_test_case import BaseTestCase
 
 
 class Test_IDMixin(BaseTestCase):

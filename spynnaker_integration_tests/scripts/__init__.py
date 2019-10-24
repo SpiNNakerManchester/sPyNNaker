@@ -12,17 +12,3 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-import spynnaker as sim
-from spynnaker_integration_tests.base_test_case import BaseTestCase
-
-
-class TestFailedState(BaseTestCase):
-
-    def test_double_end(self):
-        sim.setup(1.0)
-        sim.end()
-        sim.end()
-
-    def test_only_end(self):
-        sim.end()

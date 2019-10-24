@@ -17,7 +17,7 @@ from unittest import SkipTest
 import pytest
 from pyNN.space import Sphere, RandomStructure
 import spynnaker as sim
-from spynnaker_integeration_tests.base_test_case import BaseTestCase
+from spynnaker_integration_tests.base_test_case import BaseTestCase
 
 
 class TestPopulation(BaseTestCase):

@@ -17,7 +17,7 @@ import os
 import unittest
 import matplotlib.pyplot as plt
 from spinn_front_end_common.utilities import globals_variables
-from spynnaker_integeration_tests.base_test_case import BaseTestCase
+from spynnaker_integration_tests.base_test_case import BaseTestCase
 
 
 class TestScripts(BaseTestCase):

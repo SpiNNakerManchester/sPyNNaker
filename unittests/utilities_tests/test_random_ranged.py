@@ -16,7 +16,7 @@
 from pyNN.random import RandomDistribution
 from spynnaker.pyNN.utilities.ranged import SpynnakerRangeDictionary
 import spynnaker as p
-from spynnaker_integeration_tests.base_test_case import BaseTestCase
+from spynnaker_integration_tests.base_test_case import BaseTestCase
 
 
 class TestRanged(BaseTestCase):

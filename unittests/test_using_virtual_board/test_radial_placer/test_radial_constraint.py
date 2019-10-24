@@ -16,7 +16,7 @@
 import spynnaker as sim
 from pacman.model.constraints.placer_constraints import (
     RadialPlacementFromChipConstraint)
-from spynnaker_integeration_tests.base_test_case import BaseTestCase
+from spynnaker_integration_tests.base_test_case import BaseTestCase
 
 
 class TestConstraint(BaseTestCase):

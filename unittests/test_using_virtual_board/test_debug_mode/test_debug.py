@@ -19,7 +19,7 @@ import pacman.operations.algorithm_reports.reports as reports_names
 from pacman.operations.algorithm_reports.network_specification import (
     NetworkSpecification)
 from spinn_front_end_common.utilities import globals_variables
-from spynnaker_integeration_tests.base_test_case import BaseTestCase
+from spynnaker_integration_tests.base_test_case import BaseTestCase
 import spynnaker as sim
 
 

@@ -16,7 +16,7 @@
 import os
 import numpy
 import spynnaker as sim
-from spynnaker_integeration_tests.base_test_case import BaseTestCase
+from spynnaker_integration_tests.base_test_case import BaseTestCase
 import tempfile
 
 WEIGHT = 5
