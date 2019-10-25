@@ -89,12 +89,11 @@ class NeuronRecorder(object):
     MAX_RATE = 2 ** 32 - 1  # To allow a unit32_t to be used to store the rate
 
     # enum for code to know what state to hold for c code
-    DATA_TYPE = Enum(
-        value="DATA_TYPE",
-        names=[("BIT_FIELD", 0),
-               ("INT32", 1),
-               ("FLOAT_64", 2),
-               ("FLOAT_32", 3)])
+    class DATA_TYPE(Enum):
+        BIT_FIELD = 0
+        INT32 = 1
+        FLOAT_64 = 2
+        FLOAT_32 = 3
 
     # struct padding for the recording timed state structs. size is in bytes
     PADDING_SIZES = {DataType.INT32.value: 0,
