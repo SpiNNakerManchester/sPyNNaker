@@ -228,7 +228,7 @@ void set_spike_source_rate(neuron_pointer_t neuron, REAL rate,
 	REAL rate_diff = neuron->rate_at_last_setting - rate;
 
 	// ensure rate_diff is absolute
-	if REAL_COMPARE(rate_diff, <, REAL_CONST(0.0)) {
+	if (rate_diff < 0.0k) {
 		rate_diff = -rate_diff;
 	}
 
@@ -352,7 +352,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
     external_bias += additional_input_get_input_value_as_current(
     		additional_input, voltage);
-
+//
     if (neuron_index == 0){
     	recorded_variable_values[V_RECORDING_INDEX] = voltage;
     	// update neuron parameters
@@ -377,7 +377,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 							 - global_parameters->readout_V); // calc difference to
 //        io_printf(IO_BUF, "New Rate: %k", rate);
 //        rate = rate * 10;
-        rate = rate * 5.0k;
+//        rate = rate * 5.0k;
         if (rate > 0) { // readout is below target, so set rate = diff.
         	// This will cause potentiation of excitatory synapses,
         	// and depression of inhibitory synapses
@@ -416,7 +416,6 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
         timer++; // update this here, as needs to be done once per iteration over all the neurons
 
     }
-
 
 
     // If spike occurs, communicate to relevant parts of model

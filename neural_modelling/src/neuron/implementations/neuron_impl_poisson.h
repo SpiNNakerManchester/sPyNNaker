@@ -369,10 +369,10 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
     // Update Poisson neuron rate based on updated V
     REAL rate = result; // just a linear scaling for now
-    set_spike_source_rate(neuron, rate, threshold_type);
+//    set_spike_source_rate(neuron, rate, threshold_type);
 
     // judge whether poisson neuron should have fired
-    bool spike = timer_update_determine_poisson_spiked(neuron);
+    bool spike = 0; // timer_update_determine_poisson_spiked(neuron);
 
 
 

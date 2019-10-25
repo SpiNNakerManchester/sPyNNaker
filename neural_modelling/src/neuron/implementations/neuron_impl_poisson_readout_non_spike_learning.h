@@ -171,20 +171,20 @@ static void neuron_impl_load_neuron_parameters(
 
     neuron_model_set_global_neuron_params(global_parameters);
 
-    io_printf(IO_BUF, "\nPrinting global params\n");
-    io_printf(IO_BUF, "seed 1: %u \n", global_parameters->spike_source_seed[0]);
-    io_printf(IO_BUF, "seed 2: %u \n", global_parameters->spike_source_seed[1]);
-    io_printf(IO_BUF, "seed 3: %u \n", global_parameters->spike_source_seed[2]);
-    io_printf(IO_BUF, "seed 4: %u \n", global_parameters->spike_source_seed[3]);
-    io_printf(IO_BUF, "ticks_per_second: %k \n\n", global_parameters->ticks_per_second);
+//    io_printf(IO_BUF, "\nPrinting global params\n");
+//    io_printf(IO_BUF, "seed 1: %u \n", global_parameters->spike_source_seed[0]);
+//    io_printf(IO_BUF, "seed 2: %u \n", global_parameters->spike_source_seed[1]);
+//    io_printf(IO_BUF, "seed 3: %u \n", global_parameters->spike_source_seed[2]);
+//    io_printf(IO_BUF, "seed 4: %u \n", global_parameters->spike_source_seed[3]);
+//    io_printf(IO_BUF, "ticks_per_second: %k \n\n", global_parameters->ticks_per_second);
 
 
     for (index_t n = 0; n < n_neurons; n++) {
         neuron_model_print_parameters(&neuron_array[n]);
     }
 
-    io_printf(IO_BUF, "size of global params: %u",
-    		sizeof(global_neuron_params_t));
+//    io_printf(IO_BUF, "size of global params: %u",
+//    		sizeof(global_neuron_params_t));
 
 
 
@@ -228,7 +228,7 @@ void set_spike_source_rate(neuron_pointer_t neuron, REAL rate,
 	REAL rate_diff = neuron->rate_at_last_setting - rate;
 
 	// ensure rate_diff is absolute
-	if REAL_COMPARE(rate_diff, <, REAL_CONST(0.0)) {
+	if (rate_diff < 0.0k) {
 		rate_diff = -rate_diff;
 	}
 
@@ -381,7 +381,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
         if (rate > 0) { // readout is below target, so set rate = diff.
         	// This will cause potentiation of excitatory synapses,
         	// and depression of inhibitory synapses
-        	io_printf(IO_BUF, "\t\t\tTime: %u, logging error: %k\n", timer, rate);
+//        	io_printf(IO_BUF, "\t\t\tTime: %u, logging error: %k\n", timer, rate);
 
         	set_spike_source_rate(neuron, rate,
         			threshold_type);
@@ -416,7 +416,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
         	set_spike_source_rate(neuron, -rate,
         			threshold_type);
 
-        	io_printf(IO_BUF, "\t\t\tTime: %u, logging error: %k\n", timer, rate);
+//        	io_printf(IO_BUF, "\t\t\tTime: %u, logging error: %k\n", timer, rate);
         	// record error in postsynaptic history for use in plasticity calcs
         	synapse_dynamics_process_post_synaptic_event(
         			timer, //time,

@@ -234,7 +234,7 @@ $(BUILD_DIR)neuron/population_table/population_table_binary_search_impl.o: $(MOD
 
 #STDP Build rules If and only if STDP used
 ifeq ($(STDP_ENABLED), 1)
-    STDP_INCLUDES:= -include $(SYNAPSE_TYPE_H) -include $(WEIGHT_DEPENDENCE_H) -include $(TIMING_DEPENDENCE_H)
+    STDP_INCLUDES:= -include $(WEIGHT_DEPENDENCE_H) -include $(TIMING_DEPENDENCE_H)
     STDP_COMPILE = $(CC) -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) -DSTDP_ENABLED=$(STDP_ENABLED) -DSYNGEN_ENABLED=$(SYNGEN_ENABLED) $(STDP_INCLUDES)
 
     $(SYNAPSE_DYNAMICS_O): $(SYNAPSE_DYNAMICS_C)
