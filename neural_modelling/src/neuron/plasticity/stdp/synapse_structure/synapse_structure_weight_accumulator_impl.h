@@ -77,4 +77,19 @@ static inline plastic_synapse_t synapse_structure_get_final_synaptic_word(
     return final_state;
 }
 
+//---------------------------------------
+static inline plastic_synapse_t synapse_structure_create_synapse(
+        weight_t weight) {
+    return (plastic_synapse_t) {
+        .weight = weight,
+        .accumulator = 0
+    };
+}
+
+//---------------------------------------
+static inline weight_t synapse_structure_get_weight(
+        plastic_synapse_t synaptic_word) {
+    return synaptic_word.weight;
+}
+
 #endif // _SYNAPSE_STRUCUTRE_WEIGHT_STATE_ACCUMULATOR_IMPL_H_

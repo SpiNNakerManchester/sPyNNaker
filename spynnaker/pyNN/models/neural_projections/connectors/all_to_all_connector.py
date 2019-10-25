@@ -16,6 +16,7 @@
 import logging
 import numpy
 from spinn_utilities.overrides import overrides
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
@@ -31,7 +32,8 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
     __slots__ = [
         "__allow_self_connections"]
 
-    def __init__(self, allow_self_connections=True, safe=True, verbose=None):
+    def __init__(self, allow_self_connections=True, safe=True, callback=None,
+                 verbose=None):
         """
         :param allow_self_connections:
             if the connector is used to connect a\
@@ -40,7 +42,7 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
             Population.
         :type allow_self_connections: bool
         """
-        super(AllToAllConnector, self).__init__(safe, verbose)
+        super(AllToAllConnector, self).__init__(safe, callback, verbose)
         self.__allow_self_connections = allow_self_connections
 
     def _connection_slices(self, pre_vertex_slice, post_vertex_slice):
@@ -138,6 +140,11 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
     def allow_self_connections(self, new_value):
         self.__allow_self_connections = new_value
 
+    def _get_view_lo_hi(self, indexes):
+        view_lo = indexes[0]
+        view_hi = indexes[-1]
+        return view_lo, view_hi
+
     @property
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_id)
     def gen_connector_id(self):
@@ -149,12 +156,30 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
-        return numpy.array([
-            self.allow_self_connections],
-            dtype="uint32")
+        params = []
+        pre_view_lo = 0
+        pre_view_hi = self._n_pre_neurons - 1
+        if self._prepop_is_view:
+            pre_view_lo, pre_view_hi = self._get_view_lo_hi(
+                self.pre_population._indexes)
+
+        params.extend([pre_view_lo, pre_view_hi])
+
+        post_view_lo = 0
+        post_view_hi = self._n_post_neurons - 1
+        if self._postpop_is_view:
+            post_view_lo, post_view_hi = self._get_view_lo_hi(
+                self.post_population._indexes)
+
+        params.extend([post_view_lo, post_view_hi])
+
+        params.extend([self.allow_self_connections])
+
+        return numpy.array(params, dtype="uint32")
 
     @property
     @overrides(AbstractGenerateConnectorOnMachine.
                gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
-        return 4
+        # view parameters + allow_self_connections
+        return (4 + 1) * BYTES_PER_WORD

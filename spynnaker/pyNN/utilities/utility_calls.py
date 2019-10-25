@@ -269,6 +269,7 @@ def validate_mars_kiss_64_seed(seed):
 
     # avoid z=c=0 and make < 698769069
     seed[3] = seed[3] % 698769068 + 1
+    return seed
 
 
 def get_n_bits(n_values):

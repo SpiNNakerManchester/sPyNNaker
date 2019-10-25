@@ -29,16 +29,14 @@ class ArrayConnector(AbstractConnector):
     __slots = [
         "__array", "__array_dims", "__n_total_connections"]
 
-    def __init__(
-            self, array,
-            safe=True, callback=None, verbose=False):
+    def __init__(self, array, safe=True, callback=None, verbose=False):
         """
         :param array:
             An explicit boolean matrix that specifies the connections\
             between the pre- and post-populations\
             (see PyNN documentation)
         """
-        super(ArrayConnector, self).__init__(safe, verbose)
+        super(ArrayConnector, self).__init__(safe, callback, verbose)
         self.__array = array
         # we can get the total number of connections straight away
         # from the boolean matrix

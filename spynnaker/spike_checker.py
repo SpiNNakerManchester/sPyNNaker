@@ -34,8 +34,8 @@ def synfire_spike_checker(spikes, nNeurons):
             synfire_spike_checker(single, nNeurons)
 
 
-def synfire_multiple_lines_spike_checker(spikes, nNeurons, lines,
-                                         wrap_around=True):
+def synfire_multiple_lines_spike_checker(
+        spikes, nNeurons, lines, wrap_around=True):
     """
     Checks that there are the expected number of spike lines
 
@@ -71,6 +71,6 @@ def synfire_multiple_lines_spike_checker(spikes, nNeurons, lines,
 
 
 if __name__ == '__main__':
-    spikes = numpy.loadtxt("sorted_spikes.csv", delimiter=',')
-    synfire_multiple_lines_spike_checker(spikes, 200, 10, wrap_around=False)
-    # synfire_spike_checker(spikes, 20)
+    _spikes = numpy.loadtxt("sorted_spikes.csv", delimiter=',')
+    synfire_multiple_lines_spike_checker(_spikes, 200, 10, wrap_around=False)
+    # synfire_spike_checker(_spikes, 20)

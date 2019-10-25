@@ -41,8 +41,9 @@ def synapse_expander(
     """ Run the synapse expander - needs to be done after data has been loaded
     """
 
-    synapse_expander = executable_finder.get_executable_path(SYNAPSE_EXPANDER)
-    delay_expander = executable_finder.get_executable_path(DELAY_EXPANDER)
+    synapse_bin = executable_finder.get_executable_path(SYNAPSE_EXPANDER)
+    delay_bin = executable_finder.get_executable_path(DELAY_EXPANDER)
+    expandable = (AbstractPopulationVertex, DelayExtensionVertex)
 
     progress = ProgressBar(len(app_graph.vertices) + 2, "Expanding Synapses")
 
@@ -52,9 +53,7 @@ def synapse_expander(
     for vertex in progress.over(app_graph.vertices, finish_at_end=False):
 
         # Find population vertices
-        if isinstance(
-                vertex, (AbstractPopulationVertex, DelayExtensionVertex)):
-
+        if isinstance(vertex, expandable):
             # Add all machine vertices of the population vertex to ones
             # that need synapse expansion
             gen_on_machine = False
@@ -63,10 +62,10 @@ def synapse_expander(
                 if vertex.gen_on_machine(vertex_slice):
                     placement = placements.get_placement_of_vertex(m_vertex)
                     if isinstance(vertex, AbstractPopulationVertex):
-                        binary = synapse_expander
+                        binary = synapse_bin
                         gen_on_machine = True
                     else:
-                        binary = delay_expander
+                        binary = delay_bin
                     expander_cores.add_processor(
                         binary, placement.x, placement.y, placement.p)
             if gen_on_machine:
@@ -89,7 +88,7 @@ def synapse_expander(
             gen_on_machine_vertices, graph_mapper, placements, transceiver)
         _extract_iobuf(expander_cores, transceiver, provenance_file_path)
         progress.end()
-    except Exception:
+    except Exception:  # pylint: disable=broad-except
         logger.exception("Synapse expander has failed")
         _handle_failure(
             expander_cores, transceiver, provenance_file_path)
