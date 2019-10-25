@@ -13,16 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .pynn_synapse_dynamics import PyNNSynapseDynamics
+from .abstract_partner_selection import AbstractPartnerSelection
+from .last_neuron_selection import LastNeuronSelection
+from .random_selection import RandomSelection
 
-
-class StructuralDynamics(PyNNSynapseDynamics):
-    __slots__ = ["__structure"]
-
-    def __init__(self, slow=None, fast=None, structure=None):
-        super(StructuralDynamics, self).__init__(slow=slow, fast=fast)
-        self.__structure = structure
-
-    @property
-    def structure(self):
-        return self.__structure
+__all__ = ["AbstractPartnerSelection", "LastNeuronSelection",
+           "RandomSelection"]

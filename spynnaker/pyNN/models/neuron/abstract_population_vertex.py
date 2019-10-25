@@ -32,6 +32,8 @@ from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl)
 from spinn_front_end_common.utilities import (
     constants as common_constants, helpful_functions, globals_variables)
+from spinn_front_end_common.utilities.constants import (
+    BYTES_PER_WORD, SYSTEM_BYTES_REQUIREMENT)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.interface.buffer_management import (
@@ -53,14 +55,14 @@ from .population_machine_vertex import PopulationMachineVertex
 logger = logging.getLogger(__name__)
 
 # TODO: Make sure these values are correct (particularly CPU cycles)
-_NEURON_BASE_DTCM_USAGE_IN_BYTES = 36
-_NEURON_BASE_SDRAM_USAGE_IN_BYTES = 12
+_NEURON_BASE_DTCM_USAGE_IN_BYTES = 9 * BYTES_PER_WORD
+_NEURON_BASE_SDRAM_USAGE_IN_BYTES = 3 * BYTES_PER_WORD
 _NEURON_BASE_N_CPU_CYCLES_PER_NEURON = 22
 _NEURON_BASE_N_CPU_CYCLES = 10
 
 # TODO: Make sure these values are correct (particularly CPU cycles)
-_C_MAIN_BASE_DTCM_USAGE_IN_BYTES = 12
-_C_MAIN_BASE_SDRAM_USAGE_IN_BYTES = 72
+_C_MAIN_BASE_DTCM_USAGE_IN_BYTES = 3 * BYTES_PER_WORD
+_C_MAIN_BASE_SDRAM_USAGE_IN_BYTES = 18 * BYTES_PER_WORD
 _C_MAIN_BASE_N_CPU_CYCLES = 0
 
 # The microseconds per timestep will be divided by this to get the max offset
@@ -107,10 +109,10 @@ class AbstractPopulationVertex(
     SPIKE_RECORDING_REGION = 0
 
     # the size of the runtime SDP port data region
-    RUNTIME_SDP_PORT_SIZE = 4
+    RUNTIME_SDP_PORT_SIZE = BYTES_PER_WORD
 
     # 8 elements before the start of global parameters
-    BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 32
+    BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 8 * BYTES_PER_WORD
 
     # The Buffer traffic type
     TRAFFIC_IDENTIFIER = "BufferTraffic"
@@ -281,15 +283,14 @@ class AbstractPopulationVertex(
             self, vertex_slice, graph, machine_time_step):
         n_record = len(self.__neuron_impl.get_recordable_variables()) + 1
         sdram_requirement = (
-            common_constants.SYSTEM_BYTES_REQUIREMENT +
+            SYSTEM_BYTES_REQUIREMENT +
             self._get_sdram_usage_for_neuron_params(vertex_slice) +
             recording_utilities.get_recording_header_size(n_record) +
             recording_utilities.get_recording_data_constant_size(n_record) +
             PopulationMachineVertex.get_provenance_data_size(
                 PopulationMachineVertex.N_ADDITIONAL_PROVENANCE_DATA_ITEMS) +
             self.__synapse_manager.get_sdram_usage_in_bytes(
-                vertex_slice, graph.get_edges_ending_at_vertex(self),
-                machine_time_step) +
+                vertex_slice, machine_time_step, graph, self) +
             profile_utils.get_profile_region_size(
                 self.__n_profile_samples))
 
@@ -879,6 +880,6 @@ class AbstractPopulationVertex(
         self.__change_requires_neuron_parameters_reload = True
 
         # If synapses change during the run,
-        if self.__synapse_manager.synapse_dynamics.changes_during_run:
+        if self.__synapse_manager.changes_during_run:
             self.__change_requires_data_generation = True
             self.__change_requires_neuron_parameters_reload = False

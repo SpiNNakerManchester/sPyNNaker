@@ -77,6 +77,7 @@ class SynapseTypeExponential(AbstractSynapseType):
     @inject_items({"ts": "MachineTimeStep"})
     @overrides(AbstractSynapseType.get_values, additional_arguments={'ts'})
     def get_values(self, parameters, state_variables, vertex_slice, ts):
+        # pylint: disable=arguments-differ
 
         tsfloat = float(ts) / 1000.0
         decay = lambda x: numpy.exp(-tsfloat / x)  # noqa E731

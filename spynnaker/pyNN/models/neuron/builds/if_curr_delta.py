@@ -36,7 +36,7 @@ class IFCurrDelta(AbstractPyNNNeuronModelStandard):
         # pylint: disable=too-many-arguments, too-many-locals
         neuron_model = NeuronModelLeakyIntegrateAndFire(
             v, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac)
-        synapse_type = SynapseTypeDelta(isyn_inh, isyn_exc)
+        synapse_type = SynapseTypeDelta(isyn_exc, isyn_inh)
         input_type = InputTypeCurrent()
         threshold_type = ThresholdTypeStatic(v_thresh)
 

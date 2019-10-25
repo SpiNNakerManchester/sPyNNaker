@@ -14,13 +14,14 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import decimal
-from distutils.version import StrictVersion
+from distutils.version import StrictVersion  # pylint: disable=all
 from enum import Enum
 import numpy
 from six import with_metaclass
 from spinn_utilities.abstract_base import abstractproperty, AbstractBase
 from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.globals_variables import get_simulator
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector)
 
@@ -75,8 +76,9 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         "__connector_seed"
     ]
 
-    def __init__(self, safe=True, verbose=False):
-        AbstractConnector.__init__(self, safe=safe, verbose=verbose)
+    def __init__(self, safe=True, callback=None, verbose=False):
+        AbstractConnector.__init__(
+            self, safe=safe, callback=callback, verbose=verbose)
         self.__delay_seed = dict()
         self.__weight_seed = dict()
         self.__connector_seed = dict()
@@ -149,11 +151,11 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         """ Get the size of the parameter generator parameters in bytes
         """
         if numpy.isscalar(values):
-            return 4
+            return BYTES_PER_WORD
 
         if IS_PYNN_8 and get_simulator().is_a_pynn_random(values):
             parameters = random.available_distributions[values.name]
-            return (len(parameters) + 4) * 4
+            return (len(parameters) + 4) * BYTES_PER_WORD
 
         raise ValueError("Unexpected value {}".format(values))
 

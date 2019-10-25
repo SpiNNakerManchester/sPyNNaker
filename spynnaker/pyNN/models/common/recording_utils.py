@@ -19,10 +19,12 @@ import struct
 import numpy
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.exceptions import MemReadException
 
 logger = logging.getLogger(__name__)
 _RECORDING_COUNT = struct.Struct("<I")
+_SEEK_END = 2  # Define here for Py2.7 compatibility
 
 
 def get_recording_region_size_in_bytes(
@@ -33,7 +35,7 @@ def get_recording_region_size_in_bytes(
         raise Exception(
             "Cannot record this parameter without a fixed run time")
     return ((n_machine_time_steps * bytes_per_timestep) +
-            (n_machine_time_steps * 4))
+            (n_machine_time_steps * BYTES_PER_WORD))
 
 
 def get_data(transceiver, placement, region, region_size):
@@ -45,10 +47,10 @@ def get_data(transceiver, placement, region, region_size):
     number_of_bytes_written = _RECORDING_COUNT.unpack_from(
         transceiver.read_memory(
             placement.x, placement.y, region_base_address,
-            _RECORDING_COUNT.size))[0]
+            BYTES_PER_WORD))[0]
 
     # Subtract 4 for the word representing the size itself
-    expected_size = region_size - _RECORDING_COUNT.size
+    expected_size = region_size - BYTES_PER_WORD
     if number_of_bytes_written > expected_size:
         raise MemReadException(
             "Expected {} bytes but read {}".format(
@@ -56,7 +58,7 @@ def get_data(transceiver, placement, region, region_size):
 
     return (
         transceiver.read_memory(
-            placement.x, placement.y, region_base_address + 4,
+            placement.x, placement.y, region_base_address + BYTES_PER_WORD,
             number_of_bytes_written),
         number_of_bytes_written)
 
@@ -72,7 +74,7 @@ def pull_off_cached_lists(no_loads, cache_file):
     if no_loads == 1:
         values = numpy.load(cache_file)
         # Seek to the end of the file (for windows compatibility)
-        cache_file.seek(0, 2)
+        cache_file.seek(0, _SEEK_END)
         return values
     elif no_loads == 0:
         return []
@@ -81,7 +83,7 @@ def pull_off_cached_lists(no_loads, cache_file):
     for _ in range(0, no_loads):
         lists.append(numpy.load(cache_file))
     # Seek to the end of the file (for windows compatibility)
-    cache_file.seek(0, 2)
+    cache_file.seek(0, _SEEK_END)
     return numpy.concatenate(lists)
 
 

@@ -19,8 +19,9 @@ from .synapse_type_error_neuron_exponential import SynapseTypeErrorNeuronExponen
 from .synapse_type_exponential import SynapseTypeExponential
 from .synapse_type_delta import SynapseTypeDelta
 from .synapse_type_alpha import SynapseTypeAlpha
+from .synapse_type_semd import SynapseTypeSEMD
 from .synapse_type_erbp import SynapseTypeERBP
 
 __all__ = ["AbstractSynapseType", "SynapseTypeDualExponential",
-           "SynapseTypeExponential", "SynapseTypeDelta", "SynapseTypeAlpha"
-           "SynapseTypeERBP"]
+           "SynapseTypeExponential", "SynapseTypeDelta", "SynapseTypeAlpha",
+           "SynapseTypeERBP", "SynapseTypeSEMD"]

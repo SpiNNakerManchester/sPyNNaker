@@ -22,7 +22,9 @@ class SpikeSourceArray(AbstractPyNNModel):
 
     default_population_parameters = {}
 
-    def __init__(self, spike_times=[]):
+    def __init__(self, spike_times=None):
+        if spike_times is None:
+            spike_times = []
         self.__spike_times = spike_times
 
     @overrides(AbstractPyNNModel.create_vertex)

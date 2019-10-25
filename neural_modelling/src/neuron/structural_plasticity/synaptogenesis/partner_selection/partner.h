@@ -15,12 +15,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SP_STRUCTS_H_
-#define _SP_STRUCTS_H_
+#ifndef _PARTNER_SELECTION_H_
+#define _PARTNER_SELECTION_H_
 
-typedef struct {
-    int32_t weight, delay;
-    int32_t offset;
-} structural_plasticity_data_t;
+#include <neuron/synapses.h>
 
-#endif // _SP_STRUCTS_H_
+// MARS KISS 64 (RNG)
+#include <random.h>
+// Bit manipulation after RNG
+#include <stdfix-full-iso.h>
+
+#include <neuron/structural_plasticity/synaptogenesis/sp_structs.h>
+
+// value to be returned when there is no valid partner selection
+#define INVALID_SELECTION ((spike_t) - 1)
+
+void partner_init(uint8_t **data);
+
+static inline void partner_spike_received(uint32_t time, spike_t spike);
+
+static inline bool potential_presynaptic_partner(
+        uint32_t time, uint32_t* population_id, uint32_t *sub_population_id,
+        uint32_t *neuron_id, spike_t *spike, uint32_t *m_pop_index);
+
+#endif // _PARTNER_H_

@@ -28,9 +28,9 @@ class SmallWorldConnector(AbstractConnector):
 
     def __init__(
             self, degree, rewiring, allow_self_connections=True, safe=True,
-            verbose=False, n_connections=None):
+            callback=None, verbose=False, n_connections=None):
         # pylint: disable=too-many-arguments
-        super(SmallWorldConnector, self).__init__(safe, verbose)
+        super(SmallWorldConnector, self).__init__(safe, callback, verbose)
         self.__rewiring = rewiring
         self.__degree = degree
         self.__allow_self_connections = allow_self_connections
@@ -42,9 +42,11 @@ class SmallWorldConnector(AbstractConnector):
 
     @overrides(AbstractConnector.set_projection_information)
     def set_projection_information(
-            self, pre_population, post_population, rng, machine_time_step):
+            self, pre_population, post_population, prepop_is_view,
+            postpop_is_view, rng, machine_time_step):
         AbstractConnector.set_projection_information(
-            self, pre_population, post_population, rng, machine_time_step)
+            self, pre_population, post_population, prepop_is_view,
+            postpop_is_view, rng, machine_time_step)
         self._set_n_connections()
 
     def _set_n_connections(self):
