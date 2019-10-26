@@ -81,6 +81,8 @@ static uint32_t connection_generator_fixed_post_generate(
     use(pre_slice_count);
 
     // If there are no connections to be made, return 0
+
+    // Don't think that this is necessary, unless the user says 0 for some reason?
     struct fixed_post *obj = data;
     if (max_row_length == 0 || obj->params.n_post == 0) {
         return 0;
