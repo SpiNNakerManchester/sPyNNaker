@@ -28,6 +28,6 @@
 // Helper macros for 16-bit fixed-point multiplication
 #define STDP_FIXED_MUL_16X16(a, b) maths_fixed_mul16(a, b, STDP_FIXED_POINT)
 
-#define print_plasticity false
+#define print_plasticity true
 
 #endif  // _STDP_TYPEDEFS_H_

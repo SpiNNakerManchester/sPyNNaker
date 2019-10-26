@@ -31,6 +31,7 @@ def get_exp_lut_values(
         fixed_point_one=STDP_FIXED_POINT_ONE, size=None):
     # Calculate time constant reciprocal
     time_constant_reciprocal = time_step / float(time_constant)
+    print("size in lut generator: {}".format(size))
 
     # Generate LUT
     last_value = 1.0
@@ -49,9 +50,15 @@ def get_exp_lut_values(
         # Convert to fixed-point and write to spec
         last_value = float_to_fixed(exp_float, fixed_point_one)
         if last_value > 0.0:
+            print("appending: {}".format(index))
             values.append(last_value)
     if size is not None and size > len(values):
+        print("values length before extension: {}".format(len(values)))
         values.extend([0] * (size - len(values)))
+        print("values after before extension: {}".format(len(values)))
+
+    print("values to return len: {}".format(len(values)))
+
     return values
 
 

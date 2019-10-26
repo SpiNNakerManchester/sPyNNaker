@@ -42,7 +42,7 @@ typedef int16_t pre_trace_t;
 //---------------------------------------
 // Externals
 //---------------------------------------
-extern int16_t tau_plus_lookup[TAU_PLUS_SIZE];
+extern int16_lut *tau_plus_lookup;
 //extern int16_t tau_minus_lookup[TAU_MINUS_SIZE];
 extern int32_t is_readout;
 
@@ -130,7 +130,8 @@ static inline pre_trace_t timing_add_pre_spike(uint32_t time,
 
 	// Decay previous r1 and r2 traces
 	int32_t decayed_r1_trace = STDP_FIXED_MUL_16X16(last_trace,
-			DECAY_LOOKUP_TAU_PLUS(delta_time));
+//			DECAY_LOOKUP_TAU_PLUS(delta_time));
+			maths_lut_exponential_decay(delta_time, tau_plus_lookup));
 
 	// now scale STDP_FIXED_POINT_ONE by p_j(t), and multiply
 	// Add energy caused by new spike to trace
@@ -219,7 +220,7 @@ static inline update_state_t timing_apply_post_spike(uint32_t time,
 
 		// This allows us to decay the pre trace to the time of the error spike
 		int32_t decayed_r1 = STDP_FIXED_MUL_16X16(last_pre_trace,
-				DECAY_LOOKUP_TAU_PLUS(time_since_last_pre));
+				maths_lut_exponential_decay(time_since_last_pre, tau_plus_lookup));
 
 		uint32_t error_by_trace =
 				(decayed_r1 * weight)

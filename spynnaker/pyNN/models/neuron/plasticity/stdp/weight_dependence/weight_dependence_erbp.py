@@ -7,40 +7,40 @@ from .abstract_weight_dependence import AbstractWeightDependence
 class WeightDependenceERBP(
         AbstractHasAPlusAMinus, AbstractWeightDependence):
     __slots__ = [
-        "_w_max",
-        "_w_min",
-        "_do_reg",
-        "_reg_rate"
+        "__w_max",
+        "__w_min",
+        "__do_reg",
+        "__reg_rate"
         ]
 
     # noinspection PyPep8Naming
     def __init__(self, w_min=0.0, w_max=1.0, reg_rate=0.0):
         super(WeightDependenceERBP, self).__init__()
-        self._w_min = w_min
-        self._w_max = w_max
-        self._reg_rate = reg_rate
+        self.__w_min = w_min
+        self.__w_max = w_max
+        self.__reg_rate = reg_rate
 
     @property
     def w_min(self):
-        return self._w_min
+        return self.__w_min
 
     @property
     def w_max(self):
-        return self._w_max
+        return self.__w_max
 
     @property
     def reg_rate(self):
-        return self._reg_rate
+        return self.__reg_rate
 
     @overrides(AbstractWeightDependence.is_same_as)
     def is_same_as(self, weight_dependence):
         if not isinstance(weight_dependence, WeightDependenceERBP):
             return False
         return (
-            (self._w_min == weight_dependence.w_min) and
-            (self._w_max == weight_dependence.w_max) and
-            (self._a_plus == weight_dependence.A_plus) and
-            (self._a_minus == weight_dependence.A_minus))
+            (self.__w_min == weight_dependence.w_min) and
+            (self.__w_max == weight_dependence.w_max) and
+            (self.__a_plus == weight_dependence.A_plus) and
+            (self.__a_minus == weight_dependence.A_minus))
 
     @property
     def vertex_executable_suffix(self):
@@ -62,23 +62,23 @@ class WeightDependenceERBP(
 
             # Scale the weights
             spec.write_value(
-                data=int(round(self._w_min * w)), data_type=DataType.INT32)
+                data=int(round(self.__w_min * w)), data_type=DataType.INT32)
             spec.write_value(
-                data=int(round(self._w_max * w)), data_type=DataType.INT32)
+                data=int(round(self.__w_max * w)), data_type=DataType.INT32)
 
             # Pre-multiply A+ and A- by Wmax
             spec.write_value(
-                data=int(round(self._a_plus * (1 << 15))), # * self._w_max ),
+                data=int(round(self.A_plus * (1 << 15))), # * self._w_max ),
                 data_type=DataType.INT32)
             spec.write_value(
-                data=int(round(self._a_minus * (1 << 15))), # * self._w_max ,
+                data=int(round(self.A_minus * (1 << 15))), # * self._w_max ,
                 data_type=DataType.INT32)
 
-            spec.write_value(self._reg_rate, data_type=DataType.S1615)
+            spec.write_value(self.__reg_rate, data_type=DataType.S1615)
 
     @property
     def weight_maximum(self):
-        return self._w_max
+        return self.__w_max
 
     @overrides(AbstractWeightDependence.get_parameter_names)
     def get_parameter_names(self):

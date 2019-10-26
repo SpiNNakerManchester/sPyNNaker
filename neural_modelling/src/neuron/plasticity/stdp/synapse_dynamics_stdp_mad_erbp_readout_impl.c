@@ -119,7 +119,7 @@ static inline final_state_t _plasticity_update_synapse(
             current_state);
 
         // Go onto next event
-        post_window = post_events_next_delayed(post_window, delayed_post_time);
+        post_window = post_events_next(post_window);
     }
 
     const uint32_t delayed_pre_time = time + delay_axonal;

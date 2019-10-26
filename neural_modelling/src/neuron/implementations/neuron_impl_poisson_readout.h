@@ -171,20 +171,20 @@ static void neuron_impl_load_neuron_parameters(
 
     neuron_model_set_global_neuron_params(global_parameters);
 
-    io_printf(IO_BUF, "\nPrinting global params\n");
-    io_printf(IO_BUF, "seed 1: %u \n", global_parameters->spike_source_seed[0]);
-    io_printf(IO_BUF, "seed 2: %u \n", global_parameters->spike_source_seed[1]);
-    io_printf(IO_BUF, "seed 3: %u \n", global_parameters->spike_source_seed[2]);
-    io_printf(IO_BUF, "seed 4: %u \n", global_parameters->spike_source_seed[3]);
-    io_printf(IO_BUF, "ticks_per_second: %k \n\n", global_parameters->ticks_per_second);
+//    io_printf(IO_BUF, "\nPrinting global params\n");
+//    io_printf(IO_BUF, "seed 1: %u \n", global_parameters->spike_source_seed[0]);
+//    io_printf(IO_BUF, "seed 2: %u \n", global_parameters->spike_source_seed[1]);
+//    io_printf(IO_BUF, "seed 3: %u \n", global_parameters->spike_source_seed[2]);
+//    io_printf(IO_BUF, "seed 4: %u \n", global_parameters->spike_source_seed[3]);
+//    io_printf(IO_BUF, "ticks_per_second: %k \n\n", global_parameters->ticks_per_second);
 
 
     for (index_t n = 0; n < n_neurons; n++) {
         neuron_model_print_parameters(&neuron_array[n]);
     }
 
-    io_printf(IO_BUF, "size of global params: %u",
-    		sizeof(global_neuron_params_t));
+//    io_printf(IO_BUF, "size of global params: %u",
+//    		sizeof(global_neuron_params_t));
 
 
 
