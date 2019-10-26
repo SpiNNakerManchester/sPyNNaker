@@ -42,11 +42,9 @@ class SmallWorldConnector(AbstractConnector):
 
     @overrides(AbstractConnector.set_projection_information)
     def set_projection_information(
-            self, pre_population, post_population, prepop_is_view,
-            postpop_is_view, rng, machine_time_step):
+            self, pre_population, post_population, rng, machine_time_step):
         AbstractConnector.set_projection_information(
-            self, pre_population, post_population, prepop_is_view,
-            postpop_is_view, rng, machine_time_step)
+            self, pre_population, post_population, rng, machine_time_step)
         self._set_n_connections()
 
     def _set_n_connections(self):
