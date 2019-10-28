@@ -109,7 +109,7 @@ class IndexBasedProbabilityConnector(AbstractConnector):
         return utility_calls.get_probable_maximum_selected(
             self.n_pre_neurons(
                 synapse_info) * self.n_post_neurons(synapse_info),
-            self._n_pre_neurons, numpy.amax(self.__probs))
+            self.n_pre_neurons(synapse_info), numpy.amax(self.__probs))
 
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, weights, synapse_info):
