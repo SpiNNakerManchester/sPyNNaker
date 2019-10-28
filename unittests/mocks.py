@@ -50,7 +50,7 @@ class MockSynapseInfo(object):
         return self._pre_population
 
     @property
-    def pre_population(self):
+    def post_population(self):
         return self._post_population
 
 
