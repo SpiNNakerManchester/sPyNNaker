@@ -76,7 +76,7 @@ class IndexBasedProbabilityConnector(AbstractConnector):
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, delays, synapse_info):
-        self._update_probs_from_index_expression()
+        self._update_probs_from_index_expression(synapse_info)
         n_connections = utility_calls.get_probable_maximum_selected(
             self.n_pre_neurons(
                 synapse_info) * self.n_post_neurons(synapse_info),
