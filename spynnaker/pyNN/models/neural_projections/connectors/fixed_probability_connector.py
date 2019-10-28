@@ -190,7 +190,6 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
 
         params.extend(self._get_connector_seed(
             pre_vertex_slice, post_vertex_slice, self._rng))
-        print('params:', params)
         return numpy.array(params, dtype="uint32")
 
     @property

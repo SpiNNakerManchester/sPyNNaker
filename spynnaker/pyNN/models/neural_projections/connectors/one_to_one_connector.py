@@ -186,7 +186,6 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
                 self.post_population(synapse_info)._indexes)
 
         params.extend([post_view_lo, post_view_hi])
-        print('params: ', params)
         return numpy.array(params, dtype="uint32")
 
     @property
