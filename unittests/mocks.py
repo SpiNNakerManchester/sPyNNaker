@@ -18,6 +18,7 @@ import numpy
 from spinn_front_end_common.utilities import globals_variables
 from spynnaker.pyNN.utilities.spynnaker_failed_state import (
     SpynnakerFailedState)
+from builtins import property
 
 
 class MockPopulation(object):
@@ -36,6 +37,21 @@ class MockPopulation(object):
 
     def __repr__(self):
         return "Population {}".format(self._label)
+
+
+class MockSynapseInfo(object):
+
+    def __init__(self, pre_population, post_population):
+        self._pre_population = pre_population
+        self._post_population = post_population
+
+    @property
+    def pre_population(self):
+        return self._pre_population
+
+    @property
+    def pre_population(self):
+        return self._post_population
 
 
 class MockRNG(object):

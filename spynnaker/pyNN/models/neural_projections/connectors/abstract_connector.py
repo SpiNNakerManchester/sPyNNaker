@@ -46,10 +46,6 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
     __slots__ = [
         "_delays",
         "__min_delay",
-#         "__pre_population",
-#         "__post_population",
-#         "_prepop_is_view",
-#         "_postpop_is_view",
         "__n_clipped_delays",
         "_n_post_neurons",
         "_n_pre_neurons",
@@ -67,14 +63,8 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         self.__space = None
         self.__verbose = verbose
 
-#         self.__pre_population = None
-#         self.__post_population = None
-#         self._prepop_is_view = False
-#         self._prepop_is_view = False
-#         self._n_pre_neurons = None
-#         self._n_post_neurons = None
-        self._rng = rng
         # something needs to be done about this?
+        self._rng = rng
 
         self.__n_clipped_delays = 0
         self.__min_delay = 0
@@ -89,14 +79,8 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         self.__space = space
 
     def set_projection_information(self, rng, machine_time_step, synapse_info):
-#         self.__pre_population = pre_population
-#         self.__post_population = post_population
-#         self._n_pre_neurons = pre_population.size
-#         self._n_post_neurons = post_population.size
         self._rng = (self._rng or rng or get_simulator().get_pynn_NumpyRNG()())
         self.__min_delay = machine_time_step / 1000.0
-#         self._prepop_is_view = prepop_is_view
-#         self._postpop_is_view = postpop_is_view
 
     def _check_parameter(self, values, name, allow_lists):
         """ Check that the types of the values is supported.

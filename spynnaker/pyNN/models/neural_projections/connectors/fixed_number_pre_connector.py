@@ -120,7 +120,7 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine):
                 # If the pre and post populations are the same
                 # then deal with allow_self_connections=False
                 if (self.pre_population(synapse_info) is self.post_population(
-                    synapse_info) and not self.__allow_self_connections):
+                        synapse_info) and not self.__allow_self_connections):
                     # Exclude the current pre-neuron from the post-neuron
                     # list
                     no_self_pre_neurons = [

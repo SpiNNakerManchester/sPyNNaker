@@ -155,7 +155,7 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
     @overrides(AbstractConnector.use_direct_matrix)
     def use_direct_matrix(self, synapse_info):
         if self.prepop_is_view(synapse_info) or self.postpop_is_view(
-            synapse_info):
+                synapse_info):
             return False
         return True
 
