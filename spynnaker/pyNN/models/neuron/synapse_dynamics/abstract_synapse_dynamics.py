@@ -115,7 +115,7 @@ class AbstractSynapseDynamics(object):
         # pylint: disable=too-many-arguments
         return connector.get_delay_variance(delays)
 
-    def get_weight_mean(self, connector, weights):
+    def get_weight_mean(self, connector, weights, synapse_info):
         """ Get the mean weight for the synapses
         """
         # pylint: disable=too-many-arguments

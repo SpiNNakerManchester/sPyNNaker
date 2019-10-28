@@ -457,7 +457,8 @@ class SynapticManager(object):
 
                     weight_mean = (
                         synapse_dynamics.get_weight_mean(
-                            connector, synapse_info.weight) * weight_scale)
+                            connector, synapse_info.weight,
+                            synapse_info) * weight_scale)
                     n_connections = \
                         connector.get_n_connections_to_post_vertex_maximum(
                             synapse_info)

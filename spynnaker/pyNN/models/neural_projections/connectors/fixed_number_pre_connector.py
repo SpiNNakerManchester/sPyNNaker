@@ -105,8 +105,9 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine):
 
             # if verbose open a file to output the connectivity
             if self.verbose:
-                filename = self.pre_population.label + '_to_' + \
-                    self.post_population.label + '_fixednumberpre-conn.csv'
+                filename = self.pre_population(synapse_info).label + \
+                    '_to_' + self.post_population(synapse_info).label + \
+                    '_fixednumberpre-conn.csv'
                 with open(filename, 'w') as file_handle:
                     numpy.savetxt(file_handle,
                                   [(self.n_pre_neurons(synapse_info),

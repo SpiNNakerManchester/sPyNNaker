@@ -201,8 +201,8 @@ class SynapseDynamicsStructuralStatic(
         return self.__common_sp.elimination
 
     @overrides(SynapseDynamicsStatic.get_weight_mean)
-    def get_weight_mean(self, connector, weights):
-        return self.get_weight_maximum(connector, weights)
+    def get_weight_mean(self, connector, weights, synapse_info):
+        return self.get_weight_maximum(connector, weights, synapse_info)
 
     @overrides(SynapseDynamicsStatic.get_weight_variance)
     def get_weight_variance(self, connector, weights):
