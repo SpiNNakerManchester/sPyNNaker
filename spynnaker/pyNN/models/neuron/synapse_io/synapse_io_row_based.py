@@ -80,14 +80,15 @@ class SynapseIORowBased(AbstractSynapseIO):
         # row length for the non-delayed synaptic matrix
         max_undelayed_n_synapses = synapse_info.connector \
             .get_n_connections_from_pre_vertex_maximum(
-                synapse_info.delay, post_vertex_slice, 0, max_delay_supported)
+                synapse_info.delay, post_vertex_slice, synapse_info, 0,
+                max_delay_supported)
 
         # determine the max row length in the delay extension
         max_delayed_n_synapses = 0
         if n_delay_stages > 0:
             max_delayed_n_synapses = synapse_info.connector \
                 .get_n_connections_from_pre_vertex_maximum(
-                    synapse_info.delay, post_vertex_slice,
+                    synapse_info.delay, post_vertex_slice, synapse_info,
                     min_delay_for_delay_extension, max_delay)
 
         # Get the row sizes
@@ -196,7 +197,7 @@ class SynapseIORowBased(AbstractSynapseIO):
         connections = synapse_info.connector.create_synaptic_block(
             synapse_info.weight, synapse_info.delay, pre_slices,
             pre_slice_index, post_slices, post_slice_index, pre_vertex_slice,
-            post_vertex_slice, synapse_info.synapse_type)
+            post_vertex_slice, synapse_info.synapse_type, synapse_info)
 
         # Convert delays to timesteps
         connections["delay"] = numpy.rint(

@@ -52,12 +52,13 @@ class ArrayConnector(AbstractConnector):
         self.__array_dims = dims
 
     @overrides(AbstractConnector.get_delay_maximum)
-    def get_delay_maximum(self, delays):
+    def get_delay_maximum(self, delays, synapse_info):
         return self._get_delay_maximum(delays, len(self.__array))
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, delays, post_vertex_slice, min_delay=None, max_delay=None):
+            self, delays, post_vertex_slice, synapse_info, min_delay=None,
+            max_delay=None):
         n_connections = 0
         post_lo = post_vertex_slice.lo_atom
         post_hi = post_vertex_slice.hi_atom
@@ -74,18 +75,18 @@ class ArrayConnector(AbstractConnector):
             max_delay)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
-    def get_n_connections_to_post_vertex_maximum(self):
+    def get_n_connections_to_post_vertex_maximum(self, synapse_info):
         return self.__n_total_connections
 
     @overrides(AbstractConnector.get_weight_maximum)
-    def get_weight_maximum(self, weights):
+    def get_weight_maximum(self, weights, synapse_info):
         return self._get_weight_maximum(weights, self.__n_total_connections)
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
             self, weights, delays, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type):
+            synapse_type, synapse_info):
         pre_neurons = []
         post_neurons = []
         n_connections = 0
@@ -106,9 +107,11 @@ class ArrayConnector(AbstractConnector):
         block["source"] = pre_neurons
         block["target"] = post_neurons
         block["weight"] = self._generate_weights(
-            weights, n_connections, None, pre_vertex_slice, post_vertex_slice)
+            weights, n_connections, None, pre_vertex_slice, post_vertex_slice,
+            synapse_info)
         block["delay"] = self._generate_delays(
-            delays, n_connections, None, pre_vertex_slice, post_vertex_slice)
+            delays, n_connections, None, pre_vertex_slice, post_vertex_slice,
+            synapse_info)
         block["synapse_type"] = synapse_type
         return block
 

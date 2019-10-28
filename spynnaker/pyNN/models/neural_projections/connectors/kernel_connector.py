@@ -245,7 +245,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
                 numpy.array(all_delays), numpy.array(all_weights))
 
     @overrides(AbstractConnector.get_delay_maximum)
-    def get_delay_maximum(self, delays):
+    def get_delay_maximum(self, delays, synapse_info):
         # I think this is overestimated, but not by much
         n_conns = (
             self._pre_w * self._pre_h * self._kernel_w * self._kernel_h)
@@ -258,7 +258,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, delays, post_vertex_slice, min_delay=None, max_delay=None):
+            self, delays, post_vertex_slice, synapse_info, min_delay=None,
+            max_delay=None):
         # This is clearly a cop-out, but it works at the moment:
         # I haven't been able to make this break for "standard usage"
         return numpy.clip(
@@ -266,14 +267,15 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
             0, 255)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
-    def get_n_connections_to_post_vertex_maximum(self):
+    def get_n_connections_to_post_vertex_maximum(self, synapse_info):
         # Again as above this is something of a cop-out and we can
         # probably do better
         return numpy.clip(
-            self._kernel_h * self._kernel_w * self._n_pre_neurons, 0, 255)
+            self._kernel_h * self._kernel_w * self.n_pre_neurons(synapse_info),
+            0, 255)
 
     @overrides(AbstractConnector.get_weight_maximum)
-    def get_weight_maximum(self, weights):
+    def get_weight_maximum(self, weights, synapse_info):
         # I think this is overestimated, but not by much
         n_conns = (
             self._pre_w * self._pre_h * self._kernel_w * self._kernel_h)
@@ -291,7 +293,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
     def create_synaptic_block(
             self, weights, delays, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type):
+            synapse_type, synapse_info):
         (n_connections, all_post, all_pre_in_range, all_pre_in_range_delays,
          all_pre_in_range_weights) = self.compute_statistics(
             weights, delays, pre_vertex_slice, post_vertex_slice)
@@ -387,7 +389,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
     def gen_connector_params(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type):
+            synapse_type, synapse_info):
         return numpy.array(self._kernel_properties, dtype="uint32")
 
     @property

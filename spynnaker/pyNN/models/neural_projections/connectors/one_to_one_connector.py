@@ -38,13 +38,15 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
         super(OneToOneConnector, self).__init__(safe, callback, verbose)
 
     @overrides(AbstractConnector.get_delay_maximum)
-    def get_delay_maximum(self, delays):
+    def get_delay_maximum(self, delays, synapse_info):
         return self._get_delay_maximum(
-            delays, max((self._n_pre_neurons, self._n_post_neurons)))
+            delays, max((self.n_pre_neurons(synapse_info),
+                         self.n_post_neurons(synapse_info))))
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, delays, post_vertex_slice, min_delay=None, max_delay=None):
+            self, delays, post_vertex_slice, synapse_info, min_delay=None,
+            max_delay=None):
         # pylint: disable=too-many-arguments
         if min_delay is None or max_delay is None:
             return 1
@@ -65,22 +67,23 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
         return 0
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
-    def get_n_connections_to_post_vertex_maximum(self):
+    def get_n_connections_to_post_vertex_maximum(self, synapse_info):
         return 1
 
     @overrides(AbstractConnector.get_weight_maximum)
-    def get_weight_maximum(self, weights):
+    def get_weight_maximum(self, weights, synapse_info):
         return self._get_weight_maximum(
-            weights, max((self._n_pre_neurons, self._n_post_neurons)))
+            weights, max((self.n_pre_neurons(synapse_info),
+                          self.n_post_neurons(synapse_info))))
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
             self, weights, delays, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type):
+            synapse_type, synapse_info):
         # pylint: disable=too-many-arguments
         pre_lo, post_lo, pre_hi, post_hi = self._get_pre_post_limits(
-            pre_vertex_slice, post_vertex_slice)
+            pre_vertex_slice, post_vertex_slice, synapse_info)
 
         max_lo_atom = max((pre_lo, post_lo))
         min_hi_atom = min((pre_hi, post_hi))
@@ -94,10 +97,10 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
         block["target"] = numpy.arange(max_lo_atom, min_hi_atom + 1)
         block["weight"] = self._generate_weights(
             weights, n_connections, [connection_slice], pre_vertex_slice,
-            post_vertex_slice)
+            post_vertex_slice, synapse_info)
         block["delay"] = self._generate_delays(
             delays, n_connections, [connection_slice], pre_vertex_slice,
-            post_vertex_slice)
+            post_vertex_slice, synapse_info)
         block["synapse_type"] = synapse_type
         return block
 
@@ -105,11 +108,11 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
         return "OneToOneConnector()"
 
     def _get_pre_post_limits(
-            self, pre_vertex_slice, post_vertex_slice):
-        if self._prepop_is_view:
+            self, pre_vertex_slice, post_vertex_slice, synapse_info):
+        if self.prepop_is_view(synapse_info):
             # work out which atoms are on this pre-slice
             view_lo, view_hi = self._get_view_lo_hi(
-                self.pre_population._indexes)
+                self.pre_population(synapse_info)._indexes)
             if ((view_lo > pre_vertex_slice.lo_atom) and
                     (view_lo < pre_vertex_slice.hi_atom)):
                 pre_lo = view_lo
@@ -124,10 +127,10 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
             pre_lo = pre_vertex_slice.lo_atom
             pre_hi = pre_vertex_slice.hi_atom
 
-        if self._postpop_is_view:
+        if self.postpop_is_view(synapse_info):
             # work out which atoms are on this post-slice
             view_lo, view_hi = self._get_view_lo_hi(
-                self.post_population._indexes)
+                self.post_population(synapse_info)._indexes)
             if ((view_lo > post_vertex_slice.lo_atom) and
                     (view_lo < post_vertex_slice.hi_atom)):
                 post_lo = view_lo
@@ -149,10 +152,10 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
         view_hi = indexes[-1]
         return view_lo, view_hi
 
-    @property
     @overrides(AbstractConnector.use_direct_matrix)
-    def use_direct_matrix(self):
-        if self._prepop_is_view or self._postpop_is_view:
+    def use_direct_matrix(self, synapse_info):
+        if self.prepop_is_view(synapse_info) or self.postpop_is_view(
+            synapse_info):
             return False
         return True
 
@@ -166,24 +169,24 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
     def gen_connector_params(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type):
+            synapse_type, synapse_info):
         params = []
         pre_view_lo = 0
-        pre_view_hi = self._n_pre_neurons - 1
-        if self._prepop_is_view:
+        pre_view_hi = self.n_pre_neurons(synapse_info) - 1
+        if self.prepop_is_view(synapse_info):
             pre_view_lo, pre_view_hi = self._get_view_lo_hi(
-                self.pre_population._indexes)
+                self.pre_population(synapse_info)._indexes)
 
         params.extend([pre_view_lo, pre_view_hi])
 
         post_view_lo = 0
-        post_view_hi = self._n_post_neurons - 1
-        if self._postpop_is_view:
+        post_view_hi = self.n_post_neurons(synapse_info) - 1
+        if self.postpop_is_view(synapse_info):
             post_view_lo, post_view_hi = self._get_view_lo_hi(
-                self.post_population._indexes)
+                self.post_population(synapse_info)._indexes)
 
         params.extend([post_view_lo, post_view_hi])
-
+        print('params: ', params)
         return numpy.array(params, dtype="uint32")
 
     @property

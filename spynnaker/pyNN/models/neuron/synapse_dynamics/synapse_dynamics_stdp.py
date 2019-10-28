@@ -401,9 +401,9 @@ class SynapseDynamicsSTDP(
         return 0.0
 
     @overrides(AbstractPlasticSynapseDynamics.get_weight_maximum)
-    def get_weight_maximum(self, connector, weights):
+    def get_weight_maximum(self, connector, weights, synapse_info):
         w_max = super(SynapseDynamicsSTDP, self).get_weight_maximum(
-            connector, weights)
+            connector, weights, synapse_info)
         # The maximum weight is the largest that it could be set to from
         # the weight dependence
         return max(w_max, self.__weight_dependence.weight_maximum)

@@ -209,7 +209,7 @@ class SynapseDynamicsStructuralStatic(
         return 0.0
 
     @overrides(SynapseDynamicsStatic.get_weight_maximum)
-    def get_weight_maximum(self, connector, weights):
+    def get_weight_maximum(self, connector, weights, synapse_info):
         w_m = super(SynapseDynamicsStructuralStatic, self).get_weight_maximum(
-            connector, weights)
+            connector, weights, synapse_info)
         return max(w_m, self.__common_sp.initial_weight)

@@ -111,7 +111,8 @@ class GeneratorData(object):
         items.append(connector.gen_connector_params(
             self.__pre_slices, self.__pre_slice_index, self.__post_slices,
             self.__post_slice_index, self.__pre_vertex_slice,
-            self.__post_vertex_slice, self.__synapse_information.synapse_type))
+            self.__post_vertex_slice, self.__synapse_information.synapse_type,
+            self.__synapse_information))
         items.append(connector.gen_weights_params(
             self.__synapse_information.weight, self.__pre_vertex_slice,
             self.__post_vertex_slice))
