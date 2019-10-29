@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import math
-from spinn_front_end_common.utilities.constants import WORD_TO_BYTE_MULTIPLIER
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from pacman.utilities.algorithm_utilities. \
     partition_algorithm_utilities import determine_max_atoms_for_vertex
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
@@ -69,7 +69,7 @@ def get_estimated_sdram_for_bit_field_region(app_graph, vertex):
             sdram += (
                 (ELEMENTS_USED_IN_EACH_BIT_FIELD + (
                     n_words_for_atoms * n_machine_vertices)) *
-                WORD_TO_BYTE_MULTIPLIER)
+                BYTES_PER_WORD)
     return sdram
 
 
@@ -82,7 +82,7 @@ def get_estimated_sdram_for_key_region(app_graph, vertex):
     """
 
     # basic sdram
-    sdram = N_KEYS_DATA_SET_IN_WORDS * WORD_TO_BYTE_MULTIPLIER
+    sdram = N_KEYS_DATA_SET_IN_WORDS * BYTES_PER_WORD
     for in_edge in app_graph.get_edges_ending_at_vertex(vertex):
 
         # Get the number of likely vertices
@@ -93,7 +93,7 @@ def get_estimated_sdram_for_key_region(app_graph, vertex):
         n_edge_vertices = int(math.ceil(
             float(in_edge.pre_vertex.n_atoms) / float(max_atoms)))
         sdram += (n_edge_vertices * N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP *
-                  WORD_TO_BYTE_MULTIPLIER)
+                  BYTES_PER_WORD)
     return sdram
 
 
@@ -107,7 +107,7 @@ def _exact_sdram_for_bit_field_region(
     :param n_key_map: n keys map
     :return: sdram in bytes
     """
-    sdram = ELEMENTS_USED_IN_BIT_FIELD_HEADER * WORD_TO_BYTE_MULTIPLIER
+    sdram = ELEMENTS_USED_IN_BIT_FIELD_HEADER * BYTES_PER_WORD
     for incoming_edge in machine_graph.get_edges_ending_at_vertex(vertex):
         n_keys = n_key_map.n_keys_for_partition(
             machine_graph.get_outgoing_partition_for_edge(incoming_edge))
@@ -115,7 +115,7 @@ def _exact_sdram_for_bit_field_region(
 
         sdram += (
             (ELEMENTS_USED_IN_EACH_BIT_FIELD + n_words_for_atoms) *
-            WORD_TO_BYTE_MULTIPLIER)
+            BYTES_PER_WORD)
     return sdram
 
 
@@ -123,7 +123,7 @@ def exact_sdram_for_bit_field_builder_region():
     """ returns the sdram requirement for the builder region
     :return: returns the sdram requirement for the builder region
     """
-    return N_REGIONS_ADDRESSES * WORD_TO_BYTE_MULTIPLIER
+    return N_REGIONS_ADDRESSES * BYTES_PER_WORD
 
 
 def _exact_sdram_for_bit_field_key_region(machine_graph, vertex):
@@ -136,7 +136,7 @@ def _exact_sdram_for_bit_field_key_region(machine_graph, vertex):
     return (
                N_KEYS_DATA_SET_IN_WORDS +
                len(machine_graph.get_edges_ending_at_vertex(vertex)) *
-               N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP) * WORD_TO_BYTE_MULTIPLIER
+               N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP) * BYTES_PER_WORD
 
 
 def reserve_bit_field_regions(

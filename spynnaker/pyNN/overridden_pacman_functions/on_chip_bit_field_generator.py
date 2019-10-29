@@ -15,6 +15,9 @@
 
 import functools
 import math
+import struct
+import logging
+import os
 from collections import defaultdict
 
 from spinn_front_end_common.abstract_models import \
@@ -23,16 +26,12 @@ from spinn_front_end_common.interface.interface_functions import \
     ChipIOBufExtractor
 from spinn_front_end_common.utilities.exceptions import SpinnFrontEndException
 from spinn_front_end_common.utilities import system_control_logic
-from spinn_front_end_common.utilities.constants import WORD_TO_BYTE_MULTIPLIER
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
 from spinn_utilities.progress_bar import ProgressBar
 
 from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState
-
-import struct
-import logging
-import os
 
 logger = logging.getLogger(__name__)
 
@@ -51,9 +50,6 @@ class OnChipBitFieldGenerator(object):
 
     # n key to n neurons maps size in words
     _N_KEYS_DATA_SET_IN_WORDS = 1
-
-    # bytes per word
-    _BYTES_PER_WORD = 4
 
     # bits in a word
     _BITS_IN_A_WORD = 32
@@ -188,13 +184,13 @@ class OnChipBitFieldGenerator(object):
                     n_bit_field_entries = struct.unpack(
                         "<I", transceiver.read_memory(
                             placement.x, placement.y, bit_field_address,
-                            self._BYTES_PER_WORD))[0]
-                    reading_address = bit_field_address + self._BYTES_PER_WORD
+                            BYTES_PER_WORD))[0]
+                    reading_address = bit_field_address + BYTES_PER_WORD
 
                     # read in each bitfield
-                    for bit_field_index in range(0, n_bit_field_entries):
+                    for _bit_field_index in range(0, n_bit_field_entries):
                         # master pop key, n words and read pointer
-                        (master_pop_key, n_words_to_read, read_pointer) = \
+                        (_master_pop_key, n_words_to_read, read_pointer) = \
                             struct.unpack(
                                 "<III", transceiver.read_memory(
                                     placement.x, placement.y, reading_address,
@@ -206,7 +202,7 @@ class OnChipBitFieldGenerator(object):
                             "<{}I".format(n_words_to_read),
                             transceiver.read_memory(
                                 placement.x, placement.y, read_pointer,
-                                n_words_to_read * WORD_TO_BYTE_MULTIPLIER))
+                                n_words_to_read * BYTES_PER_WORD))
 
                         n_neurons = n_words_to_read * self._BITS_IN_A_WORD
                         for neuron_id in range(0, n_neurons):
@@ -308,11 +304,11 @@ class OnChipBitFieldGenerator(object):
                     n_bit_field_entries = struct.unpack(
                         "<I", transceiver.read_memory(
                             placement.x, placement.y, bit_field_address,
-                            self._BYTES_PER_WORD))[0]
-                    reading_address = bit_field_address + self._BYTES_PER_WORD
+                            BYTES_PER_WORD))[0]
+                    reading_address = bit_field_address + BYTES_PER_WORD
 
                     # read in each bitfield
-                    for bit_field_index in range(0, n_bit_field_entries):
+                    for _bit_field_index in range(0, n_bit_field_entries):
 
                         # master pop key, n words and read pointer
                         (master_pop_key, n_words_to_read, read_pointer) = \
@@ -327,7 +323,7 @@ class OnChipBitFieldGenerator(object):
                             "<{}I".format(n_words_to_read),
                             transceiver.read_memory(
                                 placement.x, placement.y, read_pointer,
-                                n_words_to_read * WORD_TO_BYTE_MULTIPLIER))
+                                n_words_to_read * BYTES_PER_WORD))
 
                         # put into report
                         n_neurons = n_words_to_read * self._BITS_IN_A_WORD
