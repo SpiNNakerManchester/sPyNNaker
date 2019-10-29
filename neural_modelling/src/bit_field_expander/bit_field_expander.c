@@ -381,7 +381,7 @@ bool generate_bit_field(){
                 }
 
                 while (!bit_found && population_table_get_next_address(
-                        &row_address, &n_bytes_to_transfer)){
+                        &new_key, &row_address, &n_bytes_to_transfer)){
                     log_info("%d", neuron_id);
 
                     // This is a direct row to process, so will have 1 target,

@@ -74,6 +74,10 @@ static volatile uint32_t rewires_to_do = 0;
 // up, only this or dma_n_spikes can be 1 with the other being 0.
 static uint32_t dma_n_rewires;
 
+// The number of spikes to do when the DMA completes.  When a DMA is first set
+// up, only this or dma_n_rewires can be 1 with the other being 0.
+static uint32_t dma_n_spikes;
+
 // the number of dma completes (used in provenance generation)
 static uint32_t dma_complete_count = 0;
 
