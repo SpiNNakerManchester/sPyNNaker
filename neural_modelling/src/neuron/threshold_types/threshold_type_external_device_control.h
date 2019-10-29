@@ -133,9 +133,8 @@ static bool threshold_type_is_above_threshold(
 
         threshold_type->time_until_next_send =
                 threshold_type->timesteps_between_sending;
-    } else {
-        --threshold_type->time_until_next_send;
     }
+    --threshold_type->time_until_next_send;
     return false;
 }
 

@@ -13,10 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-try:
-    from collections.abc import OrderedDict
-except ImportError:
-    from collections import OrderedDict
+from collections import OrderedDict
 import logging
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
@@ -77,6 +74,11 @@ class ExternalDeviceLifControlVertex(
         self.__partition_id_to_key = OrderedDict(
             (str(dev.device_control_partition_id), dev.device_control_key)
             for dev in devices)
+
+        # Check for same partition name
+        if len(self.__partition_id_to_key) != len(devices):
+            raise Exception(
+                "Partition names for each device must be different")
 
         # Create a partition to atom map
         self.__partition_id_to_atom = {
