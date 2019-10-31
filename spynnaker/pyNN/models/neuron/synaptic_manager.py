@@ -446,6 +446,7 @@ class SynapticManager(object):
         weights_signed = False
         rate_stats = [RunningStats() for _ in range(n_synapse_types)]
         steps_per_second = 1000000.0 / machine_timestep
+        min_max_weight = numpy.ones(n_synapse_types) * 2 ** 32
 
         for app_edge in application_graph.get_edges_ending_at_vertex(
                 application_vertex):
@@ -472,6 +473,8 @@ class SynapticManager(object):
 
                     weight_max = (synapse_dynamics.get_weight_maximum(
                         connector, synapse_info.weight) * weight_scale)
+                    min_max_weight[synapse_type] = \
+                        min(min_max_weight[synapse_type], weight_max)
                     biggest_weight[synapse_type] = max(
                         biggest_weight[synapse_type], weight_max)
 
@@ -519,23 +522,29 @@ class SynapticManager(object):
                     total_weights[synapse_type])
                 max_weights[synapse_type] = max(
                     max_weights[synapse_type], biggest_weight[synapse_type])
+            # This is to deal with very small weights that are floored to 0
+            mmw = 2**math.floor(math.log(min_max_weight[synapse_type], 2))
+            print("max_weights[", synapse_type, "]", max_weights[synapse_type],
+                  "mmw", mmw)
+            max_weights[synapse_type] = min(mmw * 2 ** 15,
+                                            max_weights[synapse_type])
+
 
         # Convert these to powers
         max_weight_powers = (
-            0 if w <= 0 else int(math.ceil(max(0, math.log(w, 2))))
+            0 if w <= 1 else int(math.ceil(max(0, math.log(w, 2))))
             for w in max_weights)
 
         # If 2^max_weight_power equals the max weight, we have to add another
         # power, as range is 0 - (just under 2^max_weight_power)!
         max_weight_powers = (
-            w + 1 if (2 ** w) <= a else w
+            w + 1 if (2 ** w) < a else w
             for w, a in zip(max_weight_powers, max_weights))
 
         # If we have synapse dynamics that uses signed weights,
         # Add another bit of shift to prevent overflows
         if weights_signed:
             max_weight_powers = (m + 1 for m in max_weight_powers)
-
         return list(max_weight_powers)
 
     @staticmethod
@@ -565,7 +574,6 @@ class SynapticManager(object):
         next_block_allowed_address = self.__poptable_type\
             .get_next_allowed_address(next_block_start_address)
         if next_block_allowed_address != next_block_start_address:
-
             # Pad out data file with the added alignment bytes:
             spec.comment("\nWriting population table required padding\n")
             spec.switch_write_focus(synaptic_matrix_region)
