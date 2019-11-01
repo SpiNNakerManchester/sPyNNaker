@@ -145,8 +145,8 @@ class SpynnakerExternalDevicePluginManager(object):
 
         # add new edge and vertex if required to SpiNNaker graph
         SpynnakerExternalDevicePluginManager.update_live_packet_gather_tracker(
-            population._vertex, "LiveSpikeReceiver", port, host, tag,
-            board_address, strip_sdp, use_prefix, key_prefix, prefix_type,
+            population._vertex, "LiveSpikeReceiver", port, host, board_address,
+            tag, strip_sdp, use_prefix, key_prefix, prefix_type,
             message_type, right_shift, payload_as_time_stamps,
             use_payload_prefix, payload_prefix, payload_right_shift,
             number_of_packets_sent_per_time_step,
