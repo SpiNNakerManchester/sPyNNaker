@@ -35,7 +35,7 @@ class IFCurrExpTwoComp(AbstractPyNNNeuronModelStandard):
             self, tau_m=0.5, cm=1.0, u_rest=0, v_reset=0.0,
             v_thresh=10.0, tau_refrac=0.1, i_offset=0.0, u=0.0,
 
-            e_rev_E=10.0, e_rev_I=0.0,
+            e_rev_E=4.667, e_rev_I=-0.333,
 
             tau_syn_E_soma=5.0, tau_syn_I_soma=5.0,
             isyn_exc_soma =0.0, isyn_inh_soma=0.0,

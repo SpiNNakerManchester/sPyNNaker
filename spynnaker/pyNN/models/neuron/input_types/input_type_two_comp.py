@@ -76,7 +76,7 @@ class InputTypeTwoComp(AbstractInputType):
 
     @overrides(AbstractInputType.get_global_weight_scale)
     def get_global_weight_scale(self):
-        return 1024.0
+        return 1
 
     @property
     def e_rev_E(self):

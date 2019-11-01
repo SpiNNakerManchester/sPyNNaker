@@ -51,6 +51,8 @@ state_t neuron_model_state_update(
         //input_t dendrite_input_this_timestep =
         //        exc_input[1] - inh_input[1];
 
+        io_printf(IO_BUF, "dend %k exp %k\n", dendrite_input_this_timestep, neuron->exp_TC_dend);
+
         // update dendrite
         neuron->V = dendrite_input_this_timestep + neuron->exp_TC_dend * (neuron->V - dendrite_input_this_timestep);
 //        neuron->V_star = neuron->V * neuron->V_star_cond;
