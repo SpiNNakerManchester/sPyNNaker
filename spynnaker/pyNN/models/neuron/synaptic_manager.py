@@ -29,7 +29,7 @@ from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spynnaker.pyNN.models.neuron.generator_data import GeneratorData
 from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractGenerateConnectorOnMachine)
+    OneToOneConnector, AbstractGenerateConnectorOnMachine)
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from .synapse_dynamics import (
     AbstractSynapseDynamicsStructural,
@@ -892,7 +892,7 @@ class SynapticManager(object):
         """
         return (
             app_edge.n_delay_stages == 0 and
-            connector.use_direct_matrix and
+            isinstance(connector, OneToOneConnector) and
             (single_addr + (pre_vertex_slice.n_atoms * BYTES_PER_WORD) <=
                 self.__one_to_one_connection_dtcm_max_bytes) and
             (pre_vertex_slice.lo_atom == post_vertex_slice.lo_atom) and
