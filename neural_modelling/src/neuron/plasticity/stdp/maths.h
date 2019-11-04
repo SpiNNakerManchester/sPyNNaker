@@ -47,7 +47,7 @@ static inline int16_lut *maths_copy_int16_lut(address_t *address) {
     int16_lut *lut = spin1_malloc(size);
     if (lut == NULL) {
         log_error("Not enough space to allocate LUT.  Try reducing the timestep,"
-            " the number of neurons per core, or the tau value");
+            " the number of neurons per core, or the tau value; size = %u", size);
         rt_error(RTE_SWERR);
     }
     spin1_memcpy(lut, sdram_lut, size);

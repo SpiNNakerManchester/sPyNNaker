@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2017-2019 The University of Manchester
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #ifndef _SYNAPSE_STRUCUTRE_WEIGHT_ELIGIBILITY_TRACE_H_
 #define _SYNAPSE_STRUCUTRE_WEIGHT_ELIGIBILITY_TRACE_H_
 
@@ -18,7 +35,7 @@ typedef weight_t final_state_t;
 // Synapse interface functions
 //---------------------------------------
 // Synapse parameter get and set helpers
-static inline int32_t synapse_structure_get_weight(plastic_synapse_t state) {
+static inline weight_t synapse_structure_get_weight(plastic_synapse_t state) {
     return (state >> 16);
 }
 
@@ -51,6 +68,12 @@ static inline weight_t synapse_structure_get_final_weight(
 static inline plastic_synapse_t synapse_structure_get_final_synaptic_word(
         final_state_t final_state) {
     return final_state;
+}
+
+//---------------------------------------
+static inline plastic_synapse_t synapse_structure_create_synapse(
+        weight_t weight) {
+    return weight;
 }
 
 #endif  // _SYNAPSE_STRUCUTRE_WEIGHT_ELIGIBILITY_TRACE_H_

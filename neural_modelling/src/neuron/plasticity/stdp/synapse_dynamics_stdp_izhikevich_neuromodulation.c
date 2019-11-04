@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2017-2019 The University of Manchester
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 // Spinn_common includes
 #include "static-assert.h"
 
@@ -20,6 +37,12 @@ static uint32_t synapse_index_mask;
 static uint32_t synapse_type_index_mask;
 static uint32_t synapse_delay_index_type_bits;
 static uint32_t synapse_type_mask;
+
+typedef struct stdp_params {
+    uint32_t backprop_delay;
+} stdp_params;
+
+static stdp_params params;
 
 uint32_t num_plastic_pre_synaptic_events = 0;
 uint32_t plastic_saturation_count = 0;
@@ -59,8 +82,8 @@ uint32_t plastic_saturation_count = 0;
 // Structures
 //---------------------------------------
 typedef struct {
-  pre_trace_t prev_trace;
-  uint32_t prev_time;
+	uint32_t prev_time;
+	pre_trace_t prev_trace;
 } pre_event_history_t;
 
 post_event_history_t *post_event_history;
@@ -83,7 +106,7 @@ static inline post_trace_t add_dopamine_spike(
             DECAY_LOOKUP_TAU_D(delta_time)) >> STDP_FIXED_POINT;
 
     // Put dopamine concentration into STDP fixed-point format
-    weight_state_t weight_state = weight_get_initial(
+    weight_state = weight_get_initial(
         concentration, synapse_type);
     if (weight_state.weight_multiply_right_shift > STDP_FIXED_POINT) {
         concentration >>=
@@ -208,19 +231,23 @@ static inline void correlation_apply_pre_spike(
 // Synapse update loop
 //---------------------------------------
 static inline plastic_synapse_t plasticity_update_synapse(
-    uint32_t time,
+    const uint32_t time,
     const uint32_t last_pre_time, const pre_trace_t last_pre_trace,
     const pre_trace_t new_pre_trace, const uint32_t delay_dendritic,
     const uint32_t delay_axonal, plastic_synapse_t *current_state,
-    post_event_history_t *post_event_history) {
+    const post_event_history_t *post_event_history) {
 
     // Apply axonal delay to time of last presynaptic spike
     const uint32_t delayed_last_pre_time = last_pre_time + delay_axonal;
 
     // Get the post-synaptic window of events to be processed
-    const uint32_t window_begin_time = (delayed_last_pre_time >= delay_dendritic) ?
-        (delayed_last_pre_time - delay_dendritic) : 0;
-    const uint32_t window_end_time = time + delay_axonal - delay_dendritic;
+    const uint32_t window_begin_time =
+    	(delayed_last_pre_time >= delay_dendritic)
+		? (delayed_last_pre_time - delay_dendritic) : 0;
+    const uint32_t delayed_pre_time = time + delay_axonal;
+    const uint32_t window_end_time =
+    	(delayed_pre_time >= delay_dendritic)
+		? (delayed_pre_time - delay_dendritic) : 0;
     post_event_window_t post_window = post_events_get_window_delayed(
         post_event_history, window_begin_time, window_end_time);
 
@@ -251,8 +278,6 @@ static inline plastic_synapse_t plasticity_update_synapse(
         // Go onto next event
         post_window = post_events_next_delayed(post_window, delayed_post_time);
     }
-
-    const uint32_t delayed_pre_time = time + delay_axonal;
 
     correlation_apply_pre_spike(
         delayed_pre_time, new_pre_trace,
@@ -285,9 +310,9 @@ static inline plastic_synapse_t plasticity_update_synapse(
 }
 
 //---------------------------------------
-static inline index_t _sparse_axonal_delay(uint32_t x) {
-    return ((x >> synapse_delay_index_type_bits) & SYNAPSE_AXONAL_DELAY_MASK);
-}
+//static inline index_t _sparse_axonal_delay(uint32_t x) {
+//    return ((x >> synapse_delay_index_type_bits) & SYNAPSE_AXONAL_DELAY_MASK);
+//}
 
 address_t synapse_dynamics_initialise(
         address_t address, uint32_t n_neurons, uint32_t n_synapse_types,
@@ -422,8 +447,7 @@ bool synapse_dynamics_process_plastic_synapses(address_t plastic,
                                                      last_pre_trace);
 
     // Loop through plastic synapses
-    for ( ; plastic_synapse > 0; plastic_synapse--)
-    {
+    for (; plastic_synapse > 0; plastic_synapse--) {
         // Get next control word (autoincrementing)
         uint32_t control_word = *control_words++;
 
@@ -446,22 +470,27 @@ bool synapse_dynamics_process_plastic_synapses(address_t plastic,
         uint32_t index = synapse_row_sparse_index(
             control_word, synapse_index_mask);
 
-       // Get state of synapse - weight and eligibility trace.
-       plastic_synapse_t* current_state = plastic_words;
-       weight_state = weight_get_initial(
-           synapse_structure_get_weight(*current_state), type);
+        // Get state of synapse - weight and eligibility trace.
+        plastic_synapse_t* current_state = plastic_words;
+//        	synapse_structure_get_update_state(*plastic_words, type);
+        weight_state = weight_get_initial(
+        	synapse_structure_get_weight(*current_state), type);
 
-       // Update the synapse state
-       plastic_synapse_t final_state = plasticity_update_synapse(time,
-           last_pre_time, last_pre_trace,
-           event_history->prev_trace, delay_dendritic, delay_axonal,
-           current_state, &post_event_history[index]);
+        // Update the synapse state
+        uint32_t post_delay = delay_dendritic;
+        if (!params.backprop_delay) {
+            post_delay = 0;
+        }
+        final_state_t final_state = plasticity_update_synapse(
+        	time, last_pre_time, last_pre_trace, event_history->prev_trace,
+			post_delay, delay_axonal, current_state,
+			&post_event_history[index]);
 
-       // Add weight to ring-buffer entry
-       ring_buffer[offset] += synapse_structure_get_weight(final_state);
+        // Add weight to ring-buffer entry
+        ring_buffer[offset] += synapse_structure_get_final_weight(final_state);
 
-       // Write back updated synaptic word to plastic region
-       *plastic_words++ = final_state;
+        // Write back updated synaptic word to plastic region
+        *plastic_words++ = synapse_structure_get_final_synaptic_word(final_state);
     }
     return true;
 }
