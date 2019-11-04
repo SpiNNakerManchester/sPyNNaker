@@ -140,11 +140,6 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
     def allow_self_connections(self, new_value):
         self.__allow_self_connections = new_value
 
-    def _get_view_lo_hi(self, indexes):
-        view_lo = indexes[0]
-        view_hi = indexes[-1]
-        return view_lo, view_hi
-
     @property
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_id)
     def gen_connector_id(self):
@@ -156,30 +151,12 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type):
-        params = []
-        pre_view_lo = 0
-        pre_view_hi = self._n_pre_neurons - 1
-        if self._prepop_is_view:
-            pre_view_lo, pre_view_hi = self._get_view_lo_hi(
-                self.pre_population._indexes)
-
-        params.extend([pre_view_lo, pre_view_hi])
-
-        post_view_lo = 0
-        post_view_hi = self._n_post_neurons - 1
-        if self._postpop_is_view:
-            post_view_lo, post_view_hi = self._get_view_lo_hi(
-                self.post_population._indexes)
-
-        params.extend([post_view_lo, post_view_hi])
-
-        params.extend([self.allow_self_connections])
-
-        return numpy.array(params, dtype="uint32")
+        return numpy.array([
+            self.allow_self_connections],
+            dtype="uint32")
 
     @property
     @overrides(AbstractGenerateConnectorOnMachine.
                gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
-        # view parameters + allow_self_connections
-        return (4 + 1) * BYTES_PER_WORD
+        return 1 * BYTES_PER_WORD
