@@ -106,7 +106,7 @@ static inline post_trace_t add_dopamine_spike(
             DECAY_LOOKUP_TAU_D(delta_time)) >> STDP_FIXED_POINT;
 
     // Put dopamine concentration into STDP fixed-point format
-    weight_state = weight_get_initial(
+    weight_state_t weight_state = weight_get_initial(
         concentration, synapse_type);
     if (weight_state.weight_multiply_right_shift > STDP_FIXED_POINT) {
         concentration >>=
@@ -244,10 +244,10 @@ static inline plastic_synapse_t plasticity_update_synapse(
     const uint32_t window_begin_time =
     	(delayed_last_pre_time >= delay_dendritic)
 		? (delayed_last_pre_time - delay_dendritic) : 0;
-    const uint32_t delayed_pre_time = time + delay_axonal;
-    const uint32_t window_end_time =
-    	(delayed_pre_time >= delay_dendritic)
-		? (delayed_pre_time - delay_dendritic) : 0;
+    const uint32_t window_end_time = time + delay_axonal - delay_dendritic;
+//    const uint32_t window_end_time =
+//    	(delayed_pre_time >= delay_dendritic)
+//		? (delayed_pre_time - delay_dendritic) : 0;
     post_event_window_t post_window = post_events_get_window_delayed(
         post_event_history, window_begin_time, window_end_time);
 
@@ -278,6 +278,8 @@ static inline plastic_synapse_t plasticity_update_synapse(
         // Go onto next event
         post_window = post_events_next_delayed(post_window, delayed_post_time);
     }
+
+    const uint32_t delayed_pre_time = time + delay_axonal;
 
     correlation_apply_pre_spike(
         delayed_pre_time, new_pre_trace,
@@ -317,6 +319,10 @@ static inline plastic_synapse_t plasticity_update_synapse(
 address_t synapse_dynamics_initialise(
         address_t address, uint32_t n_neurons, uint32_t n_synapse_types,
         uint32_t *ring_buffer_to_input_buffer_left_shifts) {
+
+    stdp_params *sdram_params = (stdp_params *) address;
+    spin1_memcpy(&params, sdram_params, sizeof(stdp_params));
+    address = (address_t) &sdram_params[1];
 
     // Load timing dependence data
     address_t weight_region_address = timing_initialise(address);
@@ -481,13 +487,13 @@ bool synapse_dynamics_process_plastic_synapses(address_t plastic,
         if (!params.backprop_delay) {
             post_delay = 0;
         }
-        final_state_t final_state = plasticity_update_synapse(
+        plastic_synapse_t final_state = plasticity_update_synapse(
         	time, last_pre_time, last_pre_trace, event_history->prev_trace,
 			post_delay, delay_axonal, current_state,
 			&post_event_history[index]);
 
         // Add weight to ring-buffer entry
-        ring_buffer[offset] += synapse_structure_get_final_weight(final_state);
+        ring_buffer[offset] += synapse_structure_get_weight(final_state);
 
         // Write back updated synaptic word to plastic region
         *plastic_words++ = synapse_structure_get_final_synaptic_word(final_state);

@@ -57,12 +57,22 @@ class TimingDependenceIzhikevichNeuromodulation(AbstractTimingDependence):
         self.__synapse_structure = SynapseStructureWeightEligibilityTrace()
 
         ts = get_simulator().machine_time_step / 1000.0
-        self.__tau_plus_data = get_exp_lut_array(ts, self.__tau_plus)
-        self.__tau_minus_data = get_exp_lut_array(ts, self.__tau_minus)
+        self.__tau_plus_data = get_exp_lut_array(
+            ts, self.__tau_plus)
+#             shift=LOOKUP_TAU_PLUS_SHIFT,
+#             size=LOOKUP_TAU_PLUS_SIZE)
+        self.__tau_minus_data = get_exp_lut_array(
+            ts, self.__tau_minus)
+#             shift=LOOKUP_TAU_MINUS_SHIFT,
+#             size=LOOKUP_TAU_MINUS_SIZE)
         self.__tau_c_data = get_exp_lut_array(
-            ts, self.__tau_c, shift=LOOKUP_TAU_C_SHIFT)
+            ts, self.__tau_c,
+            shift=LOOKUP_TAU_C_SHIFT)
+#             size=LOOKUP_TAU_C_SIZE)
         self.__tau_d_data = get_exp_lut_array(
-            ts, self.__tau_d, shift=LOOKUP_TAU_D_SHIFT)
+            ts, self.__tau_d,
+            shift=LOOKUP_TAU_D_SHIFT)
+#             size=LOOKUP_TAU_D_SIZE)
 
     @property
     def tau_plus(self):
