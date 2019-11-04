@@ -1,7 +1,7 @@
 from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModelStandard
 from spynnaker.pyNN.models.defaults import default_initial_values
 from spynnaker.pyNN.models.neuron.synapse_types import (
-    ExpIzhikevichNeuromodulated)
+    SynapseTypeExpIzhikevichNeuromodulated)
 from spynnaker.pyNN.models.neuron.input_types import InputTypeConductance
 from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeStatic
 from spynnaker.pyNN.models.neuron.neuron_models import NeuronModelIzh
@@ -18,7 +18,7 @@ class IZKCondExpIzhikevichNeuromodulation(AbstractPyNNNeuronModelStandard):
             isyn_exc=0.0, isyn_inh=0.0):
         # pylint: disable=too-many-arguments, too-many-locals
         neuron_model = NeuronModelIzh(a, b, c, d, v, u, i_offset)
-        synapse_type = ExpIzhikevichNeuromodulated(
+        synapse_type = SynapseTypeExpIzhikevichNeuromodulated(
             tau_syn_E, tau_syn_I, isyn_exc, isyn_inh)
         input_type = InputTypeConductance(e_rev_E, e_rev_I)
         threshold_type = ThresholdTypeStatic(_IZK_THRESHOLD)

@@ -17,7 +17,7 @@ UNITS = {
 }
 
 
-class ExpIzhikevichNeuromodulated(AbstractSynapseType):
+class SynapseTypeExpIzhikevichNeuromodulated(AbstractSynapseType):
     __slots__ = [
         "_tau_syn_E",
         "_tau_syn_I",
@@ -25,7 +25,7 @@ class ExpIzhikevichNeuromodulated(AbstractSynapseType):
         "_isyn_inh"]
 
     def __init__(self, tau_syn_E, tau_syn_I, isyn_exc, isyn_inh):
-        super(ExpIzhikevichNeuromodulated, self).__init__([
+        super(SynapseTypeExpIzhikevichNeuromodulated, self).__init__([
             DataType.U032,    # decay_E
             DataType.U032,    # init_E
             DataType.S1615,   # isyn_exc

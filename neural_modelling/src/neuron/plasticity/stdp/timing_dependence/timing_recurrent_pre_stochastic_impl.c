@@ -46,14 +46,14 @@ address_t timing_initialise(address_t address) {
             plasticity_trace_region_data.accumulator_potentiation_minus_one + 1);
 
     // Copy LUTs from following memory
-    // **HACK** these aren't actually int16_t-based but this function will still
-    // work fine
-    address_t lut_address = maths_copy_int16_lut(
-            &address[2], STDP_FIXED_POINT_ONE, (int16_t *) &pre_exp_dist_lookup[0]);
-    lut_address = maths_copy_int16_lut(
-            lut_address, STDP_FIXED_POINT_ONE, (int16_t *) &post_exp_dist_lookup[0]);
+    // Copy LUTs from following memory
+        uint32_t word_size = STDP_FIXED_POINT_ONE / 2;
+        spin1_memcpy(pre_exp_dist_lookup, &address[2],
+                STDP_FIXED_POINT_ONE * sizeof(uint16_t));
+        spin1_memcpy(post_exp_dist_lookup, &address[2 + word_size],
+                STDP_FIXED_POINT_ONE * sizeof(uint16_t));
 
     log_debug("timing_initialise: completed successfully");
 
-    return lut_address;
+    return &address[2 + word_size + word_size];
 }

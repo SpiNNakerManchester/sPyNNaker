@@ -18,6 +18,7 @@ import math
 import struct
 import numpy
 from spinn_utilities.overrides import overrides
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.models.neural_projections import (
     ProjectionApplicationEdge, ProjectionMachineEdge)
 from spynnaker.pyNN.exceptions import (
@@ -36,10 +37,10 @@ class _MasterPopEntry(object):
         "__mask",
         "__routing_key"]
 
-    MASTER_POP_ENTRY_SIZE_BYTES = 12
     MASTER_POP_ENTRY_SIZE_WORDS = 3
-    ADDRESS_LIST_ENTRY_SIZE_BYTES = 4
+    MASTER_POP_ENTRY_SIZE_BYTES = 3 * BYTES_PER_WORD
     ADDRESS_LIST_ENTRY_SIZE_WORDS = 1
+    ADDRESS_LIST_ENTRY_SIZE_BYTES = 1 * BYTES_PER_WORD
 
     def __init__(self, routing_key, mask):
         self.__routing_key = routing_key
@@ -182,12 +183,9 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
                     hex(next_address)))
         return next_address
 
-    def initialise_table(self, spec, master_population_table_region):
-        """ Initialise the master pop data structure
+    def initialise_table(self):
+        """ Initialise the master pop data structure.
 
-        :param spec: the DSG writer
-        :param master_population_table_region: \
-            the region in memory that the master pop table will be written in
         :rtype: None
         """
         self.__entries = dict()
