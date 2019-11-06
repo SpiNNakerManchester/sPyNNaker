@@ -150,7 +150,8 @@ class TimingDependenceIzhikevichNeuromodulation(AbstractTimingDependence):
         return self.__synapse_structure
 
 #     @overrides(AbstractTimingDependence.get_provenance_data)
-#     def get_provenance_data(self, pre_population_label, post_population_label):
+#     def get_provenance_data(self, pre_population_label,
+#                             post_population_label):
 #         prov_data = list()
 #         prov_data.append(plasticity_helpers.get_lut_provenance(
 #             pre_population_label, post_population_label, "IzhikevicRule",
