@@ -341,11 +341,11 @@ $(ELIMINATION_O): $(ELIMINATION_C) $(SYNAPSE_TYPE_H)
 	$(CC) -DLOG_LEVEL=$(PLASTIC_DEBUG) $(CFLAGS) \
 	        -include $(SYNAPSE_TYPE_H) -o $@ $<
 
-$(BUILD_DIR)neuron/neuron.o: $(MODIFIED_DIR)neuron/neuron.c $(NEURON_MODEL_H) \
-$(NEURON_O): $(NEURON_C) $(NEURON_MODEL_H) \
-                             $(SYNAPSE_TYPE_H)
+#$(BUILD_DIR)neuron/neuron.o: $(MODIFIED_DIR)neuron/neuron.c $(NEURON_MODEL_H) \
+$(NEURON_O): $(NEURON_C) $(NEURON_MODEL_H) $(SYNAPSE_TYPE_H)
 	# neuron.o
 	-@mkdir -p $(dir $@)
 	$(CC) -DLOG_LEVEL=$(NEURON_DEBUG) $(CFLAGS) $(NEURON_INCLUDES) -o $@ $<
+	IF_curdfsfdsfsdsdfsdf
 
 .PRECIOUS: $(MODIFIED_DIR)%.c $(MODIFIED_DIR)%.h $(LOG_DICT_FILE) $(EXTRA_PRECIOUS)
