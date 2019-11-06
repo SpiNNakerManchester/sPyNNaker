@@ -58,21 +58,21 @@ class TimingDependenceIzhikevichNeuromodulation(AbstractTimingDependence):
 
         ts = get_simulator().machine_time_step / 1000.0
         self.__tau_plus_data = get_exp_lut_array(
-            ts, self.__tau_plus)
-#             shift=LOOKUP_TAU_PLUS_SHIFT,
-#             size=LOOKUP_TAU_PLUS_SIZE)
+            ts, self.__tau_plus,
+            shift=LOOKUP_TAU_PLUS_SHIFT,
+            size=LOOKUP_TAU_PLUS_SIZE)
         self.__tau_minus_data = get_exp_lut_array(
-            ts, self.__tau_minus)
-#             shift=LOOKUP_TAU_MINUS_SHIFT,
-#             size=LOOKUP_TAU_MINUS_SIZE)
+            ts, self.__tau_minus,
+            shift=LOOKUP_TAU_MINUS_SHIFT,
+            size=LOOKUP_TAU_MINUS_SIZE)
         self.__tau_c_data = get_exp_lut_array(
             ts, self.__tau_c,
-            shift=LOOKUP_TAU_C_SHIFT)
-#             size=LOOKUP_TAU_C_SIZE)
+            shift=LOOKUP_TAU_C_SHIFT,
+            size=LOOKUP_TAU_C_SIZE)
         self.__tau_d_data = get_exp_lut_array(
             ts, self.__tau_d,
-            shift=LOOKUP_TAU_D_SHIFT)
-#             size=LOOKUP_TAU_D_SIZE)
+            shift=LOOKUP_TAU_D_SHIFT,
+            size=LOOKUP_TAU_D_SIZE)
 
     @property
     def tau_plus(self):
@@ -113,9 +113,6 @@ class TimingDependenceIzhikevichNeuromodulation(AbstractTimingDependence):
 
     @overrides(AbstractTimingDependence.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(self):
-        print("IZK_neuromodulation, array sizes: ", len(self.__tau_plus_data),
-              len(self.__tau_minus_data), len(self.__tau_c_data),
-              len(self.__tau_d_data))
         lut_array_words = (
             len(self.__tau_plus_data) + len(self.__tau_minus_data) +
             len(self.__tau_c_data) + len(self.__tau_d_data))
@@ -138,20 +135,6 @@ class TimingDependenceIzhikevichNeuromodulation(AbstractTimingDependence):
         spec.write_array(self.__tau_minus_data)
         spec.write_array(self.__tau_c_data)
         spec.write_array(self.__tau_d_data)
-#         self._tau_plus_last_entry = plasticity_helpers.write_exp_lut(
-#             spec, self._tau_plus, LOOKUP_TAU_PLUS_SIZE,
-#             LOOKUP_TAU_PLUS_SHIFT)
-#         self._tau_minus_last_entry = plasticity_helpers.write_exp_lut(
-#             spec, self._tau_minus, LOOKUP_TAU_MINUS_SIZE,
-#             LOOKUP_TAU_MINUS_SHIFT)
-#
-#         # Write Izhikevich model exp look up tables
-#         self._tau_c_last_entry = plasticity_helpers.write_exp_lut(
-#             spec, self._tau_c, LOOKUP_TAU_C_SIZE,
-#             LOOKUP_TAU_C_SHIFT)
-#         self._tau_d_last_entry = plasticity_helpers.write_exp_lut(
-#             spec, self._tau_d, LOOKUP_TAU_D_SIZE,
-#             LOOKUP_TAU_D_SHIFT)
 
         # Calculate constant component in Izhikevich's model weight update
         # function and write to SDRAM.

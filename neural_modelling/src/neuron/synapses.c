@@ -180,7 +180,7 @@ static inline void process_fixed_synapses(
         if (synapse_type > 1) {
             // Dopaminergic neurons send some amount of neuromodulator
             // concentration so this can actually be a weight as usual.
-            uint32_t concentration = synapse_row_sparse_weight(synaptic_word);
+            int32_t concentration = synapse_row_sparse_weight(synaptic_word);
             uint32_t index = synapse_row_sparse_index(
                 synaptic_word, synapse_index_mask);
             // In case this is punishment synapse, invert dopamine level

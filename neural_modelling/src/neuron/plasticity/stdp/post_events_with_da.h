@@ -74,15 +74,15 @@ static inline post_event_window_t post_events_get_window_delayed(
 
     post_event_window_t window;
     do {
-        // If this event is still in the future, set it as the end
-        if (*event_time > end_time) {
-            end_event_time = event_time;
-        }
-
         // Cache pointer to this event as potential
         // Next event and go back one event
         // **NOTE** next_time can be invalid
         window.next_time = event_time--;
+
+        // If this event is still in the future, set it as the end
+        if (*event_time > end_time) {
+            end_event_time = event_time;
+        }
     }
 
     // Keep looping while event occurred after start

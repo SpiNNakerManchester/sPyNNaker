@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _SYNAPSE_STRUCUTRE_WEIGHT_ELIGIBILITY_TRACE_H_
-#define _SYNAPSE_STRUCUTRE_WEIGHT_ELIGIBILITY_TRACE_H_
+#ifndef _SYNAPSE_STRUCTURE_WEIGHT_ELIGIBILITY_TRACE_H_
+#define _SYNAPSE_STRUCTURE_WEIGHT_ELIGIBILITY_TRACE_H_
 
 //---------------------------------------
 // Structures
@@ -35,7 +35,7 @@ typedef weight_t final_state_t;
 // Synapse interface functions
 //---------------------------------------
 // Synapse parameter get and set helpers
-static inline weight_t synapse_structure_get_weight(plastic_synapse_t state) {
+static inline int32_t synapse_structure_get_weight(plastic_synapse_t state) {
     return (state >> 16);
 }
 
@@ -76,4 +76,4 @@ static inline plastic_synapse_t synapse_structure_create_synapse(
     return weight;
 }
 
-#endif  // _SYNAPSE_STRUCUTRE_WEIGHT_ELIGIBILITY_TRACE_H_
+#endif  // _SYNAPSE_STRUCTURE_WEIGHT_ELIGIBILITY_TRACE_H_

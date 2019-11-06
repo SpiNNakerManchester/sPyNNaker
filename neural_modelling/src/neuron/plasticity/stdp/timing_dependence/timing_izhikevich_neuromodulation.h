@@ -25,7 +25,7 @@ typedef int32_t post_trace_t;
 typedef int16_t pre_trace_t;
 
 #include <neuron/plasticity/stdp/synapse_structure/synapse_structure_weight_eligibility_trace.h>
-#include "timing.h"
+//#include "timing.h"
 
 // Include debug header for log_info etc
 #include <debug.h>
