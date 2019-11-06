@@ -20,9 +20,11 @@ from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.log import FormatAdapter
 from spinnman.messages.eieio.data_messages import EIEIODataHeader
 from spynnaker.pyNN.models.common import recording_utils
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
 logger = FormatAdapter(logging.getLogger(__name__))
 _ONE_WORD = struct.Struct("<I")
+_TWO_WORDS = struct.Struct("<II")
 
 
 class EIEIOSpikeRecorder(object):
@@ -52,7 +54,7 @@ class EIEIOSpikeRecorder(object):
     def get_dtcm_usage_in_bytes(self):
         if not self.__record:
             return 0
-        return 4
+        return BYTES_PER_WORD
 
     def get_n_cpu_cycles(self, n_neurons):
         if not self.__record:
@@ -98,10 +100,9 @@ class EIEIOSpikeRecorder(object):
         number_of_bytes_written = len(spike_data)
         offset = 0
         while offset < number_of_bytes_written:
-            length = _ONE_WORD.unpack_from(spike_data, offset)[0]
-            time = _ONE_WORD.unpack_from(spike_data, offset + 4)[0]
+            length, time = _TWO_WORDS.unpack_from(spike_data, offset)
             time *= ms_per_tick
-            data_offset = offset + 8
+            data_offset = offset + 2 * BYTES_PER_WORD
 
             eieio_header = EIEIODataHeader.from_bytestring(
                 spike_data, data_offset)
@@ -116,5 +117,5 @@ class EIEIOSpikeRecorder(object):
                 count=eieio_header.count, offset=data_offset)
 
             neuron_ids = (keys - base_key) + vertex_slice.lo_atom
-            offset += length + 8
+            offset += length + 2 * BYTES_PER_WORD
             results.append(numpy.dstack((neuron_ids, timestamps))[0])

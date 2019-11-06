@@ -91,7 +91,7 @@ class MockSimulator(object):
     def add_population(self, pop):
         pass
 
-    def add_application_vertex(self, vertex, prefix=None):
+    def add_application_vertex(self, vertex):
         pass
 
     def verify_not_running(self):

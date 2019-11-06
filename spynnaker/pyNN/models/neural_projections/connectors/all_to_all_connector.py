@@ -16,6 +16,7 @@
 import logging
 import numpy
 from spinn_utilities.overrides import overrides
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
@@ -31,7 +32,8 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
     __slots__ = [
         "__allow_self_connections"]
 
-    def __init__(self, allow_self_connections=True, safe=True, verbose=None):
+    def __init__(self, allow_self_connections=True, safe=True, callback=None,
+                 verbose=None):
         """
         :param allow_self_connections:
             if the connector is used to connect a\
@@ -40,7 +42,7 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
             Population.
         :type allow_self_connections: bool
         """
-        super(AllToAllConnector, self).__init__(safe, verbose)
+        super(AllToAllConnector, self).__init__(safe, callback, verbose)
         self.__allow_self_connections = allow_self_connections
 
     def _connection_slices(self, pre_vertex_slice, post_vertex_slice):
@@ -157,4 +159,4 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
     @overrides(AbstractGenerateConnectorOnMachine.
                gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
-        return 4
+        return 1 * BYTES_PER_WORD

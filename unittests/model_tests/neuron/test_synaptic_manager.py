@@ -41,7 +41,19 @@ from spynnaker.pyNN.models.neural_projections import (
 from spynnaker.pyNN.models.neural_projections.connectors import (
     OneToOneConnector, AllToAllConnector)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    SynapseDynamicsStatic)
+    SynapseDynamicsStatic, SynapseDynamicsStructuralSTDP,
+    SynapseDynamicsSTDP, SynapseDynamicsStructuralStatic)
+from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
+    TimingDependenceSpikePair)
+from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
+    WeightDependenceAdditive, WeightDependenceMultiplicative)
+from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
+    .partner_selection import LastNeuronSelection, RandomSelection
+from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
+    .formation import DistanceDependentFormation
+from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
+    .elimination import RandomByWeightElimination
+from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from unittests.mocks import MockSimulator
 
 
@@ -193,7 +205,7 @@ class TestSynapticManager(unittest.TestCase):
 
     def test_write_synaptic_matrix_and_master_population_table(self):
         MockSimulator.setup()
-        # Add an sdram so maxsdram is high enough
+        # Add an sdram so max SDRAM is high enough
         SDRAM(10000)
 
         default_config_paths = os.path.join(
@@ -378,6 +390,168 @@ class TestSynapticManager(unittest.TestCase):
             post_vertex_slice.n_atoms * pre_vertex_slice.n_atoms
         assert all([conn["weight"] == 4.5 for conn in connections_3])
         assert all([conn["delay"] == 4.0 for conn in connections_3])
+
+    def test_set_synapse_dynamics(self):
+        MockSimulator.setup()
+        default_config_paths = os.path.join(
+            os.path.dirname(abstract_spinnaker_common.__file__),
+            AbstractSpiNNakerCommon.CONFIG_FILE_NAME)
+        config = conf_loader.load_config(
+            AbstractSpiNNakerCommon.CONFIG_FILE_NAME, default_config_paths)
+        synaptic_manager = SynapticManager(
+            n_synapse_types=2, ring_buffer_sigma=5.0,
+            spikes_per_second=100.0, config=config)
+
+        static = SynapseDynamicsStatic()
+        stdp = SynapseDynamicsSTDP(
+            timing_dependence=TimingDependenceSpikePair(),
+            weight_dependence=WeightDependenceAdditive())
+        alt_stdp = SynapseDynamicsSTDP(
+            timing_dependence=TimingDependenceSpikePair(),
+            weight_dependence=WeightDependenceMultiplicative())
+        static_struct = SynapseDynamicsStructuralStatic(
+            partner_selection=LastNeuronSelection(),
+            formation=DistanceDependentFormation(),
+            elimination=RandomByWeightElimination(0.5))
+        alt_static_struct = SynapseDynamicsStructuralStatic(
+            partner_selection=RandomSelection(),
+            formation=DistanceDependentFormation(),
+            elimination=RandomByWeightElimination(0.5))
+        stdp_struct = SynapseDynamicsStructuralSTDP(
+            partner_selection=LastNeuronSelection(),
+            formation=DistanceDependentFormation(),
+            elimination=RandomByWeightElimination(0.5),
+            timing_dependence=TimingDependenceSpikePair(),
+            weight_dependence=WeightDependenceAdditive())
+        alt_stdp_struct = SynapseDynamicsStructuralSTDP(
+            partner_selection=RandomSelection(),
+            formation=DistanceDependentFormation(),
+            elimination=RandomByWeightElimination(0.5),
+            timing_dependence=TimingDependenceSpikePair(),
+            weight_dependence=WeightDependenceAdditive())
+        alt_stdp_struct_2 = SynapseDynamicsStructuralSTDP(
+            partner_selection=LastNeuronSelection(),
+            formation=DistanceDependentFormation(),
+            elimination=RandomByWeightElimination(0.5),
+            timing_dependence=TimingDependenceSpikePair(),
+            weight_dependence=WeightDependenceMultiplicative())
+
+        # This should be fine as it is the first call
+        synaptic_manager.synapse_dynamics = static
+
+        # This should be fine as STDP overrides static
+        synaptic_manager.synapse_dynamics = stdp
+
+        # This should fail because STDP dependences are difference
+        with self.assertRaises(SynapticConfigurationException):
+            synaptic_manager.synapse_dynamics = alt_stdp
+
+        # This should work because STDP dependences are the same
+        synaptic_manager.synapse_dynamics = stdp
+
+        # This should work because static always works, but the type should
+        # still be STDP
+        synaptic_manager.synapse_dynamics = static
+        self.assertIsInstance(
+            synaptic_manager.synapse_dynamics, SynapseDynamicsSTDP)
+
+        # This should work but should merge with the STDP rule
+        synaptic_manager.synapse_dynamics = static_struct
+        self.assertIsInstance(
+            synaptic_manager.synapse_dynamics, SynapseDynamicsStructuralSTDP)
+
+        # These should work as static / the STDP is the same but neither should
+        # change anything
+        synaptic_manager.synapse_dynamics = static
+        self.assertIsInstance(
+            synaptic_manager.synapse_dynamics, SynapseDynamicsStructuralSTDP)
+        synaptic_manager.synapse_dynamics = stdp
+        self.assertIsInstance(
+            synaptic_manager.synapse_dynamics, SynapseDynamicsStructuralSTDP)
+        synaptic_manager.synapse_dynamics = static_struct
+        self.assertIsInstance(
+            synaptic_manager.synapse_dynamics, SynapseDynamicsStructuralSTDP)
+
+        # These should fail as things are different
+        with self.assertRaises(SynapticConfigurationException):
+            synaptic_manager.synapse_dynamics = alt_static_struct
+        with self.assertRaises(SynapticConfigurationException):
+            synaptic_manager.synapse_dynamics = alt_stdp
+
+        # This should pass as same structural STDP
+        synaptic_manager.synapse_dynamics = stdp_struct
+        self.assertIsInstance(
+            synaptic_manager.synapse_dynamics, SynapseDynamicsStructuralSTDP)
+
+        # These should fail as both different
+        with self.assertRaises(SynapticConfigurationException):
+            synaptic_manager.synapse_dynamics = alt_stdp_struct
+        with self.assertRaises(SynapticConfigurationException):
+            synaptic_manager.synapse_dynamics = alt_stdp_struct_2
+
+        # Try starting again to get a couple more combinations
+        synaptic_manager = SynapticManager(
+            n_synapse_types=2, ring_buffer_sigma=5.0,
+            spikes_per_second=100.0, config=config)
+
+        # STDP followed by structural STDP should result in Structural STDP
+        synaptic_manager.synapse_dynamics = stdp
+        synaptic_manager.synapse_dynamics = stdp_struct
+        self.assertIsInstance(
+            synaptic_manager.synapse_dynamics, SynapseDynamicsStructuralSTDP)
+
+        # ... and should fail here because of differences
+        with self.assertRaises(SynapticConfigurationException):
+            synaptic_manager.synapse_dynamics = alt_stdp
+        with self.assertRaises(SynapticConfigurationException):
+            synaptic_manager.synapse_dynamics = alt_static_struct
+        with self.assertRaises(SynapticConfigurationException):
+            synaptic_manager.synapse_dynamics = alt_stdp_struct
+        with self.assertRaises(SynapticConfigurationException):
+            synaptic_manager.synapse_dynamics = alt_stdp_struct_2
+
+        # One more time!
+        synaptic_manager = SynapticManager(
+            n_synapse_types=2, ring_buffer_sigma=5.0,
+            spikes_per_second=100.0, config=config)
+
+        # Static followed by static structural should result in static
+        # structural
+        synaptic_manager.synapse_dynamics = static
+        synaptic_manager.synapse_dynamics = static_struct
+        self.assertIsInstance(
+            synaptic_manager.synapse_dynamics, SynapseDynamicsStructuralStatic)
+
+        # ... and should fail here because of differences
+        with self.assertRaises(SynapticConfigurationException):
+            synaptic_manager.synapse_dynamics = alt_static_struct
+        with self.assertRaises(SynapticConfigurationException):
+            synaptic_manager.synapse_dynamics = alt_stdp_struct
+
+        # This should be fine
+        synaptic_manager.synapse_dynamics = static
+
+        # This should be OK, but should merge with STDP (opposite of above)
+        synaptic_manager.synapse_dynamics = stdp
+        self.assertIsInstance(
+            synaptic_manager.synapse_dynamics, SynapseDynamicsStructuralSTDP)
+
+        # ... and now these should fail
+        with self.assertRaises(SynapticConfigurationException):
+            synaptic_manager.synapse_dynamics = alt_stdp
+        with self.assertRaises(SynapticConfigurationException):
+            synaptic_manager.synapse_dynamics = alt_static_struct
+        with self.assertRaises(SynapticConfigurationException):
+            synaptic_manager.synapse_dynamics = alt_stdp_struct
+        with self.assertRaises(SynapticConfigurationException):
+            synaptic_manager.synapse_dynamics = alt_stdp_struct_2
+
+        # OK, just one more, honest
+        synaptic_manager = SynapticManager(
+            n_synapse_types=2, ring_buffer_sigma=5.0,
+            spikes_per_second=100.0, config=config)
+        synaptic_manager.synapse_dynamics = static_struct
+        synaptic_manager.synapse_dynamics = stdp_struct
 
 
 if __name__ == "__main__":

@@ -38,7 +38,6 @@ void neuron_do_timestep_update( // EXPORTED
 
     // Set up an array for storing the matrix recorded variable values
     uint32_t n_matrix_vars = neuron_recording_get_n_recorded_vars() - 1;
-    log_info("n_matrix_vars: %u", n_matrix_vars);
     state_t recorded_variable_values[n_matrix_vars];
 
     // update each neuron individually

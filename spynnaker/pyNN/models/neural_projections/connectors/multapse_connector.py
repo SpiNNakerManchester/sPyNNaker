@@ -19,6 +19,7 @@ import numpy.random
 from six import raise_from
 from spinn_utilities.abstract_base import abstractmethod
 from spinn_utilities.overrides import overrides
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.exceptions import SpynnakerException
 from .abstract_connector import AbstractConnector
@@ -44,8 +45,8 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
         "__with_replacement"]
 
     def __init__(self, num_synapses, allow_self_connections=True,
-                 with_replacement=True, safe=True, verbose=False,
-                 rng=None):
+                 with_replacement=True, safe=True, callback=None,
+                 verbose=False, rng=None):
         """
         :param num_synapses:
             This is the total number of synapses in the connection.
@@ -57,7 +58,7 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
             When selecting, allow a neuron to be re-selected or not.
         :type with_replacement: bool
         """
-        super(MultapseConnector, self).__init__(safe, verbose)
+        super(MultapseConnector, self).__init__(safe, callback, verbose)
         self.__num_synapses = num_synapses
         self.__allow_self_connections = allow_self_connections
         self.__with_replacement = with_replacement
@@ -174,7 +175,7 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
             chosen = numpy.random.choice(
                 pairs.shape[0], size=n_connections,
                 replace=self.__with_replacement)
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-except
             raise_from(SpynnakerException(
                 "MultapseConnector: The number of connections is too large "
                 "for sampling without replacement; "
@@ -222,4 +223,4 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
     @overrides(AbstractGenerateConnectorOnMachine.
                gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
-        return 16 + 16
+        return (4 + 4) * BYTES_PER_WORD

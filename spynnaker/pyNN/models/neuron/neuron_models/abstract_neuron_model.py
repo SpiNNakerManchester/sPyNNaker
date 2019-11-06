@@ -17,6 +17,7 @@ import numpy
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.neuron.implementations import (
     AbstractStandardNeuronComponent, Struct)
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
 
 class AbstractNeuronModel(AbstractStandardNeuronComponent):
@@ -49,13 +50,15 @@ class AbstractNeuronModel(AbstractStandardNeuronComponent):
     def get_dtcm_usage_in_bytes(self, n_neurons):
         usage = super(AbstractNeuronModel, self).get_dtcm_usage_in_bytes(
             n_neurons)
-        return usage + (self.__global_struct.get_size_in_whole_words() * 4)
+        return usage + (self.__global_struct.get_size_in_whole_words() *
+                        BYTES_PER_WORD)
 
     @overrides(AbstractStandardNeuronComponent.get_sdram_usage_in_bytes)
     def get_sdram_usage_in_bytes(self, n_neurons):
         usage = super(AbstractNeuronModel, self).get_sdram_usage_in_bytes(
             n_neurons)
-        return usage + (self.__global_struct.get_size_in_whole_words() * 4)
+        return usage + (self.__global_struct.get_size_in_whole_words() *
+                        BYTES_PER_WORD)
 
     def get_global_values(self):
         """ Get the global values to be written to the machine for this model
@@ -78,6 +81,7 @@ class AbstractNeuronModel(AbstractStandardNeuronComponent):
             self, data, offset, vertex_slice, parameters, state_variables):
 
         # Assume that the global data doesn't change
-        offset += (self.__global_struct.get_size_in_whole_words() * 4)
+        offset += (self.__global_struct.get_size_in_whole_words() *
+                   BYTES_PER_WORD)
         return super(AbstractNeuronModel, self).read_data(
             data, offset, vertex_slice, parameters, state_variables)

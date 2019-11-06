@@ -90,7 +90,7 @@ class PyNNProjectionCommon(object):
         # round the delays to multiples of full timesteps
         # (otherwise SDRAM estimation calculations can go wrong)
         if not get_simulator().is_a_pynn_random(synapse_dynamics_stdp.delay):
-            synapse_dynamics_stdp.delay = (
+            synapse_dynamics_stdp.set_delay(
                 numpy.rint(
                     numpy.array(synapse_dynamics_stdp.delay) *
                     (MICRO_TO_MILLISECOND_CONVERSION / machine_time_step)) *

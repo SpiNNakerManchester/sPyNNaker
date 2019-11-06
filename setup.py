@@ -15,10 +15,7 @@
 
 import os
 from setuptools import setup
-try:
-    from collections.abc import defaultdict
-except ImportError:
-    from collections import defaultdict
+from collections import defaultdict
 
 __version__ = None
 exec(open("spynnaker/_version.py").read())

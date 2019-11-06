@@ -37,7 +37,7 @@ class RangedDictVertexSlice(object):
     def __setitem__(self, key, value):
         ranged_list_vertex_slice = _RangedListVertexSlice(
             self.__ranged_dict[key], self.__vertex_slice)
-        ranged_list_vertex_slice.__setitem__(value)
+        ranged_list_vertex_slice.set_item(value)
 
 
 class _RangedListVertexSlice(object):
@@ -50,8 +50,7 @@ class _RangedListVertexSlice(object):
         self.__ranged_list = ranged_list
         self.__vertex_slice = vertex_slice
 
-    def __setitem__(self, value):
-
+    def set_item(self, value):
         if is_singleton(value):
             self.__ranged_list.set_value_by_slice(
                 self.__vertex_slice.lo_atom, self.__vertex_slice.hi_atom,
