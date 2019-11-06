@@ -299,7 +299,7 @@ class NeuronRecorder(object):
                 return True
         return False
 
-    def recorded_region_ids(self, vertex_slice):
+    def recorded_ids_by_slice(self, vertex_slice):
         return [_id
                 for _id, variable in enumerate(self.__sampling_rates.keys())
                 if self._is_recording(variable, vertex_slice)]

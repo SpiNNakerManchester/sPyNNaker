@@ -249,7 +249,8 @@ class AbstractPopulationVertex(
             constraints=None):
 
         self.__n_subvertices += 1
-        recorded_region_ids = self.__neuron_recorder.recorded_region_ids(vertex_slice)
+        recorded_region_ids = self.__neuron_recorder.recorded_ids_by_slice(
+            vertex_slice)
         return PopulationMachineVertex(
             resources_required, recorded_region_ids,
             label, constraints)
