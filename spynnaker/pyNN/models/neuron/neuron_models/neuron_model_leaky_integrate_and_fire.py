@@ -101,6 +101,7 @@ class NeuronModelLeakyIntegrateAndFire(AbstractNeuronModel):
     @inject_items({"ts": "MachineTimeStep"})
     @overrides(AbstractNeuronModel.get_values, additional_arguments={'ts'})
     def get_values(self, parameters, state_variables, vertex_slice, ts):
+        # pylint: disable=arguments-differ
 
         # Add the rest of the data
         return [state_variables[V], parameters[V_REST],

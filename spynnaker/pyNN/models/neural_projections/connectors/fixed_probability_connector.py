@@ -23,6 +23,7 @@ from spynnaker.pyNN.utilities import utility_calls
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
 
 class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
@@ -35,7 +36,7 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
 
     def __init__(
             self, p_connect, allow_self_connections=True, safe=True,
-            verbose=False, rng=None):
+            callback=None, verbose=False, rng=None):
         """
         :param p_connect:
             a float between zero and one. Each potential connection is created\
@@ -50,7 +51,8 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
             a Space object, needed if you wish to specify distance-dependent\
             weights or delays - not implemented
         """
-        super(FixedProbabilityConnector, self).__init__(safe, verbose)
+        super(FixedProbabilityConnector, self).__init__(
+            safe, callback, verbose)
         self._p_connect = p_connect
         self.__allow_self_connections = allow_self_connections
         self._rng = rng
@@ -158,4 +160,4 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
     @overrides(AbstractGenerateConnectorOnMachine.
                gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
-        return 8 + 16
+        return (2 + 4) * BYTES_PER_WORD

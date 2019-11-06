@@ -15,8 +15,6 @@
 
 import logging
 from spinn_front_end_common.utility_models import MultiCastCommand
-from spinnman.messages.eieio.data_messages import (
-    EIEIODataMessage, KeyDataElement, KeyPayloadDataElement)
 from spinn_front_end_common.utilities.connections import LiveEventConnection
 
 logger = logging.getLogger(__name__)
@@ -26,7 +24,7 @@ class EthernetControlConnection(LiveEventConnection):
     """ A connection that can translate Ethernet control messages received\
         from a Population
     """
-    __slots__ = ["__translator"]
+    __slots__ = ["__translators"]
 
     def __init__(
             self, translator, label, live_packet_gather_label, local_host=None,
@@ -39,17 +37,18 @@ class EthernetControlConnection(LiveEventConnection):
         super(EthernetControlConnection, self).__init__(
             live_packet_gather_label, receive_labels=[label],
             local_host=local_host, local_port=local_port)
-        self.__translator = translator
+        self.__translators = dict()
+        self.__translators[label] = translator
+        self.add_receive_callback(label, self._translate, translate_key=False)
 
-    def _receive_packet_callback(self, packet):
-        if isinstance(packet, EIEIODataMessage):
-            while packet.is_next_element:
-                self._translate(packet.next_element)
+    def add_translator(self, label, translator):
+        super(EthernetControlConnection, self).add_receive_label(label)
+        self.__translators[label] = translator
+        self.add_receive_callback(label, self._translate, translate_key=False)
 
-    def _translate(self, element):
-        if isinstance(element, KeyDataElement):
-            self.__translator.translate_control_packet(
-                MultiCastCommand(element.key))
-        elif isinstance(element, KeyPayloadDataElement):
-            self.__translator.translate_control_packet(
-                MultiCastCommand(element.key, element.payload))
+    def _translate(self, label, key, payload=None):
+        translator = self.__translators[label]
+        if payload is None:
+            translator.translate_control_packet(MultiCastCommand(key))
+        else:
+            translator.translate_control_packet(MultiCastCommand(key, payload))

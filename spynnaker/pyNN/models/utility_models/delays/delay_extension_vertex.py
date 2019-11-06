@@ -13,10 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-try:
-    from collections.abc import defaultdict
-except ImportError:
-    from collections import defaultdict
+from collections import defaultdict
 import logging
 import math
 from spinn_utilities.overrides import overrides
@@ -33,7 +30,7 @@ from spinn_front_end_common.abstract_models import (
     AbstractProvidesOutgoingPartitionConstraints, AbstractHasAssociatedBinary)
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities.constants import (
-    SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES)
+    SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES, BYTES_PER_WORD)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from .delay_block import DelayBlock
 from .delay_extension_machine_vertex import DelayExtensionMachineVertex
@@ -50,7 +47,7 @@ logger = logging.getLogger(__name__)
 _DELAY_PARAM_HEADER_WORDS = 8
 # pylint: disable=protected-access
 _DELEXT_REGIONS = DelayExtensionMachineVertex._DELAY_EXTENSION_REGIONS
-_EXPANDER_BASE_PARAMS_SIZE = 3 * 4
+_EXPANDER_BASE_PARAMS_SIZE = 3 * BYTES_PER_WORD
 
 # The microseconds per timestep will be divided by this for the max offset
 _MAX_OFFSET_DENOMINATOR = 10
@@ -122,6 +119,7 @@ class DelayExtensionVertex(
     @overrides(ApplicationVertex.get_resources_used_by_atoms,
                additional_arguments={"graph"})
     def get_resources_used_by_atoms(self, vertex_slice, graph):
+        # pylint: disable=arguments-differ
         out_edges = graph.get_edges_starting_at_vertex(self)
         return ResourceContainer(
             sdram=ConstantSDRAM(
@@ -167,7 +165,7 @@ class DelayExtensionVertex(
             max_stage, machine_time_step):
         """ Add delays for a connection to be generated
         """
-        key = (pre_vertex_slice.lo_atom, pre_vertex_slice.hi_atom)
+        key = (post_vertex_slice.lo_atom, post_vertex_slice.hi_atom)
         self.__delay_generator_data[key].append(
             DelayGeneratorData(
                 max_row_n_synapses, max_delayed_row_n_synapses,
@@ -198,9 +196,11 @@ class DelayExtensionVertex(
         # ###################################################################
         # Reserve SDRAM space for memory areas:
         vertex_slice = graph_mapper.get_slice(vertex)
-        n_words_per_stage = int(math.ceil(vertex_slice.n_atoms / 32.0))
-        delay_params_sz = 4 * (_DELAY_PARAM_HEADER_WORDS +
-                               (self.__n_delay_stages * n_words_per_stage))
+        n_words_per_stage = int(math.ceil(
+            vertex_slice.n_atoms / float(8 * BYTES_PER_WORD)))
+        delay_params_sz = BYTES_PER_WORD * (
+            _DELAY_PARAM_HEADER_WORDS +
+            (self.__n_delay_stages * n_words_per_stage))
 
         spec.reserve_memory_region(
             region=_DELEXT_REGIONS.SYSTEM.value,
@@ -381,7 +381,8 @@ class DelayExtensionVertex(
 
     def get_dtcm_usage_for_atoms(self, vertex_slice):
         n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
-        return (44 + (16 * 4)) * n_atoms
+        words_per_atom = 11 + 16
+        return words_per_atom * BYTES_PER_WORD * n_atoms
 
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
     def get_binary_file_name(self):

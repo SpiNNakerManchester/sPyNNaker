@@ -127,13 +127,7 @@ static inline update_state_t timing_apply_pre_spike(
 
         log_debug("\tTime_since_last_post_event=%u", time_since_last_post);
 
-        if (time_since_last_post == 0) {
-            // If pre-synaptic spike occured at the same time, ignore it
-            log_debug("\t\tIgnoring coinciding spikes");
-
-            // Transition back to idle
-            previous_state.state = STATE_IDLE;
-        } else if (timing_recurrent_in_post_window(
+        if (timing_recurrent_in_post_window(
                 time_since_last_post, previous_state)) {
             // Otherwise, if post-window is still open
             if (previous_state.accumulator >
