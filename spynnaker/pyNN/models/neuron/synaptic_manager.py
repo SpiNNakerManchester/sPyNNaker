@@ -524,8 +524,6 @@ class SynapticManager(object):
                     max_weights[synapse_type], biggest_weight[synapse_type])
             # This is to deal with very small weights that are floored to 0
             mmw = 2**math.floor(math.log(min_max_weight[synapse_type], 2))
-            print("max_weights[", synapse_type, "]", max_weights[synapse_type],
-                  "mmw", mmw)
             max_weights[synapse_type] = min(mmw * 2 ** 15,
                                             max_weights[synapse_type])
 
