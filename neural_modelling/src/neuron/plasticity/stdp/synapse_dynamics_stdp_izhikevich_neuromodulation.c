@@ -231,11 +231,11 @@ static inline void correlation_apply_pre_spike(
 // Synapse update loop
 //---------------------------------------
 static inline plastic_synapse_t plasticity_update_synapse(
-    uint32_t time,
+    const uint32_t time,
     const uint32_t last_pre_time, const pre_trace_t last_pre_trace,
     const pre_trace_t new_pre_trace, const uint32_t delay_dendritic,
     const uint32_t delay_axonal, plastic_synapse_t *current_state,
-    post_event_history_t *post_event_history) {
+    const post_event_history_t *post_event_history) {
 
     // Apply axonal delay to time of last presynaptic spike
     const uint32_t delayed_last_pre_time = last_pre_time + delay_axonal;
@@ -244,10 +244,10 @@ static inline plastic_synapse_t plasticity_update_synapse(
     const uint32_t window_begin_time =
     	(delayed_last_pre_time >= delay_dendritic)
 		? (delayed_last_pre_time - delay_dendritic) : 0;
-    const uint32_t window_end_time = time + delay_axonal - delay_dendritic;
-//    const uint32_t window_end_time =
-//    	(delayed_pre_time >= delay_dendritic)
-//		? (delayed_pre_time - delay_dendritic) : 0;
+    const uint32_t delayed_pre_time = time + delay_axonal;
+    const uint32_t window_end_time =
+    	(delayed_pre_time >= delay_dendritic)
+		? (delayed_pre_time - delay_dendritic) : 0;
     post_event_window_t post_window = post_events_get_window_delayed(
         post_event_history, window_begin_time, window_end_time);
 
@@ -279,7 +279,7 @@ static inline plastic_synapse_t plasticity_update_synapse(
         post_window = post_events_next_delayed(post_window, delayed_post_time);
     }
 
-    const uint32_t delayed_pre_time = time + delay_axonal;
+//    const uint32_t delayed_pre_time = time + delay_axonal;
 
     correlation_apply_pre_spike(
         delayed_pre_time, new_pre_trace,
