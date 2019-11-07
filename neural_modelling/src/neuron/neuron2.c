@@ -22,6 +22,7 @@
  */
 
 #include "neuron_base.h"
+#include "implementations/neuron_impl2.h"
 
 //! \executes all the updates to neural parameters when a given timer period
 //! has occurred.
@@ -36,8 +37,7 @@ void neuron_do_timestep_update( // EXPORTED
     neuron_recording_wait_to_complete();
     neuron_recording_setup_for_next_recording();
 
-    uint32_t n_matrix_vars = neuron_recording_get_n_recorded_vars() - 1;
-    log_info("n_matrix_vars: %u", n_matrix_vars);
+    state_t recorded_variable_values[2];
 
     // update each neuron individually
     for (index_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {

@@ -17,13 +17,13 @@
 
 /*! \file
  *
- * \brief implementation of the neuron.h interface except neuron_do_timestep_update
+ * \brief implementation of the neuron.h interface.
  *
  */
 
 #include "neuron.h"
 #include "neuron_recording.h"
-#include "implementations/neuron_impl.h"
+#include "implementations/neuron_impl_base_api.h"
 #include "plasticity/synapse_dynamics.h"
 #include <debug.h>
 
@@ -89,7 +89,7 @@ bool neuron_reload_neuron_parameters(address_t address) { // EXPORTED
 bool neuron_initialise(address_t address, uint32_t *n_neurons_value, // EXPORTED
         uint32_t *n_synapse_types_value, uint32_t *incoming_spike_buffer_size,
         uint32_t *timer_offset) {
-    log_info("neuron_initialise: starting");
+    log_debug("neuron_initialise: starting");
     struct neuron_parameters *params = (void *) address;
 
     *timer_offset = params->timer_start_offset;

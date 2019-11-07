@@ -17,11 +17,12 @@
 
 /*! \file
  *
- * \brief implementation of the neuron.h interface's neuron_do_timestep_update
+ * \brief implementation of the neuron.h interface.
  *
  */
 
 #include "neuron_base.h"
+#include "implementations/neuron_impl.h"
 
 //! \executes all the updates to neural parameters when a given timer period
 //! has occurred.
