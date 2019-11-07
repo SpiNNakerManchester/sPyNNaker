@@ -39,8 +39,8 @@ class WeightDependenceERBP(
         return (
             (self.__w_min == weight_dependence.w_min) and
             (self.__w_max == weight_dependence.w_max) and
-            (self.__a_plus == weight_dependence.A_plus) and
-            (self.__a_minus == weight_dependence.A_minus))
+            (self.A_plus == weight_dependence.A_plus) and
+            (self.A_minus == weight_dependence.A_minus))
 
     @property
     def vertex_executable_suffix(self):

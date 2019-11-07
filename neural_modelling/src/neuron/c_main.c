@@ -292,19 +292,19 @@ void timer_callback(uint timer_count, uint unused) {
         return;
     }
 
-    // Do rewiring
-    if (rewiring &&
-            ((last_rewiring_time >= rewiring_period && !synaptogenesis_is_fast())
-                || synaptogenesis_is_fast())) {
-        last_rewiring_time = 0;
-        // put flag in spike processing to do synaptic rewiring
-        if (synaptogenesis_is_fast()) {
-            spike_processing_do_rewiring(rewiring_period);
-        } else {
-            spike_processing_do_rewiring(1);
-        }
-        count_rewires++;
-    }
+//    // Do rewiring
+//    if (rewiring &&
+//            ((last_rewiring_time >= rewiring_period && !synaptogenesis_is_fast())
+//                || synaptogenesis_is_fast())) {
+//        last_rewiring_time = 0;
+//        // put flag in spike processing to do synaptic rewiring
+////        if (synaptogenesis_is_fast()) {
+////            spike_processing_do_rewiring(rewiring_period);
+////        } else {
+////            spike_processing_do_rewiring(1);
+////        }
+////        count_rewires++;
+//    }
     // otherwise do synapse and neuron time step updates
     synapses_do_timestep_update(time);
     neuron_do_timestep_update(time, timer_count, timer_period);

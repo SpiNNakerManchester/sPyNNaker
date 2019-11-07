@@ -70,7 +70,7 @@ class TimingDependenceERBP(AbstractTimingDependence):
 
     @overrides(AbstractTimingDependence.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(self):
-        print("len table : {}".format(len(self.__tau_plus_data)))
+        #print("len table : {}".format(len(self.__tau_plus_data)))
 
         return (4 * len(self.__tau_plus_data)) + 4  # 4 is for is_readout flag
     #(LOOKUP_TAU_PLUS_SIZE + LOOKUP_TAU_MINUS_SIZE) \
