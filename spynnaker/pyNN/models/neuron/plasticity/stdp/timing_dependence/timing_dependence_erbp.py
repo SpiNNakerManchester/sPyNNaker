@@ -37,7 +37,6 @@ class TimingDependenceERBP(AbstractTimingDependence):
 
         ts = get_simulator().machine_time_step / 1000.
         self.__tau_plus_data = get_exp_lut_array(ts, self.__tau_plus, size=LOOKUP_TAU_PLUS_SIZE)
-        print("len after creation of table : {}".format(len(self.__tau_plus_data)))
         # provenance data
         self.__tau_plus_last_entry = None
         self.__tau_minus_last_entry = None
@@ -88,6 +87,13 @@ class TimingDependenceERBP(AbstractTimingDependence):
             raise NotImplementedError(
                 "STDP LUT generation currently only supports 1ms timesteps")
 
+        # print("Is readout val: {}".format(int(self.__is_readout)))
+        spec.write_value(
+                data=int(self.__is_readout),
+                data_type=DataType.INT32)
+
+
+
 #         # Write lookup tables
 #         self._tau_plus_last_entry = plasticity_helpers.write_exp_lut(
 #             spec, self.__tau_plus, LOOKUP_TAU_PLUS_SIZE,
@@ -97,10 +103,6 @@ class TimingDependenceERBP(AbstractTimingDependence):
 #             spec, self._tau_minus, LOOKUP_TAU_MINUS_SIZE,
 #             LOOKUP_TAU_MINUS_SHIFT)
 
-        print("Is readout val: {}".format(int(self.__is_readout)))
-        spec.write_value(
-                data=int(self.__is_readout),
-                data_type=DataType.INT32)
 
     @property
     def synaptic_structure(self):

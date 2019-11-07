@@ -69,6 +69,12 @@ typedef struct {
 
 post_event_history_t *post_event_history;
 
+typedef struct stdp_params {
+    uint32_t backprop_delay;
+} stdp_params;
+
+static stdp_params params;
+
 //---------------------------------------
 // Synapse update loop
 //---------------------------------------
@@ -232,6 +238,13 @@ static inline index_t _sparse_axonal_delay(uint32_t x) {
 address_t synapse_dynamics_initialise(
         address_t address, uint32_t n_neurons, uint32_t n_synapse_types,
         uint32_t *ring_buffer_to_input_buffer_left_shifts) {
+
+
+	// This is to advance the memory pointer past the newly added back-prop delay parameter
+    stdp_params *sdram_params = (stdp_params *) address;
+    spin1_memcpy(&params, sdram_params, sizeof(stdp_params));
+    address = (address_t) &sdram_params[1];
+
 
     // Load timing dependence data
     address_t weight_region_address = timing_initialise(address);
