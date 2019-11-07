@@ -22,6 +22,7 @@
  */
 
 #include "neuron_base.h"
+#include "implementations/neuron_impl.h"
 
 //! \executes all the updates to neural parameters when a given timer period
 //! has occurred.

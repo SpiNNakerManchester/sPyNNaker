@@ -23,7 +23,7 @@
 
 #include "neuron.h"
 #include "neuron_recording.h"
-#include "implementations/neuron_impl.h"
+#include "implementations/neuron_impl_base_api.h"
 #include "plasticity/synapse_dynamics.h"
 #include <debug.h>
 
