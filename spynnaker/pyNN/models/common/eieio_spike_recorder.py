@@ -75,8 +75,16 @@ class EIEIOSpikeRecorder(object):
             placement = placements.get_placement_of_vertex(vertex)
             vertex_slice = graph_mapper.get_slice(vertex)
 
-            n_buffer_times = sum(len(i) for i in vertex.send_buffer_times)
             # Read the spikes
+            n_buffer_times = 0
+            if vertex.send_buffer_times is not None:
+                for i in vertex.send_buffer_times:
+                    if hasattr(i, "__len__"):
+                        n_buffer_times += len(i)
+                    else:
+                        # assuming this is must be a single integer
+                        n_buffer_times += 1
+
             if (n_buffer_times > 0):
                 raw_spike_data, data_missing = \
                     buffer_manager.get_data_by_placement(placement, region)
