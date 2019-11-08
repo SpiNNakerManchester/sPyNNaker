@@ -82,7 +82,7 @@ class EIEIOSpikeRecorder(object):
                     if hasattr(i, "__len__"):
                         n_buffer_times += len(i)
                     else:
-                        # assuming this is must be a single integer
+                        # assuming this must be a single integer
                         n_buffer_times += 1
 
             if (n_buffer_times > 0):
