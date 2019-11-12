@@ -271,7 +271,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
         # Again as above this is something of a cop-out and we can
         # probably do better
         return numpy.clip(
-            self._kernel_h * self._kernel_w * self.n_pre_neurons(synapse_info),
+            self._kernel_h * self._kernel_w * synapse_info.n_pre_neurons,
             0, 255)
 
     @overrides(AbstractConnector.get_weight_maximum)

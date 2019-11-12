@@ -40,8 +40,8 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, delays, synapse_info):
         return self._get_delay_maximum(
-            delays, max((self.n_pre_neurons(synapse_info),
-                         self.n_post_neurons(synapse_info))))
+            delays, max((synapse_info.n_pre_neurons,
+                         synapse_info.n_post_neurons)))
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
@@ -73,8 +73,8 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, weights, synapse_info):
         return self._get_weight_maximum(
-            weights, max((self.n_pre_neurons(synapse_info),
-                          self.n_post_neurons(synapse_info))))
+            weights, max((synapse_info.n_pre_neurons,
+                          synapse_info.n_post_neurons)))
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
@@ -109,10 +109,10 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
 
     def _get_pre_post_limits(
             self, pre_vertex_slice, post_vertex_slice, synapse_info):
-        if self.prepop_is_view(synapse_info):
+        if synapse_info.prepop_is_view:
             # work out which atoms are on this pre-slice
             view_lo, view_hi = self._get_view_lo_hi(
-                self.pre_population(synapse_info)._indexes)
+                synapse_info.pre_population._indexes)
             if ((view_lo > pre_vertex_slice.lo_atom) and
                     (view_lo < pre_vertex_slice.hi_atom)):
                 pre_lo = view_lo
@@ -127,10 +127,10 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
             pre_lo = pre_vertex_slice.lo_atom
             pre_hi = pre_vertex_slice.hi_atom
 
-        if self.postpop_is_view(synapse_info):
+        if synapse_info.postpop_is_view:
             # work out which atoms are on this post-slice
             view_lo, view_hi = self._get_view_lo_hi(
-                self.post_population(synapse_info)._indexes)
+                synapse_info.post_population._indexes)
             if ((view_lo > post_vertex_slice.lo_atom) and
                     (view_lo < post_vertex_slice.hi_atom)):
                 post_lo = view_lo
@@ -154,8 +154,7 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
 
     @overrides(AbstractConnector.use_direct_matrix)
     def use_direct_matrix(self, synapse_info):
-        if self.prepop_is_view(synapse_info) or self.postpop_is_view(
-                synapse_info):
+        if synapse_info.prepop_is_view or synapse_info.postpop_is_view:
             return False
         return True
 
@@ -172,18 +171,18 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
             synapse_type, synapse_info):
         params = []
         pre_view_lo = 0
-        pre_view_hi = self.n_pre_neurons(synapse_info) - 1
-        if self.prepop_is_view(synapse_info):
+        pre_view_hi = synapse_info.n_pre_neurons - 1
+        if synapse_info.prepop_is_view:
             pre_view_lo, pre_view_hi = self._get_view_lo_hi(
-                self.pre_population(synapse_info)._indexes)
+                synapse_info.pre_population._indexes)
 
         params.extend([pre_view_lo, pre_view_hi])
 
         post_view_lo = 0
-        post_view_hi = self.n_post_neurons(synapse_info) - 1
-        if self.postpop_is_view(synapse_info):
+        post_view_hi = synapse_info.n_post_neurons - 1
+        if synapse_info.postpop_is_view:
             post_view_lo, post_view_hi = self._get_view_lo_hi(
-                self.post_population(synapse_info)._indexes)
+                synapse_info.post_population._indexes)
 
         params.extend([post_view_lo, post_view_hi])
         return numpy.array(params, dtype="uint32")

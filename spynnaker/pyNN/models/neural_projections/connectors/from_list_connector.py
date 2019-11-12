@@ -173,8 +173,7 @@ class FromListConnector(AbstractConnector):
         # If here, there must be no delays in the list, so use the passed in
         # ones
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
-            delays, self.n_pre_neurons(
-                synapse_info) * self.n_post_neurons(synapse_info),
+            delays, synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             max_targets, min_delay, max_delay)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)

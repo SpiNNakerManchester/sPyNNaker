@@ -54,10 +54,9 @@ class CSAConnector(AbstractConnector):
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, delays, synapse_info):
-        n_connections_max = self.n_pre_neurons(
-            synapse_info) * self.n_post_neurons(synapse_info)
+        n_conns_max = synapse_info.n_pre_neurons * synapse_info.n_post_neurons
         # we can probably look at the array and do better than this?
-        return self._get_delay_maximum(delays, n_connections_max)
+        return self._get_delay_maximum(delays, n_conns_max)
 
     def _get_n_connections(self, pre_vertex_slice, post_vertex_slice,
                            synapse_info):
@@ -71,8 +70,8 @@ class CSAConnector(AbstractConnector):
         # this is where the magic needs to happen somehow
         if self.__full_cset is None:
             self.__full_cset = [x for x in csa.cross(
-                range(self.n_pre_neurons(synapse_info)),
-                range(self.n_post_neurons(synapse_info))) * self.__cset]
+                range(synapse_info.n_pre_neurons),
+                range(synapse_info.n_post_neurons)) * self.__cset]
 
         # use CSA to cross the range of this vertex's neurons with the cset
         pair_list = csa.cross(
@@ -97,20 +96,18 @@ class CSAConnector(AbstractConnector):
         n_connections_max = post_vertex_slice.n_atoms
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
-            delays, self.n_pre_neurons(
-                synapse_info) * self.n_post_neurons(synapse_info),
+            delays, synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             n_connections_max, min_delay, max_delay)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self, synapse_info):
-        n_connections_max = self.n_pre_neurons(synapse_info)
+        n_connections_max = synapse_info.n_pre_neurons
         return n_connections_max
 
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, weights, synapse_info):
-        n_connections_max = self.n_pre_neurons(
-            synapse_info) * self.n_post_neurons(synapse_info)
-        return self._get_weight_maximum(weights, n_connections_max)
+        n_conns_max = synapse_info.n_pre_neurons * synapse_info.n_post_neurons
+        return self._get_weight_maximum(weights, n_conns_max)
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(

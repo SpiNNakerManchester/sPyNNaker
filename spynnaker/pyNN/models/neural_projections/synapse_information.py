@@ -60,6 +60,14 @@ class SynapseInformation(object):
         return self.__post_population
 
     @property
+    def n_pre_neurons(self):
+        return self.__pre_population.size
+
+    @property
+    def n_post_neurons(self):
+        return self.__post_population.size
+
+    @property
     def prepop_is_view(self):
         return self.__prepop_is_view
 

@@ -392,23 +392,5 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
     def verbose(self, new_value):
         self.__verbose = new_value
 
-    def pre_population(self, synapse_info):
-        return synapse_info.pre_population
-
-    def post_population(self, synapse_info):
-        return synapse_info.post_population
-
-    def n_pre_neurons(self, synapse_info):
-        return synapse_info.pre_population.size
-
-    def n_post_neurons(self, synapse_info):
-        return synapse_info.post_population.size
-
-    def prepop_is_view(self, synapse_info):
-        return synapse_info.prepop_is_view
-
-    def postpop_is_view(self, synapse_info):
-        return synapse_info.postpop_is_view
-
     def use_direct_matrix(self, synapse_info):
         return False

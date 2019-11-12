@@ -116,11 +116,11 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
             self, delays, post_vertex_slice, synapse_info, min_delay=None,
             max_delay=None):
         prob_in_slice = (
-            float(post_vertex_slice.n_atoms) / float(self.n_post_neurons(
-                synapse_info)))
+            float(post_vertex_slice.n_atoms) / float(
+                synapse_info.n_post_neurons))
         max_in_slice = utility_calls.get_probable_maximum_selected(
             self.__num_synapses, self.__num_synapses, prob_in_slice)
-        prob_in_row = 1.0 / float(self.n_pre_neurons(synapse_info))
+        prob_in_row = 1.0 / float(synapse_info.n_pre_neurons)
         n_connections = utility_calls.get_probable_maximum_selected(
             self.__num_synapses, max_in_slice, prob_in_row)
 
@@ -128,14 +128,12 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
             return int(math.ceil(n_connections))
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
-            delays, self.n_pre_neurons(
-                synapse_info) * self.n_post_neurons(synapse_info),
+            delays, synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             n_connections, min_delay, max_delay)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self, synapse_info):
-        prob_of_choosing_post_atom = 1.0 / float(self.n_post_neurons(
-            synapse_info))
+        prob_of_choosing_post_atom = 1.0 / float(synapse_info.n_post_neurons)
         return utility_calls.get_probable_maximum_selected(
             self.__num_synapses, self.__num_synapses,
             prob_of_choosing_post_atom)

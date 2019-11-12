@@ -75,13 +75,13 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine):
         AbstractConnector.set_projection_information(
             self, rng, machine_time_step, synapse_info)
         if (not self.__with_replacement and
-                self.__n_post > self.n_post_neurons(synapse_info)):
+                self.__n_post > synapse_info.n_post_neurons):
             raise SpynnakerException(
                 "FixedNumberPostConnector will not work when "
                 "with_replacement=False and n > n_post_neurons")
         if (not self.__with_replacement and
                 not self.__allow_self_connections and
-                self.__n_post == self.n_post_neurons(synapse_info)):
+                self.__n_post == synapse_info.n_post_neurons):
             raise SpynnakerException(
                 "FixedNumberPostConnector will not work when "
                 "with_replacement=False, allow_self_connections=False "
@@ -89,42 +89,43 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine):
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, delays, synapse_info):
-        n_connections = self.n_pre_neurons(synapse_info) * self.__n_post
+        n_connections = synapse_info.n_pre_neurons * self.__n_post
         return self._get_delay_maximum(delays, n_connections)
 
     def _get_post_neurons(self, synapse_info):
         # If we haven't set the array up yet, do it now
         if not self.__post_neurons_set:
-            self.__post_neurons = [None] * self.n_pre_neurons(synapse_info)
+            self.__post_neurons = [None] * synapse_info.n_pre_neurons
             self.__post_neurons_set = True
 
             # if verbose open a file to output the connectivity
             if self.verbose:
-                filename = self.pre_population(synapse_info).label + \
-                    '_to_' + self.post_population(synapse_info).label + \
+                filename = synapse_info.pre_population.label + \
+                    '_to_' + synapse_info.post_population.label + \
                     '_fixednumberpost-conn.csv'
                 print('Output post-connectivity to ', filename)
                 with open(filename, 'w') as file_handle:
                     numpy.savetxt(file_handle,
-                                  [(self.n_pre_neurons(synapse_info),
-                                    self.n_post_neurons(synapse_info),
+                                  [(synapse_info.n_pre_neurons,
+                                    synapse_info.n_post_neurons,
                                     self.__n_post)],
                                   fmt="%u,%u,%u")
 
             # Loop over all the pre neurons
-            for m in range(0, self.n_pre_neurons(synapse_info)):
+            for m in range(0, synapse_info.n_pre_neurons):
                 if self.__post_neurons[m] is None:
 
                     # If the pre and post populations are the same
                     # then deal with allow_self_connections=False
-                    if (self.pre_population is self.post_population and
+                    if (synapse_info.pre_population is
+                            synapse_info.post_population and
                             not self.__allow_self_connections):
 
                         # Create a list without the pre_neuron in it
                         no_self_post_neurons = numpy.concatenate(
                             [numpy.arange(0, m),
                              numpy.arange(m + 1,
-                                          self.n_post_neurons(synapse_info))])
+                                          synapse_info.n_post_neurons)])
 
                         # Now use this list in the random choice
                         self.__post_neurons[m] = self._rng.choice(
@@ -132,7 +133,7 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine):
                             self.__with_replacement)
                     else:
                         self.__post_neurons[m] = self._rng.choice(
-                            self.n_post_neurons(synapse_info), self.__n_post,
+                            synapse_info.n_post_neurons, self.__n_post,
                             self.__with_replacement)
 
                     # If verbose then output the list connected to this
@@ -163,35 +164,32 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine):
         # pylint: disable=too-many-arguments
         prob_in_slice = (
             post_vertex_slice.n_atoms / float(
-                self.n_post_neurons(synapse_info)))
+                synapse_info.n_post_neurons))
         n_connections = utility_calls.get_probable_maximum_selected(
-            self.n_pre_neurons(
-                synapse_info) * self.n_post_neurons(synapse_info),
-            self.__n_post * self.n_pre_neurons(synapse_info), prob_in_slice,
+            synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
+            self.__n_post * synapse_info.n_pre_neurons, prob_in_slice,
             chance=1.0/100000.0)
 
         if min_delay is None or max_delay is None:
             return int(math.ceil(n_connections))
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
-            delays, self.n_post_neurons(
-                synapse_info) * self.n_pre_neurons(synapse_info),
+            delays, synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             n_connections, min_delay, max_delay)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self, synapse_info):
         # pylint: disable=too-many-arguments
-        selection_prob = 1.0 / float(self.n_post_neurons(synapse_info))
+        selection_prob = 1.0 / float(synapse_info.n_post_neurons)
         n_connections = utility_calls.get_probable_maximum_selected(
-            self.n_post_neurons(
-                synapse_info) * self.n_pre_neurons(synapse_info),
+            synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             self.__n_post, selection_prob,
             chance=1.0/100000.0)
         return int(math.ceil(n_connections))
 
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, weights, synapse_info):
-        n_connections = self.n_pre_neurons(synapse_info) * self.__n_post
+        n_connections = synapse_info.n_pre_neurons * self.__n_post
         return self._get_weight_maximum(weights, n_connections)
 
     @overrides(AbstractConnector.create_synaptic_block)
@@ -268,14 +266,13 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine):
         # Only deal with self-connections if the two populations are the same
         self_connections = True
         if ((not self.__allow_self_connections) and (
-                self.pre_population(synapse_info) is self.post_population(
-                    synapse_info))):
+                synapse_info.pre_population is synapse_info.post_population)):
             self_connections = False
         params = [
             self_connections,
             self.__with_replacement,
             self.__n_post,
-            self.n_post_neurons(synapse_info)]
+            synapse_info.n_post_neurons]
         params.extend(self.__post_connector_seed[key])
         return numpy.array(params, dtype="uint32")
 

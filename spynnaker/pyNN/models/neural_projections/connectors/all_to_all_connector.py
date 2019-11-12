@@ -49,7 +49,7 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
                            synapse_info):
         """ Get a slice of the overall set of connections.
         """
-        n_post_neurons = self.n_post_neurons(synapse_info)
+        n_post_neurons = synapse_info.n_post_neurons
         stop_atom = post_vertex_slice.hi_atom + 1
         if (not self.__allow_self_connections and
                 pre_vertex_slice is post_vertex_slice):
@@ -65,9 +65,7 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, delays, synapse_info):
         return self._get_delay_maximum(
-            delays,
-            self.n_pre_neurons(
-                synapse_info) * self.n_post_neurons(synapse_info))
+            delays, synapse_info.n_pre_neurons * synapse_info.n_post_neurons)
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
@@ -79,20 +77,18 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
             return post_vertex_slice.n_atoms
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
-            delays, self.n_pre_neurons(
-                synapse_info) * self.n_post_neurons(synapse_info),
+            delays, synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             post_vertex_slice.n_atoms, min_delay, max_delay)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self, synapse_info):
-        return self.n_pre_neurons(synapse_info)
+        return synapse_info.n_pre_neurons
 
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, weights, synapse_info):
         # pylint: disable=too-many-arguments
-        n_connections = self.n_pre_neurons(
-            synapse_info) * self.n_post_neurons(synapse_info)
-        return self._get_weight_maximum(weights, n_connections)
+        n_conns = synapse_info.n_pre_neurons * synapse_info.n_post_neurons
+        return self._get_weight_maximum(weights, n_conns)
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
@@ -164,18 +160,18 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
             synapse_type, synapse_info):
         params = []
         pre_view_lo = 0
-        pre_view_hi = self.n_pre_neurons(synapse_info) - 1
-        if self.prepop_is_view(synapse_info):
+        pre_view_hi = synapse_info.n_pre_neurons - 1
+        if synapse_info.prepop_is_view:
             pre_view_lo, pre_view_hi = self._get_view_lo_hi(
-                self.pre_population(synapse_info)._indexes)
+                synapse_info.pre_population._indexes)
 
         params.extend([pre_view_lo, pre_view_hi])
 
         post_view_lo = 0
-        post_view_hi = self.n_post_neurons(synapse_info) - 1
-        if self.postpop_is_view(synapse_info):
+        post_view_hi = synapse_info.n_post_neurons - 1
+        if synapse_info.postpop_is_view:
             post_view_lo, post_view_hi = self._get_view_lo_hi(
-                self.post_population(synapse_info)._indexes)
+                synapse_info.post_population._indexes)
 
         params.extend([post_view_lo, post_view_hi])
 

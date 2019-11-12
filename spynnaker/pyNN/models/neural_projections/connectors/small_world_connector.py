@@ -50,8 +50,8 @@ class SmallWorldConnector(AbstractConnector):
         # Get the probabilities up-front for now
         # TODO: Work out how this can be done statistically
         # space.distances(...) expects N,3 array in PyNN0.7, but 3,N in PyNN0.8
-        pre_positions = self.pre_population(synapse_info).positions
-        post_positions = self.post_population(synapse_info).positions
+        pre_positions = synapse_info.pre_population.positions
+        post_positions = synapse_info.post_population.positions
 
         distances = self.space.distances(
             pre_positions, post_positions, False)
@@ -80,7 +80,7 @@ class SmallWorldConnector(AbstractConnector):
         # pylint: disable=too-many-arguments
         n_connections = numpy.amax([
             numpy.sum(self.__mask[i, post_vertex_slice.as_slice])
-            for i in range(self.n_pre_neurons(synapse_info))])
+            for i in range(synapse_info.n_pre_neurons)])
 
         if min_delay is None or max_delay is None:
             return n_connections
@@ -92,8 +92,8 @@ class SmallWorldConnector(AbstractConnector):
     def get_n_connections_to_post_vertex_maximum(self, synapse_info):
         # pylint: disable=too-many-arguments
         return numpy.amax([
-            numpy.sum(self.__mask[:, i]) for i in range(self.n_post_neurons(
-                synapse_info))])
+            numpy.sum(self.__mask[:, i]) for i in range(
+                synapse_info.n_post_neurons)])
 
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, weights, synapse_info):

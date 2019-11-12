@@ -72,7 +72,7 @@ static uint32_t connection_generator_one_to_one_generate(
     use(pre_slice_count);
 
     struct one_to_one *obj = data;
-    log_info("pre_neuron_index %u count_post %u",
+    log_debug("pre_neuron_index %u count_post %u",
     		pre_neuron_index, count_post);
 
     // If no space, generate nothing
