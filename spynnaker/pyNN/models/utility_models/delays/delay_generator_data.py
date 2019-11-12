@@ -65,7 +65,7 @@ class DelayGeneratorData(object):
         return (
             self.BASE_SIZE + connector.gen_connector_params_size_in_bytes +
             connector.gen_delay_params_size_in_bytes(
-                self.__synapse_information.delay))
+                self.__synapse_information.delays))
 
     @property
     def gen_data(self):
@@ -84,7 +84,7 @@ class DelayGeneratorData(object):
             (decimal.Decimal(str(1000.0 / float(self.__machine_time_step))) *
              DataType.S1615.scale),
             connector.gen_connector_id,
-            connector.gen_delays_id(self.__synapse_information.delay)],
+            connector.gen_delays_id(self.__synapse_information.delays)],
             dtype="uint32"))
         items.append(connector.gen_connector_params(
             self.__pre_slices, self.__pre_slice_index, self.__post_slices,
@@ -92,6 +92,6 @@ class DelayGeneratorData(object):
             self.__post_vertex_slice, self.__synapse_information.synapse_type,
             self.__synapse_information))
         items.append(connector.gen_delay_params(
-            self.__synapse_information.delay, self.__pre_vertex_slice,
+            self.__synapse_information.delays, self.__pre_vertex_slice,
             self.__post_vertex_slice))
         return numpy.concatenate(items)

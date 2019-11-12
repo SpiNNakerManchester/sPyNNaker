@@ -104,9 +104,9 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
         self.__probs = _d_expr_context.eval(self.__d_expression, d=d)
 
     @overrides(AbstractConnector.get_delay_maximum)
-    def get_delay_maximum(self, delays, synapse_info):
+    def get_delay_maximum(self, synapse_info):
         return self._get_delay_maximum(
-            delays,
+            synapse_info.delays,
             utility_calls.get_probable_maximum_selected(
                 synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
                 synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
@@ -114,7 +114,7 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, delays, post_vertex_slice, synapse_info, min_delay=None,
+            self, post_vertex_slice, synapse_info, min_delay=None,
             max_delay=None):
         # pylint: disable=too-many-arguments
         max_prob = numpy.amax(
@@ -128,7 +128,8 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
             return int(math.ceil(n_connections))
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
-            delays, synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
+            synapse_info.delays,
+            synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             n_connections, min_delay, max_delay)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
@@ -140,10 +141,10 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
             numpy.amax(self.__probs))
 
     @overrides(AbstractConnector.get_weight_maximum)
-    def get_weight_maximum(self, weights, synapse_info):
+    def get_weight_maximum(self, synapse_info):
         # pylint: disable=too-many-arguments
         return self._get_weight_maximum(
-            weights,
+            synapse_info.weights,
             utility_calls.get_probable_maximum_selected(
                 synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
                 synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
@@ -151,7 +152,7 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, weights, delays, pre_slices, pre_slice_index, post_slices,
+            self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type, synapse_info):
 
@@ -176,10 +177,10 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
         block["target"] = (
             (ids % post_vertex_slice.n_atoms) + post_vertex_slice.lo_atom)
         block["weight"] = self._generate_weights(
-            weights, n_connections, None, pre_vertex_slice, post_vertex_slice,
+            n_connections, None, pre_vertex_slice, post_vertex_slice,
             synapse_info)
         block["delay"] = self._generate_delays(
-            delays, n_connections, None, pre_vertex_slice, post_vertex_slice,
+            n_connections, None, pre_vertex_slice, post_vertex_slice,
             synapse_info)
         block["synapse_type"] = synapse_type
         return block

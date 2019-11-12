@@ -122,7 +122,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
             type(delays)))
 
     @abstractmethod
-    def get_delay_maximum(self, delays, synapse_info):
+    def get_delay_maximum(self, synapse_info):
         """ Get the maximum delay specified by the user in ms, or None if\
             unbounded.
         """
@@ -169,7 +169,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
 
     @abstractmethod
     def get_n_connections_from_pre_vertex_maximum(
-            self, delays, post_vertex_slice, synapse_info, min_delay=None,
+            self, post_vertex_slice, synapse_info, min_delay=None,
             max_delay=None):
         """ Get the maximum number of connections between those from any\
             neuron in the pre vertex to the neurons in the\
@@ -224,7 +224,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         raise Exception("Unrecognised weight format")
 
     @abstractmethod
-    def get_weight_maximum(self, weights, synapse_info):
+    def get_weight_maximum(self, synapse_info):
         """ Get the maximum of the weights for this connection.
         """
         # pylint: disable=too-many-arguments
@@ -297,13 +297,13 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
             return values(d)
         raise Exception("what on earth are you giving me?")
 
-    def _generate_weights(self, values, n_connections, connection_slices,
+    def _generate_weights(self, n_connections, connection_slices,
                           pre_slice, post_slice, synapse_info):
         """ Generate weight values.
         """
         weights = self._generate_values(
-            values, n_connections, connection_slices, pre_slice, post_slice,
-            synapse_info)
+            synapse_info.weights, n_connections, connection_slices, pre_slice,
+            post_slice, synapse_info)
         if self.__safe:
             if not weights.size:
                 warn_once(logger, "No connection in " + str(self))
@@ -331,20 +331,20 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
                 delays[delays < self.__min_delay] = self.__min_delay
         return delays
 
-    def _generate_delays(self, values, n_connections, connection_slices,
+    def _generate_delays(self, n_connections, connection_slices,
                          pre_slice, post_slice, synapse_info):
         """ Generate valid delay values.
         """
 
         delays = self._generate_values(
-            values, n_connections, connection_slices, pre_slice, post_slice,
-            synapse_info)
+            synapse_info.delays, n_connections, connection_slices, pre_slice,
+            post_slice, synapse_info)
 
         return self._clip_delays(delays)
 
     @abstractmethod
     def create_synaptic_block(
-            self, weights, delays, pre_slices, pre_slice_index, post_slices,
+            self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type, synapse_info):
         """ Create a synaptic block from the data.

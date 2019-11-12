@@ -29,13 +29,13 @@ class SynapseInformation(object):
         "__rng",
         "__synapse_dynamics",
         "__synapse_type",
-        "__weight",
-        "__delay"]
+        "__weights",
+        "__delays"]
 
     def __init__(self, connector, pre_population, post_population,
                  prepop_is_view, postpop_is_view, rng,
                  synapse_dynamics, synapse_type,
-                 weight=None, delay=None):
+                 weights=None, delays=None):
         self.__connector = connector
         self.__pre_population = pre_population
         self.__post_population = post_population
@@ -44,8 +44,8 @@ class SynapseInformation(object):
         self.__rng = (rng or get_simulator().get_pynn_NumpyRNG()())
         self.__synapse_dynamics = synapse_dynamics
         self.__synapse_type = synapse_type
-        self.__weight = weight
-        self.__delay = delay
+        self.__weights = weights
+        self.__delays = delays
 
     @property
     def connector(self):
@@ -88,9 +88,9 @@ class SynapseInformation(object):
         return self.__synapse_type
 
     @property
-    def weight(self):
-        return self.__weight
+    def weights(self):
+        return self.__weights
 
     @property
-    def delay(self):
-        return self.__delay
+    def delays(self):
+        return self.__delays
