@@ -56,6 +56,14 @@ class MockSynapseInfo(object):
         return self._post_population
 
     @property
+    def n_pre_neurons(self):
+        return self._pre_population.size
+
+    @property
+    def n_post_neurons(self):
+        return self._post_population.size
+
+    @property
     def weights(self):
         return self._weights
 
