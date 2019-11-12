@@ -231,10 +231,12 @@ static inline void correlation_apply_pre_spike(
 // Synapse update loop
 //---------------------------------------
 static inline plastic_synapse_t plasticity_update_synapse(
+//static inline final_state_t plasticity_update_synapse(
     const uint32_t time,
     const uint32_t last_pre_time, const pre_trace_t last_pre_trace,
     const pre_trace_t new_pre_trace, const uint32_t delay_dendritic,
     const uint32_t delay_axonal, plastic_synapse_t *current_state,
+//    const uint32_t delay_axonal, update_state_t current_state,
     const post_event_history_t *post_event_history) {
 
     // Apply axonal delay to time of last presynaptic spike
@@ -463,21 +465,24 @@ bool synapse_dynamics_process_plastic_synapses(address_t plastic,
         uint32_t delay_dendritic = synapse_row_sparse_delay(control_word,
             synapse_type_index_bits);
         uint32_t delay_axonal = 0;//sparse_axonal_delay(control_word);
-        uint32_t type_index = synapse_row_sparse_type_index(control_word,
-            synapse_type_index_mask);
-
-        // Convert into ring buffer offset
-        uint32_t offset = synapses_get_ring_buffer_index_combined(
-            delay_axonal + delay_dendritic + time, type_index,
-            synapse_type_index_bits);
-
         uint32_t type = synapse_row_sparse_type(
             control_word, synapse_index_bits, synapse_type_mask);
         uint32_t index = synapse_row_sparse_index(
             control_word, synapse_index_mask);
+        uint32_t type_index = synapse_row_sparse_type_index(control_word,
+            synapse_type_index_mask);
+
+        // Convert into ring buffer index
+        uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
+            delay_axonal + delay_dendritic + time, type_index,
+            synapse_type_index_bits);
 
         // Get state of synapse - weight and eligibility trace.
         plastic_synapse_t* current_state = plastic_words;
+
+//        update_state_t current_state =
+//        		synapse_structure_get_update_state(*plastic_words, type);
+
         weight_state = weight_get_initial(
         	synapse_structure_get_weight(*current_state), type);
 
@@ -487,12 +492,22 @@ bool synapse_dynamics_process_plastic_synapses(address_t plastic,
             post_delay = 0;
         }
         plastic_synapse_t final_state = plasticity_update_synapse(
+//        final_state_t final_state = plasticity_update_synapse(
         	time, last_pre_time, last_pre_trace, event_history->prev_trace,
 			post_delay, delay_axonal, current_state,
 			&post_event_history[index]);
 
-        // Add weight to ring-buffer entry
-        ring_buffer[offset] += synapse_structure_get_weight(final_state);
+        // Add weight to ring-buffer entry (deal with saturation)
+        uint32_t accumulation = ring_buffer[ring_buffer_index] +
+        		synapse_structure_get_weight(final_state);
+
+        uint32_t sat_test = accumulation & 0x10000;
+        if (sat_test) {
+        	accumulation = sat_test - 1;
+        	plastic_saturation_count++;
+        }
+
+        ring_buffer[ring_buffer_index] = accumulation;
 
         // Write back updated synaptic word to plastic region
         *plastic_words++ = final_state;
@@ -513,6 +528,10 @@ input_t synapse_dynamics_get_intrinsic_bias(uint32_t time, index_t neuron_index)
 uint32_t synapse_dynamics_get_plastic_saturation_count(){
     return plastic_saturation_count;
 }
+
+// At this point do we also need to define synapse_dynamics_find_neuron,
+// synapse_dynamics_remove_neuron, control_conversion, synapse_dynamics_add_neuron
+// and synapse_dynamics_n_connections_in_row ?
 
 #if SYNGEN_ENABLED == 1
 
