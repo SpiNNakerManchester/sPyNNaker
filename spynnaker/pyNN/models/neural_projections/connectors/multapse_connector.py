@@ -172,7 +172,7 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
 
         # Deal with case where self-connections aren't allowed
         if (not self.__allow_self_connections and
-                self.pre_population is self.post_population):
+                synapse_info.pre_population is synapse_info.post_population):
             pairs = pairs[pairs[:, 0] != pairs[:, 1]]
 
         # Now do the actual random choice from the available connections
