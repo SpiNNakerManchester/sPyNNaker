@@ -98,7 +98,7 @@ def test_connectors(
                                             MockPopulation(n_post, "Post"),
                                             weight, delay)
         connector.set_projection_information(
-            rng=None, machine_time_step=1000, synapse_info=mock_synapse_info)
+            machine_time_step=1000, synapse_info=mock_synapse_info)
 
         pre_slices = [
             Slice(i, i + n_in_slice - 1) for i in range(0, n_pre, n_in_slice)]

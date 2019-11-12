@@ -106,7 +106,7 @@ class PyNNProjectionCommon(object):
 
         # Set projection information in connector
         connector.set_projection_information(
-            rng, machine_time_step, self.__synapse_information)
+            machine_time_step, self.__synapse_information)
 
         # handle max delay
         max_delay = synapse_dynamics_stdp.get_delay_maximum(

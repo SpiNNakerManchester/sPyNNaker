@@ -15,7 +15,7 @@
 
 import csa
 from spynnaker.pyNN.models.neural_projections.connectors import CSAConnector
-from unittests.mocks import MockSimulator, MockRNG, MockSynapseInfo, \
+from unittests.mocks import MockSimulator, MockSynapseInfo, \
     MockPopulation
 from pacman.model.graphs.common.slice import Slice
 import pytest
@@ -29,8 +29,7 @@ def test_csa_one_to_one_connector():
     mock_synapse_info = MockSynapseInfo(MockPopulation(10, "pre"),
                                         MockPopulation(10, "post"),
                                         weight, delay)
-    connector.set_projection_information(
-        MockRNG(), 1000.0, mock_synapse_info)
+    connector.set_projection_information(1000.0, mock_synapse_info)
     pre_vertex_slice = Slice(0, 10)
     post_vertex_slice = Slice(0, 10)
     block = connector.create_synaptic_block(
@@ -51,8 +50,7 @@ def test_csa_from_list_connector():
     mock_synapse_info = MockSynapseInfo(MockPopulation(10, "pre"),
                                         MockPopulation(10, "post"),
                                         weight, delay)
-    connector.set_projection_information(
-        MockRNG(), 1000.0, mock_synapse_info)
+    connector.set_projection_information(1000.0, mock_synapse_info)
     pre_vertex_slice = Slice(0, 10)
     post_vertex_slice = Slice(0, 10)
     block = connector.create_synaptic_block(
@@ -75,8 +73,7 @@ def test_csa_random_connector():
     mock_synapse_info = MockSynapseInfo(MockPopulation(10, "pre"),
                                         MockPopulation(10, "post"),
                                         weight, delay)
-    connector.set_projection_information(
-        MockRNG(), 1000.0, mock_synapse_info)
+    connector.set_projection_information(1000.0, mock_synapse_info)
     pre_vertex_slice = Slice(0, 10)
     post_vertex_slice = Slice(0, 10)
     block = connector.create_synaptic_block(
@@ -99,8 +96,7 @@ def test_csa_block_connector():
     mock_synapse_info = MockSynapseInfo(MockPopulation(10, "pre"),
                                         MockPopulation(10, "post"),
                                         weight, delay)
-    connector.set_projection_information(
-        MockRNG(), 1000.0, mock_synapse_info)
+    connector.set_projection_information(1000.0, mock_synapse_info)
     pre_vertex_slice = Slice(0, 10)
     post_vertex_slice = Slice(0, 10)
     block = connector.create_synaptic_block(
