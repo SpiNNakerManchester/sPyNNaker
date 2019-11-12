@@ -75,9 +75,10 @@ def test_connector(
     pre_slice = Slice(0, 10)
     post_slice = Slice(0, 10)
     mock_synapse_info = MockSynapseInfo(MockPopulation(10, "Pre"),
-                                        MockPopulation(10, "Post"))
+                                        MockPopulation(10, "Post"),
+                                        weights, delays)
     block = connector.create_synaptic_block(
-        weights, delays, [pre_slice], 0, [post_slice], 0,
+        [pre_slice], 0, [post_slice], 0,
         pre_slice, post_slice, 1, mock_synapse_info)
     assert(numpy.array_equal(block["weight"], numpy.array(expected_weights)))
     assert(numpy.array_equal(block["delay"], numpy.array(expected_delays)))
@@ -115,15 +116,18 @@ def test_connector_split():
 
     connection_list = numpy.dstack((sources, targets))[0]
     connector = MockFromListConnector(connection_list)
+    weight = 1.0
+    delay = 1.0
     mock_synapse_info = MockSynapseInfo(MockPopulation(n_sources, "Pre"),
-                                        MockPopulation(n_targets, "Post"))
+                                        MockPopulation(n_targets, "Post"),
+                                        weight, delay)
     has_block = set()
     try:
         # Check each connection is in the right place
         for i, pre_slice in enumerate(pre_slices):
             for j, post_slice in enumerate(post_slices):
                 block = connector.create_synaptic_block(
-                    1.0, 1.0, pre_slices, i, post_slices, j,
+                    pre_slices, i, post_slices, j,
                     pre_slice, post_slice, 1, mock_synapse_info)
                 for source in block["source"]:
                     assert(pre_slice.lo_atom <= source <= pre_slice.hi_atom)

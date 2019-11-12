@@ -95,7 +95,8 @@ def test_connectors(
         numpy.random.seed(seed)
         connector = create_connector()
         mock_synapse_info = MockSynapseInfo(MockPopulation(n_pre, "Pre"),
-                                            MockPopulation(n_post, "Post"))
+                                            MockPopulation(n_post, "Post"),
+                                            weight, delay)
         connector.set_projection_information(
             rng=None, machine_time_step=1000, synapse_info=mock_synapse_info)
 
@@ -113,16 +114,16 @@ def test_connectors(
         pre_range = numpy.arange(pre_slice.lo_atom, pre_slice.hi_atom + 2)
         post_range = numpy.arange(post_slice.lo_atom, post_slice.hi_atom + 2)
 
-        max_delay = connector.get_delay_maximum(delay, mock_synapse_info)
-        max_weight = connector.get_weight_maximum(weight, mock_synapse_info)
+        max_delay = connector.get_delay_maximum(mock_synapse_info)
+        max_weight = connector.get_weight_maximum(mock_synapse_info)
         if max_row_length is None:
             max_row_length = connector.\
                 get_n_connections_from_pre_vertex_maximum(
-                    delay, post_vertex_slice, mock_synapse_info)
+                    post_vertex_slice, mock_synapse_info)
         else:
             assert(max_row_length == connector.
                    get_n_connections_from_pre_vertex_maximum(
-                        delay, post_vertex_slice, mock_synapse_info))
+                        post_vertex_slice, mock_synapse_info))
         if max_col_length is None:
             max_col_length = connector.\
                 get_n_connections_to_post_vertex_maximum(mock_synapse_info)
@@ -130,7 +131,7 @@ def test_connectors(
             assert(max_col_length == connector.
                    get_n_connections_to_post_vertex_maximum(mock_synapse_info))
         synaptic_block = connector.create_synaptic_block(
-            weight, delay, pre_slices, pre_slice_index, post_slices,
+            pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type, mock_synapse_info)
         source_histogram = numpy.histogram(
