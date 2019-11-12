@@ -148,8 +148,8 @@ def test_connectors(
 
         if len(post_slices) > post_slice_index + 1:
             test_post_slice = post_slices[post_slice_index + 1]
-            test_synaptic_block = connector.create_synaptic_block(
-                weight, delay, pre_slices, pre_slice_index, post_slices,
+            test_synaptic_block = create_synaptic_block(
+                pre_slices, pre_slice_index, post_slices,
                 post_slice_index + 1, pre_vertex_slice, test_post_slice,
                 synapse_type, mock_synapse_info)
             if len(test_synaptic_block) > 0:
@@ -158,7 +158,7 @@ def test_connectors(
         if len(pre_slices) > pre_slice_index + 1:
             test_pre_slice = pre_slices[pre_slice_index + 1]
             test_synaptic_block = connector.create_synaptic_block(
-                weight, delay, pre_slices, pre_slice_index + 1, post_slices,
+                pre_slices, pre_slice_index + 1, post_slices,
                 post_slice_index, test_pre_slice, post_vertex_slice,
                 synapse_type, mock_synapse_info)
             if len(test_synaptic_block) > 0:
