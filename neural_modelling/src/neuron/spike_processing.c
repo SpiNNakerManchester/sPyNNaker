@@ -48,7 +48,7 @@ static uint32_t buffer_being_read;
 
 static uint32_t max_n_words;
 
-static spike_t spike = -1;
+static rate_t rate = {-1, 0};
 
 static uint32_t single_fixed_synapse[4];
 
@@ -63,7 +63,7 @@ static inline void do_dma_read(
     // Key of the originating spike to the beginning of DMA buffer
     dma_buffer *next_buffer = &dma_buffers[next_buffer_to_fill];
     next_buffer->sdram_writeback_address = row_address;
-    next_buffer->originating_spike = spike;
+    next_buffer->originating_spike = rate.key;
     next_buffer->n_bytes_transferred = n_bytes_to_transfer;
 
     // Start a DMA transfer to fetch this synaptic row into current
@@ -78,7 +78,7 @@ static inline void do_dma_read(
 
 static inline void do_direct_row(address_t row_address) {
     single_fixed_synapse[3] = (uint32_t) row_address[0];
-    synapses_process_synaptic_row(time, single_fixed_synapse, false, 0);
+    synapses_process_synaptic_row(time, single_fixed_synapse, false, 0, rate.rate);
 }
 
 // Check if there is anything to do - if not, DMA is not busy
@@ -100,12 +100,12 @@ static inline bool is_something_to_do(
         something_to_do = true;
     } else {
         // Are there any more spikes to process?
-        while (!something_to_do && in_spikes_get_next_spike(&spike)) {
+        while (!something_to_do && in_rates_get_next_rate(&rate)) {
             // Enable interrupts while looking up in the master pop table,
             // as this can be slow
             spin1_mode_restore(cpsr);
             if (population_table_get_first_address(
-                    spike, row_address, n_bytes_to_transfer)) {
+                    rate.key, row_address, n_bytes_to_transfer)) {
                 something_to_do = true;
             }
 
@@ -165,12 +165,12 @@ static inline void setup_synaptic_dma_write(uint32_t dma_buffer_index) {
 
 // Called when a multicast packet is received
 static void multicast_packet_received_callback(uint key, uint payload) {
-    use(payload);
+
     any_spike = true;
     log_debug("Received spike %x at %d, DMA Busy = %d", key, time, dma_busy);
 
     // If there was space to add spike to incoming spike queue
-    if (in_spikes_add_spike(key)) {
+    if (in_rates_add_rate((rate_t){key, payload})) {
         // If we're not already processing synaptic DMAs,
         // flag pipeline as busy and trigger a feed event
         if (!dma_busy) {
@@ -208,13 +208,13 @@ static void dma_complete_callback(uint unused, uint tag) {
     do {
         // Are there any more incoming spikes from the same pre-synaptic
         // neuron?
-        subsequent_spikes = in_spikes_is_next_spike_equal(
+        subsequent_spikes = in_rates_is_next_rate_equal(
                 current_buffer->originating_spike);
 
         // Process synaptic row, writing it back if it's the last time
         // it's going to be processed
         if (!synapses_process_synaptic_row(time, current_buffer->row,
-                !subsequent_spikes, current_buffer_index)) {
+                !subsequent_spikes, current_buffer_index, rate.rate)) {
             log_error("Error processing spike 0x%.8x for address 0x%.8x"
                     " (local=0x%.8x)",
                     current_buffer->originating_spike,
@@ -256,7 +256,7 @@ bool spike_processing_initialise( // EXPORTED
     max_n_words = row_max_n_words;
 
     // Allocate incoming spike buffer
-    if (!in_spikes_initialize_spike_buffer(incoming_spike_buffer_size)) {
+    if (!in_rates_initialize_rate_buffer(incoming_spike_buffer_size)) {
         return false;
     }
 
@@ -283,15 +283,15 @@ void spike_processing_finish_write(uint32_t process_id) { // EXPORTED
 //! \return the number of times the input buffer has overloaded
 uint32_t spike_processing_get_buffer_overflows(void) { // EXPORTED
     // Check for buffer overflow
-    return in_spikes_get_n_buffer_overflows();
+    return in_rates_get_n_buffer_overflows();
 }
 
-//! \brief get the address of the circular buffer used for buffering received
-//! spikes before processing them
-//! \return address of circular buffer
-circular_buffer get_circular_buffer(void) { // EXPORTED
-    return buffer;
-}
+////! \brief get the address of the circular buffer used for buffering received
+////! spikes before processing them
+////! \return address of circular buffer
+//rate_buffer get_rate_buffer(void) { // EXPORTED
+//    return buffer;
+//}
 
 //! \brief set the DMA status
 //! \param[in] busy: bool

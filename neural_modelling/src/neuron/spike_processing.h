@@ -19,7 +19,7 @@
 #define _SPIKE_PROCESSING_H_
 
 #include <common/neuron-typedefs.h>
-#include <common/in_spikes.h>
+#include <common/in_rates.h>
 #include <spin1_api.h>
 
 bool spike_processing_initialise(
@@ -47,10 +47,10 @@ typedef struct dma_buffer {
     uint32_t *row;
 } dma_buffer;
 
-//! \brief get the address of the circular buffer used for buffering received
-//! spikes before processing them
-//! \return address of circular buffer
-circular_buffer get_circular_buffer(void);
+////! \brief get the address of the circular buffer used for buffering received
+////! spikes before processing them
+////! \return address of circular buffer
+//rate_buffer get_rate_buffer(void);
 
 //! \brief set the DMA status
 //! \param[in] busy: bool

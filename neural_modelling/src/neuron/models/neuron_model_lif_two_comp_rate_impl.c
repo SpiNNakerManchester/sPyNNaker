@@ -18,15 +18,6 @@
 #include "neuron_model_lif_two_comp_impl.h"
 
 #include <debug.h>
-//
-//// simple Leaky I&F ODE
-//static inline void lif_neuron_closed_form(
-//        neuron_pointer_t neuron, REAL U_prev, input_t input_this_timestep) {
-//    REAL alpha = input_this_timestep * neuron->R_membrane + neuron->U_rest;
-//
-//    // update membrane voltage
-//    neuron->U_membrane = alpha - (neuron->exp_TC * (alpha - U_prev));
-//}
 
 void neuron_model_set_global_neuron_params(
         global_neuron_params_pointer_t params) {
@@ -51,35 +42,24 @@ state_t neuron_model_state_update(
         //input_t dendrite_input_this_timestep =
         //        exc_input[1] - inh_input[1];
 
-        io_printf(IO_BUF, "dend %k exp %k\n", dendrite_input_this_timestep, neuron->exp_TC_dend);
+        //THESE GUYS HAVE TO BE PASSED BY PYTHON!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        // Leaky conductance
+        REAL g_L = 0.1k;
+        REAL tau_L = 10;
+        // Coupling conductance
+        REAL g_D = 2k;
+        // 1/(g_L + g_D)
+        REAL R_tot = 0.476k;
 
         // update dendrite
-        neuron->V = dendrite_input_this_timestep + neuron->exp_TC_dend * (neuron->V - dendrite_input_this_timestep);
-//        neuron->V_star = neuron->V * neuron->V_star_cond;
+        neuron->V = dendrite_input_this_timestep * tau_L;
 
         // Get the soma input in nA
         //Isyn
         input_t soma_input_this_timestep =
                 exc_input[0] - inh_input[0] + neuron->I_offset;
 
-        // Leaky conductance for the soma
-        REAL g_L = 0.1k;
-        // Coupling conductance
-        REAL g_D = 2k;
-        // 1/(g_L + g_D)
-        REAL R_tot = 0.476k;
-
-        REAL alpha = R_tot * (g_D * neuron->V + soma_input_this_timestep);
-
-        neuron->U_membrane = alpha + neuron->exp_TC * (neuron->U_membrane - alpha);
-
-        //neuron->U_membrane = ((neuron->U_membrane) - ((neuron->V * g_L + soma_input_this_timestep) * neuron->V_star_cond)) * neuron->exp_TC
-        //                      + ((neuron->V * g_L + soma_input_this_timestep) * neuron->V_star_cond);
-//        // update soma
-//        lif_neuron_closed_form(
-//                neuron, neuron->U_membrane, soma_input_this_timestep);
-
-
+        neuron->U_membrane = (g_D * neuron->V + soma_input_this_timestep) / (g_L + g_D + exc_input[2] + exc_input[2]);
 
     } else {
         // countdown refractory timer

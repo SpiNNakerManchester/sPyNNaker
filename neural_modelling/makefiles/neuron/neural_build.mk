@@ -197,6 +197,7 @@ OTHER_SOURCES_CONVERTED := $(call strip_source_dirs,$(OTHER_SOURCES))
 
 # List all the sources relative to one of SOURCE_DIRS
 SOURCES = common/out_spikes.c \
+          common/rate_buffer.c\
           neuron/c_main.c \
           neuron/synapses.c \
           neuron/neuron.c \

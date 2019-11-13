@@ -349,26 +349,26 @@ void neuron_do_timestep_update( // EXPORTED
         if (spike) {
             log_debug("neuron %u spiked at time %u", neuron_index, time);
 
-            // Record the spike
+            // Record the spike (or rate update)
             out_spikes_set_spike(spike_recording_indexes[neuron_index]);
 
             // Do any required synapse processing
             synapse_dynamics_process_post_synaptic_event(time, neuron_index);
 
-            if (use_key) {
-                // Wait until the expected time to send
-                while ((ticks == timer_count) &&
-                        (tc[T1_COUNT] > expected_time)) {
-                    // Do Nothing
-                }
-                expected_time -= time_between_spikes;
+//            if (use_key) {
+//                // Wait until the expected time to send
+//                while ((ticks == timer_count) &&
+//                        (tc[T1_COUNT] > expected_time)) {
+//                    // Do Nothing
+//                }
+//                expected_time -= time_between_spikes;
 
                 // Send the spike
-                while (!spin1_send_mc_packet(
-                        key | neuron_index, 0, NO_PAYLOAD)) {
-                    spin1_delay_us(1);
-                }
+            while (!spin1_send_mc_packet(
+                key | neuron_index, neuron_impl_get_rate(neuron_index), WITH_PAYLOAD)) {
+                spin1_delay_us(1);
             }
+//            }
         } else {
             log_debug("the neuron %d has been determined to not spike",
                     neuron_index);
