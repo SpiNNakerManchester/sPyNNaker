@@ -54,23 +54,18 @@ extensions = [
     'sphinx.ext.intersphinx'
 ]
 
-ds_link = 'http://dataspecification.readthedocs.io/en/latest/'
-fe_link = 'http://spinnfrontendcommon.readthedocs.io/en/latest/'
+ds_link = 'https://dataspecification.readthedocs.io/en/latest/'
+fe_link = 'https://spinnfrontendcommon.readthedocs.io/en/latest/'
 
-intersphinx_mapping = {'spinn_machine':
-                       ('http://spinnmachine.readthedocs.io/en/latest/',
-                           None),
-                       'spinn_storage_handlers':
-                           ('http://spinnmachine.readthedocs.io/en/latest/',
-                            None),
-                       'spinnman':
-                           ('http://spinnman.readthedocs.io/en/latest/',
-                            None),
-                       'pacman': ('http://pacman.readthedocs.io/en/latest/',
-                                  None),
-                       'data_specification': (ds_link, None),
-                       'spinn_front_end_common': (fe_link, None)
-                       }
+intersphinx_mapping = {
+    'spinn_machine': ('https://spinnmachine.readthedocs.io/en/latest/', None),
+    'spinn_storage_handlers': (
+        'https://spinnmachine.readthedocs.io/en/latest/', None),
+    'spinnman': ('https://spinnman.readthedocs.io/en/latest/', None),
+    'pacman': ('https://pacman.readthedocs.io/en/latest/', None),
+    'data_specification': (ds_link, None),
+    'spinn_front_end_common': (fe_link, None)
+}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
