@@ -104,9 +104,8 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
         :param label: The label of the Population to set the rates of
         :param neuron_id_rates: A list of tuples of (neuron ID, rate) to be set
         """
-        control_label = label
-        if not control_label.endswith(self.__control_label_extension):
-            control_label = self._control_label(label)
+        if not label.endswith(self.__control_label_extension):
+            label = self._control_label(label)
         datatype = DataType.S1615
         atom_ids_and_payloads = [(nid, datatype.encode_as_int(rate))
                                  for nid, rate in neuron_id_rates]
