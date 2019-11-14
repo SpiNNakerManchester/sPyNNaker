@@ -175,8 +175,8 @@ class NeuronRecorder(object):
             elif len(local_indexes[0]) > 1:
                 fragment[i] = placement_data[local_indexes[0], 1:]
                 logger.warning(
-                    "Population {} has multiple recorded data for "
-                    "time {}", label, time)
+                    "Population {} has multiple recorded data for time {}",
+                    label, time)
             else:
                 # Set row to nan
                 fragment[i] = numpy.full(n_neurons, numpy.nan)
@@ -333,7 +333,8 @@ class NeuronRecorder(object):
         if len(missing_str) > 0:
             logger.warning(
                 "Population {} is missing recorded data in region {} from the"
-                " following cores: {}", label, region, missing_str)
+                " following cores: {}",
+                label, region, missing_str)
 
         return pop_level_data, indexes, sampling_interval
 
@@ -401,7 +402,8 @@ class NeuronRecorder(object):
         if len(missing_str) > 0:
             logger.warning(
                 "Population {} is missing spike data in region {} from the"
-                " following cores: {}", label, region, missing_str)
+                " following cores: {}",
+                label, region, missing_str)
 
         if len(spike_ids) == 0:
             return numpy.zeros((0, 2), dtype="float")
