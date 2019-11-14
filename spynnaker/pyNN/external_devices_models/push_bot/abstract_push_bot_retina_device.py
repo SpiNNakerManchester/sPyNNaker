@@ -22,6 +22,9 @@ from spinn_front_end_common.abstract_models import (
 
 class AbstractPushBotRetinaDevice(
         AbstractSendMeMulticastCommandsVertex, ProvidesKeyToAtomMappingImpl):
+    """ An abstraction of a silicon retina attached to a SpiNNaker system.
+    """
+
     def __init__(self, protocol, resolution):
         """
         :param protocol:

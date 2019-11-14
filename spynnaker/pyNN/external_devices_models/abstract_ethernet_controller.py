@@ -28,14 +28,15 @@ class AbstractEthernetController(object):
     def get_message_translator(self):
         """ Get the translator of messages
 
-        :rtype:\
-            :py:class:`spynnaker.pyNN.external_devices_models.AbstractEthernetTranslator`
+        :rtype: AbstractEthernetTranslator
         """
 
     @abstractmethod
     def get_external_devices(self):
         """ Get the external devices that are to be controlled by the\
             controller
+
+        :rtype: iterable(AbstractMulticastControllableDevice)
         """
 
     @abstractmethod

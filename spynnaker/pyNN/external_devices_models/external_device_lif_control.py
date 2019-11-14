@@ -55,12 +55,26 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
         :param devices:\
             The AbstractMulticastControllableDevice instances to be controlled\
             by the population
+        :type devices: list(AbstractMulticastControllableDevice)
         :param create_edges:\
             True if edges to the devices should be added by this device (set\
             to False if using the device over Ethernet using a translator)
+        :type create_edges: bool
         :param translator:\
             Translator to be used when used for Ethernet communication.  Must\
             be provided if the device is to be controlled over Ethernet.
+        :type translator: AbstractEthernetTranslator or None
+        :param tau_m: (defaulted LIF neuron parameter)
+        :param cm: (defaulted LIF neuron parameter)
+        :param v_rest: (defaulted LIF neuron parameter)
+        :param v_reset: (defaulted LIF neuron parameter)
+        :param tau_syn_E: (defaulted LIF neuron parameter)
+        :param tau_syn_I: (defaulted LIF neuron parameter)
+        :param tau_refrac: (defaulted LIF neuron parameter)
+        :param i_offset: (defaulted LIF neuron parameter)
+        :param v: (defaulted LIF neuron state variable init)
+        :param isyn_exc: (defaulted LIF neuron state variable init)
+        :param isyn_inh: (defaulted LIF neuron state variable init)
         """
         # pylint: disable=too-many-arguments, too-many-locals
 

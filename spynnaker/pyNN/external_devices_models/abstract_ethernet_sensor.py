@@ -31,6 +31,8 @@ class AbstractEthernetSensor(object):
     @abstractmethod
     def get_injector_parameters(self):
         """ Get the parameters of the Spike Injector to use with this device
+
+        :rtype: dict(str,Any)
         """
 
     @abstractmethod
@@ -51,4 +53,6 @@ class AbstractEthernetSensor(object):
     def get_database_connection(self):
         """ Get a Database Connection instance that this device uses\
             to inject packets
+
+        :rtype: SpynnakerLiveSpikesConnection
         """
