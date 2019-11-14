@@ -32,13 +32,12 @@ class SpynnakerLiveSpikesConnection(LiveEventConnection):
                  local_port=NOTIFY_PORT,
                  live_packet_gather_label="LiveSpikeReceiver"):
         """
-
         :param receive_labels: \
             Labels of population from which live spikes will be received.
-        :type receive_labels: iterable of str
+        :type receive_labels: iterable(str)
         :param send_labels: \
             Labels of population to which live spikes will be sent
-        :type send_labels: iterable of str
+        :type send_labels: iterable(str)
         :param local_host: Optional specification of the local hostname or\
             IP address of the interface to listen on
         :type local_host: str

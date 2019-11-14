@@ -37,7 +37,9 @@ class PushBotEthernetSpeakerDevice(
             timesteps_between_send=None):
         """
         :param speaker: The PushBotSpeaker value to control
+        :type speaker: PushBotSpeaker
         :param protocol: The protocol instance to get commands from
+        :type protocol: MunichIoEthernetProtocol
         :param start_active_time: The "active time" to set at the start
         :param start_total_period: The "total period" to set at the start
         :param start_frequency: The "frequency" to set at the start
@@ -61,6 +63,7 @@ class PushBotEthernetSpeakerDevice(
         self.__start_frequency = start_frequency
         self.__start_melody = start_melody
 
+    @overrides(PushBotEthernetDevice.set_command_protocol)
     def set_command_protocol(self, command_protocol):
         self.__command_protocol = command_protocol
 

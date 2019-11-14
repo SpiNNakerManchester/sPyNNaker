@@ -61,7 +61,7 @@ class PushBotWIFIConnection(Connection, Listenable):
         :type remote_host: str
         :param remote_port: The port number of the PushBot (default 56000)
         :type remote_port: int
-        :raise spinnman.exceptions.SpinnmanIOException: \
+        :raise SpinnmanIOException: \
             If there is an error setting up the communication channel
         """
         try:
@@ -131,11 +131,10 @@ class PushBotWIFIConnection(Connection, Listenable):
 
     @property
     def local_ip_address(self):
-        """ The local IP address to which the connection is bound.
+        """ The local IP address to which the connection is bound, \
+            as a dotted string, e.g. `0.0.0.0`
 
-        :return: The local IP address as a dotted string, e.g. `0.0.0.0`
         :rtype: str
-        :raise None: No known exceptions are thrown
         """
         return self.__local_ip_address
 
@@ -143,28 +142,25 @@ class PushBotWIFIConnection(Connection, Listenable):
     def local_port(self):
         """ The local port to which the connection is bound.
 
-        :return: The local port number
         :rtype: int
-        :raise None: No known exceptions are thrown
         """
         return self.__local_port
 
     @property
     def remote_ip_address(self):
-        """ The remote IP address to which the connection is connected.
+        """ The remote IP address to which the connection is connected, \
+            as a dotted string, or None if not connected remotely
 
-        :return: The remote IP address as a dotted string, or None if not\
-            connected remotely
-        :rtype: str
+        :rtype: str or None
         """
         return self.__remote_ip_address
 
     @property
     def remote_port(self):
-        """ The remote port to which the connection is connected.
+        """ The remote port to which the connection is connected, \
+            or None if not connected remotely
 
-        :return: The remote port, or None if not connected remotely
-        :rtype: int
+        :rtype: int or None
         """
         return self.__remote_port
 

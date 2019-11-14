@@ -36,9 +36,10 @@ class PushBotEthernetLaserDevice(
             start_active_time=None, start_total_period=None,
             start_frequency=None, timesteps_between_send=None):
         """
-
         :param laser: The PushBotLaser value to control
+        :type laser: PushBotLaser
         :param protocol: The protocol instance to get commands from
+        :type protocol: MunichIoEthernetProtocol
         :param start_active_time: The "active time" value to send at the start
         :param start_total_period:\
             The "total period" value to send at the start
@@ -61,6 +62,7 @@ class PushBotEthernetLaserDevice(
         self.__start_total_period = start_total_period
         self.__start_frequency = start_frequency
 
+    @overrides(PushBotEthernetDevice.set_command_protocol)
     def set_command_protocol(self, command_protocol):
         self.__command_protocol = command_protocol
 

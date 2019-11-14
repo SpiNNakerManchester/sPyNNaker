@@ -23,6 +23,13 @@ from spinn_front_end_common.abstract_models import (
 class AbstractPushBotRetinaDevice(
         AbstractSendMeMulticastCommandsVertex, ProvidesKeyToAtomMappingImpl):
     def __init__(self, protocol, resolution):
+        """
+        :param protocol:
+        :type protocol: \
+            MunichIOEthernetProtocol or MunichIoSpiNNakerLinkProtocol
+        :param resolution:
+        :type resolution: PushBotRetinaResolution
+        """
         self._protocol = protocol
         self._resolution = resolution
 

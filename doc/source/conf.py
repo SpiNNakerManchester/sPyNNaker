@@ -379,4 +379,10 @@ for f in os.listdir("."):
     if (os.path.isfile(f) and f.endswith(
             ".rst") and f != "index.rst" and f != "modules.rst"):
         os.remove(f)
-apidoc.main([None, '-o', ".", "../../spynnaker"])
+apidoc.main([None, '-o', ".", "../../spynnaker",
+             "../../spynnaker/pyNN/connections/[a-z]*.py",
+             "../../spynnaker/pyNN/external_devices_models/push_bot/*/[a-z]*.py",
+             "../../spynnaker/pyNN/external_devices_models/push_bot/a*.py",
+             "../../spynnaker/pyNN/external_devices_models/[a-oq-z]*.py",
+             "../../spynnaker/pyNN/protocols/m*.py",
+             ])

@@ -42,9 +42,10 @@ class PushBotSpiNNakerLinkSpeakerDevice(
             start_frequency=default_parameters['start_frequency'],
             start_melody=default_parameters['start_melody']):
         """
-
         :param speaker: The PushBotSpeaker value to control
+        :type speaker: PushBotSpeaker
         :param protocol: The protocol instance to get commands from
+        :type protocol: MunichIoSpiNNakerLinkProtocol
         :param spinnaker_link_id: The SpiNNakerLink connected to
         :param n_neurons: The number of neurons in the device
         :param label: The label of the device

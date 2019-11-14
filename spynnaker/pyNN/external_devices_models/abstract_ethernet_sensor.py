@@ -24,6 +24,8 @@ class AbstractEthernetSensor(object):
     @abstractmethod
     def get_n_neurons(self):
         """ Get the number of neurons that will be sent out by the device
+
+        :rtype: int
         """
 
     @abstractmethod
@@ -34,11 +36,15 @@ class AbstractEthernetSensor(object):
     @abstractmethod
     def get_injector_label(self):
         """ Get the label to give to the Spike Injector
+
+        :rtype: str
         """
 
     @abstractmethod
     def get_translator(self):
         """ Get a translator of multicast commands to Ethernet commands
+
+        :rtype: AbstractEthernetTranslator
         """
 
     @abstractmethod
