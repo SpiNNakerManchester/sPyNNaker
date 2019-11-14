@@ -31,6 +31,10 @@ static generate_connection_func connection_generator_fixed_prob_generate;
  *! \brief The parameters that can be copied in from SDRAM
  */
 struct fixed_prob_params {
+    uint32_t pre_lo;
+    uint32_t pre_hi;
+    uint32_t post_lo;
+    uint32_t post_hi;
     uint32_t allow_self_connections;
     unsigned long fract probability;
 };
@@ -55,8 +59,10 @@ static void *connection_generator_fixed_prob_initialise(address_t *region) {
 
     // Initialise the RNG for the connector
     obj->rng = rng_init(region);
-    log_debug("Fixed Probability Connector, allow self connections = %u, "
+    log_debug("Fixed Probability Connector, pre_lo = %u, pre_hi = %u, "
+    		"post_lo = %u, post_hi = %u, allow self connections = %u, "
             "probability = %k",
+			obj->params.pre_lo, obj->params.pre_hi, obj->params.post_lo, obj->params.post_hi,
             obj->params.allow_self_connections,
             (accum) obj->params.probability);
     return obj;
@@ -82,13 +88,25 @@ static uint32_t connection_generator_fixed_prob_generate(
         return 0;
     }
 
-    // Randomly select connections between each post-neuron
+    // If not in the pre-population view range, then don't generate
+    if ((pre_neuron_index < obj->params.pre_lo) ||
+    		(pre_neuron_index > obj->params.pre_hi)) {
+    	return 0;
+    }
+
+    // Randomly select connections to each post-neuron
     uint32_t n_conns = 0;
     for (uint32_t i = 0; i < post_slice_count; i++) {
         // Disallow self connections if configured
         if (!obj->params.allow_self_connections &&
                 (pre_neuron_index == post_slice_start + i)) {
             continue;
+        }
+
+        // Don't generate if the value is not in the range of the post-population view
+        if ((i + post_slice_start < obj->params.post_lo) ||
+        	(i + post_slice_start > obj->params.post_hi)) {
+        	continue;
         }
 
         // Generate a random number

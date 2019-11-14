@@ -86,7 +86,7 @@ class ProjectionMachineEdge(
         weight = 0
         for synapse_info in self.__synapse_information:
             new_weight = synapse_info.connector.\
-                get_n_connections_to_post_vertex_maximum()
+                get_n_connections_to_post_vertex_maximum(synapse_info)
             new_weight *= pre_vertex_slice.n_atoms
             if hasattr(pre_vertex, "rate"):
                 rate = pre_vertex.rate
@@ -107,7 +107,7 @@ class ProjectionMachineEdge(
         prov_items = list()
         for synapse_info in self.__synapse_information:
             prov_items.extend(
-                synapse_info.connector.get_provenance_data())
+                synapse_info.connector.get_provenance_data(synapse_info))
             prov_items.extend(
                 synapse_info.synapse_dynamics.get_provenance_data(
                     self.pre_vertex.label, self.post_vertex.label))
