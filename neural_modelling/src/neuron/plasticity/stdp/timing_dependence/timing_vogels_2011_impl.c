@@ -37,7 +37,7 @@ uint32_t *timing_initialise(uint32_t* address) {
     plasticity_trace_region_data.alpha = (int32_t) address[0];
 
     // Copy LUTs from following memory
-    address_t lut_address = address;
+    address_t lut_address = &address[1];
     tau_lookup = maths_copy_int16_lut(&lut_address);
 
     log_info("timing_initialise: completed successfully");
