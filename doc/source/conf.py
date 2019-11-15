@@ -406,5 +406,6 @@ apidoc.main([None, '-o', ".", "../../spynnaker",
              "../../spynnaker/pyNN/models/neuron/population_machine*.py",
              "../../spynnaker/pyNN/models/neuron/synaptic_manager.py",
              "../../spynnaker/pyNN/models/neuron/[cg]*.py",
+             "../../spynnaker/pyNN/models/utility_models/delays/[a-z]*.py",
              "../../spynnaker/pyNN/protocols/m*.py",
              ])

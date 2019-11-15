@@ -27,6 +27,18 @@ class DelayedMachineEdge(MachineEdge, AbstractFilterableEdge):
     def __init__(
             self, synapse_information, pre_vertex, post_vertex,
             label=None, weight=1):
+        """
+        :param synapse_information:
+        :type synapse_information: list(SynapseInformation)
+        :param pre_vertex:
+        :type pre_vertex: DelayExtensionMachineVertex
+        :param post_vertex:
+        :type post_vertex: PopulationMachineVertex
+        :param label:
+        :type label: str
+        :param weight:
+        :type weight: int
+        """
         # pylint: disable=too-many-arguments
         super(DelayedMachineEdge, self).__init__(
             pre_vertex, post_vertex, label=label, traffic_weight=weight)

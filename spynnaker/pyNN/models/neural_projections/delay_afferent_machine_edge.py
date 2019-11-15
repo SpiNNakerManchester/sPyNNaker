@@ -27,6 +27,16 @@ class DelayAfferentMachineEdge(
     __slots__ = []
 
     def __init__(self, pre_vertex, post_vertex, label, weight=1):
+        """
+        :param pre_vertex:
+        :type pre_vertex: PopulationMachineVertex
+        :param post_vertex:
+        :type post_vertex: DelayExtensionMachineVertex
+        :param label:
+        :type label: str
+        :param weight:
+        :type weight: int
+        """
         super(DelayAfferentMachineEdge, self).__init__(
             pre_vertex, post_vertex, label=label, traffic_weight=weight)
 

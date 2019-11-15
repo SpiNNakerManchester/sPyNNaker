@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationEdge
 from .delay_afferent_machine_edge import DelayAfferentMachineEdge
 
@@ -21,8 +22,17 @@ class DelayAfferentApplicationEdge(ApplicationEdge):
     __slots__ = ()
 
     def __init__(self, prevertex, delayvertex, label=None):
+        """
+        :param prevertex:
+        :type prevertex: AbstractPopulationVertex
+        :param delayvertex:
+        :type delayvertex: DelayExtensionVertex
+        :param label:
+        :type label: str
+        """
         super(DelayAfferentApplicationEdge, self).__init__(
             prevertex, delayvertex, label=label)
 
+    @overrides(ApplicationEdge.create_machine_edge)
     def create_machine_edge(self, pre_vertex, post_vertex, label):
         return DelayAfferentMachineEdge(pre_vertex, post_vertex, label)
