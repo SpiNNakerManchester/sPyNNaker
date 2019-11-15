@@ -288,6 +288,22 @@ class NeuronRecorder(object):
                 results.append(_id)
         return results
 
+    def _is_recording(self, variable, vertex_slice):
+        if self.__sampling_rates[variable] == 0:
+            return False
+        if self.__indexes[variable] is None:
+            return True
+        indexes = self.__indexes[variable]
+        for index in xrange(vertex_slice.lo_atom, vertex_slice.hi_atom+1):
+            if index in indexes:
+                return True
+        return False
+
+    def recorded_ids_by_slice(self, vertex_slice):
+        return [_id
+                for _id, variable in enumerate(self.__sampling_rates.keys())
+                if self._is_recording(variable, vertex_slice)]
+
     def _compute_rate(self, sampling_interval):
         """ Convert a sampling interval into a rate. \
             Remember, machine time step is in nanoseconds
