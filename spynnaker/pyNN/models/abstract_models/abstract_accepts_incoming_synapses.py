@@ -35,11 +35,18 @@ class AbstractAcceptsIncomingSynapses(object):
     @abstractmethod
     def set_synapse_dynamics(self, synapse_dynamics):
         """ Set the synapse dynamics of this vertex.
+
+        :param synapse_dynamics:
+        :type synapse_dynamics: AbstractSynapseDynamics
         """
 
     @abstractmethod
     def get_maximum_delay_supported_in_ms(self, machine_time_step):
         """ Get the maximum delay supported by this vertex.
+
+        :param machine_time_step: microseconds
+        :type machine_time_step: int
+        :rtype: int
         """
 
     @abstractmethod
@@ -47,6 +54,13 @@ class AbstractAcceptsIncomingSynapses(object):
             self, connection_holder, projection_edge, synapse_information):
         """ Add a connection holder to the vertex to be filled in when the\
             connections are actually generated.
+
+        :param connection_holder:
+        :type connection_holder: ConnectionHolder
+        :param projection_edge:
+        :type projection_edge: ProjectionApplicationEdge
+        :param synapse_information:
+        :type synapse_information: SynapseInformation
         """
 
     @abstractmethod
@@ -58,6 +72,36 @@ class AbstractAcceptsIncomingSynapses(object):
             fixed_routes=None):
         # pylint: disable=too-many-arguments
         """ Get the connections from the machine post-run.
+
+        :param transceiver:
+        :type transceiver: ~spinnman.Transceiver
+        :param placement:
+        :type placement: ~pacman.model.placements.Placement
+        :param edge:
+        :type edge: ProjectionMachineEdge
+        :param routing_infos:
+        :type routing_infos: ~pacman.model.routing_info.RoutingInfo
+        :param synapse_information:
+        :type synapse_information: SynapseInformation
+        :param machine_time_step: microseconds
+        :type machine_time_step: int
+        :param using_extra_monitor_cores:
+        :type using_extra_monitor_cores: bool
+        :param placements:
+        :type placements: None or ~pacman.model.placements.Placements
+        :param monitor_api:
+        :type monitor_api: None or \
+            ~spinn_front_end_common.utility_models.DataSpeedUpPacketGatherMachineVertex
+        :param monitor_placement:
+        :type monitor_placement: None or ~pacman.model.placements.Placement
+        :param monitor_cores:
+        :type monitor_cores: None or \
+            iterable(~spinn_front_end_common.utility_models.ExtraMonitorSupportMachineVertex)
+        :param handle_time_out_configuration:
+        :type handle_time_out_configuration: bool
+        :param fixed_routes:
+        :type fixed_routes: None or \
+            dict(tuple(int,int),~spinn_machine.FixedRouteEntry)
         """
 
     @abstractmethod

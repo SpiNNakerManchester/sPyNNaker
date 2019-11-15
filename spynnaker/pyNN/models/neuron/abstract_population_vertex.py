@@ -748,11 +748,11 @@ class AbstractPopulationVertex(
     def set_synapse_dynamics(self, synapse_dynamics):
         self.__synapse_manager.synapse_dynamics = synapse_dynamics
 
+    @overrides(AbstractAcceptsIncomingSynapses.add_pre_run_connection_holder)
     def add_pre_run_connection_holder(
-            self, connection_holder, edge, synapse_info):
-        # pylint: disable=arguments-differ
+            self, connection_holder, projection_edge, synapse_information):
         self.__synapse_manager.add_pre_run_connection_holder(
-            connection_holder, edge, synapse_info)
+            connection_holder, projection_edge, synapse_information)
 
     def get_connection_holders(self):
         return self.__synapse_manager.get_connection_holders()

@@ -28,6 +28,10 @@ class AbstractSettable(object):
     @abstractmethod
     def get_value(self, key):
         """ Get a property
+
+        :param key: the name of the property
+        :type key: str
+        :rtype: Any
         """
 
     @abstractmethod
@@ -35,5 +39,7 @@ class AbstractSettable(object):
         """ Set a property
 
         :param key: the name of the parameter to change
+        :type key: str
         :param value: the new value of the parameter to assign
+        :type value: Any
         """

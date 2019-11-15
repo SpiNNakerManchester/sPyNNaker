@@ -19,13 +19,17 @@ from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 @add_metaclass(AbstractBase)
 class AbstractContainsUnits(object):
+    """ Indicates a class that can describe the units of some of its variables
+    """
 
     __slots__ = ()
 
     @abstractmethod
     def get_units(self, variable):
-        """ Get units for a given variable
+        """ Get units for a given variable.
 
         :param variable: the variable to find units from
+        :type variable: str
         :return: the units as a string.
+        :rtype: str
         """

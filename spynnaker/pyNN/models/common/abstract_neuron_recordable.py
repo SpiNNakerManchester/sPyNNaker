@@ -20,20 +20,25 @@ from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 @add_metaclass(AbstractBase)
 class AbstractNeuronRecordable(object):
     """ Indicates that a variable (e.g., membrane voltage) can be recorded\
-        from this object
+        from this object.
     """
 
     __slots__ = ()
 
     @abstractmethod
     def get_recordable_variables(self):
-        """ Returns a list of the variables this models is expected to collect
+        """ Returns a list of the PyNN names of variables this model is \
+            expected to collect
+
+        :rtype: list(str)
         """
 
     @abstractmethod
     def is_recording(self, variable):
-        """ Determines if variable is being recorded
+        """ Determines if variable is being recorded.
 
+        :param variable: PyNN name of the variable
+        :type variable: str
         :return: True if variable are being recorded, False otherwise
         :rtype: bool
         """
@@ -42,6 +47,15 @@ class AbstractNeuronRecordable(object):
     def set_recording(self, variable, new_state=True, sampling_interval=None,
                       indexes=None):
         """ Sets variable to being recorded
+
+        :param variable: PyNN name of the variable
+        :type variable: str
+        :param new_state:
+        :type new_state: bool
+        :param sampling_interval:
+        :type sampling_interval: float or None
+        :param indexes:
+        :type indexes: list or None
         """
 
     @abstractmethod
@@ -49,8 +63,13 @@ class AbstractNeuronRecordable(object):
                         graph_mapper):
         """ Clear the recorded data from the object
 
+        :param variable: PyNN name of the variable
+        :type variable: str
         :param buffer_manager: the buffer manager object
+        :type buffer_manager: \
+            ~spinn_front_end_common.interface.buffer_management.BufferManager
         :param placements: the placements object
+        :type placements: ~pacman.model.placements.Placements
         :param graph_mapper: the graph mapper object
         :rtype: None
         """
@@ -60,13 +79,22 @@ class AbstractNeuronRecordable(object):
                  graph_mapper, buffer_manager, machine_time_step):
         """ Get the recorded data
 
-        :param variable:
+        :param variable: PyNN name of the variable
+        :type variable: str
         :param n_machine_time_steps:
+        :type n_machine_time_steps: int
+        :param machine_time_step: microseconds
+        :type machine_time_step: int
         :param placements:
+        :type placements: ~pacman.model.placements.Placements
         :param graph_mapper:
         :param buffer_manager:
-        :param machine_time_step:
-        :return:
+        :type buffer_manager: \
+            ~spinn_front_end_common.interface.buffer_management.BufferManager
+        :param machine_time_step: microseconds
+        :type machine_time_step: int
+        :return: (data, recording_indices, sampling_interval)
+        :rtype: tuple(numpy.ndarray,list(int),float)
         """
         # pylint: disable=too-many-arguments
 
@@ -75,5 +103,7 @@ class AbstractNeuronRecordable(object):
         """ Returns the current sampling interval for this variable
 
         :param variable: PyNN name of the variable
-        :return: Sampling interval in micro seconds
+        :type variable: str
+        :return: Sampling interval in microseconds
+        :rtype: float
         """

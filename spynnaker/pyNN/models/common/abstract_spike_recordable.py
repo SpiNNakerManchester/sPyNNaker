@@ -19,7 +19,7 @@ from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 @add_metaclass(AbstractBase)
 class AbstractSpikeRecordable(object):
-    """ Indicates that spikes can be recorded from this object
+    """ Indicates that spikes can be recorded from this object.
     """
 
     __slots__ = ()
@@ -41,10 +41,12 @@ class AbstractSpikeRecordable(object):
         :param new_state: Set if the spikes are recording or not
         :type new_state: bool
         :param sampling_interval: The interval at which spikes are recorded.\
-            Must be a whole multiple of the timestep
-            None will be taken as the timestep
+            Must be a whole multiple of the timestep.
+            None will be taken as the timestep.
+        :type sampling_interval: float or None
         :param indexes: The indexes of the neurons that will record spikes.
             If None the assumption is all neurons are recording
+        :type indexes: list(int) or None
         """
 
     @abstractmethod
@@ -52,7 +54,10 @@ class AbstractSpikeRecordable(object):
         """ Clear the recorded data from the object
 
         :param buffer_manager: the buffer manager object
+        :type buffer_manager: \
+            ~spinn_front_end_common.interface.buffer_management.BufferManager
         :param placements: the placements object
+        :type placements: ~pacman.model.placements.Placements
         :param graph_mapper: the graph mapper object
         :rtype: None
         """
@@ -63,16 +68,23 @@ class AbstractSpikeRecordable(object):
         """ Get the recorded spikes from the object
 
         :param placements: the placements object
+        :type placements: ~pacman.model.placements.Placements
         :param graph_mapper: the graph mapper object
         :param buffer_manager: the buffer manager object
-        :param machine_time_step: the time step of the simulation
+        :type buffer_manager: \
+            ~spinn_front_end_common.interface.buffer_management.BufferManager
+        :param machine_time_step: \
+            the time step of the simulation, in microseconds
+        :type machine_time_step: int
         :return: A numpy array of 2-element arrays of (neuron_id, time)\
-            ordered by time
+            ordered by time, one element per event
+        :rtype: numpy.ndarray(tuple(int,int))
         """
 
     @abstractmethod
     def get_spikes_sampling_interval(self):
         """ Return the current sampling interval for spikes
 
-        :return: Sampling interval in micro seconds
+        :return: Sampling interval in microseconds
+        :rtype: float
         """

@@ -37,6 +37,9 @@ class MultiSpikeRecorder(object):
 
     @property
     def record(self):
+        """
+        :rtype: bool
+        """
         return self.__record
 
     @record.setter
@@ -44,6 +47,9 @@ class MultiSpikeRecorder(object):
         self.__record = record
 
     def get_sdram_usage_in_bytes(self, n_neurons, spikes_per_timestep):
+        """
+        :rtype: ~pacman.model.resources.AbstractSDRAM
+        """
         if not self.__record:
             return ConstantSDRAM(0)
 
@@ -52,11 +58,17 @@ class MultiSpikeRecorder(object):
             out_spike_bytes * spikes_per_timestep))
 
     def get_dtcm_usage_in_bytes(self):
+        """
+        :rtype: int
+        """
         if not self.__record:
             return 0
         return BYTES_PER_WORD
 
     def get_n_cpu_cycles(self, n_neurons):
+        """
+        :rtype: int
+        """
         if not self.__record:
             return 0
         return n_neurons * 4
@@ -64,6 +76,25 @@ class MultiSpikeRecorder(object):
     def get_spikes(
             self, label, buffer_manager, region,
             placements, graph_mapper, application_vertex, machine_time_step):
+        """
+        :param label:
+        :type label: str
+        :param buffer_manager: the buffer manager object
+        :type buffer_manager: \
+            ~spinn_front_end_common.interface.buffer_management.BufferManager
+        :param region:
+        :type region: int
+        :param placements:
+        :type placements: ~pacman.model.placements.Placements
+        :param application_vertex:
+        :type application_vertex: \
+            ~pacman.model.graph.application.ApplicationVertex
+        :param machine_time_step: microseconds
+        :type machine_time_step: int
+        :return: A numpy array of 2-element arrays of (neuron_id, time)\
+            ordered by time, one element per event
+        :rtype: numpy.ndarray(tuple(int,int))
+        """
         # pylint: disable=too-many-arguments
         spike_times = list()
         spike_ids = list()
