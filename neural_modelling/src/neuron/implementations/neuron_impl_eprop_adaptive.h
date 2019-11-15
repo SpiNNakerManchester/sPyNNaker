@@ -22,7 +22,7 @@
 
 // Includes for model parts used in this implementation
 #include <neuron/synapse_types/synapse_type_eprop_adaptive.h>
-#include <neuron/threshold_types/threshold_type_adaptive.h>
+#include <neuron/threshold_types/threshold_type_none.h>
 #include <neuron/models/neuron_model_eprop_adaptive_impl.h>
 #include <neuron/input_types/input_type_current.h>
 #include <neuron/additional_inputs/additional_input_none_impl.h>
@@ -230,8 +230,8 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     input_type_pointer_t input_type = &input_type_array[neuron_index];
 
     // Get threshold and additional input parameters for this neuron
-    threshold_type_pointer_t threshold_type =
-            &threshold_type_array[neuron_index];
+//    threshold_type_pointer_t threshold_type =
+//            &threshold_type_array[neuron_index];
     additional_input_pointer_t additional_input =
             &additional_input_array[neuron_index];
     synapse_param_pointer_t synapse_type =
@@ -239,7 +239,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
     // Get the voltage
     state_t voltage = neuron_model_get_membrane_voltage(neuron);
-    state_t B_t = threshold_type->B;
+    state_t B_t = neuron->B; // cache last timestep threshold level
     state_t z_t = neuron->z;
 
 //    recorded_variable_values[V_RECORDING_INDEX] = voltage;
@@ -280,7 +280,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
             additional_input, voltage);
 
     // determine if a spike should occur
-    threshold_type_update_threshold(neuron->z, threshold_type);
+    threshold_type_update_threshold(neuron->z, neuron);
 
     // update neuron parameters
     state_t result = neuron_model_state_update(
@@ -292,7 +292,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
 
     // Also update Z (including using refractory period information)
-    state_t nu = (voltage - threshold_type->B)/threshold_type->B;
+    state_t nu = (voltage - neuron->B)/neuron->B;
 
     if (nu > ZERO){
     	neuron->z = 1.0k * neuron->A; // implements refractory period
@@ -315,7 +315,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
     // Record B
     recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
-    		B_t; // threshold_type->B;
+    		B_t; // neuron->B;
 //    		global_parameters->core_target_rate;
 //    		total_exc; // total synaptic input from input layer
     // *********************************************************

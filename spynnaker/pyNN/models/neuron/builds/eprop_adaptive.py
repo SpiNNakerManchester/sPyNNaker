@@ -16,20 +16,20 @@
 from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModelStandard
 from spynnaker.pyNN.models.defaults import default_initial_values
 from spynnaker.pyNN.models.neuron.neuron_models import (
-    NeuronModelEProp)
+    NeuronModelEPropAdaptive)
 from spynnaker.pyNN.models.neuron.synapse_types import (
     SynapseTypeEPropAdaptive)
 from spynnaker.pyNN.models.neuron.input_types import InputTypeCurrent
-from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeAdaptive
+from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeNone
 
 class EPropAdaptive(AbstractPyNNNeuronModelStandard):
     """ Adaptive threshold neuron with eprop support
     """
 
-    @default_initial_values({"v", 
-                             "isyn_exc", "isyn_exc2", "isyn_inh", "isyn_inh2", 
+    @default_initial_values({"v",
+                             "isyn_exc", "isyn_exc2", "isyn_inh", "isyn_inh2",
                              "psi", "target_rate", "tau_err",
-                             "B", "small_b", 
+                             "B", "small_b",
                              "l"
                              })
     def __init__(
@@ -41,33 +41,35 @@ class EPropAdaptive(AbstractPyNNNeuronModelStandard):
             #synapse type params
             tau_syn_E=5.0, tau_syn_E2=5.0, tau_syn_I=5.0, tau_syn_I2=5.0,
             isyn_exc=0.0, isyn_exc2=0.0, isyn_inh=0.0, isyn_inh2=0.0,
-            
+
             # Regularisation params
             target_rate=10, tau_err=1000,  #  fits with 1 ms timestep
-            
+
             # Threshold parameters
             B=10, small_b=0, small_b_0=10, tau_a=500, beta=1.8,
-            
+
             # Learning signal and weight update constants
             l=0
-            
+
             ):
         # pylint: disable=too-many-arguments, too-many-locals
-        neuron_model = NeuronModelEProp(
-            v, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac, psi, 
+        neuron_model = NeuronModelEPropAdaptive(
+            v, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac, psi,
+            # threshold params
+            B,
+            small_b,
+            small_b_0,
+            tau_a,
+            beta,
             target_rate, tau_err, l)
-        
+
         synapse_type = SynapseTypeEPropAdaptive(
-            tau_syn_E, tau_syn_E2, tau_syn_I, tau_syn_I2, 
+            tau_syn_E, tau_syn_E2, tau_syn_I, tau_syn_I2,
             isyn_exc, isyn_exc2, isyn_inh, isyn_inh2)
-        
+
         input_type = InputTypeCurrent()
-        
-        threshold_type = ThresholdTypeAdaptive(B,
-                                               small_b,
-                                               small_b_0,
-                                               tau_a,
-                                               beta)
+
+        threshold_type = ThresholdTypeNone()
 
         super(EPropAdaptive, self).__init__(
             model_name="eprop_adaptive", binary="eprop_adaptive.aplx",

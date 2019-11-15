@@ -19,6 +19,7 @@
 #define _NEURON_MODEL_LIF_CURR_IMPL_H_
 
 #include "neuron_model.h"
+#include <neuron/decay.h>
 
 #define SYNAPSES_PER_NEURON 250
 
@@ -69,6 +70,15 @@ typedef struct neuron_t {
     // pseudo derivative
     REAL     psi;
 
+    // Threshold paramters
+    REAL B; // Capital B(t)
+    REAL b; // b(t)
+    REAL b_0; // small b^0
+    decay_t e_to_dt_on_tau_a; // rho
+    REAL beta;
+    decay_t adpt; // (1-rho)
+    REAL scalar;
+
     REAL    L; // learning signal
 
     // array of synaptic states - peak fan-in of 250 for this case
@@ -81,5 +91,35 @@ typedef struct global_neuron_params_t {
 	REAL core_target_rate;
 	REAL rate_exp_TC;
 } global_neuron_params_t;
+
+
+static inline void threshold_type_update_threshold(state_t z,
+		neuron_pointer_t threshold_type){
+
+//	_print_threshold_params(threshold_type);
+
+
+	s1615 temp1 = decay_s1615(threshold_type->b, threshold_type->e_to_dt_on_tau_a);
+	s1615 temp2 = decay_s1615(threshold_type->scalar, threshold_type->adpt) * z;
+
+	threshold_type->b = temp1
+			+ temp2;
+
+
+//	// Evolve threshold dynamics (decay to baseline) and adapt if z=nonzero
+//	// Update small b (same regardless of spike - uses z from previous timestep)
+//	threshold_type->b =
+//			decay_s1615(threshold_type->b, threshold_type->e_to_dt_on_tau_a)
+//			+ decay_s1615(1000k, threshold_type->adpt) // fold scaling into decay to increase precision
+//			* z; // stored on neuron
+//
+	// Update large B
+	threshold_type->B = threshold_type->b_0 +
+			threshold_type->beta*threshold_type->b;
+
+}
+
+
+
 
 #endif // _NEURON_MODEL_LIF_CURR_IMPL_H_

@@ -35,6 +35,15 @@ COUNT_REFRAC = "count_refrac"
 PSI = "psi"
 Z = "z"
 A = "a"
+# Threshold
+BIG_B = "big_b"
+SMALL_B = "small_b"
+SMALL_B_0 = "small_b_0"
+TAU_A = "tau_a"
+BETA = "beta"
+ADPT = "adpt"
+SCALAR = "scalar"
+# Learning signal
 L = "learning_signal"
 
 UNITS = {
@@ -47,11 +56,18 @@ UNITS = {
     TAU_REFRAC: 'ms',
     Z: 'N/A',
     A: 'N/A',
-    PSI: 'N/A'
+    PSI: 'N/A',
+    BIG_B: "mV",
+    SMALL_B: "mV",
+    SMALL_B_0: "mV",
+    TAU_A: "ms",
+    BETA: "N/A",
+#          ADPT: "mV"
+    SCALAR: "dimensionless"
 }
 
 
-class NeuronModelEProp(AbstractNeuronModel):
+class NeuronModelEPropAdaptive(AbstractNeuronModel):
     __slots__ = [
         "__v_init",
         "__v_rest",
@@ -63,28 +79,45 @@ class NeuronModelEProp(AbstractNeuronModel):
         "__z",
         "__a",
         "__psi",
+        # threshold params
+        "__B",
+        "__small_b",
+        "__small_b_0",
+        "__tau_a",
+        "__beta",
+        # "_adpt"
+        "__scalar",
+        # reg params
         "__target_rate",
         "__tau_err",
+        # learning signal
         "__l"
         ]
 
     def __init__(
-            self, 
-            v_init, 
-            v_rest, 
-            tau_m, 
-            cm, 
-            i_offset, 
-            v_reset, 
+            self,
+            v_init,
+            v_rest,
+            tau_m,
+            cm,
+            i_offset,
+            v_reset,
             tau_refrac,
             psi,
+            # threshold params
+            B,
+            small_b,
+            small_b_0,
+            tau_a,
+            beta,
             # regularisation params
             target_rate,
             tau_err,
             l
             ):
-        
+
         datatype_list = [
+            # neuron params
             DataType.S1615,   #  v
             DataType.S1615,   #  v_rest
             DataType.S1615,   #  r_membrane (= tau_m / cm)
@@ -96,9 +129,18 @@ class NeuronModelEProp(AbstractNeuronModel):
             DataType.S1615,   #  Z
             DataType.S1615,   #  A
             DataType.S1615,   #  psi, pseuo_derivative
+            # threshold params
+            DataType.S1615,
+            DataType.S1615,
+            DataType.S1615,
+            DataType.UINT32,
+            DataType.S1615,
+            DataType.UINT32,
+            DataType.S1615,
+            # Learning signal
             DataType.S1615    #  L
-            ] 
-        
+            ]
+
         # Synapse states - always initialise to zero
         eprop_syn_state = [ # synaptic state, one per synapse (kept in DTCM)
                 DataType.INT16, # delta_w
@@ -108,15 +150,14 @@ class NeuronModelEProp(AbstractNeuronModel):
             ]
         # Extend to include fan-in for each neuron
         datatype_list.extend(eprop_syn_state * SYNAPSES_PER_NEURON)
-        
-        
+
         global_data_types = [
-            DataType.S1615,   #  core_pop_rate 
+            DataType.S1615,   #  core_pop_rate
             DataType.S1615,   #  core_target_rate
             DataType.S1615    #  rate_exp_TC
             ]
-        
-        super(NeuronModelEProp, self).__init__(data_types=datatype_list,
+
+        super(NeuronModelEPropAdaptive, self).__init__(data_types=datatype_list,
                                                global_data_types=global_data_types)
 
         if v_init is None:
@@ -129,11 +170,22 @@ class NeuronModelEProp(AbstractNeuronModel):
         self.__v_reset = v_reset
         self.__tau_refrac = tau_refrac
         self.__psi = psi  # calculate from v and v_thresh (but will probably end up zero)
-        
+
+        # threshold params
+        self.__B = B
+        self.__small_b = small_b
+        self.__small_b_0 = small_b_0
+        self.__tau_a = tau_a
+        self.__beta = beta
+        self.__scalar = 1000
+
+        # Regularisation params
         self.__target_rate = target_rate
         self.__tau_err = tau_err
+
+        # learning signal
         self.__l = l
-        
+
 
     @overrides(AbstractNeuronModel.get_n_cpu_cycles)
     def get_n_cpu_cycles(self, n_neurons):
@@ -149,6 +201,11 @@ class NeuronModelEProp(AbstractNeuronModel):
         parameters[V_RESET] = self.__v_reset
         parameters[TAU_REFRAC] = self.__tau_refrac
 
+        parameters[SMALL_B_0] = self.__small_b_0
+        parameters[TAU_A] = self.__tau_a
+        parameters[BETA] = self.__beta
+        parameters[SCALAR] = self.__scalar
+
     @overrides(AbstractNeuronModel.add_state_variables)
     def add_state_variables(self, state_variables):
         state_variables[V] = self.__v_init
@@ -157,6 +214,9 @@ class NeuronModelEProp(AbstractNeuronModel):
         state_variables[Z] = 0
         state_variables[A] = 0
         state_variables[L] = 0
+
+        state_variables[BIG_B] = self.__B
+        state_variables[SMALL_B] = self.__small_b
 
     @overrides(AbstractNeuronModel.get_units)
     def get_units(self, variable):
@@ -170,13 +230,15 @@ class NeuronModelEProp(AbstractNeuronModel):
     @overrides(AbstractNeuronModel.get_values, additional_arguments={'ts'})
     def get_values(self, parameters, state_variables, vertex_slice, ts):
 
+        ulfract = pow(2, 32)
+
         # Add the rest of the data
-        values = [state_variables[V], 
+        values = [state_variables[V],
                   parameters[V_REST],
                 parameters[TAU_M] / parameters[CM],
                 parameters[TAU_M].apply_operation(
                     operation=lambda x: numpy.exp(float(-ts) / (1000.0 * x))),
-                parameters[I_OFFSET], 
+                parameters[I_OFFSET],
                 state_variables[COUNT_REFRAC],
                 parameters[V_RESET],
                 parameters[TAU_REFRAC].apply_operation(
@@ -184,9 +246,22 @@ class NeuronModelEProp(AbstractNeuronModel):
                 state_variables[Z],
                 state_variables[A],
                 state_variables[PSI],
+
+                state_variables[BIG_B],
+                state_variables[SMALL_B],
+                parameters[SMALL_B_0],
+                parameters[TAU_A].apply_operation(
+                    operation=lambda
+                    x: numpy.exp(float(-ts) / (1000.0 * x)) * ulfract),
+                parameters[BETA],
+                parameters[TAU_A].apply_operation(
+                    operation=lambda x: (1 - numpy.exp(
+                        float(-ts) / (1000.0 * x))) * ulfract), # ADPT
+                parameters[SCALAR],
+
                 state_variables[L]
                 ]
-        
+
         # create synaptic state - init all state to zero
         eprop_syn_init = [0,
                           0,
@@ -194,11 +269,11 @@ class NeuronModelEProp(AbstractNeuronModel):
                           0]
         # extend to appropriate fan-in
         values.extend(eprop_syn_init * SYNAPSES_PER_NEURON)
-        
+
         return values
 
     @inject_items({"ts": "MachineTimeStep"})
-    @overrides(AbstractNeuronModel.get_global_values, 
+    @overrides(AbstractNeuronModel.get_global_values,
                additional_arguments={'ts'})
     def get_global_values(self, ts):
         glob_vals = [
@@ -206,30 +281,34 @@ class NeuronModelEProp(AbstractNeuronModel):
             self.__target_rate,     #  set target rate
             numpy.exp(-float(ts/1000)/self.__tau_err)
             ]
-        
+
         print("\n ")
         print(glob_vals)
         print(ts)
         print("\n")
         return glob_vals
-        
+
 
     @overrides(AbstractNeuronModel.update_values)
     def update_values(self, values, parameters, state_variables):
 
         # Read the data
         (v, _v_rest, _r_membrane, _exp_tc, _i_offset, count_refrac,
-         _v_reset, _tau_refrac, psi, l) = values # Not sure this will work with the new array of synapse!!!
+         _v_reset, _tau_refrac, psi,
+         big_b, small_b, _small_b_0, _e_to_dt_on_tau_a, _beta, adpt, scalar,
+         l) = values # Not sure this will work with the new array of synapse!!!
 
         # Copy the changed data only
         state_variables[V] = v
         state_variables[COUNT_REFRAC] = count_refrac
         state_vairables[PSI] = psi
-        state_variables[L] = l
-    
 
-    
-    
+        state_variables[BIG_B] = big_b
+        state_variables[SMALL_B] = small_b
+
+        state_variables[L] = l
+
+
     @property
     def v_init(self):
         return self.__v_init
@@ -285,3 +364,43 @@ class NeuronModelEProp(AbstractNeuronModel):
     @tau_refrac.setter
     def tau_refrac(self, tau_refrac):
         self.__tau_refrac = tau_refrac
+
+    @property
+    def B(self):
+        return self.__B
+
+    @B.setter
+    def B(self, new_value):
+        self.__B = new_value
+
+    @property
+    def small_b(self):
+        return self.__small_b
+
+    @small_b.setter
+    def small_b(self, new_value):
+        self.__small_b = new_value
+
+    @property
+    def small_b_0(self):
+        return self.__small_b_0
+
+    @small_b_0.setter
+    def small_b_0(self, new_value):
+        self.__small_b_0 = new_value
+
+    @property
+    def tau_a(self):
+        return self.__tau_a
+
+    @tau_a.setter
+    def tau_a(self, new_value):
+        self.__tau_a = new_value
+
+    @property
+    def beta(self):
+        return self.__beta
+
+    @beta.setter
+    def beta(self, new_value):
+        self.__beta = new_value
