@@ -307,17 +307,16 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     // Record  V (just as cheap to set then to gate later)
     recorded_variable_values[V_RECORDING_INDEX] = voltage; // result;
 
-    // Record Z
-    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = z_t;
 
-//    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] =
-//    		global_parameters->core_pop_rate;
+    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] =
+//    		z_t;
+    		global_parameters->core_pop_rate;
 
     // Record B
     recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
-    		B_t; // neuron->B;
-//    		global_parameters->core_target_rate;
-//    		total_exc; // total synaptic input from input layer
+//    		B_t; // neuron->B;
+    		global_parameters->core_target_rate;
+//    		total_inh; // total synaptic input from input layer
     // *********************************************************
 
 

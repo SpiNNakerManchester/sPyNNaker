@@ -104,7 +104,7 @@ static inline void threshold_type_update_threshold(state_t z,
 
 	threshold_type->b = temp1
 			+ temp2;
-
+	// io_printf(IO_BUF, "temp1: %k; temp2: %k\n", temp1, temp2);
 
 //	// Evolve threshold dynamics (decay to baseline) and adapt if z=nonzero
 //	// Update small b (same regardless of spike - uses z from previous timestep)
