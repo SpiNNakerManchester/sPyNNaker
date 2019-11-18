@@ -13,9 +13,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .abstract_additional_input import AbstractAdditionalInput
-from .additional_input_ca2_adaptive import AdditionalInputCa2Adaptive
-from .additional_input_ion_channel import AdditionalInputIonChannel
+APP = $(notdir $(CURDIR))
 
-__all__ = ["AbstractAdditionalInput", "AdditionalInputCa2Adaptive",
-           "AdditionalInputIonChannel"]
+NEURON_MODEL = $(NEURON_DIR)/neuron/models/neuron_model_lif_impl.c
+NEURON_MODEL_H = $(NEURON_DIR)/neuron/models/neuron_model_lif_impl.h
+INPUT_TYPE_H = $(NEURON_DIR)/neuron/input_types/input_type_current.h
+NEURON_IMPL_H = $(NEURON_DIR)/neuron/implementations/neuron_impl_standard.h
+THRESHOLD_TYPE_H = $(NEURON_DIR)/neuron/threshold_types/threshold_type_static.h
+SYNAPSE_TYPE_H = $(NEURON_DIR)/neuron/synapse_types/synapse_types_exponential_impl.h
+SYNAPSE_DYNAMICS = $(NEURON_DIR)/neuron/plasticity/synapse_dynamics_static_impl.c
+ADDITIONAL_INPUT_H = $(NEURON_DIR)/neuron/additional_inputs/additional_input_ion_channel_impl.h
+
+include ../neural_build.mk

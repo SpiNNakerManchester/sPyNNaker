@@ -245,7 +245,9 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
     // Call functions to get the input values to be recorded
     recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = total_exc;
-    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = total_inh;
+//    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
+//    		external_bias;
+//    		// total_inh;
 
     // Call functions to convert exc_input and inh_input to current
     input_type_convert_excitatory_input_to_current(
@@ -255,6 +257,10 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
     external_bias += additional_input_get_input_value_as_current(
             additional_input, voltage);
+
+    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
+    		external_bias;
+    		// total_inh;
 
     // update neuron parameters
     state_t result = neuron_model_state_update(
