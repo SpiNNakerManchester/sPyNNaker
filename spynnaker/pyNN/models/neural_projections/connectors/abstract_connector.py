@@ -60,7 +60,8 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
 
     def __init__(self, safe=True, callback=None, verbose=False, rng=None):
         """
-        :param safe:
+        :param safe: if True, check that weights and delays have valid values.\
+            If False, this check is skipped. (NB: SpiNNaker always checks.)
         :type safe: bool
         :param callback: Ignored
         :type callback: callable
@@ -469,6 +470,9 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
 
     @property
     def safe(self):
+        """
+        :rtype: bool
+        """
         return self.__safe
 
     @safe.setter
@@ -477,10 +481,19 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
 
     @property
     def space(self):
+        """ The space object (may be updated after instantiation).
+
+        :rtype: pyNN.space.Space or None
+        """
         return self.__space
 
     @space.setter
     def space(self, new_value):
+        """ Set the space object (allowed after instantiation).
+
+        :param new_value:
+        :type new_value: pyNN.space.Space
+        """
         self.__space = new_value
 
     @property

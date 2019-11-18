@@ -33,6 +33,14 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
     def __init__(self, random_number_class,
                  safe=True, callback=None, verbose=False):
         """
+        :param random_number_class:
+        :type random_number_class: class
+        :param safe:
+        :type safe: bool
+        :param callback: Ignored
+        :type callback: callable
+        :param verbose:
+        :type verbose: bool
         """
         self.__random_number_class = random_number_class
         super(OneToOneConnector, self).__init__(safe, callback, verbose)

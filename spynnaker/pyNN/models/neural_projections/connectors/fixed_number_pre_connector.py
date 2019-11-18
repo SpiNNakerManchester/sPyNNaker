@@ -61,6 +61,15 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine):
             pre-synaptic neuron has been connected to a post-neuron, it\
             can't be connected again.
         :type with_replacement: bool
+        :param safe:
+        :type safe: bool
+        :param callback: Ignored
+        :type callback: callable
+        :param verbose:
+        :type verbose: bool
+        :param rng: \
+            Seeded random number generator, or None to make one when needed
+        :type rng: pyNN.random.NumpyRNG or None
         """
         # :param space:
         # a Space object, needed if you wish to specify distance-dependent\

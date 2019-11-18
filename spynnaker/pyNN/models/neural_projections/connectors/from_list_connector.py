@@ -47,18 +47,28 @@ class FromListConnector(AbstractConnector):
     def __init__(self, conn_list, safe=True, callback=None, verbose=False,
                  column_names=None):
         """
-        :param: conn_list:
+        :param conn_list:
             a list of tuples, one tuple for each connection. Each\
             tuple should contain at least::
 
                 (pre_idx, post_idx)
 
-            where pre_idx is the index (i.e. order in the Population,\
-            not the ID) of the presynaptic neuron, and post_idx is\
+            where ``pre_idx`` is the index (i.e. order in the Population,\
+            not the ID) of the presynaptic neuron, and ``post_idx`` is\
             the index of the postsynaptic neuron.
 
             Additional items per synapse are acceptable but all synapses\
             should have the same number of items.
+        :type conn_list: numpy.ndarray or list(tuple(int,int,...))
+        :param safe:
+        :type safe: bool
+        :param callback: Ignored
+        :type callback: callable
+        :param verbose:
+        :type verbose: bool
+        :param column_names: If not None, must have same length as number of \
+            extra columns in ``conn_list`` (i.e., after the first two).
+        :type column_names: None or list(str)
         """
         super(FromListConnector, self).__init__(safe, callback, verbose)
 
@@ -249,6 +259,10 @@ class FromListConnector(AbstractConnector):
 
     @property
     def conn_list(self):
+        """ The connection list.
+
+        :rtype: numpy.ndarray
+        """
         return self.__conn_list
 
     def get_n_connections(self, pre_slices, post_slices, pre_hi, post_hi):
@@ -346,6 +360,12 @@ class FromListConnector(AbstractConnector):
 
     @property
     def column_names(self):
+        """ The names of the columns in the array after the first two.
+        Of particular interest is whether ``weight`` and ``delay`` columns
+        are present.
+
+        :rtype: list(str)
+        """
         return self.__column_names
 
     @column_names.setter
@@ -353,13 +373,17 @@ class FromListConnector(AbstractConnector):
         self.__column_names = column_names
 
     def get_extra_parameters(self):
-        """ Getter for the extra parameters.
+        """ Getter for the extra parameters. Excludes ``weight`` and
+        ``delay`` columns.
 
         :return: The extra parameters
+        :rtype: numpy.ndarray
         """
         return self.__extra_parameters
 
     def get_extra_parameter_names(self):
-        """ Getter for the names of the extra parameters
+        """ Getter for the names of the extra parameters.
+
+        :rtype: list(str)
         """
         return self.__extra_parameter_names

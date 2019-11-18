@@ -56,14 +56,23 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
             if the connector is used to connect a Population to itself, this\
             flag determines whether a neuron is allowed to connect to itself,\
             or only to other neurons in the Population.
-        :type d_expression: bool
+        :type allow_self_connections: bool
         :param space:\
             a Space object, needed if you wish to specify distance-dependent\
             weights or delays.
         :type space: pyNN.Space
+        :param safe:
+        :type safe: bool
+        :param callback: Ignored
+        :type callback: callable
+        :param verbose:
+        :type verbose: bool
         :param n_connections:\
             The number of efferent synaptic connections per neuron.
         :type n_connections: int or None
+        :param rng: \
+            Seeded random number generator, or None to make one when needed
+        :type rng: pyNN.random.NumpyRNG or None
         """
         # pylint: disable=too-many-arguments
         super(DistanceDependentProbabilityConnector, self).__init__(

@@ -57,6 +57,15 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
         :param with_replacement:
             When selecting, allow a neuron to be re-selected or not.
         :type with_replacement: bool
+        :param safe:
+        :type safe: bool
+        :param callback: Ignored
+        :type callback: callable
+        :param verbose:
+        :type verbose: bool
+        :param rng: \
+            Seeded random number generator, or None to make one when needed
+        :type rng: pyNN.random.NumpyRNG or None
         """
         super(MultapseConnector, self).__init__(safe, callback, verbose)
         self.__num_synapses = num_synapses

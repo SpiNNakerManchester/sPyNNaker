@@ -61,6 +61,15 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine):
             post-synaptic neuron has been connected to a pre-neuron, it can't\
             be connected again.
         :type with_replacement: bool
+        :param safe:
+        :type safe: bool
+        :param callback: Ignored
+        :type callback: callable
+        :param verbose:
+        :type verbose: bool
+        :param rng: \
+            Seeded random number generator, or None to make one when needed
+        :type rng: pyNN.random.NumpyRNG or None
         """
         super(FixedNumberPostConnector, self).__init__(safe, callback, verbose)
         self.__n_post = n

@@ -47,9 +47,14 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
             flag determines whether a neuron is allowed to connect to itself,\
             or only to other neurons in the Population.
         :type allow_self_connections: bool
-        :param `pyNN.Space` space:
-            a Space object, needed if you wish to specify distance-dependent\
-            weights or delays - not implemented
+        :type safe: bool
+        :param callback: Ignored
+        :type callback: callable
+        :param verbose:
+        :type verbose: bool
+        :param rng: \
+            Seeded random number generator, or None to make one when needed
+        :type rng: pyNN.random.NumpyRNG or None
         """
         super(FixedProbabilityConnector, self).__init__(
             safe, callback, verbose)

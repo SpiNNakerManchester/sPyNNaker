@@ -77,6 +77,14 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
     ]
 
     def __init__(self, safe=True, callback=None, verbose=False):
+        """
+        :param safe:
+        :type safe: bool
+        :param callback: Ignored
+        :type callback: callable
+        :param verbose:
+        :type verbose: bool
+        """
         AbstractConnector.__init__(
             self, safe=safe, callback=callback, verbose=verbose)
         self.__delay_seed = dict()
@@ -258,7 +266,7 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
 
     @abstractproperty
     def gen_connector_id(self):
-        """ Get the id of the connection generator on the machine
+        """ The ID of the connection generator on the machine.
 
         :rtype: int
         """

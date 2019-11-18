@@ -41,6 +41,12 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
             allowed to connect to itself, or only to other neurons in the\
             Population.
         :type allow_self_connections: bool
+        :param safe:
+        :type safe: bool
+        :param callback: Ignored
+        :type callback: callable
+        :param verbose:
+        :type verbose: bool
         """
         super(AllToAllConnector, self).__init__(safe, callback, verbose)
         self.__allow_self_connections = allow_self_connections
@@ -134,6 +140,9 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
 
     @property
     def allow_self_connections(self):
+        """
+        :rtype: bool
+        """
         return self.__allow_self_connections
 
     @allow_self_connections.setter
