@@ -29,7 +29,7 @@ from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spynnaker.pyNN.models.neuron.generator_data import GeneratorData
 from spynnaker.pyNN.models.neural_projections.connectors import (
-    OneToOneConnector, AbstractGenerateConnectorOnMachine)
+    AbstractGenerateConnectorOnMachine)
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from .synapse_dynamics import (
     AbstractSynapseDynamicsStructural,
@@ -281,7 +281,7 @@ class SynapticManager(object):
                     connector_gen = isinstance(
                         connector, AbstractGenerateConnectorOnMachine) and \
                         connector.generate_on_machine(
-                            synapse_info.weight, synapse_info.delay)
+                            synapse_info.weights, synapse_info.delays)
                     synapse_gen = isinstance(
                         dynamics, AbstractGenerateOnMachine)
                     if connector_gen and synapse_gen:
@@ -289,9 +289,9 @@ class SynapticManager(object):
                         gen_size = sum((
                             GeneratorData.BASE_SIZE,
                             connector.gen_delay_params_size_in_bytes(
-                                synapse_info.delay),
+                                synapse_info.delays),
                             connector.gen_weight_params_size_in_bytes(
-                                synapse_info.weight),
+                                synapse_info.weights),
                             connector.gen_connector_params_size_in_bytes,
                             dynamics.gen_matrix_params_size_in_bytes
                         ))
@@ -459,21 +459,22 @@ class SynapticManager(object):
 
                     weight_mean = (
                         synapse_dynamics.get_weight_mean(
-                            connector, synapse_info.weight) * weight_scale)
+                            connector, synapse_info) * weight_scale)
                     n_connections = \
-                        connector.get_n_connections_to_post_vertex_maximum()
+                        connector.get_n_connections_to_post_vertex_maximum(
+                            synapse_info)
                     weight_variance = synapse_dynamics.get_weight_variance(
-                        connector, synapse_info.weight) * weight_scale_squared
+                        connector, synapse_info.weights) * weight_scale_squared
                     running_totals[synapse_type].add_items(
                         weight_mean, weight_variance, n_connections)
 
                     delay_variance = synapse_dynamics.get_delay_variance(
-                        connector, synapse_info.delay)
+                        connector, synapse_info.delays)
                     delay_running_totals[synapse_type].add_items(
                         0.0, delay_variance, n_connections)
 
                     weight_max = (synapse_dynamics.get_weight_maximum(
-                        connector, synapse_info.weight) * weight_scale)
+                        connector, synapse_info) * weight_scale)
                     biggest_weight[synapse_type] = max(
                         biggest_weight[synapse_type], weight_max)
 
@@ -634,12 +635,12 @@ class SynapticManager(object):
                     if (isinstance(
                             connector, AbstractGenerateConnectorOnMachine) and
                             connector.generate_on_machine(
-                                synapse_info.weight, synapse_info.delay) and
+                                synapse_info.weights, synapse_info.delays) and
                             isinstance(dynamics, AbstractGenerateOnMachine) and
                             dynamics.generate_on_machine and
                             not self.__is_direct(
                                 single_addr, connector, pre_vertex_slice,
-                                post_vertex_slice, app_edge) and
+                                post_vertex_slice, app_edge, synapse_info) and
                             not isinstance(
                                 self.synapse_dynamics,
                                 AbstractSynapseDynamicsStructural)):
@@ -845,7 +846,8 @@ class SynapticManager(object):
                 spec, synapse_info.connector, pre_vertex_slice,
                 post_vertex_slice, row_length, row_data, rinfo,
                 single_synapses, master_pop_table_region,
-                synaptic_matrix_region, block_addr, single_addr, app_edge)
+                synaptic_matrix_region, block_addr, single_addr, app_edge,
+                synapse_info)
         elif rinfo is not None:
             index = self.__poptable_type.update_master_population_table(
                 spec, 0, 0, rinfo.first_key_and_mask, master_pop_table_region)
@@ -867,7 +869,8 @@ class SynapticManager(object):
                 spec, synapse_info.connector, pre_vertex_slice,
                 post_vertex_slice, delayed_row_length, delayed_row_data,
                 delay_rinfo, single_synapses, master_pop_table_region,
-                synaptic_matrix_region, block_addr, single_addr, app_edge)
+                synaptic_matrix_region, block_addr, single_addr, app_edge,
+                synapse_info)
         elif delay_rinfo is not None:
             d_index = self.__poptable_type.update_master_population_table(
                 spec, 0, 0, delay_rinfo.first_key_and_mask,
@@ -886,13 +889,13 @@ class SynapticManager(object):
 
     def __is_direct(
             self, single_addr, connector, pre_vertex_slice, post_vertex_slice,
-            app_edge):
+            app_edge, synapse_info):
         """ Determine if the given connection can be done with a "direct"\
             synaptic matrix - this must have an exactly 1 entry per row
         """
         return (
             app_edge.n_delay_stages == 0 and
-            isinstance(connector, OneToOneConnector) and
+            connector.use_direct_matrix(synapse_info) and
             (single_addr + (pre_vertex_slice.n_atoms * BYTES_PER_WORD) <=
                 self.__one_to_one_connection_dtcm_max_bytes) and
             (pre_vertex_slice.lo_atom == post_vertex_slice.lo_atom) and
@@ -902,10 +905,10 @@ class SynapticManager(object):
             self, spec, connector, pre_vertex_slice, post_vertex_slice,
             row_length, row_data, rinfo, single_synapses,
             master_pop_table_region, synaptic_matrix_region,
-            block_addr, single_addr, app_edge):
+            block_addr, single_addr, app_edge, synapse_info):
         if row_length == 1 and self.__is_direct(
                 single_addr, connector, pre_vertex_slice, post_vertex_slice,
-                app_edge):
+                app_edge, synapse_info):
             single_rows = row_data.reshape(-1, 4)[:, 3]
             single_synapses.append(single_rows)
             index = self.__poptable_type.update_master_population_table(

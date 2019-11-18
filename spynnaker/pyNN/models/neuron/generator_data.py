@@ -77,9 +77,9 @@ class GeneratorData(object):
                     dynamics.gen_matrix_params_size_in_bytes,
                     connector.gen_connector_params_size_in_bytes,
                     connector.gen_weight_params_size_in_bytes(
-                        self.__synapse_information.weight),
+                        self.__synapse_information.weights),
                     connector.gen_delay_params_size_in_bytes(
-                        self.__synapse_information.delay)))
+                        self.__synapse_information.delays)))
 
     @property
     def gen_data(self):
@@ -106,18 +106,19 @@ class GeneratorData(object):
             self.__synapse_information.synapse_type,
             synapse_dynamics.gen_matrix_id,
             connector.gen_connector_id,
-            connector.gen_weights_id(self.__synapse_information.weight),
-            connector.gen_delays_id(self.__synapse_information.delay)],
+            connector.gen_weights_id(self.__synapse_information.weights),
+            connector.gen_delays_id(self.__synapse_information.delays)],
             dtype="uint32"))
         items.append(synapse_dynamics.gen_matrix_params)
         items.append(connector.gen_connector_params(
             self.__pre_slices, self.__pre_slice_index, self.__post_slices,
             self.__post_slice_index, self.__pre_vertex_slice,
-            self.__post_vertex_slice, self.__synapse_information.synapse_type))
+            self.__post_vertex_slice, self.__synapse_information.synapse_type,
+            self.__synapse_information))
         items.append(connector.gen_weights_params(
-            self.__synapse_information.weight, self.__pre_vertex_slice,
+            self.__synapse_information.weights, self.__pre_vertex_slice,
             self.__post_vertex_slice))
         items.append(connector.gen_delay_params(
-            self.__synapse_information.delay, self.__pre_vertex_slice,
+            self.__synapse_information.delays, self.__pre_vertex_slice,
             self.__post_vertex_slice))
         return numpy.concatenate(items)
