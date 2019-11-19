@@ -32,6 +32,8 @@ logger = logging.getLogger(__name__)
 
 
 class TimingDependenceVogels2011(AbstractTimingDependence):
+    """ A timing dependence STDP rule due to Vogels (2011).
+    """
     __slots__ = [
         "__alpha",
         "__synapse_structure",

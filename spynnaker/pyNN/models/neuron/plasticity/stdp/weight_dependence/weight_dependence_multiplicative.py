@@ -24,6 +24,8 @@ _SPACE_PER_SYNAPSE_TYPE = 4 * BYTES_PER_WORD
 
 class WeightDependenceMultiplicative(
         AbstractHasAPlusAMinus, AbstractWeightDependence):
+    """ A multiplicative weight dependence STDP rule.
+    """
     __slots__ = [
         "__w_max",
         "__w_min"]

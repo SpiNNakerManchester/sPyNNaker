@@ -27,6 +27,8 @@ logger = logging.getLogger(__name__)
 
 
 class TimingDependenceSpikeNearestPair(AbstractTimingDependence):
+    """ A timing dependence STDP rule based on nearest pairs.
+    """
     __slots__ = [
         "__synapse_structure",
         "__tau_minus",

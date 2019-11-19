@@ -18,6 +18,8 @@ from spinn_utilities.abstract_base import AbstractBase
 
 
 class AbstractHasAPlusAMinus(with_metaclass(AbstractBase, object)):
+    """ An object that has A\ :sub:`+` and A\ :sub:`-` properties.
+    """
     __slots__ = [
         # things
         '__a_plus',

@@ -28,6 +28,8 @@ logger = logging.getLogger(__name__)
 
 
 class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
+    """ A timing dependence STDP rule based on spike triplets.
+    """
     __slots__ = [
         "__synapse_structure",
         "__tau_minus",

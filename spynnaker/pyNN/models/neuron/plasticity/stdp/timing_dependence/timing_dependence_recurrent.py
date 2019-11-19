@@ -26,6 +26,8 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
 
 
 class TimingDependenceRecurrent(AbstractTimingDependence):
+    """ A timing dependence STDP rule based on recurrences.
+    """
     __slots__ = [
         "__accumulator_depression_plus_one",
         "__accumulator_potentiation_minus_one",

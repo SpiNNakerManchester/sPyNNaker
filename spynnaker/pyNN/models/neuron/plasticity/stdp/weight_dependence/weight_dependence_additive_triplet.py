@@ -24,6 +24,8 @@ _SPACE_PER_SYNAPSE_TYPE = 6 * BYTES_PER_WORD
 
 class WeightDependenceAdditiveTriplet(
         AbstractHasAPlusAMinus, AbstractWeightDependence):
+    """ An triplet-based additive weight dependence STDP rule.
+    """
     __slots__ = [
         "__a3_minus",
         "__a3_plus",

@@ -28,6 +28,8 @@ logger = logging.getLogger(__name__)
 
 
 class TimingDependenceSpikePair(AbstractTimingDependence):
+    """ A basic timing dependence STDP rule.
+    """
     __slots__ = [
         "__synapse_structure",
         "__tau_minus",
