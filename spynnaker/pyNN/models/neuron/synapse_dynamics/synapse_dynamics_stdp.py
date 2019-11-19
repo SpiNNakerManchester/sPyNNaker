@@ -36,6 +36,10 @@ TIME_STAMP_BYTES = BYTES_PER_WORD
 class SynapseDynamicsSTDP(
         AbstractPlasticSynapseDynamics, AbstractSettable,
         AbstractChangableAfterRun, AbstractGenerateOnMachine):
+    """ The dynamics of a synapse that changes over time using a \
+        Spike Timing Dependent Plasticity (STDP) rule.
+    """
+
     __slots__ = [
         # Flag: whether there is state in this class that is not reflected on
         # the SpiNNaker system
@@ -60,6 +64,24 @@ class SynapseDynamicsSTDP(
             voltage_dependence=None, dendritic_delay_fraction=1.0,
             weight=0.0, delay=1.0, pad_to_length=None,
             backprop_delay=True):
+        """
+        :param timing_dependence:
+        :type timing_dependence: AbstractTimingDependence
+        :param weight_dependence:
+        :type weight_dependence: AbstractWeightDependence
+        :param voltage_dependence: not supported
+        :type voltage_dependence: None
+        :param dendritic_delay_fraction: [0.5, 1.0]
+        :type dendritic_delay_fraction: float
+        :param weight:
+        :type weight: float
+        :param delay:
+        :type delay: float
+        :param pad_to_length:
+        :type pad_to_length: int or None
+        :param backprop_delay:
+        :type backprop_delay: bool
+        """
         self.__timing_dependence = timing_dependence
         self.__weight_dependence = weight_dependence
         self.__dendritic_delay_fraction = float(dendritic_delay_fraction)
@@ -115,7 +137,7 @@ class SynapseDynamicsSTDP(
         return self
 
     @property
-    @overrides(AbstractChangableAfterRun.requires_mapping)
+    @overrides(AbstractChangableAfterRun.requires_mapping, extend_doc=False)
     def requires_mapping(self):
         """ True if changes that have been made require that mapping be\
             performed.  Note that this should return True the first time it\
@@ -124,7 +146,7 @@ class SynapseDynamicsSTDP(
         """
         return self.__change_requires_mapping
 
-    @overrides(AbstractChangableAfterRun.mark_no_changes)
+    @overrides(AbstractChangableAfterRun.mark_no_changes, extend_doc=False)
     def mark_no_changes(self):
         """ Marks the point after which changes are reported.  Immediately\
             after calling this method, requires_mapping should return False.
@@ -133,8 +155,6 @@ class SynapseDynamicsSTDP(
 
     @overrides(AbstractSettable.get_value)
     def get_value(self, key):
-        """ Get a property
-        """
         for obj in [self.__timing_dependence, self.__weight_dependence, self]:
             if hasattr(obj, key):
                 return getattr(obj, key)
@@ -143,11 +163,6 @@ class SynapseDynamicsSTDP(
 
     @overrides(AbstractSettable.set_value)
     def set_value(self, key, value):
-        """ Set a property
-
-        :param key: the name of the parameter to change
-        :param value: the new value of the parameter to assign
-        """
         for obj in [self.__timing_dependence, self.__weight_dependence, self]:
             if hasattr(obj, key):
                 setattr(obj, key, value)
@@ -166,6 +181,10 @@ class SynapseDynamicsSTDP(
 
     @property
     def dendritic_delay_fraction(self):
+        """ Settable.
+
+        :rtype: float
+        """
         return self.__dendritic_delay_fraction
 
     @dendritic_delay_fraction.setter
@@ -210,6 +229,16 @@ class SynapseDynamicsSTDP(
         return size
 
     def write_parameters(self, spec, region, machine_time_step, weight_scales):
+        """
+        :param spec:
+        :type spec: ~data_specification.DataSpecificationGenerator
+        :param region: region ID
+        :type region: int
+        :param machine_time_step:
+        :type machine_time_step: int
+        :param weight_scales:
+        :type weight_scales: list(float)
+        """
         spec.comment("Writing Plastic Parameters")
 
         # Switch focus to the region:

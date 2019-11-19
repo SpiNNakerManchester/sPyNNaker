@@ -130,11 +130,23 @@ class _SingleValue_Iterator(Iterator):
 
 
 class NeuronParameter(object):
+    """ A settable parameter of a neuron model.
+    """
+
     __slots__ = [
         "__data_type",
         "__value"]
 
     def __init__(self, value, data_type):
+        """
+        :param value: what the value of the parameter is; if a list or array,\
+            potentially provides a different value for each neuron
+        :type value: int or float or bool or list(int) or list(float) or \
+            list(bool) or numpy.ndarray
+        :param data_type: The serialization type of the parameter in the \
+            neuron model
+        :type data_type: ~data_specification.enums.DataType
+        """
         self.__value = value
         if data_type not in DataType:
             raise UnknownTypeException(
@@ -142,9 +154,20 @@ class NeuronParameter(object):
         self.__data_type = data_type
 
     def get_value(self):
+        """ What the value of the parameter is; if a list or array,\
+            potentially provides a different value for each neuron.
+
+        :rtype: int or float or bool or list(int) or list(float) or \
+            list(bool) or numpy.ndarray
+        """
         return self.__value
 
     def get_dataspec_datatype(self):
+        """ Get the serialization type of the parameter in the \
+            neuron model.
+
+        :rtype: ~data_specification.enums.DataType
+        """
         return self.__data_type
 
     def iterator_by_slice(self, slice_start, slice_stop, spec):
@@ -153,8 +176,9 @@ class NeuronParameter(object):
         :param slice_start: Inclusive start of the range
         :param slice_stop: Exclusive end of the range
         :param spec: The data specification to write to
-        :type spec: DataSpecificationGenerator
-        :return: Iterator
+        :type spec: ~data_specification.DataSpecificationGenerator
+        :return: Iterator that produces a value for each element in the slice.
+        :rtype: six.Iterator
         """
         if isinstance(self.__value, AbstractList):
             return _Range_Iterator(

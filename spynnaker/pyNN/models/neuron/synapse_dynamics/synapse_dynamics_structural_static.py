@@ -34,8 +34,11 @@ class SynapseDynamicsStructuralStatic(
         Written by Petrut Bogdan.
 
     :param partner_selection: The partner selection rule
+    :type partner_selection: AbstractPartnerSelection
     :param formation: The formation rule
+    :type formation: AbstractFormation
     :param elimination: The elimination rule
+    :type elimination: AbstractElimination
     :param f_rew: How many rewiring attempts will be done per second.
     :type f_rew: int
     :param initial_weight: Weight assigned to a newly formed connection
@@ -50,7 +53,9 @@ class SynapseDynamicsStructuralStatic(
     :param seed: seed the random number generators
     :type seed: int
     :param weight: The weight of connections formed by the connector
+    :type weight: float
     :param delay: The delay of connections formed by the connector
+    :type delay: float
     """
     __slots__ = ["__common_sp"]
 

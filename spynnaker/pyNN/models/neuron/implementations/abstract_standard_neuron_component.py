@@ -31,6 +31,7 @@ class AbstractStandardNeuronComponent(with_metaclass(AbstractBase, object)):
         :param data_types:\
             A list of data types in the component structure, in the order that\
             they appear
+        :type data_types: list(~data_specification.enums.DataType)
         """
         self.__struct = Struct(data_types)
 
@@ -38,8 +39,7 @@ class AbstractStandardNeuronComponent(with_metaclass(AbstractBase, object)):
     def struct(self):
         """ The structure of the component
 
-        :rtype:\
-            :py:class:'spynnaker.pyNN.models.neuron.implementations.struct.Struct'
+        :rtype: ~spynnaker.pyNN.models.neuron.implementations.Struct
         """
         return self.__struct
 
@@ -75,8 +75,7 @@ class AbstractStandardNeuronComponent(with_metaclass(AbstractBase, object)):
         """ Add the initial values of the parameters to the parameter holder
 
         :param parameters: A holder of the parameters
-        :type parameters:\
-            :py:class:`spinn_utilities.ranged.range_dictionary.RangeDictionary`
+        :type parameters: ~spinn_utilities.ranged.RangeDictionary
         """
 
     @abstractmethod
@@ -85,8 +84,7 @@ class AbstractStandardNeuronComponent(with_metaclass(AbstractBase, object)):
             variables holder
 
         :param state_variables: A holder of the state variables
-        :type state_variables:\
-            :py:class:`spinn_utilities.ranged.range_dictionary.RangeDictionary`
+        :type state_variables: ~spinn_utilities.ranged.RangeDictionary
         """
 
     @abstractmethod
@@ -94,27 +92,24 @@ class AbstractStandardNeuronComponent(with_metaclass(AbstractBase, object)):
         """ Get the values to be written to the machine for this model
 
         :param parameters: The holder of the parameters
-        :type parameters:\
-            :py:class:`spinn_utilities.ranged.range_dictionary.RangeDictionary`
+        :type parameters: ~spinn_utilities.ranged.RangeDictionary
         :param state_variables: The holder of the state variables
-        :type state_variables:\
-            :py:class:`spinn_utilities.ranged.range_dictionary.RangeDictionary`
+        :type state_variables: ~spinn_utilities.ranged.RangeDictionary
         :param vertex_slice: The slice of variables being retrieved
         :return: A list with the same length as self.struct.field_types
-        :rtype: A list of (single value or list of values or RangedList)
+        :rtype: list(int or float or list(int) or list(float) or \
+            ~spinn_utilities.ranged.RangedList)
         """
 
     def get_data(self, parameters, state_variables, vertex_slice):
         """ Get the data to be written to the machine for this model
 
         :param parameters: The holder of the parameters
-        :type parameters:\
-            :py:class:`spinn_utilities.ranged.range_dictionary.RangeDictionary`
+        :type parameters: ~spinn_utilities.ranged.RangeDictionary
         :param state_variables: The holder of the state variables
-        :type state_variables:\
-            :py:class:`spinn_utilities.ranged.range_dictionary.RangeDictionary`
+        :type state_variables: ~spinn_utilities.ranged.RangeDictionary
         :param vertex_slice: The slice of the vertex to generate parameters for
-        :rtype: numpy array of uint32
+        :rtype: numpy.ndarray(uint32)
         """
         values = self.get_values(parameters, state_variables, vertex_slice)
         return self.struct.get_data(
@@ -127,9 +122,11 @@ class AbstractStandardNeuronComponent(with_metaclass(AbstractBase, object)):
 
         :param values:\
             The values read from the machine, one for each struct element
-        :type value: A list of lists
+        :type values: list(list)
         :param parameters: The holder of the parameters to update
+        :type parameters: ~spinn_utilities.ranged.RangeDictionary
         :param state_variables: The holder of the state variables to update
+        :type state_variables: ~spinn_utilities.ranged.RangeDictionary
         """
 
     def read_data(
@@ -138,15 +135,17 @@ class AbstractStandardNeuronComponent(with_metaclass(AbstractBase, object)):
             given data
 
         :param data: The data to be read
+        :type data: bytes or bytearray or memoryview
         :param offset: The offset where the data should be read from
+        :type offset: int
         :param vertex_slice: The slice of the vertex to read parameters for
+        :type vertex_slice: ~pacman.model.graphs.common.Slice
         :param parameters: The holder of the parameters to update
-        :type parameters:\
-            :py:class:`spinn_utilities.ranged.range_dictionary.RangeDictionary`
+        :type parameters: ~spinn_utilities.ranged.RangeDictionary
         :param state_variables: The holder of the state variables to update
-        :type state_variables:\
-            :py:class:`spinn_utilities.ranged.range_dictionary.RangeDictionary`
+        :type state_variables: ~spinn_utilities.ranged.RangeDictionary
         :return: The offset after reading the data
+        :rtype: int
         """
         values = self.struct.read_data(data, offset, vertex_slice.n_atoms)
         new_offset = offset + (self.struct.get_size_in_whole_words(

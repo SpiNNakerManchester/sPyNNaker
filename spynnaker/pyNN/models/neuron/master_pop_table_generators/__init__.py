@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from .abstract_master_pop_table_factory import AbstractMasterPopTableFactory
 from .master_pop_table_as_binary_search import MasterPopTableAsBinarySearch
 
-__all__ = ['MasterPopTableAsBinarySearch']
+__all__ = ['AbstractMasterPopTableFactory', 'MasterPopTableAsBinarySearch']

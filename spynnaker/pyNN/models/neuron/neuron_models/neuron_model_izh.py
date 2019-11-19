@@ -38,6 +38,8 @@ UNITS = {
 
 
 class NeuronModelIzh(AbstractNeuronModel):
+    """ Model of neuron due to Eugene M. Izhikevich et al
+    """
     __slots__ = [
         "__a", "__b", "__c", "__d", "__v_init", "__u_init", "__i_offset"
     ]
@@ -91,12 +93,18 @@ class NeuronModelIzh(AbstractNeuronModel):
     @overrides(AbstractNeuronModel.get_global_values,
                additional_arguments={'machine_time_step'})
     def get_global_values(self, machine_time_step):
+        """
+        :param machine_time_step: machine time step
+        """
         # pylint: disable=arguments-differ
         return [float(machine_time_step)/1000.0]
 
     @inject_items({"ts": "MachineTimeStep"})
     @overrides(AbstractNeuronModel.get_values, additional_arguments={'ts'})
     def get_values(self, parameters, state_variables, vertex_slice, ts):
+        """
+        :param ts: machine time step
+        """
         # pylint: disable=arguments-differ
 
         # Add the rest of the data

@@ -40,24 +40,42 @@ class MaxRowInfo(object):
 
     @property
     def undelayed_max_n_synapses(self):
+        """
+        :rtype: int
+        """
         return self.__undelayed_max_n_synapses
 
     @property
     def delayed_max_n_synapses(self):
+        """
+        :rtype: int
+        """
         return self.__delayed_max_n_synapses
 
     @property
     def undelayed_max_bytes(self):
+        """
+        :rtype: int
+        """
         return self.__undelayed_max_bytes
 
     @property
     def delayed_max_bytes(self):
+        """
+        :rtype: int
+        """
         return self.__delayed_max_bytes
 
     @property
     def undelayed_max_words(self):
+        """
+        :rtype: int
+        """
         return self.__undelayed_max_words
 
     @property
     def delayed_max_words(self):
+        """
+        :rtype: int
+        """
         return self.__delayed_max_words

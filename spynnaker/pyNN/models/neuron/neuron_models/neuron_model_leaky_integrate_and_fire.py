@@ -40,6 +40,8 @@ UNITS = {
 
 
 class NeuronModelLeakyIntegrateAndFire(AbstractNeuronModel):
+    """ Classic leaky integrate and fire neuron model.
+    """
     __slots__ = [
         "__v_init",
         "__v_rest",
@@ -101,6 +103,9 @@ class NeuronModelLeakyIntegrateAndFire(AbstractNeuronModel):
     @inject_items({"ts": "MachineTimeStep"})
     @overrides(AbstractNeuronModel.get_values, additional_arguments={'ts'})
     def get_values(self, parameters, state_variables, vertex_slice, ts):
+        """
+        :param ts: machine time step
+        """
         # pylint: disable=arguments-differ
 
         # Add the rest of the data

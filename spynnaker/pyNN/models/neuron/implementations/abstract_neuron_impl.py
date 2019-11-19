@@ -82,7 +82,7 @@ class AbstractNeuronImpl(object):
 
     @abstractmethod
     def get_synapse_id_by_target(self, target):
-        """ Get the id of a synapse given the name
+        """ Get the ID of a synapse given the name
 
         :param target: The name of the synapse
         :type target: str
@@ -93,14 +93,14 @@ class AbstractNeuronImpl(object):
     def get_synapse_targets(self):
         """ Get the target names of the synapse type
 
-        :rtype: array of str
+        :rtype: list(str)
         """
 
     @abstractmethod
     def get_recordable_variables(self):
         """ Get the names of the variables that can be recorded in this model
 
-        :rtype: list of str
+        :rtype: list(str)
         """
 
     @abstractmethod
@@ -135,8 +135,7 @@ class AbstractNeuronImpl(object):
         """ Add the initial values of the parameters to the parameter holder
 
         :param parameters: A holder of the parameters
-        :type parameters:\
-            :py:class:`spinn_utilities.ranged.range_dictionary.RangeDictionary`
+        :type parameters: ~spinn_utilities.ranged.RangeDictionary
         """
 
     @abstractmethod
@@ -145,8 +144,7 @@ class AbstractNeuronImpl(object):
             variables holder
 
         :param state_variables: A holder of the state variables
-        :type state_variables:\
-            :py:class:`spinn_utilities.ranged.range_dictionary.RangeDictionary`
+        :type state_variables: ~spinn_utilities.ranged.RangeDictionary
         """
 
     @abstractmethod
@@ -154,13 +152,11 @@ class AbstractNeuronImpl(object):
         """ Get the data to be written to the machine for this model
 
         :param parameters: The holder of the parameters
-        :type parameters:\
-            :py:class:`spinn_utilities.ranged.range_dictionary.RangeDictionary`
+        :type parameters: ~spinn_utilities.ranged.RangeDictionary
         :param state_variables: The holder of the state variables
-        :type state_variables:\
-            :py:class:`spinn_utilities.ranged.range_dictionary.RangeDictionary`
+        :type state_variables: ~spinn_utilities.ranged.RangeDictionary
         :param vertex_slice: The slice of the vertex to generate parameters for
-        :rtype: numpy array of uint32
+        :rtype: numpy.ndarray(uint32)
         """
 
     @abstractmethod
@@ -170,14 +166,15 @@ class AbstractNeuronImpl(object):
             given data
 
         :param data: The data to be read
+        :type data: bytearray or bytes or memoryview
         :param offset: The offset where the data should be read from
+        :type offset: int
         :param vertex_slice: The slice of the vertex to read parameters for
+        :type vertex_slice: ~pacman.model.graphs.common.Slice
         :param parameters: The holder of the parameters to update
-        :type parameters:\
-            :py:class:`spinn_utilities.ranged.range_dictionary.RangeDictionary`
+        :type parameters: ~spinn_utilities.ranged.RangeDictionary
         :param state_variables: The holder of the state variables to update
-        :type state_variables:\
-            :py:class:`spinn_utilities.ranged.range_dictionary.RangeDictionary`
+        :type state_variables: ~spinn_utilities.ranged.RangeDictionary
         """
 
     @abstractmethod

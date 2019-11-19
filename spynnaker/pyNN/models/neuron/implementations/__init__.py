@@ -20,5 +20,5 @@ from .struct import Struct
 from .ranged_dict_vertex_slice import RangedDictVertexSlice
 
 __all__ = [
-    "AbstractStandardNeuronComponent", "Struct", "NeuronImplStandard",
-    "AbstractNeuronImpl", "RangedDictVertexSlice"]
+    "AbstractNeuronImpl", "AbstractStandardNeuronComponent",
+    "NeuronImplStandard", "RangedDictVertexSlice", "Struct"]
