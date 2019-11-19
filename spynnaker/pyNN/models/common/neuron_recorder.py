@@ -21,6 +21,7 @@ import numpy
 from enum import Enum
 from six import raise_from, iteritems
 from six.moves import range, xrange
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.resources.variable_sdram import VariableSDRAM
 from data_specification.enums import DataType
@@ -32,7 +33,7 @@ from spinn_front_end_common.interface.buffer_management import \
     recording_utilities
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class _ReadOnlyDict(dict):
@@ -175,8 +176,8 @@ class NeuronRecorder(object):
             elif len(local_indexes[0]) > 1:
                 fragment[i] = placement_data[local_indexes[0], 1:]
                 logger.warning(
-                    "Population {} has multiple recorded data for "
-                    "time {}".format(label, time))
+                    "Population {} has multiple recorded data for time {}",
+                    label, time)
             else:
                 # Set row to nan
                 fragment[i] = numpy.full(n_neurons, numpy.nan)
@@ -333,7 +334,7 @@ class NeuronRecorder(object):
         if len(missing_str) > 0:
             logger.warning(
                 "Population {} is missing recorded data in region {} from the"
-                " following cores: {}".format(label, region, missing_str))
+                " following cores: {}", label, region, missing_str)
 
         return pop_level_data, indexes, sampling_interval
 
@@ -401,7 +402,7 @@ class NeuronRecorder(object):
         if len(missing_str) > 0:
             logger.warning(
                 "Population {} is missing spike data in region {} from the"
-                " following cores: {}".format(label, region, missing_str))
+                " following cores: {}", label, region, missing_str)
 
         if len(spike_ids) == 0:
             return numpy.zeros((0, 2), dtype="float")
