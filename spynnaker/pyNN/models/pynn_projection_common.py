@@ -62,6 +62,31 @@ class PyNNProjectionCommon(object):
             self, spinnaker_control, connector, synapse_dynamics_stdp,
             target, pre_synaptic_population, post_synaptic_population,
             rng, machine_time_step, user_max_delay, label, time_scale_factor):
+        """
+        :param spinnaker_control: The simulator engine core.
+        :type spinnaker_control: \
+            ~spinn_front_end_common.interface.abstract_spinnaker_base.AbstractSpinnakerBase
+        :param connector: What is the connector for this projection.
+        :type connector: AbstractConnector
+        :param synapse_dynamics_stdp: How synapses behave
+        :type synapse_dynamics_stdp: AbstractSynapseDynamics
+        :param target: What is the target on the post-synaptic population?
+        :type target: str
+        :param pre_synaptic_population: Where do we connect from?
+        :type pre_synaptic_population: AbstractPopulationVertex
+        :param post_synaptic_population: Where do we connect to?
+        :type post_synaptic_population: AbstractPopulationVertex
+        :param rng:
+        :type rng: pyNN.random.NumpyRNG or None
+        :param machine_time_step:
+        :type machine_time_step: int
+        :param user_max_delay: User-provided max delay
+        :type user_max_delay: float
+        :param label: Label for the projection, or None to generate one
+        :type label: str or None
+        :param time_scale_factor:
+        :type time_scale_factor: int
+        """
         # pylint: disable=too-many-arguments, too-many-locals
         self.__spinnaker_control = spinnaker_control
         self.__projection_edge = None
@@ -183,10 +208,15 @@ class PyNNProjectionCommon(object):
 
     @property
     def requires_mapping(self):
+        """ Whether this projection requires mapping.
+
+        :rtype: bool
+        """
         return self.__requires_mapping
 
     def mark_no_changes(self):
-        # Does Nothing currently
+        """ Mark this projection as not having changes to be mapped.
+        """
         self.__requires_mapping = False
 
     @property
@@ -203,10 +233,10 @@ class PyNNProjectionCommon(object):
 
         :param pre_synaptic_vertex: the source vertex of the multapse
         :type pre_synaptic_vertex: \
-            pacman.model.graph.application.ApplicationVertex
+            ~pacman.model.graph.application.ApplicationVertex
         :param post_synaptic_vertex: The destination vertex of the multapse
         :type post_synaptic_vertex: \
-            pacman.model.graph.application.ApplicationVertex
+            ~pacman.model.graph.application.ApplicationVertex
         :return: None or the edge going to these vertices.
         """
 
@@ -374,6 +404,7 @@ class PyNNProjectionCommon(object):
 
         :param gather: If False, only get the number of connections locally.\
             Which means nothing on SpiNNaker...
+        :type gather: bool
         """
         # TODO
         raise NotImplementedError

@@ -26,7 +26,16 @@ _TMPL_FILENAME = "synaptic_matrix_for_application_edge_{}"
 
 
 class SpYNNakerSynapticMatrixReport(object):
-    """ Generate the synaptic matrix for reporting purposes
+    """ Generate the synaptic matrices for reporting purposes.
+
+    :param report_folder: where to write the report
+    :type report_folder: str
+    :param connection_holder: where the synaptic matrices are stored \
+        (possibly after retrieval from the machine)
+    :type connection_holder: \
+        dict(tuple(ProjectionApplicationEdge, SynapseInformation), \
+        ConnectionHolder)
+    :param dsg_targets: used to check if connection holders are populated
     """
 
     def __call__(self, report_folder, connection_holder, dsg_targets):

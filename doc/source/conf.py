@@ -54,17 +54,17 @@ extensions = [
     'sphinx.ext.intersphinx'
 ]
 
-ds_link = 'https://dataspecification.readthedocs.io/en/latest/'
-fe_link = 'https://spinnfrontendcommon.readthedocs.io/en/latest/'
-
 intersphinx_mapping = {
+    'spinn_utilities': ('https://spinnutils.readthedocs.io/en/latest/', None),
     'spinn_machine': ('https://spinnmachine.readthedocs.io/en/latest/', None),
     'spinn_storage_handlers': (
         'https://spinnmachine.readthedocs.io/en/latest/', None),
     'spinnman': ('https://spinnman.readthedocs.io/en/latest/', None),
     'pacman': ('https://pacman.readthedocs.io/en/latest/', None),
-    'data_specification': (ds_link, None),
-    'spinn_front_end_common': (fe_link, None)
+    'data_specification': (
+        'https://dataspecification.readthedocs.io/en/latest/', None),
+    'spinn_front_end_common': (
+        'https://spinnfrontendcommon.readthedocs.io/en/latest/', None)
 }
 
 # Add any paths that contain templates here, relative to this directory.
@@ -386,7 +386,6 @@ apidoc.main([None, '-o', ".", "../../spynnaker",
              "../../spynnaker/pyNN/external_devices_models/[a-oq-z]*.py",
              "../../spynnaker/pyNN/models/abstract_models/[a-z]*.py",
              "../../spynnaker/pyNN/models/common/[a-qs-z]*.py",
-             "../../spynnaker/pyNN/models/abstract_models/[a-z]*.py",
              "../../spynnaker/pyNN/models/neural_projections/[abd-z]*.py",
              "../../spynnaker/pyNN/models/neural_projections/connectors/[a-z]*.py",
              "../../spynnaker/pyNN/models/neural_properties/[a-z]*.py",
@@ -406,6 +405,10 @@ apidoc.main([None, '-o', ".", "../../spynnaker",
              "../../spynnaker/pyNN/models/neuron/population_machine*.py",
              "../../spynnaker/pyNN/models/neuron/synaptic_manager.py",
              "../../spynnaker/pyNN/models/neuron/[cg]*.py",
-             "../../spynnaker/pyNN/models/utility_models/delays/[a-z]*.py",
+             "../../spynnaker/pyNN/models/spike_source/*[eny].py",
+             "../../spynnaker/pyNN/models/utility_models/*/[a-z]*.py",
+             "../../spynnaker/pyNN/models/abstract_p*.py",
+             "../../spynnaker/pyNN/overridden_*/[a-z]*.py",
              "../../spynnaker/pyNN/protocols/m*.py",
+             "../../spynnaker/pyNN/utilities/ra*/[a-z]*.py",
              ])

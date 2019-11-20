@@ -36,6 +36,18 @@ class SpynnakerExternalDevicePluginManager(object):
     def add_database_socket_address(
             database_notify_host, database_notify_port_num,
             database_ack_port_num):
+        """
+        :param database_notify_host: \
+            Host to talk to tell that the database (and application) is ready.
+        :type database_notify_host: str or None
+        :param database_notify_port_num: \
+            Port to talk to tell that the database (and application) is ready.
+        :type database_notify_port_num: int or None
+        :param database_ack_port_num: \
+            Port on which to listen for an acknowledgement that the \
+            simulation should start.
+        :type database_ack_port_num: int or None
+        """
         config = get_simulator().config
         if database_notify_port_num is None:
             database_notify_port_num = helpful_functions.read_config_int(
@@ -75,7 +87,7 @@ class SpynnakerExternalDevicePluginManager(object):
 
         :param population: The population to activate the live output for
         :type population: \
-            :py:class:`spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon`
+            ~spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon
         :param database_notify_host: \
             The hostname for the device which is listening to the database\
             notification.
@@ -165,13 +177,13 @@ class SpynnakerExternalDevicePluginManager(object):
         :param population: \
             The pyNN population object from which spikes will be sent.
         :type population: \
-            :py:class:`spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon`
+            ~spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon
         :param device: \
             The pyNN population or external device to which the spikes will be\
             sent.
         :type device: \
-            :py:class:`spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon`\
-            or :py:class:`pacman.model.graphs.application.ApplicationVertex`
+            ~spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon\
+            or ~pacman.model.graphs.application.ApplicationVertex
         """
         device_vertex = device
         # pylint: disable=protected-access
@@ -234,7 +246,7 @@ class SpynnakerExternalDevicePluginManager(object):
 
         :param poisson_population: The population to control
         :type poisson_population: \
-            :py:class:`spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon`
+            ~spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon
         :param control_label_extension:\
             An extension to add to the label of the Poisson source. Must\
             match up with the equivalent in the\

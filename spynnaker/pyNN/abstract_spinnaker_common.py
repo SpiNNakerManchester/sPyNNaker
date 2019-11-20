@@ -62,6 +62,41 @@ class AbstractSpiNNakerCommon(with_metaclass(
             user_extra_algorithms_pre_run=None, time_scale_factor=None,
             extra_post_run_algorithms=None, extra_mapping_algorithms=None,
             extra_load_algorithms=None, front_end_versions=None):
+        """
+        :param graph_label:
+        :type graph_label: str
+        :param database_socket_addresses:
+        :type database_socket_addresses: \
+            iterable(~spinn_utilities.socket_address.SocketAddress)
+        :param n_chips_required:
+        :type n_chips_required: int or None
+        :param n_boards_required:
+        :type n_boards_required: int or None
+        :param timestep:
+        :type timestep: int
+        :param max_delay:
+        :type max_delay: float
+        :param min_delay:
+        :type min_delay: float
+        :param hostname:
+        :type hostname: str
+        :param user_extra_algorithm_xml_path:
+        :type user_extra_algorithm_xml_path: str or None
+        :param user_extra_mapping_inputs:
+        :type user_extra_mapping_inputs: dict(str, Any) or None
+        :param user_extra_algorithms_pre_run:
+        :type user_extra_algorithms_pre_run: list(str) or None
+        :param time_scale_factor:
+        :type time_scale_factor:
+        :param extra_post_run_algorithms:
+        :type extra_post_run_algorithms: list(str) or None
+        :param extra_mapping_algorithms:
+        :type extra_mapping_algorithms: list(str) or None
+        :param extra_load_algorithms:
+        :type extra_load_algorithms: list(str) or None
+        :param front_end_versions:
+        :type front_end_versions:
+        """
         # pylint: disable=too-many-arguments, too-many-locals
 
         # add model binaries
@@ -302,13 +337,13 @@ class AbstractSpiNNakerCommon(with_metaclass(
         :param turn_off_machine: decides if the machine should be powered down\
             after running the execution. Note that this powers down all boards\
             connected to the BMP connections given to the transceiver
-        :type turn_off_machine: bool
+        :type turn_off_machine: bool or None
         :param clear_routing_tables: informs the tool chain if it\
             should turn off the clearing of the routing tables
-        :type clear_routing_tables: bool
+        :type clear_routing_tables: bool or None
         :param clear_tags: informs the tool chain if it should clear the tags\
             off the machine at stop
-        :type clear_tags: boolean
+        :type clear_tags: bool or None
         :rtype: None
         """
         # pylint: disable=protected-access
@@ -367,10 +402,10 @@ class AbstractSpiNNakerCommon(with_metaclass(
         :param projection_to_attribute_map: \
             the projection to attributes mapping
         :type projection_to_attribute_map: \
-            dict of projection with set of attributes
+            dict(~spynnaker.pyNN.models.pynn_projection_common.PyNNProjectionCommon,\
+            list(int) or tuple(int) or None)
         :return: a extracted data object with get method for getting the data
-        :rtype: \
-            :py:class:`spynnaker.pyNN.utilities.extracted_data.ExtractedData`
+        :rtype: ~spynnaker.pyNN.utilities.extracted_data.ExtractedData
         """
         # pylint: disable=protected-access
 
@@ -451,12 +486,11 @@ class AbstractSpiNNakerCommon(with_metaclass(
 
     @property
     def id_counter(self):
-        """ Getter for id_counter, currently used by the populations.
+        """ The id_counter, currently used by the populations.
 
         .. note::
             Maybe it could live in the pop class???
 
-        :return:
         :rtype: int
         """
         return self.__id_counter

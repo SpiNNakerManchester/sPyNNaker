@@ -35,6 +35,7 @@ def check_directory_exists_and_create_if_not(filename):
     """ Create a parent directory for a file if it doesn't exist
 
     :param filename: The file whose parent directory is to be created
+    :type filename: str
     """
     directory = os.path.dirname(filename)
     if directory != "" and not os.path.exists(directory):
@@ -42,10 +43,11 @@ def check_directory_exists_and_create_if_not(filename):
 
 
 def convert_param_to_numpy(param, no_atoms):
-    """ Convert parameters into numpy arrays
+    """ Convert parameters into numpy arrays.
 
     :param param: the param to convert
     :param no_atoms: the number of atoms available for conversion of param
+    :type no_atoms: int
     :return numpy.array: the converted param in whatever format it was given
     """
 
@@ -78,6 +80,7 @@ def convert_to(value, data_type):
 
     :param value: The value to convert
     :param data_type: The data type to convert to
+    :type data_type: ~data_specification.enums.DataType
     :return: The converted data as a numpy data type
     """
     return numpy.round(
@@ -91,10 +94,15 @@ def read_in_data_from_file(
         <time>\t<atom ID>\t<data value>
 
     :param file_path: absolute path to a file containing the data
+    :type file_path: str
     :param min_atom: min neuron ID to which neurons to read in
+    :type min_atom: int
     :param max_atom: max neuron ID to which neurons to read in
+    :type max_atom: int
     :param min_time: min time slot to read neurons values of.
+    :type min_time: float or int
     :param max_time: max time slot to read neurons values of.
+    :type max_time: float or int
     :return: a numpy array of (time stamp, atom ID, data value)
     """
     times = list()
@@ -132,13 +140,13 @@ def read_spikes_from_file(file_path, min_atom=0, max_atom=float('inf'),
     :param file_path: absolute path to a file containing spike values
     :type file_path: str
     :param min_atom: min neuron ID to which neurons to read in
-    :type min_atom: int
+    :type min_atom: int or float
     :param max_atom: max neuron ID to which neurons to read in
-    :type max_atom: int
+    :type max_atom: int or float
     :param min_time: min time slot to read neurons values of.
-    :type min_time: int
+    :type min_time: float or int
     :param max_time: max time slot to read neurons values of.
-    :type max_time: int
+    :type max_time: float or int
     :param split_value: the pattern to split by
     :type split_value: str
     :return:\
@@ -261,7 +269,7 @@ def low(dist):
 
 
 def validate_mars_kiss_64_seed(seed):
-    """ Update the seed to make it compatible with the rng algorithm
+    """ Update the seed to make it compatible with the RNG algorithm
     """
     if seed[1] == 0:
         # y (<- seed[1]) can't be zero so set to arbitrary non-zero if so
@@ -291,6 +299,11 @@ def check_sampling_interval(sampling_interval):
 
 def get_n_bits(n_values):
     """ Determine how many bits are required for the given number of values
+
+    :param n_values: the number of values (starting at 0)
+    :type n_values: int
+    :return: the number of bits required to express that many values
+    :rtype: int
     """
     if n_values == 0:
         return 0

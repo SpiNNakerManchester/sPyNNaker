@@ -18,8 +18,9 @@ from collections import defaultdict
 
 class ExtractedData(object):
     """ Data holder for all synaptic data being extracted in parallel.
-    @Chimp: play here to hearts content.
     """
+    # @Chimp: play here to hearts content.
+
     __slots__ = ["__data"]
 
     def __init__(self):
@@ -29,8 +30,12 @@ class ExtractedData(object):
         """ Allow getting data from a given projection and attribute
 
         :param projection: the projection data was extracted from
+        :type projection: \
+            ~spynnaker.pyNN.models.pynn_projection_common.PyNNProjectionCommon
         :param attribute: the attribute to retrieve
+        :type attribute: list(int) or tuple(int) or None
         :return: the attribute data in a connection holder
+        :rtype: ~spynnaker.pyNN.models.neuron.ConnectionHolder
         """
         if projection in self.__data:
             if attribute in self.__data[projection]:
@@ -41,8 +46,12 @@ class ExtractedData(object):
         """ Allow the addition of data from a projection and attribute.
 
         :param projection: the projection data was extracted from
+        :type projection: \
+            ~spynnaker.pyNN.models.pynn_projection_common.PyNNProjectionCommon
         :param attribute: the attribute to store
+        :type attribute: list(int) or tuple(int) or None
         :param data: attribute data in a connection holder
+        :type data: ~spynnaker.pyNN.models.neuron.ConnectionHolder
         :rtype: None
         """
         self.__data[projection][attribute] = data

@@ -38,7 +38,23 @@ DELAY_EXPANDER = "delay_expander.aplx"
 def synapse_expander(
         app_graph, graph_mapper, placements, transceiver,
         provenance_file_path, executable_finder):
-    """ Run the synapse expander - needs to be done after data has been loaded
+    """ Run the synapse expander.
+
+    .. note::
+        Needs to be done after data has been loaded.
+
+    :param app_graph: \
+        The graph containing the vertices that might need expanding.
+    :type app_graph: ~pacman.model.graphs.application.ApplicationGraph
+    :param placements: Where all vertices are on the machine.
+    :type placements: ~pacman.model.placements.Placements
+    :param transceiver: How to talk to the machine.
+    :type transceiver: ~spinnman.transceiver.Transceiver
+    :param provenance_file_path: Where provenance data should be written.
+    :type provenance_file_path: str
+    :param executable_finder: How to find the synapse expander binaries.
+    :type executable_finder: \
+        ~spinn_utilities.executable_finder.ExecutableFinder
     """
 
     synapse_bin = executable_finder.get_executable_path(SYNAPSE_EXPANDER)
