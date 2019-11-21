@@ -104,10 +104,18 @@ class SynapseTypeSEMD(AbstractSynapseType):
     @inject_items({"ts": "MachineTimeStep"})
     @overrides(AbstractSynapseType.get_values, additional_arguments={'ts'})
     def get_values(self, parameters, state_variables, vertex_slice, ts):
-
+        """
+        :param ts: machine time step
+        :type ts: int
+        """
+        # pylint: disable=arguments-differ
         tsfloat = float(ts) / 1000.0
-        decay = lambda x: numpy.exp(-tsfloat / x)  # noqa E731
-        init = lambda x: (x / tsfloat) * (1.0 - numpy.exp(-tsfloat / x))  # noqa E731
+
+        def decay(x):
+            return numpy.exp(-tsfloat / x)
+
+        def init(x):
+            return (x / tsfloat) * (1.0 - numpy.exp(-tsfloat / x))
 
         # Add the rest of the data
         return [parameters[TAU_SYN_E].apply_operation(decay),
