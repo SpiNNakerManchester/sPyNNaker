@@ -45,6 +45,22 @@ class NeuronModelIzh(AbstractNeuronModel):
     ]
 
     def __init__(self, a, b, c, d, v_init, u_init, i_offset):
+        """
+        :param a: :math:`a`
+        :type a: float
+        :param b: :math:`b`
+        :type b: float
+        :param c: :math:`c`
+        :type c: float
+        :param d: :math:`d`
+        :type d: float
+        :param v_init: :math:`v_{init}`
+        :type v_init: float
+        :param u_init: :math:`u_{init}`
+        :type u_init: float
+        :param i_offset: :math:`I_{offset}`
+        :type i_offset: float
+        """
         super(NeuronModelIzh, self).__init__(
             [DataType.S1615,   # a
              DataType.S1615,   # b
@@ -126,6 +142,10 @@ class NeuronModelIzh(AbstractNeuronModel):
 
     @property
     def a(self):
+        """ Settable model parameter: :math:`a`
+
+        :rtype: float
+        """
         return self.__a
 
     @a.setter
@@ -134,6 +154,10 @@ class NeuronModelIzh(AbstractNeuronModel):
 
     @property
     def b(self):
+        """ Settable model parameter: :math:`b`
+
+        :rtype: float
+        """
         return self.__b
 
     @b.setter
@@ -142,6 +166,10 @@ class NeuronModelIzh(AbstractNeuronModel):
 
     @property
     def c(self):
+        """ Settable model parameter: :math:`c`
+
+        :rtype: float
+        """
         return self.__c
 
     @c.setter
@@ -150,6 +178,10 @@ class NeuronModelIzh(AbstractNeuronModel):
 
     @property
     def d(self):
+        """ Settable model parameter: :math:`d`
+
+        :rtype: float
+        """
         return self.__d
 
     @d.setter
@@ -158,6 +190,10 @@ class NeuronModelIzh(AbstractNeuronModel):
 
     @property
     def i_offset(self):
+        """ Settable model parameter: :math:`I_{offset}`
+
+        :rtype: float
+        """
         return self.__i_offset
 
     @i_offset.setter
@@ -166,6 +202,10 @@ class NeuronModelIzh(AbstractNeuronModel):
 
     @property
     def v_init(self):
+        """ Settable model parameter: :math:`v_{init}`
+
+        :rtype: float
+        """
         return self.__v_init
 
     @v_init.setter
@@ -174,6 +214,10 @@ class NeuronModelIzh(AbstractNeuronModel):
 
     @property
     def u_init(self):
+        """ Settable model parameter: :math:`u_{init}`
+
+        :rtype: float
+        """
         return self.__u_init
 
     @u_init.setter

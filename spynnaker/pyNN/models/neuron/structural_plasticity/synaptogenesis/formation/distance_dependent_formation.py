@@ -33,22 +33,26 @@ class DistanceDependentFormation(AbstractFormation):
     ]
 
     def __init__(
-            self, grid=numpy.array([16, 16]), p_form_forward=0.16,
+            self, grid=(16, 16), p_form_forward=0.16,
             sigma_form_forward=2.5, p_form_lateral=1.0,
             sigma_form_lateral=1.0):
         """
-
         :param grid: (x, y) dimensions of the grid of distance
+        :type grid: tuple(int,int) or list(int) or numpy.ndarray(int)
         :param p_form_forward:\
             The peak probability of formation on feed-forward connections
+        :type p_form_forward: float
         :param sigma_form_forward:\
             The spread of probability with distance of formation on\
             feed-forward connections
+        :type sigma_form_forward: float
         :param p_form_lateral:\
             The peak probability of formation on lateral connections
+        :type p_form_lateral: float
         :param sigma_form_lateral:\
             The spread of probability with distance of formation on\
             lateral connections
+        :type sigma_form_lateral: float
         """
         self.__grid = numpy.asarray(grid, dtype=int)
         self.__p_form_forward = p_form_forward
@@ -119,11 +123,11 @@ class DistanceDependentFormation(AbstractFormation):
             using periodic boundary conditions.
 
         :param x0: first point in space
-        :type x0: np.ndarray of ints
+        :type x0: numpy.ndarray(int)
         :param x1: second point in space
-        :type x1: np.ndarray of ints
+        :type x1: numpy.ndarray(int)
         :param grid: shape of grid
-        :type grid: np.ndarray of ints
+        :type grid: numpy.ndarray(int)
         :param metric: distance metric, i.e. euclidian or manhattan
         :type metric: str
         :return: the distance

@@ -34,6 +34,12 @@ class SynapseTypeDelta(AbstractSynapseType):
         "__isyn_inh"]
 
     def __init__(self, isyn_exc, isyn_inh):
+        """
+        :param isyn_exc: :math:`I^{syn}_e`
+        :type isyn_exc: float
+        :param isyn_inh: :math:`I^{syn}_i`
+        :type isyn_inh: float
+        """
         super(SynapseTypeDelta, self).__init__([
             DataType.S1615,   # isyn_exc
             DataType.S1615])  # isyn_inh

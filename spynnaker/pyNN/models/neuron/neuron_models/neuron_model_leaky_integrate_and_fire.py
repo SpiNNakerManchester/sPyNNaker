@@ -53,6 +53,22 @@ class NeuronModelLeakyIntegrateAndFire(AbstractNeuronModel):
 
     def __init__(
             self, v_init, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac):
+        r"""
+        :param v_init: :math:`V_{init}`
+        :type v_init: float
+        :param v_rest: :math:`V_{rest}`
+        :type v_rest: float
+        :param tau_m: :math:`\tau_{m}`
+        :type tau_m: float
+        :param cm: :math:`C_m`
+        :type cm: float
+        :param i_offset: :math:`I_{offset}`
+        :type i_offset: float
+        :param v_reset: :math:`V_{reset}`
+        :type v_reset: float
+        :param tau_refrac: :math:`\tau_{refrac}`
+        :type tau_refrac: float
+        """
         super(NeuronModelLeakyIntegrateAndFire, self).__init__(
             [DataType.S1615,   # v
              DataType.S1615,   # v_rest
@@ -105,6 +121,7 @@ class NeuronModelLeakyIntegrateAndFire(AbstractNeuronModel):
     def get_values(self, parameters, state_variables, vertex_slice, ts):
         """
         :param ts: machine time step
+        :type ts: float
         """
         # pylint: disable=arguments-differ
 
@@ -131,6 +148,10 @@ class NeuronModelLeakyIntegrateAndFire(AbstractNeuronModel):
 
     @property
     def v_init(self):
+        """ Settable model parameter: :math:`V_{init}`
+
+        :rtype: float
+        """
         return self.__v_init
 
     @v_init.setter
@@ -139,6 +160,10 @@ class NeuronModelLeakyIntegrateAndFire(AbstractNeuronModel):
 
     @property
     def v_rest(self):
+        """ Settable model parameter: :math:`V_{rest}`
+
+        :rtype: float
+        """
         return self.__v_rest
 
     @v_rest.setter
@@ -147,6 +172,10 @@ class NeuronModelLeakyIntegrateAndFire(AbstractNeuronModel):
 
     @property
     def tau_m(self):
+        r""" Settable model parameter: :math:`\tau_{m}`
+
+        :rtype: float
+        """
         return self.__tau_m
 
     @tau_m.setter
@@ -155,6 +184,10 @@ class NeuronModelLeakyIntegrateAndFire(AbstractNeuronModel):
 
     @property
     def cm(self):
+        """ Settable model parameter: :math:`C_m`
+
+        :rtype: float
+        """
         return self.__cm
 
     @cm.setter
@@ -163,6 +196,10 @@ class NeuronModelLeakyIntegrateAndFire(AbstractNeuronModel):
 
     @property
     def i_offset(self):
+        """ Settable model parameter: :math:`I_{offset}`
+
+        :rtype: float
+        """
         return self.__i_offset
 
     @i_offset.setter
@@ -171,6 +208,10 @@ class NeuronModelLeakyIntegrateAndFire(AbstractNeuronModel):
 
     @property
     def v_reset(self):
+        """ Settable model parameter: :math:`V_{reset}`
+
+        :rtype: float
+        """
         return self.__v_reset
 
     @v_reset.setter
@@ -179,6 +220,10 @@ class NeuronModelLeakyIntegrateAndFire(AbstractNeuronModel):
 
     @property
     def tau_refrac(self):
+        r""" Settable model parameter: :math:`\tau_{refrac}`
+
+        :rtype: float
+        """
         return self.__tau_refrac
 
     @tau_refrac.setter

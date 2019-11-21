@@ -38,6 +38,14 @@ class ThresholdTypeMaassStochastic(AbstractThresholdType):
         "__v_thresh"]
 
     def __init__(self, du_th, tau_th, v_thresh):
+        r"""
+        :param du_th: :math:`du_{thresh}`
+        :type du_th: float
+        :param tau_th: :math:`\tau_{thresh}`
+        :type tau_th: float
+        :param v_thresh: :math:`V_{thresh}`
+        :type v_thresh: float
+        """
         super(ThresholdTypeMaassStochastic, self).__init__([
             DataType.S1615,   # 1 / du_th
             DataType.S1615,   # 1 / tau_th
@@ -81,7 +89,6 @@ class ThresholdTypeMaassStochastic(AbstractThresholdType):
 
     @overrides(AbstractThresholdType.update_values)
     def update_values(self, values, parameters, state_variables):
-
         # Read the data
         (_du_th, _tau_th, _v_thresh, _time_step_ms_div_10) = values
 

@@ -91,7 +91,9 @@ class AbstractTimingDependence(object):
         """ Get any provenance data
 
         :param pre_population_label: label of pre.
+        :type pre_population_label: str
         :param post_population_label: label of post.
+        :type post_population_label: str
         :rtype: list
         """
         # pylint: disable=unused-argument

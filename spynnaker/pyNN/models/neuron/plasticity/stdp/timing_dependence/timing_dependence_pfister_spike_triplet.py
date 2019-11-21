@@ -43,6 +43,16 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
 
     # noinspection PyPep8Naming
     def __init__(self, tau_plus, tau_minus, tau_x, tau_y):
+        r"""
+        :param tau_plus: :math:`\tau_+`
+        :type tau_plus: float
+        :param tau_minus: :math:`\tau_-`
+        :type tau_minus: float
+        :param tau_x: :math:`\tau_x`
+        :type tau_x: float
+        :param tau_y: :math:`\tau_y`
+        :type tau_y: float
+        """
         self.__tau_plus = tau_plus
         self.__tau_minus = tau_minus
         self.__tau_x = tau_x
@@ -58,18 +68,34 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
 
     @property
     def tau_plus(self):
+        r""" :math:`\tau_+`
+
+        :rtype: float
+        """
         return self.__tau_plus
 
     @property
     def tau_minus(self):
+        r""" :math:`\tau_-`
+
+        :rtype: float
+        """
         return self.__tau_minus
 
     @property
     def tau_x(self):
+        r""" :math:`\tau_x`
+
+        :rtype: float
+        """
         return self.__tau_x
 
     @property
     def tau_y(self):
+        r""" :math:`\tau_y`
+
+        :rtype: float
+        """
         return self.__tau_y
 
     @overrides(AbstractTimingDependence.is_same_as)
@@ -85,10 +111,18 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
 
     @property
     def vertex_executable_suffix(self):
+        """ The suffix to be appended to the vertex executable for this rule
+
+        :rtype: str
+        """
         return "pfister_triplet"
 
     @property
     def pre_trace_n_bytes(self):
+        """ The number of bytes used by the pre-trace of the rule per neuron
+
+        :rtype: int
+        """
         # Triplet rule trace entries consists of two 16-bit traces - R1 and R2
         return BYTES_PER_WORD
 
@@ -101,6 +135,10 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
 
     @property
     def n_weight_terms(self):
+        """ The number of weight terms expected by this timing rule
+
+        :rtype: int
+        """
         return 2
 
     @overrides(AbstractTimingDependence.write_parameters)
@@ -119,6 +157,10 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
 
     @property
     def synaptic_structure(self):
+        """ Get the synaptic structure of the plastic part of the rows
+
+        :rtype: AbstractSynapseStructure
+        """
         return self.__synapse_structure
 
     @overrides(AbstractTimingDependence.get_parameter_names)

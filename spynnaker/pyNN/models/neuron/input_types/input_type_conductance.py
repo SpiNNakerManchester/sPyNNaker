@@ -35,9 +35,11 @@ class InputTypeConductance(AbstractInputType):
 
     def __init__(self, e_rev_E, e_rev_I):
         """
-        :param e_rev_E: Reversal potential for excitatory input
+        :param e_rev_E: Reversal potential for excitatory input;
+            :math:`E_{{rev}_e}`
         :type e_rev_E: float
-        :param e_rev_I: Reversal potential for inhibitory input
+        :param e_rev_I: Reversal potential for inhibitory input;
+            :math:`E_{{rev}_i}`
         :type e_rev_I: float
         """
         super(InputTypeConductance, self).__init__([

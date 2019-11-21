@@ -40,6 +40,16 @@ class SynapseTypeExponential(AbstractSynapseType):
         "__isyn_inh"]
 
     def __init__(self, tau_syn_E, tau_syn_I, isyn_exc, isyn_inh):
+        r"""
+        :param tau_syn_E: :math:`\tau^{syn}_e`
+        :type tau_syn_E: float
+        :param tau_syn_I: :math:`\tau^{syn}_i`
+        :type tau_syn_I: float
+        :param isyn_exc: :math:`I^{syn}_e`
+        :type isyn_exc: float
+        :param isyn_inh: :math:`I^{syn}_i`
+        :type isyn_inh: float
+        """
         super(SynapseTypeExponential, self).__init__([
             DataType.U032,    # decay_E
             DataType.U032,    # init_E
@@ -77,6 +87,10 @@ class SynapseTypeExponential(AbstractSynapseType):
     @inject_items({"ts": "MachineTimeStep"})
     @overrides(AbstractSynapseType.get_values, additional_arguments={'ts'})
     def get_values(self, parameters, state_variables, vertex_slice, ts):
+        """
+        :param ts: machine time step
+        :type ts: int
+        """
         # pylint: disable=arguments-differ
 
         tsfloat = float(ts) / 1000.0

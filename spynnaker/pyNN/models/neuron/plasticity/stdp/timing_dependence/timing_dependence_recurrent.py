@@ -74,12 +74,20 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
 
     @property
     def vertex_executable_suffix(self):
+        """ The suffix to be appended to the vertex executable for this rule
+
+        :rtype: str
+        """
         if self.__dual_fsm:
             return "recurrent_dual_fsm"
         return "recurrent_pre_stochastic"
 
     @property
     def pre_trace_n_bytes(self):
+        """ The number of bytes used by the pre-trace of the rule per neuron
+
+        :rtype: int
+        """
         # When using the separate FSMs, pre-trace contains window length,
         # otherwise it's in the synapse
         return BYTES_PER_SHORT if self.__dual_fsm else 0
@@ -93,6 +101,10 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
 
     @property
     def n_weight_terms(self):
+        """ The number of weight terms expected by this timing rule
+
+        :rtype: int
+        """
         return 1
 
     @overrides(AbstractTimingDependence.write_parameters)
@@ -126,6 +138,10 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
 
     @property
     def synaptic_structure(self):
+        """ Get the synaptic structure of the plastic part of the rows
+
+        :rtype: AbstractSynapseStructure
+        """
         return self.__synapse_structure
 
     @overrides(AbstractTimingDependence.get_parameter_names)

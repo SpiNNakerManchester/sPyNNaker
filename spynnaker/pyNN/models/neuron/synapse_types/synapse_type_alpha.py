@@ -53,6 +53,20 @@ class SynapseTypeAlpha(AbstractSynapseType):
 
     def __init__(self, exc_response, exc_exp_response,
                  tau_syn_E, inh_response, inh_exp_response, tau_syn_I):
+        r"""
+        :param exc_response:
+        :type exc_response: float
+        :param exc_exp_response:
+        :type exc_exp_response: float
+        :param tau_syn_E: :math:`\tau^{syn}_e`
+        :type tau_syn_E: float
+        :param inh_response:
+        :type inh_response: float
+        :param inh_exp_response:
+        :type inh_exp_response: float
+        :param tau_syn_I: :math:`\tau^{syn}_i`
+        :type tau_syn_I: float
+        """
         super(SynapseTypeAlpha, self).__init__([
             DataType.S1615,   # exc_response
             DataType.S1615,   # exc_exp_response
