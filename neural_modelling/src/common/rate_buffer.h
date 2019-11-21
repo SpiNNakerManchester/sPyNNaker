@@ -23,7 +23,7 @@
 
 typedef struct rate_t {
     uint32_t key;
-    uint16_t rate;
+    uint32_t rate;
 } rate_t;
 
 typedef struct _rate_buffer {

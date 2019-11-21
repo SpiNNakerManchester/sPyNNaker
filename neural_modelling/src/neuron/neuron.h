@@ -46,12 +46,13 @@
 //              the model
 //! \param[out] incoming_spike_buffer_size Returns the number of spikes to
 //!             support in the incoming spike buffer
+//! \param[out] starting_rate Returns the starting rate to set the ring buffer value on synapse side
 //! \return boolean which is True is the translation was successful
 //!         otherwise False
 bool neuron_initialise(
         address_t address, uint32_t *n_neurons_value,
         uint32_t *n_synapse_types_value, uint32_t *incoming_spike_buffer_size,
-        uint32_t *timer_offset);
+        uint32_t *timer_offset, uint16_t *starting_rate);
 
 //! \brief executes all the updates to neural parameters when a given timer
 //!        period has occurred.

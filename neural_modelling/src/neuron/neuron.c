@@ -184,7 +184,7 @@ bool neuron_reload_neuron_parameters(address_t address) { // EXPORTED
 //! \return True is the initialisation was successful, otherwise False
 bool neuron_initialise(address_t address, uint32_t *n_neurons_value, // EXPORTED
         uint32_t *n_synapse_types_value, uint32_t *incoming_spike_buffer_size,
-        uint32_t *timer_offset) {
+        uint32_t *timer_offset, uint16_t *starting_rate) {
     log_debug("neuron_initialise: starting");
     struct neuron_parameters *params = (void *) address;
 
@@ -285,6 +285,8 @@ bool neuron_initialise(address_t address, uint32_t *n_neurons_value, // EXPORTED
         return false;
     }
 
+    *starting_rate = neuron_impl_get_starting_rate();
+
     reset_record_counter();
 
     return true;
@@ -363,9 +365,11 @@ void neuron_do_timestep_update( // EXPORTED
 //                }
 //                expected_time -= time_between_spikes;
 
+            io_printf(IO_BUF, "sending %k\n", neuron_impl_get_rate_diff(neuron_index));
+
                 // Send the spike
             while (!spin1_send_mc_packet(
-                key | neuron_index, neuron_impl_get_rate(neuron_index), WITH_PAYLOAD)) {
+                key | neuron_index, neuron_impl_get_rate_diff(neuron_index), WITH_PAYLOAD)) {
                 spin1_delay_us(1);
             }
 //            }
@@ -373,6 +377,7 @@ void neuron_do_timestep_update( // EXPORTED
             log_debug("the neuron %d has been determined to not spike",
                     neuron_index);
         }
+            io_printf(IO_BUF, "Sent\n");
     }
 
     // Disable interrupts to avoid possible concurrent access
@@ -415,6 +420,8 @@ void neuron_do_timestep_update( // EXPORTED
 void neuron_add_inputs( // EXPORTED
         index_t synapse_type_index, index_t neuron_index,
         input_t weights_this_timestep) {
+
+    io_printf(IO_BUF, "Adding %k\n", weights_this_timestep);
     neuron_impl_add_inputs(
             synapse_type_index, neuron_index, weights_this_timestep);
 }

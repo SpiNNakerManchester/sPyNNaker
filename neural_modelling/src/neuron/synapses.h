@@ -52,7 +52,7 @@ static inline input_t synapses_convert_weight_to_input(
         s1615 output_type;
     } converter;
 
-    converter.input_type = (int_k_t) (weight) << left_shift;
+    converter.input_type = (int_k_t) (weight) << left_shift + 8;
 
     return converter.output_type;
 }
@@ -71,7 +71,7 @@ bool synapses_initialise(
         address_t synapse_params_address, address_t direct_matrix_address,
         uint32_t n_neurons, uint32_t n_synapse_types,
         uint32_t **ring_buffer_to_input_buffer_left_shifts,
-        address_t *direct_synapses_address);
+        address_t *direct_synapses_address, uint16_t starting_rate);
 
 void synapses_do_timestep_update(timer_t time);
 
@@ -80,10 +80,10 @@ void synapses_do_timestep_update(timer_t time);
 //! \param[in] row: the synaptic row in question
 //! \param[in] write: bool saying if to write this back to SDRAM
 //! \param[in] process_id: ??????????????????
-//! \param[in] rate: input rate
+//! \param[in] rate_diff: input rate change
 //! \return bool if successful or not
 bool synapses_process_synaptic_row(
-        uint32_t time, synaptic_row_t row, bool write, uint32_t process_id, uint16_t rate);
+        uint32_t time, synaptic_row_t row, bool write, uint32_t process_id, uint32_t rate_diff);
 
 //! \brief returns the number of times the synapses have saturated their
 //!        weights.

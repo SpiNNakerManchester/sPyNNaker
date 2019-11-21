@@ -19,7 +19,10 @@ from .neuron_model_leaky_integrate_and_fire import (
     NeuronModelLeakyIntegrateAndFire)
 from .neuron_model_leaky_integrate_and_fire_two_comp import (
     NeuronModelLeakyIntegrateAndFireTwoComp)
+from .neuron_model_leaky_integrate_and_fire_two_comp_rate import (
+    NeuronModelLeakyIntegrateAndFireTwoCompRate)
 
 __all__ = ["AbstractNeuronModel", "NeuronModelIzh",
            "NeuronModelLeakyIntegrateAndFire",
-           "NeuronModelLeakyIntegrateAndFireTwoComp"]
+           "NeuronModelLeakyIntegrateAndFireTwoComp",
+           "NeuronModelLeakyIntegrateAndFireTwoCompRate"]

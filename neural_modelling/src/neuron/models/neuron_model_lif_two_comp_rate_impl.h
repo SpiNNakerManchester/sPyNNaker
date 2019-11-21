@@ -64,6 +64,7 @@ typedef struct neuron_t {
     int32_t time_since_last_spike;
     REAL rate_at_last_setting;
     REAL rate_update_threshold;
+    REAL rate_diff;
 
 } neuron_t;
 

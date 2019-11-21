@@ -224,12 +224,15 @@ static inline bool set_spike_source_rate(neuron_pointer_t neuron, REAL rate,
 
 	REAL rate_diff = neuron->rate_at_last_setting - rate;
 
+	io_printf(IO_BUF, "curr rate %k, rate diff %k\n", rate, rate_diff);
+
 //	// ensure rate_diff is absolute
 //	if REAL_COMPARE(rate_diff, <, REAL_CONST(0.0))
 	if (rate_diff < 0.0k){
 		rate_diff = -rate_diff;
 	}
 
+	neuron->rate_diff = rate_diff;
 
 	// Has rate changed by more than a predefined threshold since it was last
 	// used to update the mean isi ticks?
@@ -296,6 +299,8 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     external_bias += additional_input_get_input_value_as_current(
             additional_input, voltage);
 
+    io_printf(IO_BUF, "pre rate %k diff %k\n", neuron->rate_at_last_setting, neuron->rate_diff);
+
     // update neuron parameters
     state_t result = neuron_model_state_update(
             NUM_EXCITATORY_RECEPTORS, exc_input_values,
@@ -305,16 +310,18 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     // ************************************************************************
     // determine if a spike should occur
     // bool spike = threshold_type_is_above_threshold(result, threshold_type);
-    REAL rate = result;
+    REAL soma_voltage = result;
 
     // Compute rate and return True if rate change is bigger than the threshold
-    bool rate_updated = set_spike_source_rate(neuron, rate, threshold_type);
+    bool rate_updated = set_spike_source_rate(neuron, soma_voltage, threshold_type);
     // ************************************************************************
 
     // Call functions to get the input values to be recorded
     recorded_variable_values[V_RECORDING_INDEX] = neuron->U_membrane;
     recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->V;
     recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->rate_at_last_setting;
+
+    io_printf(IO_BUF, "post rate %k\n", neuron->rate_at_last_setting);
 
 #if LOG_LEVEL >= LOG_DEBUG
     neuron_model_print_state_variables(neuron);
@@ -378,16 +385,32 @@ static void neuron_impl_store_neuron_parameters(
     }
 }
 
-//! \brief returns the rate at last update
+//! \brief Returns the difference between the last updated value of rate and the previous one
 //! \param[in] neuron_index: the index of the neuron
-uint16_t neuron_impl_get_rate(index_t neuron_index) {
+uint neuron_impl_get_rate_diff(index_t neuron_index) {
 
     union {
         REAL input;
-        uint16_t output;
+        uint output;
     } converter;
 
-    converter.input = neuron_array[neuron_index].rate_at_last_setting;
+    converter.input = neuron_array[neuron_index].rate_diff;
+
+    io_printf(IO_BUF, "returning %k conv %k\n", neuron_array[neuron_index].rate_diff, converter.output);
+
+    return converter.output;
+}
+
+//! \brief Returns the starting rate
+//! \param[in] neuron_index: the index of the neuron
+uint16_t neuron_impl_get_starting_rate() {
+
+    union {
+        REAL input;
+        uint output;
+    } converter;
+
+    converter.input = neuron_array[0].rate_at_last_setting;
 
     return converter.output;
 }

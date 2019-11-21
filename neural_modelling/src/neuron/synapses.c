@@ -41,9 +41,6 @@ static uint32_t n_synapse_types;
 // Ring buffers to handle delays between synapses and neurons
 static weight_t *ring_buffers;
 
-// Support structure to tell if a ring buffer cell ha been modified
-static bool *modified;
-
 // Amount to left shift the ring buffer by to make it an input
 static uint32_t *ring_buffer_to_input_left_shifts;
 
@@ -163,7 +160,7 @@ static inline void print_inputs(void) {
 // Every spike event could cause up to 256 different weights to
 // be put into the ring buffer.
 static inline void process_fixed_synapses(
-        address_t fixed_region_address, uint32_t time, uint16_t rate) {
+        address_t fixed_region_address, uint32_t time, uint32_t rate_diff) {
     register uint32_t *synaptic_words =
             synapse_row_fixed_weight_controls(fixed_region_address);
     register uint32_t fixed_synapse =
@@ -188,27 +185,22 @@ static inline void process_fixed_synapses(
                 0, combined_synapse_neuron_index,
                 synapse_type_index_bits);
 
-        if(!modified) {
+        // Add weight to current ring buffer value
+        uint32_t accumulation = ring_buffers[ring_buffer_index] + ((rate_diff * weight) >> 23);
 
-            ring_buffers[ring_buffer_index] = weight * rate;
+        // If 17th bit is set, saturate accumulator at UINT16_MAX (0xFFFF)
+        // **NOTE** 0x10000 can be expressed as an ARM literal,
+        //          but 0xFFFF cannot.  Therefore, we use (0x10000 - 1)
+        //          to obtain this value
+        uint32_t sat_test = accumulation & 0x10000;
+        if (sat_test) {
+            accumulation = sat_test - 1;
+            saturation_count++;
         }
-        else{
 
-            // Add weight to current ring buffer value
-            uint32_t accumulation = ring_buffers[ring_buffer_index] + (weight * rate);
+        ring_buffers[ring_buffer_index] = accumulation;
 
-            // If 17th bit is set, saturate accumulator at UINT16_MAX (0xFFFF)
-            // **NOTE** 0x10000 can be expressed as an ARM literal,
-            //          but 0xFFFF cannot.  Therefore, we use (0x10000 - 1)
-            //          to obtain this value
-            uint32_t sat_test = accumulation & 0x10000;
-            if (sat_test) {
-                accumulation = sat_test - 1;
-                saturation_count++;
-            }
-
-            ring_buffers[ring_buffer_index] = accumulation;
-        }
+        io_printf(IO_BUF, "added to %u %k * %k = %k sh %k index %d\n", ring_buffer_index, weight, rate_diff, ring_buffers[ring_buffer_index], (rate_diff * weight) >> 23, combined_synapse_neuron_index >> synapse_index_bits);
     }
 }
 
@@ -227,7 +219,7 @@ bool synapses_initialise(
         address_t synapse_params_address, address_t direct_matrix_address,
         uint32_t n_neurons_value, uint32_t n_synapse_types_value,
         uint32_t **ring_buffer_to_input_buffer_left_shifts,
-        address_t *direct_synapses_address) {
+        address_t *direct_synapses_address, uint16_t starting_rate) {
     log_debug("synapses_initialise: starting");
     n_neurons = n_neurons_value;
     n_synapse_types = n_synapse_types_value;
@@ -286,17 +278,17 @@ bool synapses_initialise(
     uint32_t ring_buffer_size = 1 << (n_ring_buffer_bits);
 
     ring_buffers = spin1_malloc(ring_buffer_size * sizeof(weight_t));
-    modified = spin1_malloc(ring_buffer_size * sizeof(bool));
 
-    if (ring_buffers == NULL || modified == NULL) {
+    if (ring_buffers == NULL) {
 
         log_error("Could not allocate %u entries for ring buffers",
                 ring_buffer_size);
     }
     for (uint32_t i = 0; i < ring_buffer_size; i++) {
         ring_buffers[i] = 0;
-        modified[i] = false;
     }
+
+    io_printf(IO_BUF, "starting rate %k\n", starting_rate);
 
     synapse_type_index_bits = log_n_neurons + log_n_synapse_types;
     synapse_type_index_mask = (1 << synapse_type_index_bits) - 1;
@@ -332,9 +324,6 @@ void synapses_do_timestep_update(timer_t time) {
                     synapses_convert_weight_to_input(
                             ring_buffers[ring_buffer_index],
                             ring_buffer_to_input_left_shifts[synapse_type_index]));
-
-            // Clear ring buffer
-            modified[ring_buffer_index] = false;
         }
     }
 
@@ -345,7 +334,7 @@ void synapses_do_timestep_update(timer_t time) {
 }
 
 bool synapses_process_synaptic_row(
-        uint32_t time, synaptic_row_t row, bool write, uint32_t process_id, uint16_t rate) {
+        uint32_t time, synaptic_row_t row, bool write, uint32_t process_id, uint32_t rate_diff) {
     print_synaptic_row(row);
 
     // Get address of non-plastic region from row
@@ -378,7 +367,7 @@ bool synapses_process_synaptic_row(
     // **NOTE** this is done after initiating DMA in an attempt
     // to hide cost of DMA behind this loop to improve the chance
     // that the DMA controller is ready to read next synaptic row afterwards
-    process_fixed_synapses(fixed_region_address, time, rate);
+    process_fixed_synapses(fixed_region_address, time, rate_diff);
     //}
     return true;
 }

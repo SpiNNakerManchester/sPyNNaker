@@ -28,10 +28,11 @@ from .if_curr_delta import IFCurrDelta
 from .if_curr_exp_ca2_adaptive import IFCurrExpCa2Adaptive
 from .if_curr_exp_semd_base import IFCurrExpSEMDBase
 from .if_curr_exp_two_comp import IFCurrExpTwoComp
+from .if_exp_rate_two_comp import IFExpRateTwoComp
 
 __all__ = ["EIFConductanceAlphaPopulation", "HHCondExp", "IFCondAlpha",
            "IFCondExpBase", "IFCurrAlpha", "IFCurrDualExpBase",
            "IFCurrExpBase", "IFFacetsConductancePopulation", "IzkCondExpBase",
            "IzkCurrExpBase", "IFCondExpStoc",
            "IFCurrDelta", "IFCurrExpCa2Adaptive", "IFCurrExpSEMDBase",
-           "IFCurrExpTwoComp" ]
+           "IFCurrExpTwoComp", "IFExpRateTwoComp" ]

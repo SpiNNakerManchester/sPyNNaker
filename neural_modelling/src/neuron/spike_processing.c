@@ -169,6 +169,8 @@ static void multicast_packet_received_callback(uint key, uint payload) {
     any_spike = true;
     log_debug("Received spike %x at %d, DMA Busy = %d", key, time, dma_busy);
 
+    io_printf(IO_BUF, "recv %k\n", payload);
+
     // If there was space to add spike to incoming spike queue
     if (in_rates_add_rate((rate_t){key, payload})) {
         // If we're not already processing synaptic DMAs,
@@ -266,7 +268,7 @@ bool spike_processing_initialise( // EXPORTED
     single_fixed_synapse[2] = 0;
 
     // Set up the callbacks
-    spin1_callback_on(MC_PACKET_RECEIVED,
+    spin1_callback_on(MCPL_PACKET_RECEIVED,
             multicast_packet_received_callback, mc_packet_callback_priority);
     simulation_dma_transfer_done_callback_on(
             DMA_TAG_READ_SYNAPTIC_ROW, dma_complete_callback);

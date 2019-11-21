@@ -164,12 +164,16 @@ static bool initialise(void) {
     uint32_t n_neurons;
     uint32_t n_synapse_types;
     uint32_t incoming_spike_buffer_size;
+    // SHOULD THIS BE CHANGED IN 32 BIT AT SOME POINT?????
+    uint16_t starting_rate;
     if (!neuron_initialise(
             data_specification_get_region(NEURON_PARAMS_REGION, ds_regions),
             &n_neurons, &n_synapse_types, &incoming_spike_buffer_size,
-            &timer_offset)) {
+            &timer_offset, &starting_rate)) {
         return false;
     }
+
+    io_printf(IO_BUF, "cmain starting rate %k\n", starting_rate);
 
     // Set up the synapses
     uint32_t *ring_buffer_to_input_buffer_left_shifts;
@@ -181,7 +185,7 @@ static bool initialise(void) {
             data_specification_get_region(DIRECT_MATRIX_REGION, ds_regions),
             n_neurons, n_synapse_types,
             &ring_buffer_to_input_buffer_left_shifts,
-            &direct_synapses_address)) {
+            &direct_synapses_address, starting_rate)) {
         return false;
     }
 
