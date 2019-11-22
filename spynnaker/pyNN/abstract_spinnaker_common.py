@@ -330,7 +330,7 @@ class AbstractSpiNNakerCommon(with_metaclass(
         super(AbstractSpiNNakerCommon, self).stop(
             turn_off_machine, clear_routing_tables, clear_tags)
         self.reset_number_of_neurons_per_core()
-        globals_variables.unset_simulator(self)
+        globals_variables.unset_simulator()
 
     def run(self, run_time):
         """ Run the model created.
