@@ -336,12 +336,10 @@ static bool read_rates(source_info *sdram_sources) {
 //! \return True if recording initialisation is successful, false otherwise
 static bool initialise_recording(data_specification_metadata_t *ds_regions) {
     // Get the system region
-    address_t recording_region = data_specification_get_region(
+    void *recording_region = data_specification_get_region(
             SPIKE_HISTORY_REGION, ds_regions);
 
-    uint32_t words_read = 0;
-    bool success = recording_initialize(
-        recording_region, &recording_flags, &words_read);
+    bool success = recording_initialize(&recording_region, &recording_flags);
     log_info("Recording flags = 0x%08x", recording_flags);
 
     return success;

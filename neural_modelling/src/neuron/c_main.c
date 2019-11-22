@@ -53,7 +53,7 @@
 #ifndef APPLICATION_NAME_HASH
 #define APPLICATION_NAME_HASH 0
 #error APPLICATION_NAME_HASH was undefined.  Make sure you define this\
-	constant
+    constant
 #endif
 
 struct neuron_provenance {
@@ -224,9 +224,7 @@ static bool initialise(void) {
 void resume_callback(void) {
     data_specification_metadata_t *ds_regions =
             data_specification_get_data_address();
-    if (!neuron_recording_reset(
-            data_specification_get_region(NEURON_RECORDING_REGION, ds_regions),
-            n_neurons)){
+    if (!neuron_recording_reset(n_neurons)){
         log_error("failed to reload the neuron recording parameters");
         rt_error(RTE_SWERR);
     }
@@ -309,11 +307,6 @@ void timer_callback(uint timer_count, uint unused) {
     // otherwise do synapse and neuron time step updates
     synapses_do_timestep_update(time);
     neuron_do_timestep_update(time, timer_count, timer_period);
-
-    // trigger buffering_out_mechanism
-    if (recording_flags > 0) {
-        neuron_recording_do_timestep_update(time);
-    }
 
     profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
 }

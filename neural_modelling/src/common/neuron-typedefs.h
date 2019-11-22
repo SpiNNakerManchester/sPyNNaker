@@ -92,43 +92,7 @@ typedef address_t synaptic_row_t;
 // The type of an input
 typedef REAL input_t;
 
-// Input structure for recording
-typedef struct input_struct_t {
-    input_t input;
-} input_struct_t;
-
-// Inputs with time for recording
-typedef struct timed_input_t {
-    uint32_t time;
-    input_struct_t inputs[];
-} timed_input_t;
-
 // The type of a state variable
 typedef REAL state_t;
-
-typedef struct timed_state_t {
-    uint32_t time;
-    state_t states[];
-} timed_state_t;
-
-//! \brief storage for doubles in recording
-typedef struct double_timed_state_t {
-    uint32_t time;
-    uint32_t padding;
-    double states[];
-} double_timed_state_t;
-
-//! \brief storage for floats in recording
-typedef struct float_timed_state_t {
-    uint32_t time;
-    float states[];
-} float_timed_state_t;
-
-//! \brief storage for bitfields
-typedef struct timed_bit_fields {
-    uint32_t time;
-    uint32_t out_spikes[];
-} timed_bit_fields;
-
 
 #endif /* __NEURON_TYPEDEFS_H__ */

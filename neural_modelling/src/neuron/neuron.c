@@ -150,13 +150,11 @@ void neuron_do_timestep_update( // EXPORTED
     // Set the next expected time to wait for between spike sending
     expected_time = sv->cpu_clk * timer_period;
 
-    // Wait until recordings have completed, to ensure the recording space
-    // can be re-written
-    neuron_recording_wait_to_complete();
+    // Prepare recording for the next timestep
     neuron_recording_setup_for_next_recording();
 
     // Set up an array for storing the matrix recorded variable values
-    uint32_t n_matrix_vars = neuron_recording_get_n_recorded_vars() - 1;
+    uint32_t n_matrix_vars = n_recorded_vars - 1;
     state_t recorded_variable_values[n_matrix_vars];
 
     // update each neuron individually
@@ -172,8 +170,7 @@ void neuron_do_timestep_update( // EXPORTED
 
         // Write the recorded variable values
         for (uint32_t i = 0; i < n_matrix_vars; i++) {
-            neuron_recording_set_int32_recorded_param(
-                i, neuron_index,
+            neuron_recording_record_accum(i, neuron_index,
                 recorded_variable_values[i]);
         }
 
@@ -182,7 +179,7 @@ void neuron_do_timestep_update( // EXPORTED
             log_debug("neuron %u spiked at time %u", neuron_index, time);
 
             // Record the spike
-            neuron_recording_set_spike(n_matrix_vars, neuron_index);
+            neuron_recording_record_bit(0, neuron_index);
 
             // Do any required synapse processing
             synapse_dynamics_process_post_synaptic_event(time, neuron_index);
@@ -228,14 +225,14 @@ void neuron_add_inputs( // EXPORTED
 
 #if LOG_LEVEL >= LOG_DEBUG
 void neuron_print_inputs(void) { // EXPORTED
-	neuron_impl_print_inputs(n_neurons);
+    neuron_impl_print_inputs(n_neurons);
 }
 
 void neuron_print_synapse_parameters(void) { // EXPORTED
-	neuron_impl_print_synapse_parameters(n_neurons);
+    neuron_impl_print_synapse_parameters(n_neurons);
 }
 
 const char *neuron_get_synapse_type_char(uint32_t synapse_type) { // EXPORTED
-	return neuron_impl_get_synapse_type_char(synapse_type);
+    return neuron_impl_get_synapse_type_char(synapse_type);
 }
 #endif // LOG_LEVEL >= LOG_DEBUG

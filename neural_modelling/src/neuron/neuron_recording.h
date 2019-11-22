@@ -21,72 +21,108 @@
 #include <common/neuron-typedefs.h>
 #include <bit_field.h>
 
+// A struct of the different types of recorded data
+// Note data is just bytes here but actual type is used on writing
+typedef struct recording_values_t {
+    uint32_t time;
+    uint8_t data[];
+} recording_values_t;
+
+
+typedef struct bitfield_values_t {
+    uint32_t n_words;
+    uint32_t time;
+    uint32_t bits[];
+} bitfield_values_t;
+
+#define BITFIELD_SIZE 0
+
 //! The index to record each variable to for each neuron
 extern uint8_t **neuron_recording_indexes;
 
-//! The values of the recorded variables for bitfields
-extern timed_bit_fields **neuron_recording_bit_field_values;
+//! The index to record each bitfield variable to for each neuron
+extern uint8_t **bitfield_recording_indexes;
 
-//! The values of the recorded variables for int32s
-extern timed_state_t **neuron_recording_int32_values;
+//! The number of variables that *can* be recorded not including bit fields
+extern uint32_t n_recorded_vars;
 
-//! The values for the recorded variables for doubles
-extern double_timed_state_t **neuron_recording_double_values;
+//! The number of bitfield variables that can be recorded
+extern uint32_t n_bitfield_vars;
 
-//! The values for the recorded variables for floats
-extern float_timed_state_t **neuron_recording_float_values;
+//! The values of the recorded variables
+extern recording_values_t **recording_values;
 
-//! \brief returns how many variables are able to be recorded
-//! \return the number of recordable variables
-uint32_t neuron_recording_get_n_recorded_vars(void);
+//! The values of the bitfield variables
+extern bitfield_values_t **bitfield_values;
 
-//! \brief returns the number of variables that are of type bitfield.
-//! \return the number of bitfield vars
-uint32_t neuron_recording_get_n_bit_field_vars(void);
+//! The size of the recording elements
+extern uint32_t *var_recording_element_size;
 
-//! \brief allows neurons to wait till recordings have completed
-void neuron_recording_wait_to_complete(void);
-
-//! \brief stores a recording of a matrix based int32_t variable
-//! \param[in] recording_var_index: which recording variable to write this is
+//! \brief stores a recording of a value
+//! \param[in] var_index: which recording variable to write this is
 //! \param[in] neuron_index: the neuron id for this recorded data
-//! \param[in] value: the results to record for this neuron.
-static inline void neuron_recording_set_int32_recorded_param(
-        uint32_t recording_var_index, uint32_t neuron_index, state_t value) {
-    uint32_t index = neuron_recording_indexes[recording_var_index][neuron_index];
-    neuron_recording_int32_values[recording_var_index]->states[index] = value;
+//! \param[in] value: pointer to the value to record for this neuron.
+static inline void neuron_recording_record_value(
+        uint32_t var_index, uint32_t neuron_index, void *value) {
+    uint32_t index = neuron_recording_indexes[var_index][neuron_index];
+    uint32_t size = var_recording_element_size[var_index];
+    uint32_t p = size * index;
+    spin1_memcpy(&recording_values[var_index]->data[p], value, size);
 }
 
-//! \brief stores a recording of a matrix based double variable
-//! \param[in] recording_var_index: which recording variable to write this is
+//! \brief stores a recording of an accum variable
+//! \param[in] var_index: which recording variable to write this is
 //! \param[in] neuron_index: the neuron id for this recorded data
 //! \param[in] value: the results to record for this neuron.
-static inline void neuron_recording_set_double_recorded_param(
-        uint32_t recording_var_index, uint32_t neuron_index, double value) {
-    uint8_t index = neuron_recording_indexes[recording_var_index][neuron_index];
-    neuron_recording_double_values[recording_var_index]->states[index] = value;
+static inline void neuron_recording_record_accum(
+        uint32_t var_index, uint32_t neuron_index, accum value) {
+    uint8_t index = neuron_recording_indexes[var_index][neuron_index];
+    accum *data = (accum *) &recording_values[var_index]->data;
+    data[index] = value;
 }
 
-//! \brief stores a recording of a matrix based float variable
-//! \param[in] recording_var_index: which recording variable to write this is
+//! \brief stores a recording of a double variable
+//! \param[in] var_index: which recording variable to write this is
 //! \param[in] neuron_index: the neuron id for this recorded data
 //! \param[in] value: the results to record for this neuron.
-static inline void neuron_recording_set_float_recorded_param(
-        uint32_t recording_var_index, uint32_t neuron_index, float value) {
-    uint32_t index = neuron_recording_indexes[recording_var_index][neuron_index];
-    neuron_recording_float_values[recording_var_index]->states[index] = value;
+static inline void neuron_recording_record_double(
+        uint32_t var_index, uint32_t neuron_index, double value) {
+    uint8_t index = neuron_recording_indexes[var_index][neuron_index];
+    double *data = (double *) &recording_values[var_index]->data;
+    data[index] = value;
 }
 
-//! \brief stores a recording of a bitfield based variable
-//! \param[in] neuron_index: which neuron to set the spike for
-//! \param[in] recording_var_index: which recording variable to write this is
-static inline void neuron_recording_set_spike(
-        uint32_t recording_var_index, uint32_t neuron_index) {
-    // Record the spike
-    uint32_t index = neuron_recording_indexes[recording_var_index][neuron_index];
-    bit_field_set(
-        &neuron_recording_bit_field_values[recording_var_index]->out_spikes[0],
-        index);
+//! \brief stores a recording of a float variable
+//! \param[in] var_index: which recording variable to write this is
+//! \param[in] neuron_index: the neuron id for this recorded data
+//! \param[in] value: the results to record for this neuron.
+static inline void neuron_recording_record_float(
+        uint32_t var_index, uint32_t neuron_index, float value) {
+    uint8_t index = neuron_recording_indexes[var_index][neuron_index];
+    float *data = (float *) &recording_values[var_index]->data;
+    data[index] = value;
+}
+
+//! \brief stores a recording of an int32_t variable
+//! \param[in] var_index: which recording variable to write this is
+//! \param[in] neuron_index: the neuron id for this recorded data
+//! \param[in] value: the results to record for this neuron.
+static inline void neuron_recording_record_int32(
+        uint32_t var_index, uint32_t neuron_index, int32_t value) {
+    uint8_t index = neuron_recording_indexes[var_index][neuron_index];
+    int32_t *data = (int32_t *) &recording_values[var_index]->data;
+    data[index] = value;
+}
+
+
+//! \brief stores a recording of a set bit
+//! \param[in] var_index: which bitfield recording variable to write this is
+//! \param[in] neuron_index: which neuron to set the bit for
+static inline void neuron_recording_record_bit(
+        uint32_t var_index, uint32_t neuron_index) {
+    // Record the bit
+    uint32_t index = bitfield_recording_indexes[var_index][neuron_index];
+    bit_field_set(bitfield_values[var_index]->bits, index);
 }
 
 //! \brief does the recording matrix process of handing over to basic recording
@@ -96,11 +132,10 @@ void neuron_recording_record(uint32_t time);
 //! \brief sets up state for next recording.
 void neuron_recording_setup_for_next_recording(void);
 
-//! \brief reads recording data from sdram as reset.
-//! \param[in] recording_address: sdram location for the recording data
+//! \brief reads recording data from sdram on reset.
 //! \param[in] n_neurons: the number of neurons to setup for
 //! \return bool stating if the read was successful or not
-bool neuron_recording_reset(address_t address, uint32_t n_neurons);
+bool neuron_recording_reset(uint32_t n_neurons);
 
 //! \brief sets up the recording stuff
 //! \param[in] recording_address: sdram location for the recording data
@@ -109,14 +144,10 @@ bool neuron_recording_reset(address_t address, uint32_t n_neurons);
 //! \param[in] n_neurons: the number of neurons to setup for
 //! \return bool stating if the init was successful or not
 bool neuron_recording_initialise(
-        address_t recording_address, uint32_t *recording_flags,
+        void *recording_address, uint32_t *recording_flags,
         uint32_t n_neurons);
 
-//! \brief wrapper to recording finalise
+//! \brief finishes recording
 void neuron_recording_finalise(void);
-
-//! \brief wrapper to recording do time step update
-//! \param[in] time: the time
-void neuron_recording_do_timestep_update(uint32_t time);
 
 #endif //_NEURON_RECORDING_H_

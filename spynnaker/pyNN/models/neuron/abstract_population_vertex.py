@@ -156,11 +156,10 @@ class AbstractPopulationVertex(
         # Set up for recording
         recordable_variables = list(
             self.__neuron_impl.get_recordable_variables())
-        recordable_variables.append(self.SPIKES)
+        record_data_types = dict(
+            self.__neuron_impl.get_recordable_data_types())
         self.__neuron_recorder = NeuronRecorder(
-            recordable_variables,
-            self.__neuron_impl.get_matrix_scalar_data_types(),
-            self.__neuron_impl.get_matrix_output_data_types(), n_neurons)
+            recordable_variables, record_data_types, [self.SPIKES], n_neurons)
 
         # Set up synapse handling
         self.__synapse_manager = SynapticManager(
@@ -542,7 +541,7 @@ class AbstractPopulationVertex(
         return self.__neuron_recorder.get_spikes(
             self.label, buffer_manager,
             len(self.__neuron_impl.get_recordable_variables()),
-            placements, graph_mapper, self, machine_time_step)
+            placements, graph_mapper, self, self.SPIKES, machine_time_step)
 
     @overrides(AbstractNeuronRecordable.get_recordable_variables)
     def get_recordable_variables(self):

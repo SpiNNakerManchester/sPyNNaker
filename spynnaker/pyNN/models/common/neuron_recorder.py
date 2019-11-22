@@ -18,7 +18,6 @@ from collections import OrderedDict
 import logging
 import math
 import numpy
-from enum import Enum
 from six import raise_from, iteritems
 from six.moves import range, xrange
 from spinn_utilities.log import FormatAdapter
@@ -32,6 +31,7 @@ from spinn_front_end_common.utilities.constants import (
 from spinn_front_end_common.interface.buffer_management import \
     recording_utilities
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
+import itertools
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -55,13 +55,13 @@ class NeuronRecorder(object):
         "__indexes",
         "__n_neurons",
         "__sampling_rates",
-        "__matrix_scalar_types",
-        "__matrix_output_types"]
+        "__data_types",
+        "__bitfield_variables"]
 
     N_BYTES_FOR_TIMESTAMP = DataType.UINT32.size
 
     # how many time steps to wait between recordings
-    N_BYTES_PER_RATE = DataType.UINT32.size  # uint32
+    N_BYTES_PER_RATE = DataType.UINT32.size
 
     # the enum type for the state struct
     N_BYTES_PER_ENUM = DataType.UINT32.size
@@ -89,27 +89,14 @@ class NeuronRecorder(object):
 
     MAX_RATE = 2 ** 32 - 1  # To allow a unit32_t to be used to store the rate
 
-    # enum for code to know what state to hold for c code
-    class DATA_TYPE(Enum):
-        BIT_FIELD = 0
-        INT32 = 1
-        FLOAT_64 = 2
-        FLOAT_32 = 3
-
-    # struct padding for the recording timed state structs. size is in bytes
-    PADDING_SIZES = {DataType.INT32.value: 0,
-                     DataType.FLOAT_32.value: 0,
-                     DataType.FLOAT_64.value: 4}
-
     def __init__(
-            self, allowed_variables, matrix_scalar_types,
-            matrix_output_types, n_neurons):
+            self, allowed_variables, data_types, bitfield_variables, n_neurons):
         self.__sampling_rates = OrderedDict()
         self.__indexes = dict()
-        self.__matrix_scalar_types = matrix_scalar_types
-        self.__matrix_output_types = matrix_output_types
+        self.__data_types = data_types
         self.__n_neurons = n_neurons
-        for variable in allowed_variables:
+        self.__bitfield_variables = bitfield_variables
+        for variable in itertools.chain(allowed_variables, bitfield_variables):
             self.__sampling_rates[variable] = 0
             self.__indexes[variable] = None
 
@@ -126,12 +113,10 @@ class NeuronRecorder(object):
             return []
         if self.__indexes[variable] is None:
             return range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1)
-        recording = []
         indexes = self.__indexes[variable]
-        for index in xrange(vertex_slice.lo_atom, vertex_slice.hi_atom + 1):
-            if index in indexes:
-                recording.append(index)
-        return recording
+        return [
+            i for i in xrange(vertex_slice.lo_atom, vertex_slice.hi_atom + 1)
+            if i in indexes]
 
     def get_neuron_sampling_interval(self, variable):
         """ Return the current sampling interval for this variable
@@ -144,19 +129,14 @@ class NeuronRecorder(object):
         return self.__sampling_rates[variable] * step
 
     def _convert_placement_matrix_data(
-            self, row_data, n_rows, data_row_length, variable, n_neurons,
-            needs_scaling):
+            self, row_data, n_rows, data_row_length, variable, n_neurons):
 
-        padding_size_in_bytes = (
-            self.PADDING_SIZES[self.__matrix_output_types[variable].value])
-        surplus_bytes = self.N_BYTES_FOR_TIMESTAMP + padding_size_in_bytes
-        data_byte = (row_data[:, surplus_bytes:].reshape(
+        surplus_bytes = self.N_BYTES_FOR_TIMESTAMP
+        var_data = (row_data[:, surplus_bytes:].reshape(
             n_rows * data_row_length))
-        placement_data = self.__matrix_output_types[
-            variable].decode_array(data_byte).reshape(n_rows, n_neurons)
-        if needs_scaling:
-            placement_data = placement_data / float(
-                self.__matrix_scalar_types[variable].scale)
+        dtype = self.__data_types[variable]
+        placement_data = dtype.decode_array(var_data).reshape(
+            n_rows, n_neurons)
         return placement_data
 
     @staticmethod
@@ -193,7 +173,7 @@ class NeuronRecorder(object):
         :param placements: the placements object
         :param vertex: the vertex to read from
         :param sampling_interval: the interval of sampling
-        :param indexes: the indexs of neurons
+        :param indexes: the indexes of neurons to be added to
         :param region: the recording region id
         :param graph_mapper: the graph mapper
         :param buffer_manager: the buffer manager
@@ -203,70 +183,48 @@ class NeuronRecorder(object):
         :param label: the vertex label.
         :return: placement data and sampling interval.
         """
-        needs_scaling = (
-            self.__matrix_output_types[variable] !=
-            self.__matrix_scalar_types[variable])
 
         placement = placements.get_placement_of_vertex(vertex)
-
-        # get sampling interval
-        if sampling_interval is None:
-            sampling_interval = self.get_neuron_sampling_interval(variable)
-        elif sampling_interval != self.get_neuron_sampling_interval(variable):
-            raise Exception(
-                "conflicting sampling intervals within a given recording"
-                "variable.")
-
         vertex_slice = graph_mapper.get_slice(vertex)
         neurons = self._neurons_recording(variable, vertex_slice)
         n_neurons = len(neurons)
         if n_neurons == 0:
             return None, sampling_interval
-
         indexes.extend(neurons)
+
         # for buffering output info is taken form the buffer manager
         record_raw, missing_data = buffer_manager.get_data_by_placement(
             placement, region)
         record_length = len(record_raw)
 
+        # If there is no data, return empty for all timesteps
+        if record_length == 0:
+            return numpy.zeros((expected_rows, n_neurons), dtype="float64")
+
         # There is one column for time and one for each neuron recording
-        data_row_length = (
-            n_neurons * self.__matrix_output_types[variable].size)
-        full_row_length = (
-            data_row_length + self.N_BYTES_FOR_TIMESTAMP +
-            self.PADDING_SIZES[self.__matrix_output_types[variable].value])
-
+        data_row_length = n_neurons * self.__data_types[variable].size
+        full_row_length = data_row_length + self.N_BYTES_FOR_TIMESTAMP
         n_rows = record_length // full_row_length
-        placement_data = None
-        row_data = None
+        row_data = numpy.asarray(record_raw, dtype="uint8").reshape(
+            n_rows, full_row_length)
+        placement_data = self._convert_placement_matrix_data(
+            row_data, n_rows, data_row_length, variable, n_neurons)
 
-        if record_length > 0:
-            byte_size = numpy.asarray(record_raw, dtype="uint8")
-            row_data = byte_size.reshape(n_rows, full_row_length)
-            placement_data = self._convert_placement_matrix_data(
-                row_data, n_rows, data_row_length, variable, n_neurons,
-                needs_scaling)
-            if not missing_data and n_rows == expected_rows:
-                return placement_data, sampling_interval
+        # If everything is there, return it
+        if not missing_data and n_rows == expected_rows:
+            return placement_data
 
-        # Check if you have the expected data
-        if missing_data or n_rows != expected_rows:
+        # Got data but its missing bits, so get times
+        time_bytes = (
+            row_data[:, 0: self.N_BYTES_FOR_TIMESTAMP].reshape(
+                n_rows * self.N_BYTES_FOR_TIMESTAMP))
+        times = time_bytes.view("<i4").reshape(n_rows, 1)
 
-            # if no data, make fake data and hand back
-            if record_length == 0:
-                return numpy.empty((0, n_neurons)), sampling_interval
-
-            # got data but its missing bits, so get times
-            time_bytes = (
-                row_data[:, 0: self.N_BYTES_FOR_TIMESTAMP].reshape(
-                    n_rows * self.N_BYTES_FOR_TIMESTAMP))
-            times = time_bytes.view("<i4").reshape(n_rows, 1)
-
-            # process data from core for missing data
-            placement_data = self._process_missing_data(
-                missing_str, placement, expected_rows, n_neurons, times,
-                sampling_rate, label, placement_data)
-            return placement_data, sampling_interval
+        # process data from core for missing data
+        placement_data = self._process_missing_data(
+            missing_str, placement, expected_rows, n_neurons, times,
+            sampling_rate, label, placement_data)
+        return placement_data
 
     @staticmethod
     def expected_rows_for_a_run_time(n_machine_time_steps, sampling_rate):
@@ -296,9 +254,9 @@ class NeuronRecorder(object):
         :param n_machine_time_steps:
         :return:
         """
-        if variable == self.SPIKES:
-            msg = "Variable {} is not supported use get_spikes".format(
-                self.SPIKES)
+        if variable in self.__bitfield_variables:
+            msg = "Variable {} is not supported, use get_spikes".format(
+                variable)
             raise ConfigurationException(msg)
         vertices = graph_mapper.get_machine_vertices(application_vertex)
         progress = ProgressBar(
@@ -306,19 +264,17 @@ class NeuronRecorder(object):
         sampling_rate = self.__sampling_rates[variable]
         missing_str = ""
         pop_level_data = None
-        sampling_interval = None
+        sampling_interval = self.get_neuron_sampling_interval(variable)
 
         indexes = []
         for vertex in progress.over(vertices):
             expected_rows = self.expected_rows_for_a_run_time(
                 n_machine_time_steps, sampling_rate)
 
-            placement_data, sampling_interval = \
-                self._get_placement_matrix_data(
-                    variable, placements, vertex, sampling_interval,
-                    indexes, region,
-                    graph_mapper, buffer_manager, expected_rows, missing_str,
-                    sampling_rate, label)
+            placement_data = self._get_placement_matrix_data(
+                variable, placements, vertex, sampling_interval, indexes,
+                region, graph_mapper, buffer_manager, expected_rows,
+                missing_str, sampling_rate, label)
 
             if placement_data is not None:
                 # append to the population data
@@ -340,7 +296,7 @@ class NeuronRecorder(object):
 
     def get_spikes(
             self, label, buffer_manager, region, placements, graph_mapper,
-            application_vertex, machine_time_step):
+            application_vertex, variable, machine_time_step):
 
         spike_times = list()
         spike_ids = list()
@@ -353,15 +309,11 @@ class NeuronRecorder(object):
             vertex_slice = graph_mapper.get_slice(vertex)
 
             ms_per_tick = machine_time_step / MICRO_TO_MILLISECOND_CONVERSION
+            neurons = self._neurons_recording(variable, vertex_slice)
+            neurons_recording = len(neurons)
+            if neurons_recording == 0:
+                continue
 
-            if self.__indexes[self.SPIKES] is None:
-                neurons_recording = vertex_slice.n_atoms
-            else:
-                neurons_recording = sum(
-                    (vertex_slice.lo_atom <= index <= vertex_slice.hi_atom)
-                    for index in self.__indexes[self.SPIKES])
-                if neurons_recording == 0:
-                    continue
             # Read the spikes
             n_words = int(math.ceil(neurons_recording / BITS_PER_WORD))
             n_bytes = n_words * BYTES_PER_WORD
@@ -385,17 +337,14 @@ class NeuronRecorder(object):
                 bits = numpy.fliplr(numpy.unpackbits(spikes).reshape(
                     (-1, 32))).reshape((-1, n_bytes * 8))
                 time_indices, local_indices = numpy.where(bits == 1)
-                if self.__indexes[self.SPIKES] is None:
+                if self.__indexes[variable] is None:
                     indices = local_indices + vertex_slice.lo_atom
                     times = record_time[time_indices].reshape((-1))
                     spike_ids.extend(indices)
                     spike_times.extend(times)
                 else:
-                    neurons = self._neurons_recording(
-                        self.SPIKES, vertex_slice)
-                    n_neurons = len(neurons)
                     for time_indice, local in zip(time_indices, local_indices):
-                        if local < n_neurons:
+                        if local < neurons_recording:
                             spike_ids.append(neurons[local])
                             spike_times.append(record_time[time_indice])
 
@@ -611,8 +560,10 @@ class NeuronRecorder(object):
         spec.write_array(recording_utilities.get_recording_header_array(
             self._get_buffered_sdram(vertex_slice, data_n_time_steps)))
 
-        # Write the number of recordable variables
-        spec.write_value(data=len(self.__sampling_rates))
+        # Write the number of variables and bitfields
+        n_vars = len(self.__sampling_rates) - len(self.__bitfield_variables)
+        spec.write_value(data=n_vars)
+        spec.write_value(data=len(self.__bitfield_variables))
 
         # Write the recording data
         recording_data = self._get_data(vertex_slice)
@@ -628,15 +579,14 @@ class NeuronRecorder(object):
         n_neurons = self._count_recording_per_slice(variable, vertex_slice)
         if n_neurons == 0:
             return 0
-        if variable == self.SPIKES:
+        if variable in self.__bitfield_variables:
             # Overflow can be ignored as it is not save if in an extra word
             out_spike_words = int(math.ceil(n_neurons / BITS_PER_WORD))
             out_spike_bytes = out_spike_words * BYTES_PER_WORD
             return self.N_BYTES_FOR_TIMESTAMP + out_spike_bytes
         else:
-            return (
-                self.N_BYTES_FOR_TIMESTAMP + n_neurons *
-                self.__matrix_output_types[variable].size)
+            size = self.__data_types[variable].size
+            return self.N_BYTES_FOR_TIMESTAMP + (n_neurons * size)
 
     def get_sampling_overflow_sdram(self, vertex_slice):
         """ Get the extra SDRAM that should be reserved if using per_timestep
@@ -685,9 +635,15 @@ class NeuronRecorder(object):
         n_words_for_n_neurons = int(
             math.ceil(vertex_slice.n_atoms // BYTES_PER_WORD))
         n_bytes_for_n_neurons = n_words_for_n_neurons * BYTES_PER_WORD
-        return ((self.N_BYTES_PER_RATE + self.N_BYTES_PER_SIZE +
-                 self.N_BYTES_PER_ENUM + n_bytes_for_n_neurons) *
-                len(self.__sampling_rates))
+        var_bytes = (
+            (self.N_BYTES_PER_RATE + self.N_BYTES_PER_SIZE +
+             self.N_BYTES_PER_ENUM + n_bytes_for_n_neurons) *
+            (len(self.__sampling_rates) - len(self.__bitfield_variables)))
+        bitfield_bytes = (
+            (self.N_BYTES_PER_RATE + self.N_BYTES_PER_SIZE +
+             n_bytes_for_n_neurons) *
+            len(self.__bitfield_variables))
+        return (2 * DataType.UINT32.size) + var_bytes + bitfield_bytes
 
     def _get_fixed_sdram_usage(self, vertex_slice):
         total_neurons = vertex_slice.hi_atom - vertex_slice.lo_atom + 1
@@ -741,15 +697,15 @@ class NeuronRecorder(object):
 
         # out_spikes, *_values
         for variable in self.__sampling_rates:
-            if variable == self.SPIKES:
+            if variable in self.__bitfield_variables:
                 out_spike_words = int(
                     math.ceil(vertex_slice.n_atoms / BITS_PER_WORD))
                 out_spike_bytes = out_spike_words * BYTES_PER_WORD
                 usage += self.N_BYTES_FOR_TIMESTAMP + out_spike_bytes
             else:
+                size = self.__data_types[variable].size
                 usage += (
-                    self.N_BYTES_FOR_TIMESTAMP + vertex_slice.n_atoms *
-                    self.__matrix_output_types[variable].size)
+                    self.N_BYTES_FOR_TIMESTAMP + vertex_slice.n_atoms * size)
         # *_size
         usage += len(self.__sampling_rates) * self.N_BYTES_PER_SIZE
 
@@ -761,52 +717,50 @@ class NeuronRecorder(object):
         return n_neurons * self.N_CPU_CYCLES_PER_NEURON * \
                 len(self.recording_variables)
 
-    def _determine_enum_value(self, variable):
-        store_data_type = self.__matrix_output_types[variable]
-        if store_data_type == DataType.INT32:
-            return self.DATA_TYPE.INT32.value
-        elif store_data_type == DataType.FLOAT_64:
-            return self.DATA_TYPE.FLOAT_64.value
-        elif store_data_type == DataType.FLOAT_32:
-            return self.DATA_TYPE.FLOAT_32.value
-        else:
-            raise Exception(
-                "don't know this data type {}. Only Know INT32, FLOAT_64 and "
-                "FLOAT32".format(store_data_type))
-
-    def _get_data(self, vertex_slice):
-        data = list()
+    def __add_indices(self, data, variable, rate, n_recording, vertex_slice):
         n_words_for_n_neurons = int(
             math.ceil(vertex_slice.n_atoms / BYTES_PER_WORD))
         n_bytes_for_n_neurons = n_words_for_n_neurons * BYTES_PER_WORD
+        if rate == 0:
+            data.append(numpy.zeros(n_words_for_n_neurons, dtype="uint32"))
+        elif self.__indexes[variable] is None:
+            data.append(numpy.arange(
+                n_bytes_for_n_neurons, dtype="uint8").view("uint32"))
+        else:
+            indexes = self.__indexes[variable]
+            local_index = 0
+            local_indexes = list()
+            for index in xrange(n_bytes_for_n_neurons):
+                if index + vertex_slice.lo_atom in indexes:
+                    local_indexes.append(local_index)
+                    local_index += 1
+                else:
+                    # write to one beyond recording range
+                    local_indexes.append(n_recording)
+            data.append(
+                numpy.array(local_indexes, dtype="uint8").view("uint32"))
+
+    def _get_data(self, vertex_slice):
+        data = list()
         for variable in self.__sampling_rates:
-            if variable in self.__matrix_output_types:
-                enum_index = self._determine_enum_value(variable)
-            else:
-                enum_index = self.DATA_TYPE.BIT_FIELD.value
+            # Do bitfields afterwards
+            if variable in self.__bitfield_variables:
+                continue
             rate = self.__sampling_rates[variable]
             n_recording = self._count_recording_per_slice(
                 variable, vertex_slice)
+            dtype = self.__data_types[variable]
             data.append(numpy.array(
-                [rate, n_recording, enum_index], dtype="uint32"))
-            if rate == 0:
-                data.append(numpy.zeros(n_words_for_n_neurons, dtype="uint32"))
-            elif self.__indexes[variable] is None:
-                data.append(numpy.arange(
-                    n_bytes_for_n_neurons, dtype="uint8").view("uint32"))
-            else:
-                indexes = self.__indexes[variable]
-                local_index = 0
-                local_indexes = list()
-                for index in xrange(n_bytes_for_n_neurons):
-                    if index + vertex_slice.lo_atom in indexes:
-                        local_indexes.append(local_index)
-                        local_index += 1
-                    else:
-                        # write to one beyond recording range
-                        local_indexes.append(n_recording)
-                data.append(
-                    numpy.array(local_indexes, dtype="uint8").view("uint32"))
+                [rate, n_recording, dtype.size], dtype="uint32"))
+            self.__add_indices(data, variable, rate, n_recording, vertex_slice)
+
+        for variable in self.__bitfield_variables:
+            rate = self.__sampling_rates[variable]
+            n_recording = self._count_recording_per_slice(
+                variable, vertex_slice)
+            data.append(numpy.array([rate, n_recording], dtype="uint32"))
+            self.__add_indices(data, variable, rate, n_recording, vertex_slice)
+
         return numpy.concatenate(data)
 
     def get_global_parameters(self, vertex_slice):
