@@ -182,7 +182,7 @@ def _fill_in_connection_data(
             connector_gen = isinstance(
                 connector, AbstractGenerateConnectorOnMachine) and \
                 connector.generate_on_machine(
-                    synapse_info.weight, synapse_info.delay)
+                    synapse_info.weights, synapse_info.delays)
             synapse_gen = isinstance(
                 dynamics, AbstractGenerateOnMachine)
             if connector_gen and synapse_gen:

@@ -61,6 +61,7 @@ class PyNNProjectionCommon(object):
     def __init__(
             self, spinnaker_control, connector, synapse_dynamics_stdp,
             target, pre_synaptic_population, post_synaptic_population,
+            prepop_is_view, postpop_is_view,
             rng, machine_time_step, user_max_delay, label, time_scale_factor):
         """
         :param spinnaker_control: The simulator engine core.
@@ -123,17 +124,18 @@ class PyNNProjectionCommon(object):
 
         # Set and store synapse information for future processing
         self.__synapse_information = SynapseInformation(
-            connector, synapse_dynamics_stdp, synapse_type,
-            synapse_dynamics_stdp.weight, synapse_dynamics_stdp.delay)
+            connector, pre_synaptic_population, post_synaptic_population,
+            prepop_is_view, postpop_is_view, rng, synapse_dynamics_stdp,
+            synapse_type, synapse_dynamics_stdp.weight,
+            synapse_dynamics_stdp.delay)
 
         # Set projection information in connector
         connector.set_projection_information(
-            pre_synaptic_population, post_synaptic_population, rng,
-            machine_time_step)
+            machine_time_step, self.__synapse_information)
 
         # handle max delay
         max_delay = synapse_dynamics_stdp.get_delay_maximum(
-            connector, self._synapse_information.delay)
+            connector, self.__synapse_information)
         if max_delay is None:
             max_delay = user_max_delay
 

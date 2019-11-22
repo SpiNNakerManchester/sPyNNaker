@@ -274,7 +274,7 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
     def gen_connector_params(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type):
+            synapse_type, synapse_info):
         """ Get the parameters of the on machine generation.
 
         :rtype: numpy.ndarray(uint32)

@@ -46,8 +46,6 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
     __slots__ = [
         "_delays",
         "__min_delay",
-        "__pre_population",
-        "__post_population",
         "__n_clipped_delays",
         "_n_post_neurons",
         "_n_pre_neurons",
@@ -77,10 +75,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         self.__space = None
         self.__verbose = verbose
 
-        self.__pre_population = None
-        self.__post_population = None
-        self._n_pre_neurons = None
-        self._n_post_neurons = None
+        # something needs to be done about this?
         self._rng = rng
 
         self.__n_clipped_delays = 0
@@ -95,23 +90,13 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         """
         self.__space = space
 
-    def set_projection_information(
-            self, pre_population, post_population, rng, machine_time_step):
+    def set_projection_information(self, machine_time_step, synapse_info):
         """
-        :param pre_population:
-        :type pre_population: AbstractPopulationVertex
-        :param post_population:
-        :type post_population: AbstractPopulationVertex
-        :param rng:
-        :type rng: pyNN.random.NumpyRNG or None
         :param machine_time_step:
         :type machine_time_step: int
+        :param synapse_info: SynapseInformation
         """
-        self.__pre_population = pre_population
-        self.__post_population = post_population
-        self._n_pre_neurons = pre_population.size
-        self._n_post_neurons = post_population.size
-        self._rng = (self._rng or rng or get_simulator().get_pynn_NumpyRNG()())
+        self._rng = (self._rng or get_simulator().get_pynn_NumpyRNG()())
         self.__min_delay = machine_time_step / 1000.0
 
     def _check_parameter(self, values, name, allow_lists):
@@ -162,7 +147,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
             type(delays)))
 
     @abstractmethod
-    def get_delay_maximum(self, delays):
+    def get_delay_maximum(self, synapse_info):
         """ Get the maximum delay specified by the user in ms, or None if\
             unbounded.
 
@@ -219,7 +204,8 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
 
     @abstractmethod
     def get_n_connections_from_pre_vertex_maximum(
-            self, delays, post_vertex_slice, min_delay=None, max_delay=None):
+            self, post_vertex_slice, synapse_info, min_delay=None,
+            max_delay=None):
         """ Get the maximum number of connections between those from any\
             neuron in the pre vertex to the neurons in the\
             post_vertex_slice, for connections with a delay between min_delay\
@@ -239,7 +225,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         # pylint: disable=too-many-arguments
 
     @abstractmethod
-    def get_n_connections_to_post_vertex_maximum(self):
+    def get_n_connections_to_post_vertex_maximum(self, synapse_info):
         """ Get the maximum number of connections between those to any neuron\
             in the post vertex from neurons in the pre vertex.
 
@@ -289,7 +275,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         raise Exception("Unrecognised weight format")
 
     @abstractmethod
-    def get_weight_maximum(self, weights):
+    def get_weight_maximum(self, synapse_info):
         """ Get the maximum of the weights for this connection.
 
         :param weights:
@@ -341,7 +327,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         return copy_rd.next(n_connections)
 
     def _generate_values(self, values, n_connections, connection_slices,
-                         pre_slice, post_slice):
+                         pre_slice, post_slice, synapse_info):
         if get_simulator().is_a_pynn_random(values):
             return self._generate_random_values(
                 values, n_connections, pre_slice, post_slice)
@@ -355,15 +341,16 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
             if self.__space is None:
                 raise Exception(
                     "No space object specified in projection {}-{}".format(
-                        self.__pre_population, self.__post_population))
+                        synapse_info.pre_population,
+                        synapse_info.post_population))
 
             expand_distances = True
             if isinstance(values, string_types):
                 expand_distances = self._expand_distances(values)
 
             d = self.__space.distances(
-                self.__pre_population.positions,
-                self.__post_population.positions,
+                synapse_info.pre_population.positions,
+                synapse_info.post_population.positions,
                 expand_distances)
 
             if isinstance(values, string_types):
@@ -371,12 +358,13 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
             return values(d)
         raise Exception("what on earth are you giving me?")
 
-    def _generate_weights(self, values, n_connections, connection_slices,
-                          pre_slice, post_slice):
+    def _generate_weights(self, n_connections, connection_slices,
+                          pre_slice, post_slice, synapse_info):
         """ Generate weight values.
         """
         weights = self._generate_values(
-            values, n_connections, connection_slices, pre_slice, post_slice)
+            synapse_info.weights, n_connections, connection_slices, pre_slice,
+            post_slice, synapse_info)
         if self.__safe:
             if not weights.size:
                 warn_once(logger, "No connection in " + str(self))
@@ -384,8 +372,8 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
                 raise Exception(
                     "Weights must be either all positive or all negative"
                     " in projection {}->{}".format(
-                        self.__pre_population.label,
-                        self.__post_population.label))
+                        synapse_info.pre_population.label,
+                        synapse_info.post_population.label))
         return numpy.abs(weights)
 
     def _clip_delays(self, delays):
@@ -404,21 +392,22 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
                 delays[delays < self.__min_delay] = self.__min_delay
         return delays
 
-    def _generate_delays(self, values, n_connections, connection_slices,
-                         pre_slice, post_slice):
+    def _generate_delays(self, n_connections, connection_slices,
+                         pre_slice, post_slice, synapse_info):
         """ Generate valid delay values.
         """
 
         delays = self._generate_values(
-            values, n_connections, connection_slices, pre_slice, post_slice)
+            synapse_info.delays, n_connections, connection_slices, pre_slice,
+            post_slice, synapse_info)
 
         return self._clip_delays(delays)
 
     @abstractmethod
     def create_synaptic_block(
-            self, weights, delays, pre_slices, pre_slice_index, post_slices,
+            self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type):
+            synapse_type, synapse_info):
         """ Create a synaptic block from the data.
 
         :param weights:
@@ -447,14 +436,16 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         """
         # pylint: disable=too-many-arguments
 
-    def get_provenance_data(self):
+    def get_provenance_data(self, synapse_info):
         """
+        :param synapse_info:
+        :type synapse_info: SynapseInformation
         :rtype: \
             list(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)
         """
         name = "{}_{}_{}".format(
-            self.__pre_population.label, self.__post_population.label,
-            self.__class__.__name__)
+            synapse_info.pre_population.label,
+            synapse_info.post_population.label, self.__class__.__name__)
         return [ProvenanceDataItem(
             [name, "Times_synaptic_delays_got_clipped"],
             self.__n_clipped_delays,
@@ -464,8 +455,8 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
                 "to {} a total of {} times.  This can be avoided by reducing "
                 "the timestep or increasing the minimum delay to one "
                 "timestep".format(
-                    self.__class__.__name__, self.__pre_population.label,
-                    self.__post_population.label, self.__min_delay,
+                    self.__class__.__name__, synapse_info.pre_population.label,
+                    synapse_info.post_population.label, self.__min_delay,
                     self.__n_clipped_delays)))]
 
     @property
@@ -504,10 +495,5 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
     def verbose(self, new_value):
         self.__verbose = new_value
 
-    @property
-    def pre_population(self):
-        return self.__pre_population
-
-    @property
-    def post_population(self):
-        return self.__post_population
+    def use_direct_matrix(self, synapse_info):
+        return False

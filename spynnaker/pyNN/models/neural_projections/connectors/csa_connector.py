@@ -60,12 +60,13 @@ class CSAConnector(AbstractConnector):
         self.__full_cset = None
 
     @overrides(AbstractConnector.get_delay_maximum)
-    def get_delay_maximum(self, delays):
-        n_connections_max = self._n_pre_neurons * self._n_post_neurons
+    def get_delay_maximum(self, synapse_info):
+        n_conns_max = synapse_info.n_pre_neurons * synapse_info.n_post_neurons
         # we can probably look at the array and do better than this?
-        return self._get_delay_maximum(delays, n_connections_max)
+        return self._get_delay_maximum(synapse_info.delays, n_conns_max)
 
-    def _get_n_connections(self, pre_vertex_slice, post_vertex_slice):
+    def _get_n_connections(self, pre_vertex_slice, post_vertex_slice,
+                           synapse_info):
         # do the work from self._cset in here
         # get the values for this slice
         pre_lo = pre_vertex_slice.lo_atom
@@ -76,8 +77,8 @@ class CSAConnector(AbstractConnector):
         # this is where the magic needs to happen somehow
         if self.__full_cset is None:
             self.__full_cset = [x for x in csa.cross(
-                range(self._n_pre_neurons),
-                range(self._n_post_neurons)) * self.__cset]
+                range(synapse_info.n_pre_neurons),
+                range(synapse_info.n_post_neurons)) * self.__cset]
 
         # use CSA to cross the range of this vertex's neurons with the cset
         pair_list = csa.cross(
@@ -97,33 +98,37 @@ class CSAConnector(AbstractConnector):
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, delays, post_vertex_slice, min_delay=None, max_delay=None):
+            self, post_vertex_slice, synapse_info, min_delay=None,
+            max_delay=None):
         n_connections_max = post_vertex_slice.n_atoms
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
-            delays, self._n_pre_neurons * self._n_post_neurons,
+            synapse_info.delays,
+            synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             n_connections_max, min_delay, max_delay)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
-    def get_n_connections_to_post_vertex_maximum(self):
-        n_connections_max = self._n_pre_neurons
+    def get_n_connections_to_post_vertex_maximum(self, synapse_info):
+        n_connections_max = synapse_info.n_pre_neurons
         return n_connections_max
 
     @overrides(AbstractConnector.get_weight_maximum)
-    def get_weight_maximum(self, weights):
-        n_connections_max = self._n_pre_neurons * self._n_post_neurons
-        return self._get_weight_maximum(weights, n_connections_max)
+    def get_weight_maximum(self, synapse_info):
+        n_conns_max = synapse_info.n_pre_neurons * synapse_info.n_post_neurons
+        return self._get_weight_maximum(synapse_info.weights, n_conns_max)
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, weights, delays, pre_slices, pre_slice_index, post_slices,
+            self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type):
+            synapse_type, synapse_info):
         n_connections, pair_list = self._get_n_connections(
-            pre_vertex_slice, post_vertex_slice)
+            pre_vertex_slice, post_vertex_slice, synapse_info)
 
         # Use whatever has been set up in _get_n_connections here
         # to send into the block structure
+        # TO DO: not sure this works with repeated connector, but
+        #        what does a repeated connector mean in this context?
         if self.__full_connection_set is None:
             self.__full_connection_set = [x for x in pair_list]
         else:
@@ -135,15 +140,17 @@ class CSAConnector(AbstractConnector):
         block["source"] = [x[0] for x in pair_list]
         block["target"] = [x[1] for x in pair_list]
         block["weight"] = self._generate_weights(
-            weights, n_connections, None, pre_vertex_slice, post_vertex_slice)
+            n_connections, None, pre_vertex_slice, post_vertex_slice,
+            synapse_info)
         block["delay"] = self._generate_delays(
-            delays, n_connections, None, pre_vertex_slice, post_vertex_slice)
+            n_connections, None, pre_vertex_slice, post_vertex_slice,
+            synapse_info)
         block["synapse_type"] = synapse_type
         return block
 
-    def show_connection_set(self):
-        csa.show(self.__full_connection_set,
-                 self._n_pre_neurons, self._n_post_neurons)
+    def show_connection_set(self, n_pre_neurons, n_post_neurons):
+        # Yuck; this was supposed to be available to the user from scripts...
+        csa.show(self.__full_connection_set, n_pre_neurons, n_post_neurons)
 
     def __repr__(self):
         return "CSAConnector({})".format(

@@ -57,7 +57,8 @@ def test_get_max_row_length(dynamics_class, timing, weight, size, exception,
         dynamics = dynamics_class()
     io = SynapseIORowBased()
     population_table = MasterPopTableAsBinarySearch()
-    synapse_information = SynapseInformation(None, dynamics, 0)
+    synapse_information = SynapseInformation(
+        None, None, None, None, None, None, dynamics, 0)
     in_edge = ProjectionApplicationEdge(None, None, synapse_information)
     if exception is not None:
         with pytest.raises(exception) as exc_info:

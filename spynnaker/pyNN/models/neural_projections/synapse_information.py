@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from spinn_front_end_common.utilities.globals_variables import get_simulator
+
 
 class SynapseInformation(object):
     """ Contains the synapse information including the connector, synapse type\
@@ -20,62 +22,145 @@ class SynapseInformation(object):
     """
     __slots__ = [
         "__connector",
+        "__pre_population",
+        "__post_population",
+        "__prepop_is_view",
+        "__postpop_is_view",
+        "__rng",
         "__synapse_dynamics",
         "__synapse_type",
-        "__weight",
-        "__delay"]
+        "__weights",
+        "__delays"]
 
-    def __init__(self, connector, synapse_dynamics, synapse_type,
-                 weight=None, delay=None):
+    def __init__(self, connector, pre_population, post_population,
+                 prepop_is_view, postpop_is_view, rng,
+                 synapse_dynamics, synapse_type,
+                 weights=None, delays=None):
         """
-        :param connector:
+        :param connector: The connector connected to the synapse
         :type connector: AbstractConnector
-        :param synapse_dynamics:
+        :param pre_population: The population sending spikes to the synapse
+        :type pre_population: PyNNPopulationCommon
+        :param post_population: The population hosting the synapse
+        :type post_population: PyNNPopulationCommon
+        :param prepop_is_view: Whether the prepopulation is a view
+        :type prepop_is_view: bool
+        :param postpop_is_view: Whether the postpopulation is a view
+        :type postpop_is_view: bool
+        :param rng: Seeded random number generator
+        :type rng: pyNN.random.NumpyRNG or None
+        :param synapse_dynamics: The dynamic behaviour of the synapse
         :type synapse_dynamics: AbstractSynapseDynamics
-        :param synapse_type:
+        :param synapse_type: The type of the synapse
         :type synapse_type: AbstractSynapseType
-        :param weight:
-        :type weight: int or None
-        :param delay:
-        :type delay: int or None
+        :param weights: The synaptic weights
+        :type weights: float or list(float) or numpy.ndarray(float) or None
+        :param delays: The total synaptic delays
+        :type delays: float or list(float) or numpy.ndarray(float) or None
         """
         self.__connector = connector
+        self.__pre_population = pre_population
+        self.__post_population = post_population
+        self.__prepop_is_view = prepop_is_view
+        self.__postpop_is_view = postpop_is_view
+        self.__rng = (rng or get_simulator().get_pynn_NumpyRNG()())
         self.__synapse_dynamics = synapse_dynamics
         self.__synapse_type = synapse_type
-        self.__weight = weight
-        self.__delay = delay
+        self.__weights = weights
+        self.__delays = delays
 
     @property
     def connector(self):
-        """
+        """ The connector connected to the synapse
+
         :rtype: AbstractConnector
         """
         return self.__connector
 
     @property
-    def synapse_dynamics(self):
+    def pre_population(self):
+        """ The population sending spikes to the synapse
+
+        :rtype: PyNNPopulationCommon
         """
+        return self.__pre_population
+
+    @property
+    def post_population(self):
+        """ The population hosting the synapse
+
+        :rtype: PyNNPopulationCommon
+        """
+        return self.__post_population
+
+    @property
+    def n_pre_neurons(self):
+        """ The number of neurons in the prepopulation
+
+        :rtype: int
+        """
+        return self.__pre_population.size
+
+    @property
+    def n_post_neurons(self):
+        """ The number of neurons in the postpopulation
+
+        :rtype: int
+        """
+        return self.__post_population.size
+
+    @property
+    def prepop_is_view(self):
+        """ Whether the prepopulation is a view
+
+        :rtype: bool
+        """
+        return self.__prepop_is_view
+
+    @property
+    def postpop_is_view(self):
+        """ Whether the postpopulation is a view
+
+        :rtype: bool
+        """
+        return self.__postpop_is_view
+
+    @property
+    def rng(self):
+        """ Random number generator
+
+        :rtype: pyNN.random.NumpyRNG
+        """
+        return self.__rng
+
+    @property
+    def synapse_dynamics(self):
+        """ The dynamic behaviour of the synapse
+
         :rtype: AbstractSynapseDynamics
         """
         return self.__synapse_dynamics
 
     @property
     def synapse_type(self):
-        """
+        """ The type of the synapse
+
         :rtype: AbstractSynapseType
         """
         return self.__synapse_type
 
     @property
-    def weight(self):
-        """
+    def weights(self):
+        """ The synaptic weights (if any)
+
         :rtype: int or None
         """
-        return self.__weight
+        return self.__weights
 
     @property
-    def delay(self):
-        """
+    def delays(self):
+        """ The total synaptic delays (if any)
+
         :rtype: int or None
         """
-        return self.__delay
+        return self.__delays

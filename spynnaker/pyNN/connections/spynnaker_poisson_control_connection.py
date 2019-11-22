@@ -18,11 +18,14 @@ from data_specification.enums import DataType
 from spinn_front_end_common.utilities.connections import LiveEventConnection
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.constants import NOTIFY_PORT
+import functools
 
 
 class SpynnakerPoissonControlConnection(LiveEventConnection):
     __slots__ = [
-        "__control_label_extension"]
+        "__control_label_extension",
+        "__control_label_to_label",
+        "__label_to_control_label"]
 
     def __init__(
             self, poisson_labels=None, local_host=None, local_port=NOTIFY_PORT,
@@ -42,43 +45,77 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
         :type control_label_extension: str
 
         """
+        self.__control_label_extension = control_label_extension
+
         control_labels = None
+        self.__control_label_to_label = dict()
+        self.__label_to_control_label = dict()
         if poisson_labels is not None:
             control_labels = [
-                "{}{}".format(label, control_label_extension)
+                self.__convert_to_control_label(label)
                 for label in poisson_labels
             ]
+            self.__control_label_to_label.update(
+                {control: label
+                 for control, label in zip(control_labels, poisson_labels)})
+            self.__label_to_control_label.update(
+                {label: control
+                 for label, control in zip(poisson_labels, control_labels)})
 
         super(SpynnakerPoissonControlConnection, self).__init__(
             live_packet_gather_label=None, send_labels=control_labels,
             local_host=local_host, local_port=local_port)
 
-        self.__control_label_extension = control_label_extension
-
     def add_poisson_label(self, label):
         """
         :param label: The label of the Poisson source population.
+        :type label: str
         """
-        self.add_send_label(self._control_label(label))
+        control = self.__convert_to_control_label(label)
+        self.__control_label_to_label[control] = label
+        self.__label_to_control_label[label] = control
+        self.add_send_label(control)
 
-    def _control_label(self, label):
+    def __convert_to_control_label(self, label):
         return "{}{}".format(label, self.__control_label_extension)
+
+    def __control_label(self, label):
+        # Try to get a control label, but if not just use the label
+        return self.__label_to_control_label.get(label, label)
+
+    def __label(self, control_label):
+        # Try to get a label, but if not just use the control label
+        return self.__control_label_to_label.get(control_label, control_label)
+
+    def _start_callback_wrapper(self, callback, label, connection):
+        callback(self.__label(label), connection)
+
+    def _init_callback_wrapper(self, callback, label, vertex_size, run_time_ms,
+                               machine_timestep_ms):
+        callback(self.__label(label), vertex_size, run_time_ms,
+                 machine_timestep_ms)
+
+    def _stop_callback_wrapper(self, callback, label, connection):
+        callback(self.__label(label), connection)
 
     @overrides(LiveEventConnection.add_start_callback)
     def add_start_callback(self, label, start_callback):
         super(SpynnakerPoissonControlConnection, self).add_start_callback(
-            self._control_label(label), start_callback)
+            self.__control_label(label), functools.partial(
+                self._start_callback_wrapper, start_callback))
 
     @overrides(LiveEventConnection.add_start_resume_callback)
     def add_start_resume_callback(self, label, start_resume_callback):
         super(SpynnakerPoissonControlConnection, self)\
             .add_start_resume_callback(
-            self._control_label(label), start_resume_callback)
+            self.__control_label(label), functools.partial(
+                self._start_callback_wrapper, start_resume_callback))
 
     @overrides(LiveEventConnection.add_init_callback)
     def add_init_callback(self, label, init_callback):
         super(SpynnakerPoissonControlConnection, self).add_init_callback(
-            self._control_label(label), init_callback)
+            self.__control_label(label), functools.partial(
+                self._init_callback_wrapper, init_callback))
 
     @overrides(LiveEventConnection.add_receive_callback)
     def add_receive_callback(self, label, live_event_callback,
@@ -89,7 +126,8 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
     @overrides(LiveEventConnection.add_pause_stop_callback)
     def add_pause_stop_callback(self, label, pause_stop_callback):
         super(SpynnakerPoissonControlConnection, self).add_pause_stop_callback(
-            self._control_label(label), pause_stop_callback)
+            self.__control_label(label), functools.partial(
+                self._stop_callback_wrapper, pause_stop_callback))
 
     def set_rate(self, label, neuron_id, rate):
         """ Set the rate of a Poisson neuron within a Poisson source
@@ -110,10 +148,8 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
         :type label: str
         :param neuron_id_rates: A list of tuples of (neuron ID, rate) to be set
         """
-        control_label = label
-        if not control_label.endswith(self.__control_label_extension):
-            control_label = self._control_label(label)
+        control = self.__control_label(label)
         datatype = DataType.S1615
         atom_ids_and_payloads = [(nid, datatype.encode_as_int(rate))
                                  for nid, rate in neuron_id_rates]
-        self.send_events_with_payloads(label, atom_ids_and_payloads)
+        self.send_events_with_payloads(control, atom_ids_and_payloads)
