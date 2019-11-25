@@ -1208,7 +1208,10 @@ class SynapticManager(object):
         n_neuron_id_bits = get_n_bits(post_vertex_slice.n_atoms)
         spec.write_value(n_neuron_id_bits)
         for w in weight_scales:
-            spec.write_value(int(w), data_type=DataType.INT32)
+            # if the weights are high enough and the population size large
+            # enough, then weight_scales < 1 will result in a zero scale
+            # if converted to an int, so this needs to be an S1615
+            spec.write_value(data=w, data_type=DataType.S1615)
 
         for data in generator_data:
             spec.write_array(data.gen_data)
