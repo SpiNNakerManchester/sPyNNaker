@@ -34,7 +34,6 @@ class RecordingCommon(object):
     """
     # DO NOT DEFINE SLOTS! Multiple inheritance problems otherwise.
     # __slots__ = [
-    #     "__indices_to_record",
     #     "__population",
     #     "__write_to_files_indicators"]
 
@@ -51,11 +50,6 @@ class RecordingCommon(object):
             'gsyn_exc': None,
             'gsyn_inh': None,
             'v': None}
-
-        # Create a dict of variable name -> bool array of indices in population
-        # that are recorded (initially all False)
-        self.__indices_to_record = defaultdict(
-            lambda: numpy.repeat(False, population.size))
 
     @property
     def _population(self):
