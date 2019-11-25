@@ -155,8 +155,7 @@ void neuron_do_timestep_update( // EXPORTED
     neuron_recording_setup_for_next_recording();
 
     // Set up an array for storing the matrix recorded variable values
-    uint32_t n_matrix_vars = n_recorded_vars - 1;
-    state_t recorded_variable_values[n_matrix_vars];
+    state_t recorded_variable_values[n_recorded_vars];
 
     // update each neuron individually
     for (index_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
@@ -170,7 +169,7 @@ void neuron_do_timestep_update( // EXPORTED
                 neuron_index, external_bias, recorded_variable_values);
 
         // Write the recorded variable values
-        for (uint32_t i = 0; i < n_matrix_vars; i++) {
+        for (uint32_t i = 0; i < n_recorded_vars; i++) {
             neuron_recording_record_accum(i, neuron_index,
                 recorded_variable_values[i]);
         }
