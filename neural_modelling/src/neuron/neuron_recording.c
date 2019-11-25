@@ -142,9 +142,6 @@ static bool neuron_recording_read_in_elements(
 
     for (uint32_t i = 0; i < n_recorded_vars; i++) {
         var_recording_rate[i] = data[i].rate;
-        if (var_recording_rate[i] == 0) {
-            continue;
-        }
         uint32_t n_neurons_rec = data[i].n_neurons_recording;
         var_recording_element_size[i] = data[i].element_size;
         var_recording_size[i] = sizeof(recording_values_t)
