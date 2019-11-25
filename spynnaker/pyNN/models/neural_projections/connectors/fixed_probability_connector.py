@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import decimal
 import math
 import numpy
 from spinn_utilities.overrides import overrides
@@ -173,14 +172,10 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
 
         params.extend([self.__allow_self_connections])
 
-        prob_value = round(decimal.Decimal(
-            str(self._p_connect)) * DataType.U032.scale)
         # If prob=1.0 has been specified, take care when scaling value to
         # ensure that it doesn't wrap round to zero as an unsigned long fract
-        if (self._p_connect == 1.0):
-            prob_value = round(decimal.Decimal(
-                str(self._p_connect)) * (DataType.U032.scale - 1))
-        params.extend([prob_value])
+        params.extend([DataType.U032.encode_as_int(
+            DataType.U032.max if self._p_connect == 1.0 else self._p_connect)])
 
         params.extend(self._get_connector_seed(
             pre_vertex_slice, post_vertex_slice, self._rng))
