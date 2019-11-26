@@ -1,7 +1,7 @@
 APP = $(notdir $(CURDIR))
 
-OTHER_SOURCES = $(NEURON_DIR)/neuron/models/neuron_model_store_recall_readout_impl.c
-NEURON_IMPL_H = $(NEURON_DIR)/neuron/implementations/neuron_impl_store_recall_readout.h
+OTHER_SOURCES = $(NEURON_DIR)/neuron/models/neuron_model_sinusoid_readout_impl.c
+NEURON_IMPL_H = $(NEURON_DIR)/neuron/implementations/neuron_impl_sinsuoid_readout.h
 SYNAPSE_DYNAMICS = $(NEURON_DIR)/neuron/plasticity/synapse_dynamics_static_impl.c
 
 #TIMING_DEPENDENCE = $(NEURON_DIR)/neuron/plasticity/stdp/timing_dependence/timing_erbp_impl.c
