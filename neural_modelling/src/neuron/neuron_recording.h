@@ -32,14 +32,29 @@ typedef struct recording_values_t {
     uint8_t data[];
 } recording_values_t;
 
-
+// A struct for bitfield data
 typedef struct bitfield_values_t {
-    uint32_t n_words;
     uint32_t time;
     uint32_t bits[];
 } bitfield_values_t;
 
-#define BITFIELD_SIZE 0
+typedef struct recording_info_t {
+    uint32_t element_size;
+    uint32_t rate;
+    uint32_t count;
+    uint32_t increment;
+    uint32_t size;
+    recording_values_t *values;
+} recording_info_t;
+
+typedef struct bitfield_info_t {
+    uint32_t rate;
+    uint32_t count;
+    uint32_t increment;
+    uint32_t size;
+    uint32_t n_words;
+    bitfield_values_t *values;
+} bitfield_info_t;
 
 //! The index to record each variable to for each neuron
 extern uint8_t **neuron_recording_indexes;
@@ -53,46 +68,16 @@ extern uint32_t n_recorded_vars;
 //! The number of bitfield variables that can be recorded
 extern uint32_t n_bitfield_vars;
 
-//! The values of the recorded variables
-extern recording_values_t **recording_values;
-
-//! The values of the bitfield variables
-extern bitfield_values_t **bitfield_values;
-
-//! The size of the recording elements
-extern uint32_t *var_recording_element_size;
-
 //! The number of recordings outstanding
 extern uint32_t n_recordings_outstanding;
 
-//! The size of an element of recording
-extern uint32_t *var_recording_element_size;
+extern recording_info_t *recording_info;
 
-//! The number of time steps between each variable recording
-extern uint32_t *var_recording_rate;
+extern bitfield_info_t *bitfield_info;
 
-//! Count of time steps until next variable recording
-extern uint32_t *var_recording_count;
+extern uint8_t **recording_values;
 
-//! Increment of count until next variable recording
-//! - 0 if not recorded, 1 if recorded
-extern uint32_t *var_recording_increment;
-
-//! The size of the recorded variables in bytes for a time step
-extern uint32_t *var_recording_size;
-
-//! The number of time steps between each variable recording
-extern uint32_t *bitfield_recording_rate;
-
-//! Count of time steps until next variable recording
-extern uint32_t *bitfield_recording_count;
-
-//! Increment of count until next variable recording
-//! - 0 if not recorded, 1 if recorded
-extern uint32_t *bitfield_recording_increment;
-
-//! The size of the recorded variables in bytes for a time step
-extern uint32_t *bitfield_recording_size;
+extern uint32_t **bitfield_values;
 
 //! \brief function to handle when a recording stage finished
 static void recording_done_callback(void) {
@@ -106,9 +91,9 @@ static void recording_done_callback(void) {
 static inline void neuron_recording_record_value(
         uint32_t var_index, uint32_t neuron_index, void *value) {
     uint32_t index = neuron_recording_indexes[var_index][neuron_index];
-    uint32_t size = var_recording_element_size[var_index];
+    uint32_t size = recording_info[var_index].element_size;
     uint32_t p = size * index;
-    spin1_memcpy(&recording_values[var_index]->data[p], value, size);
+    spin1_memcpy(&recording_values[var_index][p], value, size);
 }
 
 //! \brief stores a recording of an accum variable
@@ -118,7 +103,7 @@ static inline void neuron_recording_record_value(
 static inline void neuron_recording_record_accum(
         uint32_t var_index, uint32_t neuron_index, accum value) {
     uint8_t index = neuron_recording_indexes[var_index][neuron_index];
-    accum *data = (accum *) &recording_values[var_index]->data;
+    accum *data = (accum *) recording_values[var_index];
     data[index] = value;
 }
 
@@ -129,7 +114,7 @@ static inline void neuron_recording_record_accum(
 static inline void neuron_recording_record_double(
         uint32_t var_index, uint32_t neuron_index, double value) {
     uint8_t index = neuron_recording_indexes[var_index][neuron_index];
-    double *data = (double *) &recording_values[var_index]->data;
+    double *data = (double *) recording_values[var_index];
     data[index] = value;
 }
 
@@ -140,7 +125,7 @@ static inline void neuron_recording_record_double(
 static inline void neuron_recording_record_float(
         uint32_t var_index, uint32_t neuron_index, float value) {
     uint8_t index = neuron_recording_indexes[var_index][neuron_index];
-    float *data = (float *) &recording_values[var_index]->data;
+    float *data = (float *) recording_values[var_index];
     data[index] = value;
 }
 
@@ -151,7 +136,7 @@ static inline void neuron_recording_record_float(
 static inline void neuron_recording_record_int32(
         uint32_t var_index, uint32_t neuron_index, int32_t value) {
     uint8_t index = neuron_recording_indexes[var_index][neuron_index];
-    int32_t *data = (int32_t *) &recording_values[var_index]->data;
+    int32_t *data = (int32_t *) recording_values[var_index];
     data[index] = value;
 }
 
@@ -163,62 +148,60 @@ static inline void neuron_recording_record_bit(
         uint32_t var_index, uint32_t neuron_index) {
     // Record the bit
     uint32_t index = bitfield_recording_indexes[var_index][neuron_index];
-    bit_field_set(bitfield_values[var_index]->bits, index);
+    bit_field_set(bitfield_values[var_index], index);
 }
 
 //! \brief does the recording process of handing over to basic recording
 //! \param[in] time: the time to put into the recording stamps.
 static inline void neuron_recording_record(uint32_t time) {
     // go through all recordings
-    //uint32_t s = tc[T1_COUNT];
-    for (uint32_t i = 0; i < n_recorded_vars; i++) {
+    for (uint32_t i = n_recorded_vars; i > 0; i--) {
+        recording_info_t *rec_info = &recording_info[i - 1];
         // if the rate says record, record now
-        if (var_recording_count[i] == var_recording_rate[i]) {
+        if (rec_info->count == rec_info->rate) {
             // Reset the count
-            var_recording_count[i] = 1;
+            rec_info->count = 1;
             // Note we are recording
             n_recordings_outstanding += 1;
             // Set the time and record the data
-            recording_values[i]->time = time;
+            rec_info->values->time = time;
             recording_record_and_notify(
-                i, recording_values[i], var_recording_size[i],
-                recording_done_callback);
+                i - 1, rec_info->values, rec_info->size, recording_done_callback);
         } else {
 
             // Not recording this time, so increment by specified amount
-            var_recording_count[i] += var_recording_increment[i];
+            rec_info->count += rec_info->increment;
         }
     }
 
-    for (uint32_t i = 0; i < n_bitfield_vars; i++) {
+    for (uint32_t i = n_bitfield_vars; i > 0; i--) {
+        bitfield_info_t *bf_info = &bitfield_info[i - 1];
         // if the rate says record, record now
-        if (bitfield_recording_count[i] == bitfield_recording_rate[i]) {
+        if (bf_info->count == bf_info->rate) {
             // Reset the count
-            bitfield_recording_count[i] = 1;
+            bf_info->count = 1;
             // Skip empty bitfields
-            if (empty_bit_field(bitfield_values[i]->bits, bitfield_values[i]->n_words)) {
+            if (empty_bit_field(bf_info->values->bits, bf_info->n_words)) {
                 continue;
             }
             // Note we are recording
             n_recordings_outstanding += 1;
             // Set the time and record the data (note index is after recorded_vars)
-            bitfield_values[i]->time = time;
+            bf_info->values->time = time;
             recording_record_and_notify(
-                i + n_recorded_vars, &bitfield_values[i]->time,
-                bitfield_recording_size[i], recording_done_callback);
+                i + n_recorded_vars - 1, bf_info->values, bf_info->size,
+                recording_done_callback);
         } else {
 
             // Not recording this time, so increment by specified amount
-            bitfield_recording_count[i] += bitfield_recording_increment[i];
+            bf_info->count += bf_info->increment;
         }
     }
-    //uint32_t e = tc[T1_COUNT];
-    //log_info("nr: %u", s-e);
-    recording_do_timestep_update(time);
+    // recording_do_timestep_update(time);
 }
 
 //! \brief sets up state for next recording.
-static void neuron_recording_setup_for_next_recording(void) {
+static inline void neuron_recording_setup_for_next_recording(void) {
     // Wait until recordings have completed, to ensure the recording space
     // can be re-written
     while (n_recordings_outstanding > 0) {
@@ -226,9 +209,10 @@ static void neuron_recording_setup_for_next_recording(void) {
     }
 
     // Reset the bitfields before starting if a beginning of recording
-    for (uint32_t i = 0; i < n_bitfield_vars; i++) {
-        if (bitfield_recording_rate[i] == 1) {
-            clear_bit_field(bitfield_values[i]->bits, bitfield_values[i]->n_words);
+    for (uint32_t i = n_bitfield_vars; i > 0; i--) {
+        bitfield_info_t *b_info = &bitfield_info[i - 1];
+        if (b_info->rate == 1) {
+            clear_bit_field(b_info->values->bits, b_info->n_words);
         }
     }
 }
