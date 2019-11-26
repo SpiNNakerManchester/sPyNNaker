@@ -529,7 +529,6 @@ class SynapticManager(object):
             max_weights[synapse_type] = min(mmw * 2 ** 15,
                                             max_weights[synapse_type])
 
-
         # Convert these to powers
         max_weight_powers = (
             0 if w <= 1 else int(math.ceil(max(0, math.log(w, 2))))
@@ -545,6 +544,10 @@ class SynapticManager(object):
         # Add another bit of shift to prevent overflows
         if weights_signed:
             max_weight_powers = (m + 1 for m in max_weight_powers)
+        print("=" * 60)
+        print("RB left shifts for {:20}".format(application_vertex.label),
+              "=", list(max_weight_powers))
+        print("-" * 60)
         return list(max_weight_powers)
 
     @staticmethod
