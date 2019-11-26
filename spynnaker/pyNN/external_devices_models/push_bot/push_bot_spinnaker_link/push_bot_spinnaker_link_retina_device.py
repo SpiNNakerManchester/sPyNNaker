@@ -16,7 +16,8 @@
 import logging
 from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject, supports_injection
-from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
+from spinn_front_end_common.abstract_models import (
+    ApplicationSpiNNakerLinkVertex)
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.external_devices_models.push_bot import (
     AbstractPushBotRetinaDevice)

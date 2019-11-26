@@ -13,7 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
+from spinn_front_end_common.abstract_models import (
+    ApplicationSpiNNakerLinkVertex)
 from spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet import (
     PushBotEthernetMotorDevice)
 
