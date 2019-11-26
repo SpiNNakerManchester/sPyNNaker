@@ -23,7 +23,7 @@ from six.moves import range, xrange
 from spinn_utilities.index_is_value import IndexIsValue
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
-from pacman.model.resources.variable_sdram import VariableSDRAM
+from pacman.model.resources import TimeBasedSDRAM
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities import globals_variables
@@ -541,7 +541,7 @@ class NeuronRecorder(object):
         fixed_sdram += self.N_BYTES_PER_INDEX * total_neurons
         return fixed_sdram
 
-    def get_variable_sdram_usage(self, vertex_slice):
+    def get_variable_sdram_usage(self, vertex_slice, timestep):
         fixed_sdram = 0
         per_timestep_sdram = 0
         for variable in self.__sampling_rates:
@@ -560,7 +560,7 @@ class NeuronRecorder(object):
                     per_timestep_sdram += average_per_timestep
                     # Add the rest once to fixed for worst case
                     fixed_sdram += (per_record - average_per_timestep)
-        return VariableSDRAM(fixed_sdram, per_timestep_sdram)
+        return TimeBasedSDRAM(fixed_sdram, per_timestep_sdram/timestep)
 
     def get_dtcm_usage_in_bytes(self, vertex_slice):
         # *_rate + n_neurons_recording_* + *_indexes

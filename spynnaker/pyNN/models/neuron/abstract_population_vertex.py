@@ -206,15 +206,15 @@ class AbstractPopulationVertex(
             self, vertex_slice, graph, machine_time_step):
         # pylint: disable=arguments-differ
 
-        variableSDRAM = self.__neuron_recorder.get_variable_sdram_usage(
-            vertex_slice)
+        timebasedSDRAM = self.__neuron_recorder.get_variable_sdram_usage(
+            vertex_slice, self.timestep)
         constantSDRAM = ConstantSDRAM(
                 self._get_sdram_usage_for_atoms(
                     vertex_slice, graph, machine_time_step))
 
         # set resources required from this object
         container = ResourceContainer(
-            sdram=variableSDRAM + constantSDRAM,
+            sdram=timebasedSDRAM + constantSDRAM,
             dtcm=DTCMResource(self.get_dtcm_usage_for_atoms(vertex_slice)),
             cpu_cycles=CPUCyclesPerTickResource(
                 self.get_cpu_usage_for_atoms(vertex_slice)))

@@ -434,7 +434,8 @@ class SpikeSourcePoissonVertex(
 
     def get_recording_sdram_usage(self, vertex_slice, machine_time_step):
         variable_sdram = self.__spike_recorder.get_sdram_usage_in_bytes(
-            vertex_slice.n_atoms, self._max_spikes_per_ts(machine_time_step))
+            vertex_slice.n_atoms, self._max_spikes_per_ts(machine_time_step),
+            machine_time_step)
         constant_sdram = ConstantSDRAM(
             variable_sdram.per_timestep * OVERFLOW_TIMESTEPS_FOR_SDRAM)
         return variable_sdram + constant_sdram
