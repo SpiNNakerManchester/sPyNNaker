@@ -31,6 +31,7 @@ from spinn_front_end_common.abstract_models import (
 from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl)
 from spinn_front_end_common.interface.simulation import simulation_utilities
+from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.utilities.constants import (
     SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES, BYTES_PER_WORD)
@@ -200,3 +201,8 @@ class MunichMotorDevice(
         """ Return the dependent edge identifier
         """
         return [MOTOR_PARTITION_ID]
+
+    @property
+    @overrides(ApplicationVertex.timestep)
+    def timestep(self):
+        return globals_variables.get_simulator().machine_time_step

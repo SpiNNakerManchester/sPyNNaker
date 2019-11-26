@@ -28,6 +28,7 @@ from pacman.model.routing_info import (
     RoutingInfo, PartitionRoutingInfo, BaseKeyAndMask)
 from pacman.model.graphs.application import ApplicationVertex
 from spinn_storage_handlers import FileDataWriter, FileDataReader
+from spinn_front_end_common.utilities import globals_variables
 from data_specification import (
     DataSpecificationGenerator, DataSpecificationExecutor)
 from spynnaker.pyNN.models.neuron import SynapticManager
@@ -107,6 +108,10 @@ class SimpleApplicationVertex(ApplicationVertex):
     def get_resources_used_by_atoms(self, vertex_slice):
         return ResourceContainer()
 
+    @property
+    @overrides(ApplicationVertex.timestep)
+    def timestep(self):
+        return globals_variables.get_simulator().machine_time_step
 
 class TestSynapticManager(unittest.TestCase):
 

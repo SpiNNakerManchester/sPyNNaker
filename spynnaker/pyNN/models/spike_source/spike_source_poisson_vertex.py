@@ -1030,3 +1030,8 @@ class SpikeSourcePoissonVertex(
             "parameters": parameters,
         }
         return context
+
+    @property
+    @overrides(ApplicationVertex.timestep)
+    def timestep(self):
+        return self.__machine_time_step

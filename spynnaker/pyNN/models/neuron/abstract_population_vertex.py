@@ -101,7 +101,8 @@ class AbstractPopulationVertex(
         "__n_data_specs",
         "__initial_state_variables",
         "__has_reset_last",
-        "__updated_state_variables"]
+        "__updated_state_variables",
+        "_timestep"]
 
     BASIC_MALLOC_USAGE = 2
 
@@ -122,7 +123,13 @@ class AbstractPopulationVertex(
     def __init__(
             self, n_neurons, label, constraints, max_atoms_per_core,
             spikes_per_second, ring_buffer_sigma, incoming_spike_buffer_size,
-            neuron_impl, pynn_model):
+            neuron_impl, pynn_model, timestep=None):
+        """
+
+        :param timestep: timestep used by this vertex or None to use the\
+            machine timestep
+        :type timestep: None or int
+        """
         # pylint: disable=too-many-arguments, too-many-locals
         super(AbstractPopulationVertex, self).__init__(
             label, constraints, max_atoms_per_core)
@@ -169,6 +176,12 @@ class AbstractPopulationVertex(
         # Set up for profiling
         self.__n_profile_samples = helpful_functions.read_config_int(
             config, "Reports", "n_profile_samples")
+
+        if timestep is None:
+            self._timestamp = \
+                globals_variables.get_simulator().machine_time_step
+        else:
+            self._timestep = timestep
 
     @property
     @overrides(ApplicationVertex.n_atoms)
@@ -885,3 +898,8 @@ class AbstractPopulationVertex(
         if self.__synapse_manager.changes_during_run:
             self.__change_requires_data_generation = True
             self.__change_requires_neuron_parameters_reload = False
+
+    @property
+    @overrides(ApplicationVertex.timestep)
+    def timestep(self):
+        return self._timestep

@@ -408,3 +408,8 @@ class DelayExtensionVertex(
         """
         key = (vertex_slice.lo_atom, vertex_slice.hi_atom)
         return key in self.__delay_generator_data
+
+    @property
+    @overrides(ApplicationVertex.timestep)
+    def timestep(self):
+        return self.__machine_time_step
