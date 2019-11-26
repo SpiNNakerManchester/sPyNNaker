@@ -544,11 +544,12 @@ class SynapticManager(object):
         # Add another bit of shift to prevent overflows
         if weights_signed:
             max_weight_powers = (m + 1 for m in max_weight_powers)
+        rb_ls = list(max_weight_powers)
         print("=" * 60)
         print("RB left shifts for {:20}".format(application_vertex.label),
-              "=", list(max_weight_powers))
+              "=", rb_ls)
         print("-" * 60)
-        return list(max_weight_powers)
+        return rb_ls
 
     @staticmethod
     def _get_weight_scale(ring_buffer_to_input_left_shift):
