@@ -196,7 +196,7 @@ class FromListConnector(AbstractConnector):
     def get_weight_maximum(self, synapse_info):
         # pylint: disable=too-many-arguments
         if self.__weights is None:
-            return numpy.amax(synapse_info.weights)
+            return self._get_weight_maximum(self.__weights, len(self.__conn_list))
         else:
             return numpy.amax(numpy.abs(self.__weights))
 

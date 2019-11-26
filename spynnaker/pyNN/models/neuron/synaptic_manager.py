@@ -473,7 +473,7 @@ class SynapticManager(object):
                         0.0, delay_variance, n_connections)
 
                     weight_max = (synapse_dynamics.get_weight_maximum(
-                        connector, synapse_info.weight) * weight_scale)
+                        connector, synapse_info.weights) * weight_scale)
                     min_max_weight[synapse_type] = \
                         min(min_max_weight[synapse_type], weight_max)
 
