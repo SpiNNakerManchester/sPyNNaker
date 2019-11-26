@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import decimal
 from distutils.version import StrictVersion  # pylint: disable=all
 from enum import Enum
 import numpy
@@ -135,20 +134,19 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         """
         if numpy.isscalar(values):
             return numpy.array(
-                [round(decimal.Decimal(str(values)) * DataType.S1615.scale)],
+                [DataType.S1615.encode_as_int(values)],
                 dtype="uint32")
 
         if IS_PYNN_8 and get_simulator().is_a_pynn_random(values):
-            parameters = random.available_distributions[values.name]
-            params = [
-                values.parameters.get(param, None) for param in parameters]
-            params = [
+            parameters = (
+                values.parameters.get(param_name, None)
+                for param_name in random.available_distributions[values.name])
+            parameters = (
                 DataType.S1615.max if param == numpy.inf
                 else DataType.S1615.min if param == -numpy.inf else param
-                for param in params if param is not None]
+                for param in parameters if param is not None)
             params = [
-                round(decimal.Decimal(str(param)) * DataType.S1615.scale)
-                for param in params if param is not None]
+                DataType.S1615.encode_as_int(param) for param in parameters]
             params.extend(seed)
             return numpy.array(params, dtype="uint32")
 

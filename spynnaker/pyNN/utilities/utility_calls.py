@@ -16,7 +16,6 @@
 """
 utility class containing simple helper methods
 """
-from decimal import Decimal
 import os
 import logging
 import math
@@ -83,9 +82,8 @@ def convert_to(value, data_type):
     :type data_type: ~data_specification.enums.DataType
     :return: The converted data as a numpy data type
     """
-    return numpy.round(
-        float(Decimal(str(value)) * data_type.scale)).astype(
-            numpy.dtype(data_type.struct_encoding))
+    return numpy.round(data_type.encode_as_int(value)).astype(
+        data_type.struct_encoding)
 
 
 def read_in_data_from_file(
