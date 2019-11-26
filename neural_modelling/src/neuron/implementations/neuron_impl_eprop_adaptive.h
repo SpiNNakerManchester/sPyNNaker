@@ -282,6 +282,15 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     // determine if a spike should occur
     threshold_type_update_threshold(neuron->z, neuron);
 
+
+    // Record B
+    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
+//    		B_t; // neuron->B;
+//    		global_parameters->core_target_rate;
+//    	neuron->syn_state[0].e_bar;
+//    	neuron->syn_state[0].el_a;
+    		total_inh;
+
     // update neuron parameters
     state_t result = neuron_model_state_update(
             NUM_EXCITATORY_RECEPTORS, exc_input_values,
@@ -309,13 +318,18 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
 
     recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] =
+    		total_exc;
 //    		z_t;
-    		global_parameters->core_pop_rate;
+//    		global_parameters->core_pop_rate;
+//    		neuron->psi;
+//    		neuron->syn_state[0].z_bar;
 
-    // Record B
-    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
-//    		B_t; // neuron->B;
-    		global_parameters->core_target_rate;
+//    // Record B
+//    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
+////    		B_t; // neuron->B;
+////    		global_parameters->core_target_rate;
+////    	neuron->syn_state[0].e_bar;
+//    	neuron->syn_state[0].el_a;
 //    		total_inh; // total synaptic input from input layer
     // *********************************************************
 

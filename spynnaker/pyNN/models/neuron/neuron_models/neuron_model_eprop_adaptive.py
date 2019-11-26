@@ -143,10 +143,11 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
 
         # Synapse states - always initialise to zero
         eprop_syn_state = [ # synaptic state, one per synapse (kept in DTCM)
-                DataType.INT16, # delta_w
-                DataType.INT16, # z_bar
-                DataType.INT32, # ep_a
-                DataType.INT32, # e_bar
+                DataType.UINT32, # delta_w
+                DataType.S1615, # z_bar_old
+                DataType.S1615, # z_bar
+                DataType.S1615, # ep_a
+                DataType.S1615, # e_bar
             ]
         # Extend to include fan-in for each neuron
         datatype_list.extend(eprop_syn_state * SYNAPSES_PER_NEURON)
@@ -266,6 +267,7 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
         eprop_syn_init = [0,
                           0,
                           0,
+                          1,
                           0]
         # extend to appropriate fan-in
         values.extend(eprop_syn_init * SYNAPSES_PER_NEURON)

@@ -76,41 +76,52 @@ state_t neuron_model_state_update(
     // ******************************************************************
     // Update Psi (pseudo-derivative) (done once for each postsynaptic neuron)
     // ******************************************************************
-    // REAL temp1 = (neuron->V_membrane - v_threshold_baseline) * (1/v_thresh)
-    // REAL temp2 = ((1/v_th) * 0.3 * 1-(abs(temp1))
-    // neuron->psi =  (temp2 > 0)? temp2 , 0;
+    REAL psi_temp1 = (neuron->V_membrane - neuron->B) * (1/neuron->b_0);
+    REAL psi_temp2 = ((absk(psi_temp1)));
+    neuron->psi =  ((1.0k - psi_temp2) > 0.0k)?
+    		(1.0k/neuron->b_0) * 0.3k * 1.0k * (1.0k - psi_temp2) : 0.0k;
+
+    uint32_t total_synapses_per_neuron = 1;
+    REAL rho = 0.998;
 
     // All operations now need doing once per eprop synapse
-//    for (int syn=0; syn < total_synapses_per_neuron; syn++){
-    // ******************************************************************
-    // Update eligibility vector
-    // ******************************************************************
-//    neuron->syn_state[syn_ind].ep_a; = neuron->psi * neuron->syn_state[syn_ind].z_bar +
-//    		(global_params->rho - neuron->psi * global_params->beta) *
-//    			neuron->syn_state[syn_ind].ep_a;
+    for (uint32_t syn_ind=0; syn_ind < total_synapses_per_neuron; syn_ind++){
 
-
-    // ******************************************************************
-    // Update eligibility trace
-    // ******************************************************************
-//    REAL temp_elig_trace = neuron->psi * (neuron->syn_state[syn_ind].z_bar -
-//    		global_params->beta * neuron->syn_state[syn_ind].ep_a);
-//    neuron->syn_state[syn_ind].e_bar = "low pass filtered temp_elig_trace"
-
-
-    // ******************************************************************
-    // Update total weight change
-    // ******************************************************************
-//    uint16_t this_dt_weight_change = -global_params->eta * neuron->learning_sig * neuron->syn_state[syn_ind].e_bar;
-//    neuron->syn_state[syn_ind].delta_w +=this_dt_weight_change;
-
-//    }
+		// ******************************************************************
+		// Low-pass filter incoming spike train
+		// ******************************************************************
+//    	neuron->syn_state[syn_ind].z_bar_old = neuron->syn_state[syn_ind].z_bar;
+//    	neuron->syn_state[syn_ind].z_bar = neuron->syn_state[syn_ind].z_bar * neuron->exp_TC + neuron->syn_state[syn_ind].z_bar_old; // ToDo
 
 
 
+		// ******************************************************************
+		// Update eligibility vector
+		// ******************************************************************
+    	// updating z_bar is problematic, if spike could come and interrupt neuron update
+    	// (you won't know whether spike arrived before or after update)
+    	// (also need to reset if it was 1 - otherwise it will never be cleared)
+    	neuron->syn_state[syn_ind].el_a =
+    			(neuron->psi * neuron->syn_state[syn_ind].z_bar) +
+    		(rho - neuron->psi * neuron->beta) *
+			neuron->syn_state[syn_ind].el_a;
 
 
+    	// ******************************************************************
+		// Update eligibility trace
+		// ******************************************************************
+//    	REAL temp_elig_trace = neuron->psi * (neuron->syn_state[syn_ind].z_bar -
+//    		neuron->beta * neuron->syn_state[syn_ind].el_a);
 
+//    	neuron->syn_state[syn_ind].e_bar = temp_elig_trace;
+
+		// ******************************************************************
+		// Update cached total weight change
+		// ******************************************************************
+    	//    uint16_t this_dt_weight_change = -global_params->eta * neuron->learning_sig * neuron->syn_state[syn_ind].e_bar;
+    	//    neuron->syn_state[syn_ind].delta_w +=this_dt_weight_change;
+
+    }
 
     return neuron->V_membrane;
 }

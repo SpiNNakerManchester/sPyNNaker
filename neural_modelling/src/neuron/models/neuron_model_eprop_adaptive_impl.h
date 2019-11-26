@@ -25,10 +25,11 @@
 
 
 typedef struct eprop_syn_state_t {
-	uint16_t delta_w; // weight change to apply
-	uint16_t z_bar; // low-pass filtered spike train
-	uint32_t ep_a; // adaptive component of eligibility vector
-	uint32_t e_bar; // low-pass filtered eligibility trace
+	uint32_t delta_w; // weight change to apply
+	REAL z_bar_old;
+	REAL z_bar; // low-pass filtered spike train
+	REAL el_a; // adaptive component of eligibility vector
+	REAL e_bar; // low-pass filtered eligibility trace
 }eprop_syn_state_t;
 
 /////////////////////////////////////////////////////////////

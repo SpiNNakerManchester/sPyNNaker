@@ -174,11 +174,23 @@ static inline void process_fixed_synapses(
         uint32_t synaptic_word = *synaptic_words++;
 
         // Extract components from this word
-        uint32_t delay =
-                synapse_row_sparse_delay(synaptic_word, synapse_type_index_bits);
+        uint32_t delay = 1;
+        uint32_t syn_ind_from_delay =
+        		synapse_row_sparse_delay(synaptic_word, synapse_type_index_bits);
+
         uint32_t combined_synapse_neuron_index = synapse_row_sparse_type_index(
                 synaptic_word, synapse_type_index_mask);
         int32_t weight = synapse_row_sparse_weight(synaptic_word);
+
+        int32_t neuron_ind = synapse_row_sparse_index(synaptic_word, synapse_type_mask);
+
+        // Use postsynaptic neuron index to access neuron struct,
+        // and delay field to access correct synapse
+        // neuron_pointer_t neuron = neuron_array[neuron_ind]->syn_state[syn_ind_from_delay].z_bar;
+
+        io_printf(IO_BUF, "neuron ind: %u, synapse ind: %u \n", neuron_ind, syn_ind_from_delay);
+
+
 
         io_printf(IO_BUF, "signed w: %d \n", weight);
 
@@ -275,7 +287,7 @@ bool synapses_initialise(
     uint32_t log_n_synapse_types = ilog_2(n_synapse_types_power_2);
 
     uint32_t n_ring_buffer_bits =
-            log_n_neurons + log_n_synapse_types + SYNAPSE_DELAY_BITS;
+            log_n_neurons + log_n_synapse_types + 1; // SYNAPSE_DELAY_BITS; Fix at delays of 1 timestep, as this means we get memory back, and we don't need delays to prove the concept
     uint32_t ring_buffer_size = 1 << (n_ring_buffer_bits);
 
     ring_buffers = spin1_malloc(ring_buffer_size * sizeof(weight_t));
@@ -339,7 +351,7 @@ bool synapses_process_synaptic_row(
 
     // Get address of non-plastic region from row
     address_t fixed_region_address = synapse_row_fixed_region(row);
-
+    io_printf(IO_BUF, "Processing Spike...\n");
     // **TODO** multiple optimised synaptic row formats
     //if (plastic_tag(row) == 0) {
     // If this row has a plastic region

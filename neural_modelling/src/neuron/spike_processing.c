@@ -167,6 +167,7 @@ static inline void setup_synaptic_dma_write(uint32_t dma_buffer_index) {
 static void multicast_packet_received_callback(uint key, uint payload) {
     use(payload);
     any_spike = true;
+    io_printf(IO_BUF, "mc packet received \n");
     log_debug("Received spike %x at %d, DMA Busy = %d", key, time, dma_busy);
 
     // If there was space to add spike to incoming spike queue
@@ -182,7 +183,7 @@ static void multicast_packet_received_callback(uint key, uint payload) {
             }
         }
     } else {
-        log_debug("Could not add spike");
+        io_printf(IO_BUF, "Could not add spike\n");
     }
 }
 
@@ -190,6 +191,9 @@ static void multicast_packet_received_callback(uint key, uint payload) {
 static void user_event_callback(uint unused0, uint unused1) {
     use(unused0);
     use(unused1);
+
+    io_printf(IO_BUF, "user callback triggered \n");
+
     setup_synaptic_dma_read();
 }
 
@@ -198,6 +202,9 @@ static void dma_complete_callback(uint unused, uint tag) {
     use(unused);
 
     log_debug("DMA transfer complete at time %u with tag %u", time, tag);
+
+    io_printf(IO_BUF, "Entering DMA Complete...\n");
+    log_info("Entering DMA Complete...\n");
 
     // Get pointer to current buffer
     uint32_t current_buffer_index = buffer_being_read;
@@ -240,6 +247,9 @@ static void dma_complete_callback(uint unused, uint tag) {
 bool spike_processing_initialise( // EXPORTED
         size_t row_max_n_words, uint mc_packet_callback_priority,
         uint user_event_priority, uint incoming_spike_buffer_size) {
+
+	io_printf(IO_BUF, "Initialising spike_processing.c....\n");
+
     // Allocate the DMA buffers
     for (uint32_t i = 0; i < N_DMA_BUFFERS; i++) {
         dma_buffers[i].row = spin1_malloc(row_max_n_words * sizeof(uint32_t));
