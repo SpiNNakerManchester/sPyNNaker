@@ -12,9 +12,11 @@
 
 // Further includes
 #include <common/out_spikes.h>
+#include <common/maths-util.h>
 #include <recording.h>
 #include <debug.h>
 #include <random.h>
+#include <log.h>
 
 #define V_RECORDING_INDEX 0
 #define GSYN_EXCITATORY_RECORDING_INDEX 1
@@ -119,7 +121,7 @@ static bool neuron_impl_initialise(uint32_t n_neurons) {
     }
 
     // Initialise pointers to Neuron parameters in STDP code
-    synapse_dynamics_set_neuron_array(neuron_array);
+//    synapse_dynamics_set_neuron_array(neuron_array);
     log_info("set pointer to neuron array in stdp code");
 
     return true;
@@ -359,7 +361,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     	state_t result = neuron_model_state_update(
     			NUM_EXCITATORY_RECEPTORS, exc_input_values,
 				NUM_INHIBITORY_RECEPTORS, inh_input_values,
-				external_bias, neuron);
+				external_bias, neuron, 0.0k);
 //    	io_printf(IO_BUF, "Readout membrane pot: %k\n", voltage);
     // determine if a spike should occur
     // bool spike = threshold_type_is_above_threshold(result, threshold_type);

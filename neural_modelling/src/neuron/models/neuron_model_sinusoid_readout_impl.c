@@ -22,11 +22,11 @@ void neuron_model_set_global_neuron_params(
 state_t neuron_model_state_update(
 		uint16_t num_excitatory_inputs, input_t* exc_input,
 		uint16_t num_inhibitory_inputs, input_t* inh_input,
-		input_t external_bias, neuron_pointer_t neuron) {
+		input_t external_bias, neuron_pointer_t neuron, REAL dummy) {
 
 	log_debug("Exc 1: %12.6k, Exc 2: %12.6k", exc_input[0], exc_input[1]);
 	log_debug("Inh 1: %12.6k, Inh 2: %12.6k", inh_input[0], inh_input[1]);
-
+	use(dummy);
 
     // If outside of the refractory period
     if (neuron->refract_timer <= 0) {
@@ -82,9 +82,9 @@ void neuron_model_print_parameters(restrict neuron_pointer_t neuron) {
     io_printf(IO_BUF, "exp(-ms/(RC)) = %11.4k [.]\n", neuron->exp_TC);
 
     io_printf(IO_BUF, "T refract     = %u timesteps\n", neuron->T_refract);
-    io_printf(IO_BUF, "mean_isi_ticks  = %k\n", neuron->mean_isi_ticks);
-    io_printf(IO_BUF, "time_to_spike_ticks  = %k \n",
-    		neuron->time_to_spike_ticks);
+//    io_printf(IO_BUF, "mean_isi_ticks  = %k\n", neuron->mean_isi_ticks);
+//    io_printf(IO_BUF, "time_to_spike_ticks  = %k \n",
+//    		neuron->time_to_spike_ticks);
 
 //    io_printf(IO_BUF, "Seed 1: %u\n", neuron->spike_source_seed[0]);
 //    io_printf(IO_BUF, "Seed 2: %u\n", neuron->spike_source_seed[1]);

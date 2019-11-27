@@ -16,7 +16,6 @@
 #include <recording.h>
 #include <debug.h>
 #include <random.h>
-//#include "random.h"
 #include <log.h>
 
 #define V_RECORDING_INDEX 0
