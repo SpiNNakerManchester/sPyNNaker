@@ -66,7 +66,7 @@ class NeuronModelLeakyIntegrateAndFireSinusoidReadout(AbstractNeuronModel):
 #                     DataType.UINT32,  # MARS KISS seed
 #                     DataType.UINT32,  # MARS KISS seed
 #                     DataType.S1615,    # ticks_per_second
-                    DataType.S1615    # global mem pot
+#                     DataType.S1615    # global mem pot
                     ]
         global_data_types.extend([DataType.S1615 for i in range(1024)])
 
@@ -201,7 +201,7 @@ class NeuronModelLeakyIntegrateAndFireSinusoidReadout(AbstractNeuronModel):
 #                 3, # seed 3
 #                 4, # seed 4
 #                 MICROSECONDS_PER_SECOND / float(machine_time_step), # ticks_per_second
-                0.0, # set to 0, as will be set in first timestep of model anyway (membrane potential)
+#                 0.0, # set to 0, as will be set in first timestep of model anyway (membrane potential)
                 ]
 
 #         target_data = []
