@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import decimal
 import numpy
 from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
@@ -99,8 +98,7 @@ class GeneratorData(object):
             self.__pre_vertex_slice.lo_atom,
             self.__pre_vertex_slice.n_atoms,
             self.__max_stage,
-            (decimal.Decimal(str(1000.0 / float(self.__machine_time_step))) *
-             DataType.S1615.scale),
+            DataType.S1615.encode_as_int(1000.0 / self.__machine_time_step),
             self.__synapse_information.synapse_type,
             synapse_dynamics.gen_matrix_id,
             connector.gen_connector_id,
