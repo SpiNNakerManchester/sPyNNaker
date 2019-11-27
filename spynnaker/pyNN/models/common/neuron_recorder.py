@@ -90,7 +90,8 @@ class NeuronRecorder(object):
     MAX_RATE = 2 ** 32 - 1  # To allow a unit32_t to be used to store the rate
 
     def __init__(
-            self, allowed_variables, data_types, bitfield_variables, n_neurons):
+            self, allowed_variables, data_types, bitfield_variables,
+            n_neurons):
         self.__sampling_rates = OrderedDict()
         self.__indexes = dict()
         self.__data_types = data_types
