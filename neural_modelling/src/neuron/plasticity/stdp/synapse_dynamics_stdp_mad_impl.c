@@ -87,13 +87,9 @@ static inline final_state_t plasticity_update_synapse(
     return synapse_structure_get_final_state(current_state);
 }
 
-address_t synapse_dynamics_initialise(
+address_t synapse_dynamics_stdp_initialise(
         address_t address, uint32_t n_neurons, uint32_t n_synapse_types,
         uint32_t *ring_buffer_to_input_buffer_left_shifts) {
-
-    stdp_params *sdram_params = (stdp_params *) address;
-    spin1_memcpy(&params, sdram_params, sizeof(stdp_params));
-    address = (address_t) &sdram_params[1];
 
     // Load timing dependence data
     address_t weight_region_address = timing_initialise(address);
@@ -113,32 +109,6 @@ address_t synapse_dynamics_initialise(
     if (post_event_history == NULL) {
         return NULL;
     }
-
-    uint32_t n_neurons_power_2 = n_neurons;
-    uint32_t log_n_neurons = 1;
-    if (n_neurons != 1) {
-        if (!is_power_of_2(n_neurons)) {
-            n_neurons_power_2 = next_power_of_2(n_neurons);
-        }
-        log_n_neurons = ilog_2(n_neurons_power_2);
-    }
-
-    uint32_t n_synapse_types_power_2 = n_synapse_types;
-    uint32_t log_n_synapse_types = 1;
-    if (n_synapse_types != 1) {
-        if (!is_power_of_2(n_synapse_types)) {
-            n_synapse_types_power_2 = next_power_of_2(n_synapse_types);
-        }
-        log_n_synapse_types = ilog_2(n_synapse_types_power_2);
-    }
-
-    synapse_type_index_bits = log_n_neurons + log_n_synapse_types;
-    synapse_type_index_mask = (1 << synapse_type_index_bits) - 1;
-    synapse_index_bits = log_n_neurons;
-    synapse_index_mask = (1 << synapse_index_bits) - 1;
-    synapse_delay_index_type_bits =
-            SYNAPSE_DELAY_BITS + synapse_type_index_bits;
-    synapse_type_mask = (1 << log_n_synapse_types) - 1;
 
     return weight_result;
 }
