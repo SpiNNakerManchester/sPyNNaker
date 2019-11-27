@@ -184,7 +184,7 @@ bool neuron_reload_neuron_parameters(address_t address) { // EXPORTED
 //! \return True is the initialisation was successful, otherwise False
 bool neuron_initialise(address_t address, uint32_t *n_neurons_value, // EXPORTED
         uint32_t *n_synapse_types_value, uint32_t *incoming_spike_buffer_size,
-        uint32_t *timer_offset, uint16_t *starting_rate) {
+        uint32_t *timer_offset, uint32_t *starting_rate) {
     log_debug("neuron_initialise: starting");
     struct neuron_parameters *params = (void *) address;
 
@@ -367,10 +367,12 @@ void neuron_do_timestep_update( // EXPORTED
 
             io_printf(IO_BUF, "sending %k\n", neuron_impl_get_rate_diff(neuron_index));
 
+            if(use_key){
                 // Send the spike
-            while (!spin1_send_mc_packet(
-                key | neuron_index, neuron_impl_get_rate_diff(neuron_index), WITH_PAYLOAD)) {
-                spin1_delay_us(1);
+                while (!spin1_send_mc_packet(
+                    key | neuron_index, neuron_impl_get_rate_diff(neuron_index), WITH_PAYLOAD)) {
+                    spin1_delay_us(1);
+                }
             }
 //            }
         } else {

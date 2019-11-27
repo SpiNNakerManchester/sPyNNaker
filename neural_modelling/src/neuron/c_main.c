@@ -165,7 +165,7 @@ static bool initialise(void) {
     uint32_t n_synapse_types;
     uint32_t incoming_spike_buffer_size;
     // SHOULD THIS BE CHANGED IN 32 BIT AT SOME POINT?????
-    uint16_t starting_rate;
+    uint32_t starting_rate;
     if (!neuron_initialise(
             data_specification_get_region(NEURON_PARAMS_REGION, ds_regions),
             &n_neurons, &n_synapse_types, &incoming_spike_buffer_size,

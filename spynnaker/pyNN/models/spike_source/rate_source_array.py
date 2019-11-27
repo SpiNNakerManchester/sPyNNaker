@@ -17,6 +17,7 @@ from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 from .rate_source_array_vertex import RateSourceArrayVertex
 
+DEFAULT_MAX_ATOMS_PER_CORE = 500
 
 class RateSourceArray(AbstractPyNNModel):
 
@@ -28,6 +29,17 @@ class RateSourceArray(AbstractPyNNModel):
             raise Exception("Rate Source Array Error: Rate times and Rate Values must have the same length.")
         self.__rate_times = rate_times
         self.__rate_values = rate_values
+
+    @classmethod
+    def set_model_max_atoms_per_core(cls, n_atoms=DEFAULT_MAX_ATOMS_PER_CORE):
+        super(RateSourceArray, cls).set_model_max_atoms_per_core(
+            n_atoms)
+
+    @classmethod
+    def get_max_atoms_per_core(cls):
+        if cls not in super(RateSourceArray, cls)._max_atoms_per_core:
+            return DEFAULT_MAX_ATOMS_PER_CORE
+        return super(RateSourceArray, cls).get_max_atoms_per_core()
 
     @overrides(AbstractPyNNModel.create_vertex)
     def create_vertex(

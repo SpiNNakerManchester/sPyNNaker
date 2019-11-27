@@ -164,6 +164,8 @@ static void neuron_impl_load_neuron_parameters(
         next += n_words_needed(n_neurons * sizeof(neuron_t));
     }
 
+    io_printf(IO_BUF, "copied neuron paramsn\n");
+
     if (sizeof(input_type_t)) {
         log_debug("reading input type parameters");
         spin1_memcpy(input_type_array, &address[next],
@@ -250,6 +252,8 @@ static inline bool set_spike_source_rate(neuron_pointer_t neuron, REAL rate,
 
 static bool neuron_impl_do_timestep_update(index_t neuron_index,
         input_t external_bias, state_t *recorded_variable_values) {
+
+    io_printf(IO_BUF, "neuron index %d\n", neuron_index);
     // Get the neuron itself
     neuron_pointer_t neuron = &neuron_array[neuron_index];
 
@@ -403,7 +407,7 @@ uint neuron_impl_get_rate_diff(index_t neuron_index) {
 
 //! \brief Returns the starting rate
 //! \param[in] neuron_index: the index of the neuron
-uint16_t neuron_impl_get_starting_rate() {
+uint32_t neuron_impl_get_starting_rate() {
 
     union {
         REAL input;
@@ -411,6 +415,8 @@ uint16_t neuron_impl_get_starting_rate() {
     } converter;
 
     converter.input = neuron_array[0].rate_at_last_setting;
+
+    io_printf(IO_BUF, "returning %k %k\n", neuron_array[0].rate_at_last_setting, converter.output);
 
     return converter.output;
 }
