@@ -148,7 +148,6 @@ void neuron_store_neuron_parameters(address_t address) { // EXPORTED
 void neuron_do_timestep_update( // EXPORTED
         timer_t time, uint timer_count, uint timer_period) {
     // Set the next expected time to wait for between spike sending
-    uint32_t s = tc[T1_COUNT];
     expected_time = sv->cpu_clk * timer_period;
 
     // Prepare recording for the next timestep
@@ -214,9 +213,6 @@ void neuron_do_timestep_update( // EXPORTED
 
     // Re-enable interrupts
     spin1_mode_restore(cpsr);
-
-    uint32_t e = tc[T1_COUNT];
-    log_info("%d", s - e);
 }
 
 void neuron_add_inputs( // EXPORTED
