@@ -178,7 +178,7 @@ class AbstractPopulationVertex(
             config, "Reports", "n_profile_samples")
 
         if timestep is None:
-            self._timestamp = \
+            self._timestep = \
                 globals_variables.get_simulator().machine_time_step
         else:
             self._timestep = timestep
