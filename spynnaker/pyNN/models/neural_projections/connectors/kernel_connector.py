@@ -63,11 +63,11 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
         :type shape_kernel: list(int) or tuple(int,int)
         :param weight_kernel: (optional)\
             2D matrix of size shape_kernel describing the weights
-        :type weight_kernel: numpy.array or pyNN.random.NumpyRNG \
+        :type weight_kernel: ~numpy.ndarray or ~pyNN.random.NumpyRNG \
             or int or float or list(int) or list(float) or None
         :param delay_kernel: (optional)\
             2D matrix of size shape_kernel describing the delays
-        :type delay_kernel: numpy.array or pyNN.random.NumpyRNG \
+        :type delay_kernel: ~numpy.ndarray or ~pyNN.random.NumpyRNG \
             or int or float or list(int) or list(float) or None
         :param shape_common: (optional)\
             2D shape of common coordinate system (for both pre and post, \

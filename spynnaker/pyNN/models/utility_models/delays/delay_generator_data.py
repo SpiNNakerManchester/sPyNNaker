@@ -70,7 +70,7 @@ class DelayGeneratorData(object):
     def gen_data(self):
         """ Get the data to be written for this connection
 
-        :rtype: numpy array of uint32
+        :rtype: ~numpy.ndarray(~numpy.uint32)
         """
         connector = self.__synapse_information.connector
         items = list()

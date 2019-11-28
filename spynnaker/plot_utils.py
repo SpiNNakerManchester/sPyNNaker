@@ -44,8 +44,9 @@ def line_plot(data_sets, title=None):
     """ Build a line plot or plots.
 
     :param data_sets: Numpy array of data, or list of numpy arrays of data
-    :type data_sets: numpy.ndarray or list(numpy.ndarray)
+    :type data_sets: ~numpy.ndarray or list(~numpy.ndarray)
     :param title: The title for the plot
+    :type title: str or None
     """
     if not _precheck(data_sets, title):
         return
@@ -77,9 +78,11 @@ def heat_plot(data_sets, ylabel=None, title=None):
     """ Build a heatmap plot or plots.
 
     :param data_sets: Numpy array of data, or list of numpy arrays of data
-    :type data_sets: numpy.ndarray or list(numpy.ndarray)
+    :type data_sets: ~numpy.ndarray or list(~numpy.ndarray)
     :param ylabel: The label for the Y axis
+    :type ylabel: str or None
     :param title: The title for the plot
+    :type title: str or None
     """
     if not _precheck(data_sets, title):
         return
@@ -133,8 +136,9 @@ def plot_spikes(spikes, title="spikes"):
     """ Build a spike plot or plots.
 
     :param spikes: Numpy array of spikes, or list of numpy arrays of spikes
-    :type spikes: numpy.ndarray or list(numpy.ndarray)
+    :type spikes: ~numpy.ndarray or list(~numpy.ndarray)
     :param title: The title for the plot
+    :type title: str
     """
     if not _precheck(spikes, title):
         return

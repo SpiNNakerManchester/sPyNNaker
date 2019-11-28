@@ -96,8 +96,8 @@ class AbstractSynapseIO(object):
         :return: (row_data, max_row_length, delayed_row_data, \
             max_delayed_row_length, delayed_source_ids, stages)
         :rtype: \
-            tuple(numpy.ndarray, int, numpy.ndarray, int, numpy.ndarray, \
-            numpy.ndarray)
+            tuple(~numpy.ndarray, int, ~numpy.ndarray, int, ~numpy.ndarray, \
+            ~numpy.ndarray)
         """
 
     @abstractmethod
@@ -132,7 +132,7 @@ class AbstractSynapseIO(object):
         :param machine_time_step:
         :type machine_time_step: int
         :return: array with ``weight`` and ``delay`` columns
-        :rtype: numpy.ndarray
+        :rtype: ~numpy.ndarray
         """
 
     @abstractmethod

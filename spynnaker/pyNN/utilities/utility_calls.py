@@ -47,7 +47,8 @@ def convert_param_to_numpy(param, no_atoms):
     :param param: the param to convert
     :param no_atoms: the number of atoms available for conversion of param
     :type no_atoms: int
-    :return numpy.array: the converted param in whatever format it was given
+    :return: the converted param in whatever format it was given
+    :rtype: ~numpy.ndarray
     """
 
     # Deal with random distributions by generating values
@@ -102,6 +103,7 @@ def read_in_data_from_file(
     :param max_time: max time slot to read neurons values of.
     :type max_time: float or int
     :return: a numpy array of (time stamp, atom ID, data value)
+    :rtype: ~numpy.ndarray(tuple(float, int, float))
     """
     times = list()
     atom_ids = list()
@@ -150,7 +152,7 @@ def read_spikes_from_file(file_path, min_atom=0, max_atom=float('inf'),
     :return:\
         a numpy array with max_atom elements each of which is a list of\
         spike times.
-    :rtype: numpy.array(int, int)
+    :rtype: numpy.ndarray(int, int)
     """
     # pylint: disable=too-many-arguments
 

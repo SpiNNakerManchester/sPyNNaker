@@ -109,7 +109,7 @@ class AbstractStandardNeuronComponent(with_metaclass(AbstractBase, object)):
         :param state_variables: The holder of the state variables
         :type state_variables: ~spinn_utilities.ranged.RangeDictionary
         :param vertex_slice: The slice of the vertex to generate parameters for
-        :rtype: numpy.ndarray(uint32)
+        :rtype: ~numpy.ndarray(~numpy.uint32)
         """
         values = self.get_values(parameters, state_variables, vertex_slice)
         return self.struct.get_data(

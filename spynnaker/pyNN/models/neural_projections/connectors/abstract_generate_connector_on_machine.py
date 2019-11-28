@@ -184,11 +184,11 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         be generated on the machine
 
         :param weights:
-        :type weights: numpy.array or pyNN.random.NumpyRNG or int or float or\
-            list(int) or list(float)
+        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\
+            float or list(int) or list(float)
         :param delays:
-        :type delays: numpy.array or pyNN.random.NumpyRNG or int or float or \
-            list(int) or list(float)
+        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\
+            float or list(int) or list(float)
         :rtype: bool
         """
 
@@ -200,8 +200,8 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         """ Get the id of the weight generator on the machine
 
         :param weights:
-        :type weights: numpy.array or pyNN.random.NumpyRNG or int or float or\
-            list(int) or list(float)
+        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\
+            float or list(int) or list(float)
         :rtype: int
         """
         return self._param_generator_id(weights)
@@ -210,9 +210,9 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         """ Get the parameters of the weight generator on the machine
 
         :param weights:
-        :type weights: numpy.array or pyNN.random.NumpyRNG or int or float or\
-            list(int) or list(float)
-        :rtype: numpy.ndarray(uint32)
+        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\
+            float or list(int) or list(float)
+        :rtype: ~numpy.ndarray(~numpy.uint32)
         """
         seed = self._generate_param_seed(
             pre_vertex_slice, post_vertex_slice, weights,
@@ -223,8 +223,8 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         """ The size of the weight parameters in bytes
 
         :param weights:
-        :type weights: numpy.array or pyNN.random.NumpyRNG or int or float or\
-            list(int) or list(float)
+        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\
+            float or list(int) or list(float)
         :rtype: int
         """
         return self._param_generator_params_size_in_bytes(weights)
@@ -233,8 +233,8 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         """ Get the id of the delay generator on the machine
 
         :param delays:
-        :type delays: numpy.array or pyNN.random.NumpyRNG or int or float or \
-            list(int) or list(float)
+        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\
+            float or list(int) or list(float)
         :rtype: int
         """
         return self._param_generator_id(delays)
@@ -243,9 +243,9 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         """ Get the parameters of the delay generator on the machine
 
         :param delays:
-        :type delays: numpy.array or pyNN.random.NumpyRNG or int or float or \
-            list(int) or list(float)
-        :rtype: numpy.ndarray(uint32)
+        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\
+            float or list(int) or list(float)
+        :rtype: ~numpy.ndarray(~numpy.uint32)
         """
         seed = self._generate_param_seed(
             pre_vertex_slice, post_vertex_slice, delays,
@@ -256,8 +256,8 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         """ The size of the delay parameters in bytes
 
         :param delays:
-        :type delays: numpy.array or pyNN.random.NumpyRNG or int or float or \
-            list(int) or list(float)
+        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\
+            float or list(int) or list(float)
         :rtype: int
         """
         return self._param_generator_params_size_in_bytes(delays)
@@ -275,7 +275,7 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
             synapse_type, synapse_info):
         """ Get the parameters of the on machine generation.
 
-        :rtype: numpy.ndarray(uint32)
+        :rtype: ~numpy.ndarray(uint32)
         """
         return numpy.zeros(0, dtype="uint32")
 

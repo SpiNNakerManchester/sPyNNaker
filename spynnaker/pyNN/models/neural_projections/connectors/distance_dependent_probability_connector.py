@@ -60,7 +60,7 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
         :param space:\
             a Space object, needed if you wish to specify distance-dependent\
             weights or delays.
-        :type space: pyNN.Space
+        :type space: ~pyNN.space.Space
         :param safe:
         :type safe: bool
         :param callback: Ignored
@@ -72,7 +72,7 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
         :type n_connections: int or None
         :param rng: \
             Seeded random number generator, or None to make one when needed
-        :type rng: pyNN.random.NumpyRNG or None
+        :type rng: ~pyNN.random.NumpyRNG or None
         """
         # pylint: disable=too-many-arguments
         super(DistanceDependentProbabilityConnector, self).__init__(

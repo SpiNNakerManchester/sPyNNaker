@@ -51,9 +51,9 @@ class AbstractStaticSynapseDynamics(AbstractSynapseDynamics):
         for the fixed-fixed region.
 
         :param connections:
-        :type connections: numpy.ndarray
+        :type connections: ~numpy.ndarray
         :param connection_row_indices:
-        :type connection_row_indices: numpy.ndarray
+        :type connection_row_indices: ~numpy.ndarray
         :param n_rows:
         :type n_rows: int
         :param post_vertex_slice:
@@ -61,7 +61,7 @@ class AbstractStaticSynapseDynamics(AbstractSynapseDynamics):
         :param n_synapse_types:
         :type n_synapse_types: int
         :return: (ff_data, ff_size)
-        :rtype: tuple(list(numpy.ndarray), numpy.ndarray)
+        :rtype: tuple(list(~numpy.ndarray), ~numpy.ndarray)
         """
 
     @abstractmethod
@@ -70,8 +70,8 @@ class AbstractStaticSynapseDynamics(AbstractSynapseDynamics):
             given the size that was written to each row
 
         :param ff_size:
-        :type ff_size: numpy.ndarray
-        :rtype: numpy.ndarray
+        :type ff_size: ~numpy.ndarray
+        :rtype: ~numpy.ndarray
         """
 
     @abstractmethod
@@ -79,8 +79,8 @@ class AbstractStaticSynapseDynamics(AbstractSynapseDynamics):
         """ Get the number of synapses in the rows with sizes ff_size
 
         :param ff_size:
-        :type ff_size: numpy.ndarray
-        :rtype: numpy.ndarray
+        :type ff_size: ~numpy.ndarray
+        :rtype: ~numpy.ndarray
         """
 
     @abstractmethod
@@ -93,7 +93,7 @@ class AbstractStaticSynapseDynamics(AbstractSynapseDynamics):
         :param n_synapse_types:
         :type n_synapse_types: int
         :param ff_size:
-        :type ff_size: numpy.ndarray
+        :type ff_size: ~numpy.ndarray
         :param ff_data:
-        :type ff_data: list(numpy.ndarray)
+        :type ff_data: list(~numpy.ndarray)
         """

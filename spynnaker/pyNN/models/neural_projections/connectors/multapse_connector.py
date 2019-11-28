@@ -65,7 +65,7 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
         :type verbose: bool
         :param rng: \
             Seeded random number generator, or None to make one when needed
-        :type rng: pyNN.random.NumpyRNG or None
+        :type rng: ~pyNN.random.NumpyRNG or None
         """
         super(MultapseConnector, self).__init__(safe, callback, verbose)
         self.__num_synapses = num_synapses

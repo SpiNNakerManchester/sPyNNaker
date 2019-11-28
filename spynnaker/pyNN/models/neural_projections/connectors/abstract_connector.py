@@ -67,7 +67,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         :type verbose: bool
         :param rng: \
             Seeded random number generator, or None to make one when needed
-        :type rng: pyNN.random.NumpyRNG or None
+        :type rng: ~pyNN.random.NumpyRNG or None
         """
         if callback is not None:
             warn_once(logger, "sPyNNaker ignores connector callbacks.")
@@ -86,7 +86,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         """ Set the space object (allowed after instantiation).
 
         :param space:
-        :type space: pyNN.space.Space
+        :type space: ~pyNN.space.Space
         """
         self.__space = space
 
@@ -94,7 +94,8 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         """
         :param machine_time_step:
         :type machine_time_step: int
-        :param synapse_info: SynapseInformation
+        :param synapse_info:
+        :type synapse_info: SynapseInformation
         """
         self._rng = (self._rng or get_simulator().get_pynn_NumpyRNG()())
         self.__min_delay = machine_time_step / 1000.0
@@ -103,8 +104,8 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         """ Check that the types of the values is supported.
 
         :param values:
-        :type values: numpy.array or pyNN.random.NumpyRNG or int or float or \
-            list(int) or list(float)
+        :type values: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float\
+            or list(int) or list(float)
         :param name:
         :type name: str
         :param allow_lists:
@@ -151,9 +152,8 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         """ Get the maximum delay specified by the user in ms, or None if\
             unbounded.
 
-        :param delays:
-        :type delays: numpy.array or pyNN.random.NumpyRNG or int or float or \
-            list(int) or list(float)
+        :param synapse_info:
+        :type synapse_info: SynapseInformation
         :rtype: int or None
         """
 
@@ -161,8 +161,8 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         """ Get the variance of the delays.
 
         :param delays:
-        :type delays: numpy.array or pyNN.random.NumpyRNG or int or float or \
-            list(int) or list(float)
+        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float\
+            or list(int) or list(float)
         :rtype: float
         """
         if get_simulator().is_a_pynn_random(delays):
@@ -213,14 +213,15 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
             (otherwise all connections).
 
         :param delays:
-        :type delays: numpy.array or pyNN.random.NumpyRNG or int or float or \
-            list(int) or list(float)
+        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float\
+            or list(int) or list(float)
         :param post_vertex_slice:
         :type post_vertex_slice: ~pacman.model.graphs.common.Slice
         :param min_delay:
         :type min_delay: int or None
         :param max_delay:
         :type max_delay: int or None
+        :rtype: int
         """
         # pylint: disable=too-many-arguments
 
@@ -236,8 +237,8 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         """ Get the mean of the weights.
 
         :param weights:
-        :type weights: numpy.array or pyNN.random.NumpyRNG or int or float or\
-            list(int) or list(float)
+        :type weights: ~numpy.ndarray or pyNN.random.NumpyRNG or int or float\
+            or list(int) or list(float)
         :rtype: float
         """
         if get_simulator().is_a_pynn_random(weights):
@@ -278,9 +279,8 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
     def get_weight_maximum(self, synapse_info):
         """ Get the maximum of the weights for this connection.
 
-        :param weights:
-        :type weights: numpy.array or pyNN.random.NumpyRNG or int or float or\
-            list(int) or list(float)
+        :param synapse_info:
+        :type synapse_info: SynapseInformation
         :rtype: float
         """
         # pylint: disable=too-many-arguments
@@ -289,8 +289,8 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         """ Get the variance of the weights.
 
         :param weights:
-        :type weights: numpy.array or pyNN.random.NumpyRNG or int or float or\
-            list(int) or list(float)
+        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float\
+            or list(int) or list(float)
         :rtype: float
         """
         if get_simulator().is_a_pynn_random(weights):
@@ -411,11 +411,11 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         """ Create a synaptic block from the data.
 
         :param weights:
-        :type weights: numpy.array or pyNN.random.NumpyRNG or int or float or\
-            list(int) or list(float)
+        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float\
+            or list(int) or list(float)
         :param delays:
-        :type delays: numpy.array or pyNN.random.NumpyRNG or int or float or \
-            list(int) or list(float)
+        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float\
+            or list(int) or list(float)
         :param pre_slices:
         :type pre_slices: list(~pacman.model.graphs.common.Slice)
         :param pre_slice_index:
@@ -432,7 +432,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         :type synapse_type: AbstractSynapseType
         :returns: \
             The synaptic matrix data to go to the machine, as a Numpy array
-        :rtype: numpy.ndarray
+        :rtype: ~numpy.ndarray
         """
         # pylint: disable=too-many-arguments
 
@@ -474,7 +474,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
     def space(self):
         """ The space object (may be updated after instantiation).
 
-        :rtype: pyNN.space.Space or None
+        :rtype: ~pyNN.space.Space or None
         """
         return self.__space
 
@@ -483,12 +483,15 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         """ Set the space object (allowed after instantiation).
 
         :param new_value:
-        :type new_value: pyNN.space.Space
+        :type new_value: ~pyNN.space.Space
         """
         self.__space = new_value
 
     @property
     def verbose(self):
+        """
+        :rtype: bool
+        """
         return self.__verbose
 
     @verbose.setter
@@ -496,4 +499,8 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         self.__verbose = new_value
 
     def use_direct_matrix(self, synapse_info):
+        """
+        :param synapse_info:
+        :type synapse_info: SynapseInformation
+        """
         return False

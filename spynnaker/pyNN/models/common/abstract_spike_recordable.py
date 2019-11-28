@@ -78,7 +78,7 @@ class AbstractSpikeRecordable(object):
         :type machine_time_step: int
         :return: A numpy array of 2-element arrays of (neuron_id, time)\
             ordered by time, one element per event
-        :rtype: numpy.ndarray(tuple(int,int))
+        :rtype: ~numpy.ndarray(tuple(int,int))
         """
 
     @abstractmethod

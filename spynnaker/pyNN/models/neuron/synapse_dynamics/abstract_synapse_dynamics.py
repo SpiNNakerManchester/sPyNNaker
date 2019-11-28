@@ -146,7 +146,7 @@ class AbstractSynapseDynamics(object):
         :param connector:
         :type connector: AbstractConnector
         :param delays:
-        :type delays: numpy.ndarray
+        :type delays: ~numpy.ndarray
         """
         return connector.get_delay_maximum(synapse_info)
 
@@ -156,7 +156,7 @@ class AbstractSynapseDynamics(object):
         :param connector:
         :type connector: AbstractConnector
         :param delays:
-        :type delays: numpy.ndarray
+        :type delays: ~numpy.ndarray
         """
         # pylint: disable=too-many-arguments
         return connector.get_delay_variance(delays)
@@ -167,7 +167,7 @@ class AbstractSynapseDynamics(object):
         :param connector:
         :type connector: AbstractConnector
         :param weights:
-        :type weights: numpy.ndarray
+        :type weights: ~numpy.ndarray
         """
         # pylint: disable=too-many-arguments
         return connector.get_weight_mean(synapse_info.weights)
@@ -178,7 +178,7 @@ class AbstractSynapseDynamics(object):
         :param connector:
         :type connector: AbstractConnector
         :param weights:
-        :type weights: numpy.ndarray
+        :type weights: ~numpy.ndarray
         """
         # pylint: disable=too-many-arguments
         return connector.get_weight_maximum(synapse_info)
@@ -189,7 +189,7 @@ class AbstractSynapseDynamics(object):
         :param connector:
         :type connector: AbstractConnector
         :param weights:
-        :type weights: numpy.ndarray
+        :type weights: ~numpy.ndarray
         """
         # pylint: disable=too-many-arguments
         return connector.get_weight_variance(weights)
@@ -200,12 +200,12 @@ class AbstractSynapseDynamics(object):
             row-based data to be returned from get_synaptic_data
 
         :param connection_row_indices:
-        :type connection_row_indices: numpy.ndarray
+        :type connection_row_indices: ~numpy.ndarray
         :param n_rows:
         :type n_rows: int
         :param data:
-        :type data: numpy.ndarray
-        :rtype: list(numpy.ndarray)
+        :type data: ~numpy.ndarray
+        :rtype: list(~numpy.ndarray)
         """
         return [
             data[connection_row_indices == i].reshape(-1)
@@ -216,10 +216,10 @@ class AbstractSynapseDynamics(object):
             item size
 
         :param rows:
-        :type rows: numpy.ndarray
+        :type rows: ~numpy.ndarray
         :param item_size:
         :type item_size: int
-        :rtype: numpy.ndarray
+        :rtype: ~numpy.ndarray
         """
         return numpy.array([
             int(math.ceil(float(row.size) / float(item_size)))
@@ -229,8 +229,8 @@ class AbstractSynapseDynamics(object):
         """ Convert the row data to words
 
         :param rows:
-        :type rows: numpy.ndarray
-        :rtype: numpy.ndarray
+        :type rows: ~numpy.ndarray
+        :rtype: ~numpy.ndarray
         """
         words = [numpy.pad(
             row, (0, (4 - (row.size % 4)) & 0x3), mode="constant",

@@ -461,7 +461,7 @@ class SynapseDynamicsStructuralCommon(object):
         """ Set synaptic data
 
         :param connections:
-        :type connections: numpy.ndarray
+        :type connections: ~numpy.ndarray
         :param post_vertex_slice:
         :type post_vertex_slice: ~pacman.model.graphs.common.Slice
         :param app_edge:

@@ -60,7 +60,7 @@ class IndexBasedProbabilityConnector(AbstractConnector):
         :type allow_self_connections: bool
         :param rng: \
             Seeded random number generator, or None to make one when needed
-        :type rng: pyNN.random.NumpyRNG or None
+        :type rng: ~pyNN.random.NumpyRNG or None
         :param safe:
         :type safe: bool
         :param callback: Ignored

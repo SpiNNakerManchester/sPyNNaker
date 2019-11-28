@@ -41,7 +41,7 @@ class AbstractSynapseDynamicsStructural(object):
         :param machine_time_step:
         :type machine_time_step: int
         :param weight_scales:
-        :type weight_scales: numpy.ndarray?
+        :type weight_scales: ~numpy.ndarray?
         :param application_graph:
         :type application_graph: \
             ~pacman.model.graphs.application.ApplicationGraph
@@ -62,7 +62,7 @@ class AbstractSynapseDynamicsStructural(object):
         """ Set connections for structural plasticity
 
         :param connections:
-        :type connections: numpy.ndarray?
+        :type connections: ~numpy.ndarray?
         :param post_vertex_slice:
         :type post_vertex_slice: ~pacman.mode.graphs.common.Slice
         :param app_edge:

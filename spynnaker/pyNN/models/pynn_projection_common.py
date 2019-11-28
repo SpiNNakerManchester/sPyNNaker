@@ -78,7 +78,7 @@ class PyNNProjectionCommon(object):
         :param post_synaptic_population: Where do we connect to?
         :type post_synaptic_population: AbstractPopulationVertex
         :param rng:
-        :type rng: pyNN.random.NumpyRNG or None
+        :type rng: ~pyNN.random.NumpyRNG or None
         :param machine_time_step:
         :type machine_time_step: int
         :param user_max_delay: User-provided max delay
@@ -235,10 +235,10 @@ class PyNNProjectionCommon(object):
 
         :param pre_synaptic_vertex: the source vertex of the multapse
         :type pre_synaptic_vertex: \
-            ~pacman.model.graph.application.ApplicationVertex
+            ~pacman.model.graphs.application.ApplicationVertex
         :param post_synaptic_vertex: The destination vertex of the multapse
         :type post_synaptic_vertex: \
-            ~pacman.model.graph.application.ApplicationVertex
+            ~pacman.model.graphs.application.ApplicationVertex
         :return: None or the edge going to these vertices.
         """
 

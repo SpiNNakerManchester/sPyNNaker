@@ -94,7 +94,7 @@ class AbstractNeuronRecordable(object):
         :param machine_time_step: microseconds
         :type machine_time_step: int
         :return: (data, recording_indices, sampling_interval)
-        :rtype: tuple(numpy.ndarray,list(int),float)
+        :rtype: tuple(~numpy.ndarray,list(int),float)
         """
         # pylint: disable=too-many-arguments
 

@@ -181,7 +181,7 @@ class RecordingCommon(object):
         """ How to get spikes from a vertex.
 
         :return: the spikes from a vertex
-        :rtype: numpy.ndarray
+        :rtype: ~numpy.ndarray
         """
 
         # check we're in a state where we can get spikes

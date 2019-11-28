@@ -67,7 +67,7 @@ class ConnectionHolder(object):
         :param connections:\
             Any initial connections, as a numpy structured array of\
             source, target, weight and delay
-        :type connections: list(numpy.ndarray) or None
+        :type connections: list(~numpy.ndarray) or None
         :param fixed_values:\
             A list of tuples of field names and fixed values to be appended\
             to the other fields per connection, formatted as\
@@ -98,7 +98,7 @@ class ConnectionHolder(object):
         :param connections:\
             The connection to add, as a numpy structured array of\
             source, target, weight and delay
-        :type connections: numpy.ndarray
+        :type connections: ~numpy.ndarray
         """
         if self.__connections is None:
             self.__connections = list()
@@ -108,7 +108,7 @@ class ConnectionHolder(object):
     def connections(self):
         """ The connections stored
 
-        :rtype: list(numpy.ndarray)
+        :rtype: list(~numpy.ndarray)
         """
         return self.__connections
 

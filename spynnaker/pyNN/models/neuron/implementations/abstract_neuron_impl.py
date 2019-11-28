@@ -156,7 +156,7 @@ class AbstractNeuronImpl(object):
         :param state_variables: The holder of the state variables
         :type state_variables: ~spinn_utilities.ranged.RangeDictionary
         :param vertex_slice: The slice of the vertex to generate parameters for
-        :rtype: numpy.ndarray(uint32)
+        :rtype: ~numpy.ndarray(~numpy.uint32)
         """
 
     @abstractmethod

@@ -38,7 +38,7 @@ class DistanceDependentFormation(AbstractFormation):
             sigma_form_lateral=1.0):
         """
         :param grid: (x, y) dimensions of the grid of distance
-        :type grid: tuple(int,int) or list(int) or numpy.ndarray(int)
+        :type grid: tuple(int,int) or list(int) or ~numpy.ndarray(int)
         :param p_form_forward:\
             The peak probability of formation on feed-forward connections
         :type p_form_forward: float
@@ -85,7 +85,7 @@ class DistanceDependentFormation(AbstractFormation):
         :param sigma: spread
         :type sigma: float
         :return: distance-dependent probabilities
-        :rtype: numpy.ndarray(float)
+        :rtype: ~numpy.ndarray(float)
         """
         euclidian_distances = numpy.ones(self.__grid ** 2) * numpy.nan
         for row in range(euclidian_distances.shape[0]):
@@ -123,11 +123,11 @@ class DistanceDependentFormation(AbstractFormation):
             using periodic boundary conditions.
 
         :param x0: first point in space
-        :type x0: numpy.ndarray(int)
+        :type x0: ~numpy.ndarray(int)
         :param x1: second point in space
-        :type x1: numpy.ndarray(int)
+        :type x1: ~numpy.ndarray(int)
         :param grid: shape of grid
-        :type grid: numpy.ndarray(int)
+        :type grid: ~numpy.ndarray(int)
         :param metric: distance metric, i.e. euclidian or manhattan
         :type metric: str
         :return: the distance

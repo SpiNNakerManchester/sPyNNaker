@@ -59,7 +59,7 @@ class FromListConnector(AbstractConnector):
 
             Additional items per synapse are acceptable but all synapses\
             should have the same number of items.
-        :type conn_list: numpy.ndarray or list(tuple(int,int,...))
+        :type conn_list: ~numpy.ndarray or list(tuple(int,int,...))
         :param safe:
         :type safe: bool
         :param callback: Ignored

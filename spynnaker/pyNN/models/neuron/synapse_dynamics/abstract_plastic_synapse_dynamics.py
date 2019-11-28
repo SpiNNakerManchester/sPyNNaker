@@ -53,9 +53,9 @@ class AbstractPlasticSynapseDynamics(AbstractSynapseDynamics):
         for each of the fixed-plastic and plastic-plastic regions.
 
         :param connections:
-        :type connections: numpy.ndarray
+        :type connections: ~numpy.ndarray
         :param connection_row_indices:
-        :type connection_row_indices: numpy.ndarray
+        :type connection_row_indices: ~numpy.ndarray
         :param n_rows:
         :type n_rows: int
         :param post_vertex_slice:
@@ -64,7 +64,8 @@ class AbstractPlasticSynapseDynamics(AbstractSynapseDynamics):
         :type n_synapse_types: int
         :return: (fp_data, pp_data, fp_size, pp_size)
         :rtype: \
-            tuple(numpy.ndarray, numpy.ndarray, numpy.ndarray, numpy.ndarray)
+            tuple(~numpy.ndarray, ~numpy.ndarray, ~numpy.ndarray, \
+            ~numpy.ndarray)
         """
 
     @abstractmethod
@@ -72,7 +73,7 @@ class AbstractPlasticSynapseDynamics(AbstractSynapseDynamics):
         """ Get the number of plastic plastic words to be read from each row
 
         :param pp_size:
-        :type pp_size: numpy.ndarray
+        :type pp_size: ~numpy.ndarray
         """
 
     @abstractmethod
@@ -80,7 +81,7 @@ class AbstractPlasticSynapseDynamics(AbstractSynapseDynamics):
         """ Get the number of fixed plastic words to be read from each row
 
         :param fp_size:
-        :type fp_size: numpy.ndarray
+        :type fp_size: ~numpy.ndarray
         """
 
     @abstractmethod
@@ -89,9 +90,9 @@ class AbstractPlasticSynapseDynamics(AbstractSynapseDynamics):
             pp_size and fp_size
 
         :param pp_size:
-        :type pp_size: numpy.ndarray
+        :type pp_size: ~numpy.ndarray
         :param fp_size:
-        :type fp_size: numpy.ndarray
+        :type fp_size: ~numpy.ndarray
         """
 
     @abstractmethod
@@ -106,14 +107,14 @@ class AbstractPlasticSynapseDynamics(AbstractSynapseDynamics):
         :param n_synapse_types:
         :type n_synapse_types: int
         :param pp_size: 1D
-        :type pp_size: numpy.ndarray
+        :type pp_size: ~numpy.ndarray
         :param pp_data: 2D
-        :type pp_data: numpy.ndarray
+        :type pp_data: ~numpy.ndarray
         :param fp_size: 1D
-        :type fp_size: numpy.ndarray
+        :type fp_size: ~numpy.ndarray
         :param fp_data: 2D
-        :type fp_data: numpy.ndarray
+        :type fp_data: ~numpy.ndarray
         :return: array with columns ``source``, ``target``, ``weight``, \
             ``delay``
-        :rtype: numpy.ndarray
+        :rtype: ~numpy.ndarray
         """

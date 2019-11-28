@@ -83,7 +83,7 @@ class PyNNPopulationCommon(object):
             ~spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel or \
             ~pacman.model.graphs.application.ApplicationVertex
         :param structure: How the neurons are arranged in space
-        :type structure: pyNN.space.BaseStructure or None
+        :type structure: ~pyNN.space.BaseStructure or None
         :param initial_values: Initialisation for model variables.
         :type initial_values: dict(str, Any) or None
         :param additional_parameters: \

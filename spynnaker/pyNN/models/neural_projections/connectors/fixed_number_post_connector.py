@@ -69,7 +69,7 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine):
         :type verbose: bool
         :param rng: \
             Seeded random number generator, or None to make one when needed
-        :type rng: pyNN.random.NumpyRNG or None
+        :type rng: ~pyNN.random.NumpyRNG or None
         """
         super(FixedNumberPostConnector, self).__init__(safe, callback, verbose)
         self.__n_post = n

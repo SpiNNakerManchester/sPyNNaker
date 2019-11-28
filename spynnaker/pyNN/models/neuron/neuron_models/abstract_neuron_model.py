@@ -69,7 +69,7 @@ class AbstractNeuronModel(AbstractStandardNeuronComponent):
         """ Get the global values to be written to the machine for this model
 
         :return: A list with the same length as self.global_struct.field_types
-        :rtype: list(int or float) or numpy.ndarray
+        :rtype: list(int or float) or ~numpy.ndarray
         """
         return numpy.zeros(0, dtype="uint32")
 

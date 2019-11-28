@@ -35,7 +35,7 @@ class ArrayConnector(AbstractConnector):
             An explicit boolean matrix that specifies the connections\
             between the pre- and post-populations\
             (see PyNN documentation). Must be 2D in practice.
-        :type array: numpy.ndarray(2, uint8)
+        :type array: ~numpy.ndarray(2, ~numpy.uint8)
         :param safe:
         :type safe: bool
         :param callback: Ignored

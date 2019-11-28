@@ -47,7 +47,7 @@ class Struct(object):
     def numpy_dtype(self):
         """ The numpy data type of the struct
 
-        :rtype: :py:class:`numpy.dtype`
+        :rtype: ~numpy.dtype
         """
         return numpy.dtype(
             [("f" + str(i), numpy.dtype(data_type.struct_encoding))
@@ -79,7 +79,7 @@ class Struct(object):
         :type offset: int
         :param array_size: The number of structs to generate
         :type array_size: int
-        :rtype: numpy.array(dtype="uint32")
+        :rtype: ~numpy.ndarray(~numpy.uint32)
         """
         # Create an array to store values in
         data = numpy.zeros(array_size, dtype=self.numpy_dtype)
@@ -126,7 +126,7 @@ class Struct(object):
         :type array_size: int
         :return:\
             a list of lists of data values, one list for each struct element
-        :rtype: list(numpy.ndarray)
+        :rtype: list(~numpy.ndarray)
         """
         if self.numpy_dtype.itemsize == 0:
             # TODO: inconsistent return type

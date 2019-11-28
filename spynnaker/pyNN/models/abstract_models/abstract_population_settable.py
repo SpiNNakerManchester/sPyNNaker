@@ -31,7 +31,7 @@ class AbstractPopulationSettable(AbstractSettable):
     @abstractproperty
     def n_atoms(self):
         """" See \
-            :py:class:`~pacman.model.graph.application.ApplicationVertex`.n_atoms
+            :py:class:`~pacman.model.graphs.application.ApplicationVertex`.n_atoms
         """
 
     def get_value_by_selector(self, selector, key):

@@ -48,15 +48,15 @@ class SynapseInformation(object):
         :param postpop_is_view: Whether the postpopulation is a view
         :type postpop_is_view: bool
         :param rng: Seeded random number generator
-        :type rng: pyNN.random.NumpyRNG or None
+        :type rng: ~pyNN.random.NumpyRNG or None
         :param synapse_dynamics: The dynamic behaviour of the synapse
         :type synapse_dynamics: AbstractSynapseDynamics
         :param synapse_type: The type of the synapse
         :type synapse_type: AbstractSynapseType
         :param weights: The synaptic weights
-        :type weights: float or list(float) or numpy.ndarray(float) or None
+        :type weights: float or list(float) or ~numpy.ndarray(float) or None
         :param delays: The total synaptic delays
-        :type delays: float or list(float) or numpy.ndarray(float) or None
+        :type delays: float or list(float) or ~numpy.ndarray(float) or None
         """
         self.__connector = connector
         self.__pre_population = pre_population
@@ -129,7 +129,7 @@ class SynapseInformation(object):
     def rng(self):
         """ Random number generator
 
-        :rtype: pyNN.random.NumpyRNG
+        :rtype: ~pyNN.random.NumpyRNG
         """
         return self.__rng
 

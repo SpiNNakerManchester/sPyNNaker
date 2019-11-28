@@ -121,13 +121,13 @@ class NeuronRecorder(object):
             the mapping between application and machine vertices
         :param application_vertex:
         :type application_vertex: \
-            ~pacman.model.graph.application.ApplicationVertex
+            ~pacman.model.graphs.application.ApplicationVertex
         :param variable: PyNN name for the variable (V, gsy_inh etc.)
         :type variable: str
         :param n_machine_time_steps:
         :type n_machine_time_steps: int
         :return: (data, recording_indices, sampling_interval)
-        :rtype: tuple(numpy.ndarray,list(int),float)
+        :rtype: tuple(~numpy.ndarray,list(int),float)
         """
         if variable == SPIKES:
             msg = "Variable {} is not supported use get_spikes".format(SPIKES)
@@ -219,11 +219,11 @@ class NeuronRecorder(object):
             the mapping between application and machine vertices
         :param application_vertex:
         :type application_vertex: \
-            ~pacman.model.graph.application.ApplicationVertex
+            ~pacman.model.graphs.application.ApplicationVertex
         :param machine_time_step: microseconds
         :type machine_time_step: int
         :return:
-        :rtype: numpy.ndarray(tuple(int,int))
+        :rtype: ~numpy.ndarray(tuple(int,int))
         """
 
         spike_times = list()
@@ -647,7 +647,7 @@ class NeuronRecorder(object):
         """
         :param vertex_slice:
         :type vertex_slice: ~pacman.model.graphs.common.Slice
-        :rtype: numpy.ndarray
+        :rtype: ~numpy.ndarray
         """
         data = list()
         n_words_for_n_neurons = self.__n_bytes_to_n_words(vertex_slice.n_atoms)

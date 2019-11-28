@@ -69,12 +69,12 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine):
         :type verbose: bool
         :param rng: \
             Seeded random number generator, or None to make one when needed
-        :type rng: pyNN.random.NumpyRNG or None
+        :type rng: ~pyNN.random.NumpyRNG or None
         """
         # :param space:
         # a Space object, needed if you wish to specify distance-dependent\
         # weights or delays - not implemented
-        # :type space: pyNN.Space
+        # :type space: ~pyNN.space.Space
         super(FixedNumberPreConnector, self).__init__(safe, callback, verbose)
         self.__n_pre = n
         self.__allow_self_connections = allow_self_connections

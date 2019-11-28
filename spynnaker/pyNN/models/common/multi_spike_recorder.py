@@ -88,12 +88,12 @@ class MultiSpikeRecorder(object):
         :type placements: ~pacman.model.placements.Placements
         :param application_vertex:
         :type application_vertex: \
-            ~pacman.model.graph.application.ApplicationVertex
+            ~pacman.model.graphs.application.ApplicationVertex
         :param machine_time_step: microseconds
         :type machine_time_step: int
         :return: A numpy array of 2-element arrays of (neuron_id, time)\
             ordered by time, one element per event
-        :rtype: numpy.ndarray(tuple(int,int))
+        :rtype: ~numpy.ndarray(tuple(int,int))
         """
         # pylint: disable=too-many-arguments
         spike_times = list()

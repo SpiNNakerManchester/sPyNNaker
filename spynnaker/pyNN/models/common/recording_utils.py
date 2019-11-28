@@ -85,7 +85,7 @@ def pull_off_cached_lists(no_loads, cache_file):
     :param cache_file: the file to extract from
     :type cache_file: file
     :return: The extracted data
-    :rtype: numpy.ndarray
+    :rtype: ~numpy.ndarray
     """
     cache_file.seek(0)
     if no_loads == 1:
