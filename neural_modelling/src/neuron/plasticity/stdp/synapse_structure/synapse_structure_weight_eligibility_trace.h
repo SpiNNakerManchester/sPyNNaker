@@ -31,13 +31,13 @@ typedef weight_state_t update_state_t;
 // Both the weight and the synaptic word
 typedef weight_t final_state_t;
 
-//#include "synapse_structure.h"
+#include "synapse_structure.h"
 
 //---------------------------------------
 // Synapse interface functions
 //---------------------------------------
 // Synapse parameter get and set helpers
-static inline int32_t synapse_structure_get_weight(plastic_synapse_t state) {
+static inline int32_t synapse_structure_get_eligibility_weight(plastic_synapse_t state) {
     return (state >> 16);
 }
 
@@ -77,5 +77,11 @@ static inline plastic_synapse_t synapse_structure_create_synapse(
         weight_t weight) {
     return weight;
 }
+
+static inline weight_t synapse_structure_get_weight(
+        plastic_synapse_t synaptic_word) {
+    return synaptic_word;
+}
+
 
 #endif  // _SYNAPSE_STRUCTURE_WEIGHT_ELIGIBILITY_TRACE_H_

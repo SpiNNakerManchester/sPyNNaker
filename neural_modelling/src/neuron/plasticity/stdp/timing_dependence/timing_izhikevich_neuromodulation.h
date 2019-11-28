@@ -25,7 +25,7 @@ typedef int32_t post_trace_t;
 typedef int16_t pre_trace_t;
 
 #include <neuron/plasticity/stdp/synapse_structure/synapse_structure_weight_eligibility_trace.h>
-//#include "timing.h"
+#include "timing.h"
 
 // Include debug header for log_info etc
 #include <debug.h>
@@ -45,18 +45,6 @@ extern int16_lut *tau_d_lookup; //[TAU_D_SIZE];
 //---------------------------------------
 // Macros
 //---------------------------------------
-// Exponential decay lookup parameters
-//#define TAU_PLUS_TIME_SHIFT 0
-//#define TAU_PLUS_SIZE 256
-//
-//#define TAU_MINUS_TIME_SHIFT 0
-//#define TAU_MINUS_SIZE 256
-//
-//#define TAU_C_TIME_SHIFT 4
-//#define TAU_C_SIZE 520
-//
-//#define TAU_D_TIME_SHIFT 2
-//#define TAU_D_SIZE 370
 
 // Helper macros for looking up decays
 #define DECAY_LOOKUP_TAU_PLUS(time) \

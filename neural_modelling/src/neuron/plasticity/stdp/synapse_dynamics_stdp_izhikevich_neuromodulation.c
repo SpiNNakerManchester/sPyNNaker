@@ -15,6 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+// NOTE: If we want neuromodulation and structural plasticity to
+//       work together then this will need a bit of a rethink
+
 // Include post_events and common
 #include "post_events_with_da.h"
 #include "synapse_dynamics_stdp_common.h"
@@ -108,7 +111,7 @@ static inline void correlation_apply_post_spike(
     // Update eligibility trace in synapse state
     *previous_state =
         synapse_structure_update_state(decayed_eligibility_trace,
-            synapse_structure_get_weight(*previous_state));
+            synapse_structure_get_eligibility_weight(*previous_state));
 }
 
 static inline void correlation_apply_pre_spike(
@@ -159,7 +162,7 @@ static inline void correlation_apply_pre_spike(
     // Update eligibility trace in synapse state
     *previous_state =
         synapse_structure_update_state(decayed_eligibility_trace,
-            synapse_structure_get_weight(*previous_state));
+            synapse_structure_get_eligibility_weight(*previous_state));
 }
 
 // Synapse update loop
@@ -231,7 +234,7 @@ static inline plastic_synapse_t izhikevich_neuromodulation_plasticity_update_syn
            (STDP_FIXED_POINT - weight_state.weight_multiply_right_shift);
     }
 
-    int32_t new_weight = weight_update + synapse_structure_get_weight(*current_state);
+    int32_t new_weight = weight_update + synapse_structure_get_eligibility_weight(*current_state);
 
     // Saturate weight
     new_weight = MIN(weight_state.weight_region->max_weight,
@@ -340,7 +343,7 @@ void synapse_dynamics_stdp_process_plastic_synapse(
 
 	// Update the global weight_state
 	weight_state = weight_get_initial(
-		synapse_structure_get_weight(*current_state), type);
+		synapse_structure_get_eligibility_weight(*current_state), type);
 
 	// Update the synapse state
 	uint32_t post_delay = delay_dendritic;
@@ -354,7 +357,7 @@ void synapse_dynamics_stdp_process_plastic_synapse(
 
 	// Add weight to ring-buffer entry (deal with saturation)
 	uint32_t accumulation = ring_buffers[ring_buffer_index] +
-			synapse_structure_get_weight(final_state);
+			synapse_structure_get_eligibility_weight(final_state);
 
 	uint32_t sat_test = accumulation & 0x10000;
 	if (sat_test) {
