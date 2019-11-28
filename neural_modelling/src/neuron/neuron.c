@@ -36,7 +36,7 @@ extern uint ticks;
 #define SPIKE_RECORDING_CHANNEL 0
 
 //! The key to be used for this core (will be ORed with neuron ID)
-static key_t key;
+key_t key;  //MADE NON STATIC!!!
 
 //! A checker that says if this model should be transmitting. If set to false
 //! by the data region, then this model should not have a key.

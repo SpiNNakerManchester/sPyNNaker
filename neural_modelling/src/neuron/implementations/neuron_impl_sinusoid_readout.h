@@ -54,7 +54,11 @@ static synapse_param_t *neuron_synapse_shaping_params;
 
 static REAL next_spike_time = 0;
 extern uint32_t time;
+extern key_t key;
 static uint32_t target_ind = 0;
+
+
+
 
 static bool neuron_impl_initialise(uint32_t n_neurons) {
 
@@ -285,7 +289,11 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
     		error;
 
-
+    // Send error (learning signal) as packet with payload
+    while (!spin1_send_mc_packet(
+            key | neuron_index,  bitsk(error), 1 )) {
+        spin1_delay_us(1);
+    }
 
     // If spike occurs, communicate to relevant parts of model
     if (spike) {

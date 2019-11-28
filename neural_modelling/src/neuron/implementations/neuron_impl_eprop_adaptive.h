@@ -49,6 +49,10 @@
 	shaping include
 #endif
 
+
+extern REAL learning_signal;
+
+
 //! Array of neuron states
 static neuron_pointer_t neuron_array;
 
@@ -289,7 +293,8 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 //    		global_parameters->core_target_rate;
 //    	neuron->syn_state[0].e_bar;
 //    	neuron->syn_state[0].el_a;
-    		total_inh;
+//    		total_inh;
+    		learning_signal * neuron->w_fb;
 
     // update neuron parameters
     state_t result = neuron_model_state_update(

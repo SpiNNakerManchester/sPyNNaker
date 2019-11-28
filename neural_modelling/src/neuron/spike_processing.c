@@ -56,6 +56,7 @@ static uint32_t number_of_rewires = 0;
 static bool any_spike = false;
 
 /* PRIVATE FUNCTIONS - static for inlining */
+REAL learning_signal;
 
 static inline void do_dma_read(
         address_t row_address, size_t n_bytes_to_transfer) {
@@ -242,6 +243,34 @@ static void dma_complete_callback(uint unused, uint tag) {
     setup_synaptic_dma_read();
 }
 
+static void multicast_packet_wpayload_received_callback(uint key, uint payload){
+
+	learning_signal = kbits(payload);
+
+	// Print payload to test transmission of error
+	io_printf(IO_BUF, "payload: %k\n", learning_signal);
+
+	// Assign learning signal to global memory
+
+//    // If there was space to add spike to incoming spike queue
+//    if (in_spikes_add_spike(key)) {
+//        // If we're not already processing synaptic DMAs,
+//        // flag pipeline as busy and trigger a feed event
+//        if (!dma_busy) {
+//            log_debug("Sending user event for new spike");
+//            if (spin1_trigger_user_event(0, 0)) {
+//                dma_busy = true;
+//            } else {
+//                log_debug("Could not trigger user event\n");
+//            }
+//        }
+//    } else {
+//        io_printf(IO_BUF, "Could not add spike in mc_payload_received\n");
+//    }
+
+}
+
+
 /* INTERFACE FUNCTIONS - cannot be static */
 
 bool spike_processing_initialise( // EXPORTED
@@ -281,6 +310,15 @@ bool spike_processing_initialise( // EXPORTED
     simulation_dma_transfer_done_callback_on(
             DMA_TAG_READ_SYNAPTIC_ROW, dma_complete_callback);
     spin1_callback_on(USER_EVENT, user_event_callback, user_event_priority);
+
+
+    io_printf(IO_BUF, "About to register MCPL callback\n");
+
+    // Register MC_PACKET_RECEIVED_PAYLOAD
+    spin1_callback_on(MCPL_PACKET_RECEIVED,
+                multicast_packet_wpayload_received_callback, mc_packet_callback_priority);
+
+    io_printf(IO_BUF, "Registered MCPL callback successfully\n");
 
     return true;
 }
