@@ -27,12 +27,30 @@
 //----------------------------------------------------------------------------
 
 typedef struct additional_input_t {
-    // exp(-(machine time step in ms) / (TauCa))
-    REAL    exp_TauCa;
-    // Calcium current
-    REAL    I_Ca2;
-    // Influx of CA2 caused by each spike
-    REAL    I_alpha;
+//    // exp(-(machine time step in ms) / (TauCa))
+//    REAL    exp_TauCa;
+//    // Calcium current
+//    REAL    I_Ca2;
+//    // Influx of CA2 caused by each spike
+//    REAL    I_alpha;
+
+    // n = probability of gate being open
+    REAL    n;
+    // gK
+    REAL 	gK;
+    // current
+    REAL	current;
+    // alpha n
+    REAL	alpha_n;
+    // beta n
+    REAL	beta_n;
+    // tau_n
+    REAL	tau_n;
+    // n_inf
+    REAL	n_inf;
+
+
+
 
 } additional_input_t;
 
@@ -41,17 +59,31 @@ static input_t additional_input_get_input_value_as_current(
         state_t membrane_voltage) {
 	use(membrane_voltage);
 
-    // Decay Ca2 trace
-    additional_input->I_Ca2 *= additional_input->exp_TauCa;
+	// attempt at using inbuilt exponential function
+	// for alpha
+	additional_input->alpha_n = (0.01*(membrane_voltage+55))/ (1 - expk(-0.1*(membrane_voltage+55)));
+	// for beta
+	additional_input->beta_n = 0.125*expk(-0.0125*(membrane_voltage+55));
 
-    // Return the Ca2
-    return -additional_input->I_Ca2;
+
+	// update tau_n and n_inf values
+	additional_input->tau_n = 1 / (additional_input->alpha_n + additional_input->beta_n);
+	additional_input->n_inf = (additional_input->alpha_n) / (additional_input->alpha_n + additional_input->beta_n);
+
+	// update n value - change the 0.1 to ts at some point
+	additional_input->n = additional_input->n_inf + (additional_input->n - additional_input->n_inf)*expk(-0.1/additional_input->tau_n);
+
+	// calculate current
+	additional_input->current = additional_input->gK * additional_input->n * additional_input->n * additional_input->n * additional_input->n;
+
+	// return the current
+	return -additional_input->current;
 }
 
 static void additional_input_has_spiked(
         additional_input_pointer_t additional_input) {
     // Apply influx of calcium to trace
-    additional_input->I_Ca2 += additional_input->I_alpha;
+    additional_input->n = additional_input->n;
 }
 
 #endif // _ADDITIONAL_INPUT_ION_CHANNEL_H_

@@ -18,33 +18,81 @@ from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from pacman.executor.injection_decorator import inject_items
 from .abstract_additional_input import AbstractAdditionalInput
+from quantities.constants.tau import tau_neutron_mass_ratio
 
-I_ALPHA = "i_alpha"
-I_CA2 = "i_ca2"
-TAU_CA2 = "tau_ca2"
+# I_ALPHA = "i_alpha"
+# I_CA2 = "i_ca2"
+# TAU_CA2 = "tau_ca2"
+# 
+# UNITS = {
+#     I_ALPHA: "nA",
+#     I_CA2: "nA",
+#     TAU_CA2: "ms"
+# }
+
+N = "n"
+gK = "gK"
+CURRENT = "current"
+ALPHA_N = "alpha_n"
+BETA_N = "beta_n"
+TAU_N = "tau_n"
+N_INF = "n_inf"
+
 
 UNITS = {
-    I_ALPHA: "nA",
-    I_CA2: "nA",
-    TAU_CA2: "ms"
+    N: "",
+    gK: "mS/mm2",
+    CURRENT: "nA",
+    ALPHA_N: "mV",
+    BETA_N: "mV",
+    TAU_N: "mV",
+    N_INF: "mV"
 }
 
 
 class AdditionalInputIonChannel(AbstractAdditionalInput):
+#     __slots__ = [
+#         "__tau_ca2",
+#         "__i_ca2",
+#         "__i_alpha"]
     __slots__ = [
-        "__tau_ca2",
-        "__i_ca2",
-        "__i_alpha"]
+        "__n",
+        "__gK",
+        "__current",
+        "__alpha_n",
+        "__beta_n",
+        "__tau_n",
+        "__n_inf"]
+        
+#     def __init__(self,  tau_ca2, i_ca2, i_alpha):
+#         super(AdditionalInputIonChannel, self).__init__([
+#             DataType.S1615,   # e^(-ts / tau_ca2)
+#             DataType.S1615,   # i_ca_2
+#             DataType.S1615])  # i_alpha
+#         self.__tau_ca2 = tau_ca2
+#         self.__i_ca2 = i_ca2
+#         self.__i_alpha = i_alpha
 
-    def __init__(self,  tau_ca2, i_ca2, i_alpha):
+    def __init__(self,  n, gK, current, alpha_n, beta_n, tau_n, n_inf):
         super(AdditionalInputIonChannel, self).__init__([
-            DataType.S1615,   # e^(-ts / tau_ca2)
-            DataType.S1615,   # i_ca_2
-            DataType.S1615])  # i_alpha
-        self.__tau_ca2 = tau_ca2
-        self.__i_ca2 = i_ca2
-        self.__i_alpha = i_alpha
-
+            DataType.S1615,   # n
+            DataType.S1615,   # gk
+            DataType.S1615,   # current
+            DataType.S1615,   # alpha_n
+            DataType.S1615,   # beta_n
+            DataType.S1615,   # tau_n
+            DataType.S1615,   # n_inf
+            ]) 
+         # current
+        self.__n = n
+        self.__gK = gK
+        self.__current = current
+        self.__alpha_n = alpha_n
+        self.__beta_n = beta_n
+        self.__tau_n = tau_n
+        self.__n_inf = n_inf
+        
+                
     @overrides(AbstractAdditionalInput.get_n_cpu_cycles)
     def get_n_cpu_cycles(self, n_neurons):
         # A bit of a guess
@@ -52,12 +100,17 @@ class AdditionalInputIonChannel(AbstractAdditionalInput):
 
     @overrides(AbstractAdditionalInput.add_parameters)
     def add_parameters(self, parameters):
-        parameters[TAU_CA2] = self.__tau_ca2
-        parameters[I_ALPHA] = self.__i_alpha
+        parameters[gK] = self.__gK
 
     @overrides(AbstractAdditionalInput.add_state_variables)
     def add_state_variables(self, state_variables):
-        state_variables[I_CA2] = self.__i_ca2
+        state_variables[N] = self.__n
+        state_variables[CURRENT] = self.__current
+        state_variables[ALPHA_N] = self.__alpha_n
+        state_variables[BETA_N] = self.__beta_n
+        state_variables[TAU_N] = self.__tau_n
+        state_variables[N_INF] = self.__n_inf
+        
 
     @overrides(AbstractAdditionalInput.get_units)
     def get_units(self, variable):
@@ -73,39 +126,80 @@ class AdditionalInputIonChannel(AbstractAdditionalInput):
         # pylint: disable=arguments-differ
 
         # Add the rest of the data
-        return [parameters[TAU_CA2].apply_operation(
-                    operation=lambda x: numpy.exp(float(-ts) / (1000.0 * x))),
-                state_variables[I_CA2], parameters[I_ALPHA]]
+#         return [parameters[TAU_CA2].apply_operation(
+#                     operation=lambda x: numpy.exp(float(-ts) / (1000.0 * x))),
+#                 state_variables[I_CA2], parameters[I_ALPHA]]
+        return [state_variables[N], state_variables[CURRENT], parameters[gK],
+                state_variables[ALPHA_N], state_variables[BETA_N], state_variables[TAU_N],
+                state_variables[N_INF]]
 
     @overrides(AbstractAdditionalInput.update_values)
     def update_values(self, values, parameters, state_variables):
 
         # Read the data
-        (_exp_tau_ca2, i_ca2, _i_alpha) = values
+        (_n, _gK, _current, _alpha_n, _beta_n, _tau_n, _n_inf) = values
 
         # Copy the changed data only
-        state_variables[I_CA2] = i_ca2
+        state_variables[N] = n
+        state_variables[CURRENT] = current
+        state_variables[ALPHA_N] = alpha_n
+        state_variables[BETA_N] = beta_n
+        state_variables[TAU_N] = tau_n
+        state_variables[N_INF] = n_inf
+        
+    @property
+    def n(self):
+        return self.__n
+
+    @n.setter
+    def n(self, n):
+        self.__n = n
 
     @property
-    def tau_ca2(self):
-        return self.__tau_ca2
-
-    @tau_ca2.setter
-    def tau_ca2(self, tau_ca2):
-        self.__tau_ca2 = tau_ca2
-
-    @property
-    def i_ca2(self):
-        return self.__i_ca2
-
-    @i_ca2.setter
-    def i_ca2(self, i_ca2):
-        self.__i_ca2 = i_ca2
+    def gK(self):
+        return self.__gK
+    
+    @gK.setter
+    def gK(self, gK):
+        self.__gK = gK
 
     @property
-    def i_alpha(self):
-        return self.__i_alpha
+    def current(self):
+        return self.__current
 
-    @i_alpha.setter
-    def i_alpha(self, i_alpha):
-        self.__i_alpha = i_alpha
+    @current.setter
+    def current(self, current):
+        self.__current = current
+        
+    @property
+    def alpha_n(self):
+        return self.__alpha_n
+
+    @alpha_n.setter
+    def alpha_n(self, alpha_n):
+        self.__alpha_n = alpha_n
+        
+    @property
+    def beta_n(self):
+        return self.__beta_n
+
+    @beta_n.setter
+    def beta_n(self, beta_n):
+        self.__beta_n = beta_n
+        
+    @property
+    def tau_n(self):
+        return self.__tau_n
+
+    @tau_n.setter
+    def tau_n(self, tau_n):
+        self.__tau_n = tau_n
+        
+    @property
+    def n_inf(self):
+        return self.__n_inf
+
+    @n_inf.setter
+    def n_inf(self, n_inf):
+        self.__n_inf = n_inf
+        
