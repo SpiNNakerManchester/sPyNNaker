@@ -31,6 +31,9 @@
 #include <utils.h>
 #include <neuron/plasticity/synapse_dynamics.h>
 
+
+extern neuron_pointer_t neuron_array;
+
 static uint32_t synapse_type_index_bits;
 static uint32_t synapse_index_bits;
 static uint32_t synapse_index_mask;
@@ -280,19 +283,19 @@ bool synapse_dynamics_process_plastic_synapses(
 
     num_plastic_pre_synaptic_events += plastic_synapse;
 
-    // Get event history from synaptic row
-    pre_event_history_t *event_history =
-            plastic_event_history(plastic_region_address);
-
-    // Get last pre-synaptic event from event history
-    const uint32_t last_pre_time = event_history->prev_time;
-    const pre_trace_t last_pre_trace = event_history->prev_trace;
-
-    // Update pre-synaptic trace
-    log_debug("Adding pre-synaptic event to trace at time:%u", time);
-    event_history->prev_time = time;
-    event_history->prev_trace =
-            timing_add_pre_spike(time, last_pre_time, last_pre_trace);
+//    // Get event history from synaptic row
+//    pre_event_history_t *event_history =
+//            plastic_event_history(plastic_region_address);
+//
+//    // Get last pre-synaptic event from event history
+//    const uint32_t last_pre_time = event_history->prev_time;
+//    const pre_trace_t last_pre_trace = event_history->prev_trace;
+//
+//    // Update pre-synaptic trace
+//    log_debug("Adding pre-synaptic event to trace at time:%u", time);
+//    event_history->prev_time = time;
+//    event_history->prev_trace =
+//            timing_add_pre_spike(time, last_pre_time, last_pre_trace);
 
     // Loop through plastic synapses
     for (; plastic_synapse > 0; plastic_synapse--) {
@@ -302,7 +305,12 @@ bool synapse_dynamics_process_plastic_synapses(
         // Extract control-word components
         // **NOTE** cunningly, control word is just the same as lower
         // 16-bits of 32-bit fixed synapse so same functions can be used
-        uint32_t delay_axonal = sparse_axonal_delay(control_word);
+//        uint32_t delay_axonal = sparse_axonal_delay(control_word);
+
+        uint32_t delay = 1;
+        uint32_t syn_ind_from_delay =
+         		synapse_row_sparse_delay(synaptic_word, synapse_type_index_bits);
+
         uint32_t delay_dendritic = synapse_row_sparse_delay(
                 control_word, synapse_type_index_bits);
         uint32_t type = synapse_row_sparse_type(
@@ -316,11 +324,24 @@ bool synapse_dynamics_process_plastic_synapses(
         update_state_t current_state =
                 synapse_structure_get_update_state(*plastic_words, type);
 
-        // Update the synapse state
-        final_state_t final_state = plasticity_update_synapse(
-                time, last_pre_time, last_pre_trace, event_history->prev_trace,
-                delay_dendritic, delay_axonal, current_state,
-                &post_event_history[index]);
+        // Access weight change from synaptic state in DTCM
+        neuron_pointer_t neuron = &neuron_array[
+												synapse_row_sparse_index(synaptic_word, synapse_type_mask)
+												];
+        neuron->syn_state[syn_ind_from_delay].delta_w;
+
+
+//        // Update the synapse state
+//        final_state_t final_state = plasticity_update_synapse(
+//                time, last_pre_time, last_pre_trace, event_history->prev_trace,
+//                delay_dendritic, delay_axonal, current_state,
+//                &post_event_history[index]);
+
+
+        // Access and apply weight change from synaptic state array
+        // Use neuron id to index into neuron array, and delay to index into synapse array
+
+
 
         // Convert into ring buffer offset
         uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
