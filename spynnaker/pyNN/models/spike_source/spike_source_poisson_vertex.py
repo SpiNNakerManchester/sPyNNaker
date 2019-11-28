@@ -284,7 +284,8 @@ class SpikeSourcePoissonVertex(
             use_list_as_value=not hasattr(time_to_spike[0], "__len__"))
         self.__rng = numpy.random.RandomState(seed)
         self.__rate_change = numpy.zeros(n_neurons)
-        self.__machine_time_step = None
+        self.__machine_time_step = \
+            globals_variables.get_simulator().machine_time_step
 
         # get config from simulator
         config = globals_variables.get_simulator().config
@@ -437,7 +438,8 @@ class SpikeSourcePoissonVertex(
             vertex_slice.n_atoms, self._max_spikes_per_ts(machine_time_step),
             machine_time_step)
         constant_sdram = ConstantSDRAM(
-            variable_sdram.per_timestep * OVERFLOW_TIMESTEPS_FOR_SDRAM)
+            variable_sdram.per_simtime_us * OVERFLOW_TIMESTEPS_FOR_SDRAM *
+            self.timestep)
         return variable_sdram + constant_sdram
 
     @inject_items({
