@@ -247,7 +247,8 @@ class AbstractPopulationVertex(
                     variable, vertex_slice))
         return values
 
-    def _get_buffered_sdram(self, vertex_slice, n_machine_time_steps):
+    def _get_buffered_sdram(self, vertex_slice, data_simtime_in_us):
+        n_machine_time_steps = data_simtime_in_us / self._timestep
         values = [self.__neuron_recorder.get_buffered_sdram(
                 "spikes", vertex_slice, n_machine_time_steps)]
         for variable in self.__neuron_impl.get_recordable_variables():
@@ -484,19 +485,19 @@ class AbstractPopulationVertex(
         "application_graph": "MemoryApplicationGraph",
         "machine_graph": "MemoryMachineGraph",
         "routing_info": "MemoryRoutingInfos",
-        "data_n_time_steps": "DataNTimeSteps"
+        "data_simtime_in_us": "DataSimtimeInUs"
     })
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
         additional_arguments={
             "machine_time_step", "time_scale_factor", "graph_mapper",
             "application_graph", "machine_graph", "routing_info",
-            "data_n_time_steps"
+            "data_simtime_in_us"
         })
     def generate_data_specification(
             self, spec, placement, machine_time_step, time_scale_factor,
             graph_mapper, application_graph, machine_graph, routing_info,
-            data_n_time_steps):
+            data_simtime_in_us):
         # pylint: disable=too-many-arguments, arguments-differ
         vertex = placement.vertex
 
@@ -526,7 +527,7 @@ class AbstractPopulationVertex(
         spec.switch_write_focus(
             constants.POPULATION_BASED_REGIONS.RECORDING.value)
         spec.write_array(recording_utilities.get_recording_header_array(
-            self._get_buffered_sdram(vertex_slice, data_n_time_steps)))
+            self._get_buffered_sdram(vertex_slice, data_simtime_in_us)))
 
         # Write the neuron parameters
         self._write_neuron_parameters(

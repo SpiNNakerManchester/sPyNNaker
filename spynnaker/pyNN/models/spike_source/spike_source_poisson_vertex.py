@@ -922,7 +922,7 @@ class SpikeSourcePoissonVertex(
         "time_scale_factor": "TimeScaleFactor",
         "graph_mapper": "MemoryGraphMapper",
         "routing_info": "MemoryRoutingInfos",
-        "data_n_time_steps": "DataNTimeSteps",
+        "data_simtime_in_us": "DataSimtimeInUs",
         "graph": "MemoryMachineGraph",
         "first_machine_time_step": "FirstMachineTimeStep"
     })
@@ -930,13 +930,13 @@ class SpikeSourcePoissonVertex(
         AbstractGeneratesDataSpecification.generate_data_specification,
         additional_arguments={
             "machine_time_step", "time_scale_factor", "graph_mapper",
-            "routing_info", "data_n_time_steps", "graph",
+            "routing_info", "data_simtime_in_us", "graph",
             "first_machine_time_step"
         }
     )
     def generate_data_specification(
             self, spec, placement, machine_time_step, time_scale_factor,
-            graph_mapper, routing_info, data_n_time_steps, graph,
+            graph_mapper, routing_info, data_simtime_in_us, graph,
             first_machine_time_step):
         # pylint: disable=too-many-arguments, arguments-differ
         self.__machine_time_step = machine_time_step
@@ -958,7 +958,8 @@ class SpikeSourcePoissonVertex(
         spec.switch_write_focus(_REGIONS.SPIKE_HISTORY_REGION.value)
         sdram = self.get_recording_sdram_usage(
             vertex_slice, machine_time_step)
-        recorded_region_sizes = [sdram.get_total_sdram(data_n_time_steps)]
+        recorded_region_sizes = [
+            sdram.get_sdram_for_simtime(data_simtime_in_us)]
         spec.write_array(recording_utilities.get_recording_header_array(
             recorded_region_sizes))
 
