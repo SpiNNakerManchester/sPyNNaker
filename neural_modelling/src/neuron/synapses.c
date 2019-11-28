@@ -23,6 +23,7 @@
 #include <debug.h>
 #include <spin1_api.h>
 #include <utils.h>
+#include "models/neuron_model_eprop_adaptive_impl.h"
 
 //! if using profiler import profiler tags
 #ifdef PROFILER_ENABLED
@@ -31,6 +32,7 @@
 
 // Globals required for synapse benchmarking to work.
 uint32_t  num_fixed_pre_synaptic_events = 0;
+extern neuron_pointer_t neuron_array;
 
 // The number of neurons
 static uint32_t n_neurons;
@@ -184,13 +186,15 @@ static inline void process_fixed_synapses(
 
         int32_t neuron_ind = synapse_row_sparse_index(synaptic_word, synapse_type_mask);
 
+
+        // For low pass filter of incoming spike train on this synapse
         // Use postsynaptic neuron index to access neuron struct,
         // and delay field to access correct synapse
         // neuron_pointer_t neuron = neuron_array[neuron_ind]->syn_state[syn_ind_from_delay].z_bar;
 
         io_printf(IO_BUF, "neuron ind: %u, synapse ind: %u \n", neuron_ind, syn_ind_from_delay);
-
-
+        neuron_pointer_t neuron = &neuron_array[neuron_ind];
+        neuron->syn_state[syn_ind_from_delay].z_bar_inp = 1024;
 
         io_printf(IO_BUF, "signed w: %d \n", weight);
 

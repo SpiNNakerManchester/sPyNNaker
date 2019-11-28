@@ -19,6 +19,9 @@
 
 #include <debug.h>
 
+extern REAL learning_signal;
+REAL local_eta;
+
 // simple Leaky I&F ODE
 static inline void lif_neuron_closed_form(
         neuron_pointer_t neuron, REAL V_prev, input_t input_this_timestep,
@@ -34,6 +37,9 @@ static inline void lif_neuron_closed_form(
 void neuron_model_set_global_neuron_params(
         global_neuron_params_pointer_t params) {
     use(params);
+
+    local_eta = params->eta;
+    io_printf(IO_BUF, "local eta = %k", local_eta);
     // Does Nothing - no params
 }
 
@@ -82,7 +88,15 @@ state_t neuron_model_state_update(
     		(1.0k/neuron->b_0) * 0.3k * 1.0k * (1.0k - psi_temp2) : 0.0k;
 
     uint32_t total_synapses_per_neuron = 1;
+
+
+//    neuron->psi = neuron->psi << 10;
+
     REAL rho = 0.998;
+
+
+    neuron->L = learning_signal * neuron->w_fb;
+
 
     // All operations now need doing once per eprop synapse
     for (uint32_t syn_ind=0; syn_ind < total_synapses_per_neuron; syn_ind++){
@@ -90,17 +104,16 @@ state_t neuron_model_state_update(
 		// ******************************************************************
 		// Low-pass filter incoming spike train
 		// ******************************************************************
-//    	neuron->syn_state[syn_ind].z_bar_old = neuron->syn_state[syn_ind].z_bar;
-//    	neuron->syn_state[syn_ind].z_bar = neuron->syn_state[syn_ind].z_bar * neuron->exp_TC + neuron->syn_state[syn_ind].z_bar_old; // ToDo
-
+    	neuron->syn_state[syn_ind].z_bar =
+    			neuron->syn_state[syn_ind].z_bar * neuron->exp_TC
+    			+ (1 - neuron->exp_TC) * neuron->syn_state[syn_ind].z_bar_inp; // updating z_bar is problematic, if spike could come and interrupt neuron update
+    	// reset input (can't have more than one spike per timestep
+    	neuron->syn_state[syn_ind].z_bar_inp = 0;
 
 
 		// ******************************************************************
 		// Update eligibility vector
 		// ******************************************************************
-    	// updating z_bar is problematic, if spike could come and interrupt neuron update
-    	// (you won't know whether spike arrived before or after update)
-    	// (also need to reset if it was 1 - otherwise it will never be cleared)
     	neuron->syn_state[syn_ind].el_a =
     			(neuron->psi * neuron->syn_state[syn_ind].z_bar) +
     		(rho - neuron->psi * neuron->beta) *
@@ -110,16 +123,19 @@ state_t neuron_model_state_update(
     	// ******************************************************************
 		// Update eligibility trace
 		// ******************************************************************
-//    	REAL temp_elig_trace = neuron->psi * (neuron->syn_state[syn_ind].z_bar -
-//    		neuron->beta * neuron->syn_state[syn_ind].el_a);
+    	REAL temp_elig_trace = neuron->psi * (neuron->syn_state[syn_ind].z_bar -
+    		neuron->beta * neuron->syn_state[syn_ind].el_a);
 
-//    	neuron->syn_state[syn_ind].e_bar = temp_elig_trace;
+    	neuron->syn_state[syn_ind].e_bar =
+    			neuron->exp_TC * neuron->syn_state[syn_ind].e_bar
+				+ (1 - neuron->exp_TC) * temp_elig_trace;
 
 		// ******************************************************************
 		// Update cached total weight change
 		// ******************************************************************
-    	//    uint16_t this_dt_weight_change = -global_params->eta * neuron->learning_sig * neuron->syn_state[syn_ind].e_bar;
-    	//    neuron->syn_state[syn_ind].delta_w +=this_dt_weight_change;
+    	uint16_t this_dt_weight_change =
+    			-local_eta * neuron->L * neuron->syn_state[syn_ind].e_bar;
+    	neuron->syn_state[syn_ind].delta_w = this_dt_weight_change;
 
     }
 

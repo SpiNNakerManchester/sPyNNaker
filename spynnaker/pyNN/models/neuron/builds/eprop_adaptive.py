@@ -30,7 +30,7 @@ class EPropAdaptive(AbstractPyNNNeuronModelStandard):
                              "isyn_exc", "isyn_exc2", "isyn_inh", "isyn_inh2",
                              "psi", "target_rate", "tau_err",
                              "B", "small_b",
-                             "l", "w_fb"
+                             "l", "w_fb", "eta"
                              })
     def __init__(
             self,
@@ -49,7 +49,7 @@ class EPropAdaptive(AbstractPyNNNeuronModelStandard):
             B=10, small_b=0, small_b_0=10, tau_a=500, beta=1.8,
 
             # Learning signal and weight update constants
-            l=0, w_fb=0.5,
+            l=0, w_fb=0.5, eta=1.0
 
             ):
         # pylint: disable=too-many-arguments, too-many-locals
@@ -61,7 +61,11 @@ class EPropAdaptive(AbstractPyNNNeuronModelStandard):
             small_b_0,
             tau_a,
             beta,
-            target_rate, tau_err, l, w_fb)
+            # Regularisation params
+            target_rate, tau_err, 
+            # Learning signal params
+            l, w_fb, eta
+            )
 
         synapse_type = SynapseTypeEPropAdaptive(
             tau_syn_E, tau_syn_E2, tau_syn_I, tau_syn_I2,

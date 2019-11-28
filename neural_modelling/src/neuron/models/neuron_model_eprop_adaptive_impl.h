@@ -26,7 +26,7 @@
 
 typedef struct eprop_syn_state_t {
 	uint32_t delta_w; // weight change to apply
-	REAL z_bar_old;
+	REAL z_bar_inp;
 	REAL z_bar; // low-pass filtered spike train
 	REAL el_a; // adaptive component of eligibility vector
 	REAL e_bar; // low-pass filtered eligibility trace
@@ -92,6 +92,7 @@ typedef struct global_neuron_params_t {
 	REAL core_pop_rate;
 	REAL core_target_rate;
 	REAL rate_exp_TC;
+	REAL eta; // learning rate
 } global_neuron_params_t;
 
 

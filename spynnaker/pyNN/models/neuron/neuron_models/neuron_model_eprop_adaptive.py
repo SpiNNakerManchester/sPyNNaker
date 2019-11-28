@@ -96,7 +96,8 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
         
         # learning signal
         "__l",
-        "__w_fb"
+        "__w_fb",
+        "__eta"
         ]
 
     def __init__(
@@ -121,7 +122,8 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
             target_rate,
             tau_err,
             l,
-            w_fb
+            w_fb,
+            eta
             ):
 
         datatype_list = [
@@ -164,7 +166,8 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
         global_data_types = [
             DataType.S1615,   #  core_pop_rate
             DataType.S1615,   #  core_target_rate
-            DataType.S1615    #  rate_exp_TC
+            DataType.S1615,   #  rate_exp_TC
+            DataType.S1615    #  eta (learning rate)
             ]
 
         super(NeuronModelEPropAdaptive, self).__init__(data_types=datatype_list,
@@ -196,6 +199,8 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
         # learning signal
         self.__l = l
         self.__w_fb = w_fb
+        
+        self.__eta = eta
 
 
     @overrides(AbstractNeuronModel.get_n_cpu_cycles)
@@ -217,6 +222,7 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
         parameters[BETA] = self.__beta
         parameters[SCALAR] = self.__scalar
         parameters[W_FB] = self.__w_fb
+
 
     @overrides(AbstractNeuronModel.add_state_variables)
     def add_state_variables(self, state_variables):
@@ -280,7 +286,7 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
         eprop_syn_init = [0,
                           0,
                           0,
-                          1,
+                          0,
                           0]
         # extend to appropriate fan-in
         values.extend(eprop_syn_init * SYNAPSES_PER_NEURON)
@@ -294,7 +300,8 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
         glob_vals = [
             self.__target_rate,     #  initialise global pop rate to the target
             self.__target_rate,     #  set target rate
-            numpy.exp(-float(ts/1000)/self.__tau_err)
+            numpy.exp(-float(ts/1000)/self.__tau_err),
+            self.__eta              # learning rate
             ]
 
         print("\n ")

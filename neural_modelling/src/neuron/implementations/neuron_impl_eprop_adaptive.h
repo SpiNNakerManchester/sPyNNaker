@@ -54,7 +54,7 @@ extern REAL learning_signal;
 
 
 //! Array of neuron states
-static neuron_pointer_t neuron_array;
+neuron_pointer_t neuron_array;
 
 //! Input states array
 static input_type_pointer_t input_type_array;
@@ -292,9 +292,9 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 //    		B_t; // neuron->B;
 //    		global_parameters->core_target_rate;
 //    	neuron->syn_state[0].e_bar;
-//    	neuron->syn_state[0].el_a;
+    	neuron->syn_state[0].el_a;
 //    		total_inh;
-    		learning_signal * neuron->w_fb;
+//    		learning_signal * neuron->w_fb;
 
     // update neuron parameters
     state_t result = neuron_model_state_update(
@@ -323,10 +323,12 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
 
     recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] =
-    		total_exc;
+//    		neuron->syn_state[0].delta_w;
+//    		neuron->syn_state[0].z_bar;
+//    		total_exc;
 //    		z_t;
 //    		global_parameters->core_pop_rate;
-//    		neuron->psi;
+    		neuron->psi;
 //    		neuron->syn_state[0].z_bar;
 
 //    // Record B
