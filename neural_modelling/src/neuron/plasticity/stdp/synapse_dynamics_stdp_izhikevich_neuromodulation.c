@@ -164,13 +164,11 @@ static inline void correlation_apply_pre_spike(
 
 // Synapse update loop
 //---------------------------------------
-static inline plastic_synapse_t plasticity_update_synapse(
-//static inline final_state_t plasticity_update_synapse(
+static inline plastic_synapse_t izhikevich_neuromodulation_plasticity_update_synapse(
     const uint32_t time,
     const uint32_t last_pre_time, const pre_trace_t last_pre_trace,
     const pre_trace_t new_pre_trace, const uint32_t delay_dendritic,
     const uint32_t delay_axonal, plastic_synapse_t *current_state,
-//    const uint32_t delay_axonal, update_state_t current_state,
     const post_event_history_t *post_event_history) {
 
     // Apply axonal delay to time of last presynaptic spike
@@ -214,8 +212,6 @@ static inline plastic_synapse_t plasticity_update_synapse(
         // Go onto next event
         post_window = post_events_next_delayed(post_window, delayed_post_time);
     }
-
-//    const uint32_t delayed_pre_time = time + delay_axonal;
 
     correlation_apply_pre_spike(
         delayed_pre_time, new_pre_trace,
@@ -315,87 +311,58 @@ void synapse_dynamics_process_neuromodulator_event(
 }
 
 //---------------------------------------
-bool synapse_dynamics_process_plastic_synapses(address_t plastic,
-         address_t fixed, weight_t *ring_buffer, uint32_t time) {
+// can this be inlined?
+void synapse_dynamics_stdp_process_plastic_synapse(
+        uint32_t control_word, uint32_t last_pre_time, pre_trace_t last_pre_trace,
+		pre_event_history_t* event_history, weight_t *ring_buffers, uint32_t time,
+		plastic_synapse_t* plastic_words) {
 
-    // Extract separate arrays of plastic synapses (from plastic region),
-    // Control words (from fixed region) and number of plastic synapses
-    plastic_synapse_t *plastic_words = plastic_synapses(plastic);
-    const control_t *control_words = synapse_row_plastic_controls(fixed);
-    size_t plastic_synapse  = synapse_row_num_plastic_controls(fixed);
+	// Extract control-word components
+	// **NOTE** cunningly, control word is just the same as lower
+	// 16-bits of 32-bit fixed synapse so same functions can be used
+	uint32_t delay_dendritic = synapse_row_sparse_delay(control_word,
+		synapse_type_index_bits);
+	uint32_t delay_axonal = 0;//sparse_axonal_delay(control_word);
+	uint32_t type = synapse_row_sparse_type(
+		control_word, synapse_index_bits, synapse_type_mask);
+	uint32_t index = synapse_row_sparse_index(
+		control_word, synapse_index_mask);
+	uint32_t type_index = synapse_row_sparse_type_index(control_word,
+		synapse_type_index_mask);
 
-    num_plastic_pre_synaptic_events += plastic_synapse;
+	// Convert into ring buffer index
+	uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
+		delay_axonal + delay_dendritic + time, type_index,
+		synapse_type_index_bits);
 
-    // Get event history from synaptic row
-    pre_event_history_t *event_history = plastic_event_history(plastic);
+	// Get state of synapse - weight and eligibility trace.
+	plastic_synapse_t* current_state = plastic_words;
 
-    // Get last pre-synaptic event from event history
-    const uint32_t last_pre_time = event_history->prev_time;
-    const pre_trace_t last_pre_trace = event_history->prev_trace;
+	// Update the global weight_state
+	weight_state = weight_get_initial(
+		synapse_structure_get_weight(*current_state), type);
 
-    // Update pre-synaptic trace
-    log_debug("Adding pre-synaptic event to trace at time:%u", time);
-    event_history->prev_time = time;
-    event_history->prev_trace = timing_add_pre_spike(time, last_pre_time,
-                                                     last_pre_trace);
+	// Update the synapse state
+	uint32_t post_delay = delay_dendritic;
+	if (!params.backprop_delay) {
+		post_delay = 0;
+	}
+	plastic_synapse_t final_state = izhikevich_neuromodulation_plasticity_update_synapse(
+		time, last_pre_time, last_pre_trace, event_history->prev_trace,
+		post_delay, delay_axonal, current_state,
+		&post_event_history[index]);
 
-    // Loop through plastic synapses
-    for (; plastic_synapse > 0; plastic_synapse--) {
-        // Get next control word (autoincrementing)
-        uint32_t control_word = *control_words++;
+	// Add weight to ring-buffer entry (deal with saturation)
+	uint32_t accumulation = ring_buffers[ring_buffer_index] +
+			synapse_structure_get_weight(final_state);
 
-        // Extract control-word components
-        // **NOTE** cunningly, control word is just the same as lower
-        // 16-bits of 32-bit fixed synapse so same functions can be used
-        uint32_t delay_dendritic = synapse_row_sparse_delay(control_word,
-            synapse_type_index_bits);
-        uint32_t delay_axonal = 0;//sparse_axonal_delay(control_word);
-        uint32_t type = synapse_row_sparse_type(
-            control_word, synapse_index_bits, synapse_type_mask);
-        uint32_t index = synapse_row_sparse_index(
-            control_word, synapse_index_mask);
-        uint32_t type_index = synapse_row_sparse_type_index(control_word,
-            synapse_type_index_mask);
+	uint32_t sat_test = accumulation & 0x10000;
+	if (sat_test) {
+		accumulation = sat_test - 1;
+		plastic_saturation_count++;
+	}
 
-        // Convert into ring buffer index
-        uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
-            delay_axonal + delay_dendritic + time, type_index,
-            synapse_type_index_bits);
+	ring_buffers[ring_buffer_index] = accumulation;
 
-        // Get state of synapse - weight and eligibility trace.
-        plastic_synapse_t* current_state = plastic_words;
-
-//        update_state_t current_state =
-//        		synapse_structure_get_update_state(*plastic_words, type);
-
-        weight_state = weight_get_initial(
-        	synapse_structure_get_weight(*current_state), type);
-
-        // Update the synapse state
-        uint32_t post_delay = delay_dendritic;
-        if (!params.backprop_delay) {
-            post_delay = 0;
-        }
-        plastic_synapse_t final_state = plasticity_update_synapse(
-//        final_state_t final_state = plasticity_update_synapse(
-        	time, last_pre_time, last_pre_trace, event_history->prev_trace,
-			post_delay, delay_axonal, current_state,
-			&post_event_history[index]);
-
-        // Add weight to ring-buffer entry (deal with saturation)
-        uint32_t accumulation = ring_buffer[ring_buffer_index] +
-        		synapse_structure_get_weight(final_state);
-
-        uint32_t sat_test = accumulation & 0x10000;
-        if (sat_test) {
-        	accumulation = sat_test - 1;
-        	plastic_saturation_count++;
-        }
-
-        ring_buffer[ring_buffer_index] = accumulation;
-
-        // Write back updated synaptic word to plastic region
-        *plastic_words++ = final_state;
-    }
-    return true;
+	*plastic_words++ = final_state;
 }

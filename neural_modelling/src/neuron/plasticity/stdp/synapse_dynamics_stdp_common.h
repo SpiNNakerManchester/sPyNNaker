@@ -202,6 +202,53 @@ address_t synapse_dynamics_initialise(
     return weight_result;
 }
 
+void synapse_dynamics_stdp_process_plastic_synapse(
+        uint32_t control_word, uint32_t last_pre_time, pre_trace_t last_pre_trace,
+		pre_event_history_t* event_history, weight_t *ring_buffers, uint32_t time,
+		plastic_synapse_t* plastic_words);
+
+bool synapse_dynamics_process_plastic_synapses(
+        address_t plastic_region_address, address_t fixed_region_address,
+        weight_t *ring_buffers, uint32_t time) {
+    // Extract separate arrays of plastic synapses (from plastic region),
+    // Control words (from fixed region) and number of plastic synapses
+    plastic_synapse_t *plastic_words =
+            plastic_synapses(plastic_region_address);
+    const control_t *control_words =
+            synapse_row_plastic_controls(fixed_region_address);
+    size_t plastic_synapse =
+            synapse_row_num_plastic_controls(fixed_region_address);
+
+    num_plastic_pre_synaptic_events += plastic_synapse;
+
+    // Get event history from synaptic row
+    pre_event_history_t *event_history =
+            plastic_event_history(plastic_region_address);
+
+    // Get last pre-synaptic event from event history
+    const uint32_t last_pre_time = event_history->prev_time;
+    const pre_trace_t last_pre_trace = event_history->prev_trace;
+
+    // Update pre-synaptic trace
+    log_debug("Adding pre-synaptic event to trace at time:%u", time);
+    event_history->prev_time = time;
+    event_history->prev_trace =
+            timing_add_pre_spike(time, last_pre_time, last_pre_trace);
+
+    // Loop through plastic synapses
+    for (; plastic_synapse > 0; plastic_synapse--) {
+        // Get next control word (auto incrementing)
+        uint32_t control_word = *control_words++;
+
+        synapse_dynamics_stdp_process_plastic_synapse(
+        		control_word, last_pre_time, last_pre_trace,
+				event_history, ring_buffers, time, plastic_words);
+
+    }
+    return true;
+}
+
+
 input_t synapse_dynamics_get_intrinsic_bias(
         uint32_t time, index_t neuron_index) {
     use(time);

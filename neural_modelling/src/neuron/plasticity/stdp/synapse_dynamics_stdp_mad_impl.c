@@ -24,7 +24,7 @@
 //---------------------------------------
 // Synapse update loop
 //---------------------------------------
-static inline final_state_t plasticity_update_synapse(
+static inline final_state_t mad_plasticity_update_synapse(
         const uint32_t time,
         const uint32_t last_pre_time, const pre_trace_t last_pre_trace,
         const pre_trace_t new_pre_trace, const uint32_t delay_dendritic,
@@ -133,91 +133,60 @@ void synapse_dynamics_process_neuromodulator_event(
     use(synapse_type);
 }
 
-bool synapse_dynamics_process_plastic_synapses(
-        address_t plastic_region_address, address_t fixed_region_address,
-        weight_t *ring_buffers, uint32_t time) {
-    // Extract separate arrays of plastic synapses (from plastic region),
-    // Control words (from fixed region) and number of plastic synapses
-    plastic_synapse_t *plastic_words =
-            plastic_synapses(plastic_region_address);
-    const control_t *control_words =
-            synapse_row_plastic_controls(fixed_region_address);
-    size_t plastic_synapse =
-            synapse_row_num_plastic_controls(fixed_region_address);
+// can this be inlined?
+void synapse_dynamics_stdp_process_plastic_synapse(
+        uint32_t control_word, uint32_t last_pre_time, pre_trace_t last_pre_trace,
+		pre_event_history_t* event_history, weight_t *ring_buffers, uint32_t time,
+		plastic_synapse_t* plastic_words) {
 
-    num_plastic_pre_synaptic_events += plastic_synapse;
+	// Extract control-word components
+	// **NOTE** cunningly, control word is just the same as lower
+	// 16-bits of 32-bit fixed synapse so same functions can be used
+	uint32_t delay_axonal = sparse_axonal_delay(control_word);
+	uint32_t delay_dendritic = synapse_row_sparse_delay(
+			control_word, synapse_type_index_bits);
+	uint32_t type = synapse_row_sparse_type(
+			control_word, synapse_index_bits, synapse_type_mask);
+	uint32_t index =
+			synapse_row_sparse_index(control_word, synapse_index_mask);
+	uint32_t type_index = synapse_row_sparse_type_index(
+			control_word, synapse_type_index_mask);
 
-    // Get event history from synaptic row
-    pre_event_history_t *event_history =
-            plastic_event_history(plastic_region_address);
+	// Create update state from the plastic synaptic word
+	update_state_t current_state =
+			synapse_structure_get_update_state(*plastic_words, type);
 
-    // Get last pre-synaptic event from event history
-    const uint32_t last_pre_time = event_history->prev_time;
-    const pre_trace_t last_pre_trace = event_history->prev_trace;
+	// Convert into ring buffer offset
+	uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
+			delay_axonal + delay_dendritic + time, type_index,
+			synapse_type_index_bits);
 
-    // Update pre-synaptic trace
-    log_debug("Adding pre-synaptic event to trace at time:%u", time);
-    event_history->prev_time = time;
-    event_history->prev_trace =
-            timing_add_pre_spike(time, last_pre_time, last_pre_trace);
+	// Update the synapse state
+	uint32_t post_delay = delay_dendritic;
+	if (!params.backprop_delay) {
+		post_delay = 0;
+	}
+	final_state_t final_state = mad_plasticity_update_synapse(
+			time, last_pre_time, last_pre_trace, event_history->prev_trace,
+			post_delay, delay_axonal, current_state,
+			&post_event_history[index]);
 
-    // Loop through plastic synapses
-    for (; plastic_synapse > 0; plastic_synapse--) {
-        // Get next control word (auto incrementing)
-        uint32_t control_word = *control_words++;
+	// Add weight to ring-buffer entry
+	// **NOTE** Dave suspects that this could be a
+	// potential location for overflow
 
-        // Extract control-word components
-        // **NOTE** cunningly, control word is just the same as lower
-        // 16-bits of 32-bit fixed synapse so same functions can be used
-        uint32_t delay_axonal = sparse_axonal_delay(control_word);
-        uint32_t delay_dendritic = synapse_row_sparse_delay(
-                control_word, synapse_type_index_bits);
-        uint32_t type = synapse_row_sparse_type(
-                control_word, synapse_index_bits, synapse_type_mask);
-        uint32_t index =
-                synapse_row_sparse_index(control_word, synapse_index_mask);
-        uint32_t type_index = synapse_row_sparse_type_index(
-                control_word, synapse_type_index_mask);
+	uint32_t accumulation = ring_buffers[ring_buffer_index] +
+			synapse_structure_get_final_weight(final_state);
 
-        // Create update state from the plastic synaptic word
-        update_state_t current_state =
-                synapse_structure_get_update_state(*plastic_words, type);
+	uint32_t sat_test = accumulation & 0x10000;
+	if (sat_test) {
+		accumulation = sat_test - 1;
+		plastic_saturation_count++;
+	}
 
-        // Convert into ring buffer offset
-        uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
-                delay_axonal + delay_dendritic + time, type_index,
-                synapse_type_index_bits);
+	ring_buffers[ring_buffer_index] = accumulation;
 
-        // Update the synapse state
-        uint32_t post_delay = delay_dendritic;
-        if (!params.backprop_delay) {
-            post_delay = 0;
-        }
-        final_state_t final_state = plasticity_update_synapse(
-                time, last_pre_time, last_pre_trace, event_history->prev_trace,
-                post_delay, delay_axonal, current_state,
-                &post_event_history[index]);
-
-        // Add weight to ring-buffer entry
-        // **NOTE** Dave suspects that this could be a
-        // potential location for overflow
-
-        uint32_t accumulation = ring_buffers[ring_buffer_index] +
-                synapse_structure_get_final_weight(final_state);
-
-        uint32_t sat_test = accumulation & 0x10000;
-        if (sat_test) {
-            accumulation = sat_test - 1;
-            plastic_saturation_count++;
-        }
-
-        ring_buffers[ring_buffer_index] = accumulation;
-
-        // Write back updated synaptic word to plastic region
-        *plastic_words++ =
-                synapse_structure_get_final_synaptic_word(final_state);
-    }
-    return true;
+	*plastic_words++ = synapse_structure_get_final_synaptic_word(final_state);
 }
 
 void synapse_dynamics_process_post_synaptic_event(
