@@ -46,6 +46,11 @@ class PopulationMachineVertex(
         BUFFER_OVERFLOW_COUNT = 2
         CURRENT_TIMER_TIC = 3
         PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT = 4
+        MAX_SPIKES_IN_A_TICK = 5
+        MAX_DMAS_IN_A_TICK = 6
+        MAX_PIPELINE_RESTARTS = 7
+        TIMER_CALLBACK_COMPLETED = 8
+        SPIKES_PIPELINE_ACTIVATED = 9
 
     PROFILE_TAG_LABELS = {
         0: "TIMER",
@@ -108,7 +113,22 @@ class PopulationMachineVertex(
             self.EXTRA_PROVENANCE_DATA_ENTRIES.CURRENT_TIMER_TIC.value]
         n_plastic_saturations = provenance_data[
             self.EXTRA_PROVENANCE_DATA_ENTRIES.
-            PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT.value]
+                PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT.value]
+        max_spikes_in_a_tick = provenance_data[
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.
+                MAX_SPIKES_IN_A_TICK.value]
+        max_dmas_in_a_tick = provenance_data[
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.
+                MAX_DMAS_IN_A_TICK.value]
+        max_pipeline_restarts = provenance_data[
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.
+                MAX_PIPELINE_RESTARTS.value]
+        timer_callback_completed = provenance_data[
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.
+                TIMER_CALLBACK_COMPLETED.value]
+        spike_pipeline_deactivated = provenance_data[
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.
+                SPIKES_PIPELINE_ACTIVATED.value]
 
         label, x, y, p, names = self._get_placement_details(placement)
 
@@ -151,6 +171,36 @@ class PopulationMachineVertex(
                 "spikes_per_second and / or ring_buffer_sigma values located "
                 "within the .spynnaker.cfg file.".format(
                     label, x, y, p, n_plastic_saturations))))
+        provenance_items.append(ProvenanceDataItem(
+            self._add_name(names,
+                           "MAX_SPIKES_IN_A_TICK"),
+            max_spikes_in_a_tick,
+            report=max_spikes_in_a_tick > 20,
+            message=(
+                "Max number of spikes for {} on {}, {}, {} "
+                "was {}. Empirically, we can deal with ~20 for real time "
+                "performance using a 0.1 ms timestep.".format(
+                    label, x, y, p, max_spikes_in_a_tick))))
+        provenance_items.append(ProvenanceDataItem(
+            self._add_name(names,
+                           "MAX_DMAS_IN_A_TICK"),
+            max_dmas_in_a_tick))
+        provenance_items.append(ProvenanceDataItem(
+            self._add_name(names,
+                           "MAX_PIPELINE_RESTARTS"),
+            max_pipeline_restarts))
+        provenance_items.append(ProvenanceDataItem(
+            self._add_name(names,
+                           "MAX_PIPELINE_RESTARTS"),
+            max_pipeline_restarts))
+        provenance_items.append(ProvenanceDataItem(
+            self._add_name(names,
+                           "TIMER_CALLBACK_COMPLETED"),
+            timer_callback_completed))
+        provenance_items.append(ProvenanceDataItem(
+            self._add_name(names,
+                           "SPIKES_PIPELINE_ACTIVATED"),
+            spike_pipeline_deactivated))
 
         return provenance_items
 

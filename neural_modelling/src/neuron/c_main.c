@@ -41,6 +41,7 @@
 #include "plasticity/synapse_dynamics.h"
 #include "structural_plasticity/synaptogenesis_dynamics.h"
 #include "profile_tags.h"
+#include "spike_profiling.h"
 
 #include <data_specification.h>
 #include <simulation.h>
@@ -61,6 +62,11 @@ struct neuron_provenance {
     uint32_t n_input_buffer_overflows;
     uint32_t current_timer_tick;
     uint32_t n_plastic_synaptic_weight_saturations;
+    uint32_t max_spikes_in_a_tick;
+    uint32_t max_dmas_in_a_tick;
+    uint32_t max_pipeline_restarts;
+    uint32_t timer_callback_completed;
+    uint32_t spike_pipeline_deactivated;
 };
 
 //! values for the priority for each callback
@@ -72,6 +78,24 @@ typedef enum callback_priorities {
 #define NUMBER_OF_REGIONS_TO_RECORD 4
 
 // Globals
+
+// Counters to assess maximum spikes per timer tick
+uint32_t max_spikes_in_a_tick = 0;
+uint32_t max_dmas_in_a_tick = 0;
+uint32_t max_pipeline_restarts = 0;
+
+uint32_t timer_callback_completed = 20000000;
+uint32_t temp_timer_callback_completed = 0;
+uint32_t spike_pipeline_deactivated = 0;
+
+uint32_t last_spikes = 0;
+uint32_t last_restarts = 0;
+uint32_t deactivation_time = 0;
+
+struct spike_holder_t spike_counter;
+struct spike_holder_t spike_cache;
+struct spike_holder_t spike_counter_inh;
+struct spike_holder_t spike_cache_inh;
 
 //! the current timer tick value
 //! the timer tick callback returning the same value.
@@ -123,6 +147,11 @@ void c_main_store_provenance_data(address_t provenance_region) {
     prov->current_timer_tick = time;
     prov->n_plastic_synaptic_weight_saturations =
             synapse_dynamics_get_plastic_saturation_count();
+    prov->max_spikes_in_a_tick = max_spikes_in_a_tick;
+    prov->max_dmas_in_a_tick = max_dmas_in_a_tick;
+    prov->max_pipeline_restarts = max_pipeline_restarts;
+    prov->timer_callback_completed = timer_callback_completed;
+    prov->spike_pipeline_deactivated = spike_pipeline_deactivated;
     log_debug("finished other provenance data");
 }
 
@@ -230,6 +259,11 @@ static bool initialise(void) {
 void resume_callback(void) {
     recording_reset();
 
+    // reset high water mark for spike counter
+    max_spikes_in_a_tick = 0;
+    max_dmas_in_a_tick = 0;
+    max_pipeline_restarts = 0;
+
     // try reloading neuron parameters
     data_specification_metadata_t *ds_regions =
             data_specification_get_data_address();
@@ -247,6 +281,27 @@ void resume_callback(void) {
 //! \return None
 void timer_callback(uint timer_count, uint unused) {
     use(unused);
+
+    // Get number of spikes in last tick, and reset spike counter
+    last_spikes = spike_processing_get_and_reset_spikes_this_tick();
+    uint32_t last_dmas = spike_processing_get_and_reset_dmas_this_tick();
+    last_restarts =
+    		spike_processing_get_and_reset_pipeline_restarts_this_tick();
+    deactivation_time = spike_processing_get_pipeline_deactivation_time();
+
+    // cache and flush spike counters
+	spike_profiling_cache_and_flush_spike_holder(&spike_counter,
+			&spike_cache);
+	spike_profiling_cache_and_flush_spike_holder(&spike_counter_inh,
+			&spike_cache_inh);
+
+    if (last_spikes > max_spikes_in_a_tick){
+    	max_spikes_in_a_tick = last_spikes;
+    	max_dmas_in_a_tick = last_dmas;
+    	max_pipeline_restarts = last_restarts;
+    	timer_callback_completed = temp_timer_callback_completed;
+    	spike_pipeline_deactivated = deactivation_time;
+    }
 
     profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
 
