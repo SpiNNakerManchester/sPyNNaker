@@ -113,6 +113,7 @@ class SimpleApplicationVertex(ApplicationVertex):
     def timestep(self):
         return globals_variables.get_simulator().machine_time_step
 
+
 class TestSynapticManager(unittest.TestCase):
 
     def test_retrieve_synaptic_block(self):

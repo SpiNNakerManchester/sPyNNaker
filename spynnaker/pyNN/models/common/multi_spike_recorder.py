@@ -44,7 +44,8 @@ class MultiSpikeRecorder(object):
     def record(self, record):
         self.__record = record
 
-    def get_sdram_usage_in_bytes(self, n_neurons, spikes_per_timestep, timestep):
+    def get_sdram_usage_in_bytes(
+            self, n_neurons, spikes_per_timestep, timestep):
         if not self.__record:
             return ConstantSDRAM(0)
 
