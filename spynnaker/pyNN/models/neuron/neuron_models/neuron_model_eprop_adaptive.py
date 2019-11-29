@@ -154,7 +154,7 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
 
         # Synapse states - always initialise to zero
         eprop_syn_state = [ # synaptic state, one per synapse (kept in DTCM)
-                DataType.UINT32, # delta_w
+                DataType.S1615, # delta_w
                 DataType.S1615, # z_bar_old
                 DataType.S1615, # z_bar
                 DataType.S1615, # ep_a

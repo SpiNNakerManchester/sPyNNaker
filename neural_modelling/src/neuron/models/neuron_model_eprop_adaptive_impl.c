@@ -85,7 +85,9 @@ state_t neuron_model_state_update(
     REAL psi_temp1 = (neuron->V_membrane - neuron->B) * (1/neuron->b_0);
     REAL psi_temp2 = ((absk(psi_temp1)));
     neuron->psi =  ((1.0k - psi_temp2) > 0.0k)?
-    		(1.0k/neuron->b_0) * 0.3k * 1.0k * (1.0k - psi_temp2) : 0.0k;
+    		(1.0k/neuron->b_0) *
+//			0.3k *
+			(1.0k - psi_temp2) : 0.0k;
 
     uint32_t total_synapses_per_neuron = 1;
 
@@ -133,7 +135,7 @@ state_t neuron_model_state_update(
 		// ******************************************************************
 		// Update cached total weight change
 		// ******************************************************************
-    	uint16_t this_dt_weight_change =
+    	REAL this_dt_weight_change =
     			-local_eta * neuron->L * neuron->syn_state[syn_ind].e_bar;
     	neuron->syn_state[syn_ind].delta_w = this_dt_weight_change;
 
