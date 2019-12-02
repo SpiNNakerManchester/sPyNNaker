@@ -22,7 +22,7 @@ from pacman.model.resources.constant_sdram import ConstantSDRAM
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.log import FormatAdapter
 from spynnaker.pyNN.models.common import recording_utils
-from pacman.model.resources import TimeBasedSDRAM
+from pacman.model.resources import VariableSDRAM
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -50,8 +50,8 @@ class MultiSpikeRecorder(object):
             return ConstantSDRAM(0)
 
         out_spike_bytes = int(math.ceil(n_neurons / 32.0)) * BYTES_PER_WORD
-        return TimeBasedSDRAM(0, (2 * BYTES_PER_WORD) + (
-            out_spike_bytes * spikes_per_timestep/timestep))
+        return VariableSDRAM(0, (2 * BYTES_PER_WORD) + (
+            out_spike_bytes * spikes_per_timestep, timestep))
 
     def get_dtcm_usage_in_bytes(self):
         if not self.__record:
