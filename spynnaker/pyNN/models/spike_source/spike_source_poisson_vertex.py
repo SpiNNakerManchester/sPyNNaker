@@ -439,7 +439,7 @@ class SpikeSourcePoissonVertex(
             machine_time_step)
         constant_sdram = ConstantSDRAM(
             variable_sdram.per_simtime_us * OVERFLOW_TIMESTEPS_FOR_SDRAM *
-            self.timestep)
+            self.timestep_in_us)
         return variable_sdram + constant_sdram
 
     @inject_items({
@@ -1036,6 +1036,6 @@ class SpikeSourcePoissonVertex(
         return context
 
     @property
-    @overrides(ApplicationVertex.timestep)
-    def timestep(self):
+    @overrides(ApplicationVertex.timestep_in_us)
+    def timestep_in_us(self):
         return self.__machine_time_step

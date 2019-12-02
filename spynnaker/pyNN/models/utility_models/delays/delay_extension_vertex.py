@@ -410,6 +410,6 @@ class DelayExtensionVertex(
         return key in self.__delay_generator_data
 
     @property
-    @overrides(ApplicationVertex.timestep)
-    def timestep(self):
+    @overrides(ApplicationVertex.timestep_in_us)
+    def timestep_in_us(self):
         return self.__machine_time_step

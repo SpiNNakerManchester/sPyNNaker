@@ -207,7 +207,7 @@ class AbstractPopulationVertex(
         # pylint: disable=arguments-differ
 
         timebasedSDRAM = self.__neuron_recorder.get_variable_sdram_usage(
-            vertex_slice, self.timestep)
+            vertex_slice, self.timestep_in_us)
         constantSDRAM = ConstantSDRAM(
                 self._get_sdram_usage_for_atoms(
                     vertex_slice, graph, machine_time_step))
@@ -901,6 +901,6 @@ class AbstractPopulationVertex(
             self.__change_requires_neuron_parameters_reload = False
 
     @property
-    @overrides(ApplicationVertex.timestep)
-    def timestep(self):
+    @overrides(ApplicationVertex.timestep_in_us)
+    def timestep_in_us(self):
         return self._timestep
