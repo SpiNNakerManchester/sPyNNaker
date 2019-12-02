@@ -206,7 +206,7 @@ class AbstractPopulationVertex(
             self, vertex_slice, graph, machine_time_step):
         # pylint: disable=arguments-differ
 
-        timebasedSDRAM = self.__neuron_recorder.get_variable_sdram_usage(
+        variableSDRAM = self.__neuron_recorder.get_variable_sdram_usage(
             vertex_slice, self.timestep_in_us)
         constantSDRAM = ConstantSDRAM(
                 self._get_sdram_usage_for_atoms(
@@ -214,7 +214,7 @@ class AbstractPopulationVertex(
 
         # set resources required from this object
         container = ResourceContainer(
-            sdram=timebasedSDRAM + constantSDRAM,
+            sdram=variableSDRAM + constantSDRAM,
             dtcm=DTCMResource(self.get_dtcm_usage_for_atoms(vertex_slice)),
             cpu_cycles=CPUCyclesPerTickResource(
                 self.get_cpu_usage_for_atoms(vertex_slice)))
@@ -248,7 +248,8 @@ class AbstractPopulationVertex(
         return values
 
     def _get_buffered_sdram(self, vertex_slice, data_simtime_in_us):
-        n_machine_time_steps = data_simtime_in_us / self._timestep
+        n_machine_time_steps = self.simtime_in_us_to_timesteps(
+            data_simtime_in_us)
         values = [self.__neuron_recorder.get_buffered_sdram(
                 "spikes", vertex_slice, n_machine_time_steps)]
         for variable in self.__neuron_impl.get_recordable_variables():
