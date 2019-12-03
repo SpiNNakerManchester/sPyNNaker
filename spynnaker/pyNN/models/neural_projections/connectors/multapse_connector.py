@@ -79,6 +79,12 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
     @abstractmethod
     def get_rng_next(self, num_synapses, prob_connect):
         """ Get the required RNGs
+
+        :param int num_synapses: \
+            The number of synapses to make random numbers for in this call
+        :param float prob_connect: \
+            The probability of connection
+        :rtype: ~numpy.ndarray
         """
 
     @overrides(AbstractConnector.get_delay_maximum)
