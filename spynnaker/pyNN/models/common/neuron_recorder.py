@@ -560,7 +560,7 @@ class NeuronRecorder(object):
                     per_timestep_sdram += average_per_timestep
                     # Add the rest once to fixed for worst case
                     fixed_sdram += (per_record - average_per_timestep)
-                return VariableSDRAM(fixed_sdram, per_timestep_sdram, timestep)
+        return VariableSDRAM(fixed_sdram, per_timestep_sdram, timestep)
 
     def get_dtcm_usage_in_bytes(self, vertex_slice):
         # *_rate + n_neurons_recording_* + *_indexes
