@@ -24,6 +24,7 @@ from data_specification.enums import DataType
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
+from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
@@ -1036,6 +1037,6 @@ class SpikeSourcePoissonVertex(
         return context
 
     @property
-    @overrides(ApplicationVertex.timestep_in_us)
+    @overrides(AbstractVertex.timestep_in_us)
     def timestep_in_us(self):
         return self.__machine_time_step

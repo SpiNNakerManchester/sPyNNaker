@@ -20,6 +20,7 @@ from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
 from pacman.executor.injection_decorator import inject_items
+from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
@@ -902,6 +903,6 @@ class AbstractPopulationVertex(
             self.__change_requires_neuron_parameters_reload = False
 
     @property
-    @overrides(ApplicationVertex.timestep_in_us)
+    @overrides(AbstractVertex.timestep_in_us)
     def timestep_in_us(self):
         return self._timestep_in_us

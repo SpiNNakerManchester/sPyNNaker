@@ -22,6 +22,7 @@ from spinn_utilities.overrides import overrides
 from spinn_machine import SDRAM
 from pacman.model.placements import Placement
 from pacman.model.resources import ResourceContainer
+from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.common import GraphMapper, Slice
 from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex
 from pacman.model.routing_info import (
@@ -109,7 +110,7 @@ class SimpleApplicationVertex(ApplicationVertex):
         return ResourceContainer()
 
     @property
-    @overrides(ApplicationVertex.timestep_in_us)
+    @overrides(AbstractVertex.timestep_in_us)
     def timestep_in_us(self):
         return globals_variables.get_simulator().machine_time_step
 

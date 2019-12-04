@@ -18,6 +18,7 @@ from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.constraints.key_allocator_constraints import (
     FixedMaskConstraint)
+from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.graphs.application import (ApplicationVertex)
 from pacman.model.resources import (
@@ -203,6 +204,6 @@ class MunichMotorDevice(
         return [MOTOR_PARTITION_ID]
 
     @property
-    @overrides(ApplicationVertex.timestep_in_us)
+    @overrides(AbstractVertex.timestep_in_us)
     def timestep_in_us(self):
         return globals_variables.get_simulator().machine_time_step

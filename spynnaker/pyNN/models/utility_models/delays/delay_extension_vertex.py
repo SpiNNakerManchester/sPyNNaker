@@ -22,6 +22,7 @@ from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
 from pacman.model.constraints.partitioner_constraints import (
     SameAtomsAsVertexConstraint)
+from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
@@ -410,6 +411,6 @@ class DelayExtensionVertex(
         return key in self.__delay_generator_data
 
     @property
-    @overrides(ApplicationVertex.timestep_in_us)
+    @overrides(AbstractVertex.timestep_in_us)
     def timestep_in_us(self):
         return self.__machine_time_step
