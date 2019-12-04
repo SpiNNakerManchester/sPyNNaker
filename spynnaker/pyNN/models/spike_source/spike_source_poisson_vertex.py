@@ -484,7 +484,7 @@ class SpikeSourcePoissonVertex(
         self.__n_subvertices += 1
         return SpikeSourcePoissonMachineVertex(
             resources_required, self.__spike_recorder.record,
-            self.timestep_in_us, constraints, label)
+            self.timestep_in_us, label, constraints)
 
     @property
     def max_rate(self):
