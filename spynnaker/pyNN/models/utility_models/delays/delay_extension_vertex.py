@@ -113,7 +113,7 @@ class DelayExtensionVertex(
             constraints=None):
         self.__n_subvertices += 1
         return DelayExtensionMachineVertex(
-            resources_required, label, constraints)
+            resources_required, self.timestep_in_us, label, constraints)
 
     @inject_items({
         "graph": "MemoryApplicationGraph"})

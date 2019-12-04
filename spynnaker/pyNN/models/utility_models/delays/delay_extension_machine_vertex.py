@@ -42,9 +42,10 @@ class DelayExtensionMachineVertex(
 
     N_EXTRA_PROVENANCE_DATA_ENTRIES = len(EXTRA_PROVENANCE_DATA_ENTRIES)
 
-    def __init__(self, resources_required, label, constraints=None):
+    def __init__(
+            self, resources_required, timestep_in_us, label, constraints=None):
         super(DelayExtensionMachineVertex, self).__init__(
-            label, constraints=constraints)
+            timestep_in_us, label, constraints=constraints)
         self.__resources = resources_required
 
     @property

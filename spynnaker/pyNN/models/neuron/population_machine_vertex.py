@@ -57,15 +57,18 @@ class PopulationMachineVertex(
     N_ADDITIONAL_PROVENANCE_DATA_ITEMS = len(EXTRA_PROVENANCE_DATA_ENTRIES)
 
     def __init__(
-            self, resources_required, recorded_region_ids, label, constraints):
+            self, resources_required, recorded_region_ids, timestep_in_us,
+            label, constraints):
         """
         :param resources_required:
         :param recorded_region_ids:
+        :param timestep_in_us: The timestep of this vertex in us
+        :type timestep_in_us: int
         :param label:
         :param constraints:
         :type sampling: bool
         """
-        MachineVertex.__init__(self, label, constraints)
+        MachineVertex.__init__(self, timestep_in_us, label, constraints)
         AbstractRecordable.__init__(self)
         self.__recorded_region_ids = recorded_region_ids
         self.__resources = resources_required

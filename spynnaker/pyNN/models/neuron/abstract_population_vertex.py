@@ -268,7 +268,7 @@ class AbstractPopulationVertex(
         recorded_region_ids = self.__neuron_recorder.recorded_ids_by_slice(
             vertex_slice)
         return PopulationMachineVertex(
-            resources_required, recorded_region_ids,
+            resources_required, recorded_region_ids, self.timestep_in_us,
             label, constraints)
 
     def get_cpu_usage_for_atoms(self, vertex_slice):
