@@ -102,7 +102,7 @@ class MunichMotorDevice(
     def create_machine_vertex(self, vertex_slice, resources_required,
                               label=None, constraints=None):
         return SimpleMachineVertex(
-            resources_required, label, constraints)
+            resources_required, label, constraints, self.timestep_in_us)
 
     @overrides(ApplicationVertex.get_resources_used_by_atoms)
     def get_resources_used_by_atoms(self, vertex_slice):
