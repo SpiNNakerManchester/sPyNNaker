@@ -1111,6 +1111,8 @@ class SynapticManager(object):
             # if exploiting the extra monitor cores, need to set the machine
             # for data extraction mode
             if using_monitors and handle_time_out_configuration:
+                monitor_api.load_system_routing_tables(
+                    txrx, monitor_cores, placements)
                 monitor_api.set_cores_for_data_streaming(
                     txrx, monitor_cores, placements)
 
@@ -1128,6 +1130,8 @@ class SynapticManager(object):
 
             if using_monitors and handle_time_out_configuration:
                 monitor_api.unset_cores_for_data_streaming(
+                    txrx, monitor_cores, placements)
+                monitor_api.load_application_routing_tables(
                     txrx, monitor_cores, placements)
 
         self.__retrieved_blocks[placement, key, index] = \
