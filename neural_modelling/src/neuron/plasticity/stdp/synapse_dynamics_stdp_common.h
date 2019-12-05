@@ -267,6 +267,7 @@ uint32_t synapse_dynamics_get_plastic_saturation_count(void) {
 bool synapse_dynamics_find_neuron(
         uint32_t id, address_t row, weight_t *weight, uint16_t *delay,
         uint32_t *offset, uint32_t *synapse_type) {
+    log_info("sdyn: find_neuron id=%u", id);
     address_t fixed_region = synapse_row_fixed_region(row);
     address_t plastic_region_address = synapse_row_plastic_region(row);
     plastic_synapse_t *plastic_words = plastic_synapses(plastic_region_address);
@@ -293,6 +294,7 @@ bool synapse_dynamics_find_neuron(
 }
 
 bool synapse_dynamics_remove_neuron(uint32_t offset, address_t row){
+    log_info("sdyn: remove_neuron offset=%u", offset);
     address_t fixed_region = synapse_row_fixed_region(row);
     plastic_synapse_t *plastic_words =
             plastic_synapses(synapse_row_plastic_region(row));
@@ -315,6 +317,7 @@ bool synapse_dynamics_remove_neuron(uint32_t offset, address_t row){
 //! packing all of the information into the required plastic control word
 static inline control_t control_conversion(
         uint32_t id, uint32_t delay, uint32_t type) {
+    log_info("sdyn: control_conversion id=%u", id);
     control_t new_control =
             (delay & ((1 << SYNAPSE_DELAY_BITS) - 1)) << synapse_type_index_bits;
     new_control |= (type & ((1 << synapse_type_index_bits) - 1)) << synapse_index_bits;
@@ -324,6 +327,7 @@ static inline control_t control_conversion(
 
 bool synapse_dynamics_add_neuron(uint32_t id, address_t row,
         weight_t weight, uint32_t delay, uint32_t type) {
+    log_info("sdyn: add_neuron id=%u", id);
     plastic_synapse_t new_weight = synapse_structure_create_synapse(weight);
     control_t new_control = control_conversion(id, delay, type);
 
