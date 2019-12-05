@@ -157,7 +157,7 @@ class NeuronRecorder(object):
             # Check if you have the expected data
             if not missing_data and n_rows == expected_rows:
                 # Just cut the timestamps off to get the fragment
-                fragment = (record[:, 1:] / float(DataType.S1615.scale))
+                fragment = DataType.S1615.decode_numpy_array(record[:, 1:])
             else:
                 missing_str += "({}, {}, {}); ".format(
                     placement.x, placement.y, placement.p)
@@ -168,8 +168,8 @@ class NeuronRecorder(object):
                     # Check if there is data for this timestep
                     local_indexes = numpy.where(record[:, 0] == time)
                     if len(local_indexes[0]) == 1:
-                        fragment[i] = (record[local_indexes[0], 1:] /
-                                       float(DataType.S1615.scale))
+                        fragment[i] = DataType.S1615.decode_numpy_array(
+                            record[local_indexes[0], 1:])
                     elif len(local_indexes[0]) > 1:
                         logger.warning(
                             "Population {} on multiple recorded data for "

@@ -347,8 +347,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
             properties = self._kernel_properties
             properties.append(post_vertex_slice.lo_atom)
             data = numpy.array(properties, dtype="uint32")
-            values = numpy.round(self._krn_delays * float(
-                DataType.S1615.scale)).astype("uint32")
+            values = DataType.S1615.encode_as_numpy_int_array(self._krn_delays)
             return numpy.concatenate((data, values.flatten()))
         return super(KernelConnector, self).gen_delay_params(
             delays, pre_vertex_slice, post_vertex_slice)
@@ -374,8 +373,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
             properties = self._kernel_properties
             properties.append(post_vertex_slice.lo_atom)
             data = numpy.array(properties, dtype="uint32")
-            values = numpy.round(self._krn_weights * float(
-                DataType.S1615.scale)).astype("uint32")
+            values = DataType.S1615.encode_as_numpy_int_array(
+                self._krn_weights)
             return numpy.concatenate((data, values.flatten()))
         return super(KernelConnector, self).gen_weights_params(
             weights, pre_vertex_slice, post_vertex_slice)
