@@ -28,9 +28,8 @@ class ThresholdTypeStatic(AbstractThresholdType):
     __slots__ = ["__v_thresh"]
 
     def __init__(self, v_thresh):
-        r"""
-        :param v_thresh: :math:`V_{thresh}`
-        :type v_thresh: float
+        """
+        :param float v_thresh: :math:`V_{thresh}`
         """
         super(ThresholdTypeStatic, self).__init__([
             DataType.S1615])  # v_thresh

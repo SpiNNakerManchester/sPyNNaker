@@ -44,14 +44,10 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
     # noinspection PyPep8Naming
     def __init__(self, tau_plus, tau_minus, tau_x, tau_y):
         r"""
-        :param tau_plus: :math:`\tau_+`
-        :type tau_plus: float
-        :param tau_minus: :math:`\tau_-`
-        :type tau_minus: float
-        :param tau_x: :math:`\tau_x`
-        :type tau_x: float
-        :param tau_y: :math:`\tau_y`
-        :type tau_y: float
+        :param float tau_plus: :math:`\tau_+`
+        :param float tau_minus: :math:`\tau_-`
+        :param float tau_x: :math:`\tau_x`
+        :param float tau_y: :math:`\tau_y`
         """
         self.__tau_plus = tau_plus
         self.__tau_minus = tau_minus

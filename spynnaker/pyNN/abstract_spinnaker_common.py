@@ -63,23 +63,18 @@ class AbstractSpiNNakerCommon(with_metaclass(
             extra_post_run_algorithms=None, extra_mapping_algorithms=None,
             extra_load_algorithms=None, front_end_versions=None):
         """
-        :param graph_label:
-        :type graph_label: str
+        :param str graph_label:
         :param database_socket_addresses:
-        :type database_socket_addresses: \
+        :type database_socket_addresses:
             iterable(~spinn_utilities.socket_address.SocketAddress)
         :param n_chips_required:
         :type n_chips_required: int or None
         :param n_boards_required:
         :type n_boards_required: int or None
-        :param timestep:
-        :type timestep: int
-        :param max_delay:
-        :type max_delay: float
-        :param min_delay:
-        :type min_delay: float
-        :param hostname:
-        :type hostname: str
+        :param int timestep:
+        :param float max_delay:
+        :param float min_delay:
+        :param str hostname:
         :param user_extra_algorithm_xml_path:
         :type user_extra_algorithm_xml_path: str or None
         :param user_extra_mapping_inputs:
@@ -334,14 +329,14 @@ class AbstractSpiNNakerCommon(with_metaclass(
     def stop(self, turn_off_machine=None, clear_routing_tables=None,
              clear_tags=None):
         """
-        :param turn_off_machine: decides if the machine should be powered down\
-            after running the execution. Note that this powers down all boards\
+        :param turn_off_machine: decides if the machine should be powered down
+            after running the execution. Note that this powers down all boards
             connected to the BMP connections given to the transceiver
         :type turn_off_machine: bool or None
-        :param clear_routing_tables: informs the tool chain if it\
+        :param clear_routing_tables: informs the tool chain if it
             should turn off the clearing of the routing tables
         :type clear_routing_tables: bool or None
-        :param clear_tags: informs the tool chain if it should clear the tags\
+        :param clear_tags: informs the tool chain if it should clear the tags
             off the machine at stop
         :type clear_tags: bool or None
         :rtype: None
@@ -359,6 +354,8 @@ class AbstractSpiNNakerCommon(with_metaclass(
         """ Run the model created.
 
         :param run_time: the time (in milliseconds) to run the simulation for
+        :type run_time: float or int
+        :rtype: None
         """
         # pylint: disable=protected-access
 
@@ -372,7 +369,8 @@ class AbstractSpiNNakerCommon(with_metaclass(
     def register_binary_search_path(search_path):
         """ Register an additional binary search path for executables.
 
-        :param search_path: absolute search path for binaries
+        :param str search_path: absolute search path for binaries
+        :rtype: None
         """
         # pylint: disable=protected-access
         AbstractSpiNNakerCommon.__EXECUTABLE_FINDER.add_path(search_path)
@@ -396,13 +394,13 @@ class AbstractSpiNNakerCommon(with_metaclass(
             neuron_type.set_model_max_atoms_per_core()
 
     def get_projections_data(self, projection_to_attribute_map):
-        """ Common data extractor for projection data. Allows fully \
+        """ Common data extractor for projection data. Allows fully
             exploitation of the ????
 
-        :param projection_to_attribute_map: \
+        :param projection_to_attribute_map:
             the projection to attributes mapping
-        :type projection_to_attribute_map: \
-            dict(~spynnaker.pyNN.models.pynn_projection_common.PyNNProjectionCommon,\
+        :type projection_to_attribute_map:
+            dict(~spynnaker.pyNN.models.pynn_projection_common.PyNNProjectionCommon,
             list(int) or tuple(int) or None)
         :return: a extracted data object with get method for getting the data
         :rtype: ~spynnaker.pyNN.utilities.extracted_data.ExtractedData
@@ -502,8 +500,6 @@ class AbstractSpiNNakerCommon(with_metaclass(
         .. note::
             Maybe it could live in the pop class???
 
-        :param new_value: new value for id_counter
-        :type new_value: int
-        :return:
+        :param int new_value: new value for id_counter
         """
         self.__id_counter = new_value

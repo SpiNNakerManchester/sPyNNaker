@@ -43,8 +43,7 @@ class AbstractPartnerSelection(object):
     def write_parameters(self, spec):
         """ Write the parameters of the rule to the spec
 
-        :param spec:
-        :type spec: ~data_specification.DataSpecificationGenerator
+        :param ~data_specification.DataSpecificationGenerator spec:
         """
 
     @abstractmethod

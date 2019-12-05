@@ -123,31 +123,25 @@ class AbstractPopulationVertex(
             spikes_per_second, ring_buffer_sigma, incoming_spike_buffer_size,
             neuron_impl, pynn_model):
         """
-        :param n_neurons: The number of neurons in the population
-        :type n_neurons: int
-        :param label: The label on the population
-        :type label: str
-        :param constraints: \
+        :param int n_neurons: The number of neurons in the population
+        :param str label: The label on the population
+        :param list(~pacman.model.constraints.AbstractConstraint) constraints:
             Constraints on where a population's vertices may be placed.
-        :type constraints: list(~pacman.model.constraints.AbstractConstraint)
-        :param max_atoms_per_core: The maximum number of atoms (neurons) per \
-            SpiNNaker core.
-        :type max_atoms_per_core: int
+        :param int max_atoms_per_core:
+            The maximum number of atoms (neurons) per SpiNNaker core.
         :param spikes_per_second: Expected spike rate
         :type spikes_per_second: float or None
-        :param ring_buffer_sigma: \
+        :param ring_buffer_sigma:
             How many SD above the mean to go for upper bound of ring buffer \
             size; a good starting choice is 5.0. Given length of simulation \
             we can set this for approximate number of saturation events.
         :type ring_buffer_sigma: float or None
         :param incoming_spike_buffer_size:
         :type incoming_spike_buffer_size: int or None
-        :param neuron_impl: The (Python side of the) implementation of the \
-            neurons themselves.
-        :type neuron_impl: AbstractNeuronImpl
-        :param pynn_model: The PyNN neuron model that this vertex is working \
-            on behalf of.
-        :type pynn_model: AbstractPyNNNeuronModel
+        :param AbstractNeuronImpl neuron_impl:
+            The (Python side of the) implementation of the neurons themselves.
+        :param AbstractPyNNNeuronModel pynn_model:
+            The PyNN neuron model that this vertex is working on behalf of.
         """
 
         # pylint: disable=too-many-arguments, too-many-locals
@@ -284,8 +278,7 @@ class AbstractPopulationVertex(
 
     def get_cpu_usage_for_atoms(self, vertex_slice):
         """
-        :param vertex_slice:
-        :type vertex_slice: ~pacman.model.graphs.common.Slice
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
         """
         return (
             _NEURON_BASE_N_CPU_CYCLES + _C_MAIN_BASE_N_CPU_CYCLES +
@@ -296,8 +289,7 @@ class AbstractPopulationVertex(
 
     def get_dtcm_usage_for_atoms(self, vertex_slice):
         """
-        :param vertex_slice:
-        :type vertex_slice: ~pacman.model.graphs.common.Slice
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
         """
         return (
             _NEURON_BASE_DTCM_USAGE_IN_BYTES +
@@ -308,8 +300,8 @@ class AbstractPopulationVertex(
     def _get_sdram_usage_for_neuron_params(self, vertex_slice):
         """ Calculate the SDRAM usage for just the neuron parameters region.
 
-        :param vertex_slice: the slice of atoms.
-        :type vertex_slice: ~pacman.model.graphs.common.Slice
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            the slice of atoms.
         :return: The SDRAM required for the neuron region
         """
         return (
@@ -335,7 +327,15 @@ class AbstractPopulationVertex(
         return sdram_requirement
 
     def _reserve_memory_regions(self, spec, vertex_slice, vertex):
+        """ Reserve the neuron parameter data region.
 
+        :param ~data_specification.DataSpecificationGenerator spec:
+            the spec to write the DSG region to
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            the slice of atoms from the application vertex
+        :param vertex:
+        :return: None
+        """
         spec.comment("\nReserving memory space for data regions:\n\n")
 
         # Reserve memory:
@@ -360,9 +360,10 @@ class AbstractPopulationVertex(
     def _reserve_neuron_params_data_region(self, spec, vertex_slice):
         """ Reserve the neuron parameter data region.
 
-        :param spec: the spec to write the DSG region to
-        :param vertex_slice: the slice of atoms from the application vertex
-        :type vertex_slice: ~pacman.model.graphs.common.Slice
+        :param ~data_specification.DataSpecificationGenerator spec:
+            the spec to write the DSG region to
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            the slice of atoms from the application vertex
         :return: None
         """
         params_size = self._get_sdram_usage_for_neuron_params(vertex_slice)
@@ -805,8 +806,7 @@ class AbstractPopulationVertex(
 
     def set_synapse_dynamics(self, synapse_dynamics):
         """
-        :param synapse_dynamics:
-        :type synapse_dynamics: AbstractSynapseDynamics
+        :param AbstractSynapseDynamics synapse_dynamics:
         """
         self.__synapse_manager.synapse_dynamics = synapse_dynamics
 
@@ -916,6 +916,8 @@ class AbstractPopulationVertex(
 
         If template is None, then a dictionary containing the template context\
         will be returned.
+
+        :rtype: dict(str, ...)
         """
         parameters = dict()
         for parameter_name in self.__pynn_model.default_parameters:
@@ -942,8 +944,7 @@ class AbstractPopulationVertex(
         """ True if the synapses of a particular slice of this population \
             should be generated on the machine.
 
-        :param vertex_slice:
-        :type vertex_slice: ~pacman.model.graphs.common.Slice
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
         """
         return self.__synapse_manager.gen_on_machine(vertex_slice)
 

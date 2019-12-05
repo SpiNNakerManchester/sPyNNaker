@@ -25,11 +25,11 @@ class ExternalCochleaDevice(
     def __init__(
             self, n_neurons, spinnaker_link, label=None, board_address=None):
         """
-        :param n_neurons: Number of neurons
-        :param spinnaker_link: \
+        :param int n_neurons: Number of neurons
+        :param int spinnaker_link:
             The SpiNNaker link to which the cochlea is connected
-        :param label:
-        :param board_address:
+        :param str label:
+        :param str board_address:
         """
         super(ExternalCochleaDevice, self).__init__(
             n_atoms=n_neurons, spinnaker_link_id=spinnaker_link,

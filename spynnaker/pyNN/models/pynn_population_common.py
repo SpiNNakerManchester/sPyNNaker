@@ -69,24 +69,23 @@ class PyNNPopulationCommon(object):
             structure, initial_values, additional_parameters=None):
         """
         :param spinnaker_control: The simulator engine core.
-        :type spinnaker_control: \
+        :type spinnaker_control:
             ~spinn_front_end_common.interface.abstract_spinnaker_base.AbstractSpinnakerBase
         :param size: The size of the population; external devices may use None
         :type size: int or float or None
         :param label: The label for the population, or None for a default
         :type label: str or None
-        :param constraints: \
+        :param list(~pacman.model.constraints.AbstractConstraint) constraints:
             How do we constrain where to put things on SpiNNaker
-        :type constraints: list(~pacman.model.constraints.AbstractConstraint)
         :param model: What neuron model is being run by this population
-        :type model: \
-            ~spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel or \
+        :type model:
+            ~spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel or
             ~pacman.model.graphs.application.ApplicationVertex
         :param structure: How the neurons are arranged in space
         :type structure: ~pyNN.space.BaseStructure or None
         :param initial_values: Initialisation for model variables.
         :type initial_values: dict(str, Any) or None
-        :param additional_parameters: \
+        :param additional_parameters:
             Any extra parameters to pass to the model's vertex creation \
             function.
         :type additional_parameters: dict(str, Any) or None
@@ -239,10 +238,8 @@ class PyNNPopulationCommon(object):
         :param parameter_names: Name of parameter. This is either a single\
             string or a list of strings
         :type parameter_names: str or iterable(str)
-        :param gather: pointless on sPyNNaker
-        :type gather: bool
-        :param simplify: ignored
-        :type simplify: bool
+        :param bool gather: pointless on sPyNNaker
+        :param bool simplify: ignored
         :return: A single list of values (or possibly a single value) if\
             paramter_names is a string, or a dict of these if parameter names\
             is a list.
@@ -417,8 +414,7 @@ class PyNNPopulationCommon(object):
 
         :param parameter: the parameter to set
         :type parameter: str or dict(str, Any)
-        :param value: the value of the parameter to set.
-        :type value: Any
+        :param Any value: the value of the parameter to set.
         """
         self._set_check(parameter, value)
 
@@ -443,10 +439,13 @@ class PyNNPopulationCommon(object):
             p.set("tau_m", 20.0).
             p.set({'tau_m':20, 'v_rest':-65})
 
-        :param selector: See RangedList.set_value_by_selector as this is just \
-            a pass through method
+        :param selector:
+            See :py:meth:`RangedList.set_value_by_selector` as this is just a
+            pass through method
         :param parameter: the parameter to set
+        :type parameter: str or dict(str, float or int)
         :param value: the value of the parameter to set.
+        :type value: float or int
         """
         self._set_check(parameter, value)
 
@@ -544,12 +543,9 @@ class PyNNPopulationCommon(object):
     def add_placement_constraint(self, x, y, p=None):
         """ Add a placement constraint
 
-        :param x: The x-coordinate of the placement constraint
-        :type x: int
-        :param y: The y-coordinate of the placement constraint
-        :type y: int
-        :param p: The processor ID of the placement constraint (optional)
-        :type p: int
+        :param int x: The x-coordinate of the placement constraint
+        :param int y: The y-coordinate of the placement constraint
+        :param int p: The processor ID of the placement constraint (optional)
         """
         globals_variables.get_simulator().verify_not_running()
         self.__vertex.add_constraint(ChipAndCoreConstraint(x, y, p))

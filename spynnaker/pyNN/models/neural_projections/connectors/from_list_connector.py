@@ -60,12 +60,9 @@ class FromListConnector(AbstractConnector):
             Additional items per synapse are acceptable but all synapses\
             should have the same number of items.
         :type conn_list: ~numpy.ndarray or list(tuple(int,int,...))
-        :param safe:
-        :type safe: bool
-        :param callback: Ignored
-        :type callback: callable
-        :param verbose:
-        :type verbose: bool
+        :param bool safe:
+        :param callable callback: Ignored
+        :param bool verbose:
         :param column_names: If not None, must have same length as number of \
             extra columns in ``conn_list`` (i.e., after the first two).
         :type column_names: None or list(str)

@@ -34,23 +34,15 @@ class AbstractSynapseDynamicsStructural(object):
             routing_info, synapse_indices):
         """ Write structural plasticity parameters
 
-        :param spec:
-        :type spec: ~data_specification.DataSpecificationGenerator
-        :param region: region ID
-        :type region: int
-        :param machine_time_step:
-        :type machine_time_step: int
-        :param weight_scales:
-        :type weight_scales: ~numpy.ndarray?
-        :param application_graph:
-        :type application_graph: \
-            ~pacman.model.graphs.application.ApplicationGraph
-        :param app_vertex:
-        :type app_vertex: AbstractPopulationVertex
-        :param post_slice:
-        :type post_slice: ~pacman.mode.graphs.common.Slice
-        :param routing_info:
-        :type routing_info: ~pacman.model.routing_info.RoutingInfo
+        :param ~data_specification.DataSpecificationGenerator spec:
+        :param int region: region ID
+        :param int machine_time_step:
+        :param ~numpy.ndarray? weight_scales:
+        :param ~pacman.model.graphs.application.ApplicationGraph\
+                application_graph:
+        :param AbstractPopulationVertex app_vertex:
+        :param ~pacman.mode.graphs.common.Slice post_slice:
+        :param ~pacman.model.routing_info.RoutingInfo routing_info:
         :param synapse_indices:
         :type synapse_indices: dict(tuple(SynapseInformation, int, int), int)
         """
@@ -61,16 +53,11 @@ class AbstractSynapseDynamicsStructural(object):
             machine_edge):
         """ Set connections for structural plasticity
 
-        :param connections:
-        :type connections: ~numpy.ndarray?
-        :param post_vertex_slice:
-        :type post_vertex_slice: ~pacman.mode.graphs.common.Slice
-        :param app_edge:
-        :type app_edge: ProjectionApplicationEdge
-        :param synapse_info:
-        :type synapse_info: SynapseInformation
-        :param machine_edge:
-        :type machine_edge: ProjectionMachineEdge
+        :param ~numpy.ndarray? connections:
+        :param ~pacman.mode.graphs.common.Slice post_vertex_slice:
+        :param ProjectionApplicationEdge app_edge:
+        :param SynapseInformation synapse_info:
+        :param ProjectionMachineEdge machine_edge:
         """
 
     @abstractproperty

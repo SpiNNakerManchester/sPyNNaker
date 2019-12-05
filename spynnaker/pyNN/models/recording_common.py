@@ -39,7 +39,7 @@ class RecordingCommon(object):
     def __init__(self, population):
         """
         :param population: the population to record for
-        :type population: \
+        :type population:
             ~spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon
         """
 

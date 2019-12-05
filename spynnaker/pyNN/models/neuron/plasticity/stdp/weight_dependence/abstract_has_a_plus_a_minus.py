@@ -32,10 +32,8 @@ class AbstractHasAPlusAMinus(with_metaclass(AbstractBase, object)):
     def set_a_plus_a_minus(self, a_plus, a_minus):
         """ Set the values of :math:`A^+` and :math:`A^-`.
 
-        :param a_plus: :math:`A^+`
-        :type a_plus: float
-        :param a_minus: :math:`A^-`
-        :type a_minus: float
+        :param float a_plus: :math:`A^+`
+        :param float a_minus: :math:`A^-`
         """
         self.__a_plus = a_plus
         self.__a_minus = a_minus

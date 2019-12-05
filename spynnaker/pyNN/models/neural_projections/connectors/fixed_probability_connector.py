@@ -37,21 +37,17 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
             self, p_connect, allow_self_connections=True, safe=True,
             callback=None, verbose=False, rng=None):
         """
-        :param p_connect:
+        :param float p_connect:
             a float between zero and one. Each potential connection is created\
             with this probability.
-        :type p_connect: float
-        :param allow_self_connections:
+        :param bool allow_self_connections:
             if the connector is used to connect a Population to itself, this\
             flag determines whether a neuron is allowed to connect to itself,\
             or only to other neurons in the Population.
-        :type allow_self_connections: bool
-        :type safe: bool
-        :param callback: Ignored
-        :type callback: callable
-        :param verbose:
-        :type verbose: bool
-        :param rng: \
+        :param bool safe:
+        :param callable callback: Ignored
+        :param bool verbose:
+        :param rng:
             Seeded random number generator, or None to make one when needed
         :type rng: ~pyNN.random.NumpyRNG or None
         """

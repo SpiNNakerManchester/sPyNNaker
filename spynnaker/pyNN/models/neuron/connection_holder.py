@@ -56,29 +56,26 @@ class ConnectionHolder(object):
         """
         :param data_items_to_return: A list of data fields to be returned
         :type data_items_to_return: list(int) or tuple(int) or None
-        :param as_list:\
-            True if the data will be returned as a list, False if it is to be\
+        :param bool as_list:
+            True if the data will be returned as a list, False if it is to be
             returned as a matrix (or series of matrices)
-        :type as_list: bool
-        :param n_pre_atoms: The number of atoms in the pre-vertex
-        :type n_pre_atoms: int
-        :param n_post_atoms: The number of atoms in the post-vertex
-        :type n_post_atoms: int
-        :param connections:\
-            Any initial connections, as a numpy structured array of\
+        :param int n_pre_atoms: The number of atoms in the pre-vertex
+        :param int n_post_atoms: The number of atoms in the post-vertex
+        :param connections:
+            Any initial connections, as a numpy structured array of
             source, target, weight and delay
         :type connections: list(~numpy.ndarray) or None
-        :param fixed_values:\
-            A list of tuples of field names and fixed values to be appended\
-            to the other fields per connection, formatted as\
-            [(field_name, value), ...].
-            Note that if the field is to be returned, the name must also\
-            appear in data_items_to_return, which determines the order of\
+        :param fixed_values:
+            A list of tuples of field names and fixed values to be appended
+            to the other fields per connection, formatted as
+            `[(field_name, value), ...]`.
+            Note that if the field is to be returned, the name must also
+            appear in data_items_to_return, which determines the order of
             items in the result
         :type fixed_values: list(tuple(str,int)) or None
-        :param notify:\
-            A callback to call when the connections have all been added.\
-            This should accept a single parameter, which will contain the\
+        :param notify:
+            A callback to call when the connections have all been added.
+            This should accept a single parameter, which will contain the
             data requested
         :type notify: callable(ConnectionHolder, None) or None
         """
@@ -95,10 +92,9 @@ class ConnectionHolder(object):
     def add_connections(self, connections):
         """ Add connections to the holder to be returned
 
-        :param connections:\
-            The connection to add, as a numpy structured array of\
+        :param ~numpy.ndarray connections:
+            The connection to add, as a numpy structured array of
             source, target, weight and delay
-        :type connections: ~numpy.ndarray
         """
         if self.__connections is None:
             self.__connections = list()

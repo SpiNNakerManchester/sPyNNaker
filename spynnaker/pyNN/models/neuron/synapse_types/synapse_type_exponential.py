@@ -41,14 +41,10 @@ class SynapseTypeExponential(AbstractSynapseType):
 
     def __init__(self, tau_syn_E, tau_syn_I, isyn_exc, isyn_inh):
         r"""
-        :param tau_syn_E: :math:`\tau^{syn}_e`
-        :type tau_syn_E: float
-        :param tau_syn_I: :math:`\tau^{syn}_i`
-        :type tau_syn_I: float
-        :param isyn_exc: :math:`I^{syn}_e`
-        :type isyn_exc: float
-        :param isyn_inh: :math:`I^{syn}_i`
-        :type isyn_inh: float
+        :param float tau_syn_E: :math:`\tau^{syn}_e`
+        :param float tau_syn_I: :math:`\tau^{syn}_i`
+        :param float isyn_exc: :math:`I^{syn}_e`
+        :param float isyn_inh: :math:`I^{syn}_i`
         """
         super(SynapseTypeExponential, self).__init__([
             DataType.U032,    # decay_E
@@ -88,8 +84,7 @@ class SynapseTypeExponential(AbstractSynapseType):
     @overrides(AbstractSynapseType.get_values, additional_arguments={'ts'})
     def get_values(self, parameters, state_variables, vertex_slice, ts):
         """
-        :param ts: machine time step
-        :type ts: int
+        :param int ts: machine time step
         """
         # pylint: disable=arguments-differ
 

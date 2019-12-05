@@ -51,14 +51,14 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
             post_sample_steps, post_start_coords, safe, verbose,
             callback=None):
         """
-        :param shape_pre:\
+        :param shape_pre:
             2D shape of the pre population (rows/height, cols/width, usually \
             the input image shape)
         :type shape_pre: list(int) or tuple(int,int)
-        :param shape_post:\
+        :param shape_post:
             2D shape of the post population (rows/height, cols/width)
         :type shape_post: list(int) or tuple(int,int)
-        :param shape_kernel:\
+        :param shape_kernel:
             2D shape of the kernel (rows/height, cols/width)
         :type shape_kernel: list(int) or tuple(int,int)
         :param weight_kernel: (optional)\

@@ -88,19 +88,18 @@ class SynapticManager(object):
     def __init__(self, n_synapse_types, ring_buffer_sigma, spikes_per_second,
                  config, population_table_type=None, synapse_io=None):
         """
-        :param n_synapse_types: number of synapse types on a neuron (e.g., 2 \
-            for excitatory and inhibitory)
-        :type n_synapse_types: int
-        :param ring_buffer_sigma: \
-            How many SD above the mean to go for upper bound; a\
-            good starting choice is 5.0. Given length of simulation we can\
+        :param int n_synapse_types:
+            number of synapse types on a neuron (e.g., 2 for excitatory and
+            inhibitory)
+        :param ring_buffer_sigma:
+            How many SD above the mean to go for upper bound; a
+            good starting choice is 5.0. Given length of simulation we can
             set this for approximate number of saturation events.
         :type ring_buffer_sigma: float or None
         :param spikes_per_second: Estimated spikes per second
         :type spikes_per_second: float or None
-        :param config: The system configuration
-        :type config: configparser.RawConfigParser
-        :param population_table_type: \
+        :param configparser.RawConfigParser config: The system configuration
+        :param population_table_type:
             What type of master population table is used
         :type population_table_type: AbstractMasterPopTableFactory or None
         :param synapse_io: How IO for synapses is performed
@@ -231,12 +230,9 @@ class SynapticManager(object):
     def add_pre_run_connection_holder(
             self, connection_holder, edge, synapse_info):
         """
-        :param connection_holder:
-        :type connection_holder: ConnectionHolder
-        :param edge:
-        :type edge: ProjectionApplicationEdge
-        :param synapse_info:
-        :type synapse_info: SynapseInformation
+        :param ConnectionHolder connection_holder:
+        :param ProjectionApplicationEdge edge:
+        :param SynapseInformation synapse_info:
         """
         self.__pre_run_connection_holders[edge, synapse_info].append(
             connection_holder)
@@ -378,15 +374,11 @@ class SynapticManager(object):
             self, vertex_slice, machine_time_step, application_graph,
             app_vertex):
         """
-        :param vertex_slice:
-        :type vertex_slice: ~pacman.models.common.Slice
-        :param machine_time_step:
-        :type machine_time_step: int
-        :param application_graph:
-        :type application_graph: \
-            ~pacman.models.graphs.application.ApplicationGraph
-        :param app_vertex:
-        :type app_vertex: AbstractPopulationVertex
+        :param ~pacman.models.common.Slice vertex_slice:
+        :param int machine_time_step:
+        :param ~pacman.models.graphs.application.ApplicationGraph \
+                application_graph:
+        :param AbstractPopulationVertex app_vertex:
         :rtype: int
         """
         in_edges = application_graph.get_edges_ending_at_vertex(app_vertex)
@@ -1009,27 +1001,24 @@ class SynapticManager(object):
             placement, machine_graph, application_graph, routing_info,
             graph_mapper, weight_scale, machine_time_step):
         """
-        :param spec: The data specification to write to
-        :type spec: ~data_specification.DataSpecificationGenerator
-        :param application_vertex: The vertex owning the synapses
-        :type application_vertex: AbstractPopulationVertex
-        :param post_vertex_slice: The part of the vertex we're dealing with
-        :type post_vertex_slice: ~pacman.model.graphs.common.Slice
-        :param machine_vertex: The machine vertex
-        :type machine_vertex: PopulationMachineVertex
-        :param placement: Where the vertex is placed
-        :type placement: ~pacman.model.placements.Placement
-        :param machine_graph: The graph containing the machine vertex
-        :type machine_graph: ~pacman.model.graphs.machine.MachineGraph
-        :param application_graph: The graph containing the application vertex
-        :type application_graph: \
-            ~pacman.model.graphs.application.ApplicationGraph
-        :param routing_info: How messages are routed
-        :type routing_info: ~pacman.model.routing_info.RoutingInfo
-        :param weight_scale: How to scale the weights of the synapses
-        :type weight_scale: float
-        :param machine_time_step:
-        :type machine_time_step: int
+        :param ~data_specification.DataSpecificationGenerator spec:
+            The data specification to write to
+        :param AbstractPopulationVertex application_vertex:
+            The vertex owning the synapses
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+            The part of the vertex we're dealing with
+        :param PopulationMachineVertex machine_vertex: The machine vertex
+        :param ~pacman.model.placements.Placement placement:
+            Where the vertex is placed
+        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
+            The graph containing the machine vertex
+        :param ~pacman.model.graphs.application.ApplicationGraph \
+                application_graph:
+            The graph containing the application vertex
+        :param ~pacman.model.routing_info.RoutingInfo routing_info:
+            How messages are routed
+        :param float weight_scale: How to scale the weights of the synapses
+        :param int machine_time_step:
         """
         # Create an index of delay keys into this vertex
         for m_edge in machine_graph.get_edges_ending_at_vertex(machine_vertex):
@@ -1100,46 +1089,42 @@ class SynapticManager(object):
             monitor_placement=None, monitor_cores=None,
             handle_time_out_configuration=True, fixed_routes=None):
         """
-        :param transceiver: How to talk to the machine
-        :type transceiver: ~spinnman.Transceiver
-        :param placement: Where on the machine are we talking to?
-        :type placement: ~pacman.model.placements.Placement
-        :param machine_edge: What edge's connections are we talking about?
-        :type machine_edge: ProjectionMachineEdge
-        :param routing_infos: Where did the edge go?
-        :type routing_infos: ~pacman.model.routing_info.RoutingInfo
-        :param synapse_info: What do we know about the edge's synapses?
-        :type synapse_info: SynapseInformation
-        :param machine_time_step: How fast the clock ticks
-        :type machine_time_step: int
-        :param using_extra_monitor_cores: \
+        :param ~spinnman.Transceiver transceiver: How to talk to the machine
+        :param ~pacman.model.placements.Placement placement:
+            Where on the machine are we talking to?
+        :param ProjectionMachineEdge machine_edge:
+            What edge's connections are we talking about?
+        :param ~pacman.model.routing_info.RoutingInfo routing_infos:
+            Where did the edge go?
+        :param SynapseInformation synapse_info:
+            What do we know about the edge's synapses?
+        :param int machine_time_step: How fast the clock ticks
+        :param bool using_extra_monitor_cores:
             Are we to use the fast download protocol?
-        :type using_extra_monitor_cores: bool
-        :param placements: Where are all the vertices? \
+        :param placements: Where are all the vertices?
             Must not be ``None`` if ``using_extra_monitor_cores`` is true.
         :type placements: ~pacman.model.placements.Placements or None
-        :param monitor_api: How do we talk the fast protocol? \
+        :param monitor_api: How do we talk the fast protocol?
             Must not be ``None`` if ``using_extra_monitor_cores`` is true.
-        :type monitor_api: \
-            ~spinn_front_end_common.utility_models.DataSpeedUpPacketGatherMachineVertex\
+        :type monitor_api:
+            ~spinn_front_end_common.utility_models.DataSpeedUpPacketGatherMachineVertex
             or None
-        :param monitor_placement: Where is the master monitor? \
+        :param monitor_placement: Where is the master monitor?
             Must not be ``None`` if ``using_extra_monitor_cores`` is true.
         :type monitor_placement: ~pacman.model.placements.Placement or None
-        :param monitor_cores: Where are all the monitors? \
+        :param monitor_cores: Where are all the monitors?
             Must not be ``None`` if ``using_extra_monitor_cores`` is true.
-        :type monitor_cores: \
-            list(~spinn_front_end_common.utility_models.ExtraMonitorSupportMachineVertex)\
+        :type monitor_cores:
+            list(~spinn_front_end_common.utility_models.ExtraMonitorSupportMachineVertex)
             or None
-        :param handle_time_out_configuration: \
-            Should we reconfigure the on-chip network to not time out? \
+        :param bool handle_time_out_configuration:
+            Should we reconfigure the on-chip network to not time out?
             (Should be true under all normal circumstances.)
-        :type handle_time_out_configuration: bool
-        :param fixed_routes: \
-            What is the planned configuration of the Fixed Route packet \
-            routing? \
+        :param fixed_routes:
+            What is the planned configuration of the Fixed Route packet
+            routing?
             Must not be ``None`` if ``using_extra_monitor_cores`` is true.
-        :type fixed_routes: \
+        :type fixed_routes:
             dict(tuple(int,int),~spinn_machine.FixedRouteEntry) or None
         """
         app_edge = graph_mapper.get_application_edge(machine_edge)
@@ -1323,8 +1308,8 @@ class SynapticManager(object):
         """ Write the data spec for the synapse expander
 
         :param spec: The specification to write to
-        :param post_vertex_slice: The slice of the vertex being written
-        :type post_vertex_slice: ~pacman.models.common.Slice
+        :param ~pacman.models.common.Slice post_vertex_slice:
+            The slice of the vertex being written
         :param weight_scales: scaling of weights on each synapse
         """
         if not generator_data:
@@ -1358,8 +1343,7 @@ class SynapticManager(object):
     def gen_on_machine(self, vertex_slice):
         """ True if the synapses should be generated on the machine
 
-        :param vertex_slice:
-        :type vertex_slice: ~pacman.models.common.Slice
+        :param ~pacman.models.common.Slice vertex_slice:
         :rtype: bool
         """
         key = (vertex_slice.lo_atom, vertex_slice.hi_atom)

@@ -82,13 +82,13 @@ class MunichRetinaDevice(
             polarity=default_parameters['polarity'],
             board_address=default_parameters['board_address']):
         """
-        :param retina_key:
-        :param spinnaker_link_id: \
+        :param int retina_key:
+        :param int spinnaker_link_id:
             The SpiNNaker link to which the retina is connected
-        :param position: LEFT or RIGHT
-        :param label:
-        :param polarity: UP, DOWN or MERGED
-        :param board_address:
+        :param str position: ``LEFT`` or ``RIGHT``
+        :param str label:
+        :param str polarity: ``UP``, ``DOWN`` or ``MERGED``
+        :param str board_address:
         """
         # pylint: disable=too-many-arguments
         if polarity is None:

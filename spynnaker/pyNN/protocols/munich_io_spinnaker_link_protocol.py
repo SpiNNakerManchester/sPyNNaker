@@ -291,10 +291,12 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
     def __init__(self, mode, instance_key=None, uart_id=0):
         """
-
-        :param mode: The mode of operation of the protocol
+        :param ~spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES \
+                mode:
+            The mode of operation of the protocol
         :param instance_key: The optional instance key to use
-        :param uart_id: The ID of the UART when needed
+        :type instance_key: int or None
+        :param int uart_id: The ID of the UART when needed
         """
         self.__mode = mode
 
@@ -313,10 +315,16 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
     @property
     def mode(self):
+        """
+        :rtype: ~spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES
+        """
         return self.__mode
 
     @property
     def uart_id(self):
+        """
+        :rtype: int
+        """
         return self.__uart_id
 
     @staticmethod
@@ -328,6 +336,8 @@ class MunichIoSpiNNakerLinkProtocol(object):
     @property
     def instance_key(self):
         """ The key of this instance of the protocol
+
+        :rtype: int
         """
         return self.__instance_key
 
@@ -823,12 +833,12 @@ class MunichIoSpiNNakerLinkProtocol(object):
             retina_payload=None, time=None):
         """ Set the retina transmission key
 
-        :param retina_key: the new key for the retina
-        :type retina_key: RetinaKey
-        :param retina_payload: \
+        :param RetinaKey retina_key: the new key for the retina
+        :param retina_payload:
             the new payload for the set retina key command packet
         :type retina_payload: RetinaPayload or None
         :param time: when to transmit this packet
+        :type time: int or float or None
         :return: the command to send
         :rtype: ~spinn_front_end_common.utility_models.MultiCastCommand
         """

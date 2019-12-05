@@ -25,14 +25,10 @@ class DelayedApplicationEdge(ApplicationEdge):
     def __init__(
             self, pre_vertex, post_vertex, synapse_information, label=None):
         """
-        :param pre_vertex:
-        :type pre_vertex: DelayExtensionVertex
-        :param post_vertex:
-        :type post_vertex: AbstractPopulationVertex
-        :param synapse_information:
-        :type synapse_information: SynapseInformation
-        :param label:
-        :type label: str
+        :param DelayExtensionVertex pre_vertex:
+        :param AbstractPopulationVertex post_vertex:
+        :param SynapseInformation synapse_information:
+        :param str label:
         """
         super(DelayedApplicationEdge, self).__init__(
             pre_vertex, post_vertex, label=label)
@@ -47,8 +43,7 @@ class DelayedApplicationEdge(ApplicationEdge):
 
     def add_synapse_information(self, synapse_information):
         """
-        :param synapse_information:
-        :type synapse_information: SynapseInformation
+        :param SynapseInformation synapse_information:
         """
         self.__synapse_information.append(synapse_information)
 

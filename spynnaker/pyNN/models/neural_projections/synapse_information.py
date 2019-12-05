@@ -37,22 +37,19 @@ class SynapseInformation(object):
                  synapse_dynamics, synapse_type,
                  weights=None, delays=None):
         """
-        :param connector: The connector connected to the synapse
-        :type connector: AbstractConnector
-        :param pre_population: The population sending spikes to the synapse
-        :type pre_population: PyNNPopulationCommon
-        :param post_population: The population hosting the synapse
-        :type post_population: PyNNPopulationCommon
-        :param prepop_is_view: Whether the prepopulation is a view
-        :type prepop_is_view: bool
-        :param postpop_is_view: Whether the postpopulation is a view
-        :type postpop_is_view: bool
+        :param AbstractConnector connector:
+            The connector connected to the synapse
+        :param PyNNPopulationCommon pre_population:
+            The population sending spikes to the synapse
+        :param PyNNPopulationCommon post_population:
+            The population hosting the synapse
+        :param bool prepop_is_view: Whether the prepopulation is a view
+        :param bool postpop_is_view: Whether the postpopulation is a view
         :param rng: Seeded random number generator
         :type rng: ~pyNN.random.NumpyRNG or None
-        :param synapse_dynamics: The dynamic behaviour of the synapse
-        :type synapse_dynamics: AbstractSynapseDynamics
-        :param synapse_type: The type of the synapse
-        :type synapse_type: AbstractSynapseType
+        :param AbstractSynapseDynamics synapse_dynamics:
+            The dynamic behaviour of the synapse
+        :param AbstractSynapseType synapse_type: The type of the synapse
         :param weights: The synaptic weights
         :type weights: float or list(float) or ~numpy.ndarray(float) or None
         :param delays: The total synaptic delays

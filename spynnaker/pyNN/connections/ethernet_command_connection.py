@@ -31,18 +31,18 @@ class EthernetCommandConnection(DatabaseConnection):
             self, translator, command_containers=None, local_host=None,
             local_port=NOTIFY_PORT):
         """
-        :param translator:\
+        :param translator:
             A translator of multicast commands to device commands
-        :type translator: \
+        :type translator:
             ~spynnaker.pyNN.external_devices_models.AbstractEthernetTranslator
-        :param command_containers:\
+        :param command_containers:
             A list of vertices that have commands to be sent at the start \
             and end of simulation
-        :type command_containers: \
+        :type command_containers:
             list(~spinn_front_end_common.abstract_models.AbstractSendMeMulticastCommandsVertex)
-        :param local_host:\
+        :param str local_host:
             The optional host to listen on for the start/resume message
-        :param local_port:\
+        :param int local_port:
             The optional port to listen on for the stop/pause message
         """
 
@@ -60,10 +60,10 @@ class EthernetCommandConnection(DatabaseConnection):
     def add_command_container(self, command_container):
         """ Add a command container.
 
-        :param command_container:\
+        :param command_container:
             A vertex that has commands to be sent at the start and end of \
             simulation
-        :type command_container: \
+        :type command_container:
             ~spinn_front_end_common.abstract_models.AbstractSendMeMulticastCommandsVertex
         """
         if not isinstance(

@@ -47,26 +47,21 @@ class IndexBasedProbabilityConnector(AbstractConnector):
             self, index_expression, allow_self_connections=True, rng=None,
             safe=True, callback=None, verbose=False):
         """
-        :param index_expression:
+        :param str index_expression:
             the right-hand side of a valid python expression for
             probability, involving the indices of the pre and post populations,
             that can be parsed by eval(), that computes a probability dist.
-        :type index_expression: str
-        :param allow_self_connections:
+        :param bool allow_self_connections:
             if the connector is used to connect a
             Population to itself, this flag determines whether a neuron is
             allowed to connect to itself, or only to other neurons in the
             Population.
-        :type allow_self_connections: bool
-        :param rng: \
+        :param rng:
             Seeded random number generator, or None to make one when needed
         :type rng: ~pyNN.random.NumpyRNG or None
-        :param safe:
-        :type safe: bool
-        :param callback: Ignored
-        :type callback: callable
-        :param verbose:
-        :type verbose: bool
+        :param bool safe:
+        :param callable callback: Ignored
+        :param bool verbose:
         """
         super(IndexBasedProbabilityConnector, self).__init__(
             safe, callback, verbose)

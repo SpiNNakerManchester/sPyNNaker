@@ -92,8 +92,7 @@ class AbstractPyNNModel(object):
     def has_parameter(cls, name):
         """ Determine if the model has a parameter with the given name
 
-        :param name: The name of the parameter to check for
-        :type name: str
+        :param str name: The name of the parameter to check for
         :rtype: bool
         """
         return name in cls.default_parameters
@@ -111,13 +110,11 @@ class AbstractPyNNModel(object):
     def create_vertex(self, n_neurons, label, constraints):
         """ Create a vertex for a population of the model
 
-        :param n_neurons: The number of neurons in the population
-        :type n_neurons: int
-        :param label: The label to give to the vertex
-        :type label: str
-        :param constraints:\
+        :param int n_neurons: The number of neurons in the population
+        :param str label: The label to give to the vertex
+        :param constraints:
             A list of constraints to give to the vertex, or None
-        :type constraints: \
+        :type constraints:
             list(~pacman.model.constraints.AbstractConstraint) or None
         :return: An application vertex for the population
         :rtype: ~pacman.model.graphs.application.ApplicationVertex

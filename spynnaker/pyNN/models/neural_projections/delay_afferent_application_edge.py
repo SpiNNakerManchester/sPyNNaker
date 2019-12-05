@@ -23,12 +23,9 @@ class DelayAfferentApplicationEdge(ApplicationEdge):
 
     def __init__(self, prevertex, delayvertex, label=None):
         """
-        :param prevertex:
-        :type prevertex: AbstractPopulationVertex
-        :param delayvertex:
-        :type delayvertex: DelayExtensionVertex
-        :param label:
-        :type label: str
+        :param AbstractPopulationVertex prevertex:
+        :param DelayExtensionVertex delayvertex:
+        :param str label:
         """
         super(DelayAfferentApplicationEdge, self).__init__(
             prevertex, delayvertex, label=label)

@@ -27,8 +27,7 @@ class AbstractAcceptsIncomingSynapses(object):
     def get_synapse_id_by_target(self, target):
         """ Get the ID of a synapse given the name.
 
-        :param target: The name of the synapse
-        :type target: str
+        :param str target: The name of the synapse
         :rtype: int
         """
 
@@ -36,16 +35,14 @@ class AbstractAcceptsIncomingSynapses(object):
     def set_synapse_dynamics(self, synapse_dynamics):
         """ Set the synapse dynamics of this vertex.
 
-        :param synapse_dynamics:
-        :type synapse_dynamics: AbstractSynapseDynamics
+        :param AbstractSynapseDynamics synapse_dynamics:
         """
 
     @abstractmethod
     def get_maximum_delay_supported_in_ms(self, machine_time_step):
         """ Get the maximum delay supported by this vertex.
 
-        :param machine_time_step: microseconds
-        :type machine_time_step: int
+        :param int machine_time_step: microseconds
         :rtype: int
         """
 
@@ -55,12 +52,9 @@ class AbstractAcceptsIncomingSynapses(object):
         """ Add a connection holder to the vertex to be filled in when the\
             connections are actually generated.
 
-        :param connection_holder:
-        :type connection_holder: ConnectionHolder
-        :param projection_edge:
-        :type projection_edge: ProjectionApplicationEdge
-        :param synapse_information:
-        :type synapse_information: SynapseInformation
+        :param ConnectionHolder connection_holder:
+        :param ProjectionApplicationEdge projection_edge:
+        :param SynapseInformation synapse_information:
         """
 
     @abstractmethod
@@ -73,20 +67,13 @@ class AbstractAcceptsIncomingSynapses(object):
         # pylint: disable=too-many-arguments
         """ Get the connections from the machine post-run.
 
-        :param transceiver:
-        :type transceiver: ~spinnman.Transceiver
-        :param placement:
-        :type placement: ~pacman.model.placements.Placement
-        :param edge:
-        :type edge: ProjectionMachineEdge
-        :param routing_infos:
-        :type routing_infos: ~pacman.model.routing_info.RoutingInfo
-        :param synapse_information:
-        :type synapse_information: SynapseInformation
-        :param machine_time_step: microseconds
-        :type machine_time_step: int
-        :param using_extra_monitor_cores:
-        :type using_extra_monitor_cores: bool
+        :param ~spinnman.Transceiver transceiver:
+        :param ~pacman.model.placements.Placement placement:
+        :param ProjectionMachineEdge edge:
+        :param ~pacman.model.routing_info.RoutingInfo routing_infos:
+        :param SynapseInformation synapse_information:
+        :param int machine_time_step: microseconds
+        :param bool using_extra_monitor_cores:
         :param placements:
         :type placements: None or ~pacman.model.placements.Placements
         :param monitor_api:
@@ -97,8 +84,7 @@ class AbstractAcceptsIncomingSynapses(object):
         :param monitor_cores:
         :type monitor_cores: None or \
             iterable(~spinn_front_end_common.utility_models.ExtraMonitorSupportMachineVertex)
-        :param handle_time_out_configuration:
-        :type handle_time_out_configuration: bool
+        :param bool handle_time_out_configuration:
         :param fixed_routes:
         :type fixed_routes: None or \
             dict(tuple(int,int),~spinn_machine.FixedRouteEntry)

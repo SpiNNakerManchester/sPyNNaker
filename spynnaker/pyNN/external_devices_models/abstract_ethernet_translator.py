@@ -31,7 +31,7 @@ class AbstractEthernetTranslator(object):
             appropriate messages to the external device.
 
         :param multicast_packet: A received multicast packet
-        :type multicast_packet:\
+        :type multicast_packet:
             ~spinnman.messages.eieio.data_messages.AbstractEIEIODataElement
         :rtype: None
         """

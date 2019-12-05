@@ -148,6 +148,17 @@ class SpikeSourcePoissonVertex(
             max_atoms_per_core, model, rate=None, start=None,
             duration=None, rates=None, starts=None, durations=None,
             max_rate=None):
+        """
+        :param int n_neurons:
+        :param constraints:
+        :param str label:
+        :param float sed:
+        :param int max_atoms_per_core:
+        :param model:
+        :param float rate:
+        :param int start:
+        :param int duration:
+        """
         # pylint: disable=too-many-arguments
         super(SpikeSourcePoissonVertex, self).__init__(
             label, constraints, max_atoms_per_core)
@@ -473,6 +484,7 @@ class SpikeSourcePoissonVertex(
     def n_atoms(self):
         return self.__n_atoms
 
+    @overrides(ApplicationVertex.create_machine_vertex)
     def create_machine_vertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
@@ -499,7 +511,7 @@ class SpikeSourcePoissonVertex(
     def get_rates_bytes(self, vertex_slice):
         """ Gets the size of the Poisson rates in bytes
 
-        :param vertex_slice:
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
         """
         n_rates = sum(len(self.__data["rates"][i]) for i in range(
             vertex_slice.lo_atom, vertex_slice.hi_atom + 1))
@@ -510,8 +522,10 @@ class SpikeSourcePoissonVertex(
         """ Reserve memory regions for Poisson source parameters and output\
             buffer.
 
-        :param spec: the data specification writer
-        :param placement: the location this vertex resides on in the machine
+        :param ~data_specification.DataSpecification spec:
+            the data specification writer
+        :param ~pacman.models.placements.Placement placement:
+            the location this vertex resides on in the machine
         :param graph_mapper: the mapping between app and machine graphs
         :return: None
         """
@@ -542,10 +556,11 @@ class SpikeSourcePoissonVertex(
         """ Allocate space for the Poisson parameters and rates regions as\
             they can be reused for setters after an initial run
 
-        :param placement: the location on machine for this vertex
+        :param ~pacman.models.placements.Placement placement:
+            the location on machine for this vertex
         :param graph_mapper: the mapping between machine and application graphs
-        :param spec: the DSG writer
-        :return:  None
+        :param ~data_specification.DataSpecification spec: the DSG writer
+        :return: None
         """
         spec.reserve_memory_region(
             region=_REGIONS.POISSON_PARAMS_REGION.value,
@@ -560,13 +575,16 @@ class SpikeSourcePoissonVertex(
             vertex_slice, machine_time_step, time_scale_factor):
         """ Generate Parameter data for Poisson spike sources
 
-        :param spec: the data specification writer
-        :param key: the routing key for this vertex
-        :param vertex_slice:\
-            the slice of atoms a machine vertex holds from its application\
+        :param ~data_specification.DataSpecification spec:
+            the data specification writer
+        :param ~pacman.model.graphs.machine.MachineGraph graph:
+        :param ~pacman.model.placements.Placement placement:
+        :param ~pacman.model.routing_info.RoutingInfo routing_info:
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            the slice of atoms a machine vertex holds from its application
             vertex
-        :param machine_time_step: the time between timer tick updates.
-        :param time_scale_factor:\
+        :param int machine_time_step: the time between timer tick updates.
+        :param int time_scale_factor:
             the scaling between machine time step and real time
         """
         # pylint: disable=too-many-arguments, too-many-locals
@@ -670,12 +688,13 @@ class SpikeSourcePoissonVertex(
                              first_machine_time_step):
         """ Generate Rate data for Poisson spike sources
 
-        :param spec: the data specification writer
-        :param vertex_slice:\
-            the slice of atoms a machine vertex holds from its application\
+        :param ~data_specification.DataSpecification spec:
+            the data specification writer
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            the slice of atoms a machine vertex holds from its application
             vertex
-        :param machine_time_step: the time between timer tick updates.
-        :param first_machine_time_step:\
+        :param int machine_time_step: the time between timer tick updates.
+        :param int first_machine_time_step:
             First machine time step to start from the correct index
         """
         spec.comment("\nWriting Rates for {} poisson sources:\n"
@@ -816,6 +835,13 @@ class SpikeSourcePoissonVertex(
     def regenerate_data_specification(
             self, spec, placement, machine_time_step, time_scale_factor,
             graph_mapper, routing_info, graph, first_machine_time_step):
+        """
+        :param int machine_time_step:
+        :param int time_scale_factor:
+        :param ~pacman.model.routing_info.RoutingInfo routing_info:
+        :param ~pacman.model.graphs.machine.MachineGraph graph:
+        :param int first_machine_time_step:
+        """
         # pylint: disable=too-many-arguments, arguments-differ
 
         # reserve the neuron parameters data region
@@ -937,6 +963,14 @@ class SpikeSourcePoissonVertex(
             self, spec, placement, machine_time_step, time_scale_factor,
             graph_mapper, routing_info, data_n_time_steps, graph,
             first_machine_time_step):
+        """
+        :param int machine_time_step:
+        :param int time_scale_factor:
+        :param ~pacman.model.routing_info.RoutingInfo routing_info:
+        :param int data_n_time_steps:
+        :param ~pacman.model.graphs.machine.MachineGraph graph:
+        :param int first_machine_time_step:
+        """
         # pylint: disable=too-many-arguments, arguments-differ
         self.__machine_time_step = machine_time_step
         vertex = placement.vertex
@@ -1017,6 +1051,8 @@ class SpikeSourcePoissonVertex(
 
         If template is None, then a dictionary containing the template context\
         will be returned.
+
+        :rtype: dict(str, ...)
         """
 
         parameters = dict()

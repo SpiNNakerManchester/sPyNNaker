@@ -77,12 +77,9 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
 
     def __init__(self, safe=True, callback=None, verbose=False):
         """
-        :param safe:
-        :type safe: bool
-        :param callback: Ignored
-        :type callback: callable
-        :param verbose:
-        :type verbose: bool
+        :param bool safe:
+        :param callable callback: Ignored
+        :param bool verbose:
         """
         AbstractConnector.__init__(
             self, safe=safe, callback=callback, verbose=verbose)

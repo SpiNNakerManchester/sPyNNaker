@@ -33,8 +33,7 @@ logger = logging.getLogger(__name__)
 def check_directory_exists_and_create_if_not(filename):
     """ Create a parent directory for a file if it doesn't exist
 
-    :param filename: The file whose parent directory is to be created
-    :type filename: str
+    :param str filename: The file whose parent directory is to be created
     """
     directory = os.path.dirname(filename)
     if directory != "" and not os.path.exists(directory):
@@ -45,10 +44,11 @@ def convert_param_to_numpy(param, no_atoms):
     """ Convert parameters into numpy arrays.
 
     :param param: the param to convert
-    :param no_atoms: the number of atoms available for conversion of param
-    :type no_atoms: int
-    :return: the converted param in whatever format it was given
-    :rtype: ~numpy.ndarray
+    :type param: ~pyNN.random.NumpyRNG or int or float or list(int) or
+        list(float) or ~numpy.ndarray
+    :param int no_atoms: the number of atoms available for conversion of param
+    :return: the converted param as an array of floats
+    :rtype: ~numpy.ndarray(float)
     """
 
     # Deal with random distributions by generating values
@@ -79,9 +79,10 @@ def convert_to(value, data_type):
     """ Convert a value to a given data type
 
     :param value: The value to convert
-    :param data_type: The data type to convert to
-    :type data_type: ~data_specification.enums.DataType
+    :param ~data_specification.enums.DataType data_type:
+        The data type to convert to
     :return: The converted data as a numpy data type
+    :rtype: ~numpy.ndarray(int32)
     """
     return numpy.round(data_type.encode_as_int(value)).astype(
         data_type.struct_encoding)
@@ -92,12 +93,9 @@ def read_in_data_from_file(
     """ Read in a file of data values where the values are in a format of:
         <time>\t<atom ID>\t<data value>
 
-    :param file_path: absolute path to a file containing the data
-    :type file_path: str
-    :param min_atom: min neuron ID to which neurons to read in
-    :type min_atom: int
-    :param max_atom: max neuron ID to which neurons to read in
-    :type max_atom: int
+    :param str file_path: absolute path to a file containing the data
+    :param int min_atom: min neuron ID to which neurons to read in
+    :param int max_atom: max neuron ID to which neurons to read in
     :param min_time: min time slot to read neurons values of.
     :type min_time: float or int
     :param max_time: max time slot to read neurons values of.
@@ -134,11 +132,10 @@ def read_in_data_from_file(
 
 def read_spikes_from_file(file_path, min_atom=0, max_atom=float('inf'),
                           min_time=0, max_time=float('inf'), split_value="\t"):
-    """ Read spikes from a file formatted as:\
+    """ Read spikes from a file formatted as:
         <time>\t<neuron ID>
 
-    :param file_path: absolute path to a file containing spike values
-    :type file_path: str
+    :param str file_path: absolute path to a file containing spike values
     :param min_atom: min neuron ID to which neurons to read in
     :type min_atom: int or float
     :param max_atom: max neuron ID to which neurons to read in
@@ -147,9 +144,8 @@ def read_spikes_from_file(file_path, min_atom=0, max_atom=float('inf'),
     :type min_time: float or int
     :param max_time: max time slot to read neurons values of.
     :type max_time: float or int
-    :param split_value: the pattern to split by
-    :type split_value: str
-    :return:\
+    :param str split_value: the pattern to split by
+    :return:
         a numpy array with max_atom elements each of which is a list of\
         spike times.
     :rtype: numpy.ndarray(int, int)
@@ -300,8 +296,7 @@ def check_sampling_interval(sampling_interval):
 def get_n_bits(n_values):
     """ Determine how many bits are required for the given number of values
 
-    :param n_values: the number of values (starting at 0)
-    :type n_values: int
+    :param int n_values: the number of values (starting at 0)
     :return: the number of bits required to express that many values
     :rtype: int
     """

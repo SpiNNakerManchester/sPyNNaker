@@ -32,8 +32,7 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
 
     def __init__(self, model):
         """
-        :param model: The model implementation
-        :type model: AbstractNeuronImpl
+        :param AbstractNeuronImpl model: The model implementation
         """
         self.__model = model
 

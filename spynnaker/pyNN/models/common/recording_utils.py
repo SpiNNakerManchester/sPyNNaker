@@ -31,10 +31,8 @@ def get_recording_region_size_in_bytes(
         n_machine_time_steps, bytes_per_timestep):
     """ Get the size of a recording region in bytes.
 
-    :param n_machine_time_steps:
-    :type n_machine_time_steps: int or None
-    :param bytes_per_timestep:
-    :type bytes_per_timestep: int
+    :param int n_machine_time_steps:
+    :param int bytes_per_timestep:
     """
     if n_machine_time_steps is None:
         raise Exception(
@@ -46,14 +44,11 @@ def get_recording_region_size_in_bytes(
 def get_data(transceiver, placement, region, region_size):
     """ Get the recorded data from a region.
 
-    :param transceiver:
-    :type transceiver: ~spinnman.transceiver.Transceiver
-    :param placement:
-    :type placement: ~pacman.model.placements.Placement
-    :param region:
-    :type region: int
-    :param region_size:
-    :type region_size: int
+    :param ~spinnman.transceiver.Transceiver transceiver:
+    :param ~pacman.model.placements.Placement placement:
+    :param int region:
+    :param int region_size:
+    :rtype: tuple(bytearray, int)
     """
 
     region_base_address = locate_memory_region_for_placement(
@@ -78,12 +73,11 @@ def get_data(transceiver, placement, region, region_size):
 
 
 def pull_off_cached_lists(no_loads, cache_file):
-    """ Extracts numpy based data from a  file
+    """ Extracts numpy based data from a file
 
-    :param no_loads: the number of numpy elements in the file
-    :type no_loads: int
+    :param int no_loads: the number of numpy elements in the file
     :param cache_file: the file to extract from
-    :type cache_file: file
+    :type cache_file: str or file
     :return: The extracted data
     :rtype: ~numpy.ndarray
     """
@@ -132,8 +126,7 @@ def get_buffer_sizes(buffer_max, space_needed, enable_buffered_recording):
 
 def make_missing_string(missing):
     """
-    :param missing:
-    :type missing: iterable(~pacman.model.placements.Placement)
+    :param iterable(~pacman.model.placements.Placement) missing:
     :rtype: str
     """
     missing_str = ""

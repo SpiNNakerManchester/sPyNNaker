@@ -52,29 +52,27 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
             tau_syn_I=5.0, tau_refrac=0.1, i_offset=0.0, v=0.0,
             isyn_exc=0.0, isyn_inh=0.0):
         """
-        :param devices:\
-            The AbstractMulticastControllableDevice instances to be controlled\
+        :param list(AbstractMulticastControllableDevice) devices:
+            The AbstractMulticastControllableDevice instances to be controlled
             by the population
-        :type devices: list(AbstractMulticastControllableDevice)
-        :param create_edges:\
-            True if edges to the devices should be added by this device (set\
+        :param bool create_edges:
+            True if edges to the devices should be added by this device (set
             to False if using the device over Ethernet using a translator)
-        :type create_edges: bool
-        :param translator:\
-            Translator to be used when used for Ethernet communication.  Must\
+        :param translator:
+            Translator to be used when used for Ethernet communication.  Must
             be provided if the device is to be controlled over Ethernet.
         :type translator: AbstractEthernetTranslator or None
-        :param tau_m: (defaulted LIF neuron parameter)
-        :param cm: (defaulted LIF neuron parameter)
-        :param v_rest: (defaulted LIF neuron parameter)
-        :param v_reset: (defaulted LIF neuron parameter)
-        :param tau_syn_E: (defaulted LIF neuron parameter)
-        :param tau_syn_I: (defaulted LIF neuron parameter)
-        :param tau_refrac: (defaulted LIF neuron parameter)
-        :param i_offset: (defaulted LIF neuron parameter)
-        :param v: (defaulted LIF neuron state variable init)
-        :param isyn_exc: (defaulted LIF neuron state variable init)
-        :param isyn_inh: (defaulted LIF neuron state variable init)
+        :param float tau_m: (defaulted LIF neuron parameter)
+        :param float cm: (defaulted LIF neuron parameter)
+        :param float v_rest: (defaulted LIF neuron parameter)
+        :param float v_reset: (defaulted LIF neuron parameter)
+        :param float tau_syn_E: (defaulted LIF neuron parameter)
+        :param float tau_syn_I: (defaulted LIF neuron parameter)
+        :param float tau_refrac: (defaulted LIF neuron parameter)
+        :param float i_offset: (defaulted LIF neuron parameter)
+        :param float v: (defaulted LIF neuron state variable init)
+        :param float isyn_exc: (defaulted LIF neuron state variable init)
+        :param float isyn_inh: (defaulted LIF neuron state variable init)
         """
         # pylint: disable=too-many-arguments, too-many-locals
 

@@ -28,8 +28,7 @@ class AbstractSynapseIO(object):
         """ Get the maximum delay supported by the synapse representation \
             before extensions are required, or None if any delay is supported
 
-        :param machine_time_step:
-        :type machine_time_step: int
+        :param int machine_time_step:
         :rtype: int or None
         """
 
@@ -40,16 +39,11 @@ class AbstractSynapseIO(object):
             undelayed rows in bytes (including header), words (without header)\
             and number of synapses
 
-        :param synapse_info:
-        :type synapse_info: SynapseInformation
-        :param post_vertex_slice:
-        :type post_vertex_slice: ~pacman.model.graphs.common.Slice
-        :param n_delay_stages:
-        :type n_delay_stages: int
-        :param population_table:
-        :type population_table: AbstractMasterPopTableFactory
-        :param machine_time_step:
-        :type machine_time_step: int
+        :param SynapseInformation synapse_info:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param int n_delay_stages:
+        :param AbstractMasterPopTableFactory population_table:
+        :param int machine_time_step:
         :param in_edge:
         :type in_edge: ProjectionApplicationEdge or ProjectionMachineEdge
         :rtype: MaxRowInfo
@@ -65,37 +59,24 @@ class AbstractSynapseIO(object):
         """ Get the synapses as an array of words for non-delayed synapses and\
             an array of words for delayed synapses
 
-        :param synapse_info:
-        :type synapse_info: SynapseInformation
-        :param pre_slices:
-        :type pre_slices: list(~pacman.model.graphs.common.Slice)
-        :param pre_slice_index:
-        :type pre_slice_index: int
-        :param post_slices:
-        :type post_slices: list(~pacman.model.graphs.common.Slice)
-        :param post_slice_index:
-        :type post_slice_index: int
-        :param pre_vertex_slice:
-        :type pre_vertex_slice: ~pacman.model.graphs.common.Slice
-        :param post_vertex_slice:
-        :type post_vertex_slice: ~pacman.model.graphs.common.Slice
-        :param n_delay_stages:
-        :type n_delay_stages: int
-        :param population_table:
-        :type population_table: AbstractMasterPopTableFactory
-        :param n_synapse_types:
-        :type n_synapse_types: int
+        :param SynapseInformation synapse_info:
+        :param list(~pacman.model.graphs.common.Slice) pre_slices:
+        :param int pre_slice_index:
+        :param list(~pacman.model.graphs.common.Slice) post_slices:
+        :param int post_slice_index:
+        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param int n_delay_stages:
+        :param AbstractMasterPopTableFactory population_table:
+        :param int n_synapse_types:
         :param weight_scales:
         :type weight_scales: dict(AbstractSynapseType, float)
-        :param machine_time_step:
-        :type machine_time_step: int
-        :param app_edge:
-        :type app_edge: ProjectionApplicationEdge
-        :param machine_edge:
-        :type machine_edge: ProjectionMachineEdge
-        :return: (row_data, max_row_length, delayed_row_data, \
+        :param int machine_time_step:
+        :param ProjectionApplicationEdge app_edge:
+        :param ProjectionMachineEdge machine_edge:
+        :return: (row_data, max_row_length, delayed_row_data,
             max_delayed_row_length, delayed_source_ids, stages)
-        :rtype: \
+        :rtype:
             tuple(~numpy.ndarray, int, ~numpy.ndarray, int, ~numpy.ndarray, \
             ~numpy.ndarray)
         """
@@ -109,28 +90,20 @@ class AbstractSynapseIO(object):
         """ Read the synapses for a given projection synapse information\
             object out of the given data
 
-        :param synapse_info:
-        :type synapse_info: SynapseInformation
-        :param pre_vertex_slice:
-        :type pre_vertex_slice: ~pacman.model.graphs.common.Slice
-        :param post_vertex_slice:
-        :type post_vertex_slice: ~pacman.model.graphs.common.Slice
-        :param max_row_length:
-        :type max_row_length: int
-        :param delayed_max_row_length:
-        :type delayed_max_row_length: int
-        :param n_synapse_types:
-        :type n_synapse_types: int
+        :param SynapseInformation synapse_info:
+        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param int max_row_length:
+        :param int delayed_max_row_length:
+        :param int n_synapse_types:
         :param weight_scales:
         :type weight_scales: dict(AbstractSynapseType, float)
         :param data:
         :type data: bytes or bytearray or memoryview
         :param delayed_data:
         :type delayed_data: bytes or bytearray or memoryview
-        :param n_delay_stages:
-        :type n_delay_stages: int
-        :param machine_time_step:
-        :type machine_time_step: int
+        :param int n_delay_stages:
+        :param int machine_time_step:
         :return: array with ``weight`` and ``delay`` columns
         :rtype: ~numpy.ndarray
         """
@@ -140,9 +113,7 @@ class AbstractSynapseIO(object):
         """ Get the number of bytes in a block given the max row length and\
             number of rows
 
-        :param max_row_length:
-        :type max_row_length: int
-        :param n_rows:
-        :type n_rows: int
+        :param int max_row_length:
+        :param int n_rows:
         :rtype: int
         """

@@ -20,8 +20,7 @@ def synfire_spike_checker(spikes, nNeurons):
     """
     :param spikes: The spike data to check.
     :type spikes: ~numpy.ndarray or list(~numpy.ndarray)
-    :param nNeurons: The number of neurons.
-    :type nNeurons: int
+    :param int nNeurons: The number of neurons.
     :raises Exception: If there is a problem with the data
     """
     if isinstance(spikes, numpy.ndarray):
@@ -48,13 +47,10 @@ def synfire_multiple_lines_spike_checker(
 
     :param spikes: The spikes
     :type spikes: ~numpy.ndarray or list(~numpy.ndarray)
-    :param nNeurons: The number of neurons.
-    :type nNeurons: int
-    :param lines: Expected number of lines
-    :type lines: int
-    :param wrap_around: \
+    :param int nNeurons: The number of neurons.
+    :param int lines: Expected number of lines
+    :param bool wrap_around:
         If True the lines will wrap around when reaching the last neuron.
-    :type wrap_around: bool
     :raises Exception: If there is a problem with the data
     """
     sorted_spikes = spikes[spikes[:, 1].argsort()]

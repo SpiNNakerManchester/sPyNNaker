@@ -41,13 +41,13 @@ class PushBotEthernetLEDDevice(
         :type led: PushBotLED
         :param protocol: The protocol instance to get commands from
         :type protocol: MunichIoEthernetProtocol
-        :param start_active_time_front:\
+        :param start_active_time_front:
             The "active time" to set for the front LED at the start
-        :param start_active_time_back:\
+        :param start_active_time_back:
             The "active time" to set for the back LED at the start
         :param start_total_period: The "total period" to set at the start
         :param start_frequency: The "frequency" to set at the start
-        :param timesteps_between_send:\
+        :param timesteps_between_send:
             The number of timesteps between sending commands to the device,\
             or None to use the default
         """

@@ -94,8 +94,7 @@ class NeuronRecorder(object):
     def get_neuron_sampling_interval(self, variable):
         """ Return the current sampling interval for this variable
 
-        :param variable: PyNN name of the variable
-        :type variable: str
+        :param str variable: PyNN name of the variable
         :return: Sampling interval in microseconds
         :rtype: float
         """
@@ -108,24 +107,20 @@ class NeuronRecorder(object):
         """ Read a uint32 mapped to time and neuron IDs from the SpiNNaker\
             machine.
 
-        :param label: vertex label
-        :type label: str
+        :param str label: vertex label
         :param buffer_manager: the manager for buffered data
-        :type buffer_manager: \
+        :type buffer_manager:
             ~spinn_front_end_common.interface.buffer_management.BufferManager
-        :param region: the DSG region ID used for this data
-        :type region: int
+        :param int region: the DSG region ID used for this data
         :param placements: the placements object
         :type placements: ~pacman.model.placements.Placements
-        :param graph_mapper: \
+        :param graph_mapper:
             the mapping between application and machine vertices
         :param application_vertex:
-        :type application_vertex: \
+        :type application_vertex:
             ~pacman.model.graphs.application.ApplicationVertex
-        :param variable: PyNN name for the variable (V, gsy_inh etc.)
-        :type variable: str
-        :param n_machine_time_steps:
-        :type n_machine_time_steps: int
+        :param str variable: PyNN name for the variable (V, gsy_inh etc.)
+        :param int n_machine_time_steps:
         :return: (data, recording_indices, sampling_interval)
         :rtype: tuple(~numpy.ndarray,list(int),float)
         """
@@ -206,22 +201,19 @@ class NeuronRecorder(object):
         """ Read a uint32 mapped to time and neuron IDs from the SpiNNaker\
             machine.
 
-        :param label: vertex label
-        :type label: str
+        :param str label: vertex label
         :param buffer_manager: the manager for buffered data
-        :type buffer_manager: \
+        :type buffer_manager:
             ~spinn_front_end_common.interface.buffer_management.BufferManager
-        :param region: the DSG region ID used for this data
-        :type region: int
+        :param int region: the DSG region ID used for this data
         :param placements: the placements object
         :type placements: ~pacman.model.placements.Placements
-        :param graph_mapper: \
+        :param graph_mapper:
             the mapping between application and machine vertices
         :param application_vertex:
-        :type application_vertex: \
+        :type application_vertex:
             ~pacman.model.graphs.application.ApplicationVertex
-        :param machine_time_step: microseconds
-        :type machine_time_step: int
+        :param int machine_time_step: microseconds
         :return:
         :rtype: ~numpy.ndarray(tuple(int,int))
         """
@@ -334,8 +326,7 @@ class NeuronRecorder(object):
 
     def recorded_ids_by_slice(self, vertex_slice):
         """
-        :param vertex_slice:
-        :type vertex_slice: ~pacman.model.graphs.common.Slice
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
         """
         return [_id
                 for _id, variable in enumerate(self.__sampling_rates.keys())
@@ -345,7 +336,7 @@ class NeuronRecorder(object):
         """ Convert a sampling interval into a rate. \
             Remember, machine time step is in nanoseconds
 
-        :param sampling_interval: interval between samples in microseconds
+        :param int sampling_interval: interval between samples in microseconds
         :return: rate
         """
         if sampling_interval is None:
@@ -478,9 +469,8 @@ class NeuronRecorder(object):
     def get_buffered_sdram_per_record(self, variable, vertex_slice):
         """ Return the SDRAM used per record
 
-        :param variable: PyNN variable name
-        :param vertex_slice:
-        :type vertex_slice: ~pacman.model.graphs.common.Slice
+        :param str variable: PyNN variable name
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
         :return:
         """
         n_neurons = self._count_recording_per_slice(variable, vertex_slice)
@@ -501,9 +491,8 @@ class NeuronRecorder(object):
         In the case where sampling is used it returns the average\
         for recording and none recording based on the recording rate
 
-        :param variable: PyNN variable name
-        :param vertex_slice:
-        :type vertex_slice: ~pacman.model.graphs.common.Slice
+        :param str variable: PyNN variable name
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
         :return:
         """
         rate = self.__sampling_rates[variable]
@@ -527,8 +516,7 @@ class NeuronRecorder(object):
         where time_steps is a multiple of sampling rate + 1,\
         and recording is done in the first and last time_step
 
-        :param vertex_slice:
-        :type vertex_slice: ~pacman.model.graphs.common.Slice
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
         :return: Highest possible overflow needed
         """
         overflow = 0
@@ -546,12 +534,9 @@ class NeuronRecorder(object):
 
         If required the total is rounded up so the space will always fit
 
-        :param variable: The PyNN variable name
-        :type variable: str
-        :param vertex_slice:
-        :type vertex_slice: ~pacman.model.graphs.common.Slice
-        :param n_machine_time_steps:
-        :type n_machine_time_steps: int
+        :param str variable: The PyNN variable name
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :param int n_machine_time_steps:
         :return: bytes required
         :rtype: int
         """
@@ -570,8 +555,7 @@ class NeuronRecorder(object):
 
     def get_sdram_usage_in_bytes(self, vertex_slice):
         """
-        :param vertex_slice:
-        :type vertex_slice: ~pacman.model.graphs.common.Slice
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
         """
         n_words_for_n_neurons = self.__n_bytes_to_n_words(vertex_slice.n_atoms)
         n_bytes_for_n_neurons = n_words_for_n_neurons * BYTES_PER_WORD
@@ -592,8 +576,7 @@ class NeuronRecorder(object):
 
     def get_variable_sdram_usage(self, vertex_slice):
         """
-        :param vertex_slice:
-        :type vertex_slice: ~pacman.model.graphs.common.Slice
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
         """
         fixed_sdram = 0
         per_timestep_sdram = 0
@@ -617,8 +600,7 @@ class NeuronRecorder(object):
 
     def get_dtcm_usage_in_bytes(self, vertex_slice):
         """
-        :param vertex_slice:
-        :type vertex_slice: ~pacman.model.graphs.common.Slice
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
         """
         # *_rate + n_neurons_recording_* + *_indexes
         usage = self.get_sdram_usage_in_bytes(vertex_slice)
@@ -645,8 +627,7 @@ class NeuronRecorder(object):
 
     def get_data(self, vertex_slice):
         """
-        :param vertex_slice:
-        :type vertex_slice: ~pacman.model.graphs.common.Slice
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
         :rtype: ~numpy.ndarray
         """
         data = list()
@@ -679,8 +660,7 @@ class NeuronRecorder(object):
 
     def get_global_parameters(self, vertex_slice):
         """
-        :param vertex_slice:
-        :type vertex_slice: ~pacman.model.graphs.common.Slice
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
         """
         params = []
         for variable in self.__sampling_rates:
@@ -694,8 +674,7 @@ class NeuronRecorder(object):
 
     def get_index_parameters(self, vertex_slice):
         """
-        :param vertex_slice:
-        :type vertex_slice: ~pacman.model.graphs.common.Slice
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
         """
         params = []
         for variable in self.__sampling_rates:

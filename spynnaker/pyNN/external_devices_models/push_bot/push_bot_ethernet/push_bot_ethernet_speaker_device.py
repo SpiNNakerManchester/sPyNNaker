@@ -44,7 +44,7 @@ class PushBotEthernetSpeakerDevice(
         :param start_total_period: The "total period" to set at the start
         :param start_frequency: The "frequency" to set at the start
         :param start_melody: The "melody" to set at the start
-        :param timesteps_between_send:\
+        :param timesteps_between_send:
             The number of timesteps between sending commands to the device,\
             or None to use the default
         """

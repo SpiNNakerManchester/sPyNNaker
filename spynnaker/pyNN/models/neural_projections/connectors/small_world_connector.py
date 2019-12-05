@@ -30,18 +30,12 @@ class SmallWorldConnector(AbstractConnector):
             self, degree, rewiring, allow_self_connections=True, safe=True,
             callback=None, verbose=False, n_connections=None):
         """
-        :param degree:
-        :type degree: float
-        :param rewiring:
-        :type rewiring: float
-        :param allow_self_connections:
-        :type allow_self_connections: bool
-        :param safe:
-        :type safe: bool
-        :param callback: Ignored
-        :type callback: callable
-        :param verbose:
-        :type verbose: bool
+        :param float degree:
+        :param float rewiring:
+        :param bool allow_self_connections:
+        :param bool safe:
+        :param callable callback: Ignored
+        :param bool verbose:
         :param n_connections:
         :type n_connections: int or None
         """

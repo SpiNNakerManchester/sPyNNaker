@@ -28,8 +28,7 @@ class AbstractContainsUnits(object):
     def get_units(self, variable):
         """ Get units for a given variable.
 
-        :param variable: the variable to find units from
-        :type variable: str
+        :param str variable: the variable to find units from
         :return: the units as a string.
         :rtype: str
         """

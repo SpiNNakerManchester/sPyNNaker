@@ -79,22 +79,20 @@ class EIEIOSpikeRecorder(object):
         """ Get the recorded spikes from the object
 
         :param buffer_manager: the buffer manager object
-        :type buffer_manager: \
+        :type buffer_manager:
             ~spinn_front_end_common.interface.buffer_management.BufferManager
-        :param region:
-        :type region: int
+        :param int region:
         :param placements: the placements object
         :type placements: ~pacman.model.placements.Placements
         :param application_vertex:
-        :type application_vertex: \
+        :type application_vertex:
             ~pacman.model.graphs.application.ApplicationVertex
-        :param machine_time_step: \
+        :param int machine_time_step:
             the time step of the simulation, in microseconds
         :param base_key_function:
-        :type base_key_function: \
-            func(~pacman.model.graphs.machine.MachineVertex,int)
-        :type machine_time_step: int
-        :return: A numpy array of 2-element arrays of (neuron_id, time)\
+        :type base_key_function:
+            callable(~pacman.model.graphs.machine.MachineVertex,int)
+        :return: A numpy array of 2-element arrays of (neuron_id, time)
             ordered by time, one element per event
         :rtype: ~numpy.ndarray(tuple(int,int))
         """

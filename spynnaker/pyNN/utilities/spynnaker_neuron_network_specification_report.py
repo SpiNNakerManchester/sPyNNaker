@@ -26,11 +26,10 @@ class SpYNNakerNeuronGraphNetworkSpecificationReport(object):
     """ Produces a report describing the graph created from the neural \
         populations and projections.
 
-    :param report_folder: the report folder to put figure into
-    :type report_folder: str
-    :param application_graph: the app graph
-    :type application_graph: ~pacman.model.graphs.application.ApplicationGraph
-    :rtype: None
+    :param str report_folder: the report folder to put figure into
+    :param ~pacman.model.graphs.application.ApplicationGraph \
+            application_graph:
+        the app graph
     """
 
     @staticmethod

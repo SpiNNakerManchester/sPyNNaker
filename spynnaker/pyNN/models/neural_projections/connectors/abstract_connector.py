@@ -58,14 +58,12 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
 
     def __init__(self, safe=True, callback=None, verbose=False, rng=None):
         """
-        :param safe: if True, check that weights and delays have valid values.\
-            If False, this check is skipped. (NB: SpiNNaker always checks.)
-        :type safe: bool
-        :param callback: Ignored
-        :type callback: callable
-        :param verbose:
-        :type verbose: bool
-        :param rng: \
+        :param bool safe: if True, check that weights and delays have valid
+            values. If False, this check is skipped. (NB: SpiNNaker always
+            checks.)
+        :param callable callback: Ignored
+        :param bool verbose:
+        :param rng:
             Seeded random number generator, or None to make one when needed
         :type rng: ~pyNN.random.NumpyRNG or None
         """
@@ -85,17 +83,14 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
     def set_space(self, space):
         """ Set the space object (allowed after instantiation).
 
-        :param space:
-        :type space: ~pyNN.space.Space
+        :param ~pyNN.space.Space space:
         """
         self.__space = space
 
     def set_projection_information(self, machine_time_step, synapse_info):
         """
-        :param machine_time_step:
-        :type machine_time_step: int
-        :param synapse_info:
-        :type synapse_info: SynapseInformation
+        :param int machine_time_step:
+        :param SynapseInformation synapse_info:
         """
         self._rng = (self._rng or get_simulator().get_pynn_NumpyRNG()())
         self.__min_delay = machine_time_step / 1000.0
@@ -104,12 +99,10 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         """ Check that the types of the values is supported.
 
         :param values:
-        :type values: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float\
+        :type values: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float
             or list(int) or list(float)
-        :param name:
-        :type name: str
-        :param allow_lists:
-        :type allow_lists: bool
+        :param str name:
+        :param bool allow_lists:
         """
         if (not numpy.isscalar(values) and
                 not (get_simulator().is_a_pynn_random(values)) and
@@ -161,7 +154,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         """ Get the variance of the delays.
 
         :param delays:
-        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float\
+        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float
             or list(int) or list(float)
         :rtype: float
         """
@@ -176,8 +169,8 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
     def _get_n_connections_from_pre_vertex_with_delay_maximum(
             self, delays, n_total_connections, n_connections,
             min_delay, max_delay):
-        """ Get the expected number of delays that will fall within min_delay\
-            and max_delay given given a float, RandomDistribution or list of\
+        """ Get the expected number of delays that will fall within min_delay
+            and max_delay given given a float, RandomDistribution or list of
             delays.
         """
         # pylint: disable=too-many-arguments
@@ -206,17 +199,15 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
     def get_n_connections_from_pre_vertex_maximum(
             self, post_vertex_slice, synapse_info, min_delay=None,
             max_delay=None):
-        """ Get the maximum number of connections between those from any\
-            neuron in the pre vertex to the neurons in the\
-            post_vertex_slice, for connections with a delay between min_delay\
-            and max_delay (inclusive) if both specified\
-            (otherwise all connections).
+        """ Get the maximum number of connections between those from any
+            neuron in the pre vertex to the neurons in the post_vertex_slice,
+            for connections with a delay between min_delay and max_delay
+            (inclusive) if both specified (otherwise all connections).
 
         :param delays:
-        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float\
+        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float
             or list(int) or list(float)
-        :param post_vertex_slice:
-        :type post_vertex_slice: ~pacman.model.graphs.common.Slice
+        :param: ~pacman.model.graphs.common.Slice post_vertex_slice:
         :param min_delay:
         :type min_delay: int or None
         :param max_delay:
@@ -227,7 +218,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
 
     @abstractmethod
     def get_n_connections_to_post_vertex_maximum(self, synapse_info):
-        """ Get the maximum number of connections between those to any neuron\
+        """ Get the maximum number of connections between those to any neuron
             in the post vertex from neurons in the pre vertex.
 
         :rtype: int
@@ -237,7 +228,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         """ Get the mean of the weights.
 
         :param weights:
-        :type weights: ~numpy.ndarray or pyNN.random.NumpyRNG or int or float\
+        :type weights: ~numpy.ndarray or pyNN.random.NumpyRNG or int or float
             or list(int) or list(float)
         :rtype: float
         """
@@ -279,8 +270,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
     def get_weight_maximum(self, synapse_info):
         """ Get the maximum of the weights for this connection.
 
-        :param synapse_info:
-        :type synapse_info: SynapseInformation
+        :param SynapseInformation synapse_info:
         :rtype: float
         """
         # pylint: disable=too-many-arguments
@@ -289,7 +279,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         """ Get the variance of the weights.
 
         :param weights:
-        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float\
+        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float
             or list(int) or list(float)
         :rtype: float
         """
@@ -302,10 +292,10 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         raise Exception("Unrecognised weight format")
 
     def _expand_distances(self, d_expression):
-        """ Check if a distance expression contains at least one term `d[x]`.\
-            If yes, then the distances are expanded to distances in the\
-            separate coordinates rather than the overall distance over all\
-            coordinates, and we assume the user has specified an expression\
+        """ Check if a distance expression contains at least one term `d[x]`.
+            If yes, then the distances are expanded to distances in the
+            separate coordinates rather than the overall distance over all
+            coordinates, and we assume the user has specified an expression
             such as `d[0] + d[2]`.
         """
         regexpr = re.compile(r'.*d\[\d*\].*')
@@ -411,26 +401,19 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         """ Create a synaptic block from the data.
 
         :param weights:
-        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float\
+        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float
             or list(int) or list(float)
         :param delays:
-        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float\
+        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float
             or list(int) or list(float)
-        :param pre_slices:
-        :type pre_slices: list(~pacman.model.graphs.common.Slice)
-        :param pre_slice_index:
-        :type pre_slice_index: int
-        :param post_slices:
-        :type post_slices: list(~pacman.model.graphs.common.Slice)
-        :param post_slice_index:
-        :type post_slice_index: int
-        :param pre_vertex_slice:
-        :type pre_vertex_slice: ~pacman.model.graphs.common.Slice
-        :param post_vertex_slice:
-        :type post_vertex_slice: ~pacman.model.graphs.common.Slice
-        :param synapse_type:
-        :type synapse_type: AbstractSynapseType
-        :returns: \
+        :param list(~pacman.model.graphs.common.Slice) pre_slices:
+        :param int pre_slice_index:
+        :param list(~pacman.model.graphs.common.Slice) post_slices:
+        :param int post_slice_index:
+        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param AbstractSynapseType synapse_type:
+        :returns:
             The synaptic matrix data to go to the machine, as a Numpy array
         :rtype: ~numpy.ndarray
         """
@@ -438,9 +421,8 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
 
     def get_provenance_data(self, synapse_info):
         """
-        :param synapse_info:
-        :type synapse_info: SynapseInformation
-        :rtype: \
+        :param SynapseInformation synapse_info:
+        :rtype:
             list(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)
         """
         name = "{}_{}_{}".format(
@@ -482,8 +464,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
     def space(self, new_value):
         """ Set the space object (allowed after instantiation).
 
-        :param new_value:
-        :type new_value: ~pyNN.space.Space
+        :param ~pyNN.space.Space new_value:
         """
         self.__space = new_value
 
@@ -500,7 +481,6 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
 
     def use_direct_matrix(self, synapse_info):
         """
-        :param synapse_info:
-        :type synapse_info: SynapseInformation
+        :param SynapseInformation synapse_info:
         """
         return False

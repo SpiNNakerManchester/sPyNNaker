@@ -78,16 +78,16 @@ class MunichMotorDevice(
             sample_time=4096, update_time=512, delay_time=5,
             delta_threshold=23, continue_if_not_different=True, label=None):
         """
-        :param spinnaker_link_id: \
+        :param int spinnaker_link_id:
             The SpiNNaker link to which the motor is connected
-        :param board_address:
-        :param speed:
-        :param sample_time:
-        :param update_time:
-        :param delay_time:
-        :param delta_threshold:
-        :param continue_if_not_different:
-        :param label:
+        :param str board_address:
+        :param int speed:
+        :param int sample_time:
+        :param int update_time:
+        :param int delay_time:
+        :param int delta_threshold:
+        :param bool continue_if_not_different:
+        :param str label:
         """
         # pylint: disable=too-many-arguments
 

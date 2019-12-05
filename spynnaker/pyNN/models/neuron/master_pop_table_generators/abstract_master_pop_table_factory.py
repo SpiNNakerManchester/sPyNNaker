@@ -31,17 +31,16 @@ class AbstractMasterPopTableFactory(object):
             self, incoming_key, master_pop_base_mem_address, txrx, chip_x,
             chip_y):
         """
-        :param incoming_key: \
+        :param int incoming_key:
             the source key which the synaptic matrix needs to be mapped to
-        :type incoming_key: int
-        :param master_pop_base_mem_address: the base address of the master pop
-        :type master_pop_base_mem_address: int
-        :param txrx: how to talk to the machine
-        :type txrx: ~spinnman.transceiver.Transceiver
-        :param chip_x: the X coordinate of the chip of this master pop table
-        :type chip_x: int
-        :param chip_y: the Y coordinate of the chip of this master pop table
-        :type chip_y: int
+        :param int master_pop_base_mem_address:
+            the base address of the master pop
+        :param ~spinnman.transceiver.Transceiver txrx:
+            how to talk to the machine
+        :param int chip_x:
+            the X coordinate of the chip of this master pop table
+        :param int chip_y:
+            the Y coordinate of the chip of this master pop table
         :return: a synaptic matrix memory position.
         :rtype: int
         """
@@ -52,34 +51,28 @@ class AbstractMasterPopTableFactory(object):
             master_pop_table_region, is_single=False):
         """ Update a data specification with a master pop entry in some form.
 
-        :param spec: the data specification to write the master pop entry to
-        :type spec: ~data_specification.DataSpecificationGenerator
-        :param block_start_addr: the start address of the row in the region
-        :type block_start_addr: int
-        :param row_length: the row length of this entry
-        :type row_length: int
-        :param key_and_mask: a key_and_mask object used as part of describing\
-            an edge that will require being received to be stored in the\
-            master pop table; the whole edge will become multiple calls to\
-            this function
-        :type key_and_mask: \
-            ~pacman.model.routing_info.BaseKeyAndMask
-        :param master_pop_table_region: \
+        :param ~data_specification.DataSpecificationGenerator spec:
+            the data specification to write the master pop entry to
+        :param int block_start_addr: the start address of the row in the region
+        :param int row_length: the row length of this entry
+        :param ~pacman.model.routing_info.BaseKeyAndMask key_and_mask:
+            a key_and_mask object used as part of describing an edge that will
+            require being received to be stored in the master pop table; the
+            whole edge will become multiple calls to this function
+        :param int master_pop_table_region:
             The region to which the master pop table is being stored
-        :type master_pop_table_region: int
-        :param is_single: True if this is a single synapse, False otherwise
-        :type is_single: bool
+        :param bool is_single:
+            True if this is a single synapse, False otherwise
         """
 
     @abstractmethod
     def finish_master_pop_table(self, spec, master_pop_table_region):
         """ Complete the master pop table in the data specification.
 
-        :param spec: the data specification to write the master pop entry to
-        :type spec: ~data_specification.DataSpecificationGenerator
-        :param master_pop_table_region: \
+        :param ~data_specification.DataSpecificationGenerator spec:
+            the data specification to write the master pop entry to
+        :param int master_pop_table_region:
             the region to which the master pop table is being stored
-        :type master_pop_table_region: int
         """
 
     @abstractmethod
@@ -94,12 +87,12 @@ class AbstractMasterPopTableFactory(object):
     def get_master_population_table_size(self, vertex_slice, in_edges):
         """ Get the size of the master population table in SDRAM
 
-        :param vertex_slice: The part of the vertex the table serves
-        :type vertex_slice: ~pacman.model.graphs.common.Slice
-        :param in_edges: The edges arriving at the vertex that are to be \
-            handled by this table
-        :type in_edges: \
-            iterable(~pacman.model.graphs.application.ApplicationEdge)
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            The part of the vertex the table serves
+        :param iterable(~pacman.model.graphs.application.ApplicationEdge)\
+                in_edges:
+            The edges arriving at the vertex that are to be handled by this
+            table
         :return: the size the master pop table will take in SDRAM (in bytes)
         :rtype: int
         """

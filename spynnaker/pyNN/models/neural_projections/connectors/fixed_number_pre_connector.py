@@ -44,37 +44,29 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine):
             self, n, allow_self_connections=True, with_replacement=False,
             safe=True, callback=None, verbose=False, rng=None):
         """
-        :param n: \
+        :param int n:
             number of random pre-synaptic neurons connected to output
-        :type n: int
-        :param allow_self_connections: \
-            if the connector is used to connect a\
-            Population to itself, this flag determines whether a neuron is\
-            allowed to connect to itself, or only to other neurons in the\
-            Population.
-        :type allow_self_connections: bool
-        :param with_replacement:
-            this flag determines how the random selection of pre-synaptic\
-            neurons is performed; if true, then every pre-synaptic neuron\
-            can be chosen on each occasion, and so multiple connections\
-            between neuron pairs are possible; if false, then once a\
-            pre-synaptic neuron has been connected to a post-neuron, it\
+        :param bool allow_self_connections:
+            if the connector is used to connect a Population to itself,
+            this flag determines whether a neuron is allowed to connect to
+            itself, or only to other neurons in the Population.
+        :param bool with_replacement:
+            this flag determines how the random selection of pre-synaptic
+            neurons is performed; if true, then every pre-synaptic neuron
+            can be chosen on each occasion, and so multiple connections
+            between neuron pairs are possible; if false, then once a
+            pre-synaptic neuron has been connected to a post-neuron, it
             can't be connected again.
-        :type with_replacement: bool
-        :param safe:
-        :type safe: bool
-        :param callback: Ignored
-        :type callback: callable
-        :param verbose:
-        :type verbose: bool
-        :param rng: \
+        :param bool safe:
+        :param callable callback: Ignored
+        :param bool verbose:
+        :param rng:
             Seeded random number generator, or None to make one when needed
         :type rng: ~pyNN.random.NumpyRNG or None
         """
-        # :param space:
+        # :param ~pyNN.space.Space space:
         # a Space object, needed if you wish to specify distance-dependent\
         # weights or delays - not implemented
-        # :type space: ~pyNN.space.Space
         super(FixedNumberPreConnector, self).__init__(safe, callback, verbose)
         self.__n_pre = n
         self.__allow_self_connections = allow_self_connections

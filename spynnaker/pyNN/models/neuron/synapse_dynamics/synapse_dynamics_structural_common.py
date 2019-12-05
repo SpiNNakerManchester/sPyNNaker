@@ -98,23 +98,17 @@ class SynapseDynamicsStructuralCommon(object):
             self, partner_selection, formation, elimination, f_rew,
             initial_weight, initial_delay, s_max, seed):
         """
-        :param partner_selection: The partner selection rule
-        :type partner_selection: AbstractPartnerSelection
-        :param formation: The formation rule
-        :type formation: AbstractFormation
-        :param elimination: The elimination rule
-        :type elimination: AbstractElimination
-        :param f_rew: How many rewiring attempts will be done per second.
-        :type f_rew: int
-        :param initial_weight:\
+        :param AbstractPartnerSelection partner_selection:
+            The partner selection rule
+        :param AbstractFormation formation: The formation rule
+        :param AbstractElimination elimination: The elimination rule
+        :param int f_rew: How many rewiring attempts will be done per second.
+        :param float initial_weight:
             Initial weight assigned to a newly formed connection
-        :type initial_weight: float
         :param initial_delay: Delay assigned to a newly formed connection
         :type initial_delay: int or (int, int)
-        :param s_max: Maximum fan-in per target layer neuron
-        :type s_max: int
-        :param seed: seed the random number generators
-        :type seed: int
+        :param int s_max: Maximum fan-in per target layer neuron
+        :param int seed: seed the random number generators
         """
         self.__partner_selection = partner_selection
         self.__formation = formation
@@ -184,23 +178,17 @@ class SynapseDynamicsStructuralCommon(object):
             routing_info, synapse_indices):
         """ Write the synapse parameters to the spec.
 
-        :param spec: the data spec
-        :type spec: ~data_specification.DataSpecificationGenerator
-        :param region: region ID
-        :type region: int
-        :param machine_time_step:
-        :type machine_time_step: int
+        :param ~data_specification.DataSpecificationGenerator spec:
+            the data spec
+        :param int region: region ID
+        :param int machine_time_step:
         :param weight_scales:
         :type weight_scales: dict(AbstractSynapseType, float)
-        :param application_graph:
-        :type application_graph: \
-            ~pacman.model.graphs.application.ApplicationGraph
-        :param app_vertex:
-        :type app_vertex: AbstractPopulationVertex
-        :param post_slice:
-        :type post_slice: ~pacman.model.graphs.common.Slice
-        :param routing_info:
-        :type routing_info: ~pacman.model.routing_info.RoutingInfo
+        :param ~pacman.model.graphs.application.ApplicationGraph\
+                application_graph:
+        :param AbstractPopulationVertex app_vertex:
+        :param ~pacman.model.graphs.common.Slice post_slice:
+        :param ~pacman.model.routing_info.RoutingInfo routing_info:
         :param synapse_indices:
         :type synapse_indices: dict(tuple(SynapseInformation, int, int), int)
         """
@@ -260,18 +248,14 @@ class SynapseDynamicsStructuralCommon(object):
             self, spec, app_vertex, post_slice, machine_time_step, n_pre_pops):
         """ Write the non-sub-population synapse parameters to the spec.
 
-        :param spec: the data spec
-        :type spec: ~data_specification.DataSpecificationGenerator
-        :param app_vertex: \
+        :param ~data_specification.DataSpecificationGenerator spec:
+            the data spec
+        :param AbstractPopulationVertex app_vertex:
             the highest level object of the post-synaptic population
-        :type app_vertex: AbstractPopulationVertex
-        :param post_slice: \
+        :param ~pacman.model.graphs.common.Slice post_slice:
             the slice of the app vertex corresponding to this machine vertex
-        :type post_slice: ~pacman.model.graphs.common.Slice
-        :param machine_time_step: the duration of a machine time step (ms)
-        :type machine_time_step: int
-        :param n_pre_pops: the number of pre-populations
-        :type n_pre_pops: int
+        :param int machine_time_step: the duration of a machine time step (ms)
+        :param int n_pre_pops: the number of pre-populations
         :return: None
         :rtype: None
         """
@@ -419,13 +403,10 @@ class SynapseDynamicsStructuralCommon(object):
             self, application_graph, app_vertex, n_neurons):
         """ Get SDRAM usage
 
-        :param application_graph:
-        :type application_graph: \
-            ~pacman.model.graphs.application.ApplicationGraph
-        :param app_vertex:
-        :type app_vertex: AbstractPopulationVertex
-        :param n_neurons:
-        :type n_neurons: int
+        :param ~pacman.model.graphs.application.ApplicationGraph \
+                application_graph:
+        :param AbstractPopulationVertex app_vertex:
+        :param int n_neurons:
         :return: SDRAM usage
         :rtype: int
         """
@@ -460,16 +441,11 @@ class SynapseDynamicsStructuralCommon(object):
             machine_edge):
         """ Set synaptic data
 
-        :param connections:
-        :type connections: ~numpy.ndarray
-        :param post_vertex_slice:
-        :type post_vertex_slice: ~pacman.model.graphs.common.Slice
-        :param app_edge:
-        :type app_edge: ProjectionApplicationEdge
-        :param synapse_info:
-        :type synapse_info: SynapseInformation
-        :param machine_edge:
-        :type machine_edge: ProjectionMachineEdge
+        :param ~numpy.ndarray connections:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param ProjectionApplicationEdge app_edge:
+        :param SynapseInformation synapse_info:
+        :param ProjectionMachineEdge machine_edge:
         """
         if not isinstance(synapse_info.synapse_dynamics,
                           AbstractSynapseDynamicsStructural):
@@ -483,16 +459,14 @@ class SynapseDynamicsStructuralCommon(object):
     def n_words_for_plastic_connections(self, value):
         """ Set size of plastic connections in words
 
-        :param value:
-        :type value: int
+        :param int value:
         """
         self.__actual_row_max_length = value
 
     def n_words_for_static_connections(self, value):
         """ Set size of static connections in words
 
-        :param value:
-        :type value: int
+        :param int value:
         """
         self.__actual_row_max_length = value
 
@@ -505,8 +479,7 @@ class SynapseDynamicsStructuralCommon(object):
 
     def is_same_as(self, synapse_dynamics):
         """
-        :param synapse_dynamics:
-        :type synapse_dynamics: SynapseDynamicsStructuralCommon
+        :param SynapseDynamicsStructuralCommon synapse_dynamics:
         :rtype: bool
         """
         # Note noqa because exact type comparison is required here

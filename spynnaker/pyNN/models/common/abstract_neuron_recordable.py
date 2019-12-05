@@ -37,8 +37,7 @@ class AbstractNeuronRecordable(object):
     def is_recording(self, variable):
         """ Determines if variable is being recorded.
 
-        :param variable: PyNN name of the variable
-        :type variable: str
+        :param str variable: PyNN name of the variable
         :return: True if variable are being recorded, False otherwise
         :rtype: bool
         """
@@ -48,10 +47,8 @@ class AbstractNeuronRecordable(object):
                       indexes=None):
         """ Sets variable to being recorded
 
-        :param variable: PyNN name of the variable
-        :type variable: str
-        :param new_state:
-        :type new_state: bool
+        :param str variable: PyNN name of the variable
+        :param bool new_state:
         :param sampling_interval:
         :type sampling_interval: float or None
         :param indexes:
@@ -63,13 +60,12 @@ class AbstractNeuronRecordable(object):
                         graph_mapper):
         """ Clear the recorded data from the object
 
-        :param variable: PyNN name of the variable
-        :type variable: str
+        :param str variable: PyNN name of the variable
         :param buffer_manager: the buffer manager object
-        :type buffer_manager: \
+        :type buffer_manager:
             ~spinn_front_end_common.interface.buffer_management.BufferManager
-        :param placements: the placements object
-        :type placements: ~pacman.model.placements.Placements
+        :param ~pacman.model.placements.Placements placements:
+            the placements object
         :param graph_mapper: the graph mapper object
         :rtype: None
         """
@@ -79,20 +75,14 @@ class AbstractNeuronRecordable(object):
                  graph_mapper, buffer_manager, machine_time_step):
         """ Get the recorded data
 
-        :param variable: PyNN name of the variable
-        :type variable: str
-        :param n_machine_time_steps:
-        :type n_machine_time_steps: int
-        :param machine_time_step: microseconds
-        :type machine_time_step: int
-        :param placements:
-        :type placements: ~pacman.model.placements.Placements
+        :param str variable: PyNN name of the variable
+        :param int n_machine_time_steps:
+        :param ~pacman.model.placements.Placements placements:
         :param graph_mapper:
         :param buffer_manager:
-        :type buffer_manager: \
+        :type buffer_manager:
             ~spinn_front_end_common.interface.buffer_management.BufferManager
-        :param machine_time_step: microseconds
-        :type machine_time_step: int
+        :param int machine_time_step: microseconds
         :return: (data, recording_indices, sampling_interval)
         :rtype: tuple(~numpy.ndarray,list(int),float)
         """
@@ -102,8 +92,7 @@ class AbstractNeuronRecordable(object):
     def get_neuron_sampling_interval(self, variable):
         """ Returns the current sampling interval for this variable
 
-        :param variable: PyNN name of the variable
-        :type variable: str
+        :param str variable: PyNN name of the variable
         :return: Sampling interval in microseconds
         :rtype: float
         """

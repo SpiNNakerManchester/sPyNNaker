@@ -137,8 +137,7 @@ def plot_spikes(spikes, title="spikes"):
 
     :param spikes: Numpy array of spikes, or list of numpy arrays of spikes
     :type spikes: ~numpy.ndarray or list(~numpy.ndarray)
-    :param title: The title for the plot
-    :type title: str
+    :param str title: The title for the plot
     """
     if not _precheck(spikes, title):
         return

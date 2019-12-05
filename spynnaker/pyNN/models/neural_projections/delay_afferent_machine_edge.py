@@ -28,14 +28,10 @@ class DelayAfferentMachineEdge(
 
     def __init__(self, pre_vertex, post_vertex, label, weight=1):
         """
-        :param pre_vertex:
-        :type pre_vertex: PopulationMachineVertex
-        :param post_vertex:
-        :type post_vertex: DelayExtensionMachineVertex
-        :param label:
-        :type label: str
-        :param weight:
-        :type weight: int
+        :param PopulationMachineVertex pre_vertex:
+        :param DelayExtensionMachineVertex post_vertex:
+        :param str label:
+        :param int weight:
         """
         super(DelayAfferentMachineEdge, self).__init__(
             pre_vertex, post_vertex, label=label, traffic_weight=weight)

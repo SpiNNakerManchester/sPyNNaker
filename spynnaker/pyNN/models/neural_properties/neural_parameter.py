@@ -29,14 +29,17 @@ class _Range_Iterator(Iterator):
         "__stop_range"]
 
     def __init__(self, value, datatype, slice_start, slice_stop, spec):
-        """ Iterator over a RangedList which is range based
+        """ Iterator over a :py:class:`~spinn_utilities.ranged.RangedList`
+            which is range based
 
-        :param value: The list or Abstract list holding the data
-        :param datatype: The type of each element of data
-        :param slice_start: Inclusive start of the range
-        :param slice_stop: Exclusive end of the range
-        :param spec: The data specification to write to
-        :type spec: DataSpecificationGenerator
+        :param ~spinn_utilities.ranged.AbstractList value:
+            The abstract list holding the data
+        :param ~data_specification.enums.DataType datatype:
+            The type of each element of data
+        :param int slice_start: Inclusive start of the range
+        :param int slice_stop: Exclusive end of the range
+        :param ~data_specification.DataSpecificationGenerator spec:
+            The data specification to write to
         """
         # pylint: disable=too-many-arguments
         self.__iterator = value.iter_ranges_by_slice(slice_start, slice_stop)
@@ -73,12 +76,14 @@ class _Get_Iterator(Iterator):
     def __init__(self, value, datatype, slice_start, slice_stop, spec):
         """ Iterator over a standard collection that supports __getitem__
 
-        :param value: The list or Abstract list holding the data
-        :param datatype: The type of each element of data
-        :param slice_start: Inclusive start of the range
-        :param slice_stop: Exclusive end of the range
-        :param spec: The data specification to write to
-        :type spec: DataSpecificationGenerator
+        :param value: The list holding the data
+        :type value: list(int) or list(float) or list(bool) or ~numpy.ndarray
+        :param ~data_specification.enums.DataType datatype:
+            The type of each element of data
+        :param int slice_start: Inclusive start of the range
+        :param int slice_stop: Exclusive end of the range
+        :param ~data_specification.DataSpecificationGenerator spec:
+            The data specification to write to
         """
         # pylint: disable=too-many-arguments
         self.__value = value
@@ -110,12 +115,14 @@ class _SingleValue_Iterator(Iterator):
         with len. \
         Caches `cmd_word_list` and `cmd_string` so they are only created once.
 
-        :param value: The list or Abstract list holding the data
-        :param datatype: The type of each element of data
-        :param slice_start: Inclusive start of the range
-        :param slice_stop: Exclusive end of the range
-        :param spec: The data specification to write to
-        :type spec: DataSpecificationGenerator
+        :param value: The simple value that is the data for each element
+        :type value: int or float or bool
+        :param ~data_specification.enums.DataType datatype:
+            The type of each element of data
+        :param int slice_start: Inclusive start of the range
+        :param int slice_stop: Exclusive end of the range
+        :param ~data_specification.DataSpecificationGenerator spec:
+            The data specification to write to
         """
         # pylint: disable=too-many-arguments
         self.__cmd_pair = spec.create_cmd(data=value, data_type=datatype)
@@ -142,10 +149,9 @@ class NeuronParameter(object):
         :param value: what the value of the parameter is; if a list or array,\
             potentially provides a different value for each neuron
         :type value: int or float or bool or list(int) or list(float) or \
-            list(bool) or numpy.ndarray
-        :param data_type: The serialization type of the parameter in the \
-            neuron model
-        :type data_type: ~data_specification.enums.DataType
+            list(bool) or ~numpy.ndarray or ~spinn_utilities.ranged.AbstractList
+        :param ~data_specification.enums.DataType data_type:
+            The serialization type of the parameter in the neuron model.
         """
         self.__value = value
         if data_type not in DataType:
@@ -158,7 +164,7 @@ class NeuronParameter(object):
             potentially provides a different value for each neuron.
 
         :rtype: int or float or bool or list(int) or list(float) or \
-            list(bool) or numpy.ndarray
+            list(bool) or ~numpy.ndarray or ~spinn_utilities.ranged.AbstractList
         """
         return self.__value
 
@@ -171,14 +177,17 @@ class NeuronParameter(object):
         return self.__data_type
 
     def iterator_by_slice(self, slice_start, slice_stop, spec):
-        """ Creates an Iterator.
+        """ Creates an iterator over the commands to use to write the\
+            parameter to the data specification being generated.
 
-        :param slice_start: Inclusive start of the range
-        :param slice_stop: Exclusive end of the range
-        :param spec: The data specification to write to
-        :type spec: ~data_specification.DataSpecificationGenerator
-        :return: Iterator that produces a value for each element in the slice.
-        :rtype: six.Iterator
+        :param int slice_start: Inclusive start of the range
+        :param int slice_stop: Exclusive end of the range
+        :param ~data_specification.DataSpecificationGenerator spec:
+            The data specification to eventually write to.
+            (Note that this does not actually do the write).
+        :return: Iterator that produces a command to write to the\
+            specification for each element in the slice.
+        :rtype: six.Iterator(tuple(bytearray, str))
         """
         if isinstance(self.__value, AbstractList):
             return _Range_Iterator(

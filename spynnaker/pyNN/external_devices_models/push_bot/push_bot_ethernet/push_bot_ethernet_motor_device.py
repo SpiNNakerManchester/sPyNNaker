@@ -37,8 +37,8 @@ class PushBotEthernetMotorDevice(
         :type motor: PushBotMotor
         :param protocol: The protocol used to control the device
         :type protocol: MunichIoEthernetProtocol
-        :param timesteps_between_send:\
-            The number of timesteps between sending commands to the device,\
+        :param timesteps_between_send:
+            The number of timesteps between sending commands to the device,
             or None to use the default
         """
 

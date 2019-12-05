@@ -38,12 +38,9 @@ class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
 
     def __init__(self,  tau_ca2, i_ca2, i_alpha):
         r"""
-        :param tau_ca2: :math:`\tau_{\mathrm{Ca}^{+2}}`
-        :type tau_ca2: float
-        :param i_ca2: :math:`I_{\mathrm{Ca}^{+2}}`
-        :type i_ca2: float
-        :param i_alpha: :math:`I_{\alpha}`
-        :type i_alpha: float
+        :param float tau_ca2: :math:`\tau_{\mathrm{Ca}^{+2}}`
+        :param float i_ca2: :math:`I_{\mathrm{Ca}^{+2}}`
+        :param float i_alpha: :math:`I_{\alpha}`
         """
         super(AdditionalInputCa2Adaptive, self).__init__([
             DataType.S1615,   # e^(-ts / tau_ca2)
@@ -79,8 +76,7 @@ class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
     @overrides(AbstractAdditionalInput.get_values, additional_arguments={'ts'})
     def get_values(self, parameters, state_variables, vertex_slice, ts):
         """
-        :param ts: machine time step
-        :type ts: int
+        :param int ts: machine time step
         """
         # pylint: disable=arguments-differ
 

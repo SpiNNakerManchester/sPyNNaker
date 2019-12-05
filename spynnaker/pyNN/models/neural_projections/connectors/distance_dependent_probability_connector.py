@@ -46,31 +46,25 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
             self, d_expression, allow_self_connections=True, safe=True,
             callback=None, verbose=False, n_connections=None, rng=None):
         """
-        :param d_expression:\
-            the right-hand side of a valid python expression for\
-            probability, involving 'd', e.g. "exp(-abs(d))", or "d<3",\
-            that can be parsed by eval(), that computes the distance\
+        :param str d_expression:
+            the right-hand side of a valid python expression for
+            probability, involving 'd', e.g. "exp(-abs(d))", or "d<3",
+            that can be parsed by eval(), that computes the distance
             dependent distribution.
-        :type d_expression: str
-        :param allow_self_connections:\
-            if the connector is used to connect a Population to itself, this\
-            flag determines whether a neuron is allowed to connect to itself,\
+        :param bool allow_self_connections:
+            if the connector is used to connect a Population to itself, this
+            flag determines whether a neuron is allowed to connect to itself,
             or only to other neurons in the Population.
-        :type allow_self_connections: bool
-        :param space:\
-            a Space object, needed if you wish to specify distance-dependent\
+        :param ~pyNN.space.Space space:
+            a Space object, needed if you wish to specify distance-dependent
             weights or delays.
-        :type space: ~pyNN.space.Space
-        :param safe:
-        :type safe: bool
-        :param callback: Ignored
-        :type callback: callable
-        :param verbose:
-        :type verbose: bool
-        :param n_connections:\
+        :param bool safe:
+        :param callable callback: Ignored
+        :param bool verbose:
+        :param n_connections:
             The number of efferent synaptic connections per neuron.
         :type n_connections: int or None
-        :param rng: \
+        :param rng:
             Seeded random number generator, or None to make one when needed
         :type rng: ~pyNN.random.NumpyRNG or None
         """

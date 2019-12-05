@@ -65,28 +65,24 @@ class PyNNProjectionCommon(object):
             rng, machine_time_step, user_max_delay, label, time_scale_factor):
         """
         :param spinnaker_control: The simulator engine core.
-        :type spinnaker_control: \
+        :type spinnaker_control:
             ~spinn_front_end_common.interface.abstract_spinnaker_base.AbstractSpinnakerBase
-        :param connector: What is the connector for this projection.
-        :type connector: AbstractConnector
-        :param synapse_dynamics_stdp: How synapses behave
-        :type synapse_dynamics_stdp: AbstractSynapseDynamics
-        :param target: What is the target on the post-synaptic population?
-        :type target: str
-        :param pre_synaptic_population: Where do we connect from?
-        :type pre_synaptic_population: AbstractPopulationVertex
-        :param post_synaptic_population: Where do we connect to?
-        :type post_synaptic_population: AbstractPopulationVertex
+        :param AbstractConnector connector:
+            What is the connector for this projection.
+        :param AbstractSynapseDynamics synapse_dynamics_stdp:
+            How synapses behave
+        :param str target: What is the target on the post-synaptic population?
+        :param AbstractPopulationVertex pre_synaptic_population:
+            Where do we connect from?
+        :param AbstractPopulationVertex post_synaptic_population:
+            Where do we connect to?
         :param rng:
         :type rng: ~pyNN.random.NumpyRNG or None
-        :param machine_time_step:
-        :type machine_time_step: int
-        :param user_max_delay: User-provided max delay
-        :type user_max_delay: float
+        :param int machine_time_step:
+        :param float user_max_delay: User-provided max delay
         :param label: Label for the projection, or None to generate one
         :type label: str or None
-        :param time_scale_factor:
-        :type time_scale_factor: int
+        :param int time_scale_factor:
         """
         # pylint: disable=too-many-arguments, too-many-locals
         self.__spinnaker_control = spinnaker_control
@@ -234,10 +230,10 @@ class PyNNProjectionCommon(object):
             edge which has the same post and pre vertex
 
         :param pre_synaptic_vertex: the source vertex of the multapse
-        :type pre_synaptic_vertex: \
+        :type pre_synaptic_vertex:
             ~pacman.model.graphs.application.ApplicationVertex
         :param post_synaptic_vertex: The destination vertex of the multapse
-        :type post_synaptic_vertex: \
+        :type post_synaptic_vertex:
             ~pacman.model.graphs.application.ApplicationVertex
         :return: None or the edge going to these vertices.
         """
@@ -404,9 +400,9 @@ class PyNNProjectionCommon(object):
     def size(self, gather=True):
         """ Return the total number of connections.
 
-        :param gather: If False, only get the number of connections locally.\
+        :param bool gather:
+            If False, only get the number of connections locally.
             Which means nothing on SpiNNaker...
-        :type gather: bool
         """
         # TODO
         raise NotImplementedError

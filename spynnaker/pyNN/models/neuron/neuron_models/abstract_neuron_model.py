@@ -28,14 +28,13 @@ class AbstractNeuronModel(AbstractStandardNeuronComponent):
 
     def __init__(self, data_types, global_data_types=None):
         """
-        :param data_types:\
-            A list of data types in the neuron structure, in the order that\
+        :param list(~data_specification.enums.DataType) data_types:
+            A list of data types in the neuron structure, in the order that
             they appear
-        :type data_types: list(~data_specification.enums.DataType)
-        :param global_data_types:\
-            A list of data types in the neuron global structure, in the order\
+        :param global_data_types:
+            A list of data types in the neuron global structure, in the order
             that they appear
-        :type global_data_types: \
+        :type global_data_types:
             list(~data_specification.enums.DataType) or None
         """
         super(AbstractNeuronModel, self).__init__(data_types)

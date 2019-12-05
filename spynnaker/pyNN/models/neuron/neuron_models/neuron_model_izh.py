@@ -46,20 +46,13 @@ class NeuronModelIzh(AbstractNeuronModel):
 
     def __init__(self, a, b, c, d, v_init, u_init, i_offset):
         """
-        :param a: :math:`a`
-        :type a: float
-        :param b: :math:`b`
-        :type b: float
-        :param c: :math:`c`
-        :type c: float
-        :param d: :math:`d`
-        :type d: float
-        :param v_init: :math:`v_{init}`
-        :type v_init: float
-        :param u_init: :math:`u_{init}`
-        :type u_init: float
-        :param i_offset: :math:`I_{offset}`
-        :type i_offset: float
+        :param float a: :math:`a`
+        :param float b: :math:`b`
+        :param float c: :math:`c`
+        :param float d: :math:`d`
+        :param float v_init: :math:`v_{init}`
+        :param float u_init: :math:`u_{init}`
+        :param float i_offset: :math:`I_{offset}`
         """
         super(NeuronModelIzh, self).__init__(
             [DataType.S1615,   # a

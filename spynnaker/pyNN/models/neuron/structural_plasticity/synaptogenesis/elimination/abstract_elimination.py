@@ -43,10 +43,8 @@ class AbstractElimination(object):
     def write_parameters(self, spec, weight_scale):
         """ Write the parameters of the rule to the spec
 
-        :param spec:
-        :type spec: ~data_specification.DataSpecificationGenerator
-        :param weight_scale:
-        :type weight_scale: float
+        :param ~data_specification.DataSpecificationGenerator spec:
+        :param float weight_scale:
         """
 
     @abstractmethod

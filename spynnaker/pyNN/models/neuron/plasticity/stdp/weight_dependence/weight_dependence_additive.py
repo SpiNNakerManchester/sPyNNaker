@@ -34,10 +34,8 @@ class WeightDependenceAdditive(
     # noinspection PyPep8Naming
     def __init__(self, w_min=0.0, w_max=1.0):
         """
-        :param w_min: :math:`w^{min}`
-        :type w_min: float
-        :param w_max: :math:`w^{max}`
-        :type w_max: float
+        :param float w_min: :math:`w^{min}`
+        :param float w_max: :math:`w^{max}`
         """
         super(WeightDependenceAdditive, self).__init__()
         self.__w_min = w_min

@@ -48,22 +48,16 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
                  with_replacement=True, safe=True, callback=None,
                  verbose=False, rng=None):
         """
-        :param num_synapses:
+        :param int num_synapses:
             This is the total number of synapses in the connection.
-        :type num_synapses: int
-        :param allow_self_connections:
+        :param bool allow_self_connections:
             Allow a neuron to connect to itself or not.
-        :type allow_self_connections: bool
-        :param with_replacement:
+        :param bool with_replacement:
             When selecting, allow a neuron to be re-selected or not.
-        :type with_replacement: bool
-        :param safe:
-        :type safe: bool
-        :param callback: Ignored
-        :type callback: callable
-        :param verbose:
-        :type verbose: bool
-        :param rng: \
+        :param bool safe:
+        :param callable callback: Ignored
+        :param bool verbose:
+        :param rng:
             Seeded random number generator, or None to make one when needed
         :type rng: ~pyNN.random.NumpyRNG or None
         """
@@ -80,10 +74,9 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
     def get_rng_next(self, num_synapses, prob_connect):
         """ Get the required RNGs
 
-        :param int num_synapses: \
+        :param int num_synapses:
             The number of synapses to make random numbers for in this call
-        :param float prob_connect: \
-            The probability of connection
+        :param float prob_connect: The probability of connection
         :rtype: ~numpy.ndarray
         """
 

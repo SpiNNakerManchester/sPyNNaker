@@ -54,18 +54,12 @@ class SynapseTypeAlpha(AbstractSynapseType):
     def __init__(self, exc_response, exc_exp_response,
                  tau_syn_E, inh_response, inh_exp_response, tau_syn_I):
         r"""
-        :param exc_response:
-        :type exc_response: float
-        :param exc_exp_response:
-        :type exc_exp_response: float
-        :param tau_syn_E: :math:`\tau^{syn}_e`
-        :type tau_syn_E: float
-        :param inh_response:
-        :type inh_response: float
-        :param inh_exp_response:
-        :type inh_exp_response: float
-        :param tau_syn_I: :math:`\tau^{syn}_i`
-        :type tau_syn_I: float
+        :param float exc_response:
+        :param float exc_exp_response:
+        :param float tau_syn_E: :math:`\tau^{syn}_e`
+        :param float inh_response:
+        :param float inh_exp_response:
+        :param float tau_syn_I: :math:`\tau^{syn}_i`
         """
         super(SynapseTypeAlpha, self).__init__([
             DataType.S1615,   # exc_response
@@ -117,7 +111,7 @@ class SynapseTypeAlpha(AbstractSynapseType):
     @overrides(AbstractSynapseType.get_values, additional_arguments={'ts'})
     def get_values(self, parameters, state_variables, vertex_slice, ts):
         """
-        :param ts: machine time step
+        :param int ts: machine time step
         """
         # pylint: disable=arguments-differ
 

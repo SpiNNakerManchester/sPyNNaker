@@ -28,10 +28,9 @@ class AbstractPushBotRetinaDevice(
     def __init__(self, protocol, resolution):
         """
         :param protocol:
-        :type protocol: \
+        :type protocol:
             MunichIOEthernetProtocol or MunichIoSpiNNakerLinkProtocol
-        :param resolution:
-        :type resolution: PushBotRetinaResolution
+        :param PushBotRetinaResolution resolution:
         """
         self._protocol = protocol
         self._resolution = resolution

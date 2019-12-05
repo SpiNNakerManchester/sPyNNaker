@@ -27,8 +27,7 @@ class AbstractTimingDependence(object):
     def is_same_as(self, timing_dependence):
         """ Determine if this timing dependence is the same as another
 
-        :param timing_dependence:
-        :type timing_dependence: AbstractTimingDependence
+        :param AbstractTimingDependence timing_dependence:
         :rtype: bool
         """
 
@@ -64,10 +63,8 @@ class AbstractTimingDependence(object):
     def write_parameters(self, spec, machine_time_step, weight_scales):
         """ Write the parameters of the rule to the spec
 
-        :param spec:
-        :type spec: ~data_specification.DataSpecificationGenerator
-        :param machine_time_step:
-        :type machine_time_step: int
+        :param ~data_specification.DataSpecificationGenerator spec:
+        :param int machine_time_step:
         :param weight_scales: (unused?)
         :type weight_scales: dict(SynapseInformation, float)
         """
@@ -90,10 +87,8 @@ class AbstractTimingDependence(object):
     def get_provenance_data(self, pre_population_label, post_population_label):
         """ Get any provenance data
 
-        :param pre_population_label: label of pre.
-        :type pre_population_label: str
-        :param post_population_label: label of post.
-        :type post_population_label: str
+        :param str pre_population_label: label of pre.
+        :param str post_population_label: label of post.
         :rtype: list
         """
         # pylint: disable=unused-argument

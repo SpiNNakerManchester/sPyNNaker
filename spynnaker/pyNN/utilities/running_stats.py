@@ -46,12 +46,9 @@ class RunningStats(object):
     def add_items(self, mean, variance, n_items):
         """ Add a bunch of items (via their statistics).
 
-        :param mean: The mean of the items to add.
-        :type mean: float
-        :param variance: The variance of the items to add.
-        :type variance: float
-        :param n_items: The number of items represented.
-        :type n_items: int
+        :param float mean: The mean of the items to add.
+        :param float variance: The variance of the items to add.
+        :param int n_items: The number of items represented.
         """
         if n_items > 0:
             new_n_items = self.__n_items + n_items

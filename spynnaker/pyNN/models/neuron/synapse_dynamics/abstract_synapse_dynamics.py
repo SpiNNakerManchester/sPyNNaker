@@ -36,8 +36,7 @@ class AbstractSynapseDynamics(object):
         """ Merge with the given synapse_dynamics and return the result, or\
             error if merge is not possible
 
-        :param synapse_dynamics:
-        :type synapse_dynamics: AbstractSynapseDynamics
+        :param AbstractSynapseDynamics synapse_dynamics:
         :rtype: AbstractSynapseDynamics
         """
 
@@ -45,8 +44,7 @@ class AbstractSynapseDynamics(object):
     def is_same_as(self, synapse_dynamics):
         """ Determines if this synapse dynamics is the same as another
 
-        :param synapse_dynamics:
-        :type synapse_dynamics: AbstractSynapseDynamics
+        :param AbstractSynapseDynamics synapse_dynamics:
         :rtype: bool
         """
 
@@ -68,10 +66,8 @@ class AbstractSynapseDynamics(object):
     def get_parameters_sdram_usage_in_bytes(self, n_neurons, n_synapse_types):
         """ Get the SDRAM usage of the synapse dynamics parameters in bytes
 
-        :param n_neurons:
-        :type n_neurons: int
-        :param n_synapse_types:
-        :type n_synapse_types: int
+        :param int n_neurons:
+        :param int n_synapse_types:
         :rtype: int
         """
 
@@ -79,14 +75,10 @@ class AbstractSynapseDynamics(object):
     def write_parameters(self, spec, region, machine_time_step, weight_scales):
         """ Write the synapse parameters to the spec
 
-        :param spec:
-        :type spec: ~data_specification.DataSpecificationGenerator
-        :param region: region ID
-        :type region: int
-        :param machine_time_step:
-        :type machine_time_step: int
-        :param weight_scales:
-        :type weight_scales: ?
+        :param ~data_specification.DataSpecificationGenerator spec:
+        :param int region: region ID
+        :param int machine_time_step:
+        :param list(float) weight_scales:
         """
 
     @abstractmethod
@@ -102,8 +94,7 @@ class AbstractSynapseDynamics(object):
         """ Get the maximum number of synapses that can be held in the given\
             number of words
 
-        :param n_words: The number of words the synapses must fit in
-        :type n_words: int
+        :param int n_words: The number of words the synapses must fit in
         :rtype: int
         """
 
@@ -132,10 +123,8 @@ class AbstractSynapseDynamics(object):
     def get_provenance_data(self, pre_population_label, post_population_label):
         """ Get the provenance data from this synapse dynamics object
 
-        :param pre_population_label:
-        :type pre_population_label: str
-        :param post_population_label:
-        :type post_population_label: str
+        :param str pre_population_label:
+        :param str post_population_label:
         """
         # pylint: disable=unused-argument
         return list()
@@ -143,20 +132,16 @@ class AbstractSynapseDynamics(object):
     def get_delay_maximum(self, connector, synapse_info):
         """ Get the maximum delay for the synapses
 
-        :param connector:
-        :type connector: AbstractConnector
-        :param delays:
-        :type delays: ~numpy.ndarray
+        :param AbstractConnector connector:
+        :param ~numpy.ndarray delays:
         """
         return connector.get_delay_maximum(synapse_info)
 
     def get_delay_variance(self, connector, delays):
         """ Get the variance in delay for the synapses
 
-        :param connector:
-        :type connector: AbstractConnector
-        :param delays:
-        :type delays: ~numpy.ndarray
+        :param AbstractConnector connector:
+        :param ~numpy.ndarray delays:
         """
         # pylint: disable=too-many-arguments
         return connector.get_delay_variance(delays)
@@ -164,10 +149,8 @@ class AbstractSynapseDynamics(object):
     def get_weight_mean(self, connector, synapse_info):
         """ Get the mean weight for the synapses
 
-        :param connector:
-        :type connector: AbstractConnector
-        :param weights:
-        :type weights: ~numpy.ndarray
+        :param AbstractConnector connector:
+        :param ~numpy.ndarray weights:
         """
         # pylint: disable=too-many-arguments
         return connector.get_weight_mean(synapse_info.weights)
@@ -175,10 +158,8 @@ class AbstractSynapseDynamics(object):
     def get_weight_maximum(self, connector, synapse_info):
         """ Get the maximum weight for the synapses
 
-        :param connector:
-        :type connector: AbstractConnector
-        :param weights:
-        :type weights: ~numpy.ndarray
+        :param AbstractConnector connector:
+        :param ~numpy.ndarray weights:
         """
         # pylint: disable=too-many-arguments
         return connector.get_weight_maximum(synapse_info)
@@ -186,10 +167,8 @@ class AbstractSynapseDynamics(object):
     def get_weight_variance(self, connector, weights):
         """ Get the variance in weight for the synapses
 
-        :param connector:
-        :type connector: AbstractConnector
-        :param weights:
-        :type weights: ~numpy.ndarray
+        :param AbstractConnector connector:
+        :param ~numpy.ndarray weights:
         """
         # pylint: disable=too-many-arguments
         return connector.get_weight_variance(weights)
@@ -199,12 +178,9 @@ class AbstractSynapseDynamics(object):
         """ Converts per-connection data generated from connections into\
             row-based data to be returned from get_synaptic_data
 
-        :param connection_row_indices:
-        :type connection_row_indices: ~numpy.ndarray
-        :param n_rows:
-        :type n_rows: int
-        :param data:
-        :type data: ~numpy.ndarray
+        :param ~numpy.ndarray connection_row_indices:
+        :param int n_rows:
+        :param ~numpy.ndarray data:
         :rtype: list(~numpy.ndarray)
         """
         return [
@@ -215,10 +191,8 @@ class AbstractSynapseDynamics(object):
         """ Get the number of items in each row as 4-byte values, given the\
             item size
 
-        :param rows:
-        :type rows: ~numpy.ndarray
-        :param item_size:
-        :type item_size: int
+        :param ~numpy.ndarray rows:
+        :param int item_size:
         :rtype: ~numpy.ndarray
         """
         return numpy.array([
@@ -228,8 +202,7 @@ class AbstractSynapseDynamics(object):
     def get_words(self, rows):
         """ Convert the row data to words
 
-        :param rows:
-        :type rows: ~numpy.ndarray
+        :param ~numpy.ndarray rows:
         :rtype: ~numpy.ndarray
         """
         words = [numpy.pad(

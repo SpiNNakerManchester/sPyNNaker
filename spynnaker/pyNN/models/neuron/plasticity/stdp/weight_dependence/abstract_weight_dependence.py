@@ -25,10 +25,8 @@ class AbstractWeightDependence(object):
     def get_provenance_data(self, pre_population_label, post_population_label):
         """ Get any provenance data
 
-        :param pre_population_label: label of pre.
-        :type pre_population_label: str
-        :param post_population_label: label of post.
-        :type post_population_label: str
+        :param str pre_population_label: label of pre.
+        :param str post_population_label: label of post.
         :return: the provenance data of the weight dependency
         :rtype: list
         """
@@ -46,8 +44,7 @@ class AbstractWeightDependence(object):
     def is_same_as(self, weight_dependence):
         """ Determine if this weight dependence is the same as another
 
-        :param weight_dependence:
-        :type weight_dependence: AbstractWeightDependence
+        :param AbstractWeightDependence weight_dependence:
         :rtype: bool
         """
 
@@ -63,10 +60,8 @@ class AbstractWeightDependence(object):
             self, n_synapse_types, n_weight_terms):
         """ Get the amount of SDRAM used by the parameters of this rule
 
-        :param n_synapse_types:
-        :type n_synapse_types: int
-        :param n_weight_terms:
-        :type n_weight_terms: int
+        :param int n_synapse_types:
+        :param int n_weight_terms:
         :rtype: int
         """
 
@@ -75,14 +70,10 @@ class AbstractWeightDependence(object):
             self, spec, machine_time_step, weight_scales, n_weight_terms):
         """ Write the parameters of the rule to the spec
 
-        :param spec:
-        :type spec: ~data_specification.DataSpecificationGenerator
-        :param machine_time_step: (unused?)
-        :type machine_time_step: int
-        :param weight_scales:
-        :type weight_scales: iterable(float)
-        :param n_weight_terms:
-        :type n_weight_terms: int
+        :param ~data_specification.DataSpecificationGenerator spec:
+        :param int machine_time_step: (unused?)
+        :param iterable(float) weight_scales:
+        :param int n_weight_terms:
        """
 
     @abstractproperty

@@ -64,12 +64,10 @@ class PopulationMachineVertex(
     def __init__(
             self, resources_required, recorded_region_ids, label, constraints):
         """
-        :param resources_required:
-        :param recorded_region_ids:
-        :param label:
-        :type label: str
-        :param constraints:
-        :type constraints: list(~pacman.model.constraints.AbstractConstraint)
+        :param ~pacman.model.resources.ResourceContainer resources_required:
+        :param iterable(int) recorded_region_ids:
+        :param str label:
+        :param list(~pacman.model.constraints.AbstractConstraint) constraints:
         """
         MachineVertex.__init__(self, label, constraints)
         AbstractRecordable.__init__(self)

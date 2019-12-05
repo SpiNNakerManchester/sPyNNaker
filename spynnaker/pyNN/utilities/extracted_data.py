@@ -30,7 +30,7 @@ class ExtractedData(object):
         """ Allow getting data from a given projection and attribute
 
         :param projection: the projection data was extracted from
-        :type projection: \
+        :type projection:
             ~spynnaker.pyNN.models.pynn_projection_common.PyNNProjectionCommon
         :param attribute: the attribute to retrieve
         :type attribute: list(int) or tuple(int) or None
@@ -46,12 +46,12 @@ class ExtractedData(object):
         """ Allow the addition of data from a projection and attribute.
 
         :param projection: the projection data was extracted from
-        :type projection: \
+        :type projection:
             ~spynnaker.pyNN.models.pynn_projection_common.PyNNProjectionCommon
         :param attribute: the attribute to store
         :type attribute: list(int) or tuple(int) or None
-        :param data: attribute data in a connection holder
-        :type data: ~spynnaker.pyNN.models.neuron.ConnectionHolder
+        :param ~spynnaker.pyNN.models.neuron.ConnectionHolder data:
+            attribute data in a connection holder
         :rtype: None
         """
         self.__data[projection][attribute] = data

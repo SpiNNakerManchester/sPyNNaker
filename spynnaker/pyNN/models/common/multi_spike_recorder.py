@@ -77,20 +77,17 @@ class MultiSpikeRecorder(object):
             self, label, buffer_manager, region,
             placements, graph_mapper, application_vertex, machine_time_step):
         """
-        :param label:
-        :type label: str
+        :param str label:
         :param buffer_manager: the buffer manager object
-        :type buffer_manager: \
+        :type buffer_manager:
             ~spinn_front_end_common.interface.buffer_management.BufferManager
-        :param region:
-        :type region: int
+        :param int region:
         :param placements:
         :type placements: ~pacman.model.placements.Placements
         :param application_vertex:
-        :type application_vertex: \
+        :type application_vertex:
             ~pacman.model.graphs.application.ApplicationVertex
-        :param machine_time_step: microseconds
-        :type machine_time_step: int
+        :param int machine_time_step: microseconds
         :return: A numpy array of 2-element arrays of (neuron_id, time)\
             ordered by time, one element per event
         :rtype: ~numpy.ndarray(tuple(int,int))

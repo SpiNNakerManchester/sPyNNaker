@@ -54,20 +54,13 @@ class NeuronModelLeakyIntegrateAndFire(AbstractNeuronModel):
     def __init__(
             self, v_init, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac):
         r"""
-        :param v_init: :math:`V_{init}`
-        :type v_init: float
-        :param v_rest: :math:`V_{rest}`
-        :type v_rest: float
-        :param tau_m: :math:`\tau_{m}`
-        :type tau_m: float
-        :param cm: :math:`C_m`
-        :type cm: float
-        :param i_offset: :math:`I_{offset}`
-        :type i_offset: float
-        :param v_reset: :math:`V_{reset}`
-        :type v_reset: float
-        :param tau_refrac: :math:`\tau_{refrac}`
-        :type tau_refrac: float
+        :param float v_init: :math:`V_{init}`
+        :param float v_rest: :math:`V_{rest}`
+        :param float tau_m: :math:`\tau_{m}`
+        :param float cm: :math:`C_m`
+        :param float i_offset: :math:`I_{offset}`
+        :param float v_reset: :math:`V_{reset}`
+        :param float tau_refrac: :math:`\tau_{refrac}`
         """
         super(NeuronModelLeakyIntegrateAndFire, self).__init__(
             [DataType.S1615,   # v
@@ -120,8 +113,7 @@ class NeuronModelLeakyIntegrateAndFire(AbstractNeuronModel):
     @overrides(AbstractNeuronModel.get_values, additional_arguments={'ts'})
     def get_values(self, parameters, state_variables, vertex_slice, ts):
         """
-        :param ts: machine time step
-        :type ts: float
+        :param int ts: machine time step
         """
         # pylint: disable=arguments-differ
 

@@ -65,22 +65,15 @@ class SynapseDynamicsSTDP(
             weight=0.0, delay=1.0, pad_to_length=None,
             backprop_delay=True):
         """
-        :param timing_dependence:
-        :type timing_dependence: AbstractTimingDependence
-        :param weight_dependence:
-        :type weight_dependence: AbstractWeightDependence
-        :param voltage_dependence: not supported
-        :type voltage_dependence: None
-        :param dendritic_delay_fraction: [0.5, 1.0]
-        :type dendritic_delay_fraction: float
-        :param weight:
-        :type weight: float
-        :param delay:
-        :type delay: float
+        :param AbstractTimingDependence timing_dependence:
+        :param AbstractWeightDependence weight_dependence:
+        :param None voltage_dependence: not supported
+        :param flooat dendritic_delay_fraction: [0.5, 1.0]
+        :param float weight:
+        :param float delay:
         :param pad_to_length:
         :type pad_to_length: int or None
-        :param backprop_delay:
-        :type backprop_delay: bool
+        :param bool backprop_delay:
         """
         self.__timing_dependence = timing_dependence
         self.__weight_dependence = weight_dependence
@@ -230,14 +223,10 @@ class SynapseDynamicsSTDP(
 
     def write_parameters(self, spec, region, machine_time_step, weight_scales):
         """
-        :param spec:
-        :type spec: ~data_specification.DataSpecificationGenerator
-        :param region: region ID
-        :type region: int
-        :param machine_time_step:
-        :type machine_time_step: int
-        :param weight_scales:
-        :type weight_scales: list(float)
+        :param ~data_specification.DataSpecificationGenerator spec:
+        :param int region: region ID
+        :param int machine_time_step:
+        :param list(float) weight_scales:
         """
         spec.comment("Writing Plastic Parameters")
 

@@ -137,10 +137,8 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
     def get_exact_master_population_table_size(
             self, vertex, machine_graph, graph_mapper):
         """
-        :param vertex:
-        :type vertex: PopulationMachineVertex
-        :param machine_graph:
-        :type machine_graph: ~pacman.model.graphs.machine.MachineGraph
+        :param PopulationMachineVertex vertex:
+        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
         :return: the size the master pop table will take in SDRAM (in bytes)
         :rtype: int
         """
@@ -161,8 +159,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
 
     def get_allowed_row_length(self, row_length):
         """
-        :param row_length: the row length being considered
-        :type row_length: int
+        :param int row_length: the row length being considered
         :return: the row length available
         :rtype: int
         :raises SynapseRowTooBigException: If the row won't fit
@@ -174,8 +171,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
 
     def get_next_allowed_address(self, next_address):
         """
-        :param next_address: The next address that would be used
-        :type next_address: int
+        :param int next_address: The next address that would be used
         :return: The next address that can be used following next_address
         :rtype: int
         :raises SynapticConfigurationException: if the address is out of range

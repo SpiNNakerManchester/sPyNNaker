@@ -43,18 +43,16 @@ def synapse_expander(
     .. note::
         Needs to be done after data has been loaded.
 
-    :param app_graph: \
+    :param ~pacman.model.graphs.application.ApplicationGraph app_graph:
         The graph containing the vertices that might need expanding.
-    :type app_graph: ~pacman.model.graphs.application.ApplicationGraph
-    :param placements: Where all vertices are on the machine.
-    :type placements: ~pacman.model.placements.Placements
-    :param transceiver: How to talk to the machine.
-    :type transceiver: ~spinnman.transceiver.Transceiver
-    :param provenance_file_path: Where provenance data should be written.
-    :type provenance_file_path: str
-    :param executable_finder: How to find the synapse expander binaries.
-    :type executable_finder: \
-        ~spinn_utilities.executable_finder.ExecutableFinder
+    :param ~pacman.model.placements.Placements placements:
+        Where all vertices are on the machine.
+    :param ~spinnman.transceiver.Transceiver transceiver:
+        How to talk to the machine.
+    :param str provenance_file_path: Where provenance data should be written.
+    :param ~spinn_utilities.executable_finder.ExecutableFinder \
+            executable_finder:
+        How to find the synapse expander binaries.
     """
 
     synapse_bin = executable_finder.get_executable_path(SYNAPSE_EXPANDER)

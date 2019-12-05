@@ -31,10 +31,8 @@ _existing_connections = dict()
 def get_pushbot_wifi_connection(remote_host, remote_port=56000):
     """ Get an existing connection to a PushBot, or make a new one.
 
-    :param remote_host: The IP address of the PushBot
-    :type remote_host: str
-    :param remote_port: The port number of the PushBot (default 56000)
-    :type remote_port: int
+    :param str remote_host: The IP address of the PushBot
+    :param int remote_port: The port number of the PushBot (default 56000)
     """
     key = (remote_host, remote_port)
     if key not in _existing_connections:
@@ -57,11 +55,9 @@ class PushBotWIFIConnection(Connection, Listenable):
 
     def __init__(self, remote_host, remote_port=56000):
         """
-        :param remote_host: The IP address of the PushBot
-        :type remote_host: str
-        :param remote_port: The port number of the PushBot (default 56000)
-        :type remote_port: int
-        :raise SpinnmanIOException: \
+        :param str remote_host: The IP address of the PushBot
+        :param int remote_port: The port number of the PushBot (default 56000)
+        :raise SpinnmanIOException:
             If there is an error setting up the communication channel
         """
         try:
@@ -108,7 +104,7 @@ class PushBotWIFIConnection(Connection, Listenable):
 
     def is_connected(self):
         """ See\
-            :py:meth:`spinnman.connections.Connection.is_connected`
+            :py:meth:`~spinnman.connections.Connection.is_connected`
         """
         if platform.platform().lower().startswith("windows"):
             cmd_args = "-n 1 -w 1"
@@ -170,8 +166,8 @@ class PushBotWIFIConnection(Connection, Listenable):
         :param timeout: The timeout, or None to wait forever
         :type timeout: float or None
         :return: The data received
-        :rtype: bytestring
-        :raise SpinnmanTimeoutException: \
+        :rtype: bytes
+        :raise SpinnmanTimeoutException:
             If a timeout occurs before any data is received
         :raise SpinnmanIOException: If an error occurs receiving the data
         """
@@ -186,8 +182,7 @@ class PushBotWIFIConnection(Connection, Listenable):
     def send(self, data):
         """ Send data down this connection
 
-        :param data: The data to be sent
-        :type data: bytestring
+        :param bytearray data: The data to be sent
         :raise SpinnmanIOException: If there is an error sending the data
         """
         try:

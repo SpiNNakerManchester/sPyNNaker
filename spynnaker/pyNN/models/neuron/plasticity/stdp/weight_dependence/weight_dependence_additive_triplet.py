@@ -41,15 +41,11 @@ class WeightDependenceAdditiveTriplet(
             w_max=default_parameters['w_max'],
             A3_plus=default_parameters['A3_plus'],
             A3_minus=default_parameters['A3_minus']):
-        r"""
-        :param w_min: :math:`w^{min}`
-        :type w_min: float
-        :param w_max: :math:`w^{max}`
-        :type w_max: float
-        :param A3_plus: :math:`A_3^+`
-        :type A3_plus: float
-        :param A3_minus: :math:`A_3^-`
-        :type A3_minus: float
+        """
+        :param float w_min: :math:`w^{min}`
+        :param float w_max: :math:`w^{max}`
+        :param float A3_plus: :math:`A_3^+`
+        :param float A3_minus: :math:`A_3^-`
         """
         super(WeightDependenceAdditiveTriplet, self).__init__()
         self.__w_min = w_min

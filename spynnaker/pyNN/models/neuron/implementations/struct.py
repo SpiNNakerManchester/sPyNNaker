@@ -22,16 +22,18 @@ from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
 
 class Struct(object):
-    """ Represents a C code structure
+    """ Represents a C code structure.
+
+    .. note::
+        The structure cannot currently represent arrays.
     """
 
     __slots__ = ["__field_types"]
 
     def __init__(self, field_types):
         """
-        :param field_types:\
+        :param list(~data_specification.enums.DataType) field_types:
             The types of the fields, ordered as they appear in the struct
-        :type field_types: list(~data_specification.enums.DataType)
         """
         self.__field_types = field_types
 
@@ -58,8 +60,7 @@ class Struct(object):
         """ Get the size of the struct in whole words in an array of given\
             size (default 1 item)
 
-        :param array_size: The number of elements in an array of structs
-        :type array_size: int
+        :param int array_size: The number of elements in an array of structs
         :rtype: int
         """
         datatype = self.numpy_dtype
@@ -69,16 +70,14 @@ class Struct(object):
     def get_data(self, values, offset=0, array_size=1):
         """ Get a numpy array of uint32 of data for the given values
 
-        :param values:\
-            A list of values with length the same size as the number of fields\
+        :param values:
+            A list of values with length the same size as the number of fields
             returned by field_types
-        :type values:\
-            list(int or float or list(int) or list(float) or \
+        :type values:
+            list(int or float or list(int) or list(float) or
             ~spinn_utilities.ranged.RangedList)
-        :param offset: The offset into each of the values where to start
-        :type offset: int
-        :param array_size: The number of structs to generate
-        :type array_size: int
+        :param int offset: The offset into each of the values where to start
+        :param int array_size: The number of structs to generate
         :rtype: ~numpy.ndarray(~numpy.uint32)
         """
         # Create an array to store values in
@@ -120,11 +119,9 @@ class Struct(object):
 
         :param data: The data to be read
         :type data: bytes or bytearray or memoryview
-        :param offset: Index of the byte at the start of the valid data
-        :type offset: int
-        :param array_size: The number of struct elements to read
-        :type array_size: int
-        :return:\
+        :param int offset: Index of the byte at the start of the valid data
+        :param int array_size: The number of struct elements to read
+        :return:
             a list of lists of data values, one list for each struct element
         :rtype: list(~numpy.ndarray)
         """

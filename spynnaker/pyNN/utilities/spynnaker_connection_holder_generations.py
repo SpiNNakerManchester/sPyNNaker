@@ -24,8 +24,9 @@ logger = logging.getLogger(__name__)
 class SpYNNakerConnectionHolderGenerator(object):
     """ Sets up connection holders for reports to use.
 
-    :param application_graph: app graph
-    :type application_graph: ~pacman.model.graphs.application.ApplicationGraph
+    :param ~pacman.model.graphs.application.ApplicationGraph \
+            application_graph:
+        app graph
     :return: the set of connection holders for after DSG generation
     :rtype: dict(tuple(ProjectionApplicationEdge, SynapseInformation), \
         ConnectionHolder)
