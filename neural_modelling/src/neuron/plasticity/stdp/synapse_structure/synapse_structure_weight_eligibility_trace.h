@@ -72,15 +72,17 @@ static inline plastic_synapse_t synapse_structure_get_final_synaptic_word(
     return final_state;
 }
 
+// The issue here is that plastic_synapse_t and weight_t aren't the same.. ?
+// I'm pretty sure the simple conversion will be problematic at higher weights...
 //---------------------------------------
 static inline plastic_synapse_t synapse_structure_create_synapse(
         weight_t weight) {
-    return weight;
+    return (weight_t)weight;
 }
 
 static inline weight_t synapse_structure_get_weight(
         plastic_synapse_t synaptic_word) {
-    return synaptic_word;
+    return (weight_t)synaptic_word;
 }
 
 
