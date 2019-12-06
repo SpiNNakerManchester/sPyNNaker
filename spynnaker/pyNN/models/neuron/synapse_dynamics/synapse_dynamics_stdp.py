@@ -199,13 +199,22 @@ class SynapseDynamicsSTDP(
         return False
 
     def get_vertex_executable_suffix(self):
-        # For neuromodulation binary name is set completely in the build
-        # as it is not using standard weight and timing dependence
+        # Get the suffix values for timing and weight dependence
+        timing_suffix = self.__timing_dependence.vertex_executable_suffix
+        weight_suffix = self.__weight_dependence.vertex_executable_suffix
+
+        # For STDP with neuromodulation binary name is set completely in the
+        # build as it must use a particular weight and timing dependence
         if self.__neuromodulation:
-            return ""
-        name = "_stdp_mad"
-        name += "_" + self.__timing_dependence.vertex_executable_suffix
-        name += "_" + self.__weight_dependence.vertex_executable_suffix
+            if (weight_suffix != "multiplicative") or (
+                    timing_suffix != "izhikevich_neuromodulation"):
+                # Error
+                raise NotImplementedError(
+                    "Neuromodulation only uses MultiplicativeWeightDependence"
+                    " and IzhikevichNeuromodulation timing dependence")
+            else:
+                return ""
+        name = "_stdp_mad_" + timing_suffix + "_" + weight_suffix
         return name
 
     def get_parameters_sdram_usage_in_bytes(self, n_neurons, n_synapse_types):
