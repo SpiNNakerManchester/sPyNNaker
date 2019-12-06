@@ -21,6 +21,8 @@ from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.utilities import constants
+from spinn_front_end_common.utilities.constants import (
+    BYTES_PER_WORD, BYTES_PER_SHORT)
 import math
 
 
@@ -68,19 +70,20 @@ class SynapseDynamicsStructuralCommon(object):
     # 7 32-bit numbers (fast; p_rew; s_max; app_no_atoms; machine_no_atoms;
     # low_atom; high_atom) + 2 4-word RNG seeds (shared_seed; local_seed)
     # + 1 32-bit number (no_pre_pops)
-    REWIRING_DATA_SIZE = (7 * 4) + (2 * 4 * 4) + 4
+    REWIRING_DATA_SIZE = (
+        (7 * BYTES_PER_WORD) + (2 * 4 * BYTES_PER_WORD) + BYTES_PER_WORD)
 
     # Size excluding key_atom_info (as variable length)
     # 4 16-bit numbers (no_pre_vertices; sp_control; delay_lo; delay_hi)
     # + 3 32-bit numbers (weight; connection_type; total_no_atoms)
-    PRE_POP_INFO_BASE_SIZE = (4 * 2) + (3 * 4)
+    PRE_POP_INFO_BASE_SIZE = (4 * BYTES_PER_SHORT) + (3 * BYTES_PER_WORD)
 
     # 5 32-bit numbers (key; mask; n_atoms; lo_atom; m_pop_index)
-    KEY_ATOM_INFO_SIZE = (5 * 4)
+    KEY_ATOM_INFO_SIZE = (5 * BYTES_PER_WORD)
 
     # 1 16-bit number (neuron_index)
     # + 2 8-bit numbers (sub_pop_index; pop_index)
-    POST_TO_PRE_ENTRY_SIZE = 2 + (2 * 1)
+    POST_TO_PRE_ENTRY_SIZE = BYTES_PER_SHORT + (2 * 1)
 
     DEFAULT_F_REW = 10**4
     DEFAULT_INITIAL_WEIGHT = 0

@@ -15,6 +15,7 @@
 
 import logging
 import os
+from six import iteritems
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.make_tools.replacer import Replacer
 from spinnman.model import ExecutableTargets
@@ -23,11 +24,6 @@ from spinn_front_end_common.utilities import globals_variables
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
-from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractGenerateConnectorOnMachine)
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractGenerateOnMachine)
-from six import iteritems
 
 logger = logging.getLogger(__name__)
 
@@ -156,7 +152,7 @@ def _handle_failure(expander_cores, transceiver, provenance_file_path):
 
 def _fill_in_connection_data(expanded_pop_vertices, placements, transceiver):
     """ Once expander has run, fill in the connection data
-    :param app_graph
+
     :rtype: None
     """
     ctl = globals_variables.get_simulator()
@@ -168,7 +164,7 @@ def _fill_in_connection_data(expanded_pop_vertices, placements, transceiver):
                 conn_holders):
             # Only do this if this synapse_info has been generated
             # on the machine using the expander
-            if _synapses_were_generated_on_machine(synapse_info):
+            if synapse_info.may_generate_on_machine():
                 machine_edges = app_edge.machine_edges
                 for machine_edge in machine_edges:
                     placement = placements.get_placement_of_vertex(
@@ -179,14 +175,3 @@ def _fill_in_connection_data(expanded_pop_vertices, placements, transceiver):
                         use_extra_monitors)
                     for conn_holder in conn_holder_list:
                         conn_holder.add_connections(conns)
-
-
-def _synapses_were_generated_on_machine(synapse_info):
-    connector_gen = (
-        isinstance(synapse_info.connector,
-                   AbstractGenerateConnectorOnMachine) and
-        synapse_info.connector.generate_on_machine(
-            synapse_info.weight, synapse_info.delay))
-    synapse_gen = isinstance(synapse_info.synapse_dynamics,
-                             AbstractGenerateOnMachine)
-    return connector_gen and synapse_gen

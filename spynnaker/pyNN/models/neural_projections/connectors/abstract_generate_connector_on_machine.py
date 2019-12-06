@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import decimal
 from distutils.version import StrictVersion  # pylint: disable=all
 from enum import Enum
 import numpy
@@ -21,6 +20,7 @@ from six import with_metaclass
 from spinn_utilities.abstract_base import abstractproperty, AbstractBase
 from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.globals_variables import get_simulator
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector)
 
@@ -126,20 +126,19 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         """
         if numpy.isscalar(values):
             return numpy.array(
-                [round(decimal.Decimal(str(values)) * DataType.S1615.scale)],
+                [DataType.S1615.encode_as_int(values)],
                 dtype="uint32")
 
         if IS_PYNN_8 and get_simulator().is_a_pynn_random(values):
-            parameters = random.available_distributions[values.name]
-            params = [
-                values.parameters.get(param, None) for param in parameters]
-            params = [
+            parameters = (
+                values.parameters.get(param_name, None)
+                for param_name in random.available_distributions[values.name])
+            parameters = (
                 DataType.S1615.max if param == numpy.inf
                 else DataType.S1615.min if param == -numpy.inf else param
-                for param in params if param is not None]
+                for param in parameters if param is not None)
             params = [
-                round(decimal.Decimal(str(param)) * DataType.S1615.scale)
-                for param in params if param is not None]
+                DataType.S1615.encode_as_int(param) for param in parameters]
             params.extend(seed)
             return numpy.array(params, dtype="uint32")
 
@@ -150,11 +149,11 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         """ Get the size of the parameter generator parameters in bytes
         """
         if numpy.isscalar(values):
-            return 4
+            return BYTES_PER_WORD
 
         if IS_PYNN_8 and get_simulator().is_a_pynn_random(values):
             parameters = random.available_distributions[values.name]
-            return (len(parameters) + 4) * 4
+            return (len(parameters) + 4) * BYTES_PER_WORD
 
         raise ValueError("Unexpected value {}".format(values))
 
@@ -241,7 +240,7 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
     def gen_connector_params(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type):
+            synapse_type, synapse_info):
         """ Get the parameters of the on machine generation.
 
         :rtype: numpy array of uint32

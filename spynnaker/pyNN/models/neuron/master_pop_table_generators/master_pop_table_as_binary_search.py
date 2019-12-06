@@ -18,6 +18,7 @@ import math
 import struct
 import numpy
 from spinn_utilities.overrides import overrides
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.models.neural_projections import (
     ProjectionApplicationEdge, ProjectionMachineEdge)
 from spynnaker.pyNN.exceptions import (
@@ -36,10 +37,10 @@ class _MasterPopEntry(object):
         "__mask",
         "__routing_key"]
 
-    MASTER_POP_ENTRY_SIZE_BYTES = 12
     MASTER_POP_ENTRY_SIZE_WORDS = 3
-    ADDRESS_LIST_ENTRY_SIZE_BYTES = 4
+    MASTER_POP_ENTRY_SIZE_BYTES = 3 * BYTES_PER_WORD
     ADDRESS_LIST_ENTRY_SIZE_WORDS = 1
+    ADDRESS_LIST_ENTRY_SIZE_BYTES = 1 * BYTES_PER_WORD
 
     def __init__(self, routing_key, mask):
         self.__routing_key = routing_key

@@ -126,7 +126,7 @@ class PyNNPopulationCommon(object):
         # add objects to the SpiNNaker control class
         self.__spinnaker_control.add_population(self)
         self.__spinnaker_control.add_application_vertex(
-            self.__vertex, "Population ")
+            self.__vertex)
 
         # initialise common stuff
         self._size = size
@@ -188,12 +188,6 @@ class PyNNPopulationCommon(object):
         # TODO: Make this add the neurons from another population to this one
         _we_dont_do_this_now(other)
 
-    def all(self):
-        """ Iterator over cell IDs on all nodes.
-        """
-        # TODO: Return the cells when we have such a thing
-        _we_dont_do_this_now()
-
     @property
     def conductance_based(self):
         """ True if the population uses conductance inputs
@@ -201,11 +195,6 @@ class PyNNPopulationCommon(object):
         if hasattr(self.__vertex, "conductance_based"):
             return self.__vertex.conductance_based
         return False
-
-    def __getitem__(self, index_or_slice):
-        # Note: This is supported by sPyNNaker8
-        # TODO: Used to get a single cell - not yet supported
-        raise NotImplementedError
 
     def get(self, parameter_names, gather=True, simplify=True):
         """ Get the values of a parameter for every local cell in the\
@@ -265,6 +254,9 @@ class PyNNPopulationCommon(object):
     def id_to_index(self, id):  # @ReservedAssignment
         """ Given the ID(s) of cell(s) in the Population, return its (their)\
             index (order in the Population).
+
+        Defined by
+        http://neuralensemble.org/docs/PyNN/reference/populations.html
         """
         # pylint: disable=redefined-builtin
         if not numpy.iterable(id):
@@ -292,6 +284,8 @@ class PyNNPopulationCommon(object):
         """ Given the ID(s) of cell(s) in the Population, return its (their)\
             index (order in the Population), counting only cells on the local\
             MPI node.
+        Defined by
+        http://neuralensemble.org/docs/PyNN/reference/populations.html
         """
         # TODO: Need __getitem__
         _we_dont_do_this_now(cell_id)
@@ -310,28 +304,15 @@ class PyNNPopulationCommon(object):
         self._read_parameters_before_set()
         self.__vertex.initialize(variable, value)
 
-    def can_record(self, variable):
-        """ Determine whether `variable` can be recorded from this population.
-
-        Note: This is supported by sPyNNaker8
-        """
-        # TODO: Needs a more precise recording mechanism (coming soon)
-        _we_dont_do_this_now(variable)
-
     def inject(self, current_source):
         """ Connect a current source to all cells in the Population.
+
+        Defined by
+        http://neuralensemble.org/docs/PyNN/reference/populations.html
         """
 
         # TODO:
         _we_dont_do_this_now(current_source)
-
-    def __iter__(self):
-        """ Iterate over local cells
-
-        Note: This is supported by sPyNNaker8
-        """
-        # TODO:
-        _we_dont_do_this_now()
 
     def __len__(self):
         """ Get the total number of cells in the population.
@@ -352,6 +333,9 @@ class PyNNPopulationCommon(object):
     @property
     def local_size(self):
         """ The number of local cells
+
+        Defined by
+        http://neuralensemble.org/docs/PyNN/reference/populations.html
         """
         # Doesn't make much sense on SpiNNaker
         return self._size
@@ -458,6 +442,9 @@ class PyNNPopulationCommon(object):
 
     def get_spike_counts(self, spikes, gather=True):
         """ Return the number of spikes for each neuron.
+
+        Defined by
+        http://neuralensemble.org/docs/PyNN/reference/populations.html
 
         :param gather: pointless on sPyNNaker
         """

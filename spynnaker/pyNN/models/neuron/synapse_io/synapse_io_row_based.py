@@ -17,6 +17,7 @@ import math
 import numpy
 from six import raise_from
 from spinn_utilities.overrides import overrides
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector)
 from spynnaker.pyNN.exceptions import SynapseRowTooBigException
@@ -43,8 +44,9 @@ class SynapseIORowBased(AbstractSynapseIO):
         # There are 16 slots, one per time step
         return 16 * (machine_time_step / 1000.0)
 
-    def _n_words(self, n_bytes):
-        return math.ceil(float(n_bytes) / 4.0)
+    @staticmethod
+    def _n_words(n_bytes):
+        return math.ceil(float(n_bytes) / BYTES_PER_WORD)
 
     def _get_max_row_length(
             self, size, dynamics, population_table, in_edge, row_length):
@@ -78,14 +80,14 @@ class SynapseIORowBased(AbstractSynapseIO):
         # row length for the non-delayed synaptic matrix
         max_undelayed_n_synapses = synapse_info.connector \
             .get_n_connections_from_pre_vertex_maximum(
-                synapse_info.delay, post_vertex_slice, 0, max_delay_supported)
+                post_vertex_slice, synapse_info, 0, max_delay_supported)
 
         # determine the max row length in the delay extension
         max_delayed_n_synapses = 0
         if n_delay_stages > 0:
             max_delayed_n_synapses = synapse_info.connector \
                 .get_n_connections_from_pre_vertex_maximum(
-                    synapse_info.delay, post_vertex_slice,
+                    post_vertex_slice, synapse_info,
                     min_delay_for_delay_extension, max_delay)
 
         # Get the row sizes
@@ -111,10 +113,12 @@ class SynapseIORowBased(AbstractSynapseIO):
 
         undelayed_max_bytes = 0
         if undelayed_max_n_words > 0:
-            undelayed_max_bytes = (undelayed_max_n_words + _N_HEADER_WORDS) * 4
+            undelayed_max_bytes = (undelayed_max_n_words + _N_HEADER_WORDS) * \
+                BYTES_PER_WORD
         delayed_max_bytes = 0
         if delayed_max_n_words > 0:
-            delayed_max_bytes = (delayed_max_n_words + _N_HEADER_WORDS) * 4
+            delayed_max_bytes = (delayed_max_n_words + _N_HEADER_WORDS) * \
+                BYTES_PER_WORD
 
         return MaxRowInfo(
             max_undelayed_n_synapses, max_delayed_n_synapses,
@@ -190,9 +194,9 @@ class SynapseIORowBased(AbstractSynapseIO):
 
         # Get the actual connections
         connections = synapse_info.connector.create_synaptic_block(
-            synapse_info.weight, synapse_info.delay, pre_slices,
-            pre_slice_index, post_slices, post_slice_index, pre_vertex_slice,
-            post_vertex_slice, synapse_info.synapse_type)
+            pre_slices, pre_slice_index, post_slices, post_slice_index,
+            pre_vertex_slice, post_vertex_slice, synapse_info.synapse_type,
+            synapse_info)
 
         # Convert delays to timesteps
         connections["delay"] = numpy.rint(
@@ -310,12 +314,10 @@ class SynapseIORowBased(AbstractSynapseIO):
         connections = numpy.concatenate(connections)
 
         # Return the delays values to milliseconds
-        connections["delay"] = (
-                connections["delay"] / (1000.0 / machine_time_step))
+        connections["delay"] /= 1000.0 / machine_time_step
 
         # Undo the weight scaling
-        connections["weight"] = (connections["weight"] / weight_scales[
-            synapse_info.synapse_type])
+        connections["weight"] /= weight_scales[synapse_info.synapse_type]
 
         # Return the connections
         return connections
@@ -438,4 +440,4 @@ class SynapseIORowBased(AbstractSynapseIO):
 
     @overrides(AbstractSynapseIO.get_block_n_bytes)
     def get_block_n_bytes(self, max_row_length, n_rows):
-        return (_N_HEADER_WORDS + max_row_length) * 4 * n_rows
+        return (_N_HEADER_WORDS + max_row_length) * BYTES_PER_WORD * n_rows

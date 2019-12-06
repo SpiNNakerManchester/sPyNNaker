@@ -32,7 +32,7 @@ from spinn_front_end_common.abstract_models.impl import (
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.utilities.constants import (
-    SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES)
+    SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES, BYTES_PER_WORD)
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.defaults import defaults
 
@@ -71,7 +71,7 @@ class MunichMotorDevice(
     SYSTEM_REGION = 0
     PARAMS_REGION = 1
 
-    PARAMS_SIZE = 7 * 4
+    PARAMS_SIZE = 7 * BYTES_PER_WORD
 
     def __init__(
             self, spinnaker_link_id, board_address=None, speed=30,

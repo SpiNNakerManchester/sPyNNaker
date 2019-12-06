@@ -13,10 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-try:
-    from collections.abc import defaultdict
-except ImportError:
-    from collections import defaultdict
+from collections import defaultdict
 import logging
 import math
 from spinn_utilities.overrides import overrides
@@ -33,7 +30,7 @@ from spinn_front_end_common.abstract_models import (
     AbstractProvidesOutgoingPartitionConstraints, AbstractHasAssociatedBinary)
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities.constants import (
-    SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES)
+    SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES, BYTES_PER_WORD)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from .delay_block import DelayBlock
 from .delay_extension_machine_vertex import DelayExtensionMachineVertex
@@ -50,7 +47,7 @@ logger = logging.getLogger(__name__)
 _DELAY_PARAM_HEADER_WORDS = 8
 # pylint: disable=protected-access
 _DELEXT_REGIONS = DelayExtensionMachineVertex._DELAY_EXTENSION_REGIONS
-_EXPANDER_BASE_PARAMS_SIZE = 3 * 4
+_EXPANDER_BASE_PARAMS_SIZE = 3 * BYTES_PER_WORD
 
 # The microseconds per timestep will be divided by this for the max offset
 _MAX_OFFSET_DENOMINATOR = 10
@@ -194,9 +191,11 @@ class DelayExtensionVertex(
         # ###################################################################
         # Reserve SDRAM space for memory areas:
         vertex_slice = vertex.vertex_slice
-        n_words_per_stage = int(math.ceil(vertex_slice.n_atoms / 32.0))
-        delay_params_sz = 4 * (_DELAY_PARAM_HEADER_WORDS +
-                               (self.__n_delay_stages * n_words_per_stage))
+        n_words_per_stage = int(math.ceil(
+            vertex_slice.n_atoms / float(8 * BYTES_PER_WORD)))
+        delay_params_sz = BYTES_PER_WORD * (
+            _DELAY_PARAM_HEADER_WORDS +
+            (self.__n_delay_stages * n_words_per_stage))
 
         spec.reserve_memory_region(
             region=_DELEXT_REGIONS.SYSTEM.value,
@@ -334,14 +333,14 @@ class DelayExtensionVertex(
         connector_gen = isinstance(
             connector, AbstractGenerateConnectorOnMachine) and \
             connector.generate_on_machine(
-                synapse_info.weight, synapse_info.delay)
+                synapse_info.weights, synapse_info.delays)
         synapse_gen = isinstance(
             dynamics, AbstractGenerateOnMachine)
         if connector_gen and synapse_gen:
             return sum((
                 DelayGeneratorData.BASE_SIZE,
                 connector.gen_delay_params_size_in_bytes(
-                    synapse_info.delay),
+                    synapse_info.delays),
                 connector.gen_connector_params_size_in_bytes,
             ))
         return 0
@@ -373,9 +372,11 @@ class DelayExtensionVertex(
 
     def get_dtcm_usage_for_atoms(self, vertex_slice):
         """
-        :type vertex_slice: :py:class:`pacman.model.graphs.common.Slice`
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
         """
-        return (44 + (16 * 4)) * vertex_slice.n_atoms
+        n_atoms = vertex_slice.n_atoms + 1
+        words_per_atom = 11 + 16
+        return words_per_atom * BYTES_PER_WORD * n_atoms
 
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
     def get_binary_file_name(self):
@@ -400,6 +401,6 @@ class DelayExtensionVertex(
     def gen_on_machine(self, vertex_slice):
         """ Determine if the given slice needs to be generated on the machine
 
-        :type vertex_slice: :py:class:`pacman.model.graphs.common.Slice`
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
         """
         return vertex_slice in self.__delay_generator_data
