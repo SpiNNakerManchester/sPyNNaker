@@ -124,12 +124,6 @@ class TimingDependenceIzhikevichNeuromodulation(AbstractTimingDependence):
 
     @overrides(AbstractTimingDependence.write_parameters)
     def write_parameters(self, spec, machine_time_step, weight_scales):
-
-        # Check timestep is valid
-        if machine_time_step != 1000:
-            raise NotImplementedError(
-                "STDP LUT generation currently only supports 1ms timesteps")
-
         # Write lookup tables
         spec.write_array(self.__tau_plus_data)
         spec.write_array(self.__tau_minus_data)
