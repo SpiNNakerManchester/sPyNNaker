@@ -993,11 +993,11 @@ class SpikeSourcePoissonVertex(
 
     @overrides(AbstractSpikeRecordable.get_spikes)
     def get_spikes(
-            self, placements, graph_mapper, buffer_manager, machine_time_step):
+            self, placements, graph_mapper, buffer_manager):
         return self.__spike_recorder.get_spikes(
             self.label, buffer_manager,
             SpikeSourcePoissonVertex.SPIKE_RECORDING_REGION_ID,
-            placements, graph_mapper, self, machine_time_step)
+            placements, graph_mapper, self, self.timestep_in_us)
 
     @overrides(AbstractProvidesOutgoingPartitionConstraints.
                get_outgoing_partition_constraints)

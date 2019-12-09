@@ -205,8 +205,7 @@ class RecordingCommon(object):
         # assuming we got here, everything is OK, so we should go get the
         # spikes
         return self.__population._vertex.get_spikes(
-            sim.placements, sim.graph_mapper, sim.buffer_manager,
-            sim.machine_time_step)
+            sim.placements, sim.graph_mapper, sim.buffer_manager)
 
     def _turn_off_all_recording(self, indexes=None):
         """ Turns off recording, is used by a pop saying `.record()`

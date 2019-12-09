@@ -122,7 +122,7 @@ class SpikeSourceArrayVertex(
 
     @overrides(AbstractSpikeRecordable.get_spikes)
     def get_spikes(
-            self, placements, graph_mapper, buffer_manager, machine_time_step):
+            self, placements, graph_mapper, buffer_manager):
         return self.__spike_recorder.get_spikes(
             self.label, buffer_manager, 0,
             placements, graph_mapper, self,
@@ -130,7 +130,7 @@ class SpikeSourceArrayVertex(
                 vertex.virtual_key
                 if vertex.virtual_key is not None
                 else 0,
-            machine_time_step)
+            self.timestep_in_us)
 
     @overrides(AbstractSpikeRecordable.clear_spike_recording)
     def clear_spike_recording(self, buffer_manager, placements, graph_mapper):
