@@ -19,6 +19,7 @@ from six.moves import xrange
 from spinn_utilities import logger_utils
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.timer import Timer
+from spinn_front_end_common.utilities.constants import US_TO_MS
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spynnaker.pyNN.models.common import (
@@ -167,7 +168,7 @@ class RecordingCommon(object):
             # assuming we got here, everything is ok, so we should go get the
             # data
             results = self.__population._vertex.get_data(
-                variable, sim.get_current_time(), sim.placements,
+                variable, sim.get_current_time() * US_TO_MS, sim.placements,
                 sim.graph_mapper, sim.buffer_manager)
             (data, indexes, sampling_interval) = results
 
