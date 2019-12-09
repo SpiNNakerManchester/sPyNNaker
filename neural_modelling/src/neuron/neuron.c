@@ -148,13 +148,11 @@ void neuron_store_neuron_parameters(address_t address) { // EXPORTED
 void neuron_do_timestep_update( // EXPORTED
         timer_t time, uint timer_count, uint timer_period) {
     // Set the next expected time to wait for between spike sending
+    // uint32_t start = tc[T1_COUNT];
     expected_time = sv->cpu_clk * timer_period;
 
     // Prepare recording for the next timestep
     neuron_recording_setup_for_next_recording();
-
-    // Set up an array for storing the matrix recorded variable values
-    state_t recorded_variable_values[n_recorded_vars];
 
     // update each neuron individually
     for (index_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
@@ -164,14 +162,7 @@ void neuron_do_timestep_update( // EXPORTED
                 synapse_dynamics_get_intrinsic_bias(time, neuron_index);
 
         // call the implementation function (boolean for spike)
-        bool spike = neuron_impl_do_timestep_update(
-                neuron_index, external_bias, recorded_variable_values);
-
-        // Write the recorded variable values
-        for (uint32_t i = 0; i < n_recorded_vars; i++) {
-            neuron_recording_record_accum(i, neuron_index,
-                recorded_variable_values[i]);
-        }
+        bool spike = neuron_impl_do_timestep_update(neuron_index, external_bias);
 
         // If the neuron has spiked
         if (spike) {
@@ -213,6 +204,9 @@ void neuron_do_timestep_update( // EXPORTED
 
     // Re-enable interrupts
     spin1_mode_restore(cpsr);
+
+    // uint32_t end = tc[T1_COUNT];
+    // log_info("%d", start - end);
 }
 
 void neuron_add_inputs( // EXPORTED
