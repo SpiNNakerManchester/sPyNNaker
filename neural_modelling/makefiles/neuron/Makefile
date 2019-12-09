@@ -48,6 +48,7 @@ MODELS = IF_curr_exp \
          IZK_cond_exp_stdp_mad_pair_additive \
          IF_curr_exp_stdp_izhikevich_neuromodulation \
          IF_curr_exp_stdp_izhikevich_neuromodulation_structural_random_distance_weight \
+         IF_cond_exp_stdp_izhikevich_neuromodulation \
          IZK_curr_exp_stdp_izhikevich_neuromodulation \
          IZK_cond_exp_stdp_izhikevich_neuromodulation
 
