@@ -129,8 +129,7 @@ class SpikeSourceArrayVertex(
             lambda vertex:
                 vertex.virtual_key
                 if vertex.virtual_key is not None
-                else 0,
-            self.timestep_in_us)
+                else 0)
 
     @overrides(AbstractSpikeRecordable.clear_spike_recording)
     def clear_spike_recording(self, buffer_manager, placements, graph_mapper):

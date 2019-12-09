@@ -20,7 +20,8 @@ from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.log import FormatAdapter
 from spinnman.messages.eieio.data_messages import EIEIODataHeader
 from spynnaker.pyNN.models.common import recording_utils
-from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spinn_front_end_common.utilities.constants import (BYTES_PER_WORD,
+                                                        US_TO_MS)
 
 logger = FormatAdapter(logging.getLogger(__name__))
 _ONE_WORD = struct.Struct("<I")
@@ -63,17 +64,17 @@ class EIEIOSpikeRecorder(object):
 
     def get_spikes(self, label, buffer_manager, region,
                    placements, graph_mapper, application_vertex,
-                   base_key_function, machine_time_step):
+                   base_key_function):
         # pylint: disable=too-many-arguments
         results = list()
         missing = []
-        ms_per_tick = machine_time_step / 1000.0
         vertices = graph_mapper.get_machine_vertices(application_vertex)
         progress = ProgressBar(vertices,
                                "Getting spikes for {}".format(label))
         for vertex in progress.over(vertices):
             placement = placements.get_placement_of_vertex(vertex)
             vertex_slice = graph_mapper.get_slice(vertex)
+            ms_per_tick = vertex.timestep_in_us / US_TO_MS
 
             # Read the spikes
             n_buffer_times = 0
