@@ -27,7 +27,8 @@ from pacman.model.resources import VariableSDRAM
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities import globals_variables
-from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spinn_front_end_common.utilities.constants import (
+    BYTES_PER_WORD, US_TO_MS)
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
 
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -191,11 +192,11 @@ class NeuronRecorder(object):
 
     def get_spikes(
             self, label, buffer_manager, region, placements, graph_mapper,
-            application_vertex, machine_time_step):
+            application_vertex):
 
         spike_times = list()
         spike_ids = list()
-        ms_per_tick = machine_time_step / 1000.0
+        ms_per_tick = application_vertex.timestep_in_us / US_TO_MS
 
         vertices = graph_mapper.get_machine_vertices(application_vertex)
         missing_str = ""

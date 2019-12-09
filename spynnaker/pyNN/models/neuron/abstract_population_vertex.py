@@ -582,7 +582,7 @@ class AbstractPopulationVertex(
             self, placements, graph_mapper, buffer_manager, machine_time_step):
         return self.__neuron_recorder.get_spikes(
             self.label, buffer_manager, self.SPIKE_RECORDING_REGION,
-            placements, graph_mapper, self, machine_time_step)
+            placements, graph_mapper, self)
 
     @overrides(AbstractNeuronRecordable.get_recordable_variables)
     def get_recordable_variables(self):
