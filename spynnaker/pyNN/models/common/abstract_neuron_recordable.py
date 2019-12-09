@@ -56,16 +56,15 @@ class AbstractNeuronRecordable(object):
         """
 
     @abstractmethod
-    def get_data(self, variable, n_machine_time_steps, placements,
-                 graph_mapper, buffer_manager, machine_time_step):
+    def get_data(self, variable, current_time_in_us, placements,
+                 graph_mapper, buffer_manager):
         """ Get the recorded data
 
         :param variable:
-        :param n_machine_time_steps:
+        :param current_time_in_us:
         :param placements:
         :param graph_mapper:
         :param buffer_manager:
-        :param machine_time_step:
         :return:
         """
         # pylint: disable=too-many-arguments

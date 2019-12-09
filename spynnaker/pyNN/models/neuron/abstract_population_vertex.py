@@ -600,13 +600,15 @@ class AbstractPopulationVertex(
             variable, new_state, sampling_interval, indexes)
 
     @overrides(AbstractNeuronRecordable.get_data)
-    def get_data(self, variable, n_machine_time_steps, placements,
-                 graph_mapper, buffer_manager, machine_time_step):
+    def get_data(self, variable, current_time_in_us, placements,
+                 graph_mapper, buffer_manager):
         # pylint: disable=too-many-arguments
         index = 0
         if variable != "spikes":
             index = 1 + self.__neuron_impl.get_recordable_variable_index(
                 variable)
+        n_machine_time_steps = self.simtime_in_us_to_timesteps(
+            current_time_in_us)
         return self.__neuron_recorder.get_matrix_data(
             self.label, buffer_manager, index, placements, graph_mapper,
             self, variable, n_machine_time_steps)
