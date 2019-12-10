@@ -211,7 +211,7 @@ static inline void neuron_recording_setup_for_next_recording(void) {
     // Reset the bitfields before starting if a beginning of recording
     for (uint32_t i = n_bitfield_vars; i > 0; i--) {
         bitfield_info_t *b_info = &bitfield_info[i - 1];
-        if (b_info->rate == 1) {
+        if (b_info->count == 1) {
             clear_bit_field(b_info->values->bits, b_info->n_words);
         }
     }
