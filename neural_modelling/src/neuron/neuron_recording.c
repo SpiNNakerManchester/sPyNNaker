@@ -69,8 +69,8 @@ static void reset_record_counter(void) {
             // Setting increment to zero means count will never equal rate
             bitfield_info[i].increment = 0;
 
-            // Count is not rate so does not record
-            bitfield_info[i].count = 1;
+            // Count is not rate so does not record, but not 1 so it does not reset!
+            bitfield_info[i].count = 2;
         } else {
             // Increase one each call so count gets to rate
             bitfield_info[i].increment = 1;
