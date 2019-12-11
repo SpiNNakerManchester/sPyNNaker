@@ -122,7 +122,6 @@ class MunichMotorDevice(
 
     @inject_items({
         "routing_info": "MemoryRoutingInfos",
-        "machine_time_step": "MachineTimeStep",
         "time_scale_factor": "TimeScaleFactor"
     })
     @overrides(
@@ -131,8 +130,7 @@ class MunichMotorDevice(
             "routing_info", "machine_time_step", "time_scale_factor"
         })
     def generate_data_specification(
-            self, spec, placement, routing_info,
-            machine_time_step, time_scale_factor):
+            self, spec, placement, routing_info, time_scale_factor):
         # pylint: disable=too-many-arguments, arguments-differ
 
         # reserve regions
@@ -144,7 +142,7 @@ class MunichMotorDevice(
         # handle simulation data
         spec.switch_write_focus(self.SYSTEM_REGION)
         spec.write_array(simulation_utilities.get_simulation_header_array(
-            self.get_binary_file_name(), machine_time_step,
+            self.get_binary_file_name(), self.timestep_in_us,
             time_scale_factor))
 
         # Get the key

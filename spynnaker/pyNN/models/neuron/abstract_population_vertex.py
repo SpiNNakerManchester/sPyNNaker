@@ -195,23 +195,18 @@ class AbstractPopulationVertex(
 
     @inject_items({
         "graph": "MemoryApplicationGraph",
-        "machine_time_step": "MachineTimeStep"
     })
     @overrides(
         ApplicationVertex.get_resources_used_by_atoms,
-        additional_arguments={
-            "graph", "machine_time_step"
-        }
+        additional_arguments={"graph"}
     )
-    def get_resources_used_by_atoms(
-            self, vertex_slice, graph, machine_time_step):
+    def get_resources_used_by_atoms(self, vertex_slice, graph):
         # pylint: disable=arguments-differ
 
         variableSDRAM = self.__neuron_recorder.get_variable_sdram_usage(
             vertex_slice, self.timestep_in_us)
         constantSDRAM = ConstantSDRAM(
-                self._get_sdram_usage_for_atoms(
-                    vertex_slice, graph, machine_time_step))
+                self._get_sdram_usage_for_atoms(vertex_slice, graph))
 
         # set resources required from this object
         container = ResourceContainer(
@@ -297,8 +292,7 @@ class AbstractPopulationVertex(
             self.__neuron_recorder.get_sdram_usage_in_bytes(vertex_slice) +
             self.__neuron_impl.get_sdram_usage_in_bytes(vertex_slice.n_atoms))
 
-    def _get_sdram_usage_for_atoms(
-            self, vertex_slice, graph, machine_time_step):
+    def _get_sdram_usage_for_atoms(self, vertex_slice, graph):
         n_record = len(self.__neuron_impl.get_recordable_variables()) + 1
         sdram_requirement = (
             SYSTEM_BYTES_REQUIREMENT +
@@ -308,7 +302,7 @@ class AbstractPopulationVertex(
             PopulationMachineVertex.get_provenance_data_size(
                 PopulationMachineVertex.N_ADDITIONAL_PROVENANCE_DATA_ITEMS) +
             self.__synapse_manager.get_sdram_usage_in_bytes(
-                vertex_slice, machine_time_step, graph, self) +
+                vertex_slice, self.timestep_in_us, graph, self) +
             profile_utils.get_profile_region_size(
                 self.__n_profile_samples))
 
@@ -441,18 +435,16 @@ class AbstractPopulationVertex(
         spec.write_array(neuron_data)
 
     @inject_items({
-        "machine_time_step": "MachineTimeStep",
         "time_scale_factor": "TimeScaleFactor",
         "graph_mapper": "MemoryGraphMapper",
         "routing_info": "MemoryRoutingInfos"})
     @overrides(
         AbstractRewritesDataSpecification.regenerate_data_specification,
         additional_arguments={
-            "machine_time_step", "time_scale_factor", "graph_mapper",
-            "routing_info"})
+            "time_scale_factor", "graph_mapper", "routing_info"})
     def regenerate_data_specification(
-            self, spec, placement, machine_time_step, time_scale_factor,
-            graph_mapper, routing_info):
+            self, spec, placement, time_scale_factor, graph_mapper,
+            routing_info):
         # pylint: disable=too-many-arguments, arguments-differ
         vertex_slice = graph_mapper.get_slice(placement.vertex)
 
@@ -464,7 +456,7 @@ class AbstractPopulationVertex(
         self._write_neuron_parameters(
             key=routing_info.get_first_key_from_pre_vertex(
                 placement.vertex, constants.SPIKE_PARTITION_ID),
-            machine_time_step=machine_time_step, spec=spec,
+            machine_time_step=self.timestep_in_us, spec=spec,
             time_scale_factor=time_scale_factor,
             vertex_slice=vertex_slice)
 
@@ -481,7 +473,6 @@ class AbstractPopulationVertex(
         self.__change_requires_neuron_parameters_reload = False
 
     @inject_items({
-        "machine_time_step": "MachineTimeStep",
         "time_scale_factor": "TimeScaleFactor",
         "graph_mapper": "MemoryGraphMapper",
         "application_graph": "MemoryApplicationGraph",
@@ -492,13 +483,12 @@ class AbstractPopulationVertex(
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
         additional_arguments={
-            "machine_time_step", "time_scale_factor", "graph_mapper",
-            "application_graph", "machine_graph", "routing_info",
-            "data_simtime_in_us"
+            "time_scale_factor", "graph_mapper", "application_graph",
+            "machine_graph", "routing_info", "data_simtime_in_us"
         })
     def generate_data_specification(
-            self, spec, placement, machine_time_step, time_scale_factor,
-            graph_mapper, application_graph, machine_graph, routing_info,
+            self, spec, placement, time_scale_factor, graph_mapper,
+            application_graph, machine_graph, routing_info,
             data_simtime_in_us):
         # pylint: disable=too-many-arguments, arguments-differ
         vertex = placement.vertex
@@ -522,7 +512,7 @@ class AbstractPopulationVertex(
         spec.switch_write_focus(
             constants.POPULATION_BASED_REGIONS.SYSTEM.value)
         spec.write_array(simulation_utilities.get_simulation_header_array(
-            self.get_binary_file_name(), machine_time_step,
+            self.get_binary_file_name(), self.timestep_in_us,
             time_scale_factor))
 
         # Write the recording region
@@ -533,7 +523,7 @@ class AbstractPopulationVertex(
 
         # Write the neuron parameters
         self._write_neuron_parameters(
-            spec, key, vertex_slice, machine_time_step, time_scale_factor)
+            spec, key, vertex_slice, self.timestep_in_us, time_scale_factor)
 
         # write profile data
         profile_utils.write_profile_region_data(
@@ -547,7 +537,7 @@ class AbstractPopulationVertex(
         self.__synapse_manager.write_data_spec(
             spec, self, vertex_slice, vertex, placement, machine_graph,
             application_graph, routing_info, graph_mapper,
-            weight_scale, machine_time_step)
+            weight_scale, self.timestep_in_us)
 
         # End the writing of this specification:
         spec.end_specification()

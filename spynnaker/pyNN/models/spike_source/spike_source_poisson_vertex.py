@@ -421,8 +421,8 @@ class SpikeSourcePoissonVertex(
         SimplePopulationSettable.set_value(self, key, value)
         self.__change_requires_neuron_parameters_reload = True
 
-    def _max_spikes_per_ts(self, machine_time_step):
-        ts_per_second = MICROSECONDS_PER_SECOND / float(machine_time_step)
+    def _max_spikes_per_ts(self):
+        ts_per_second = MICROSECONDS_PER_SECOND / float(self.timestep_in_us)
         if float(self.__max_rate) / ts_per_second < \
                 SLOW_RATE_PER_TICK_CUTOFF:
             return 1
@@ -434,23 +434,17 @@ class SpikeSourcePoissonVertex(
             float(self.__max_rate) / ts_per_second)
         return int(math.ceil(max_spikes_per_ts)) + 1.0
 
-    def get_recording_sdram_usage(self, vertex_slice, machine_time_step):
+    def get_recording_sdram_usage(self, vertex_slice):
         variable_sdram = self.__spike_recorder.get_sdram_usage_in_bytes(
-            vertex_slice.n_atoms, self._max_spikes_per_ts(machine_time_step),
-            machine_time_step)
+            vertex_slice.n_atoms, self._max_spikes_per_ts(),
+            self.timestep_in_us)
         constant_sdram = ConstantSDRAM(
             variable_sdram.per_simtime_us * OVERFLOW_TIMESTEPS_FOR_SDRAM *
             self.timestep_in_us)
         return variable_sdram + constant_sdram
 
-    @inject_items({
-        "machine_time_step": "MachineTimeStep"
-    })
-    @overrides(
-        ApplicationVertex.get_resources_used_by_atoms,
-        additional_arguments={"machine_time_step"}
-    )
-    def get_resources_used_by_atoms(self, vertex_slice, machine_time_step):
+    @overrides(ApplicationVertex.get_resources_used_by_atoms)
+    def get_resources_used_by_atoms(self, vertex_slice):
         # pylint: disable=arguments-differ
 
         poisson_params_sz = self.get_rates_bytes(vertex_slice)
@@ -462,8 +456,7 @@ class SpikeSourcePoissonVertex(
             recording_utilities.get_recording_data_constant_size(1) +
             profile_utils.get_profile_region_size(self.__n_profile_samples))
 
-        recording = self.get_recording_sdram_usage(
-            vertex_slice, machine_time_step)
+        recording = self.get_recording_sdram_usage(vertex_slice)
         # build resources as i currently know
         container = ResourceContainer(
             sdram=recording + other,
@@ -806,7 +799,6 @@ class SpikeSourcePoissonVertex(
         return 0
 
     @inject_items({
-        "machine_time_step": "MachineTimeStep",
         "time_scale_factor": "TimeScaleFactor",
         "graph_mapper": "MemoryGraphMapper",
         "routing_info": "MemoryRoutingInfos",
@@ -815,11 +807,11 @@ class SpikeSourcePoissonVertex(
     @overrides(
         AbstractRewritesDataSpecification.regenerate_data_specification,
         additional_arguments={
-            "machine_time_step", "time_scale_factor", "graph_mapper",
-            "routing_info", "graph", "first_machine_time_step"})
+            "time_scale_factor", "graph_mapper", "routing_info",
+            "graph", "first_machine_time_step"})
     def regenerate_data_specification(
-            self, spec, placement, machine_time_step, time_scale_factor,
-            graph_mapper, routing_info, graph, first_machine_time_step):
+            self, spec, placement, time_scale_factor, graph_mapper,
+            routing_info, graph, first_machine_time_step):
         # pylint: disable=too-many-arguments, arguments-differ
 
         # reserve the neuron parameters data region
@@ -832,7 +824,7 @@ class SpikeSourcePoissonVertex(
             spec=spec, graph=graph, placement=placement,
             routing_info=routing_info,
             vertex_slice=vertex_slice,
-            machine_time_step=machine_time_step,
+            machine_time_step=self.timestep_in_us,
             time_scale_factor=time_scale_factor)
 
         # write rates
@@ -921,7 +913,6 @@ class SpikeSourcePoissonVertex(
                 i, time_to_next_spike)
 
     @inject_items({
-        "machine_time_step": "MachineTimeStep",
         "time_scale_factor": "TimeScaleFactor",
         "graph_mapper": "MemoryGraphMapper",
         "routing_info": "MemoryRoutingInfos",
@@ -932,17 +923,15 @@ class SpikeSourcePoissonVertex(
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
         additional_arguments={
-            "machine_time_step", "time_scale_factor", "graph_mapper",
-            "routing_info", "data_simtime_in_us", "graph",
-            "first_machine_time_step"
+            "time_scale_factor", "graph_mapper", "routing_info",
+            "data_simtime_in_us", "graph", "first_machine_time_step"
         }
     )
     def generate_data_specification(
-            self, spec, placement, machine_time_step, time_scale_factor,
+            self, spec, placement, time_scale_factor,
             graph_mapper, routing_info, data_simtime_in_us, graph,
             first_machine_time_step):
         # pylint: disable=too-many-arguments, arguments-differ
-        self.__machine_time_step = machine_time_step
         vertex = placement.vertex
         vertex_slice = graph_mapper.get_slice(vertex)
 
@@ -954,13 +943,12 @@ class SpikeSourcePoissonVertex(
         # write setup data
         spec.switch_write_focus(_REGIONS.SYSTEM_REGION.value)
         spec.write_array(simulation_utilities.get_simulation_header_array(
-            self.get_binary_file_name(), machine_time_step,
+            self.get_binary_file_name(), self.timestep_in_us,
             time_scale_factor))
 
         # write recording data
         spec.switch_write_focus(_REGIONS.SPIKE_HISTORY_REGION.value)
-        sdram = self.get_recording_sdram_usage(
-            vertex_slice, machine_time_step)
+        sdram = self.get_recording_sdram_usage(vertex_slice)
         recorded_region_sizes = [
             sdram.get_sdram_for_simtime(data_simtime_in_us)]
         spec.write_array(recording_utilities.get_recording_header_array(
@@ -969,10 +957,10 @@ class SpikeSourcePoissonVertex(
         # write parameters
         self._write_poisson_parameters(
             spec, graph, placement, routing_info, vertex_slice,
-            machine_time_step, time_scale_factor)
+            self.timestep_in_us, time_scale_factor)
 
         # write rates
-        self._write_poisson_rates(spec, vertex_slice, machine_time_step,
+        self._write_poisson_rates(spec, vertex_slice, self.timestep_in_us,
                                   first_machine_time_step)
 
         # write profile data
