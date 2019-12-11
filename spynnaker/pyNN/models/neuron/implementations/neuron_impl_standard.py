@@ -144,9 +144,11 @@ class NeuronImplStandard(AbstractNeuronImpl):
             component.add_state_variables(state_variables)
 
     @overrides(AbstractNeuronImpl.get_data)
-    def get_data(self, parameters, state_variables, vertex_slice):
+    def get_data(
+            self, parameters, state_variables, vertex_slice, timestamp_in_us):
         return numpy.concatenate([
-            component.get_data(parameters, state_variables, vertex_slice)
+            component.get_data(
+                parameters, state_variables, vertex_slice, timestamp_in_us)
             for component in self.__components
         ])
 

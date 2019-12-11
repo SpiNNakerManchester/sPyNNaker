@@ -67,14 +67,15 @@ class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
     def has_variable(self, variable):
         return variable in UNITS
 
-    @inject_items({"ts": "MachineTimeStep"})
-    @overrides(AbstractAdditionalInput.get_values, additional_arguments={'ts'})
-    def get_values(self, parameters, state_variables, vertex_slice, ts):
+    @overrides(AbstractAdditionalInput.get_values)
+    def get_values(
+            self, parameters, state_variables, vertex_slice, timestamp_in_us):
         # pylint: disable=arguments-differ
 
         # Add the rest of the data
         return [parameters[TAU_CA2].apply_operation(
-                    operation=lambda x: numpy.exp(float(-ts) / (1000.0 * x))),
+                    operation=lambda x:
+                    numpy.exp(float(-timestamp_in_us) / (1000.0 * x))),
                 state_variables[I_CA2], parameters[I_ALPHA]]
 
     @overrides(AbstractAdditionalInput.update_values)

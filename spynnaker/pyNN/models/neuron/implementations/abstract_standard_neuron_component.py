@@ -107,7 +107,8 @@ class AbstractStandardNeuronComponent(with_metaclass(AbstractBase, object)):
         :rtype: A list of (single value or list of values or RangedList)
         """
 
-    def get_data(self, parameters, state_variables, vertex_slice):
+    def get_data(
+            self, parameters, state_variables, vertex_slice, timestamp_in_us):
         """ Get the data to be written to the machine for this model
 
         :param parameters: The holder of the parameters
@@ -117,10 +118,12 @@ class AbstractStandardNeuronComponent(with_metaclass(AbstractBase, object)):
         :type state_variables:\
             :py:class:`spinn_utilities.ranged.range_dictionary.RangeDictionary`
         :param vertex_slice: The slice of the vertex to generate parameters for
+        :param timestamp_in_us: the timestep for this vertex in us
+        :type timestamp_in_us: int
         :rtype: numpy array of uint32
         """
-        # TODO REMOVE 1000 HACK!
-        values = self.get_values(parameters, state_variables, vertex_slice, 1000)
+        values = self.get_values(
+            parameters, state_variables, vertex_slice, timestamp_in_us)
         return self.struct.get_data(
             values, vertex_slice.lo_atom, vertex_slice.n_atoms)
 

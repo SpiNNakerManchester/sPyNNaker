@@ -150,7 +150,8 @@ class AbstractNeuronImpl(object):
         """
 
     @abstractmethod
-    def get_data(self, parameters, state_variables, vertex_slice):
+    def get_data(
+            self, parameters, state_variables, vertex_slice, timestamp_in_us):
         """ Get the data to be written to the machine for this model
 
         :param parameters: The holder of the parameters
@@ -160,6 +161,8 @@ class AbstractNeuronImpl(object):
         :type state_variables:\
             :py:class:`spinn_utilities.ranged.range_dictionary.RangeDictionary`
         :param vertex_slice: The slice of the vertex to generate parameters for
+        :param timestamp_in_us: the timestep for this vertex in us
+        :type timestamp_in_us: int
         :rtype: numpy array of uint32
         """
 

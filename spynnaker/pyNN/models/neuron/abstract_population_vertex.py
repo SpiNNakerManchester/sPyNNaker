@@ -431,7 +431,8 @@ class AbstractPopulationVertex(
 
         # Write the neuron parameters
         neuron_data = self.__neuron_impl.get_data(
-            self._parameters, self._state_variables, vertex_slice)
+            self._parameters, self._state_variables, vertex_slice,
+            self.timestep_in_us)
         spec.write_array(neuron_data)
 
     @inject_items({
