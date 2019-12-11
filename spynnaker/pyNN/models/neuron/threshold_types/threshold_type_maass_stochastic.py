@@ -69,15 +69,15 @@ class ThresholdTypeMaassStochastic(AbstractThresholdType):
     def has_variable(self, variable):
         return variable in UNITS
 
-    @inject_items({"ts": "MachineTimeStep"})
-    @overrides(AbstractThresholdType.get_values, additional_arguments={'ts'})
-    def get_values(self, parameters, state_variables, vertex_slice, ts):
+    @overrides(AbstractThresholdType.get_values)
+    def get_values(
+            self, parameters, state_variables, vertex_slice, timestamp_in_us):
         # pylint: disable=arguments-differ
 
         # Add the rest of the data
         return [parameters[DU_TH].apply_operation(lambda x: 1.0 / x),
                 parameters[TAU_TH].apply_operation(lambda x: 1.0 / x),
-                parameters[V_THRESH], float(ts) / -10000.0]
+                parameters[V_THRESH], float(timestamp_in_us) / -10000.0]
 
     @overrides(AbstractThresholdType.update_values)
     def update_values(self, values, parameters, state_variables):

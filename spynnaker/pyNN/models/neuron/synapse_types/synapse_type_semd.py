@@ -101,11 +101,11 @@ class SynapseTypeSEMD(AbstractSynapseType):
     def has_variable(self, variable):
         return variable in UNITS
 
-    @inject_items({"ts": "MachineTimeStep"})
-    @overrides(AbstractSynapseType.get_values, additional_arguments={'ts'})
-    def get_values(self, parameters, state_variables, vertex_slice, ts):
+    @overrides(AbstractSynapseType.get_values)
+    def get_values(
+            self, parameters, state_variables, vertex_slice, timestamp_in_us):
 
-        tsfloat = float(ts) / 1000.0
+        tsfloat = float(timestamp_in_us) / 1000.0
         decay = lambda x: numpy.exp(-tsfloat / x)  # noqa E731
         init = lambda x: (x / tsfloat) * (1.0 - numpy.exp(-tsfloat / x))  # noqa E731
 

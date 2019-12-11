@@ -94,16 +94,16 @@ class NeuronModelIzh(AbstractNeuronModel):
         # pylint: disable=arguments-differ
         return [float(machine_time_step)/1000.0]
 
-    @inject_items({"ts": "MachineTimeStep"})
-    @overrides(AbstractNeuronModel.get_values, additional_arguments={'ts'})
-    def get_values(self, parameters, state_variables, vertex_slice, ts):
+    @overrides(AbstractNeuronModel.get_values)
+    def get_values(
+            self, parameters, state_variables, vertex_slice, timestamp_in_us):
         # pylint: disable=arguments-differ
 
         # Add the rest of the data
         return [
             parameters[A], parameters[B], parameters[C], parameters[D],
             state_variables[V], state_variables[U], parameters[I_OFFSET],
-            float(ts) / 1000.0
+            float(timestamp_in_us) / 1000.0
         ]
 
     @overrides(AbstractNeuronModel.update_values)

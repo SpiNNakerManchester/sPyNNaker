@@ -99,13 +99,13 @@ class SynapseTypeAlpha(AbstractSynapseType):
     def has_variable(self, variable):
         return variable in UNITS
 
-    @inject_items({"ts": "MachineTimeStep"})
-    @overrides(AbstractSynapseType.get_values, additional_arguments={'ts'})
-    def get_values(self, parameters, state_variables, vertex_slice, ts):
+    @overrides(AbstractSynapseType.get_values)
+    def get_values(
+            self, parameters, state_variables, vertex_slice, timestamp_in_us):
         # pylint: disable=arguments-differ
 
-        init = lambda x: (float(ts) / 1000.0) / (x * x)  # noqa
-        decay = lambda x: numpy.exp((-float(ts) / 1000.0) / x)  # noqa
+        init = lambda x: (float(timestamp_in_us) / 1000.0) / (x * x)  # noqa
+        decay = lambda x: numpy.exp((-float(timestamp_in_us) / 1000.0) / x)  # noqa
 
         # Add the rest of the data
         return [state_variables[EXC_RESPONSE],

@@ -98,20 +98,22 @@ class NeuronModelLeakyIntegrateAndFire(AbstractNeuronModel):
     def has_variable(self, variable):
         return variable in UNITS
 
-    @inject_items({"ts": "MachineTimeStep"})
-    @overrides(AbstractNeuronModel.get_values, additional_arguments={'ts'})
-    def get_values(self, parameters, state_variables, vertex_slice, ts):
+    @overrides(AbstractNeuronModel.get_values)
+    def get_values(
+            self, parameters, state_variables, vertex_slice, timestamp_in_us):
         # pylint: disable=arguments-differ
 
         # Add the rest of the data
         return [state_variables[V], parameters[V_REST],
                 parameters[TAU_M] / parameters[CM],
                 parameters[TAU_M].apply_operation(
-                    operation=lambda x: numpy.exp(float(-ts) / (1000.0 * x))),
+                    operation=lambda x:
+                    numpy.exp(float(-timestamp_in_us) / (1000.0 * x))),
                 parameters[I_OFFSET], state_variables[COUNT_REFRAC],
                 parameters[V_RESET],
                 parameters[TAU_REFRAC].apply_operation(
-                    operation=lambda x: int(numpy.ceil(x / (ts / 1000.0))))]
+                    operation=lambda x:
+                    int(numpy.ceil(x / (timestamp_in_us / 1000.0))))]
 
     @overrides(AbstractNeuronModel.update_values)
     def update_values(self, values, parameters, state_variables):

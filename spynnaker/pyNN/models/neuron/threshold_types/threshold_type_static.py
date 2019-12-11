@@ -54,7 +54,8 @@ class ThresholdTypeStatic(AbstractThresholdType):
         return variable in UNITS
 
     @overrides(AbstractThresholdType.get_values)
-    def get_values(self, parameters, state_variables, vertex_slice):
+    def get_values(
+            self, parameters, state_variables, vertex_slice, timestamp_in_us):
 
         # Add the rest of the data
         return [parameters[V_THRESH]]
