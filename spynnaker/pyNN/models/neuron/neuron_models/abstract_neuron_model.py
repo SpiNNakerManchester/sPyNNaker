@@ -60,9 +60,11 @@ class AbstractNeuronModel(AbstractStandardNeuronComponent):
         return usage + (self.__global_struct.get_size_in_whole_words() *
                         BYTES_PER_WORD)
 
-    def get_global_values(self):
+    def get_global_values(self, timestamp_in_us):
         """ Get the global values to be written to the machine for this model
 
+        :param timestamp_in_us: the timestep for this vertex in us
+        :type timestamp_in_us: int
         :return: A list with the same length as self.global_struct.field_types
         :rtype: A list of single values
         """
@@ -73,7 +75,7 @@ class AbstractNeuronModel(AbstractStandardNeuronComponent):
             self, parameters, state_variables, vertex_slice, timestamp_in_us):
         super_data = super(AbstractNeuronModel, self).get_data(
             parameters, state_variables, vertex_slice, timestamp_in_us)
-        values = self.get_global_values()
+        values = self.get_global_values(timestamp_in_us)
         global_data = self.__global_struct.get_data(values)
         return numpy.concatenate([global_data, super_data])
 
