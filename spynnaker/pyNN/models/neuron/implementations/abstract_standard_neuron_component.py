@@ -20,6 +20,7 @@ from .struct import Struct
 from .ranged_dict_vertex_slice import RangedDictVertexSlice
 
 
+# with_metaclass due to https://github.com/benjaminp/six/issues/219
 class AbstractStandardNeuronComponent(with_metaclass(AbstractBase, object)):
     """ Represents a component of a standard neural model
     """
