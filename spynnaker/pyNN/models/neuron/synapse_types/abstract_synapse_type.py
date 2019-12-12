@@ -15,7 +15,6 @@
 
 from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
-from spinn_utilities.abstract_base import abstractmethod
 from spynnaker.pyNN.models.neuron.implementations import (
     AbstractStandardNeuronComponent)
 

@@ -24,7 +24,7 @@ from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
 # with_metaclass due to https://github.com/benjaminp/six/issues/219
 class AbstractNeuronModel(
-    with_metaclass(AbstractBase, AbstractStandardNeuronComponent)):
+        with_metaclass(AbstractBase, AbstractStandardNeuronComponent)):
     """ Represents a neuron model.
     """
 
