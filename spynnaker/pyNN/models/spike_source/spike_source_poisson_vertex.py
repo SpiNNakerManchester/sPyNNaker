@@ -663,17 +663,15 @@ class SpikeSourcePoissonVertex(
         for value in self.__kiss_seed[kiss_key]:
             spec.write_value(data=value)
 
-    def _write_poisson_rates(self, spec, vertex_slice, machine_time_step,
-                             first_machine_time_step):
+    def _write_poisson_rates(self, spec, vertex_slice, run_from_time_in_us):
         """ Generate Rate data for Poisson spike sources
 
         :param spec: the data specification writer
         :param vertex_slice:\
             the slice of atoms a machine vertex holds from its application\
             vertex
-        :param machine_time_step: the time between timer tick updates.
-        :param first_machine_time_step:\
-            First machine time step to start from the correct index
+        :param run_from_time_in_us:\
+            simtime to start from the correct index
         """
         spec.comment("\nWriting Rates for {} poisson sources:\n"
                      .format(vertex_slice.n_atoms))
@@ -687,7 +685,7 @@ class SpikeSourcePoissonVertex(
             # Convert start times to start time steps
             starts = self.__data["starts"][i].astype("float")
             starts_scaled = self._convert_ms_to_n_timesteps(
-                starts, machine_time_step)
+                starts, self.timestep_in_us)
 
             # Convert durations to end time steps
             durations = self.__data["durations"][i].astype("float")
@@ -696,7 +694,7 @@ class SpikeSourcePoissonVertex(
             positions = numpy.invert(none_positions)
             ends_scaled[none_positions] = 0xFFFFFFFF
             ends_scaled[positions] = self._convert_ms_to_n_timesteps(
-                starts[positions] + durations[positions], machine_time_step)
+                starts[positions] + durations[positions], self.timestep_in_us)
 
             # Convert start times to next steps, adding max uint to end
             next_scaled = numpy.append(starts_scaled[1:], 0xFFFFFFFF)
@@ -704,7 +702,7 @@ class SpikeSourcePoissonVertex(
             # Compute the spikes per tick for each atom
             rates = self.__data["rates"][i].astype("float")
             spikes_per_tick = (
-                rates * (float(machine_time_step) / MICROSECONDS_PER_SECOND))
+                rates * (float(self.timestep_in_us) / MICROSECONDS_PER_SECOND))
 
             # Determine which sources are fast and which are slow
             is_fast_source = spikes_per_tick >= SLOW_RATE_PER_TICK_CUTOFF
@@ -749,6 +747,8 @@ class SpikeSourcePoissonVertex(
             ))[0].flatten()
 
             # Find the index to start at
+            first_machine_time_step = self.simtime_in_us_to_timesteps(
+                run_from_time_in_us)
             index = 0
             while (ends_scaled[index] < first_machine_time_step and
                    (index + 1) < len(ends_scaled)):
@@ -763,11 +763,6 @@ class SpikeSourcePoissonVertex(
     def _convert_ms_to_n_timesteps(value, machine_time_step):
         return numpy.round(
             value * (MICROSECONDS_PER_MILLISECOND / float(machine_time_step)))
-
-    @staticmethod
-    def _convert_n_timesteps_to_ms(value, machine_time_step):
-        return (
-            value / (MICROSECONDS_PER_MILLISECOND / float(machine_time_step)))
 
     @overrides(AbstractSpikeRecordable.is_recording_spikes)
     def is_recording_spikes(self):
@@ -803,15 +798,15 @@ class SpikeSourcePoissonVertex(
         "graph_mapper": "MemoryGraphMapper",
         "routing_info": "MemoryRoutingInfos",
         "graph": "MemoryMachineGraph",
-        "first_machine_time_step": "FirstMachineTimeStep"})
+        "run_from_time_in_us": "RunFromTimeInUs"})
     @overrides(
         AbstractRewritesDataSpecification.regenerate_data_specification,
         additional_arguments={
             "time_scale_factor", "graph_mapper", "routing_info",
-            "graph", "first_machine_time_step"})
+            "graph", "run_from_time_in_us"})
     def regenerate_data_specification(
             self, spec, placement, time_scale_factor, graph_mapper,
-            routing_info, graph, first_machine_time_step):
+            routing_info, graph, run_from_time_in_us):
         # pylint: disable=too-many-arguments, arguments-differ
 
         # reserve the neuron parameters data region
@@ -828,8 +823,7 @@ class SpikeSourcePoissonVertex(
             time_scale_factor=time_scale_factor)
 
         # write rates
-        self._write_poisson_rates(spec, vertex_slice, machine_time_step,
-                                  first_machine_time_step)
+        self._write_poisson_rates(spec, vertex_slice, run_from_time_in_us)
 
         # end spec
         spec.end_specification()
@@ -918,19 +912,19 @@ class SpikeSourcePoissonVertex(
         "routing_info": "MemoryRoutingInfos",
         "data_simtime_in_us": "DataSimtimeInUs",
         "graph": "MemoryMachineGraph",
-        "first_machine_time_step": "FirstMachineTimeStep"
+        "run_from_time_in_us": "RunFromTimeInUs"
     })
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
         additional_arguments={
             "time_scale_factor", "graph_mapper", "routing_info",
-            "data_simtime_in_us", "graph", "first_machine_time_step"
+            "data_simtime_in_us", "graph", "run_from_time_in_us"
         }
     )
     def generate_data_specification(
             self, spec, placement, time_scale_factor,
             graph_mapper, routing_info, data_simtime_in_us, graph,
-            first_machine_time_step):
+            run_from_time_in_us):
         # pylint: disable=too-many-arguments, arguments-differ
         vertex = placement.vertex
         vertex_slice = graph_mapper.get_slice(vertex)
@@ -960,8 +954,7 @@ class SpikeSourcePoissonVertex(
             self.timestep_in_us, time_scale_factor)
 
         # write rates
-        self._write_poisson_rates(spec, vertex_slice, self.timestep_in_us,
-                                  first_machine_time_step)
+        self._write_poisson_rates(spec, vertex_slice, run_from_time_in_us)
 
         # write profile data
         profile_utils.write_profile_region_data(
