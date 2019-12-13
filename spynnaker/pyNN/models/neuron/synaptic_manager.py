@@ -742,7 +742,7 @@ class SynapticManager(object):
             # is only one anyway...
             if app_key_info is None or len(m_edges) == 1:
                 r_info = routing_info.get_routing_info_for_edge(m_edge)
-                block_addr, single_addr = self.__write_machine_matrix(
+                block_addr, single_addr, index = self.__write_machine_matrix(
                     block_addr, single_addr, spec, master_pop_table_region,
                     max_row_info.undelayed_max_n_synapses,
                     max_row_info.undelayed_max_words, r_info, row_data,
@@ -759,7 +759,7 @@ class SynapticManager(object):
                 delay_key = (app_edge.pre_vertex,
                              pre_slice.lo_atom, pre_slice.hi_atom)
                 r_info = self.__delay_key_index.get(delay_key, None)
-                block_addr, single_addr = self.__write_machine_matrix(
+                block_addr, single_addr, d_index = self.__write_machine_matrix(
                     block_addr, single_addr, spec, master_pop_table_region,
                     max_row_info.delayed_max_n_synapses,
                     max_row_info.delayed_max_words, r_info, delayed_row_data,
@@ -775,13 +775,13 @@ class SynapticManager(object):
         # to the population table but also put in padding
         # between tables when necessary
         if app_key_info is not None and len(m_edges) > 1:
-            block_addr = self.__write_app_matrix(
+            block_addr, index = self.__write_app_matrix(
                 block_addr, spec, master_pop_table_region,
                 max_row_info.undelayed_max_words,
                 max_row_info.undelayed_max_bytes, app_key_info,
                 undelayed_matrix_data, all_syn_block_sz, 1)
         if delay_app_key_info is not None:
-            block_addr = self.__write_app_matrix(
+            block_addr, d_index = self.__write_app_matrix(
                 block_addr, spec, master_pop_table_region,
                 max_row_info.delayed_max_words, max_row_info.delayed_max_bytes,
                 delay_app_key_info, delayed_matrix_data, all_syn_block_sz,
@@ -798,7 +798,7 @@ class SynapticManager(object):
                 spec, app_key_info.key_and_mask, app_key_info.core_mask,
                 app_key_info.core_shift, app_key_info.n_neurons,
                 master_pop_table_region)
-            return block_addr
+            return block_addr, index
 
         # Write a matrix for the whole application vertex
         block_addr = self._write_pop_table_padding(spec, block_addr)
@@ -818,7 +818,7 @@ class SynapticManager(object):
                 raise Exception(
                     "Too much synaptic memory has been written: {} of {} "
                     .format(block_addr, all_syn_block_sz))
-        return block_addr
+        return block_addr, index
 
     def __write_machine_matrix(
             self, block_addr, single_addr, spec, master_pop_table_region,
@@ -831,7 +831,7 @@ class SynapticManager(object):
                 index = self.__poptable_type.add_invalid_entry(
                     spec, r_info.first_key_and_mask, 0, 0, 0,
                     master_pop_table_region)
-            return block_addr, single_addr
+            return block_addr, single_addr, index
 
         # Write a matrix for an incoming machine vertex
         if max_synapses == 1 and self.__is_direct(
@@ -855,7 +855,7 @@ class SynapticManager(object):
                 raise Exception(
                     "Too much synaptic memory has been written: {} of {} "
                     .format(block_addr, all_syn_block_sz))
-        return block_addr, single_addr
+        return block_addr, single_addr, index
 
     def __check_keys_adjacent(self, keys, mask, mask_size):
         # Check that keys are all adjacent
@@ -1373,9 +1373,9 @@ class SynapticManager(object):
                     transceiver, extra_monitor_cores_for_router_timeout,
                     placements)
 
-        self.__retrieved_blocks[placement, key, index] = (block, max_row_length)
+        self.__retrieved_blocks[
+            placement, key, index] = (block, max_row_length)
         return block, max_row_length
-
 
     def __read_multiple_synaptic_blocks(
             self, transceiver, monitor_api, placement, n_rows, max_row_length,
