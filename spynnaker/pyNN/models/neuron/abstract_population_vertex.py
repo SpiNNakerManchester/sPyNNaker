@@ -1,3 +1,18 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import logging
 import os
 import math
@@ -11,39 +26,43 @@ from pacman.model.resources import (
 from spinn_front_end_common.abstract_models import (
     AbstractChangableAfterRun, AbstractProvidesIncomingPartitionConstraints,
     AbstractProvidesOutgoingPartitionConstraints, AbstractHasAssociatedBinary,
-    AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification)
+    AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification,
+    AbstractCanReset)
 from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl)
 from spinn_front_end_common.utilities import (
     constants as common_constants, helpful_functions, globals_variables)
+from spinn_front_end_common.utilities.constants import (
+    BYTES_PER_WORD, SYSTEM_BYTES_REQUIREMENT)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.interface.buffer_management import (
     recording_utilities)
 from spinn_front_end_common.interface.profiling import profile_utils
-from .synaptic_manager import SynapticManager
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, AbstractNeuronRecordable, NeuronRecorder)
 from spynnaker.pyNN.utilities import constants
-from .population_machine_vertex import PopulationMachineVertex
 from spynnaker.pyNN.models.abstract_models import (
     AbstractPopulationInitializable, AbstractAcceptsIncomingSynapses,
     AbstractPopulationSettable, AbstractReadParametersBeforeSet,
     AbstractContainsUnits)
 from spynnaker.pyNN.exceptions import InvalidParameterType
-from spynnaker.pyNN.utilities.ranged import SpynnakerRangeDictionary
+from spynnaker.pyNN.utilities.ranged import (
+    SpynnakerRangeDictionary, SpynnakerRangedList)
+from .synaptic_manager import SynapticManager
+from .population_machine_vertex import PopulationMachineVertex
 
 logger = logging.getLogger(__name__)
 
 # TODO: Make sure these values are correct (particularly CPU cycles)
-_NEURON_BASE_DTCM_USAGE_IN_BYTES = 36
-_NEURON_BASE_SDRAM_USAGE_IN_BYTES = 12
+_NEURON_BASE_DTCM_USAGE_IN_BYTES = 9 * BYTES_PER_WORD
+_NEURON_BASE_SDRAM_USAGE_IN_BYTES = 3 * BYTES_PER_WORD
 _NEURON_BASE_N_CPU_CYCLES_PER_NEURON = 22
 _NEURON_BASE_N_CPU_CYCLES = 10
 
 # TODO: Make sure these values are correct (particularly CPU cycles)
-_C_MAIN_BASE_DTCM_USAGE_IN_BYTES = 12
-_C_MAIN_BASE_SDRAM_USAGE_IN_BYTES = 72
+_C_MAIN_BASE_DTCM_USAGE_IN_BYTES = 3 * BYTES_PER_WORD
+_C_MAIN_BASE_SDRAM_USAGE_IN_BYTES = 18 * BYTES_PER_WORD
 _C_MAIN_BASE_N_CPU_CYCLES = 0
 
 # The microseconds per timestep will be divided by this to get the max offset
@@ -59,12 +78,14 @@ class AbstractPopulationVertex(
         AbstractPopulationInitializable, AbstractPopulationSettable,
         AbstractChangableAfterRun,
         AbstractRewritesDataSpecification, AbstractReadParametersBeforeSet,
-        AbstractAcceptsIncomingSynapses, ProvidesKeyToAtomMappingImpl):
+        AbstractAcceptsIncomingSynapses, ProvidesKeyToAtomMappingImpl,
+        AbstractCanReset):
     """ Underlying vertex model for Neural Populations.
     """
     __slots__ = [
         "__change_requires_mapping",
         "__change_requires_neuron_parameters_reload",
+        "__change_requires_data_generation",
         "__incoming_spike_buffer_size",
         "__n_atoms",
         "__n_profile_samples",
@@ -77,7 +98,10 @@ class AbstractPopulationVertex(
         "__time_between_requests",
         "__units",
         "__n_subvertices",
-        "__n_data_specs"]
+        "__n_data_specs",
+        "__initial_state_variables",
+        "__has_reset_last",
+        "__updated_state_variables"]
 
     BASIC_MALLOC_USAGE = 2
 
@@ -85,10 +109,10 @@ class AbstractPopulationVertex(
     SPIKE_RECORDING_REGION = 0
 
     # the size of the runtime SDP port data region
-    RUNTIME_SDP_PORT_SIZE = 4
+    RUNTIME_SDP_PORT_SIZE = BYTES_PER_WORD
 
     # 8 elements before the start of global parameters
-    BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 32
+    BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 8 * BYTES_PER_WORD
 
     # The Buffer traffic type
     TRAFFIC_IDENTIFIER = "BufferTraffic"
@@ -123,6 +147,8 @@ class AbstractPopulationVertex(
         self._state_variables = SpynnakerRangeDictionary(n_neurons)
         self.__neuron_impl.add_parameters(self._parameters)
         self.__neuron_impl.add_state_variables(self._state_variables)
+        self.__initial_state_variables = None
+        self.__updated_state_variables = set()
 
         # Set up for recording
         recordables = ["spikes"]
@@ -137,6 +163,8 @@ class AbstractPopulationVertex(
         # bool for if state has changed.
         self.__change_requires_mapping = True
         self.__change_requires_neuron_parameters_reload = False
+        self.__change_requires_data_generation = False
+        self.__has_reset_last = True
 
         # Set up for profiling
         self.__n_profile_samples = helpful_functions.read_config_int(
@@ -186,9 +214,15 @@ class AbstractPopulationVertex(
     def requires_mapping(self):
         return self.__change_requires_mapping
 
+    @property
+    @overrides(AbstractChangableAfterRun.requires_data_generation)
+    def requires_data_generation(self):
+        return self.__change_requires_data_generation
+
     @overrides(AbstractChangableAfterRun.mark_no_changes)
     def mark_no_changes(self):
         self.__change_requires_mapping = False
+        self.__change_requires_data_generation = False
 
     # CB: May be dead code
     def _get_buffered_sdram_per_timestep(self, vertex_slice):
@@ -215,8 +249,10 @@ class AbstractPopulationVertex(
             constraints=None):
 
         self.__n_subvertices += 1
+        recorded_region_ids = self.__neuron_recorder.recorded_ids_by_slice(
+            vertex_slice)
         return PopulationMachineVertex(
-            resources_required, self.__neuron_recorder.recorded_region_ids,
+            resources_required, recorded_region_ids,
             label, constraints)
 
     def get_cpu_usage_for_atoms(self, vertex_slice):
@@ -249,15 +285,14 @@ class AbstractPopulationVertex(
             self, vertex_slice, graph, machine_time_step):
         n_record = len(self.__neuron_impl.get_recordable_variables()) + 1
         sdram_requirement = (
-            common_constants.SYSTEM_BYTES_REQUIREMENT +
+            SYSTEM_BYTES_REQUIREMENT +
             self._get_sdram_usage_for_neuron_params(vertex_slice) +
             recording_utilities.get_recording_header_size(n_record) +
             recording_utilities.get_recording_data_constant_size(n_record) +
             PopulationMachineVertex.get_provenance_data_size(
                 PopulationMachineVertex.N_ADDITIONAL_PROVENANCE_DATA_ITEMS) +
             self.__synapse_manager.get_sdram_usage_in_bytes(
-                vertex_slice, graph.get_edges_ending_at_vertex(self),
-                machine_time_step) +
+                vertex_slice, machine_time_step, graph, self) +
             profile_utils.get_profile_region_size(
                 self.__n_profile_samples))
 
@@ -299,9 +334,43 @@ class AbstractPopulationVertex(
             size=params_size,
             label='NeuronParams')
 
+    @staticmethod
+    def __copy_ranged_dict(source, merge=None, merge_keys=None):
+        target = SpynnakerRangeDictionary(len(source))
+        for key in source.keys():
+            copy_list = SpynnakerRangedList(len(source))
+            if merge_keys is None or key not in merge_keys:
+                init_list = source.get_list(key)
+            else:
+                init_list = merge.get_list(key)
+            for start, stop, value in init_list.iter_ranges():
+                is_list = (hasattr(value, '__iter__') and
+                           not isinstance(value, str))
+                copy_list.set_value_by_slice(start, stop, value, is_list)
+            target[key] = copy_list
+        return target
+
     def _write_neuron_parameters(
             self, spec, key, vertex_slice, machine_time_step,
             time_scale_factor):
+
+        # If resetting, reset any state variables that need to be reset
+        if (self.__has_reset_last and
+                self.__initial_state_variables is not None):
+            self._state_variables = self.__copy_ranged_dict(
+                self.__initial_state_variables, self._state_variables,
+                self.__updated_state_variables)
+            self.__initial_state_variables = None
+
+        # If no initial state variables, copy them now
+        if self.__has_reset_last:
+            self.__initial_state_variables = self.__copy_ranged_dict(
+                self._state_variables)
+
+        # Reset things that need resetting
+        self.__has_reset_last = False
+        self.__updated_state_variables.clear()
+
         # pylint: disable=too-many-arguments
         n_atoms = vertex_slice.n_atoms
         spec.comment("\nWriting Neuron Parameters for {} Neurons:\n".format(
@@ -402,20 +471,19 @@ class AbstractPopulationVertex(
         "application_graph": "MemoryApplicationGraph",
         "machine_graph": "MemoryMachineGraph",
         "routing_info": "MemoryRoutingInfos",
-        "data_n_time_steps": "DataNTimeSteps",
-        "placements": "MemoryPlacements"
+        "data_n_time_steps": "DataNTimeSteps"
     })
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
         additional_arguments={
             "machine_time_step", "time_scale_factor", "graph_mapper",
             "application_graph", "machine_graph", "routing_info",
-            "data_n_time_steps", "placements"
+            "data_n_time_steps"
         })
     def generate_data_specification(
             self, spec, placement, machine_time_step, time_scale_factor,
             graph_mapper, application_graph, machine_graph, routing_info,
-            data_n_time_steps, placements):
+            data_n_time_steps):
         # pylint: disable=too-many-arguments, arguments-differ
         vertex = placement.vertex
 
@@ -463,7 +531,7 @@ class AbstractPopulationVertex(
         self.__synapse_manager.write_data_spec(
             spec, self, vertex_slice, vertex, placement, machine_graph,
             application_graph, routing_info, graph_mapper,
-            weight_scale, machine_time_step, placements)
+            weight_scale, machine_time_step)
 
         # End the writing of this specification:
         spec.end_specification()
@@ -537,11 +605,16 @@ class AbstractPopulationVertex(
 
     @overrides(AbstractPopulationInitializable.initialize)
     def initialize(self, variable, value):
+        if not self.__has_reset_last:
+            raise Exception(
+                "initialize can only be called before the first call to run, "
+                "or before the first call to run after a reset")
         if variable not in self._state_variables:
             raise KeyError(
                 "Vertex does not support initialisation of"
                 " parameter {}".format(variable))
         self._state_variables.set_value(variable, value)
+        self.__updated_state_variables.add(variable)
         self.__change_requires_neuron_parameters_reload = True
 
     @property
@@ -681,6 +754,9 @@ class AbstractPopulationVertex(
         self.__synapse_manager.add_pre_run_connection_holder(
             connection_holder, edge, synapse_info)
 
+    def get_connection_holders(self):
+        return self.__synapse_manager.get_connection_holders()
+
     @overrides(AbstractAcceptsIncomingSynapses.get_connections_from_machine)
     def get_connections_from_machine(
             self, transceiver, placement, edge, graph_mapper, routing_infos,
@@ -798,3 +874,14 @@ class AbstractPopulationVertex(
 
     def gen_on_machine(self, vertex_slice):
         return self.__synapse_manager.gen_on_machine(vertex_slice)
+
+    @overrides(AbstractCanReset.reset_to_first_timestep)
+    def reset_to_first_timestep(self):
+        # Mark that reset has been done, and reload state variables
+        self.__has_reset_last = True
+        self.__change_requires_neuron_parameters_reload = True
+
+        # If synapses change during the run,
+        if self.__synapse_manager.changes_during_run:
+            self.__change_requires_data_generation = True
+            self.__change_requires_neuron_parameters_reload = False

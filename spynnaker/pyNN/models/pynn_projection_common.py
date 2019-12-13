@@ -1,3 +1,18 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import logging
 import math
 import numpy
@@ -11,7 +26,7 @@ from spynnaker.pyNN.models.abstract_models import (
 from spynnaker.pyNN.models.neural_projections import (
     DelayedApplicationEdge, SynapseInformation,
     ProjectionApplicationEdge, DelayAfferentApplicationEdge)
-from spynnaker.pyNN.models.utility_models import DelayExtensionVertex
+from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.neuron import ConnectionHolder
 from spinn_front_end_common.utilities.globals_variables import get_simulator
@@ -46,6 +61,7 @@ class PyNNProjectionCommon(object):
     def __init__(
             self, spinnaker_control, connector, synapse_dynamics_stdp,
             target, pre_synaptic_population, post_synaptic_population,
+            prepop_is_view, postpop_is_view,
             rng, machine_time_step, user_max_delay, label, time_scale_factor):
         # pylint: disable=too-many-arguments, too-many-locals
         self.__spinnaker_control = spinnaker_control
@@ -72,9 +88,9 @@ class PyNNProjectionCommon(object):
         # round the delays to multiples of full timesteps
         # (otherwise SDRAM estimation calculations can go wrong)
         if not get_simulator().is_a_pynn_random(synapse_dynamics_stdp.delay):
-            synapse_dynamics_stdp.delay = numpy.rint(numpy.array(
-                synapse_dynamics_stdp.delay) * (
-                    1000.0 / machine_time_step)) * (machine_time_step / 1000.0)
+            synapse_dynamics_stdp.set_delay(numpy.rint(numpy.array(
+                synapse_dynamics_stdp.delay) * (1000.0 / machine_time_step)) *
+                (machine_time_step / 1000.0))
 
         # set the plasticity dynamics for the post pop (allows plastic stuff
         #  when needed)
@@ -83,17 +99,18 @@ class PyNNProjectionCommon(object):
 
         # Set and store synapse information for future processing
         self.__synapse_information = SynapseInformation(
-            connector, synapse_dynamics_stdp, synapse_type,
-            synapse_dynamics_stdp.weight, synapse_dynamics_stdp.delay)
+            connector, pre_synaptic_population, post_synaptic_population,
+            prepop_is_view, postpop_is_view, rng, synapse_dynamics_stdp,
+            synapse_type, synapse_dynamics_stdp.weight,
+            synapse_dynamics_stdp.delay)
 
         # Set projection information in connector
         connector.set_projection_information(
-            pre_synaptic_population, post_synaptic_population, rng,
-            machine_time_step)
+            machine_time_step, self.__synapse_information)
 
         # handle max delay
         max_delay = synapse_dynamics_stdp.get_delay_maximum(
-            connector, self._synapse_information.delay)
+            connector, self.__synapse_information)
         if max_delay is None:
             max_delay = user_max_delay
 
@@ -102,11 +119,13 @@ class PyNNProjectionCommon(object):
         post_vertex_max_supported_delay_ms = \
             post_synaptic_population._get_vertex \
             .get_maximum_delay_supported_in_ms(machine_time_step)
-        if max_delay > (post_vertex_max_supported_delay_ms +
-                        _delay_extension_max_supported_delay):
+        max_supported_delay_ms = post_vertex_max_supported_delay_ms + \
+            _delay_extension_max_supported_delay * (machine_time_step / 1000.0)
+        if max_delay > max_supported_delay_ms:
             raise ConfigurationException(
-                "The maximum delay {} for projection is not supported".format(
-                    max_delay))
+                "The maximum delay {} for projection is not supported "
+                "(max supported delay is {})".format(max_delay,
+                                                     max_supported_delay_ms))
 
         if max_delay > user_max_delay / (machine_time_step / 1000.0):
             logger.warning("The end user entered a max delay"

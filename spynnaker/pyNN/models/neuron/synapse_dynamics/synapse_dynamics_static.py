@@ -1,3 +1,18 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import numpy
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
@@ -6,7 +21,6 @@ from .abstract_static_synapse_dynamics import AbstractStaticSynapseDynamics
 from .abstract_generate_on_machine import (
     AbstractGenerateOnMachine, MatrixGeneratorID)
 from spynnaker.pyNN.exceptions import InvalidParameterType
-from .abstract_synapse_dynamics import AbstractSynapseDynamics
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 
 
@@ -14,32 +28,45 @@ class SynapseDynamicsStatic(
         AbstractStaticSynapseDynamics, AbstractSettable,
         AbstractChangableAfterRun, AbstractGenerateOnMachine):
     __slots__ = [
-        # ??????????
+        # Indicates if a change that has been made requires mapping
         "__change_requires_mapping",
         # padding to add to a synaptic row for synaptic rewiring
-        "__pad_to_length"]
+        "__pad_to_length",
+        # weight of connections
+        "__weight",
+        # delay of connections
+        "__delay"]
 
-    def __init__(self, pad_to_length=None):
+    def __init__(self, weight=0.0, delay=1.0, pad_to_length=None):
         self.__change_requires_mapping = True
+        self.__weight = weight
+        self.__delay = delay
         self.__pad_to_length = pad_to_length
 
-    @overrides(AbstractSynapseDynamics.is_same_as)
+    @overrides(AbstractStaticSynapseDynamics.merge)
+    def merge(self, synapse_dynamics):
+        # We can always override a static synapse dynamics with a more
+        # complex model
+        return synapse_dynamics
+
+    @overrides(AbstractStaticSynapseDynamics.is_same_as)
     def is_same_as(self, synapse_dynamics):
         return isinstance(synapse_dynamics, SynapseDynamicsStatic)
 
-    @overrides(AbstractSynapseDynamics.are_weights_signed)
+    @overrides(AbstractStaticSynapseDynamics.are_weights_signed)
     def are_weights_signed(self):
         return False
 
-    @overrides(AbstractSynapseDynamics.get_vertex_executable_suffix)
+    @overrides(AbstractStaticSynapseDynamics.get_vertex_executable_suffix)
     def get_vertex_executable_suffix(self):
         return ""
 
-    @overrides(AbstractSynapseDynamics.get_parameters_sdram_usage_in_bytes)
+    @overrides(AbstractStaticSynapseDynamics.
+               get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(self, n_neurons, n_synapse_types):
         return 0
 
-    @overrides(AbstractSynapseDynamics.write_parameters)
+    @overrides(AbstractStaticSynapseDynamics.write_parameters)
     def write_parameters(self, spec, region, machine_time_step, weight_scales):
         # Nothing to do here
         pass
@@ -127,6 +154,7 @@ class SynapseDynamicsStatic(
 
         return connections
 
+    @property
     @overrides(AbstractChangableAfterRun.requires_mapping)
     def requires_mapping(self):
         """ True if changes that have been made require that mapping be\
@@ -177,3 +205,22 @@ class SynapseDynamicsStatic(
     @overrides(AbstractGenerateOnMachine.gen_matrix_id)
     def gen_matrix_id(self):
         return MatrixGeneratorID.STATIC_MATRIX.value
+
+    @property
+    @overrides(AbstractStaticSynapseDynamics.changes_during_run)
+    def changes_during_run(self):
+        return False
+
+    @property
+    @overrides(AbstractStaticSynapseDynamics.weight)
+    def weight(self):
+        return self.__weight
+
+    @property
+    @overrides(AbstractStaticSynapseDynamics.delay)
+    def delay(self):
+        return self.__delay
+
+    @overrides(AbstractStaticSynapseDynamics.set_delay)
+    def set_delay(self, delay):
+        self.__delay = delay

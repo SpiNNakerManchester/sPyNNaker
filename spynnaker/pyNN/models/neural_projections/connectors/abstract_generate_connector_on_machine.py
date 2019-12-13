@@ -1,11 +1,26 @@
-import decimal
-from distutils.version import StrictVersion
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+from distutils.version import StrictVersion  # pylint: disable=all
 from enum import Enum
 import numpy
 from six import with_metaclass
 from spinn_utilities.abstract_base import abstractproperty, AbstractBase
 from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.globals_variables import get_simulator
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector)
 
@@ -35,6 +50,8 @@ PARAM_TYPE_BY_NAME = {
     "exponential": 5
 }
 
+PARAM_TYPE_KERNEL = 6
+
 
 # Hashes of the connection generators supported by the synapse expander
 class ConnectorIDs(Enum):
@@ -42,6 +59,9 @@ class ConnectorIDs(Enum):
     ALL_TO_ALL_CONNECTOR = 1
     FIXED_PROBABILITY_CONNECTOR = 2
     FIXED_TOTAL_NUMBER_CONNECTOR = 3
+    FIXED_NUMBER_PRE_CONNECTOR = 4
+    FIXED_NUMBER_POST_CONNECTOR = 5
+    KERNEL_CONNECTOR = 6
 
 
 class AbstractGenerateConnectorOnMachine(with_metaclass(
@@ -55,8 +75,9 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         "__connector_seed"
     ]
 
-    def __init__(self, safe=True, verbose=False):
-        AbstractConnector.__init__(self, safe=safe, verbose=verbose)
+    def __init__(self, safe=True, callback=None, verbose=False):
+        AbstractConnector.__init__(
+            self, safe=safe, callback=callback, verbose=verbose)
         self.__delay_seed = dict()
         self.__weight_seed = dict()
         self.__connector_seed = dict()
@@ -105,20 +126,19 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         """
         if numpy.isscalar(values):
             return numpy.array(
-                [round(decimal.Decimal(str(values)) * DataType.S1615.scale)],
+                [DataType.S1615.encode_as_int(values)],
                 dtype="uint32")
 
         if IS_PYNN_8 and get_simulator().is_a_pynn_random(values):
-            parameters = random.available_distributions[values.name]
-            params = [
-                values.parameters.get(param, None) for param in parameters]
-            params = [
+            parameters = (
+                values.parameters.get(param_name, None)
+                for param_name in random.available_distributions[values.name])
+            parameters = (
                 DataType.S1615.max if param == numpy.inf
                 else DataType.S1615.min if param == -numpy.inf else param
-                for param in params if param is not None]
+                for param in parameters if param is not None)
             params = [
-                round(decimal.Decimal(str(param)) * DataType.S1615.scale)
-                for param in params if param is not None]
+                DataType.S1615.encode_as_int(param) for param in parameters]
             params.extend(seed)
             return numpy.array(params, dtype="uint32")
 
@@ -129,11 +149,11 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         """ Get the size of the parameter generator parameters in bytes
         """
         if numpy.isscalar(values):
-            return 4
+            return BYTES_PER_WORD
 
         if IS_PYNN_8 and get_simulator().is_a_pynn_random(values):
             parameters = random.available_distributions[values.name]
-            return (len(parameters) + 4) * 4
+            return (len(parameters) + 4) * BYTES_PER_WORD
 
         raise ValueError("Unexpected value {}".format(values))
 
@@ -220,7 +240,7 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
     def gen_connector_params(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type):
+            synapse_type, synapse_info):
         """ Get the parameters of the on machine generation.
 
         :rtype: numpy array of uint32

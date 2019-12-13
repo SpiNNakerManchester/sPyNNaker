@@ -1,9 +1,33 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import inspect
 try:
     from inspect import getfullargspec
 except ImportError:
     # Python 2.7 hack
     from inspect import getargspec as getfullargspec
+from spinn_utilities.log import FormatAdapter
+import logging
+
+logger = FormatAdapter(logging.getLogger(__name__))
+
+
+def _get_args(func):
+    # So we have a disable in one place, not many
+    return getfullargspec(func)  # pylint: disable=deprecated-method
 
 
 def _check_args(args_to_find, default_args, init):
@@ -15,11 +39,12 @@ def _check_args(args_to_find, default_args, init):
 
 
 def get_dict_from_init(init, skip=None, include=None):
-    init_args = getfullargspec(init)
-    n_defaults = len(init_args.defaults)
-    n_args = len(init_args.args)
-    default_args = init_args.args[n_args - n_defaults:]
-    default_values = init_args.defaults
+    init_args = _get_args(init)
+    n_defaults = 0 if init_args.defaults is None else len(init_args.defaults)
+    n_args = 0 if init_args.args is None else len(init_args.args)
+    default_args = ([] if init_args.args is None else
+                    init_args.args[n_args - n_defaults:])
+    default_values = [] if init_args.defaults is None else init_args.defaults
 
     # Check that included / skipped things exist
     if include is not None:
@@ -43,8 +68,30 @@ def default_parameters(parameters):
     :type parameters: set of str
     """
     def wrap(method):
+        # Find the real method in case we use multiple of these decorators
+        wrapped = method
+        while hasattr(method, "_method"):
+            method = getattr(method, "_method")
+
+        # Set the parameters of the method to be used later
         method._parameters = parameters
-        return method
+        method_args = _get_args(method)
+
+        def wrapper(*args, **kwargs):
+            # Check for state variables that have been specified in cell_params
+            args_provided = method_args.args[:len(args)]
+            args_provided.extend([
+                arg for arg in kwargs.keys() if arg in method_args.args])
+            for arg in args_provided:
+                if arg not in method._parameters and arg != "self":
+                    logger.warning(
+                        "Formal PyNN specifies that {} should be set using "
+                        "initial_values not cell_params".format(arg))
+            wrapped(*args, **kwargs)
+
+        # Store the real method in the returned object
+        wrapper._method = method
+        return wrapper
     return wrap
 
 
@@ -57,8 +104,30 @@ def default_initial_values(state_variables):
     :type state_variables: set of str
     """
     def wrap(method):
+        # Find the real method in case we use multiple of these decorators
+        wrapped = method
+        while hasattr(method, "_method"):
+            method = getattr(method, "_method")
+
+        # Store the state variables of the method to be used later
         method._state_variables = state_variables
-        return method
+        method_args = _get_args(method)
+
+        def wrapper(*args, **kwargs):
+            # Check for state variables that have been specified in cell_params
+            args_provided = method_args.args[:len(args)]
+            args_provided.extend([
+                arg for arg in kwargs.keys() if arg in method_args.args])
+            for arg in args_provided:
+                if arg in method._state_variables:
+                    logger.warning(
+                        "Formal PyNN specifies that {} should be set using "
+                        "initial_values not cell_params".format(arg))
+            wrapped(*args, **kwargs)
+
+        # Store the real method in the returned object
+        wrapper._method = method
+        return wrapper
     return wrap
 
 
@@ -77,6 +146,8 @@ def defaults(cls):
     if not hasattr(cls, "__init__"):
         raise AttributeError("No __init__ found in {}".format(cls))
     init = getattr(cls, "__init__")
+    while hasattr(init, "_method"):
+        init = getattr(init, "_method")
     params = None
     if hasattr(init, "_parameters"):
         params = getattr(init, "_parameters")

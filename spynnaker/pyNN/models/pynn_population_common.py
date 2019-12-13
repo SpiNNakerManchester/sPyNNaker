@@ -1,6 +1,22 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import logging
 import numpy
 from six import string_types, iteritems
+from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.log import FormatAdapter
 from pacman.model.constraints import AbstractConstraint
 from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
@@ -19,6 +35,11 @@ from .abstract_pynn_model import AbstractPyNNModel
 logger = FormatAdapter(logging.getLogger(__file__))
 
 
+def _we_dont_do_this_now(*args):  # pylint: disable=unused-argument
+    # pragma: no cover
+    raise NotImplementedError("sPyNNaker8 does not currently do this")
+
+
 class PyNNPopulationCommon(object):
     __slots__ = [
         "_all_ids",
@@ -26,7 +47,6 @@ class PyNNPopulationCommon(object):
         "__delay_vertex",
         "__first_id",
         "__has_read_neuron_parameters_this_run",
-        "__label",
         "__last_id",
         "_positions",
         "__record_gsyn_file",
@@ -46,8 +66,7 @@ class PyNNPopulationCommon(object):
             self, spinnaker_control, size, label, constraints, model,
             structure, initial_values, additional_parameters=None):
         # pylint: disable=too-many-arguments
-        self.__label = label
-        size = self._roundsize(size)
+        size = self._roundsize(size, label)
 
         # Use a provided model to create a vertex
         if isinstance(model, AbstractPyNNModel):
@@ -57,12 +76,6 @@ class PyNNPopulationCommon(object):
             population_parameters = dict(model.default_population_parameters)
             if additional_parameters is not None:
                 population_parameters.update(additional_parameters)
-            if label is None:
-                simulator = globals_variables.get_simulator()
-                label = "Population {}".format(
-                    simulator.none_labelled_vertex_count)
-                simulator.increment_none_labelled_vertex_count()
-                self.__label = label
             self.__vertex = model.create_vertex(
                 size, label, constraints, **population_parameters)
 
@@ -78,8 +91,8 @@ class PyNNPopulationCommon(object):
             elif size != self.__vertex.n_atoms:
                 raise ConfigurationException(
                     "Vertex size does not match Population size")
-            if label is None:
-                self.__label = self.__vertex.label
+            if label is not None:
+                self.__vertex.set_label(label)
             if constraints is not None:
                 self.__vertex.add_constraints(constraints)
 
@@ -112,7 +125,8 @@ class PyNNPopulationCommon(object):
 
         # add objects to the SpiNNaker control class
         self.__spinnaker_control.add_population(self)
-        self.__spinnaker_control.add_application_vertex(self.__vertex)
+        self.__spinnaker_control.add_application_vertex(
+            self.__vertex)
 
         # initialise common stuff
         self._size = size
@@ -172,13 +186,7 @@ class PyNNPopulationCommon(object):
         """ Merges populations
         """
         # TODO: Make this add the neurons from another population to this one
-        raise NotImplementedError
-
-    def all(self):
-        """ Iterator over cell IDs on all nodes.
-        """
-        # TODO: Return the cells when we have such a thing
-        raise NotImplementedError
+        _we_dont_do_this_now(other)
 
     @property
     def conductance_based(self):
@@ -188,22 +196,25 @@ class PyNNPopulationCommon(object):
             return self.__vertex.conductance_based
         return False
 
-    def __getitem__(self, index_or_slice):
-        # Note: This is supported by sPyNNaker8
-        # TODO: Used to get a single cell - not yet supported
-        raise NotImplementedError
-
-    def get(self, parameter_names, gather=False):
+    def get(self, parameter_names, gather=True, simplify=True):
         """ Get the values of a parameter for every local cell in the\
             population.
 
         :param parameter_names: Name of parameter. This is either a single\
             string or a list of strings
+        :param gather: pointless on sPyNNaker
         :return: A single list of values (or possibly a single value) if\
             paramter_names is a string, or a dict of these if parameter names\
             is a list.
         :rtype: str or list(str) or dict(str,str) or dict(str,list(str))
         """
+        if not gather:
+            warn_once(
+                logger, "sPyNNaker only supports gather=True. We will run "
+                "as if gather was set to True.")
+        if simplify is not True:
+            warn_once(
+                logger, "The simplify value is ignored if not set to true")
         if not self._vertex_population_settable:
             raise KeyError("Population does not support setting")
         if isinstance(parameter_names, string_types):
@@ -243,6 +254,9 @@ class PyNNPopulationCommon(object):
     def id_to_index(self, id):  # @ReservedAssignment
         """ Given the ID(s) of cell(s) in the Population, return its (their)\
             index (order in the Population).
+
+        Defined by
+        http://neuralensemble.org/docs/PyNN/reference/populations.html
         """
         # pylint: disable=redefined-builtin
         if not numpy.iterable(id):
@@ -270,9 +284,11 @@ class PyNNPopulationCommon(object):
         """ Given the ID(s) of cell(s) in the Population, return its (their)\
             index (order in the Population), counting only cells on the local\
             MPI node.
+        Defined by
+        http://neuralensemble.org/docs/PyNN/reference/populations.html
         """
         # TODO: Need __getitem__
-        raise NotImplementedError
+        _we_dont_do_this_now(cell_id)
 
     def _initialize(self, variable, value):
         """ Set the initial value of one of the state variables of the neurons\
@@ -285,32 +301,18 @@ class PyNNPopulationCommon(object):
         if globals_variables.get_not_running_simulator().has_ran \
                 and not self._vertex_changeable_after_run:
             raise Exception("Population does not support changes after run")
+        self._read_parameters_before_set()
         self.__vertex.initialize(variable, value)
-
-    def can_record(self, variable):
-        """ Determine whether `variable` can be recorded from this population.
-
-        Note: This is supported by sPyNNaker8
-        """
-
-        # TODO: Needs a more precise recording mechanism (coming soon)
-        raise NotImplementedError
 
     def inject(self, current_source):
         """ Connect a current source to all cells in the Population.
+
+        Defined by
+        http://neuralensemble.org/docs/PyNN/reference/populations.html
         """
 
         # TODO:
-        raise NotImplementedError
-
-    def __iter__(self):
-        """ Iterate over local cells
-
-        Note: This is supported by sPyNNaker8
-        """
-
-        # TODO:
-        raise NotImplementedError
+        _we_dont_do_this_now(current_source)
 
     def __len__(self):
         """ Get the total number of cells in the population.
@@ -321,15 +323,19 @@ class PyNNPopulationCommon(object):
     def label(self):
         """ The label of the population
         """
-        return self.__label
+        return self._vertex.label
 
     @label.setter
     def label(self, label):
-        self.__label = label
+        raise NotImplementedError(
+            "As label is used as an ID it can not be changed")
 
     @property
     def local_size(self):
         """ The number of local cells
+
+        Defined by
+        http://neuralensemble.org/docs/PyNN/reference/populations.html
         """
         # Doesn't make much sense on SpiNNaker
         return self._size
@@ -417,7 +423,6 @@ class PyNNPopulationCommon(object):
         # If the tools have run before, and not reset, and the read
         # hasn't already been done, read back the data
         if globals_variables.get_simulator().has_ran \
-                and not globals_variables.get_simulator().has_reset_last \
                 and self._vertex_read_parameters_before_set \
                 and not self.__has_read_neuron_parameters_this_run \
                 and not globals_variables.get_simulator().use_virtual_board:
@@ -443,7 +448,16 @@ class PyNNPopulationCommon(object):
 
     def get_spike_counts(self, spikes, gather=True):
         """ Return the number of spikes for each neuron.
+
+        Defined by
+        http://neuralensemble.org/docs/PyNN/reference/populations.html
+
+        :param gather: pointless on sPyNNaker
         """
+        if not gather:
+            warn_once(
+                logger, "sPyNNaker only supports gather=True. We will run "
+                "as if gather was set to True.")
         n_spikes = {}
         counts = numpy.bincount(spikes[:, 0].astype(dtype=numpy.int32),
                                 minlength=self.__vertex.n_atoms)
@@ -556,7 +570,7 @@ class PyNNPopulationCommon(object):
         raise ConfigurationException(
             "This population does not support describing its units")
 
-    def _roundsize(self, size):
+    def _roundsize(self, size, label):
         if isinstance(size, int):
             return size
         # External device population can have a size of None so accept for now
@@ -567,8 +581,8 @@ class PyNNPopulationCommon(object):
         if abs(temp - size) < 0.001:
             logger.warning("Size of the population rounded "
                            "from {} to {}. Please use int values for size",
-                           self.label, size, temp)
+                           label, size, temp)
             return temp
         raise ConfigurationException(
             "Size of a population with label {} must be an int,"
-            " received {}".format(self.label, size))
+            " received {}".format(label, size))

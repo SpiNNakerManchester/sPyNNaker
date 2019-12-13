@@ -1,7 +1,21 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 """
 utility class containing simple helper methods
 """
-from decimal import Decimal
 import os
 import logging
 import math
@@ -65,9 +79,8 @@ def convert_to(value, data_type):
     :param data_type: The data type to convert to
     :return: The converted data as a numpy data type
     """
-    return numpy.round(
-        float(Decimal(str(value)) * data_type.scale)).astype(
-            numpy.dtype(data_type.struct_encoding))
+    return numpy.round(data_type.encode_as_int(value)).astype(
+        data_type.struct_encoding)
 
 
 def read_in_data_from_file(
@@ -254,6 +267,7 @@ def validate_mars_kiss_64_seed(seed):
 
     # avoid z=c=0 and make < 698769069
     seed[3] = seed[3] % 698769068 + 1
+    return seed
 
 
 def check_sampling_interval(sampling_interval):

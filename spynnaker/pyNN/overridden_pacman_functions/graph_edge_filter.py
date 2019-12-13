@@ -1,4 +1,20 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import logging
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.graphs.application import ApplicationEdge
 from pacman.model.graphs.machine import MachineGraph
@@ -9,7 +25,7 @@ from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamicsStructural)
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class GraphEdgeFilter(object):
@@ -35,19 +51,25 @@ class GraphEdgeFilter(object):
         for vertex in progress.over(machine_graph.vertices, False):
             self._add_vertex_to_new_graph(
                 vertex, graph_mapper, new_machine_graph, new_graph_mapper)
+        prune_count = 0
+        no_prune_count = 0
 
         # start checking edges to decide which ones need pruning....
         for partition in progress.over(machine_graph.outgoing_edge_partitions):
             for edge in partition.edges:
                 if self._is_filterable(edge, graph_mapper):
-                    logger.debug("this edge was pruned %s", edge)
+                    logger.debug("this edge was pruned {}", edge)
+                    prune_count += 1
                     continue
-                logger.debug("this edge was not pruned %s", edge)
+                logger.debug("this edge was not pruned {}", edge)
+                no_prune_count += 1
                 self._add_edge_to_new_graph(
                     edge, partition, graph_mapper, new_machine_graph,
                     new_graph_mapper)
 
         # returned the pruned graph and graph_mapper
+        logger.debug("prune_count:{} no_prune_count:{}",
+                     prune_count, no_prune_count)
         return new_machine_graph, new_graph_mapper
 
     @staticmethod

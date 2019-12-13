@@ -1,3 +1,18 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import logging
 import numpy
 from spinn_utilities.overrides import overrides
@@ -29,7 +44,8 @@ class FromListConnector(AbstractConnector):
         "__split_pre_slices",
         "__split_post_slices"]
 
-    def __init__(self, conn_list, safe=True, verbose=False, column_names=None):
+    def __init__(self, conn_list, safe=True, callback=None, verbose=False,
+                 column_names=None):
         """
         :param: conn_list:
             a list of tuples, one tuple for each connection. Each\
@@ -44,7 +60,7 @@ class FromListConnector(AbstractConnector):
             Additional items per synapse are acceptable but all synapses\
             should have the same number of items.
         """
-        super(FromListConnector, self).__init__(safe, verbose)
+        super(FromListConnector, self).__init__(safe, callback, verbose)
 
         # Need to set column names first, as setter uses this
         self.__column_names = column_names
@@ -58,9 +74,9 @@ class FromListConnector(AbstractConnector):
         self.__split_post_slices = None
 
     @overrides(AbstractConnector.get_delay_maximum)
-    def get_delay_maximum(self, delays):
+    def get_delay_maximum(self, synapse_info):
         if self.__delays is None:
-            return numpy.max(delays)
+            return numpy.max(synapse_info.delays)
         else:
             return numpy.max(self.__delays)
 
@@ -128,7 +144,8 @@ class FromListConnector(AbstractConnector):
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, delays, post_vertex_slice, min_delay=None, max_delay=None):
+            self, post_vertex_slice, synapse_info, min_delay=None,
+            max_delay=None):
 
         mask = None
         if min_delay is None or max_delay is None or self.__delays is None:
@@ -156,11 +173,12 @@ class FromListConnector(AbstractConnector):
         # If here, there must be no delays in the list, so use the passed in
         # ones
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
-            delays, self._n_pre_neurons * self._n_post_neurons,
+            synapse_info.delays,
+            synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             max_targets, min_delay, max_delay)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
-    def get_n_connections_to_post_vertex_maximum(self):
+    def get_n_connections_to_post_vertex_maximum(self, synapse_info):
         if not len(self.__targets):
             return 0
         # pylint: disable=too-many-arguments
@@ -175,10 +193,10 @@ class FromListConnector(AbstractConnector):
             return numpy.mean(numpy.abs(self.__weights))
 
     @overrides(AbstractConnector.get_weight_maximum)
-    def get_weight_maximum(self, weights):
+    def get_weight_maximum(self, synapse_info):
         # pylint: disable=too-many-arguments
         if self.__weights is None:
-            return numpy.amax(weights)
+            return numpy.amax(synapse_info.weights)
         else:
             return numpy.amax(numpy.abs(self.__weights))
 
@@ -192,9 +210,9 @@ class FromListConnector(AbstractConnector):
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, weights, delays, pre_slices, pre_slice_index, post_slices,
+            self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type):
+            synapse_type, synapse_info):
         # pylint: disable=too-many-arguments
         if not len(self.__sources):
             return numpy.zeros(0, dtype=self.NUMPY_SYNAPSES_DTYPE)
@@ -206,20 +224,22 @@ class FromListConnector(AbstractConnector):
         block["target"] = self.__targets[indices]
         # check that conn_list has weights, if not then use the value passed in
         if self.__weights is None:
-            if hasattr(weights, "__getitem__"):
-                block["weight"] = numpy.array(weights)[indices]
+            if hasattr(synapse_info.weights, "__len__"):
+                block["weight"] = numpy.array(synapse_info.weights)[indices]
             else:
                 block["weight"] = self._generate_weights(
-                    weights, len(indices), None)
+                    len(indices), None, pre_vertex_slice,
+                    post_vertex_slice, synapse_info)
         else:
             block["weight"] = self.__weights[indices]
         # check that conn_list has delays, if not then use the value passed in
         if self.__delays is None:
-            if hasattr(weights, "__getitem__"):
-                block["delay"] = numpy.array(weights)[indices]
+            if hasattr(synapse_info.delays, "__len__"):
+                block["delay"] = numpy.array(synapse_info.delays)[indices]
             else:
                 block["delay"] = self._generate_delays(
-                    delays, len(indices), None)
+                    len(indices), None, pre_vertex_slice,
+                    post_vertex_slice, synapse_info)
         else:
             block["delay"] = self._clip_delays(self.__delays[indices])
         block["synapse_type"] = synapse_type
@@ -232,6 +252,10 @@ class FromListConnector(AbstractConnector):
     @property
     def conn_list(self):
         return self.__conn_list
+
+    def get_n_connections(self, pre_slices, post_slices, pre_hi, post_hi):
+        self._split_connections(pre_slices, post_slices)
+        return len(self.__split_conn_list[(pre_hi, post_hi)])
 
     @conn_list.setter
     def conn_list(self, conn_list):

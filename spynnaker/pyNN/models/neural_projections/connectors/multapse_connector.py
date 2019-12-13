@@ -1,9 +1,25 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import logging
 import math
 import numpy.random
 from six import raise_from
 from spinn_utilities.abstract_base import abstractmethod
 from spinn_utilities.overrides import overrides
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.exceptions import SpynnakerException
 from .abstract_connector import AbstractConnector
@@ -29,8 +45,8 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
         "__with_replacement"]
 
     def __init__(self, num_synapses, allow_self_connections=True,
-                 with_replacement=True, safe=True, verbose=False,
-                 rng=None):
+                 with_replacement=True, safe=True, callback=None,
+                 verbose=False, rng=None):
         """
         :param num_synapses:
             This is the total number of synapses in the connection.
@@ -42,7 +58,7 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
             When selecting, allow a neuron to be re-selected or not.
         :type with_replacement: bool
         """
-        super(MultapseConnector, self).__init__(safe, verbose)
+        super(MultapseConnector, self).__init__(safe, callback, verbose)
         self.__num_synapses = num_synapses
         self.__allow_self_connections = allow_self_connections
         self.__with_replacement = with_replacement
@@ -57,8 +73,9 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
         """
 
     @overrides(AbstractConnector.get_delay_maximum)
-    def get_delay_maximum(self, delays):
-        return self._get_delay_maximum(delays, self.__num_synapses)
+    def get_delay_maximum(self, synapse_info):
+        return self._get_delay_maximum(
+            synapse_info.delays, self.__num_synapses)
 
     def _update_synapses_per_post_vertex(self, pre_slices, post_slices):
         if (self.__synapses_per_edge is None or
@@ -97,12 +114,14 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, delays, post_vertex_slice, min_delay=None, max_delay=None):
+            self, post_vertex_slice, synapse_info, min_delay=None,
+            max_delay=None):
         prob_in_slice = (
-            float(post_vertex_slice.n_atoms) / float(self._n_post_neurons))
+            float(post_vertex_slice.n_atoms) / float(
+                synapse_info.n_post_neurons))
         max_in_slice = utility_calls.get_probable_maximum_selected(
             self.__num_synapses, self.__num_synapses, prob_in_slice)
-        prob_in_row = 1.0 / float(self._n_pre_neurons)
+        prob_in_row = 1.0 / float(synapse_info.n_pre_neurons)
         n_connections = utility_calls.get_probable_maximum_selected(
             self.__num_synapses, max_in_slice, prob_in_row)
 
@@ -110,25 +129,27 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
             return int(math.ceil(n_connections))
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
-            delays, self._n_pre_neurons * self._n_post_neurons,
+            synapse_info.delays,
+            synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             n_connections, min_delay, max_delay)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
-    def get_n_connections_to_post_vertex_maximum(self):
-        prob_of_choosing_post_atom = 1.0 / float(self._n_post_neurons)
+    def get_n_connections_to_post_vertex_maximum(self, synapse_info):
+        prob_of_choosing_post_atom = 1.0 / float(synapse_info.n_post_neurons)
         return utility_calls.get_probable_maximum_selected(
             self.__num_synapses, self.__num_synapses,
             prob_of_choosing_post_atom)
 
     @overrides(AbstractConnector.get_weight_maximum)
-    def get_weight_maximum(self, weights):
-        return self._get_weight_maximum(weights, self.__num_synapses)
+    def get_weight_maximum(self, synapse_info):
+        return self._get_weight_maximum(
+            synapse_info.weights, self.__num_synapses)
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, weights, delays, pre_slices, pre_slice_index, post_slices,
+            self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type):
+            synapse_type, synapse_info):
         # pylint: disable=too-many-arguments
         # update the synapses as required, and get the number of connections
         self._update_synapses_per_post_vertex(pre_slices, post_slices)
@@ -151,7 +172,7 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
 
         # Deal with case where self-connections aren't allowed
         if (not self.__allow_self_connections and
-                self.pre_population is self.post_population):
+                synapse_info.pre_population is synapse_info.post_population):
             pairs = pairs[pairs[:, 0] != pairs[:, 1]]
 
         # Now do the actual random choice from the available connections
@@ -159,7 +180,7 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
             chosen = numpy.random.choice(
                 pairs.shape[0], size=n_connections,
                 replace=self.__with_replacement)
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-except
             raise_from(SpynnakerException(
                 "MultapseConnector: The number of connections is too large "
                 "for sampling without replacement; "
@@ -169,9 +190,11 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
         block["source"] = pairs[chosen, 0]
         block["target"] = pairs[chosen, 1]
         block["weight"] = self._generate_weights(
-            weights, n_connections, [connection_slice])
+            n_connections, [connection_slice], pre_vertex_slice,
+            post_vertex_slice, synapse_info)
         block["delay"] = self._generate_delays(
-            delays, n_connections, [connection_slice])
+            n_connections, [connection_slice], pre_vertex_slice,
+            post_vertex_slice, synapse_info)
         block["synapse_type"] = synapse_type
         return block
 
@@ -188,7 +211,7 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
     def gen_connector_params(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type):
+            synapse_type, synapse_info):
         self._update_synapses_per_post_vertex(pre_slices, post_slices)
         n_connections = self._get_n_connections(
             pre_slice_index, post_slice_index)
@@ -205,4 +228,4 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
     @overrides(AbstractGenerateConnectorOnMachine.
                gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
-        return 16 + 16
+        return (4 + 4) * BYTES_PER_WORD

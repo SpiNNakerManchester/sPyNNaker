@@ -1,3 +1,18 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from enum import Enum
 from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
@@ -11,6 +26,9 @@ from spinn_front_end_common.interface.buffer_management.buffer_models import (
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
+from spinn_front_end_common.interface.profiling import AbstractHasProfileData
+from spinn_front_end_common.interface.profiling.profile_utils import (
+    get_profiling_data)
 from spynnaker.pyNN.utilities.constants import (
     LIVE_POISSON_CONTROL_PARTITION_ID)
 
@@ -18,19 +36,24 @@ from spynnaker.pyNN.utilities.constants import (
 class SpikeSourcePoissonMachineVertex(
         MachineVertex, AbstractReceiveBuffersToHost,
         ProvidesProvenanceDataFromMachineImpl, AbstractRecordable,
-        AbstractSupportsDatabaseInjection):
+        AbstractSupportsDatabaseInjection, AbstractHasProfileData):
     __slots__ = [
         "__buffered_sdram_per_timestep",
         "__is_recording",
         "__minimum_buffer_sdram",
         "__resources"]
 
-    POISSON_SPIKE_SOURCE_REGIONS = Enum(
-        value="POISSON_SPIKE_SOURCE_REGIONS",
-        names=[('SYSTEM_REGION', 0),
-               ('POISSON_PARAMS_REGION', 1),
-               ('SPIKE_HISTORY_REGION', 2),
-               ('PROVENANCE_REGION', 3)])
+    class POISSON_SPIKE_SOURCE_REGIONS(Enum):
+        SYSTEM_REGION = 0
+        POISSON_PARAMS_REGION = 1
+        RATES_REGION = 2
+        SPIKE_HISTORY_REGION = 3
+        PROVENANCE_REGION = 4
+        PROFILER_REGION = 5
+
+    PROFILE_TAG_LABELS = {
+        0: "TIMER",
+        1: "PROB_FUNC"}
 
     def __init__(
             self, resources_required, is_recording, constraints=None,
@@ -74,11 +97,14 @@ class SpikeSourcePoissonMachineVertex(
             self.POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value,
             txrx)
 
+    @property
+    @overrides(AbstractSupportsDatabaseInjection.is_in_injection_mode)
+    def is_in_injection_mode(self):
+        # pylint: disable=no-value-for-parameter
+        return self._is_in_injection_mode()
+
     @inject_items({"graph": "MemoryMachineGraph"})
-    @overrides(
-        AbstractSupportsDatabaseInjection.is_in_injection_mode,
-        additional_arguments=["graph"])
-    def is_in_injection_mode(self, graph):
+    def _is_in_injection_mode(self, graph):
         # pylint: disable=arguments-differ
         in_edges = graph.get_edges_ending_at_vertex_with_partition_name(
             self, LIVE_POISSON_CONTROL_PARTITION_ID)
@@ -86,3 +112,9 @@ class SpikeSourcePoissonMachineVertex(
             raise ConfigurationException(
                 "Poisson source can only have one incoming control")
         return len(in_edges) == 1
+
+    @overrides(AbstractHasProfileData.get_profile_data)
+    def get_profile_data(self, transceiver, placement):
+        return get_profiling_data(
+            self.POISSON_SPIKE_SOURCE_REGIONS.PROFILER_REGION.value,
+            self.PROFILE_TAG_LABELS, transceiver, placement)

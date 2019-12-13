@@ -1,5 +1,21 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from six import with_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from .struct import Struct
 from .ranged_dict_vertex_slice import RangedDictVertexSlice
 
@@ -43,7 +59,7 @@ class AbstractStandardNeuronComponent(with_metaclass(AbstractBase, object)):
         :type n_neurons: int
         :rtype: int
         """
-        return self.struct.get_size_in_whole_words(n_neurons) * 4
+        return self.struct.get_size_in_whole_words(n_neurons) * BYTES_PER_WORD
 
     def get_sdram_usage_in_bytes(self, n_neurons):
         """ Get the SDRAM memory usage required
@@ -52,7 +68,7 @@ class AbstractStandardNeuronComponent(with_metaclass(AbstractBase, object)):
         :type n_neurons: int
         :rtype: int
         """
-        return self.struct.get_size_in_whole_words(n_neurons) * 4
+        return self.struct.get_size_in_whole_words(n_neurons) * BYTES_PER_WORD
 
     @abstractmethod
     def add_parameters(self, parameters):
@@ -134,7 +150,7 @@ class AbstractStandardNeuronComponent(with_metaclass(AbstractBase, object)):
         """
         values = self.struct.read_data(data, offset, vertex_slice.n_atoms)
         new_offset = offset + (self.struct.get_size_in_whole_words(
-            vertex_slice.n_atoms) * 4)
+            vertex_slice.n_atoms) * BYTES_PER_WORD)
         params = RangedDictVertexSlice(parameters, vertex_slice)
         variables = RangedDictVertexSlice(state_variables, vertex_slice)
         self.update_values(values, params, variables)

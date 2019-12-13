@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2017-2019 The University of Manchester
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #ifndef _THRESHOLD_TYPE_PUSH_BOT_CONTROL_MODULE_H_
 #define _THRESHOLD_TYPE_PUSH_BOT_CONTROL_MODULE_H_
 
@@ -52,21 +69,18 @@ static inline uint int_bits(int value) {
 //! \param[in] payload: the payload to fire
 //! \param[in] with_payload: bool saying if a payload is needed or not
 static inline void send_packet(
-        uint32_t key, uint32_t payload, bool with_payload){
-
+        uint32_t key, uint32_t payload, bool with_payload) {
     // Wait until the expected time to send
     while (tc[T1_COUNT] > expected_time) {
-
         // Do Nothing
     }
     expected_time -= time_between_spikes;
 
-    if (with_payload){
+    if (with_payload) {
         while (!spin1_send_mc_packet(key, payload, WITH_PAYLOAD)) {
             spin1_delay_us(1);
         }
-    }
-    else{// Send the spike
+    } else {// Send the spike
         while (!spin1_send_mc_packet(key, 0, NO_PAYLOAD)) {
             spin1_delay_us(1);
         }
@@ -96,11 +110,8 @@ static inline uint get_payload(enum send_type type, accum value) {
 
 static bool threshold_type_is_above_threshold(
         state_t value, threshold_type_pointer_t threshold_type) {
-
     if (threshold_type->time_until_next_send == 0) {
-
         if (threshold_type->value_as_payload) {
-
             accum value_to_send = value;
             if (value > threshold_type->max_value) {
                 value_to_send = threshold_type->max_value;
@@ -122,9 +133,8 @@ static bool threshold_type_is_above_threshold(
 
         threshold_type->time_until_next_send =
                 threshold_type->timesteps_between_sending;
-    } else {
-        --threshold_type->time_until_next_send;
     }
+    --threshold_type->time_until_next_send;
     return false;
 }
 

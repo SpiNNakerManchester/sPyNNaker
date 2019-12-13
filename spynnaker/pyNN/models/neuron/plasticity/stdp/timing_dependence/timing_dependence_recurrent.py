@@ -1,6 +1,23 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import math
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
+from spinn_front_end_common.utilities.constants import (
+    BYTES_PER_WORD, BYTES_PER_SHORT)
 from .abstract_timing_dependence import AbstractTimingDependence
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
     SynapseStructureWeightAccumulator)
@@ -61,17 +78,16 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
 
     @property
     def pre_trace_n_bytes(self):
-
         # When using the separate FSMs, pre-trace contains window length,
         # otherwise it's in the synapse
-        return 2 if self.__dual_fsm else 0
+        return BYTES_PER_SHORT if self.__dual_fsm else 0
 
     @overrides(AbstractTimingDependence.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(self):
-
         # 2 * 32-bit parameters
         # 2 * LUTS with STDP_FIXED_POINT_ONE * 16-bit entries
-        return (4 * 2) + (2 * (2 * plasticity_helpers.STDP_FIXED_POINT_ONE))
+        return (BYTES_PER_WORD * 2) + (
+            BYTES_PER_SHORT * (2 * plasticity_helpers.STDP_FIXED_POINT_ONE))
 
     @property
     def n_weight_terms(self):

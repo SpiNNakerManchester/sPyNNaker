@@ -1,7 +1,19 @@
-try:
-    from collections.abc import OrderedDict
-except ImportError:
-    from collections import OrderedDict
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+from collections import OrderedDict
 import logging
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
@@ -62,6 +74,11 @@ class ExternalDeviceLifControlVertex(
         self.__partition_id_to_key = OrderedDict(
             (str(dev.device_control_partition_id), dev.device_control_key)
             for dev in devices)
+
+        # Check for same partition name
+        if len(self.__partition_id_to_key) != len(devices):
+            raise Exception(
+                "Partition names for each device must be different")
 
         # Create a partition to atom map
         self.__partition_id_to_atom = {

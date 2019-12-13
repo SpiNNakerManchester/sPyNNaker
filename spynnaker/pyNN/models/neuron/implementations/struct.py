@@ -1,8 +1,24 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import numpy
 from spinn_utilities.helpful_functions import is_singleton
 from spinn_utilities.ranged.ranged_list import RangedList
 from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spynnaker.pyNN.utilities.utility_calls import convert_to
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
 
 class Struct(object):
@@ -48,7 +64,7 @@ class Struct(object):
         """
         datatype = self.numpy_dtype
         size_in_bytes = array_size * datatype.itemsize
-        return (size_in_bytes + 3) // 4
+        return (size_in_bytes + (BYTES_PER_WORD - 1)) // BYTES_PER_WORD
 
     def get_data(self, values, offset=0, array_size=1):
         """ Get a numpy array of uint32 of data for the given values
@@ -89,9 +105,10 @@ class Struct(object):
                         start - offset:end - offset] = data_value
 
         # Pad to whole number of uint32s
-        overflow = (array_size * self.numpy_dtype.itemsize) % 4
+        overflow = (array_size * self.numpy_dtype.itemsize) % BYTES_PER_WORD
         if overflow != 0:
-            data = numpy.pad(data.view("uint8"), (0, 4 - overflow), "constant")
+            data = numpy.pad(
+                data.view("uint8"), (0, BYTES_PER_WORD - overflow), "constant")
 
         return data.view("uint32")
 

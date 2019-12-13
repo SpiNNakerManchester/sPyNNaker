@@ -1,7 +1,18 @@
-try:
-    from collections.abc import defaultdict
-except ImportError:
-    from collections import defaultdict
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import logging
 import numpy
 from six.moves import xrange
@@ -22,7 +33,6 @@ class RecordingCommon(object):
     """
     # DO NOT DEFINE SLOTS! Multiple inheritance problems otherwise.
     # __slots__ = [
-    #     "__indices_to_record",
     #     "__population",
     #     "__write_to_files_indicators"]
 
@@ -39,11 +49,6 @@ class RecordingCommon(object):
             'gsyn_exc': None,
             'gsyn_inh': None,
             'v': None}
-
-        # Create a dict of variable name -> bool array of indices in population
-        # that are recorded (initially all False)
-        self.__indices_to_record = defaultdict(
-            lambda: numpy.repeat(False, population.size))
 
     @property
     def _population(self):
@@ -99,45 +104,20 @@ class RecordingCommon(object):
                     "conductance from a model which does not use conductance "
                     "input. You will receive current measurements instead.")
 
-    def _set_v_recording(self):
-        """ Set the parameters etc that are used by the voltage recording.
-
-        :return: None
-        """
-        self.__population._vertex.set_recording("v")
-
-    def _set_spikes_recording(self, sampling_interval, indexes=None):
-        """ Set the parameters, etc., that are used by the spikes recording.
-
-        :return: None
-        """
-
-    @staticmethod
-    def pynn7_format(data, ids, sampling_interval, data2=None):
-        n_machine_time_steps = len(data)
-        n_neurons = len(ids)
-        column_length = n_machine_time_steps * n_neurons
-        times = [i * sampling_interval
-                 for i in xrange(0, n_machine_time_steps)]
-        if data2 is None:
-            pynn7 = numpy.column_stack((
-                numpy.repeat(ids, n_machine_time_steps, 0),
-                numpy.tile(times, n_neurons),
-                numpy.transpose(data).reshape(column_length)))
-        else:
-            pynn7 = numpy.column_stack((
-                numpy.repeat(ids, n_machine_time_steps, 0),
-                numpy.tile(times, n_neurons),
-                numpy.transpose(data).reshape(column_length),
-                numpy.transpose(data2).reshape(column_length)))
-        return pynn7
-
     def _get_recorded_pynn7(self, variable):
         if variable == "spikes":
             data = self._get_spikes()
 
         (data, ids, sampling_interval) = self._get_recorded_matrix(variable)
-        return self.pynn7_format(data, ids, sampling_interval)
+        n_machine_time_steps = len(data)
+        n_neurons = len(ids)
+        column_length = n_machine_time_steps * n_neurons
+        times = [i * sampling_interval
+                 for i in xrange(0, n_machine_time_steps)]
+        return numpy.column_stack((
+                numpy.repeat(ids, n_machine_time_steps, 0),
+                numpy.tile(times, n_neurons),
+                numpy.transpose(data).reshape(column_length)))
 
     def _get_recorded_matrix(self, variable):
         """ Perform safety checks and get the recorded data from the vertex\

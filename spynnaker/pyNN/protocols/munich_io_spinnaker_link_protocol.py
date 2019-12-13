@@ -1,3 +1,18 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from enum import Enum
 import logging
 from spinn_front_end_common.utility_models import MultiCastCommand
@@ -247,15 +262,14 @@ class MunichIoSpiNNakerLinkProtocol(object):
     """
     __slots__ = ["__instance_key", "__mode", "__uart_id"]
 
-    # types of modes supported by this protocol
-    MODES = Enum(
-        value="MODES",
-        names=[('RESET_TO_DEFAULT', 0),
-               ('PUSH_BOT', 1),
-               ('SPOMNIBOT', 2),
-               ('BALL_BALANCER', 3),
-               ('MY_ORO_BOTICS', 4),
-               ('FREE', 5)])
+    class MODES(Enum):
+        """types of modes supported by this protocol"""
+        RESET_TO_DEFAULT = 0
+        PUSH_BOT = 1
+        SPOMNIBOT = 2
+        BALL_BALANCER = 3
+        MY_ORO_BOTICS = 4
+        FREE = 5
 
     # The instance of the protocol in use, to ensure that each vertex that is
     # to send commands to the PushBot uses a different outgoing key; the top
@@ -438,8 +452,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
     def generic_motor_total_period_key(self):
         return self._get_key(MOTOR_RUN_FOR_PERIOD_KEY, RETINA_UART_SHIFT)
 
-    def generic_motor_total_period(
-            self, time_in_ms, uart_id=0, time=None):
+    def generic_motor_total_period(self, time_in_ms, time=None):
         return MultiCastCommand(
             key=self.generic_motor_total_period_key,
             payload=time_in_ms, time=time)
