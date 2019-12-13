@@ -176,7 +176,7 @@ def _fill_in_connection_data(
                         machine_edge.post_vertex)
                     conns = vertex.get_connections_from_machine(
                         transceiver, placement, machine_edge, graph_mapper,
-                        ctl.routing_infos, synapse_info, ctl.machine_time_step,
+                        ctl.routing_infos, synapse_info, ctl.user_time_step_in_us,
                         use_extra_monitors)
                     for conn_holder in conn_holder_list:
                         conn_holder.add_connections(conns)

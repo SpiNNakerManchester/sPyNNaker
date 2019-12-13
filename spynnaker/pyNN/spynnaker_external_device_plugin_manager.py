@@ -292,7 +292,7 @@ class SpynnakerExternalDevicePluginManager(object):
 
     @staticmethod
     def machine_time_step():
-        return get_simulator().machine_time_step
+        return get_simulator().user_time_step_in_us
 
     @staticmethod
     def time_scale_factor():

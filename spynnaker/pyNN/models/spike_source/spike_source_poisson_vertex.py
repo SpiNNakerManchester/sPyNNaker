@@ -286,7 +286,7 @@ class SpikeSourcePoissonVertex(
         self.__rng = numpy.random.RandomState(seed)
         self.__rate_change = numpy.zeros(n_neurons)
         self.__machine_time_step = \
-            globals_variables.get_simulator().machine_time_step
+            globals_variables.get_simulator().user_time_step_in_us
 
         # get config from simulator
         config = globals_variables.get_simulator().config
@@ -788,7 +788,7 @@ class SpikeSourcePoissonVertex(
 
     @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
     def get_spikes_sampling_interval(self):
-        return globals_variables.get_simulator().machine_time_step
+        return globals_variables.get_simulator().user_time_step_in_us
 
     @staticmethod
     def get_dtcm_usage_for_atoms():

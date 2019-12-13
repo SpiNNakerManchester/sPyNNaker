@@ -48,7 +48,7 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
 
         self.__synapse_structure = SynapseStructureWeightOnly()
 
-        ts = get_simulator().machine_time_step / 1000.0
+        ts = get_simulator().user_time_step_in_us / 1000.0
         self.__tau_plus_data = get_exp_lut_array(ts, self.__tau_plus)
         self.__tau_minus_data = get_exp_lut_array(ts, self.__tau_minus)
         self.__tau_x_data = get_exp_lut_array(ts, self.__tau_x, shift=2)

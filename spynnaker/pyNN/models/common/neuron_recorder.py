@@ -98,7 +98,7 @@ class NeuronRecorder(object):
         :param variable: PyNN name of the variable
         :return: Sampling interval in micro seconds
         """
-        step = globals_variables.get_simulator().machine_time_step / 1000
+        step = globals_variables.get_simulator().user_time_step_in_us / 1000
         return self.__sampling_rates[variable] * step
 
     def get_matrix_data(
@@ -315,7 +315,7 @@ class NeuronRecorder(object):
         if sampling_interval is None:
             return 1
 
-        step = globals_variables.get_simulator().machine_time_step / 1000
+        step = globals_variables.get_simulator().user_time_step_in_us / 1000
         rate = int(sampling_interval / step)
         if sampling_interval != rate * step:
             msg = "sampling_interval {} is not an an integer multiple of the "\

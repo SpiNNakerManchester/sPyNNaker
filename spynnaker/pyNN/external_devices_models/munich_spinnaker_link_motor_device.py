@@ -204,4 +204,4 @@ class MunichMotorDevice(
     @property
     @overrides(AbstractVertex.timestep_in_us)
     def timestep_in_us(self):
-        return globals_variables.get_simulator().machine_time_step
+        return globals_variables.get_simulator().user_time_step_in_us

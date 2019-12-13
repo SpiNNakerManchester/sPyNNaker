@@ -156,7 +156,7 @@ class AbstractSpiNNakerCommon(with_metaclass(
 
         # get the machine time step
         logger.info("Setting machine time step to {} micro-seconds.",
-                    self.machine_time_step)
+                    self.user_time_step_in_us)
 
     def _set_up_timings(
             self, timestep, min_delay, max_delay, config, time_scale_factor):
@@ -169,7 +169,7 @@ class AbstractSpiNNakerCommon(with_metaclass(
             self.set_up_timings(
                 math.ceil(timestep * 1000.0), time_scale_factor)
 
-        machine_time_step = self.machine_time_step
+        machine_time_step = self.user_time_step_in_us
         # Sort out the minimum delay
         if (min_delay is not None and
                 min_delay * 1000.0 < machine_time_step):
