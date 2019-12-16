@@ -263,7 +263,6 @@ class TestSynapticManager(unittest.TestCase):
 
         pre_app_vertex.remember_associated_machine_vertex(pre_vertex)
         post_app_vertex.remember_associated_machine_vertex(post_vertex)
-        app_edge.remember_associated_machine_edge(machine_edge)
 
         weight_scales = [4096.0, 4096.0]
 
