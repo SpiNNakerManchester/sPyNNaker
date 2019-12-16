@@ -26,7 +26,6 @@
 #include <neuron/additional_inputs/additional_input.h>
 #include <neuron/threshold_types/threshold_type.h>
 #include <neuron/synapse_types/synapse_types.h>
-#include <neuron/neuron_recording.h>
 
 // Further includes
 #include <debug.h>
@@ -34,6 +33,13 @@
 #define V_RECORDING_INDEX 0
 #define GSYN_EXC_RECORDING_INDEX 1
 #define GSYN_INH_RECORDING_INDEX 2
+#define N_RECORDED_VARS 3
+
+#define SPIKE_RECORDING_BITFIELD 0
+#define N_BITFIELD_VARS 1
+
+// This import depends on variables defined above
+#include <neuron/neuron_recording.h>
 
 #ifndef NUM_EXCITATORY_RECEPTORS
 #define NUM_EXCITATORY_RECEPTORS 1
@@ -65,6 +71,7 @@ static global_neuron_params_pointer_t global_parameters;
 // The synapse shaping parameters
 static synapse_param_t *neuron_synapse_shaping_params;
 
+__attribute__((unused)) // Marked unused as only used sometimes
 static bool neuron_impl_initialise(uint32_t n_neurons) {
     // allocate DTCM for the global parameter details
     if (sizeof(global_neuron_params_t)) {
@@ -129,6 +136,7 @@ static bool neuron_impl_initialise(uint32_t n_neurons) {
     return true;
 }
 
+__attribute__((unused)) // Marked unused as only used sometimes
 static void neuron_impl_add_inputs(
         index_t synapse_type_index, index_t neuron_index,
         input_t weights_this_timestep) {
@@ -143,6 +151,7 @@ static uint32_t n_words_needed(uint32_t size) {
     return (size + (sizeof(uint32_t) - 1)) / sizeof(uint32_t);
 }
 
+__attribute__((unused)) // Marked unused as only used sometimes
 static void neuron_impl_load_neuron_parameters(
         address_t address, uint32_t next, uint32_t n_neurons) {
     log_debug("reading parameters, next is %u, n_neurons is %u ",
@@ -201,6 +210,7 @@ static void neuron_impl_load_neuron_parameters(
 #endif // LOG_LEVEL >= LOG_DEBUG
 }
 
+__attribute__((unused)) // Marked unused as only used sometimes
 static bool neuron_impl_do_timestep_update(index_t neuron_index,
         input_t external_bias) {
     // Get the neuron itself
@@ -272,6 +282,9 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
         // Tell the additional input
         additional_input_has_spiked(additional_input);
+
+        // Record the spike
+        neuron_recording_record_bit(SPIKE_RECORDING_BITFIELD, neuron_index);
     }
 
     // Shape the existing input according to the included rule
@@ -287,6 +300,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
 //! \brief stores neuron parameter back into sdram
 //! \param[in] address: the address in sdram to start the store
+__attribute__((unused)) // Marked unused as only used sometimes
 static void neuron_impl_store_neuron_parameters(
         address_t address, uint32_t next, uint32_t n_neurons) {
     log_debug("writing parameters");

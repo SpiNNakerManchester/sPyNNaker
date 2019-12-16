@@ -25,12 +25,6 @@ uint8_t **neuron_recording_indexes;
 //! The index to record each bitfield variable to for each neuron
 uint8_t **bitfield_recording_indexes;
 
-//! The number of variables that *can* be recorded - might not be enabled
-uint32_t n_recorded_vars;
-
-//! The number of bitfield variables that can be recorded
-uint32_t n_bitfield_vars;
-
 recording_info_t *recording_info;
 
 bitfield_info_t *bitfield_info;
@@ -47,7 +41,7 @@ static void *reset_address;
 
 //! \brief resets all states back to start state.
 static void reset_record_counter(void) {
-    for (uint32_t i = 0; i < n_recorded_vars; i++) {
+    for (uint32_t i = 0; i < N_RECORDED_VARS; i++) {
         if (recording_info[i].rate == 0) {
             // Setting increment to zero means count will never equal rate
             recording_info[i].increment = 0;
@@ -64,7 +58,7 @@ static void reset_record_counter(void) {
     }
 
     // clear the bitfields
-    for (uint32_t i = 0; i < n_bitfield_vars; i++) {
+    for (uint32_t i = 0; i < N_BITFIELD_VARS; i++) {
         if (bitfield_info[i].rate == 0) {
             // Setting increment to zero means count will never equal rate
             bitfield_info[i].increment = 0;
@@ -114,7 +108,7 @@ static bool neuron_recording_read_in_elements(
 
     neuron_recording_data_t *data = data_address;
 
-    for (uint32_t i = 0; i < n_recorded_vars; i++) {
+    for (uint32_t i = 0; i < N_RECORDED_VARS; i++) {
         recording_info[i].rate = data[i].rate;
         uint32_t n_neurons_rec = data[i].n_neurons_recording;
         recording_info[i].element_size = data[i].element_size;
@@ -145,9 +139,9 @@ static bool neuron_recording_read_in_elements(
     } bitfield_recording_data_t;
 
     bitfield_recording_data_t *bitfield_data =
-            (bitfield_recording_data_t *) &data[n_recorded_vars];
+            (bitfield_recording_data_t *) &data[N_RECORDED_VARS];
 
-    for (uint32_t i = 0; i < n_bitfield_vars; i++) {
+    for (uint32_t i = 0; i < N_BITFIELD_VARS; i++) {
         bitfield_info[i].rate = bitfield_data[i].rate;
         if (bitfield_info[i].rate == 0) {
             continue;
@@ -188,26 +182,26 @@ bool neuron_recording_reset(uint32_t n_neurons) {
 //! \param[in] n_neurons: how many neurons to set dtcm for
 static inline bool allocate_dtcm(uint32_t n_neurons) {
 
-    recording_info = spin1_malloc(n_recorded_vars * sizeof(recording_info_t));
+    recording_info = spin1_malloc(N_RECORDED_VARS * sizeof(recording_info_t));
     if (recording_info == NULL) {
         log_error("Could not allocated space for recording_info");
         return false;
     }
 
     // allocate dtcm for the overall holder for indexes
-    neuron_recording_indexes = spin1_malloc(n_recorded_vars * sizeof(uint8_t *));
+    neuron_recording_indexes = spin1_malloc(N_RECORDED_VARS * sizeof(uint8_t *));
     if (neuron_recording_indexes == NULL) {
         log_error("Could not allocate space for var_recording_indexes");
         return false;
     }
 
-    recording_values = spin1_malloc(n_recorded_vars * sizeof(uint8_t *));
+    recording_values = spin1_malloc(N_RECORDED_VARS * sizeof(uint8_t *));
     if (recording_values == NULL) {
         log_error("Could not allocate space for recording_values");
         return false;
     }
 
-    for (uint32_t i = 0; i < n_recorded_vars; i++) {
+    for (uint32_t i = 0; i < N_RECORDED_VARS; i++) {
 
         // clear recorded values pointer
         recording_info[i].values = NULL;
@@ -228,26 +222,26 @@ static inline bool allocate_dtcm(uint32_t n_neurons) {
 //! \param[in] n_neurons: how many neurons to set dtcm for
 static inline bool allocate_bitfield_dtcm(uint32_t n_neurons) {
 
-    bitfield_info = spin1_malloc(n_bitfield_vars * sizeof(bitfield_info_t));
+    bitfield_info = spin1_malloc(N_BITFIELD_VARS * sizeof(bitfield_info_t));
     if (bitfield_info == NULL) {
         log_error("Failed to allocate space for bitfield_info");
         return false;
     }
 
     // allocate dtcm for the overall holder for indexes
-    bitfield_recording_indexes = spin1_malloc(n_bitfield_vars * sizeof(uint8_t *));
+    bitfield_recording_indexes = spin1_malloc(N_BITFIELD_VARS * sizeof(uint8_t *));
     if (bitfield_recording_indexes == NULL) {
         log_error("Could not allocate space for bitfield_recording_indexes");
         return false;
     }
 
-    bitfield_values = spin1_malloc(n_bitfield_vars * sizeof(uint32_t *));
+    bitfield_values = spin1_malloc(N_BITFIELD_VARS * sizeof(uint32_t *));
     if (bitfield_values == NULL) {
         log_error("Could not allocate space for bitfield_values");
         return false;
     }
 
-    for (uint32_t i = 0; i < n_bitfield_vars; i++) {
+    for (uint32_t i = 0; i < N_BITFIELD_VARS; i++) {
 
         // clear recorded values pointer
         bitfield_info[i].values = NULL;
@@ -281,13 +275,23 @@ bool neuron_recording_initialise(
         return false;
     }
 
-    // read in the n neuron recording elements
+    // Verify the number of recording and bitfield elements
     neuron_recording_header_t *header = data_addr;
-    n_recorded_vars = header->n_recorded_vars;
-    n_bitfield_vars = header->n_bitfield_vars;
+    if (header->n_recorded_vars != N_RECORDED_VARS) {
+        log_error("Data spec number of recording variables %d != "
+            "neuron implementation number of recorded variables %d",
+            header->n_recorded_vars, N_RECORDED_VARS);
+        return false;
+    }
+    if (header->n_bitfield_vars != N_BITFIELD_VARS) {
+            log_error("Data spec number of bitfield variables %d != "
+                "neuron implementation number of bitfield variables %d",
+                header->n_bitfield_vars, N_BITFIELD_VARS);
+            return false;
+        }
     data_addr = &header[1];
     log_info("Recording %d variables and %d bitfield variables",
-            n_recorded_vars, n_bitfield_vars);
+            N_RECORDED_VARS, N_BITFIELD_VARS);
 
     bool dtcm_allocated = allocate_dtcm(n_neurons);
     if (!dtcm_allocated) {

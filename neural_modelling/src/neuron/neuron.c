@@ -30,8 +30,6 @@
 // Spin1 API ticks - to know when the timer wraps
 extern uint ticks;
 
-#define SPIKE_RECORDING_CHANNEL 0
-
 //! The key to be used for this core (will be ORed with neuron ID)
 static key_t key;
 
@@ -47,6 +45,9 @@ static uint32_t time_between_spikes;
 
 //! The expected current clock tick of timer_1 when the next spike can be sent
 static uint32_t expected_time;
+
+//! The recording flags
+static uint32_t recording_flags = 0;
 
 //! parameters that reside in the neuron_parameter_data_region
 struct neuron_parameters {
@@ -74,7 +75,13 @@ static bool neuron_load_neuron_parameters(address_t address) {
     return true;
 }
 
-bool neuron_reload_neuron_parameters(address_t address) { // EXPORTED
+bool neuron_resume(address_t address) { // EXPORTED
+
+    if (!neuron_recording_reset(n_neurons)){
+        log_error("failed to reload the neuron recording parameters");
+        return false;
+    }
+
     log_debug("neuron_reloading_neuron_parameters: starting");
     return neuron_load_neuron_parameters(address);
 }
@@ -86,9 +93,9 @@ bool neuron_reload_neuron_parameters(address_t address) { // EXPORTED
 //!            (contains which regions are active and how big they are)
 //! \param[out] n_neurons_value The number of neurons this model is to emulate
 //! \return True is the initialisation was successful, otherwise False
-bool neuron_initialise(address_t address, uint32_t *n_neurons_value, // EXPORTED
-        uint32_t *n_synapse_types_value, uint32_t *incoming_spike_buffer_size,
-        uint32_t *timer_offset) {
+bool neuron_initialise(address_t address, address_t recording_address, // EXPORTED
+        uint32_t *n_neurons_value, uint32_t *n_synapse_types_value,
+        uint32_t *incoming_spike_buffer_size, uint32_t *timer_offset) {
     log_debug("neuron_initialise: starting");
     struct neuron_parameters *params = (void *) address;
 
@@ -131,12 +138,25 @@ bool neuron_initialise(address_t address, uint32_t *n_neurons_value, // EXPORTED
         return false;
     }
 
+    // setup recording region
+    if (!neuron_recording_initialise(recording_address, &recording_flags, n_neurons)) {
+        return false;
+    }
+
     return true;
 }
 
 //! \brief stores neuron parameter back into SDRAM
 //! \param[in] address: the address in SDRAM to start the store
-void neuron_store_neuron_parameters(address_t address) { // EXPORTED
+void neuron_pause(address_t address) { // EXPORTED
+
+    /* Finalise any recordings that are in progress, writing back the final
+     * amounts of samples recorded to SDRAM */
+    if (recording_flags > 0) {
+        log_debug("updating recording regions");
+        neuron_recording_finalise();
+    }
+
     // call neuron implementation function to do the work
     neuron_impl_store_neuron_parameters(
         address, START_OF_GLOBAL_PARAMETERS, n_neurons);
@@ -148,7 +168,6 @@ void neuron_store_neuron_parameters(address_t address) { // EXPORTED
 void neuron_do_timestep_update( // EXPORTED
         timer_t time, uint timer_count, uint timer_period) {
     // Set the next expected time to wait for between spike sending
-    // uint32_t start = tc[T1_COUNT];
     expected_time = sv->cpu_clk * timer_period;
 
     // Prepare recording for the next timestep
@@ -167,9 +186,6 @@ void neuron_do_timestep_update( // EXPORTED
         // If the neuron has spiked
         if (spike) {
             log_debug("neuron %u spiked at time %u", neuron_index, time);
-
-            // Record the spike
-            neuron_recording_record_bit(0, neuron_index);
 
             // Do any required synapse processing
             synapse_dynamics_process_post_synaptic_event(time, neuron_index);
@@ -204,9 +220,6 @@ void neuron_do_timestep_update( // EXPORTED
 
     // Re-enable interrupts
     spin1_mode_restore(cpsr);
-
-    // uint32_t end = tc[T1_COUNT];
-    // log_info("%d", start - end);
 }
 
 void neuron_add_inputs( // EXPORTED

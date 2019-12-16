@@ -22,6 +22,17 @@
 #include <bit_field.h>
 #include <recording.h>
 
+
+#ifndef N_RECORDED_VARS
+#define N_RECORDED_VARS 1
+#error N_RECORDED_VARS was undefined.  It should be defined by a neuron impl include.
+#endif
+
+#ifndef N_BITFIELD_VARS
+#define N_BITFIELD_VARS 1
+#error N_BITFIELD_VARS was undefined.  It should be defined by a neuron impl include.
+#endif
+
 // declare spin1_wfi
 void spin1_wfi();
 
@@ -61,12 +72,6 @@ extern uint8_t **neuron_recording_indexes;
 
 //! The index to record each bitfield variable to for each neuron
 extern uint8_t **bitfield_recording_indexes;
-
-//! The number of variables that *can* be recorded not including bit fields
-extern uint32_t n_recorded_vars;
-
-//! The number of bitfield variables that can be recorded
-extern uint32_t n_bitfield_vars;
 
 //! The number of recordings outstanding
 extern uint32_t n_recordings_outstanding;
@@ -155,7 +160,7 @@ static inline void neuron_recording_record_bit(
 //! \param[in] time: the time to put into the recording stamps.
 static inline void neuron_recording_record(uint32_t time) {
     // go through all recordings
-    for (uint32_t i = n_recorded_vars; i > 0; i--) {
+    for (uint32_t i = N_RECORDED_VARS; i > 0; i--) {
         recording_info_t *rec_info = &recording_info[i - 1];
         // if the rate says record, record now
         if (rec_info->count == rec_info->rate) {
@@ -174,7 +179,7 @@ static inline void neuron_recording_record(uint32_t time) {
         }
     }
 
-    for (uint32_t i = n_bitfield_vars; i > 0; i--) {
+    for (uint32_t i = N_BITFIELD_VARS; i > 0; i--) {
         bitfield_info_t *bf_info = &bitfield_info[i - 1];
         // if the rate says record, record now
         if (bf_info->count == bf_info->rate) {
@@ -189,7 +194,7 @@ static inline void neuron_recording_record(uint32_t time) {
             // Set the time and record the data (note index is after recorded_vars)
             bf_info->values->time = time;
             recording_record_and_notify(
-                i + n_recorded_vars - 1, bf_info->values, bf_info->size,
+                i + N_RECORDED_VARS - 1, bf_info->values, bf_info->size,
                 recording_done_callback);
         } else {
 
@@ -209,7 +214,7 @@ static inline void neuron_recording_setup_for_next_recording(void) {
     }
 
     // Reset the bitfields before starting if a beginning of recording
-    for (uint32_t i = n_bitfield_vars; i > 0; i--) {
+    for (uint32_t i = N_BITFIELD_VARS; i > 0; i--) {
         bitfield_info_t *b_info = &bitfield_info[i - 1];
         if (b_info->count == 1) {
             clear_bit_field(b_info->values->bits, b_info->n_words);

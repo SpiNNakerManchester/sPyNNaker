@@ -337,5 +337,11 @@ $(BUILD_DIR)neuron/neuron.o: $(MODIFIED_DIR)neuron/neuron.c $(NEURON_MODEL_H) \
 	# neuron.o
 	-@mkdir -p $(dir $@)
 	$(CC) -DLOG_LEVEL=$(NEURON_DEBUG) $(CFLAGS) $(NEURON_INCLUDES) -o $@ $<
+	
+$(BUILD_DIR)neuron/neuron_recording.o: $(MODIFIED_DIR)neuron/neuron_recording.c $(NEURON_MODEL_H) \
+                             $(SYNAPSE_TYPE_H)
+	# neuron_recording.o
+	-@mkdir -p $(dir $@)
+	$(CC) -DLOG_LEVEL=$(NEURON_DEBUG) $(CFLAGS) $(NEURON_INCLUDES) -o $@ $<
 
 .PRECIOUS: $(MODIFIED_DIR)%.c $(MODIFIED_DIR)%.h $(LOG_DICT_FILE) $(EXTRA_PRECIOUS)

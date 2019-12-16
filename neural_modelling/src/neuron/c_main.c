@@ -41,7 +41,6 @@
 #include "plasticity/synapse_dynamics.h"
 #include "structural_plasticity/synaptogenesis_dynamics.h"
 #include "profile_tags.h"
-#include "neuron_recording.h"
 
 #include <data_specification.h>
 #include <simulation.h>
@@ -86,9 +85,6 @@ static uint32_t simulation_ticks = 0;
 
 //! Determines if this model should run for infinite time
 static uint32_t infinite_run;
-
-//! The recording flags
-static uint32_t recording_flags = 0;
 
 //! Timer callbacks since last rewiring
 int32_t last_rewiring_time = 0;
@@ -153,15 +149,9 @@ static bool initialise(void) {
     uint32_t incoming_spike_buffer_size;
     if (!neuron_initialise(
             data_specification_get_region(NEURON_PARAMS_REGION, ds_regions),
+            data_specification_get_region(NEURON_RECORDING_REGION, ds_regions),
             &n_neurons, &n_synapse_types, &incoming_spike_buffer_size,
             &timer_offset)) {
-        return false;
-    }
-
-    // setup recording region
-    if (!neuron_recording_initialise(
-            data_specification_get_region(NEURON_RECORDING_REGION, ds_regions),
-            &recording_flags, n_neurons)){
         return false;
     }
 
@@ -224,15 +214,11 @@ static bool initialise(void) {
 void resume_callback(void) {
     data_specification_metadata_t *ds_regions =
             data_specification_get_data_address();
-    if (!neuron_recording_reset(n_neurons)){
-        log_error("failed to reload the neuron recording parameters");
-        rt_error(RTE_SWERR);
-    }
 
-    // try reloading neuron parameters
-    if (!neuron_reload_neuron_parameters(
+    // try resuming neuron
+    if (!neuron_resume(
             data_specification_get_region(NEURON_PARAMS_REGION, ds_regions))) {
-        log_error("failed to reload the neuron parameters.");
+        log_error("failed to resume neuron.");
         rt_error(RTE_SWERR);
     }
 }
@@ -268,18 +254,10 @@ void timer_callback(uint timer_count, uint unused) {
         // rewrite neuron params to SDRAM for reading out if needed
         data_specification_metadata_t *ds_regions =
                 data_specification_get_data_address();
-        neuron_store_neuron_parameters(
-                data_specification_get_region(
-                    NEURON_PARAMS_REGION, ds_regions));
+        neuron_pause(data_specification_get_region(NEURON_PARAMS_REGION, ds_regions));
 
         profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
 
-        /* Finalise any recordings that are in progress, writing back the final
-         * amounts of samples recorded to SDRAM */
-        if (recording_flags > 0) {
-            log_debug("updating recording regions");
-            neuron_recording_finalise();
-        }
         profiler_finalise();
 
         // Subtract 1 from the time so this tick gets done again on the next
