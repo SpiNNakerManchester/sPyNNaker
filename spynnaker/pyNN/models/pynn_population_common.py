@@ -41,6 +41,8 @@ def _we_dont_do_this_now(*args):  # pylint: disable=unused-argument
 
 
 class PyNNPopulationCommon(object):
+    """ Base class for PyNN populations.
+    """
     __slots__ = [
         "_all_ids",
         "__change_requires_mapping",
@@ -65,6 +67,29 @@ class PyNNPopulationCommon(object):
     def __init__(
             self, spinnaker_control, size, label, constraints, model,
             structure, initial_values, additional_parameters=None):
+        """
+        :param spinnaker_control: The simulator engine core.
+        :type spinnaker_control:
+            ~spinn_front_end_common.interface.abstract_spinnaker_base.AbstractSpinnakerBase
+        :param size: The size of the population; external devices may use None
+        :type size: int or float or None
+        :param label: The label for the population, or None for a default
+        :type label: str or None
+        :param list(~pacman.model.constraints.AbstractConstraint) constraints:
+            How do we constrain where to put things on SpiNNaker
+        :param model: What neuron model is being run by this population
+        :type model:
+            ~spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel or
+            ~pacman.model.graphs.application.ApplicationVertex
+        :param structure: How the neurons are arranged in space
+        :type structure: ~pyNN.space.BaseStructure or None
+        :param initial_values: Initialisation for model variables.
+        :type initial_values: dict(str, Any) or None
+        :param additional_parameters:
+            Any extra parameters to pass to the model's vertex creation \
+            function.
+        :type additional_parameters: dict(str, Any) or None
+        """
         # pylint: disable=too-many-arguments
         size = self._roundsize(size, label)
 
@@ -156,10 +181,14 @@ class PyNNPopulationCommon(object):
 
     @property
     def first_id(self):
+        """ The ID of the first member of the population.
+        """
         return self.__first_id
 
     @property
     def last_id(self):
+        """ The ID of the last member of the population.
+        """
         return self.__last_id
 
     @property
@@ -172,6 +201,10 @@ class PyNNPopulationCommon(object):
 
     @property
     def requires_mapping(self):
+        """ Whether this population requires mapping.
+
+        :rtype: bool
+        """
         return self.__change_requires_mapping
 
     @requires_mapping.setter
@@ -179,6 +212,8 @@ class PyNNPopulationCommon(object):
         self.__change_requires_mapping = new_value
 
     def mark_no_changes(self):
+        """ Mark this population as not having changes to be mapped.
+        """
         self.__change_requires_mapping = False
         self.__has_read_neuron_parameters_this_run = False
 
@@ -202,7 +237,9 @@ class PyNNPopulationCommon(object):
 
         :param parameter_names: Name of parameter. This is either a single\
             string or a list of strings
-        :param gather: pointless on sPyNNaker
+        :type parameter_names: str or iterable(str)
+        :param bool gather: pointless on sPyNNaker
+        :param bool simplify: ignored
         :return: A single list of values (or possibly a single value) if\
             paramter_names is a string, or a dict of these if parameter names\
             is a list.
@@ -229,12 +266,13 @@ class PyNNPopulationCommon(object):
         """ Get the values of a parameter for the selected cell in the\
             population.
 
-        :param parameter_names: Name of parameter. This is either a\
-            single string or a list of strings
         :param selector: a description of the subrange to accept. \
             Or None for all. \
             See: _selector_to_ids in \
-            SpiNNUtils.spinn_utilities.ranged.abstract_sized.py
+            :py:class:`~spinn_utilities.ranged.AbstractSized`
+        :param parameter_names: Name of parameter. This is either a\
+            single string or a list of strings
+        :type parameter_names: str or iterable(str)
         :return: A single list of values (or possibly a single value) if\
             paramter_names is a string or a dict of these if parameter names\
             is a list.
@@ -284,6 +322,7 @@ class PyNNPopulationCommon(object):
         """ Given the ID(s) of cell(s) in the Population, return its (their)\
             index (order in the Population), counting only cells on the local\
             MPI node.
+
         Defined by
         http://neuralensemble.org/docs/PyNN/reference/populations.html
         """
@@ -374,8 +413,8 @@ class PyNNPopulationCommon(object):
             p.set({'tau_m':20, 'v_rest':-65})
 
         :param parameter: the parameter to set
-        :type parameter: str or dict
-        :param value: the value of the parameter to set.
+        :type parameter: str or dict(str, Any)
+        :param Any value: the value of the parameter to set.
         """
         self._set_check(parameter, value)
 
@@ -400,10 +439,13 @@ class PyNNPopulationCommon(object):
             p.set("tau_m", 20.0).
             p.set({'tau_m':20, 'v_rest':-65})
 
-        :param selector: See RangedList.set_value_by_selector as this is just \
-            a pass through method
+        :param selector:
+            See :py:meth:`RangedList.set_value_by_selector` as this is just a
+            pass through method
         :param parameter: the parameter to set
+        :type parameter: str or dict(str, float or int)
         :param value: the value of the parameter to set.
+        :type value: float or int
         """
         self._set_check(parameter, value)
 
@@ -495,12 +537,9 @@ class PyNNPopulationCommon(object):
     def add_placement_constraint(self, x, y, p=None):
         """ Add a placement constraint
 
-        :param x: The x-coordinate of the placement constraint
-        :type x: int
-        :param y: The y-coordinate of the placement constraint
-        :type y: int
-        :param p: The processor ID of the placement constraint (optional)
-        :type p: int
+        :param int x: The x-coordinate of the placement constraint
+        :param int y: The y-coordinate of the placement constraint
+        :param int p: The processor ID of the placement constraint (optional)
         """
         globals_variables.get_simulator().verify_not_running()
         self.__vertex.add_constraint(ChipAndCoreConstraint(x, y, p))

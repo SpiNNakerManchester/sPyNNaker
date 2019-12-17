@@ -54,6 +54,16 @@ class SynapseTypeSEMD(AbstractSynapseType):
     def __init__(
             self, tau_syn_E, tau_syn_E2, tau_syn_I, isyn_exc, isyn_exc2,
             isyn_inh, multiplicator, exc2_old):
+        r"""
+        :param float tau_syn_E: :math:`\tau^{syn}_{e_1}`
+        :param float tau_syn_E2: :math:`\tau^{syn}_{e_2}`
+        :param float tau_syn_I: :math:`\tau^{syn}_i`
+        :param float isyn_exc: :math:`I^{syn}_{e_1}`
+        :param float isyn_exc2: :math:`I^{syn}_{e_2}`
+        :param float isyn_inh: :math:`I^{syn}_i`
+        :param float multiplicator:
+        :param float exc2_old:
+        """
         super(SynapseTypeSEMD, self).__init__(
             [DataType.U032,    # decay_E
              DataType.U032,    # init_E
@@ -104,10 +114,17 @@ class SynapseTypeSEMD(AbstractSynapseType):
     @inject_items({"ts": "MachineTimeStep"})
     @overrides(AbstractSynapseType.get_values, additional_arguments={'ts'})
     def get_values(self, parameters, state_variables, vertex_slice, ts):
-
+        """
+        :param int ts: machine time step
+        """
+        # pylint: disable=arguments-differ
         tsfloat = float(ts) / 1000.0
-        decay = lambda x: numpy.exp(-tsfloat / x)  # noqa E731
-        init = lambda x: (x / tsfloat) * (1.0 - numpy.exp(-tsfloat / x))  # noqa E731
+
+        def decay(x):
+            return numpy.exp(-tsfloat / x)
+
+        def init(x):
+            return (x / tsfloat) * (1.0 - numpy.exp(-tsfloat / x))
 
         # Add the rest of the data
         return [parameters[TAU_SYN_E].apply_operation(decay),

@@ -28,6 +28,8 @@ logger = logging.getLogger(__name__)
 
 
 class TimingDependenceSpikePair(AbstractTimingDependence):
+    """ A basic timing dependence STDP rule.
+    """
     __slots__ = [
         "__synapse_structure",
         "__tau_minus",
@@ -36,6 +38,10 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
         "__tau_plus_data"]
 
     def __init__(self, tau_plus=20.0, tau_minus=20.0):
+        r"""
+        :param float tau_plus: :math:`\tau_+`
+        :param float tau_minus: :math:`\tau_-`
+        """
         self.__tau_plus = tau_plus
         self.__tau_minus = tau_minus
 
@@ -48,10 +54,18 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
 
     @property
     def tau_plus(self):
+        r""" :math:`\tau_+`
+
+        :rtype: float
+        """
         return self.__tau_plus
 
     @property
     def tau_minus(self):
+        r""" :math:`\tau_-`
+
+        :rtype: float
+        """
         return self.__tau_minus
 
     @overrides(AbstractTimingDependence.is_same_as)
@@ -63,11 +77,18 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
 
     @property
     def vertex_executable_suffix(self):
+        """ The suffix to be appended to the vertex executable for this rule
+
+        :rtype: str
+        """
         return "pair"
 
     @property
     def pre_trace_n_bytes(self):
+        """ The number of bytes used by the pre-trace of the rule per neuron
 
+        :rtype: int
+        """
         # Pair rule requires no pre-synaptic trace when only the nearest
         # Neighbours are considered and, a single 16-bit R1 trace
         return BYTES_PER_SHORT
@@ -79,6 +100,10 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
 
     @property
     def n_weight_terms(self):
+        """ The number of weight terms expected by this timing rule
+
+        :rtype: int
+        """
         return 1
 
     @overrides(AbstractTimingDependence.write_parameters)
@@ -90,6 +115,10 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
 
     @property
     def synaptic_structure(self):
+        """ Get the synaptic structure of the plastic part of the rows
+
+        :rtype: AbstractSynapseStructure
+        """
         return self.__synapse_structure
 
     @overrides(AbstractTimingDependence.get_parameter_names)

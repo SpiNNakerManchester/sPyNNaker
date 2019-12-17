@@ -51,26 +51,44 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
             post_sample_steps, post_start_coords, safe, verbose,
             callback=None):
         """
-        :param shape_pre:\
+        :param shape_pre:
             2D shape of the pre population (rows/height, cols/width, usually \
             the input image shape)
-        :param shape_post:\
+        :type shape_pre: list(int) or tuple(int,int)
+        :param shape_post:
             2D shape of the post population (rows/height, cols/width)
-        :param shape_kernel:\
+        :type shape_post: list(int) or tuple(int,int)
+        :param shape_kernel:
             2D shape of the kernel (rows/height, cols/width)
-        :param weight_kernel (optional):\
+        :type shape_kernel: list(int) or tuple(int,int)
+        :param weight_kernel: (optional)\
             2D matrix of size shape_kernel describing the weights
-        :param delay_kernel (optional):\
+        :type weight_kernel: ~numpy.ndarray or ~pyNN.random.NumpyRNG \
+            or int or float or list(int) or list(float) or None
+        :param delay_kernel: (optional)\
             2D matrix of size shape_kernel describing the delays
-        :param shape_common (optional):\
+        :type delay_kernel: ~numpy.ndarray or ~pyNN.random.NumpyRNG \
+            or int or float or list(int) or list(float) or None
+        :param shape_common: (optional)\
             2D shape of common coordinate system (for both pre and post, \
             usually the input image sizes)
-        :param pre/post_sample_steps (optional):\
-            Sampling steps/jumps for pre/post pop <=> (startX, endX, _stepX_)
+        :type shape_common: list(int) or tuple(int,int) or None
+        :param pre_sample_steps: (optional)\
+            Sampling steps/jumps for pre pop <=> (startX, endX, _stepX_)
             None or 2-item array
-        :param pre/post_start_coords (optional):\
-            Starting row/col for pre/post sampling <=> (_startX_, endX, stepX)
+        :type pre_sample_steps: None or list(int) or tuple(int,int)
+        :param pre_start_coords: (optional)\
+            Starting row/col for pre sampling <=> (_startX_, endX, stepX)
             None or 2-item array
+        :type pre_start_coords: None or list(int) or tuple(int,int)
+        :param post_sample_steps: (optional)\
+            Sampling steps/jumps for post pop <=> (startX, endX, _stepX_)
+            None or 2-item array
+        :type post_sample_steps: None or list(int) or tuple(int,int)
+        :param post_start_coords: (optional)\
+            Starting row/col for post sampling <=> (_startX_, endX, stepX)
+            None or 2-item array
+        :type post_start_coords: None or list(int) or tuple(int,int)
         """
         super(KernelConnector, self).__init__(
             safe=safe, callback=callback, verbose=verbose)
@@ -119,8 +137,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
             self._post_step_h = post_sample_steps[HEIGHT]
 
         # Make sure the supplied values are in the correct format
-        self._krn_weights = self.get_kernel_vals(weight_kernel)
-        self._krn_delays = self.get_kernel_vals(delay_kernel)
+        self._krn_weights = self.__get_kernel_vals(weight_kernel)
+        self._krn_delays = self.__get_kernel_vals(delay_kernel)
 
         self._shape_common = \
             shape_pre if shape_common is None else shape_common
@@ -132,34 +150,41 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
         # Create storage for later
         self._post_as_pre = {}
 
-    # Get a list of possible post-slice coordinates
-    def to_post_coords(self, post_vertex_slice):
+    def __to_post_coords(self, post_vertex_slice):
+        """ Get a list of possible post-slice coordinates.
+        """
         post = numpy.arange(
             post_vertex_slice.lo_atom, post_vertex_slice.hi_atom + 1)
 
         return numpy.divmod(post, self._post_w)
 
-    # Get a map from post to pre coords
-    def map_to_pre_coords(self, post_r, post_c):
+    def __map_to_pre_coords(self, post_r, post_c):
+        """ Get a map from post to pre coords.
+        """
         return (self._post_start_h + post_r * self._post_step_h,
                 self._post_start_w + post_c * self._post_step_w)
 
-    # Write post coords as pre coords
-    def post_as_pre(self, post_vertex_slice):
+    def __post_as_pre(self, post_vertex_slice):
+        """ Write post coords as pre coords.
+        """
+        # TODO: When slices become hashable, update this code to use them
+        # directly as the cache index
         if str(post_vertex_slice) not in self._post_as_pre:
-            post_r, post_c = self.to_post_coords(post_vertex_slice)
-            self._post_as_pre[str(post_vertex_slice)] = self.map_to_pre_coords(
-                post_r, post_c)
+            post_r, post_c = self.__to_post_coords(post_vertex_slice)
+            self._post_as_pre[str(post_vertex_slice)] = \
+                self.__map_to_pre_coords(post_r, post_c)
         return self._post_as_pre[str(post_vertex_slice)]
 
-    # Write pre coords as post coords
-    def pre_as_post(self, coords):
-        r = ((coords[HEIGHT] - self._pre_start_h - 1) // self._pre_step_h) + 1
-        c = ((coords[WIDTH] - self._pre_start_w - 1) // self._pre_step_w) + 1
+    def __pre_as_post(self, pre_r, pre_c):
+        """ Write pre coords as post coords.
+        """
+        r = ((pre_r - self._pre_start_h - 1) // self._pre_step_h) + 1
+        c = ((pre_c - self._pre_start_w - 1) // self._pre_step_w) + 1
         return (r, c)
 
-    # Convert kernel values given into the correct format
-    def get_kernel_vals(self, vals):
+    def __get_kernel_vals(self, vals):
+        """ Convert kernel values given into the correct format.
+        """
         if vals is None:
             return None
         krn_size = self._kernel_h * self._kernel_w
@@ -179,17 +204,18 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
             "weight and/or delay kernel then ensure they are the same size "
             "as specified by the shape kernel values.")
 
-    # Compute the relevant information required for the connections
-    def compute_statistics(
+    def __compute_statistics(
             self, weights, delays, pre_vertex_slice, post_vertex_slice):
-        # If compute_statistics is called more than once, there's
+        """ Compute the relevant information required for the connections.
+        """
+        # If __compute_statistics is called more than once, there's
         # no need to get the user-supplied weights and delays again
         if self._krn_weights is None:
-            self._krn_weights = self.get_kernel_vals(weights)
+            self._krn_weights = self.__get_kernel_vals(weights)
         if self._krn_delays is None:
-            self._krn_delays = self.get_kernel_vals(delays)
+            self._krn_delays = self.__get_kernel_vals(delays)
 
-        post_as_pre_r, post_as_pre_c = self.post_as_pre(post_vertex_slice)
+        post_as_pre_r, post_as_pre_c = self.__post_as_pre(post_vertex_slice)
         coords = {}
         hh, hw = self._hlf_k_h, self._hlf_k_w
         all_pre_ids = []
@@ -214,7 +240,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
                 if not (0 <= r < self._common_h and 0 <= c < self._common_w):
                     continue
 
-                r, c = self.pre_as_post((r, c))
+                r, c = self.__pre_as_post(r, c)
 
                 # Obtain coordinates to test against kernel sizes
                 dr = r - pre_r
@@ -294,7 +320,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type, synapse_info):
         (n_connections, all_post, all_pre_in_range, all_pre_in_range_delays,
-         all_pre_in_range_weights) = self.compute_statistics(
+         all_pre_in_range_weights) = self.__compute_statistics(
             synapse_info.weights, synapse_info.delays, pre_vertex_slice,
             post_vertex_slice)
 

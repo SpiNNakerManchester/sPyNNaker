@@ -32,29 +32,25 @@ class SynapseDynamicsStructuralSTDP(
 
         Written by Petrut Bogdan.
 
-
-    :param partner_selection: The partner selection rule
-    :param formation: The formation rule
-    :param elimination: The elimination rule
-    :param timing_dependence: The STDP timing dependence
-    :param weight_dependence: The STDP weight dependence
-    :param voltage_dependence: The STDP voltage dependence
-    :param dendritic_delay_fraction: The STDP dendritic delay fraction
-    :param f_rew: How many rewiring attempts will be done per second.
-    :type f_rew: int
-    :param initial_weight: Weight assigned to a newly formed connection
-    :type initial_weight: float
-    :param initial_delay:\
-        Delay assigned to a newly formed connection; a single value means a\
-        fixed delay value, or a tuple of two values means the delay will be\
+    :param AbstractPartnerSelection partner_selection:
+        The partner selection rule
+    :param AbstractFormation formation: The formation rule
+    :param AbstractElimination elimination: The elimination rule
+    :param AbstractTimingDependence timing_dependence:
+    :param AbstractWeightDependence weight_dependence:
+    :param None voltage_dependence: The STDP voltage dependence (unsupported)
+    :param float dendritic_delay_fraction: The STDP dendritic delay fraction
+    :param int f_rew: How many rewiring attempts will be done per second.
+    :param float initial_weight: Weight assigned to a newly formed connection
+    :param initial_delay:
+        Delay assigned to a newly formed connection; a single value means a
+        fixed delay value, or a tuple of two values means the delay will be
         chosen at random from a uniform distribution between the given values
-    :type initial_delay: float or (float, float)
-    :param s_max: Maximum fan-in per target layer neuron
-    :type s_max: int
-    :param seed: seed the random number generators
-    :type seed: int
-    :param weight: The weight of connections formed by the connector
-    :param delay: The delay of connections formed by the connector
+    :type initial_delay: float or tuple(float, float)
+    :param int s_max: Maximum fan-in per target layer neuron
+    :param int seed: seed the random number generators
+    :param float weight: The weight of connections formed by the connector
+    :param float delay: The delay of connections formed by the connector
     """
     __slots__ = ["__common_sp"]
 

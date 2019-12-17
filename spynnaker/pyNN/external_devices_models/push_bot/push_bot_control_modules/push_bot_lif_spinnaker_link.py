@@ -23,6 +23,23 @@ logger = logging.getLogger(__name__)
 
 class PushBotLifSpinnakerLink(ExternalDeviceLifControl):
     """ Control module for a PushBot connected to a SpiNNaker Link
+
+    :param ~spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol protocol:
+        How to talk to the bot.
+    :param devices: The devices on the bot that we are interested in.
+    :type devices:
+        iterable(~spynnaker.pyNN.external_devices_models.AbstractMulticastControllableDevice)
+    :param float tau_m: LIF neuron parameter (defaulted)
+    :param float cm: LIF neuron parameter (defaulted)
+    :param float v_rest: LIF neuron parameter (defaulted)
+    :param float v_reset: LIF neuron parameter (defaulted)
+    :param float tau_syn_E: LIF neuron parameter (defaulted)
+    :param float tau_syn_I: LIF neuron parameter (defaulted)
+    :param float tau_refrac: LIF neuron parameter (defaulted)
+    :param float i_offset: LIF neuron parameter (defaulted)
+    :param float v: LIF neuron parameter (defaulted)
+    :param float isyn_exc: LIF neuron parameter (defaulted)
+    :param float isyn_inh: LIF neuron parameter (defaulted)
     """
     __slots__ = []
 

@@ -39,6 +39,8 @@ class RecordingCommon(object):
     def __init__(self, population):
         """
         :param population: the population to record for
+        :type population:
+            ~spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon
         """
 
         self.__population = population
@@ -179,6 +181,7 @@ class RecordingCommon(object):
         """ How to get spikes from a vertex.
 
         :return: the spikes from a vertex
+        :rtype: ~numpy.ndarray
         """
 
         # check we're in a state where we can get spikes

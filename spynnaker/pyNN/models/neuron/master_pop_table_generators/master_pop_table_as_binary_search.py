@@ -37,10 +37,12 @@ class _MasterPopEntry(object):
         "__mask",
         "__routing_key"]
 
-    MASTER_POP_ENTRY_SIZE_WORDS = 3
-    MASTER_POP_ENTRY_SIZE_BYTES = 3 * BYTES_PER_WORD
-    ADDRESS_LIST_ENTRY_SIZE_WORDS = 1
-    ADDRESS_LIST_ENTRY_SIZE_BYTES = 1 * BYTES_PER_WORD
+    _MASTER_POP_ENTRY_SIZE_WORDS = 3
+    _MASTER_POP_ENTRY_SIZE_BYTES = (
+        _MASTER_POP_ENTRY_SIZE_WORDS * BYTES_PER_WORD)
+    _ADDRESS_LIST_ENTRY_SIZE_WORDS = 1
+    _ADDRESS_LIST_ENTRY_SIZE_BYTES = (
+        _ADDRESS_LIST_ENTRY_SIZE_WORDS * BYTES_PER_WORD)
 
     def __init__(self, routing_key, mask):
         self.__routing_key = routing_key
@@ -86,17 +88,17 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
 
     # Switched ordering of count and start as numpy will switch them back
     # when asked for view("<4")
-    MASTER_POP_ENTRY_DTYPE = [
+    _MASTER_POP_ENTRY_DTYPE = [
         ("key", "<u4"), ("mask", "<u4"), ("start", "<u2"), ("count", "<u2")]
 
-    ADDRESS_LIST_DTYPE = "<u4"
+    _ADDRESS_LIST_DTYPE = "<u4"
 
     # top bit of the 32 bit number
-    SINGLE_BIT_FLAG_BIT = 0x80000000
-    ROW_LENGTH_MASK = 0xFF
-    ADDRESS_MASK = 0x7FFFFF00
-    ADDRESS_SCALE = 16
-    ADDRESS_SCALED_SHIFT = 8 - 4
+    _SINGLE_BIT_FLAG_BIT = 0x80000000
+    _ROW_LENGTH_MASK = 0xFF
+    _ADDRESS_MASK = 0x7FFFFF00
+    _ADDRESS_SCALE = 16
+    _ADDRESS_SCALED_SHIFT = 8 - 4
 
     def __init__(self):
         self.__entries = None
@@ -105,18 +107,11 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
 
     @overrides(AbstractMasterPopTableFactory.get_master_population_table_size)
     def get_master_population_table_size(self, vertex_slice, in_edges):
-        """
-        :param vertex_slice: the slice of the vertex
-        :param in_edges: the in coming edges
-        :return: the size the master pop table will take in SDRAM (in bytes)
-        """
-
         # Entry for each edge - but don't know the edges yet, so
         # assume multiple entries for each edge
         n_vertices = 0
         n_entries = 0
         for in_edge in in_edges:
-
             if isinstance(in_edge, ProjectionApplicationEdge):
 
                 # TODO: Fix this to be more accurate!
@@ -135,14 +130,17 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
 
         # Multiply by 2 to get an upper bound
         return (
-            (n_vertices * 2 * _MasterPopEntry.MASTER_POP_ENTRY_SIZE_BYTES) +
-            (n_entries * 2 * _MasterPopEntry.ADDRESS_LIST_ENTRY_SIZE_BYTES) +
+            (n_vertices * 2 * _MasterPopEntry._MASTER_POP_ENTRY_SIZE_BYTES) +
+            (n_entries * 2 * _MasterPopEntry._ADDRESS_LIST_ENTRY_SIZE_BYTES) +
             8)
 
     def get_exact_master_population_table_size(
             self, vertex, machine_graph):
         """
+        :param PopulationMachineVertex vertex:
+        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
         :return: the size the master pop table will take in SDRAM (in bytes)
+        :rtype: int
         """
         in_edges = machine_graph.get_edges_ending_at_vertex(vertex)
 
@@ -154,14 +152,16 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
 
         # Multiply by 2 to get an upper bound
         return (
-            (n_vertices * 2 * _MasterPopEntry.MASTER_POP_ENTRY_SIZE_BYTES) +
-            (n_entries * 2 * _MasterPopEntry.ADDRESS_LIST_ENTRY_SIZE_BYTES) +
+            (n_vertices * 2 * _MasterPopEntry._MASTER_POP_ENTRY_SIZE_BYTES) +
+            (n_entries * 2 * _MasterPopEntry._ADDRESS_LIST_ENTRY_SIZE_BYTES) +
             8)
 
     def get_allowed_row_length(self, row_length):
         """
-        :param row_length: the row length being considered
+        :param int row_length: the row length being considered
         :return: the row length available
+        :rtype: int
+        :raises SynapseRowTooBigException: If the row won't fit
         """
         if row_length > 255:
             raise SynapseRowTooBigException(
@@ -170,13 +170,15 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
 
     def get_next_allowed_address(self, next_address):
         """
-        :param next_address: The next address that would be used
+        :param int next_address: The next address that would be used
         :return: The next address that can be used following next_address
+        :rtype: int
+        :raises SynapticConfigurationException: if the address is out of range
         """
         next_address = (
-            (next_address + (self.ADDRESS_SCALE - 1)) //
-            self.ADDRESS_SCALE) * self.ADDRESS_SCALE
-        if (next_address / self.ADDRESS_SCALE) > 0x7FFFFF:
+            (next_address + (self._ADDRESS_SCALE - 1)) //
+            self._ADDRESS_SCALE) * self._ADDRESS_SCALE
+        if (next_address / self._ADDRESS_SCALE) > 0x7FFFFF:
             raise SynapticConfigurationException(
                 "Address {} is out of range for this population table!".format(
                     hex(next_address)))
@@ -191,23 +193,10 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         self.__n_addresses = 0
         self.__n_single_entries = 0
 
-    @overrides(AbstractMasterPopTableFactory.update_master_population_table,
-               extend_doc=False)
+    @overrides(AbstractMasterPopTableFactory.update_master_population_table)
     def update_master_population_table(
             self, spec, block_start_addr, row_length, key_and_mask,
             master_pop_table_region, is_single=False):
-        """ Add an entry in the binary search to deal with the synaptic matrix
-
-        :param spec: the writer for DSG
-        :param block_start_addr: where the synaptic matrix block starts
-        :param row_length: how long in bytes each synaptic entry is
-        :param key_and_mask: the key and mask for this master pop entry
-        :param master_pop_table_region: the region ID for the master pop
-        :param is_single: \
-            Flag that states if the entry is a direct entry for a single row.
-        :return: The index of the entry, to be used to retrieve it
-        :rtype: int
-        """
         # pylint: disable=too-many-arguments, arguments-differ
         if key_and_mask.key not in self.__entries:
             self.__entries[key_and_mask.key] = _MasterPopEntry(
@@ -216,7 +205,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
 
         # if single, don' t add to start address as its going in its own block
         if not is_single:
-            start_addr = block_start_addr // self.ADDRESS_SCALE
+            start_addr = block_start_addr // self._ADDRESS_SCALE
         index = self.__entries[key_and_mask.key].append(
             start_addr, row_length, is_single)
         self.__n_addresses += 1
@@ -237,9 +226,9 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         spec.write_value(self.__n_addresses)
 
         # Generate the table and list as arrays
-        pop_table = numpy.zeros(n_entries, dtype=self.MASTER_POP_ENTRY_DTYPE)
+        pop_table = numpy.zeros(n_entries, dtype=self._MASTER_POP_ENTRY_DTYPE)
         address_list = numpy.zeros(
-            self.__n_addresses, dtype=self.ADDRESS_LIST_DTYPE)
+            self.__n_addresses, dtype=self._ADDRESS_LIST_DTYPE)
         start = 0
         for i, entry in enumerate(entries):
             start += self._make_pop_table_entry(
@@ -263,10 +252,10 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         pop_table[i]["count"] = count
         for j, (address, row_length, is_single) in enumerate(
                 entry.addresses_and_row_lengths):
-            single_bit = self.SINGLE_BIT_FLAG_BIT if is_single else 0
+            single_bit = self._SINGLE_BIT_FLAG_BIT if is_single else 0
             address_list[start + j] = (
                 (single_bit | (address & 0x7FFFFF) << 8) |
-                (row_length & self.ROW_LENGTH_MASK))
+                (row_length & self._ROW_LENGTH_MASK))
         return count
 
     @overrides(
@@ -280,9 +269,9 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         n_entries, n_addresses = _TWO_WORDS.unpack(txrx.read_memory(
             chip_x, chip_y, master_pop_base_mem_address, _TWO_WORDS.size))
         n_entry_bytes = (
-            n_entries * _MasterPopEntry.MASTER_POP_ENTRY_SIZE_BYTES)
+            n_entries * _MasterPopEntry._MASTER_POP_ENTRY_SIZE_BYTES)
         n_address_bytes = (
-            n_addresses * _MasterPopEntry.ADDRESS_LIST_ENTRY_SIZE_BYTES)
+            n_addresses * _MasterPopEntry._ADDRESS_LIST_ENTRY_SIZE_BYTES)
 
         # read in master pop structure
         full_data = txrx.read_memory(
@@ -292,10 +281,10 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         # convert into a numpy arrays
         entry_list = numpy.frombuffer(
             full_data, 'uint8', n_entry_bytes, 0).view(
-                dtype=self.MASTER_POP_ENTRY_DTYPE)
+                dtype=self._MASTER_POP_ENTRY_DTYPE)
         address_list = numpy.frombuffer(
             full_data, 'uint8', n_address_bytes, n_entry_bytes).view(
-                dtype=self.ADDRESS_LIST_DTYPE)
+                dtype=self._ADDRESS_LIST_DTYPE)
 
         entry = self._locate_entry(entry_list, incoming_key)
         if entry is None:
@@ -305,17 +294,17 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
             address_and_row_length = address_list[i]
             is_single = (
                 address_and_row_length &
-                MasterPopTableAsBinarySearch.SINGLE_BIT_FLAG_BIT) > 0
+                MasterPopTableAsBinarySearch._SINGLE_BIT_FLAG_BIT) > 0
             address = (
                 address_and_row_length &
-                MasterPopTableAsBinarySearch.ADDRESS_MASK)
+                MasterPopTableAsBinarySearch._ADDRESS_MASK)
             row_length = (
                 address_and_row_length &
-                MasterPopTableAsBinarySearch.ROW_LENGTH_MASK)
+                MasterPopTableAsBinarySearch._ROW_LENGTH_MASK)
             if is_single:
                 address = address >> 8
             else:
-                address = address >> self.ADDRESS_SCALED_SHIFT
+                address = address >> self._ADDRESS_SCALED_SHIFT
 
             addresses.append((row_length, address, is_single))
         return addresses

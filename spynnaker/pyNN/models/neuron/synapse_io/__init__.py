@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from .abstract_synapse_io import AbstractSynapseIO
+from .max_row_info import MaxRowInfo
 from .synapse_io_row_based import SynapseIORowBased
 
-__all__ = ["AbstractSynapseIO", "SynapseIORowBased"]
+__all__ = ["AbstractSynapseIO", "MaxRowInfo", "SynapseIORowBased"]

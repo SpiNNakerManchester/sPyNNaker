@@ -226,6 +226,7 @@ static inline uint32_t faster_spike_source_get_num_spikes(
     return (uint32_t) roundk(x * x, nbits);
 }
 
+#if LOG_LEVEL >= LOG_DEBUG
 static void print_spike_source(index_t s) {
     spike_source_t *p = &source[s];
     log_info("atom %d", s);
@@ -243,6 +244,7 @@ static void print_spike_sources(void) {
         print_spike_source(s);
     }
 }
+#endif
 
 //! \brief entry method for reading the global parameters stored in Poisson
 //!        parameter region
@@ -681,7 +683,9 @@ static void timer_callback(uint timer_count, uint unused) {
         if ((time + 1) >= spike_source->next_ticks) {
             log_debug("Moving to next rate at time %d", time);
             read_next_rates(s_id);
+#if LOG_LEVEL >= LOG_DEBUG
             // print_spike_source(s_id);
+#endif
         }
     }
 

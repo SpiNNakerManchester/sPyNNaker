@@ -34,6 +34,10 @@ class InputTypeCurrentSEMD(AbstractInputType):
         "__inh_input_previous"]
 
     def __init__(self, multiplicator, inh_input_previous):
+        """
+        :param float multiplicator:
+        :param float inh_input_previous:
+        """
         super(InputTypeCurrentSEMD, self).__init__([
             DataType.S1615,   # multiplicator
             DataType.S1615])  # inh_input_previous

@@ -143,7 +143,7 @@ class SpikeSourceArrayVertex(
 
         The output may be customised by specifying a different template\
         together with an associated template engine\
-        (see ``pyNN.descriptions``).
+        (see :py:mod:`pyNN.descriptions`).
 
         If template is None, then a dictionary containing the template\
         context will be returned.

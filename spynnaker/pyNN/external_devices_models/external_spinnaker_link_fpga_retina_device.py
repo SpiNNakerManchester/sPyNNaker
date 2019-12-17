@@ -88,13 +88,13 @@ class ExternalFPGARetinaDevice(
             self, mode, retina_key, spinnaker_link_id, polarity,
             label=None, board_address=None):
         """
-        :param mode: The retina "mode"
-        :param retina_key: The value of the top 16-bits of the key
-        :param spinnaker_link_id: \
+        :param str mode: The retina "mode"
+        :param int retina_key: The value of the top 16-bits of the key
+        :param int spinnaker_link_id:
             The SpiNNaker link to which the retina is connected
-        :param polarity: The "polarity" of the retina data
-        :param label:
-        :param board_address:
+        :param str polarity: The "polarity" of the retina data
+        :param str label:
+        :param sr board_address:
         """
         # pylint: disable=too-many-arguments
         self.__polarity = polarity

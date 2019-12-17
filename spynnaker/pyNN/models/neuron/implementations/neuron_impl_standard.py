@@ -20,7 +20,7 @@ from .abstract_neuron_impl import AbstractNeuronImpl
 
 
 class NeuronImplStandard(AbstractNeuronImpl):
-    """ The standard neuron implementation, consisting of various components
+    """ The standard componentised neuron implementation.
     """
 
     __slots__ = [

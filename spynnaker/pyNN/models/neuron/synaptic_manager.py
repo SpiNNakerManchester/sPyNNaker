@@ -88,6 +88,24 @@ class SynapticManager(object):
 
     def __init__(self, n_synapse_types, ring_buffer_sigma, spikes_per_second,
                  config, population_table_type=None, synapse_io=None):
+        """
+        :param int n_synapse_types:
+            number of synapse types on a neuron (e.g., 2 for excitatory and
+            inhibitory)
+        :param ring_buffer_sigma:
+            How many SD above the mean to go for upper bound; a
+            good starting choice is 5.0. Given length of simulation we can
+            set this for approximate number of saturation events.
+        :type ring_buffer_sigma: float or None
+        :param spikes_per_second: Estimated spikes per second
+        :type spikes_per_second: float or None
+        :param configparser.RawConfigParser config: The system configuration
+        :param population_table_type:
+            What type of master population table is used
+        :type population_table_type: AbstractMasterPopTableFactory or None
+        :param synapse_io: How IO for synapses is performed
+        :type synapse_io: AbstractSynapseIO or None
+        """
         self.__n_synapse_types = n_synapse_types
         self.__ring_buffer_sigma = ring_buffer_sigma
         self.__spikes_per_second = spikes_per_second
@@ -144,6 +162,10 @@ class SynapticManager(object):
 
     @property
     def synapse_dynamics(self):
+        """ Settable.
+
+        :rtype: AbstractSynapseDynamics or None
+        """
         return self.__synapse_dynamics
 
     def __combine_structural_stdp_dynamics(self, structural, stdp):
@@ -158,7 +180,6 @@ class SynapticManager(object):
 
     @synapse_dynamics.setter
     def synapse_dynamics(self, synapse_dynamics):
-
         if self.__synapse_dynamics is None:
             self.__synapse_dynamics = synapse_dynamics
         else:
@@ -167,6 +188,10 @@ class SynapticManager(object):
 
     @property
     def ring_buffer_sigma(self):
+        """ Settable.
+
+        :rtype: float
+        """
         return self.__ring_buffer_sigma
 
     @ring_buffer_sigma.setter
@@ -175,6 +200,10 @@ class SynapticManager(object):
 
     @property
     def spikes_per_second(self):
+        """ Settable.
+
+        :rtype: float
+        """
         return self.__spikes_per_second
 
     @spikes_per_second.setter
@@ -182,28 +211,51 @@ class SynapticManager(object):
         self.__spikes_per_second = spikes_per_second
 
     def get_maximum_delay_supported_in_ms(self, machine_time_step):
+        """
+        :rtype: int or None
+        """
         return self.__synapse_io.get_maximum_delay_supported_in_ms(
             machine_time_step)
 
     @property
     def vertex_executable_suffix(self):
+        """ The suffix of the executable name due to the type of synapses \
+            in use.
+
+        :rtype: str
+        """
         if self.__synapse_dynamics is None:
             return ""
         return self.__synapse_dynamics.get_vertex_executable_suffix()
 
     def add_pre_run_connection_holder(
             self, connection_holder, edge, synapse_info):
+        """
+        :param ConnectionHolder connection_holder:
+        :param ProjectionApplicationEdge edge:
+        :param SynapseInformation synapse_info:
+        """
         self.__pre_run_connection_holders[edge, synapse_info].append(
             connection_holder)
 
     def get_connection_holders(self):
+        """
+        :rtype: dict(tuple(ProjectionApplicationEdge,SynapseInformation),\
+            ConnectionHolder)
+        """
         return self.__pre_run_connection_holders
 
     def get_n_cpu_cycles(self):
+        """
+        :rtype: int
+        """
         # TODO: Calculate this correctly
         return 0
 
     def get_dtcm_usage_in_bytes(self):
+        """
+        :rtype: int
+        """
         # TODO: Calculate this correctly
         return 0
 
@@ -316,6 +368,14 @@ class SynapticManager(object):
     def get_sdram_usage_in_bytes(
             self, vertex_slice, machine_time_step, application_graph,
             app_vertex):
+        """
+        :param ~pacman.models.common.Slice vertex_slice:
+        :param int machine_time_step:
+        :param ~pacman.models.graphs.application.ApplicationGraph \
+                application_graph:
+        :param AbstractPopulationVertex app_vertex:
+        :rtype: int
+        """
         in_edges = application_graph.get_edges_ending_at_vertex(app_vertex)
         return (
             self._get_synapse_params_size() +
@@ -921,6 +981,26 @@ class SynapticManager(object):
             self, spec, application_vertex, post_vertex_slice, machine_vertex,
             placement, machine_graph, application_graph, routing_info,
             weight_scale, machine_time_step):
+        """
+        :param ~data_specification.DataSpecificationGenerator spec:
+            The data specification to write to
+        :param AbstractPopulationVertex application_vertex:
+            The vertex owning the synapses
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+            The part of the vertex we're dealing with
+        :param PopulationMachineVertex machine_vertex: The machine vertex
+        :param ~pacman.model.placements.Placement placement:
+            Where the vertex is placed
+        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
+            The graph containing the machine vertex
+        :param ~pacman.model.graphs.application.ApplicationGraph \
+                application_graph:
+            The graph containing the application vertex
+        :param ~pacman.model.routing_info.RoutingInfo routing_info:
+            How messages are routed
+        :param float weight_scale: How to scale the weights of the synapses
+        :param int machine_time_step:
+        """
         # Create an index of delay keys into this vertex
         for m_edge in machine_graph.get_edges_ending_at_vertex(machine_vertex):
             app_edge = m_edge.app_edge
@@ -975,6 +1055,8 @@ class SynapticManager(object):
             spec, post_vertex_slice, weight_scales, gen_data)
 
     def clear_connection_cache(self):
+        """ Flush the cache of connection information.
+        """
         self.__retrieved_blocks = dict()
 
     def get_connections_from_machine(
@@ -983,6 +1065,45 @@ class SynapticManager(object):
             using_extra_monitor_cores, placements=None, monitor_api=None,
             monitor_placement=None, monitor_cores=None,
             handle_time_out_configuration=True, fixed_routes=None):
+        """
+        :param ~spinnman.Transceiver transceiver: How to talk to the machine
+        :param ~pacman.model.placements.Placement placement:
+            Where on the machine are we talking to?
+        :param ProjectionMachineEdge machine_edge:
+            What edge's connections are we talking about?
+        :param ~pacman.model.routing_info.RoutingInfo routing_infos:
+            Where did the edge go?
+        :param SynapseInformation synapse_info:
+            What do we know about the edge's synapses?
+        :param int machine_time_step: How fast the clock ticks
+        :param bool using_extra_monitor_cores:
+            Are we to use the fast download protocol?
+        :param placements: Where are all the vertices?
+            Must not be ``None`` if ``using_extra_monitor_cores`` is true.
+        :type placements: ~pacman.model.placements.Placements or None
+        :param monitor_api: How do we talk the fast protocol?
+            Must not be ``None`` if ``using_extra_monitor_cores`` is true.
+        :type monitor_api:
+            ~spinn_front_end_common.utility_models.DataSpeedUpPacketGatherMachineVertex
+            or None
+        :param monitor_placement: Where is the master monitor?
+            Must not be ``None`` if ``using_extra_monitor_cores`` is true.
+        :type monitor_placement: ~pacman.model.placements.Placement or None
+        :param monitor_cores: Where are all the monitors?
+            Must not be ``None`` if ``using_extra_monitor_cores`` is true.
+        :type monitor_cores:
+            list(~spinn_front_end_common.utility_models.ExtraMonitorSupportMachineVertex)
+            or None
+        :param bool handle_time_out_configuration:
+            Should we reconfigure the on-chip network to not time out?
+            (Should be true under all normal circumstances.)
+        :param fixed_routes:
+            What is the planned configuration of the Fixed Route packet
+            routing?
+            Must not be ``None`` if ``using_extra_monitor_cores`` is true.
+        :type fixed_routes:
+            dict(tuple(int,int),~spinn_machine.FixedRouteEntry) or None
+        """
         app_edge = machine_edge.app_edge
         if not isinstance(app_edge, ProjectionApplicationEdge):
             return None
@@ -1149,6 +1270,11 @@ class SynapticManager(object):
 
     # inherited from AbstractProvidesIncomingPartitionConstraints
     def get_incoming_partition_constraints(self):
+        """ Gets the constraints due to synapses managed by this class.
+
+        :return: a list of constraints
+        :rtype: list(~pacman.model.constraints.AbstractConstraint)
+        """
         return self.__poptable_type.get_edge_constraints()
 
     def _write_on_machine_data_spec(
@@ -1156,7 +1282,8 @@ class SynapticManager(object):
         """ Write the data spec for the synapse expander
 
         :param spec: The specification to write to
-        :param post_vertex_slice: The slice of the vertex being written
+        :param ~pacman.models.common.Slice post_vertex_slice:
+            The slice of the vertex being written
         :param weight_scales: scaling of weights on each synapse
         """
         if not generator_data:
@@ -1189,11 +1316,18 @@ class SynapticManager(object):
 
     def gen_on_machine(self, vertex_slice):
         """ True if the synapses should be generated on the machine
+
+        :param ~pacman.models.common.Slice vertex_slice:
+        :rtype: bool
         """
         return self.__gen_on_machine.get(vertex_slice, False)
 
     @property
     def changes_during_run(self):
+        """ Whether the synapses being managed change during running.
+
+        :rtype: bool
+        """
         if self.__synapse_dynamics is None:
             return False
         return self.__synapse_dynamics.changes_during_run

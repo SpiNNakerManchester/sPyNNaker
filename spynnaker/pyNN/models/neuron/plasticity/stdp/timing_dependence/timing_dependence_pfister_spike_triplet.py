@@ -28,6 +28,8 @@ logger = logging.getLogger(__name__)
 
 
 class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
+    """ A timing dependence STDP rule based on spike triplets.
+    """
     __slots__ = [
         "__synapse_structure",
         "__tau_minus",
@@ -41,6 +43,12 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
 
     # noinspection PyPep8Naming
     def __init__(self, tau_plus, tau_minus, tau_x, tau_y):
+        r"""
+        :param float tau_plus: :math:`\tau_+`
+        :param float tau_minus: :math:`\tau_-`
+        :param float tau_x: :math:`\tau_x`
+        :param float tau_y: :math:`\tau_y`
+        """
         self.__tau_plus = tau_plus
         self.__tau_minus = tau_minus
         self.__tau_x = tau_x
@@ -56,18 +64,34 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
 
     @property
     def tau_plus(self):
+        r""" :math:`\tau_+`
+
+        :rtype: float
+        """
         return self.__tau_plus
 
     @property
     def tau_minus(self):
+        r""" :math:`\tau_-`
+
+        :rtype: float
+        """
         return self.__tau_minus
 
     @property
     def tau_x(self):
+        r""" :math:`\tau_x`
+
+        :rtype: float
+        """
         return self.__tau_x
 
     @property
     def tau_y(self):
+        r""" :math:`\tau_y`
+
+        :rtype: float
+        """
         return self.__tau_y
 
     @overrides(AbstractTimingDependence.is_same_as)
@@ -83,10 +107,18 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
 
     @property
     def vertex_executable_suffix(self):
+        """ The suffix to be appended to the vertex executable for this rule
+
+        :rtype: str
+        """
         return "pfister_triplet"
 
     @property
     def pre_trace_n_bytes(self):
+        """ The number of bytes used by the pre-trace of the rule per neuron
+
+        :rtype: int
+        """
         # Triplet rule trace entries consists of two 16-bit traces - R1 and R2
         return BYTES_PER_WORD
 
@@ -99,15 +131,14 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
 
     @property
     def n_weight_terms(self):
+        """ The number of weight terms expected by this timing rule
+
+        :rtype: int
+        """
         return 2
 
     @overrides(AbstractTimingDependence.write_parameters)
     def write_parameters(self, spec, machine_time_step, weight_scales):
-
-        # Check timestep is valid
-        if machine_time_step != 1000:
-            raise NotImplementedError(
-                "STDP LUT generation currently only supports 1ms timesteps")
 
         # Write lookup tables
         spec.write_array(self.__tau_plus_data)
@@ -117,6 +148,10 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
 
     @property
     def synaptic_structure(self):
+        """ Get the synaptic structure of the plastic part of the rows
+
+        :rtype: AbstractSynapseStructure
+        """
         return self.__synapse_structure
 
     @overrides(AbstractTimingDependence.get_parameter_names)

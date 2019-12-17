@@ -50,7 +50,7 @@ class AbstractGenerateOnMachine(object):
     def gen_matrix_params(self):
         """ Any parameters required by the matrix generator
 
-        :rtype: numpy array of uint32
+        :rtype: ~numpy.ndarray(uint32)
         """
         return numpy.zeros(0, dtype="uint32")
 

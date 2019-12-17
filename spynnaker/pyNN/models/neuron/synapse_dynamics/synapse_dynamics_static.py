@@ -27,6 +27,9 @@ from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 class SynapseDynamicsStatic(
         AbstractStaticSynapseDynamics, AbstractSettable,
         AbstractChangableAfterRun, AbstractGenerateOnMachine):
+    """ The dynamics of a synapse that does not change over time.
+    """
+
     __slots__ = [
         # Indicates if a change that has been made requires mapping
         "__change_requires_mapping",
@@ -154,7 +157,7 @@ class SynapseDynamicsStatic(
         return connections
 
     @property
-    @overrides(AbstractChangableAfterRun.requires_mapping)
+    @overrides(AbstractChangableAfterRun.requires_mapping, extend_doc=False)
     def requires_mapping(self):
         """ True if changes that have been made require that mapping be\
             performed.  Note that this should return True the first time it\
@@ -163,7 +166,7 @@ class SynapseDynamicsStatic(
         """
         return self.__change_requires_mapping
 
-    @overrides(AbstractChangableAfterRun.mark_no_changes)
+    @overrides(AbstractChangableAfterRun.mark_no_changes, extend_doc=False)
     def mark_no_changes(self):
         """ Marks the point after which changes are reported.  Immediately\
             after calling this method, requires_mapping should return False.
@@ -172,8 +175,6 @@ class SynapseDynamicsStatic(
 
     @overrides(AbstractSettable.get_value)
     def get_value(self, key):
-        """ Get a property
-        """
         if hasattr(self, key):
             return getattr(self, key)
         raise InvalidParameterType(
@@ -181,11 +182,6 @@ class SynapseDynamicsStatic(
 
     @overrides(AbstractSettable.set_value)
     def set_value(self, key, value):
-        """ Set a property
-
-        :param key: the name of the parameter to change
-        :param value: the new value of the parameter to assign
-        """
         if hasattr(self, key):
             setattr(self, key, value)
             self.__change_requires_mapping = True

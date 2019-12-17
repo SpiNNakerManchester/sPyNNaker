@@ -19,6 +19,8 @@ from spynnaker.pyNN.external_devices_models\
 
 
 class AbstractPushBotOutputDevice(Enum):
+    """ Superclass of all output device descriptors
+    """
 
     def __new__(
             cls, value, protocol_property, min_value, max_value,
@@ -35,6 +37,9 @@ class AbstractPushBotOutputDevice(Enum):
 
     @property
     def protocol_property(self):
+        """
+        :rtype: property
+        """
         return self._protocol_property
 
     @property
@@ -47,8 +52,14 @@ class AbstractPushBotOutputDevice(Enum):
 
     @property
     def time_between_send(self):
+        """
+        :rtype: int
+        """
         return self._time_between_send
 
     @property
     def send_type(self):
+        """
+        :rtype: SendType
+        """
         return self._send_type

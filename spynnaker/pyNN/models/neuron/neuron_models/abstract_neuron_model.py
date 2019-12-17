@@ -14,13 +14,17 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy
+from six import with_metaclass
+from spinn_utilities.abstract_base import AbstractBase
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.neuron.implementations import (
     AbstractStandardNeuronComponent, Struct)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
 
-class AbstractNeuronModel(AbstractStandardNeuronComponent):
+# with_metaclass due to https://github.com/benjaminp/six/issues/219
+class AbstractNeuronModel(
+        with_metaclass(AbstractBase, AbstractStandardNeuronComponent)):
     """ Represents a neuron model.
     """
 
@@ -28,12 +32,14 @@ class AbstractNeuronModel(AbstractStandardNeuronComponent):
 
     def __init__(self, data_types, global_data_types=None):
         """
-        :param data_types:\
-            A list of data types in the neuron structure, in the order that\
+        :param list(~data_specification.enums.DataType) data_types:
+            A list of data types in the neuron structure, in the order that
             they appear
-        :param global_data_types:\
-            A list of data types in the neuron global structure, in the order\
+        :param global_data_types:
+            A list of data types in the neuron global structure, in the order
             that they appear
+        :type global_data_types:
+            list(~data_specification.enums.DataType) or None
         """
         super(AbstractNeuronModel, self).__init__(data_types)
         if global_data_types is None:
@@ -43,6 +49,8 @@ class AbstractNeuronModel(AbstractStandardNeuronComponent):
     @property
     def global_struct(self):
         """ Get the global parameters structure
+
+        :rtype: Struct
         """
         return self.__global_struct
 
@@ -64,7 +72,7 @@ class AbstractNeuronModel(AbstractStandardNeuronComponent):
         """ Get the global values to be written to the machine for this model
 
         :return: A list with the same length as self.global_struct.field_types
-        :rtype: A list of single values
+        :rtype: list(int or float) or ~numpy.ndarray
         """
         return numpy.zeros(0, dtype="uint32")
 

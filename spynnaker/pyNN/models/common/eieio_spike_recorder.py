@@ -38,6 +38,9 @@ class EIEIOSpikeRecorder(object):
 
     @property
     def record(self):
+        """
+        :rtype: bool
+        """
         return self.__record
 
     @record.setter
@@ -46,23 +49,53 @@ class EIEIOSpikeRecorder(object):
         self.__record = new_state
 
     def set_recording(self, new_state, sampling_interval=None):
+        """
+        :param new_state: bool
+        """
         if sampling_interval is not None:
             logger.warning("Sampling interval currently not supported for "
                            "SpikeSourceArray so being ignored")
         self.__record = new_state
 
     def get_dtcm_usage_in_bytes(self):
+        """
+        :rtype: int
+        """
         if not self.__record:
             return 0
         return BYTES_PER_WORD
 
     def get_n_cpu_cycles(self, n_neurons):
+        """
+        :rtype: int
+        """
         if not self.__record:
             return 0
         return n_neurons * 4
 
     def get_spikes(self, label, buffer_manager, region, placements,
                    application_vertex, base_key_function, machine_time_step):
+        """ Get the recorded spikes from the object
+
+        :param str label:
+        :param buffer_manager: the buffer manager object
+        :type buffer_manager:
+            ~spinn_front_end_common.interface.buffer_management.BufferManager
+        :param int region:
+        :param ~pacman.model.placements.Placements placements:
+            the placements object
+        :param application_vertex:
+        :type application_vertex:
+            ~pacman.model.graphs.application.ApplicationVertex
+        :param int machine_time_step:
+            the time step of the simulation, in microseconds
+        :param base_key_function:
+        :type base_key_function:
+            callable(~pacman.model.graphs.machine.MachineVertex,int)
+        :return: A numpy array of 2-element arrays of (neuron_id, time)
+            ordered by time, one element per event
+        :rtype: ~numpy.ndarray(tuple(int,int))
+        """
         # pylint: disable=too-many-arguments
         results = list()
         missing = []

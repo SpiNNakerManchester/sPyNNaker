@@ -76,6 +76,11 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
     ]
 
     def __init__(self, safe=True, callback=None, verbose=False):
+        """
+        :param bool safe:
+        :param callable callback: Ignored
+        :param bool verbose:
+        """
         AbstractConnector.__init__(
             self, safe=safe, callback=callback, verbose=verbose)
         self.__delay_seed = dict()
@@ -175,6 +180,12 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         Default implementation returns True if the weights and delays can\
         be generated on the machine
 
+        :param weights:
+        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\
+            float or list(int) or list(float)
+        :param delays:
+        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\
+            float or list(int) or list(float)
         :rtype: bool
         """
 
@@ -185,6 +196,9 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
     def gen_weights_id(self, weights):
         """ Get the id of the weight generator on the machine
 
+        :param weights:
+        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\
+            float or list(int) or list(float)
         :rtype: int
         """
         return self._param_generator_id(weights)
@@ -192,7 +206,10 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
     def gen_weights_params(self, weights, pre_vertex_slice, post_vertex_slice):
         """ Get the parameters of the weight generator on the machine
 
-        :rtype: numpy array of uint32
+        :param weights:
+        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\
+            float or list(int) or list(float)
+        :rtype: ~numpy.ndarray(~numpy.uint32)
         """
         seed = self._generate_param_seed(
             pre_vertex_slice, post_vertex_slice, weights,
@@ -202,6 +219,9 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
     def gen_weight_params_size_in_bytes(self, weights):
         """ The size of the weight parameters in bytes
 
+        :param weights:
+        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\
+            float or list(int) or list(float)
         :rtype: int
         """
         return self._param_generator_params_size_in_bytes(weights)
@@ -209,6 +229,9 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
     def gen_delays_id(self, delays):
         """ Get the id of the delay generator on the machine
 
+        :param delays:
+        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\
+            float or list(int) or list(float)
         :rtype: int
         """
         return self._param_generator_id(delays)
@@ -216,7 +239,10 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
     def gen_delay_params(self, delays, pre_vertex_slice, post_vertex_slice):
         """ Get the parameters of the delay generator on the machine
 
-        :rtype: numpy array of uint32
+        :param delays:
+        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\
+            float or list(int) or list(float)
+        :rtype: ~numpy.ndarray(~numpy.uint32)
         """
         seed = self._generate_param_seed(
             pre_vertex_slice, post_vertex_slice, delays,
@@ -226,13 +252,16 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
     def gen_delay_params_size_in_bytes(self, delays):
         """ The size of the delay parameters in bytes
 
+        :param delays:
+        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\
+            float or list(int) or list(float)
         :rtype: int
         """
         return self._param_generator_params_size_in_bytes(delays)
 
     @abstractproperty
     def gen_connector_id(self):
-        """ Get the id of the connection generator on the machine
+        """ The ID of the connection generator on the machine.
 
         :rtype: int
         """
@@ -243,7 +272,7 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
             synapse_type, synapse_info):
         """ Get the parameters of the on machine generation.
 
-        :rtype: numpy array of uint32
+        :rtype: ~numpy.ndarray(uint32)
         """
         return numpy.zeros(0, dtype="uint32")
 

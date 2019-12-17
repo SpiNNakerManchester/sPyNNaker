@@ -40,6 +40,25 @@ class SynapseInformation(object):
                  prepop_is_view, postpop_is_view, rng,
                  synapse_dynamics, synapse_type,
                  weights=None, delays=None):
+        """
+        :param AbstractConnector connector:
+            The connector connected to the synapse
+        :param PyNNPopulationCommon pre_population:
+            The population sending spikes to the synapse
+        :param PyNNPopulationCommon post_population:
+            The population hosting the synapse
+        :param bool prepop_is_view: Whether the prepopulation is a view
+        :param bool postpop_is_view: Whether the postpopulation is a view
+        :param rng: Seeded random number generator
+        :type rng: ~pyNN.random.NumpyRNG or None
+        :param AbstractSynapseDynamics synapse_dynamics:
+            The dynamic behaviour of the synapse
+        :param AbstractSynapseType synapse_type: The type of the synapse
+        :param weights: The synaptic weights
+        :type weights: float or list(float) or ~numpy.ndarray(float) or None
+        :param delays: The total synaptic delays
+        :type delays: float or list(float) or ~numpy.ndarray(float) or None
+        """
         self.__connector = connector
         self.__pre_population = pre_population
         self.__post_population = post_population
@@ -53,50 +72,98 @@ class SynapseInformation(object):
 
     @property
     def connector(self):
+        """ The connector connected to the synapse
+
+        :rtype: AbstractConnector
+        """
         return self.__connector
 
     @property
     def pre_population(self):
+        """ The population sending spikes to the synapse
+
+        :rtype: PyNNPopulationCommon
+        """
         return self.__pre_population
 
     @property
     def post_population(self):
+        """ The population hosting the synapse
+
+        :rtype: PyNNPopulationCommon
+        """
         return self.__post_population
 
     @property
     def n_pre_neurons(self):
+        """ The number of neurons in the prepopulation
+
+        :rtype: int
+        """
         return self.__pre_population.size
 
     @property
     def n_post_neurons(self):
+        """ The number of neurons in the postpopulation
+
+        :rtype: int
+        """
         return self.__post_population.size
 
     @property
     def prepop_is_view(self):
+        """ Whether the prepopulation is a view
+
+        :rtype: bool
+        """
         return self.__prepop_is_view
 
     @property
     def postpop_is_view(self):
+        """ Whether the postpopulation is a view
+
+        :rtype: bool
+        """
         return self.__postpop_is_view
 
     @property
     def rng(self):
+        """ Random number generator
+
+        :rtype: ~pyNN.random.NumpyRNG
+        """
         return self.__rng
 
     @property
     def synapse_dynamics(self):
+        """ The dynamic behaviour of the synapse
+
+        :rtype: AbstractSynapseDynamics
+        """
         return self.__synapse_dynamics
 
     @property
     def synapse_type(self):
+        """ The type of the synapse
+
+        :rtype: AbstractSynapseType
+        """
         return self.__synapse_type
 
     @property
     def weights(self):
+        """ The synaptic weights (if any)
+
+        :rtype: int or None
+        """
         return self.__weights
 
     @property
     def delays(self):
+        """ The total synaptic delays (if any)
+
+        :rtype: int or None
+        """
         return self.__delays
 
     def may_generate_on_machine(self):

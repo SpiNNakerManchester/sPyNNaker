@@ -39,8 +39,15 @@ class CSAConnector(AbstractConnector):
 
     def __init__(self, cset, safe=True, callback=None, verbose=False):
         """
-        :param '?' cset:
+        :param cset:
             A description of the connection set between populations
+        :type cset: csa.connset.CSet
+        :param safe:
+        :type safe: bool
+        :param callback: Ignored
+        :type callback: callable
+        :param verbose:
+        :type verbose: bool
         """
         super(CSAConnector, self).__init__(safe, callback, verbose)
         found, ex = _csa_found
