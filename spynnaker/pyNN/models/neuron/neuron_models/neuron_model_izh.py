@@ -15,7 +15,6 @@
 
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
-from pacman.executor.injection_decorator import inject_items
 from .abstract_neuron_model import AbstractNeuronModel
 
 A = 'a'
@@ -89,13 +88,11 @@ class NeuronModelIzh(AbstractNeuronModel):
 
     @overrides(AbstractNeuronModel.get_global_values)
     def get_global_values(self, timestamp_in_us):
-        # pylint: disable=arguments-differ
         return [float(timestamp_in_us)/1000.0]
 
     @overrides(AbstractNeuronModel.get_values)
     def get_values(
             self, parameters, state_variables, vertex_slice, timestamp_in_us):
-        # pylint: disable=arguments-differ
 
         # Add the rest of the data
         return [

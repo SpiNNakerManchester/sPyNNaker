@@ -16,7 +16,6 @@
 import numpy
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
-from pacman.executor.injection_decorator import inject_items
 from .abstract_neuron_model import AbstractNeuronModel
 
 V = "v"
@@ -101,7 +100,6 @@ class NeuronModelLeakyIntegrateAndFire(AbstractNeuronModel):
     @overrides(AbstractNeuronModel.get_values)
     def get_values(
             self, parameters, state_variables, vertex_slice, timestamp_in_us):
-        # pylint: disable=arguments-differ
 
         # Add the rest of the data
         return [state_variables[V], parameters[V_REST],

@@ -15,7 +15,6 @@
 
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
-from pacman.executor.injection_decorator import inject_items
 from .abstract_threshold_type import AbstractThresholdType
 
 DU_TH = "du_th"
@@ -72,7 +71,6 @@ class ThresholdTypeMaassStochastic(AbstractThresholdType):
     @overrides(AbstractThresholdType.get_values)
     def get_values(
             self, parameters, state_variables, vertex_slice, timestamp_in_us):
-        # pylint: disable=arguments-differ
 
         # Add the rest of the data
         return [parameters[DU_TH].apply_operation(lambda x: 1.0 / x),

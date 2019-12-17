@@ -16,7 +16,6 @@
 import numpy
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
-from pacman.executor.injection_decorator import inject_items
 from .abstract_synapse_type import AbstractSynapseType
 
 TAU_SYN_E = 'tau_syn_E'
@@ -77,7 +76,6 @@ class SynapseTypeExponential(AbstractSynapseType):
     @overrides(AbstractSynapseType.get_values)
     def get_values(
             self, parameters, state_variables, vertex_slice, timestamp_in_us):
-        # pylint: disable=arguments-differ
 
         tsfloat = float(timestamp_in_us) / 1000.0
         decay = lambda x: numpy.exp(-tsfloat / x)  # noqa E731

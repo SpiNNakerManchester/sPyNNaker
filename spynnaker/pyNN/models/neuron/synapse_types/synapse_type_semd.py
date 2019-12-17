@@ -16,7 +16,6 @@
 import numpy
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
-from pacman.executor.injection_decorator import inject_items
 from .abstract_synapse_type import AbstractSynapseType
 
 TAU_SYN_E = 'tau_syn_E'
