@@ -357,7 +357,7 @@ class PyNNProjectionCommon(object):
             connections = post_vertex.get_connections_from_machine(
                 ctl.transceiver, placement, edge, ctl.graph_mapper,
                 ctl.routing_infos, self.__synapse_information,
-                ctl.user_time_step_in_us, extra_monitors is not None,
+                extra_monitors is not None,
                 ctl.placements, receiver, sender_monitor_place,
                 extra_monitors, handle_time_out_configuration,
                 ctl.fixed_routes)
