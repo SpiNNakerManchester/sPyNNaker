@@ -167,7 +167,6 @@ class RecordingCommon(object):
         else:
             # assuming we got here, everything is ok, so we should go get the
             # data
-            time = sim.get_current_time() * US_TO_MS
             results = self.__population._vertex.get_data(
                 variable, sim.get_current_time() * US_TO_MS, sim.placements,
                 sim.graph_mapper, sim.buffer_manager)
