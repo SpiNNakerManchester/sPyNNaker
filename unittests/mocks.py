@@ -159,3 +159,7 @@ class MockSimulator(object):
     @property
     def use_virtual_board(self):
         return True
+
+    @property
+    def user_time_step_in_us(self):
+        return 1000
