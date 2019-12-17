@@ -16,7 +16,6 @@
 import numpy
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
-from pacman.executor.injection_decorator import inject_items
 from .abstract_additional_input import AbstractAdditionalInput
 
 I_ALPHA = "i_alpha"
@@ -70,8 +69,6 @@ class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
     @overrides(AbstractAdditionalInput.get_values)
     def get_values(
             self, parameters, state_variables, vertex_slice, timestamp_in_us):
-        # pylint: disable=arguments-differ
-
         # Add the rest of the data
         return [parameters[TAU_CA2].apply_operation(
                     operation=lambda x:

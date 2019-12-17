@@ -776,9 +776,10 @@ class AbstractPopulationVertex(
         # pylint: disable=too-many-arguments
         return self.__synapse_manager.get_connections_from_machine(
             transceiver, placement, edge, graph_mapper, routing_infos,
-            synapse_information, self.timestep_in_us, using_extra_monitor_cores,
-            placements, monitor_api, monitor_placement, monitor_cores,
-            handle_time_out_configuration, fixed_routes)
+            synapse_information, self.timestep_in_us,
+            using_extra_monitor_cores, placements, monitor_api,
+            monitor_placement, monitor_cores, handle_time_out_configuration,
+            fixed_routes)
 
     def clear_connection_cache(self):
         self.__synapse_manager.clear_connection_cache()
