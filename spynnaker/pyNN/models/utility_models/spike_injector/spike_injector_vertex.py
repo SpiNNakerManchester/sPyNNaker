@@ -47,7 +47,7 @@ class SpikeInjectorVertex(
 
     def __init__(
             self, n_neurons, label, constraints, port, virtual_key,
-            reserve_reverse_ip_tag):
+            reserve_reverse_ip_tag, timestep_in_us=None):
         # pylint: disable=too-many-arguments
         self.__requires_mapping = True
         self.__receive_port = None
@@ -57,7 +57,7 @@ class SpikeInjectorVertex(
             n_keys=n_neurons, label=label, receive_port=port,
             virtual_key=virtual_key,
             reserve_reverse_ip_tag=reserve_reverse_ip_tag,
-            constraints=constraints)
+            constraints=constraints, timestep_in_us=timestep_in_us)
 
         # Set up for recording
         self.__spike_recorder = EIEIOSpikeRecorder()
