@@ -424,6 +424,9 @@ void neuron_add_inputs( // EXPORTED
         input_t weights_this_timestep) {
 
     io_printf(IO_BUF, "Adding %k\n", weights_this_timestep);
+    if(weights_this_timestep > 0) {
+        io_printf(IO_BUF, "positive\n");
+    }
     neuron_impl_add_inputs(
             synapse_type_index, neuron_index, weights_this_timestep);
 }

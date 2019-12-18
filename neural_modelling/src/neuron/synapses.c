@@ -39,10 +39,13 @@ static uint32_t n_neurons;
 static uint32_t n_synapse_types;
 
 // Ring buffers to handle delays between synapses and neurons
-static weight_t *ring_buffers;
+static uint32_t *ring_buffers;
 
 // Amount to left shift the ring buffer by to make it an input
 static uint32_t *ring_buffer_to_input_left_shifts;
+
+// Amount to right shift the content for ring buffer after multiplication to keep max precision
+static uint32_t *ring_buffer_relative_shifts;
 
 // Count of the number of times the ring buffers have saturated
 static uint32_t saturation_count = 0;
@@ -186,13 +189,10 @@ static inline void process_fixed_synapses(
                 synapse_type_index_bits);
 
         // Add weight to current ring buffer value
-        uint32_t accumulation = ring_buffers[ring_buffer_index] + ((rate_diff * weight) >> 23);
+        uint64_t accumulation = ring_buffers[ring_buffer_index] + (((uint64_t) rate_diff * (uint64_t) weight) >> 10);
 
-        // If 17th bit is set, saturate accumulator at UINT16_MAX (0xFFFF)
-        // **NOTE** 0x10000 can be expressed as an ARM literal,
-        //          but 0xFFFF cannot.  Therefore, we use (0x10000 - 1)
-        //          to obtain this value
-        uint32_t sat_test = accumulation & 0x10000;
+        // Saturation check, Probably useless now!
+        uint64_t sat_test = accumulation & 0x100000000;
         if (sat_test) {
             accumulation = sat_test - 1;
             saturation_count++;
@@ -200,7 +200,7 @@ static inline void process_fixed_synapses(
 
         ring_buffers[ring_buffer_index] = accumulation;
 
-        io_printf(IO_BUF, "added to %u %k * %k = %k sh %k index %d\n", ring_buffer_index, weight, rate_diff, ring_buffers[ring_buffer_index], (rate_diff * weight) >> 23, combined_synapse_neuron_index >> synapse_index_bits);
+        io_printf(IO_BUF, "added to %u %k * %k = %k sh %k index %d\n", ring_buffer_index, weight, rate_diff, ring_buffers[ring_buffer_index], (rate_diff * weight) >> 12, combined_synapse_neuron_index >> synapse_index_bits);
     }
 }
 
@@ -236,6 +236,11 @@ bool synapses_initialise(
             n_synapse_types * sizeof(uint32_t));
     *ring_buffer_to_input_buffer_left_shifts =
             ring_buffer_to_input_left_shifts;
+
+    for(uint32_t i = 0; i < n_synapse_types; i++) {
+
+
+    }
 
     // Work out the positions of the direct and indirect synaptic matrices
     // and copy the direct matrix to DTCM
@@ -277,7 +282,7 @@ bool synapses_initialise(
             log_n_neurons + log_n_synapse_types;
     uint32_t ring_buffer_size = 1 << (n_ring_buffer_bits);
 
-    ring_buffers = spin1_malloc(ring_buffer_size * sizeof(weight_t));
+    ring_buffers = spin1_malloc(ring_buffer_size * sizeof(uint32_t));
 
     if (ring_buffers == NULL) {
 
@@ -302,6 +307,20 @@ bool synapses_initialise(
     return true;
 }
 
+// Converts a rate to an input (TMP, need to be different from the one in synapse.h because of the shift amount,
+// direction and the size of the data). This allows to do only one shift instead of two.
+static inline input_t convert_rate_to_input(
+        uint32_t rate, uint32_t left_shift) {
+    union {
+        uint32_t input_type;
+        s1615 output_type;
+    } converter;
+
+    converter.input_type = (rate);
+
+    return converter.output_type;
+}
+
 void synapses_do_timestep_update(timer_t time) {
     print_ring_buffers(time);
 
@@ -324,7 +343,7 @@ void synapses_do_timestep_update(timer_t time) {
             // input for this synapse type and neuron
             neuron_add_inputs(
                     synapse_type_index, neuron_index,
-                    synapses_convert_weight_to_input(
+                    convert_rate_to_input(
                             ring_buffers[ring_buffer_index],
                             ring_buffer_to_input_left_shifts[synapse_type_index]));
         }

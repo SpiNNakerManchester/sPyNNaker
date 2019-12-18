@@ -919,10 +919,11 @@ class SynapticManager(object):
         """ Get the ring buffer shifts for this vertex
         """
         if self.__ring_buffer_shifts is None:
-            self.__ring_buffer_shifts = \
-                self._get_ring_buffer_to_input_left_shifts(
-                    application_vertex, application_graph, machine_timestep,
-                    weight_scale)
+            # self.__ring_buffer_shifts = \
+            #     self._get_ring_buffer_to_input_left_shifts(
+            #         application_vertex, application_graph, machine_timestep,
+            #         weight_scale)
+            self.__ring_buffer_shifts = [5 for _ in range(self.__n_synapse_types)]
         return self.__ring_buffer_shifts
 
     def write_data_spec(

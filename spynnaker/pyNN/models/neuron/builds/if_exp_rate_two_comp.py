@@ -33,7 +33,7 @@ class IFExpRateTwoComp(AbstractPyNNNeuronModelStandard):
                              "mean_isi_ticks", "time_to_spike_ticks",
                              "starting_rate"})
     def __init__(
-            self, tau_m=0.5, cm=1.0, u_rest=0, v_reset=0.0,
+            self, tau_m=0.5, cm=1.0, u_rest=0, v_reset=-50.0,
             v_thresh=10.0, tau_refrac=0.1, i_offset=0.0, u=0.0,
 
             e_rev_E=4.667, e_rev_I=0.333,

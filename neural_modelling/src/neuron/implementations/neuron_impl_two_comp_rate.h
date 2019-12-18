@@ -64,8 +64,14 @@ static threshold_type_pointer_t threshold_type_array;
 //! Global parameters for the neurons
 static global_neuron_params_pointer_t global_parameters;
 
-// The synapse shaping parameters
+//! The synapse shaping parameters
 static synapse_param_t *neuron_synapse_shaping_params;
+
+//! Coefficients for the rate function (magic numbers from polynomial interpolation)
+static REAL cubic_term = -24.088958;
+static REAL square_term = 48.012303;
+static REAL linear_term = 73.084895;
+static REAL constant_term = 1.994506;
 
 static bool neuron_impl_initialise(uint32_t n_neurons) {
     // allocate DTCM for the global parameter details
@@ -211,34 +217,38 @@ static void neuron_impl_load_neuron_parameters(
 
 // Rate Update Function
 
-static inline bool set_spike_source_rate(neuron_pointer_t neuron, REAL rate,
+static inline bool set_spike_source_rate(neuron_pointer_t neuron, REAL somatic_voltage,
 		threshold_type_pointer_t threshold_type) {
 
-	REAL rate_scale = 50.0k;
-	rate = rate * rate_scale;
+	REAL rate;
 
-	// clip rate to avoid divide by 0 and overflow
-	if (rate < 0.001){
-		rate = 0.001;
-	} else if (rate > (threshold_type->threshold_value * rate_scale)) {
-		rate = threshold_type->threshold_value * rate_scale;
+	// Compute the rate function based on sigmoid approximation
+	if (somatic_voltage < 0.0k){
+		rate = 0.001k;
+	} else if (somatic_voltage > 2.0k) {
+		rate = 150.0k;
+	}
+	else {
+
+        // Compute the square and cube for the rate function (the values are shifted to stay on 32 bits)
+	    REAL voltage_sq = ((somatic_voltage * somatic_voltage) >> 15);
+	    REAL voltage_cube = ((voltage_sq * somatic_voltage) >> 15);
+
+	    rate = ((cubic_term * voltage_cube) >> 15) +
+	           ((square_term * voltage_sq) >> 15) +
+	           ((linear_term * somatic_voltage) >> 15) +
+	           constant_term;
 	}
 
 	REAL rate_diff = neuron->rate_at_last_setting - rate;
 
 	io_printf(IO_BUF, "curr rate %k, rate diff %k\n", rate, rate_diff);
 
-//	// ensure rate_diff is absolute
-//	if REAL_COMPARE(rate_diff, <, REAL_CONST(0.0))
-	if (rate_diff < 0.0k){
-		rate_diff = -rate_diff;
-	}
-
 	neuron->rate_diff = rate_diff;
 
 	// Has rate changed by more than a predefined threshold since it was last
 	// used to update the mean isi ticks?
-	if ((rate_diff) > neuron->rate_update_threshold){
+	if ((rate_diff) > neuron->rate_update_threshold || (rate_diff) < -neuron->rate_update_threshold){
 		// then update the rate
 		neuron->rate_at_last_setting = rate;
 
@@ -253,7 +263,7 @@ static inline bool set_spike_source_rate(neuron_pointer_t neuron, REAL rate,
 static bool neuron_impl_do_timestep_update(index_t neuron_index,
         input_t external_bias, state_t *recorded_variable_values) {
 
-    io_printf(IO_BUF, "neuron index %d\n", neuron_index);
+    io_printf(IO_BUF, "neuron index %d\n\n\n", neuron_index);
     // Get the neuron itself
     neuron_pointer_t neuron = &neuron_array[neuron_index];
 
