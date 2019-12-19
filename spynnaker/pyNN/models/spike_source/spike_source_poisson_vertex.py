@@ -828,14 +828,14 @@ class SpikeSourcePoissonVertex(
         # end spec
         spec.end_specification()
 
-    @inject_items({"first_machine_time_step": "FirstMachineTimeStep"})
+    @inject_items({"run_from_time_in_us": "RunFromTimeInUs"})
     @overrides(AbstractRewritesDataSpecification
                .requires_memory_regions_to_be_reloaded,
-               additional_arguments={"first_machine_time_step"})
-    def requires_memory_regions_to_be_reloaded(self, first_machine_time_step):
+               additional_arguments={"run_from_time_in_us"})
+    def requires_memory_regions_to_be_reloaded(self, run_from_time_in_us):
         # pylint: disable=arguments-differ
         return (self.__change_requires_neuron_parameters_reload or
-                first_machine_time_step == 0)
+                run_from_time_in_us == 0)
 
     @overrides(AbstractRewritesDataSpecification.mark_regions_reloaded)
     def mark_regions_reloaded(self):
