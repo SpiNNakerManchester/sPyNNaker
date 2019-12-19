@@ -18,7 +18,6 @@ from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.constraints.key_allocator_constraints import (
     FixedMaskConstraint)
-from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.graphs.application import (ApplicationVertex)
 from pacman.model.resources import (
@@ -26,13 +25,12 @@ from pacman.model.resources import (
 from spinn_front_end_common.abstract_models import (
     AbstractGeneratesDataSpecification, AbstractHasAssociatedBinary,
     AbstractProvidesOutgoingPartitionConstraints,
-    AbstractVertexWithEdgeToDependentVertices)
+    AbstractVertexWithEdgeToDependentVertices, ApplicationTimestepVertex)
 from spinn_front_end_common.abstract_models import (
     ApplicationSpiNNakerLinkVertex)
 from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl)
 from spinn_front_end_common.interface.simulation import simulation_utilities
-from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.utilities.constants import (
     SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES, BYTES_PER_WORD)
@@ -55,7 +53,7 @@ class _MunichMotorDevice(ApplicationSpiNNakerLinkVertex):
 
 @defaults
 class MunichMotorDevice(
-        ApplicationVertex, AbstractVertexWithEdgeToDependentVertices,
+        ApplicationTimestepVertex, AbstractVertexWithEdgeToDependentVertices,
         AbstractGeneratesDataSpecification, AbstractHasAssociatedBinary,
         AbstractProvidesOutgoingPartitionConstraints,
         ProvidesKeyToAtomMappingImpl):
@@ -200,8 +198,3 @@ class MunichMotorDevice(
         """ Return the dependent edge identifier
         """
         return [MOTOR_PARTITION_ID]
-
-    @property
-    @overrides(AbstractVertex.timestep_in_us)
-    def timestep_in_us(self):
-        return globals_variables.get_simulator().user_time_step_in_us

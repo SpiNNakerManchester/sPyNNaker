@@ -111,9 +111,9 @@ class SimpleApplicationVertex(ApplicationVertex):
         return ResourceContainer()
 
     @property
-    @overrides(AbstractVertex.timestep_in_us)
-    def timestep_in_us(self):
-        return globals_variables.get_simulator().user_time_step_in_us
+    @overrides(ApplicationVertex.timesteps_in_us)
+    def timesteps_in_us(self):
+        return set()
 
 
 class TestSynapticManager(unittest.TestCase):

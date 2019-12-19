@@ -24,14 +24,13 @@ from data_specification.enums import DataType
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
-from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
 from spinn_front_end_common.abstract_models import (
     AbstractChangableAfterRun, AbstractProvidesOutgoingPartitionConstraints,
     AbstractGeneratesDataSpecification, AbstractHasAssociatedBinary,
-    AbstractRewritesDataSpecification)
+    AbstractRewritesDataSpecification, ApplicationTimestepVertex)
 from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl)
 from spinn_front_end_common.interface.simulation import simulation_utilities
@@ -111,7 +110,7 @@ def _flatten(alist):
 
 
 class SpikeSourcePoissonVertex(
-        ApplicationVertex, AbstractGeneratesDataSpecification,
+        ApplicationTimestepVertex, AbstractGeneratesDataSpecification,
         AbstractHasAssociatedBinary, AbstractSpikeRecordable,
         AbstractProvidesOutgoingPartitionConstraints,
         AbstractChangableAfterRun, AbstractReadParametersBeforeSet,
@@ -123,7 +122,6 @@ class SpikeSourcePoissonVertex(
         "__change_requires_mapping",
         "__change_requires_neuron_parameters_reload",
         "__duration",
-        "__machine_time_step",
         "__model",
         "__model_name",
         "__n_atoms",
@@ -285,8 +283,6 @@ class SpikeSourcePoissonVertex(
             use_list_as_value=not hasattr(time_to_spike[0], "__len__"))
         self.__rng = numpy.random.RandomState(seed)
         self.__rate_change = numpy.zeros(n_neurons)
-        self.__machine_time_step = \
-            globals_variables.get_simulator().user_time_step_in_us
 
         # get config from simulator
         config = globals_variables.get_simulator().config
@@ -554,7 +550,7 @@ class SpikeSourcePoissonVertex(
 
     def _write_poisson_parameters(
             self, spec, graph, placement, routing_info,
-            vertex_slice, machine_time_step, time_scale_factor):
+            vertex_slice, time_scale_factor):
         """ Generate Parameter data for Poisson spike sources
 
         :param spec: the data specification writer
@@ -562,7 +558,6 @@ class SpikeSourcePoissonVertex(
         :param vertex_slice:\
             the slice of atoms a machine vertex holds from its application\
             vertex
-        :param machine_time_step: the time between timer tick updates.
         :param time_scale_factor:\
             the scaling between machine time step and real time
         """
@@ -597,7 +592,7 @@ class SpikeSourcePoissonVertex(
 
         # Write the offset value
         max_offset = (
-            machine_time_step * time_scale_factor) // _MAX_OFFSET_DENOMINATOR
+            self.timestep_in_us * time_scale_factor) // _MAX_OFFSET_DENOMINATOR
         spec.write_value(
             int(math.ceil(max_offset / self.__n_subvertices)) *
             self.__n_data_specs)
@@ -612,14 +607,14 @@ class SpikeSourcePoissonVertex(
             max_spikes = numpy.sum(scipy.stats.poisson.ppf(
                 1.0 - (1.0 / max_rates), max_rates))
             spikes_per_timestep = (
-                max_spikes / (MICROSECONDS_PER_SECOND // machine_time_step))
+                max_spikes / (MICROSECONDS_PER_SECOND // self.timestep_in_us))
             # avoid a possible division by zero / small number (which may
             # result in a value that doesn't fit in a uint32) by only
             # setting time_between_spikes if spikes_per_timestep is > 1
             time_between_spikes = 1.0
             if spikes_per_timestep > 1:
                 time_between_spikes = (
-                    (machine_time_step * time_scale_factor) /
+                    (self.timestep_in_us * time_scale_factor) /
                     (spikes_per_timestep * 2.0))
             spec.write_value(data=int(time_between_spikes))
         else:
@@ -631,12 +626,12 @@ class SpikeSourcePoissonVertex(
 
         # Write the number of seconds per timestep (unsigned long fract)
         spec.write_value(
-            data=float(machine_time_step) / MICROSECONDS_PER_SECOND,
+            data=float(self.timestep_in_us) / MICROSECONDS_PER_SECOND,
             data_type=DataType.U032)
 
         # Write the number of timesteps per second (integer)
         spec.write_value(
-            data=int(MICROSECONDS_PER_SECOND / float(machine_time_step)))
+            data=int(MICROSECONDS_PER_SECOND / float(self.timestep_in_us)))
 
         # Write the slow-rate-per-tick-cutoff (accum)
         spec.write_value(
@@ -819,7 +814,6 @@ class SpikeSourcePoissonVertex(
             spec=spec, graph=graph, placement=placement,
             routing_info=routing_info,
             vertex_slice=vertex_slice,
-            machine_time_step=self.timestep_in_us,
             time_scale_factor=time_scale_factor)
 
         # write rates
@@ -899,7 +893,7 @@ class SpikeSourcePoissonVertex(
             self.__data["rates"].set_value_by_id(
                 i,
                 spikes_per_tick *
-                (MICROSECONDS_PER_SECOND / float(self.__machine_time_step)))
+                (MICROSECONDS_PER_SECOND / float(self.timestep_in_us)))
 
             # Store the updated time until next spike so that it can be
             # rewritten when the parameters are loaded
@@ -951,7 +945,7 @@ class SpikeSourcePoissonVertex(
         # write parameters
         self._write_poisson_parameters(
             spec, graph, placement, routing_info, vertex_slice,
-            self.timestep_in_us, time_scale_factor)
+            time_scale_factor)
 
         # write rates
         self._write_poisson_rates(spec, vertex_slice, run_from_time_in_us)
@@ -1016,8 +1010,3 @@ class SpikeSourcePoissonVertex(
             "parameters": parameters,
         }
         return context
-
-    @property
-    @overrides(AbstractVertex.timestep_in_us)
-    def timestep_in_us(self):
-        return self.__machine_time_step

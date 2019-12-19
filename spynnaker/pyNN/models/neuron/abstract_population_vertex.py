@@ -20,7 +20,6 @@ from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
 from pacman.executor.injection_decorator import inject_items
-from pacman.model.graphs import AbstractVertex
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
@@ -28,7 +27,7 @@ from spinn_front_end_common.abstract_models import (
     AbstractChangableAfterRun, AbstractProvidesIncomingPartitionConstraints,
     AbstractProvidesOutgoingPartitionConstraints, AbstractHasAssociatedBinary,
     AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification,
-    AbstractCanReset)
+    AbstractCanReset, ApplicationTimestepVertex)
 from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl)
 from spinn_front_end_common.utilities import (
@@ -71,7 +70,7 @@ _MAX_OFFSET_DENOMINATOR = 10
 
 
 class AbstractPopulationVertex(
-        ApplicationVertex, AbstractGeneratesDataSpecification,
+        ApplicationTimestepVertex, AbstractGeneratesDataSpecification,
         AbstractHasAssociatedBinary, AbstractContainsUnits,
         AbstractSpikeRecordable,  AbstractNeuronRecordable,
         AbstractProvidesOutgoingPartitionConstraints,
@@ -102,8 +101,7 @@ class AbstractPopulationVertex(
         "__n_data_specs",
         "__initial_state_variables",
         "__has_reset_last",
-        "__updated_state_variables",
-        "_timestep_in_us"]
+        "__updated_state_variables"]
 
     BASIC_MALLOC_USAGE = 2
 
@@ -128,12 +126,12 @@ class AbstractPopulationVertex(
         """
 
         :param timestep_in_us: timestep used by this vertex or None to use the\
-            machine timestep
+            user defined timestep
         :type timestep_in_us: None or int
         """
         # pylint: disable=too-many-arguments, too-many-locals
         super(AbstractPopulationVertex, self).__init__(
-            label, constraints, max_atoms_per_core)
+            label, constraints, max_atoms_per_core, timestep_in_us)
 
         self.__n_atoms = n_neurons
         self.__n_subvertices = 0
@@ -177,12 +175,6 @@ class AbstractPopulationVertex(
         # Set up for profiling
         self.__n_profile_samples = helpful_functions.read_config_int(
             config, "Reports", "n_profile_samples")
-
-        if timestep_in_us is None:
-            self._timestep_in_us = \
-                globals_variables.get_simulator().user_time_step_in_us
-        else:
-            self._timestep_in_us = timestep_in_us
 
     @property
     @overrides(ApplicationVertex.n_atoms)
@@ -895,8 +887,3 @@ class AbstractPopulationVertex(
         if self.__synapse_manager.changes_during_run:
             self.__change_requires_data_generation = True
             self.__change_requires_neuron_parameters_reload = False
-
-    @property
-    @overrides(AbstractVertex.timestep_in_us)
-    def timestep_in_us(self):
-        return self._timestep_in_us
