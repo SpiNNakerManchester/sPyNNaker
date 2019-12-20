@@ -16,7 +16,7 @@
 from enum import Enum
 from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
-from pacman.model.graphs.machine import MachineVertex
+from pacman.model.graphs.machine import MachineTimestepVertex, MachineVertex
 from spinn_front_end_common.abstract_models import (
     AbstractSupportsDatabaseInjection, AbstractRecordable)
 from spinn_front_end_common.interface.provenance import (
@@ -34,7 +34,7 @@ from spynnaker.pyNN.utilities.constants import (
 
 
 class SpikeSourcePoissonMachineVertex(
-        MachineVertex, AbstractReceiveBuffersToHost,
+        MachineTimestepVertex, AbstractReceiveBuffersToHost,
         ProvidesProvenanceDataFromMachineImpl, AbstractRecordable,
         AbstractSupportsDatabaseInjection, AbstractHasProfileData):
     __slots__ = [

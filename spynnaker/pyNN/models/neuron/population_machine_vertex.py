@@ -15,7 +15,7 @@
 
 from enum import Enum
 from spinn_utilities.overrides import overrides
-from pacman.model.graphs.machine import MachineVertex
+from pacman.model.graphs.machine import MachineTimestepVertex, MachineVertex
 from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 from spinn_front_end_common.interface.provenance import (
     ProvidesProvenanceDataFromMachineImpl)
@@ -31,7 +31,7 @@ from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
 
 
 class PopulationMachineVertex(
-        MachineVertex, AbstractReceiveBuffersToHost,
+        MachineTimestepVertex, AbstractReceiveBuffersToHost,
         ProvidesProvenanceDataFromMachineImpl, AbstractRecordable,
         AbstractHasProfileData):
     __slots__ = [
