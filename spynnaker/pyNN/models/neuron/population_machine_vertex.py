@@ -68,7 +68,8 @@ class PopulationMachineVertex(
         :param constraints:
         :type sampling: bool
         """
-        MachineVertex.__init__(self, timestep_in_us, label, constraints)
+        MachineTimestepVertex.__init__(
+            self, timestep_in_us, label, constraints)
         AbstractRecordable.__init__(self)
         self.__recorded_region_ids = recorded_region_ids
         self.__resources = resources_required
