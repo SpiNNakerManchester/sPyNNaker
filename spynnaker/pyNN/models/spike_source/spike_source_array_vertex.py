@@ -45,7 +45,7 @@ class SpikeSourceArrayVertex(
         ReverseIpTagMultiCastSource, AbstractSpikeRecordable,
         SimplePopulationSettable, AbstractChangableAfterRun,
         ProvidesKeyToAtomMappingImpl):
-    """ Model for play back of spikes
+    """ Model for play back of spikess
     """
 
     SPIKE_RECORDING_REGION_ID = 0
@@ -57,15 +57,17 @@ class SpikeSourceArrayVertex(
         self.__model_name = "SpikeSourceArray"
         self.__model = model
 
+        if timestep_in_us is None:
+            timestep_in_us = \
+                globals_variables.get_simulator().user_time_step_in_us
         if spike_times is None:
             spike_times = []
         self._spike_times = spike_times
-        time_step = self.get_spikes_sampling_interval()
 
         super(SpikeSourceArrayVertex, self).__init__(
             n_keys=n_neurons, label=label, constraints=constraints,
             max_atoms_per_core=max_atoms_per_core,
-            send_buffer_times=_send_buffer_times(spike_times, time_step),
+            send_buffer_times=_send_buffer_times(spike_times, timestep_in_us),
             send_buffer_partition_id=constants.SPIKE_PARTITION_ID,
             timestep_in_us=timestep_in_us)
 
@@ -96,8 +98,8 @@ class SpikeSourceArrayVertex(
             actual change
 
         """
-        time_step = self.get_spikes_sampling_interval()
-        self.send_buffer_times = _send_buffer_times(spike_times, time_step)
+        self.send_buffer_times = _send_buffer_times(
+            spike_times, self.timestep_in_us)
         self._spike_times = spike_times
 
     @overrides(AbstractSpikeRecordable.is_recording_spikes)
@@ -119,7 +121,7 @@ class SpikeSourceArrayVertex(
 
     @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
     def get_spikes_sampling_interval(self):
-        return globals_variables.get_simulator().user_time_step_in_us
+        return self.timestep_in_us
 
     @overrides(AbstractSpikeRecordable.get_spikes)
     def get_spikes(
