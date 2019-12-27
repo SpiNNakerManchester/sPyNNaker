@@ -59,7 +59,7 @@ class SpikeSourceArrayVertex(
 
         if timestep_in_us is None:
             timestep_in_us = \
-                globals_variables.get_simulator().user_time_step_in_us
+                globals_variables.get_simulator().user_timestep_in_us
         if spike_times is None:
             spike_times = []
         self._spike_times = spike_times

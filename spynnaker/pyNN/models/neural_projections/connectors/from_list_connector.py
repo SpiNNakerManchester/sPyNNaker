@@ -314,7 +314,7 @@ class FromListConnector(AbstractConnector):
         try:
             delay_column = column_names.index('delay') + _FIRST_PARAM
             machine_time_step = globals_variables.get_simulator(
-                ).user_time_step_in_us
+                ).user_timestep_in_us
             self.__delays = numpy.rint(
                 numpy.array(self.__conn_list[:, delay_column]) * (
                     1000.0 / machine_time_step)) * (machine_time_step / 1000.0)

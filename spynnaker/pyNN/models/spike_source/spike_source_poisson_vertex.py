@@ -778,7 +778,7 @@ class SpikeSourcePoissonVertex(
 
     @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
     def get_spikes_sampling_interval(self):
-        return globals_variables.get_simulator().user_time_step_in_us
+        return globals_variables.get_simulator().user_timestep_in_us
 
     @staticmethod
     def get_dtcm_usage_for_atoms():

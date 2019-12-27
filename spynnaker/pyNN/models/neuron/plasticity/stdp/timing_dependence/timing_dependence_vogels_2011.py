@@ -46,7 +46,7 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
 
         self.__synapse_structure = SynapseStructureWeightOnly()
 
-        ts = get_simulator().user_time_step_in_us / 1000.0
+        ts = get_simulator().user_timestep_in_us / 1000.0
         self.__tau_data = get_exp_lut_array(ts, self.__tau)
 
     @property
