@@ -161,5 +161,5 @@ class MockSimulator(object):
         return True
 
     @property
-    def user_time_step_in_us(self):
+    def user_timestep_in_us(self):
         return 1000
