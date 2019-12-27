@@ -159,28 +159,30 @@ class AbstractSpiNNakerCommon(with_metaclass(
                     self.user_timestep_in_us)
 
     def _set_up_timings(
-            self, timestep, min_delay, max_delay, config, time_scale_factor):
+            self, timestep_in_ms, min_delay, max_delay, config, time_scale_factor):
         # pylint: disable=too-many-arguments
 
         # Get the standard values
-        if timestep is None:
-            self.set_up_timings(timestep, time_scale_factor)
+        if timestep_in_ms is None:
+            self.set_up_timings(timestep_in_ms, time_scale_factor)
         else:
             self.set_up_timings(
-                math.ceil(timestep * 1000.0), time_scale_factor)
+                math.ceil(timestep_in_ms * 1000.0), time_scale_factor)
 
-        machine_time_step = self.user_timestep_in_us
+        # Read the value back as it may come from config is none
+        user_timestep_in_us = self.user_timestep_in_us
+
         # Sort out the minimum delay
         if (min_delay is not None and
-                min_delay * 1000.0 < machine_time_step):
+                min_delay * 1000.0 < user_timestep_in_us):
             raise ConfigurationException(
                 "Pacman does not support min delays below {} ms with the "
                 "current machine time step".format(
-                    constants.MIN_SUPPORTED_DELAY * machine_time_step))
+                    constants.MIN_SUPPORTED_DELAY * user_timestep_in_us))
         if min_delay is not None:
             self.__min_delay = min_delay
         else:
-            self.__min_delay = machine_time_step / 1000.0
+            self.__min_delay = user_timestep_in_us / 1000.0
 
         # Sort out the maximum delay
         natively_supported_delay_for_models = \
@@ -192,22 +194,22 @@ class AbstractSpiNNakerCommon(with_metaclass(
             natively_supported_delay_for_models + \
             delay_extension_max_supported_delay
         if (max_delay is not None and max_delay * 1000.0 >
-                max_delay_tics_supported * machine_time_step):
+                max_delay_tics_supported * user_timestep_in_us):
             raise ConfigurationException(
                 "Pacman does not support max delays above {} ms with the "
                 "current machine time step".format(
-                    0.144 * machine_time_step))
+                    0.144 * user_timestep_in_us))
         if max_delay is not None:
             self.__max_delay = max_delay
         else:
             self.__max_delay = (
-                max_delay_tics_supported * (machine_time_step / 1000.0))
+                max_delay_tics_supported * (user_timestep_in_us / 1000.0))
 
         # Sort out the time scale factor if not user specified
         # (including config)
         if self.time_scale_factor is None:
             self.time_scale_factor = max(
-                1.0, math.ceil(1000.0 / machine_time_step))
+                1.0, math.ceil(1000.0 / user_timestep_in_us))
             if self.time_scale_factor > 1:
                 logger.warning(
                     "A timestep was entered that has forced sPyNNaker to "
@@ -217,7 +219,7 @@ class AbstractSpiNNakerCommon(with_metaclass(
                     self.time_scale_factor, self.CONFIG_FILE_NAME)
 
         # Check the combination of machine time step and time scale factor
-        if machine_time_step * self.time_scale_factor < 1000:
+        if user_timestep_in_us * self.time_scale_factor < 1000:
             if not config.getboolean(
                     "Mode", "violate_1ms_wall_clock_restriction"):
                 raise ConfigurationException(
