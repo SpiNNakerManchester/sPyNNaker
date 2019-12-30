@@ -122,7 +122,7 @@ class AbstractPopulationVertex(
     def __init__(
             self, n_neurons, label, constraints, max_atoms_per_core,
             spikes_per_second, ring_buffer_sigma, incoming_spike_buffer_size,
-            neuron_impl, pynn_model, timestep_in_us=None):
+            neuron_impl, pynn_model=None, timestep_in_us=None):
         """
 
         :param timestep_in_us: timestep used by this vertex or None to use the\
@@ -159,7 +159,8 @@ class AbstractPopulationVertex(
         # Set up for recording
         recordables = ["spikes"]
         recordables.extend(self.__neuron_impl.get_recordable_variables())
-        self.__neuron_recorder = NeuronRecorder(recordables, n_neurons)
+        self.__neuron_recorder = NeuronRecorder(
+            recordables, n_neurons, self.timestep_in_us)
 
         # Set up synapse handling
         self.__synapse_manager = SynapticManager(

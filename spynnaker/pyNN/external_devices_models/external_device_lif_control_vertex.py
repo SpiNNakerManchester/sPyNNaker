@@ -52,7 +52,7 @@ class ExternalDeviceLifControlVertex(
             self, devices, create_edges, max_atoms_per_core, neuron_impl,
             pynn_model, translator=None, spikes_per_second=None, label=None,
             ring_buffer_sigma=None, incoming_spike_buffer_size=None,
-            constraints=None):
+            constraints=None, timestep_in_us=None):
         """
         :param n_neurons: The number of neurons in the population
         :param devices:\
@@ -97,7 +97,7 @@ class ExternalDeviceLifControlVertex(
         super(ExternalDeviceLifControlVertex, self).__init__(
             len(devices), label, constraints, max_atoms_per_core,
             spikes_per_second, ring_buffer_sigma, incoming_spike_buffer_size,
-            neuron_impl, pynn_model)
+            neuron_impl, pynn_model, timestep_in_us)
 
     def routing_key_partition_atom_mapping(self, routing_info, partition):
         # pylint: disable=arguments-differ
