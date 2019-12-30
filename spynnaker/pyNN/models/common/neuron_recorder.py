@@ -26,7 +26,6 @@ from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.resources import VariableSDRAM
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, US_TO_MS)
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
@@ -51,7 +50,7 @@ class _ReadOnlyDict(dict):
 
 class NeuronRecorder(object):
     __slots__ = [
-        "__indexes", "__n_neurons", "__sampling_rates"]
+        "__indexes", "__n_neurons", "__sampling_rates", "__timestep_in_ms"]
 
     N_BYTES_FOR_TIMESTAMP = BYTES_PER_WORD
     N_BYTES_PER_VALUE = BYTES_PER_WORD
@@ -64,10 +63,11 @@ class NeuronRecorder(object):
 
     MAX_RATE = 2 ** 32 - 1  # To allow a unit32_t to be used to store the rate
 
-    def __init__(self, allowed_variables, n_neurons):
+    def __init__(self, allowed_variables, n_neurons, timestep_in_us):
         self.__sampling_rates = OrderedDict()
         self.__indexes = dict()
         self.__n_neurons = n_neurons
+        self.__timestep_in_ms = timestep_in_us / US_TO_MS
         for variable in allowed_variables:
             self.__sampling_rates[variable] = 0
             self.__indexes[variable] = None
@@ -98,8 +98,7 @@ class NeuronRecorder(object):
         :param variable: PyNN name of the variable
         :return: Sampling interval in micro seconds
         """
-        step = globals_variables.get_simulator().user_timestep_in_us / 1000
-        return self.__sampling_rates[variable] * step
+        return self.__sampling_rates[variable] * self.__timestep_in_ms
 
     def get_matrix_data(
             self, label, buffer_manager, region, placements, graph_mapper,
@@ -196,7 +195,6 @@ class NeuronRecorder(object):
 
         spike_times = list()
         spike_ids = list()
-        ms_per_tick = application_vertex.timestep_in_us / US_TO_MS
 
         vertices = graph_mapper.get_machine_vertices(application_vertex)
         missing_str = ""
@@ -233,7 +231,7 @@ class NeuronRecorder(object):
             else:
                 raw_data = record_raw
             if len(raw_data) > 0:
-                record_time = raw_data[:, 0] * float(ms_per_tick)
+                record_time = raw_data[:, 0] * float(self.__timestep_in_ms)
                 spikes = raw_data[:, 1:].byteswap().view("uint8")
                 bits = numpy.fliplr(numpy.unpackbits(spikes).reshape(
                     (-1, 32))).reshape((-1, n_bytes * 8))
@@ -315,15 +313,16 @@ class NeuronRecorder(object):
         if sampling_interval is None:
             return 1
 
-        step = globals_variables.get_simulator().user_timestep_in_us / 1000
-        rate = int(sampling_interval / step)
-        if sampling_interval != rate * step:
+        rate = int(sampling_interval / self.__timestep_in_ms)
+        if sampling_interval != rate * self.__timestep_in_ms:
             msg = "sampling_interval {} is not an an integer multiple of the "\
-                  "simulation timestep {}".format(sampling_interval, step)
+                  "simulation timestep {}".format(
+                sampling_interval, self.__timestep_in_ms)
             raise ConfigurationException(msg)
         if rate > self.MAX_RATE:
             msg = "sampling_interval {} higher than max allowed which is {}" \
-                  "".format(sampling_interval, step * self.MAX_RATE)
+                  "".format(sampling_interval,
+                            self.__timestep_in_ms * self.MAX_RATE)
             raise ConfigurationException(msg)
         return rate
 
