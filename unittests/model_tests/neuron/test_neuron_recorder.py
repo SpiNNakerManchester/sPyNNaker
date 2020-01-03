@@ -32,7 +32,7 @@ def test_simple_record():
     globals_variables.set_failed_state(SpynnakerFailedState())
     globals_variables.set_simulator(simulator)
 
-    nr = NeuronRecorder(["spikes", "v", "gsyn_exc", "gsyn_inh"], 100)
+    nr = NeuronRecorder(["spikes", "v", "gsyn_exc", "gsyn_inh"], 100, 1000)
     assert(frozenset(["spikes", "v", "gsyn_exc", "gsyn_inh"]) ==
            frozenset(nr.get_recordable_variables()))
     assert([] == nr.recording_variables)
@@ -51,7 +51,7 @@ def test_recording_variables():
     globals_variables.set_failed_state(SpynnakerFailedState())
     globals_variables.set_simulator(simulator)
 
-    nr = NeuronRecorder(["spikes", "v", "gsyn_exc", "gsyn_inh"], 100)
+    nr = NeuronRecorder(["spikes", "v", "gsyn_exc", "gsyn_inh"], 100, 1000)
     assert([] == nr.recording_variables)
     nr.set_recording("v", True)
     nr.set_recording("gsyn_inh", True)
