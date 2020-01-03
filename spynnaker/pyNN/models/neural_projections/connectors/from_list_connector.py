@@ -16,7 +16,6 @@
 import logging
 import numpy
 from spinn_utilities.overrides import overrides
-from spinn_front_end_common.utilities import globals_variables
 from .abstract_connector import AbstractConnector
 from spynnaker.pyNN.exceptions import InvalidParameterType
 
@@ -299,9 +298,7 @@ class FromListConnector(AbstractConnector):
         except ValueError:
             pass
 
-        # Find any delays
-        #self._calc_delays(
-        #    globals_variables.get_simulator().user_timestep_in_us)
+        # Finding any delays not done until timestep is set
 
         # Find extra columns
         extra_columns = list()

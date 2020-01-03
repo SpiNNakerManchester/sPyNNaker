@@ -31,6 +31,7 @@ class SpikeSourceArray(AbstractPyNNModel):
                additional_arguments="timestep_in_us")
     def create_vertex(
             self, n_neurons, label, constraints, timestep_in_us):
+        # pylint: disable=arguments-differ
         max_atoms = self.get_max_atoms_per_core()
         return SpikeSourceArrayVertex(
             n_neurons, self.__spike_times, constraints, label, max_atoms, self,

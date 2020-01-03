@@ -316,8 +316,8 @@ class NeuronRecorder(object):
         rate = int(sampling_interval / self.__timestep_in_ms)
         if sampling_interval != rate * self.__timestep_in_ms:
             msg = "sampling_interval {} is not an an integer multiple of the "\
-                  "simulation timestep {}".format(
-                sampling_interval, self.__timestep_in_ms)
+                  "simulation timestep {}" \
+                  "".format(sampling_interval, self.__timestep_in_ms)
             raise ConfigurationException(msg)
         if rate > self.MAX_RATE:
             msg = "sampling_interval {} higher than max allowed which is {}" \

@@ -159,7 +159,8 @@ class AbstractSpiNNakerCommon(with_metaclass(
                     self.user_timestep_in_us)
 
     def _set_up_timings(
-            self, timestep_in_ms, min_delay, max_delay, config, time_scale_factor):
+            self, timestep_in_ms, min_delay, max_delay, config,
+            time_scale_factor):
         # pylint: disable=too-many-arguments
 
         # Get the standard values
