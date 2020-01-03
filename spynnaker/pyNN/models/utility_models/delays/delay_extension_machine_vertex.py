@@ -22,7 +22,8 @@ from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 
 
 class DelayExtensionMachineVertex(
-        MachineVertex, ProvidesProvenanceDataFromMachineImpl):
+    MachineTimestepVertex, ProvidesProvenanceDataFromMachineImpl):
+
     __slots__ = [
         "__resources"]
 
@@ -43,9 +44,9 @@ class DelayExtensionMachineVertex(
     N_EXTRA_PROVENANCE_DATA_ENTRIES = len(EXTRA_PROVENANCE_DATA_ENTRIES)
 
     def __init__(
-            self, resources_required, label, constraints=None):
+            self, timestep_in_us, resources_required, label, constraints=None):
         super(DelayExtensionMachineVertex, self).__init__(
-            label, constraints=constraints)
+            timestep_in_us, label, constraints=constraints)
         self.__resources = resources_required
 
     @property
