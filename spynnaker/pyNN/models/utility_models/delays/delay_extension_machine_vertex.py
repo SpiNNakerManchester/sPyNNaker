@@ -23,7 +23,7 @@ from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 
 
 class DelayExtensionMachineVertex(
-    MachineTimestepVertex, ProvidesProvenanceDataFromMachineImpl):
+        MachineTimestepVertex, ProvidesProvenanceDataFromMachineImpl):
 
     __slots__ = [
         "__resources"]
