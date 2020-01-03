@@ -270,23 +270,6 @@ def validate_mars_kiss_64_seed(seed):
     return seed
 
 
-def check_sampling_interval(sampling_interval):
-    step = globals_variables.get_simulator().user_timestep_in_us / 1000
-    if sampling_interval is None:
-        return step
-    rate = int(sampling_interval / step)
-    if sampling_interval != rate * step:
-        msg = "sampling_interval {} is not an an integer " \
-              "multiple of the simulation timestep {}" \
-              "".format(sampling_interval, step)
-        raise ConfigurationException(msg)
-    if rate > MAX_RATE:
-        msg = "sampling_interval {} higher than max allowed which is {}" \
-              "".format(sampling_interval, step * MAX_RATE)
-        raise ConfigurationException(msg)
-    return sampling_interval
-
-
 def get_n_bits(n_values):
     """ Determine how many bits are required for the given number of values
     """
