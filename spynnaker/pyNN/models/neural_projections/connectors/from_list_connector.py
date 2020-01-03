@@ -285,17 +285,7 @@ class FromListConnector(AbstractConnector):
                 " additional elements in each tuple in the connection list,"
                 " not including the pre_idx or post_idx")
 
-        # Get the column names if not specified
-        column_names = self.__column_names
-        if self.__column_names is None:
-            if n_columns == 4:
-                column_names = ('weight', 'delay')
-            elif n_columns == 2:
-                column_names = ()
-            else:
-                raise TypeError(
-                    "Need to set 'column_names' for n_columns={}".format(
-                        n_columns))
+        column_names = self._calc_column_names()
 
         # Set the source and targets
         self.__sources = self.__conn_list[:, _SOURCE]
@@ -310,16 +300,8 @@ class FromListConnector(AbstractConnector):
             pass
 
         # Find any delays
-        self.__delays = None
-        try:
-            delay_column = column_names.index('delay') + _FIRST_PARAM
-            machine_time_step = globals_variables.get_simulator(
-                ).user_timestep_in_us
-            self.__delays = numpy.rint(
-                numpy.array(self.__conn_list[:, delay_column]) * (
-                    1000.0 / machine_time_step)) * (machine_time_step / 1000.0)
-        except ValueError:
-            pass
+        #self._calc_delays(
+        #    globals_variables.get_simulator().user_timestep_in_us)
 
         # Find extra columns
         extra_columns = list()
@@ -346,6 +328,34 @@ class FromListConnector(AbstractConnector):
             self.__extra_parameter_names = [
                 column_names[i - _FIRST_PARAM] for i in extra_columns]
 
+    def _calc_column_names(self):
+        # This tells us how many columns are in the list
+        n_columns = self.__conn_list.shape[1]
+
+        # Get the column names if not specified
+        column_names = self.__column_names
+        if self.__column_names is None:
+            if n_columns == 4:
+                column_names = ('weight', 'delay')
+            elif n_columns == 2:
+                column_names = ()
+            else:
+                raise TypeError(
+                    "Need to set 'column_names' for n_columns={}".format(
+                        n_columns))
+        return column_names
+
+    def _calc_delays(self, machine_time_step):
+        column_names = self._calc_column_names()
+        self.__delays = None
+        try:
+            delay_column = column_names.index('delay') + _FIRST_PARAM
+            self.__delays = numpy.rint(
+                numpy.array(self.__conn_list[:, delay_column]) * (
+                    1000.0 / machine_time_step)) * (machine_time_step / 1000.0)
+        except ValueError:
+            pass
+
     @property
     def column_names(self):
         return self.__column_names
@@ -365,3 +375,6 @@ class FromListConnector(AbstractConnector):
         """ Getter for the names of the extra parameters
         """
         return self.__extra_parameter_names
+
+    def set_timestep_in_us(self, timestep_in_us):
+        self._calc_delays(timestep_in_us)

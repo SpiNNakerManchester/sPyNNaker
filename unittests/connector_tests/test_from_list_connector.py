@@ -54,6 +54,7 @@ def test_connector(
         expected_extra_parameter_names):
     MockSimulator.setup()
     connector = FromListConnector(clist, column_names=column_names)
+    connector.set_timestep_in_us(1000)
     if expected_clist is not None:
         assert(numpy.array_equal(connector.conn_list, expected_clist))
     else:
@@ -116,6 +117,7 @@ def test_connector_split():
 
     connection_list = numpy.dstack((sources, targets))[0]
     connector = MockFromListConnector(connection_list)
+    connector.set_timestep_in_us(1000)
     weight = 1.0
     delay = 1.0
     mock_synapse_info = MockSynapseInfo(MockPopulation(n_sources, "Pre"),
