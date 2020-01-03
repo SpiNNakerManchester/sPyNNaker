@@ -16,6 +16,7 @@
 from enum import Enum
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.machine import MachineVertex
+from pacman.model.graphs.machine import MachineTimestepVertex
 from spinn_front_end_common.interface.provenance import (
     ProvidesProvenanceDataFromMachineImpl)
 from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
