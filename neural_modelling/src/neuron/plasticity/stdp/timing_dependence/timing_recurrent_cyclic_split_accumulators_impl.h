@@ -162,7 +162,7 @@ static inline update_state_t timing_apply_pre_spike(
         uint32_t syn_type,
 		neuron_pointer_t post_synaptic_neuron,
 		additional_input_pointer_t post_synaptic_additional_input,
-        threshold_type_pointer_t post_synaptic_threshold){
+        threshold_type_pointer_t post_synaptic_threshold, input_t post_synaptic_mem_V){
 
     use(&trace);
     use(&last_pre_time);
@@ -175,6 +175,7 @@ static inline update_state_t timing_apply_pre_spike(
 
 
        uint32_t random;
+       accum voltage_difference = post_synaptic_threshold->threshold_value - post_synaptic_mem_V;
 
        if (!random_enabled) {
     	   random = (STDP_FIXED_POINT_ONE>>3)-1; //5;
@@ -203,6 +204,7 @@ static inline update_state_t timing_apply_pre_spike(
            window_length = post_exp_dist_lookup_inhib2[random];
 
        uint32_t this_window_close_time = last_post_time + window_length;
+
 
        // Check if this post-spike extends the open window:
        if (previous_state.longest_post_pre_window_closing_time < this_window_close_time) {
@@ -263,18 +265,28 @@ static inline update_state_t timing_apply_pre_spike(
         			io_printf(IO_BUF, "        Accumulator limit reached: Depressing\n");
         		}
         		if (previous_state.lock == 0){
+                        	// SD New. don't depress if we're in the right firing zone:
+                        	// How far was the neuron from threshold just before the teaching signal arrived?
+                        	if (voltage_difference < v_diff_pot_threshold) {
+                                        // Weight is to be used, but we don't want or need a full weight decrement.
+                                        // Lock so this weight does not get used again until it decays:
+                                        previous_state.weight_state.weight = previous_state.weight_state.weight * 0.95k;
+                                        previous_state.lock = 1;
+        			        previous_state.dep_accumulator = 0;
+                                }
+                                else {
+        			    // Otherwise, reset accumulator and apply depression
+        			    // Note: at present this is not gated on membrane potential
+        			    previous_state.dep_accumulator = 0;
 
-        			// Otherwise, reset accumulator and apply depression
-        			// Note: at present this is not gated on membrane potential
-        			previous_state.dep_accumulator = 0;
-
-        			// Depress synapse using A2_minus rate
-        			previous_state.weight_state = weight_one_term_apply_depression_sd(
-        					previous_state.weight_state, syn_type, STDP_FIXED_POINT_ONE);
+        			    // Depress synapse using A2_minus rate
+        		            previous_state.weight_state = weight_one_term_apply_depression_sd(
+        		    	    previous_state.weight_state, syn_type, STDP_FIXED_POINT_ONE);
 
 
-        			// Lock synapse in depressed state
-        			previous_state.lock = 1;
+        			    // Lock synapse in depressed state
+           			    previous_state.lock = 1;
+                                }
 
         		} else {
         			if (print_plasticity){
@@ -346,7 +358,7 @@ static inline update_state_t timing_apply_post_spike(
       previous_state.pre_waiting_post = false;
 
       // Now check if this post spike occurred in the open window created by the previous pre-spike:
-      if (time_since_last_pre < last_pre_trace) {
+      if (time_since_last_pre <= last_pre_trace) {
          if (previous_state.pot_accumulator <
              recurrent_plasticity_params.accum_pot_minus_one[syn_type]<<ACCUM_SCALING){
              // If accumulator's not going to hit potentiation limit, increment it:
@@ -405,7 +417,9 @@ static inline update_state_t timing_apply_post_spike(
                     	if (print_plasticity){
                     		io_printf(IO_BUF, "Voltage  diff: %k, so lock at current weight\n", voltage_difference);
                     	}
-                    	previous_state.weight_state.weight = previous_state.weight_state.weight * 1.05k;
+                    	//previous_state.weight_state.weight = previous_state.weight_state.weight * 1.05k;
+                        // SD 22/8/2019. Let's depress these locked synapses slightly, to prevent creeping potentiation:
+                    	previous_state.weight_state.weight = previous_state.weight_state.weight * 0.95k;
                         previous_state.lock = 1;
                     }
 
@@ -515,20 +529,20 @@ static inline weight_state_t weight_one_term_apply_depression_sd(
 
    uint16_t shift_to_print = 15 - state.weight_multiply_right_shift - global_weight_scale;
 
-   io_printf(IO_BUF, "    Fixed Initial weight: %k, min_weight: %k\n",
-		   state.weight << shift_to_print, state.weight_region->min_weight << shift_to_print);
+   //io_printf(IO_BUF, "    Fixed Initial weight: %k, min_weight: %k\n",
+   //		   state.weight << shift_to_print, state.weight_region->min_weight << shift_to_print);
 
-   io_printf(IO_BUF, "    Int   Initial weight: %u, min_weight: %u\n",
-		   state.weight, state.weight_region->min_weight);
+   //io_printf(IO_BUF, "    Int   Initial weight: %u, min_weight: %u\n",
+   //		   state.weight, state.weight_region->min_weight);
 
    int32_t scale = maths_fixed_mul16(
                    state.weight - state.weight_region->min_weight,
                    state.weight_region->a2_minus, (state.weight_multiply_right_shift + global_weight_scale));
 
-   io_printf(IO_BUF, "        A-: %u", state.weight_region->a2_minus);
-   io_printf(IO_BUF, "        shift: %u \n", state.weight_multiply_right_shift);
+   //io_printf(IO_BUF, "        A-: %u", state.weight_region->a2_minus);
+   //io_printf(IO_BUF, "        shift: %u \n", state.weight_multiply_right_shift);
 
-   io_printf(IO_BUF, "        scale: %u, depression: %k \n", scale , depression << 4);
+   //io_printf(IO_BUF, "        scale: %u, depression: %k \n", scale , depression << 4);
 
    state.weight -= (scale);
 

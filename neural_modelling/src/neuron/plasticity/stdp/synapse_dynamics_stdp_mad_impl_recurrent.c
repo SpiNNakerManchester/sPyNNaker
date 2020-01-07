@@ -98,8 +98,8 @@ static inline final_state_t _plasticity_update_synapse(
 
     // Get the post-synaptic window of events to be processed
     const uint32_t window_begin_time = (delayed_last_pre_time >=
-        delay_dendritic) ? (delayed_last_pre_time ) : 0;
-    const uint32_t window_end_time = time + delay_axonal ;
+        delay_dendritic) ? (delayed_last_pre_time - delay_dendritic ) : 0;
+    const uint32_t window_end_time = time + delay_axonal - delay_dendritic ;
     post_event_window_t post_window = post_events_get_window_delayed(
             post_event_history, window_begin_time, window_end_time);
 
@@ -149,7 +149,7 @@ static inline final_state_t _plasticity_update_synapse(
         delayed_pre_time, new_pre_trace, delayed_last_pre_time, last_pre_trace,
         post_window.prev_time, post_window.prev_trace, current_state, syn_type,
 		post_synaptic_neuron, post_synaptic_additional_input,
-		post_synaptic_threshold);
+		post_synaptic_threshold, *post_window.next_post_synaptic_v); // SD 25/10/19: use membrane pot for depression, too.
 
 //    io_printf(IO_BUF, "Weight is: %u\n", current_state.weight_state.weight);
 
@@ -349,6 +349,7 @@ bool synapse_dynamics_process_plastic_synapses(
 //        io_printf(IO_BUF, "Initial weight is: %u\n", current_state.weight_state.weight);
 
         uint32_t full_delay = delay_dendritic;
+        delay_dendritic = 20; // SD 2.0 ms back propo time at 0.1 ms time step
 
         // Update the synapse state
         final_state_t final_state = _plasticity_update_synapse(
