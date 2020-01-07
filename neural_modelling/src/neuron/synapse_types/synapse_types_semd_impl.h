@@ -59,6 +59,7 @@ typedef struct synapse_param_t {
 	exp_params_t exc2;
 	exp_params_t inh;
 	input_t multiplicator;
+	input_t exc_old;
 	input_t exc2_old;
 } synapse_param_t;
 
@@ -131,13 +132,14 @@ static inline input_t* synapse_types_get_excitatory_input(
         synapse_param_pointer_t parameter) {
 
 	if (parameter->exc2.synaptic_input_value >= 0.001 && parameter->multiplicator == 0
-			&& parameter->exc2_old == 0) {
+			&& parameter->exc2_old == 0 && parameter->exc_old > parameter->exc.synaptic_input_value) {   //added exc_old > parameter->exc.synaptic_input_value
 		parameter->multiplicator = parameter->exc.synaptic_input_value;
 	} else if (parameter->exc2.synaptic_input_value < 0.001) {
 		parameter->multiplicator = 0;
 	}
 
 	parameter->exc2_old = parameter->exc2.synaptic_input_value;
+	parameter->exc_old = parameter->exc.synaptic_input_value; // added this expression
 
     excitatory_response[0] = 0; // I think?
     excitatory_response[1] =
@@ -205,6 +207,7 @@ static inline void synapse_types_print_parameters(
             parameter->inh.synaptic_input_value);
     log_info("multiplicator = %11.4k\n", parameter->multiplicator);
     log_info("exc2_old      = %11.4k\n", parameter->exc2_old);
+    log_info("exc_old      = %11.4k\n", parameter->exc_old); //added exc_old
 }
 
 #endif  // _SYNAPSE_TYPES_SEMD_IMPL_H_
