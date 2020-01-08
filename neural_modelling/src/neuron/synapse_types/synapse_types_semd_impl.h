@@ -131,8 +131,10 @@ static inline void synapse_types_add_neuron_input(
 static inline input_t* synapse_types_get_excitatory_input(
         synapse_param_pointer_t parameter) {
 
+	// added exc_old > parameter->exc.synaptic_input_value
 	if (parameter->exc2.synaptic_input_value >= 0.001 && parameter->multiplicator == 0
-			&& parameter->exc2_old == 0 && parameter->exc_old > parameter->exc.synaptic_input_value) {   //added exc_old > parameter->exc.synaptic_input_value
+			&& parameter->exc2_old == 0
+			&& parameter->exc_old > parameter->exc.synaptic_input_value) {
 		parameter->multiplicator = parameter->exc.synaptic_input_value;
 	} else if (parameter->exc2.synaptic_input_value < 0.001) {
 		parameter->multiplicator = 0;
