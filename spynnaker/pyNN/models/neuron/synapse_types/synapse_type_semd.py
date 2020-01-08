@@ -135,7 +135,8 @@ class SynapseTypeSEMD(AbstractSynapseType):
 
         # Read the data
         (_decay_E, _init_E, isyn_exc, _decay_E2, _init_E2, isyn_exc2,
-         _decay_I, _init_I, isyn_inh, _multiplicator, exc_old, exc2_old) = values
+         _decay_I, _init_I, isyn_inh, _multiplicator, exc_old,
+         exc2_old) = values
 
         state_variables[ISYN_EXC] = isyn_exc
         state_variables[ISYN_EXC2] = isyn_exc2
