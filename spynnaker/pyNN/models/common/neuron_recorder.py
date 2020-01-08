@@ -102,7 +102,7 @@ class NeuronRecorder(object):
 
     def get_matrix_data(
             self, label, buffer_manager, region, placements, graph_mapper,
-            application_vertex, variable, n_machine_time_steps):
+            machine_vertices, variable, n_machine_time_steps):
         """ Read a uint32 mapped to time and neuron IDs from the SpiNNaker\
             machine.
 
@@ -112,7 +112,7 @@ class NeuronRecorder(object):
         :param placements: the placements object
         :param graph_mapper: \
             the mapping between application and machine vertices
-        :param application_vertex:
+        :param machine_vertices:
         :param variable: PyNN name for the variable (V, gsy_inh etc.)
         :type variable: str
         :param n_machine_time_steps:
@@ -121,16 +121,15 @@ class NeuronRecorder(object):
         if variable == SPIKES:
             msg = "Variable {} is not supported use get_spikes".format(SPIKES)
             raise ConfigurationException(msg)
-        vertices = graph_mapper.get_machine_vertices(application_vertex)
         progress = ProgressBar(
-            vertices, "Getting {} for {}".format(variable, label))
+            machine_vertices, "Getting {} for {}".format(variable, label))
         sampling_rate = self.__sampling_rates[variable]
         expected_rows = int(math.ceil(
             n_machine_time_steps / sampling_rate))
         missing_str = ""
         data = None
         indexes = []
-        for vertex in progress.over(vertices):
+        for vertex in progress.over(machine_vertices):
             placement = placements.get_placement_of_vertex(vertex)
             vertex_slice = graph_mapper.get_slice(vertex)
             neurons = self._neurons_recording(variable, vertex_slice)
@@ -191,16 +190,15 @@ class NeuronRecorder(object):
 
     def get_spikes(
             self, label, buffer_manager, region, placements, graph_mapper,
-            application_vertex):
+            machine_vertices):
 
         spike_times = list()
         spike_ids = list()
 
-        vertices = graph_mapper.get_machine_vertices(application_vertex)
         missing_str = ""
-        progress = ProgressBar(vertices,
+        progress = ProgressBar(machine_vertices,
                                "Getting spikes for {}".format(label))
-        for vertex in progress.over(vertices):
+        for vertex in progress.over(machine_vertices):
             placement = placements.get_placement_of_vertex(vertex)
             vertex_slice = graph_mapper.get_slice(vertex)
 

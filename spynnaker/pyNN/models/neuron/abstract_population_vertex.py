@@ -564,9 +564,10 @@ class AbstractPopulationVertex(
     @overrides(AbstractSpikeRecordable.get_spikes)
     def get_spikes(
             self, placements, graph_mapper, buffer_manager):
+        machine_vertices = graph_mapper.get_machine_vertices(self)
         return self.__neuron_recorder.get_spikes(
             self.label, buffer_manager, self.SPIKE_RECORDING_REGION,
-            placements, graph_mapper, self)
+            placements, graph_mapper, machine_vertices)
 
     @overrides(AbstractNeuronRecordable.get_recordable_variables)
     def get_recordable_variables(self):
@@ -593,9 +594,10 @@ class AbstractPopulationVertex(
                 variable)
         n_machine_time_steps = self.simtime_in_us_to_timesteps(
             current_time_in_us)
+        machine_vertices = graph_mapper.get_machine_vertices(self)
         return self.__neuron_recorder.get_matrix_data(
             self.label, buffer_manager, index, placements, graph_mapper,
-            self, variable, n_machine_time_steps)
+            machine_vertices, variable, n_machine_time_steps)
 
     @overrides(AbstractNeuronRecordable.get_neuron_sampling_interval)
     def get_neuron_sampling_interval(self, variable):
