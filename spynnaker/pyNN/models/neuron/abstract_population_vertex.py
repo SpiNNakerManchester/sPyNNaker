@@ -160,7 +160,7 @@ class AbstractPopulationVertex(
         recordables = ["spikes"]
         recordables.extend(self.__neuron_impl.get_recordable_variables())
         self.__neuron_recorder = NeuronRecorder(
-            recordables, n_neurons, self.timestep_in_us)
+            recordables, 0, n_neurons, self.timestep_in_us)
 
         # Set up synapse handling
         self.__synapse_manager = SynapticManager(

@@ -69,6 +69,7 @@ _C_MAIN_BASE_N_CPU_CYCLES = 0
 # The microseconds per timestep will be divided by this to get the max offset
 _MAX_OFFSET_DENOMINATOR = 10
 
+NEURONS_PER_CORE = 3
 
 class AbstractPopulationVertex2(
         ApplicationTimestepVertex, AbstractGeneratesDataSpecification,
@@ -119,8 +120,6 @@ class AbstractPopulationVertex2(
     # The Buffer traffic type
     TRAFFIC_IDENTIFIER = "BufferTraffic"
 
-    _n_vertices = 0
-
     def __init__(
             self, n_neurons, label, constraints, max_atoms_per_core,
             spikes_per_second, ring_buffer_sigma, incoming_spike_buffer_size,
@@ -163,9 +162,13 @@ class AbstractPopulationVertex2(
         recordables.extend(self.__neuron_impl.get_recordable_variables())
         self.__neuron_recorders = list()
         self.__neuron_recorders.append(NeuronRecorder(
-            recordables, n_neurons, self.timestep_in_us))
+            recordables, 0, NEURONS_PER_CORE, self.timestep_in_us))
         self.__neuron_recorders.append(NeuronRecorder(
-            recordables, n_neurons, self.timestep_in_us))
+            recordables, NEURONS_PER_CORE, NEURONS_PER_CORE*2,
+            self.timestep_in_us))
+        self.__neuron_recorders.append(NeuronRecorder(
+            recordables, NEURONS_PER_CORE*2, NEURONS_PER_CORE*3,
+            self.timestep_in_us))
 
         # Set up synapse handling
         self.__synapse_manager = SynapticManager(
@@ -193,7 +196,7 @@ class AbstractPopulationVertex2(
         raise NotImplementedError
 
     def _nr_by_slice(self, vertex_slice):
-        return self.__neuron_recorders[vertex_slice.lo_atom]
+        return self.__neuron_recorders[vertex_slice.lo_atom // NEURONS_PER_CORE]
 
     @inject_items({
         "graph": "MemoryApplicationGraph",
@@ -257,7 +260,7 @@ class AbstractPopulationVertex2(
         return values
 
     def get_max_atoms_per_core(self):
-        return 1
+        return NEURONS_PER_CORE
 
     @overrides(ApplicationVertex.create_machine_vertex)
     def create_machine_vertex(
@@ -585,12 +588,10 @@ class AbstractPopulationVertex2(
         for vertex in self.__machine_vertexes:
             vertex_slice = graph_mapper.get_slice(vertex)
             neuron_recorder = self._nr_by_slice(vertex_slice)
-            spikes = neuron_recorder.get_spikes(
+            allspikes.append(neuron_recorder.get_spikes(
                 self.label, buffer_manager, self.SPIKE_RECORDING_REGION,
-                placements, graph_mapper, [vertex])
-            print(vertex)
-            print(spikes)
-        return spikes
+                placements, graph_mapper, [vertex]))
+        return NeuronRecorder.combine_spikes(allspikes)
 
     @overrides(AbstractNeuronRecordable.get_recordable_variables)
     def get_recordable_variables(self):
@@ -627,10 +628,11 @@ class AbstractPopulationVertex2(
         for vertex in self.__machine_vertexes:
             vertex_slice = graph_mapper.get_slice(vertex)
             neuron_recorder = self._nr_by_slice(vertex_slice)
-            data = self.__neuron_recorders[0].get_matrix_data(
+            data, indexes, sampling_interval = self.__neuron_recorders[0].get_matrix_data(
                 self.label, buffer_manager, index, placements, graph_mapper,
-                vertex, variable, n_machine_time_steps)
-        return vertex
+                [vertex], variable, n_machine_time_steps)
+            print(data.shape)
+        return data, indexes, sampling_interval
 
     @overrides(AbstractNeuronRecordable.get_neuron_sampling_interval)
     def get_neuron_sampling_interval(self, variable):

@@ -50,7 +50,7 @@ class _ReadOnlyDict(dict):
 
 class NeuronRecorder(object):
     __slots__ = [
-        "__indexes", "__n_neurons", "__sampling_rates", "__timestep_in_ms"]
+        "__indexes", "__min_id", "__max_id", "__sampling_rates", "__timestep_in_ms"]
 
     N_BYTES_FOR_TIMESTAMP = BYTES_PER_WORD
     N_BYTES_PER_VALUE = BYTES_PER_WORD
@@ -63,10 +63,23 @@ class NeuronRecorder(object):
 
     MAX_RATE = 2 ** 32 - 1  # To allow a unit32_t to be used to store the rate
 
-    def __init__(self, allowed_variables, n_neurons, timestep_in_us):
+    def __init__(self, allowed_variables, min_id, max_id, timestep_in_us):
+        """
+
+        :param allowed_variables: Names of allowed variables including spikes
+        :type allowed_variables: iterable(Sting)
+        :param min_id: The lowest neuron id. Typically 0
+        :type min_id: int
+        :param max_id: The number below which all neuron ids fall.\
+            Ie the exclusive end of the id range. Typically n_neurons
+        :type max_id: int
+        :param timestep_in_us: timestep used by the vertices that use this
+        :type timestep_in_us: int
+        """
         self.__sampling_rates = OrderedDict()
         self.__indexes = dict()
-        self.__n_neurons = n_neurons
+        self.__min_id = min_id
+        self.__max_id = max_id
         self.__timestep_in_ms = timestep_in_us / US_TO_MS
         for variable in allowed_variables:
             self.__sampling_rates[variable] = 0
@@ -258,6 +271,11 @@ class NeuronRecorder(object):
         result = numpy.column_stack((spike_ids, spike_times))
         return result[numpy.lexsort((spike_times, spike_ids))]
 
+    @staticmethod
+    def combine_spikes(spikes_list):
+        result = numpy.concatenate(spikes_list)
+        return result[numpy.lexsort((result[:,1], result[:,0]))]
+
     def get_recordable_variables(self):
         return self.__sampling_rates.keys()
 
@@ -337,12 +355,13 @@ class NeuronRecorder(object):
             if index < 0:
                 raise ConfigurationException(
                     "Negative indexes are not supported")
-            elif index >= self.__n_neurons:
-                warning = "Ignoring indexes greater than population size."
+            elif index >= self.__min_id__max_id:
+                warning = "Ignoring indexes outside of the range {} {}".format(
+                    self.__min_id, self.__max_id)
             else:
                 found = True
-            if warning is not None:
-                logger.warning(warning)
+        if warning is not None:
+            logger.warning(warning)
         if not found:
             raise ConfigurationException(
                 "All indexes larger than population size")
@@ -369,7 +388,7 @@ class NeuronRecorder(object):
 
         if self.__indexes[variable] is None:
             # start with all indexes
-            self.__indexes[variable] = range(self.__n_neurons)
+            self.__indexes[variable] = range(self.__min_id, self.__max_id)
 
         # remove the indexes not recording
         self.__indexes[variable] = \
@@ -386,7 +405,7 @@ class NeuronRecorder(object):
             # overwriting all OK!
             return
         if self.__indexes[variable] is None:
-            if set(set(range(self.__n_neurons))).issubset(set(indexes)):
+            if set(range(self.__min_id, self.__max_id)).issubset(set(indexes)):
                 # overwriting all previous so OK!
                 return
         else:
