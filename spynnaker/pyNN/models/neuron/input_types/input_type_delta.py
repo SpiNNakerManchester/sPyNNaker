@@ -52,11 +52,11 @@ class InputTypeDelta(AbstractInputType):
 
     @overrides(AbstractInputType.get_units)
     def get_units(self, variable):
-        raise KeyError(variable)  # ?
+        raise KeyError(variable)
 
     @overrides(AbstractInputType.has_variable)
     def has_variable(self, variable):
-        return False # ?
+        return False
 
     @overrides(AbstractInputType.get_global_weight_scale)
     def get_global_weight_scale(self):
