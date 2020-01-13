@@ -34,7 +34,7 @@ from spinn_front_end_common.abstract_models.impl import (
 from spinn_front_end_common.utilities import (
     constants as common_constants, helpful_functions, globals_variables)
 from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, SYSTEM_BYTES_REQUIREMENT)
+    BYTES_PER_WORD, SYSTEM_BYTES_REQUIREMENT, US_TO_MS)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.interface.buffer_management import (
@@ -165,10 +165,10 @@ class AbstractPopulationVertex2(
             recordables, 0, NEURONS_PER_CORE, self.timestep_in_us))
         self.__neuron_recorders.append(NeuronRecorder(
             recordables, NEURONS_PER_CORE, NEURONS_PER_CORE*2,
-            self.timestep_in_us))
+            self.timestep_in_us * 2))
         self.__neuron_recorders.append(NeuronRecorder(
             recordables, NEURONS_PER_CORE*2, NEURONS_PER_CORE*3,
-            self.timestep_in_us))
+            self.timestep_in_us * 3))
 
         # Set up synapse handling
         self.__synapse_manager = SynapticManager(
@@ -207,9 +207,9 @@ class AbstractPopulationVertex2(
     )
     def get_resources_used_by_atoms(self, vertex_slice, graph):
         # pylint: disable=arguments-differ
-
+        slice_num = vertex_slice.lo_atom // 3
         variableSDRAM = self._nr_by_slice(vertex_slice).get_variable_sdram_usage(
-            vertex_slice, self.timestep_in_us)
+            vertex_slice, self.timesteps_in_us[slice_num])
         constantSDRAM = ConstantSDRAM(
                 self._get_sdram_usage_for_atoms(vertex_slice, graph))
 
@@ -249,8 +249,9 @@ class AbstractPopulationVertex2(
         return values
 
     def _get_buffered_sdram(self, vertex_slice, data_simtime_in_us):
-        n_machine_time_steps = self.simtime_in_us_to_timesteps(
-            data_simtime_in_us)
+        slice_num = vertex_slice.lo_atom // 3
+        n_machine_time_steps =  \
+            data_simtime_in_us // self.timesteps_in_us[slice_num]
         values = [self._nr_by_slice(vertex_slice).get_buffered_sdram(
                 "spikes", vertex_slice, n_machine_time_steps)]
         for variable in self.__neuron_impl.get_recordable_variables():
@@ -270,9 +271,10 @@ class AbstractPopulationVertex2(
         self.__n_subvertices += 1
         recorded_region_ids = self._nr_by_slice(vertex_slice).\
             recorded_ids_by_slice(vertex_slice)
+        slice_num = vertex_slice.lo_atom // 3
         vertex = PopulationMachineVertex(
-            resources_required, recorded_region_ids, self.timestep_in_us,
-            label, constraints)
+            resources_required, recorded_region_ids,
+            self.timesteps_in_us[slice_num], label, constraints)
         self.__machine_vertexes.append(vertex)
         return vertex
 
@@ -304,6 +306,7 @@ class AbstractPopulationVertex2(
 
     def _get_sdram_usage_for_atoms(self, vertex_slice, graph):
         n_record = len(self.__neuron_impl.get_recordable_variables()) + 1
+        slice_num = vertex_slice.lo_atom // 3
         sdram_requirement = (
             SYSTEM_BYTES_REQUIREMENT +
             self._get_sdram_usage_for_neuron_params(vertex_slice) +
@@ -312,7 +315,7 @@ class AbstractPopulationVertex2(
             PopulationMachineVertex.get_provenance_data_size(
                 PopulationMachineVertex.N_ADDITIONAL_PROVENANCE_DATA_ITEMS) +
             self.__synapse_manager.get_sdram_usage_in_bytes(
-                vertex_slice, self.timestep_in_us, graph, self) +
+                vertex_slice, self.timesteps_in_us[slice_num], graph, self) +
             profile_utils.get_profile_region_size(
                 self.__n_profile_samples))
 
@@ -440,9 +443,10 @@ class AbstractPopulationVertex2(
         spec.write_array(recording_data)
 
         # Write the neuron parameters
+        slice_num = vertex_slice.lo_atom // 3
         neuron_data = self.__neuron_impl.get_data(
             self._parameters, self._state_variables, vertex_slice,
-            self.timestep_in_us)
+            self.timesteps_in_us[slice_num])
         spec.write_array(neuron_data)
 
     @inject_items({
@@ -464,10 +468,11 @@ class AbstractPopulationVertex2(
             spec, graph_mapper.get_slice(placement.vertex))
 
         # write the neuron params into the new DSG region
+        slice_num = vertex_slice.lo_atom // 3
         self._write_neuron_parameters(
             key=routing_info.get_first_key_from_pre_vertex(
                 placement.vertex, constants.SPIKE_PARTITION_ID),
-            machine_time_step=self.timestep_in_us, spec=spec,
+            machine_time_step=self.timesteps_in_us[slice_num], spec=spec,
             time_scale_factor=time_scale_factor,
             vertex_slice=vertex_slice)
 
@@ -520,10 +525,11 @@ class AbstractPopulationVertex2(
             vertex, constants.SPIKE_PARTITION_ID)
 
         # Write the setup region
+        slice_num = vertex_slice.lo_atom // 3
         spec.switch_write_focus(
             constants.POPULATION_BASED_REGIONS.SYSTEM.value)
         spec.write_array(simulation_utilities.get_simulation_header_array(
-            self.get_binary_file_name(), self.timestep_in_us,
+            self.get_binary_file_name(), self.timesteps_in_us[slice_num],
             time_scale_factor))
 
         # Write the recording region
@@ -534,7 +540,7 @@ class AbstractPopulationVertex2(
 
         # Write the neuron parameters
         self._write_neuron_parameters(
-            spec, key, vertex_slice, self.timestep_in_us, time_scale_factor)
+            spec, key, vertex_slice, self.timesteps_in_us[slice_num], time_scale_factor)
 
         # write profile data
         profile_utils.write_profile_region_data(
@@ -548,7 +554,7 @@ class AbstractPopulationVertex2(
         self.__synapse_manager.write_data_spec(
             spec, self, vertex_slice, vertex, placement, machine_graph,
             application_graph, routing_info, graph_mapper,
-            weight_scale, self.timestep_in_us)
+            weight_scale, self.timesteps_in_us[slice_num])
 
         # End the writing of this specification:
         spec.end_specification()
@@ -623,15 +629,18 @@ class AbstractPopulationVertex2(
         if variable != "spikes":
             index = 1 + self.__neuron_impl.get_recordable_variable_index(
                 variable)
-        n_machine_time_steps = self.simtime_in_us_to_timesteps(
-            current_time_in_us)
         matrices = []
         all_indexes = []
         sampling_intervals = []
         for vertex in self.__machine_vertexes:
             vertex_slice = graph_mapper.get_slice(vertex)
+            slice_num = vertex_slice.lo_atom // 3
             neuron_recorder = self._nr_by_slice(vertex_slice)
-            data, indexes, sampling_interval = self.__neuron_recorders[0].get_matrix_data(
+            n_machine_time_steps = int(
+                current_time_in_us / self.timesteps_in_us[slice_num])
+
+            data, indexes, sampling_interval = \
+                neuron_recorder.get_matrix_data(
                 self.label, buffer_manager, index, placements, graph_mapper,
                 [vertex], variable, n_machine_time_steps)
             matrices.append(data)
@@ -648,8 +657,9 @@ class AbstractPopulationVertex2(
     def get_spikes_sampling_interval(self):
         all = set()
         for neuron_recorder in self.__neuron_recorders:
-            all.add(neuron_recorder.get_neuron_sampling_interval("spikes"))
-        return gcd(all)
+            all.add(int(
+                neuron_recorder.get_neuron_sampling_interval("spikes"))* US_TO_MS)
+        return gcd(all) / US_TO_MS
 
     @overrides(AbstractPopulationInitializable.initialize)
     def initialize(self, variable, value):
@@ -813,6 +823,7 @@ class AbstractPopulationVertex2(
             monitor_cores=None, handle_time_out_configuration=True,
             fixed_routes=None):
         # pylint: disable=too-many-arguments
+        raise NotImplementedError("Multiple timesteps")
         return self.__synapse_manager.get_connections_from_machine(
             transceiver, placement, edge, graph_mapper, routing_infos,
             synapse_information, self.timestep_in_us,
@@ -934,3 +945,11 @@ class AbstractPopulationVertex2(
         if self.__synapse_manager.changes_during_run:
             self.__change_requires_data_generation = True
             self.__change_requires_neuron_parameters_reload = False
+
+    def simtime_in_us_to_timesteps(self, simtime_in_us):
+        raise NotImplementedError("Nope!")
+
+    @property
+    @overrides(ApplicationVertex.timesteps_in_us)
+    def timesteps_in_us(self):
+        return [1000, 2000, 3000]
