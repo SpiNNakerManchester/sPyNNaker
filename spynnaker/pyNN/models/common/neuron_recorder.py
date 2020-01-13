@@ -21,6 +21,7 @@ import numpy
 from six import raise_from, iteritems
 from six.moves import range, xrange
 from spinn_utilities.index_is_value import IndexIsValue
+from spinn_utilities.helpful_functions import gcd
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.resources import VariableSDRAM
@@ -275,6 +276,36 @@ class NeuronRecorder(object):
     def combine_spikes(spikes_list):
         result = numpy.concatenate(spikes_list)
         return result[numpy.lexsort((result[:,1], result[:,0]))]
+
+    @staticmethod
+    def combine_matrix(matrices, indexes, sampling_intervals_ms):
+        sampling_intervals_us = [round(s * US_TO_MS)
+                                 for s in sampling_intervals_ms]
+        gcd_interval = gcd(sampling_intervals_us)
+        filled = []
+        for i in range(len(sampling_intervals_us)):
+            ratio = int(sampling_intervals_us[i]//gcd_interval)
+            filled.append(NeuronRecorder.pack_matrix(matrices[i], ratio))
+        all_indexes = list(numpy.concatenate(indexes))
+        return (numpy.concatenate(filled, axis=1),
+               all_indexes,
+               gcd_interval / US_TO_MS)
+
+    @staticmethod
+    def pack_matrix(original, ratio):
+        """
+        Packs rows into a matrix based on the ratio
+
+        :param original: Original 2D matrix
+        :param ratio: Number of new rows required for each original row
+        :return: New matrix with probably extra rows
+        """
+        if ratio == 1:
+            return original
+        org_rows, org_cols = original.shape
+        nans = numpy.full((org_rows, org_cols*(ratio-1)), numpy.nan)
+        return numpy.concatenate((original, nans), axis=1).reshape(
+            org_rows*ratio, org_cols)
 
     def get_recordable_variables(self):
         return self.__sampling_rates.keys()

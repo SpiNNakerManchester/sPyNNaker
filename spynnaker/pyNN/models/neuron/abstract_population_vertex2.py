@@ -625,14 +625,20 @@ class AbstractPopulationVertex2(
                 variable)
         n_machine_time_steps = self.simtime_in_us_to_timesteps(
             current_time_in_us)
+        matrices = []
+        all_indexes = []
+        sampling_intervals = []
         for vertex in self.__machine_vertexes:
             vertex_slice = graph_mapper.get_slice(vertex)
             neuron_recorder = self._nr_by_slice(vertex_slice)
             data, indexes, sampling_interval = self.__neuron_recorders[0].get_matrix_data(
                 self.label, buffer_manager, index, placements, graph_mapper,
                 [vertex], variable, n_machine_time_steps)
-            print(data.shape)
-        return data, indexes, sampling_interval
+            matrices.append(data)
+            all_indexes.append((indexes))
+            sampling_intervals.append(sampling_interval)
+        return NeuronRecorder.combine_matrix(
+            matrices, all_indexes, sampling_intervals)
 
     @overrides(AbstractNeuronRecordable.get_neuron_sampling_interval)
     def get_neuron_sampling_interval(self, variable):
