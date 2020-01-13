@@ -59,7 +59,7 @@ before_install:
 
 install:
   - pip install -r requirements-test.txt
-  - pip install pylint python-coveralls 'coverage>=4.4'
+  - pip install pylint python-coveralls 'coverage>=4.4,<5.0'
   - python ./setup.py install
 
 before_script:
