@@ -149,7 +149,8 @@ class NeuronParameter(object):
         :param value: what the value of the parameter is; if a list or array,\
             potentially provides a different value for each neuron
         :type value: int or float or bool or list(int) or list(float) or \
-            list(bool) or ~numpy.ndarray or ~spinn_utilities.ranged.AbstractList
+            list(bool) or ~numpy.ndarray or \
+            ~spinn_utilities.ranged.AbstractList
         :param ~data_specification.enums.DataType data_type:
             The serialization type of the parameter in the neuron model.
         """
@@ -164,7 +165,8 @@ class NeuronParameter(object):
             potentially provides a different value for each neuron.
 
         :rtype: int or float or bool or list(int) or list(float) or \
-            list(bool) or ~numpy.ndarray or ~spinn_utilities.ranged.AbstractList
+            list(bool) or ~numpy.ndarray or \
+            ~spinn_utilities.ranged.AbstractList
         """
         return self.__value
 
