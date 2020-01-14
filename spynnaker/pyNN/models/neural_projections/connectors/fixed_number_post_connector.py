@@ -162,9 +162,9 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine):
             self, post_vertex_slice, synapse_info, min_delay=None,
             max_delay=None):
         # pylint: disable=too-many-arguments
-        prob_in_slice = (
+        prob_in_slice = min(
             post_vertex_slice.n_atoms / float(
-                synapse_info.n_post_neurons))
+                synapse_info.n_post_neurons), 1.0)
         n_connections = utility_calls.get_probable_maximum_selected(
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             self.__n_post * synapse_info.n_pre_neurons, prob_in_slice,
@@ -247,6 +247,11 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine):
     def allow_self_connections(self, new_value):
         self.__allow_self_connections = new_value
 
+    def _get_view_lo_hi(self, indexes):
+        view_lo = indexes[0]
+        view_hi = indexes[-1]
+        return view_lo, view_hi
+
     @property
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_id)
     def gen_connector_id(self):
@@ -258,6 +263,23 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine):
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type, synapse_info):
+        params = []
+        pre_view_lo = 0
+        pre_view_hi = synapse_info.n_pre_neurons - 1
+        if synapse_info.prepop_is_view:
+            pre_view_lo, pre_view_hi = self._get_view_lo_hi(
+                synapse_info.pre_population._indexes)
+
+        params.extend([pre_view_lo, pre_view_hi])
+
+        post_view_lo = 0
+        post_view_hi = synapse_info.n_post_neurons - 1
+        if synapse_info.postpop_is_view:
+            post_view_lo, post_view_hi = self._get_view_lo_hi(
+                synapse_info.post_population._indexes)
+
+        params.extend([post_view_lo, post_view_hi])
+
         # The same seed needs to be sent to each of the slices
         key = (id(pre_vertex_slice), id(post_slices))
         if key not in self.__post_connector_seed:
@@ -269,11 +291,11 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine):
         if ((not self.__allow_self_connections) and (
                 synapse_info.pre_population is synapse_info.post_population)):
             self_connections = False
-        params = [
+        params.extend([
             self_connections,
             self.__with_replacement,
             self.__n_post,
-            synapse_info.n_post_neurons]
+            synapse_info.n_post_neurons])
         params.extend(self.__post_connector_seed[key])
         return numpy.array(params, dtype="uint32")
 
@@ -281,4 +303,4 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine):
     @overrides(AbstractGenerateConnectorOnMachine.
                gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
-        return (4 + 4) * BYTES_PER_WORD
+        return (4 + 4 + 4) * BYTES_PER_WORD
