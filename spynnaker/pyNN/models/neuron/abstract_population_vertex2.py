@@ -71,8 +71,9 @@ _MAX_OFFSET_DENOMINATOR = 10
 
 NEURONS_PER_CORE = 3
 
+
 class AbstractPopulationVertex2(
-        ApplicationTimestepVertex, AbstractGeneratesDataSpecification,
+        ApplicationVertex, AbstractGeneratesDataSpecification,
         AbstractHasAssociatedBinary, AbstractContainsUnits,
         AbstractSpikeRecordable,  AbstractNeuronRecordable,
         AbstractProvidesOutgoingPartitionConstraints,
@@ -132,7 +133,7 @@ class AbstractPopulationVertex2(
         """
         # pylint: disable=too-many-arguments, too-many-locals
         super(AbstractPopulationVertex2, self).__init__(
-            label, constraints, max_atoms_per_core, timestep_in_us)
+            label, constraints, max_atoms_per_core)
 
         self.__n_atoms = n_neurons
         self.__n_subvertices = 0
@@ -162,13 +163,13 @@ class AbstractPopulationVertex2(
         recordables.extend(self.__neuron_impl.get_recordable_variables())
         self.__neuron_recorders = list()
         self.__neuron_recorders.append(NeuronRecorder(
-            recordables, 0, NEURONS_PER_CORE, self.timestep_in_us))
+            recordables, 0, NEURONS_PER_CORE, self.timesteps_in_us[0]))
         self.__neuron_recorders.append(NeuronRecorder(
             recordables, NEURONS_PER_CORE, NEURONS_PER_CORE*2,
-            self.timestep_in_us * 2))
+            self.timesteps_in_us[1]))
         self.__neuron_recorders.append(NeuronRecorder(
             recordables, NEURONS_PER_CORE*2, NEURONS_PER_CORE*3,
-            self.timestep_in_us * 3))
+            self.timesteps_in_us[2]))
 
         # Set up synapse handling
         self.__synapse_manager = SynapticManager(
@@ -945,6 +946,10 @@ class AbstractPopulationVertex2(
         if self.__synapse_manager.changes_during_run:
             self.__change_requires_data_generation = True
             self.__change_requires_neuron_parameters_reload = False
+
+    @property
+    def timestep_in_us(self):
+        raise NotImplementedError("Nope!")
 
     def simtime_in_us_to_timesteps(self, simtime_in_us):
         raise NotImplementedError("Nope!")

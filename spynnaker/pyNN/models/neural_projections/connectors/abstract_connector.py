@@ -79,10 +79,13 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         """
         self.__space = space
 
-    def set_projection_information(self, machine_time_step, synapse_info):
-        # pylint: disable=unused-argument
+    def set_min_delay(self, time_step_in_us):
         self._rng = (self._rng or get_simulator().get_pynn_NumpyRNG()())
-        self.__min_delay = machine_time_step / 1000.0
+        self.__min_delay = time_step_in_us / 1000.0
+
+    def set_synapse_info(self, synapse_info):
+        # pylint: disable=unused-argument
+        pass
 
     def _check_parameter(self, values, name, allow_lists):
         """ Check that the types of the values is supported.

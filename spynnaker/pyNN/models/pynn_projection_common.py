@@ -90,7 +90,7 @@ class PyNNProjectionCommon(object):
         if not get_simulator().is_a_pynn_random(synapse_dynamics_stdp.delay):
             synapse_dynamics_stdp.set_delay(numpy.rint(numpy.array(
                 synapse_dynamics_stdp.delay) * (1000.0 / machine_time_step)) *
-                (machine_time_step / 1000.0))
+                                            (machine_time_step / 1000.0))
 
         # set the plasticity dynamics for the post pop (allows plastic stuff
         #  when needed)
@@ -105,8 +105,9 @@ class PyNNProjectionCommon(object):
             synapse_dynamics_stdp.delay)
 
         # Set projection information in connector
-        connector.set_projection_information(
-            machine_time_step, self.__synapse_information)
+        connector.set_min_delay(machine_time_step)
+        connector.set_synapse_info(self.__synapse_information)
+        #connector.set_projection_information()
 
         # handle max delay
         max_delay = synapse_dynamics_stdp.get_delay_maximum(

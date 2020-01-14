@@ -75,9 +75,8 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine):
         self.__pre_connector_seed = dict()
         self._rng = rng
 
-    def set_projection_information(self, machine_time_step, synapse_info):
-        AbstractConnector.set_projection_information(
-            self, machine_time_step, synapse_info)
+    @overrides(AbstractConnector.set_synapse_info)
+    def set_synapse_info(self, synapse_info):
         if (not self.__with_replacement and
                 self.__n_pre > synapse_info.n_pre_neurons):
             raise SpynnakerException(
