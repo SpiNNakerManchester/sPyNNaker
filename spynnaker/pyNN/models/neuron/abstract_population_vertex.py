@@ -779,9 +779,9 @@ class AbstractPopulationVertex(
     def clear_connection_cache(self):
         self.__synapse_manager.clear_connection_cache()
 
-    def get_maximum_delay_supported_in_ms(self, machine_time_step):
+    def get_maximum_delay_supported_in_ms(self):
         return self.__synapse_manager.get_maximum_delay_supported_in_ms(
-            machine_time_step)
+            self.timestep_in_us)
 
     @overrides(AbstractProvidesIncomingPartitionConstraints.
                get_incoming_partition_constraints)

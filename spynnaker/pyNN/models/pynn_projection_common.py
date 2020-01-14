@@ -119,7 +119,7 @@ class PyNNProjectionCommon(object):
         # delays in the models
         post_vertex_max_supported_delay_ms = \
             post_synaptic_population._get_vertex \
-            .get_maximum_delay_supported_in_ms(machine_time_step)
+            .get_maximum_delay_supported_in_ms()
         max_supported_delay_ms = post_vertex_max_supported_delay_ms + \
             _delay_extension_max_supported_delay * (machine_time_step / 1000.0)
         if max_delay > max_supported_delay_ms:

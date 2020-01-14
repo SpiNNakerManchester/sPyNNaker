@@ -38,7 +38,7 @@ class AbstractAcceptsIncomingSynapses(object):
         """
 
     @abstractmethod
-    def get_maximum_delay_supported_in_ms(self, machine_time_step):
+    def get_maximum_delay_supported_in_ms(self):
         """ Get the maximum delay supported by this vertex.
         """
 
