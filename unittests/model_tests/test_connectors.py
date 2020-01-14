@@ -97,8 +97,8 @@ def test_connectors(
         mock_synapse_info = MockSynapseInfo(MockPopulation(n_pre, "Pre"),
                                             MockPopulation(n_post, "Post"),
                                             weight, delay)
-        connector.set_projection_information(
-            machine_time_step=1000, synapse_info=mock_synapse_info)
+        connector.set_min_delay(timestep_in_us=1000)
+        connector.set_synapse_info(synapse_info=mock_synapse_info)
 
         pre_slices = [
             Slice(i, i + n_in_slice - 1) for i in range(0, n_pre, n_in_slice)]
