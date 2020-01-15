@@ -40,6 +40,7 @@ def _iterate_parameter_values(iterator, data_type):
         except StopIteration:
             return alist
 
+
 def run_spec_check(method):
     MockSimulator.setup()
     if platform.system() == "Windows":
@@ -58,6 +59,7 @@ def run_spec_check(method):
             finally:
                 spec.end_specification()
 
+
 def range_list(spec):
     value = SpynnakerRangedList(size=10, value=1.0, key="test")
     value[2:4] = 2.0
@@ -67,12 +69,15 @@ def range_list(spec):
     assert list(value[0:5]) == values
     assert isinstance(iterator, _Range_Iterator)
 
+
 def test_range_list():
     run_spec_check(range_list)
+
 
 def _generator(size):
     for i in xrange(size):
         yield i
+
 
 def range_list_as_list(spec):
     value = SpynnakerRangedList(size=10, value=_generator(10), key="test")
@@ -82,8 +87,10 @@ def range_list_as_list(spec):
     assert list(value[0:5]) == values
     assert isinstance(iterator, _Range_Iterator)
 
+
 def test_range_list_as_list():
     run_spec_check(range_list_as_list)
+
 
 def real_list(spec):
     value = range(10)
@@ -93,8 +100,10 @@ def real_list(spec):
     assert list(value[0:5]) == values
     assert isinstance(iterator, _Get_Iterator)
 
+
 def test_real_list():
     run_spec_check(real_list)
+
 
 def single_value(spec):
     value = 1.0
@@ -103,6 +112,7 @@ def single_value(spec):
     values = _iterate_parameter_values(iterator, DataType.S1615)
     assert [value] * 5 == values
     assert isinstance(iterator, _SingleValue_Iterator)
+
 
 def test_single_value():
     run_spec_check(single_value)
