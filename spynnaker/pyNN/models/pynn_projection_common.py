@@ -110,13 +110,14 @@ class PyNNProjectionCommon(object):
                 "Synapse target {} not found in {}".format(
                     target, post_synaptic_population.label))
 
+        delay = synapse_dynamics_stdp.delay
         # round the delays to multiples of full timesteps
         # (otherwise SDRAM estimation calculations can go wrong)
         # WARNING is best effort based on rounding_in_us
-        if not get_simulator().is_a_pynn_random(synapse_dynamics_stdp.delay):
-            synapse_dynamics_stdp.set_delay(numpy.rint(numpy.array(
-                synapse_dynamics_stdp.delay) * (US_TO_MS / rounding_in_us)) *
-                                            (rounding_in_us / US_TO_MS))
+        if not get_simulator().is_a_pynn_random(delay):
+            delay = numpy.rint(numpy.array(synapse_dynamics_stdp.delay) *
+                               (US_TO_MS / rounding_in_us)) * \
+                    (rounding_in_us / US_TO_MS)
 
         # set the plasticity dynamics for the post pop (allows plastic stuff
         #  when needed)
@@ -127,8 +128,7 @@ class PyNNProjectionCommon(object):
         self.__synapse_information = SynapseInformation(
             connector, pre_synaptic_population, post_synaptic_population,
             prepop_is_view, postpop_is_view, rng, synapse_dynamics_stdp,
-            synapse_type, synapse_dynamics_stdp.weight,
-            synapse_dynamics_stdp.delay)
+            synapse_type, synapse_dynamics_stdp.weight, delay)
 
         # Set projection information in connector
         connector.set_min_delay(rounding_in_us)

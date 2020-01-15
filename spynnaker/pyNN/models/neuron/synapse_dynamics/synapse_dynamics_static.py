@@ -219,7 +219,3 @@ class SynapseDynamicsStatic(
     @overrides(AbstractStaticSynapseDynamics.delay)
     def delay(self):
         return self.__delay
-
-    @overrides(AbstractStaticSynapseDynamics.set_delay)
-    def set_delay(self, delay):
-        self.__delay = delay
