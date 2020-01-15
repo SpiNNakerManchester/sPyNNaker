@@ -80,7 +80,7 @@ def test_connector(
                                         weights, delays)
     block = connector.create_synaptic_block(
         [pre_slice], 0, [post_slice], 0,
-        pre_slice, post_slice, 1, mock_synapse_info)
+        pre_slice, post_slice, 1, mock_synapse_info, 1000)
     assert(numpy.array_equal(block["weight"], numpy.array(expected_weights)))
     assert(numpy.array_equal(block["delay"], numpy.array(expected_delays)))
 
@@ -130,7 +130,7 @@ def test_connector_split():
             for j, post_slice in enumerate(post_slices):
                 block = connector.create_synaptic_block(
                     pre_slices, i, post_slices, j,
-                    pre_slice, post_slice, 1, mock_synapse_info)
+                    pre_slice, post_slice, 1, mock_synapse_info, 1000)
                 for source in block["source"]:
                     assert(pre_slice.lo_atom <= source <= pre_slice.hi_atom)
                 for target in block["target"]:

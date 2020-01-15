@@ -191,12 +191,11 @@ class SynapseIORowBased(AbstractSynapseIO):
         max_delay = self.get_maximum_delay_supported_in_ms(machine_time_step)
         if max_delay is not None:
             max_delay *= (1000.0 / machine_time_step)
-
         # Get the actual connections
         connections = synapse_info.connector.create_synaptic_block(
             pre_slices, pre_slice_index, post_slices, post_slice_index,
             pre_vertex_slice, post_vertex_slice, synapse_info.synapse_type,
-            synapse_info)
+            synapse_info, machine_time_step)
 
         # Convert delays to timesteps
         connections["delay"] = numpy.rint(

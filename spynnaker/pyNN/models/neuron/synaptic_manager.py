@@ -819,7 +819,6 @@ class SynapticManager(object):
              app_edge.n_delay_stages, self.__poptable_type, n_synapse_types,
              weight_scales, machine_time_step,
              app_edge=app_edge, machine_edge=machine_edge)
-
         if app_edge.delay_edge is not None:
             app_edge.delay_edge.pre_vertex.add_delays(
                 pre_vertex_slice, delayed_source_ids, delay_stages)

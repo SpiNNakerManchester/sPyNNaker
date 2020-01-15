@@ -211,7 +211,7 @@ class FromListConnector(AbstractConnector):
     def create_synaptic_block(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type, synapse_info):
+            synapse_type, synapse_info, timestep_in_us):
         # pylint: disable=too-many-arguments
         if not len(self.__sources):
             return numpy.zeros(0, dtype=self.NUMPY_SYNAPSES_DTYPE)
@@ -238,9 +238,10 @@ class FromListConnector(AbstractConnector):
             else:
                 block["delay"] = self._generate_delays(
                     len(indices), None, pre_vertex_slice,
-                    post_vertex_slice, synapse_info)
+                    post_vertex_slice, synapse_info, timestep_in_us)
         else:
-            block["delay"] = self._clip_delays(self.__delays[indices])
+            block["delay"] = self._clip_delays(
+                self.__delays[indices], timestep_in_us)
         block["synapse_type"] = synapse_type
         return block
 

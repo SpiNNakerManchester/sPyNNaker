@@ -133,7 +133,7 @@ def test_connectors(
         synaptic_block = connector.create_synaptic_block(
             pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type, mock_synapse_info)
+            synapse_type, mock_synapse_info, 1000)
         source_histogram = numpy.histogram(
             synaptic_block["source"], pre_range)[0]
         target_histogram = numpy.histogram(
@@ -151,7 +151,7 @@ def test_connectors(
             test_synaptic_block = connector.create_synaptic_block(
                 pre_slices, pre_slice_index, post_slices,
                 post_slice_index + 1, pre_vertex_slice, test_post_slice,
-                synapse_type, mock_synapse_info)
+                synapse_type, mock_synapse_info, 1000)
             if len(test_synaptic_block) > 0:
                 assert not numpy.array_equal(
                     test_synaptic_block, synaptic_block)
@@ -160,7 +160,7 @@ def test_connectors(
             test_synaptic_block = connector.create_synaptic_block(
                 pre_slices, pre_slice_index + 1, post_slices,
                 post_slice_index, test_pre_slice, post_vertex_slice,
-                synapse_type, mock_synapse_info)
+                synapse_type, mock_synapse_info, 1000)
             if len(test_synaptic_block) > 0:
                 assert not numpy.array_equal(
                     test_synaptic_block, synaptic_block)

@@ -106,7 +106,7 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
     def create_synaptic_block(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type, synapse_info):
+            synapse_type, synapse_info, timestep_in_us):
         # pylint: disable=too-many-arguments
         n_items = pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms
         items = self._rng.next(n_items)
@@ -130,7 +130,7 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
             synapse_info)
         block["delay"] = self._generate_delays(
             n_connections, None, pre_vertex_slice, post_vertex_slice,
-            synapse_info)
+            synapse_info, timestep_in_us)
         block["synapse_type"] = synapse_type
         return block
 

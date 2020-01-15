@@ -149,7 +149,7 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
     def create_synaptic_block(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type, synapse_info):
+            synapse_type, synapse_info, timestep_in_us):
         # pylint: disable=too-many-arguments
         # update the synapses as required, and get the number of connections
         self._update_synapses_per_post_vertex(pre_slices, post_slices)
@@ -194,7 +194,7 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
             post_vertex_slice, synapse_info)
         block["delay"] = self._generate_delays(
             n_connections, [connection_slice], pre_vertex_slice,
-            post_vertex_slice, synapse_info)
+            post_vertex_slice, synapse_info, timestep_in_us)
         block["synapse_type"] = synapse_type
         return block
 

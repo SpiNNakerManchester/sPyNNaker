@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import division
 import logging
 import math
 import re
@@ -22,6 +23,7 @@ from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.safe_eval import SafeEval
 from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spinn_front_end_common.utilities.constants import US_TO_MS
 from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spynnaker.pyNN.utilities import utility_calls
 
@@ -46,7 +48,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
 
     __slots__ = [
         "_delays",
-        "__min_delay",
+        #"__min_delay",
         "__n_clipped_delays",
         "_n_post_neurons",
         "_n_pre_neurons",
@@ -68,7 +70,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         self._rng = rng
 
         self.__n_clipped_delays = 0
-        self.__min_delay = 0
+        #self.__min_delay = 0
         self.__param_seeds = dict()
 
     def set_space(self, space):
@@ -81,7 +83,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
 
     def set_min_delay(self, timestep_in_us):
         self._rng = (self._rng or get_simulator().get_pynn_NumpyRNG()())
-        self.__min_delay = timestep_in_us / 1000.0
+        #self.__min_delay = timestep_in_us / 1000.0
 
     def set_synapse_info(self, synapse_info):
         # pylint: disable=unused-argument
@@ -320,38 +322,37 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
                         synapse_info.post_population.label))
         return numpy.abs(weights)
 
-    def _clip_delays(self, delays):
+    def _clip_delays(self, delays, timestep_in_us):
         """ Clip delay values, keeping track of how many have been clipped.
         """
-
+        timestep_in_ms =  timestep_in_us / US_TO_MS
         # count values that could be clipped
-        self.__n_clipped_delays = numpy.sum(delays < self.__min_delay)
+        self.__n_clipped_delays = numpy.sum(delays < timestep_in_ms)
 
         # clip values
         if numpy.isscalar(delays):
-            if delays < self.__min_delay:
-                delays = self.__min_delay
+            if delays < timestep_in_ms:
+                delays = timestep_in_ms
         else:
             if delays.size:
-                delays[delays < self.__min_delay] = self.__min_delay
+                delays[delays < timestep_in_ms] = timestep_in_ms
         return delays
 
     def _generate_delays(self, n_connections, connection_slices,
-                         pre_slice, post_slice, synapse_info):
+                         pre_slice, post_slice, synapse_info, timestep_in_us):
         """ Generate valid delay values.
         """
 
         delays = self._generate_values(
             synapse_info.delays, n_connections, connection_slices, pre_slice,
             post_slice, synapse_info)
-
-        return self._clip_delays(delays)
+        return self._clip_delays(delays, timestep_in_us)
 
     @abstractmethod
     def create_synaptic_block(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type, synapse_info):
+            synapse_type, synapse_info, timestep_in_us):
         """ Create a synaptic block from the data.
         """
         # pylint: disable=too-many-arguments

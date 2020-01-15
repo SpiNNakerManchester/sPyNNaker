@@ -82,7 +82,7 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
     def create_synaptic_block(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type, synapse_info):
+            synapse_type, synapse_info, timestep_in_us):
         # pylint: disable=too-many-arguments
         pre_lo, post_lo, pre_hi, post_hi = self._get_pre_post_limits(
             pre_vertex_slice, post_vertex_slice, synapse_info)
