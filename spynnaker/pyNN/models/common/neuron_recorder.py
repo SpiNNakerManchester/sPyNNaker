@@ -386,7 +386,7 @@ class NeuronRecorder(object):
             if index < 0:
                 raise ConfigurationException(
                     "Negative indexes are not supported")
-            elif index >= self.__min_id__max_id:
+            elif self.__min_id < index >= self.__max_id:
                 warning = "Ignoring indexes outside of the range {} {}".format(
                     self.__min_id, self.__max_id)
             else:
