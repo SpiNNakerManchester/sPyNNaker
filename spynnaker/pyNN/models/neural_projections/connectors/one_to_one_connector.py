@@ -102,7 +102,7 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
             post_vertex_slice, synapse_info)
         block["delay"] = self._generate_delays(
             n_connections, [connection_slice], pre_vertex_slice,
-            post_vertex_slice, synapse_info)
+            post_vertex_slice, synapse_info, timestep_in_us)
         block["synapse_type"] = synapse_type
         return block
 

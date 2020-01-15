@@ -29,14 +29,14 @@ import sys
     "expected_extra_parameter_names", [
         (None, None, 0, 0, numpy.zeros((0, 2)), [], [], None, None),
         ([], None, 0, 0, numpy.zeros((0, 2)), [], [], None, None),
-        (numpy.array([(0, 0, 0, 0), (1, 1, 1, 1), (2, 2, 2, 2)]), None, 5, 1,
-         None, [0, 1, 2], [0, 1, 2], None, None),
+        (numpy.array([(0, 0, 0, 1), (1, 1, 1, 2), (2, 2, 2, 3)]), None, 5, 1,
+         None, [0, 1, 2], [1, 2, 3], None, None),
         (numpy.array([(0, 0), (1, 1), (2, 2)]), None, 5, 1,
          None, [5, 5, 5], [1, 1, 1], None, None),
         (numpy.array([(0, 0, 0), (1, 1, 1), (2, 2, 2)]), ["weight"], 5, 1,
          None, [0, 1, 2], [1, 1, 1], None, None),
-        (numpy.array([(0, 0, 0), (1, 1, 1), (2, 2, 2)]), ["delay"], 5, 1,
-         None, [5, 5, 5], [0, 1, 2], None, None),
+        (numpy.array([(0, 0, 1), (1, 1, 2), (2, 2, 3)]), ["delay"], 5, 1,
+         None, [5, 5, 5], [1, 2, 3], None, None),
         (numpy.array([(0, 0, 0), (1, 1, 0), (2, 2, 0)]), ["extra"], 5, 1,
          None, [5, 5, 5], [1, 1, 1], numpy.array([[0], [0], [0]]), ["extra"]),
     ], ids=[
