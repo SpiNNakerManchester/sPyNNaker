@@ -79,9 +79,9 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         """
         self.__space = space
 
-    def set_min_delay(self, time_step_in_us):
+    def set_min_delay(self, timestep_in_us):
         self._rng = (self._rng or get_simulator().get_pynn_NumpyRNG()())
-        self.__min_delay = time_step_in_us / 1000.0
+        self.__min_delay = timestep_in_us / 1000.0
 
     def set_synapse_info(self, synapse_info):
         # pylint: disable=unused-argument
