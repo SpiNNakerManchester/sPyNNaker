@@ -106,7 +106,7 @@ def test_combine_matrix():
                         361, 362, 363,
                         391, 392, 393]).\
         reshape(4,3)
-    result2_3, interval2_3, indexex2_3 = \
+    result2_3, indexex2_3, interval2_3 = \
         NeuronRecorder.combine_matrix([org2, org3],
                                       [[4, 5, 6], [7, 8, 9]],
                                       [2000, 3000],)
@@ -125,12 +125,8 @@ def test_combine_matrix():
                              nan, nan, nan, 391, 392, 393,
                              2101, 2102, 2103, nan, nan, nan,
                              nan, nan, nan, nan, nan, nan]).reshape(12,6)
-    # for i in range(12):
-    #    for j in range(6):
-    #        print(i, j, result2_3[i,j], target2_3[i,j])
-    #        numpy.testing.assert_equal(result2_3[i,j], target2_3[i,j])
     numpy.testing.assert_equal(result2_3, target2_3)
-    result1_2_3, interval1_2_3, indexex1_2_3 = \
+    result1_2_3, indexex1_2_3, interval1_2_3 = \
         NeuronRecorder.combine_matrix([org1, org2, org3],
                                       [[1, 2, 3], [4, 5, 6], [7, 8, 9]],
                                       [1000, 2000, 3000])
