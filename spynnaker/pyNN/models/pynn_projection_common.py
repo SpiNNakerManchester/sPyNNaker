@@ -275,8 +275,7 @@ class PyNNProjectionCommon(object):
         return delay_edge
 
     def _get_synaptic_data(
-            self, as_list, data_to_get, fixed_values=None, notify=None,
-            handle_time_out_configuration=True):
+            self, as_list, data_to_get, fixed_values=None, notify=None):
         # pylint: disable=too-many-arguments
         post_vertex = self.__projection_edge.post_vertex
         pre_vertex = self.__projection_edge.pre_vertex
@@ -309,60 +308,22 @@ class PyNNProjectionCommon(object):
         # Otherwise, get the connections now, as we have ran and therefore can
         # get them
         self.__get_projection_data(
-            data_to_get, pre_vertex, post_vertex, connection_holder,
-            handle_time_out_configuration)
+            data_to_get, pre_vertex, post_vertex, connection_holder)
         return connection_holder
 
     def __get_projection_data(
-            self, data_to_get, pre_vertex, post_vertex, connection_holder,
-            handle_time_out_configuration):
+            self, data_to_get, pre_vertex, post_vertex, connection_holder):
         # pylint: disable=too-many-arguments, too-many-locals
         ctl = self.__spinnaker_control
 
-        # if using extra monitor functionality, locate extra data items
-        if ctl.get_generated_output("UsingAdvancedMonitorSupport"):
-            extra_monitors = ctl.get_generated_output(
-                "MemoryExtraMonitorVertices")
-            receivers = ctl.get_generated_output(
-                "MemoryMCGatherVertexToEthernetConnectedChipMapping")
-            extra_monitor_placements = ctl.get_generated_output(
-                "MemoryExtraMonitorToChipMapping")
-        else:
-            extra_monitors = None
-            receivers = None
-            extra_monitor_placements = None
-
-        edges = ctl.graph_mapper.get_machine_edges(self.__projection_edge)
-        progress = ProgressBar(
-            edges, "Getting {}s for projection between {} and {}".format(
+        print("Getting {}s for projection between {} and {}".format(
                 data_to_get, pre_vertex.label, post_vertex.label))
-        for edge in progress.over(edges):
-            placement = ctl.placements.get_placement_of_vertex(
-                edge.post_vertex)
-
-            # if using extra monitor data extractor find local receiver
-            if extra_monitors is not None:
-                receiver = helpful_functions.locate_extra_monitor_mc_receiver(
-                    placement_x=placement.x, placement_y=placement.y,
-                    machine=ctl.machine,
-                    packet_gather_cores_to_ethernet_connection_map=receivers)
-                sender_extra_monitor_core = extra_monitor_placements[
-                    placement.x, placement.y]
-                sender_monitor_place = ctl.placements.get_placement_of_vertex(
-                    sender_extra_monitor_core)
-            else:
-                receiver = None
-                sender_monitor_place = None
-
-            connections = post_vertex.get_connections_from_machine(
-                ctl.transceiver, placement, edge, ctl.graph_mapper,
-                ctl.routing_infos, self.__synapse_information,
-                ctl.machine_time_step, extra_monitors is not None,
-                ctl.placements, receiver, sender_monitor_place,
-                extra_monitors, handle_time_out_configuration,
-                ctl.fixed_routes)
-            if connections is not None:
-                connection_holder.add_connections(connections)
+        connections = post_vertex.get_connections_from_machine(
+            ctl.transceiver, ctl.placements, self.__projection_edge,
+            ctl.graph_mapper, self.__synapse_information,
+            ctl.machine_time_step, ctl.buffer_manager)
+        if connections is not None:
+            connection_holder.add_connections(connections)
         connection_holder.finish()
 
     def _clear_cache(self):
