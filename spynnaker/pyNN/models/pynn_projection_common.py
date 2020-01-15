@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import division
 import logging
 import math
 import numpy
@@ -20,6 +21,7 @@ from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.constraints.partitioner_constraints import (
     SameAtomsAsVertexConstraint)
 from spinn_front_end_common.utilities import helpful_functions
+from spinn_front_end_common.utilities.constants import US_TO_MS
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.models.abstract_models import (
     AbstractAcceptsIncomingSynapses)
@@ -62,7 +64,25 @@ class PyNNProjectionCommon(object):
             self, spinnaker_control, connector, synapse_dynamics_stdp,
             target, pre_synaptic_population, post_synaptic_population,
             prepop_is_view, postpop_is_view,
-            rng, machine_time_step, user_max_delay, label, time_scale_factor):
+            rng, timestep_in_us, user_max_delay, label, time_scale_factor):
+        """
+
+        :param spinnaker_control:
+        :param connector:
+        :param synapse_dynamics_stdp:
+        :param target:
+        :param pre_synaptic_population:
+        :param post_synaptic_population:
+        :param prepop_is_view:
+        :param postpop_is_view:
+        :param rng:
+        :param timestep_in_us: Shared simtime in us used by all vertexes \
+        or None if there are multiple timesteps
+        :type timestep_in_us: int or None
+        :param user_max_delay:
+        :param label:
+        :param time_scale_factor:
+        """
         # pylint: disable=too-many-arguments, too-many-locals
         self.__spinnaker_control = spinnaker_control
         self.__projection_edge = None
@@ -70,6 +90,11 @@ class PyNNProjectionCommon(object):
         self.__has_retrieved_synaptic_list_from_machine = False
         self.__requires_mapping = True
         self.__label = None
+
+        if timestep_in_us is None:
+            rounding_in_us = 1
+        else:
+            rounding_in_us = timestep_in_us
 
         if not isinstance(post_synaptic_population._get_vertex,
                           AbstractAcceptsIncomingSynapses):
@@ -87,10 +112,11 @@ class PyNNProjectionCommon(object):
 
         # round the delays to multiples of full timesteps
         # (otherwise SDRAM estimation calculations can go wrong)
+        # WARNING is best effort based on rounding_in_us
         if not get_simulator().is_a_pynn_random(synapse_dynamics_stdp.delay):
             synapse_dynamics_stdp.set_delay(numpy.rint(numpy.array(
-                synapse_dynamics_stdp.delay) * (1000.0 / machine_time_step)) *
-                                            (machine_time_step / 1000.0))
+                synapse_dynamics_stdp.delay) * (US_TO_MS / rounding_in_us)) *
+                                            (rounding_in_us / US_TO_MS))
 
         # set the plasticity dynamics for the post pop (allows plastic stuff
         #  when needed)
@@ -105,7 +131,7 @@ class PyNNProjectionCommon(object):
             synapse_dynamics_stdp.delay)
 
         # Set projection information in connector
-        connector.set_min_delay(machine_time_step)
+        connector.set_min_delay(rounding_in_us)
         connector.set_synapse_info(self.__synapse_information)
         #connector.set_projection_information()
 
@@ -121,14 +147,14 @@ class PyNNProjectionCommon(object):
             post_synaptic_population._get_vertex \
             .get_maximum_delay_supported_in_ms()
         max_supported_delay_ms = post_vertex_max_supported_delay_ms + \
-            _delay_extension_max_supported_delay * (machine_time_step / 1000.0)
+            _delay_extension_max_supported_delay * (rounding_in_us / 1000.0)
         if max_delay > max_supported_delay_ms:
             raise ConfigurationException(
                 "The maximum delay {} for projection is not supported "
                 "(max supported delay is {})".format(max_delay,
                                                      max_supported_delay_ms))
 
-        if max_delay > user_max_delay / (machine_time_step / 1000.0):
+        if max_delay > user_max_delay / (rounding_in_us / 1000.0):
             logger.warning("The end user entered a max delay"
                            " for which the projection breaks")
 
@@ -162,9 +188,12 @@ class PyNNProjectionCommon(object):
 
         # If the delay exceeds the post vertex delay, add a delay extension
         if max_delay > post_vertex_max_supported_delay_ms:
+            if timestep_in_us is None:
+                raise NotImplementedError(
+                    "Delay Extensions not supported with Multiple timesteps")
             delay_edge = self._add_delay_extension(
                 pre_synaptic_population, post_synaptic_population, max_delay,
-                post_vertex_max_supported_delay_ms, machine_time_step,
+                post_vertex_max_supported_delay_ms, timestep_in_us,
                 time_scale_factor)
             self.__projection_edge.delay_edge = delay_edge
 
