@@ -1149,6 +1149,7 @@ class SynapticManager(object):
 
         # read in the synaptic block
         if using_monitors:
+            extra_monitor.update_transaction_id_from_machine(transceiver)
             return monitor_api.get_data(
                 extra_monitor,
                 placements.get_placement_of_vertex(extra_monitor), address,
@@ -1166,6 +1167,7 @@ class SynapticManager(object):
 
         # read in the synaptic row data
         if using_monitors:
+            extra_monitor.update_transaction_id_from_machine(transceiver)
             single_block = data_receiver.get_data(
                 extra_monitor,
                 placements.get_placement_of_vertex(extra_monitor),
