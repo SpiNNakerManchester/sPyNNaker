@@ -38,11 +38,8 @@ class RecordingCommon(object):
 
     def __init__(self, population):
         """
-        :param population: the population to record for
-        :type population:
-            ~spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon
+        :param PyNNPopulationCommon population: the population to record for
         """
-
         self.__population = population
 
         # file flags, allows separate files for the recorded variables

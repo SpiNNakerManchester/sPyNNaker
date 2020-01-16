@@ -400,10 +400,9 @@ class AbstractSpiNNakerCommon(with_metaclass(
         :param projection_to_attribute_map:
             the projection to attributes mapping
         :type projection_to_attribute_map:
-            dict(~spynnaker.pyNN.models.pynn_projection_common.PyNNProjectionCommon,
-            list(int) or tuple(int) or None)
+            dict(PyNNProjectionCommon, list(int) or tuple(int) or None)
         :return: a extracted data object with get method for getting the data
-        :rtype: ~spynnaker.pyNN.utilities.extracted_data.ExtractedData
+        :rtype: ExtractedData
         """
         # pylint: disable=protected-access
 

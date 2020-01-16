@@ -42,12 +42,9 @@ def get_dict_from_init(init, skip=None, include=None):
     """ Get an argument initialisation dictionary by examining an \
         ``__init__`` method or function.
 
-    :param init: The method.
-    :type init: callable
-    :param skip: Those arguments to be skipped, if any
-    :type skip: frozenset(str) or None
-    :param include: Those arguments that must be present, if any
-    :type include: frozenset(str) or None
+    :param callable init: The method.
+    :param frozenset(str) skip: The arguments to be skipped, if any
+    :param frozenset(str) include: The arguments that must be present, if any
     :return: an initialisation dictionary
     :rtype: dict(str, Any)
     """
@@ -76,8 +73,8 @@ def default_parameters(parameters):
         ``__init__`` method of a class that is additionally decorated with\
         :py:meth:`defaults`
 
-    :param parameters: The names of the arguments that are parameters
-    :type parameters: iterable(str)
+    :param iterable(str) parameters:
+        The names of the arguments that are parameters
     """
     def wrap(method):
         # Find the real method in case we use multiple of these decorators
@@ -112,8 +109,8 @@ def default_initial_values(state_variables):
         ``__init__`` method of a class that is additionally decorated with\
         :py:meth:`defaults`
 
-    :param state_variables: The names of the arguments that are state variables
-    :type state_variables: iterable(str)
+    :param iterable(str) state_variables:
+        The names of the arguments that are state variables
     """
     def wrap(method):
         # Find the real method in case we use multiple of these decorators

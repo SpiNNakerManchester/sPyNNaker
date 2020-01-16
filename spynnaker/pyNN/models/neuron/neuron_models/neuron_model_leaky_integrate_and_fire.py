@@ -18,6 +18,8 @@ from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from pacman.executor.injection_decorator import inject_items
 from .abstract_neuron_model import AbstractNeuronModel
+from spynnaker.pyNN.models.neuron.implementations import (
+    AbstractStandardNeuronComponent)
 
 V = "v"
 V_REST = "v_rest"
@@ -82,12 +84,12 @@ class NeuronModelLeakyIntegrateAndFire(AbstractNeuronModel):
         self.__v_reset = v_reset
         self.__tau_refrac = tau_refrac
 
-    @overrides(AbstractNeuronModel.get_n_cpu_cycles)
+    @overrides(AbstractStandardNeuronComponent.get_n_cpu_cycles)
     def get_n_cpu_cycles(self, n_neurons):
         # A bit of a guess
         return 100 * n_neurons
 
-    @overrides(AbstractNeuronModel.add_parameters)
+    @overrides(AbstractStandardNeuronComponent.add_parameters)
     def add_parameters(self, parameters):
         parameters[V_REST] = self.__v_rest
         parameters[TAU_M] = self.__tau_m
@@ -96,21 +98,22 @@ class NeuronModelLeakyIntegrateAndFire(AbstractNeuronModel):
         parameters[V_RESET] = self.__v_reset
         parameters[TAU_REFRAC] = self.__tau_refrac
 
-    @overrides(AbstractNeuronModel.add_state_variables)
+    @overrides(AbstractStandardNeuronComponent.add_state_variables)
     def add_state_variables(self, state_variables):
         state_variables[V] = self.__v_init
         state_variables[COUNT_REFRAC] = 0
 
-    @overrides(AbstractNeuronModel.get_units)
+    @overrides(AbstractStandardNeuronComponent.get_units)
     def get_units(self, variable):
         return UNITS[variable]
 
-    @overrides(AbstractNeuronModel.has_variable)
+    @overrides(AbstractStandardNeuronComponent.has_variable)
     def has_variable(self, variable):
         return variable in UNITS
 
     @inject_items({"ts": "MachineTimeStep"})
-    @overrides(AbstractNeuronModel.get_values, additional_arguments={'ts'})
+    @overrides(AbstractStandardNeuronComponent.get_values,
+               additional_arguments={'ts'})
     def get_values(self, parameters, state_variables, vertex_slice, ts):
         """
         :param int ts: machine time step
@@ -127,7 +130,7 @@ class NeuronModelLeakyIntegrateAndFire(AbstractNeuronModel):
                 parameters[TAU_REFRAC].apply_operation(
                     operation=lambda x: int(numpy.ceil(x / (ts / 1000.0))))]
 
-    @overrides(AbstractNeuronModel.update_values)
+    @overrides(AbstractStandardNeuronComponent.update_values)
     def update_values(self, values, parameters, state_variables):
 
         # Read the data

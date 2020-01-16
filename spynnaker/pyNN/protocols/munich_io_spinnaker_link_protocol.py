@@ -291,8 +291,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
 
     def __init__(self, mode, instance_key=None, uart_id=0):
         """
-        :param ~spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES \
-                mode:
+        :param MODES mode:
             The mode of operation of the protocol
         :param instance_key: The optional instance key to use
         :type instance_key: int or None
@@ -316,7 +315,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
     @property
     def mode(self):
         """
-        :rtype: ~spynnaker.pyNN.protocols.MunichIoSpiNNakerLinkProtocol.MODES
+        :rtype: MODES
         """
         return self.__mode
 

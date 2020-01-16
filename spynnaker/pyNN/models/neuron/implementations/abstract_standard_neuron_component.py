@@ -37,7 +37,7 @@ class AbstractStandardNeuronComponent(with_metaclass(AbstractBase, object)):
 
     @property
     def struct(self):
-        """ The structure of the component. This structure will have copies in
+        """ The structure of the component. This structure will have copies in\
             both SDRAM (the initialisation values) and DTCM (the working copy).
 
         :rtype: ~spynnaker.pyNN.models.neuron.implementations.Struct
@@ -79,7 +79,7 @@ class AbstractStandardNeuronComponent(with_metaclass(AbstractBase, object)):
     @abstractmethod
     def add_state_variables(self, state_variables):
         """ Add the initial values of the state variables to the state\
-            variables holde
+            variables holder
 
         :param ~spinn_utilities.ranged.RangeDictionary state_variables:
             A holder of the state variables
@@ -93,7 +93,7 @@ class AbstractStandardNeuronComponent(with_metaclass(AbstractBase, object)):
             The holder of the parameters
         :param ~spinn_utilities.ranged.RangeDictionary state_variables:
             The holder of the state variables
-        :param ~pacman.models.common.Slice vertex_slice:
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of variables being retrieved
         :return: A list with the same length as self.struct.field_types
         :rtype: list(int or float or list(int) or list(float) or
@@ -101,13 +101,14 @@ class AbstractStandardNeuronComponent(with_metaclass(AbstractBase, object)):
         """
 
     def get_data(self, parameters, state_variables, vertex_slice):
-        """ Get the data to be written to the machine for this model
+        """ Get the data to be written to the machine for this model.
 
         :param ~spinn_utilities.ranged.RangeDictionary parameters:
             The holder of the parameters
         :param ~spinn_utilities.ranged.RangeDictionary state_variables:
             The holder of the state variables
-        :param vertex_slice: The slice of the vertex to generate parameters for
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            The slice of the vertex to generate parameters for
         :rtype: ~numpy.ndarray(~numpy.uint32)
         """
         values = self.get_values(parameters, state_variables, vertex_slice)
@@ -116,7 +117,7 @@ class AbstractStandardNeuronComponent(with_metaclass(AbstractBase, object)):
 
     @abstractmethod
     def update_values(self, values, parameters, state_variables):
-        """ Update the parameters and state variables with the given struct
+        """ Update the parameters and state variables with the given struct\
             values that have been read from the machine
 
         :param list(list) values:
@@ -145,12 +146,12 @@ class AbstractStandardNeuronComponent(with_metaclass(AbstractBase, object)):
         :rtype: int
         """
         values = self.struct.read_data(data, offset, vertex_slice.n_atoms)
-        new_offset = offset + (self.struct.get_size_in_whole_words(
-            vertex_slice.n_atoms) * BYTES_PER_WORD)
+        offset += BYTES_PER_WORD * self.struct.get_size_in_whole_words(
+            vertex_slice.n_atoms)
         params = RangedDictVertexSlice(parameters, vertex_slice)
         variables = RangedDictVertexSlice(state_variables, vertex_slice)
         self.update_values(values, params, variables)
-        return new_offset
+        return offset
 
     @abstractmethod
     def has_variable(self, variable):

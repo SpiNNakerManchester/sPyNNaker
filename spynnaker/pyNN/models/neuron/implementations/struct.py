@@ -21,11 +21,15 @@ from spynnaker.pyNN.utilities.utility_calls import convert_to
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
 
+def _key(i):
+    return "f" + str(i)
+
+
 class Struct(object):
     """ Represents a C code structure.
 
     .. note::
-        The structure cannot currently represent arrays.
+        The structure cannot currently represent arrays inside itself.
     """
 
     __slots__ = ["__field_types"]
@@ -52,7 +56,7 @@ class Struct(object):
         :rtype: ~numpy.dtype
         """
         return numpy.dtype(
-            [("f" + str(i), numpy.dtype(data_type.struct_encoding))
+            [(_key(i), numpy.dtype(data_type.struct_encoding))
              for i, data_type in enumerate(self.field_types)],
             align=True)
 
@@ -84,27 +88,9 @@ class Struct(object):
         data = numpy.zeros(array_size, dtype=self.numpy_dtype)
 
         # Go through and get the values and put them in the array
-        for i, (values, data_type) in enumerate(zip(values, self.field_types)):
-
-            if is_singleton(values):
-                data_value = convert_to(values, data_type)
-                data["f" + str(i)] = data_value
-            elif not isinstance(values, RangedList):
-                data_value = [convert_to(v, data_type)
-                              for v in values[offset:(offset + array_size)]]
-                data["f" + str(i)] = data_value
-            else:
-                for start, end, value in values.iter_ranges_by_slice(
-                        offset, offset + array_size):
-
-                    # Get the values and get them into the correct data type
-                    if get_simulator().is_a_pynn_random(value):
-                        values = value.next(end - start)
-                        data_value = [convert_to(v, data_type) for v in values]
-                    else:
-                        data_value = convert_to(value, data_type)
-                    data["f" + str(i)][
-                        start - offset:end - offset] = data_value
+        for i, (vals, data_type) in enumerate(zip(values, self.field_types)):
+            self.__do_data_item(
+                data, _key(i), vals, data_type, offset, array_size)
 
         # Pad to whole number of uint32s
         overflow = (array_size * self.numpy_dtype.itemsize) % BYTES_PER_WORD
@@ -113,6 +99,26 @@ class Struct(object):
                 data.view("uint8"), (0, BYTES_PER_WORD - overflow), "constant")
 
         return data.view("uint32")
+
+    @staticmethod
+    def __do_data_item(data, key, values, data_type, offset, array_size):
+        if is_singleton(values):
+            data[key] = convert_to(values, data_type)
+        elif isinstance(values, RangedList):
+            for start, end, value in values.iter_ranges_by_slice(
+                    offset, offset + array_size):
+                # Get the values and get them into the correct data type
+                if get_simulator().is_a_pynn_random(value):
+                    data[key][start - offset:end - offset] = [
+                        convert_to(v, data_type)
+                        for v in value.next(end - start)]
+                else:
+                    data[key][start - offset:end - offset] = \
+                            convert_to(value, data_type)
+        else:
+            data[key] = [
+                convert_to(v, data_type)
+                for v in values[offset:offset + array_size]]
 
     def read_data(self, data, offset=0, array_size=1):
         """ Read a bytearray of data and convert to struct values
@@ -129,25 +135,17 @@ class Struct(object):
             # TODO: inconsistent return type
             return numpy.zeros(0, dtype=self.numpy_dtype)
 
-        # Prepare items to return
-        items_to_return = list()
-
         # It could be possible that a component has no parameters
         # (for example, InputTypeCurrent): this needs to be dealt with,
         # as numpy.frombuffer does not like an empty type
         if len(self.numpy_dtype) == 0:
-            return items_to_return
+            return []
 
         # Read in the data values
         numpy_data = numpy.frombuffer(
             data, offset=offset, dtype=self.numpy_dtype, count=array_size)
 
-        # Go through the things to be set
-        items_to_return = list()
-        for i, data_type in enumerate(self.field_types):
-            # Get the data to set for this item
-            values = numpy_data["f" + str(i)]
-            items_to_return.append(values / float(data_type.scale))
-
-        # Return values read
-        return items_to_return
+        # Go through the things to be set and scale them
+        return [
+            numpy_data[_key(i)] / float(data_type.scale)
+            for i, data_type in enumerate(self.field_types)]

@@ -26,7 +26,22 @@ from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeStatic
 class IFCurrDualExpBase(AbstractPyNNNeuronModelStandard):
     """ Leaky integrate and fire neuron with two exponentially decaying \
         excitatory current inputs, and one exponentially decaying inhibitory \
-        current input
+        current input.
+
+    :param tau_m:
+    :param cm:
+    :param v_rest:
+    :param v_reset:
+    :param v_thresh:
+    :param tau_syn_E:
+    :param tau_syn_E2:
+    :param tau_syn_I:
+    :param tau_refrac:
+    :param i_offset:
+    :param v:
+    :param isyn_exc:
+    :param isyn_inh:
+    :param isyn_exc2:
     """
 
     @default_initial_values({"v", "isyn_exc", "isyn_exc2", "isyn_inh"})

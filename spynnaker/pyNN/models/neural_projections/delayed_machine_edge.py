@@ -41,7 +41,6 @@ class DelayedMachineEdge(MachineEdge, AbstractFilterableEdge):
 
     @overrides(AbstractFilterableEdge.filter_edge)
     def filter_edge(self, graph_mapper):
-
         # Filter one-to-one connections that are out of range
         for synapse_info in self.__synapse_information:
             if isinstance(synapse_info.connector, OneToOneConnector):

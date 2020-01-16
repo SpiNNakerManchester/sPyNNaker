@@ -30,9 +30,8 @@ class EthernetControlConnection(LiveEventConnection):
             self, translator, label, live_packet_gather_label, local_host=None,
             local_port=None):
         """
-        :param translator: The translator of multicast to control commands
-        :type translator:
-            ~spynnaker.pyNN.external_devices_models.AbstractEthernetTranslator
+        :param AbstractEthernetTranslator translator:
+            The translator of multicast to control commands
         :param str label: The label of the vertex to attach the translator to
         :param str live_packet_gather_label: The label of the LPG vertex that
             this control connection will listen to.
@@ -50,9 +49,8 @@ class EthernetControlConnection(LiveEventConnection):
         """ Add another translator that routes via the LPG.
 
         :param str label: The label of the vertex to attach the translator to
-        :param translator: The translator of multicast to control commands
-        :type translator:
-            ~spynnaker.pyNN.external_devices_models.AbstractEthernetTranslator
+        :param AbstractEthernetTranslator translator:
+            The translator of multicast to control commands
         """
         super(EthernetControlConnection, self).add_receive_label(label)
         self.__translators[label] = translator

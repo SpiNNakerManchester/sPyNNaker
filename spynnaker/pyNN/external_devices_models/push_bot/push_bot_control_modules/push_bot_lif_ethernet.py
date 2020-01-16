@@ -27,11 +27,10 @@ class PushBotLifEthernet(ExternalDeviceLifControl):
     """ Leaky integrate and fire neuron with an exponentially decaying \
         current input
 
-    :param ~spynnaker.pyNN.protocols.MunichIoEthernetProtocol protocol:
+    :param MunichIoEthernetProtocol protocol:
         How to talk to the bot.
-    :param devices: The devices on the bot that we are interested in.
-    :type devices:
-        iterable(~spynnaker.pyNN.external_devices_models.AbstractMulticastControllableDevice)
+    :param iterable(AbstractMulticastControllableDevice) devices:
+        The devices on the bot that we are interested in.
     :param str pushbot_ip_address: Where is the pushbot?
     :param int pushbot_port: (defaulted)
     :param float tau_m: LIF neuron parameter (defaulted)

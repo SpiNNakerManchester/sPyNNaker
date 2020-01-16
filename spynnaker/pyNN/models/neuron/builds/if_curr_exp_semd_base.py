@@ -23,9 +23,26 @@ from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeStatic
 
 
 class IFCurrExpSEMDBase(AbstractPyNNNeuronModelStandard):
-    """ Leaky integrate and fire neuron with an exponentially decaying \
-        current input, where the excitatory input depends upon the inhibitory
+    """ Leaky integrate and fire neuron with an exponentially decaying\
+        current input, where the excitatory input depends upon the inhibitory\
         input (see https://www.cit-ec.de/en/nbs/spiking-insect-vision)
+
+    :param tau_m:
+    :param cm:
+    :param v_rest:
+    :param v_reset:
+    :param v_thresh:
+    :param tau_syn_E:
+    :param tau_syn_E2:
+    :param tau_syn_I:
+    :param tau_refrac:
+    :param i_offset:
+    :param v:
+    :param isyn_exc:
+    :param isyn_exc2:
+    :param isyn_inh:
+    :param multiplicator:
+    :param exc2_old:
     """
 
     @default_initial_values({"v", "isyn_exc", "isyn_exc2", "isyn_inh",
@@ -35,7 +52,6 @@ class IFCurrExpSEMDBase(AbstractPyNNNeuronModelStandard):
             v_thresh=-50.0, tau_syn_E=5.0, tau_syn_E2=5.0, tau_syn_I=5.0,
             tau_refrac=0.1, i_offset=0.0, v=-65.0, isyn_exc=0.0,
             isyn_exc2=0.0, isyn_inh=0.0, multiplicator=0.0, exc2_old=0.0):
-
         neuron_model = NeuronModelLeakyIntegrateAndFire(
             v, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac)
         synapse_type = SynapseTypeSEMD(
