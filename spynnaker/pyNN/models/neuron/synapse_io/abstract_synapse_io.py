@@ -31,7 +31,7 @@ class AbstractSynapseIO(object):
 
     def get_max_row_info(
             self, synapse_info, post_vertex_slice, n_delay_stages,
-            population_table, machine_time_step, in_edge):
+            population_table, timestep_in_us, in_edge):
         """ Get the information about the maximum lengths of delayed and\
             undelayed rows in bytes (including header), words (without header)\
             and number of synapses

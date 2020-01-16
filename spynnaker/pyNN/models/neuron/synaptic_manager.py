@@ -180,9 +180,9 @@ class SynapticManager(object):
     def spikes_per_second(self, spikes_per_second):
         self.__spikes_per_second = spikes_per_second
 
-    def get_maximum_delay_supported_in_ms(self, machine_time_step):
+    def get_maximum_delay_supported_in_ms(self, timestep_in_us):
         return self.__synapse_io.get_maximum_delay_supported_in_ms(
-            machine_time_step)
+            timestep_in_us)
 
     @property
     def vertex_executable_suffix(self):
@@ -218,7 +218,7 @@ class SynapticManager(object):
 
     def _get_max_row_info(
             self, synapse_info, post_vertex_slice, app_edge,
-            machine_time_step):
+            timestep_in_us):
         """ Get the maximum size of each row for a given slice of the vertex
         """
         key = (synapse_info, post_vertex_slice.lo_atom,
@@ -227,11 +227,11 @@ class SynapticManager(object):
             self.__max_row_info[key] = self.__synapse_io.get_max_row_info(
                 synapse_info, post_vertex_slice,
                 app_edge.n_delay_stages, self.__poptable_type,
-                machine_time_step, app_edge)
+                timestep_in_us, app_edge)
         return self.__max_row_info[key]
 
     def _get_synaptic_blocks_size(
-            self, post_vertex_slice, in_edges, machine_time_step):
+            self, post_vertex_slice, in_edges, timestep_in_us):
         """ Get the size of the synaptic blocks in bytes
         """
         memory_size = self._get_static_synaptic_matrix_sdram_requirements()
@@ -240,13 +240,13 @@ class SynapticManager(object):
                 for synapse_info in in_edge.synapse_information:
                     memory_size = self.__add_synapse_size(
                         memory_size, synapse_info, post_vertex_slice, in_edge,
-                        machine_time_step)
+                        timestep_in_us)
         return int(memory_size * _SYNAPSE_SDRAM_OVERSCALE)
 
     def __add_synapse_size(self, memory_size, synapse_info, post_vertex_slice,
-                           in_edge, machine_time_step):
+                           in_edge, timestep_in_us):
         max_row_info = self._get_max_row_info(
-            synapse_info, post_vertex_slice, in_edge, machine_time_step)
+            synapse_info, post_vertex_slice, in_edge, timestep_in_us)
         n_atoms = in_edge.pre_vertex.n_atoms
         memory_size = self.__poptable_type.get_next_allowed_address(
             memory_size)
@@ -319,18 +319,18 @@ class SynapticManager(object):
                 vertex_slice.n_atoms, self.__n_synapse_types)
 
     def get_sdram_usage_in_bytes(
-            self, vertex_slice, machine_time_step, application_graph,
+            self, vertex_slice, timestep_in_us, application_graph,
             app_vertex):
         in_edges = application_graph.get_edges_ending_at_vertex(app_vertex)
         return (
-            self._get_synapse_params_size() +
-            self._get_synapse_dynamics_parameter_size(
+                self._get_synapse_params_size() +
+                self._get_synapse_dynamics_parameter_size(
                 vertex_slice, application_graph, app_vertex) +
-            self._get_synaptic_blocks_size(
-                vertex_slice, in_edges, machine_time_step) +
-            self.__poptable_type.get_master_population_table_size(
+                self._get_synaptic_blocks_size(
+                vertex_slice, in_edges, timestep_in_us) +
+                self.__poptable_type.get_master_population_table_size(
                 vertex_slice, in_edges) +
-            self._get_size_of_generator_information(in_edges))
+                self._get_size_of_generator_information(in_edges))
 
     def _reserve_memory_regions(
             self, spec, machine_vertex, vertex_slice,
@@ -363,7 +363,7 @@ class SynapticManager(object):
     @staticmethod
     def _ring_buffer_expected_upper_bound(
             weight_mean, weight_std_dev, spikes_per_second,
-            machine_timestep, n_synapses_in, sigma):
+            timestep_in_us, n_synapses_in, sigma):
         """ Provides expected upper bound on accumulated values in a ring\
             buffer element.
 
@@ -379,14 +379,14 @@ class SynapticManager(object):
             microSiemens as required)
         :param weight_std_dev: SD of weight distribution
         :param spikes_per_second: Maximum expected Poisson rate in Hz
-        :param machine_timestep: in us
+        :param timestep_in_us: in us
         :param n_synapses_in: No of connected synapses
         :param sigma: How many SD above the mean to go for upper bound; a\
             good starting choice is 5.0. Given length of simulation we can\
             set this for approximate number of saturation events.
         """
         # E[ number of spikes ] in a timestep
-        steps_per_second = 1000000.0 / machine_timestep
+        steps_per_second = 1000000.0 / timestep_in_us
         average_spikes_per_timestep = (
             float(n_synapses_in * spikes_per_second) / steps_per_second)
 
@@ -432,7 +432,7 @@ class SynapticManager(object):
                 (sigma * math.sqrt(poisson_variance + weight_variance)))
 
     def _get_ring_buffer_to_input_left_shifts(
-            self, application_vertex, application_graph, machine_timestep,
+            self, application_vertex, application_graph, timestep_in_us,
             weight_scale):
         """ Get the scaling of the ring buffer to provide as much accuracy as\
             possible without too much overflow
@@ -445,7 +445,7 @@ class SynapticManager(object):
         biggest_weight = numpy.zeros(n_synapse_types)
         weights_signed = False
         rate_stats = [RunningStats() for _ in range(n_synapse_types)]
-        steps_per_second = 1000000.0 / machine_timestep
+        steps_per_second = 1000000.0 / timestep_in_us
 
         for app_edge in application_graph.get_edges_ending_at_vertex(
                 application_vertex):
@@ -515,7 +515,7 @@ class SynapticManager(object):
                 max_weights[synapse_type] = min(
                     self._ring_buffer_expected_upper_bound(
                         stats.mean, stats.standard_deviation, rates.mean,
-                        machine_timestep, stats.n_items,
+                        timestep_in_us, stats.n_items,
                         self.__ring_buffer_sigma),
                     total_weights[synapse_type])
                 max_weights[synapse_type] = max(
@@ -584,7 +584,7 @@ class SynapticManager(object):
             post_vertex_slice, all_syn_block_sz, weight_scales,
             master_pop_table_region, synaptic_matrix_region,
             direct_matrix_region, routing_info,
-            graph_mapper, machine_graph, machine_time_step):
+            graph_mapper, machine_graph, timestep_in_us):
         """ Simultaneously generates both the master population table and
             the synaptic matrix.
         """
@@ -653,7 +653,7 @@ class SynapticManager(object):
                             post_vertex_slice, app_edge,
                             self.__n_synapse_types,
                             single_synapses, master_pop_table_region,
-                            weight_scales, machine_time_step, rinfo,
+                            weight_scales, timestep_in_us, rinfo,
                             all_syn_block_sz, block_addr, single_addr,
                             machine_edge=machine_edge)
                         key = (synapse_info, pre_vertex_slice.lo_atom,
@@ -671,7 +671,7 @@ class SynapticManager(object):
                 pre_slices, pre_slice_index, post_slices,
                 post_slice_index, pre_vertex_slice,
                 post_vertex_slice, master_pop_table_region, rinfo,
-                all_syn_block_sz, block_addr, machine_time_step, app_edge,
+                all_syn_block_sz, block_addr, timestep_in_us, app_edge,
                 generator_data)
             key = (synapse_info, pre_vertex_slice.lo_atom,
                    post_vertex_slice.lo_atom)
@@ -703,14 +703,14 @@ class SynapticManager(object):
             self, spec, synapse_info, pre_slices,
             pre_slice_index, post_slices, post_slice_index, pre_vertex_slice,
             post_vertex_slice, master_pop_table_region, rinfo,
-            all_syn_block_sz, block_addr, machine_time_step,
+            all_syn_block_sz, block_addr, timestep_in_us,
             app_edge, generator_data):
         """ Generate data for the synapse expander
         """
 
         # Get the size of the matrices that will be required
         max_row_info = self._get_max_row_info(
-            synapse_info, post_vertex_slice, app_edge, machine_time_step)
+            synapse_info, post_vertex_slice, app_edge, timestep_in_us)
 
         # If delay edge exists, tell this about the data too, so it can
         # generate its own data
@@ -721,7 +721,7 @@ class SynapticManager(object):
                 max_row_info.delayed_max_n_synapses,
                 pre_slices, pre_slice_index, post_slices, post_slice_index,
                 pre_vertex_slice, post_vertex_slice, synapse_info,
-                app_edge.n_delay_stages + 1, machine_time_step)
+                app_edge.n_delay_stages + 1, timestep_in_us)
         elif max_row_info.delayed_max_n_synapses != 0:
             raise Exception(
                 "Found delayed items but no delay "
@@ -796,7 +796,7 @@ class SynapticManager(object):
             max_row_info.delayed_max_n_synapses, pre_slices, pre_slice_index,
             post_slices, post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_info, n_delay_stages + 1,
-            machine_time_step))
+            timestep_in_us))
         key = (post_vertex_slice.lo_atom, post_vertex_slice.hi_atom)
         self.__gen_on_machine[key] = True
 
@@ -809,7 +809,7 @@ class SynapticManager(object):
             self, spec, synaptic_matrix_region, synapse_info, pre_slices,
             pre_slice_index, post_slices, post_slice_index, pre_vertex_slice,
             post_vertex_slice, app_edge, n_synapse_types, single_synapses,
-            master_pop_table_region, weight_scales, machine_time_step,
+            master_pop_table_region, weight_scales, timestep_in_us,
             rinfo, all_syn_block_sz, block_addr, single_addr,
             machine_edge):
         (row_data, row_length, delayed_row_data, delayed_row_length,
@@ -817,7 +817,7 @@ class SynapticManager(object):
              synapse_info, pre_slices, pre_slice_index, post_slices,
              post_slice_index, pre_vertex_slice, post_vertex_slice,
              app_edge.n_delay_stages, self.__poptable_type, n_synapse_types,
-             weight_scales, machine_time_step,
+             weight_scales, timestep_in_us,
              app_edge=app_edge, machine_edge=machine_edge)
         if app_edge.delay_edge is not None:
             app_edge.delay_edge.pre_vertex.add_delays(
@@ -834,7 +834,7 @@ class SynapticManager(object):
                     synapse_info, pre_vertex_slice, post_vertex_slice,
                     row_length, delayed_row_length, n_synapse_types,
                     weight_scales, row_data, delayed_row_data,
-                    app_edge.n_delay_stages, machine_time_step))
+                    app_edge.n_delay_stages, timestep_in_us))
                 conn_holder.finish()
 
         index = None
@@ -924,21 +924,21 @@ class SynapticManager(object):
         return block_addr, single_addr, index
 
     def _get_ring_buffer_shifts(
-            self, application_vertex, application_graph, machine_timestep,
+            self, application_vertex, application_graph, timestep_in_us,
             weight_scale):
         """ Get the ring buffer shifts for this vertex
         """
         if self.__ring_buffer_shifts is None:
             self.__ring_buffer_shifts = \
                 self._get_ring_buffer_to_input_left_shifts(
-                    application_vertex, application_graph, machine_timestep,
+                    application_vertex, application_graph, timestep_in_us,
                     weight_scale)
         return self.__ring_buffer_shifts
 
     def write_data_spec(
             self, spec, application_vertex, post_vertex_slice, machine_vertex,
             placement, machine_graph, application_graph, routing_info,
-            graph_mapper, weight_scale, machine_time_step):
+            graph_mapper, weight_scale, timestep_in_us):
         # Create an index of delay keys into this vertex
         for m_edge in machine_graph.get_edges_ending_at_vertex(machine_vertex):
             app_edge = graph_mapper.get_application_edge(m_edge)
@@ -957,14 +957,14 @@ class SynapticManager(object):
         in_edges = application_graph.get_edges_ending_at_vertex(
             application_vertex)
         all_syn_block_sz = self._get_synaptic_blocks_size(
-            post_vertex_slice, in_edges, machine_time_step)
+            post_vertex_slice, in_edges, timestep_in_us)
         self._reserve_memory_regions(
             spec, machine_vertex, post_vertex_slice, machine_graph,
             all_syn_block_sz, graph_mapper, application_graph,
             application_vertex)
 
         ring_buffer_shifts = self._get_ring_buffer_shifts(
-            application_vertex, application_graph, machine_time_step,
+            application_vertex, application_graph, timestep_in_us,
             weight_scale)
         weight_scales = self._write_synapse_parameters(
             spec, ring_buffer_shifts, weight_scale)
@@ -975,21 +975,21 @@ class SynapticManager(object):
             POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
             POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
             POPULATION_BASED_REGIONS.DIRECT_MATRIX.value,
-            routing_info, graph_mapper, machine_graph, machine_time_step)
+            routing_info, graph_mapper, machine_graph, timestep_in_us)
 
         if self.__synapse_dynamics is not None:
             if isinstance(self.__synapse_dynamics,
                           AbstractSynapseDynamicsStructural):
                 self.__synapse_dynamics.write_structural_parameters(
                     spec, POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value,
-                    machine_time_step, weight_scales, application_graph,
+                    timestep_in_us, weight_scales, application_graph,
                     application_vertex, post_vertex_slice, graph_mapper,
                     routing_info, self.__synapse_indices)
             else:
                 self.__synapse_dynamics.write_parameters(
                     spec,
                     POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value,
-                    machine_time_step, weight_scales)
+                    timestep_in_us, weight_scales)
 
         self.__weight_scales[placement] = weight_scales
 
@@ -1001,7 +1001,7 @@ class SynapticManager(object):
 
     def get_connections_from_machine(
             self, transceiver, placement, machine_edge, graph_mapper,
-            routing_infos, synapse_info, machine_time_step,
+            routing_infos, synapse_info, timestep_in_us,
             using_extra_monitor_cores, placements=None, monitor_api=None,
             monitor_placement=None, monitor_cores=None,
             handle_time_out_configuration=True, fixed_routes=None):
@@ -1052,7 +1052,7 @@ class SynapticManager(object):
             synapse_info, pre_vertex_slice, post_vertex_slice,
             max_row_length, delayed_max_row_len, self.__n_synapse_types,
             self.__weight_scales[placement], data, delayed_data,
-            app_edge.n_delay_stages, machine_time_step)
+            app_edge.n_delay_stages, timestep_in_us)
 
     def __compute_addresses(self, transceiver, placement):
         """ Helper for computing the addresses of the master pop table and\

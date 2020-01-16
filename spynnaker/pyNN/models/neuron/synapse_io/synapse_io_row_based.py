@@ -68,9 +68,9 @@ class SynapseIORowBased(AbstractSynapseIO):
     @overrides(AbstractSynapseIO.get_max_row_info)
     def get_max_row_info(
             self, synapse_info, post_vertex_slice, n_delay_stages,
-            population_table, machine_time_step, in_edge):
+            population_table, timestep_in_us, in_edge):
         max_delay_supported = self.get_maximum_delay_supported_in_ms(
-            machine_time_step)
+            timestep_in_us)
         max_delay = max_delay_supported * (n_delay_stages + 1)
 
         # delay point where delay extensions start
