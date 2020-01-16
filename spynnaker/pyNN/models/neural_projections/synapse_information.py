@@ -118,6 +118,3 @@ class SynapseInformation(object):
         # convert back to ms
         return clipped_in_timesteps * timestep_in_us / US_TO_MS
 
-    @property
-    def delays(self):
-        return self.__raw_delays

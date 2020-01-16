@@ -233,8 +233,12 @@ class FromListConnector(AbstractConnector):
             block["weight"] = self.__weights[indices]
         # check that conn_list has delays, if not then use the value passed in
         if self.__delays is None:
-            if hasattr(synapse_info.delays, "__len__"):
-                block["delay"] = numpy.array(synapse_info.delays)[indices]
+            # Used raw delays so we get clipping provenance
+            info_delays = synapse_info.raw_delays_in_ms
+            if hasattr(info_delays, "__len__"):
+                unclipped_delays = numpy.array(info_delays)[indices]
+                block["delay"] = self._clip_delays(
+                    unclipped_delays, timestep_in_us)
             else:
                 block["delay"] = self._generate_delays(
                     len(indices), None, pre_vertex_slice,

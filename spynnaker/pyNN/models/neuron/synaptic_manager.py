@@ -257,7 +257,7 @@ class SynapticManager(object):
             max_row_info.delayed_max_bytes * n_atoms * in_edge.n_delay_stages)
         return memory_size
 
-    def _get_size_of_generator_information(self, in_edges):
+    def _get_size_of_generator_information(self, in_edges, timestep_in_us):
         """ Get the size of the synaptic expander parameters
         """
         gen_on_machine = False
@@ -266,6 +266,7 @@ class SynapticManager(object):
             if isinstance(in_edge, ProjectionApplicationEdge):
                 for synapse_info in in_edge.synapse_information:
 
+                    delays = synapse_info.round_delays_in_ms(timestep_in_us)
                     # Get the number of likely vertices
                     max_atoms = in_edge.pre_vertex.get_max_atoms_per_core()
                     if in_edge.pre_vertex.n_atoms < max_atoms:
@@ -279,15 +280,14 @@ class SynapticManager(object):
                     connector_gen = isinstance(
                         connector, AbstractGenerateConnectorOnMachine) and \
                         connector.generate_on_machine(
-                            synapse_info.weights, synapse_info.delays)
+                            synapse_info.weights, delays)
                     synapse_gen = isinstance(
                         dynamics, AbstractGenerateOnMachine)
                     if connector_gen and synapse_gen:
                         gen_on_machine = True
                         gen_size = sum((
                             GeneratorData.BASE_SIZE,
-                            connector.gen_delay_params_size_in_bytes(
-                                synapse_info.delays),
+                            connector.gen_delay_params_size_in_bytes(delays),
                             connector.gen_weight_params_size_in_bytes(
                                 synapse_info.weights),
                             connector.gen_connector_params_size_in_bytes,
@@ -330,7 +330,8 @@ class SynapticManager(object):
                 vertex_slice, in_edges, timestep_in_us) +
                 self.__poptable_type.get_master_population_table_size(
                 vertex_slice, in_edges) +
-                self._get_size_of_generator_information(in_edges))
+                self._get_size_of_generator_information(
+                    in_edges, timestep_in_us))
 
     def _reserve_memory_regions(
             self, spec, machine_vertex, vertex_slice,
@@ -467,7 +468,8 @@ class SynapticManager(object):
                         weight_mean, weight_variance, n_connections)
 
                     delay_variance = synapse_dynamics.get_delay_variance(
-                        connector, synapse_info.delays)
+                        connector, synapse_info.round_delays_in_ms(
+                            timestep_in_us))
                     delay_running_totals[synapse_type].add_items(
                         0.0, delay_variance, n_connections)
 
@@ -633,7 +635,8 @@ class SynapticManager(object):
                     if (isinstance(
                             connector, AbstractGenerateConnectorOnMachine) and
                             connector.generate_on_machine(
-                                synapse_info.weights, synapse_info.delays) and
+                                synapse_info.weights,
+                                synapse_info.raw_delays_in_ms) and
                             isinstance(dynamics, AbstractGenerateOnMachine) and
                             dynamics.generate_on_machine and
                             not self.__is_direct(
@@ -994,7 +997,7 @@ class SynapticManager(object):
         self.__weight_scales[placement] = weight_scales
 
         self._write_on_machine_data_spec(
-            spec, post_vertex_slice, weight_scales, gen_data)
+            spec, post_vertex_slice, weight_scales, gen_data, timestep_in_us)
 
     def clear_connection_cache(self):
         self.__retrieved_blocks = dict()
@@ -1177,7 +1180,8 @@ class SynapticManager(object):
         return self.__poptable_type.get_edge_constraints()
 
     def _write_on_machine_data_spec(
-            self, spec, post_vertex_slice, weight_scales, generator_data):
+            self, spec, post_vertex_slice, weight_scales, generator_data,
+            timestep_in_us):
         """ Write the data spec for the synapse expander
 
         :param spec: The specification to write to
@@ -1191,7 +1195,7 @@ class SynapticManager(object):
             _SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES +
             (self.__n_synapse_types * BYTES_PER_WORD))
         for data in generator_data:
-            n_bytes += data.size
+            n_bytes += data.size(timestep_in_us)
 
         spec.reserve_memory_region(
             region=POPULATION_BASED_REGIONS.CONNECTOR_BUILDER.value,
@@ -1210,7 +1214,7 @@ class SynapticManager(object):
             spec.write_value(int(w), data_type=DataType.INT32)
 
         for data in generator_data:
-            spec.write_array(data.gen_data)
+            spec.write_array(data.gen_data(timestep_in_us))
 
     def gen_on_machine(self, vertex_slice):
         """ True if the synapses should be generated on the machine

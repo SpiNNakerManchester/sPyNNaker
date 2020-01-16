@@ -62,8 +62,7 @@ class GeneratorData(object):
         self.__max_stage = max_stage
         self.__machine_time_step = machine_time_step
 
-    @property
-    def size(self):
+    def size(self, timestep_in_us):
         """ The size of the generated data in bytes
 
         :rtype: int
@@ -77,10 +76,10 @@ class GeneratorData(object):
                     connector.gen_weight_params_size_in_bytes(
                         self.__synapse_information.weights),
                     connector.gen_delay_params_size_in_bytes(
-                        self.__synapse_information.delays)))
+                        self.__synapse_information.round_delays_in_ms(
+                            timestep_in_us))))
 
-    @property
-    def gen_data(self):
+    def gen_data(self, timestep_in_us):
         """ Get the data to be written for this connection
 
         :rtype: numpy array of uint32
@@ -103,7 +102,8 @@ class GeneratorData(object):
             synapse_dynamics.gen_matrix_id,
             connector.gen_connector_id,
             connector.gen_weights_id(self.__synapse_information.weights),
-            connector.gen_delays_id(self.__synapse_information.delays)],
+            connector.gen_delays_id(
+                self.__synapse_information.raw_delays_in_ms)],
             dtype="uint32"))
         items.append(synapse_dynamics.gen_matrix_params)
         items.append(connector.gen_connector_params(
@@ -115,6 +115,6 @@ class GeneratorData(object):
             self.__synapse_information.weights, self.__pre_vertex_slice,
             self.__post_vertex_slice))
         items.append(connector.gen_delay_params(
-            self.__synapse_information.delays, self.__pre_vertex_slice,
-            self.__post_vertex_slice))
+            self.__synapse_information.round_delays_in_ms(timestep_in_us),
+            self.__pre_vertex_slice, self.__post_vertex_slice))
         return numpy.concatenate(items)

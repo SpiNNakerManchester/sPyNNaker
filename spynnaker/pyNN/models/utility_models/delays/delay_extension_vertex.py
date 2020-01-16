@@ -337,19 +337,19 @@ class DelayExtensionVertex(
     def _get_edge_generator_size(self, synapse_info):
         """ Get the size of the generator data for a given synapse info object
         """
+        delays = synapse_info.round_delays_in_ms(self.timestep_in_us)
         connector = synapse_info.connector
         dynamics = synapse_info.synapse_dynamics
         connector_gen = isinstance(
             connector, AbstractGenerateConnectorOnMachine) and \
             connector.generate_on_machine(
-                synapse_info.weights, synapse_info.delays)
+                synapse_info.weights, delays)
         synapse_gen = isinstance(
             dynamics, AbstractGenerateOnMachine)
         if connector_gen and synapse_gen:
             return sum((
                 DelayGeneratorData.BASE_SIZE,
-                connector.gen_delay_params_size_in_bytes(
-                    synapse_info.delays),
+                connector.gen_delay_params_size_in_bytes(delays),
                 connector.gen_connector_params_size_in_bytes,
             ))
         return 0

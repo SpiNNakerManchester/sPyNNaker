@@ -296,7 +296,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
             synapse_type, synapse_info, timestep_in_us):
         (n_connections, all_post, all_pre_in_range, all_pre_in_range_delays,
          all_pre_in_range_weights) = self.compute_statistics(
-            synapse_info.weights, synapse_info.delays, pre_vertex_slice,
+            synapse_info.weights,
+            synapse_info.round_delays_in_ms(timestep_in_us), pre_vertex_slice,
             post_vertex_slice)
 
         syn_dtypes = AbstractConnector.NUMPY_SYNAPSES_DTYPE

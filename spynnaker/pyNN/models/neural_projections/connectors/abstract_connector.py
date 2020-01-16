@@ -339,8 +339,8 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         """
 
         delays = self._generate_values(
-            synapse_info.delays, n_connections, connection_slices, pre_slice,
-            post_slice, synapse_info)
+            synapse_info.raw_delays_in_ms, n_connections, connection_slices,
+            pre_slice, post_slice, synapse_info)
         return self._clip_delays(delays, timestep_in_us)
 
     @abstractmethod

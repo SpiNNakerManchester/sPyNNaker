@@ -22,7 +22,7 @@ class DelayGeneratorData(object):
     """ Data for each connection of the delay generator
     """
     __slots__ = (
-        "__machine_time_step",
+        "__timestep_in_us",
         "__max_delayed_row_n_synapses",
         "__max_row_n_synapses",
         "__max_stage",
@@ -40,7 +40,7 @@ class DelayGeneratorData(object):
             self, max_row_n_synapses, max_delayed_row_n_synapses,
             pre_slices, pre_slice_index, post_slices, post_slice_index,
             pre_vertex_slice, post_vertex_slice, synapse_information,
-            max_stage, machine_time_step):
+            max_stage, timestep_in_us):
         self.__max_row_n_synapses = max_row_n_synapses
         self.__max_delayed_row_n_synapses = max_delayed_row_n_synapses
         self.__pre_slices = pre_slices
@@ -51,7 +51,7 @@ class DelayGeneratorData(object):
         self.__post_vertex_slice = post_vertex_slice
         self.__synapse_information = synapse_information
         self.__max_stage = max_stage
-        self.__machine_time_step = machine_time_step
+        self.__timestep_in_us = timestep_in_us
 
     @property
     def size(self):
@@ -64,7 +64,8 @@ class DelayGeneratorData(object):
         return (
             self.BASE_SIZE + connector.gen_connector_params_size_in_bytes +
             connector.gen_delay_params_size_in_bytes(
-                self.__synapse_information.delays))
+                self.__synapse_information.round_delays_in_ms(
+                    self.__timestep_in_us)))
 
     @property
     def gen_data(self):
@@ -74,15 +75,17 @@ class DelayGeneratorData(object):
         """
         connector = self.__synapse_information.connector
         items = list()
+        delays = self.__synapse_information.round_delays_in_ms(
+            self.__timestep_in_us)
         items.append(numpy.array([
             self.__max_row_n_synapses,
             self.__max_delayed_row_n_synapses,
             self.__pre_vertex_slice.lo_atom,
             self.__pre_vertex_slice.n_atoms,
             self.__max_stage,
-            DataType.S1615.encode_as_int(1000.0 / self.__machine_time_step),
+            DataType.S1615.encode_as_int(1000.0 / self.__timestep_in_us),
             connector.gen_connector_id,
-            connector.gen_delays_id(self.__synapse_information.delays)],
+            connector.gen_delays_id(delays)],
             dtype="uint32"))
         items.append(connector.gen_connector_params(
             self.__pre_slices, self.__pre_slice_index, self.__post_slices,
@@ -90,6 +93,5 @@ class DelayGeneratorData(object):
             self.__post_vertex_slice, self.__synapse_information.synapse_type,
             self.__synapse_information))
         items.append(connector.gen_delay_params(
-            self.__synapse_information.delays, self.__pre_vertex_slice,
-            self.__post_vertex_slice))
+            delays, self.__pre_vertex_slice, self.__post_vertex_slice))
         return numpy.concatenate(items)
