@@ -254,12 +254,12 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
             return self._get_delay_maximum(self._krn_delays, n_conns)
 
         # if not then use the values that came in
-        return self._get_delay_maximum(synapse_info.delays_in_ms, n_conns)
+        return self._get_delay_maximum(synapse_info.raw_delays_in_ms, n_conns)
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, post_vertex_slice, synapse_info, min_delay=None,
-            max_delay=None):
+            self, post_vertex_slice, synapse_info, timestep_in_us,
+            min_delay=None, max_delay=None):
         # This is clearly a cop-out, but it works at the moment:
         # I haven't been able to make this break for "standard usage"
         return numpy.clip(

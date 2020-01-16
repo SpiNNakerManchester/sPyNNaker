@@ -170,8 +170,8 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
 
     @abstractmethod
     def get_n_connections_from_pre_vertex_maximum(
-            self, post_vertex_slice, synapse_info, min_delay=None,
-            max_delay=None):
+            self, post_vertex_slice, synapse_info, timestep_in_us,
+            min_delay=None, max_delay=None):
         """ Get the maximum number of connections between those from any\
             neuron in the pre vertex to the neurons in the\
             post_vertex_slice, for connections with a delay between min_delay\

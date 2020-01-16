@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import numpy
+from spinn_front_end_common.utilities.constants import US_TO_MS
 from spinn_front_end_common.utilities.globals_variables import get_simulator
 
 
@@ -30,7 +32,8 @@ class SynapseInformation(object):
         "__synapse_dynamics",
         "__synapse_type",
         "__weights",
-        "__delays"]
+        "__raw_delays",
+        "__rounded_delays"]
 
     def __init__(self, connector, pre_population, post_population,
                  prepop_is_view, postpop_is_view, rng,
@@ -45,7 +48,8 @@ class SynapseInformation(object):
         self.__synapse_dynamics = synapse_dynamics
         self.__synapse_type = synapse_type
         self.__weights = weights
-        self.__delays = delays
+        self.__raw_delays = delays
+        self.__rounded_delays = []
 
     @property
     def connector(self):
@@ -92,9 +96,28 @@ class SynapseInformation(object):
         return self.__weights
 
     @property
-    def delays_in_ms(self):
-        return self.__delays
+    def raw_delays_in_ms(self):
+        return self.__raw_delays
+
+    def rounded_delays_in_ms(self, timestep_in_us):
+        #  the results to avoid repeated work
+        if not timestep_in_us in self.__rounded_delays:
+            self.__rounded_delays[timestep_in_us] = self._round_delays(
+                timestep_in_us)
+        return self.__rounded_delays[timestep_in_us]
+
+    def round_delays_in_ms(self, timestep_in_us):
+        # Leave randoms as is
+        if get_simulator().is_a_pynn_random(self.__raw_delays):
+            return self.__raw_delays
+        # Concvert to timesteps
+        delays_in_timesteps = numpy.rint(
+            numpy.array(self.__raw_delays) *  US_TO_MS / timestep_in_us)
+        # make sure delay is at least one timestep
+        clipped_in_timesteps = numpy.clip(delays_in_timesteps, 1, float("inf"))
+        # convert back to ms
+        return clipped_in_timesteps * timestep_in_us / US_TO_MS
 
     @property
     def delays(self):
-        return self.__delays
+        return self.__raw_delays

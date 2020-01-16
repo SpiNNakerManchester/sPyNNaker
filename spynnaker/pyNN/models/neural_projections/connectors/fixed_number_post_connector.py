@@ -89,7 +89,7 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine):
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
         n_connections = synapse_info.n_pre_neurons * self.__n_post
-        return self._get_delay_maximum(synapse_info.delays_in_ms, n_connections)
+        return self._get_delay_maximum(synapse_info.raw_delays_in_ms, n_connections)
 
     def _get_post_neurons(self, synapse_info):
         # If we haven't set the array up yet, do it now
@@ -158,8 +158,8 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine):
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, post_vertex_slice, synapse_info, min_delay=None,
-            max_delay=None):
+            self, post_vertex_slice, synapse_info, timestep_in_us,
+            min_delay=None, max_delay=None):
         # pylint: disable=too-many-arguments
         prob_in_slice = (
             post_vertex_slice.n_atoms / float(
@@ -173,7 +173,7 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine):
             return int(math.ceil(n_connections))
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
-            synapse_info.delays,
+            synapse_info.rounded_delays_in_ms(timestep_in_us),
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             n_connections, min_delay, max_delay)
 

@@ -123,11 +123,11 @@ def test_connectors(
         if max_row_length is None:
             max_row_length = connector.\
                 get_n_connections_from_pre_vertex_maximum(
-                    post_vertex_slice, synapse_info)
+                    post_vertex_slice, synapse_info, timestep_in_us=1000)
         else:
             assert(max_row_length == connector.
                    get_n_connections_from_pre_vertex_maximum(
-                        post_vertex_slice, synapse_info))
+                        post_vertex_slice, synapse_info, timestep_in_us=1000))
         if max_col_length is None:
             max_col_length = connector.\
                 get_n_connections_to_post_vertex_maximum(synapse_info)

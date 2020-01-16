@@ -70,12 +70,12 @@ class SmallWorldConnector(AbstractConnector):
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
         return self._get_delay_maximum(
-            synapse_info.delays_in_ms, self.__n_connections)
+            synapse_info.raw_delays_in_ms, self.__n_connections)
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, post_vertex_slice, synapse_info, min_delay=None,
-            max_delay=None):
+            self, post_vertex_slice, synapse_info, timestep_in_us,
+            min_delay=None, max_delay=None):
         # pylint: disable=too-many-arguments
         n_connections = numpy.amax([
             numpy.sum(self.__mask[i, post_vertex_slice.as_slice])
@@ -85,8 +85,8 @@ class SmallWorldConnector(AbstractConnector):
             return n_connections
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
-            synapse_info.delays, self.__n_connections, n_connections,
-            min_delay, max_delay)
+            synapse_info.rounded_delays_in_ms(timestep_in_us),
+            self.__n_connections, n_connections, min_delay, max_delay)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self, synapse_info):

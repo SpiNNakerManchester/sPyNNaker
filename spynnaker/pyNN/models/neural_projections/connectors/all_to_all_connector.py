@@ -65,20 +65,20 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
         return self._get_delay_maximum(
-            synapse_info.delays_in_ms,
+            synapse_info.raw_delays_in_ms,
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons)
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, post_vertex_slice, synapse_info, min_delay=None,
-            max_delay=None):
+            self, post_vertex_slice, synapse_info, timestep_in_us,
+            min_delay=None, max_delay=None):
         # pylint: disable=too-many-arguments
 
         if min_delay is None or max_delay is None:
             return post_vertex_slice.n_atoms
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
-            synapse_info.delays,
+            synapse_info.rounded_delays_in_ms(timestep_in_us),
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             post_vertex_slice.n_atoms, min_delay, max_delay)
 

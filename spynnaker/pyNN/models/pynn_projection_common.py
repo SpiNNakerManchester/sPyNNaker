@@ -21,7 +21,7 @@ from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.constraints.partitioner_constraints import (
     SameAtomsAsVertexConstraint)
 from spinn_front_end_common.utilities import helpful_functions
-from spinn_front_end_common.utilities.constants import US_TO_MS
+
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.models.abstract_models import (
     AbstractAcceptsIncomingSynapses)
@@ -31,7 +31,6 @@ from spynnaker.pyNN.models.neural_projections import (
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.neuron import ConnectionHolder
-from spinn_front_end_common.utilities.globals_variables import get_simulator
 
 # pylint: disable=protected-access
 
@@ -110,15 +109,6 @@ class PyNNProjectionCommon(object):
                 "Synapse target {} not found in {}".format(
                     target, post_synaptic_population.label))
 
-        delay = synapse_dynamics_stdp.delay
-        # round the delays to multiples of full timesteps
-        # (otherwise SDRAM estimation calculations can go wrong)
-        # WARNING is best effort based on rounding_in_us
-        if not get_simulator().is_a_pynn_random(delay):
-            delay = numpy.rint(numpy.array(synapse_dynamics_stdp.delay) *
-                               (US_TO_MS / rounding_in_us)) * \
-                    (rounding_in_us / US_TO_MS)
-
         # set the plasticity dynamics for the post pop (allows plastic stuff
         #  when needed)
         post_synaptic_population._get_vertex.set_synapse_dynamics(
@@ -128,7 +118,8 @@ class PyNNProjectionCommon(object):
         self.__synapse_information = SynapseInformation(
             connector, pre_synaptic_population, post_synaptic_population,
             prepop_is_view, postpop_is_view, rng, synapse_dynamics_stdp,
-            synapse_type, synapse_dynamics_stdp.weight, delay)
+            synapse_type, synapse_dynamics_stdp.weight,
+            synapse_dynamics_stdp.delay)
 
         connector.set_synapse_info(self.__synapse_information)
 

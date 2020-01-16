@@ -54,12 +54,12 @@ class ArrayConnector(AbstractConnector):
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
         return self._get_delay_maximum(
-            synapse_info.delays_in_ms, len(self.__array))
+            synapse_info.raw_delays_in_ms, len(self.__array))
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, post_vertex_slice, synapse_info, min_delay=None,
-            max_delay=None):
+            self, post_vertex_slice, synapse_info, timestep_in_us,
+            min_delay=None, max_delay=None):
         n_connections = 0
         post_lo = post_vertex_slice.lo_atom
         post_hi = post_vertex_slice.hi_atom
@@ -72,8 +72,8 @@ class ArrayConnector(AbstractConnector):
             return n_connections
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
-            synapse_info.delays, self.__n_total_connections, n_connections,
-            min_delay, max_delay)
+            synapse_info.rounded_delays_in_ms(timestep_in_us),
+            self.__n_total_connections, n_connections, min_delay, max_delay)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self, synapse_info):
