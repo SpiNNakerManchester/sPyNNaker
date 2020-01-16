@@ -59,7 +59,6 @@ class IndexBasedProbabilityConnector(AbstractConnector):
         """
         super(IndexBasedProbabilityConnector, self).__init__(
             safe, callback, verbose)
-        self._rng = rng
         self.__index_expression = index_expression
         self.__allow_self_connections = allow_self_connections
         self.__probs = None
@@ -80,7 +79,7 @@ class IndexBasedProbabilityConnector(AbstractConnector):
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             numpy.amax(self.__probs))
-        return self._get_delay_maximum(synapse_info.delays, n_connections)
+        return self._get_delay_maximum(synapse_info.delays_in_ms, n_connections)
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(

@@ -104,7 +104,7 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
         return self._get_delay_maximum(
-            synapse_info.delays,
+            synapse_info.delays_in_ms,
             utility_calls.get_probable_maximum_selected(
                 synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
                 synapse_info.n_pre_neurons * synapse_info.n_post_neurons,

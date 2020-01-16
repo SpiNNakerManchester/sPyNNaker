@@ -40,7 +40,7 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
         return self._get_delay_maximum(
-            synapse_info.delays,
+            synapse_info.delays_in_ms,
             max((synapse_info.n_pre_neurons, synapse_info.n_post_neurons)))
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)

@@ -92,5 +92,9 @@ class SynapseInformation(object):
         return self.__weights
 
     @property
+    def delays_in_ms(self):
+        return self.__delays
+
+    @property
     def delays(self):
         return self.__delays

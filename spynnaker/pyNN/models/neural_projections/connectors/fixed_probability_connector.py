@@ -51,10 +51,9 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
             weights or delays - not implemented
         """
         super(FixedProbabilityConnector, self).__init__(
-            safe, callback, verbose)
+            safe, callback, verbose, rng)
         self._p_connect = p_connect
         self.__allow_self_connections = allow_self_connections
-        self._rng = rng
         if not 0 <= self._p_connect <= 1:
             raise ConfigurationException(
                 "The probability must be between 0 and 1 (inclusive)")
@@ -65,7 +64,7 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             self._p_connect)
-        return self._get_delay_maximum(synapse_info.delays, n_connections)
+        return self._get_delay_maximum(synapse_info.delays_in_ms, n_connections)
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(

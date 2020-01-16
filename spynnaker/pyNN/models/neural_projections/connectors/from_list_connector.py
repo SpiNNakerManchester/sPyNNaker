@@ -75,7 +75,7 @@ class FromListConnector(AbstractConnector):
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
         if self.__delays is None:
-            return numpy.max(synapse_info.delays)
+            return numpy.max(synapse_info.delays_in_ms)
         else:
             return numpy.max(self.__delays)
 

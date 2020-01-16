@@ -254,7 +254,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
             return self._get_delay_maximum(self._krn_delays, n_conns)
 
         # if not then use the values that came in
-        return self._get_delay_maximum(synapse_info.delays, n_conns)
+        return self._get_delay_maximum(synapse_info.delays_in_ms, n_conns)
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(

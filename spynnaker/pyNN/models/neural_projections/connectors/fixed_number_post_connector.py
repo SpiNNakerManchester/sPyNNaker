@@ -62,14 +62,14 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine):
             be connected again.
         :type with_replacement: bool
         """
-        super(FixedNumberPostConnector, self).__init__(safe, callback, verbose)
+        super(FixedNumberPostConnector, self).__init__(
+            safe, callback, verbose, rng)
         self.__n_post = n
         self.__allow_self_connections = allow_self_connections
         self.__with_replacement = with_replacement
         self.__post_neurons = None
         self.__post_neurons_set = False
         self.__post_connector_seed = dict()
-        self._rng = rng
 
     @overrides(AbstractConnector.set_synapse_info)
     def set_synapse_info(self, synapse_info):
@@ -89,7 +89,7 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine):
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
         n_connections = synapse_info.n_pre_neurons * self.__n_post
-        return self._get_delay_maximum(synapse_info.delays, n_connections)
+        return self._get_delay_maximum(synapse_info.delays_in_ms, n_connections)
 
     def _get_post_neurons(self, synapse_info):
         # If we haven't set the array up yet, do it now

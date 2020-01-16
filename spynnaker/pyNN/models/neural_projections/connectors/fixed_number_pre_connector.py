@@ -66,14 +66,14 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine):
         # a Space object, needed if you wish to specify distance-dependent\
         # weights or delays - not implemented
         # :type space: pyNN.Space
-        super(FixedNumberPreConnector, self).__init__(safe, callback, verbose)
+        super(FixedNumberPreConnector, self).__init__(
+            safe, callback, verbose, rng)
         self.__n_pre = n
         self.__allow_self_connections = allow_self_connections
         self.__with_replacement = with_replacement
         self.__pre_neurons_set = False
         self.__pre_neurons = None
         self.__pre_connector_seed = dict()
-        self._rng = rng
 
     @overrides(AbstractConnector.set_synapse_info)
     def set_synapse_info(self, synapse_info):
@@ -94,7 +94,8 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine):
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
         return self._get_delay_maximum(
-            synapse_info.delays, self.__n_pre * synapse_info.n_post_neurons)
+            synapse_info.delays_in_ms,
+            self.__n_pre * synapse_info.n_post_neurons)
 
     def _get_pre_neurons(self, synapse_info):
         # If we haven't set the array up yet, do it now

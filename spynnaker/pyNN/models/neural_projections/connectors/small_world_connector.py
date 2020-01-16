@@ -70,7 +70,7 @@ class SmallWorldConnector(AbstractConnector):
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
         return self._get_delay_maximum(
-            synapse_info.delays, self.__n_connections)
+            synapse_info.delays_in_ms, self.__n_connections)
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(

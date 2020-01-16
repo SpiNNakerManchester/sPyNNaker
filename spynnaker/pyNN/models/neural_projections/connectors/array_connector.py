@@ -53,7 +53,8 @@ class ArrayConnector(AbstractConnector):
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
-        return self._get_delay_maximum(synapse_info.delays, len(self.__array))
+        return self._get_delay_maximum(
+            synapse_info.delays_in_ms, len(self.__array))
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(

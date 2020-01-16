@@ -58,14 +58,13 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
             When selecting, allow a neuron to be re-selected or not.
         :type with_replacement: bool
         """
-        super(MultapseConnector, self).__init__(safe, callback, verbose)
+        super(MultapseConnector, self).__init__(safe, callback, verbose, rng)
         self.__num_synapses = num_synapses
         self.__allow_self_connections = allow_self_connections
         self.__with_replacement = with_replacement
         self.__pre_slices = None
         self.__post_slices = None
         self.__synapses_per_edge = None
-        self._rng = rng
 
     @abstractmethod
     def get_rng_next(self, num_synapses, prob_connect):
@@ -75,7 +74,7 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
         return self._get_delay_maximum(
-            synapse_info.delays, self.__num_synapses)
+            synapse_info.delays_in_ms, self.__num_synapses)
 
     def _update_synapses_per_post_vertex(self, pre_slices, post_slices):
         if (self.__synapses_per_edge is None or
