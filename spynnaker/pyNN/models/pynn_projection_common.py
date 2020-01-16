@@ -130,10 +130,7 @@ class PyNNProjectionCommon(object):
             prepop_is_view, postpop_is_view, rng, synapse_dynamics_stdp,
             synapse_type, synapse_dynamics_stdp.weight, delay)
 
-        # Set projection information in connector
-        connector.set_min_delay(rounding_in_us)
         connector.set_synapse_info(self.__synapse_information)
-        #connector.set_projection_information()
 
         # handle max delay
         max_delay = synapse_dynamics_stdp.get_delay_maximum(

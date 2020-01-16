@@ -48,7 +48,6 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
 
     __slots__ = [
         "_delays",
-        #"__min_delay",
         "__n_clipped_delays",
         "_n_post_neurons",
         "_n_pre_neurons",
@@ -67,10 +66,9 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         self.__verbose = verbose
 
         # something needs to be done about this?
-        self._rng = rng
+        self._rng = (rng or get_simulator().get_pynn_NumpyRNG()())
 
         self.__n_clipped_delays = 0
-        #self.__min_delay = 0
         self.__param_seeds = dict()
 
     def set_space(self, space):
@@ -80,10 +78,6 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         :return:
         """
         self.__space = space
-
-    def set_min_delay(self, timestep_in_us):
-        self._rng = (self._rng or get_simulator().get_pynn_NumpyRNG()())
-        #self.__min_delay = timestep_in_us / 1000.0
 
     def set_synapse_info(self, synapse_info):
         # pylint: disable=unused-argument
@@ -358,6 +352,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         """
         # pylint: disable=too-many-arguments
 
+    # https://github.com/SpiNNakerManchester/SpiNNFrontEndCommon/issues/536
     def get_provenance_data(self, synapse_info):
         name = "{}_{}_{}".format(
             synapse_info.pre_population.label,
@@ -368,11 +363,11 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
             report=self.__n_clipped_delays > 0,
             message=(
                 "The delays in the connector {} from {} to {} was clipped "
-                "to {} a total of {} times.  This can be avoided by reducing "
+                "a total of {} times.  This can be avoided by reducing "
                 "the timestep or increasing the minimum delay to one "
                 "timestep".format(
                     self.__class__.__name__, synapse_info.pre_population.label,
-                    synapse_info.post_population.label, self.__min_delay,
+                    synapse_info.post_population.label,
                     self.__n_clipped_delays)))]
 
     @property

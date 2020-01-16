@@ -29,7 +29,6 @@ def test_csa_one_to_one_connector():
     mock_synapse_info = MockSynapseInfo(MockPopulation(10, "pre"),
                                         MockPopulation(10, "post"),
                                         weight, delay)
-    connector.set_min_delay(timestep_in_us=1000)
     connector.set_synapse_info(synapse_info=mock_synapse_info)
     pre_vertex_slice = Slice(0, 10)
     post_vertex_slice = Slice(0, 10)
@@ -53,7 +52,6 @@ def test_csa_from_list_connector():
     mock_synapse_info = MockSynapseInfo(MockPopulation(10, "pre"),
                                         MockPopulation(10, "post"),
                                         weight, delay)
-    connector.set_min_delay(timestep_in_us=1000)
     connector.set_synapse_info(synapse_info=mock_synapse_info)
     pre_vertex_slice = Slice(0, 10)
     post_vertex_slice = Slice(0, 10)
@@ -77,7 +75,6 @@ def test_csa_random_connector():
     mock_synapse_info = MockSynapseInfo(MockPopulation(10, "pre"),
                                         MockPopulation(10, "post"),
                                         weight, delay)
-    connector.set_min_delay(timestep_in_us=1000)
     connector.set_synapse_info(synapse_info=mock_synapse_info)
     pre_vertex_slice = Slice(0, 10)
     post_vertex_slice = Slice(0, 10)
@@ -101,7 +98,6 @@ def test_csa_block_connector():
     mock_synapse_info = MockSynapseInfo(MockPopulation(10, "pre"),
                                         MockPopulation(10, "post"),
                                         weight, delay)
-    connector.set_min_delay(timestep_in_us=1000)
     connector.set_synapse_info(synapse_info=mock_synapse_info)
     pre_vertex_slice = Slice(0, 10)
     post_vertex_slice = Slice(0, 10)
