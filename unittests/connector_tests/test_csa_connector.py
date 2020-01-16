@@ -15,8 +15,9 @@
 
 import csa
 from spynnaker.pyNN.models.neural_projections.connectors import CSAConnector
-from unittests.mocks import MockSimulator, MockSynapseInfo, \
-    MockPopulation
+from spynnaker.pyNN.models.neural_projections.synapse_information import (
+    SynapseInformation)
+from unittests.mocks import MockSimulator, MockPopulation
 from pacman.model.graphs.common.slice import Slice
 import pytest
 
@@ -26,21 +27,24 @@ def test_csa_one_to_one_connector():
     connector = CSAConnector(csa.oneToOne)
     weight = 1.0
     delay = 2.0
-    mock_synapse_info = MockSynapseInfo(MockPopulation(10, "pre"),
-                                        MockPopulation(10, "post"),
-                                        weight, delay)
-    connector.set_synapse_info(synapse_info=mock_synapse_info)
+    synapse_info = SynapseInformation(
+        connector=connector, pre_population=MockPopulation(10, "pre"),
+        post_population=MockPopulation(10, "post"),
+        prepop_is_view=False, postpop_is_view=False, rng=None,
+        synapse_dynamics="Stub", synapse_type="Stub", weights=weight,
+        delays=delay)
+    connector.set_synapse_info(synapse_info=synapse_info)
     pre_vertex_slice = Slice(0, 10)
     post_vertex_slice = Slice(0, 10)
     block = connector.create_synaptic_block(
         [pre_vertex_slice], 0, [post_vertex_slice], 0,
-        pre_vertex_slice, post_vertex_slice, 0, mock_synapse_info, 1000)
+        pre_vertex_slice, post_vertex_slice, 0, synapse_info, 1000)
     assert(len(block) > 0)
     assert(all(item["source"] == item["target"] for item in block))
-    assert(all(item["weight"] == 1.0 for item in block))
+    assert(all(item["weight"] == weight for item in block))
     for item in block:
         a = item["delay"]
-    assert(all(item["delay"] == 2.0 for item in block))
+    assert(all(item["delay"] == delay for item in block))
 
 
 def test_csa_from_list_connector():
@@ -49,21 +53,24 @@ def test_csa_from_list_connector():
     connector = CSAConnector(conn_list)
     weight = 1.0
     delay = 2.0
-    mock_synapse_info = MockSynapseInfo(MockPopulation(10, "pre"),
-                                        MockPopulation(10, "post"),
-                                        weight, delay)
-    connector.set_synapse_info(synapse_info=mock_synapse_info)
+    synapse_info = SynapseInformation(
+        connector=connector, pre_population=MockPopulation(10, "pre"),
+        post_population=MockPopulation(10, "post"),
+        prepop_is_view=False, postpop_is_view=False, rng=None,
+        synapse_dynamics="Stub", synapse_type="Stub", weights=weight,
+        delays=delay)
+    connector.set_synapse_info(synapse_info=synapse_info)
     pre_vertex_slice = Slice(0, 10)
     post_vertex_slice = Slice(0, 10)
     block = connector.create_synaptic_block(
         [pre_vertex_slice], 0, [post_vertex_slice], 0,
-        pre_vertex_slice, post_vertex_slice, 0, mock_synapse_info, 1000)
+        pre_vertex_slice, post_vertex_slice, 0, synapse_info, 1000)
     assert(len(block) > 0)
     assert(all(item["source"] == conn[0]
                for item, conn in zip(block, conn_list)))
     assert(all(item["target"] == conn[1]
                for item, conn in zip(block, conn_list)))
-    assert(all(item["weight"] == 1.0 for item in block))
+    assert(all(item["weight"] == weight for item in block))
     assert(all(item["delay"] == 2.0 for item in block))
 
 
@@ -72,18 +79,21 @@ def test_csa_random_connector():
     connector = CSAConnector(csa.random(0.05))
     weight = 1.0
     delay = 2.0
-    mock_synapse_info = MockSynapseInfo(MockPopulation(10, "pre"),
-                                        MockPopulation(10, "post"),
-                                        weight, delay)
-    connector.set_synapse_info(synapse_info=mock_synapse_info)
+    synapse_info = SynapseInformation(
+        connector=connector, pre_population=MockPopulation(10, "pre"),
+        post_population=MockPopulation(10, "post"),
+        prepop_is_view=False, postpop_is_view=False, rng=None,
+        synapse_dynamics="Stub", synapse_type="Stub", weights=weight,
+        delays=delay)
+    connector.set_synapse_info(synapse_info=synapse_info)
     pre_vertex_slice = Slice(0, 10)
     post_vertex_slice = Slice(0, 10)
     block = connector.create_synaptic_block(
         [pre_vertex_slice], 0, [post_vertex_slice], 0,
-        pre_vertex_slice, post_vertex_slice, 0, mock_synapse_info, 1000)
+        pre_vertex_slice, post_vertex_slice, 0, synapse_info, 1000)
     assert(len(block) >= 0)
-    assert(all(item["weight"] == 1.0 for item in block))
-    assert(all(item["delay"] == 2.0 for item in block))
+    assert(all(item["weight"] == weight for item in block))
+    assert(all(item["delay"] == delay for item in block))
 
 
 @pytest.mark.skip(reason="https://github.com/INCF/csa/issues/17")
@@ -95,15 +105,18 @@ def test_csa_block_connector():
         csa.block(2, 5) * csa.random(0.5) * csa.random(0.3))
     weight = 1.0
     delay = 2.0
-    mock_synapse_info = MockSynapseInfo(MockPopulation(10, "pre"),
-                                        MockPopulation(10, "post"),
-                                        weight, delay)
-    connector.set_synapse_info(synapse_info=mock_synapse_info)
+    synapse_info = SynapseInformation(
+        connector=connector, pre_population=MockPopulation(10, "pre"),
+        post_population=MockPopulation(10, "post"),
+        prepop_is_view=False, postpop_is_view=False, rng=None,
+        synapse_dynamics="Stub", synapse_type="Stub", weights=None,
+        delays=None)
+    connector.set_synapse_info(synapse_info=synapse_info)
     pre_vertex_slice = Slice(0, 10)
     post_vertex_slice = Slice(0, 10)
     block = connector.create_synaptic_block(
         [pre_vertex_slice], 0, [post_vertex_slice], 0,
-        pre_vertex_slice, post_vertex_slice, 0, mock_synapse_info)
+        pre_vertex_slice, post_vertex_slice, 0, synapse_info)
     assert(len(block) >= 0)
     assert(all(item["weight"] == 1.0 for item in block))
     assert(all(item["delay"] == 2.0 for item in block))

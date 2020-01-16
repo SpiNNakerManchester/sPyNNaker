@@ -39,39 +39,6 @@ class MockPopulation(object):
         return "Population {}".format(self._label)
 
 
-class MockSynapseInfo(object):
-
-    def __init__(self, pre_population, post_population, weights, delays):
-        self._pre_population = pre_population
-        self._post_population = post_population
-        self._weights = weights
-        self._delays = delays
-
-    @property
-    def pre_population(self):
-        return self._pre_population
-
-    @property
-    def post_population(self):
-        return self._post_population
-
-    @property
-    def n_pre_neurons(self):
-        return self._pre_population.size
-
-    @property
-    def n_post_neurons(self):
-        return self._post_population.size
-
-    @property
-    def weights(self):
-        return self._weights
-
-    @property
-    def delays(self):
-        return self._delays
-
-
 class MockRNG(object):
 
     def __init__(self):
