@@ -77,13 +77,13 @@ class DelayExtensionVertex(
                  machine_time_step, timescale_factor, constraints=None,
                  label="DelayExtension"):
         """
-        :param n_neurons: the number of neurons
-        :param delay_per_stage: the delay per stage
+        :param int n_neurons: the number of neurons
+        :param int delay_per_stage: the delay per stage
         :param source_vertex: where messages are coming from
-        :param machine_time_step: how long is the machine time step
-        :param timescale_factor: what slowdown factor has been applied
+        :param int machine_time_step: how long is the machine time step
+        :param int timescale_factor: what slowdown factor has been applied
         :param constraints: the vertex constraints
-        :param label: the vertex label
+        :param str label: the vertex label
         """
         # pylint: disable=too-many-arguments
         super(DelayExtensionVertex, self).__init__(label, constraints, 256)
@@ -137,6 +137,8 @@ class DelayExtensionVertex(
     def n_delay_stages(self):
         """ The maximum number of delay stages required by any connection\
             out of this delay extension vertex
+
+        :rtype: int
         """
         return self.__n_delay_stages
 
@@ -151,7 +153,9 @@ class DelayExtensionVertex(
     def add_delays(self, vertex_slice, source_ids, stages):
         """ Add delayed connections for a given vertex slice
 
-        :type vertex_slice: :py:class:`pacman.model.graphs.common.Slice`
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :param list(int) source_ids:
+        :param list(int) stages:
         """
         if vertex_slice not in self.__delay_blocks:
             self.__delay_blocks[vertex_slice] = DelayBlock(
@@ -165,6 +169,19 @@ class DelayExtensionVertex(
             pre_vertex_slice, post_vertex_slice, synapse_information,
             max_stage, machine_time_step):
         """ Add delays for a connection to be generated
+
+        :param int max_row_n_synapses:
+        :param int max_delayed_row_n_synapses:
+        :param list(~pacman.model.graphs.common.Slice) pre_slices:
+        :param int pre_slice_index:
+        :param list(~pacman.model.graphs.common.Slice) post_slices:
+        :param int post_slice_index:
+        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param ~spynnaker.pyNN.models.neural_projections.SynapseInformation \
+                synapse_information:
+        :param int max_stage:
+        :param int machine_time_step:
         """
         self.__delay_generator_data[pre_vertex_slice].append(
             DelayGeneratorData(

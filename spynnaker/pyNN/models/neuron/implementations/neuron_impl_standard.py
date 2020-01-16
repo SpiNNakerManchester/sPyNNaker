@@ -45,6 +45,16 @@ class NeuronImplStandard(AbstractNeuronImpl):
     def __init__(
             self, model_name, binary, neuron_model, input_type,
             synapse_type, threshold_type, additional_input_type=None):
+        """
+        :param str model_name:
+        :param str binary:
+        :param AbstractNeuronModel neuron_model:
+        :param AbstractInputType input_type:
+        :param AbstractSynapseType synapse_type:
+        :param AbstractThresholdType threshold_type:
+        :param additional_input_type:
+        :type additional_input_type: AbstractAdditionalInput or None
+        """
         self.__model_name = model_name
         self.__binary = binary
         self.__neuron_model = neuron_model

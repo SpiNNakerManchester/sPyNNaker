@@ -23,7 +23,7 @@ UNITS = {V_THRESH: "mV"}
 
 
 class ThresholdTypeStatic(AbstractThresholdType):
-    """ A threshold that is a static value
+    """ A threshold that is a static value.
     """
     __slots__ = ["__v_thresh"]
 
@@ -70,6 +70,9 @@ class ThresholdTypeStatic(AbstractThresholdType):
 
     @property
     def v_thresh(self):
+        """
+        :math:`V_{thresh}`
+        """
         return self.__v_thresh
 
     @v_thresh.setter

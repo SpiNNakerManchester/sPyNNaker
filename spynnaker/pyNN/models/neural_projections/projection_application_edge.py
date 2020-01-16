@@ -107,4 +107,4 @@ class ProjectionApplicationEdge(ApplicationEdge, AbstractFilterableEdge):
     def filter_edge(self):
         return all(
             not _are_dynamics_structural(syn_info.synapse_dynamics)
-            for syn_info in self.app_edge.synapse_information)
+            for syn_info in self.__synapse_information)

@@ -86,6 +86,9 @@ class InputTypeConductance(AbstractInputType):
 
     @property
     def e_rev_E(self):
+        """
+        :math:`E_{{rev}_e}`
+        """
         return self.__e_rev_E
 
     @e_rev_E.setter
@@ -94,6 +97,9 @@ class InputTypeConductance(AbstractInputType):
 
     @property
     def e_rev_I(self):
+        """
+        :math:`E_{{rev}_i}`
+        """
         return self.__e_rev_I
 
     @e_rev_I.setter

@@ -69,10 +69,8 @@ class ProjectionMachineEdge(
             elif isinstance(synapse_info.connector, FromListConnector):
                 pre_hi = self.pre_vertex.vertex_slice.hi_atom
                 post_hi = self.post_vertex.vertex_slice.hi_atom
-                pre_app_vertex = self.pre_vertex.app_vertex
-                post_app_vertex = self.post_vertex.app_vertex
-                pre_slices = pre_app_vertex.vertex_slices
-                post_slices = post_app_vertex.vertex_slices
+                pre_slices = self.pre_vertex.app_vertex.vertex_slices
+                post_slices = self.post_vertex.app_vertex.vertex_slices
                 # run through connection list and check for any connections
                 # between the pre and post vertices that could be filtered
                 n_connections = synapse_info.connector.get_n_connections(

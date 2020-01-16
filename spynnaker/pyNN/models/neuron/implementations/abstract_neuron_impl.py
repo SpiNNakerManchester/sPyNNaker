@@ -148,7 +148,8 @@ class AbstractNeuronImpl(object):
             The holder of the parameters
         :param ~spinn_utilities.ranged.RangeDictionary state_variables:
             The holder of the state variables
-        :param vertex_slice: The slice of the vertex to generate parameters for
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            The slice of the vertex to generate parameters for
         :rtype: ~numpy.ndarray(~numpy.uint32)
         """
 

@@ -83,7 +83,7 @@ class PushBotEthernetDevice(with_metaclass(
     def protocol(self):
         """ The protocol instance, for use in the subclass
 
-        :rtype: ~spynnaker.pyNN.protocols.MunichIoEthernetProtocol
+        :rtype: MunichIoEthernetProtocol
         """
         return self.__protocol
 

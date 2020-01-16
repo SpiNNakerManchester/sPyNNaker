@@ -31,10 +31,8 @@ class EthernetCommandConnection(DatabaseConnection):
             self, translator, command_containers=None, local_host=None,
             local_port=NOTIFY_PORT):
         """
-        :param translator:
+        :param AbstractEthernetTranslator translator:
             A translator of multicast commands to device commands
-        :type translator:
-            ~spynnaker.pyNN.external_devices_models.AbstractEthernetTranslator
         :param command_containers:
             A list of vertices that have commands to be sent at the start \
             and end of simulation

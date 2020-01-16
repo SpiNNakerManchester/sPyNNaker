@@ -24,6 +24,22 @@ _IZK_THRESHOLD = 30.0
 
 
 class IzkCondExpBase(AbstractPyNNNeuronModelStandard):
+    """ Izhikevich neuron model with conductance inputs.
+
+    :param a:
+    :param b:
+    :param c:
+    :param d:
+    :param i_offset:
+    :param u:
+    :param v:
+    :param tau_syn_E:
+    :param tau_syn_I:
+    :param e_rev_E:
+    :param e_rev_I:
+    :param isyn_exc:
+    :param isyn_inh:
+    """
 
     # noinspection PyPep8Naming
     @default_initial_values({"v", "u", "isyn_exc", "isyn_inh"})

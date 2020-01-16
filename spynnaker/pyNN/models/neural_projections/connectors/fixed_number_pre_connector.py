@@ -258,8 +258,7 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine):
     def gen_connector_id(self):
         return ConnectorIDs.FIXED_NUMBER_PRE_CONNECTOR.value
 
-    @overrides(AbstractGenerateConnectorOnMachine.
-               gen_connector_params)
+    @overrides(AbstractGenerateConnectorOnMachine.gen_connector_params)
     def gen_connector_params(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,

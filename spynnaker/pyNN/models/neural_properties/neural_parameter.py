@@ -171,8 +171,7 @@ class NeuronParameter(object):
         return self.__value
 
     def get_dataspec_datatype(self):
-        """ Get the serialization type of the parameter in the \
-            neuron model.
+        """ Get the serialization type of the parameter in the neuron model.
 
         :rtype: ~data_specification.enums.DataType
         """

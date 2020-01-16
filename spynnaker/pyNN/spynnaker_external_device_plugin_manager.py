@@ -23,7 +23,8 @@ from spinn_front_end_common.utilities.notification_protocol import (
     SocketAddress)
 from spinn_front_end_common.utilities.utility_objs import (
     LivePacketGatherParameters)
-from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.utilities.constants import (
+    LIVE_POISSON_CONTROL_PARTITION_ID, SPIKE_PARTITION_ID)
 from spynnaker.pyNN.models.pynn_population_common import PyNNPopulationCommon
 
 
@@ -85,9 +86,8 @@ class SpynnakerExternalDevicePluginManager(object):
         """ Output the spikes from a given population from SpiNNaker as they\
             occur in the simulation.
 
-        :param population: The population to activate the live output for
-        :type population:
-            ~spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon
+        :param PyNNPopulationCommon population:
+            The population to activate the live output for
         :param str database_notify_host:
             The hostname for the device which is listening to the database
             notification.
@@ -154,7 +154,7 @@ class SpynnakerExternalDevicePluginManager(object):
             message_type, right_shift, payload_as_time_stamps,
             use_payload_prefix, payload_prefix, payload_right_shift,
             number_of_packets_sent_per_time_step,
-            partition_ids=[constants.SPIKE_PARTITION_ID])
+            partition_ids=[SPIKE_PARTITION_ID])
 
         if notify:
             SpynnakerExternalDevicePluginManager.add_database_socket_address(
@@ -166,24 +166,21 @@ class SpynnakerExternalDevicePluginManager(object):
         """ Activate the output of spikes from a population to an external\
             device. Note that all spikes will be sent to the device.
 
-        :param population:
+        :param PyNNPopulationCommon population:
             The pyNN population object from which spikes will be sent.
-        :type population:
-            ~spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon
         :param device:
             The pyNN population or external device to which the spikes will be
             sent.
         :type device:
-            ~spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon
-            or ~pacman.model.graphs.application.ApplicationVertex
+            PyNNPopulationCommon or
+            ~pacman.model.graphs.application.ApplicationVertex
         """
         device_vertex = device
         # pylint: disable=protected-access
         if isinstance(device, PyNNPopulationCommon):
             device_vertex = device._get_vertex
         SpynnakerExternalDevicePluginManager.add_edge(
-            population._get_vertex, device_vertex,
-            constants.SPIKE_PARTITION_ID)
+            population._get_vertex, device_vertex, SPIKE_PARTITION_ID)
 
     @staticmethod
     def add_socket_address(socket_address):
@@ -257,23 +254,21 @@ class SpynnakerExternalDevicePluginManager(object):
             reserve_reverse_ip_tag=False):
         """ Add a live rate controller to a Poisson population.
 
-        :param poisson_population: The population to control
-        :type poisson_population:
-            ~spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon
+        :param PyNNPopulationCommon poisson_population:
+            The population to control
         :param str control_label_extension:
-            An extension to add to the label of the Poisson source. Must\
-            match up with the equivalent in the\
-            SpynnakerPoissonControlConnection
+            An extension to add to the label of the Poisson source. Must match
+            up with the equivalent in the SpynnakerPoissonControlConnection
         :param int receive_port:
             The port that the SpiNNaker board should listen on
-        :param str database_notify_host: the hostname for the device which is\
+        :param str database_notify_host: the hostname for the device which is
             listening to the database notification.
-        :param int database_ack_port_num: the port number to which a external\
-            device will acknowledge that they have finished reading the \
+        :param int database_ack_port_num: the port number to which a external
+            device will acknowledge that they have finished reading the
             database and are ready for it to start execution
-        :param int database_notify_port_num: The port number to which a\
+        :param int database_notify_port_num: The port number to which an
             external device will receive the database is ready command
-        :param bool reserve_reverse_ip_tag: True if a reverse IP tag is to be\
+        :param bool reserve_reverse_ip_tag: True if a reverse IP tag is to be
             used, False if SDP is to be used (default)
         """
         # pylint: disable=too-many-arguments, protected-access
@@ -285,7 +280,7 @@ class SpynnakerExternalDevicePluginManager(object):
             reserve_reverse_ip_tag=reserve_reverse_ip_tag)
         SpynnakerExternalDevicePluginManager.add_application_vertex(controller)
         SpynnakerExternalDevicePluginManager.add_edge(
-            controller, vertex, constants.LIVE_POISSON_CONTROL_PARTITION_ID)
+            controller, vertex, LIVE_POISSON_CONTROL_PARTITION_ID)
         if notify:
             SpynnakerExternalDevicePluginManager.add_database_socket_address(
                 database_notify_host, database_notify_port_num,

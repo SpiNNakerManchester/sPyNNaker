@@ -17,6 +17,8 @@ from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from pacman.executor.injection_decorator import inject_items
 from .abstract_neuron_model import AbstractNeuronModel
+from spynnaker.pyNN.models.neuron.implementations import (
+    AbstractStandardNeuronComponent)
 
 A = 'a'
 B = 'b'
@@ -72,12 +74,12 @@ class NeuronModelIzh(AbstractNeuronModel):
         self.__v_init = v_init
         self.__u_init = u_init
 
-    @overrides(AbstractNeuronModel.get_n_cpu_cycles)
+    @overrides(AbstractStandardNeuronComponent.get_n_cpu_cycles)
     def get_n_cpu_cycles(self, n_neurons):
         # A bit of a guess
         return 150 * n_neurons
 
-    @overrides(AbstractNeuronModel.add_parameters)
+    @overrides(AbstractStandardNeuronComponent.add_parameters)
     def add_parameters(self, parameters):
         parameters[A] = self.__a
         parameters[B] = self.__b
@@ -85,16 +87,16 @@ class NeuronModelIzh(AbstractNeuronModel):
         parameters[D] = self.__d
         parameters[I_OFFSET] = self.__i_offset
 
-    @overrides(AbstractNeuronModel.add_state_variables)
+    @overrides(AbstractStandardNeuronComponent.add_state_variables)
     def add_state_variables(self, state_variables):
         state_variables[V] = self.__v_init
         state_variables[U] = self.__u_init
 
-    @overrides(AbstractNeuronModel.get_units)
+    @overrides(AbstractStandardNeuronComponent.get_units)
     def get_units(self, variable):
         return UNITS[variable]
 
-    @overrides(AbstractNeuronModel.has_variable)
+    @overrides(AbstractStandardNeuronComponent.has_variable)
     def has_variable(self, variable):
         return variable in UNITS
 
@@ -109,7 +111,8 @@ class NeuronModelIzh(AbstractNeuronModel):
         return [float(machine_time_step)/1000.0]
 
     @inject_items({"ts": "MachineTimeStep"})
-    @overrides(AbstractNeuronModel.get_values, additional_arguments={'ts'})
+    @overrides(AbstractStandardNeuronComponent.get_values,
+               additional_arguments={'ts'})
     def get_values(self, parameters, state_variables, vertex_slice, ts):
         """
         :param ts: machine time step
@@ -123,7 +126,7 @@ class NeuronModelIzh(AbstractNeuronModel):
             float(ts) / 1000.0
         ]
 
-    @overrides(AbstractNeuronModel.update_values)
+    @overrides(AbstractStandardNeuronComponent.update_values)
     def update_values(self, values, parameters, state_variables):
 
         # Decode the values
