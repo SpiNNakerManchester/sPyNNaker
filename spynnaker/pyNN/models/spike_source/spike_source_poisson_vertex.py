@@ -431,6 +431,9 @@ class SpikeSourcePoissonVertex(
         self.__change_requires_neuron_parameters_reload = True
 
     def _max_spikes_per_ts(self, machine_time_step):
+        """
+        :param int machine_time_step:
+        """
         ts_per_second = MICROSECONDS_PER_SECOND / float(machine_time_step)
         if float(self.__max_rate) / ts_per_second < \
                 SLOW_RATE_PER_TICK_CUTOFF:
@@ -444,6 +447,10 @@ class SpikeSourcePoissonVertex(
         return int(math.ceil(max_spikes_per_ts)) + 1.0
 
     def get_recording_sdram_usage(self, vertex_slice, machine_time_step):
+        """
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :param int machine_time_step:
+        """
         variable_sdram = self.__spike_recorder.get_sdram_usage_in_bytes(
             vertex_slice.n_atoms, self._max_spikes_per_ts(machine_time_step))
         constant_sdram = ConstantSDRAM(
@@ -458,8 +465,11 @@ class SpikeSourcePoissonVertex(
         additional_arguments={"machine_time_step"}
     )
     def get_resources_used_by_atoms(self, vertex_slice, machine_time_step):
+        """
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :param int machine_time_step:
+        """
         # pylint: disable=arguments-differ
-
         poisson_params_sz = self.get_rates_bytes(vertex_slice)
         other = ConstantSDRAM(
             SYSTEM_BYTES_REQUIREMENT +
@@ -512,6 +522,7 @@ class SpikeSourcePoissonVertex(
         """ Gets the size of the Poisson rates in bytes
 
         :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :rtype: int
         """
         n_rates = sum(len(self.__data["rates"][i]) for i in range(
             vertex_slice.lo_atom, vertex_slice.hi_atom + 1))
