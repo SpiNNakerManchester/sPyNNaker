@@ -322,6 +322,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
                         synapse_info.post_population.label))
         return numpy.abs(weights)
 
+#ALSO ROUBD AND UGH MAX
     def _clip_delays(self, delays, timestep_in_us):
         """ Clip delay values, keeping track of how many have been clipped.
         """
