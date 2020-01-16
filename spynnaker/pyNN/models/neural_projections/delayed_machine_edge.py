@@ -45,8 +45,8 @@ class DelayedMachineEdge(MachineEdge, AbstractFilterableEdge):
         # Filter one-to-one connections that are out of range
         return any(
             isinstance(synapse_info.connector, OneToOneConnector)
+            for synapse_info in self.__synapse_information) \
             and self.__no_overlap(self.pre_vertex, self.post_vertex)
-            for synapse_info in self.__synapse_information)
 
     @staticmethod
     def __no_overlap(pre_vertex, post_vertex):
