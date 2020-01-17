@@ -64,7 +64,7 @@ class DelayGeneratorData(object):
         return (
             self.BASE_SIZE + connector.gen_connector_params_size_in_bytes +
             connector.gen_delay_params_size_in_bytes(
-                self.__synapse_information.round_delays_in_ms(
+                self.__synapse_information.rounded_delays_in_ms(
                     self.__timestep_in_us)))
 
     @property
@@ -75,7 +75,7 @@ class DelayGeneratorData(object):
         """
         connector = self.__synapse_information.connector
         items = list()
-        delays = self.__synapse_information.round_delays_in_ms(
+        delays = self.__synapse_information.rounded_delays_in_ms(
             self.__timestep_in_us)
         items.append(numpy.array([
             self.__max_row_n_synapses,

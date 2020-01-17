@@ -266,7 +266,7 @@ class SynapticManager(object):
             if isinstance(in_edge, ProjectionApplicationEdge):
                 for synapse_info in in_edge.synapse_information:
 
-                    delays = synapse_info.round_delays_in_ms(timestep_in_us)
+                    delays = synapse_info.rounded_delays_in_ms(timestep_in_us)
                     # Get the number of likely vertices
                     max_atoms = in_edge.pre_vertex.get_max_atoms_per_core()
                     if in_edge.pre_vertex.n_atoms < max_atoms:
@@ -468,7 +468,7 @@ class SynapticManager(object):
                         weight_mean, weight_variance, n_connections)
 
                     delay_variance = synapse_dynamics.get_delay_variance(
-                        connector, synapse_info.round_delays_in_ms(
+                        connector, synapse_info.rounded_delays_in_ms(
                             timestep_in_us))
                     delay_running_totals[synapse_type].add_items(
                         0.0, delay_variance, n_connections)

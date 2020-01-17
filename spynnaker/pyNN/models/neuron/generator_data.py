@@ -76,7 +76,7 @@ class GeneratorData(object):
                     connector.gen_weight_params_size_in_bytes(
                         self.__synapse_information.weights),
                     connector.gen_delay_params_size_in_bytes(
-                        self.__synapse_information.round_delays_in_ms(
+                        self.__synapse_information.rounded_delays_in_ms(
                             timestep_in_us))))
 
     def gen_data(self, timestep_in_us):
@@ -115,6 +115,6 @@ class GeneratorData(object):
             self.__synapse_information.weights, self.__pre_vertex_slice,
             self.__post_vertex_slice))
         items.append(connector.gen_delay_params(
-            self.__synapse_information.round_delays_in_ms(timestep_in_us),
+            self.__synapse_information.rounded_delays_in_ms(timestep_in_us),
             self.__pre_vertex_slice, self.__post_vertex_slice))
         return numpy.concatenate(items)

@@ -49,7 +49,7 @@ class SynapseInformation(object):
         self.__synapse_type = synapse_type
         self.__weights = weights
         self.__raw_delays = delays
-        self.__rounded_delays = []
+        self.__rounded_delays = {}
 
     @property
     def connector(self):
@@ -106,7 +106,7 @@ class SynapseInformation(object):
                 timestep_in_us)
         return self.__rounded_delays[timestep_in_us]
 
-    def round_delays_in_ms(self, timestep_in_us):
+    def _round_delays(self, timestep_in_us):
         # Leave randoms as is
         if get_simulator().is_a_pynn_random(self.__raw_delays):
             return self.__raw_delays
