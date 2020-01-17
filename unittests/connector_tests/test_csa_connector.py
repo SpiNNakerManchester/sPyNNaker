@@ -42,8 +42,6 @@ def test_csa_one_to_one_connector():
     assert(len(block) > 0)
     assert(all(item["source"] == item["target"] for item in block))
     assert(all(item["weight"] == weight for item in block))
-    for item in block:
-        a = item["delay"]
     assert(all(item["delay"] == delay for item in block))
 
 
@@ -109,8 +107,8 @@ def test_csa_block_connector():
         connector=connector, pre_population=MockPopulation(10, "pre"),
         post_population=MockPopulation(10, "post"),
         prepop_is_view=False, postpop_is_view=False, rng=None,
-        synapse_dynamics="Stub", synapse_type="Stub", weights=None,
-        delays=None)
+        synapse_dynamics="Stub", synapse_type="Stub", weights=weight,
+        delays=delay)
     connector.set_synapse_info(synapse_info=synapse_info)
     pre_vertex_slice = Slice(0, 10)
     post_vertex_slice = Slice(0, 10)
@@ -118,5 +116,5 @@ def test_csa_block_connector():
         [pre_vertex_slice], 0, [post_vertex_slice], 0,
         pre_vertex_slice, post_vertex_slice, 0, synapse_info)
     assert(len(block) >= 0)
-    assert(all(item["weight"] == 1.0 for item in block))
-    assert(all(item["delay"] == 2.0 for item in block))
+    assert(all(item["weight"] == weight for item in block))
+    assert(all(item["delay"] == delay for item in block))

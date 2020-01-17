@@ -110,7 +110,7 @@ class ArrayConnector(AbstractConnector):
         block["target"] = post_neurons
         block["weight"] = self._generate_weights(
             n_connections, None, pre_vertex_slice, post_vertex_slice,
-            synapse_info)#
+            synapse_info)
         block["delay"] = self._generate_delays(
             n_connections, None, pre_vertex_slice, post_vertex_slice,
             synapse_info, timestep_in_us)

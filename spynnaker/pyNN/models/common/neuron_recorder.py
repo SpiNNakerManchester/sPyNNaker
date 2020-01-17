@@ -51,7 +51,8 @@ class _ReadOnlyDict(dict):
 
 class NeuronRecorder(object):
     __slots__ = [
-        "__indexes", "__min_id", "__max_id", "__sampling_rates", "__timestep_in_ms"]
+        "__indexes", "__min_id", "__max_id", "__sampling_rates",
+        "__timestep_in_ms"]
 
     N_BYTES_FOR_TIMESTAMP = BYTES_PER_WORD
     N_BYTES_PER_VALUE = BYTES_PER_WORD
@@ -275,7 +276,7 @@ class NeuronRecorder(object):
     @staticmethod
     def combine_spikes(spikes_list):
         result = numpy.concatenate(spikes_list)
-        return result[numpy.lexsort((result[:,1], result[:,0]))]
+        return result[numpy.lexsort((result[:, 1], result[:, 0]))]
 
     @staticmethod
     def combine_matrix(matrices, indexes, sampling_intervals_ms):
@@ -288,8 +289,8 @@ class NeuronRecorder(object):
             filled.append(NeuronRecorder.pack_matrix(matrices[i], ratio))
         all_indexes = list(numpy.concatenate(indexes))
         return (numpy.concatenate(filled, axis=1),
-               all_indexes,
-               gcd_interval / US_TO_MS)
+                all_indexes,
+                gcd_interval / US_TO_MS)
 
     @staticmethod
     def pack_matrix(original, ratio):

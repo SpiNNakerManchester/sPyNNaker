@@ -325,11 +325,11 @@ class SynapticManager(object):
         return (
                 self._get_synapse_params_size() +
                 self._get_synapse_dynamics_parameter_size(
-                vertex_slice, application_graph, app_vertex) +
+                    vertex_slice, application_graph, app_vertex) +
                 self._get_synaptic_blocks_size(
-                vertex_slice, in_edges, timestep_in_us) +
+                    vertex_slice, in_edges, timestep_in_us) +
                 self.__poptable_type.get_master_population_table_size(
-                vertex_slice, in_edges) +
+                    vertex_slice, in_edges) +
                 self._get_size_of_generator_information(
                     in_edges, timestep_in_us))
 

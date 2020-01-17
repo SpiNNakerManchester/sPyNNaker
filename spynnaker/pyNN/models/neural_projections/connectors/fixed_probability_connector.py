@@ -64,7 +64,8 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             self._p_connect)
-        return self._get_delay_maximum(synapse_info.raw_delays_in_ms, n_connections)
+        return self._get_delay_maximum(
+            synapse_info.raw_delays_in_ms, n_connections)
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(

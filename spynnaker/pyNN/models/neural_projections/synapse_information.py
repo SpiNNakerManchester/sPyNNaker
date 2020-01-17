@@ -101,7 +101,7 @@ class SynapseInformation(object):
 
     def rounded_delays_in_ms(self, timestep_in_us):
         #  the results to avoid repeated work
-        if not timestep_in_us in self.__rounded_delays:
+        if timestep_in_us not in self.__rounded_delays:
             self.__rounded_delays[timestep_in_us] = self._round_delays(
                 timestep_in_us)
         return self.__rounded_delays[timestep_in_us]
@@ -112,9 +112,8 @@ class SynapseInformation(object):
             return self.__raw_delays
         # Concvert to timesteps
         delays_in_timesteps = numpy.rint(
-            numpy.array(self.__raw_delays) *  US_TO_MS / timestep_in_us)
+            numpy.array(self.__raw_delays) * US_TO_MS / timestep_in_us)
         # make sure delay is at least one timestep
         clipped_in_timesteps = numpy.clip(delays_in_timesteps, 1, float("inf"))
         # convert back to ms
         return clipped_in_timesteps * timestep_in_us / US_TO_MS
-

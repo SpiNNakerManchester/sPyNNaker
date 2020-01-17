@@ -16,7 +16,6 @@
 from __future__ import division
 import logging
 import math
-import numpy
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.constraints.partitioner_constraints import (
     SameAtomsAsVertexConstraint)

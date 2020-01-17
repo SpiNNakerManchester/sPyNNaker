@@ -28,7 +28,7 @@ from spinn_front_end_common.abstract_models import (
     AbstractChangableAfterRun, AbstractProvidesIncomingPartitionConstraints,
     AbstractProvidesOutgoingPartitionConstraints, AbstractHasAssociatedBinary,
     AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification,
-    AbstractCanReset, ApplicationTimestepVertex)
+    AbstractCanReset)
 from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl)
 from spinn_front_end_common.utilities import (
@@ -197,7 +197,8 @@ class AbstractPopulationVertex2(
         raise NotImplementedError
 
     def _nr_by_slice(self, vertex_slice):
-        return self.__neuron_recorders[vertex_slice.lo_atom // NEURONS_PER_CORE]
+        return self.__neuron_recorders[
+            vertex_slice.lo_atom // NEURONS_PER_CORE]
 
     @inject_items({
         "graph": "MemoryApplicationGraph",
@@ -209,7 +210,8 @@ class AbstractPopulationVertex2(
     def get_resources_used_by_atoms(self, vertex_slice, graph):
         # pylint: disable=arguments-differ
         slice_num = vertex_slice.lo_atom // 3
-        variableSDRAM = self._nr_by_slice(vertex_slice).get_variable_sdram_usage(
+        variableSDRAM = self._nr_by_slice(
+            vertex_slice).get_variable_sdram_usage(
             vertex_slice, self.timesteps_in_us[slice_num])
         constantSDRAM = ConstantSDRAM(
                 self._get_sdram_usage_for_atoms(vertex_slice, graph))
@@ -242,10 +244,11 @@ class AbstractPopulationVertex2(
     # CB: May be dead code
     def _get_buffered_sdram_per_timestep(self, vertex_slice):
         values = [self._nr_by_slice(vertex_slice).get_buffered_sdram_per_timestep(
-                "spikes", vertex_slice)]
+                  "spikes", vertex_slice)]
         for variable in self.__neuron_impl.get_recordable_variables():
             values.append(
-                self._nr_by_slice(vertex_slice).get_buffered_sdram_per_timestep(
+                self._nr_by_slice(
+                    vertex_slice).get_buffered_sdram_per_timestep(
                     variable, vertex_slice))
         return values
 
@@ -283,7 +286,8 @@ class AbstractPopulationVertex2(
         return (
             _NEURON_BASE_N_CPU_CYCLES + _C_MAIN_BASE_N_CPU_CYCLES +
             (_NEURON_BASE_N_CPU_CYCLES_PER_NEURON * vertex_slice.n_atoms) +
-            self._nr_by_slice(vertex_slice).get_n_cpu_cycles(vertex_slice.n_atoms) +
+            self._nr_by_slice(vertex_slice).get_n_cpu_cycles(
+                vertex_slice.n_atoms) +
             self.__neuron_impl.get_n_cpu_cycles(vertex_slice.n_atoms) +
             self.__synapse_manager.get_n_cpu_cycles())
 
@@ -291,7 +295,8 @@ class AbstractPopulationVertex2(
         return (
             _NEURON_BASE_DTCM_USAGE_IN_BYTES +
             self.__neuron_impl.get_dtcm_usage_in_bytes(vertex_slice.n_atoms) +
-            self._nr_by_slice(vertex_slice).get_dtcm_usage_in_bytes(vertex_slice) +
+            self._nr_by_slice(vertex_slice).get_dtcm_usage_in_bytes(
+                vertex_slice) +
             self.__synapse_manager.get_dtcm_usage_in_bytes())
 
     def _get_sdram_usage_for_neuron_params(self, vertex_slice):
@@ -302,7 +307,8 @@ class AbstractPopulationVertex2(
         """
         return (
             self.BYTES_TILL_START_OF_GLOBAL_PARAMETERS +
-            self._nr_by_slice(vertex_slice).get_sdram_usage_in_bytes(vertex_slice) +
+            self._nr_by_slice(vertex_slice).get_sdram_usage_in_bytes(
+                vertex_slice) +
             self.__neuron_impl.get_sdram_usage_in_bytes(vertex_slice.n_atoms))
 
     def _get_sdram_usage_for_atoms(self, vertex_slice, graph):
@@ -541,7 +547,8 @@ class AbstractPopulationVertex2(
 
         # Write the neuron parameters
         self._write_neuron_parameters(
-            spec, key, vertex_slice, self.timesteps_in_us[slice_num], time_scale_factor)
+            spec, key, vertex_slice, self.timesteps_in_us[slice_num],
+            time_scale_factor)
 
         # write profile data
         profile_utils.write_profile_region_data(
@@ -642,8 +649,8 @@ class AbstractPopulationVertex2(
 
             data, indexes, sampling_interval = \
                 neuron_recorder.get_matrix_data(
-                self.label, buffer_manager, index, placements, graph_mapper,
-                [vertex], variable, n_machine_time_steps)
+                    self.label, buffer_manager, index, placements,
+                    graph_mapper, [vertex], variable, n_machine_time_steps)
             matrices.append(data)
             all_indexes.append((indexes))
             sampling_intervals.append(sampling_interval)
@@ -659,7 +666,8 @@ class AbstractPopulationVertex2(
         all = set()
         for neuron_recorder in self.__neuron_recorders:
             all.add(int(
-                neuron_recorder.get_neuron_sampling_interval("spikes"))* US_TO_MS)
+                neuron_recorder.get_neuron_sampling_interval("spikes"))
+                    * US_TO_MS)
         return gcd(all) / US_TO_MS
 
     @overrides(AbstractPopulationInitializable.initialize)
@@ -875,7 +883,7 @@ class AbstractPopulationVertex2(
     def clear_spike_recording(self, buffer_manager, placements, graph_mapper):
         self._clear_recording_region(
             buffer_manager, placements, graph_mapper,
-            AbstractPopulationVertex.SPIKE_RECORDING_REGION)
+            AbstractPopulationVertex2.SPIKE_RECORDING_REGION)
 
     def _clear_recording_region(
             self, buffer_manager, placements, graph_mapper,

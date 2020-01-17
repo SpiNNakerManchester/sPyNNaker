@@ -59,9 +59,10 @@ def test_recording_variables():
     assert(["v", "gsyn_inh"] == nr.recording_variables)
     assert([1, 3] == nr.recorded_region_ids)
 
+
 def test_pack_matrix():
     original = numpy.array([1, 2, 3, 31, 32, 33, 61, 62, 63, 91, 92, 93]).\
-        reshape(4,3)
+        reshape(4, 3)
     ratio = 3
     result = NeuronRecorder.pack_matrix(original, ratio)
     target = numpy.array(
@@ -76,9 +77,10 @@ def test_pack_matrix():
          numpy.nan, numpy.nan, numpy.nan,
          91, 92, 93,
          numpy.nan, numpy.nan, numpy.nan,
-         numpy.nan, numpy.nan, numpy.nan]).reshape(12,3)
+         numpy.nan, numpy.nan, numpy.nan]).reshape(12, 3)
     assert(result.shape == target.shape)
     numpy.testing.assert_equal(result, target)
+
 
 def test_combine_matrix():
     org1 = numpy.array([1, 2, 3,
@@ -93,7 +95,7 @@ def test_combine_matrix():
                         91, 92, 93,
                         101, 102, 103,
                         111, 112, 113]). \
-            reshape(12,3)
+            reshape(12, 3)
     org2 = numpy.array([21, 22, 23,
                         221, 222, 223,
                         241, 242, 243,
@@ -109,8 +111,8 @@ def test_combine_matrix():
     result2_3, indexex2_3, interval2_3 = \
         NeuronRecorder.combine_matrix([org2, org3],
                                       [[4, 5, 6], [7, 8, 9]],
-                                      [2000, 3000],)
-    assert(result2_3.shape == (12,6))
+                                      [2000, 3000])
+    assert(result2_3.shape == (12, 6))
     assert( interval2_3 == 1000)
     nan = numpy.nan
     target2_3 = numpy.array([21, 22, 23, 31, 32, 33,
@@ -124,13 +126,13 @@ def test_combine_matrix():
                              281, 282, 283, nan, nan, nan,
                              nan, nan, nan, 391, 392, 393,
                              2101, 2102, 2103, nan, nan, nan,
-                             nan, nan, nan, nan, nan, nan]).reshape(12,6)
+                             nan, nan, nan, nan, nan, nan]).reshape(12, 6)
     numpy.testing.assert_equal(result2_3, target2_3)
     result1_2_3, indexex1_2_3, interval1_2_3 = \
         NeuronRecorder.combine_matrix([org1, org2, org3],
                                       [[1, 2, 3], [4, 5, 6], [7, 8, 9]],
                                       [1000, 2000, 3000])
-    assert(result1_2_3.shape == (12,9))
+    assert(result1_2_3.shape == (12, 9))
     assert(interval1_2_3 == 1000)
     numpy.array_equal(indexex1_2_3, [1, 2, 3, 4, 5, 6, 7, 8, 9])
     target1_2_3 = numpy.array(
