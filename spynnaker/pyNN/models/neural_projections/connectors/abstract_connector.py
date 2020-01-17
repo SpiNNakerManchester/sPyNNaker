@@ -49,6 +49,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
     __slots__ = [
         "_delays",
         "__n_clipped_delays",
+        "__n_rounded_delays",
         "_n_post_neurons",
         "_n_pre_neurons",
         "_rng",
@@ -69,6 +70,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         self._rng = (rng or get_simulator().get_pynn_NumpyRNG()())
 
         self.__n_clipped_delays = 0
+        self.__n_rounded_delays = 0
         self.__param_seeds = dict()
 
     def set_space(self, space):
@@ -316,21 +318,31 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
                         synapse_info.post_population.label))
         return numpy.abs(weights)
 
-#ALSO ROUBD AND UGH MAX
     def _clip_delays(self, delays, timestep_in_us):
-        """ Clip delay values, keeping track of how many have been clipped.
         """
-        timestep_in_ms =  timestep_in_us / US_TO_MS
-        # count values that could be clipped
-        self.__n_clipped_delays = numpy.sum(delays < timestep_in_ms)
+        Clips and rounds delay values,
 
-        # clip values
+        Keeping track of how many have been clipped.
+        """
+        timestep_in_ms = timestep_in_us / US_TO_MS
         if numpy.isscalar(delays):
             if delays < timestep_in_ms:
-                delays = timestep_in_ms
+                self.__n_clipped_delays += 1
+                return timestep_in_ms
+            rounded = round(delays * US_TO_MS / timestep_in_us) * \
+                      timestep_in_us / US_TO_MS
+            if not numpy.allclose(delays, rounded):
+                self.__n_rounded_delays += 1
+            return delays
         else:
             if delays.size:
+                self.__n_clipped_delays += numpy.sum(delays < timestep_in_ms)
                 delays[delays < timestep_in_ms] = timestep_in_ms
+                rounded = numpy.rint(delays * US_TO_MS / timestep_in_us) \
+                          * timestep_in_us / US_TO_MS
+                self.__n_rounded_delays += delays.size - numpy.sum(
+                    numpy.isclose(delays, rounded))
+                return rounded
         return delays
 
     def _generate_delays(self, n_connections, connection_slices,
@@ -357,7 +369,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         name = "{}_{}_{}".format(
             synapse_info.pre_population.label,
             synapse_info.post_population.label, self.__class__.__name__)
-        return [ProvenanceDataItem(
+        clipped = ProvenanceDataItem(
             [name, "Times_synaptic_delays_got_clipped"],
             self.__n_clipped_delays,
             report=self.__n_clipped_delays > 0,
@@ -368,7 +380,19 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
                 "timestep".format(
                     self.__class__.__name__, synapse_info.pre_population.label,
                     synapse_info.post_population.label,
-                    self.__n_clipped_delays)))]
+                    self.__n_clipped_delays)))
+        rounded = ProvenanceDataItem(
+            [name, "Times_synaptic_delays_got_rounded"],
+            self.__n_rounded_delays,
+            report=self.__n_rounded_delays > 0,
+            message=(
+                "The delays in the connector {} from {} to {} was rounded "
+                "a total of {} times.  This can be avoided by ensuring "
+                "the delay is a multiple of the timestep".format(
+                    self.__class__.__name__, synapse_info.pre_population.label,
+                    synapse_info.post_population.label,
+                    self.__n_rounded_delays)))
+        return [clipped, rounded]
 
     @property
     def safe(self):
