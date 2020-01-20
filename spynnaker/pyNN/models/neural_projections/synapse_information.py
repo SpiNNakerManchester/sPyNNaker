@@ -100,17 +100,20 @@ class SynapseInformation(object):
         return self.__raw_delays
 
     def rounded_delays_in_ms(self, timestep_in_us):
-        #  the results to avoid repeated work
+        #  Cache the results to avoid repeated work
         if timestep_in_us not in self.__rounded_delays:
             self.__rounded_delays[timestep_in_us] = self._round_delays(
                 timestep_in_us)
         return self.__rounded_delays[timestep_in_us]
 
     def _round_delays(self, timestep_in_us):
+        if timestep_in_us <= 0:
+            raise ValueError ("timestep {} is not possitive!".format(
+                timestep_in_us))
         # Leave randoms as is
         if get_simulator().is_a_pynn_random(self.__raw_delays):
             return self.__raw_delays
-        # Concvert to timesteps
+        # Concert to timesteps
         delays_in_timesteps = numpy.rint(
             numpy.array(self.__raw_delays) * US_TO_MS / timestep_in_us)
         # make sure delay is at least one timestep
