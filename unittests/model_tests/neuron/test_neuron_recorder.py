@@ -102,18 +102,18 @@ def test_combine_matrix():
                         261, 262, 263,
                         281, 282, 283,
                         2101, 2102, 2103]).\
-        reshape(6,3)
+        reshape(6, 3)
     org3 = numpy.array([31, 32, 33,
                         331, 332, 333,
                         361, 362, 363,
                         391, 392, 393]).\
-        reshape(4,3)
+        reshape(4, 3)
     result2_3, indexex2_3, interval2_3 = \
         NeuronRecorder.combine_matrix([org2, org3],
                                       [[4, 5, 6], [7, 8, 9]],
                                       [2000, 3000])
     assert(result2_3.shape == (12, 6))
-    assert( interval2_3 == 1000)
+    assert(interval2_3 == 1000)
     nan = numpy.nan
     target2_3 = numpy.array([21, 22, 23, 31, 32, 33,
                              nan, nan, nan, nan, nan, nan,

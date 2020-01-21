@@ -330,7 +330,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
                 self.__n_clipped_delays += 1
                 return timestep_in_ms
             rounded = round(delays * US_TO_MS / timestep_in_us) * \
-                      timestep_in_us / US_TO_MS
+                timestep_in_us / US_TO_MS
             if not numpy.allclose(delays, rounded):
                 self.__n_rounded_delays += 1
             return delays
@@ -339,7 +339,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
                 self.__n_clipped_delays += numpy.sum(delays < timestep_in_ms)
                 delays[delays < timestep_in_ms] = timestep_in_ms
                 rounded = numpy.rint(delays * US_TO_MS / timestep_in_us) \
-                          * timestep_in_us / US_TO_MS
+                    * timestep_in_us / US_TO_MS
                 self.__n_rounded_delays += delays.size - numpy.sum(
                     numpy.isclose(delays, rounded))
                 return rounded

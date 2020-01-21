@@ -107,9 +107,14 @@ class SynapseInformation(object):
         return self.__rounded_delays[timestep_in_us]
 
     def _round_delays(self, timestep_in_us):
-        if timestep_in_us <= 0:
-            raise ValueError ("timestep {} is not possitive!".format(
-                timestep_in_us))
+        if timestep_in_us < 50:
+            if timestep_in_us <= 0:
+                raise ValueError("timestep {} is not possitive!".format(
+                    timestep_in_us))
+            else:
+                # Safety code it timestep < 50 intended reduce as required
+                raise NotImplementedError("timestep {} appears to be too low"
+                                          "".format(timestep_in_us))
         # Leave randoms as is
         if get_simulator().is_a_pynn_random(self.__raw_delays):
             return self.__raw_delays
