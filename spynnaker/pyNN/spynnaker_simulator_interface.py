@@ -34,11 +34,6 @@ class SpynnakerSimulatorInterface(SimulatorInterface):
     def get_current_time(self):
         pass
 
-    # Used at common level but depends on PyNN so individual implementations
-    @abstractmethod
-    def get_random_distribution(self):
-        pass
-
     # declared in common and used in common
     @abstractproperty
     def has_reset_last(self):

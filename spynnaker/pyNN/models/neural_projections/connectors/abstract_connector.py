@@ -203,7 +203,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
     def _get_weight_maximum(self, weights, n_connections):
         """ Get the maximum of the weights.
         """
-        if isinstance(weights, RandomDistribution)::
+        if isinstance(weights, RandomDistribution):
             mean_weight = utility_calls.get_mean(weights)
             if mean_weight < 0:
                 min_weight = utility_calls.get_minimum_probable_value(
@@ -261,7 +261,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
             seed = int(values.rng.next() * 0x7FFFFFFF)
             self.__param_seeds[key] = seed
         new_rng = NumpyRNG(seed)
-        copy_rd = get_simulator().get_random_distribution()(
+        copy_rd = RandomDistribution(
             values.name, parameters_pos=None, rng=new_rng,
             **values.parameters)
         if n_connections == 1:

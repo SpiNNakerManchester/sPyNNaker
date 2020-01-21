@@ -46,9 +46,6 @@ class MainInterfaceImpl(AbstractSpiNNakerCommon):
     def get_distribution_to_stats(self):
         return None
 
-    def get_random_distribution(self):
-        return None
-
 
 class TestSpinnakerMainInterface(unittest.TestCase):
 
