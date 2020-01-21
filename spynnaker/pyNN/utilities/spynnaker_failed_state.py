@@ -24,9 +24,6 @@ class SpynnakerFailedState(SpynnakerSimulatorInterface, FailedState, object):
 
     __slots__ = ()
 
-    def get_distribution_to_stats(self):
-        raise ConfigurationException(FAILED_STATE_MSG)
-
     def get_current_time(self):
         raise ConfigurationException(FAILED_STATE_MSG)
 

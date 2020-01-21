@@ -25,8 +25,26 @@ from scipy.stats import binom
 from spinn_utilities.safe_eval import SafeEval
 from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
+from spynnaker.pyNN.utilities.random_stats import (
+    RandomStatsExponentialImpl, RandomStatsGammaImpl, RandomStatsLogNormalImpl,
+    RandomStatsNormalClippedImpl, RandomStatsNormalImpl,
+    RandomStatsPoissonImpl, RandomStatsRandIntImpl, RandomStatsUniformImpl,
+    RandomStatsVonmisesImpl, RandomStatsBinomialImpl)
 
 MAX_RATE = 2 ** 32 - 1  # To allow a unit32_t to be used to store the rate
+
+STATS_BY_NAME = {
+    'binomial': RandomStatsBinomialImpl(),
+    'gamma': RandomStatsGammaImpl(),
+    'exponential': RandomStatsExponentialImpl(),
+    'lognormal': RandomStatsLogNormalImpl(),
+    'normal': RandomStatsNormalImpl(),
+    'normal_clipped': RandomStatsNormalClippedImpl(),
+    'normal_clipped_to_boundary': RandomStatsNormalClippedImpl(),
+    'poisson': RandomStatsPoissonImpl(),
+    'uniform': RandomStatsUniformImpl(),
+    'randint': RandomStatsRandIntImpl(),
+    'vonmises': RandomStatsVonmisesImpl()}
 
 logger = logging.getLogger(__name__)
 
@@ -185,13 +203,11 @@ def get_probable_maximum_selected(
     prob = 1.0 - (chance / float(n_total_trials))
     return binom.ppf(prob, n_trials, selection_prob)
 
-
 def get_probability_within_range(dist, lower, upper):
     """ Get the probability that a value will fall within the given range for\
         a given RandomDistribution
     """
-    simulator = globals_variables.get_simulator()
-    stats = simulator.get_distribution_to_stats()[dist.name]
+    stats = STATS_BY_NAME[dist.name]
     return (stats.cdf(dist, upper) - stats.cdf(dist, lower))
 
 
@@ -199,8 +215,7 @@ def get_maximum_probable_value(dist, n_items, chance=(1.0 / 100.0)):
     """ Get the likely maximum value of a RandomDistribution given a\
         number of draws
     """
-    simulator = globals_variables.get_simulator()
-    stats = simulator.get_distribution_to_stats()[dist.name]
+    stats = STATS_BY_NAME[dist.name]
     prob = 1.0 - (chance / float(n_items))
     return stats.ppf(dist, prob)
 
@@ -209,8 +224,7 @@ def get_minimum_probable_value(dist, n_items, chance=(1.0 / 100.0)):
     """ Get the likely minimum value of a RandomDistribution given a\
         number of draws
     """
-    simulator = globals_variables.get_simulator()
-    stats = simulator.get_distribution_to_stats()[dist.name]
+    stats = STATS_BY_NAME[dist.name]
     prob = chance / float(n_items)
     return stats.ppf(dist, prob)
 
@@ -218,24 +232,21 @@ def get_minimum_probable_value(dist, n_items, chance=(1.0 / 100.0)):
 def get_mean(dist):
     """ Get the mean of a RandomDistribution
     """
-    simulator = globals_variables.get_simulator()
-    stats = simulator.get_distribution_to_stats()[dist.name]
+    stats = STATS_BY_NAME()[dist.name]
     return stats.mean(dist)
 
 
 def get_standard_deviation(dist):
     """ Get the standard deviation of a RandomDistribution
     """
-    simulator = globals_variables.get_simulator()
-    stats = simulator.get_distribution_to_stats()[dist.name]
+    stats = STATS_BY_NAME()[dist.name]
     return stats.std(dist)
 
 
 def get_variance(dist):
     """ Get the variance of a RandomDistribution
     """
-    simulator = globals_variables.get_simulator()
-    stats = simulator.get_distribution_to_stats()[dist.name]
+    stats = STATS_BY_NAME[dist.name]
     return stats.var(dist)
 
 
@@ -244,8 +255,7 @@ def high(dist):
 
     Could return None
     """
-    simulator = globals_variables.get_simulator()
-    stats = simulator.get_distribution_to_stats()[dist.name]
+    stats = STATS_BY_NAME[dist.name]
     return stats.high(dist)
 
 
@@ -254,8 +264,7 @@ def low(dist):
 
     Could return None
     """
-    simulator = globals_variables.get_simulator()
-    stats = simulator.get_distribution_to_stats()[dist.name]
+    stats = STATS_BY_NAME()[dist.name]
     return stats.low(dist)
 
 

@@ -24,11 +24,6 @@ class SpynnakerSimulatorInterface(SimulatorInterface):
 
     __slots__ = ()
 
-    # Used at common level but depends on PyNN so individual implementations
-    @abstractmethod
-    def get_distribution_to_stats(self):
-        pass
-
     # Implemented in FEC but only used by sPyNNaker
     @abstractmethod
     def get_current_time(self):
