@@ -19,6 +19,7 @@ import numpy.random
 from six import raise_from
 from spinn_utilities.abstract_base import abstractmethod
 from spinn_utilities.overrides import overrides
+from pacman.model.graphs.common import Slice
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.exceptions import SpynnakerException
@@ -116,9 +117,9 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
     def get_n_connections_from_pre_vertex_maximum(
             self, post_vertex_slice, synapse_info, min_delay=None,
             max_delay=None):
-        prob_in_slice = (
+        prob_in_slice = min(
             float(post_vertex_slice.n_atoms) / float(
-                synapse_info.n_post_neurons))
+                synapse_info.n_post_neurons), 1.0)
         max_in_slice = utility_calls.get_probable_maximum_selected(
             self.__num_synapses, self.__num_synapses, prob_in_slice)
         prob_in_row = 1.0 / float(synapse_info.n_pre_neurons)
@@ -201,6 +202,11 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
     def __repr__(self):
         return "MultapseConnector({})".format(self.__num_synapses)
 
+    def _get_view_lo_hi(self, indexes):
+        view_lo = indexes[0]
+        view_hi = indexes[-1]
+        return view_lo, view_hi
+
     @property
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_id)
     def gen_connector_id(self):
@@ -212,14 +218,109 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type, synapse_info):
-        self._update_synapses_per_post_vertex(pre_slices, post_slices)
+
+        params = []
+        pre_view_lo = 0
+        pre_view_hi = synapse_info.n_pre_neurons - 1
+        pre_size = pre_vertex_slice.n_atoms
+        if synapse_info.prepop_is_view:
+            pre_view_lo, pre_view_hi = self._get_view_lo_hi(
+                synapse_info.pre_population._indexes)
+            # work out the number of atoms required on this slice
+            if ((pre_view_lo >= pre_vertex_slice.lo_atom) and
+                (pre_view_lo <= pre_vertex_slice.hi_atom)):
+                if (pre_view_hi <= pre_vertex_slice.hi_atom):
+                    pre_size = pre_view_hi - pre_view_lo + 1
+                else:
+                    pre_size = pre_vertex_slice.hi_atom - pre_view_lo + 1
+            elif ((pre_view_lo < pre_vertex_slice.lo_atom) and
+                  (pre_view_hi >= pre_vertex_slice.lo_atom)):
+                if (pre_view_hi <= pre_vertex_slice.hi_atom):
+                    pre_size = pre_view_hi - pre_vertex_slice.lo_atom + 1
+                else:
+                    pre_size = (
+                        pre_vertex_slice.hi_atom - pre_vertex_slice.lo_atom + 1)
+            else:
+                pre_size = 0
+
+        params.extend([pre_view_lo, pre_view_hi])
+
+        post_view_lo = 0
+        post_view_hi = synapse_info.n_post_neurons - 1
+        post_size = post_vertex_slice.n_atoms
+        if synapse_info.postpop_is_view:
+            post_view_lo, post_view_hi = self._get_view_lo_hi(
+                synapse_info.post_population._indexes)
+            # work out the number of atoms required on this slice
+            if ((post_view_lo >= post_vertex_slice.lo_atom) and
+                (post_view_lo <= post_vertex_slice.hi_atom)):
+                if (post_view_hi <= post_vertex_slice.hi_atom):
+                    post_size = (post_view_hi - post_view_lo + 1)
+                else:
+                    post_size = post_vertex_slice.hi_atom - post_view_lo + 1
+            elif ((post_view_lo < post_vertex_slice.lo_atom) and
+                  (post_view_hi >= post_vertex_slice.lo_atom)):
+                if (post_view_hi <= post_vertex_slice.hi_atom):
+                    post_size = (post_view_hi - post_vertex_slice.lo_atom + 1)
+                else:
+                    post_size = (
+                        post_vertex_slice.hi_atom - post_vertex_slice.lo_atom\
+                        + 1)
+            else:
+                post_size = 0
+
+        params.extend([post_view_lo, post_view_hi])
+
+        # only select the relevant pre- and post-slices
+        view_pre_slices = []
+        for pre in pre_slices:
+            new_lo = 0
+            new_hi = 0
+            if ((pre_view_lo >= pre.lo_atom) and
+                (pre_view_lo <= pre.hi_atom)):
+                new_lo = pre_view_lo
+                if (pre_view_hi <= pre.hi_atom):
+                    new_hi = pre_view_hi
+                else:
+                    new_hi = pre.hi_atom
+            elif ((pre_view_lo < pre.lo_atom) and
+                  (pre_view_hi >= pre.lo_atom)):
+                new_lo = pre.lo_atom
+                if (pre_view_hi <= pre.hi_atom):
+                    new_hi = pre_view_hi
+                else:
+                    new_hi = pre.hi_atom
+            view_pre_slices.append(Slice(new_lo, new_hi))
+
+        view_post_slices = []
+        for pre in post_slices:
+            new_lo = 0
+            new_hi = 0
+            if ((post_view_lo >= pre.lo_atom) and
+                (post_view_lo <= pre.hi_atom)):
+                new_lo = post_view_lo
+                if (post_view_hi <= pre.hi_atom):
+                    new_hi = post_view_hi
+                else:
+                    new_hi = pre.hi_atom
+            elif ((post_view_lo < pre.lo_atom) and
+                  (post_view_hi >= pre.lo_atom)):
+                new_lo = pre.lo_atom
+                if (post_view_hi <= pre.hi_atom):
+                    new_hi = post_view_hi
+                else:
+                    new_hi = pre.hi_atom
+            view_post_slices.append(Slice(new_lo, new_hi))
+
+        self._update_synapses_per_post_vertex(view_pre_slices, view_post_slices)
+
         n_connections = self._get_n_connections(
             pre_slice_index, post_slice_index)
-        params = [
+        params.extend([
             self.__allow_self_connections,
             self.__with_replacement,
             n_connections,
-            pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms]
+            pre_size * post_size])
         params.extend(self._get_connector_seed(
             pre_vertex_slice, post_vertex_slice, self._rng))
         return numpy.array(params, dtype="uint32")
@@ -228,4 +329,4 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
     @overrides(AbstractGenerateConnectorOnMachine.
                gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
-        return (4 + 4) * BYTES_PER_WORD
+        return (4 + 4 + 4) * BYTES_PER_WORD
