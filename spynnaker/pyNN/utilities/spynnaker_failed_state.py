@@ -37,9 +37,6 @@ class SpynnakerFailedState(SpynnakerSimulatorInterface, FailedState, object):
     def has_reset_last(self):
         raise ConfigurationException(FAILED_STATE_MSG)
 
-    def is_a_pynn_random(self, thing):
-        raise ConfigurationException(FAILED_STATE_MSG)
-
     @property
     def max_delay(self):
         raise ConfigurationException(FAILED_STATE_MSG)

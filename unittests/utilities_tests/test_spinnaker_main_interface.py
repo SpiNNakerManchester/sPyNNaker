@@ -46,9 +46,6 @@ class MainInterfaceImpl(AbstractSpiNNakerCommon):
     def get_distribution_to_stats(self):
         return None
 
-    def is_a_pynn_random(self, thing):
-        return True
-
     def get_random_distribution(self):
         return None
 

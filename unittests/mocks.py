@@ -113,9 +113,6 @@ class MockSimulator(object):
         self.config["MasterPopTable"] = {"generator": "BinarySearch"}
         self.config["Reports"] = {"n_profile_samples": 0}
 
-    def is_a_pynn_random(self, values):
-        return isinstance(values, MockRNG)
-
     def get_random_distribution(self):
         return MockRandomDistribution
 

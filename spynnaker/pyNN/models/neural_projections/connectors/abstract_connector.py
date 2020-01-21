@@ -17,7 +17,7 @@ import logging
 import math
 import re
 import numpy
-from pyNN.random import NumpyRNG
+from pyNN.random import NumpyRNG, RandomDistribution
 from six import string_types, with_metaclass
 from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.safe_eval import SafeEval
@@ -89,7 +89,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         """ Check that the types of the values is supported.
         """
         if (not numpy.isscalar(values) and
-                not (get_simulator().is_a_pynn_random(values)) and
+                not (isinstance(values, RandomDistribution)) and
                 not hasattr(values, "__getitem__")):
             raise Exception("Parameter {} format unsupported".format(name))
         if not allow_lists and hasattr(values, "__getitem__"):
@@ -133,7 +133,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
     def get_delay_variance(self, delays):
         """ Get the variance of the delays.
         """
-        if get_simulator().is_a_pynn_random(delays):
+        if isinstance(delays, RandomDistribution):
             return utility_calls.get_variance(delays)
         elif numpy.isscalar(delays):
             return 0.0
@@ -149,7 +149,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
             delays.
         """
         # pylint: disable=too-many-arguments
-        if get_simulator().is_a_pynn_random(delays):
+        if isinstance(delays, RandomDistribution):
             prob_in_range = utility_calls.get_probability_within_range(
                 delays, min_delay, max_delay)
             return int(math.ceil(utility_calls.get_probable_maximum_selected(
@@ -192,7 +192,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
     def get_weight_mean(self, weights):
         """ Get the mean of the weights.
         """
-        if get_simulator().is_a_pynn_random(weights):
+        if isinstance(weights, RandomDistribution):
             return abs(utility_calls.get_mean(weights))
         elif numpy.isscalar(weights):
             return abs(weights)
@@ -203,7 +203,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
     def _get_weight_maximum(self, weights, n_connections):
         """ Get the maximum of the weights.
         """
-        if get_simulator().is_a_pynn_random(weights):
+        if isinstance(weights, RandomDistribution)::
             mean_weight = utility_calls.get_mean(weights)
             if mean_weight < 0:
                 min_weight = utility_calls.get_minimum_probable_value(
@@ -235,7 +235,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
     def get_weight_variance(self, weights):
         """ Get the variance of the weights.
         """
-        if get_simulator().is_a_pynn_random(weights):
+        if isinstance(weights, RandomDistribution):
             return utility_calls.get_variance(weights)
         elif numpy.isscalar(weights):
             return 0.0
@@ -270,7 +270,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
 
     def _generate_values(self, values, n_connections, connection_slices,
                          pre_slice, post_slice, synapse_info):
-        if get_simulator().is_a_pynn_random(values):
+        if isinstance(values, RandomDistribution):
             return self._generate_random_values(
                 values, n_connections, pre_slice, post_slice)
         elif numpy.isscalar(values):

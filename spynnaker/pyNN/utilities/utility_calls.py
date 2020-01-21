@@ -20,6 +20,7 @@ import os
 import logging
 import math
 import numpy
+from pyNN.random import RandomDistribution
 from scipy.stats import binom
 from spinn_utilities.safe_eval import SafeEval
 from spinn_front_end_common.utilities import globals_variables
@@ -49,7 +50,7 @@ def convert_param_to_numpy(param, no_atoms):
     """
 
     # Deal with random distributions by generating values
-    if globals_variables.get_simulator().is_a_pynn_random(param):
+    if isinstance(param, RandomDistribution):
 
         # numpy reduces a single valued array to a single value, so enforce
         # that it is an array

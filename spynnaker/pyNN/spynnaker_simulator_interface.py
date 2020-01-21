@@ -44,11 +44,6 @@ class SpynnakerSimulatorInterface(SimulatorInterface):
     def has_reset_last(self):
         pass
 
-    # Used at common level but depends on PyNN so individual implementations
-    @abstractmethod
-    def is_a_pynn_random(self, thing):
-        pass
-
     # declared in FEC common and used in 7 and 8
     @abstractproperty
     def max_delay(self):
