@@ -24,18 +24,7 @@ from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector)
 
-# Travis fix - when sPyNNaker is installed, you will likely always have
-# PyNN installed as well, but sPyNNaker itself doesn't rely on PyNN
-# explicitly as it tries to be version agnostic.  In this case, PyNN 0.7
-# random doesn't give us enough information to load the data, so PyNN >= 0.8
-# is required here...
-try:
-    from pyNN import __version__ as pyNNVersion, random
-except ImportError:
-    pyNNVersion = "0.7"
-
-# Generation on host only works for PyNN >= 0.8
-IS_PYNN_8 = StrictVersion(pyNNVersion) >= StrictVersion("0.8")
+from pyNN.random import available_distributions
 
 # Hash of the constant parameter generator
 PARAM_TYPE_CONSTANT_ID = 0
@@ -94,7 +83,7 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
 
         # Only certain types of random distributions are supported for\
         # generation on the machine
-        if IS_PYNN_8 and get_simulator().is_a_pynn_random(values):
+        if get_simulator().is_a_pynn_random(values):
             return values.name in PARAM_TYPE_BY_NAME
 
         return False
@@ -129,10 +118,10 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
                 [DataType.S1615.encode_as_int(values)],
                 dtype="uint32")
 
-        if IS_PYNN_8 and get_simulator().is_a_pynn_random(values):
+        if get_simulator().is_a_pynn_random(values):
             parameters = (
                 values.parameters.get(param_name, None)
-                for param_name in random.available_distributions[values.name])
+                for param_name in available_distributions[values.name])
             parameters = (
                 DataType.S1615.max if param == numpy.inf
                 else DataType.S1615.min if param == -numpy.inf else param
@@ -151,8 +140,8 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         if numpy.isscalar(values):
             return BYTES_PER_WORD
 
-        if IS_PYNN_8 and get_simulator().is_a_pynn_random(values):
-            parameters = random.available_distributions[values.name]
+        if get_simulator().is_a_pynn_random(values):
+            parameters = available_distributions[values.name]
             return (len(parameters) + 4) * BYTES_PER_WORD
 
         raise ValueError("Unexpected value {}".format(values))
@@ -164,7 +153,7 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         if numpy.isscalar(values):
             return PARAM_TYPE_CONSTANT_ID
 
-        if IS_PYNN_8 and get_simulator().is_a_pynn_random(values):
+        if get_simulator().is_a_pynn_random(values):
             return PARAM_TYPE_BY_NAME[values.name]
 
         raise ValueError("Unexpected value {}".format(values))
@@ -178,8 +167,7 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         :rtype: bool
         """
 
-        return (IS_PYNN_8 and
-                self._generate_lists_on_machine(weights) and
+        return (self._generate_lists_on_machine(weights) and
                 self._generate_lists_on_machine(delays))
 
     def gen_weights_id(self, weights):
