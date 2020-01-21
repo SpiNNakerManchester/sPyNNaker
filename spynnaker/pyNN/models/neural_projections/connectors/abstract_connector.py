@@ -17,6 +17,7 @@ import logging
 import math
 import re
 import numpy
+from pyNN.random import NumpyRNG
 from six import string_types, with_metaclass
 from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.safe_eval import SafeEval
@@ -81,7 +82,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
 
     def set_projection_information(self, machine_time_step, synapse_info):
         # pylint: disable=unused-argument
-        self._rng = (self._rng or get_simulator().get_pynn_NumpyRNG()())
+        self._rng = (self._rng or NumpyRNG())
         self.__min_delay = machine_time_step / 1000.0
 
     def _check_parameter(self, values, name, allow_lists):
@@ -259,7 +260,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         if seed is None:
             seed = int(values.rng.next() * 0x7FFFFFFF)
             self.__param_seeds[key] = seed
-        new_rng = get_simulator().get_pynn_NumpyRNG()(seed)
+        new_rng = NumpyRNG(seed)
         copy_rd = get_simulator().get_random_distribution()(
             values.name, parameters_pos=None, rng=new_rng,
             **values.parameters)

@@ -116,9 +116,6 @@ class MockSimulator(object):
     def is_a_pynn_random(self, values):
         return isinstance(values, MockRNG)
 
-    def get_pynn_NumpyRNG(self):
-        return MockRNG
-
     def get_random_distribution(self):
         return MockRandomDistribution
 
