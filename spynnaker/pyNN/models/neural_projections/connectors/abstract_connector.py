@@ -108,7 +108,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         """ Get the maximum delay given a float, RandomDistribution or list of\
             delays.
         """
-        if get_simulator().is_a_pynn_random(delays):
+        if isinstance(delays, RandomDistribution):
             max_estimated_delay = utility_calls.get_maximum_probable_value(
                 delays, n_connections)
             high = utility_calls.high(delays)
