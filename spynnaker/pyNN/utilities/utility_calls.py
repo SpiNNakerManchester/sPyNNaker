@@ -232,14 +232,14 @@ def get_minimum_probable_value(dist, n_items, chance=(1.0 / 100.0)):
 def get_mean(dist):
     """ Get the mean of a RandomDistribution
     """
-    stats = STATS_BY_NAME()[dist.name]
+    stats = STATS_BY_NAME[dist.name]
     return stats.mean(dist)
 
 
 def get_standard_deviation(dist):
     """ Get the standard deviation of a RandomDistribution
     """
-    stats = STATS_BY_NAME()[dist.name]
+    stats = STATS_BY_NAME[dist.name]
     return stats.std(dist)
 
 
@@ -264,7 +264,7 @@ def low(dist):
 
     Could return None
     """
-    stats = STATS_BY_NAME()[dist.name]
+    stats = STATS_BY_NAME[dist.name]
     return stats.low(dist)
 
 
