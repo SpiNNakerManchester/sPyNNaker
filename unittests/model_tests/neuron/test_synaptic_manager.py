@@ -39,7 +39,7 @@ import spynnaker.pyNN.abstract_spinnaker_common as abstract_spinnaker_common
 from spynnaker.pyNN.models.neural_projections import (
     ProjectionApplicationEdge, ProjectionMachineEdge, SynapseInformation)
 from spynnaker.pyNN.models.neural_projections.connectors import (
-    OneToOneConnector, AllToAllConnector)
+    AbstractGenerateConnectorOnMachine, AllToAllConnector, OneToOneConnector)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsStatic, SynapseDynamicsStructuralSTDP,
     SynapseDynamicsSTDP, SynapseDynamicsStructuralStatic)
@@ -203,11 +203,16 @@ class TestSynapticManager(unittest.TestCase):
         assert data_1 == direct_matrix_1_expanded
         assert data_2 == direct_matrix_2_expanded
 
+    def say_false(self, weights, delays):
+        return False
+
     def test_write_synaptic_matrix_and_master_population_table(self):
         MockSimulator.setup()
         # Add an sdram so max SDRAM is high enough
         SDRAM(10000)
 
+        # UGLY but the mock transceiver NEED generate_on_machine be False
+        AbstractGenerateConnectorOnMachine.generate_on_machine = self.say_false
         default_config_paths = os.path.join(
             os.path.dirname(abstract_spinnaker_common.__file__),
             AbstractSpiNNakerCommon.CONFIG_FILE_NAME)
@@ -288,8 +293,6 @@ class TestSynapticManager(unittest.TestCase):
         synaptic_manager = SynapticManager(
             n_synapse_types=2, ring_buffer_sigma=5.0,
             spikes_per_second=100.0, config=config)
-        # UGLY but the mock transceiver NEED generate_on_machine be False
-        abstract_generate_connector_on_machine.IS_PYNN_8 = False
         synaptic_manager._write_synaptic_matrix_and_master_population_table(
             spec, [post_vertex_slice], post_slice_index, post_vertex,
             post_vertex_slice, all_syn_block_sz, weight_scales,
