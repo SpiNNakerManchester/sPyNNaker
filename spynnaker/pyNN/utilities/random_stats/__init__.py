@@ -25,7 +25,6 @@ from .random_stats_randint_impl import RandomStatsRandIntImpl
 from .random_stats_scipy_impl import RandomStatsScipyImpl
 from .random_stats_uniform_impl import RandomStatsUniformImpl
 from .random_stats_vonmises_impl import RandomStatsVonmisesImpl
-from .random_stats_exponential_impl import RandomStatsExponentialImpl
 
 __all__ = ["AbstractRandomStats", "RandomStatsBinomialImpl",
            "RandomStatsExponentialImpl", "RandomStatsGammaImpl",

@@ -203,6 +203,7 @@ def get_probable_maximum_selected(
     prob = 1.0 - (chance / float(n_total_trials))
     return binom.ppf(prob, n_trials, selection_prob)
 
+
 def get_probability_within_range(dist, lower, upper):
     """ Get the probability that a value will fall within the given range for\
         a given RandomDistribution

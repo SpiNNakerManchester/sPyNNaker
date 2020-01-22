@@ -31,9 +31,6 @@ from spinn_storage_handlers import FileDataWriter, FileDataReader
 from data_specification import (
     DataSpecificationGenerator, DataSpecificationExecutor)
 from spynnaker.pyNN.models.neuron import SynapticManager
-import spynnaker.pyNN.models.neural_projections.connectors.\
-    abstract_generate_connector_on_machine as \
-    abstract_generate_connector_on_machine
 from spynnaker.pyNN.abstract_spinnaker_common import AbstractSpiNNakerCommon
 import spynnaker.pyNN.abstract_spinnaker_common as abstract_spinnaker_common
 from spynnaker.pyNN.models.neural_projections import (
@@ -211,7 +208,7 @@ class TestSynapticManager(unittest.TestCase):
         # Add an sdram so max SDRAM is high enough
         SDRAM(10000)
 
-        # UGLY but the mock transceiver NEED generate_on_machine be False
+        # UGLY but the mock transceiver NEED generate_on_machine to be False
         AbstractGenerateConnectorOnMachine.generate_on_machine = self.say_false
         default_config_paths = os.path.join(
             os.path.dirname(abstract_spinnaker_common.__file__),
