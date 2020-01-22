@@ -68,7 +68,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         self.__verbose = verbose
 
         # something needs to be done about this?
-        self._rng = (rng or get_simulator().get_pynn_NumpyRNG()())
+        self._rng = (rng or NumpyRNG())
 
         self.__n_clipped_delays = 0
         self.__n_rounded_delays = 0

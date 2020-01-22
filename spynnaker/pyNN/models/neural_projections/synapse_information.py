@@ -14,8 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy
+from pyNN.random import RandomDistribution
 from spinn_front_end_common.utilities.constants import US_TO_MS
-from spinn_front_end_common.utilities.globals_variables import get_simulator
 from pyNN.random import NumpyRNG
 
 
@@ -117,7 +117,7 @@ class SynapseInformation(object):
                 raise NotImplementedError("timestep {} appears to be too low"
                                           "".format(timestep_in_us))
         # Leave randoms as is
-        if get_simulator().is_a_pynn_random(self.__raw_delays):
+        if isinstance(self.__raw_delays, RandomDistribution):
             return self.__raw_delays
         # Concert to timesteps
         delays_in_timesteps = numpy.rint(
