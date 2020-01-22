@@ -392,6 +392,10 @@ class AbstractSpiNNakerCommon(with_metaclass(
 
         # set up the router timeouts to stop packet loss
         for data_receiver, extra_monitor_cores in receivers:
+            data_receiver.load_system_routing_tables(
+                self._txrx,
+                self.get_generated_output("MemoryExtraMonitorVertices"),
+                self._placements)
             data_receiver.set_cores_for_data_streaming(
                 self._txrx, list(extra_monitor_cores), self._placements)
 
@@ -408,6 +412,10 @@ class AbstractSpiNNakerCommon(with_metaclass(
         for data_receiver, extra_monitor_cores in receivers:
             data_receiver.unset_cores_for_data_streaming(
                 self._txrx, list(extra_monitor_cores), self._placements)
+            data_receiver.load_application_routing_tables(
+                self._txrx,
+                self.get_generated_output("MemoryExtraMonitorVertices"),
+                self._placements)
 
         # return data items
         return mother_lode
