@@ -107,6 +107,7 @@
         </optional_inputs>
         <outputs>
             <param_type>DataSpecificationTargets</param_type>
+            <param_type>RegionSizes</param_type>
         </outputs>
     </algorithm>
     <algorithm name="SynapticMatrixReport">
