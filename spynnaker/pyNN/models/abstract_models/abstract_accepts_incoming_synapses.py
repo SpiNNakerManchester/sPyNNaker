@@ -52,7 +52,7 @@ class AbstractAcceptsIncomingSynapses(object):
     @abstractmethod
     def get_connections_from_machine(
             self, transceiver, placement, edge, graph_mapper, routing_infos,
-            synapse_information, machine_time_step, using_extra_monitor_cores,
+            synapse_information, using_extra_monitor_cores,
             placements=None, monitor_api=None, monitor_cores=None,
             handle_time_out_configuration=True, fixed_routes=None,
             extra_monitor=None):

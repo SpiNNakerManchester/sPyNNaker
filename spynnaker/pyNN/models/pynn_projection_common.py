@@ -376,7 +376,7 @@ class PyNNProjectionCommon(object):
                 extra_monitors is not None,
                 ctl.placements, receiver, sender_monitor_place,
                 extra_monitors, handle_time_out_configuration,
-                ctl.fixed_routes)
+                ctl.fixed_routes, sender_extra_monitor_core)
             if connections is not None:
                 connection_holder.add_connections(connections)
         connection_holder.finish()
