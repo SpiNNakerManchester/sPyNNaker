@@ -16,6 +16,8 @@
 from __future__ import division
 import logging
 import math
+import numpy
+from pyNN.random import RandomDistribution
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.constraints.partitioner_constraints import (
     SameAtomsAsVertexConstraint)
@@ -107,6 +109,13 @@ class PyNNProjectionCommon(object):
             raise ConfigurationException(
                 "Synapse target {} not found in {}".format(
                     target, post_synaptic_population.label))
+
+        # round the delays to multiples of full timesteps
+        # (otherwise SDRAM estimation calculations can go wrong)
+        if not isinstance(synapse_dynamics_stdp.delay, RandomDistribution):
+            synapse_dynamics_stdp.set_delay(numpy.rint(numpy.array(
+                synapse_dynamics_stdp.delay) * (1000.0 / machine_time_step)) *
+                (machine_time_step / 1000.0))
 
         # set the plasticity dynamics for the post pop (allows plastic stuff
         #  when needed)

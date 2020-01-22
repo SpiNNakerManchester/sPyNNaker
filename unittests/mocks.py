@@ -51,17 +51,6 @@ class MockRNG(object):
         return getattr(self._rng, name)
 
 
-class MockRandomDistribution(object):
-
-    def __init__(self, name, rng, **kwargs):
-        self._name = name
-        self._kwargs = kwargs
-        self._rng = rng
-
-    def next(self, n=1):
-        return self._rng.next(n)
-
-
 class MockSimulator(object):
 
     def __init__(self):
@@ -79,15 +68,6 @@ class MockSimulator(object):
                                   "enable_buffered_recording": "False"}
         self.config["MasterPopTable"] = {"generator": "BinarySearch"}
         self.config["Reports"] = {"n_profile_samples": 0}
-
-    def is_a_pynn_random(self, values):
-        return isinstance(values, MockRNG)
-
-    def get_pynn_NumpyRNG(self):
-        return MockRNG
-
-    def get_random_distribution(self):
-        return MockRandomDistribution
 
     def add_population(self, pop):
         pass

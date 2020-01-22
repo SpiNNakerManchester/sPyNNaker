@@ -41,21 +41,6 @@ class Close_Once(object):
             self.closed = True
 
 
-class MainInterfaceImpl(AbstractSpiNNakerCommon):
-
-    def get_distribution_to_stats(self):
-        return None
-
-    def get_pynn_NumpyRNG(self):
-        return None
-
-    def is_a_pynn_random(self, thing):
-        return True
-
-    def get_random_distribution(self):
-        return None
-
-
 class TestSpinnakerMainInterface(unittest.TestCase):
 
     @classmethod
@@ -89,7 +74,7 @@ class TestSpinnakerMainInterface(unittest.TestCase):
     def test_timings(self):
 
         # Test normal use
-        interface = MainInterfaceImpl(
+        interface = AbstractSpiNNakerCommon(
             graph_label="Test", database_socket_addresses=[],
             n_chips_required=None, n_boards_required=None, timestep=1.0,
             max_delay=144.0, min_delay=1.0, hostname=None)
@@ -97,7 +82,7 @@ class TestSpinnakerMainInterface(unittest.TestCase):
         assert interface.time_scale_factor == 1
 
         # Test auto time scale factor
-        interface = MainInterfaceImpl(
+        interface = AbstractSpiNNakerCommon(
             graph_label="Test", database_socket_addresses=[],
             n_chips_required=None, n_boards_required=None, timestep=0.1,
             max_delay=14.4, min_delay=1.0, hostname=None)
@@ -106,12 +91,12 @@ class TestSpinnakerMainInterface(unittest.TestCase):
 
         # Test delay out of bounds
         with self.assertRaises(ConfigurationException):
-            interface = MainInterfaceImpl(
+            interface = AbstractSpiNNakerCommon(
                 graph_label="Test", database_socket_addresses=[],
                 n_chips_required=None, n_boards_required=None, timestep=1.0,
                 max_delay=145.0,  min_delay=1.0, hostname=None)
         with self.assertRaises(ConfigurationException):
-            interface = MainInterfaceImpl(
+            interface = AbstractSpiNNakerCommon(
                 graph_label="Test", database_socket_addresses=[],
                 n_chips_required=None, n_boards_required=None, timestep=0.1,
                 max_delay=145.0, min_delay=1.0, hostname=None)
