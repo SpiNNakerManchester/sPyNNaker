@@ -35,7 +35,7 @@
 #endif
 
 //! Array of neuron states
-static neuron_pointer_t neuron_array;
+neuron_pointer_t neuron_array;
 
 //! Input states array
 static input_type_pointer_t input_type_array;

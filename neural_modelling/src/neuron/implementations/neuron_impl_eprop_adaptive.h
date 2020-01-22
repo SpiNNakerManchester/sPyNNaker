@@ -291,10 +291,10 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
 //    		B_t; // neuron->B;
 //    		global_parameters->core_target_rate;
-    	neuron->syn_state[0].e_bar;
+//    	neuron->syn_state[0].e_bar;
 //    	neuron->syn_state[0].el_a;
 //    		total_inh;
-//    		learning_signal * neuron->w_fb;
+    		learning_signal * neuron->w_fb;
 
     // update neuron parameters
     state_t result = neuron_model_state_update(
