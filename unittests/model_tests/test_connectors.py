@@ -22,7 +22,6 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
     FixedNumberPreConnector, FixedNumberPostConnector,
     FixedProbabilityConnector, IndexBasedProbabilityConnector)
 from unittests.mocks import MockSimulator, MockPopulation, MockSynapseInfo
-from unittest import SkipTest
 
 
 @pytest.fixture(scope="module", params=[10, 100])
