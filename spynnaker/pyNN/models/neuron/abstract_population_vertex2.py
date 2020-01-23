@@ -131,7 +131,7 @@ class AbstractPopulationVertex2(
             user defined timestep
         :type timestep_in_us: None or int
         """
-        # pylint: disable=too-many-arguments, too-many-locals
+        # pylint: disable=too-many-arguments, too-many-locals, unused-argument
         super(AbstractPopulationVertex2, self).__init__(
             label, constraints, max_atoms_per_core)
 
@@ -652,12 +652,12 @@ class AbstractPopulationVertex2(
 
     @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
     def get_spikes_sampling_interval(self):
-        all = set()
+        intervals = set()
         for neuron_recorder in self.__neuron_recorders:
-            all.add(int(
+            intervals.add(int(
                 neuron_recorder.get_neuron_sampling_interval("spikes"))
                     * US_TO_MS)
-        return gcd(all) / US_TO_MS
+        return gcd(intervals) / US_TO_MS
 
     @overrides(AbstractPopulationInitializable.initialize)
     def initialize(self, variable, value):

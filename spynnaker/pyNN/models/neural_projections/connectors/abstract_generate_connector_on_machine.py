@@ -62,6 +62,7 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
     ]
 
     def __init__(self, safe=True, callback=None, verbose=False, rng=None):
+        # pylint: disable=non-parent-init-called
         AbstractConnector.__init__(
             self, safe=safe, callback=callback, verbose=verbose, rng=rng)
         self.__delay_seed = dict()
@@ -226,6 +227,7 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type, synapse_info):
+        # pylint: disable=unused-argument
         """ Get the parameters of the on machine generation.
 
         :rtype: numpy array of uint32
