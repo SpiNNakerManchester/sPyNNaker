@@ -659,6 +659,11 @@ class AbstractPopulationVertex(
 
     @overrides(AbstractPopulationInitializable.set_initial_value)
     def set_initial_value(self, variable, value, selector=None):
+        if variable not in self._state_variables:
+            raise KeyError(
+                "Vertex does not support initialisation of"
+                " parameter {}".format(variable))
+
         parameter = self._get_parameter(variable)
 
         ranged_list = self._state_variables[parameter]

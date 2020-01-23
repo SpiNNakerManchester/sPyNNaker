@@ -24,7 +24,6 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
     FixedNumberPreConnector, FixedNumberPostConnector,
     FixedProbabilityConnector, IndexBasedProbabilityConnector)
 from unittests.mocks import MockSimulator, MockPopulation
-from unittest import SkipTest
 
 
 @pytest.fixture(scope="module", params=[10, 100])
@@ -180,7 +179,5 @@ def test_connectors(
             print(max_col_length, max(target_histogram), target_histogram)
             print(max_weight, matrix_max_weight, synaptic_block["weight"])
             print(max_delay, matrix_max_delay, synaptic_block["delay"])
-            raise SkipTest(
-                "https://github.com/SpiNNakerManchester/sPyNNaker/issues/587")
     print(connector, n_pre, n_post, n_in_slice, max_row_length,
           max_source, max_col_length, max_target)
