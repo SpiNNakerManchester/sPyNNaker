@@ -779,6 +779,8 @@ class AbstractPopulationVertex(
     def clear_connection_cache(self):
         self.__synapse_manager.clear_connection_cache()
 
+    @overrides(AbstractAcceptsIncomingSynapses.
+               get_maximum_delay_supported_in_ms)
     def get_maximum_delay_supported_in_ms(self):
         return self.__synapse_manager.get_maximum_delay_supported_in_ms(
             self.timestep_in_us)

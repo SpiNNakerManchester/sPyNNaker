@@ -120,8 +120,8 @@ class SynapseInformation(object):
         if isinstance(self.__raw_delays, RandomDistribution):
             return self.__raw_delays
         # Concert to timesteps
-        delays_in_timesteps = numpy.rint(
-            numpy.array(self.__raw_delays) * US_TO_MS / timestep_in_us)
+        as_numpy = numpy.array(self.__raw_delays)
+        delays_in_timesteps = numpy.rint(as_numpy * US_TO_MS / timestep_in_us)
         # make sure delay is at least one timestep
         clipped_in_timesteps = numpy.clip(delays_in_timesteps, 1, float("inf"))
         # convert back to ms
