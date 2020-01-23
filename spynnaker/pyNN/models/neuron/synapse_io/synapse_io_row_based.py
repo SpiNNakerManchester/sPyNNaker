@@ -280,7 +280,7 @@ class SynapseIORowBased(AbstractSynapseIO):
             self, synapse_info, pre_vertex_slice, post_vertex_slice,
             max_row_length, delayed_max_row_length, n_synapse_types,
             weight_scales, data, delayed_data, n_delay_stages,
-            machine_time_step):
+            timestep_in_us):
         # pylint: disable=too-many-arguments, too-many-locals, arguments-differ
 
         # Translate the data into rows
@@ -314,7 +314,15 @@ class SynapseIORowBased(AbstractSynapseIO):
         connections = numpy.concatenate(connections)
 
         # Return the delays values to milliseconds
-        connections["delay"] /= 1000.0 / machine_time_step
+        if timestep_in_us is None:
+            # Mutiple timestep just use synapse_info
+            try:
+                connections["delay"] = synapse_info.raw_delays_in_ms
+            except TypeError:
+                # Random so just giveup
+                connections["delay"] = numpy.nan
+        else:
+            connections["delay"] /= 1000.0 / timestep_in_us
 
         # Undo the weight scaling
         connections["weight"] /= weight_scales[synapse_info.synapse_type]

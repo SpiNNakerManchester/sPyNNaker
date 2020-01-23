@@ -821,15 +821,22 @@ class AbstractPopulationVertex2(
             handle_time_out_configuration=True, fixed_routes=None,
             extra_monitor=None):
         # pylint: disable=too-many-arguments
-        raise NotImplementedError("Multiple timesteps")
+        timestep_in_us = None
+        # So "Delay" will come out as original values
+        return self.__synapse_manager.get_connections_from_machine(
+            transceiver, placement, edge, graph_mapper, routing_infos,
+            synapse_information, timestep_in_us,
+            using_extra_monitor_cores, placements, monitor_api,
+            monitor_cores, handle_time_out_configuration, fixed_routes,
+            extra_monitor)
 
     def clear_connection_cache(self):
         self.__synapse_manager.clear_connection_cache()
 
     def get_maximum_delay_supported_in_ms(self):
-        HACK = 6000
+        timestep_in_us = min(self.timestep_in_us)
         return self.__synapse_manager.get_maximum_delay_supported_in_ms(
-            HACK)
+            timestep_in_us)
 
     @overrides(AbstractProvidesIncomingPartitionConstraints.
                get_incoming_partition_constraints)
@@ -938,13 +945,6 @@ class AbstractPopulationVertex2(
         if self.__synapse_manager.changes_during_run:
             self.__change_requires_data_generation = True
             self.__change_requires_neuron_parameters_reload = False
-
-    @property
-    def timestep_in_us(self):
-        raise NotImplementedError("Nope!")
-
-    def simtime_in_us_to_timesteps(self, simtime_in_us):
-        raise NotImplementedError("Nope!")
 
     @property
     @overrides(ApplicationVertex.timesteps_in_us)

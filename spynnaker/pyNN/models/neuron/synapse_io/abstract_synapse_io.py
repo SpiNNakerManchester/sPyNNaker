@@ -53,7 +53,7 @@ class AbstractSynapseIO(object):
             self, synapse_info, pre_vertex_slice, post_vertex_slice,
             max_row_length, delayed_max_row_length, n_synapse_types,
             weight_scales, data, delayed_data, n_delay_stages,
-            machine_time_step):
+            timestep_in_us):
         """ Read the synapses for a given projection synapse information\
             object out of the given data
         """

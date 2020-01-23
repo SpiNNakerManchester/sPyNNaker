@@ -1079,11 +1079,11 @@ class SynapticManager(object):
 
     def _read_synapses(self, info, pre_slice, post_slice, max_row_length,
                        delayed_max_row_length, n_synapse_types, weight_scales,
-                       data, delayed_data, n_delays, timestep):
+                       data, delayed_data, n_delays, timestep_in_us):
         return self.__synapse_io.read_synapses(
             info, pre_slice, post_slice, max_row_length,
             delayed_max_row_length, n_synapse_types, weight_scales, data,
-            delayed_data, n_delays, timestep)
+            delayed_data, n_delays, timestep_in_us)
 
     def _retrieve_synaptic_block(
             self, txrx, placement, master_pop_table_address,
