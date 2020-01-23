@@ -223,23 +223,24 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
         pre_view_lo = 0
         pre_view_hi = synapse_info.n_pre_neurons - 1
         pre_size = pre_vertex_slice.n_atoms
+        pre_lo_atom = pre_vertex_slice.lo_atom
+        pre_hi_atom = pre_vertex_slice.hi_atom
         if synapse_info.prepop_is_view:
             pre_view_lo, pre_view_hi = self._get_view_lo_hi(
                 synapse_info.pre_population._indexes)
             # work out the number of atoms required on this slice
-            if ((pre_view_lo >= pre_vertex_slice.lo_atom) and
-                (pre_view_lo <= pre_vertex_slice.hi_atom)):
-                if (pre_view_hi <= pre_vertex_slice.hi_atom):
+            if ((pre_view_lo >= pre_lo_atom) and
+                    (pre_view_lo <= pre_hi_atom)):
+                if (pre_view_hi <= pre_hi_atom):
                     pre_size = pre_view_hi - pre_view_lo + 1
                 else:
-                    pre_size = pre_vertex_slice.hi_atom - pre_view_lo + 1
-            elif ((pre_view_lo < pre_vertex_slice.lo_atom) and
-                  (pre_view_hi >= pre_vertex_slice.lo_atom)):
-                if (pre_view_hi <= pre_vertex_slice.hi_atom):
-                    pre_size = pre_view_hi - pre_vertex_slice.lo_atom + 1
+                    pre_size = pre_hi_atom - pre_view_lo + 1
+            elif ((pre_view_lo < pre_lo_atom) and
+                  (pre_view_hi >= pre_lo_atom)):
+                if (pre_view_hi <= pre_hi_atom):
+                    pre_size = pre_view_hi - pre_lo_atom + 1
                 else:
-                    pre_size = (
-                        pre_vertex_slice.hi_atom - pre_vertex_slice.lo_atom + 1)
+                    pre_size = pre_hi_atom - pre_lo_atom + 1
             else:
                 pre_size = 0
 
@@ -248,24 +249,24 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
         post_view_lo = 0
         post_view_hi = synapse_info.n_post_neurons - 1
         post_size = post_vertex_slice.n_atoms
+        post_lo_atom = post_vertex_slice.lo_atom
+        post_hi_atom = post_vertex_slice.hi_atom
         if synapse_info.postpop_is_view:
             post_view_lo, post_view_hi = self._get_view_lo_hi(
                 synapse_info.post_population._indexes)
             # work out the number of atoms required on this slice
-            if ((post_view_lo >= post_vertex_slice.lo_atom) and
-                (post_view_lo <= post_vertex_slice.hi_atom)):
-                if (post_view_hi <= post_vertex_slice.hi_atom):
-                    post_size = (post_view_hi - post_view_lo + 1)
+            if ((post_view_lo >= post_lo_atom) and
+                (post_view_lo <= post_hi_atom)):
+                if (post_view_hi <= post_hi_atom):
+                    post_size = post_view_hi - post_view_lo + 1
                 else:
-                    post_size = post_vertex_slice.hi_atom - post_view_lo + 1
-            elif ((post_view_lo < post_vertex_slice.lo_atom) and
-                  (post_view_hi >= post_vertex_slice.lo_atom)):
-                if (post_view_hi <= post_vertex_slice.hi_atom):
-                    post_size = (post_view_hi - post_vertex_slice.lo_atom + 1)
+                    post_size = post_hi_atom - post_view_lo + 1
+            elif ((post_view_lo < post_lo_atom) and
+                  (post_view_hi >= post_lo_atom)):
+                if (post_view_hi <= post_hi_atom):
+                    post_size = post_view_hi - post_lo_atom + 1
                 else:
-                    post_size = (
-                        post_vertex_slice.hi_atom - post_vertex_slice.lo_atom\
-                        + 1)
+                    post_size = post_hi_atom - post_lo_atom + 1
             else:
                 post_size = 0
 
@@ -277,14 +278,14 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
             new_lo = 0
             new_hi = 0
             if ((pre_view_lo >= pre.lo_atom) and
-                (pre_view_lo <= pre.hi_atom)):
+                    (pre_view_lo <= pre.hi_atom)):
                 new_lo = pre_view_lo
                 if (pre_view_hi <= pre.hi_atom):
                     new_hi = pre_view_hi
                 else:
                     new_hi = pre.hi_atom
             elif ((pre_view_lo < pre.lo_atom) and
-                  (pre_view_hi >= pre.lo_atom)):
+                    (pre_view_hi >= pre.lo_atom)):
                 new_lo = pre.lo_atom
                 if (pre_view_hi <= pre.hi_atom):
                     new_hi = pre_view_hi
@@ -297,14 +298,14 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
             new_lo = 0
             new_hi = 0
             if ((post_view_lo >= pre.lo_atom) and
-                (post_view_lo <= pre.hi_atom)):
+                    (post_view_lo <= pre.hi_atom)):
                 new_lo = post_view_lo
                 if (post_view_hi <= pre.hi_atom):
                     new_hi = post_view_hi
                 else:
                     new_hi = pre.hi_atom
             elif ((post_view_lo < pre.lo_atom) and
-                  (post_view_hi >= pre.lo_atom)):
+                    (post_view_hi >= pre.lo_atom)):
                 new_lo = pre.lo_atom
                 if (post_view_hi <= pre.hi_atom):
                     new_hi = post_view_hi
@@ -312,7 +313,8 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
                     new_hi = pre.hi_atom
             view_post_slices.append(Slice(new_lo, new_hi))
 
-        self._update_synapses_per_post_vertex(view_pre_slices, view_post_slices)
+        self._update_synapses_per_post_vertex(view_pre_slices,
+                                              view_post_slices)
 
         n_connections = self._get_n_connections(
             pre_slice_index, post_slice_index)
