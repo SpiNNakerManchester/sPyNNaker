@@ -129,19 +129,19 @@ class SynapseTypeEPropAdaptive(AbstractSynapseType):
 
     @overrides(AbstractSynapseType.get_synapse_id_by_target)
     def get_synapse_id_by_target(self, target):
-        if target == "excitatory":
+        if target == "input_connections":
             return 0
-        elif target == "exc_err":
+        elif target == "recurrent_connections":
             return 1
-        elif target == "inhibitory":
+        elif target == "learning_signal":
             return 2
-        elif target == "inh_err":
+        elif target == "unused":
             return 3
         return None
 
     @overrides(AbstractSynapseType.get_synapse_targets)
     def get_synapse_targets(self):
-        return "excitatory", "exc_err", "inhibitory", "inh_err"
+        return "input_connections", "recurrent_connections", "learning_signal", "unused"
 
     @property
     def tau_syn_E(self):

@@ -258,16 +258,16 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     input_t* inh_input_values = input_type_get_input_value(
             inh_value, input_type, NUM_INHIBITORY_RECEPTORS);
 
-    // Sum g_syn contributions from all receptors for recording
-    REAL total_exc = 0;
-    REAL total_inh = 0;
-
-    for (int i = 0; i < NUM_EXCITATORY_RECEPTORS; i++) {
-        total_exc += exc_input_values[i];
-    }
-    for (int i = 0; i < NUM_INHIBITORY_RECEPTORS; i++) {
-        total_inh += inh_input_values[i];
-    }
+//    // Sum g_syn contributions from all receptors for recording
+//    REAL total_exc = 0;
+//    REAL total_inh = 0;
+//
+//    for (int i = 0; i < NUM_EXCITATORY_RECEPTORS; i++) {
+//        total_exc += exc_input_values[i];
+//    }
+//    for (int i = 0; i < NUM_INHIBITORY_RECEPTORS; i++) {
+//        total_inh += inh_input_values[i];
+//    }
 
 //    // Call functions to get the input values to be recorded
 //    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = total_exc;
@@ -293,8 +293,8 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 //    		global_parameters->core_target_rate;
 //    	neuron->syn_state[0].e_bar;
 //    	neuron->syn_state[0].el_a;
-//    		total_inh;
-    		learning_signal * neuron->w_fb;
+    		exc_input_values[1]; // record recurrent input (signed)
+//    		learning_signal * neuron->w_fb;
 
     // update neuron parameters
     state_t result = neuron_model_state_update(
@@ -323,9 +323,9 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
 
     recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] =
-    		neuron->syn_state[0].delta_w;
+//    		neuron->syn_state[0].delta_w;
 //    		neuron->syn_state[0].z_bar;
-//    		total_exc;
+    		exc_input_values[0]; // record input input (signed)
 //    		z_t;
 //    		global_parameters->core_pop_rate;
 //    		neuron->psi;

@@ -67,18 +67,22 @@ typedef enum input_buffer_regions {
 static inline void synapse_types_shape_input(
         synapse_param_pointer_t parameter) {
 
-    parameter->input_buffer_excitatory_value = decay_s1615(
-        parameter->input_buffer_excitatory_value,
-        parameter->exc_decay);
-    parameter->input_buffer_excitatory2_value = decay_s1615(
-        parameter->input_buffer_excitatory2_value,
-        parameter->exc2_decay);
-    parameter->input_buffer_inhibitory_value = decay_s1615(
-        parameter->input_buffer_inhibitory_value,
-        parameter->inh_decay);
-    parameter->input_buffer_inhibitory2_value = decay_s1615(
-        parameter->input_buffer_inhibitory2_value,
-        parameter->inh2_decay);
+    parameter->input_buffer_excitatory_value = 0;
+//    		decay_s1615(
+//        parameter->input_buffer_excitatory_value,
+//        parameter->exc_decay);
+    parameter->input_buffer_excitatory2_value = 0;
+//    decay_s1615(
+//        parameter->input_buffer_excitatory2_value,
+//        parameter->exc2_decay);
+    parameter->input_buffer_inhibitory_value = 0;
+//    decay_s1615(
+//        parameter->input_buffer_inhibitory_value,
+//        parameter->inh_decay);
+    parameter->input_buffer_inhibitory2_value = 0;
+//    decay_s1615(
+//        parameter->input_buffer_inhibitory2_value,
+//        parameter->inh2_decay);
 }
 
 //! \brief adds the inputs for a give timer period to a given neuron that is
@@ -92,24 +96,28 @@ static inline void synapse_types_add_neuron_input(
         index_t synapse_type_index, synapse_param_pointer_t parameter,
         input_t input) {
     if (synapse_type_index == EXCITATORY_ONE) {
-        parameter->input_buffer_excitatory_value =
-            parameter->input_buffer_excitatory_value +
-            decay_s1615(input, parameter->exc_init);
+        parameter->input_buffer_excitatory_value += input;
+//		=
+//            parameter->input_buffer_excitatory_value +
+//            decay_s1615(input, parameter->exc_init);
 
     } else if (synapse_type_index == EXCITATORY_TWO) {
-        parameter->input_buffer_excitatory2_value =
-            parameter->input_buffer_excitatory2_value +
-            decay_s1615(input, parameter->exc2_init);
+        parameter->input_buffer_excitatory2_value += input;
+//		=
+//            parameter->input_buffer_excitatory2_value +
+//            decay_s1615(input, parameter->exc2_init);
 
     } else if (synapse_type_index == INHIBITORY_ONE) {
-        parameter->input_buffer_inhibitory_value =
-            parameter->input_buffer_inhibitory_value +
-            decay_s1615(input, parameter->inh_init);
+        parameter->input_buffer_inhibitory_value += input;
+//		=
+//            parameter->input_buffer_inhibitory_value +
+//            decay_s1615(input, parameter->inh_init);
 
     } else if (synapse_type_index == INHIBITORY_TWO) {
-        parameter->input_buffer_inhibitory2_value =
-            parameter->input_buffer_inhibitory2_value +
-            decay_s1615(input, parameter->inh2_init);
+        parameter->input_buffer_inhibitory2_value += input;
+//		=
+//            parameter->input_buffer_inhibitory2_value +
+//            decay_s1615(input, parameter->inh2_init);
     }
 }
 
