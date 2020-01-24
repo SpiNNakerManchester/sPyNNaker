@@ -138,6 +138,8 @@ static uint32_t connection_generator_fixed_total_generate(
         return 0;
     }
 
+    log_info("pre_neuron_index = %u", pre_neuron_index);
+
     // If not in the pre-population view range, then don't generate
     if ((pre_neuron_index < obj->params.pre_lo) ||
     		(pre_neuron_index > obj->params.pre_hi)) {
@@ -231,6 +233,11 @@ static uint32_t connection_generator_fixed_total_generate(
                 indices[j] = i + slice_lo - post_slice_start;
             }
         }
+    }
+
+    for (unsigned int i = 0; i < n_conns; i++) {
+    	log_info("pre_neuron_index = %u, indices[%u] = %u",
+    			pre_neuron_index, i, indices[i]);
     }
 
     obj->params.n_connections -= n_conns;
