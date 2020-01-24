@@ -256,7 +256,7 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
                 synapse_info.post_population._indexes)
             # work out the number of atoms required on this slice
             if ((post_view_lo >= post_lo_atom) and
-                (post_view_lo <= post_hi_atom)):
+                     (post_view_lo <= post_hi_atom)):
                 if (post_view_hi <= post_hi_atom):
                     post_size = post_view_hi - post_view_lo + 1
                 else:
