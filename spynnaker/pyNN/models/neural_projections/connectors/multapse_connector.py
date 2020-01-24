@@ -82,8 +82,9 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
         if (self.__synapses_per_edge is None or
                 len(self.__pre_slices) != len(pre_slices) or
                 len(self.__post_slices) != len(post_slices)):
-            n_pre_atoms = sum([pre.n_atoms for pre in pre_slices])
-            n_post_atoms = sum([post.n_atoms for post in post_slices])
+            n_pre_atoms = sum([pre.n_atoms for pre in pre_slices if pre != []])
+            n_post_atoms = sum([post.n_atoms for post in post_slices
+                                if post != []])
             n_connections = n_pre_atoms * n_post_atoms
             if (not self.__with_replacement and
                     n_connections < self.__num_synapses):
@@ -92,6 +93,7 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
                     "with_replacement=False & num_synapses > n_pre * n_post")
             prob_connect = [
                 float(pre.n_atoms * post.n_atoms) / float(n_connections)
+                if (pre != []) and (post != []) else 0
                 for pre in pre_slices for post in post_slices]
             self.__synapses_per_edge = self.get_rng_next(
                 self.__num_synapses, prob_connect)
@@ -275,48 +277,49 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
         # only select the relevant pre- and post-slices
         view_pre_slices = []
         for pre in pre_slices:
-            new_lo = 0
-            new_hi = 0
+            new_pre_lo = 0
+            new_pre_hi = 0
             if ((pre_view_lo >= pre.lo_atom) and
                     (pre_view_lo <= pre.hi_atom)):
-                new_lo = pre_view_lo
+                new_pre_lo = pre_view_lo
                 if (pre_view_hi <= pre.hi_atom):
-                    new_hi = pre_view_hi
+                    new_pre_hi = pre_view_hi
                 else:
-                    new_hi = pre.hi_atom
+                    new_pre_hi = pre.hi_atom
             elif ((pre_view_lo < pre.lo_atom) and
                     (pre_view_hi >= pre.lo_atom)):
-                new_lo = pre.lo_atom
+                new_pre_lo = pre.lo_atom
                 if (pre_view_hi <= pre.hi_atom):
-                    new_hi = pre_view_hi
+                    new_pre_hi = pre_view_hi
                 else:
-                    new_hi = pre.hi_atom
-            view_pre_slices.append(Slice(new_lo, new_hi))
+                    new_pre_hi = pre.hi_atom
+            if (new_pre_lo == 0) and (new_pre_hi == 0):
+                view_pre_slices.append([])
+            else:
+                view_pre_slices.append(Slice(new_pre_lo, new_pre_hi))
 
         view_post_slices = []
         for post in post_slices:
-            new_lo = 0
-            new_hi = 0
+            new_post_lo = 0
+            new_post_hi = 0
             if ((post_view_lo >= post.lo_atom) and
                     (post_view_lo <= post.hi_atom)):
-                new_lo = post_view_lo
+                new_post_lo = post_view_lo
                 if (post_view_hi <= post.hi_atom):
-                    new_hi = post_view_hi
+                    new_post_hi = post_view_hi
                 else:
-                    new_hi = post.hi_atom
+                    new_post_hi = post.hi_atom
             elif ((post_view_lo < post.lo_atom) and
                     (post_view_hi >= post.lo_atom)):
-                new_lo = post.lo_atom
+                new_post_lo = post.lo_atom
                 if (post_view_hi <= post.hi_atom):
-                    new_hi = post_view_hi
+                    new_post_hi = post_view_hi
                 else:
-                    new_hi = post.hi_atom
-            view_post_slices.append(Slice(new_lo, new_hi))
-
-        print('pre_slices: ', pre_slices)
-        print('view_pre_slices: ', view_pre_slices)
-        print('post_slices: ', post_slices)
-        print('view_post_slices: ', view_post_slices)
+                    new_post_hi = post.hi_atom
+            if (new_post_lo == 0) and (new_post_hi == 0):
+                view_post_slices.append([])
+            else:
+                view_post_slices.append(Slice(new_post_lo, new_post_hi))
 
         self._update_synapses_per_post_vertex(view_pre_slices,
                                               view_post_slices)
@@ -330,7 +333,6 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
             pre_size * post_size])
         params.extend(self._get_connector_seed(
             pre_vertex_slice, post_vertex_slice, self._rng))
-        print('multapse on machine, params: ', params)
         return numpy.array(params, dtype="uint32")
 
     @property

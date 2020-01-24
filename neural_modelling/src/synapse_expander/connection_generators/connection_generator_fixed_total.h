@@ -138,8 +138,6 @@ static uint32_t connection_generator_fixed_total_generate(
         return 0;
     }
 
-    log_info("pre_neuron_index = %u", pre_neuron_index);
-
     // If not in the pre-population view range, then don't generate
     if ((pre_neuron_index < obj->params.pre_lo) ||
     		(pre_neuron_index > obj->params.pre_hi)) {
@@ -148,7 +146,7 @@ static uint32_t connection_generator_fixed_total_generate(
 
     // Work out how many values can be sampled from (on this slice)
     uint32_t slice_lo = post_slice_start;
-    uint32_t slice_hi = post_slice_start + post_slice_count;
+    uint32_t slice_hi = post_slice_start + post_slice_count - 1;
 
     // If everything is off the current slice then don't generate
     if ((obj->params.post_hi < slice_lo) ||
@@ -158,16 +156,16 @@ static uint32_t connection_generator_fixed_total_generate(
 
     // Otherwise work out how many values can be sampled from
     if ((obj->params.post_lo >= post_slice_start) &&
-    		(obj->params.post_lo <= post_slice_start + post_slice_count)) {
+    		(obj->params.post_lo < post_slice_start + post_slice_count)) {
     	slice_lo = obj->params.post_lo;
-    	if (obj->params.post_hi > post_slice_start + post_slice_count) {
+    	if (obj->params.post_hi >= post_slice_start + post_slice_count) {
     		slice_hi = post_slice_start + post_slice_count - 1;
     	} else {
     		slice_hi = obj->params.post_hi;
     	}
     } else { // post_lo is less than slice_start
     	slice_lo = post_slice_start;
-    	if (obj->params.post_hi > post_slice_start + post_slice_count) {
+    	if (obj->params.post_hi >= post_slice_start + post_slice_count) {
     		slice_hi = post_slice_start + post_slice_count - 1;
     	}
     	else {
@@ -233,11 +231,6 @@ static uint32_t connection_generator_fixed_total_generate(
                 indices[j] = i + slice_lo - post_slice_start;
             }
         }
-    }
-
-    for (unsigned int i = 0; i < n_conns; i++) {
-    	log_info("pre_neuron_index = %u, indices[%u] = %u",
-    			pre_neuron_index, i, indices[i]);
     }
 
     obj->params.n_connections -= n_conns;
