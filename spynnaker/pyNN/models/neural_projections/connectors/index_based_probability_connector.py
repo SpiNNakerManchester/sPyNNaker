@@ -58,7 +58,7 @@ class IndexBasedProbabilityConnector(AbstractConnector):
             Population.
         """
         super(IndexBasedProbabilityConnector, self).__init__(
-            safe, callback, verbose)
+            safe, callback, verbose, rng)
         self.__index_expression = index_expression
         self.__allow_self_connections = allow_self_connections
         self.__probs = None

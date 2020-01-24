@@ -67,10 +67,9 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
         """
         # pylint: disable=too-many-arguments
         super(DistanceDependentProbabilityConnector, self).__init__(
-            safe, callback, verbose)
+            safe, callback, verbose, rng)
         self.__d_expression = d_expression
         self.__allow_self_connections = allow_self_connections
-        self._rng = rng
         if n_connections is not None:
             raise NotImplementedError(
                 "n_connections is not implemented for"
