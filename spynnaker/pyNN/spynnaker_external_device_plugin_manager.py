@@ -13,14 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from spinn_utilities.socket_address import SocketAddress
 from pacman.model.graphs.application import ApplicationEdge
 from spinnman.messages.eieio import EIEIOType
 from spinn_front_end_common.utilities import helpful_functions
 from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spinn_front_end_common.utility_models import (
     ReverseIpTagMultiCastSource)
-from spinn_front_end_common.utilities.notification_protocol import (
-    SocketAddress)
 from spinn_front_end_common.utilities.utility_objs import (
     LivePacketGatherParameters)
 from spynnaker.pyNN.utilities.constants import (
@@ -312,4 +311,4 @@ class SpynnakerExternalDevicePluginManager(object):
 
     @staticmethod
     def time_scale_factor():
-        return get_simulator().timescale_factor
+        return get_simulator().time_scale_factor

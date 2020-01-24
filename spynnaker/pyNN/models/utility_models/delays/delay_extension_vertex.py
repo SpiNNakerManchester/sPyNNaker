@@ -68,20 +68,20 @@ class DelayExtensionVertex(
         "__n_atoms",
         "__n_delay_stages",
         "__source_vertex",
-        "__timescale_factor",
+        "__time_scale_factor",
         "__delay_generator_data",
         "__n_subvertices",
         "__n_data_specs"]
 
     def __init__(self, n_neurons, delay_per_stage, source_vertex,
-                 machine_time_step, timescale_factor, constraints=None,
+                 machine_time_step, time_scale_factor, constraints=None,
                  label="DelayExtension"):
         """
         :param int n_neurons: the number of neurons
         :param int delay_per_stage: the delay per stage
         :param source_vertex: where messages are coming from
         :param int machine_time_step: how long is the machine time step
-        :param int timescale_factor: what slowdown factor has been applied
+        :param int time_scale_factor: what slowdown factor has been applied
         :param constraints: the vertex constraints
         :param str label: the vertex label
         """
@@ -93,7 +93,7 @@ class DelayExtensionVertex(
         self.__delay_per_stage = delay_per_stage
         self.__delay_generator_data = defaultdict(list)
         self.__machine_time_step = machine_time_step
-        self.__timescale_factor = timescale_factor
+        self.__time_scale_factor = time_scale_factor
         self.__n_subvertices = 0
         self.__n_data_specs = 0
 
@@ -234,7 +234,7 @@ class DelayExtensionVertex(
         vertex.reserve_provenance_data_region(spec)
 
         self.write_setup_info(
-            spec, self.__machine_time_step, self.__timescale_factor)
+            spec, self.__machine_time_step, self.__time_scale_factor)
 
         spec.comment("\n*** Spec for Delay Extension Instance ***\n\n")
 
@@ -260,7 +260,7 @@ class DelayExtensionVertex(
         self.write_delay_parameters(
             spec, vertex_slice, key, incoming_key, incoming_mask,
             self.__n_subvertices, self.__machine_time_step,
-            self.__timescale_factor, n_outgoing_edges)
+            self.__time_scale_factor, n_outgoing_edges)
 
         key = (vertex_slice.lo_atom, vertex_slice.hi_atom)
         if key in self.__delay_generator_data:
