@@ -834,7 +834,7 @@ class AbstractPopulationVertex2(
         self.__synapse_manager.clear_connection_cache()
 
     def get_maximum_delay_supported_in_ms(self):
-        timestep_in_us = min(self.timestep_in_us)
+        timestep_in_us = min(self.timesteps_in_us)
         return self.__synapse_manager.get_maximum_delay_supported_in_ms(
             timestep_in_us)
 
