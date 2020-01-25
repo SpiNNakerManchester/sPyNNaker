@@ -18,6 +18,7 @@ import numpy
 from six import raise_from
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spynnaker.pyNN.utilities.constants import MAX_SUPPORTED_DELAY_TICS
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector)
 from spynnaker.pyNN.exceptions import SynapseRowTooBigException
@@ -42,7 +43,7 @@ class SynapseIORowBased(AbstractSynapseIO):
     @overrides(AbstractSynapseIO.get_maximum_delay_supported_in_ms)
     def get_maximum_delay_supported_in_ms(self, machine_time_step):
         # There are 16 slots, one per time step
-        return 16 * (machine_time_step / 1000.0)
+        return MAX_SUPPORTED_DELAY_TICS * (machine_time_step / 1000.0)
 
     @staticmethod
     def _n_words(n_bytes):

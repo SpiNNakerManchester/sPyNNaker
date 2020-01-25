@@ -188,7 +188,7 @@ class FromListConnector(AbstractConnector):
     @overrides(AbstractConnector.get_weight_mean)
     def get_weight_mean(self, weights):
         if self.__weights is None:
-            return numpy.mean(weights)
+            return super(FromListConnector, self).get_weight_mean(weights)
         else:
             return numpy.mean(numpy.abs(self.__weights))
 
@@ -196,7 +196,7 @@ class FromListConnector(AbstractConnector):
     def get_weight_maximum(self, synapse_info):
         # pylint: disable=too-many-arguments
         if self.__weights is None:
-            return numpy.amax(synapse_info.weights)
+            return self._get_weight_maximum(self.__weights, len(self.__conn_list))
         else:
             return numpy.amax(numpy.abs(self.__weights))
 
@@ -204,7 +204,7 @@ class FromListConnector(AbstractConnector):
     def get_weight_variance(self, weights):
         # pylint: disable=too-many-arguments
         if self.__weights is None:
-            return numpy.var(weights)
+            return super(FromListConnector, self).get_weight_variance(weights)
         else:
             return numpy.var(numpy.abs(self.__weights))
 
