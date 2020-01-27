@@ -314,7 +314,7 @@ class TimingDependenceCyclic(AbstractTimingDependence):
             p_float = -math.log(1.0 - x_float) * mean
 
             p = round(p_float)
-            print "x: ", x, " xfloat: ", x_float, " p_float: ", p_float, "  p_int: ", p
+            print("x: ", x, " xfloat: ", x_float, " p_float: ", p_float, "  p_int: ", p)
 #             if count == 5:
 #                print "x: ", x, " xfloat: ", x_float, " p_float: ", p_float, "  p_int: ", p
 #                count = 0

@@ -108,9 +108,13 @@ static inline final_state_t _plasticity_update_synapse(
         window_begin_time, window_end_time, post_window.prev_time,
         post_window.num_events);
 
-    // print_event_history(post_event_history);
-    // print_delayed_window_events(post_event_history, window_begin_time,
-    //		window_end_time, delay_dendritic);
+
+     io_printf(IO_BUF, "PRINTING ENTIRE HISTORY\n");
+     print_event_history(post_event_history);
+
+     io_printf(IO_BUF, "PRINTING WINDOW \n");
+     print_delayed_window_events(post_event_history, window_begin_time,
+    		window_end_time, delay_dendritic);
 
     // Process events in post-synaptic window
     while (post_window.num_events > 0) {
@@ -133,9 +137,10 @@ static inline final_state_t _plasticity_update_synapse(
         post_window = post_events_next_delayed(post_window, delayed_post_time);
     }
 
+
     const uint32_t delayed_pre_time = time + delay_axonal;
     if (print_plasticity){
-    	io_printf(IO_BUF, "\t\tApplying pre-synaptic event at time:%u last post time:%u\n",
+    	io_printf(IO_BUF, "\t\t Applying pre-synaptic event at time:%u last post time:%u\n",
               delayed_pre_time, post_window.prev_time);
     }
 
@@ -145,11 +150,20 @@ static inline final_state_t _plasticity_update_synapse(
     	io_printf(IO_BUF, "Weight is: %u\n", current_state.weight_state.weight);
     }
 
+    io_printf(IO_BUF, "PRINTING POST HISTORY BEFORE DEPRESSION\n");
+    io_printf(IO_BUF, "Spike: %u, Time: %u, Trace: %u, Mem_V: %k\n",
+		post_window.num_events, post_window.prev_time,
+		post_window.prev_trace, post_window.prev_post_synaptic_v);
+
+
+
+    io_printf(IO_BUF, "\n\n\n");
+
     current_state = timing_apply_pre_spike(
         delayed_pre_time, new_pre_trace, delayed_last_pre_time, last_pre_trace,
         post_window.prev_time, post_window.prev_trace, current_state, syn_type,
 		post_synaptic_neuron, post_synaptic_additional_input,
-		post_synaptic_threshold, *post_window.next_post_synaptic_v); // SD 25/10/19: use membrane pot for depression, too.
+		post_synaptic_threshold, post_window.prev_post_synaptic_v); // SD 25/10/19: use membrane pot for depression, too.
 
 //    io_printf(IO_BUF, "Weight is: %u\n", current_state.weight_state.weight);
 
