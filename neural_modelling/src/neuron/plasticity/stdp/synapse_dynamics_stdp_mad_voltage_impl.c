@@ -334,6 +334,8 @@ bool synapse_dynamics_process_plastic_synapses(
 
         // Get data structures for this synapse's post-synaptic neuron
         neuron_pointer_t post_synaptic_neuron = &neuron_array_plasticity[index];
+        additional_input_pointer_t post_synaptic_additional_input =
+                		&additional_input_array_plasticity[index];
         threshold_type_pointer_t post_synaptic_threshold = &threshold_type_array_plasticity[index];
 
         // Create update state from the plastic synaptic word
@@ -411,6 +413,10 @@ void synapse_dynamics_set_neuron_array(neuron_pointer_t neuron_array){
 
 void synapse_dynamics_set_threshold_array(threshold_type_pointer_t threshold_type_array){
 	threshold_type_array_plasticity = threshold_type_array;
+}
+
+void synapse_dynamics_set_additional_input_array(additional_input_pointer_t additional_input_array){
+	additional_input_array_plasticity = additional_input_array;
 }
 
 bool synapse_dynamics_find_neuron(
