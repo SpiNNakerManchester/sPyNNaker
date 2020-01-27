@@ -15,13 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "timing_pair_predictive_impl.h"
+#include "timing_pair_dual_impl.h"
 
 //---------------------------------------
 // Globals
 //---------------------------------------
 // Exponential lookup-tables
 int16_lut *tau_lookup;
+int16_lut *tau_plus_lookup;
+int16_lut *tau_minus_lookup;
 
 // Global plasticity parameter data
 plasticity_trace_region_data_t plasticity_trace_region_data;
@@ -31,7 +33,7 @@ plasticity_trace_region_data_t plasticity_trace_region_data;
 //---------------------------------------
 uint32_t *timing_initialise(uint32_t* address) {
     log_info("timing_initialise: starting");
-    log_info("\tVogels 2011 timing rule");
+    log_info("\tDual timing rule");
 
     // Copy parameters
     plasticity_trace_region_data.alpha = (int32_t) address[0];
@@ -39,6 +41,13 @@ uint32_t *timing_initialise(uint32_t* address) {
     // Copy LUTs from following memory
     address_t lut_address = &address[1];
     tau_lookup = maths_copy_int16_lut(&lut_address);
+
+    //---------------------------------------------------------------
+    //---------------------------------------------------------------
+    tau_plus_lookup = maths_copy_int16_lut(&lut_address); //<- probably need to change address
+    tau_minus_lookup = maths_copy_int16_lut(&lut_address);
+    //---------------------------------------------------------------
+    //---------------------------------------------------------------
 
     log_info("timing_initialise: completed successfully");
 

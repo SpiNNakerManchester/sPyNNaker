@@ -36,15 +36,41 @@ typedef int16_t pre_trace_t;
 #include <neuron/plasticity/stdp/stdp_typedefs.h>
 
 //---------------------------------------
-// Macros
+// Structures
 //---------------------------------------
-
+typedef struct {
+    int32_t alpha;
+} plasticity_trace_region_data_t;
 
 //---------------------------------------
 // Externals
 //---------------------------------------
-extern int16_lut *tau_plus_lookup;
-extern int16_lut *tau_minus_lookup;
+extern int16_lut *tau_lookup;
+extern plasticity_trace_region_data_t plasticity_trace_region_data;
+
+//---------------------------------------
+// Declared functions
+//---------------------------------------
+uint32_t *plasticity_region_trace_filled(uint32_t* address, uint32_t flags);
+
+//---------------------------------------
+// Timing dependence inline functions
+//---------------------------------------
+static inline int16_t timing_add_spike(
+        uint32_t time, uint32_t last_time, int16_t last_trace) {
+    // Get time since last spike
+    uint32_t delta_time = time - last_time;
+
+    // Decay previous trace
+    int32_t decayed_trace = STDP_FIXED_MUL_16X16(last_trace,
+        maths_lut_exponential_decay(delta_time, tau_lookup));
+
+    // Add new spike to trace
+    int32_t new_trace = decayed_trace + STDP_FIXED_POINT_ONE;
+
+    log_debug("\tdelta_time=%d, new_trace=%d\n", delta_time, new_trace);
+    return (int16_t)new_trace;
+}
 
 //---------------------------------------
 // Timing dependence inline functions
@@ -52,48 +78,16 @@ extern int16_lut *tau_minus_lookup;
 static inline post_trace_t timing_get_initial_post_trace(void) {
     return 0;
 }
-
 //---------------------------------------
 static inline post_trace_t timing_add_post_spike(
         uint32_t time, uint32_t last_time, post_trace_t last_trace) {
-    // Get time since last spike
-    uint32_t delta_time = time - last_time;
-
-    // Decay previous o1 and o2 traces
-    int32_t decayed_o1_trace = STDP_FIXED_MUL_16X16(last_trace,
-            maths_lut_exponential_decay(delta_time, tau_minus_lookup));
-
-    // Add energy caused by new spike to trace
-    // **NOTE** o2 trace is pre-multiplied by a3_plus
-    int32_t new_o1_trace = decayed_o1_trace + STDP_FIXED_POINT_ONE;
-
-    log_debug("\tdelta_time=%d, o1=%d\n", delta_time, new_o1_trace);
-
-    // Return new pre- synaptic event with decayed trace values with energy
-    // for new spike added
-    return (post_trace_t) new_o1_trace;
+    return timing_add_spike(time, last_time, last_trace);
 }
-
 //---------------------------------------
 static inline pre_trace_t timing_add_pre_spike(
         uint32_t time, uint32_t last_time, pre_trace_t last_trace) {
-    // Get time since last spike
-    uint32_t delta_time = time - last_time;
-
-    // Decay previous r1 and r2 traces
-    int32_t decayed_r1_trace = STDP_FIXED_MUL_16X16(last_trace,
-        maths_lut_exponential_decay(delta_time, tau_plus_lookup));
-
-    // Add energy caused by new spike to trace
-    int32_t new_r1_trace = decayed_r1_trace + STDP_FIXED_POINT_ONE;
-
-    log_debug("\tdelta_time=%u, r1=%d\n", delta_time, new_r1_trace);
-
-    // Return new pre-synaptic event with decayed trace values with energy
-    // for new spike added
-    return (pre_trace_t) new_r1_trace;
+    return timing_add_spike(time, last_time, last_trace);
 }
-
 //---------------------------------------
 static inline update_state_t timing_apply_pre_spike(
         uint32_t time, pre_trace_t trace, uint32_t last_pre_time,
@@ -105,16 +99,20 @@ static inline update_state_t timing_apply_pre_spike(
 
     // Get time of event relative to last post-synaptic event
     uint32_t time_since_last_post = time - last_post_time;
-    int32_t decayed_o1 = STDP_FIXED_MUL_16X16(last_post_trace,
-        maths_lut_exponential_decay(time_since_last_post, tau_minus_lookup));
+    int32_t exponential_decay = maths_lut_exponential_decay(
+            time_since_last_post, tau_lookup);
+//    int32_t decayed_o1 = STDP_FIXED_MUL_16X16(last_post_trace, exponential_decay)
+//            - plasticity_trace_region_data.alpha;
+
+    int32_t decayed_o1 = - plasticity_trace_region_data.alpha;
 
     log_debug("\t\t\ttime_since_last_post_event=%u, decayed_o1=%d\n",
             time_since_last_post, decayed_o1);
 
-    // Apply depression to state (which is a weight_state)
-    return weight_one_term_apply_depression(previous_state, decayed_o1);
-}
+    // Apply potentiation to state (which is a weight_state)
+    return weight_one_term_apply_potentiation(previous_state, decayed_o1);
 
+}
 //---------------------------------------
 static inline update_state_t timing_apply_post_spike(
         uint32_t time, post_trace_t trace, uint32_t last_pre_time,
@@ -126,18 +124,15 @@ static inline update_state_t timing_apply_post_spike(
 
     // Get time of event relative to last pre-synaptic event
     uint32_t time_since_last_pre = time - last_pre_time;
-    if (time_since_last_pre > 0) {
-        int32_t decayed_r1 = STDP_FIXED_MUL_16X16(last_pre_trace,
-            maths_lut_exponential_decay(time_since_last_pre, tau_plus_lookup));
+    int32_t exponential_decay = maths_lut_exponential_decay(
+            time_since_last_pre, tau_lookup);
+    int32_t decayed_r1 = STDP_FIXED_MUL_16X16(last_pre_trace, exponential_decay);
 
-        log_debug("\t\t\ttime_since_last_pre_event=%u, decayed_r1=%d\n",
-                time_since_last_pre, decayed_r1);
+    log_debug("\t\t\ttime_since_last_pre_event=%u, decayed_r1=%d\n",
+            time_since_last_pre, decayed_r1);
 
-        // Apply potentiation to state (which is a weight_state)
-        return weight_one_term_apply_potentiation(previous_state, decayed_r1);
-    } else {
-        return previous_state;
-    }
+    // Apply potentiation to state (which is a weight_state)
+    return weight_one_term_apply_potentiation(previous_state, decayed_r1);
 }
 
 #endif // _TIMING_PAIR_PREDICTIVE_IMPL_H_

@@ -31,23 +31,31 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.common\
 logger = logging.getLogger(__name__)
 
 
-class TimingDependenceSpikePairPredictive(AbstractTimingDependence):
+class TimingDependenceSpikePairDual(AbstractTimingDependence):
     __slots__ = [
         "__alpha",
         "__synapse_structure",
         "__tau",
-        "__tau_data"]
+        "__tau_data",
+        "__tau_minus",
+        "__tau_minus_data",
+        "__tau_plus",
+        "__tau_plus_data"]
 
-    default_parameters = {'tau': 20.0}
+    #default_parameters = {'tau': 20.0, 'tau_plus': 20.0, 'tau_minus': 20.0}
 
-    def __init__(self, alpha, tau=default_parameters['tau']):
+    def __init__(self, alpha, tau=20.0, tau_plus=20.0, tau_minus=20.0):
         self.__alpha = alpha
         self.__tau = tau
+        self.__tau_plus = tau_plus
+        self.__tau_minus = tau_minus
 
         self.__synapse_structure = SynapseStructureWeightOnly()
 
         ts = get_simulator().machine_time_step / 1000.0
         self.__tau_data = get_exp_lut_array(ts, self.__tau)
+        self.__tau_plus_data = get_exp_lut_array(ts, self.__tau_plus)
+        self.__tau_minus_data = get_exp_lut_array(ts, self.__tau_minus)
 
     @property
     def alpha(self):
@@ -57,18 +65,28 @@ class TimingDependenceSpikePairPredictive(AbstractTimingDependence):
     def tau(self):
         return self.__tau
 
+    @property
+    def tau_plus(self):
+        return self.__tau_plus
+
+    @property
+    def tau_minus(self):
+        return self.__tau_minus
+
     @overrides(AbstractTimingDependence.is_same_as)
     def is_same_as(self, timing_dependence):
         # pylint: disable=protected-access
         if timing_dependence is None or not isinstance(
-                timing_dependence, TimingDependenceSpikePairPredictive):
+                timing_dependence, TimingDependenceSpikePairDual):
             return False
         return (self.__tau == timing_dependence.tau and
-                self.__alpha == timing_dependence.alpha)
+                self.__alpha == timing_dependence.alpha and
+                self.__tau_plus == timing_dependence.tau_plus and
+                self.__tau_minus == timing_dependence.tau_minus)
 
     @property
     def vertex_executable_suffix(self):
-        return "pair_predictive"
+        return "pair_dual"
 
     @property
     def pre_trace_n_bytes(self):
@@ -77,7 +95,9 @@ class TimingDependenceSpikePairPredictive(AbstractTimingDependence):
 
     @overrides(AbstractTimingDependence.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(self):
-        return BYTES_PER_WORD + BYTES_PER_WORD * len(self.__tau_data)
+        return (BYTES_PER_WORD + BYTES_PER_WORD * len(self.__tau_data)
+                + BYTES_PER_WORD * (len(self.__tau_plus_data) +
+                                    len(self.__tau_minus_data)))
 
     @property
     def n_weight_terms(self):
@@ -93,6 +113,8 @@ class TimingDependenceSpikePairPredictive(AbstractTimingDependence):
 
         # Write lookup table
         spec.write_array(self.__tau_data)
+        spec.write_array(self.__tau_plus_data)
+        spec.write_array(self.__tau_minus_data)
 
     @property
     def synaptic_structure(self):
@@ -100,4 +122,4 @@ class TimingDependenceSpikePairPredictive(AbstractTimingDependence):
 
     @overrides(AbstractTimingDependence.get_parameter_names)
     def get_parameter_names(self):
-        return ['alpha', 'tau']
+        return ['alpha', 'tau', 'tau_plus', 'tau_minus']
