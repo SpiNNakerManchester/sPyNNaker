@@ -14,8 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy
+from spinn_utilities.overrides import overrides
 from .abstract_formation import AbstractFormation
-from pacman.model.decorators.overrides import overrides
 
 
 class DistanceDependentFormation(AbstractFormation):

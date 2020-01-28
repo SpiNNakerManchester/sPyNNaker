@@ -14,14 +14,14 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy
+from spinn_utilities.overrides import overrides
+from data_specification.enums.data_type import DataType
+from spinn_front_end_common.utilities.globals_variables import get_simulator
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from .abstract_connector import AbstractConnector
 from spynnaker.pyNN.exceptions import SpynnakerException
-from spinn_front_end_common.utilities.globals_variables import get_simulator
-from pacman.model.decorators.overrides import overrides
-from data_specification.enums.data_type import DataType
-from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-from .abstract_generate_connector_on_machine \
-    import AbstractGenerateConnectorOnMachine, ConnectorIDs, PARAM_TYPE_KERNEL
+from .abstract_generate_connector_on_machine import (
+    AbstractGenerateConnectorOnMachine, ConnectorIDs, PARAM_TYPE_KERNEL)
 
 HEIGHT, WIDTH = 0, 1
 N_KERNEL_PARAMS = 8
