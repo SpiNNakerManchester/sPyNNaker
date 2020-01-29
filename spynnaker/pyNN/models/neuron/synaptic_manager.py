@@ -99,7 +99,7 @@ class SynapticManager(object):
         :type ring_buffer_sigma: float or None
         :param spikes_per_second: Estimated spikes per second
         :type spikes_per_second: float or None
-        :param configparser.RawConfigParser config: The system configuration
+        :param ~configparser.RawConfigParser config: The system configuration
         :param population_table_type:
             What type of master population table is used
         :type population_table_type: AbstractMasterPopTableFactory or None
@@ -369,9 +369,9 @@ class SynapticManager(object):
             self, vertex_slice, machine_time_step, application_graph,
             app_vertex):
         """
-        :param ~pacman.models.common.Slice vertex_slice:
+        :param ~pacman.model.common.Slice vertex_slice:
         :param int machine_time_step:
-        :param ~pacman.models.graphs.application.ApplicationGraph \
+        :param ~pacman.model.graphs.application.ApplicationGraph \
                 application_graph:
         :param AbstractPopulationVertex app_vertex:
         :rtype: int
@@ -390,6 +390,15 @@ class SynapticManager(object):
     def _reserve_memory_regions(
             self, spec, machine_vertex, vertex_slice, machine_graph,
             all_syn_block_sz, application_graph, application_vertex):
+        """
+        :param ~.DataSpecificationGenerator spec:
+        :param ~.MachineVertex machine_vertex:
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :param ~.MachineGraph machine_graph:
+        :param int all_syn_block_sz:
+        :param ~.ApplicationGraph application_graph:
+        :param ~.ApplicationVertex application_vertex:
+        """
         spec.reserve_memory_region(
             region=POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value,
             size=self._get_synapse_params_size(),
@@ -429,14 +438,14 @@ class SynapticManager(object):
         All arguments should be assumed real values except n_synapses_in\
         which will be an integer.
 
-        :param weight_mean: Mean of weight distribution (in either nA or\
+        :param float weight_mean: Mean of weight distribution (in either nA or\
             microSiemens as required)
-        :param weight_std_dev: SD of weight distribution
-        :param spikes_per_second: Maximum expected Poisson rate in Hz
-        :param machine_timestep: in us
-        :param n_synapses_in: No of connected synapses
-        :param sigma: How many SD above the mean to go for upper bound; a\
-            good starting choice is 5.0. Given length of simulation we can\
+        :param float weight_std_dev: SD of weight distribution
+        :param float spikes_per_second: Maximum expected Poisson rate in Hz
+        :param int machine_timestep: in us
+        :param int n_synapses_in: No of connected synapses
+        :param float sigma: How many SD above the mean to go for upper bound;\
+            a good starting choice is 5.0. Given length of simulation we can\
             set this for approximate number of saturation events.
         """
         # E[ number of spikes ] in a timestep
@@ -599,12 +608,17 @@ class SynapticManager(object):
             floating point values to 16-bit fixed point numbers which can be \
             shifted left by ring_buffer_to_input_left_shift to produce an\
             s1615 fixed point number
+
+        :rtype: float
         """
         return float(math.pow(2, 16 - (ring_buffer_to_input_left_shift + 1)))
 
     def _write_synapse_parameters(
             self, spec, ring_buffer_shifts, weight_scale):
-        """Get the ring buffer shifts and scaling factors."""
+        """ Get the ring buffer shifts and scaling factors.
+
+        :param ~.DataSpecificationGenerator spec:
+        """
 
         # Write the ring buffer shifts
         spec.switch_write_focus(POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value)
@@ -617,6 +631,9 @@ class SynapticManager(object):
 
     def _write_padding(
             self, spec, synaptic_matrix_region, next_block_start_address):
+        """
+        :param ~.DataSpecificationGenerator spec:
+        """
         next_block_allowed_address = self.__poptable_type\
             .get_next_allowed_address(next_block_start_address)
         if next_block_allowed_address != next_block_start_address:
@@ -641,6 +658,8 @@ class SynapticManager(object):
             machine_time_step):
         """ Simultaneously generates both the master population table and
             the synaptic matrix.
+
+        :param ~.DataSpecificationGenerator spec:
         """
         spec.comment(
             "\nWriting Synaptic Matrix and Master Population Table:\n")
@@ -754,6 +773,8 @@ class SynapticManager(object):
             all_syn_block_sz, block_addr, machine_time_step,
             app_edge, generator_data):
         """ Generate data for the synapse expander
+
+        :param ~.DataSpecificationGenerator spec:
         """
 
         # Get the size of the matrices that will be required
@@ -856,6 +877,9 @@ class SynapticManager(object):
             master_pop_table_region, weight_scales, machine_time_step,
             rinfo, all_syn_block_sz, block_addr, single_addr,
             machine_edge):
+        """
+        :param ~.DataSpecificationGenerator spec:
+        """
         (row_data, row_length, delayed_row_data, delayed_row_length,
          delayed_source_ids, delay_stages) = self.__synapse_io.get_synapses(
              synapse_info, pre_slices, pre_slice_index, post_slices,
@@ -931,6 +955,13 @@ class SynapticManager(object):
             app_edge, synapse_info):
         """ Determine if the given connection can be done with a "direct"\
             synaptic matrix - this must have an exactly 1 entry per row
+
+        :param int single_addr:
+        :param AbstractConnector connector:
+        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param ProjectionApplicationEdge app_edge:
+        :param SynapseInformation synapse_info:
         """
         return (
             app_edge.n_delay_stages == 0 and
@@ -945,6 +976,9 @@ class SynapticManager(object):
             row_length, row_data, rinfo, single_synapses,
             master_pop_table_region, synaptic_matrix_region,
             block_addr, single_addr, app_edge, synapse_info):
+        """
+        :param ~.DataSpecificationGenerator spec:
+        """
         if row_length == 1 and self.__is_direct(
                 single_addr, connector, pre_vertex_slice, post_vertex_slice,
                 app_edge, synapse_info):
@@ -1063,10 +1097,11 @@ class SynapticManager(object):
             self, transceiver, placement, machine_edge,
             routing_infos, synapse_info, machine_time_step,
             using_extra_monitor_cores, placements=None, monitor_api=None,
-            monitor_placement=None, monitor_cores=None,
-            handle_time_out_configuration=True, fixed_routes=None):
+            monitor_cores=None, handle_time_out_configuration=True,
+            fixed_routes=None, extra_monitor=None):
         """
-        :param ~spinnman.Transceiver transceiver: How to talk to the machine
+        :param ~spinnman.transceiver.Transceiver transceiver:
+            How to talk to the machine
         :param ~pacman.model.placements.Placement placement:
             Where on the machine are we talking to?
         :param ProjectionMachineEdge machine_edge:
@@ -1081,14 +1116,11 @@ class SynapticManager(object):
         :param placements: Where are all the vertices?
             Must not be ``None`` if ``using_extra_monitor_cores`` is true.
         :type placements: ~pacman.model.placements.Placements or None
-        :param monitor_api: How do we talk the fast protocol?
+        :param monitor_api:
+            How do we talk the fast protocol?
             Must not be ``None`` if ``using_extra_monitor_cores`` is true.
         :type monitor_api:
             ~spinn_front_end_common.utility_models.DataSpeedUpPacketGatherMachineVertex
-            or None
-        :param monitor_placement: Where is the master monitor?
-            Must not be ``None`` if ``using_extra_monitor_cores`` is true.
-        :type monitor_placement: ~pacman.model.placements.Placement or None
         :param monitor_cores: Where are all the monitors?
             Must not be ``None`` if ``using_extra_monitor_cores`` is true.
         :type monitor_cores:
@@ -1103,6 +1135,10 @@ class SynapticManager(object):
             Must not be ``None`` if ``using_extra_monitor_cores`` is true.
         :type fixed_routes:
             dict(tuple(int,int),~spinn_machine.FixedRouteEntry) or None
+        :param extra_monitor:
+        :type extra_monitor:
+            ~spinn_front_end_common.utility_models.ExtraMonitorSupportMachineVertex
+        :rtype: ~numpy.ndarray
         """
         app_edge = machine_edge.app_edge
         if not isinstance(app_edge, ProjectionApplicationEdge):
@@ -1129,7 +1165,7 @@ class SynapticManager(object):
             transceiver, placement, master_pop_table, indirect_synapses,
             direct_synapses, key, pre_vertex_slice.n_atoms, index,
             using_extra_monitor_cores, placements, monitor_api,
-            monitor_placement, monitor_cores, fixed_routes)
+            extra_monitor, monitor_cores, fixed_routes=fixed_routes)
 
         # Get the block for the connections from the delayed pre_vertex
         delayed_data = None
@@ -1140,8 +1176,8 @@ class SynapticManager(object):
                 direct_synapses, delayed_key,
                 pre_vertex_slice.n_atoms * app_edge.n_delay_stages,
                 index, using_extra_monitor_cores, placements,
-                monitor_api, monitor_placement, monitor_cores,
-                handle_time_out_configuration, fixed_routes)
+                monitor_api, extra_monitor, monitor_cores,
+                handle_time_out_configuration, fixed_routes=fixed_routes)
 
         # Convert the blocks into connections
         return self._read_synapses(
@@ -1153,6 +1189,10 @@ class SynapticManager(object):
     def __compute_addresses(self, transceiver, placement):
         """ Helper for computing the addresses of the master pop table and\
             synaptic-matrix-related bits.
+
+        :param ~.Transceiver transceiver:
+        :param ~.Placement placement:
+        :rtype: tuple(int, int, int)
         """
         master_pop_table = locate_memory_region_for_placement(
             placement, POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
@@ -1166,14 +1206,37 @@ class SynapticManager(object):
         return master_pop_table, direct_synapses, synaptic_matrix
 
     def _extract_synaptic_matrix_data_location(
-            self, key, master_pop_table_address, transceiver, placement):
+            self, key, master_pop_table_address, txrx, placement):
+        """
+        :param int key:
+        :param int master_pop_table_address:
+        :param ~spinnman.transceiver.Transceiver txrx:
+        :param ~.Placement placement:
+        :rtype: int
+        """
         return self.__poptable_type.extract_synaptic_matrix_data_location(
-            key, master_pop_table_address, transceiver,
-            placement.x, placement.y)
+            key, master_pop_table_address, txrx, placement.x, placement.y)
 
     def _read_synapses(self, info, pre_slice, post_slice, max_row_length,
                        delayed_max_row_length, n_synapse_types, weight_scales,
                        data, delayed_data, n_delays, timestep):
+        """
+        :param SynapseInformation synapse_info:
+        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param int max_row_length:
+        :param int delayed_max_row_length:
+        :param int n_synapse_types:
+        :param dict(AbstractSynapseType,float) weight_scales:
+        :param data:
+        :type data: bytes or bytearray or memoryview
+        :param delayed_data:
+        :type delayed_data: bytes or bytearray or memoryview
+        :param int n_delay_stages:
+        :param int machine_time_step:
+        :return: array with ``weight`` and ``delay`` columns
+        :rtype: ~numpy.ndarray
+        """
         return self.__synapse_io.read_synapses(
             info, pre_slice, post_slice, max_row_length,
             delayed_max_row_length, n_synapse_types, weight_scales, data,
@@ -1183,10 +1246,27 @@ class SynapticManager(object):
             self, txrx, placement, master_pop_table_address,
             indirect_synapses_address, direct_synapses_address,
             key, n_rows, index, using_monitors, placements=None,
-            monitor_api=None, monitor_placement=None, monitor_cores=None,
+            data_receiver=None, extra_monitor=None, monitor_cores=None,
             handle_time_out_configuration=True, fixed_routes=None):
         """ Read in a synaptic block from a given processor and vertex on\
             the machine
+
+        :param ~.Transceiver txrx:
+        :param ~.Placement placement:
+        :param int master_pop_table_address:
+        :param int indirect_synapses_address:
+        :param int direct_synapses_address:
+        :param int key:
+        :param int n_rows:
+        :param int index:
+        :param bool using_monitors:
+        :param ~.Placements placements:
+        :param ~.DataSpeedUpPacketGatherMachineVertex data_receiver:
+        :param ~.ExtraMonitorSupportMachineVertex extra_monitor:
+        :param list(~.ExtraMonitorSupportMachineVertex) monitor_cores:
+        :param bool handle_time_out_configuration:
+        :param dict(tuple(int,int),~.FixedRouteEntry) fixed_routes:
+        :rtype: tuple(bytearray, int)
         """
         # See if we have already got this block
         if (placement, key, index) in self.__retrieved_blocks:
@@ -1195,44 +1275,60 @@ class SynapticManager(object):
         items = self._extract_synaptic_matrix_data_location(
             key, master_pop_table_address, txrx, placement)
         if index >= len(items):
-            return None, None
+            return None, 0
 
         max_row_length, synaptic_block_offset, is_single = items[index]
         if max_row_length == 0:
-            return None, None
+            return None, 0
 
         block = None
         if max_row_length > 0 and synaptic_block_offset is not None:
             # if exploiting the extra monitor cores, need to set the machine
             # for data extraction mode
             if using_monitors and handle_time_out_configuration:
-                monitor_api.set_cores_for_data_streaming(
+                data_receiver.load_system_routing_tables(
+                    txrx, monitor_cores, placements)
+                data_receiver.set_cores_for_data_streaming(
                     txrx, monitor_cores, placements)
 
             # read in the synaptic block
             if not is_single:
                 block = self.__read_multiple_synaptic_blocks(
-                    txrx, monitor_api, placement, n_rows, max_row_length,
+                    txrx, data_receiver, placement, n_rows, max_row_length,
                     indirect_synapses_address + synaptic_block_offset,
-                    using_monitors, monitor_placement, fixed_routes)
+                    using_monitors, extra_monitor, fixed_routes, placements)
             else:
                 block, max_row_length = self.__read_single_synaptic_block(
-                    txrx, monitor_api, placement, n_rows,
+                    txrx, data_receiver, placement, n_rows,
                     direct_synapses_address + synaptic_block_offset,
-                    using_monitors, monitor_placement, fixed_routes)
+                    using_monitors, extra_monitor, fixed_routes, placements)
 
             if using_monitors and handle_time_out_configuration:
-                monitor_api.unset_cores_for_data_streaming(
+                data_receiver.unset_cores_for_data_streaming(
+                    txrx, monitor_cores, placements)
+                data_receiver.load_application_routing_tables(
                     txrx, monitor_cores, placements)
 
-        self.__retrieved_blocks[placement, key, index] = \
-            (block, max_row_length)
-        return block, max_row_length
+        result = (block, max_row_length)
+        self.__retrieved_blocks[placement, key, index] = result
+        return result
 
     def __read_multiple_synaptic_blocks(
-            self, transceiver, monitor_api, placement, n_rows, max_row_length,
-            address, using_monitors, monitor_placement, fixed_routes):
+            self, transceiver, data_receiver, placement, n_rows, max_row_length,
+            address, using_monitors, extra_monitor, fixed_routes, placements):
         """ Read in an array of synaptic blocks.
+
+        :param ~.Transceiver transceiver:
+        :param ~.DataSpeedUpPacketGatherMachineVertex data_receiver:
+        :param ~.Placement placement:
+        :param int n_rows:
+        :param int max_row_length:
+        :param int address:
+        :param bool using_monitors:
+        :param ~.ExtraMonitorSupportMachineVertex extra_monitor:
+        :param dict(tuple(int,int),~.FixedRouteEntry) fixed_routes:
+        :param ~.Placements placements:
+        :rtype: bytearray
         """
         # calculate the synaptic block size in bytes
         synaptic_block_size = self.__synapse_io.get_block_n_bytes(
@@ -1240,23 +1336,40 @@ class SynapticManager(object):
 
         # read in the synaptic block
         if using_monitors:
-            return monitor_api.get_data(
-                monitor_placement, address, synaptic_block_size, fixed_routes)
+            extra_monitor.update_transaction_id_from_machine(transceiver)
+            return data_receiver.get_data(
+                extra_monitor,
+                placements.get_placement_of_vertex(extra_monitor),
+                address, synaptic_block_size, fixed_routes)
         return transceiver.read_memory(
             placement.x, placement.y, address, synaptic_block_size)
 
     def __read_single_synaptic_block(
             self, transceiver, data_receiver, placement, n_rows, address,
-            using_monitors, monitor_placement, fixed_routes):
+            using_monitors, extra_monitor, fixed_routes, placements):
         """ Read in a single synaptic block.
+
+        :param ~.Transceiver transceiver:
+        :param ~.DataSpeedUpPacketGatherMachineVertex data_receiver:
+        :param ~.Placement placement:
+        :param int n_rows:
+        :param int address:
+        :param bool using_monitors:
+        :param ~.ExtraMonitorSupportMachineVertex extra_monitor:
+        :param dict(tuple(int,int),~.FixedRouteEntry) fixed_routes:
+        :param ~.Placements placements:
+        :rtype: tuple(bytearray, int)
         """
         # The data is one per row
         synaptic_block_size = n_rows * BYTES_PER_WORD
 
         # read in the synaptic row data
         if using_monitors:
+            extra_monitor.update_transaction_id_from_machine(transceiver)
             single_block = data_receiver.get_data(
-                monitor_placement, address, synaptic_block_size, fixed_routes)
+                extra_monitor,
+                placements.get_placement_of_vertex(extra_monitor),
+                address, synaptic_block_size, fixed_routes)
         else:
             single_block = transceiver.read_memory(
                 placement.x, placement.y, address, synaptic_block_size)
@@ -1282,7 +1395,7 @@ class SynapticManager(object):
         """ Write the data spec for the synapse expander
 
         :param spec: The specification to write to
-        :param ~pacman.models.common.Slice post_vertex_slice:
+        :param ~pacman.model.common.Slice post_vertex_slice:
             The slice of the vertex being written
         :param weight_scales: scaling of weights on each synapse
         """
@@ -1317,7 +1430,7 @@ class SynapticManager(object):
     def gen_on_machine(self, vertex_slice):
         """ True if the synapses should be generated on the machine
 
-        :param ~pacman.models.common.Slice vertex_slice:
+        :param ~pacman.model.common.Slice vertex_slice:
         :rtype: bool
         """
         return self.__gen_on_machine.get(vertex_slice, False)

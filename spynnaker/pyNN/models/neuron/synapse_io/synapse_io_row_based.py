@@ -281,7 +281,7 @@ class SynapseIORowBased(AbstractSynapseIO):
             max_row_length, delayed_max_row_length, n_synapse_types,
             weight_scales, data, delayed_data, n_delay_stages,
             machine_time_step):
-        # pylint: disable=too-many-arguments, too-many-locals, arguments-differ
+        # pylint: disable=too-many-arguments, too-many-locals
 
         # Translate the data into rows
         row_data = None

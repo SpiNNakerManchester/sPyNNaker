@@ -313,9 +313,11 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
     def _locate_entry(entries, key):
         """ Search the binary tree structure for the correct entry.
 
-        :param key: the key to search the master pop table for a given entry
+        :param list entries:
+        :param int key:
+            the key to search the master pop table for a given entry
         :return: the entry for this given key
-        :rtype: :py:class:`_MasterPopEntry`
+        :rtype: _MasterPopEntry
         """
         imin = 0
         imax = len(entries)
