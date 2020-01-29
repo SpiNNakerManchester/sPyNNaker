@@ -64,7 +64,7 @@ state_t neuron_model_state_update(
         neuron->refract_timer--;
     }
 
-    io_printf(IO_BUF, "Membrane potential: %k\n", neuron->V_membrane);
+//    io_printf(IO_BUF, "Membrane potential: %k\n", neuron->V_membrane);
 
     return neuron->V_membrane;
 }

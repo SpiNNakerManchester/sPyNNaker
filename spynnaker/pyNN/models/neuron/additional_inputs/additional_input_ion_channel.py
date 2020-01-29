@@ -32,23 +32,22 @@ from quantities.constants.tau import tau_neutron_mass_ratio
 
 N = "n"
 gK = "gK"
-CURRENT = "current"
-ALPHA_N = "alpha_n"
-BETA_N = "beta_n"
-TAU_N = "tau_n"
-N_INF = "n_inf"
+Ek = "Ek"
+I_k = "I_k"
 
 
 UNITS = {
     N: "",
     gK: "mS/mm2",
-    CURRENT: "nA",
-    ALPHA_N: "mV",
-    BETA_N: "mV",
-    TAU_N: "mV",
-    N_INF: "mV"
+    Ek :"mV",
+    I_k: "nA"
 }
 
+#     CURRENT: "nA",
+#     ALPHA_N: "mV",
+#     BETA_N: "mV",
+#     TAU_N: "mV",
+#     N_INF: "mV"
 
 class AdditionalInputIonChannel(AbstractAdditionalInput):
 #     __slots__ = [
@@ -58,11 +57,14 @@ class AdditionalInputIonChannel(AbstractAdditionalInput):
     __slots__ = [
         "__n",
         "__gK",
-        "__current",
-        "__alpha_n",
-        "__beta_n",
-        "__tau_n",
-        "__n_inf"]
+        "__Ek",
+        "__I_k"]
+    
+#         "__current",
+#         "__alpha_n",
+#         "__beta_n",
+#         "__tau_n",
+#         "__n_inf"
         
 #     def __init__(self,  tau_ca2, i_ca2, i_alpha):
 #         super(AdditionalInputIonChannel, self).__init__([
@@ -73,24 +75,24 @@ class AdditionalInputIonChannel(AbstractAdditionalInput):
 #         self.__i_ca2 = i_ca2
 #         self.__i_alpha = i_alpha
 
-    def __init__(self,  n, gK, current, alpha_n, beta_n, tau_n, n_inf):
+    def __init__(self,  n, gK, Ek, I_k):
         super(AdditionalInputIonChannel, self).__init__([
             DataType.S1615,   # n
             DataType.S1615,   # gk
-            DataType.S1615,   # current
-            DataType.S1615,   # alpha_n
-            DataType.S1615,   # beta_n
-            DataType.S1615,   # tau_n
-            DataType.S1615,   # n_inf
+            DataType.S1615,   # Ek
+            DataType.S1615,   # I_k
             ]) 
+#             DataType.S1615,   # beta_n
+#             DataType.S1615,   # tau_n
+#             DataType.S1615,   # n_inf
          # current
         self.__n = n
         self.__gK = gK
-        self.__current = current
-        self.__alpha_n = alpha_n
-        self.__beta_n = beta_n
-        self.__tau_n = tau_n
-        self.__n_inf = n_inf
+        self.__Ek = Ek
+        self.__I_k = I_k
+#         self.__beta_n = beta_n
+#         self.__tau_n = tau_n
+#         self.__n_inf = n_inf
         
                 
     @overrides(AbstractAdditionalInput.get_n_cpu_cycles)
@@ -101,15 +103,17 @@ class AdditionalInputIonChannel(AbstractAdditionalInput):
     @overrides(AbstractAdditionalInput.add_parameters)
     def add_parameters(self, parameters):
         parameters[gK] = self.__gK
+        parameters[Ek] = self.__Ek
 
     @overrides(AbstractAdditionalInput.add_state_variables)
     def add_state_variables(self, state_variables):
         state_variables[N] = self.__n
-        state_variables[CURRENT] = self.__current
-        state_variables[ALPHA_N] = self.__alpha_n
-        state_variables[BETA_N] = self.__beta_n
-        state_variables[TAU_N] = self.__tau_n
-        state_variables[N_INF] = self.__n_inf
+        state_variables[I_k] = self.I_k
+#         state_variables[CURRENT] = self.__current
+#         state_variables[ALPHA_N] = self.__alpha_n
+#         state_variables[BETA_N] = self.__beta_n
+#         state_variables[TAU_N] = self.__tau_n
+#         state_variables[N_INF] = self.__n_inf
         
 
     @overrides(AbstractAdditionalInput.get_units)
@@ -129,24 +133,25 @@ class AdditionalInputIonChannel(AbstractAdditionalInput):
 #         return [parameters[TAU_CA2].apply_operation(
 #                     operation=lambda x: numpy.exp(float(-ts) / (1000.0 * x))),
 #                 state_variables[I_CA2], parameters[I_ALPHA]]
-        return [state_variables[N], state_variables[CURRENT], parameters[gK],
-                state_variables[ALPHA_N], state_variables[BETA_N], state_variables[TAU_N],
-                state_variables[N_INF]]
+        return [state_variables[N], parameters[gK], parameters[Ek], state_variables[I_k]]
+#                 state_variables[ALPHA_N], state_variables[BETA_N], state_variables[TAU_N],
+#                 state_variables[N_INF]]
 
     @overrides(AbstractAdditionalInput.update_values)
     def update_values(self, values, parameters, state_variables):
 
         # Read the data
-        (_n, _gK, _current, _alpha_n, _beta_n, _tau_n, _n_inf) = values
+        (_n, _gK, _Ek, _I_k) = values
+#         , _beta_n, _tau_n, _n_inf
 
         # Copy the changed data only
         state_variables[N] = n
-        state_variables[CURRENT] = current
-        state_variables[ALPHA_N] = alpha_n
-        state_variables[BETA_N] = beta_n
-        state_variables[TAU_N] = tau_n
-        state_variables[N_INF] = n_inf
-        
+        state_variables[I_k] = I_k
+#         state_variables[ALPHA_N] = alpha_n
+#         state_variables[BETA_N] = beta_n
+#         state_variables[TAU_N] = tau_n
+#         state_variables[N_INF] = n_inf
+#         
     @property
     def n(self):
         return self.__n
@@ -162,44 +167,52 @@ class AdditionalInputIonChannel(AbstractAdditionalInput):
     @gK.setter
     def gK(self, gK):
         self.__gK = gK
-
-    @property
-    def current(self):
-        return self.__current
-
-    @current.setter
-    def current(self, current):
-        self.__current = current
         
     @property
-    def alpha_n(self):
-        return self.__alpha_n
+    def Ek(self):
+        return self.__Ek
 
-    @alpha_n.setter
-    def alpha_n(self, alpha_n):
-        self.__alpha_n = alpha_n
-        
+    @Ek.setter
+    def Ek(self, Ek):
+        self.__Ek = Ek
+
     @property
-    def beta_n(self):
-        return self.__beta_n
+    def I_k(self):
+        return self.__I_k
 
-    @beta_n.setter
-    def beta_n(self, beta_n):
-        self.__beta_n = beta_n
+    @I_k.setter
+    def I_k(self, I_k):
+        self.__I_k = I_k
         
-    @property
-    def tau_n(self):
-        return self.__tau_n
-
-    @tau_n.setter
-    def tau_n(self, tau_n):
-        self.__tau_n = tau_n
-        
-    @property
-    def n_inf(self):
-        return self.__n_inf
-
-    @n_inf.setter
-    def n_inf(self, n_inf):
-        self.__n_inf = n_inf
+#     @property
+#     def alpha_n(self):
+#         return self.__alpha_n
+# 
+#     @alpha_n.setter
+#     def alpha_n(self, alpha_n):
+#         self.__alpha_n = alpha_n
+#         
+#     @property
+#     def beta_n(self):
+#         return self.__beta_n
+# 
+#     @beta_n.setter
+#     def beta_n(self, beta_n):
+#         self.__beta_n = beta_n
+#         
+#     @property
+#     def tau_n(self):
+#         return self.__tau_n
+# 
+#     @tau_n.setter
+#     def tau_n(self, tau_n):
+#         self.__tau_n = tau_n
+#         
+#     @property
+#     def n_inf(self):
+#         return self.__n_inf
+# 
+#     @n_inf.setter
+#     def n_inf(self, n_inf):
+#         self.__n_inf = n_inf
         

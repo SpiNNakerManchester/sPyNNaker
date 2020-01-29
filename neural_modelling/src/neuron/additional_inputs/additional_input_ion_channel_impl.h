@@ -27,30 +27,14 @@
 //----------------------------------------------------------------------------
 
 typedef struct additional_input_t {
-//    // exp(-(machine time step in ms) / (TauCa))
-//    REAL    exp_TauCa;
-//    // Calcium current
-//    REAL    I_Ca2;
-//    // Influx of CA2 caused by each spike
-//    REAL    I_alpha;
-
     // n = probability of gate being open
     REAL    n;
     // gK
     REAL 	gK;
     // current
-    REAL	current;
-    // alpha n
-    REAL	alpha_n;
-    // beta n
-    REAL	beta_n;
-    // tau_n
-    REAL	tau_n;
-    // n_inf
-    REAL	n_inf;
-
-
-
+    REAL	I_k;
+    // Ek
+    REAL	Ek;
 
 } additional_input_t;
 
@@ -59,30 +43,36 @@ static input_t additional_input_get_input_value_as_current(
         state_t membrane_voltage) {
 	use(membrane_voltage);
 
-	// attempt at using inbuilt exponential function
-	// for alpha
-	additional_input->alpha_n = (0.01*(membrane_voltage+55))/ (1 - expk(-0.1*(membrane_voltage+55)));
-	// for beta
-	additional_input->beta_n = 0.125*expk(-0.0125*(membrane_voltage+55));
 
+//	update alpha_n and beta_n values for this membrane voltage
+	REAL alpha_n = (0.01*(membrane_voltage+55)) / (1 - expk(-0.1*(membrane_voltage+55)));
+	REAL beta_n = 0.125*expk(-0.0125*(membrane_voltage+65));
 
 	// update tau_n and n_inf values
-	additional_input->tau_n = 1 / (additional_input->alpha_n + additional_input->beta_n);
-	additional_input->n_inf = (additional_input->alpha_n) / (additional_input->alpha_n + additional_input->beta_n);
+	REAL tau_n = 1 / (alpha_n + beta_n);
+	REAL n_inf = (alpha_n) / (alpha_n + beta_n);
 
 	// update n value - change the 0.1 to ts at some point
-	additional_input->n = additional_input->n_inf + (additional_input->n - additional_input->n_inf)*expk(-0.1/additional_input->tau_n);
+	additional_input->n = n_inf + (additional_input->n - n_inf)*expk(-0.1/tau_n);
 
-	// calculate current
-	additional_input->current = additional_input->gK * additional_input->n * additional_input->n * additional_input->n * additional_input->n;
+//	io_printf(IO_BUF, "n=%k\n", additional_input->n);
+
+
+	// n^4 and use this to update the current through the channel
+	REAL n_pow = additional_input->n * additional_input->n * additional_input->n * additional_input->n;
+
+	// update current according to equation I_k = gK*n**4*(V-Ek)
+	additional_input->I_k = additional_input->gK * n_pow * (membrane_voltage - additional_input->Ek);
+//	io_printf(IO_BUF, "current=%k\n", additional_input->I_k);
+
 
 	// return the current
-	return -additional_input->current;
+	return additional_input->I_k;
 }
 
 static void additional_input_has_spiked(
         additional_input_pointer_t additional_input) {
-    // Apply influx of calcium to trace
+    // do nothing
     additional_input->n = additional_input->n;
 }
 
