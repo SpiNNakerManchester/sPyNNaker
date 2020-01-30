@@ -1,5 +1,3 @@
-from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
-from six import iteritems
 # Copyright (c) 2017-2019 The University of Manchester
 #
 # This program is free software: you can redistribute it and/or modify
@@ -16,6 +14,7 @@ from six import iteritems
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from collections import defaultdict
+from six import iteritems
 import math
 import struct
 import numpy
@@ -49,6 +48,7 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
 from spynnaker.pyNN.models.neuron.synapse_dynamics import SynapseDynamicsStatic
 from .key_space_tracker import KeySpaceTracker
 from pacman.model.graphs.common.slice import Slice
+from pacman.model.routing_info.base_key_and_mask import BaseKeyAndMask
 
 TIME_STAMP_BYTES = BYTES_PER_WORD
 
