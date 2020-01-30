@@ -304,7 +304,7 @@ class SynapseIORowBased(AbstractSynapseIO):
                 dynamics, pre_vertex_slice, post_vertex_slice, n_synapse_types,
                 row_data)
 
-        if not connections:
+        if not connections.size:
             return numpy.zeros(
                 0, dtype=AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE)
 
@@ -327,19 +327,18 @@ class SynapseIORowBased(AbstractSynapseIO):
                 -1, (delayed_max_row_length + _N_HEADER_WORDS))
 
         dynamics = synapse_info.synapse_dynamics
-        connections = []
         if isinstance(dynamics, AbstractStaticSynapseDynamics):
             # Read static data
-            connections.append(self._read_delayed_static_data(
+            connections = self._read_delayed_static_data(
                 dynamics, pre_vertex_slice, post_vertex_slice, n_synapse_types,
-                delayed_row_data))
+                delayed_row_data)
         else:
             # Read plastic data
-            connections.append(self._read_delayed_plastic_data(
+            connections = self._read_delayed_plastic_data(
                 dynamics, pre_vertex_slice, post_vertex_slice, n_synapse_types,
-                delayed_row_data))
+                delayed_row_data)
 
-        if not connections:
+        if not connections.size:
             return numpy.zeros(
                 0, dtype=AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE)
 
@@ -387,8 +386,9 @@ class SynapseIORowBased(AbstractSynapseIO):
         """
         # pylint: disable=too-many-arguments, too-many-locals
 
-        if row_data is None or row_data.size:
-            return []
+        if row_data is None or not row_data.size:
+            return numpy.zeros(
+                0, dtype=AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE)
 
         ff_size, ff_data = SynapseIORowBased._parse_static_data(
             row_data, dynamics)
@@ -402,8 +402,9 @@ class SynapseIORowBased(AbstractSynapseIO):
             dynamics, pre_vertex_slice, post_vertex_slice,
             n_synapse_types, delayed_row_data):
 
-        if delayed_row_data is None or delayed_row_data.size:
-            return []
+        if delayed_row_data is None or not delayed_row_data.size:
+            return numpy.zeros(
+                0, dtype=AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE)
 
         ff_size, ff_data = SynapseIORowBased._parse_static_data(
             delayed_row_data, dynamics)
@@ -454,8 +455,9 @@ class SynapseIORowBased(AbstractSynapseIO):
         """
         # pylint: disable=too-many-arguments, too-many-locals
 
-        if row_data is None:
-            return []
+        if row_data is None or not row_data.size:
+            return numpy.zeros(
+                0, dtype=AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE)
         pp_size, pp_data, fp_size, fp_data = \
             SynapseIORowBased._parse_plastic_data(row_data, dynamics)
         undelayed_connections = dynamics.read_plastic_synaptic_data(
@@ -468,8 +470,9 @@ class SynapseIORowBased(AbstractSynapseIO):
     def _read_delayed_plastic_data(
             dynamics, pre_vertex_slice, post_vertex_slice, n_synapse_types,
             delayed_row_data):
-        if delayed_row_data is None:
-            return []
+        if delayed_row_data is None or not delayed_row_data.size:
+            return numpy.zeros(
+                0, dtype=AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE)
 
         pp_size, pp_data, fp_size, fp_data = \
             SynapseIORowBased._parse_plastic_data(delayed_row_data, dynamics)

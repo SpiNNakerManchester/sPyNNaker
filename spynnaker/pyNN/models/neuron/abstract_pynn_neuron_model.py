@@ -17,7 +17,7 @@ from pacman.model.decorators.overrides import overrides
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
 
-DEFAULT_MAX_ATOMS_PER_CORE = 255
+DEFAULT_MAX_ATOMS_PER_CORE = 256
 
 _population_parameters = {
     "spikes_per_second": None, "ring_buffer_sigma": None,

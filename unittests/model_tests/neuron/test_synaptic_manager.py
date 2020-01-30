@@ -14,10 +14,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-import struct
 import tempfile
 import unittest
 import math
+import shutil
+
+from tempfile import mkdtemp
+
 import spinn_utilities.conf_loader as conf_loader
 from spinn_utilities.overrides import overrides
 from spinn_machine import SDRAM
@@ -56,7 +59,12 @@ from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
 from spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis\
     .elimination import RandomByWeightElimination
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
+from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 from unittests.mocks import MockSimulator
+from pacman.model.placements.placements import Placements
+from spinn_front_end_common.interface.buffer_management import BufferManager
+from pacman.model.graphs.application.application_graph import ApplicationGraph
+from data_specification.constants import MAX_MEM_REGIONS
 
 
 class MockSynapseIO(object):
@@ -75,10 +83,20 @@ class MockMasterPopulationTable(object):
         return self._key_to_entry_map[key]
 
 
+class MockCPUInfo(object):
+
+    @property
+    def user(self):
+        return [0, 0, 0, 0]
+
+
 class MockTransceiverRawData(object):
 
     def __init__(self, data_to_read):
         self._data_to_read = data_to_read
+
+    def get_cpu_information_from_core(self, x, y, p):
+        return MockCPUInfo()
 
     def read_memory(self, x, y, base_address, length):
         return self._data_to_read[base_address:base_address + length]
@@ -115,100 +133,7 @@ class SimpleApplicationVertex(ApplicationVertex):
 
 class TestSynapticManager(unittest.TestCase):
 
-    def test_retrieve_synaptic_block(self):
-        default_config_paths = os.path.join(
-            os.path.dirname(abstract_spinnaker_common.__file__),
-            AbstractSpiNNakerCommon.CONFIG_FILE_NAME)
-
-        config = conf_loader.load_config(
-            AbstractSpiNNakerCommon.CONFIG_FILE_NAME, default_config_paths)
-
-        key = 0
-
-        synaptic_manager = SynapticManager(
-            n_synapse_types=2, ring_buffer_sigma=5.0, spikes_per_second=100.0,
-            config=config,
-            population_table_type=MockMasterPopulationTable(
-                {key: [(1, 0, False)]}),
-            synapse_io=MockSynapseIO())
-
-        transceiver = MockTransceiverRawData(bytearray(16))
-        placement = Placement(None, 0, 0, 1)
-
-        first_block, row_len_1 = synaptic_manager._retrieve_synaptic_block(
-            transceiver=transceiver, placement=placement,
-            master_pop_table_address=0, indirect_synapses_address=0,
-            direct_synapses_address=0, key=key, n_rows=1, index=0,
-            using_extra_monitor_cores=False)
-        same_block, row_len_1_2 = synaptic_manager._retrieve_synaptic_block(
-            transceiver=transceiver, placement=placement,
-            master_pop_table_address=0, indirect_synapses_address=0,
-            direct_synapses_address=0, key=key, n_rows=1, index=0,
-            using_extra_monitor_cores=False)
-        synaptic_manager.clear_connection_cache()
-        different_block, row_len_2 = synaptic_manager._retrieve_synaptic_block(
-            transceiver=transceiver, placement=placement,
-            master_pop_table_address=0, indirect_synapses_address=0,
-            direct_synapses_address=0, key=key, n_rows=1, index=0,
-            using_extra_monitor_cores=False)
-
-        # Check that the row lengths are all the same
-        assert row_len_1 == row_len_1_2
-        assert row_len_1 == row_len_2
-
-        # Check that the block retrieved twice without reset is cached
-        assert id(first_block) == id(same_block)
-
-        # Check that the block after reset is not a copy
-        assert id(first_block) != id(different_block)
-
-    def test_retrieve_direct_block(self):
-        default_config_paths = os.path.join(
-            os.path.dirname(abstract_spinnaker_common.__file__),
-            AbstractSpiNNakerCommon.CONFIG_FILE_NAME)
-
-        config = conf_loader.load_config(
-            AbstractSpiNNakerCommon.CONFIG_FILE_NAME, default_config_paths)
-
-        key = 0
-        n_rows = 2
-
-        direct_matrix = bytearray(struct.pack("<IIII", 1, 2, 3, 4))
-        direct_matrix_1_expanded = bytearray(
-            struct.pack("<IIIIIIII", 0, 1, 0, 1, 0, 1, 0, 2))
-        direct_matrix_2_expanded = bytearray(
-            struct.pack("<IIIIIIII", 0, 1, 0, 3, 0, 1, 0, 4))
-
-        synaptic_manager = SynapticManager(
-            n_synapse_types=2, ring_buffer_sigma=5.0, spikes_per_second=100.0,
-            config=config,
-            population_table_type=MockMasterPopulationTable(
-                {key: [(1, 0, True), (1, n_rows * 4, True)]}),
-            synapse_io=MockSynapseIO())
-
-        transceiver = MockTransceiverRawData(direct_matrix)
-        placement = Placement(None, 0, 0, 1)
-
-        data_1, row_len_1 = synaptic_manager._retrieve_synaptic_block(
-            transceiver=transceiver, placement=placement,
-            master_pop_table_address=0, indirect_synapses_address=0,
-            direct_synapses_address=0, key=key, n_rows=n_rows, index=0,
-            using_extra_monitor_cores=False)
-        data_2, row_len_2 = synaptic_manager._retrieve_synaptic_block(
-            transceiver=transceiver, placement=placement,
-            master_pop_table_address=0, indirect_synapses_address=0,
-            direct_synapses_address=0, key=key, n_rows=n_rows, index=1,
-            using_extra_monitor_cores=False)
-
-        # Row lengths should be 1
-        assert row_len_1 == 1
-        assert row_len_2 == 1
-
-        # Check the data retrieved
-        assert data_1 == direct_matrix_1_expanded
-        assert data_2 == direct_matrix_2_expanded
-
-    def test_write_synaptic_matrix_and_master_population_table(self):
+    def test_write_data_spec(self):
         MockSimulator.setup()
         # Add an sdram so max SDRAM is high enough
         SDRAM(10000)
@@ -223,15 +148,21 @@ class TestSynapticManager(unittest.TestCase):
 
         machine_time_step = 1000.0
 
+        placements = Placements()
         pre_app_vertex = SimpleApplicationVertex(10, label="pre")
         pre_vertex = SimpleMachineVertex(resources=None, label="pre_m")
+        placements.add_placement(Placement(pre_vertex, 0, 0, 1))
         pre_vertex_slice = Slice(0, 9)
         post_app_vertex = SimpleApplicationVertex(10, label="post")
         post_vertex = SimpleMachineVertex(resources=None, label="post_m")
+        post_vertex_placement = Placement(post_vertex, 0, 0, 2)
+        placements.add_placement(post_vertex_placement)
         post_vertex_slice = Slice(0, 9)
-        post_slice_index = 0
-        delay_app_vertex = SimpleApplicationVertex(10, label="delay")
-        delay_vertex = SimpleMachineVertex(resources=None)
+        delay_app_vertex = DelayExtensionVertex(
+            10, 16, pre_app_vertex, 1000, 1, label="delay")
+        delay_vertex = delay_app_vertex.create_machine_vertex(
+            post_vertex_slice, resources_required=None)
+        placements.add_placement(Placement(delay_vertex, 0, 0, 3))
         one_to_one_connector_1 = OneToOneConnector(None)
         direct_synapse_information_1 = SynapseInformation(
             one_to_one_connector_1, pre_app_vertex, post_app_vertex, False,
@@ -284,6 +215,13 @@ class TestSynapticManager(unittest.TestCase):
         graph.add_edge(machine_edge, partition_name)
         graph.add_edge(delay_machine_edge, partition_name)
 
+        app_graph = ApplicationGraph("Test")
+        app_graph.add_vertex(pre_app_vertex)
+        app_graph.add_vertex(post_app_vertex)
+        app_graph.add_vertex(delay_app_vertex)
+        app_graph.add_edge(app_edge, partition_name)
+        app_graph.add_edge(delay_edge, partition_name)
+
         graph_mapper = GraphMapper()
         graph_mapper.add_vertex_mapping(
             pre_vertex, pre_vertex_slice, pre_app_vertex)
@@ -293,8 +231,6 @@ class TestSynapticManager(unittest.TestCase):
             delay_vertex, pre_vertex_slice, delay_app_vertex)
         graph_mapper.add_edge_mapping(machine_edge, app_edge)
         graph_mapper.add_edge_mapping(delay_machine_edge, delay_edge)
-
-        weight_scales = [4096.0, 4096.0]
 
         routing_info = RoutingInfo()
         key = 0
@@ -313,177 +249,85 @@ class TestSynapticManager(unittest.TestCase):
         temp_spec = tempfile.mktemp()
         spec_writer = FileDataWriter(temp_spec)
         spec = DataSpecificationGenerator(spec_writer, None)
-        master_pop_sz = 1000
-        master_pop_region = 0
-        all_syn_block_sz = 2000
-        synapse_region = 1
-        direct_region = 2
-        spec.reserve_memory_region(master_pop_region, master_pop_sz)
-        spec.reserve_memory_region(synapse_region, all_syn_block_sz)
 
         synaptic_manager = SynapticManager(
             n_synapse_types=2, ring_buffer_sigma=5.0,
             spikes_per_second=100.0, config=config)
         # UGLY but the mock transceiver NEED generate_on_machine be False
         abstract_generate_connector_on_machine.IS_PYNN_8 = False
-        synaptic_manager._SynapticManager__delay_key_index[
-            pre_app_vertex, pre_vertex_slice.lo_atom,
-            pre_vertex_slice.hi_atom] = delay_routing_info
-        synaptic_manager._write_synaptic_matrix_and_master_population_table(
-            spec, [post_vertex_slice], post_slice_index, post_vertex,
-            post_vertex_slice, all_syn_block_sz, weight_scales,
-            master_pop_region, synapse_region, direct_region, routing_info,
-            graph_mapper, graph, machine_time_step)
+        synaptic_manager.write_data_spec(
+            spec, post_app_vertex, post_vertex_slice, post_vertex,
+            post_vertex_placement, graph, app_graph, routing_info,
+            graph_mapper, 1.0, machine_time_step)
         spec.end_specification()
         spec_writer.close()
 
         spec_reader = FileDataReader(temp_spec)
-        executor = DataSpecificationExecutor(
-            spec_reader, master_pop_sz + all_syn_block_sz)
+        executor = DataSpecificationExecutor(spec_reader, 20000)
         executor.execute()
 
-        master_pop_table = executor.get_region(0)
-        synaptic_matrix = executor.get_region(1)
-        direct_matrix = executor.get_region(2)
-
         all_data = bytearray()
-        all_data.extend(master_pop_table.region_data[
-            :master_pop_table.max_write_pointer])
-        all_data.extend(synaptic_matrix.region_data[
-            :synaptic_matrix.max_write_pointer])
-        all_data.extend(direct_matrix.region_data[
-            :direct_matrix.max_write_pointer])
-        master_pop_table_address = 0
-        synaptic_matrix_address = master_pop_table.max_write_pointer
-        direct_synapses_address = (
-            synaptic_matrix_address + synaptic_matrix.max_write_pointer)
-        direct_synapses_address += 4
-        indirect_synapses_address = synaptic_matrix_address
-        placement = Placement(None, 0, 0, 1)
+        all_data.extend(bytearray(executor.get_header()))
+        all_data.extend(bytearray(executor.get_pointer_table(0)))
+        for r in range(MAX_MEM_REGIONS):
+            region = executor.get_region(r)
+            if region is not None:
+                all_data.extend(region.region_data)
         transceiver = MockTransceiverRawData(all_data)
+        report_folder = mkdtemp()
+        try:
+            buffer_manager = BufferManager(
+                placements=placements, tags=None, transceiver=transceiver,
+                extra_monitor_cores=None,
+                packet_gather_cores_to_ethernet_connection_map=None,
+                extra_monitor_to_chip_mapping=None, machine=None,
+                fixed_routes=None, uses_advanced_monitors=False,
+                report_folder=report_folder, java_caller=None)
 
-        # Get the master population table details
-        items = synaptic_manager._extract_synaptic_matrix_data_location(
-            key, master_pop_table_address, transceiver, placement)
-        delay_items = synaptic_manager._extract_synaptic_matrix_data_location(
-            delay_key, master_pop_table_address, transceiver, placement)
+            connections_1 = synaptic_manager.get_connections_from_machine(
+                post_app_vertex, transceiver, placements, app_edge,
+                graph_mapper, direct_synapse_information_1, machine_time_step,
+                buffer_manager)
 
-        # The first entry should be direct, but the rest should be indirect;
-        # the second is potentially direct, but has been restricted by the
-        # restriction on the size of the direct matrix.  All items
-        # should be "valid" in that they have row length
-        assert len(items) == 4
-        assert items[0][2]
-        assert not items[1][2]
-        assert not items[2][2]
-        assert not items[3][2]
-        assert items[0][0] > 0
-        assert items[1][0] > 0
-        assert items[2][0] > 0
-        assert items[3][0] > 0
-        assert items[0][1] == 0
-        assert items[1][1] == 0
-        assert items[2][1] > 0
-        assert items[3][1] > 0
+            # Check that all the connections have the right weight and delay
+            assert len(connections_1) == post_vertex_slice.n_atoms
+            assert all([conn["weight"] == 1.5 for conn in connections_1])
+            assert all([conn["delay"] == 1.0 for conn in connections_1])
 
-        # There are 4 delay items even though there is only one delayed entry
-        # because invalid entries are added to keep the indices the same
-        # between delayed and not delayed items.  The first 3 items should all
-        # be invalid in that they have a row length of 0.  The last item should
-        # not be single
-        assert len(delay_items) == 4
-        assert delay_items[0][0] == 0
-        assert delay_items[1][0] == 0
-        assert delay_items[2][0] == 0
-        assert delay_items[3][0] > 0
-        assert not delay_items[3][2]
+            connections_2 = synaptic_manager.get_connections_from_machine(
+                post_app_vertex, transceiver, placements, app_edge,
+                graph_mapper, direct_synapse_information_2, machine_time_step,
+                buffer_manager)
 
-        data_1, row_len_1 = synaptic_manager._retrieve_synaptic_block(
-            transceiver=transceiver, placement=placement,
-            master_pop_table_address=master_pop_table_address,
-            indirect_synapses_address=indirect_synapses_address,
-            direct_synapses_address=direct_synapses_address, key=key,
-            n_rows=pre_vertex_slice.n_atoms, index=0,
-            using_extra_monitor_cores=False)
-        connections_1 = synaptic_manager._read_synapses(
-            direct_synapse_information_1, pre_vertex_slice, post_vertex_slice,
-            row_len_1, 0, 2, weight_scales, data_1, None,
-            app_edge.n_delay_stages, machine_time_step)
+            # Check that all the connections have the right weight and delay
+            assert len(connections_2) == post_vertex_slice.n_atoms
+            assert all([conn["weight"] == 2.5 for conn in connections_2])
+            assert all([conn["delay"] == 2.0 for conn in connections_2])
 
-        # The first matrix is a 1-1 matrix, so row length is 1
-        assert row_len_1 == 1
+            connections_3 = synaptic_manager.get_connections_from_machine(
+                post_app_vertex, transceiver, placements, app_edge,
+                graph_mapper, all_to_all_synapse_information,
+                machine_time_step, buffer_manager)
 
-        # Check that all the connections have the right weight and delay
-        assert len(connections_1) == post_vertex_slice.n_atoms
-        assert all([conn["weight"] == 1.5 for conn in connections_1])
-        assert all([conn["delay"] == 1.0 for conn in connections_1])
+            # Check that all the connections have the right weight and delay
+            assert len(connections_3) == \
+                post_vertex_slice.n_atoms * pre_vertex_slice.n_atoms
+            assert all([conn["weight"] == 4.5 for conn in connections_3])
+            assert all([conn["delay"] == 4.0 for conn in connections_3])
 
-        data_2, row_len_2 = synaptic_manager._retrieve_synaptic_block(
-            transceiver=transceiver, placement=placement,
-            master_pop_table_address=master_pop_table_address,
-            indirect_synapses_address=indirect_synapses_address,
-            direct_synapses_address=direct_synapses_address, key=key,
-            n_rows=pre_vertex_slice.n_atoms, index=1,
-            using_extra_monitor_cores=False)
-        connections_2 = synaptic_manager._read_synapses(
-            direct_synapse_information_2, pre_vertex_slice, post_vertex_slice,
-            row_len_2, 0, 2, weight_scales, data_2, None,
-            app_edge.n_delay_stages, machine_time_step)
+            connections_4 = synaptic_manager.get_connections_from_machine(
+                post_app_vertex, transceiver, placements, app_edge,
+                graph_mapper, from_list_synapse_information, machine_time_step,
+                buffer_manager)
 
-        # The second matrix is a 1-1 matrix, so row length is 1
-        assert row_len_2 == 1
-
-        # Check that all the connections have the right weight and delay
-        assert len(connections_2) == post_vertex_slice.n_atoms
-        assert all([conn["weight"] == 2.5 for conn in connections_2])
-        assert all([conn["delay"] == 2.0 for conn in connections_2])
-
-        data_3, row_len_3 = synaptic_manager._retrieve_synaptic_block(
-            transceiver=transceiver, placement=placement,
-            master_pop_table_address=master_pop_table_address,
-            indirect_synapses_address=indirect_synapses_address,
-            direct_synapses_address=direct_synapses_address, key=key,
-            n_rows=pre_vertex_slice.n_atoms, index=2,
-            using_extra_monitor_cores=False)
-        connections_3 = synaptic_manager._read_synapses(
-            all_to_all_synapse_information, pre_vertex_slice,
-            post_vertex_slice, row_len_3, 0, 2, weight_scales, data_3, None,
-            app_edge.n_delay_stages, machine_time_step)
-
-        # The third matrix is an all-to-all matrix, so length is n_atoms
-        assert row_len_3 == post_vertex_slice.n_atoms
-
-        # Check that all the connections have the right weight and delay
-        assert len(connections_3) == \
-            post_vertex_slice.n_atoms * pre_vertex_slice.n_atoms
-        assert all([conn["weight"] == 4.5 for conn in connections_3])
-        assert all([conn["delay"] == 4.0 for conn in connections_3])
-
-        data_4, row_len_4 = synaptic_manager._retrieve_synaptic_block(
-            transceiver=transceiver, placement=placement,
-            master_pop_table_address=master_pop_table_address,
-            indirect_synapses_address=indirect_synapses_address,
-            direct_synapses_address=direct_synapses_address, key=key,
-            n_rows=pre_vertex_slice.n_atoms, index=3,
-            using_extra_monitor_cores=False)
-        d_data_4, d_row_len_4 = synaptic_manager._retrieve_synaptic_block(
-            transceiver=transceiver, placement=placement,
-            master_pop_table_address=master_pop_table_address,
-            indirect_synapses_address=indirect_synapses_address,
-            direct_synapses_address=direct_synapses_address, key=delay_key,
-            n_rows=pre_vertex_slice.n_atoms * n_delay_stages, index=3,
-            using_extra_monitor_cores=False)
-        connections_4 = synaptic_manager._read_synapses(
-            from_list_synapse_information, pre_vertex_slice,
-            post_vertex_slice, row_len_4, d_row_len_4, 2, weight_scales,
-            data_4, d_data_4, app_edge.n_delay_stages, machine_time_step)
-
-        # Check that all the connections have the right weight and delay
-        assert len(connections_4) == len(from_list_list)
-        list_weights = [values[2] for values in from_list_list]
-        list_delays = [values[3] for values in from_list_list]
-        assert all(list_weights == connections_4["weight"])
-        assert all(list_delays == connections_4["delay"])
+            # Check that all the connections have the right weight and delay
+            assert len(connections_4) == len(from_list_list)
+            list_weights = [values[2] for values in from_list_list]
+            list_delays = [values[3] for values in from_list_list]
+            assert all(list_weights == connections_4["weight"])
+            assert all(list_delays == connections_4["delay"])
+        finally:
+            shutil.rmtree(report_folder, ignore_errors=True)
 
     def test_set_synapse_dynamics(self):
         MockSimulator.setup()
