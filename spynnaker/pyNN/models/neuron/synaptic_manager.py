@@ -767,7 +767,7 @@ class SynapticManager(object):
                     else:
                         size = block_addr - syn_mat_addr
                     self.__m_edge_info[key] = (
-                        syn_mat_addr, max_row_info.undelayed_max_n_synapses,
+                        syn_mat_addr, max_row_info.undelayed_max_words,
                         size, is_single)
             elif is_undelayed:
                 # If there is an app_key, save the data to be written later
@@ -791,7 +791,7 @@ class SynapticManager(object):
                 if syn_mat_addr is not None:
                     key = (m_edge, synapse_info, post_vertex_slice.lo_atom)
                     self.__delay_m_edge_info[key] = (
-                        syn_mat_addr, max_row_info.delayed_max_n_synapses,
+                        syn_mat_addr, max_row_info.delayed_max_words,
                         block_addr - syn_mat_addr, False)
             elif is_delayed:
                 # If there is a delay_app_key, save the data for delays
@@ -812,7 +812,7 @@ class SynapticManager(object):
             if syn_mat_addr is not None:
                 key = (app_edge, synapse_info, post_vertex_slice.lo_atom)
                 self.__app_edge_info[key] = (
-                    syn_mat_addr, max_row_info.undelayed_max_n_synapses,
+                    syn_mat_addr, max_row_info.undelayed_max_words,
                     block_addr - syn_mat_addr)
         if delay_app_key_info is not None:
             block_addr, syn_mat_addr = self.__write_app_matrix(
@@ -823,7 +823,7 @@ class SynapticManager(object):
             if syn_mat_addr is not None:
                 key = (app_edge, synapse_info, post_vertex_slice.lo_atom)
                 self.__delay_edge_info[key] = (
-                    syn_mat_addr, max_row_info.delayed_max_n_synapses,
+                    syn_mat_addr, max_row_info.delayed_max_words,
                     block_addr - syn_mat_addr)
 
         return block_addr, single_addr
@@ -968,7 +968,7 @@ class SynapticManager(object):
             return False
         next_high = 0
         for s in slices:
-            if s.low_atom != next_high:
+            if s.lo_atom != next_high:
                 return False
             next_high = s.hi_atom + 1
         return True
@@ -1055,7 +1055,7 @@ class SynapticManager(object):
             syn_max_addr = block_addr
             key = (app_edge, synapse_info, post_vertex_slice.lo_atom)
             self.__app_edge_info[key] = (
-                syn_block_addr, max_row_info.undelayed_max_n_synapses,
+                syn_block_addr, max_row_info.undelayed_max_words,
                 block_addr - syn_block_addr)
         elif app_key_info is not None:
             self.__poptable_type.add_invalid_entry(
@@ -1073,7 +1073,7 @@ class SynapticManager(object):
             delay_max_addr = block_addr
             key = (app_edge, synapse_info, post_vertex_slice.lo_atom)
             self.__delay_edge_info[key] = (
-                delay_block_addr, max_row_info.delayed_max_n_synapses,
+                delay_block_addr, max_row_info.delayed_max_words,
                 block_addr - delay_block_addr)
         elif delay_app_key_info is not None:
             self.__poptable_type.add_invalid_entry(
@@ -1114,7 +1114,7 @@ class SynapticManager(object):
                         post_vertex_slice, synapse_info)
                     key = (m_edge, synapse_info, post_vertex_slice.lo_atom)
                     self.__m_edge_info[key] = (
-                        syn_mat_offset, max_row_info.undelayed_max_n_synapses,
+                        syn_mat_offset, max_row_info.undelayed_max_words,
                         block_addr - syn_mat_offset, False)
                 elif r_info is not None:
                     self.__poptable_type.add_invalid_entry(
@@ -1142,7 +1142,7 @@ class SynapticManager(object):
                         post_vertex_slice, synapse_info)
                     key = (m_edge, synapse_info, post_vertex_slice.lo_atom)
                     self.__delay_m_edge_info[key] = (
-                        d_mat_offset, max_row_info.delayed_max_n_synapses,
+                        d_mat_offset, max_row_info.delayed_max_words,
                         block_addr - d_mat_offset, False)
                 elif r_info is not None:
                     self.__poptable_type.add_invalid_entry(
