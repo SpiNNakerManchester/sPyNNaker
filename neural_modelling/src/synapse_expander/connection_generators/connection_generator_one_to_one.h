@@ -91,6 +91,12 @@ static uint32_t connection_generator_one_to_one_generate(
         return 0;
     }
 
+    // If out of range, don't generate anything
+    if ((post_neuron_index < (int) post_slice_start) ||
+            (post_neuron_index >= (int) (post_slice_start + post_slice_count))) {
+        return 0;
+    }
+
     // Post-index = core-relative post-index
     indices[0] = post_neuron_index - post_slice_start;
     return 1;
