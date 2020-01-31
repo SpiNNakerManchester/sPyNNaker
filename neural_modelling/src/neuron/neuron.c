@@ -126,7 +126,11 @@ static uint32_t synapse_index_bits;
 
 static uint32_t memory_index;
 
+static uint32_t incoming_partitions;
+
 static timer_t current_time;
+
+static uint32_t n_neurons_power_2;
 
 //! Size of DMA read for synaptic contributions
 static size_t dma_size;
@@ -147,7 +151,7 @@ static uint32_t sum;
 typedef enum parameters_in_neuron_parameter_data_region {
     TIMER_START_OFFSET, TIME_BETWEEN_SPIKES, HAS_KEY,
     TRANSMISSION_KEY, N_NEURONS_TO_SIMULATE, N_SYNAPSE_TYPES,
-    MEM_INDEX, N_RECORDED_VARIABLES, START_OF_GLOBAL_PARAMETERS,
+    MEM_INDEX, INCOMING_PARTITIONS, N_RECORDED_VARIABLES, START_OF_GLOBAL_PARAMETERS,
 } parameters_in_neuron_parameter_data_region;
 
 static void _reset_record_counter() {
@@ -278,6 +282,8 @@ bool neuron_do_timestep_update(
     // Set the next expected time to wait for between spike sending
     expected_time = sv->cpu_clk * timer_period;
 
+    io_printf(IO_BUF, "read from %d\n", synaptic_region);
+
     // Wait until recordings have completed, to ensure the recording space
     // can be re-written
     while (n_recordings_outstanding > 0) {
@@ -299,20 +305,35 @@ bool neuron_do_timestep_update(
 
             uint32_t buff_index = ((synapse_type_index << synapse_index_bits) | neuron_index);
 
-            if(synapse_type_index > 0) {
+            sum = synaptic_contributions[buff_index];
 
-                sum = synaptic_contributions[buff_index];
-            }
-            else {
+            io_printf(IO_BUF, "buff_index: %d\n", buff_index);
 
-                sum =
-                    synaptic_contributions[buff_index] +
-                    synaptic_contributions[buff_index + contribution_offset];
+            if(synaptic_region[buff_index] != 0)
+                io_printf(IO_BUF, "contr %d n %d\n", synaptic_region[buff_index], neuron_index);
+
+            // Some way to do it a bit better?
+
+            if(synapse_type_index == 0) {
+
+                buff_index += n_neurons_power_2;
+
+                for(uint32_t i = 2; i < incoming_partitions; i++) {
+
+                    buff_index += n_neurons_power_2;
+
+                    sum += synaptic_contributions[buff_index];
+                }
 
                 if(sum & 0x10000) {
 
                     sum = SAT_VALUE;
                 }
+            }
+
+            if(sum != 0){
+
+                io_printf(IO_BUF, "sum %d, neuron %d syn %d\n", sum , neuron_index, synapse_type_index);
             }
 
             neuron_impl_add_inputs(
@@ -343,7 +364,7 @@ bool neuron_do_timestep_update(
 
             log_debug("neuron %u spiked at time %u", neuron_index, time);
 
-            //io_printf(IO_BUF, "n %d t %d\n", neuron_index, time);
+            io_printf(IO_BUF, "SPIKE n %d t %d\n", neuron_index, time);
 
             // Record the spike
             out_spikes_set_spike(spike_recording_indexes[neuron_index]);
@@ -449,10 +470,14 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset) {
 
     memory_index = address[MEM_INDEX];
 
+    incoming_partitions = address[INCOMING_PARTITIONS];
+
+    io_printf(IO_BUF, "Incoming partitions: %d\n", incoming_partitions);
+
     // Read number of recorded variables
     n_recorded_vars = address[N_RECORDED_VARIABLES];
 
-    uint32_t n_neurons_power_2 = n_neurons;
+    n_neurons_power_2 = n_neurons;
     uint32_t log_n_neurons = 1;
     if (n_neurons != 1) {
         if (!is_power_of_2(n_neurons)) {
@@ -470,15 +495,19 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset) {
     synapse_type_index_bits = log_n_neurons + log_n_synapse_types;
     synapse_index_bits = log_n_neurons;
 
-    uint32_t contribution_bits =
-        log_n_neurons + log_n_synapse_types;
-    uint32_t contribution_size = (1 << (contribution_bits)) + n_neurons_power_2;
+    //uint32_t contribution_bits =
+    //    log_n_neurons + log_n_synapse_types;
+    //uint32_t contribution_size = (1 << (contribution_bits)) + n_neurons_power_2;
 
-    contribution_offset = 2 * n_neurons_power_2;
+    uint32_t contribution_size = n_neurons_power_2 * incoming_partitions;
+
+    // contribution_offset = 2 * n_neurons_power_2;
 
     dma_size = contribution_size * sizeof(weight_t);
 
     dma_finished = false;
+
+    io_printf(IO_BUF, "Contributions size: %d\ndma_size: %d\n", contribution_size, dma_size);
 
 
     //Allocate the region in SDRAM for synaptic contribution. Size is dma_size.
