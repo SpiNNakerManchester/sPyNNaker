@@ -16,10 +16,8 @@
 import logging
 import math
 import numpy
-from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.constraints.partitioner_constraints import (
     SameAtomsAsVertexConstraint)
-from spinn_front_end_common.utilities import helpful_functions
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.models.abstract_models import (
     AbstractAcceptsIncomingSynapses)
@@ -316,8 +314,6 @@ class PyNNProjectionCommon(object):
         # pylint: disable=too-many-arguments, too-many-locals
         ctl = self.__spinnaker_control
 
-        print("Getting {}s for projection between {} and {}".format(
-                data_to_get, pre_vertex.label, post_vertex.label))
         connections = post_vertex.get_connections_from_machine(
             ctl.transceiver, ctl.placements, self.__projection_edge,
             ctl.graph_mapper, self.__synapse_information,

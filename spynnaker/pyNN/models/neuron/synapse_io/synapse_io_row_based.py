@@ -74,6 +74,7 @@ class SynapseIORowBased(AbstractSynapseIO):
         max_delay_supported = self.get_maximum_delay_supported_in_ms(
             machine_time_step)
         max_delay = max_delay_supported * (n_delay_stages + 1)
+        pad_to_length = synapse_info.synapse_dynamics.pad_to_length
 
         # delay point where delay extensions start
         min_delay_for_delay_extension = (
@@ -83,6 +84,9 @@ class SynapseIORowBased(AbstractSynapseIO):
         max_undelayed_n_synapses = synapse_info.connector \
             .get_n_connections_from_pre_vertex_maximum(
                 post_vertex_slice, synapse_info, 0, max_delay_supported)
+        if pad_to_length is not None:
+            max_undelayed_n_synapses = max(pad_to_length,
+                                           max_undelayed_n_synapses)
 
         # determine the max row length in the delay extension
         max_delayed_n_synapses = 0
@@ -91,6 +95,9 @@ class SynapseIORowBased(AbstractSynapseIO):
                 .get_n_connections_from_pre_vertex_maximum(
                     post_vertex_slice, synapse_info,
                     min_delay_for_delay_extension, max_delay)
+            if pad_to_length is not None:
+                max_delayed_n_synapses = max(pad_to_length,
+                                             max_delayed_n_synapses)
 
         # Get the row sizes
         dynamics = synapse_info.synapse_dynamics
