@@ -498,4 +498,3 @@ class SynapseDynamicsSTDP(
     @overrides(AbstractPlasticSynapseDynamics.pad_to_length)
     def pad_to_length(self):
         return self.__pad_to_length
-
