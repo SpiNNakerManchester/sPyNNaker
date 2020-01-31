@@ -274,8 +274,6 @@ static inline void _process_fixed_synapses(
 
         ring_buffers[ring_buffer_index] = accumulation;
 
-        if(ring_buffers[ring_buffer_index] != 0)
-            io_printf(IO_BUF, "writing %d index %d\n", ring_buffers[ring_buffer_index], ring_buffer_index);
     }
 }
 
@@ -318,8 +316,6 @@ bool synapses_initialise(
     memory_index = synapse_params_address[MEM_INDEX];
 
     offset = synapse_params_address[OFFSET];
-
-    io_printf(IO_BUF, "memory_index %d\noffset %d\n", memory_index, offset);
 
     n_recorded_vars = synapse_params_address[N_RECORDED_VARIABLES];
 
@@ -511,16 +507,10 @@ void synapses_do_timestep_update(timer_t time) {
                 time+1, 0, 0, synapse_index_bits,
                 synapse_index_bits);
 
-    for (uint32_t i = 0; i < n_neurons; i++)
-        if(ring_buffers[ring_buffer_index + i] != 0)
-            io_printf(IO_BUF, "DMA %d index %d addr %d\n", ring_buffers[ring_buffer_index + i], i, synaptic_region);
-
     // Start the transfer
     spin1_dma_transfer(
         DMA_TAG_WRITE_SYNAPTIC_CONTRIBUTION, synaptic_region, &ring_buffers[ring_buffer_index],
         DMA_WRITE, size_to_be_transferred);
-
-    io_printf(IO_BUF, "transfer size: %d\n", size_to_be_transferred);
 
     _print_inputs();
 
@@ -724,6 +714,4 @@ void synapses_set_contribution_region() {
 
     synaptic_region = sark_tag_ptr(memory_index, 0);
     synaptic_region += (offset << synapse_index_bits);
-
-    io_printf(IO_BUF, "syn_region %d\n", synaptic_region);
 }

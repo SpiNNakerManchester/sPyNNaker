@@ -119,7 +119,8 @@ class AbstractPopulationVertex(
         "__updated_state_variables",
         "__n_data_specs",
         "_atoms_offset",
-        "_slice_list"]
+        "_slice_list",
+        "_incoming_partitions"]
 
     BASIC_MALLOC_USAGE = 2
 
@@ -129,8 +130,8 @@ class AbstractPopulationVertex(
     # the size of the runtime SDP port data region
     RUNTIME_SDP_PORT_SIZE = 4
 
-    # 9 elements before the start of global parameters
-    BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 36
+    # 10 elements before the start of global parameters
+    BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 40
 
     # The Buffer traffic type
     TRAFFIC_IDENTIFIER = "BufferTraffic"
@@ -162,6 +163,7 @@ class AbstractPopulationVertex(
         self._machine_vertices = dict()
         self._connected_app_vertices = None
         self._slice_list = None
+        self._incoming_partitions = None
         self.__initial_state_variables = None
         self.__updated_state_variables = set()
 
@@ -243,6 +245,14 @@ class AbstractPopulationVertex(
     @slice_list.setter
     def slice_list(self, slices):
         self._slice_list = slices
+
+    @property
+    def incoming_partitions(self):
+        return self._incoming_partitions
+
+    @incoming_partitions.setter
+    def incoming_partitions(self, incoming_partitions):
+        self._incoming_partitions = incoming_partitions
 
     @property
     @overrides(AbstractChangableAfterRun.requires_data_generation)
@@ -648,6 +658,10 @@ class AbstractPopulationVertex(
 
         # Write the SDRAM tag for the contribution area
         spec.write_value(data=index)
+
+        # Write the number of incoming partitions to allocate a sufficiently big contribution area
+        # for all the synapse cores. + 1 makes sure we have the inhibitory partition included
+        spec.write_value(data=(self._incoming_partitions + 1))
 
         # Write the number of variables that can be recorded
         spec.write_value(

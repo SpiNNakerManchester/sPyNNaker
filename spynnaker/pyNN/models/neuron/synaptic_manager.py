@@ -167,7 +167,7 @@ class SynapticManager(
         self._atoms_neuron_cores = max_atoms_per_core
         self._atoms_offset = atoms_offset
         # Hardcoded, avoids the function call and is set to the same value for all the partitions
-        self._ring_buffer_shifts = [2]
+        self._ring_buffer_shifts = [7]
         self._slice_list = None
 
         #FOR RECORDING
@@ -194,7 +194,11 @@ class SynapticManager(
             label, constraints, max_atoms_per_core)
 
         #MIGHT NEED WORK FOR DUAL EXC SYN TYPES
-        self.__partition = 0 if ("low" in label.split("_") or self._synapse_index > 1) else 2
+        _name_list = label.split("_")
+        partition_name = _name_list[len(_name_list) - 4]
+
+        self.__partition = int(partition_name[1]) if ((partition_name[0] == "e" and partition_name[1] == "0")
+                                                      or partition_name[0] == "i") else int(partition_name[1]) + 1
 
 
         # Get the type of population table

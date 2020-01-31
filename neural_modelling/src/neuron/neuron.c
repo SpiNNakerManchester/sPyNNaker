@@ -282,8 +282,6 @@ bool neuron_do_timestep_update(
     // Set the next expected time to wait for between spike sending
     expected_time = sv->cpu_clk * timer_period;
 
-    io_printf(IO_BUF, "read from %d\n", synaptic_region);
-
     // Wait until recordings have completed, to ensure the recording space
     // can be re-written
     while (n_recordings_outstanding > 0) {
@@ -307,11 +305,6 @@ bool neuron_do_timestep_update(
 
             sum = synaptic_contributions[buff_index];
 
-            io_printf(IO_BUF, "buff_index: %d\n", buff_index);
-
-            if(synaptic_region[buff_index] != 0)
-                io_printf(IO_BUF, "contr %d n %d\n", synaptic_region[buff_index], neuron_index);
-
             // Some way to do it a bit better?
 
             if(synapse_type_index == 0) {
@@ -329,11 +322,6 @@ bool neuron_do_timestep_update(
 
                     sum = SAT_VALUE;
                 }
-            }
-
-            if(sum != 0){
-
-                io_printf(IO_BUF, "sum %d, neuron %d syn %d\n", sum , neuron_index, synapse_type_index);
             }
 
             neuron_impl_add_inputs(
@@ -363,8 +351,6 @@ bool neuron_do_timestep_update(
         if (spike) {
 
             log_debug("neuron %u spiked at time %u", neuron_index, time);
-
-            io_printf(IO_BUF, "SPIKE n %d t %d\n", neuron_index, time);
 
             // Record the spike
             out_spikes_set_spike(spike_recording_indexes[neuron_index]);
@@ -472,8 +458,6 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset) {
 
     incoming_partitions = address[INCOMING_PARTITIONS];
 
-    io_printf(IO_BUF, "Incoming partitions: %d\n", incoming_partitions);
-
     // Read number of recorded variables
     n_recorded_vars = address[N_RECORDED_VARIABLES];
 
@@ -506,8 +490,6 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset) {
     dma_size = contribution_size * sizeof(weight_t);
 
     dma_finished = false;
-
-    io_printf(IO_BUF, "Contributions size: %d\ndma_size: %d\n", contribution_size, dma_size);
 
 
     //Allocate the region in SDRAM for synaptic contribution. Size is dma_size.
