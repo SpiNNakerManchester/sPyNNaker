@@ -62,6 +62,7 @@ static uint32_t connection_generator_one_to_one_generate(
         void *data,  uint32_t pre_slice_start, uint32_t pre_slice_count,
         uint32_t pre_neuron_index, uint32_t post_slice_start,
         uint32_t post_slice_count, uint32_t max_row_length, uint16_t *indices) {
+    use(post_slice_count);
     use(pre_slice_start);
     use(pre_slice_count);
 
@@ -85,8 +86,8 @@ static uint32_t connection_generator_one_to_one_generate(
 
     // If not in the post-population view range, then don't generate.
     // This will filter negatives
-    if ((post_neuron_index < obj->post_lo) ||
-            (post_neuron_index > obj->post_hi)) {
+    if ((post_neuron_index < (int) obj->post_lo) ||
+            (post_neuron_index > (int) obj->post_hi)) {
         return 0;
     }
 
