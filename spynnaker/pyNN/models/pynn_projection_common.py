@@ -238,6 +238,7 @@ class PyNNProjectionCommon(object):
         :type post_synaptic_vertex:
             ~pacman.model.graphs.application.ApplicationVertex
         :return: None or the edge going to these vertices.
+        :rtype: ~.ApplicationEdge
         """
 
         # Find edges ending at the postsynaptic vertex
@@ -255,6 +256,14 @@ class PyNNProjectionCommon(object):
             max_delay_for_projection, max_delay_per_neuron, machine_time_step,
             time_scale_factor):
         """ Instantiate delay extension component
+
+        :param PyNNPopulationCommon pre_synaptic_population:
+        :param PyNNPopulationCommon post_synaptic_population:
+        :param int max_delay_for_projection:
+        :param int max_delay_per_neuron:
+        :param int machine_time_step:
+        :param int time_scale_factor:
+        :rtype: DelayedApplicationEdge
         """
         # pylint: disable=too-many-arguments
 
@@ -303,6 +312,14 @@ class PyNNProjectionCommon(object):
     def _get_synaptic_data(
             self, as_list, data_to_get, fixed_values=None, notify=None,
             handle_time_out_configuration=True):
+        """
+        :param bool as_list:
+        :param list(int) data_to_get:
+        :param list(tuple(str,int)) fixed_values:
+        :param callable(ConnectionHolder,None) notify:
+        :param bool handle_time_out_configuration:
+        :rtype: ConnectionHolder
+        """
         # pylint: disable=too-many-arguments
         post_vertex = self.__projection_edge.post_vertex
         pre_vertex = self.__projection_edge.pre_vertex
@@ -342,6 +359,13 @@ class PyNNProjectionCommon(object):
     def __get_projection_data(
             self, data_to_get, pre_vertex, post_vertex, connection_holder,
             handle_time_out_configuration):
+        """
+        :param str data_to_get:
+        :param .ApplicationVertex pre_vertex:
+        :param .AbstractPopulationVertex post_vertex:
+        :param ConnectionHolder connection_holder:
+        :param bool handle_time_out_configuration:
+        """
         # pylint: disable=too-many-arguments, too-many-locals
         ctl = self.__spinnaker_control
 

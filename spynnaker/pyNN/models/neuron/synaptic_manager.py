@@ -168,6 +168,11 @@ class SynapticManager(object):
         return self.__synapse_dynamics
 
     def __combine_structural_stdp_dynamics(self, structural, stdp):
+        """
+        :param AbstractSynapseDynamicsStructural structural:
+        :param SynapseDynamicsSTDP stdp:
+        :rtype: SynapseDynamicsStructuralSTDP
+        """
         return SynapseDynamicsStructuralSTDP(
             structural.partner_selection, structural.formation,
             structural.elimination,
@@ -259,11 +264,16 @@ class SynapticManager(object):
         return 0
 
     def _get_synapse_params_size(self):
+        """
+        :rtype: int
+        """
         return (_SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES +
                 (BYTES_PER_WORD * self.__n_synapse_types))
 
     def _get_static_synaptic_matrix_sdram_requirements(self):
-
+        """
+        :rtype: int
+        """
         # 4 for address of direct addresses, and
         # 4 for the size of the direct addresses matrix in bytes
         return 2 * BYTES_PER_WORD
@@ -272,6 +282,12 @@ class SynapticManager(object):
             self, synapse_info, post_vertex_slice, app_edge,
             machine_time_step):
         """ Get the maximum size of each row for a given slice of the vertex
+
+        :param SynapseInformation synapse_info:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param ProjectionApplicationEdge app_edge:
+        :param int machine_time_step:
+        :rtype: MaxRowInfo
         """
         key = (synapse_info, post_vertex_slice.lo_atom,
                post_vertex_slice.hi_atom)
@@ -285,6 +301,11 @@ class SynapticManager(object):
     def _get_synaptic_blocks_size(
             self, post_vertex_slice, in_edges, machine_time_step):
         """ Get the size of the synaptic blocks in bytes
+
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param list(.ApplicationEdge) in_edges:
+        :param int machine_time_step:
+        :rtype: int
         """
         memory_size = self._get_static_synaptic_matrix_sdram_requirements()
         for in_edge in in_edges:
@@ -297,6 +318,14 @@ class SynapticManager(object):
 
     def __add_synapse_size(self, memory_size, synapse_info, post_vertex_slice,
                            in_edge, machine_time_step):
+        """
+        :param memory_size:
+        :param SynapseInformation synapse_info:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param ProjectionApplicationEdge in_edge:
+        :param int machine_time_step:
+        :rtype: int
+        """
         max_row_info = self._get_max_row_info(
             synapse_info, post_vertex_slice, in_edge, machine_time_step)
         n_atoms = in_edge.pre_vertex.n_atoms
@@ -311,6 +340,9 @@ class SynapticManager(object):
 
     def _get_size_of_generator_information(self, in_edges):
         """ Get the size of the synaptic expander parameters
+
+        :param list(.ApplicationEdge) in_edges:
+        :rtype: int
         """
         gen_on_machine = False
         size = 0
