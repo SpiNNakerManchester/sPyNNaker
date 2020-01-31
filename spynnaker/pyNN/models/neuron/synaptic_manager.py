@@ -1257,7 +1257,9 @@ class SynapticManager(object):
             (single_addr + (pre_vertex_slice.n_atoms * 4) <=
                 self.__one_to_one_connection_dtcm_max_bytes) and
             (pre_vertex_slice.lo_atom == post_vertex_slice.lo_atom) and
-            (pre_vertex_slice.hi_atom == post_vertex_slice.hi_atom))
+            (pre_vertex_slice.hi_atom == post_vertex_slice.hi_atom) and
+            not s_info.prepop_is_view and
+            not s_info.postpop_is_view)
 
     def _get_ring_buffer_shifts(
             self, application_vertex, application_graph, machine_timestep,
