@@ -41,8 +41,9 @@ class AbstractMasterPopTableFactory(object):
             the X coordinate of the chip of this master pop table
         :param int chip_y:
             the Y coordinate of the chip of this master pop table
-        :return: a synaptic matrix memory position.
-        :rtype: int
+        :return: the synaptic matrix memory position information;
+            (row_length, location, is_single).
+        :rtype: list(tuple(int, int, bool))
         """
 
     @abstractmethod

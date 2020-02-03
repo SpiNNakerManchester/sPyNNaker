@@ -131,17 +131,15 @@ class SynapseDynamicsStructuralCommon(object):
 
     def set_projection_parameter(self, param, value):
         """
-        :param param:
+        :param str param:
         :param value:
         """
-        has_set = False
-        for item in [self.__partner_selection, self.__formation,
-                     self.__elimination]:
+        for item in (self.__partner_selection, self.__formation,
+                     self.__elimination):
             if hasattr(item, param):
                 setattr(item, param, value)
-                has_set = True
                 break
-        if not has_set:
+        else:
             raise Exception("Unknown parameter {}".format(param))
 
     def get_parameter_names(self):
@@ -182,8 +180,7 @@ class SynapseDynamicsStructuralCommon(object):
             the data spec
         :param int region: region ID
         :param int machine_time_step:
-        :param weight_scales:
-        :type weight_scales: dict(AbstractSynapseType, float)
+        :param dict(AbstractSynapseType,float) weight_scales:
         :param ~pacman.model.graphs.application.ApplicationGraph\
                 application_graph:
         :param AbstractPopulationVertex app_vertex:
@@ -225,10 +222,14 @@ class SynapseDynamicsStructuralCommon(object):
             dynamics.elimination.write_parameters(
                 spec, weight_scales[synapse_info.synapse_type])
 
-    def __get_structural_edges(self, application_graph, app_vertex):
-        structural_application_edges = list()
-        for app_edge in application_graph.get_edges_ending_at_vertex(
-                app_vertex):
+    def __get_structural_edges(self, app_graph, app_vertex):
+        """
+        :param ~pacman.model.graphs.application.ApplicationGraph app_graph:
+        :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
+        :rtype: list(tuple(ProjectionApplicationEdge, SynapseInformation))
+        """
+        structural_edges = list()
+        for app_edge in app_graph.get_edges_ending_at_vertex(app_vertex):
             if isinstance(app_edge, ProjectionApplicationEdge):
                 found = False
                 for synapse_info in app_edge.synapse_information:
@@ -236,13 +237,11 @@ class SynapseDynamicsStructuralCommon(object):
                                   AbstractSynapseDynamicsStructural):
                         if found:
                             raise SynapticConfigurationException(
-                                "Only one Projection between each pair of"
-                                " Populations can use structural plasticity ")
+                                "Only one Projection between each pair of "
+                                "Populations can use structural plasticity")
                         found = True
-                        structural_application_edges.append(
-                            (app_edge, synapse_info))
-
-        return structural_application_edges
+                        structural_edges.append((app_edge, synapse_info))
+        return structural_edges
 
     def __write_common_rewiring_data(
             self, spec, app_vertex, post_slice, machine_time_step, n_pre_pops):
@@ -301,6 +300,18 @@ class SynapseDynamicsStructuralCommon(object):
             self, spec, app_vertex, structural_edges, graph_mapper,
             routing_info, weight_scales, post_slice, synapse_indices,
             machine_time_step):
+        """
+        :param ~data_specification.DataSpecificationGenerator spec:
+        :param AbstractPopulationVertex app_vertex:
+        :param list(tuple(ProjectionApplicationEdge,SynapseInformation)) \
+                structural_edges:
+        :param RoutingInfo routing_info:
+        :param dict(AbstractSynapseType,float) weight_scales:
+        :param ~pacman.model.graphs.common.Slice post_slice:
+        :param dict(tuple(SynapseInformation,int,int),int) synapse_indices:
+        :param int machine_time_step:
+        :rtype: dict(tuple(AbstractPopulationVertex,SynapseInformation),int)
+        """
         pop_index = dict()
         index = 0
         for app_edge, synapse_info in structural_edges:
@@ -351,7 +362,13 @@ class SynapseDynamicsStructuralCommon(object):
     def __write_post_to_pre_table(
             self, spec, pop_index, app_vertex, post_slice, graph_mapper):
         """ Post to pre table is basically the transpose of the synaptic\
-            matrix
+            matrix.
+
+        :param ~data_specification.DataSpecificationGenerator spec:
+        :param dict(tuple(AbstractPopulationVertex,SynapseInformation),int) \
+                pop_index:
+        :param AbstractPopulationVertex app_vertex:
+        :param ~pacman.model.graphs.common.Slice post_slice:
         """
         # Get connections for this post slice
         key = (app_vertex, post_slice.lo_atom)
@@ -471,6 +488,9 @@ class SynapseDynamicsStructuralCommon(object):
         self.__actual_row_max_length = value
 
     def get_vertex_executable_suffix(self):
+        """
+        :rtype: str
+        """
         name = "_structural"
         name += self.__partner_selection.vertex_executable_suffix
         name += self.__formation.vertex_executable_suffix
@@ -517,12 +537,21 @@ class SynapseDynamicsStructuralCommon(object):
 
     @property
     def partner_selection(self):
+        """
+        :rtype: AbstractPartnerSelection
+        """
         return self.__partner_selection
 
     @property
     def formation(self):
+        """
+        :rtype: AbstractFormation
+        """
         return self.__formation
 
     @property
     def elimination(self):
+        """
+        :rtype: AbstractElimination
+        """
         return self.__elimination

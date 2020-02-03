@@ -27,7 +27,7 @@ UNITS = {
 
 
 class InputTypeCurrentSEMD(AbstractInputType):
-    """ The current sEMD input type
+    """ The current sEMD input type.
     """
     __slots__ = [
         "__multiplicator",
