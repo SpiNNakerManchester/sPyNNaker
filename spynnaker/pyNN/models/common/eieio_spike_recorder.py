@@ -82,8 +82,8 @@ class EIEIOSpikeRecorder(object):
         :type buffer_manager:
             ~spinn_front_end_common.interface.buffer_management.BufferManager
         :param int region:
-        :param placements: the placements object
-        :type placements: ~pacman.model.placements.Placements
+        :param ~pacman.model.placements.Placements placements:
+            the placements object
         :param application_vertex:
         :type application_vertex:
             ~pacman.model.graphs.application.ApplicationVertex
@@ -139,6 +139,13 @@ class EIEIOSpikeRecorder(object):
     @staticmethod
     def _process_spike_data(
             vertex_slice, spike_data, ms_per_tick, base_key, results):
+        """
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :param bytearray spike_data:
+        :param int ms_per_tick:
+        :param int base_key:
+        :param list(~numpy.ndarray) results:
+        """
         number_of_bytes_written = len(spike_data)
         offset = 0
         while offset < number_of_bytes_written:

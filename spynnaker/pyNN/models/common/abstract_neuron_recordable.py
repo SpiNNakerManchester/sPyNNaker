@@ -50,8 +50,8 @@ class AbstractNeuronRecordable(object):
         :param str variable: PyNN name of the variable
         :param bool new_state:
         :param sampling_interval:
-        :type sampling_interval: float or None
-        :param indexes:
+        :type sampling_interval: int or None
+        :param indexes: Which indices are to be recorded (or None for all)
         :type indexes: list or None
         """
 
@@ -67,7 +67,6 @@ class AbstractNeuronRecordable(object):
         :param ~pacman.model.placements.Placements placements:
             the placements object
         :param graph_mapper: the graph mapper object
-        :rtype: None
         """
 
     @abstractmethod

@@ -61,10 +61,11 @@ class RecordingCommon(object):
                 indexes=None):
         """ Tell the vertex to record data.
 
-        :param variable: the variable to record, valued variables to record\
-            are: 'gsyn_exc', 'gsyn_inh', 'v', 'spikes'
-        :param sampling_interval: the interval to record them
+        :param str variable: the variable to record, valued variables to\
+            record are: 'gsyn_exc', 'gsyn_inh', 'v', 'spikes'
+        :param int sampling_interval: the interval to record them
         :param indexes: List of indexes to record or None for all
+        :type indexes: list(int) or None
         :return: None
         """
 
@@ -104,9 +105,8 @@ class RecordingCommon(object):
                     "input. You will receive current measurements instead.")
 
     def _get_recorded_pynn7(self, variable):
-        if variable == "spikes":
-            data = self._get_spikes()
-
+        """ Get recorded data in PyNN 0.7 format. Must not be spikes.
+        """
         (data, ids, sampling_interval) = self._get_recorded_matrix(variable)
         n_machine_time_steps = len(data)
         n_neurons = len(ids)
@@ -122,9 +122,11 @@ class RecordingCommon(object):
         """ Perform safety checks and get the recorded data from the vertex\
             in matrix format.
 
-        :param variable: the variable name to read. supported variable names
-            are :'gsyn_exc', 'gsyn_inh', 'v'
+        :param str variable:
+            the variable name to read. supported variable names are:
+            'gsyn_exc', 'gsyn_inh', 'v'
         :return: the data
+        :rtype: tuple(~numpy.ndarray, list(int), int)
         """
         timer = Timer()
         timer.start_timing()
@@ -213,7 +215,6 @@ class RecordingCommon(object):
 
         :rtype: None
         """
-
         # check for standard record which includes spikes
         if isinstance(self.__population._vertex, AbstractNeuronRecordable):
             variables = self.__population._vertex.get_recordable_variables()
@@ -222,6 +223,6 @@ class RecordingCommon(object):
                     variable, new_state=False, indexes=indexes)
 
         # check for spikes
-        elif isinstance(self.__population._vertex, AbstractSpikeRecordable):
+        if isinstance(self.__population._vertex, AbstractSpikeRecordable):
             self.__population._vertex.set_recording_spikes(
                 new_state=False, indexes=indexes)

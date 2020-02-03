@@ -65,8 +65,7 @@ class ProjectionApplicationEdge(ApplicationEdge):
 
     @property
     def delay_edge(self):
-        """
-        Settable.
+        """ Settable.
 
         :rtype: DelayedApplicationEdge or None
         """

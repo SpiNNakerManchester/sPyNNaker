@@ -21,14 +21,14 @@ from .delay_afferent_machine_edge import DelayAfferentMachineEdge
 class DelayAfferentApplicationEdge(ApplicationEdge):
     __slots__ = ()
 
-    def __init__(self, prevertex, delayvertex, label=None):
+    def __init__(self, pre_vertex, delay_vertex, label=None):
         """
-        :param AbstractPopulationVertex prevertex:
-        :param DelayExtensionVertex delayvertex:
+        :param AbstractPopulationVertex pre_vertex:
+        :param DelayExtensionVertex delay_vertex:
         :param str label:
         """
         super(DelayAfferentApplicationEdge, self).__init__(
-            prevertex, delayvertex, label=label)
+            pre_vertex, delay_vertex, label=label)
 
     @overrides(ApplicationEdge.create_machine_edge)
     def create_machine_edge(self, pre_vertex, post_vertex, label):

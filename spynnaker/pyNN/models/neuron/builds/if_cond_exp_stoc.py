@@ -26,22 +26,22 @@ from spynnaker.pyNN.models.neuron.threshold_types import (
 class IFCondExpStoc(AbstractPyNNNeuronModelStandard):
     """ Leaky integrate and fire neuron with a stochastic threshold.
 
-    :param tau_m:
-    :param cm:
-    :param v_rest:
-    :param v_reset:
-    :param v_thresh:
-    :param tau_syn_E:
-    :param tau_syn_I:
-    :param tau_refrac:
-    :param i_offset:
-    :param e_rev_E:
-    :param e_rev_I:
-    :param du_th:
-    :param tau_th:
-    :param v:
-    :param isyn_exc:
-    :param isyn_inh:
+    :param tau_m: :math:`\\tau_m`
+    :param cm: :math:`C_m`
+    :param v_rest: :math:`V_{rest}`
+    :param v_reset: :math:`V_{reset}`
+    :param v_thresh: :math:`V_{thresh}`
+    :param tau_syn_E: :math:`\\tau^{syn}_e`
+    :param tau_syn_I: :math:`\\tau^{syn}_i`
+    :param tau_refrac: :math:`\\tau_{refrac}`
+    :param i_offset: :math:`I_{offset}`
+    :param e_rev_E: :math:`E^{rev}_e`
+    :param e_rev_I: :math:`E^{rev}_i`
+    :param du_th: :math:`du_{thresh}`
+    :param tau_th: :math:`\\tau_{thresh}`
+    :param v: :math:`V_{init}`
+    :param isyn_exc: :math:`I^{syn}_e`
+    :param isyn_inh: :math:`I^{syn}_i`
     """
 
     @default_initial_values({"v", "isyn_exc", "isyn_inh"})

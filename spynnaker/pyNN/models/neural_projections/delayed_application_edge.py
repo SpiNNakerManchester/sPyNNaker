@@ -37,7 +37,7 @@ class DelayedApplicationEdge(ApplicationEdge):
     @property
     def synapse_information(self):
         """
-        :rtype: SynapseInformation
+        :rtype: list(SynapseInformation)
         """
         return self.__synapse_information
 

@@ -83,8 +83,7 @@ class MultiSpikeRecorder(object):
         :type buffer_manager: \
             ~spinn_front_end_common.interface.buffer_management.BufferManager
         :param int region:
-        :param placements:
-        :type placements: ~pacman.model.placements.Placements
+        :param ~pacman.model.placements.Placements placements:
         :param application_vertex:
         :type application_vertex: \
             ~pacman.model.graphs.application.ApplicationVertex
@@ -118,8 +117,8 @@ class MultiSpikeRecorder(object):
 
         if missing:
             logger.warning(
-                "Population {} is missing spike data in region {} from the"
-                " following cores: {}", label, region,
+                "Population {} is missing spike data in region {} from the "
+                "following cores: {}", label, region,
                 recording_utils.make_missing_string(missing))
 
         if not spike_ids:
@@ -134,6 +133,14 @@ class MultiSpikeRecorder(object):
     def _process_spike_data(
             vertex_slice, ms_per_tick, n_words, raw_data, spike_ids,
             spike_times):
+        """
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :param int ms_per_tick:
+        :param int n_words:
+        :param bytearray raw_data:
+        :param list(~numpy.ndarray) spike_ids:
+        :param list(~numpy.ndarray) spike_times:
+        """
         # pylint: disable=too-many-arguments
         n_bytes_per_block = n_words * BYTES_PER_WORD
         offset = 0

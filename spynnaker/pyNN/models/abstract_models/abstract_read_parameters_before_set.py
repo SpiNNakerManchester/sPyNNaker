@@ -29,10 +29,11 @@ class AbstractReadParametersBeforeSet(object):
             self, transceiver, placement, vertex_slice):
         """ Read the parameters from the machine before any are changed.
 
-        :param transceiver: the SpinnMan interface
-        :type transceiver: ~spinnman.transceiver.Transceiver
-        :param placement: the placement of a vertex
-        :type placement: ~pacman.model.placements.Placement
-        :param vertex_slice: the slice of atoms for this vertex
-        :type vertex_slice: ~pacman.model.graphs.common.Slice
+        :param ~spinnman.transceiver.Transceiver transceiver:
+            the SpinnMan interface
+        :param ~pacman.model.placements.Placement placement:
+            the placement of a vertex
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            the slice of atoms for this vertex
+        :rtype: None
         """

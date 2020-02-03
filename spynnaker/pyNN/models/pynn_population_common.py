@@ -91,7 +91,7 @@ class PyNNPopulationCommon(object):
         :type additional_parameters: dict(str, Any) or None
         """
         # pylint: disable=too-many-arguments
-        size = self._roundsize(size, label)
+        size = self.__roundsize(size, label)
 
         # Use a provided model to create a vertex
         if isinstance(model, AbstractPyNNModel):
@@ -182,21 +182,31 @@ class PyNNPopulationCommon(object):
     @property
     def first_id(self):
         """ The ID of the first member of the population.
+
+        :rtype: int
         """
         return self.__first_id
 
     @property
     def last_id(self):
         """ The ID of the last member of the population.
+
+        :rtype: int
         """
         return self.__last_id
 
     @property
     def _structure(self):
+        """
+        :rtype: ~pyNN.space.BaseStructure or None
+        """
         return self.__structure
 
     @property
     def _vertex(self):
+        """
+        :rtype: ~pacman.model.graphs.application.ApplicationVertex
+        """
         return self.__vertex
 
     @property
@@ -226,6 +236,8 @@ class PyNNPopulationCommon(object):
     @property
     def conductance_based(self):
         """ True if the population uses conductance inputs
+
+        :rtype: bool
         """
         if hasattr(self.__vertex, "conductance_based"):
             return self.__vertex.conductance_based
@@ -267,9 +279,9 @@ class PyNNPopulationCommon(object):
             population.
 
         :param selector: a description of the subrange to accept. \
-            Or None for all. \
-            See: _selector_to_ids in \
-            :py:class:`~spinn_utilities.ranged.AbstractSized`
+            Or None for all. See: \
+            :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
+        :type selector: slice or int or iterable(bool) or iterable(int)
         :param parameter_names: Name of parameter. This is either a\
             single string or a list of strings
         :type parameter_names: str or iterable(str)
@@ -295,6 +307,10 @@ class PyNNPopulationCommon(object):
 
         Defined by
         http://neuralensemble.org/docs/PyNN/reference/populations.html
+
+        :param id:
+        :type id: int or iterable(int)
+        :rtype: int or iterable(int)
         """
         # pylint: disable=redefined-builtin
         if not numpy.iterable(id):
@@ -308,6 +324,10 @@ class PyNNPopulationCommon(object):
     def index_to_id(self, index):
         """ Given the index (order in the Population) of cell(s) in the\
             Population, return their ID(s)
+
+        :param index:
+        :type index: int or iterable(int)
+        :rtype: int or iterable(int)
         """
         if not numpy.iterable(index):
             if index > self.__last_id - self.__first_id:
@@ -325,6 +345,10 @@ class PyNNPopulationCommon(object):
 
         Defined by
         http://neuralensemble.org/docs/PyNN/reference/populations.html
+
+        :param cell_id:
+        :type cell_id: int or iterable(int)
+        :rtype: int or iterable(int)
         """
         # TODO: Need __getitem__
         _we_dont_do_this_now(cell_id)
@@ -332,6 +356,10 @@ class PyNNPopulationCommon(object):
     def _initialize(self, variable, value):
         """ Set the initial value of one of the state variables of the neurons\
             in this population.
+
+        :param str variable:
+        :param value:
+        :type value: float or int or list(float) or list(int)
         """
         if not self._vertex_population_initializable:
             raise KeyError(
@@ -349,7 +377,6 @@ class PyNNPopulationCommon(object):
         Defined by
         http://neuralensemble.org/docs/PyNN/reference/populations.html
         """
-
         # TODO:
         _we_dont_do_this_now(current_source)
 
@@ -361,6 +388,8 @@ class PyNNPopulationCommon(object):
     @property
     def label(self):
         """ The label of the population
+
+        :rtype: str
         """
         return self._vertex.label
 
@@ -494,7 +523,9 @@ class PyNNPopulationCommon(object):
         Defined by
         http://neuralensemble.org/docs/PyNN/reference/populations.html
 
+        :param ~numpy.ndarray spikes:
         :param gather: pointless on sPyNNaker
+        :rtype: dict(int,int)
         """
         if not gather:
             warn_once(
@@ -522,6 +553,8 @@ class PyNNPopulationCommon(object):
     @property
     def structure(self):
         """ Return the structure for the population.
+
+        :rtype: ~pyNN.space.BaseStructure or None
         """
         return self.__structure
 
@@ -529,6 +562,8 @@ class PyNNPopulationCommon(object):
     def set_constraint(self, constraint):
         """ Apply a constraint to a population that restricts the processor\
             onto which its atoms will be placed.
+
+        :param ~pacman.model.constraints.AbstractConstraint constraint:
         """
         globals_variables.get_simulator().verify_not_running()
         if not isinstance(constraint, AbstractConstraint):
@@ -557,9 +592,9 @@ class PyNNPopulationCommon(object):
     def set_mapping_constraint(self, constraint_dict):
         """ Add a placement constraint - for backwards compatibility
 
-        :param constraint_dict: A dictionary containing "x", "y" and\
-            optionally "p" as keys, and ints as values
-        :type constraint_dict: dict(str, int)
+        :param dict(str,int) constraint_dict:
+            A dictionary containing "x", "y" and optionally "p" as keys, and
+            ints as values
         """
         globals_variables.get_simulator().verify_not_running()
         self.add_placement_constraint(**constraint_dict)
@@ -571,7 +606,8 @@ class PyNNPopulationCommon(object):
     def set_max_atoms_per_core(self, max_atoms_per_core):
         """ Supports the setting of this population's max atoms per core
 
-        :param max_atoms_per_core: the new value for the max atoms per core.
+        :param int max_atoms_per_core:
+            the new value for the max atoms per core.
         """
         globals_variables.get_simulator().verify_not_running()
         self.__vertex.add_constraint(
@@ -582,15 +618,23 @@ class PyNNPopulationCommon(object):
     @property
     def size(self):
         """ The number of neurons in the population
+
+        :rtype: int
         """
         return self.__vertex.n_atoms
 
     @property
     def _get_vertex(self):
+        """
+        :rtype: ~pacman.model.graphs.application.ApplicationVertex
+        """
+        # Overridden by PopulationView
         return self.__vertex
 
     @property
     def _internal_delay_vertex(self):
+        """
+        """
         return self.__delay_vertex
 
     @_internal_delay_vertex.setter
@@ -601,20 +645,20 @@ class PyNNPopulationCommon(object):
     def _get_variable_unit(self, parameter_name):
         """ Helper method for getting units from a parameter used by the vertex
 
-        :param parameter_name: the parameter name to find the units for
+        :param str parameter_name: the parameter name to find the units for
         :return: the units in string form
+        :rtype: str
         """
         if self._vertex_contains_units:
             return self.__vertex.get_units(parameter_name)
         raise ConfigurationException(
             "This population does not support describing its units")
 
-    def _roundsize(self, size, label):
-        if isinstance(size, int):
-            return size
+    @staticmethod
+    def __roundsize(size, label):
         # External device population can have a size of None so accept for now
-        if size is None:
-            return None
+        if size is None or isinstance(size, int):
+            return size
         # Allow a float which has a near int value
         temp = int(round(size))
         if abs(temp - size) < 0.001:

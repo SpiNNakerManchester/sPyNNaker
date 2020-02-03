@@ -23,19 +23,18 @@ from spynnaker.pyNN.models.neuron.synapse_types import SynapseTypeDelta
 
 
 class IFCurrDelta(AbstractPyNNNeuronModelStandard):
-    """ Leaky integrate and fire neuron with an instantaneous \
-        current input.
+    """ Leaky integrate and fire neuron with an instantaneous current input.
 
-    :param tau_m:
-    :param cm:
-    :param v_rest:
-    :param v_reset:
-    :param v_thresh:
-    :param tau_refrac:
-    :param i_offset:
-    :param v:
-    :param isyn_exc:
-    :param isyn_inh:
+    :param float tau_m: :math:`\\tau_m`
+    :param float cm: :math:`C_m`
+    :param float v_rest: :math:`V_{rest}`
+    :param float v_reset: :math:`V_{reset}`
+    :param float v_thresh: :math:`V_{thresh}`
+    :param float tau_refrac: :math:`\\tau_{refrac}`
+    :param float i_offset: :math:`I_{offset}`
+    :param float v: :math:`V_{init}`
+    :param float isyn_exc: :math:`I^{syn}_e`
+    :param float isyn_inh: :math:`I^{syn}_i`
     """
 
     # noinspection PyPep8Naming

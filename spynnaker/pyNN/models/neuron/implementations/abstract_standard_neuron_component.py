@@ -101,7 +101,7 @@ class AbstractStandardNeuronComponent(with_metaclass(AbstractBase, object)):
         """
 
     def get_data(self, parameters, state_variables, vertex_slice):
-        """ Get the data to be written to the machine for this model.
+        """ Get the data *to be written to the machine* for this model.
 
         :param ~spinn_utilities.ranged.RangeDictionary parameters:
             The holder of the parameters
@@ -130,8 +130,8 @@ class AbstractStandardNeuronComponent(with_metaclass(AbstractBase, object)):
 
     def read_data(
             self, data, offset, vertex_slice, parameters, state_variables):
-        """ Read the parameters and state variables of the model from the\
-            given data
+        """ Read the parameters and state variables of the model\
+            *from the given data* (read from the machine)
 
         :param data: The data to be read
         :type data: bytes or bytearray or memoryview

@@ -20,7 +20,7 @@ from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 @add_metaclass(AbstractBase)
 class AbstractSettable(object):
     """ Indicates that some properties of this object can be accessed from\
-        the PyNN population set and get methods
+        the PyNN population set and get methods.
     """
 
     __slots__ = ()
@@ -29,17 +29,15 @@ class AbstractSettable(object):
     def get_value(self, key):
         """ Get a property
 
-        :param key: the name of the property
-        :type key: str
-        :rtype: Any
+        :param str key: the name of the property
+        :rtype: Any or float or int or list(float) or list(int)
         """
 
     @abstractmethod
     def set_value(self, key, value):
         """ Set a property
 
-        :param key: the name of the parameter to change
-        :type key: str
+        :param str key: the name of the parameter to change
         :param value: the new value of the parameter to assign
-        :type value: Any
+        :type value: Any or float or int or list(float) or list(int)
         """

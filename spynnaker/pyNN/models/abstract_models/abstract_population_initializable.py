@@ -31,10 +31,9 @@ class AbstractPopulationInitializable(object):
         """ Set the initial value of one of the state variables of the neurons\
             in this population.
 
-        :param variable: The name of the variable to set
-        :type variable: str
+        :param str variable: The name of the variable to set
         :param value: The value of the variable to set
-        :type value: float or Any
+        :type value: float or int or Any
         """
 
     @property
@@ -48,10 +47,10 @@ class AbstractPopulationInitializable(object):
     def get_initial_values(self, selector=None):
         """ A dict containing the initial values of the state variables.
 
-        :param selector: a description of the subrange to accept. \
-            Or None for all. \
-            See: _selector_to_ids in \
-            :py:class:`spinn_utilities.ranged.AbstractSized`
+        :param selector: a description of the subrange to accept, or None for
+            all. See:
+            :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
+        :type selector: None or slice or int or list(bool) or list(int)
         :rtype: dict(str,Any)
         """
         results = dict()
@@ -72,12 +71,11 @@ class AbstractPopulationInitializable(object):
         Must support the variable as listed in initialize_parameters.keys, \
         ideally also with ``_init`` removed or added.
 
-        :param variable: variable name with our without _init
-        :type variable: str
-        :param selector: a description of the subrange to accept. \
-            Or None for all. \
-            See: ``_selector_to_ids`` in \
-            :py:class:`spinn_utilities.ranged.AbstractSized`
+        :param str variable: variable name with or without ``_init``
+        :param selector: a description of the subrange to accept, or None for
+            all. See:
+            :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
+        :type selector: None or slice or int or list(bool) or list(int)
         :return: A list or an Object which act like a list
         :rtype: iterable
         """
@@ -88,15 +86,15 @@ class AbstractPopulationInitializable(object):
             initialize_parameters.keys
 
         Must support the variable as listed in initialize_parameters.keys,\
-        ideally also with `_init` removed or added
+        ideally also with ``_init`` removed or added
 
-        :param variable: variable name with our without `_init`
-        :type variable: str
+        :param str variable: variable name with or without ``_init``
         :param value: New value for the variable
-        :param selector: a description of the subrange to accept. \
-            Or None for all. \
-            See: ``_selector_to_ids`` in \
-            :py:class:`spinn_utilities.ranged.AbstractSized`
+        :type value: int or float or list(int) or list(float)
+        :param selector: a description of the subrange to accept, or None for
+            all. See:
+            :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
+        :type selector: None or slice or int or list(bool) or list(int)
         :return: A list or an Object which act like a list
         :rtype: iterable
         """
