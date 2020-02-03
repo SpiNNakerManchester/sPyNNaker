@@ -296,4 +296,4 @@ class SpynnakerExternalDevicePluginManager(object):
 
     @staticmethod
     def time_scale_factor():
-        return get_simulator().timescale_factor
+        return get_simulator().time_scale_factor
