@@ -21,10 +21,11 @@ from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState
 from spinn_front_end_common.utilities import globals_variables
 from spynnaker.pyNN.exceptions import SpynnakerException
-from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
-from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractGenerateConnectorOnMachine)
+from spynnaker.pyNN.models.abstract_models import (
+    AbstractExpanable, AbstractSynapseExpanable)
+
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractGenerateOnMachine)
 from six import iteritems
@@ -43,7 +44,6 @@ def synapse_expander(
 
     synapse_bin = executable_finder.get_executable_path(SYNAPSE_EXPANDER)
     delay_bin = executable_finder.get_executable_path(DELAY_EXPANDER)
-    expandable = (AbstractPopulationVertex, DelayExtensionVertex)
 
     progress = ProgressBar(len(app_graph.vertices) + 2, "Expanding Synapses")
 
@@ -53,7 +53,7 @@ def synapse_expander(
     for vertex in progress.over(app_graph.vertices, finish_at_end=False):
 
         # Find population vertices
-        if isinstance(vertex, expandable):
+        if isinstance(vertex, AbstractExpanable):
             # Add all machine vertices of the population vertex to ones
             # that need synapse expansion
             gen_on_machine = False
@@ -61,7 +61,7 @@ def synapse_expander(
                 vertex_slice = graph_mapper.get_slice(m_vertex)
                 if vertex.gen_on_machine(vertex_slice):
                     placement = placements.get_placement_of_vertex(m_vertex)
-                    if isinstance(vertex, AbstractPopulationVertex):
+                    if isinstance(vertex, AbstractSynapseExpanable):
                         binary = synapse_bin
                         gen_on_machine = True
                     else:

@@ -37,6 +37,7 @@ from .delay_block import DelayBlock
 from .delay_extension_machine_vertex import DelayExtensionMachineVertex
 from .delay_generator_data import DelayGeneratorData
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
+from spynnaker.pyNN.models.abstract_models import AbstractExpanable
 from spynnaker.pyNN.models.neural_projections import DelayedApplicationEdge
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractGenerateConnectorOnMachine)
@@ -58,7 +59,7 @@ class DelayExtensionVertex(
         ApplicationTimestepVertex, AbstractGeneratesDataSpecification,
         AbstractHasAssociatedBinary,
         AbstractProvidesOutgoingPartitionConstraints,
-        AbstractProvidesNKeysForPartition):
+        AbstractProvidesNKeysForPartition, AbstractExpanable):
     """ Provide delays to incoming spikes in multiples of the maximum delays\
         of a neuron (typically 16 or 32)
     """
@@ -403,6 +404,7 @@ class DelayExtensionVertex(
     def get_outgoing_partition_constraints(self, partition):
         return [ContiguousKeyRangeContraint()]
 
+    @overrides(AbstractExpanable.gen_on_machine)
     def gen_on_machine(self, vertex_slice):
         """ Determine if the given slice needs to be generated on the machine
         """
