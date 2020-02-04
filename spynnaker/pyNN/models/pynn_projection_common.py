@@ -227,7 +227,7 @@ class PyNNProjectionCommon(object):
     def _add_delay_extension(
             self, pre_synaptic_population, post_synaptic_population,
             max_delay_for_projection, max_delay_per_neuron, machine_time_step,
-            timescale_factor):
+            time_scale_factor):
         """ Instantiate delay extension component
         """
         # pylint: disable=too-many-arguments
@@ -239,7 +239,7 @@ class PyNNProjectionCommon(object):
             delay_name = "{}_delayed".format(pre_vertex.label)
             delay_vertex = DelayExtensionVertex(
                 pre_vertex.n_atoms, max_delay_per_neuron, pre_vertex,
-                machine_time_step, timescale_factor, label=delay_name)
+                machine_time_step, time_scale_factor, label=delay_name)
             pre_synaptic_population._internal_delay_vertex = delay_vertex
             pre_vertex.add_constraint(
                 SameAtomsAsVertexConstraint(delay_vertex))
