@@ -19,7 +19,7 @@ from spynnaker.pyNN.models.neural_projections import (
     ProjectionApplicationEdge, SynapseInformation)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsStatic, SynapseDynamicsSTDP)
-from spynnaker.pyNN.models.neuron.master_pop_table_as_binary_search import (
+from spynnaker.pyNN.models.neuron.master_pop_table import (
     MasterPopTableAsBinarySearch)
 from spynnaker.pyNN.models.neuron.synapse_io_row_based import SynapseIORowBased
 from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (

@@ -40,7 +40,7 @@ from spynnaker.pyNN.utilities.constants import (
 from spynnaker.pyNN.utilities.utility_calls import (
     get_maximum_probable_value, get_n_bits)
 from spynnaker.pyNN.utilities.running_stats import RunningStats
-from spynnaker.pyNN.models.neuron.master_pop_table_as_binary_search import (
+from spynnaker.pyNN.models.neuron.master_pop_table import (
     MasterPopTableAsBinarySearch)
 
 TIME_STAMP_BYTES = BYTES_PER_WORD
