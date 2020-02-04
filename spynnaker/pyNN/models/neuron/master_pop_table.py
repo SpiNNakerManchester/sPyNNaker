@@ -101,7 +101,7 @@ class MasterPopTableAsBinarySearch(object):
         self.__n_addresses = 0
         self.__n_single_entries = None
 
-    def get_master_population_table_size(self, vertex_slice, in_edges):
+    def get_master_population_table_size(self, in_edges):
         """ Get the size of the master population table in SDRAM
 
         :param vertex_slice: the slice of the vertex
@@ -114,9 +114,7 @@ class MasterPopTableAsBinarySearch(object):
         n_vertices = 0
         n_entries = 0
         for in_edge in in_edges:
-
             if isinstance(in_edge, ProjectionApplicationEdge):
-
                 # TODO: Fix this to be more accurate!
                 # May require modification to the master population table
                 # Get the number of atoms per core incoming
@@ -191,8 +189,7 @@ class MasterPopTableAsBinarySearch(object):
         self.__n_single_entries = 0
 
     def update_master_population_table(
-            self, spec, block_start_addr, row_length, key_and_mask,
-            master_pop_table_region, is_single=False):
+            self, block_start_addr, row_length, key_and_mask, is_single=False):
         """ Add an entry in the binary search to deal with the synaptic matrix
 
         :param spec: the writer for DSG
