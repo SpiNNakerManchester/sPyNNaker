@@ -1391,7 +1391,7 @@ class SynapticManager(object):
         connections = []
         if key in edge_info:
             offset, row_len, block_sz = edge_info[key]
-            pre_slice = Slice(0, app_edge.pre_vertex.n_atoms)
+            pre_slice = Slice(0, app_edge.pre_vertex.n_atoms - 1)
             connections.append(self._read_connections(
                 row_len, block_sz, buffer_manager, transceiver, placement,
                 indirect_synapses + offset, synapse_info, pre_slice,
