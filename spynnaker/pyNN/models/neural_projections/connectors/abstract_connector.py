@@ -35,6 +35,7 @@ _expr_context = SafeEval(
     numpy.maximum, numpy.minimum, e=numpy.e, pi=numpy.pi)
 
 
+# with_metaclass due to https://github.com/benjaminp/six/issues/219
 class AbstractConnector(with_metaclass(AbstractBase, object)):
     """ Abstract class that all PyNN Connectors extend.
     """
@@ -79,6 +80,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         self.__space = space
 
     def set_projection_information(self, machine_time_step, synapse_info):
+        # pylint: disable=unused-argument
         self._rng = (self._rng or get_simulator().get_pynn_NumpyRNG()())
         self.__min_delay = machine_time_step / 1000.0
 
@@ -393,4 +395,5 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         self.__verbose = new_value
 
     def use_direct_matrix(self, synapse_info):
+        # pylint: disable=unused-argument
         return False

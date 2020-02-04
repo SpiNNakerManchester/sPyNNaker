@@ -119,11 +119,13 @@ class PyNNProjectionCommon(object):
         post_vertex_max_supported_delay_ms = \
             post_synaptic_population._get_vertex \
             .get_maximum_delay_supported_in_ms(machine_time_step)
-        if max_delay > (post_vertex_max_supported_delay_ms +
-                        _delay_extension_max_supported_delay):
+        max_supported_delay_ms = post_vertex_max_supported_delay_ms + \
+            _delay_extension_max_supported_delay * (machine_time_step / 1000.0)
+        if max_delay > max_supported_delay_ms:
             raise ConfigurationException(
-                "The maximum delay {} for projection is not supported".format(
-                    max_delay))
+                "The maximum delay {} for projection is not supported "
+                "(max supported delay is {})".format(max_delay,
+                                                     max_supported_delay_ms))
 
         if max_delay > user_max_delay / (machine_time_step / 1000.0):
             logger.warning("The end user entered a max delay"
@@ -225,7 +227,7 @@ class PyNNProjectionCommon(object):
     def _add_delay_extension(
             self, pre_synaptic_population, post_synaptic_population,
             max_delay_for_projection, max_delay_per_neuron, machine_time_step,
-            timescale_factor):
+            time_scale_factor):
         """ Instantiate delay extension component
         """
         # pylint: disable=too-many-arguments
@@ -237,7 +239,7 @@ class PyNNProjectionCommon(object):
             delay_name = "{}_delayed".format(pre_vertex.label)
             delay_vertex = DelayExtensionVertex(
                 pre_vertex.n_atoms, max_delay_per_neuron, pre_vertex,
-                machine_time_step, timescale_factor, label=delay_name)
+                machine_time_step, time_scale_factor, label=delay_name)
             pre_synaptic_population._internal_delay_vertex = delay_vertex
             pre_vertex.add_constraint(
                 SameAtomsAsVertexConstraint(delay_vertex))
@@ -346,19 +348,17 @@ class PyNNProjectionCommon(object):
                     packet_gather_cores_to_ethernet_connection_map=receivers)
                 sender_extra_monitor_core = extra_monitor_placements[
                     placement.x, placement.y]
-                sender_monitor_place = ctl.placements.get_placement_of_vertex(
-                    sender_extra_monitor_core)
             else:
                 receiver = None
-                sender_monitor_place = None
+                sender_extra_monitor_core = None
 
             connections = post_vertex.get_connections_from_machine(
                 ctl.transceiver, placement, edge, ctl.graph_mapper,
                 ctl.routing_infos, self.__synapse_information,
                 ctl.machine_time_step, extra_monitors is not None,
-                ctl.placements, receiver, sender_monitor_place,
-                extra_monitors, handle_time_out_configuration,
-                ctl.fixed_routes)
+                ctl.placements, receiver, extra_monitors,
+                handle_time_out_configuration,
+                ctl.fixed_routes, sender_extra_monitor_core)
             if connections is not None:
                 connection_holder.add_connections(connections)
         connection_holder.finish()

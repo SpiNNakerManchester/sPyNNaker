@@ -22,14 +22,14 @@ exec(open("spynnaker/_version.py").read())
 assert __version__
 
 install_requires = [
-    'SpiNNUtilities >= 1!5.0.1, < 1!6.0.0',
-    'SpiNNStorageHandlers >= 1!5.0.1, < 1!6.0.0',
-    'SpiNNMachine >= 1!5.0.1, < 1!6.0.0',
-    'SpiNNMan >= 1!5.0.1, < 1!6.0.0',
-    'SpiNNaker_PACMAN >= 1!5.0.1, < 1!6.0.0',
-    'SpiNNaker_DataSpecification >= 1!5.0.1, < 1!6.0.0',
-    'spalloc >= 2.0.1, < 3.0.0',
-    'SpiNNFrontEndCommon >= 1!5.0.1, < 1!6.0.0',
+    'SpiNNUtilities >= 1!5.1.1, < 1!6.0.0',
+    'SpiNNStorageHandlers >= 1!5.1.1, < 1!6.0.0',
+    'SpiNNMachine >= 1!5.1.1, < 1!6.0.0',
+    'SpiNNMan >= 1!5.1.1, < 1!6.0.0',
+    'SpiNNaker_PACMAN >= 1!5.1.1, < 1!6.0.0',
+    'SpiNNaker_DataSpecification >= 1!5.1.1, < 1!6.0.0',
+    'spalloc >= 2.0.2, < 3.0.0',
+    'SpiNNFrontEndCommon >= 1!5.1.1, < 1!6.0.0',
     'numpy', 'lxml', 'six']
 if os.environ.get('READTHEDOCS', None) != 'True':
 
