@@ -824,7 +824,7 @@ class SynapticManager(object):
                     synapse_info, pre_vertex_slice, post_vertex_slice,
                     row_length, delayed_row_length, n_synapse_types,
                     weight_scales, row_data, delayed_row_data,
-                    app_edge.n_delay_stages, machine_time_step))
+                    machine_time_step))
                 conn_holder.finish()
 
         index = None
@@ -1037,7 +1037,7 @@ class SynapticManager(object):
             synapse_info, pre_vertex_slice, post_vertex_slice,
             max_row_length, delayed_max_row_len, self.__n_synapse_types,
             self.__weight_scales[placement], data, delayed_data,
-            app_edge.n_delay_stages, machine_time_step)
+            machine_time_step)
 
     def __compute_addresses(self, transceiver, placement):
         """ Helper for computing the addresses of the master pop table and\
@@ -1062,11 +1062,11 @@ class SynapticManager(object):
 
     def _read_synapses(self, info, pre_slice, post_slice, max_row_length,
                        delayed_max_row_length, n_synapse_types, weight_scales,
-                       data, delayed_data, n_delays, timestep):
+                       data, delayed_data, timestep):
         return self.__synapse_io.read_synapses(
             info, pre_slice, post_slice, max_row_length,
             delayed_max_row_length, n_synapse_types, weight_scales, data,
-            delayed_data, n_delays, timestep)
+            delayed_data, timestep)
 
     def _retrieve_synaptic_block(
             self, txrx, placement, master_pop_table_address,
