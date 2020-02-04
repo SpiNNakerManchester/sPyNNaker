@@ -244,6 +244,14 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         self.__n_addresses = 0
 
     def _make_pop_table_entry(self, entry, i, start, pop_table, address_list):
+        """
+        :param _MasterPopEntry entry:
+        :param int i:
+        :param int start:
+        :param ~numpy.ndarray pop_table:
+        :param ~numpy.ndarray address_list:
+        :rtype: int
+        """
         # pylint: disable=too-many-arguments
         pop_table[i]["key"] = entry.routing_key
         pop_table[i]["mask"] = entry.mask

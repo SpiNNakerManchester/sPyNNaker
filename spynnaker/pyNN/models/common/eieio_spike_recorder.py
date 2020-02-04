@@ -139,6 +139,13 @@ class EIEIOSpikeRecorder(object):
     @staticmethod
     def _process_spike_data(
             vertex_slice, spike_data, ms_per_tick, base_key, results):
+        """
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :param bytearray spike_data:
+        :param int ms_per_tick:
+        :param int base_key:
+        :param list(~numpy.ndarray) results:
+        """
         number_of_bytes_written = len(spike_data)
         offset = 0
         while offset < number_of_bytes_written:

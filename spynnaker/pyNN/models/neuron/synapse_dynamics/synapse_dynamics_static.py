@@ -41,6 +41,11 @@ class SynapseDynamicsStatic(
         "__delay"]
 
     def __init__(self, weight=0.0, delay=1.0, pad_to_length=None):
+        """
+        :param float weight:
+        :param float delay:
+        :param int pad_to_length:
+        """
         self.__change_requires_mapping = True
         self.__weight = weight
         self.__delay = delay
@@ -112,6 +117,11 @@ class SynapseDynamicsStatic(
         return ff_data, ff_size
 
     def _pad_row(self, rows, no_bytes_per_connection):
+        """
+        :param list(~numpy.ndarray) rows:
+        :param int no_bytes_per_connection:
+        :rtype: list(~numpy.ndarray)
+        """
         padded_rows = []
         for row in rows:  # Row elements are (individual) bytes
             padded_rows.append(

@@ -16,8 +16,8 @@
 import logging
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-from spynnaker.pyNN.models.neuron.plasticity.stdp.common\
-    .plasticity_helpers import get_exp_lut_array
+from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
+    get_exp_lut_array)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence\
     import AbstractTimingDependence
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure\
@@ -29,6 +29,10 @@ logger = logging.getLogger(__name__)
 
 class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
     """ A timing dependence STDP rule based on spike triplets.
+
+    Jean-Pascal Pfister, Wulfram Gerstner. Triplets of Spikes in a Model of
+    Spike Timing-Dependent Plasticity. *Journal of Neuroscience*,
+    20 September 2006, 26 (38) 9673-9682; DOI: 10.1523/JNEUROSCI.1425-06.2006
     """
     __slots__ = [
         "__synapse_structure",

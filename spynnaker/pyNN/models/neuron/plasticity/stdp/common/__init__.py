@@ -12,3 +12,69 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+import math
+import logging
+import numpy
+
+logger = logging.getLogger(__name__)
+# Default value of fixed-point one for STDP
+STDP_FIXED_POINT_ONE = (1 << 11)
+
+
+def float_to_fixed(value):
+    """
+    :param float value:
+    :rtype: int
+    """
+    return int(round(float(value) * float(STDP_FIXED_POINT_ONE)))
+
+
+def get_exp_lut_values(time_step, time_constant, shift=0, size=None):
+    """
+    :param int time_step:
+    :param float time_constant:
+    :param int shift:
+    :param int size:
+    :rtype: list(int)
+    """
+    # Calculate time constant reciprocal
+    time_constant_reciprocal = time_step / float(time_constant)
+
+    # Generate LUT
+    last_value = 1.0
+    index = 0
+    values = list()
+    while last_value > 0.0 and (size is None or len(values) < size):
+
+        # Apply shift to get time from index
+        time = (index << shift)
+        index += 1
+
+        # Multiply by time constant and calculate negative exponential
+        value = float(time) * time_constant_reciprocal
+        exp_float = math.exp(-value)
+
+        # Convert to fixed-point and write to spec
+        last_value = float_to_fixed(exp_float)
+        if last_value > 0.0:
+            values.append(last_value)
+    if size is not None and size > len(values):
+        values.extend([0] * (size - len(values)))
+    return values
+
+
+def get_exp_lut_array(time_step, time_constant, shift=0, size=None):
+    """
+    :param int time_step:
+    :param float time_constant:
+    :param int shift:
+    :param int size:
+    :rtype: ~numpy.ndarray
+    """
+    values = get_exp_lut_values(time_step, time_constant, shift, size)
+    values_size = len(values)
+    if len(values) % 2 != 0:
+        values.append(0)
+    return numpy.concatenate(
+        ([values_size, shift], values)).astype("uint16").view("uint32")

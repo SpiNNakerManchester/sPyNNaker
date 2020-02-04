@@ -154,7 +154,7 @@ class SynapseInformation(object):
     def weights(self):
         """ The synaptic weights (if any)
 
-        :rtype: int or None
+        :rtype: float or list(float) or ~numpy.ndarray(float) or None
         """
         return self.__weights
 
@@ -162,7 +162,7 @@ class SynapseInformation(object):
     def delays(self):
         """ The total synaptic delays (if any)
 
-        :rtype: int or None
+        :rtype: float or list(float) or ~numpy.ndarray(float) or None
         """
         return self.__delays
 

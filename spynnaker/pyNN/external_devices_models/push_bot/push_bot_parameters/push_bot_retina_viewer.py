@@ -126,7 +126,7 @@ class PushBotRetinaViewer(Thread):
         # Create image plot of retina output
         fig = self.__pyplot.figure()
         self.__image = self.__pyplot.imshow(
-            self.__image_data_view, cmap="jet", vmin=0.0,
+            self.__image_data_view, cmap="viridis", vmin=0.0,
             vmax=self.__display_max)
 
         # Play animation

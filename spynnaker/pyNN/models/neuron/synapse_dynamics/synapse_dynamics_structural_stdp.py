@@ -31,26 +31,6 @@ class SynapseDynamicsStructuralSTDP(
         operate in parallel with STDP synapses.
 
         Written by Petrut Bogdan.
-
-    :param AbstractPartnerSelection partner_selection:
-        The partner selection rule
-    :param AbstractFormation formation: The formation rule
-    :param AbstractElimination elimination: The elimination rule
-    :param AbstractTimingDependence timing_dependence:
-    :param AbstractWeightDependence weight_dependence:
-    :param None voltage_dependence: The STDP voltage dependence (unsupported)
-    :param float dendritic_delay_fraction: The STDP dendritic delay fraction
-    :param int f_rew: How many rewiring attempts will be done per second.
-    :param float initial_weight: Weight assigned to a newly formed connection
-    :param initial_delay:
-        Delay assigned to a newly formed connection; a single value means a
-        fixed delay value, or a tuple of two values means the delay will be
-        chosen at random from a uniform distribution between the given values
-    :type initial_delay: float or tuple(float, float)
-    :param int s_max: Maximum fan-in per target layer neuron
-    :param int seed: seed the random number generators
-    :param float weight: The weight of connections formed by the connector
-    :param float delay: The delay of connections formed by the connector
     """
     __slots__ = ["__common_sp"]
 
@@ -63,6 +43,32 @@ class SynapseDynamicsStructuralSTDP(
             initial_delay=CommonSP.DEFAULT_INITIAL_DELAY,
             s_max=CommonSP.DEFAULT_S_MAX, seed=None,
             weight=0.0, delay=1.0, backprop_delay=True):
+        """
+        :param AbstractPartnerSelection partner_selection:
+            The partner selection rule
+        :param AbstractFormation formation: The formation rule
+        :param AbstractElimination elimination: The elimination rule
+        :param AbstractTimingDependence timing_dependence:
+        :param AbstractWeightDependence weight_dependence:
+        :param None voltage_dependence:
+            The STDP voltage dependence (unsupported)
+        :param float dendritic_delay_fraction:
+            The STDP dendritic delay fraction
+        :param int f_rew:
+            How many rewiring attempts will be done per second.
+        :param float initial_weight:
+            Weight assigned to a newly formed connection
+        :param initial_delay:
+            Delay assigned to a newly formed connection; a single value means
+            a fixed delay value, or a tuple of two values means the delay will
+            be chosen at random from a uniform distribution between the given
+            values
+        :type initial_delay: float or tuple(float, float)
+        :param int s_max: Maximum fan-in per target layer neuron
+        :param int seed: seed the random number generators
+        :param float weight: The weight of connections formed by the connector
+        :param float delay: The delay of connections formed by the connector
+        """
         super(SynapseDynamicsStructuralSTDP, self).__init__(
             timing_dependence, weight_dependence, voltage_dependence,
             dendritic_delay_fraction, weight, delay, pad_to_length=s_max,
@@ -102,6 +108,10 @@ class SynapseDynamicsStructuralSTDP(
             app_vertex, post_slice, routing_info, synapse_indices)
 
     def set_projection_parameter(self, param, value):
+        """
+        :param str param:
+        :param value:
+        """
         self.__common_sp.set_projection_parameter(param, value)
 
     @overrides(SynapseDynamicsSTDP.is_same_as)

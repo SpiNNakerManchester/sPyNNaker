@@ -117,8 +117,8 @@ class MultiSpikeRecorder(object):
 
         if missing:
             logger.warning(
-                "Population {} is missing spike data in region {} from the"
-                " following cores: {}", label, region,
+                "Population {} is missing spike data in region {} from the "
+                "following cores: {}", label, region,
                 recording_utils.make_missing_string(missing))
 
         if not spike_ids:

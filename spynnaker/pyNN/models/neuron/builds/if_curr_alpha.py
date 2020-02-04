@@ -26,20 +26,20 @@ class IFCurrAlpha(AbstractPyNNNeuronModelStandard):
     """ Leaky integrate and fire neuron with an alpha-shaped current-based\
         input.
 
-    :param tau_m:
-    :param cm:
-    :param v_rest:
-    :param v_reset:
-    :param v_thresh:
-    :param tau_syn_E:
-    :param tau_syn_I:
-    :param tau_refrac:
-    :param i_offset:
-    :param v:
-    :param exc_response:
-    :param exc_exp_response:
-    :param inh_response:
-    :param inh_exp_response:
+    :param float tau_m: :math:`\\tau_m`
+    :param float cm: :math:`C_m`
+    :param float v_rest: :math:`V_{rest}`
+    :param float v_reset: :math:`V_{reset}`
+    :param float v_thresh: :math:`V_{thresh}`
+    :param float tau_syn_E: :math:`\\tau^{syn}_e`
+    :param float tau_syn_I: :math:`\\tau^{syn}_i`
+    :param float tau_refrac: :math:`\\tau_{refrac}`
+    :param float i_offset: :math:`I_{offset}`
+    :param float v: :math:`V_{init}`
+    :param float exc_response: :math:`response^\\mathrm{linear}_e`
+    :param float exc_exp_response: :math:`response^\\mathrm{exponential}_e`
+    :param float inh_response: :math:`response^\\mathrm{linear}_i`
+    :param float inh_exp_response: :math:`response^\\mathrm{exponential}_i`
     """
 
     @default_initial_values({

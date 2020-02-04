@@ -42,7 +42,7 @@ class AbstractSpikeRecordable(object):
         :param sampling_interval: The interval at which spikes are recorded.
             Must be a whole multiple of the timestep.
             None will be taken as the timestep.
-        :type sampling_interval: float or None
+        :type sampling_interval: int or None
         :param indexes: The indexes of the neurons that will record spikes.
             If None the assumption is all neurons are recording
         :type indexes: list(int) or None
@@ -55,8 +55,8 @@ class AbstractSpikeRecordable(object):
         :param buffer_manager: the buffer manager object
         :type buffer_manager:
             ~spinn_front_end_common.interface.buffer_management.BufferManager
-        :param placements: the placements object
-        :type placements: ~pacman.model.placements.Placements
+        :param ~pacman.model.placements.Placements placements:
+            the placements object
         :rtype: None
         """
 
@@ -64,8 +64,8 @@ class AbstractSpikeRecordable(object):
     def get_spikes(self, placements, buffer_manager, machine_time_step):
         """ Get the recorded spikes from the object
 
-        :param placements: the placements object
-        :type placements: ~pacman.model.placements.Placements
+        :param ~pacman.model.placements.Placements placements:
+            the placements object
         :param buffer_manager: the buffer manager object
         :type buffer_manager:
             ~spinn_front_end_common.interface.buffer_management.BufferManager

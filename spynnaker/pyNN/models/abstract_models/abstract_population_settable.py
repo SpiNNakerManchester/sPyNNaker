@@ -31,7 +31,7 @@ class AbstractPopulationSettable(AbstractSettable):
     @abstractproperty
     def n_atoms(self):
         """" See \
-            :py:class:`~pacman.model.graphs.application.ApplicationVertex`.n_atoms
+            :py:meth:`~pacman.model.graphs.application.ApplicationVertex.n_atoms`
         """
 
     def get_value_by_selector(self, selector, key):
@@ -39,10 +39,11 @@ class AbstractPopulationSettable(AbstractSettable):
             subset.
 
         :param selector: See \
-            :py:class:`~spinn_utilities.ranged.RangedList`.get_value_by_selector\
+            :py:meth:`~spinn_utilities.ranged.RangedList.get_value_by_selector`\
             as this is just a pass through method
-        :param key: the name of the parameter to change
-        :param value: the new value of the parameter to assign
+        :type selector: None or slice or int or list(bool) or list(int)
+        :param str key: the name of the parameter to change
+        :rtype: list(float or int)
         """
         old_values = self.get_value(key)
         if isinstance(old_values, AbstractList):
@@ -62,8 +63,10 @@ class AbstractPopulationSettable(AbstractSettable):
         :param selector: See \
             :py:class:`~spinn_utilities.ranged.RangedList`.set_value_by_selector\
             as this is just a pass through method
-        :param key: the name of the parameter to change
+        :type selector: None or slice or int or list(bool) or list(int)
+        :param str key: the name of the parameter to change
         :param value: the new value of the parameter to assign
+        :type value: float or int or list(float) or list(int)
         """
         old_values = self.get_value(key)
         if isinstance(old_values, AbstractList):

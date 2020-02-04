@@ -46,10 +46,23 @@ class SynapseIORowBased(AbstractSynapseIO):
 
     @staticmethod
     def _n_words(n_bytes):
+        """
+        :param int n_bytes:
+        :rtype: int
+        """
         return math.ceil(float(n_bytes) / BYTES_PER_WORD)
 
+    @staticmethod
     def _get_max_row_length(
-            self, size, dynamics, population_table, in_edge, row_length):
+            size, dynamics, population_table, in_edge, row_length):
+        """
+        :param int size:
+        :param AbstractSynapseDynamics dynamics:
+        :param MasterPopTableAsBinarySearch population_table:
+        :param in_edge:
+        :type in_edge: ProjectionApplicationEdge or ProjectionMachineEdge
+        :param int row_length:
+        """
         # pylint: disable=too-many-arguments
         try:
             return population_table.get_allowed_row_length(size)
@@ -129,6 +142,16 @@ class SynapseIORowBased(AbstractSynapseIO):
     def _get_max_row_length_and_row_data(
             connections, row_indices, n_rows, post_vertex_slice,
             n_synapse_types, population_table, synapse_dynamics):
+        """
+        :param ~numpy.ndarray connections:
+        :param ~numpy.ndarray row_indices:
+        :param int n_rows:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param int n_synapse_types:
+        :param MasterPopTableAsBinarySearch population_table:
+        :param AbstractSynapseDynamics synapse_dynamics:
+        :rtype: tuple(int, ~numpy.ndarray)
+        """
         # pylint: disable=too-many-arguments, too-many-locals
         row_ids = range(n_rows)
         ff_data, ff_size = None, None
@@ -324,6 +347,11 @@ class SynapseIORowBased(AbstractSynapseIO):
 
     @staticmethod
     def _parse_static_data(row_data, dynamics):
+        """
+        :param ~numpy.ndarray row_data:
+        :param AbstractStaticSynapseDynamics dynamics:
+        :rtype: tuple(int, list(~numpy.ndarray))
+        """
         n_rows = row_data.shape[0]
         ff_size = row_data[:, 1]
         ff_words = dynamics.get_n_static_words_per_row(ff_size)
@@ -336,6 +364,14 @@ class SynapseIORowBased(AbstractSynapseIO):
     def _read_static_data(self, dynamics, pre_vertex_slice, post_vertex_slice,
                           n_synapse_types, row_data, delayed_row_data):
         """ Read static data.
+
+        :param AbstractStaticSynapseDynamics dynamics:
+        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param int n_synapse_types:
+        :param ~numpy.ndarray row_data:
+        :param ~numpy.ndarray delayed_row_data:
+        :rtype: list(~numpy.ndarray)
         """
         # pylint: disable=too-many-arguments, too-many-locals
         connections = []
@@ -377,6 +413,11 @@ class SynapseIORowBased(AbstractSynapseIO):
 
     @staticmethod
     def _parse_plastic_data(row_data, dynamics):
+        """
+        :param ~numpy.ndarray row_data:
+        :param AbstractPlasticSynapseDynamics dynamics:
+        :rtype: tuple(int, list(~numpy.ndarray))
+        """
         n_rows = row_data.shape[0]
         pp_size = row_data[:, 0]
         pp_words = dynamics.get_n_plastic_plastic_words_per_row(pp_size)
@@ -395,6 +436,14 @@ class SynapseIORowBased(AbstractSynapseIO):
             self, dynamics, pre_vertex_slice, post_vertex_slice,
             n_synapse_types, row_data, delayed_row_data):
         """ Read plastic data.
+
+        :param AbstractPlasticSynapseDynamics dynamics:
+        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param int n_synapse_types:
+        :param ~numpy.ndarray row_data:
+        :param ~numpy.ndarray delayed_row_data:
+        :rtype: list(~numpy.ndarray)
         """
         # pylint: disable=too-many-arguments, too-many-locals
         connections = []

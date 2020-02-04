@@ -33,6 +33,7 @@ def get_recording_region_size_in_bytes(
 
     :param int n_machine_time_steps:
     :param int bytes_per_timestep:
+    :rtype: int
     """
     if n_machine_time_steps is None:
         raise Exception(
@@ -76,8 +77,7 @@ def pull_off_cached_lists(no_loads, cache_file):
     """ Extracts numpy based data from a file
 
     :param int no_loads: the number of numpy elements in the file
-    :param cache_file: the file to extract from
-    :type cache_file: str or file
+    :param ~io.FileIO cache_file: the file to extract from
     :return: The extracted data
     :rtype: ~numpy.ndarray
     """
@@ -100,6 +100,9 @@ def pull_off_cached_lists(no_loads, cache_file):
 
 def needs_buffering(buffer_max, space_needed, enable_buffered_recording):
     """
+    :param int buffer_max:
+    :param int space_needed:
+    :param bool enable_buffered_recording:
     :rtype: bool
     """
     if space_needed == 0:
@@ -113,6 +116,9 @@ def needs_buffering(buffer_max, space_needed, enable_buffered_recording):
 
 def get_buffer_sizes(buffer_max, space_needed, enable_buffered_recording):
     """
+    :param int buffer_max:
+    :param int space_needed:
+    :param bool enable_buffered_recording:
     :rtype: int
     """
     if space_needed == 0:

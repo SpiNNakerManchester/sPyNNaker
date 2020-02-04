@@ -22,11 +22,9 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
     AbstractTimingDependence)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
     SynapseStructureWeightOnly)
-from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
-    plasticity_helpers)
 from spinn_front_end_common.utilities.globals_variables import get_simulator
-from spynnaker.pyNN.models.neuron.plasticity.stdp.common\
-    .plasticity_helpers import get_exp_lut_array
+from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
+    float_to_fixed, get_exp_lut_array)
 
 logger = logging.getLogger(__name__)
 
@@ -113,8 +111,7 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
     def write_parameters(self, spec, machine_time_step, weight_scales):
 
         # Write alpha to spec
-        fixed_point_alpha = plasticity_helpers.float_to_fixed(
-            self.__alpha, plasticity_helpers.STDP_FIXED_POINT_ONE)
+        fixed_point_alpha = float_to_fixed(self.__alpha)
         spec.write_value(data=fixed_point_alpha, data_type=DataType.INT32)
 
         # Write lookup table

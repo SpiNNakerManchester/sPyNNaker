@@ -32,22 +32,6 @@ class SynapseDynamicsStructuralStatic(
         rewiring can operate in parallel with static synapses.
 
         Written by Petrut Bogdan.
-
-    :param AbstractPartnerSelection partner_selection:
-        The partner selection rule
-    :param AbstractFormation formation: The formation rule
-    :param AbstractElimination elimination: The elimination rule
-    :param int f_rew: How many rewiring attempts will be done per second.
-    :param float initial_weight: Weight assigned to a newly formed connection
-    :param initial_delay:
-        Delay assigned to a newly formed connection; a single value means a\
-        fixed delay value, or a tuple of two values means the delay will be\
-        chosen at random from a uniform distribution between the given values
-    :type initial_delay: float or (float, float)
-    :param int s_max: Maximum fan-in per target layer neuron
-    :param int seed: seed the random number generators
-    :param float weight: The weight of connections formed by the connector
-    :param float delay: The delay of connections formed by the connector
     """
     __slots__ = ["__common_sp"]
 
@@ -58,7 +42,25 @@ class SynapseDynamicsStructuralStatic(
             initial_delay=CommonSP.DEFAULT_INITIAL_DELAY,
             s_max=CommonSP.DEFAULT_S_MAX, seed=None,
             weight=0.0, delay=1.0):
-
+        """
+        :param AbstractPartnerSelection partner_selection:
+            The partner selection rule
+        :param AbstractFormation formation: The formation rule
+        :param AbstractElimination elimination: The elimination rule
+        :param int f_rew: How many rewiring attempts will be done per second.
+        :param float initial_weight:
+            Weight assigned to a newly formed connection
+        :param initial_delay:
+            Delay assigned to a newly formed connection; a single value means
+            a fixed delay value, or a tuple of two values means the delay will
+            be chosen at random from a uniform distribution between the given
+            values
+        :type initial_delay: float or (float, float)
+        :param int s_max: Maximum fan-in per target layer neuron
+        :param int seed: seed the random number generators
+        :param float weight: The weight of connections formed by the connector
+        :param float delay: The delay of connections formed by the connector
+        """
         super(SynapseDynamicsStructuralStatic, self).__init__(
             weight=weight, delay=delay, pad_to_length=s_max)
 
@@ -106,6 +108,10 @@ class SynapseDynamicsStructuralStatic(
             app_vertex, post_slice, routing_info, synapse_indices)
 
     def set_projection_parameter(self, param, value):
+        """
+        :param str param:
+        :param value:
+        """
         self.__common_sp.set_projection_parameter(param, value)
 
     @overrides(SynapseDynamicsStatic.is_same_as)
