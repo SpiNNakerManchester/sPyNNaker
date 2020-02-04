@@ -19,7 +19,6 @@ import struct
 import numpy
 import scipy.stats  # @UnresolvedImport
 from scipy import special  # @UnresolvedImport
-from spinn_utilities.helpful_functions import get_valid_components
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
@@ -32,7 +31,7 @@ from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from .synapse_dynamics import (
     AbstractSynapseDynamicsStructural,
     AbstractGenerateOnMachine, SynapseDynamicsStructuralSTDP)
-from spynnaker.pyNN.models.neuron.synapse_io import SynapseIORowBased
+from spynnaker.pyNN.models.neuron.synapse_io_row_based import SynapseIORowBased
 from spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex import (
     SpikeSourcePoissonVertex)
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
@@ -41,7 +40,8 @@ from spynnaker.pyNN.utilities.constants import (
 from spynnaker.pyNN.utilities.utility_calls import (
     get_maximum_probable_value, get_n_bits)
 from spynnaker.pyNN.utilities.running_stats import RunningStats
-from spynnaker.pyNN.models.neuron import master_pop_table_generators
+from spynnaker.pyNN.models.neuron.master_pop_table_as_binary_search import (
+    MasterPopTableAsBinarySearch)
 
 TIME_STAMP_BYTES = BYTES_PER_WORD
 
@@ -94,11 +94,7 @@ class SynapticManager(object):
         # Get the type of population table
         self.__poptable_type = population_table_type
         if population_table_type is None:
-            population_table_type = ("MasterPopTableAs" + config.get(
-                "MasterPopTable", "generator"))
-            algorithms = get_valid_components(
-                master_pop_table_generators, "master_pop_table_as")
-            self.__poptable_type = algorithms[population_table_type]()
+            self.__poptable_type = MasterPopTableAsBinarySearch()
 
         # Get the synapse IO
         self.__synapse_io = synapse_io
