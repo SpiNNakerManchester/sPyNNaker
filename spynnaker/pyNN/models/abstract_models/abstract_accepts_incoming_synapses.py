@@ -15,10 +15,11 @@
 
 from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from .abstract_expandable import AbstractExpanable
 
 
 @add_metaclass(AbstractBase)
-class AbstractAcceptsIncomingSynapses(object):
+class AbstractAcceptsIncomingSynapses(AbstractExpanable):
     """ Indicates an object that can be a post-vertex in a PyNN projection.
     """
     __slots__ = ()

@@ -24,7 +24,7 @@ from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractGenerateConnectorOnMachine)
 from spynnaker.pyNN.models.abstract_models import (
-    AbstractExpanable, AbstractSynapseExpanable)
+    AbstractAcceptsIncomingSynapses, AbstractExpanable)
 
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractGenerateOnMachine)
@@ -61,7 +61,7 @@ def synapse_expander(
                 vertex_slice = graph_mapper.get_slice(m_vertex)
                 if vertex.gen_on_machine(vertex_slice):
                     placement = placements.get_placement_of_vertex(m_vertex)
-                    if isinstance(vertex, AbstractSynapseExpanable):
+                    if isinstance(vertex, AbstractAcceptsIncomingSynapses):
                         binary = synapse_bin
                         gen_on_machine = True
                     else:

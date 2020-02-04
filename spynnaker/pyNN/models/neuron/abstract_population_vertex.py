@@ -45,7 +45,7 @@ from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.abstract_models import (
     AbstractAcceptsIncomingSynapses, AbstractContainsUnits, AbstractExpanable,
     AbstractPopulationInitializable, AbstractPopulationSettable,
-    AbstractReadParametersBeforeSet, AbstractSynapseExpanable)
+    AbstractReadParametersBeforeSet)
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.utilities.ranged import (
     SpynnakerRangeDictionary, SpynnakerRangedList)
@@ -79,7 +79,7 @@ class AbstractPopulationVertex(
         AbstractChangableAfterRun,
         AbstractRewritesDataSpecification, AbstractReadParametersBeforeSet,
         AbstractAcceptsIncomingSynapses, ProvidesKeyToAtomMappingImpl,
-        AbstractCanReset, AbstractSynapseExpanable):
+        AbstractCanReset):
     """ Underlying vertex model for Neural Populations.
     """
     __slots__ = [
