@@ -20,6 +20,7 @@ from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
+from spynnaker.pyNN.models.neural_projections.synapse_information import SynapseInformation
 
 logger = logging.getLogger(__file__)
 
@@ -50,6 +51,11 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
     def _connection_slices(self, pre_vertex_slice, post_vertex_slice,
                            synapse_info):
         """ Get a slice of the overall set of connections.
+
+        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param SynapseInformation synapse_info:
+        :rtype: list(slice)
         """
         n_post_neurons = synapse_info.n_post_neurons
         stop_atom = post_vertex_slice.hi_atom + 1
@@ -149,11 +155,6 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
     def allow_self_connections(self, new_value):
         self.__allow_self_connections = new_value
 
-    def _get_view_lo_hi(self, indexes):
-        view_lo = indexes[0]
-        view_hi = indexes[-1]
-        return view_lo, view_hi
-
     @property
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_id)
     def gen_connector_id(self):
@@ -166,21 +167,18 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type, synapse_info):
         params = []
-        pre_view_lo = 0
-        pre_view_hi = synapse_info.n_pre_neurons - 1
+
+        view_range = 0, synapse_info.n_pre_neurons - 1
         if synapse_info.prepop_is_view:
-            pre_view_lo, pre_view_hi = self._get_view_lo_hi(
-                synapse_info.pre_population._indexes)
+            view_range = self._get_view_lo_hi(
+                synapse_info.pre_population)
+        params.extend(view_range)
 
-        params.extend([pre_view_lo, pre_view_hi])
-
-        post_view_lo = 0
-        post_view_hi = synapse_info.n_post_neurons - 1
+        view_range = 0, synapse_info.n_post_neurons - 1
         if synapse_info.postpop_is_view:
-            post_view_lo, post_view_hi = self._get_view_lo_hi(
-                synapse_info.post_population._indexes)
-
-        params.extend([post_view_lo, post_view_hi])
+            view_range = self._get_view_lo_hi(
+                synapse_info.post_population)
+        params.extend(view_range)
 
         params.extend([self.allow_self_connections])
 

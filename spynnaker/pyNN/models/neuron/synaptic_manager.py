@@ -319,7 +319,7 @@ class SynapticManager(object):
     def __add_synapse_size(self, memory_size, synapse_info, post_vertex_slice,
                            in_edge, machine_time_step):
         """
-        :param memory_size:
+        :param int memory_size:
         :param SynapseInformation synapse_info:
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
         :param ProjectionApplicationEdge in_edge:
@@ -384,8 +384,13 @@ class SynapticManager(object):
         return size
 
     def _get_synapse_dynamics_parameter_size(
-            self, vertex_slice, application_graph, app_vertex):
+            self, vertex_slice, app_graph, app_vertex):
         """ Get the size of the synapse dynamics region
+
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :param ~.ApplicationGraph app_graph:
+        :param ~.ApplicationVertex app_vertex:
+        :rtype: int
         """
         if self.__synapse_dynamics is None:
             return 0
@@ -396,7 +401,7 @@ class SynapticManager(object):
                       AbstractSynapseDynamicsStructural):
             return self.__synapse_dynamics\
                 .get_structural_parameters_sdram_usage_in_bytes(
-                     application_graph, app_vertex, vertex_slice.n_atoms,
+                     app_graph, app_vertex, vertex_slice.n_atoms,
                      self.__n_synapse_types)
         else:
             return self.__synapse_dynamics.get_parameters_sdram_usage_in_bytes(
@@ -485,6 +490,7 @@ class SynapticManager(object):
         :param float sigma: How many SD above the mean to go for upper bound;\
             a good starting choice is 5.0. Given length of simulation we can\
             set this for approximate number of saturation events.
+        :rtype: float
         """
         # E[ number of spikes ] in a timestep
         steps_per_second = 1000000.0 / machine_timestep
@@ -667,7 +673,6 @@ class SynapticManager(object):
         :param float weight_scale:
         :rtype: ~numpy.ndarray
         """
-
         # Write the ring buffer shifts
         spec.switch_write_focus(POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value)
         spec.write_array(ring_buffer_shifts)
@@ -1535,10 +1540,12 @@ class SynapticManager(object):
             self, spec, post_vertex_slice, weight_scales, generator_data):
         """ Write the data spec for the synapse expander
 
-        :param spec: The specification to write to
+        :param ~.DataSpecificationGenerator spec:
+            The specification to write to
         :param ~pacman.model.common.Slice post_vertex_slice:
             The slice of the vertex being written
         :param weight_scales: scaling of weights on each synapse
+        :type weight_scales: list(int or float)
         :param list(GeneratorData) generator_data:
         """
         if not generator_data:

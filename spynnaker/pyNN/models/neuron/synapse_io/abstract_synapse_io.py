@@ -57,7 +57,8 @@ class AbstractSynapseIO(object):
             n_synapse_types, weight_scales, machine_time_step,
             app_edge, machine_edge):
         """ Get the synapses as an array of words for non-delayed synapses and\
-            an array of words for delayed synapses
+            an array of words for delayed synapses. This is used to prepare\
+            information for *deployment to SpiNNaker*.
 
         :param SynapseInformation synapse_info:
         :param list(~pacman.model.graphs.common.Slice) pre_slices:
@@ -69,8 +70,7 @@ class AbstractSynapseIO(object):
         :param int n_delay_stages:
         :param AbstractMasterPopTableFactory population_table:
         :param int n_synapse_types:
-        :param weight_scales:
-        :type weight_scales: dict(AbstractSynapseType, float)
+        :param dict(AbstractSynapseType,float) weight_scales:
         :param int machine_time_step:
         :param ProjectionApplicationEdge app_edge:
         :param ProjectionMachineEdge machine_edge:
@@ -88,7 +88,8 @@ class AbstractSynapseIO(object):
             weight_scales, data, delayed_data, n_delay_stages,
             machine_time_step):
         """ Read the synapses for a given projection synapse information\
-            object out of the given data
+            object out of the given data. This is used to parse information\
+            *read from SpiNNaker*.
 
         :param SynapseInformation synapse_info:
         :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
@@ -96,8 +97,7 @@ class AbstractSynapseIO(object):
         :param int max_row_length:
         :param int delayed_max_row_length:
         :param int n_synapse_types:
-        :param weight_scales:
-        :type weight_scales: dict(AbstractSynapseType, float)
+        :param dict(AbstractSynapseType,float) weight_scales:
         :param data:
         :type data: bytes or bytearray or memoryview
         :param delayed_data:
