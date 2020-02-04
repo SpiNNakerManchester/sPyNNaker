@@ -20,7 +20,6 @@ from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
-from spynnaker.pyNN.models.neural_projections.synapse_information import SynapseInformation
 
 logger = logging.getLogger(__file__)
 
@@ -37,10 +36,9 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
                  verbose=None):
         """
         :param bool allow_self_connections:
-            if the connector is used to connect a\
-            Population to itself, this flag determines whether a neuron is\
-            allowed to connect to itself, or only to other neurons in the\
-            Population.
+            if the connector is used to connect a Population to itself, this
+            flag determines whether a neuron is allowed to connect to itself,
+            or only to other neurons in the Population.
         :param bool safe:
         :param callable callback: Ignored
         :param bool verbose:
@@ -48,8 +46,8 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
         super(AllToAllConnector, self).__init__(safe, callback, verbose)
         self.__allow_self_connections = allow_self_connections
 
-    def _connection_slices(self, pre_vertex_slice, post_vertex_slice,
-                           synapse_info):
+    def _connection_slices(
+            self, pre_vertex_slice, post_vertex_slice, synapse_info):
         """ Get a slice of the overall set of connections.
 
         :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
@@ -102,9 +100,8 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type, synapse_info):
+            self, pre_slices, pre_slice_index, post_slices, post_slice_index,
+            pre_vertex_slice, post_vertex_slice, synapse_type, synapse_info):
         # pylint: disable=too-many-arguments
         n_connections = pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms
         if (not self.__allow_self_connections and
@@ -160,33 +157,29 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
     def gen_connector_id(self):
         return ConnectorIDs.ALL_TO_ALL_CONNECTOR.value
 
-    @overrides(AbstractGenerateConnectorOnMachine.
-               gen_connector_params)
+    @overrides(AbstractGenerateConnectorOnMachine.gen_connector_params)
     def gen_connector_params(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type, synapse_info):
+            self, pre_slices, pre_slice_index, post_slices, post_slice_index,
+            pre_vertex_slice, post_vertex_slice, synapse_type, synapse_info):
         params = []
 
         view_range = 0, synapse_info.n_pre_neurons - 1
         if synapse_info.prepop_is_view:
-            view_range = self._get_view_lo_hi(
-                synapse_info.pre_population)
+            view_range = self._get_view_lo_hi(synapse_info.pre_population)
         params.extend(view_range)
 
         view_range = 0, synapse_info.n_post_neurons - 1
         if synapse_info.postpop_is_view:
-            view_range = self._get_view_lo_hi(
-                synapse_info.post_population)
+            view_range = self._get_view_lo_hi(synapse_info.post_population)
         params.extend(view_range)
 
-        params.extend([self.allow_self_connections])
+        params.append(self.__allow_self_connections)
 
         return numpy.array(params, dtype="uint32")
 
     @property
-    @overrides(AbstractGenerateConnectorOnMachine.
-               gen_connector_params_size_in_bytes)
+    @overrides(
+        AbstractGenerateConnectorOnMachine.gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
         # view parameters + allow_self_connections
         return (4 + 1) * BYTES_PER_WORD

@@ -84,9 +84,8 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type, synapse_info):
+            self, pre_slices, pre_slice_index, post_slices, post_slice_index,
+            pre_vertex_slice, post_vertex_slice, synapse_type, synapse_info):
         # pylint: disable=too-many-arguments
         pre_lo, post_lo, pre_hi, post_hi = self._get_pre_post_limits(
             pre_vertex_slice, post_vertex_slice, synapse_info)
@@ -167,12 +166,10 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
     def gen_connector_id(self):
         return ConnectorIDs.ONE_TO_ONE_CONNECTOR.value
 
-    @overrides(AbstractGenerateConnectorOnMachine.
-               gen_connector_params)
+    @overrides(AbstractGenerateConnectorOnMachine.gen_connector_params)
     def gen_connector_params(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type, synapse_info):
+            self, pre_slices, pre_slice_index, post_slices, post_slice_index,
+            pre_vertex_slice, post_vertex_slice, synapse_type, synapse_info):
         params = []
 
         view_range = 0, synapse_info.n_pre_neurons - 1
@@ -188,7 +185,7 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
         return numpy.array(params, dtype="uint32")
 
     @property
-    @overrides(AbstractGenerateConnectorOnMachine.
-               gen_connector_params_size_in_bytes)
+    @overrides(
+        AbstractGenerateConnectorOnMachine.gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
         return 16

@@ -39,15 +39,15 @@ class CSAConnector(AbstractConnector):
 
     def __init__(self, cset, safe=True, callback=None, verbose=False):
         """
-        :param cset:
+        :param csa.connset.CSet cset:
             A description of the connection set between populations
-        :type cset: csa.connset.CSet
-        :param safe:
-        :type safe: bool
-        :param callback: Ignored
-        :type callback: callable
-        :param verbose:
-        :type verbose: bool
+        :param bool safe:
+        :param callable callback: Ignored
+        :param bool verbose:
+        :raises ImportError:
+            if the `csa` library isn't present; it's tricky to install in
+            some environments so we don't force it to be present unless you
+            want to actually use this class.
         """
         super(CSAConnector, self).__init__(safe, callback, verbose)
         found, ex = _csa_found
@@ -65,8 +65,14 @@ class CSAConnector(AbstractConnector):
         # we can probably look at the array and do better than this?
         return self._get_delay_maximum(synapse_info.delays, n_conns_max)
 
-    def _get_n_connections(self, pre_vertex_slice, post_vertex_slice,
-                           synapse_info):
+    def _get_n_connections(
+            self, pre_vertex_slice, post_vertex_slice, synapse_info):
+        """
+        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param SynapseInformation synapse_info:
+        :rtype: tuple(int, cset.connset.CSet)
+        """
         # do the work from self._cset in here
         # get the values for this slice
         pre_lo = pre_vertex_slice.lo_atom
@@ -119,9 +125,8 @@ class CSAConnector(AbstractConnector):
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type, synapse_info):
+            self, pre_slices, pre_slice_index, post_slices, post_slice_index,
+            pre_vertex_slice, post_vertex_slice, synapse_type, synapse_info):
         n_connections, pair_list = self._get_n_connections(
             pre_vertex_slice, post_vertex_slice, synapse_info)
 
@@ -149,6 +154,10 @@ class CSAConnector(AbstractConnector):
         return block
 
     def show_connection_set(self, n_pre_neurons, n_post_neurons):
+        """
+        :param int n_pre_neurons:
+        :param int n_post_neurons:
+        """
         # Yuck; this was supposed to be available to the user from scripts...
         csa.show(self.__full_connection_set, n_pre_neurons, n_post_neurons)
 
