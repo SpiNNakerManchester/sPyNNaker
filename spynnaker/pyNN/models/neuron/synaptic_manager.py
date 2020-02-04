@@ -31,7 +31,7 @@ from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from .synapse_dynamics import (
     AbstractSynapseDynamicsStructural,
     AbstractGenerateOnMachine, SynapseDynamicsStructuralSTDP)
-from spynnaker.pyNN.models.neuron.synapse_io_row_based import SynapseIORowBased
+from spynnaker.pyNN.models.neuron.synapse_io import SynapseIORowBased
 from spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex import (
     SpikeSourcePoissonVertex)
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
