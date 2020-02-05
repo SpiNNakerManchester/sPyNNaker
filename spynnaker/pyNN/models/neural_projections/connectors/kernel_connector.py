@@ -38,11 +38,13 @@ def shape2word(sw, sh):
 
 class KernelConnector(AbstractGenerateConnectorOnMachine):
     """
-    Where the pre- and post-synaptic populations are considered as a 2D array.
-    Connect every post(row, col) neuron to many pre(row, col, kernel) through
-    a (kernel) set of weights and/or delays.
+    Where the pre- and post-synaptic populations are considered as a 2D\
+    array. Connect every post(row, col) neuron to many pre(row, col, kernel)\
+    through a (kernel) set of weights and/or delays.
 
-    TODO: should these include allow_self_connections and with_replacement?
+    .. todo::
+
+        Should these include `allow_self_connections` and `with_replacement`?
     """
 
     def __init__(
@@ -152,20 +154,29 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
 
     def __to_post_coords(self, post_vertex_slice):
         """ Get a list of possible post-slice coordinates.
+
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :rtype: tuple(~numpy.ndarray, ~numpy.ndarray)
         """
         post = numpy.arange(
             post_vertex_slice.lo_atom, post_vertex_slice.hi_atom + 1)
-
         return numpy.divmod(post, self._post_w)
 
     def __map_to_pre_coords(self, post_r, post_c):
         """ Get a map from post to pre coords.
+
+        :param ~numpy.ndarray post_r: rows
+        :param ~numpy.ndarray post_c: columns
+        :rtype: tuple(~numpy.ndarray, ~numpy.ndarray)
         """
         return (self._post_start_h + post_r * self._post_step_h,
                 self._post_start_w + post_c * self._post_step_w)
 
     def __post_as_pre(self, post_vertex_slice):
         """ Write post coords as pre coords.
+
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :rtype: tuple(~numpy.ndarray, ~numpy.ndarray)
         """
         # TODO: When slices become hashable, update this code to use them
         # directly as the cache index
@@ -177,6 +188,10 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
 
     def __pre_as_post(self, pre_r, pre_c):
         """ Write pre coords as post coords.
+
+        :param int pre_r: row
+        :param int pre_c: column
+        :rtype: tuple(int,int)
         """
         r = ((pre_r - self._pre_start_h - 1) // self._pre_step_h) + 1
         c = ((pre_c - self._pre_start_w - 1) // self._pre_step_w) + 1
@@ -184,6 +199,11 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
 
     def __get_kernel_vals(self, vals):
         """ Convert kernel values given into the correct format.
+
+        :param vals:
+        :type vals: int or float or ~pyNN.random.NumpyRNG or ~numpy.ndarray\
+            or ConvolutionKernel
+        :rtype: ~numpy.ndarray
         """
         if vals is None:
             return None
@@ -207,6 +227,15 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
     def __compute_statistics(
             self, weights, delays, pre_vertex_slice, post_vertex_slice):
         """ Compute the relevant information required for the connections.
+
+        :param weights:
+        :type weights: int or float or ~pyNN.random.NumpyRNG or \
+            ~numpy.ndarray or ConvolutionKernel
+        :param delays:
+        :type delays: int or float or ~pyNN.random.NumpyRNG or ~numpy.ndarray\
+            or ConvolutionKernel
+        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
         """
         # If __compute_statistics is called more than once, there's
         # no need to get the user-supplied weights and delays again
@@ -316,9 +345,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type, synapse_info):
+            self, pre_slices, pre_slice_index, post_slices, post_slice_index,
+            pre_vertex_slice, post_vertex_slice, synapse_type, synapse_info):
         (n_connections, all_post, all_pre_in_range, all_pre_in_range_delays,
          all_pre_in_range_weights) = self.__compute_statistics(
             synapse_info.weights, synapse_info.delays, pre_vertex_slice,
@@ -341,6 +369,9 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
 
     @property
     def _kernel_properties(self):
+        """
+        :rtype: list(int)
+        """
         return [
             shape2word(self._common_w, self._common_h),
             shape2word(self._pre_w, self._pre_h),
@@ -357,8 +388,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
             return PARAM_TYPE_KERNEL
         return super(KernelConnector, self).gen_delays_id(delays)
 
-    @overrides(AbstractGenerateConnectorOnMachine.
-               gen_delay_params_size_in_bytes)
+    @overrides(
+        AbstractGenerateConnectorOnMachine.gen_delay_params_size_in_bytes)
     def gen_delay_params_size_in_bytes(self, delays):
         if self._krn_delays is not None:
             return (N_KERNEL_PARAMS + 1 + self._krn_delays.size) * \
@@ -383,8 +414,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
             return PARAM_TYPE_KERNEL
         return super(KernelConnector, self).gen_weights_id(weights)
 
-    @overrides(AbstractGenerateConnectorOnMachine.
-               gen_weight_params_size_in_bytes)
+    @overrides(
+        AbstractGenerateConnectorOnMachine.gen_weight_params_size_in_bytes)
     def gen_weight_params_size_in_bytes(self, weights):
         if self._krn_weights is not None:
             return (N_KERNEL_PARAMS + 1 + self._krn_weights.size) * \
@@ -409,16 +440,14 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
     def gen_connector_id(self):
         return ConnectorIDs.KERNEL_CONNECTOR.value
 
-    @overrides(AbstractGenerateConnectorOnMachine.
-               gen_connector_params)
+    @overrides(AbstractGenerateConnectorOnMachine.gen_connector_params)
     def gen_connector_params(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type, synapse_info):
+            self, pre_slices, pre_slice_index, post_slices, post_slice_index,
+            pre_vertex_slice, post_vertex_slice, synapse_type, synapse_info):
         return numpy.array(self._kernel_properties, dtype="uint32")
 
     @property
-    @overrides(AbstractGenerateConnectorOnMachine.
-               gen_connector_params_size_in_bytes)
+    @overrides(
+        AbstractGenerateConnectorOnMachine.gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
         return N_KERNEL_PARAMS * BYTES_PER_WORD

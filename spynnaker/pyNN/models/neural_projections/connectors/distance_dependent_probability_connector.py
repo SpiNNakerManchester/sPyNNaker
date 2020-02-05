@@ -86,6 +86,9 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
         self._set_probabilities(synapse_info)
 
     def _set_probabilities(self, synapse_info):
+        """
+        :param SynapseInformation synapse_info:
+        """
         # Set the probabilities up-front for now
         # TODO: Work out how this can be done statistically
         expand_distances = self._expand_distances(self.__d_expression)
@@ -155,10 +158,8 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type, synapse_info):
-
+            self, pre_slices, pre_slice_index, post_slices, post_slice_index,
+            pre_vertex_slice, post_vertex_slice, synapse_type, synapse_info):
         probs = self.__probs[
             pre_vertex_slice.as_slice, post_vertex_slice.as_slice].reshape(-1)
         n_items = pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms
@@ -194,6 +195,9 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
 
     @property
     def allow_self_connections(self):
+        """
+        :rtype: bool
+        """
         return self.__allow_self_connections
 
     @allow_self_connections.setter
@@ -202,6 +206,10 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
 
     @property
     def d_expression(self):
+        """ The distance expression.
+
+        :rtype: str
+        """
         return self.__d_expression
 
     @d_expression.setter

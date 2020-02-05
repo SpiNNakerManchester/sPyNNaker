@@ -41,6 +41,19 @@ class DelayGeneratorData(object):
             pre_slices, pre_slice_index, post_slices, post_slice_index,
             pre_vertex_slice, post_vertex_slice, synapse_information,
             max_stage, machine_time_step):
+        """
+        :param int max_row_n_synapses:
+        :param int max_delayed_row_n_synapses:
+        :param list(~pacman.model.graphs.common.Slice) pre_slices:
+        :param int pre_slice_index:
+        :param list(~pacman.model.graphs.common.Slice) post_slices:
+        :param int post_slice_index:
+        :param ~pacman.model.graphs.common.Slicepre_vertex_slice:
+        :param ~pacman.model.graphs.common.Slicepost_vertex_slice:
+        :param SynapseInformation synapse_information:
+        :param int max_stage:
+        :param int machine_time_step:
+        """
         self.__max_row_n_synapses = max_row_n_synapses
         self.__max_delayed_row_n_synapses = max_delayed_row_n_synapses
         self.__pre_slices = pre_slices

@@ -231,6 +231,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float
             or list(int) or list(float)
         :param: ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param SynapseInformation synapse_info:
         :param min_delay:
         :type min_delay: int or None
         :param max_delay:
@@ -244,6 +245,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         """ Get the maximum number of connections between those to any neuron
             in the post vertex from neurons in the pre vertex.
 
+        :param SynapseInformation synapse_info:
         :rtype: int
         """
 
@@ -478,6 +480,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
         :param AbstractSynapseType synapse_type:
+        :param SynapseInformation synapse_info:
         :returns:
             The synaptic matrix data to go to the machine, as a Numpy array
         :rtype: ~numpy.ndarray

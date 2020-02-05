@@ -95,6 +95,11 @@ class FromListConnector(AbstractConnector):
             return numpy.var(self.__delays)
 
     def _split_connections(self, pre_slices, post_slices):
+        """
+        :param list(~pacman.model.graphs.commmon.Slice) pre_slices:
+        :param list(~pacman.model.graphs.commmon.Slice) post_slices:
+        :rtype: bool
+        """
         # If there are no connections, return
         if not len(self.__sources):
             return False
@@ -217,9 +222,8 @@ class FromListConnector(AbstractConnector):
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type, synapse_info):
+            self, pre_slices, pre_slice_index, post_slices, post_slice_index,
+            pre_vertex_slice, post_vertex_slice, synapse_type, synapse_info):
         # pylint: disable=too-many-arguments
         if not len(self.__sources):
             return numpy.zeros(0, dtype=self.NUMPY_SYNAPSES_DTYPE)
@@ -265,6 +269,13 @@ class FromListConnector(AbstractConnector):
         return self.__conn_list
 
     def get_n_connections(self, pre_slices, post_slices, pre_hi, post_hi):
+        """
+        :param list(~pacman.model.graphs.commmon.Slice) pre_slices:
+        :param list(~pacman.model.graphs.commmon.Slice) post_slices:
+        :param int pre_hi:
+        :param int post_hi:
+        :rtype: int
+        """
         self._split_connections(pre_slices, post_slices)
         return len(self.__split_conn_list[pre_hi, post_hi])
 
@@ -359,8 +370,8 @@ class FromListConnector(AbstractConnector):
 
     @property
     def column_names(self):
-        """ The names of the columns in the array after the first two.
-        Of particular interest is whether ``weight`` and ``delay`` columns
+        """ The names of the columns in the array after the first two. \
+        Of particular interest is whether ``weight`` and ``delay`` columns\
         are present.
 
         :rtype: list(str)
@@ -372,11 +383,11 @@ class FromListConnector(AbstractConnector):
         self.__column_names = column_names
 
     def get_extra_parameters(self):
-        """ Getter for the extra parameters. Excludes ``weight`` and
+        """ Getter for the extra parameters. Excludes ``weight`` and\
         ``delay`` columns.
 
         :return: The extra parameters
-        :rtype: numpy.ndarray
+        :rtype: ~numpy.ndarray
         """
         return self.__extra_parameters
 
