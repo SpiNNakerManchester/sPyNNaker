@@ -62,7 +62,6 @@ from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 from unittests.mocks import MockSimulator
 from pacman.model.placements.placements import Placements
-from spinn_front_end_common.interface.buffer_management import BufferManager
 from pacman.model.graphs.application.application_graph import ApplicationGraph
 from data_specification.constants import MAX_MEM_REGIONS
 

@@ -305,13 +305,11 @@ class PyNNProjectionCommon(object):
 
         # Otherwise, get the connections now, as we have ran and therefore can
         # get them
-        self.__get_projection_data(
-            data_to_get, pre_vertex, post_vertex, connection_holder)
+        self.__get_projection_data(post_vertex, connection_holder)
         return connection_holder
 
-    def __get_projection_data(
-            self, data_to_get, pre_vertex, post_vertex, connection_holder):
-        # pylint: disable=too-many-arguments, too-many-locals
+    def __get_projection_data(self, post_vertex, connection_holder):
+        # pylint: disable=too-many-locals
         ctl = self.__spinnaker_control
 
         connections = post_vertex.get_connections_from_machine(
