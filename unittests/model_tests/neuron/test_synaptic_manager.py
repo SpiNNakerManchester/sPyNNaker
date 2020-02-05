@@ -276,18 +276,9 @@ class TestSynapticManager(unittest.TestCase):
         transceiver = MockTransceiverRawData(all_data)
         report_folder = mkdtemp()
         try:
-            buffer_manager = BufferManager(
-                placements=placements, tags=None, transceiver=transceiver,
-                extra_monitor_cores=None,
-                packet_gather_cores_to_ethernet_connection_map=None,
-                extra_monitor_to_chip_mapping=None, machine=None,
-                fixed_routes=None, uses_advanced_monitors=False,
-                report_folder=report_folder, java_caller=None)
-
             connections_1 = synaptic_manager.get_connections_from_machine(
                 post_app_vertex, transceiver, placements, app_edge,
-                graph_mapper, direct_synapse_information_1, machine_time_step,
-                buffer_manager)
+                graph_mapper, direct_synapse_information_1, machine_time_step)
 
             # Check that all the connections have the right weight and delay
             assert len(connections_1) == post_vertex_slice.n_atoms
@@ -296,8 +287,7 @@ class TestSynapticManager(unittest.TestCase):
 
             connections_2 = synaptic_manager.get_connections_from_machine(
                 post_app_vertex, transceiver, placements, app_edge,
-                graph_mapper, direct_synapse_information_2, machine_time_step,
-                buffer_manager)
+                graph_mapper, direct_synapse_information_2, machine_time_step)
 
             # Check that all the connections have the right weight and delay
             assert len(connections_2) == post_vertex_slice.n_atoms
@@ -307,7 +297,7 @@ class TestSynapticManager(unittest.TestCase):
             connections_3 = synaptic_manager.get_connections_from_machine(
                 post_app_vertex, transceiver, placements, app_edge,
                 graph_mapper, all_to_all_synapse_information,
-                machine_time_step, buffer_manager)
+                machine_time_step)
 
             # Check that all the connections have the right weight and delay
             assert len(connections_3) == \
@@ -317,8 +307,7 @@ class TestSynapticManager(unittest.TestCase):
 
             connections_4 = synaptic_manager.get_connections_from_machine(
                 post_app_vertex, transceiver, placements, app_edge,
-                graph_mapper, from_list_synapse_information, machine_time_step,
-                buffer_manager)
+                graph_mapper, from_list_synapse_information, machine_time_step)
 
             # Check that all the connections have the right weight and delay
             assert len(connections_4) == len(from_list_list)
