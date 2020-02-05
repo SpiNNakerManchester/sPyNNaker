@@ -22,7 +22,7 @@ from .abstract_timing_dependence import AbstractTimingDependence
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
     SynapseStructureWeightAccumulator)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
-    plasticity_helpers)
+    STDP_FIXED_POINT_ONE)
 
 
 class TimingDependenceRecurrent(AbstractTimingDependence):
@@ -96,8 +96,8 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
     def get_parameters_sdram_usage_in_bytes(self):
         # 2 * 32-bit parameters
         # 2 * LUTS with STDP_FIXED_POINT_ONE * 16-bit entries
-        return (BYTES_PER_WORD * 2) + (
-            BYTES_PER_SHORT * (2 * plasticity_helpers.STDP_FIXED_POINT_ONE))
+        return (2 * BYTES_PER_WORD) + (
+            2 * STDP_FIXED_POINT_ONE * BYTES_PER_SHORT)
 
     @property
     def n_weight_terms(self):
@@ -127,10 +127,10 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
         self._write_exp_dist_lut(spec, mean_post_timesteps)
 
     def _write_exp_dist_lut(self, spec, mean):
-        for x in range(plasticity_helpers.STDP_FIXED_POINT_ONE):
+        for x in range(STDP_FIXED_POINT_ONE):
 
             # Calculate inverse CDF
-            x_float = float(x) / float(plasticity_helpers.STDP_FIXED_POINT_ONE)
+            x_float = float(x) / float(STDP_FIXED_POINT_ONE)
             p_float = math.log(1.0 - x_float) * -mean
 
             p = round(p_float)
