@@ -17,7 +17,6 @@ import logging
 import math
 import struct
 import numpy
-from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.models.neural_projections import (
     ProjectionApplicationEdge, ProjectionMachineEdge)
 from spynnaker.pyNN.exceptions import (
@@ -160,13 +159,12 @@ class MasterPopTableAsBinarySearch(object):
                 # TODO: Fix this to be more accurate!
                 # May require modification to the master population table
                 # Get the number of atoms per core incoming
-                max_atoms = in_edge.pre_vertex.get_max_atoms_per_core()
-                if in_edge.pre_vertex.n_atoms < max_atoms:
-                    max_atoms = in_edge.pre_vertex.n_atoms
+                vertex = in_edge.pre_vertex
+                max_atoms = float(min(vertex.get_max_atoms_per_core(),
+                                      vertex.n_atoms))
 
                 # Get the number of likely vertices
-                n_edge_vertices = int(math.ceil(
-                    float(in_edge.pre_vertex.n_atoms) / float(max_atoms)))
+                n_edge_vertices = int(math.ceil(vertex.n_atoms / max_atoms))
                 n_vertices += n_edge_vertices
                 n_entries += (
                     n_edge_vertices * len(in_edge.synapse_information))
@@ -202,9 +200,9 @@ class MasterPopTableAsBinarySearch(object):
         :param row_length: the row length being considered
         :return: the row length available
         """
-        if row_length > 255:
+        if (row_length - 1) & _ROW_LENGTH_MASK != (row_length - 1):
             raise SynapseRowTooBigException(
-                255, "Only rows of up to 255 entries are allowed")
+                256, "Only rows of up to 256 entries are allowed")
         return row_length
 
     def get_next_allowed_address(self, next_address):
@@ -229,11 +227,10 @@ class MasterPopTableAsBinarySearch(object):
         self.__n_single_entries = 0
 
     def update_master_population_table(
-            self, block_start_addr, row_length, key_and_mask,
-            core_mask, core_shift, n_neurons, is_single=False):
+            self, block_start_addr, row_length, key_and_mask, core_mask,
+            core_shift, n_neurons, is_single=False):
         """ Add an entry in the binary search to deal with the synaptic matrix
 
-        :param spec: the writer for DSG
         :param block_start_addr: where the synaptic matrix block starts
         :param row_length: how long in bytes each synaptic entry is
         :param key_and_mask: the key and mask for this master pop entry
@@ -376,7 +373,7 @@ class MasterPopTableAsBinarySearch(object):
             full_data, 'uint8', n_address_bytes, n_entry_bytes).view(
                 dtype=_ADDRESS_LIST_DTYPE)
 
-        entry = self._locate_entry(entry_list, incoming_key)
+        entry = self.__locate_entry(entry_list, incoming_key)
         if entry is None:
             return []
         addresses = list()
@@ -397,7 +394,7 @@ class MasterPopTableAsBinarySearch(object):
         return addresses
 
     @staticmethod
-    def _locate_entry(entries, key):
+    def __locate_entry(entries, key):
         """ Search the binary tree structure for the correct entry.
 
         :param key: the key to search the master pop table for a given entry
