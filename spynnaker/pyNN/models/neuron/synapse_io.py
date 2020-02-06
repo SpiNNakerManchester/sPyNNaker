@@ -25,6 +25,8 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamics)
 
 _N_HEADER_WORDS = 3
+# There are 16 slots, one per time step
+_STD_DELAY_SLOTS = 16
 
 
 class MaxRowInfo(object):
@@ -111,9 +113,6 @@ class SynapseIORowBased(object):
     """
     __slots__ = []
 
-    # There are 16 slots, one per time step
-    _STD_DELAY_SLOTS = 16
-
     def get_maximum_delay_supported_in_ms(self, machine_time_step):
         """ Get the maximum delay supported by the synapse representation \
             before extensions are required, or None if any delay is supported
@@ -122,7 +121,7 @@ class SynapseIORowBased(object):
         :rtype: int or None
         """
         # There are 16 slots, one per time step
-        return self._STD_DELAY_SLOTS * (machine_time_step / 1000.0)
+        return _STD_DELAY_SLOTS * (machine_time_step / 1000.0)
 
     @staticmethod
     def _n_words(n_bytes):
