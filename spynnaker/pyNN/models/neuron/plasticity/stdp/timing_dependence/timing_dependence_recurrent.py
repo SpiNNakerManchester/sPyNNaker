@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import math
+import numpy
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.constants import (
@@ -126,15 +126,16 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
         self._write_exp_dist_lut(spec, mean_pre_timesteps)
         self._write_exp_dist_lut(spec, mean_post_timesteps)
 
-    def _write_exp_dist_lut(self, spec, mean):
-        for x in range(STDP_FIXED_POINT_ONE):
-
-            # Calculate inverse CDF
-            x_float = float(x) / float(STDP_FIXED_POINT_ONE)
-            p_float = math.log(1.0 - x_float) * -mean
-
-            p = round(p_float)
-            spec.write_value(data=p, data_type=DataType.UINT16)
+    @staticmethod
+    def _write_exp_dist_lut(spec, mean):
+        """
+        :param .DataSpecificationGenerator spec:
+        :param float mean:
+        """
+        indices = numpy.arange(STDP_FIXED_POINT_ONE)
+        inv_cdf = numpy.log(1.0 - indices/float(STDP_FIXED_POINT_ONE)) * -mean
+        spec.write_array(
+            inv_cdf.astype(numpy.uint16), data_type=DataType.UINT16)
 
     @property
     def synaptic_structure(self):

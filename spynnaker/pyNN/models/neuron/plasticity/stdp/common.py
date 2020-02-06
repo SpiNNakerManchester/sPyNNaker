@@ -27,54 +27,29 @@ def float_to_fixed(value):
     :param float value:
     :rtype: int
     """
-    return int(round(float(value) * float(STDP_FIXED_POINT_ONE)))
+    return int(round(float(value) * STDP_FIXED_POINT_ONE))
 
 
-def get_exp_lut_values(time_step, time_constant, shift=0, size=None):
+def get_exp_lut_array(time_step, time_constant, shift=0):
     """
     :param int time_step:
     :param float time_constant:
     :param int shift:
-    :param int size:
-    :rtype: list(int)
-    """
-    # Calculate time constant reciprocal
-    time_constant_reciprocal = time_step / float(time_constant)
-
-    # Generate LUT
-    last_value = 1.0
-    index = 0
-    values = list()
-    while last_value > 0.0 and (size is None or len(values) < size):
-
-        # Apply shift to get time from index
-        time = (index << shift)
-        index += 1
-
-        # Multiply by time constant and calculate negative exponential
-        value = float(time) * time_constant_reciprocal
-        exp_float = math.exp(-value)
-
-        # Convert to fixed-point and write to spec
-        last_value = float_to_fixed(exp_float)
-        if last_value > 0.0:
-            values.append(last_value)
-    if size is not None and size > len(values):
-        values.extend([0] * (size - len(values)))
-    return values
-
-
-def get_exp_lut_array(time_step, time_constant, shift=0, size=None):
-    """
-    :param int time_step:
-    :param float time_constant:
-    :param int shift:
-    :param int size:
     :rtype: ~numpy.ndarray
     """
-    values = get_exp_lut_values(time_step, time_constant, shift, size)
-    values_size = len(values)
-    if len(values) % 2 != 0:
-        values.append(0)
-    return numpy.concatenate(
-        ([values_size, shift], values)).astype("uint16").view("uint32")
+    # Compute the actual exponential decay parameter
+    # NB: lambda is a reserved word in Python
+    l_ambda = time_step / float(time_constant)
+
+    # Compute the size of the array, which must be a multiple of 2
+    size = math.log(STDP_FIXED_POINT_ONE) / l_ambda
+    size, extra = divmod(size / (1 << shift), 2)
+    size = ((int(size) + (extra > 0)) * 2)
+
+    # Fill out the values in the array
+    a = numpy.exp((numpy.arange(size) << shift) * -l_ambda)
+    a = numpy.floor(a * STDP_FIXED_POINT_ONE)
+
+    # Concatenate with the header
+    header = numpy.array([len(a), shift], dtype="uint16")
+    return numpy.concatenate((header, a.astype("uint16"))).view("uint32")
