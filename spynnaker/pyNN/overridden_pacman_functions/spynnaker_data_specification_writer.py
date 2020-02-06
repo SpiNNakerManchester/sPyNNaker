@@ -15,7 +15,8 @@
 
 from spinn_front_end_common.interface.interface_functions import (
     GraphDataSpecificationWriter)
-from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
+from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex, \
+    DelayExtensionMachineVertex
 
 
 class SpynnakerDataSpecificationWriter(
@@ -28,16 +29,16 @@ class SpynnakerDataSpecificationWriter(
     def __call__(
             self, placements, hostname,
             report_default_directory, write_text_specs, machine,
-            data_n_timesteps, graph_mapper=None):
+            data_n_timesteps, graph_mapper, machine_graph):
         # pylint: disable=too-many-arguments, signature-differs
 
         delay_extensions = list()
         placement_order = list()
-        for placement in placements.placements:
-            associated_vertex = graph_mapper.get_application_vertex(
-                placement.vertex)
 
-            if isinstance(associated_vertex, DelayExtensionVertex):
+        for machine_vertex in machine_graph.vertices:
+            placement = placements.get_placement_of_vertex(machine_vertex)
+
+            if isinstance(machine_vertex, DelayExtensionMachineVertex):
                 delay_extensions.append(placement)
             else:
                 placement_order.append(placement)
