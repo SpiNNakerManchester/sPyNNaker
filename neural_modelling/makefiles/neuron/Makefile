@@ -45,7 +45,8 @@ MODELS = IF_curr_exp \
          IF_curr_exp_stdp_mad_pair_additive_structural_random_distance_weight \
          IF_curr_exp_sEMD \
          IZK_curr_exp_stdp_mad_pair_additive \
-         IZK_cond_exp_stdp_mad_pair_additive
+         IZK_cond_exp_stdp_mad_pair_additive \
+         IF_cond_alpha
 
 all:
 	for d in $(MODELS); do $(MAKE) -C $$d || exit $$?; done
