@@ -43,8 +43,7 @@ class AbstractSynapseDynamicsStructural(object):
         :param AbstractPopulationVertex app_vertex:
         :param ~pacman.mode.graphs.common.Slice post_slice:
         :param ~pacman.model.routing_info.RoutingInfo routing_info:
-        :param synapse_indices:
-        :type synapse_indices: dict(tuple(SynapseInformation, int, int), int)
+        :param dict(tuple(SynapseInformation,int),int) synapse_indices:
         """
 
     @abstractmethod

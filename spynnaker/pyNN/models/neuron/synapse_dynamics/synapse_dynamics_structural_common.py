@@ -14,16 +14,16 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import collections
+import math
 import numpy
 from data_specification.enums.data_type import DataType
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
-from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BYTES_PER_SHORT)
-import math
 
 
 class SynapseDynamicsStructuralCommon(object):
@@ -191,12 +191,11 @@ class SynapseDynamicsStructuralCommon(object):
             the slice of the app vertex corresponding to this machine vertex
         :param ~pacman.model.routing_info.RoutingInfo routing_info:
             All of the routing information on the network
-        :param synapse_indices:
-        :type synapse_indices: dict(tuple(SynapseInformation, int, int), int)
+        :param dict(tuple(SynapseInformation,int),int) synapse_indices:
         """
         spec.comment("Writing structural plasticity parameters")
-        if spec.current_region != constants.POPULATION_BASED_REGIONS. \
-                SYNAPSE_DYNAMICS.value:
+        if spec.current_region != \
+                POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value:
             spec.switch_write_focus(region)
 
         # Get relevant edges
@@ -210,8 +209,8 @@ class SynapseDynamicsStructuralCommon(object):
 
         # Write the pre-population info
         pop_index = self.__write_prepopulation_info(
-            spec, app_vertex, structural_edges, routing_info,
-            weight_scales, post_slice, synapse_indices, machine_time_step)
+            spec, app_vertex, structural_edges, routing_info, weight_scales,
+            post_slice, synapse_indices, machine_time_step)
 
         # Write the post-to-pre table
         self.__write_post_to_pre_table(spec, pop_index, app_vertex, post_slice)
@@ -312,7 +311,7 @@ class SynapseDynamicsStructuralCommon(object):
         :param RoutingInfo routing_info:
         :param dict(AbstractSynapseType,float) weight_scales:
         :param ~pacman.model.graphs.common.Slice post_slice:
-        :param dict(tuple(SynapseInformation,int,int),int) synapse_indices:
+        :param dict(tuple(SynapseInformation,int),int) synapse_indices:
         :param int machine_time_step:
         :rtype: dict(tuple(AbstractPopulationVertex,SynapseInformation),int)
         """
@@ -354,12 +353,12 @@ class SynapseDynamicsStructuralCommon(object):
             for machine_edge in machine_edges:
                 r_info = routing_info.get_routing_info_for_edge(machine_edge)
                 vertex_slice = machine_edge.pre_vertex.vertex_slice
-                skey = (synapse_info, vertex_slice.lo_atom, post_slice.lo_atom)
                 spec.write_value(r_info.first_key)
                 spec.write_value(r_info.first_mask)
                 spec.write_value(vertex_slice.n_atoms)
                 spec.write_value(vertex_slice.lo_atom)
-                spec.write_value(synapse_indices[skey])
+                spec.write_value(
+                    synapse_indices[synapse_info, vertex_slice.lo_atom])
         return pop_index
 
     def __write_post_to_pre_table(
