@@ -12,6 +12,13 @@ not intended to be used directly; the `sPyNNaker7` and `sPyNNaker8` packages
 contain the user-facing APIs, and you should use the one that corresponds to
 the version of PyNN you wish to work with.
 
+Citation
+--------
+
+When publishing papers that run PyNN simulations on SpiNNaker using sPyNNaker, please cite: Rhodes, O., Bogdan, P. A., Brenninkmeijer, C., Davidson, S., Fellows, D., Gait, A., Lester, D. R., Mikaitis, M., Rowley, A. G. D., Plana, L. A., Stokes, A. B., Furber, S. B. (2019). sPyNNaker : A Software Package for Running PyNN Simulations on SpiNNaker. Frontiers in Neuroscience, 12(November). https://doi.org/10.3389/fnins.2018.00816
+
+When publishing papers that run generic applications on SpiNNaker, please cite: Rowley, A. G. D., Brenninkmeijer, C., Davidson, S., Fellows, D., Gait, A., Lester, D. R., Plana, L. A., Rhodes, O., Stokes, A. B., Furber, S. B. (2019). SpiNNTools: The Execution Engine for the SpiNNaker Platform. Frontiers in Neuroscience, 13(March), 1–21. https://doi.org/10.3389/fnins.2019.00231
+
 Developer Installation
 ----------------------
 If you want to be able to edit the source code, but still have it referenced
