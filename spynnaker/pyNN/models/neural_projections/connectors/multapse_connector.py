@@ -26,11 +26,14 @@ from spynnaker.pyNN.exceptions import SpynnakerException
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
+from .abstract_connector_supports_views_on_machine import (
+    AbstractConnectorSupportsViewsOnMachine)
 
 logger = logging.getLogger(__name__)
 
 
-class MultapseConnector(AbstractGenerateConnectorOnMachine):
+class MultapseConnector(AbstractGenerateConnectorOnMachine,
+                        AbstractConnectorSupportsViewsOnMachine):
     """ Create a multapse connector. The size of the source and destination\
         populations are obtained when the projection is connected. The number\
         of synapses is specified. when instantiated, the required number of\
@@ -204,7 +207,8 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
     def __repr__(self):
         return "MultapseConnector({})".format(self.__num_synapses)
 
-    def _get_view_lo_hi(self, indexes):
+    @overrides(AbstractConnectorSupportsViewsOnMachine.get_view_lo_hi)
+    def get_view_lo_hi(self, indexes):
         view_lo = indexes[0]
         view_hi = indexes[-1]
         return view_lo, view_hi
@@ -226,7 +230,7 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
         pre_view_hi = synapse_info.n_pre_neurons - 1
         pre_size = pre_vertex_slice.n_atoms
         if synapse_info.prepop_is_view:
-            pre_view_lo, pre_view_hi = self._get_view_lo_hi(
+            pre_view_lo, pre_view_hi = self.get_view_lo_hi(
                 synapse_info.pre_population._indexes)
             # work out the number of atoms required on this slice
             pre_lo_atom = pre_vertex_slice.lo_atom
@@ -252,7 +256,7 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
         post_view_hi = synapse_info.n_post_neurons - 1
         post_size = post_vertex_slice.n_atoms
         if synapse_info.postpop_is_view:
-            post_view_lo, post_view_hi = self._get_view_lo_hi(
+            post_view_lo, post_view_hi = self.get_view_lo_hi(
                 synapse_info.post_population._indexes)
             # work out the number of atoms required on this slice
             post_lo_atom = post_vertex_slice.lo_atom

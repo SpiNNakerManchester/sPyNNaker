@@ -22,13 +22,16 @@ from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
+from .abstract_connector_supports_views_on_machine import (
+    AbstractConnectorSupportsViewsOnMachine)
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.exceptions import SpynnakerException
 
 logger = logging.getLogger(__file__)
 
 
-class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine):
+class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
+                               AbstractConnectorSupportsViewsOnMachine):
     """ Connects a fixed number of post-synaptic neurons selected at random,\
         to all pre-synaptic neurons.
     """
@@ -247,7 +250,8 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine):
     def allow_self_connections(self, new_value):
         self.__allow_self_connections = new_value
 
-    def _get_view_lo_hi(self, indexes):
+    @overrides(AbstractConnectorSupportsViewsOnMachine.get_view_lo_hi)
+    def get_view_lo_hi(self, indexes):
         view_lo = indexes[0]
         view_hi = indexes[-1]
         return view_lo, view_hi
@@ -267,7 +271,7 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine):
         pre_view_lo = 0
         pre_view_hi = synapse_info.n_pre_neurons - 1
         if synapse_info.prepop_is_view:
-            pre_view_lo, pre_view_hi = self._get_view_lo_hi(
+            pre_view_lo, pre_view_hi = self.get_view_lo_hi(
                 synapse_info.pre_population._indexes)
 
         params.extend([pre_view_lo, pre_view_hi])
@@ -275,7 +279,7 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine):
         post_view_lo = 0
         post_view_hi = synapse_info.n_post_neurons - 1
         if synapse_info.postpop_is_view:
-            post_view_lo, post_view_hi = self._get_view_lo_hi(
+            post_view_lo, post_view_hi = self.get_view_lo_hi(
                 synapse_info.post_population._indexes)
 
         params.extend([post_view_lo, post_view_hi])

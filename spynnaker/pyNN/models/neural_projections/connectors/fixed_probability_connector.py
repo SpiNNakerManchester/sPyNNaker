@@ -22,10 +22,13 @@ from spynnaker.pyNN.utilities import utility_calls
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
+from .abstract_connector_supports_views_on_machine import (
+    AbstractConnectorSupportsViewsOnMachine)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
 
-class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
+class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
+                                AbstractConnectorSupportsViewsOnMachine):
     """ For each pair of pre-post cells, the connection probability is constant.
     """
 
@@ -137,7 +140,8 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
     def __repr__(self):
         return "FixedProbabilityConnector({})".format(self._p_connect)
 
-    def _get_view_lo_hi(self, indexes):
+    @overrides(AbstractConnectorSupportsViewsOnMachine.get_view_lo_hi)
+    def get_view_lo_hi(self, indexes):
         view_lo = indexes[0]
         view_hi = indexes[-1]
         return view_lo, view_hi
@@ -157,7 +161,7 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
         pre_view_lo = 0
         pre_view_hi = synapse_info.n_pre_neurons - 1
         if synapse_info.prepop_is_view:
-            pre_view_lo, pre_view_hi = self._get_view_lo_hi(
+            pre_view_lo, pre_view_hi = self.get_view_lo_hi(
                 synapse_info.pre_population._indexes)
 
         params.extend([pre_view_lo, pre_view_hi])
@@ -165,7 +169,7 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
         post_view_lo = 0
         post_view_hi = synapse_info.n_post_neurons - 1
         if synapse_info.postpop_is_view:
-            post_view_lo, post_view_hi = self._get_view_lo_hi(
+            post_view_lo, post_view_hi = self.get_view_lo_hi(
                 synapse_info.post_population._indexes)
 
         params.extend([post_view_lo, post_view_hi])
