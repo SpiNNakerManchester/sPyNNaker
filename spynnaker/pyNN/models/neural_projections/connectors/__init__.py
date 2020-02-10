@@ -34,7 +34,8 @@ from .small_world_connector import SmallWorldConnector
 from .kernel_connector import KernelConnector
 
 __all__ = ["AbstractConnector", "AbstractGenerateConnectorOnMachine",
-           "AllToAllConnector", "ArrayConnector", "CSAConnector",
+           "AbstractConnectorSupportsViewsOnMachine", "AllToAllConnector",
+           "ArrayConnector", "CSAConnector",
            "DistanceDependentProbabilityConnector", "FixedNumberPostConnector",
            "FixedNumberPreConnector", "FixedProbabilityConnector",
            "FromListConnector", "IndexBasedProbabilityConnector",
