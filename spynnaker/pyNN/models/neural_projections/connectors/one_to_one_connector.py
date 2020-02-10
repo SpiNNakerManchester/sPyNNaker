@@ -16,11 +16,14 @@
 import logging
 import numpy
 from spinn_utilities.overrides import overrides
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
 from .abstract_connector_supports_views_on_machine import (
     AbstractConnectorSupportsViewsOnMachine)
+
+N_VIEWS_PARAMS = 4
 
 logger = logging.getLogger(__name__)
 
@@ -38,6 +41,7 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
         """
         """
         self.__random_number_class = random_number_class
+        self._VIEWS_PARAMS_SIZE = 4
         super(OneToOneConnector, self).__init__(safe, callback, verbose)
 
     @overrides(AbstractConnector.get_delay_maximum)
@@ -197,4 +201,4 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
     @overrides(AbstractGenerateConnectorOnMachine.
                gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
-        return 16
+        return N_VIEWS_PARAMS * BYTES_PER_WORD
