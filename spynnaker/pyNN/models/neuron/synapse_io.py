@@ -85,12 +85,12 @@ class SynapseIORowBased(object):
     """
     __slots__ = []
 
-    def get_maximum_delay_supported_in_ms(self, machine_time_step):
+    def get_maximum_delay_supported_in_ms(self, timestep_in_us):
         """ Get the maximum delay supported by the synapse representation \
             before extensions are required, or None if any delay is supported
         """
         # There are 16 slots, one per time step
-        return 16 * (machine_time_step / 1000.0)
+        return 16 * (timestep_in_us / 1000.0)
 
     @staticmethod
     def _n_words(n_bytes):
@@ -115,13 +115,13 @@ class SynapseIORowBased(object):
 
     def get_max_row_info(
             self, synapse_info, post_vertex_slice, n_delay_stages,
-            population_table, machine_time_step, in_edge):
+            population_table, timestep_in_us, in_edge):
         """ Get the information about the maximum lengths of delayed and\
             undelayed rows in bytes (including header), words (without header)\
             and number of synapses
         """
         max_delay_supported = self.get_maximum_delay_supported_in_ms(
-            machine_time_step)
+            timestep_in_us)
         max_delay = max_delay_supported * (n_delay_stages + 1)
 
         # delay point where delay extensions start
@@ -131,7 +131,8 @@ class SynapseIORowBased(object):
         # row length for the non-delayed synaptic matrix
         max_undelayed_n_synapses = synapse_info.connector \
             .get_n_connections_from_pre_vertex_maximum(
-                post_vertex_slice, synapse_info, 0, max_delay_supported)
+                post_vertex_slice, synapse_info, timestep_in_us, 0,
+            max_delay_supported)
 
         # determine the max row length in the delay extension
         max_delayed_n_synapses = 0
@@ -233,7 +234,7 @@ class SynapseIORowBased(object):
             self, synapse_info, pre_slices, pre_slice_index,
             post_slices, post_slice_index, pre_vertex_slice,
             post_vertex_slice, n_delay_stages, population_table,
-            n_synapse_types, weight_scales, machine_time_step,
+            n_synapse_types, weight_scales, timestep_in_us,
             app_edge, machine_edge):
         """ Get the synapses as an array of words for non-delayed synapses and\
             an array of words for delayed synapses
@@ -241,19 +242,19 @@ class SynapseIORowBased(object):
         # pylint: disable=too-many-arguments, too-many-locals, arguments-differ
         # pylint: disable=assignment-from-no-return
         # Get delays in timesteps
-        max_delay = self.get_maximum_delay_supported_in_ms(machine_time_step)
+        max_delay = self.get_maximum_delay_supported_in_ms(timestep_in_us)
         if max_delay is not None:
-            max_delay *= (1000.0 / machine_time_step)
+            max_delay *= (1000.0 / timestep_in_us)
 
         # Get the actual connections
         connections = synapse_info.connector.create_synaptic_block(
             pre_slices, pre_slice_index, post_slices, post_slice_index,
             pre_vertex_slice, post_vertex_slice, synapse_info.synapse_type,
-            synapse_info)
+            synapse_info, timestep_in_us)
 
         # Convert delays to timesteps
         connections["delay"] = numpy.rint(
-            connections["delay"] * (1000.0 / machine_time_step))
+            connections["delay"] * (1000.0 / timestep_in_us))
 
         # Scale weights
         connections["weight"] = (connections["weight"] * weight_scales[
@@ -331,7 +332,7 @@ class SynapseIORowBased(object):
     def read_synapses(
             self, synapse_info, pre_vertex_slice, post_vertex_slice,
             max_row_length, delayed_max_row_length, n_synapse_types,
-            weight_scales, data, delayed_data, machine_time_step):
+            weight_scales, data, delayed_data, timestep_in_us):
         """ Read the synapses for a given projection synapse information\
             object out of the given data
         """
@@ -368,7 +369,15 @@ class SynapseIORowBased(object):
         connections = numpy.concatenate(connections)
 
         # Return the delays values to milliseconds
-        connections["delay"] /= 1000.0 / machine_time_step
+        if timestep_in_us is None:
+            # Mutiple timestep just use synapse_info
+            try:
+                connections["delay"] = synapse_info.raw_delays_in_ms
+            except TypeError:
+                # Random so just giveup
+                connections["delay"] = numpy.nan
+        else:
+            connections["delay"] /= 1000.0 / timestep_in_us
 
         # Undo the weight scaling
         connections["weight"] /= weight_scales[synapse_info.synapse_type]
