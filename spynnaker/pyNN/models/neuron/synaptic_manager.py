@@ -20,7 +20,6 @@ import numpy
 import scipy.stats  # @UnresolvedImport
 from scipy import special  # @UnresolvedImport
 from pyNN.random import RandomDistribution
-from spinn_utilities.helpful_functions import get_valid_components
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)

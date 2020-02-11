@@ -132,7 +132,7 @@ class SynapseIORowBased(object):
         max_undelayed_n_synapses = synapse_info.connector \
             .get_n_connections_from_pre_vertex_maximum(
                 post_vertex_slice, synapse_info, timestep_in_us, 0,
-            max_delay_supported)
+                max_delay_supported)
 
         # determine the max row length in the delay extension
         max_delayed_n_synapses = 0
