@@ -161,25 +161,8 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type, synapse_info):
-        params = []
-        pre_view_lo = 0
-        pre_view_hi = synapse_info.n_pre_neurons - 1
-        if synapse_info.prepop_is_view:
-            pre_view_lo, pre_view_hi = self.get_view_lo_hi(
-                synapse_info.pre_population._indexes)
-
-        params.extend([pre_view_lo, pre_view_hi])
-
-        post_view_lo = 0
-        post_view_hi = synapse_info.n_post_neurons - 1
-        if synapse_info.postpop_is_view:
-            post_view_lo, post_view_hi = self.get_view_lo_hi(
-                synapse_info.post_population._indexes)
-
-        params.extend([post_view_lo, post_view_hi])
-
+        params = self._basic_connector_params(synapse_info)
         params.extend([self.allow_self_connections])
-
         return numpy.array(params, dtype="uint32")
 
     @property
