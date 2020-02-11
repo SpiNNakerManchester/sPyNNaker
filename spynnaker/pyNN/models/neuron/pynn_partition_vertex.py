@@ -50,7 +50,7 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
         # These two are not safe, need a mechanism to avoid weird numbering and able to be set from above maybe!!!!!!!!!!!!!!!!!!!!!!!!
         self._n_incoming_partitions = 2
 
-        self._n_outgoing_partitions = 1#int(math.ceil(float(self._n_atoms) / DEFAULT_MAX_ATOMS_PER_NEURON_CORE))
+        self._n_outgoing_partitions = 1 if self._n_atoms <= DEFAULT_MAX_ATOMS_PER_NEURON_CORE else 1#int(math.ceil(float(self._n_atoms) / DEFAULT_MAX_ATOMS_PER_NEURON_CORE))
 
         # if self._n_atoms > DEFAULT_MAX_ATOMS_PER_NEURON_CORE:
         #     self._n_partitions = 6
