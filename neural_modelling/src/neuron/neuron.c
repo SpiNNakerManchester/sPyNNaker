@@ -139,9 +139,6 @@ static volatile bool dma_finished;
 
 static weight_t *synaptic_region;
 
-//! Offset for the second exc synaptic contribution
-static uint32_t contribution_offset;
-
 //! Placeholder for synaptic contributions sum
 static uint32_t sum;
 
@@ -476,6 +473,12 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset) {
     }
     uint32_t log_n_synapse_types = ilog_2(n_synapse_types_power_2);
 
+    uint32_t incoming_partitions_power_2 = incoming_partitions;
+    if (!is_power_of_2(incoming_partitions)) {
+        incoming_partitions_power_2 = next_power_of_2(incoming_partitions);
+    }
+    uint32_t log_incoming_partitions = ilog_2(incoming_partitions_power_2);
+
     synapse_type_index_bits = log_n_neurons + log_n_synapse_types;
     synapse_index_bits = log_n_neurons;
 
@@ -483,9 +486,9 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset) {
     //    log_n_neurons + log_n_synapse_types;
     //uint32_t contribution_size = (1 << (contribution_bits)) + n_neurons_power_2;
 
-    uint32_t contribution_size = n_neurons_power_2 * incoming_partitions;
-
-    // contribution_offset = 2 * n_neurons_power_2;
+    uint32_t contribution_bits =
+        log_n_neurons + log_incoming_partitions;
+    uint32_t contribution_size = 1 << contribution_bits;
 
     dma_size = contribution_size * sizeof(weight_t);
 
