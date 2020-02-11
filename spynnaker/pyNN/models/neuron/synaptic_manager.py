@@ -913,7 +913,8 @@ class SynapticManager(object):
             weight_scale):
         """ Get the ring buffer shifts for this vertex
         """
-        if self.__ring_buffer_shifts is None:
+        if ((self.__ring_buffer_shifts is None) or
+                (sum(self.__ring_buffer_shifts)==0)):
             self.__ring_buffer_shifts = \
                 self._get_ring_buffer_to_input_left_shifts(
                     application_vertex, application_graph, machine_timestep,
