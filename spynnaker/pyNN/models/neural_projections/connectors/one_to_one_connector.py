@@ -41,7 +41,6 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
         """
         """
         self.__random_number_class = random_number_class
-        self._VIEWS_PARAMS_SIZE = 4
         super(OneToOneConnector, self).__init__(safe, callback, verbose)
 
     @overrides(AbstractConnector.get_delay_maximum)
