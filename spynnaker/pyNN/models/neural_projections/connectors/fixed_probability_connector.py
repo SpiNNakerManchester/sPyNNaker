@@ -143,12 +143,6 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
     def __repr__(self):
         return "FixedProbabilityConnector({})".format(self._p_connect)
 
-    @overrides(AbstractConnectorSupportsViewsOnMachine.get_view_lo_hi)
-    def get_view_lo_hi(self, indexes):
-        view_lo = indexes[0]
-        view_hi = indexes[-1]
-        return view_lo, view_hi
-
     @property
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_id)
     def gen_connector_id(self):

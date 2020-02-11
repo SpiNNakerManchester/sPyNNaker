@@ -13,18 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from six import add_metaclass
-from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
-
-@add_metaclass(AbstractBase)
 class AbstractConnectorSupportsViewsOnMachine(object):
     """ Connector that generates on machine and supports using PopulationViews
     """
 
     __slots__ = ()
 
-    @abstractmethod
     def get_view_lo_hi(self, indexes):
         """ Get the low and high index values of the PopulationView
 
@@ -32,3 +27,7 @@ class AbstractConnectorSupportsViewsOnMachine(object):
         :return: The low and high index values of the PopulationView
         :rtype: uint, uint
         """
+        view_lo = indexes[0]
+        view_hi = indexes[-1]
+        return view_lo, view_hi
+

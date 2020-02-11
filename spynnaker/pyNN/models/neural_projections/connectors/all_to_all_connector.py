@@ -150,12 +150,6 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
     def allow_self_connections(self, new_value):
         self.__allow_self_connections = new_value
 
-    @overrides(AbstractConnectorSupportsViewsOnMachine.get_view_lo_hi)
-    def get_view_lo_hi(self, indexes):
-        view_lo = indexes[0]
-        view_hi = indexes[-1]
-        return view_lo, view_hi
-
     @property
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_id)
     def gen_connector_id(self):
