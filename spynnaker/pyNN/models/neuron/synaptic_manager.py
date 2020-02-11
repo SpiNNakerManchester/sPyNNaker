@@ -328,7 +328,8 @@ class SynapticManager(object):
                     vertex_slice, in_edges, timestep_in_us) +
                 self.__poptable_type.get_master_population_table_size(
                     in_edges) +
-                self._get_size_of_generator_information(in_edges))
+                self._get_size_of_generator_information(
+                    in_edges, timestep_in_us))
 
     def _reserve_memory_regions(
             self, spec, machine_vertex, vertex_slice,
