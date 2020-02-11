@@ -627,6 +627,11 @@ class AbstractPopulationVertex(
 
     @overrides(AbstractPopulationInitializable.set_initial_value)
     def set_initial_value(self, variable, value, selector=None):
+        if variable not in self._state_variables:
+            raise KeyError(
+                "Vertex does not support initialisation of"
+                " parameter {}".format(variable))
+
         parameter = self._get_parameter(variable)
 
         ranged_list = self._state_variables[parameter]
@@ -727,15 +732,15 @@ class AbstractPopulationVertex(
     def get_connections_from_machine(
             self, transceiver, placement, edge, graph_mapper, routing_infos,
             synapse_information, machine_time_step, using_extra_monitor_cores,
-            placements=None, monitor_api=None, monitor_placement=None,
-            monitor_cores=None, handle_time_out_configuration=True,
-            fixed_routes=None):
+            placements=None, monitor_api=None, monitor_cores=None,
+            handle_time_out_configuration=True, fixed_routes=None,
+            extra_monitor=None):
         # pylint: disable=too-many-arguments
         return self.__synapse_manager.get_connections_from_machine(
             transceiver, placement, edge, graph_mapper, routing_infos,
             synapse_information, machine_time_step, using_extra_monitor_cores,
-            placements, monitor_api, monitor_placement, monitor_cores,
-            handle_time_out_configuration, fixed_routes)
+            placements, monitor_api, monitor_cores,
+            handle_time_out_configuration, fixed_routes, extra_monitor)
 
     def clear_connection_cache(self):
         self.__synapse_manager.clear_connection_cache()
