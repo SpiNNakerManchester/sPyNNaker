@@ -68,10 +68,7 @@ typedef enum input_buffer_regions {
 //---------------------------------------
 
 //! \brief decays the stuff thats sitting in the input buffers
-//! (to compensate for the valve behaviour of a synapse
-//! in biology (spike goes in, synapse opens, then closes slowly) plus the
-//! leaky aspect of a neuron). as these have not yet been processed and applied
-//! to the neuron.
+//! In this case a delta shape means returning the value to zero immediately.
 //! \param[in]  parameter: the pointer to the parameters to use
 //! \return nothing
 static inline void delta_shaping(delta_params_t* delta_params) {
