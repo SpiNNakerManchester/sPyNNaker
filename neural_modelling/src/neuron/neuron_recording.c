@@ -124,6 +124,8 @@ static bool neuron_recording_read_in_elements(
         recording_info[i].element_size = data[i].element_size;
         recording_info[i].size = sizeof(recording_values_t)
                 + (n_neurons_rec * recording_info[i].element_size);
+        // There is an extra "neuron" in the data used when one of the neurons
+        // is *not* recording, to avoid a check
         uint32_t alloc_size = recording_info[i].size +
                 recording_info[i].element_size;
 
