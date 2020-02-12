@@ -39,6 +39,12 @@ uint32_t n_recordings_outstanding = 0;
 //! The address of the recording region to read on reset
 static void *reset_address;
 
+//! When bitwise anded with a number will floor to the nearest multiple of 4
+#define FLOOR_TO_4 0xFFFFFFFC
+
+//! Add to a number before applying floor to 4 to turn it into a ceil operation
+#define CEIL_TO_4 3
+
 //! \brief resets all states back to start state.
 static void reset_record_counter(void) {
     for (uint32_t i = 0; i < N_RECORDED_VARS; i++) {
@@ -96,7 +102,7 @@ static bool neuron_recording_read_in_elements(
 
     // Round up the number of bytes to align at a word boundary i.e. round to
     // the next multiple of 4
-    uint32_t ceil_n_entries = (n_neurons + 3) & 0xFFFFFFFC;
+    uint32_t ceil_n_entries = (n_neurons + CEIL_TO_4) & FLOOR_TO_4;
 
     // GCC lets you define a struct like this!
     typedef struct neuron_recording_data {
