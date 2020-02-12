@@ -26,32 +26,26 @@ def test_simple_record():
     globals_variables.set_failed_state(SpynnakerFailedState())
     globals_variables.set_simulator(simulator)
 
-    recordable_scalers = {
+    recordables = ["v", "gsyn_exc", "gsyn_inh"]
+
+    data_types = {
         "v": DataType.S1615,
         "gsyn_exc": DataType.S1615,
         "gsyn_inh": DataType.S1615
     }
 
-    recordable_outputs = {
-        "v": DataType.INT32,
-        "gsyn_exc": DataType.INT32,
-        "gsyn_inh": DataType.INT32
-    }
-
-    nr = NeuronRecorder(
-        ["spikes", "v", "gsyn_exc", "gsyn_inh"], recordable_scalers,
-        recordable_outputs, 100)
-    assert(frozenset(["spikes", "v", "gsyn_exc", "gsyn_inh"]) ==
+    nr = NeuronRecorder(recordables, data_types, [], 100)
+    assert(frozenset(["v", "gsyn_exc", "gsyn_inh"]) ==
            frozenset(nr.get_recordable_variables()))
     assert([] == nr.recording_variables)
     nr.set_recording("v", True)
     assert(["v"] == nr.recording_variables)
     _slice = Slice(0, 50)
     gps = nr.get_global_parameters(_slice)
-    # 4 rates second (index "1") is v
-    assert (gps[1].get_value() == 1)
-    # 4 n_neurons second (index "5") is v
-    assert (gps[5].get_value() == _slice.n_atoms)
+    # 3 rates (index "0" is v)
+    assert (gps[0].get_value() == 1)
+    # 3 n_neurons  (index "3" is v)
+    assert (gps[3].get_value() == _slice.n_atoms)
 
 
 def test_recording_variables():
@@ -59,23 +53,17 @@ def test_recording_variables():
     globals_variables.set_failed_state(SpynnakerFailedState())
     globals_variables.set_simulator(simulator)
 
-    recordable_scalers = {
+    recordables = ["v", "gsyn_exc", "gsyn_inh"]
+
+    data_types = {
         "v": DataType.S1615,
         "gsyn_exc": DataType.S1615,
         "gsyn_inh": DataType.S1615
     }
 
-    recordable_outputs = {
-        "v": DataType.INT32,
-        "gsyn_exc": DataType.INT32,
-        "gsyn_inh": DataType.INT32
-    }
-
-    nr = NeuronRecorder(
-        ["spikes", "v", "gsyn_exc", "gsyn_inh"], recordable_scalers,
-        recordable_outputs, 100)
+    nr = NeuronRecorder(recordables, data_types, [], 100)
     assert([] == nr.recording_variables)
     nr.set_recording("v", True)
     nr.set_recording("gsyn_inh", True)
     assert(["v", "gsyn_inh"] == nr.recording_variables)
-    assert([1, 3] == nr.recorded_region_ids)
+    assert([0, 2] == nr.recorded_region_ids)
