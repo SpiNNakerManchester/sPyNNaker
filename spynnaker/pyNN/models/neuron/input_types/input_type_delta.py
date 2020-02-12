@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_utilities.overrides import overrides
-from pacman.executor.injection_decorator import inject_items
 from data_specification.enums import DataType
 from .abstract_input_type import AbstractInputType
 
