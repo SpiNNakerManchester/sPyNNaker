@@ -50,7 +50,7 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
         # These two are not safe, need a mechanism to avoid weird numbering and able to be set from above maybe!!!!!!!!!!!!!!!!!!!!!!!!
         self._n_incoming_partitions = 2
 
-        self._n_outgoing_partitions = 1 if self._n_atoms <= DEFAULT_MAX_ATOMS_PER_NEURON_CORE else 1#int(math.ceil(float(self._n_atoms) / DEFAULT_MAX_ATOMS_PER_NEURON_CORE))
+        self._n_outgoing_partitions = 1 if self._n_atoms <= DEFAULT_MAX_ATOMS_PER_NEURON_CORE else 2#int(math.ceil(float(self._n_atoms) / DEFAULT_MAX_ATOMS_PER_NEURON_CORE))
 
         # if self._n_atoms > DEFAULT_MAX_ATOMS_PER_NEURON_CORE:
         #     self._n_partitions = 6
@@ -137,7 +137,15 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
         return int(math.ceil(float(self._n_atoms) / DEFAULT_MAX_ATOMS_PER_NEURON_CORE))
 
     def _compute_partition_and_offset_size(self):
-        return -((-self._n_atoms / self._n_outgoing_partitions) // DEFAULT_MAX_ATOMS_PER_NEURON_CORE) * DEFAULT_MAX_ATOMS_PER_NEURON_CORE
+        #return -((-self._n_atoms / self._n_outgoing_partitions) // DEFAULT_MAX_ATOMS_PER_NEURON_CORE) * DEFAULT_MAX_ATOMS_PER_NEURON_CORE
+
+        # Allows to compute the optimal number of neurons on each partition.
+        # Avoids to have the last partitions without neurons in case of odd numbering
+        # Better way?
+        i = 1
+        while self._n_outgoing_partitions * (i + 1) * DEFAULT_MAX_ATOMS_PER_NEURON_CORE < self._n_atoms:
+            i += 1
+        return DEFAULT_MAX_ATOMS_PER_NEURON_CORE * i
 
     def get_application_vertices(self):
 
