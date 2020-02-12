@@ -40,10 +40,10 @@ class InputTypeDelta(AbstractInputType):
     def add_state_variables(self, state_variables):
         pass
 
-    @inject_items({"ts": "MachineTimeStep"})
-    @overrides(AbstractInputType.get_values, additional_arguments={'ts'})
-    def get_values(self, parameters, state_variables, vertex_slice, ts):
-        scale_factor = 1000.0 / float(ts)
+    @overrides(AbstractInputType.get_values)
+    def get_values(self, parameters, state_variables, vertex_slice,
+                   timestamp_in_us):
+        scale_factor = 1000.0 / float(timestamp_in_us)
         return [scale_factor]
 
     @overrides(AbstractInputType.update_values)
