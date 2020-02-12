@@ -16,6 +16,7 @@
 import logging
 import math
 import numpy
+from pyNN.random import RandomDistribution
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.constraints.partitioner_constraints import (
     SameAtomsAsVertexConstraint)
@@ -29,7 +30,6 @@ from spynnaker.pyNN.models.neural_projections import (
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.neuron import ConnectionHolder
-from spinn_front_end_common.utilities.globals_variables import get_simulator
 
 # pylint: disable=protected-access
 
@@ -108,7 +108,7 @@ class PyNNProjectionCommon(object):
 
         # round the delays to multiples of full timesteps
         # (otherwise SDRAM estimation calculations can go wrong)
-        if not get_simulator().is_a_pynn_random(synapse_dynamics_stdp.delay):
+        if not isinstance(synapse_dynamics_stdp.delay, RandomDistribution):
             synapse_dynamics_stdp.set_delay(numpy.rint(numpy.array(
                 synapse_dynamics_stdp.delay) * (1000.0 / machine_time_step)) *
                 (machine_time_step / 1000.0))

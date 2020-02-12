@@ -17,12 +17,12 @@ import logging
 import math
 import re
 import numpy
+from pyNN.random import NumpyRNG, RandomDistribution
 from six import string_types, with_metaclass
 from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.safe_eval import SafeEval
 from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
-from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spynnaker.pyNN.utilities import utility_calls
 
 # global objects
@@ -94,7 +94,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         :param SynapseInformation synapse_info:
         """
         # pylint: disable=unused-argument
-        self._rng = (self._rng or get_simulator().get_pynn_NumpyRNG()())
+        self._rng = (self._rng or NumpyRNG())
         self.__min_delay = machine_time_step / 1000.0
 
     def _check_parameter(self, values, name, allow_lists):
@@ -107,7 +107,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         :param bool allow_lists:
         """
         if (not numpy.isscalar(values) and
-                not (get_simulator().is_a_pynn_random(values)) and
+                not (isinstance(values, RandomDistribution)) and
                 not hasattr(values, "__getitem__")):
             raise Exception("Parameter {} format unsupported".format(name))
         if not allow_lists and hasattr(values, "__getitem__"):
@@ -139,7 +139,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
             or list(int) or list(float)
         :param int n_connections:
         """
-        if get_simulator().is_a_pynn_random(delays):
+        if isinstance(delays, RandomDistribution):
             max_estimated_delay = utility_calls.get_maximum_probable_value(
                 delays, n_connections)
             high = utility_calls.high(delays)
@@ -172,7 +172,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
             or list(int) or list(float)
         :rtype: float
         """
-        if get_simulator().is_a_pynn_random(delays):
+        if isinstance(delays, RandomDistribution):
             return utility_calls.get_variance(delays)
         elif numpy.isscalar(delays):
             return 0.0
@@ -197,7 +197,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         :rtype: float
         """
         # pylint: disable=too-many-arguments
-        if get_simulator().is_a_pynn_random(delays):
+        if isinstance(delays, RandomDistribution):
             prob_in_range = utility_calls.get_probability_within_range(
                 delays, min_delay, max_delay)
             return int(math.ceil(utility_calls.get_probable_maximum_selected(
@@ -257,7 +257,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
             or list(int) or list(float)
         :rtype: float
         """
-        if get_simulator().is_a_pynn_random(weights):
+        if isinstance(weights, RandomDistribution):
             return abs(utility_calls.get_mean(weights))
         elif numpy.isscalar(weights):
             return abs(weights)
@@ -274,7 +274,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         :param int n_connections:
         :rtype: float
         """
-        if get_simulator().is_a_pynn_random(weights):
+        if isinstance(weights, RandomDistribution):
             mean_weight = utility_calls.get_mean(weights)
             if mean_weight < 0:
                 min_weight = utility_calls.get_minimum_probable_value(
@@ -314,7 +314,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
             or list(int) or list(float)
         :rtype: float
         """
-        if get_simulator().is_a_pynn_random(weights):
+        if isinstance(weights, RandomDistribution):
             return utility_calls.get_variance(weights)
         elif numpy.isscalar(weights):
             return 0.0
@@ -349,8 +349,8 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         if seed is None:
             seed = int(values.rng.next() * 0x7FFFFFFF)
             self.__param_seeds[key] = seed
-        new_rng = get_simulator().get_pynn_NumpyRNG()(seed)
-        copy_rd = get_simulator().get_random_distribution()(
+        new_rng = NumpyRNG(seed)
+        copy_rd = RandomDistribution(
             values.name, parameters_pos=None, rng=new_rng,
             **values.parameters)
         if n_connections == 1:
@@ -370,7 +370,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         :param SynapseInformation synapse_info:
         :rtype: ~numpy.ndarray
         """
-        if get_simulator().is_a_pynn_random(values):
+        if isinstance(values, RandomDistribution):
             return self._generate_random_values(
                 values, n_connections, pre_slice, post_slice)
         elif numpy.isscalar(values):

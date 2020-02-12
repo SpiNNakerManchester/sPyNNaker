@@ -14,9 +14,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy
+from pyNN.random import RandomDistribution
 from spinn_utilities.helpful_functions import is_singleton
 from spinn_utilities.ranged.ranged_list import RangedList
-from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spynnaker.pyNN.utilities.utility_calls import convert_to
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
@@ -108,7 +108,7 @@ class Struct(object):
             for start, end, value in values.iter_ranges_by_slice(
                     offset, offset + array_size):
                 # Get the values and get them into the correct data type
-                if get_simulator().is_a_pynn_random(value):
+                if isinstance(value, RandomDistribution):
                     data[key][start - offset:end - offset] = [
                         convert_to(v, data_type)
                         for v in value.next(end - start)]
