@@ -49,6 +49,7 @@ typedef struct bitfield_values_t {
     uint32_t bits[];
 } bitfield_values_t;
 
+// A struct for information for a non-bitfield recording
 typedef struct recording_info_t {
     uint32_t element_size;
     uint32_t rate;
@@ -58,6 +59,7 @@ typedef struct recording_info_t {
     recording_values_t *values;
 } recording_info_t;
 
+// A struct for information on a bitfield recording
 typedef struct bitfield_info_t {
     uint32_t rate;
     uint32_t count;
@@ -76,12 +78,16 @@ extern uint8_t **bitfield_recording_indexes;
 //! The number of recordings outstanding
 extern uint32_t n_recordings_outstanding;
 
+//! An array of recording information structures
 extern recording_info_t *recording_info;
 
+//! An array of bitfield information structures
 extern bitfield_info_t *bitfield_info;
 
+//! An array of spaces into which recording values can be written
 extern uint8_t **recording_values;
 
+//! An array of spaces into which bitfields can be written
 extern uint32_t **bitfield_values;
 
 //! \brief function to handle when a recording stage finished
