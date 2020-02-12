@@ -112,14 +112,6 @@ class AbstractPopulationVertex(
     # 5. n atoms, 6. n synapse types, 7. incoming spike buffer size.
     BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 7 * BYTES_PER_WORD
 
-    # The Buffer traffic type
-    TRAFFIC_IDENTIFIER = "BufferTraffic"
-
-    # named constant for spikes
-    SPIKES = "spikes"
-
-    SPIKES_FUDGE_FACTOR = 1
-
     _n_vertices = 0
 
     def __init__(
@@ -159,7 +151,8 @@ class AbstractPopulationVertex(
         record_data_types = dict(
             self.__neuron_impl.get_recordable_data_types())
         self.__neuron_recorder = NeuronRecorder(
-            recordable_variables, record_data_types, [self.SPIKES], n_neurons)
+            recordable_variables, record_data_types, [NeuronRecorder.SPIKES],
+            n_neurons)
 
         # Set up synapse handling
         self.__synapse_manager = SynapticManager(
@@ -541,7 +534,8 @@ class AbstractPopulationVertex(
         return self.__neuron_recorder.get_spikes(
             self.label, buffer_manager,
             len(self.__neuron_impl.get_recordable_variables()),
-            placements, graph_mapper, self, self.SPIKES, machine_time_step)
+            placements, graph_mapper, self, NeuronRecorder.SPIKES,
+            machine_time_step)
 
     @overrides(AbstractNeuronRecordable.get_recordable_variables)
     def get_recordable_variables(self):
@@ -773,7 +767,7 @@ class AbstractPopulationVertex(
         AbstractNeuronRecordable.clear_recording)
     def clear_recording(
             self, variable, buffer_manager, placements, graph_mapper):
-        if variable == self.SPIKES:
+        if variable == NeuronRecorder.SPIKES:
             index = len(self.__neuron_impl.get_recordable_variables())
         else:
             index = (
@@ -806,8 +800,8 @@ class AbstractPopulationVertex(
 
     @overrides(AbstractContainsUnits.get_units)
     def get_units(self, variable):
-        if variable == self.SPIKES:
-            return self.SPIKES
+        if variable == NeuronRecorder.SPIKES:
+            return NeuronRecorder.SPIKES
         if self.__neuron_impl.is_recordable(variable):
             return self.__neuron_impl.get_recordable_units(variable)
         if variable not in self._parameters:
