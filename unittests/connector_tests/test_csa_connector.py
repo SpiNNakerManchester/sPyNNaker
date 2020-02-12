@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import csa
+import sys
 from spynnaker.pyNN.models.neural_projections.connectors import CSAConnector
 from unittests.mocks import MockSimulator, MockSynapseInfo, \
     MockPopulation
@@ -107,3 +108,7 @@ def test_csa_block_connector():
         assert(all(item["delay"] == 2.0 for item in block))
     except TypeError:
         raise SkipTest("https://github.com/INCF/csa/issues/17")
+    except RuntimeError:
+        if sys.version_info >= (3, 7):
+            raise SkipTest("https://github.com/INCF/csa/issues/16")
+        raise
