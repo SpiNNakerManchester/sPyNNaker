@@ -24,34 +24,14 @@ class SpynnakerSimulatorInterface(SimulatorInterface):
 
     __slots__ = ()
 
-    # Used at common level but depends on PyNN so individual implementations
-    @abstractmethod
-    def get_distribution_to_stats(self):
-        pass
-
     # Implemented in FEC but only used by sPyNNaker
     @abstractmethod
     def get_current_time(self):
         pass
 
-    # Used at common level but depends on PyNN so individual implementations
-    @abstractmethod
-    def get_random_distribution(self):
-        pass
-
-    # Used at common level but depends on PyNN so individual implementations
-    @abstractmethod
-    def get_pynn_NumpyRNG(self):
-        pass
-
     # declared in common and used in common
     @abstractproperty
     def has_reset_last(self):
-        pass
-
-    # Used at common level but depends on PyNN so individual implementations
-    @abstractmethod
-    def is_a_pynn_random(self, thing):
         pass
 
     # declared in FEC common and used in 7 and 8
