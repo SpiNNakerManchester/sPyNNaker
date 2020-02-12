@@ -93,6 +93,8 @@ void neuron_recording_finalise(void){
 }
 
 //! \brief the number of bytes used in bitfield recording for n_neurons
+//! \param[in] n_neurons: The number of neurons to create a bitfield for
+//! \return the size of the bitfield data structure for the number of neurons
 static inline uint32_t bitfield_data_size(uint32_t n_neurons) {
     return sizeof(bitfield_values_t) + (get_bit_field_size(n_neurons) * sizeof(uint32_t));
 }
