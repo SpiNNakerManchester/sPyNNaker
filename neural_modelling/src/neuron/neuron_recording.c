@@ -25,12 +25,16 @@ uint8_t **neuron_recording_indexes;
 //! The index to record each bitfield variable to for each neuron
 uint8_t **bitfield_recording_indexes;
 
+//! An array of recording information structures
 recording_info_t *recording_info;
 
+//! An array of bitfield information structures
 bitfield_info_t *bitfield_info;
 
+//! An array of spaces into which recording values can be written
 uint8_t **recording_values;
 
+//! An array of spaces into which bitfields can be written
 uint32_t **bitfield_values;
 
 //! The number of recordings outstanding
@@ -154,6 +158,8 @@ static bool neuron_recording_read_in_elements(
         }
         uint32_t n_neurons_rec = bitfield_data[i].n_neurons_recording;
         bitfield_info[i].size = bitfield_data_size(n_neurons_rec);
+        // There is an extra "neuron" in the data used when one of the neurons
+        // is *not* recording, to avoid a check
         uint32_t alloc_size = bitfield_data_size(n_neurons_rec + 1);
 
         // allocate memory for the recording
@@ -163,6 +169,8 @@ static bool neuron_recording_read_in_elements(
                 log_error("couldn't allocate bitfield recording data space for %d", i);
                 return false;
             }
+            // There is an extra "neuron" in the data used when one of the
+            // neurons is *not* recording, to avoid a check
             bitfield_info[i].n_words = get_bit_field_size(n_neurons_rec + 1);
             bitfield_values[i] = bitfield_info[i].values->bits;
         }
