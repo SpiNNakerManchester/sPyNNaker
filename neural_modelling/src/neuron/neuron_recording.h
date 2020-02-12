@@ -208,7 +208,6 @@ static inline void neuron_recording_record(uint32_t time) {
             bf_info->count += bf_info->increment;
         }
     }
-    // recording_do_timestep_update(time);
 }
 
 //! \brief sets up state for next recording.
