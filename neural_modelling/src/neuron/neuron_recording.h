@@ -95,7 +95,8 @@ static void recording_done_callback(void) {
     n_recordings_outstanding -= 1;
 }
 
-//! \brief stores a recording of a value
+//! \brief stores a recording of a value of any type; use the functions below
+//!        for common types as these will be faster.
 //! \param[in] var_index: which recording variable to write this is
 //! \param[in] neuron_index: the neuron id for this recorded data
 //! \param[in] value: pointer to the value to record for this neuron.
@@ -107,7 +108,8 @@ static inline void neuron_recording_record_value(
     spin1_memcpy(&recording_values[var_index][p], value, size);
 }
 
-//! \brief stores a recording of an accum variable
+//! \brief stores a recording of an accum variable only; this is faster than
+//!        neuron_recording_record_value for this type
 //! \param[in] var_index: which recording variable to write this is
 //! \param[in] neuron_index: the neuron id for this recorded data
 //! \param[in] value: the results to record for this neuron.
@@ -118,7 +120,8 @@ static inline void neuron_recording_record_accum(
     data[index] = value;
 }
 
-//! \brief stores a recording of a double variable
+//! \brief stores a recording of a double variable only; this is faster than
+//!        neuron_recording_record_value for this type
 //! \param[in] var_index: which recording variable to write this is
 //! \param[in] neuron_index: the neuron id for this recorded data
 //! \param[in] value: the results to record for this neuron.
@@ -129,7 +132,8 @@ static inline void neuron_recording_record_double(
     data[index] = value;
 }
 
-//! \brief stores a recording of a float variable
+//! \brief stores a recording of a float variable only; this is faster than
+//!        neuron_recording_record_value for this type
 //! \param[in] var_index: which recording variable to write this is
 //! \param[in] neuron_index: the neuron id for this recorded data
 //! \param[in] value: the results to record for this neuron.
