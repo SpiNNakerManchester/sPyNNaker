@@ -298,6 +298,10 @@ class NeuronRecorder(object):
     def get_spikes(
             self, label, buffer_manager, region, placements, graph_mapper,
             application_vertex, variable, machine_time_step):
+        if variable not in self.__bitfield_variables:
+            msg = "Variable {} is not supported, use get_matrix_data".format(
+                variable)
+            raise ConfigurationException(msg)
 
         spike_times = list()
         spike_ids = list()
