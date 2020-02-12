@@ -84,6 +84,9 @@ class NeuronRecorder(object):
     # size of the counter for outstanding recording
     N_BYTES_PER_OUTSTANDING_RECORDING = DataType.UINT32.size
 
+    # number of items types (currently non-bitfield and bitfield)
+    N_ITEM_TYPES = 2
+
     # flag for spikes
     SPIKES = "spikes"
 
@@ -648,7 +651,8 @@ class NeuronRecorder(object):
             (self.N_BYTES_PER_RATE + self.N_BYTES_PER_SIZE +
              n_bytes_for_n_neurons) *
             len(self.__bitfield_variables))
-        return (2 * DataType.UINT32.size) + var_bytes + bitfield_bytes
+        return ((self.N_ITEM_TYPES * DataType.UINT32.size) + var_bytes +
+                bitfield_bytes)
 
     def _get_fixed_sdram_usage(self, vertex_slice):
         total_neurons = vertex_slice.hi_atom - vertex_slice.lo_atom + 1
