@@ -13,9 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from pyNN.random import RandomDistribution
 from spinn_utilities.overrides import overrides
 from spinn_utilities.ranged.ranged_list import RangedList
-from spinn_front_end_common.utilities import globals_variables
 
 
 class SpynnakerRangedList(RangedList):
@@ -24,7 +24,7 @@ class SpynnakerRangedList(RangedList):
     @overrides(RangedList.is_list)
     def is_list(value, size):
 
-        if globals_variables.get_simulator().is_a_pynn_random(value):
+        if isinstance(value, RandomDistribution):
             return True
 
         return RangedList.is_list(value, size)
@@ -33,7 +33,7 @@ class SpynnakerRangedList(RangedList):
     @overrides(RangedList.as_list)
     def as_list(value, size, ids=None):
 
-        if globals_variables.get_simulator().is_a_pynn_random(value):
+        if isinstance(value, RandomDistribution):
             return value.next(n=size)
 
         return RangedList.as_list(value, size, ids)

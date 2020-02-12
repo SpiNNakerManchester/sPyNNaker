@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from spinn_front_end_common.utilities.globals_variables import get_simulator
+from pyNN.random import NumpyRNG
 
 
 class SynapseInformation(object):
@@ -41,7 +41,7 @@ class SynapseInformation(object):
         self.__post_population = post_population
         self.__prepop_is_view = prepop_is_view
         self.__postpop_is_view = postpop_is_view
-        self.__rng = (rng or get_simulator().get_pynn_NumpyRNG()())
+        self.__rng = (rng or NumpyRNG())
         self.__synapse_dynamics = synapse_dynamics
         self.__synapse_type = synapse_type
         self.__weights = weights
