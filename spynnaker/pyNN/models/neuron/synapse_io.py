@@ -16,13 +16,10 @@
 import math
 import numpy
 from six import raise_from
-from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector)
 from spynnaker.pyNN.exceptions import SynapseRowTooBigException
-from .abstract_synapse_io import AbstractSynapseIO
-from .max_row_info import MaxRowInfo
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractStaticSynapseDynamics, AbstractSynapseDynamicsStructural,
     AbstractSynapseDynamics)
@@ -30,7 +27,56 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
 _N_HEADER_WORDS = 3
 
 
-class SynapseIORowBased(AbstractSynapseIO):
+class MaxRowInfo(object):
+    """ Information about the maximums for rows in a synaptic matrix.
+    """
+
+    __slots__ = [
+        "__undelayed_max_n_synapses",
+        "__delayed_max_n_synapses",
+        "__undelayed_max_bytes",
+        "__delayed_max_bytes",
+        "__undelayed_max_words",
+        "__delayed_max_words",
+    ]
+
+    def __init__(
+            self, undelayed_max_n_synapses, delayed_max_n_synapses,
+            undelayed_max_bytes, delayed_max_bytes,
+            undelayed_max_words, delayed_max_words):
+        self.__undelayed_max_n_synapses = undelayed_max_n_synapses
+        self.__delayed_max_n_synapses = delayed_max_n_synapses
+        self.__undelayed_max_bytes = undelayed_max_bytes
+        self.__delayed_max_bytes = delayed_max_bytes
+        self.__undelayed_max_words = undelayed_max_words
+        self.__delayed_max_words = delayed_max_words
+
+    @property
+    def undelayed_max_n_synapses(self):
+        return self.__undelayed_max_n_synapses
+
+    @property
+    def delayed_max_n_synapses(self):
+        return self.__delayed_max_n_synapses
+
+    @property
+    def undelayed_max_bytes(self):
+        return self.__undelayed_max_bytes
+
+    @property
+    def delayed_max_bytes(self):
+        return self.__delayed_max_bytes
+
+    @property
+    def undelayed_max_words(self):
+        return self.__undelayed_max_words
+
+    @property
+    def delayed_max_words(self):
+        return self.__delayed_max_words
+
+
+class SynapseIORowBased(object):
     """ A SynapseRowIO implementation that uses a row for each source neuron,\
         where each row consists of a fixed region, a plastic region, and a\
         fixed-plastic region (this is the bits of the plastic row that don't\
@@ -39,8 +85,10 @@ class SynapseIORowBased(AbstractSynapseIO):
     """
     __slots__ = []
 
-    @overrides(AbstractSynapseIO.get_maximum_delay_supported_in_ms)
     def get_maximum_delay_supported_in_ms(self, machine_time_step):
+        """ Get the maximum delay supported by the synapse representation \
+            before extensions are required, or None if any delay is supported
+        """
         # There are 16 slots, one per time step
         return 16 * (machine_time_step / 1000.0)
 
@@ -65,10 +113,13 @@ class SynapseIORowBased(AbstractSynapseIO):
                     in_edge.pre_vertex, in_edge.post_vertex, row_length,
                     max_synapses)), e)
 
-    @overrides(AbstractSynapseIO.get_max_row_info)
     def get_max_row_info(
             self, synapse_info, post_vertex_slice, n_delay_stages,
             population_table, machine_time_step, in_edge):
+        """ Get the information about the maximum lengths of delayed and\
+            undelayed rows in bytes (including header), words (without header)\
+            and number of synapses
+        """
         max_delay_supported = self.get_maximum_delay_supported_in_ms(
             machine_time_step)
         max_delay = max_delay_supported * (n_delay_stages + 1)
@@ -178,13 +229,15 @@ class SynapseIORowBased(AbstractSynapseIO):
         # Return the data
         return max_row_length, row_data
 
-    @overrides(AbstractSynapseIO.get_synapses)
     def get_synapses(
             self, synapse_info, pre_slices, pre_slice_index,
             post_slices, post_slice_index, pre_vertex_slice,
             post_vertex_slice, n_delay_stages, population_table,
             n_synapse_types, weight_scales, machine_time_step,
             app_edge, machine_edge):
+        """ Get the synapses as an array of words for non-delayed synapses and\
+            an array of words for delayed synapses
+        """
         # pylint: disable=too-many-arguments, too-many-locals, arguments-differ
         # pylint: disable=assignment-from-no-return
         # Get delays in timesteps
@@ -275,12 +328,13 @@ class SynapseIORowBased(AbstractSynapseIO):
         return (row_data, max_row_length, delayed_row_data,
                 max_delayed_row_length, delayed_source_ids, stages)
 
-    @overrides(AbstractSynapseIO.read_synapses)
     def read_synapses(
             self, synapse_info, pre_vertex_slice, post_vertex_slice,
             max_row_length, delayed_max_row_length, n_synapse_types,
-            weight_scales, data, delayed_data, n_delay_stages,
-            machine_time_step):
+            weight_scales, data, delayed_data, machine_time_step):
+        """ Read the synapses for a given projection synapse information\
+            object out of the given data
+        """
         # pylint: disable=too-many-arguments, too-many-locals, arguments-differ
 
         # Translate the data into rows
@@ -438,6 +492,8 @@ class SynapseIORowBased(AbstractSynapseIO):
 
         return connections
 
-    @overrides(AbstractSynapseIO.get_block_n_bytes)
     def get_block_n_bytes(self, max_row_length, n_rows):
+        """ Get the number of bytes in a block given the max row length and\
+            number of rows
+        """
         return (_N_HEADER_WORDS + max_row_length) * BYTES_PER_WORD * n_rows
