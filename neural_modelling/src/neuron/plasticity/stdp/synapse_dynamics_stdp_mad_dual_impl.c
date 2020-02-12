@@ -30,7 +30,8 @@
 //-------------------------------------------------------------------------
 #include "weight_dependence/weight.h"
 //#include "timing_dependence/timing.h"
-#include "timing_dependence/timing_pair_dual_impl.h"
+#include "neuron/models/neuron_model_lif_impl.h"
+#include "neuron/threshold_types/threshold_type_static.h"
 //-------------------------------------------------------------------------
 //-------------------------------------------------------------------------
 //-------------------------------------------------------------------------
@@ -38,6 +39,7 @@
 #include <debug.h>
 #include <utils.h>
 #include <neuron/plasticity/synapse_dynamics.h>
+#include "timing_dependence/timing_pair_dual_impl.h"
 
 static uint32_t synapse_type_index_bits;
 static uint32_t synapse_index_bits;
@@ -93,6 +95,11 @@ typedef struct {
 } pre_event_history_t;
 
 post_event_history_t *post_event_history;
+
+// Pointers to neuron data
+static neuron_pointer_t neuron_array_plasticity;
+static additional_input_pointer_t additional_input_array_plasticity;
+static threshold_type_pointer_t threshold_type_array_plasticity;
 
 /* PRIVATE FUNCTIONS */
 
@@ -414,8 +421,6 @@ bool synapse_dynamics_process_plastic_synapses(
             plastic_saturation_count++;
         }
 
-        ring_buffers[ring_buffer_index] = accumulation;
-
         // Write back updated synaptic word to plastic region
         *plastic_words++ =
                 synapse_structure_get_final_synaptic_word(final_state);
@@ -449,6 +454,18 @@ uint32_t synapse_dynamics_get_plastic_pre_synaptic_events(void) {
 
 uint32_t synapse_dynamics_get_plastic_saturation_count(void) {
     return plastic_saturation_count;
+}
+
+void synapse_dynamics_set_neuron_array(neuron_pointer_t neuron_array){
+	neuron_array_plasticity = neuron_array;
+}
+
+void synapse_dynamics_set_threshold_array(threshold_type_pointer_t threshold_type_array){
+	threshold_type_array_plasticity = threshold_type_array;
+}
+
+void synapse_dynamics_set_additional_input_array(additional_input_pointer_t additional_input_array){
+	additional_input_array_plasticity = additional_input_array;
 }
 
 bool synapse_dynamics_find_neuron(

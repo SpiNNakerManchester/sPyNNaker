@@ -71,6 +71,9 @@ void neuron_model_has_spiked(neuron_pointer_t neuron) {
 
     // reset refractory timer
     neuron->refract_timer  = neuron->T_refract;
+
+    //io_printf(IO_BUF, "Neuron has spiked!! membrane pot: %k \n", neuron->V_membrane);
+
 }
 
 state_t neuron_model_get_membrane_voltage(neuron_pointer_t neuron) {

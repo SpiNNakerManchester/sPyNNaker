@@ -31,62 +31,61 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.common\
 logger = logging.getLogger(__name__)
 
 
-class TimingDependenceSpikePairDual(AbstractTimingDependence):
+class TimingDependenceSpikePairDualVDep(AbstractTimingDependence):
     __slots__ = [
-        "__alpha",
+        "__alpha_exc",
+        "__alpha_inh",
         "__synapse_structure",
-        "__tau",
-        "__tau_data",
-        "__tau_minus",
-        "__tau_minus_data",
-        "__tau_plus",
-        "__tau_plus_data"]
+        "__tau_exc",
+        "__tau_exc_data",
+        "__tau_inh",
+        "__tau_inh_data"]
 
     #default_parameters = {'tau': 20.0, 'tau_plus': 20.0, 'tau_minus': 20.0}
 
-    def __init__(self, alpha, tau=20.0, tau_plus=20.0, tau_minus=20.0):
-        self.__alpha = alpha
-        self.__tau = tau
-        self.__tau_plus = tau_plus
-        self.__tau_minus = tau_minus
+    def __init__(self, alpha_exc, alpha_inh, tau_exc=20.0, tau_inh=20.0):
+        self.__alpha_exc = alpha_exc
+        self.__alpha_inh = alpha_inh
+        self.__tau_exc = tau_exc
+        self.__tau_inh = tau_inh
 
         self.__synapse_structure = SynapseStructureWeightOnly()
 
         ts = get_simulator().machine_time_step / 1000.0
-        self.__tau_data = get_exp_lut_array(ts, self.__tau)
-        self.__tau_plus_data = get_exp_lut_array(ts, self.__tau_plus)
-        self.__tau_minus_data = get_exp_lut_array(ts, self.__tau_minus)
+        self.__tau_exc_data = get_exp_lut_array(ts, self.__tau_exc)
+        self.__tau_inh_data = get_exp_lut_array(ts, self.__tau_inh)
 
     @property
-    def alpha(self):
-        return self.__alpha
+    def alpha_exc(self):
+        return self.__alpha_exc
 
     @property
-    def tau(self):
-        return self.__tau
+    def alpha_inh(self):
+        return self.__alpha_inh
 
     @property
-    def tau_plus(self):
-        return self.__tau_plus
+    def tau_exc(self):
+        return self.__tau_exc
 
     @property
-    def tau_minus(self):
-        return self.__tau_minus
+    def tau_inh(self):
+        return self.__tau_inh
 
     @overrides(AbstractTimingDependence.is_same_as)
     def is_same_as(self, timing_dependence):
         # pylint: disable=protected-access
         if timing_dependence is None or not isinstance(
-                timing_dependence, TimingDependenceSpikePairDual):
+                timing_dependence, TimingDependenceSpikePairDualVDep):
             return False
-        return (self.__tau == timing_dependence.tau and
-                self.__alpha == timing_dependence.alpha and
-                self.__tau_plus == timing_dependence.tau_plus and
-                self.__tau_minus == timing_dependence.tau_minus)
+        return (self.__tau_exc == timing_dependence.tau_exc and
+                self.__alpha_exc == timing_dependence.alpha_exc and
+                self.__tau_inh == timing_dependence.tau_plus and
+                self.__alpha_inh == timing_dependence.alpha_inh)
+
 
     @property
     def vertex_executable_suffix(self):
-        return "dual_pair_dual"
+        return "dual_v_dep_pair_dual_v_dep"
 
     @property
     def pre_trace_n_bytes(self):
@@ -95,9 +94,8 @@ class TimingDependenceSpikePairDual(AbstractTimingDependence):
 
     @overrides(AbstractTimingDependence.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(self):
-        return (BYTES_PER_WORD + BYTES_PER_WORD * len(self.__tau_data)
-                + BYTES_PER_WORD * (len(self.__tau_plus_data) +
-                                    len(self.__tau_minus_data)))
+        return (2 * BYTES_PER_WORD + BYTES_PER_WORD * (len(self.__tau_exc_data)
+                                                        + len(self.__tau_inh_data)))
 
     @property
     def n_weight_terms(self):
@@ -107,14 +105,17 @@ class TimingDependenceSpikePairDual(AbstractTimingDependence):
     def write_parameters(self, spec, machine_time_step, weight_scales):
 
         # Write alpha to spec
-        fixed_point_alpha = plasticity_helpers.float_to_fixed(
-            self.__alpha, plasticity_helpers.STDP_FIXED_POINT_ONE)
-        spec.write_value(data=fixed_point_alpha, data_type=DataType.INT32)
+        fixed_point_alpha_exc = plasticity_helpers.float_to_fixed(
+            self.__alpha_exc, plasticity_helpers.STDP_FIXED_POINT_ONE)
+        spec.write_value(data=fixed_point_alpha_exc, data_type=DataType.INT32)
+
+        fixed_point_alpha_inh = plasticity_helpers.float_to_fixed(
+            self.__alpha_inh, plasticity_helpers.STDP_FIXED_POINT_ONE)
+        spec.write_value(data=fixed_point_alpha_inh, data_type=DataType.INT32)
 
         # Write lookup table
-        spec.write_array(self.__tau_data)
-        spec.write_array(self.__tau_plus_data)
-        spec.write_array(self.__tau_minus_data)
+        spec.write_array(self.__tau_exc)
+        spec.write_array(self.__tau_inh)
 
     @property
     def synaptic_structure(self):
@@ -122,4 +123,4 @@ class TimingDependenceSpikePairDual(AbstractTimingDependence):
 
     @overrides(AbstractTimingDependence.get_parameter_names)
     def get_parameter_names(self):
-        return ['alpha', 'tau', 'tau_plus', 'tau_minus']
+        return ['alpha_exc', 'alpha_inh', 'tau_exc', 'tau_inh']

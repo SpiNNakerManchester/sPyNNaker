@@ -26,10 +26,13 @@
 #include "post_events.h"
 
 #include "weight_dependence/weight.h"
-#include "timing_dependence/timing.h"
+//#include "timing_dependence/timing.h"
+#include "neuron/models/neuron_model_lif_impl.h"
+#include "neuron/threshold_types/threshold_type_static.h"
 #include <debug.h>
 #include <utils.h>
 #include <neuron/plasticity/synapse_dynamics.h>
+#include "timing_dependence/timing_pair_dual_v_dep_impl.h"
 
 static uint32_t synapse_type_index_bits;
 static uint32_t synapse_index_bits;
@@ -86,6 +89,11 @@ typedef struct {
 
 post_event_history_t *post_event_history;
 
+// Pointers to neuron data
+static neuron_pointer_t neuron_array_plasticity;
+static additional_input_pointer_t additional_input_array_plasticity;
+static threshold_type_pointer_t threshold_type_array_plasticity;
+
 /* PRIVATE FUNCTIONS */
 
 //---------------------------------------
@@ -96,7 +104,10 @@ static inline final_state_t plasticity_update_synapse(
         const uint32_t last_pre_time, const pre_trace_t last_pre_trace,
         const pre_trace_t new_pre_trace, const uint32_t delay_dendritic,
         const uint32_t delay_axonal, update_state_t current_state,
-        const post_event_history_t *post_event_history) {
+        const post_event_history_t *post_event_history,
+		const uint32_t synapse_type,
+		neuron_pointer_t post_synaptic_neuron,
+        threshold_type_pointer_t post_synaptic_threshold) {
 
     // Apply axonal delay to time of last presynaptic spike
     const uint32_t delayed_last_pre_time = last_pre_time + delay_axonal;
@@ -134,7 +145,7 @@ static inline final_state_t plasticity_update_synapse(
         current_state = timing_apply_post_spike(
                 delayed_post_time, *post_window.next_trace, delayed_last_pre_time,
                 last_pre_trace, post_window.prev_time, post_window.prev_trace,
-                current_state);
+                current_state, synapse_type);
 
         // Go onto next event
         post_window = post_events_next(post_window);
@@ -147,7 +158,8 @@ static inline final_state_t plasticity_update_synapse(
                 delayed_pre_time, delayed_last_post);
         current_state = timing_apply_pre_spike(
                 delayed_pre_time, new_pre_trace, delayed_last_pre_time, last_pre_trace,
-                delayed_last_post, post_window.prev_trace, current_state);
+                delayed_last_post, post_window.prev_trace, current_state, synapse_type,
+				post_synaptic_neuron, post_synaptic_threshold);
     }
 
     // Return final synaptic word and weight
@@ -311,8 +323,13 @@ bool synapse_dynamics_process_plastic_synapses(
     // Update pre-synaptic trace
     log_debug("Adding pre-synaptic event to trace at time:%u", time);
     event_history->prev_time = time;
+
+    uint32_t control_word = *control_words;
+    uint32_t type = synapse_row_sparse_type(
+            control_word, synapse_index_bits, synapse_type_mask); //get type of synapse
+
     event_history->prev_trace =
-            timing_add_pre_spike(time, last_pre_time, last_pre_trace);
+            timing_add_pre_spike(time, last_pre_time, last_pre_trace, type); //added argument 'type'
 
     // Loop through plastic synapses
     for (; plastic_synapse > 0; plastic_synapse--) {
@@ -334,9 +351,16 @@ bool synapse_dynamics_process_plastic_synapses(
 
         // Get data structures for this synapse's post-synaptic neuron
         neuron_pointer_t post_synaptic_neuron = &neuron_array_plasticity[index];
-        additional_input_pointer_t post_synaptic_additional_input =
-                		&additional_input_array_plasticity[index];
+
+        //        additional_input_pointer_t post_synaptic_additional_input =
+//                		&additional_input_array_plasticity[index];
         threshold_type_pointer_t post_synaptic_threshold = &threshold_type_array_plasticity[index];
+
+        io_printf(IO_BUF, "Time: %u \t Post V: %11.4k \t Post Thresh: %11.4k \n", time,
+        		post_synaptic_neuron->V_membrane, post_synaptic_threshold->threshold_value);
+        //io_printf(IO_BUF, "Post synaptic neuron voltage: %11.4k \n", post_synaptic_neuron->V_membrane);
+        //io_printf(IO_BUF, "Post synaptic neuron threshold: %11.4k \n", post_synaptic_threshold->threshold_value);
+
 
         // Create update state from the plastic synaptic word
         update_state_t current_state =
@@ -355,7 +379,8 @@ bool synapse_dynamics_process_plastic_synapses(
         final_state_t final_state = plasticity_update_synapse(
                 time, last_pre_time, last_pre_trace, event_history->prev_trace,
                 post_delay, delay_axonal, current_state,
-                &post_event_history[index]);
+                &post_event_history[index], type, post_synaptic_neuron,
+		        post_synaptic_threshold);
 
         // Add weight to ring-buffer entry
         // **NOTE** Dave suspects that this could be a
@@ -418,6 +443,7 @@ void synapse_dynamics_set_threshold_array(threshold_type_pointer_t threshold_typ
 void synapse_dynamics_set_additional_input_array(additional_input_pointer_t additional_input_array){
 	additional_input_array_plasticity = additional_input_array;
 }
+
 
 bool synapse_dynamics_find_neuron(
         uint32_t id, address_t row, weight_t *weight, uint16_t *delay,

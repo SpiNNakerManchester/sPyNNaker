@@ -48,7 +48,9 @@ MODELS = IF_curr_exp \
          IZK_cond_exp_stdp_mad_pair_additive \
          IF_curr_exp_stdp_mad_pair_predictive_additive_predictive \
          IF_curr_exp_stdp_mad_pair_predictive_additive \
-         IF_curr_exp_stdp_mad_pair_dual_additive
+         IF_curr_exp_stdp_mad_dual_pair_dual_additive \
+         IF_curr_exp_stdp_mad_dual_v_dep_pair_dual_v_dep_additive
+         
          
 
 all:

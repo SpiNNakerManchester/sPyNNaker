@@ -86,6 +86,12 @@ typedef struct {
 
 post_event_history_t *post_event_history;
 
+// Pointers to neuron data
+static neuron_pointer_t neuron_array_plasticity;
+
+static additional_input_pointer_t additional_input_array_plasticity;
+static threshold_type_pointer_t threshold_type_array_plasticity;
+
 /* PRIVATE FUNCTIONS */
 
 //---------------------------------------
@@ -332,6 +338,14 @@ bool synapse_dynamics_process_plastic_synapses(
         uint32_t type_index = synapse_row_sparse_type_index(
                 control_word, synapse_type_index_mask);
 
+        // Get data structures for this synapse's post-synaptic neuron
+//        neuron_pointer_t post_synaptic_neuron = &neuron_array_plasticity[index];
+//        io_printf(IO_BUF, "Neuron voltage: %k", post_synaptic_neuron->V_membrane);
+
+//        additional_input_pointer_t post_synaptic_additional_input =
+//                		&additional_input_array_plasticity[index];
+//        threshold_type_pointer_t post_synaptic_threshold = &threshold_type_array_plasticity[index];
+
         // Create update state from the plastic synaptic word
         update_state_t current_state =
                 synapse_structure_get_update_state(*plastic_words, type);
@@ -400,6 +414,19 @@ uint32_t synapse_dynamics_get_plastic_pre_synaptic_events(void) {
 uint32_t synapse_dynamics_get_plastic_saturation_count(void) {
     return plastic_saturation_count;
 }
+
+void synapse_dynamics_set_neuron_array(neuron_pointer_t neuron_array){
+	neuron_array_plasticity = neuron_array;
+}
+
+void synapse_dynamics_set_threshold_array(threshold_type_pointer_t threshold_type_array){
+	threshold_type_array_plasticity = threshold_type_array;
+}
+
+void synapse_dynamics_set_additional_input_array(additional_input_pointer_t additional_input_array){
+	additional_input_array_plasticity = additional_input_array;
+}
+
 
 bool synapse_dynamics_find_neuron(
         uint32_t id, address_t row, weight_t *weight, uint16_t *delay,
