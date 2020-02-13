@@ -13,10 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from pyNN.random import RandomDistribution
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.utilities import utility_calls
 from pacman.model.graphs.machine import MachineEdge
-from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.interface.provenance import (
     AbstractProvidesLocalProvenanceData)
 from spynnaker.pyNN.models.neural_projections.connectors import (
@@ -92,7 +92,7 @@ class ProjectionMachineEdge(
                 rate = pre_vertex.rate
                 if hasattr(rate, "__getitem__"):
                     rate = max(rate)
-                elif globals_variables.get_simulator().is_a_pynn_random(rate):
+                elif isinstance(rate, RandomDistribution):
                     rate = utility_calls.get_maximum_probable_value(
                         rate, pre_vertex_slice.n_atoms)
                 new_weight *= rate
