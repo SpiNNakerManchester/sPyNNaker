@@ -13,13 +13,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .abstract_input_type import AbstractInputType
-from .input_type_conductance import InputTypeConductance
-from .input_type_current import InputTypeCurrent
-from .input_type_current_semd import InputTypeCurrentSEMD
-from .input_type_delta import InputTypeDelta
-from .input_type_delta_conductance import InputTypeDeltaConductance
+APP = $(notdir $(CURDIR))
 
-__all__ = ["AbstractInputType", "InputTypeConductance", "InputTypeCurrent",
-           "InputTypeCurrentSEMD", "InputTypeDelta",
-           "InputTypeDeltaConductance"]
+NEURON_MODEL = $(NEURON_DIR)/neuron/models/neuron_model_lif_impl.c
+NEURON_MODEL_H = $(NEURON_DIR)/neuron/models/neuron_model_lif_impl.h
+INPUT_TYPE_H = $(NEURON_DIR)/neuron/input_types/input_type_delta_conductance.h
+NEURON_IMPL_H = $(NEURON_DIR)/neuron/implementations/neuron_impl_standard.h
+THRESHOLD_TYPE_H = $(NEURON_DIR)/neuron/threshold_types/threshold_type_static.h
+SYNAPSE_TYPE_H = $(NEURON_DIR)/neuron/synapse_types/synapse_types_delta_impl.h
+SYNAPSE_DYNAMICS = $(NEURON_DIR)/neuron/plasticity/synapse_dynamics_static_impl.c
+
+include ../neural_build.mk
