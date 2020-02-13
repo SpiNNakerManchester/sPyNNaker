@@ -144,7 +144,8 @@ static inline void neuron_recording_record_float(
     data[index] = value;
 }
 
-//! \brief stores a recording of an int32_t variable
+//! \brief stores a recording of an int32_t variable only; this is faster than
+//!        neuron_recording_record_value for this type
 //! \param[in] var_index: which recording variable to write this is
 //! \param[in] neuron_index: the neuron id for this recorded data
 //! \param[in] value: the results to record for this neuron.
