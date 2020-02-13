@@ -16,9 +16,12 @@
 import math
 import numpy
 from six import raise_from
-from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+
+from spinn_front_end_common.utilities.constants import \
+    MICRO_TO_MILLISECOND_CONVERSION, BYTES_PER_WORD
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector)
+from spynnaker.pyNN.utilities.constants import MAX_SUPPORTED_DELAY_TICS
 from spynnaker.pyNN.exceptions import SynapseRowTooBigException
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractStaticSynapseDynamics, AbstractSynapseDynamicsStructural,
@@ -90,7 +93,8 @@ class SynapseIORowBased(object):
             before extensions are required, or None if any delay is supported
         """
         # There are 16 slots, one per time step
-        return 16 * (machine_time_step / 1000.0)
+        return MAX_SUPPORTED_DELAY_TICS * (
+            machine_time_step / MICRO_TO_MILLISECOND_CONVERSION)
 
     @staticmethod
     def _n_words(n_bytes):
@@ -164,12 +168,12 @@ class SynapseIORowBased(object):
 
         undelayed_max_bytes = 0
         if undelayed_max_n_words > 0:
-            undelayed_max_bytes = (undelayed_max_n_words + _N_HEADER_WORDS) * \
-                BYTES_PER_WORD
+            undelayed_max_bytes = (
+                undelayed_max_n_words + _N_HEADER_WORDS) * BYTES_PER_WORD
         delayed_max_bytes = 0
         if delayed_max_n_words > 0:
-            delayed_max_bytes = (delayed_max_n_words + _N_HEADER_WORDS) * \
-                BYTES_PER_WORD
+            delayed_max_bytes = (
+                delayed_max_n_words + _N_HEADER_WORDS) * BYTES_PER_WORD
 
         return MaxRowInfo(
             max_undelayed_n_synapses, max_delayed_n_synapses,
@@ -243,7 +247,7 @@ class SynapseIORowBased(object):
         # Get delays in timesteps
         max_delay = self.get_maximum_delay_supported_in_ms(machine_time_step)
         if max_delay is not None:
-            max_delay *= (1000.0 / machine_time_step)
+            max_delay *= (MICRO_TO_MILLISECOND_CONVERSION / machine_time_step)
 
         # Get the actual connections
         connections = synapse_info.connector.create_synaptic_block(
@@ -253,7 +257,8 @@ class SynapseIORowBased(object):
 
         # Convert delays to timesteps
         connections["delay"] = numpy.rint(
-            connections["delay"] * (1000.0 / machine_time_step))
+            connections["delay"] * (
+                MICRO_TO_MILLISECOND_CONVERSION / machine_time_step))
 
         # Scale weights
         connections["weight"] = (connections["weight"] * weight_scales[
@@ -368,7 +373,8 @@ class SynapseIORowBased(object):
         connections = numpy.concatenate(connections)
 
         # Return the delays values to milliseconds
-        connections["delay"] /= 1000.0 / machine_time_step
+        connections["delay"] /= (
+                MICRO_TO_MILLISECOND_CONVERSION / machine_time_step)
 
         # Undo the weight scaling
         connections["weight"] /= weight_scales[synapse_info.synapse_type]
@@ -386,6 +392,29 @@ class SynapseIORowBased(object):
         return (
             ff_size,
             [row_data[row, ff_start:ff_end[row]] for row in range(n_rows)])
+
+    def __convert_delayed_data(
+            self, n_synapses, pre_vertex_slice, delayed_connections):
+        """ Take the delayed_connections and convert the source ids and delay\
+            values
+        """
+        synapse_ids = range(len(n_synapses))
+        row_stage = numpy.array([
+            i // pre_vertex_slice.n_atoms
+            for i in synapse_ids], dtype="uint32")
+        row_min_delay = (row_stage + 1) * 16
+        connection_min_delay = numpy.concatenate([
+            numpy.repeat(row_min_delay[i], n_synapses[i])
+            for i in synapse_ids])
+        connection_source_extra = numpy.concatenate([
+            numpy.repeat(
+                row_stage[i] * numpy.uint32(pre_vertex_slice.n_atoms),
+                n_synapses[i])
+            for i in synapse_ids])
+        delayed_connections["source"] -= connection_source_extra
+        delayed_connections["source"] += pre_vertex_slice.lo_atom
+        delayed_connections["delay"] += connection_min_delay
+        return delayed_connections
 
     def _read_static_data(self, dynamics, pre_vertex_slice, post_vertex_slice,
                           n_synapse_types, row_data, delayed_row_data):
@@ -409,22 +438,8 @@ class SynapseIORowBased(object):
 
             # Use the row index to work out the actual delay and source
             n_synapses = dynamics.get_n_synapses_in_rows(ff_size)
-            synapse_ids = range(len(n_synapses))
-            row_stage = numpy.array([
-                i // pre_vertex_slice.n_atoms
-                for i in synapse_ids], dtype="uint32")
-            row_min_delay = (row_stage + 1) * 16
-            connection_min_delay = numpy.concatenate([
-                numpy.repeat(row_min_delay[i], n_synapses[i])
-                for i in synapse_ids])
-            connection_source_extra = numpy.concatenate([
-                numpy.repeat(
-                    row_stage[i] * numpy.uint32(pre_vertex_slice.n_atoms),
-                    n_synapses[i])
-                for i in synapse_ids])
-            delayed_connections["source"] -= connection_source_extra
-            delayed_connections["source"] += pre_vertex_slice.lo_atom
-            delayed_connections["delay"] += connection_min_delay
+            delayed_connections = self.__convert_delayed_data(
+                n_synapses, pre_vertex_slice, delayed_connections)
             connections.append(delayed_connections)
 
         return connections
@@ -471,23 +486,8 @@ class SynapseIORowBased(object):
 
             # Use the row index to work out the actual delay and source
             n_synapses = dynamics.get_n_synapses_in_rows(pp_size, fp_size)
-            synapse_ids = range(len(n_synapses))
-            row_stage = numpy.array([
-                (i // pre_vertex_slice.n_atoms)
-                for i in synapse_ids], dtype="uint32")
-            row_min_delay = (row_stage + 1) * 16
-            connection_min_delay = numpy.concatenate([
-                numpy.repeat(row_min_delay[i], n_synapses[i])
-                for i in synapse_ids])
-            connection_source_extra = numpy.concatenate([
-                numpy.repeat(
-                    row_stage[i] * numpy.uint32(pre_vertex_slice.n_atoms),
-                    n_synapses[i])
-                for i in synapse_ids])
-
-            delayed_connections["source"] -= connection_source_extra
-            delayed_connections["source"] += pre_vertex_slice.lo_atom
-            delayed_connections["delay"] += connection_min_delay
+            delayed_connections = self.__convert_delayed_data(
+                n_synapses, pre_vertex_slice, delayed_connections)
             connections.append(delayed_connections)
 
         return connections

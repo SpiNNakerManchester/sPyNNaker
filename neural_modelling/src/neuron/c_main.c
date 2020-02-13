@@ -52,7 +52,7 @@
 #ifndef APPLICATION_NAME_HASH
 #define APPLICATION_NAME_HASH 0
 #error APPLICATION_NAME_HASH was undefined.  Make sure you define this\
-	constant
+    constant
 #endif
 
 struct neuron_provenance {
@@ -86,9 +86,6 @@ static uint32_t simulation_ticks = 0;
 //! Determines if this model should run for infinite time
 static uint32_t infinite_run;
 
-//! The recording flags
-static uint32_t recording_flags = 0;
-
 //! Timer callbacks since last rewiring
 int32_t last_rewiring_time = 0;
 
@@ -101,16 +98,9 @@ bool rewiring = false;
 // FOR DEBUGGING!
 uint32_t count_rewires = 0;
 
+//! The number of neurons on the core
+static uint32_t n_neurons;
 
-//! \brief Initialises the recording parts of the model
-//! \param[in] recording_address: the address in SDRAM where to store
-//! recordings
-//! \return True if recording initialisation is successful, false otherwise
-static bool initialise_recording(address_t recording_address) {
-    bool success = recording_initialize(recording_address, &recording_flags);
-    log_debug("Recording flags = 0x%08x", recording_flags);
-    return success;
-}
 
 void c_main_store_provenance_data(address_t provenance_region) {
     log_debug("writing other provenance data");
@@ -154,18 +144,12 @@ static bool initialise(void) {
             c_main_store_provenance_data,
             data_specification_get_region(PROVENANCE_DATA_REGION, ds_regions));
 
-    // setup recording region
-    if (!initialise_recording(
-            data_specification_get_region(RECORDING_REGION, ds_regions))) {
-        return false;
-    }
-
     // Set up the neurons
-    uint32_t n_neurons;
     uint32_t n_synapse_types;
     uint32_t incoming_spike_buffer_size;
     if (!neuron_initialise(
             data_specification_get_region(NEURON_PARAMS_REGION, ds_regions),
+            data_specification_get_region(NEURON_RECORDING_REGION, ds_regions),
             &n_neurons, &n_synapse_types, &incoming_spike_buffer_size,
             &timer_offset)) {
         return false;
@@ -228,14 +212,13 @@ static bool initialise(void) {
 //! \brief the function to call when resuming a simulation
 //! \return None
 void resume_callback(void) {
-    recording_reset();
-
-    // try reloading neuron parameters
     data_specification_metadata_t *ds_regions =
             data_specification_get_data_address();
-    if (!neuron_reload_neuron_parameters(
+
+    // try resuming neuron
+    if (!neuron_resume(
             data_specification_get_region(NEURON_PARAMS_REGION, ds_regions))) {
-        log_error("failed to reload the neuron parameters.");
+        log_error("failed to resume neuron.");
         rt_error(RTE_SWERR);
     }
 }
@@ -262,6 +245,7 @@ void timer_callback(uint timer_count, uint unused) {
     /* if a fixed number of simulation ticks that were specified at startup
      * then do reporting for finishing */
     if (infinite_run != TRUE && time >= simulation_ticks) {
+
         // Enter pause and resume state to avoid another tick
         simulation_handle_pause_resume(resume_callback);
 
@@ -270,17 +254,10 @@ void timer_callback(uint timer_count, uint unused) {
         // rewrite neuron params to SDRAM for reading out if needed
         data_specification_metadata_t *ds_regions =
                 data_specification_get_data_address();
-        neuron_store_neuron_parameters(
-                data_specification_get_region(NEURON_PARAMS_REGION, ds_regions));
+        neuron_pause(data_specification_get_region(NEURON_PARAMS_REGION, ds_regions));
 
         profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
 
-        /* Finalise any recordings that are in progress, writing back the final
-         * amounts of samples recorded to SDRAM */
-        if (recording_flags > 0) {
-            log_debug("updating recording regions");
-            recording_finalise();
-        }
         profiler_finalise();
 
         // Subtract 1 from the time so this tick gets done again on the next
@@ -309,16 +286,12 @@ void timer_callback(uint timer_count, uint unused) {
     synapses_do_timestep_update(time);
     neuron_do_timestep_update(time, timer_count, timer_period);
 
-    // trigger buffering_out_mechanism
-    if (recording_flags > 0) {
-        recording_do_timestep_update(time);
-    }
-
     profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
 }
 
 //! \brief The entry point for this model.
 void c_main(void) {
+
     // initialise the model
     if (!initialise()) {
         rt_error(RTE_API);
@@ -329,7 +302,7 @@ void c_main(void) {
 
     // Set timer tick (in microseconds)
     log_debug("setting timer tick callback for %d microseconds",
-            timer_period);
+              timer_period);
     spin1_set_timer_tick_and_phase(timer_period, timer_offset);
 
     // Set up the timer tick callback (others are handled elsewhere)

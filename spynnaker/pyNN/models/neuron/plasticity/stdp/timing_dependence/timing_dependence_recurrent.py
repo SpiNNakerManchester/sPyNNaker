@@ -14,6 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy
+from spinn_front_end_common.utilities.constants import \
+    MICRO_TO_MILLISECOND_CONVERSION
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.constants import (
@@ -104,10 +106,12 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
                          data_type=DataType.INT32)
 
         # Convert mean times into machine timesteps
-        mean_pre_timesteps = (float(self.__mean_pre_window) *
-                              (1000.0 / float(machine_time_step)))
-        mean_post_timesteps = (float(self.__mean_post_window) *
-                               (1000.0 / float(machine_time_step)))
+        mean_pre_timesteps = (
+            float(self.__mean_pre_window) *
+            (MICRO_TO_MILLISECOND_CONVERSION / float(machine_time_step)))
+        mean_post_timesteps = (
+            float(self.__mean_post_window) *
+            (MICRO_TO_MILLISECOND_CONVERSION / float(machine_time_step)))
 
         # Write lookup tables
         self._write_exp_dist_lut(spec, mean_pre_timesteps)
