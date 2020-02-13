@@ -95,8 +95,8 @@ static void recording_done_callback(void) {
     n_recordings_outstanding -= 1;
 }
 
-//! \brief stores a recording of a value of any type; use the functions below
-//!        for common types as these will be faster.
+//! \brief stores a recording of a value of any type, except bitfield;
+//!        use the functions below for common types as these will be faster.
 //! \param[in] var_index: which recording variable to write this is
 //! \param[in] neuron_index: the neuron id for this recorded data
 //! \param[in] value: pointer to the value to record for this neuron.
@@ -156,7 +156,8 @@ static inline void neuron_recording_record_int32(
 }
 
 
-//! \brief stores a recording of a set bit
+//! \brief stores a recording of a set bit; this is the only way to set a bit
+//!        in a bitfield; neuron_recording_record_value doesn't work for this!
 //! \param[in] var_index: which bitfield recording variable to write this is
 //! \param[in] neuron_index: which neuron to set the bit for
 static inline void neuron_recording_record_bit(
