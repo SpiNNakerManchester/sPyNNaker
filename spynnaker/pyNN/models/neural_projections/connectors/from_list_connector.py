@@ -15,6 +15,9 @@
 
 import logging
 import numpy
+
+from spinn_front_end_common.utilities.constants import \
+    MICRO_TO_MILLISECOND_CONVERSION
 from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
 from spynnaker.pyNN.exceptions import InvalidParameterType
@@ -135,7 +138,7 @@ class FromListConnector(AbstractConnector):
         pre_post_bins = [(pre - 1, post - 1) for pre in pre_bins[1:]
                          for post in post_bins[1:]]
         self.__split_conn_list = {
-            (pre_post): indices
+            pre_post: indices
             for pre_post, indices in zip(pre_post_bins, split_indices)
         }
 

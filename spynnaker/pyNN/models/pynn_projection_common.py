@@ -16,6 +16,10 @@
 from __future__ import division
 import logging
 import math
+import numpy
+from pyNN.random import RandomDistribution
+from spinn_front_end_common.utilities.constants import \
+    MICRO_TO_MILLISECOND_CONVERSION
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.constraints.partitioner_constraints import (
     SameAtomsAsVertexConstraint)
@@ -140,7 +144,8 @@ class PyNNProjectionCommon(object):
                 "(max supported delay is {})".format(max_delay,
                                                      max_supported_delay_ms))
 
-        if max_delay > user_max_delay / (rounding_in_us / 1000.0):
+        if max_delay > user_max_delay / (
+                rounding_in_us / MICRO_TO_MILLISECOND_CONVERSION):
             logger.warning("The end user entered a max delay"
                            " for which the projection breaks")
 

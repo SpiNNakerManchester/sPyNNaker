@@ -17,6 +17,9 @@ import logging
 import math
 import os
 from six import with_metaclass
+
+from spinn_front_end_common.utilities.constants import \
+    MICRO_TO_MILLISECOND_CONVERSION
 from spinn_utilities.abstract_base import AbstractBase
 from spinn_utilities.log import FormatAdapter
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
@@ -125,6 +128,8 @@ class AbstractSpiNNakerCommon(with_metaclass(
             extra_mapping_algorithms = []
         if extra_load_algorithms is None:
             extra_load_algorithms = []
+        if extra_post_run_algorithms is None:
+            extra_post_run_algorithms = []
         extra_load_algorithms.append("SynapseExpander")
         extra_algorithms_pre_run = []
 
@@ -168,22 +173,24 @@ class AbstractSpiNNakerCommon(with_metaclass(
             self.set_up_timings(timestep_in_ms, time_scale_factor)
         else:
             self.set_up_timings(
-                math.ceil(timestep_in_ms * 1000.0), time_scale_factor)
+                math.ceil(timestep * MICRO_TO_MILLISECOND_CONVERSION),
+                time_scale_factor)
 
         # Read the value back as it may come from config is none
         user_timestep_in_us = self.user_timestep_in_us
-
         # Sort out the minimum delay
         if (min_delay is not None and
-                min_delay * 1000.0 < user_timestep_in_us):
+                (min_delay * MICRO_TO_MILLISECOND_CONVERSION) <
+                user_timestep_in_us):
             raise ConfigurationException(
                 "Pacman does not support min delays below {} ms with the "
                 "current machine time step".format(
                     constants.MIN_SUPPORTED_DELAY * user_timestep_in_us))
-        if min_delay is not None:
+         if min_delay is not None:
             self.__min_delay = min_delay
         else:
-            self.__min_delay = user_timestep_in_us / 1000.0
+            self.__min_delay = (
+                    user_timestep_in_us / MICRO_TO_MILLISECOND_CONVERSION)
 
         # Sort out the maximum delay
         natively_supported_delay_for_models = \
@@ -194,7 +201,8 @@ class AbstractSpiNNakerCommon(with_metaclass(
         max_delay_tics_supported = \
             natively_supported_delay_for_models + \
             delay_extension_max_supported_delay
-        if (max_delay is not None and max_delay * 1000.0 >
+        if (max_delay is not None and
+                max_delay * MICRO_TO_MILLISECOND_CONVERSION >
                 max_delay_tics_supported * user_timestep_in_us):
             raise ConfigurationException(
                 "Pacman does not support max delays above {} ms with the "
@@ -204,13 +212,15 @@ class AbstractSpiNNakerCommon(with_metaclass(
             self.__max_delay = max_delay
         else:
             self.__max_delay = (
-                max_delay_tics_supported * (user_timestep_in_us / 1000.0))
+                max_delay_tics_supported * (user_timestep_in_us /
+                    MICRO_TO_MILLISECOND_CONVERSION))
 
         # Sort out the time scale factor if not user specified
         # (including config)
         if self.time_scale_factor is None:
             self.time_scale_factor = max(
-                1.0, math.ceil(1000.0 / user_timestep_in_us))
+                1.0, math.ceil(
+                    MICRO_TO_MILLISECOND_CONVERSION / user_timestep_in_us))
             if self.time_scale_factor > 1:
                 logger.warning(
                     "A timestep was entered that has forced sPyNNaker to "
@@ -220,7 +230,8 @@ class AbstractSpiNNakerCommon(with_metaclass(
                     self.time_scale_factor, self.CONFIG_FILE_NAME)
 
         # Check the combination of machine time step and time scale factor
-        if user_timestep_in_us * self.time_scale_factor < 1000:
+        if (user_timestep_in_us * self.time_scale_factor <
+                MICRO_TO_MILLISECOND_CONVERSION):
             if not config.getboolean(
                     "Mode", "violate_1ms_wall_clock_restriction"):
                 raise ConfigurationException(

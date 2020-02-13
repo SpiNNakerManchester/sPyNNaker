@@ -112,6 +112,13 @@ class AbstractNeuronImpl(object):
         """
 
     @abstractmethod
+    def get_recordable_data_types(self):
+        """ Get the data type of the variables that can be recorded
+
+        :return: dict of name of variable to DataType of variable
+        """
+
+    @abstractmethod
     def is_recordable(self, variable):
         """ Determine if the given variable can be recorded
 

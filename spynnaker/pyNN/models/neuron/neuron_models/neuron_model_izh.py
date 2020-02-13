@@ -12,7 +12,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+from spinn_front_end_common.utilities.constants import \
+    MICRO_TO_MILLISECOND_CONVERSION
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from .abstract_neuron_model import AbstractNeuronModel
@@ -88,7 +89,7 @@ class NeuronModelIzh(AbstractNeuronModel):
 
     @overrides(AbstractNeuronModel.get_global_values)
     def get_global_values(self, timestamp_in_us):
-        return [float(timestamp_in_us)/1000.0]
+        return [float(timestamp_in_us) / MICRO_TO_MILLISECOND_CONVERSION]
 
     @overrides(AbstractNeuronModel.get_values)
     def get_values(
@@ -98,7 +99,7 @@ class NeuronModelIzh(AbstractNeuronModel):
         return [
             parameters[A], parameters[B], parameters[C], parameters[D],
             state_variables[V], state_variables[U], parameters[I_OFFSET],
-            float(timestamp_in_us) / 1000.0
+            float(timestamp_in_us) / MICRO_TO_MILLISECOND_CONVERSION
         ]
 
     @overrides(AbstractNeuronModel.update_values)
