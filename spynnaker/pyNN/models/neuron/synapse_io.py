@@ -439,7 +439,7 @@ class SynapseIORowBased(object):
             # Use the row index to work out the actual delay and source
             n_synapses = dynamics.get_n_synapses_in_rows(ff_size)
             delayed_connections = self.__convert_delayed_data(
-                n_synapses, pre_vertex_slice, delayed_connections, connections)
+                n_synapses, pre_vertex_slice, delayed_connections)
             connections.append(delayed_connections)
 
         return connections
@@ -487,7 +487,7 @@ class SynapseIORowBased(object):
             # Use the row index to work out the actual delay and source
             n_synapses = dynamics.get_n_synapses_in_rows(pp_size, fp_size)
             delayed_connections = self.__convert_delayed_data(
-                n_synapses, pre_vertex_slice, delayed_connections, connections)
+                n_synapses, pre_vertex_slice, delayed_connections)
             connections.append(delayed_connections)
 
         return connections
