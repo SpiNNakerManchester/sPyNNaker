@@ -23,7 +23,6 @@ import numpy
 from pyNN.random import RandomDistribution
 from scipy.stats import binom
 from spinn_utilities.safe_eval import SafeEval
-from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.utilities.random_stats import (
     RandomStatsExponentialImpl, RandomStatsGammaImpl, RandomStatsLogNormalImpl,
@@ -168,17 +167,17 @@ def read_spikes_from_file(file_path, min_atom=0, max_atom=float('inf'),
     # For backward compatibility as previous version tested for None rather
     # than having default values
     if min_atom is None:
-        min_atom = 0
+        min_atom = 0.0
     if max_atom is None:
         max_atom = float('inf')
     if min_time is None:
-        min_time = 0
+        min_time = 0.0
     if max_time is None:
         max_time = float('inf')
 
     data = []
-    with open(file_path, 'r') as fsource:
-        read_data = fsource.readlines()
+    with open(file_path, 'r') as f_source:
+        read_data = f_source.readlines()
 
     evaluator = SafeEval()
     for line in read_data:
@@ -279,23 +278,6 @@ def validate_mars_kiss_64_seed(seed):
     # avoid z=c=0 and make < 698769069
     seed[3] = seed[3] % 698769068 + 1
     return seed
-
-
-def check_sampling_interval(sampling_interval):
-    step = globals_variables.get_simulator().machine_time_step / 1000
-    if sampling_interval is None:
-        return step
-    rate = int(sampling_interval / step)
-    if sampling_interval != rate * step:
-        msg = "sampling_interval {} is not an an integer " \
-              "multiple of the simulation timestep {}" \
-              "".format(sampling_interval, step)
-        raise ConfigurationException(msg)
-    if rate > MAX_RATE:
-        msg = "sampling_interval {} higher than max allowed which is {}" \
-              "".format(sampling_interval, step * MAX_RATE)
-        raise ConfigurationException(msg)
-    return sampling_interval
 
 
 def get_n_bits(n_values):

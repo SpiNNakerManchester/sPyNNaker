@@ -16,13 +16,14 @@
 import collections
 import numpy
 from data_specification.enums.data_type import DataType
+from spinn_front_end_common.utilities.constants import (
+    MICRO_TO_MILLISECOND_CONVERSION, MICRO_TO_SECOND_CONVERSION,
+    BYTES_PER_WORD, BYTES_PER_SHORT)
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.utilities import constants
-from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, BYTES_PER_SHORT)
 import math
 
 
@@ -242,16 +243,19 @@ class SynapseDynamicsStructuralCommon(object):
         :return: None
         :rtype: None
         """
-        if self.__p_rew * 1000. < machine_time_step / 1000.:
+        if (self.__p_rew * MICRO_TO_MILLISECOND_CONVERSION <
+                machine_time_step / MICRO_TO_MILLISECOND_CONVERSION):
             # Fast rewiring
             spec.write_value(data=1)
-            spec.write_value(
-                data=int(machine_time_step / (self.__p_rew * 10 ** 6)))
+            spec.write_value(data=int(
+                machine_time_step / (
+                    self.__p_rew * MICRO_TO_SECOND_CONVERSION)))
         else:
             # Slow rewiring
             spec.write_value(data=0)
-            spec.write_value(
-                data=int((self.__p_rew * 10 ** 6) / float(machine_time_step)))
+            spec.write_value(data=int((
+                self.__p_rew * MICRO_TO_SECOND_CONVERSION) /
+                float(machine_time_step)))
         # write s_max
         spec.write_value(data=int(self.__s_max))
         # write total number of atoms in the application vertex

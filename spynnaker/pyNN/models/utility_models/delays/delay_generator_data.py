@@ -15,7 +15,8 @@
 
 import numpy
 from data_specification.enums.data_type import DataType
-from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spinn_front_end_common.utilities.constants import (
+    MICRO_TO_MILLISECOND_CONVERSION, BYTES_PER_WORD)
 
 
 class DelayGeneratorData(object):
@@ -80,7 +81,8 @@ class DelayGeneratorData(object):
             self.__pre_vertex_slice.lo_atom,
             self.__pre_vertex_slice.n_atoms,
             self.__max_stage,
-            DataType.S1615.encode_as_int(1000.0 / self.__machine_time_step),
+            DataType.S1615.encode_as_int(
+                MICRO_TO_MILLISECOND_CONVERSION / self.__machine_time_step),
             connector.gen_connector_id,
             connector.gen_delays_id(self.__synapse_information.delays)],
             dtype="uint32"))

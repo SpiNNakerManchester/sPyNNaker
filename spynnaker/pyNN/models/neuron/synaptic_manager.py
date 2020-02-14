@@ -12,6 +12,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from spinn_front_end_common.utilities.constants import \
+    MICRO_TO_SECOND_CONVERSION
 
 from collections import defaultdict
 from six import iteritems
@@ -399,7 +401,7 @@ class SynapticManager(object):
             set this for approximate number of saturation events.
         """
         # E[ number of spikes ] in a timestep
-        steps_per_second = 1000000.0 / machine_timestep
+        steps_per_second = MICRO_TO_SECOND_CONVERSION / machine_timestep
         average_spikes_per_timestep = (
             float(n_synapses_in * spikes_per_second) / steps_per_second)
 
@@ -458,7 +460,7 @@ class SynapticManager(object):
         biggest_weight = numpy.zeros(n_synapse_types)
         weights_signed = False
         rate_stats = [RunningStats() for _ in range(n_synapse_types)]
-        steps_per_second = 1000000.0 / machine_timestep
+        steps_per_second = MICRO_TO_SECOND_CONVERSION / machine_timestep
 
         for app_edge in application_graph.get_edges_ending_at_vertex(
                 application_vertex):
@@ -496,7 +498,7 @@ class SynapticManager(object):
                                   SpikeSourcePoissonVertex):
                         rate = app_edge.pre_vertex.max_rate
                         # If non-zero rate then use it; otherwise keep default
-                        if (rate != 0):
+                        if rate != 0:
                             spikes_per_second = rate
                         if hasattr(spikes_per_second, "__getitem__"):
                             spikes_per_second = numpy.max(spikes_per_second)
