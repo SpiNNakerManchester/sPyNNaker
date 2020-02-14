@@ -157,9 +157,6 @@ static bool neuron_recording_read_in_elements(
 
     for (uint32_t i = 0; i < N_BITFIELD_VARS; i++) {
         bitfield_info[i].rate = bitfield_data[i].rate;
-        if (bitfield_info[i].rate == 0) {
-            continue;
-        }
         uint32_t n_neurons_rec = bitfield_data[i].n_neurons_recording;
         bitfield_info[i].size = bitfield_data_size(n_neurons_rec);
         // There is an extra "neuron" in the data used when one of the neurons
