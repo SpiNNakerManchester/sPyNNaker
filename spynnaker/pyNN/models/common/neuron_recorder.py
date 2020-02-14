@@ -868,7 +868,7 @@ class NeuronRecorder(object):
         :rtype: int
         """
         return n_neurons * self._N_CPU_CYCLES_PER_NEURON * \
-                len(self.recording_variables)
+            len(self.recording_variables)
 
     def __add_indices(self, data, variable, rate, n_recording, vertex_slice):
         """
