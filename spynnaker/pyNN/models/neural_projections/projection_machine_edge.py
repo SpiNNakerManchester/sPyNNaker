@@ -78,7 +78,7 @@ class ProjectionMachineEdge(
                 if n_connections == 0:
                     n_filtered += 1
 
-        return (n_filtered == len(self.__synapse_information))
+        return n_filtered == len(self.__synapse_information)
 
     @overrides(AbstractWeightUpdatable.update_weight)
     def update_weight(self):
