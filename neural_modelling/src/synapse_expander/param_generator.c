@@ -158,9 +158,6 @@ void param_generator_generate(
 }
 
 void param_generator_free(param_generator_t generator) {
-    log_debug("Freeing generator 0x%08x", generator);
-    log_debug("Freeing 0x%08x with data 0x%08x", generator->type, generator->data);
     generator->type->free(generator->data);
-    log_debug("Freeing generator 0x%08x", generator);
     sark_free(generator);
 }
