@@ -173,7 +173,7 @@ class AbstractSpiNNakerCommon(with_metaclass(
             self.set_up_timings(timestep_in_ms, time_scale_factor)
         else:
             self.set_up_timings(
-                math.ceil(timestep * MICRO_TO_MILLISECOND_CONVERSION),
+                math.ceil(timestep_in_ms * MICRO_TO_MILLISECOND_CONVERSION),
                 time_scale_factor)
 
         # Read the value back as it may come from config is none

@@ -12,12 +12,9 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-<<<<<<< HEAD
 
 import numpy
-=======
 from data_specification.enums import DataType
->>>>>>> refs/remotes/origin/master
 from unittests.mocks import MockSimulator
 from pacman.model.graphs.common import Slice
 from spinn_front_end_common.utilities import globals_variables
@@ -31,10 +28,9 @@ def test_simple_record():
     globals_variables.set_failed_state(SpynnakerFailedState())
     globals_variables.set_simulator(simulator)
 
-<<<<<<< HEAD
-    nr = NeuronRecorder(["spikes", "v", "gsyn_exc", "gsyn_inh"], 0, 100, 1000)
-    assert(frozenset(["spikes", "v", "gsyn_exc", "gsyn_inh"]) ==
-=======
+#allowed_variables, data_types, bitfield_variables,
+#                 min_id, max_id, timestep_in_us
+
     recordables = ["v", "gsyn_exc", "gsyn_inh"]
 
     data_types = {
@@ -42,10 +38,9 @@ def test_simple_record():
         "gsyn_exc": DataType.S1615,
         "gsyn_inh": DataType.S1615
     }
+    nr = NeuronRecorder(recordables, data_types, [], 0, 100, 1000)
 
-    nr = NeuronRecorder(recordables, data_types, [], 100)
     assert(frozenset(["v", "gsyn_exc", "gsyn_inh"]) ==
->>>>>>> refs/remotes/origin/master
            frozenset(nr.get_recordable_variables()))
     assert([] == nr.recording_variables)
     nr.set_recording("v", True)
@@ -63,9 +58,6 @@ def test_recording_variables():
     globals_variables.set_failed_state(SpynnakerFailedState())
     globals_variables.set_simulator(simulator)
 
-<<<<<<< HEAD
-    nr = NeuronRecorder(["spikes", "v", "gsyn_exc", "gsyn_inh"], 0, 100, 1000)
-=======
     recordables = ["v", "gsyn_exc", "gsyn_inh"]
 
     data_types = {
@@ -74,14 +66,12 @@ def test_recording_variables():
         "gsyn_inh": DataType.S1615
     }
 
-    nr = NeuronRecorder(recordables, data_types, [], 100)
->>>>>>> refs/remotes/origin/master
+    nr = NeuronRecorder(recordables, data_types, [], 0, 100, 1000)
     assert([] == nr.recording_variables)
     nr.set_recording("v", True)
     nr.set_recording("gsyn_inh", True)
     assert(["v", "gsyn_inh"] == nr.recording_variables)
-<<<<<<< HEAD
-    assert([1, 3] == nr.recorded_region_ids)
+    assert([0, 2] == nr.recorded_region_ids)
 
 
 def test_pack_matrix():
@@ -173,6 +163,3 @@ def test_combine_matrix():
          101, 102, 103, 2101, 2102, 2103, nan, nan, nan,
          111, 112, 113, nan, nan, nan, nan, nan, nan]).reshape(12, 9)
     numpy.testing.assert_equal(result1_2_3, target1_2_3)
-=======
-    assert([0, 2] == nr.recorded_region_ids)
->>>>>>> refs/remotes/origin/master

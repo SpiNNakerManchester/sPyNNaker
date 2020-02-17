@@ -20,18 +20,15 @@ import math
 import numpy
 from six import raise_from, iteritems
 from six.moves import range, xrange
-from spinn_utilities.index_is_value import IndexIsValue
 from spinn_utilities.helpful_functions import gcd
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.resources import VariableSDRAM
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
+from spinn_front_end_common.utilities.constants import (US_TO_MS)
 from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, US_TO_MS)
-from spinn_front_end_common.utilities import globals_variables
-from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, MICRO_TO_MILLISECOND_CONVERSION, BITS_PER_WORD)
+    BYTES_PER_WORD, BITS_PER_WORD)
 from spinn_front_end_common.interface.buffer_management import \
     recording_utilities
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
