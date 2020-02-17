@@ -1,20 +1,36 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from pacman.model.graphs.application import ApplicationEdge
 from spinnman.messages.eieio import EIEIOType
-from spinn_front_end_common.utilities.globals_variables import get_simulator
-from spynnaker.pyNN.utilities import constants
 from spinn_front_end_common.utilities import helpful_functions
+from spinn_front_end_common.utilities.globals_variables import get_simulator
+from spinn_front_end_common.utility_models import (
+    ReverseIpTagMultiCastSource)
+from spinn_front_end_common.utilities.notification_protocol import (
+    SocketAddress)
+from spinn_front_end_common.utilities.utility_objs import (
+    LivePacketGatherParameters)
+from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.pynn_population_common import PyNNPopulationCommon
-from spinn_front_end_common.utility_models \
-    import ReverseIpTagMultiCastSource
-from spinn_front_end_common.utilities.notification_protocol \
-    import SocketAddress
-from spinn_front_end_common.utilities.utility_objs \
-    import LivePacketGatherParameters
 
 
 class SpynnakerExternalDevicePluginManager(object):
     """ User-level interface for the external device plugin manager.
     """
+    __slots__ = []
 
     @staticmethod
     def add_database_socket_address(
@@ -114,6 +130,10 @@ class SpynnakerExternalDevicePluginManager(object):
             Determines if the spike packet will contain a common prefix for\
             the spikes
         :type use_prefix: bool
+        :param label: The label of the gatherer vertex
+        :type label: str
+        :param partition_ids: The names of the partitions to create edges for
+        :type partition_ids: list(str)
         """
         # pylint: disable=too-many-arguments, too-many-locals, protected-access
         config = get_simulator().config
@@ -125,11 +145,12 @@ class SpynnakerExternalDevicePluginManager(object):
 
         # add new edge and vertex if required to SpiNNaker graph
         SpynnakerExternalDevicePluginManager.update_live_packet_gather_tracker(
-            population._vertex, port, host, tag, board_address, strip_sdp,
-            use_prefix, key_prefix, prefix_type, message_type, right_shift,
-            payload_as_time_stamps, use_payload_prefix, payload_prefix,
-            payload_right_shift, number_of_packets_sent_per_time_step,
-            partition_id=constants.SPIKE_PARTITION_ID)
+            population._vertex, "LiveSpikeReceiver", port, host, board_address,
+            tag, strip_sdp, use_prefix, key_prefix, prefix_type,
+            message_type, right_shift, payload_as_time_stamps,
+            use_payload_prefix, payload_prefix, payload_right_shift,
+            number_of_packets_sent_per_time_step,
+            partition_ids=[constants.SPIKE_PARTITION_ID])
 
         if notify:
             SpynnakerExternalDevicePluginManager.add_database_socket_address(
@@ -153,9 +174,9 @@ class SpynnakerExternalDevicePluginManager(object):
             or :py:class:`pacman.model.graphs.application.ApplicationVertex`
         """
         device_vertex = device
+        # pylint: disable=protected-access
         if isinstance(device, PyNNPopulationCommon):
             device_vertex = device._get_vertex
-        # pylint: disable=protected-access
         SpynnakerExternalDevicePluginManager.add_edge(
             population._get_vertex, device_vertex,
             constants.SPIKE_PARTITION_ID)
@@ -173,14 +194,14 @@ class SpynnakerExternalDevicePluginManager(object):
 
     @staticmethod
     def update_live_packet_gather_tracker(
-            vertex_to_record_from, port, hostname, tag=None,
-            board_address=None,
-            strip_sdp=True, use_prefix=False, key_prefix=None,
-            prefix_type=None, message_type=EIEIOType.KEY_32_BIT,
+            vertex_to_record_from, lpg_label, port=None, hostname=None,
+            board_address=None, tag=None, strip_sdp=True, use_prefix=False,
+            key_prefix=None, prefix_type=None,
+            message_type=EIEIOType.KEY_32_BIT,
             right_shift=0, payload_as_time_stamps=True,
             use_payload_prefix=True, payload_prefix=None,
             payload_right_shift=0, number_of_packets_sent_per_time_step=0,
-            partition_id=None):
+            partition_ids=None):
         """ Add an edge from a vertex to the live packet gatherer, builds as\
             needed and has all the parameters for the creation of the live\
             packet gatherer if needed.
@@ -196,18 +217,19 @@ class SpynnakerExternalDevicePluginManager(object):
             payload_right_shift=payload_right_shift,
             number_of_packets_sent_per_time_step=(
                 number_of_packets_sent_per_time_step),
-            partition_id=partition_id)
+            label=lpg_label)
 
         # add to the tracker
         get_simulator().add_live_packet_gatherer_parameters(
-            params, vertex_to_record_from)
+            params, vertex_to_record_from, partition_ids)
 
     @staticmethod
     def add_poisson_live_rate_control(
             poisson_population, control_label_extension="_control",
             receive_port=None, database_notify_host=None,
             database_notify_port_num=None,
-            database_ack_port_num=None, notify=True):
+            database_ack_port_num=None, notify=True,
+            reserve_reverse_ip_tag=False):
         """ Add a live rate controller to a Poisson population.
 
         :param poisson_population: The population to control
@@ -231,13 +253,17 @@ class SpynnakerExternalDevicePluginManager(object):
         :param database_notify_port_num: The port number to which a external\
             device will receive the database is ready command
         :type database_notify_port_num: int
+        :param reserve_reverse_ip_tag: True if a reverse ip tag is to be\
+            used, False if SDP is to be used (default)
+        :type reserve_reverse_ip_tag: bool
         """
         # pylint: disable=too-many-arguments, protected-access
         vertex = poisson_population._get_vertex
         control_label = "{}{}".format(vertex.label, control_label_extension)
         controller = ReverseIpTagMultiCastSource(
             n_keys=vertex.n_atoms, label=control_label,
-            receive_port=receive_port, reserve_reverse_ip_tag=True)
+            receive_port=receive_port,
+            reserve_reverse_ip_tag=reserve_reverse_ip_tag)
         SpynnakerExternalDevicePluginManager.add_application_vertex(controller)
         SpynnakerExternalDevicePluginManager.add_edge(
             controller, vertex, constants.LIVE_POISSON_CONTROL_PARTITION_ID)
@@ -270,4 +296,4 @@ class SpynnakerExternalDevicePluginManager(object):
 
     @staticmethod
     def time_scale_factor():
-        return get_simulator().timescale_factor
+        return get_simulator().time_scale_factor

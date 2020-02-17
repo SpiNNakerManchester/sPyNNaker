@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2017-2019 The University of Manchester
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 /**
  *! \file
  *! \brief The implementation of a parameter generator
@@ -5,6 +22,7 @@
 #include "param_generator.h"
 #include <spin1_api.h>
 #include <debug.h>
+#include "generator_types.h"
 
 #include "param_generators/param_generator_constant.h"
 #include "param_generators/param_generator_uniform.h"
@@ -12,38 +30,38 @@
 #include "param_generators/param_generator_normal_clipped.h"
 #include "param_generators/param_generator_normal_clipped_to_boundary.h"
 #include "param_generators/param_generator_exponential.h"
+#include "param_generators/param_generator_kernel.h"
 
-/**
- *! \brief The number of known generators
- */
-#define N_PARAM_GENERATORS 6
-
-/**
- *! \brief The data for a parameter generator
- */
-struct param_generator {
-    uint32_t index;
-    void *data;
+enum {
+    CONSTANT,
+    UNIFORM,
+    NORMAL,
+    NORMAL_CLIPPED,
+    NORMAL_CLIPPED_BOUNDARY,
+    EXPONENTIAL,
+    KERNEL,
+    /**
+     *! \brief The number of known generators
+     */
+    N_PARAM_GENERATORS = 7
 };
 
 /**
  *! \brief A "class" for parameter generators
  */
-struct param_generator_info {
-
+typedef struct param_generator_info {
     /**
-     *! \brief The hash of the generator
+     *! \brief The hash of the generator.
+     *! For now, hash is just an index agreed between Python and here.
      */
-    uint32_t hash;
-
+    generator_hash_t hash;
     /**
      *! \brief Initialise the generator
      *! \param[in/out] region Region to read parameters from.  Should be updated
      *!                       to position just after parameters after calling.
      *! \return A data item to be passed in to other functions later on
      */
-    void* (*initialize)(address_t *region);
-
+    initialize_func *initialize;
     /**
      *! \brief Generate values with a parameter generator
      *! \param[in] data The data for the parameter generator, returned by the
@@ -52,91 +70,79 @@ struct param_generator_info {
      *! \param[in] pre_neuron_index The index of the neuron in the pre-population
      *!                             being generated
      *! \param[in] indices The n_indices post-neuron indices for each connection
-     *! \param[in/out] values An array into which to place the values - will be
+     *! \param[in/out] values An array into which to place the values; will be
      *!                       n_indices in size
      */
-    void (*generate)(
-        void *data, uint32_t n_synapses, uint32_t pre_neuron_index,
-        uint16_t *indices, accum *values);
-
+    generate_param_func *generate;
     /**
      *! \brief Free any data for the generator
      *! \param[in] data The data to free
      */
-    void (*free)(void *data);
+    free_func *free;
+} param_generator_info;
+
+/**
+ *! \brief The data for a parameter generator
+ */
+struct param_generator {
+    const param_generator_info *type;
+    void *data;
 };
 
 /**
  *! \brief An Array of known generators
  */
-struct param_generator_info param_generators[N_PARAM_GENERATORS];
-
-void register_param_generators() {
-    // Register each of the known connection generators
-    // For now, hash is just an index agreed between Python and here
-
-    // Constant value
-    param_generators[0].hash = 0;
-    param_generators[0].initialize = param_generator_constant_initialize;
-    param_generators[0].generate = param_generator_constant_generate;
-    param_generators[0].free = param_generator_constant_free;
-
-    // Uniform random values
-    param_generators[1].hash = 1;
-    param_generators[1].initialize = param_generator_uniform_initialize;
-    param_generators[1].generate = param_generator_uniform_generate;
-    param_generators[1].free = param_generator_uniform_free;
-
-    // Normally distributed random values
-    param_generators[2].hash = 2;
-    param_generators[2].initialize = param_generator_normal_initialize;
-    param_generators[2].generate = param_generator_normal_generate;
-    param_generators[2].free = param_generator_normal_free;
-
-    // Normally distributed random values redrawn when outside boundary
-    param_generators[3].hash = 3;
-    param_generators[3].initialize = param_generator_normal_clipped_initialize;
-    param_generators[3].generate = param_generator_normal_clipped_generate;
-    param_generators[3].free = param_generator_normal_clipped_free;
-
-    // Normally distributed random values clipped to boundary
-    param_generators[4].hash = 4;
-    param_generators[4].initialize =
-        param_generator_normal_clipped_boundary_initialize;
-    param_generators[4].generate =
-        param_generator_normal_clipped_boundary_generate;
-    param_generators[4].free = param_generator_normal_clipped_boundary_free;
-
-    // Exponentially distributed random values
-    param_generators[5].hash = 5;
-    param_generators[5].initialize = param_generator_exponential_initialize;
-    param_generators[5].generate = param_generator_exponential_generate;
-    param_generators[5].free = param_generator_exponential_free;
-}
+static const struct param_generator_info param_generators[] = {
+    {CONSTANT,
+            param_generator_constant_initialize,
+            param_generator_constant_generate,
+            param_generator_constant_free},
+    {UNIFORM,
+            param_generator_uniform_initialize,
+            param_generator_uniform_generate,
+            param_generator_uniform_free},
+    {NORMAL,
+            param_generator_normal_initialize,
+            param_generator_normal_generate,
+            param_generator_normal_free},
+    {NORMAL_CLIPPED,
+            param_generator_normal_clipped_initialize,
+            param_generator_normal_clipped_generate,
+            param_generator_normal_clipped_free},
+    {NORMAL_CLIPPED_BOUNDARY,
+            param_generator_normal_clipped_boundary_initialize,
+            param_generator_normal_clipped_boundary_generate,
+            param_generator_normal_clipped_boundary_free},
+    {EXPONENTIAL,
+            param_generator_exponential_initialize,
+            param_generator_exponential_generate,
+            param_generator_exponential_free},
+    {KERNEL,
+            param_generator_kernel_initialize,
+            param_generator_kernel_generate,
+            param_generator_kernel_free},
+};
 
 param_generator_t param_generator_init(uint32_t hash, address_t *in_region) {
-
     // Look through the known generators
     for (uint32_t i = 0; i < N_PARAM_GENERATORS; i++) {
+        const param_generator_info *type = &param_generators[i];
 
         // If the hash requested matches the hash of the generator, use it
-        if (hash == param_generators[i].hash) {
-
+        if (hash == type->hash) {
             // Prepare a space for the data
-            address_t region = *in_region;
-            param_generator_t generator = spin1_malloc(
-                sizeof(param_generator_t));
+            struct param_generator *generator =
+                    spin1_malloc(sizeof(struct param_generator));
             if (generator == NULL) {
                 log_error("Could not create generator");
                 return NULL;
             }
 
             // Store the index
-            generator->index = i;
+            generator->type = type;
 
             // Initialise the generator and store the data
-            generator->data = param_generators[i].initialize(&region);
-            *in_region = region;
+            generator->data = type->initialize(in_region);
             return generator;
         }
     }
@@ -147,11 +153,11 @@ param_generator_t param_generator_init(uint32_t hash, address_t *in_region) {
 void param_generator_generate(
         param_generator_t generator, uint32_t n_indices,
         uint32_t pre_neuron_index, uint16_t *indices, accum *values) {
-    param_generators[generator->index].generate(
-        generator->data, n_indices, pre_neuron_index, indices, values);
+    generator->type->generate(
+            generator->data, n_indices, pre_neuron_index, indices, values);
 }
 
 void param_generator_free(param_generator_t generator) {
-    param_generators[generator->index].free(generator->data);
+    generator->type->free(generator->data);
     sark_free(generator);
 }

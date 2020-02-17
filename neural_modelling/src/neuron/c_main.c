@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2017-2019 The University of Manchester
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 /*!\file
  *
  * SUMMARY
@@ -31,23 +48,23 @@
 #include <debug.h>
 
 /* validates that the model being compiled does indeed contain a application
-   magic number*/
+ * magic number*/
 #ifndef APPLICATION_NAME_HASH
 #define APPLICATION_NAME_HASH 0
 #error APPLICATION_NAME_HASH was undefined.  Make sure you define this\
-       constant
+    constant
 #endif
 
-typedef enum extra_provenance_data_region_entries{
-    NUMBER_OF_PRE_SYNAPTIC_EVENT_COUNT = 0,
-    SYNAPTIC_WEIGHT_SATURATION_COUNT = 1,
-    INPUT_BUFFER_OVERFLOW_COUNT = 2,
-    CURRENT_TIMER_TICK = 3,
-    PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT = 4
-} extra_provenance_data_region_entries;
+struct neuron_provenance {
+    uint32_t n_pre_synaptic_events;
+    uint32_t n_synaptic_weight_saturations;
+    uint32_t n_input_buffer_overflows;
+    uint32_t current_timer_tick;
+    uint32_t n_plastic_synaptic_weight_saturations;
+};
 
 //! values for the priority for each callback
-typedef enum callback_priorities{
+typedef enum callback_priorities {
     MC = -1, DMA = 0, USER = 0, SDP = 1, TIMER = 2
 } callback_priorities;
 
@@ -60,14 +77,14 @@ typedef enum callback_priorities{
 //! the timer tick callback returning the same value.
 uint32_t time;
 
+static uint32_t timer_period;
+static uint32_t timer_offset;
+
 //! The number of timer ticks to run for before being expected to exit
 static uint32_t simulation_ticks = 0;
 
 //! Determines if this model should run for infinite time
 static uint32_t infinite_run;
-
-//! The recording flags
-static uint32_t recording_flags = 0;
 
 //! Timer callbacks since last rewiring
 int32_t last_rewiring_time = 0;
@@ -81,29 +98,20 @@ bool rewiring = false;
 // FOR DEBUGGING!
 uint32_t count_rewires = 0;
 
+//! The number of neurons on the core
+static uint32_t n_neurons;
 
-//! \brief Initialises the recording parts of the model
-//! \param[in] recording_address: the address in SDRAM where to store
-//! recordings
-//! \return True if recording initialisation is successful, false otherwise
-static bool initialise_recording(address_t recording_address){
-    bool success = recording_initialize(recording_address, &recording_flags);
-    log_debug("Recording flags = 0x%08x", recording_flags);
-    return success;
-}
 
-void c_main_store_provenance_data(address_t provenance_region){
+void c_main_store_provenance_data(address_t provenance_region) {
     log_debug("writing other provenance data");
+    struct neuron_provenance *prov = (void *) provenance_region;
 
     // store the data into the provenance data region
-    provenance_region[NUMBER_OF_PRE_SYNAPTIC_EVENT_COUNT] =
-        synapses_get_pre_synaptic_events();
-    provenance_region[SYNAPTIC_WEIGHT_SATURATION_COUNT] =
-        synapses_get_saturation_count();
-    provenance_region[INPUT_BUFFER_OVERFLOW_COUNT] =
-        spike_processing_get_buffer_overflows();
-    provenance_region[CURRENT_TIMER_TICK] = time;
-    provenance_region[PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT] =
+    prov->n_pre_synaptic_events = synapses_get_pre_synaptic_events();
+    prov->n_synaptic_weight_saturations = synapses_get_saturation_count();
+    prov->n_input_buffer_overflows = spike_processing_get_buffer_overflows();
+    prov->current_timer_tick = time;
+    prov->n_plastic_synaptic_weight_saturations =
             synapse_dynamics_get_plastic_saturation_count();
     log_debug("finished other provenance data");
 }
@@ -113,52 +121,48 @@ void c_main_store_provenance_data(address_t provenance_region){
 //! \param[in] timer_period a pointer for the memory address where the timer
 //!            period should be stored during the function.
 //! \return True if it successfully initialised, false otherwise
-static bool initialise(uint32_t *timer_period) {
+static bool initialise(void) {
     log_debug("Initialise: started");
 
     // Get the address this core's DTCM data starts at from SRAM
-    address_t address = data_specification_get_data_address();
+    data_specification_metadata_t *ds_regions =
+            data_specification_get_data_address();
 
     // Read the header
-    if (!data_specification_read_header(address)) {
+    if (!data_specification_read_header(ds_regions)) {
         return false;
     }
 
     // Get the timing details and set up the simulation interface
     if (!simulation_initialise(
-            data_specification_get_region(SYSTEM_REGION, address),
-            APPLICATION_NAME_HASH, timer_period, &simulation_ticks,
-            &infinite_run, SDP, DMA)) {
+            data_specification_get_region(SYSTEM_REGION, ds_regions),
+            APPLICATION_NAME_HASH, &timer_period, &simulation_ticks,
+            &infinite_run, &time, SDP, DMA)) {
         return false;
     }
     simulation_set_provenance_function(
-        c_main_store_provenance_data,
-        data_specification_get_region(PROVENANCE_DATA_REGION, address));
-
-    // setup recording region
-    if (!initialise_recording(
-            data_specification_get_region(RECORDING_REGION, address))){
-        return false;
-    }
+            c_main_store_provenance_data,
+            data_specification_get_region(PROVENANCE_DATA_REGION, ds_regions));
 
     // Set up the neurons
-    uint32_t n_neurons;
     uint32_t n_synapse_types;
     uint32_t incoming_spike_buffer_size;
     if (!neuron_initialise(
-            data_specification_get_region(NEURON_PARAMS_REGION, address),
-            &n_neurons, &n_synapse_types, &incoming_spike_buffer_size)) {
+            data_specification_get_region(NEURON_PARAMS_REGION, ds_regions),
+            data_specification_get_region(NEURON_RECORDING_REGION, ds_regions),
+            &n_neurons, &n_synapse_types, &incoming_spike_buffer_size,
+            &timer_offset)) {
         return false;
     }
 
     // Set up the synapses
     uint32_t *ring_buffer_to_input_buffer_left_shifts;
-    address_t indirect_synapses_address = data_specification_get_region(
-        SYNAPTIC_MATRIX_REGION, address);
+    address_t indirect_synapses_address =
+            data_specification_get_region(SYNAPTIC_MATRIX_REGION, ds_regions);
     address_t direct_synapses_address;
     if (!synapses_initialise(
-            data_specification_get_region(SYNAPSE_PARAMS_REGION, address),
-            data_specification_get_region(DIRECT_MATRIX_REGION, address),
+            data_specification_get_region(SYNAPSE_PARAMS_REGION, ds_regions),
+            data_specification_get_region(DIRECT_MATRIX_REGION, ds_regions),
             n_neurons, n_synapse_types,
             &ring_buffer_to_input_buffer_left_shifts,
             &direct_synapses_address)) {
@@ -168,14 +172,14 @@ static bool initialise(uint32_t *timer_period) {
     // Set up the population table
     uint32_t row_max_n_words;
     if (!population_table_initialise(
-            data_specification_get_region(POPULATION_TABLE_REGION, address),
+            data_specification_get_region(POPULATION_TABLE_REGION, ds_regions),
             indirect_synapses_address, direct_synapses_address,
             &row_max_n_words)) {
         return false;
     }
     // Set up the synapse dynamics
     address_t synapse_dynamics_region_address =
-        data_specification_get_region(SYNAPSE_DYNAMICS_REGION, address);
+            data_specification_get_region(SYNAPSE_DYNAMICS_REGION, ds_regions);
     address_t syn_dyn_end_address = synapse_dynamics_initialise(
             synapse_dynamics_region_address, n_neurons, n_synapse_types,
             ring_buffer_to_input_buffer_left_shifts);
@@ -186,22 +190,20 @@ static bool initialise(uint32_t *timer_period) {
 
     // Set up structural plasticity dynamics
     if (synapse_dynamics_region_address &&
-        !synaptogenesis_dynamics_initialise(syn_dyn_end_address)){
+            !synaptogenesis_dynamics_initialise(syn_dyn_end_address)) {
         return false;
     }
 
-    rewiring_period = get_p_rew();
+    rewiring_period = synaptogenesis_rewiring_period();
     rewiring = rewiring_period != -1;
 
     if (!spike_processing_initialise(
-            row_max_n_words, MC, USER,
-            incoming_spike_buffer_size)) {
+            row_max_n_words, MC, USER, incoming_spike_buffer_size)) {
         return false;
     }
 
     // Setup profiler
-    profiler_init(
-        data_specification_get_region(PROFILER_REGION, address));
+    profiler_init(data_specification_get_region(PROFILER_REGION, ds_regions));
 
     log_debug("Initialise: finished");
     return true;
@@ -209,15 +211,14 @@ static bool initialise(uint32_t *timer_period) {
 
 //! \brief the function to call when resuming a simulation
 //! \return None
-void resume_callback() {
-    recording_reset();
+void resume_callback(void) {
+    data_specification_metadata_t *ds_regions =
+            data_specification_get_data_address();
 
-    // try reloading neuron parameters
-    address_t address = data_specification_get_data_address();
-    if (!neuron_reload_neuron_parameters(
-            data_specification_get_region(
-                NEURON_PARAMS_REGION, address))) {
-        log_error("failed to reload the neuron parameters.");
+    // try resuming neuron
+    if (!neuron_resume(
+            data_specification_get_region(NEURON_PARAMS_REGION, ds_regions))) {
+        log_error("failed to resume neuron.");
         rt_error(RTE_SWERR);
     }
 }
@@ -228,7 +229,6 @@ void resume_callback() {
 //! \param[in] unused unused parameter kept for API consistency
 //! \return None
 void timer_callback(uint timer_count, uint unused) {
-    use(timer_count);
     use(unused);
 
     profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
@@ -243,7 +243,7 @@ void timer_callback(uint timer_count, uint unused) {
     log_debug("Timer tick %u \n", time);
 
     /* if a fixed number of simulation ticks that were specified at startup
-       then do reporting for finishing */
+     * then do reporting for finishing */
     if (infinite_run != TRUE && time >= simulation_ticks) {
 
         // Enter pause and resume state to avoid another tick
@@ -252,68 +252,39 @@ void timer_callback(uint timer_count, uint unused) {
         log_debug("Completed a run");
 
         // rewrite neuron params to SDRAM for reading out if needed
-        address_t address = data_specification_get_data_address();
-        neuron_store_neuron_parameters(
-            data_specification_get_region(NEURON_PARAMS_REGION, address));
+        data_specification_metadata_t *ds_regions =
+                data_specification_get_data_address();
+        neuron_pause(data_specification_get_region(NEURON_PARAMS_REGION, ds_regions));
 
         profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
 
-        // Finalise any recordings that are in progress, writing back the final
-        // amounts of samples recorded to SDRAM
-        if (recording_flags > 0) {
-            log_debug("updating recording regions");
-            recording_finalise();
-        }
         profiler_finalise();
 
         // Subtract 1 from the time so this tick gets done again on the next
         // run
-        time -= 1;
+        time--;
 
         log_debug("Rewire tries = %d", count_rewires);
-
         simulation_ready_to_read();
-
         return;
     }
 
-    uint cpsr = 0;
     // Do rewiring
     if (rewiring &&
-        ((last_rewiring_time >= rewiring_period && !is_fast()) || is_fast())) {
-        update_goal_posts(time);
+            ((last_rewiring_time >= rewiring_period && !synaptogenesis_is_fast())
+                || synaptogenesis_is_fast())) {
         last_rewiring_time = 0;
         // put flag in spike processing to do synaptic rewiring
-//        synaptogenesis_dynamics_rewire(time);
-        if (is_fast()) {
-            do_rewiring(rewiring_period);
+        if (synaptogenesis_is_fast()) {
+            spike_processing_do_rewiring(rewiring_period);
         } else {
-            do_rewiring(1);
+            spike_processing_do_rewiring(1);
         }
-        // disable interrupts
-        cpsr = spin1_int_disable();
-//       // If we're not already processing synaptic DMAs,
-//        // flag pipeline as busy and trigger a feed event
-        if (!get_dma_busy()) {
-            log_debug("Sending user event for new spike");
-            if (spin1_trigger_user_event(0, 0)) {
-                set_dma_busy(true);
-            } else {
-                log_debug("Could not trigger user event\n");
-            }
-        }
-        // enable interrupts
-        spin1_mode_restore(cpsr);
         count_rewires++;
     }
     // otherwise do synapse and neuron time step updates
     synapses_do_timestep_update(time);
-    neuron_do_timestep_update(time);
-
-    // trigger buffering_out_mechanism
-    if (recording_flags > 0) {
-        recording_do_timestep_update(time);
-    }
+    neuron_do_timestep_update(time, timer_count, timer_period);
 
     profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
 }
@@ -321,11 +292,8 @@ void timer_callback(uint timer_count, uint unused) {
 //! \brief The entry point for this model.
 void c_main(void) {
 
-    // Load DTCM data
-    uint32_t timer_period;
-
     // initialise the model
-    if (!initialise(&timer_period)){
+    if (!initialise()) {
         rt_error(RTE_API);
     }
 
@@ -335,7 +303,7 @@ void c_main(void) {
     // Set timer tick (in microseconds)
     log_debug("setting timer tick callback for %d microseconds",
               timer_period);
-    spin1_set_timer_tick(timer_period);
+    spin1_set_timer_tick_and_phase(timer_period, timer_offset);
 
     // Set up the timer tick callback (others are handled elsewhere)
     spin1_callback_on(TIMER_TICK, timer_callback, TIMER);

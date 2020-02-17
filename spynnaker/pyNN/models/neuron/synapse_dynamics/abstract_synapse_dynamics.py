@@ -1,8 +1,23 @@
-from six import add_metaclass
-import numpy
-import math
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+import math
+import numpy
+from six import add_metaclass
+from spinn_utilities.abstract_base import (
+    AbstractBase, abstractmethod, abstractproperty)
 
 
 @add_metaclass(AbstractBase)
@@ -12,6 +27,12 @@ class AbstractSynapseDynamics(object):
 
     NUMPY_CONNECTORS_DTYPE = [("source", "uint32"), ("target", "uint32"),
                               ("weight", "float64"), ("delay", "float64")]
+
+    @abstractmethod
+    def merge(self, synapse_dynamics):
+        """ Merge with the given synapse_dynamics and return the result, or\
+            error if merge is not possible
+        """
 
     @abstractmethod
     def is_same_as(self, synapse_dynamics):
@@ -55,39 +76,62 @@ class AbstractSynapseDynamics(object):
         :rtype: int
         """
 
+    @abstractproperty
+    def changes_during_run(self):
+        """ Determine if the synapses change during a run
+
+        :rtype: bool
+        """
+
+    @abstractproperty
+    def weight(self):
+        """ The weight of connections
+        """
+
+    @abstractproperty
+    def delay(self):
+        """ The delay of connections
+        """
+
+    @abstractmethod
+    def set_delay(self, delay):
+        """ Set the delay
+        """
+
     def get_provenance_data(self, pre_population_label, post_population_label):
         """ Get the provenance data from this synapse dynamics object
         """
+        # pylint: disable=unused-argument
         return list()
 
-    def get_delay_maximum(self, connector):
+    def get_delay_maximum(self, connector, synapse_info):
         """ Get the maximum delay for the synapses
         """
-        return connector.get_delay_maximum()
+        return connector.get_delay_maximum(synapse_info)
 
-    def get_delay_variance(self, connector):
+    def get_delay_variance(self, connector, delays):
         """ Get the variance in delay for the synapses
         """
         # pylint: disable=too-many-arguments
-        return connector.get_delay_variance()
+        return connector.get_delay_variance(delays)
 
-    def get_weight_mean(self, connector):
+    def get_weight_mean(self, connector, synapse_info):
         """ Get the mean weight for the synapses
         """
         # pylint: disable=too-many-arguments
-        return connector.get_weight_mean()
+        return connector.get_weight_mean(synapse_info.weights)
 
-    def get_weight_maximum(self, connector):
+    def get_weight_maximum(self, connector, synapse_info):
         """ Get the maximum weight for the synapses
         """
         # pylint: disable=too-many-arguments
-        return connector.get_weight_maximum()
+        return connector.get_weight_maximum(synapse_info)
 
-    def get_weight_variance(self, connector):
+    def get_weight_variance(self, connector, weights):
         """ Get the variance in weight for the synapses
         """
         # pylint: disable=too-many-arguments
-        return connector.get_weight_variance()
+        return connector.get_weight_variance(weights)
 
     def convert_per_connection_data_to_rows(
             self, connection_row_indices, n_rows, data):

@@ -1,4 +1,21 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from enum import Enum
+from spinn_front_end_common.utilities.constants import (
+    BYTES_PER_WORD, BYTES_PER_KB)
 
 POSSION_SIGMA_SUMMATION_LIMIT = 3.0
 
@@ -8,20 +25,22 @@ BLOCK_INDEX_ROW_WORDS = 2
 RECORD_SPIKE_BIT = 1 << 0
 RECORD_STATE_BIT = 1 << 1
 RECORD_GSYN_BIT = 1 << 2
-RECORDING_ENTRY_BYTE_SIZE = 4
+RECORDING_ENTRY_BYTE_SIZE = BYTES_PER_WORD
 
 
 # From neuron common-typedefs.h
 SYNAPSE_INDEX_BITS = 8
-MAX_NEURON_SIZE = (1 << SYNAPSE_INDEX_BITS)
-OUT_SPIKE_SIZE = (MAX_NEURON_SIZE >> 5)  # The size of each output spike line
-OUT_SPIKE_BYTES = OUT_SPIKE_SIZE * 4  # The number of bytes for each spike line
-V_BUFFER_SIZE_PER_TICK_PER_NEURON = 4
-GSYN_BUFFER_SIZE_PER_TICK_PER_NEURON = 8
+MAX_NEURON_SIZE = 1 << SYNAPSE_INDEX_BITS
+# The size of each output spike line
+OUT_SPIKE_SIZE = MAX_NEURON_SIZE >> 5
+# The number of bytes for each spike line
+OUT_SPIKE_BYTES = OUT_SPIKE_SIZE * BYTES_PER_WORD
+V_BUFFER_SIZE_PER_TICK_PER_NEURON = BYTES_PER_WORD
+GSYN_BUFFER_SIZE_PER_TICK_PER_NEURON = 2 * BYTES_PER_WORD
 
-SPIKE_BUFFER_SIZE_BUFFERING_IN = 1 * 1024 * 1024
-EIEIO_SPIKE_BUFFER_SIZE_BUFFERING_OUT = 1 * 1024 * 1024
-EIEIO_BUFFER_SIZE_BEFORE_RECEIVE = 512 * 1024
+SPIKE_BUFFER_SIZE_BUFFERING_IN = 1 * 1024 * BYTES_PER_KB
+EIEIO_SPIKE_BUFFER_SIZE_BUFFERING_OUT = 1 * 1024 * BYTES_PER_KB
+EIEIO_BUFFER_SIZE_BEFORE_RECEIVE = 512 * BYTES_PER_KB
 
 INFINITE_SIMULATION = 4294967295
 
@@ -44,20 +63,21 @@ MAX_TIMER_TICS_SUPPORTED_PER_BLOCK = 16
 # the minimum supported delay slot between two neurons
 MIN_SUPPORTED_DELAY = 1
 
-# Regions for populations
-POPULATION_BASED_REGIONS = Enum(
-    value="POPULATION_BASED_REGIONS",
-    names=[('SYSTEM', 0),
-           ('NEURON_PARAMS', 1),
-           ('SYNAPSE_PARAMS', 2),
-           ('POPULATION_TABLE', 3),
-           ('SYNAPTIC_MATRIX', 4),
-           ('SYNAPSE_DYNAMICS', 5),
-           ('RECORDING', 6),
-           ('PROVENANCE_DATA', 7),
-           ('PROFILING', 8),
-           ('CONNECTOR_BUILDER', 9),
-           ('DIRECT_MATRIX', 10)])
+
+class POPULATION_BASED_REGIONS(Enum):
+    """Regions for populations."""
+    SYSTEM = 0
+    NEURON_PARAMS = 1
+    SYNAPSE_PARAMS = 2
+    POPULATION_TABLE = 3
+    SYNAPTIC_MATRIX = 4
+    SYNAPSE_DYNAMICS = 5
+    NEURON_RECORDING = 6
+    PROVENANCE_DATA = 7
+    PROFILING = 8
+    CONNECTOR_BUILDER = 9
+    DIRECT_MATRIX = 10
+
 
 # The partition ID used for spike data
 SPIKE_PARTITION_ID = "SPIKE"

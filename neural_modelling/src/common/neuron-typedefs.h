@@ -1,3 +1,20 @@
+/*
+ * Copyright (c) 2017-2019 The University of Manchester
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 /*! \file
  *
  *
@@ -35,7 +52,7 @@ typedef uint64_t spike_t;
 //! \param[in] s: the spike to get the key from
 //! \return key_t: the key from the spike
 static inline key_t spike_key(spike_t s) {
-    return ((key_t)(s >> 32));
+    return (key_t) (s >> 32);
 }
 
 //! \brief helper method to retrieve the pay-load from a spike
@@ -43,7 +60,7 @@ static inline key_t spike_key(spike_t s) {
 //! \return payload_t: the pay-load from the spike (only used if the model
 //! is compiled with SPIKES_WITH_PAYLOADS)
 static inline payload_t spike_payload (spike_t s) {
-    return ((payload_t)(s & UINT32_MAX));
+    return (payload_t) (s & UINT32_MAX);
 }
 
 #else  /*SPIKES_WITHOUT_PAYLOADS*/
@@ -54,7 +71,7 @@ typedef uint32_t spike_t;
 //! \param[in] s: the spike to get the key from
 //! \return key_t: the key from the spike
 static inline key_t spike_key(spike_t s) {
-    return (s);
+    return s;
 }
 
 //! \brief helper method to retrieve the pay-load from a spike
@@ -75,24 +92,7 @@ typedef address_t synaptic_row_t;
 // The type of an input
 typedef REAL input_t;
 
-// Input structure for recording
-typedef struct input_struct_t{
-    input_t input;
-} input_struct_t;
-
-// Inputs with time for recording
-typedef struct timed_input_t {
-    uint32_t time;
-    input_struct_t inputs[];
-} timed_input_t;
-
 // The type of a state variable
 typedef REAL state_t;
-
-typedef struct timed_state_t {
-    uint32_t time;
-    state_t states[];
-} timed_state_t;
-
 
 #endif /* __NEURON_TYPEDEFS_H__ */
