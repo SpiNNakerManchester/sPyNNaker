@@ -131,7 +131,7 @@ param_generator_t param_generator_init(uint32_t hash, address_t *in_region) {
         // If the hash requested matches the hash of the generator, use it
         if (hash == type->hash) {
             // Prepare a space for the data
-            param_generator_t generator =
+            struct param_generator *generator =
                     spin1_malloc(sizeof(struct param_generator));
             if (generator == NULL) {
                 log_error("Could not create generator");
@@ -158,9 +158,6 @@ void param_generator_generate(
 }
 
 void param_generator_free(param_generator_t generator) {
-    log_debug("Freeing generator 0x%08x", generator);
-    log_debug("Freeing 0x%08x with data 0x%08x", generator->type, generator->data);
     generator->type->free(generator->data);
-    log_debug("Freeing generator 0x%08x", generator);
     sark_free(generator);
 }
