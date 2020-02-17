@@ -37,7 +37,8 @@ class PyNNPartitionEdge():
                 if synapse_type == 0:
                     dest = index
                 else:
-                    dest = synapse_type + 1
+                    #dest = synapse_type + 1
+                    dest = len(post_app_vertices[syn_index]) - 1
 
                 if not isinstance(post_app_vertices[syn_index][dest],
                                   AbstractAcceptsIncomingSynapses):

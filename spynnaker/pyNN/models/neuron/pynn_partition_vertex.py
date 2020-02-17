@@ -43,14 +43,14 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
         "_n_incoming_partitions"]
 
     def __init__(self, n_neurons, label, constraints, max_atoms_neuron_core, spikes_per_second,
-                 ring_buffer_sigma, neuron_model, pynn_model, incoming_spike_buffer_size):
+                 ring_buffer_sigma, neuron_model, pynn_model, incoming_spike_buffer_size,
+                 incoming_partitions, outgoing_partitions):
 
         self._n_atoms = n_neurons
 
-        # These two are not safe, need a mechanism to avoid weird numbering and able to be set from above maybe!!!!!!!!!!!!!!!!!!!!!!!!
-        self._n_incoming_partitions = 2
+        self._n_incoming_partitions = incoming_partitions
 
-        self._n_outgoing_partitions = 1 if self._n_atoms <= DEFAULT_MAX_ATOMS_PER_NEURON_CORE else 2#int(math.ceil(float(self._n_atoms) / DEFAULT_MAX_ATOMS_PER_NEURON_CORE))
+        self._n_outgoing_partitions = 1 if self._n_atoms <= DEFAULT_MAX_ATOMS_PER_NEURON_CORE else outgoing_partitions#int(math.ceil(float(self._n_atoms) / DEFAULT_MAX_ATOMS_PER_NEURON_CORE))
 
         # if self._n_atoms > DEFAULT_MAX_ATOMS_PER_NEURON_CORE:
         #     self._n_partitions = 6
@@ -66,8 +66,10 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
         for i in range(self._n_outgoing_partitions):
 
             # Distribute neurons in order to have the low neuron cores completely filled
-            atoms = self._offset if (self._n_atoms - (self._offset * (i + 1)) >= 0) \
-                else self._n_atoms - (self._offset * i)
+            #atoms = self._offset if (self._n_atoms - (self._offset * (i + 1)) >= 0) \
+            #    else self._n_atoms - (self._offset * i)
+            atoms = self._offset if i < (self._n_outgoing_partitions - 1) \
+                    else self._n_atoms - (self._offset * i)
 
             self._neuron_vertices.append(AbstractPopulationVertex(
                 atoms, self._offset*i, label + "_" + str(i) + "_neuron_vertex",
@@ -141,7 +143,7 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
 
         # Allows to compute the optimal number of neurons on each partition.
         # Avoids to have the last partitions without neurons in case of odd numbering
-        # Better way?
+        # &\LPimprove\&
         i = 1
         while self._n_outgoing_partitions * (i + 1) * DEFAULT_MAX_ATOMS_PER_NEURON_CORE < self._n_atoms:
             i += 1

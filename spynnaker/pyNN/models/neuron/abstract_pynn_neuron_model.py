@@ -26,7 +26,8 @@ DEFAULT_MAX_ATOMS_PER_NEURON_CORE = DEFAULT_MAX_ATOMS_PER_SYN_CORE * SYN_CORES_P
 
 _population_parameters = {
     "spikes_per_second": None, "ring_buffer_sigma": None,
-    "incoming_spike_buffer_size": None
+    "incoming_spike_buffer_size": None, "in_partitions": None,
+    "out_partitions":None
 }
 
 
@@ -57,10 +58,12 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
                additional_arguments=_population_parameters.keys())
     def create_vertex(
             self, n_neurons, label, constraints, spikes_per_second,
-            ring_buffer_sigma, incoming_spike_buffer_size):
+            ring_buffer_sigma, incoming_spike_buffer_size,
+            in_partitions, out_partitions):
 
         max_atoms = self.get_max_atoms_per_core()
 
         return PyNNPartitionVertex(n_neurons, label, constraints, max_atoms,
                                    spikes_per_second, ring_buffer_sigma, self._model,
-                                   self, incoming_spike_buffer_size)
+                                   self, incoming_spike_buffer_size, in_partitions,
+                                   out_partitions)

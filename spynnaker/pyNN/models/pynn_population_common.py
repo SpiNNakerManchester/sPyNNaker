@@ -73,7 +73,8 @@ class PyNNPopulationCommon(object):
 
     def __init__(
             self, spinnaker_control, size, label, constraints, model,
-            structure, initial_values, additional_parameters=None):
+            structure, initial_values, additional_parameters=None,
+            in_partitions=None, out_partitions=None):
         # pylint: disable=too-many-arguments
         self.__label = label
         size = self._roundsize(size)
@@ -93,6 +94,9 @@ class PyNNPopulationCommon(object):
                     simulator.none_labelled_vertex_count)
                 simulator.increment_none_labelled_vertex_count()
                 self.__label = label
+            if in_partitions is not None and out_partitions is not None:
+                population_parameters["in_partitions"] = in_partitions
+                population_parameters["out_partitions"] = out_partitions
             vertex = model.create_vertex(
                 size, label, constraints, **population_parameters)
 
