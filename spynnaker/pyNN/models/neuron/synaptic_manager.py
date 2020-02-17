@@ -12,6 +12,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from spinn_front_end_common.utilities.constants import \
+    MICRO_TO_SECOND_CONVERSION
 
 from collections import defaultdict
 import math
@@ -19,11 +21,11 @@ import struct
 import numpy
 import scipy.stats  # @UnresolvedImport
 from scipy import special  # @UnresolvedImport
+from pyNN.random import RandomDistribution
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spynnaker.pyNN.models.neuron.generator_data import GeneratorData
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractGenerateConnectorOnMachine)
@@ -383,7 +385,7 @@ class SynapticManager(object):
             set this for approximate number of saturation events.
         """
         # E[ number of spikes ] in a timestep
-        steps_per_second = 1000000.0 / machine_timestep
+        steps_per_second = MICRO_TO_SECOND_CONVERSION / machine_timestep
         average_spikes_per_timestep = (
             float(n_synapses_in * spikes_per_second) / steps_per_second)
 
@@ -442,7 +444,7 @@ class SynapticManager(object):
         biggest_weight = numpy.zeros(n_synapse_types)
         weights_signed = False
         rate_stats = [RunningStats() for _ in range(n_synapse_types)]
-        steps_per_second = 1000000.0 / machine_timestep
+        steps_per_second = MICRO_TO_SECOND_CONVERSION / machine_timestep
 
         for app_edge in application_graph.get_edges_ending_at_vertex(
                 application_vertex):
@@ -480,12 +482,11 @@ class SynapticManager(object):
                                   SpikeSourcePoissonVertex):
                         rate = app_edge.pre_vertex.max_rate
                         # If non-zero rate then use it; otherwise keep default
-                        if (rate != 0):
+                        if rate != 0:
                             spikes_per_second = rate
                         if hasattr(spikes_per_second, "__getitem__"):
                             spikes_per_second = numpy.max(spikes_per_second)
-                        elif get_simulator().is_a_pynn_random(
-                                spikes_per_second):
+                        elif isinstance(spikes_per_second, RandomDistribution):
                             spikes_per_second = get_maximum_probable_value(
                                 spikes_per_second, app_edge.pre_vertex.n_atoms)
                         prob = 1.0 - (

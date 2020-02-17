@@ -41,11 +41,9 @@ static void neuron_impl_load_neuron_parameters(
 //! \brief Do the timestep update for the particular implementation
 //! \param[in] neuron_index The index of the neuron to update
 //! \param[in] external_bias External input to be applied to the neuron
-//! \param[in/out] recorded_variable_values The values to potentially record
 //! \return bool value for whether a spike has occurred
 static bool neuron_impl_do_timestep_update(
-        index_t neuron_index, input_t external_bias,
-        state_t *recorded_variable_values);
+        index_t neuron_index, input_t external_bias);
 
 //! \brief Store the neuron parameters to the given address
 static void neuron_impl_store_neuron_parameters(
