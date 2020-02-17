@@ -20,26 +20,20 @@ import math
 import numpy
 from six import raise_from, iteritems
 from six.moves import range, xrange
-<<<<<<< HEAD
 from spinn_utilities.index_is_value import IndexIsValue
 from spinn_utilities.helpful_functions import gcd
-=======
->>>>>>> refs/remotes/origin/master
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.resources import VariableSDRAM
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-<<<<<<< HEAD
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, US_TO_MS)
-=======
 from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, MICRO_TO_MILLISECOND_CONVERSION, BITS_PER_WORD)
 from spinn_front_end_common.interface.buffer_management import \
     recording_utilities
->>>>>>> refs/remotes/origin/master
 from spynnaker.pyNN.models.neural_properties import NeuronParameter
 import itertools
 
@@ -62,16 +56,15 @@ class _ReadOnlyDict(dict):
 
 class NeuronRecorder(object):
     __slots__ = [
-<<<<<<< HEAD
-        "__indexes", "__min_id", "__max_id", "__sampling_rates",
-        "__timestep_in_ms"]
-=======
-        "__indexes",
-        "__n_neurons",
-        "__sampling_rates",
+        "__bitfield_variables",
         "__data_types",
-        "__bitfield_variables"]
->>>>>>> refs/remotes/origin/master
+        "__indexes",
+        # "__n_neurons",
+        "__min_id",
+        "__max_id",
+        "__sampling_rates",
+        "__timestep_in_ms"
+        ]
 
     N_BYTES_FOR_TIMESTAMP = DataType.UINT32.size
 
@@ -107,8 +100,8 @@ class NeuronRecorder(object):
 
     MAX_RATE = 2 ** 32 - 1  # To allow a unit32_t to be used to store the rate
 
-<<<<<<< HEAD
-    def __init__(self, allowed_variables, min_id, max_id, timestep_in_us):
+    def __init__(self, allowed_variables, data_types, bitfield_variables,
+                 min_id, max_id, timestep_in_us):
         """
 
         :param allowed_variables: Names of allowed variables including spikes
@@ -123,21 +116,12 @@ class NeuronRecorder(object):
         """
         self.__sampling_rates = OrderedDict()
         self.__indexes = dict()
+        self.__data_types = data_types
+        self.__bitfield_variables = bitfield_variables
         self.__min_id = min_id
         self.__max_id = max_id
         self.__timestep_in_ms = timestep_in_us / US_TO_MS
-        for variable in allowed_variables:
-=======
-    def __init__(
-            self, allowed_variables, data_types, bitfield_variables,
-            n_neurons):
-        self.__sampling_rates = OrderedDict()
-        self.__indexes = dict()
-        self.__data_types = data_types
-        self.__n_neurons = n_neurons
-        self.__bitfield_variables = bitfield_variables
         for variable in itertools.chain(allowed_variables, bitfield_variables):
->>>>>>> refs/remotes/origin/master
             self.__sampling_rates[variable] = 0
             self.__indexes[variable] = None
 
@@ -165,13 +149,7 @@ class NeuronRecorder(object):
         :param variable: PyNN name of the variable
         :return: Sampling interval in micro seconds
         """
-<<<<<<< HEAD
         return self.__sampling_rates[variable] * self.__timestep_in_ms
-=======
-        step = (globals_variables.get_simulator().machine_time_step /
-                MICRO_TO_MILLISECOND_CONVERSION)
-        return self.__sampling_rates[variable] * step
->>>>>>> refs/remotes/origin/master
 
     def _convert_placement_matrix_data(
             self, row_data, n_rows, data_row_length, variable, n_neurons):
@@ -311,24 +289,7 @@ class NeuronRecorder(object):
         sampling_interval = self.get_neuron_sampling_interval(variable)
 
         indexes = []
-<<<<<<< HEAD
         for vertex in progress.over(machine_vertices):
-            placement = placements.get_placement_of_vertex(vertex)
-            vertex_slice = graph_mapper.get_slice(vertex)
-            neurons = self._neurons_recording(variable, vertex_slice)
-            n_neurons = len(neurons)
-            if n_neurons == 0:
-                continue
-            indexes.extend(neurons)
-            # for buffering output info is taken form the buffer manager
-            record_raw, missing_data = buffer_manager.get_data_by_placement(
-                    placement, region)
-            record_length = len(record_raw)
-
-            row_length = self.N_BYTES_FOR_TIMESTAMP + \
-                n_neurons * self.N_BYTES_PER_VALUE
-=======
-        for vertex in progress.over(vertices):
             expected_rows = self.expected_rows_for_a_run_time(
                 n_machine_time_steps, sampling_rate)
 
@@ -346,7 +307,6 @@ class NeuronRecorder(object):
                     # which is IDs/channel_index
                     pop_level_data = numpy.append(
                         pop_level_data, placement_data, axis=1)
->>>>>>> refs/remotes/origin/master
 
         # warn user of missing data
         if len(missing_str) > 0:
@@ -356,34 +316,25 @@ class NeuronRecorder(object):
 
         return pop_level_data, indexes, sampling_interval
 
+    # TODO need to rename to remove spikes from name
     def get_spikes(
             self, label, buffer_manager, region, placements, graph_mapper,
-<<<<<<< HEAD
-            machine_vertices):
-=======
-            application_vertex, variable, machine_time_step):
+            machine_vertices, variable):
         if variable not in self.__bitfield_variables:
             msg = "Variable {} is not supported, use get_matrix_data".format(
                 variable)
             raise ConfigurationException(msg)
->>>>>>> refs/remotes/origin/master
 
         spike_times = list()
         spike_ids = list()
 
         missing_str = ""
-<<<<<<< HEAD
         progress = ProgressBar(machine_vertices,
                                "Getting spikes for {}".format(label))
         for vertex in progress.over(machine_vertices):
-=======
-        progress = ProgressBar(vertices, "Getting spikes for {}".format(label))
-        for vertex in progress.over(vertices):
->>>>>>> refs/remotes/origin/master
             placement = placements.get_placement_of_vertex(vertex)
             vertex_slice = graph_mapper.get_slice(vertex)
 
-            ms_per_tick = machine_time_step / MICRO_TO_MILLISECOND_CONVERSION
             neurons = self._neurons_recording(variable, vertex_slice)
             neurons_recording = len(neurons)
             if neurons_recording == 0:
@@ -522,16 +473,8 @@ class NeuronRecorder(object):
         if sampling_interval is None:
             return 1
 
-<<<<<<< HEAD
         rate = int(sampling_interval / self.__timestep_in_ms)
         if sampling_interval != rate * self.__timestep_in_ms:
-=======
-        step = (
-            globals_variables.get_simulator().machine_time_step /
-            MICRO_TO_MILLISECOND_CONVERSION)
-        rate = int(sampling_interval / step)
-        if sampling_interval != rate * step:
->>>>>>> refs/remotes/origin/master
             msg = "sampling_interval {} is not an an integer multiple of the "\
                   "simulation timestep {}" \
                   "".format(sampling_interval, self.__timestep_in_ms)
@@ -776,9 +719,6 @@ class NeuronRecorder(object):
         fixed_sdram += self.N_BYTES_PER_INDEX * total_neurons
         return fixed_sdram
 
-<<<<<<< HEAD
-    def get_variable_sdram_usage(self, vertex_slice, timestep):
-=======
     def get_static_sdram_usage(self, vertex_slice):
         n_record = len(self.__sampling_rates)
         sdram = (
@@ -788,7 +728,6 @@ class NeuronRecorder(object):
         return int(sdram)
 
     def get_variable_sdram_usage(self, vertex_slice):
->>>>>>> refs/remotes/origin/master
         fixed_sdram = 0
         per_timestep_sdram = 0
         for variable in self.__sampling_rates:
@@ -807,7 +746,8 @@ class NeuronRecorder(object):
                     per_timestep_sdram += average_per_timestep
                     # Add the rest once to fixed for worst case
                     fixed_sdram += (per_record - average_per_timestep)
-        return VariableSDRAM(fixed_sdram, per_timestep_sdram, timestep)
+        return VariableSDRAM(
+            fixed_sdram, per_timestep_sdram, self.__timestep_in_ms)
 
     def get_dtcm_usage_in_bytes(self, vertex_slice):
         # *_rate + n_neurons_recording_* + *_indexes
