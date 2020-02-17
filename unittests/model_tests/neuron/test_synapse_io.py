@@ -19,7 +19,7 @@ from spynnaker.pyNN.models.neural_projections import (
     ProjectionApplicationEdge, SynapseInformation)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsStatic, SynapseDynamicsSTDP)
-from spynnaker.pyNN.models.neuron.master_pop_table_generators import (
+from spynnaker.pyNN.models.neuron.master_pop_table import (
     MasterPopTableAsBinarySearch)
 from spynnaker.pyNN.models.neuron.synapse_io import SynapseIORowBased
 from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
@@ -57,7 +57,8 @@ def test_get_max_row_length(dynamics_class, timing, weight, size, exception,
         dynamics = dynamics_class()
     io = SynapseIORowBased()
     population_table = MasterPopTableAsBinarySearch()
-    synapse_information = SynapseInformation(None, dynamics, 0)
+    synapse_information = SynapseInformation(
+        None, None, None, None, None, None, dynamics, 0)
     in_edge = ProjectionApplicationEdge(None, None, synapse_information)
     if exception is not None:
         with pytest.raises(exception) as exc_info:

@@ -34,12 +34,12 @@
 #define _NEURON_H_
 
 #include <common/neuron-typedefs.h>
-#include "recording.h"
 
 //! \brief translate the data stored in the NEURON_PARAMS data region in SDRAM
 //!        and convert it into c based objects for use.
 //! \param[in] address the absolute address in SDRAM for the start of the
 //!            NEURON_PARAMS data region in SDRAM
+//! \param[in] recording_address
 //! \param[out] n_neurons_value Returns the number of neurons this model is to
 //              simulate
 //! \param[out] n_synapse_types_value Returns the number of synapse types in
@@ -49,7 +49,7 @@
 //! \return boolean which is True is the translation was successful
 //!         otherwise False
 bool neuron_initialise(
-        address_t address, uint32_t *n_neurons_value,
+        address_t address, address_t recording_address, uint32_t *n_neurons_value,
         uint32_t *n_synapse_types_value, uint32_t *incoming_spike_buffer_size,
         uint32_t *timer_offset);
 
@@ -60,17 +60,16 @@ bool neuron_initialise(
 void neuron_do_timestep_update(
         uint32_t time, uint timer_count, uint timer_period);
 
-//! \brief interface for reloading neuron parameters as needed
+//! \brief Prepare to resume simulation of the neurons
 //! \param[in] address: the address where the neuron parameters are stored
-//! in SDRAM
-//! \return bool which is true if the reload of the neuron parameters was
-//! successful or not
-bool neuron_reload_neuron_parameters(address_t address);
+//!                     in SDRAM
+//! \return bool which is true if the resume was successful or not
+bool neuron_resume(address_t address);
 
-//! \brief interface for rewriting the neuron parameters back into SDRAM
-//! \param[in] address the absolute address in SDRAM for the start of the
-//!            NEURON_PARAMS data region in SDRAM
-void neuron_store_neuron_parameters(address_t address);
+//! \brief Perform steps needed before pausing a simulation
+//! \param[in] address: the address where the neuron parameters are stored
+//!                     in SDRAM
+void neuron_pause(address_t address);
 
 //! \brief Add inputs to the neuron
 //! \param[in] synapse_type_index the synapse type (e.g. exc. or inh.)
