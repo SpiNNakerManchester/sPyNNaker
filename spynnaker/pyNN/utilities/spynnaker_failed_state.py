@@ -24,23 +24,11 @@ class SpynnakerFailedState(SpynnakerSimulatorInterface, FailedState, object):
 
     __slots__ = ()
 
-    def get_distribution_to_stats(self):
-        raise ConfigurationException(FAILED_STATE_MSG)
-
     def get_current_time(self):
-        raise ConfigurationException(FAILED_STATE_MSG)
-
-    def get_random_distribution(self):
-        raise ConfigurationException(FAILED_STATE_MSG)
-
-    def get_pynn_NumpyRNG(self):
         raise ConfigurationException(FAILED_STATE_MSG)
 
     @property
     def has_reset_last(self):
-        raise ConfigurationException(FAILED_STATE_MSG)
-
-    def is_a_pynn_random(self, thing):
         raise ConfigurationException(FAILED_STATE_MSG)
 
     @property

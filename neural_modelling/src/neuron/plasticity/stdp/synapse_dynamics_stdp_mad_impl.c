@@ -212,10 +212,10 @@ void synapse_dynamics_print_plastic_synapses(
         synapses_print_weight(
                 weight, ring_buffer_to_input_buffer_left_shifts[synapse_type]);
         log_debug("nA) d: %2u, %s, n = %3u)] - {%08x %08x}\n",
-                synapse_row_sparse_delay(control_word, synapse_type_index_bits),
-                synapse_types_get_type_char(synapse_type),
-                synapse_row_sparse_index(control_word, synapse_index_mask),
-                SYNAPSE_DELAY_MASK, synapse_type_index_bits);
+            synapse_row_sparse_delay(control_word, synapse_type_index_bits),
+            synapse_types_get_type_char(synapse_type),
+            synapse_row_sparse_index(control_word, synapse_index_mask),
+            SYNAPSE_DELAY_MASK, synapse_type_index_bits);
     }
 #endif // LOG_LEVEL >= LOG_DEBUG
 }

@@ -12,7 +12,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+from spinn_front_end_common.utilities.constants import \
+    MICRO_TO_MILLISECOND_CONVERSION
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from pacman.executor.injection_decorator import inject_items
@@ -92,7 +93,7 @@ class NeuronModelIzh(AbstractNeuronModel):
                additional_arguments={'machine_time_step'})
     def get_global_values(self, machine_time_step):
         # pylint: disable=arguments-differ
-        return [float(machine_time_step)/1000.0]
+        return [float(machine_time_step) / MICRO_TO_MILLISECOND_CONVERSION]
 
     @inject_items({"ts": "MachineTimeStep"})
     @overrides(AbstractNeuronModel.get_values, additional_arguments={'ts'})
@@ -103,7 +104,7 @@ class NeuronModelIzh(AbstractNeuronModel):
         return [
             parameters[A], parameters[B], parameters[C], parameters[D],
             state_variables[V], state_variables[U], parameters[I_OFFSET],
-            float(ts) / 1000.0
+            float(ts) / MICRO_TO_MILLISECOND_CONVERSION
         ]
 
     @overrides(AbstractNeuronModel.update_values)

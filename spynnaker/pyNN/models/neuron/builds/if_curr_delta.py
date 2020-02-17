@@ -17,7 +17,7 @@ from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModelStandard
 from spynnaker.pyNN.models.defaults import default_initial_values
 from spynnaker.pyNN.models.neuron.neuron_models import (
     NeuronModelLeakyIntegrateAndFire)
-from spynnaker.pyNN.models.neuron.input_types import InputTypeCurrent
+from spynnaker.pyNN.models.neuron.input_types import InputTypeDelta
 from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeStatic
 from spynnaker.pyNN.models.neuron.synapse_types import SynapseTypeDelta
 
@@ -37,7 +37,7 @@ class IFCurrDelta(AbstractPyNNNeuronModelStandard):
         neuron_model = NeuronModelLeakyIntegrateAndFire(
             v, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac)
         synapse_type = SynapseTypeDelta(isyn_exc, isyn_inh)
-        input_type = InputTypeCurrent()
+        input_type = InputTypeDelta()
         threshold_type = ThresholdTypeStatic(v_thresh)
 
         super(IFCurrDelta, self).__init__(
