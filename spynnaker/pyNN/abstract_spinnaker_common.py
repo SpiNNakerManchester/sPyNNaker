@@ -186,7 +186,7 @@ class AbstractSpiNNakerCommon(with_metaclass(
                 "Pacman does not support min delays below {} ms with the "
                 "current machine time step".format(
                     constants.MIN_SUPPORTED_DELAY * user_timestep_in_us))
-         if min_delay is not None:
+        if min_delay is not None:
             self.__min_delay = min_delay
         else:
             self.__min_delay = (

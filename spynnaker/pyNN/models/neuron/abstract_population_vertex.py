@@ -152,20 +152,13 @@ class AbstractPopulationVertex(
         self.__updated_state_variables = set()
 
         # Set up for recording
-<<<<<<< HEAD
-        recordables = ["spikes"]
-        recordables.extend(self.__neuron_impl.get_recordable_variables())
-        self.__neuron_recorder = NeuronRecorder(
-            recordables, 0, n_neurons, self.timestep_in_us)
-=======
         recordable_variables = list(
             self.__neuron_impl.get_recordable_variables())
         record_data_types = dict(
             self.__neuron_impl.get_recordable_data_types())
         self.__neuron_recorder = NeuronRecorder(
             recordable_variables, record_data_types, [NeuronRecorder.SPIKES],
-            n_neurons)
->>>>>>> refs/remotes/origin/master
+            0, n_neurons, self.timestep_in_us)
 
         # Set up synapse handling
         self.__synapse_manager = SynapticManager(
@@ -231,30 +224,6 @@ class AbstractPopulationVertex(
         self.__change_requires_mapping = False
         self.__change_requires_data_generation = False
 
-<<<<<<< HEAD
-    # CB: May be dead code
-    def _get_buffered_sdram_per_timestep(self, vertex_slice):
-        values = [self.__neuron_recorder.get_buffered_sdram_per_timestep(
-                "spikes", vertex_slice)]
-        for variable in self.__neuron_impl.get_recordable_variables():
-            values.append(
-                self.__neuron_recorder.get_buffered_sdram_per_timestep(
-                    variable, vertex_slice))
-        return values
-
-    def _get_buffered_sdram(self, vertex_slice, data_simtime_in_us):
-        n_machine_time_steps = self.simtime_in_us_to_timesteps(
-            data_simtime_in_us)
-        values = [self.__neuron_recorder.get_buffered_sdram(
-                "spikes", vertex_slice, n_machine_time_steps)]
-        for variable in self.__neuron_impl.get_recordable_variables():
-            values.append(
-                self.__neuron_recorder.get_buffered_sdram(
-                    variable, vertex_slice, n_machine_time_steps))
-        return values
-
-=======
->>>>>>> refs/remotes/origin/master
     @overrides(ApplicationVertex.create_machine_vertex)
     def create_machine_vertex(
             self, vertex_slice, resources_required, label=None,
@@ -292,13 +261,8 @@ class AbstractPopulationVertex(
             self.BYTES_TILL_START_OF_GLOBAL_PARAMETERS +
             self.__neuron_impl.get_sdram_usage_in_bytes(vertex_slice.n_atoms))
 
-<<<<<<< HEAD
+
     def _get_sdram_usage_for_atoms(self, vertex_slice, graph):
-        n_record = len(self.__neuron_impl.get_recordable_variables()) + 1
-=======
-    def _get_sdram_usage_for_atoms(
-            self, vertex_slice, graph, machine_time_step):
->>>>>>> refs/remotes/origin/master
         sdram_requirement = (
             SYSTEM_BYTES_REQUIREMENT +
             self._get_sdram_usage_for_neuron_params(vertex_slice) +
@@ -306,14 +270,8 @@ class AbstractPopulationVertex(
             PopulationMachineVertex.get_provenance_data_size(
                 PopulationMachineVertex.N_ADDITIONAL_PROVENANCE_DATA_ITEMS) +
             self.__synapse_manager.get_sdram_usage_in_bytes(
-<<<<<<< HEAD
                 vertex_slice, self.timestep_in_us, graph, self) +
-            profile_utils.get_profile_region_size(
-                self.__n_profile_samples))
-=======
-                vertex_slice, machine_time_step, graph, self) +
             profile_utils.get_profile_region_size(self.__n_profile_samples))
->>>>>>> refs/remotes/origin/master
 
         return sdram_requirement
 
@@ -516,18 +474,10 @@ class AbstractPopulationVertex(
             self.get_binary_file_name(), self.timestep_in_us,
             time_scale_factor))
 
-<<<<<<< HEAD
-        # Write the recording region
-        spec.switch_write_focus(
-            constants.POPULATION_BASED_REGIONS.RECORDING.value)
-        spec.write_array(recording_utilities.get_recording_header_array(
-            self._get_buffered_sdram(vertex_slice, data_simtime_in_us)))
-=======
         # Write the neuron recording region
         self._neuron_recorder.write_neuron_recording_region(
             spec, POPULATION_BASED_REGIONS.NEURON_RECORDING.value,
-            vertex_slice, data_n_time_steps)
->>>>>>> refs/remotes/origin/master
+            vertex_slice, data_simtime_in_us)
 
         # Write the neuron parameters
         self._write_neuron_parameters(
@@ -581,15 +531,9 @@ class AbstractPopulationVertex(
             self, placements, graph_mapper, buffer_manager):
         machine_vertices = graph_mapper.get_machine_vertices(self)
         return self.__neuron_recorder.get_spikes(
-<<<<<<< HEAD
-            self.label, buffer_manager, self.SPIKE_RECORDING_REGION,
-            placements, graph_mapper, machine_vertices)
-=======
             self.label, buffer_manager,
             len(self.__neuron_impl.get_recordable_variables()),
-            placements, graph_mapper, self, NeuronRecorder.SPIKES,
-            machine_time_step)
->>>>>>> refs/remotes/origin/master
+            placements, graph_mapper, machine_vertices, NeuronRecorder.SPIKES)
 
     @overrides(AbstractNeuronRecordable.get_recordable_variables)
     def get_recordable_variables(self):
@@ -610,7 +554,6 @@ class AbstractPopulationVertex(
     def get_data(self, variable, current_time_in_us, placements,
                  graph_mapper, buffer_manager):
         # pylint: disable=too-many-arguments
-<<<<<<< HEAD
         index = 0
         if variable != "spikes":
             index = 1 + self.__neuron_impl.get_recordable_variable_index(
@@ -619,14 +562,10 @@ class AbstractPopulationVertex(
             current_time_in_us)
         machine_vertices = graph_mapper.get_machine_vertices(self)
         return self.__neuron_recorder.get_matrix_data(
-            self.label, buffer_manager, index, placements, graph_mapper,
-            machine_vertices, variable, n_machine_time_steps)
-=======
-        return self.__neuron_recorder.get_matrix_data(
             self.label, buffer_manager,
             self.__neuron_impl.get_recordable_variable_index(variable),
-            placements, graph_mapper, self, variable, n_machine_time_steps)
->>>>>>> refs/remotes/origin/master
+            placements, graph_mapper, machine_vertices, variable,
+            n_machine_time_steps)
 
     @overrides(AbstractNeuronRecordable.get_neuron_sampling_interval)
     def get_neuron_sampling_interval(self, variable):

@@ -599,7 +599,8 @@ class NeuronRecorder(object):
             raise ConfigurationException("Variable {} is not supported".format(
                 variable))
 
-    def _get_buffered_sdram(self, vertex_slice, n_machine_time_steps):
+    def _get_buffered_sdram(self, vertex_slice, data_simtime_in_us):
+        n_machine_time_steps = data_simtime_in_us / self.__timestep_in_ms
         values = list()
         for variable in self.__sampling_rates:
             values.append(self.get_buffered_sdram(
@@ -608,18 +609,18 @@ class NeuronRecorder(object):
 
     def write_neuron_recording_region(
             self, spec, neuron_recording_region, vertex_slice,
-            data_n_time_steps):
+            data_simtime_in_us):
         """ recording data specification
 
         :param spec: dsg spec
         :param neuron_recording_region: the recording region
         :param vertex_slice: the vertex slice
-        :param data_n_time_steps: how many time steps to run this time
+        :param data_simtime_in_us: how long to run this time
         :rtype: None
         """
         spec.switch_write_focus(neuron_recording_region)
         spec.write_array(recording_utilities.get_recording_header_array(
-            self._get_buffered_sdram(vertex_slice, data_n_time_steps)))
+            self._get_buffered_sdram(vertex_slice, data_simtime_in_us)))
 
         # Write the number of variables and bitfields
         n_vars = len(self.__sampling_rates) - len(self.__bitfield_variables)
