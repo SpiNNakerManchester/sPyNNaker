@@ -19,7 +19,6 @@ import numpy
 from pyNN.random import RandomDistribution
 from spinn_front_end_common.utilities.constants import \
     MICRO_TO_MILLISECOND_CONVERSION
-from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.constraints.partitioner_constraints import (
     SameAtomsAsVertexConstraint)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException

@@ -483,7 +483,6 @@ class SynapseIORowBased(object):
         undelayed_connections["source"] += pre_vertex_slice.lo_atom
         return undelayed_connections
 
-
     def _read_delayed_static_data(
             self, dynamics, pre_vertex_slice, post_vertex_slice,
             n_synapse_types, delayed_row_data):
