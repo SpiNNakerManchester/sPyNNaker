@@ -63,26 +63,39 @@ class ProjectionMachineEdge(
                     prepop_hi = synapse_info.pre_population._indexes[-1]
                     postpop_lo = synapse_info.post_population._indexes[0]
                     postpop_hi = synapse_info.post_population._indexes[-1]
-                    if ((prepop_hi < pre_lo or prepop_lo > pre_hi) or
-                            (postpop_hi < post_lo or postpop_lo > post_hi)):
+                    # Get test values
+                    pre_lo_test = pre_lo - prepop_lo
+                    pre_hi_test = pre_hi - prepop_lo
+                    post_lo_test = post_lo - postpop_lo
+                    post_hi_test = post_hi - postpop_lo
+                    if ((pre_hi_test < post_lo_test) or
+                            (pre_lo_test > post_hi_test) or
+                            (pre_hi < prepop_lo) or (pre_lo > prepop_hi) or
+                            (post_hi < postpop_lo) or (post_lo > postpop_hi)):
                         n_filtered += 1
                 # Filter edge if pre-pop is outside limit and post_lo is bigger
                 # than n_pre_neurons
                 elif synapse_info.prepop_is_view:
                     prepop_lo = synapse_info.pre_population._indexes[0]
                     prepop_hi = synapse_info.pre_population._indexes[-1]
-                    prepop_size = synapse_info.n_pre_neurons
-                    if ((prepop_hi < pre_lo or prepop_lo > pre_hi) or
-                            (prepop_size < post_lo)):
+                    # Get test values
+                    pre_lo_test = pre_lo - prepop_lo
+                    pre_hi_test = pre_hi - prepop_lo
+                    if ((pre_hi_test < post_lo) or
+                            (pre_lo_test > post_hi) or
+                            (pre_hi < prepop_lo) or (pre_lo > prepop_hi)):
                         n_filtered += 1
                 # Filter edge if post-pop is outside limit and pre_lo is bigger
                 # than n_post_neurons
                 elif synapse_info.postpop_is_view:
                     postpop_lo = synapse_info.post_population._indexes[0]
                     postpop_hi = synapse_info.post_population._indexes[-1]
-                    postpop_size = synapse_info.n_post_neurons
-                    if ((postpop_hi < post_lo or postpop_lo > post_hi) or
-                            (postpop_size < pre_lo)):
+                    # Get test values
+                    post_lo_test = post_lo - postpop_lo
+                    post_hi_test = post_hi - postpop_lo
+                    if ((pre_hi < post_lo_test) or
+                            (pre_lo > post_hi_test) or
+                            (post_hi < postpop_lo) or (post_lo > postpop_hi)):
                         n_filtered += 1
                 # Filter edge in the usual scenario with normal populations
                 else:
