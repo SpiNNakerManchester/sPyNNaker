@@ -76,16 +76,16 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
             usually the input image sizes)
         :type shape_common: list(int) or tuple(int,int) or None
         :param pre_sample_steps_in_post: (optional)
-            Sampling steps/jumps for pre pop <=> (startX, endX, *stepX*)
+            Sampling steps/jumps for pre pop <=> (stepX, stepY)
         :type pre_sample_steps_in_post: None or list(int) or tuple(int,int)
         :param pre_start_coords_in_post: (optional)
-            Starting row/col for pre sampling <=> (*startX*, endX, stepX)
+            Starting row/col for pre sampling <=> (offX, offY)
         :type pre_start_coords_in_post: None or list(int) or tuple(int,int)
         :param post_sample_steps_in_pre: (optional)
-            Sampling steps/jumps for post pop <=> (startX, endX, *stepX*)
+            Sampling steps/jumps for post pop <=> (stepX, stepY)
         :type post_sample_steps_in_pre: None or list(int) or tuple(int,int)
         :param post_start_coords_in_pre: (optional)
-            Starting row/col for post sampling <=> (*startX*, endX, stepX)
+            Starting row/col for post sampling <=> (offX, offY)
         :type post_start_coords_in_pre: None or list(int) or tuple(int,int)
         :param bool safe:
         :param bool verbose:
