@@ -270,8 +270,6 @@ bool spike_processing_initialise(
     buffer_being_read = N_DMA_BUFFERS;
     max_n_words = row_max_n_words;
 
-    io_printf(IO_BUF, "incoming_spike_buffer_size: %u\n", incoming_spike_buffer_size);
-
     // Allocate incoming spike buffer
     if (!in_spikes_initialize_spike_buffer(incoming_spike_buffer_size)) {
         return false;
