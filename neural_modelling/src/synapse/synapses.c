@@ -270,7 +270,7 @@ static inline void _process_fixed_synapses(
 
         // Convert into ring buffer offset
         uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
-            delay + time, combined_synapse_neuron_index,
+            delay + time, combined_synapse_neuron_index & synapse_index_mask,
             synapse_index_bits);
 
         // Add weight to current ring buffer value
