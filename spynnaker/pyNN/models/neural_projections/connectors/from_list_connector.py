@@ -51,37 +51,34 @@ class FromListConnector(AbstractConnector):
                  column_names=None):
         """
         :param conn_list:
-            a list of tuples, one tuple for each connection. Each\
+            a list of tuples, one tuple for each connection. Each
             tuple should contain at least::
 
                 (pre_idx, post_idx)
 
-            where ``pre_idx`` is the index (i.e. order in the Population,\
-            not the ID) of the presynaptic neuron, and ``post_idx`` is\
+            where ``pre_idx`` is the index (i.e. order in the Population,
+            not the ID) of the presynaptic neuron, and ``post_idx`` is
             the index of the postsynaptic neuron.
 
-            Additional items per synapse are acceptable but all synapses\
+            Additional items per synapse are acceptable but all synapses
             should have the same number of items.
         :type conn_list: ~numpy.ndarray or list(tuple(int,int,...))
         :param bool safe:
         :param callable callback: Ignored
         :param bool verbose:
-        :param column_names: If not None, must have same length as number of \
+        :param column_names: If not None, must have same length as number of
             extra columns in ``conn_list`` (i.e., after the first two).
         :type column_names: None or list(str)
         """
         super(FromListConnector, self).__init__(safe, callback, verbose)
 
-        # Need to set column names first, as setter uses this
         self.__column_names = column_names
-
-        # Call the conn_list setter, as this sets the internal values
-        self.conn_list = conn_list
-
-        # The connection list split by pre/post vertex slices
         self.__split_conn_list = None
         self.__split_pre_slices = None
         self.__split_post_slices = None
+
+        # Call the conn_list setter, as this sets the internal values
+        self.conn_list = conn_list
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
@@ -267,19 +264,21 @@ class FromListConnector(AbstractConnector):
     def conn_list(self):
         """ The connection list.
 
-        :rtype: numpy.ndarray
+        :rtype: ~numpy.ndarray
         """
         return self.__conn_list
 
     def get_n_connections(self, pre_slices, post_slices, pre_hi, post_hi):
         """
-        :param list(~pacman.model.graphs.commmon.Slice) pre_slices:
-        :param list(~pacman.model.graphs.commmon.Slice) post_slices:
+        :param list(~pacman.model.graphs.common.Slice) pre_slices:
+        :param list(~pacman.model.graphs.common.Slice) post_slices:
         :param int pre_hi:
         :param int post_hi:
         :rtype: int
         """
         self._split_connections(pre_slices, post_slices)
+        if not self.__split_conn_list:
+            return 0
         return len(self.__split_conn_list[pre_hi, post_hi])
 
     @conn_list.setter

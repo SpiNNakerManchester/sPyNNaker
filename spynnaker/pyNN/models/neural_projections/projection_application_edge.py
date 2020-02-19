@@ -99,8 +99,10 @@ class ProjectionApplicationEdge(ApplicationEdge, AbstractFilterableEdge):
     @overrides(ApplicationEdge.create_machine_edge)
     def create_machine_edge(
             self, pre_vertex, post_vertex, label):
-        return ProjectionMachineEdge(
+        edge = ProjectionMachineEdge(
             self.__synapse_information, pre_vertex, post_vertex, self, label)
+        self.remember_associated_machine_edge(edge)
+        return edge
 
     @overrides(AbstractFilterableEdge.filter_edge)
     def filter_edge(self):
