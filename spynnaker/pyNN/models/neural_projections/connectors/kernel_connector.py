@@ -49,12 +49,12 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
 
     def __init__(
             self, shape_pre, shape_post, shape_kernel, weight_kernel,
-            delay_kernel, shape_common, pre_sample_steps, pre_start_coords,
-            post_sample_steps, post_start_coords, safe, verbose,
-            callback=None):
+            delay_kernel, shape_common, pre_sample_steps_in_post,
+            pre_start_coords_in_post, post_sample_steps_in_pre,
+            post_start_coords_in_pre, safe, verbose, callback=None):
         """
         :param shape_pre:
-            2D shape of the pre population (rows/height, cols/width, usually \
+            2D shape of the pre population (rows/height, cols/width, usually
             the input image shape)
         :type shape_pre: list(int) or tuple(int,int)
         :param shape_post:
@@ -63,34 +63,33 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
         :param shape_kernel:
             2D shape of the kernel (rows/height, cols/width)
         :type shape_kernel: list(int) or tuple(int,int)
-        :param weight_kernel: (optional)\
+        :param weight_kernel: (optional)
             2D matrix of size shape_kernel describing the weights
         :type weight_kernel: ~numpy.ndarray or ~pyNN.random.NumpyRNG \
             or int or float or list(int) or list(float) or None
-        :param delay_kernel: (optional)\
+        :param delay_kernel: (optional)
             2D matrix of size shape_kernel describing the delays
         :type delay_kernel: ~numpy.ndarray or ~pyNN.random.NumpyRNG \
             or int or float or list(int) or list(float) or None
-        :param shape_common: (optional)\
-            2D shape of common coordinate system (for both pre and post, \
+        :param shape_common: (optional)
+            2D shape of common coordinate system (for both pre and post,
             usually the input image sizes)
         :type shape_common: list(int) or tuple(int,int) or None
-        :param pre_sample_steps: (optional)\
-            Sampling steps/jumps for pre pop <=> (startX, endX, _stepX_)
-            None or 2-item array
-        :type pre_sample_steps: None or list(int) or tuple(int,int)
-        :param pre_start_coords: (optional)\
-            Starting row/col for pre sampling <=> (_startX_, endX, stepX)
-            None or 2-item array
-        :type pre_start_coords: None or list(int) or tuple(int,int)
-        :param post_sample_steps: (optional)\
-            Sampling steps/jumps for post pop <=> (startX, endX, _stepX_)
-            None or 2-item array
-        :type post_sample_steps: None or list(int) or tuple(int,int)
-        :param post_start_coords: (optional)\
-            Starting row/col for post sampling <=> (_startX_, endX, stepX)
-            None or 2-item array
-        :type post_start_coords: None or list(int) or tuple(int,int)
+        :param pre_sample_steps_in_post: (optional)
+            Sampling steps/jumps for pre pop <=> (startX, endX, *stepX*)
+        :type pre_sample_steps_in_post: None or list(int) or tuple(int,int)
+        :param pre_start_coords_in_post: (optional)
+            Starting row/col for pre sampling <=> (*startX*, endX, stepX)
+        :type pre_start_coords_in_post: None or list(int) or tuple(int,int)
+        :param post_sample_steps_in_pre: (optional)
+            Sampling steps/jumps for post pop <=> (startX, endX, *stepX*)
+        :type post_sample_steps_in_pre: None or list(int) or tuple(int,int)
+        :param post_start_coords_in_pre: (optional)
+            Starting row/col for post sampling <=> (*startX*, endX, stepX)
+        :type post_start_coords_in_pre: None or list(int) or tuple(int,int)
+        :param bool safe:
+        :param bool verbose:
+        :param callable callback: (ignored)
         """
         super(KernelConnector, self).__init__(
             safe=safe, callback=callback, verbose=verbose)
@@ -110,33 +109,33 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
         self._post_h = shape_post[HEIGHT]
 
         # Get the starting coords and step sizes (or defaults if not given)
-        if pre_start_coords is None:
+        if pre_start_coords_in_post is None:
             self._pre_start_w = 0
             self._pre_start_h = 0
         else:
-            self._pre_start_w = pre_start_coords[WIDTH]
-            self._pre_start_h = pre_start_coords[HEIGHT]
+            self._pre_start_w = pre_start_coords_in_post[WIDTH]
+            self._pre_start_h = pre_start_coords_in_post[HEIGHT]
 
-        if post_start_coords is None:
+        if post_start_coords_in_pre is None:
             self._post_start_w = 0
             self._post_start_h = 0
         else:
-            self._post_start_w = post_start_coords[WIDTH]
-            self._post_start_h = post_start_coords[HEIGHT]
+            self._post_start_w = post_start_coords_in_pre[WIDTH]
+            self._post_start_h = post_start_coords_in_pre[HEIGHT]
 
-        if pre_sample_steps is None:
+        if pre_sample_steps_in_post is None:
             self._pre_step_w = 1
             self._pre_step_h = 1
         else:
-            self._pre_step_w = pre_sample_steps[WIDTH]
-            self._pre_step_h = pre_sample_steps[HEIGHT]
+            self._pre_step_w = pre_sample_steps_in_post[WIDTH]
+            self._pre_step_h = pre_sample_steps_in_post[HEIGHT]
 
-        if post_sample_steps is None:
+        if post_sample_steps_in_pre is None:
             self._post_step_w = 1
             self._post_step_h = 1
         else:
-            self._post_step_w = post_sample_steps[WIDTH]
-            self._post_step_h = post_sample_steps[HEIGHT]
+            self._post_step_w = post_sample_steps_in_pre[WIDTH]
+            self._post_step_h = post_sample_steps_in_pre[HEIGHT]
 
         # Make sure the supplied values are in the correct format
         self._krn_weights = self.__get_kernel_vals(weight_kernel)
