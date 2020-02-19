@@ -102,7 +102,7 @@ class SpynnakerExternalDevicePluginManager(object):
             address is OK
         :param key_prefix: the prefix to be applied to the key
         :type key_prefix: int or None
-        :param spinnman.messages.eieio.EIEIOPrefix prefix_type:
+        :param ~spinnman.messages.eieio.EIEIOPrefix prefix_type:
             if the prefix type is 32 bit or 16 bit
         :param ~spinnman.messages.eieio.EIEIOType message_type:
             If the message is a EIEIO command message, or an EIEIO data
