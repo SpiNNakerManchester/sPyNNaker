@@ -32,4 +32,6 @@ class DelayAfferentApplicationEdge(ApplicationEdge):
 
     @overrides(ApplicationEdge.create_machine_edge)
     def create_machine_edge(self, pre_vertex, post_vertex, label):
-        return DelayAfferentMachineEdge(pre_vertex, post_vertex, label, self)
+        edge = DelayAfferentMachineEdge(pre_vertex, post_vertex, label, self)
+        self.remember_associated_machine_edge(edge)
+        return edge

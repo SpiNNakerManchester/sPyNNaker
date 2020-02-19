@@ -108,9 +108,9 @@ class SynapticManager(object):
         :param ~configparser.RawConfigParser config: The system configuration
         :param population_table_type:
             What type of master population table is used
-        :type population_table_type: AbstractMasterPopTableFactory or None
+        :type population_table_type: MasterPopTableAsBinarySearch or None
         :param synapse_io: How IO for synapses is performed
-        :type synapse_io: AbstractSynapseIO or None
+        :type synapse_io: SynapseIORowBased or None
         """
         self.__n_synapse_types = n_synapse_types
         self.__ring_buffer_sigma = ring_buffer_sigma
@@ -408,7 +408,7 @@ class SynapticManager(object):
             self, vertex_slice, machine_time_step, application_graph,
             app_vertex):
         """
-        :param ~pacman.model.common.Slice vertex_slice:
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
         :param int machine_time_step:
         :param ~pacman.model.graphs.application.ApplicationGraph \
                 application_graph:
@@ -1529,7 +1529,7 @@ class SynapticManager(object):
     def gen_on_machine(self, vertex_slice):
         """ True if the synapses should be generated on the machine
 
-        :param ~pacman.model.common.Slice vertex_slice:
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
         :rtype: bool
         """
         return self.__gen_on_machine.get(vertex_slice, False)

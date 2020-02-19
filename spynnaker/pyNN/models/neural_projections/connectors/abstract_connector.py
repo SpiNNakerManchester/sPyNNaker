@@ -233,7 +233,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         :param delays:
         :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float
             or list(int) or list(float)
-        :param: ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
         :param SynapseInformation synapse_info:
         :param min_delay:
         :type min_delay: int or None
@@ -256,7 +256,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         """ Get the mean of the weights.
 
         :param weights:
-        :type weights: ~numpy.ndarray or pyNN.random.NumpyRNG or int or float
+        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float
             or list(int) or list(float)
         :rtype: float
         """

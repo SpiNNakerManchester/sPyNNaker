@@ -50,12 +50,12 @@ class MaxRowInfo(object):
             undelayed_max_bytes, delayed_max_bytes,
             undelayed_max_words, delayed_max_words):
         """
-        :param undelayed_max_n_synapses:
-        :param delayed_max_n_synapses:
-        :param undelayed_max_bytes:
-        :param delayed_max_bytes:
-        :param undelayed_max_words:
-        :param delayed_max_words:
+        :param int undelayed_max_n_synapses:
+        :param int delayed_max_n_synapses:
+        :param int undelayed_max_bytes:
+        :param int delayed_max_bytes:
+        :param int undelayed_max_words:
+        :param int delayed_max_words:
         """
         self.__undelayed_max_n_synapses = undelayed_max_n_synapses
         self.__delayed_max_n_synapses = delayed_max_n_synapses
@@ -171,7 +171,7 @@ class SynapseIORowBased(object):
         :param SynapseInformation synapse_info:
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
         :param int n_delay_stages:
-        :param AbstractMasterPopTableFactory population_table:
+        :param MasterPopTableAsBinarySearch population_table:
         :param int machine_time_step:
         :param in_edge:
         :type in_edge: ProjectionApplicationEdge or ProjectionMachineEdge
@@ -315,7 +315,7 @@ class SynapseIORowBased(object):
         :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
         :param int n_delay_stages:
-        :param AbstractMasterPopTableFactory population_table:
+        :param MasterPopTableAsBinarySearch population_table:
         :param int n_synapse_types:
         :param dict(AbstractSynapseType,float) weight_scales:
         :param int machine_time_step:

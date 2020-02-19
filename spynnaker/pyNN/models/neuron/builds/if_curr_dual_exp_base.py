@@ -33,15 +33,15 @@ class IFCurrDualExpBase(AbstractPyNNNeuronModelStandard):
     :param float v_rest: :math:`V_{rest}`
     :param float v_reset: :math:`V_{reset}`
     :param float v_thresh: :math:`V_{thresh}`
-    :param float tau_syn_E: :math:`\\tau^{syn}_e_1`
-    :param float tau_syn_E2: :math:`\\tau^{syn}_e_2`
+    :param float tau_syn_E: :math:`\\tau^{syn}_{e_1}`
+    :param float tau_syn_E2: :math:`\\tau^{syn}_{e_2}`
     :param float tau_syn_I: :math:`\\tau^{syn}_i`
     :param float tau_refrac: :math:`\\tau_{refrac}`
     :param float i_offset: :math:`I_{offset}`
     :param float v: :math:`V_{init}`
-    :param float isyn_exc: :math:`I^{syn}_e_1`
+    :param float isyn_exc: :math:`I^{syn}_{e_1}`
     :param float isyn_inh: :math:`I^{syn}_i`
-    :param float isyn_exc2: :math:`I^{syn}_e_2`
+    :param float isyn_exc2: :math:`I^{syn}_{e_2}`
     """
 
     @default_initial_values({"v", "isyn_exc", "isyn_exc2", "isyn_inh"})

@@ -25,6 +25,15 @@ class AbstractSynapseDynamicsStructural(object):
     def get_structural_parameters_sdram_usage_in_bytes(
             self, application_graph, app_vertex, n_neurons, n_synapse_types):
         """ Get the size of the structural parameters
+
+        :param ~pacman.model.graphs.application.ApplicationGraph \
+                application_graph:
+        :param ~spynnaker.pyNN.models.neuron.AbstractPopulationVertex \
+                app_vertex:
+        :param int n_neurons:
+        :param int n_synapse_types:
+        :return: the size of the parameters, in bytes
+        :rtype: int
         """
 
     @abstractmethod
@@ -37,11 +46,12 @@ class AbstractSynapseDynamicsStructural(object):
         :param ~data_specification.DataSpecificationGenerator spec:
         :param int region: region ID
         :param int machine_time_step:
-        :param ~numpy.ndarray? weight_scales:
+        :param weight_scales:
+        :type weight_scales: ~numpy.ndarray or list(float)
         :param ~pacman.model.graphs.application.ApplicationGraph\
                 application_graph:
         :param AbstractPopulationVertex app_vertex:
-        :param ~pacman.mode.graphs.common.Slice post_slice:
+        :param ~pacman.model.graphs.common.Slice post_slice:
         :param ~pacman.model.routing_info.RoutingInfo routing_info:
         :param dict(tuple(SynapseInformation,int),int) synapse_indices:
         """
@@ -52,8 +62,8 @@ class AbstractSynapseDynamicsStructural(object):
             machine_edge):
         """ Set connections for structural plasticity
 
-        :param ~numpy.ndarray? connections:
-        :param ~pacman.mode.graphs.common.Slice post_vertex_slice:
+        :param ~numpy.ndarray connections:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
         :param ProjectionApplicationEdge app_edge:
         :param SynapseInformation synapse_info:
         :param ProjectionMachineEdge machine_edge:
