@@ -198,7 +198,7 @@ class SynapticManager(
         partition_name = _name_list[len(_name_list) - 4]
 
         self.__partition = int(partition_name[1]) if ((partition_name[0] == "e" and partition_name[1] == "0")
-                                                      or partition_name[0] == "i") else int(partition_name[1]) + 1
+                                                      or partition_name[0] == "i") else int(partition_name[1:]) + 1
 
 
         # Get the type of population table

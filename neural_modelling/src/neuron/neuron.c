@@ -458,7 +458,8 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset) {
     // Read number of recorded variables
     n_recorded_vars = address[N_RECORDED_VARIABLES];
 
-    n_neurons_power_2 = n_neurons;
+    // Avoids offset problems with a single neuron assuming min power = 2
+    n_neurons_power_2 = (n_neurons == 1) ? 2 : n_neurons;
     uint32_t log_n_neurons = 1;
     if (n_neurons != 1) {
         if (!is_power_of_2(n_neurons)) {

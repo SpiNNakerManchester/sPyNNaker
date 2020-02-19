@@ -254,8 +254,11 @@ static inline void _process_fixed_synapses(
 
         // Convert into ring buffer offset
         uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
-            delay + time, combined_synapse_neuron_index,
+            delay + time, combined_synapse_neuron_index & synapse_index_mask,
             synapse_index_bits);
+
+        io_printf(IO_BUF, "syn index bits %d, comb syn neu %d and %d\n", synapse_index_bits, combined_synapse_neuron_index, combined_synapse_neuron_index & synapse_index_mask);
+        io_printf(IO_BUF, "delay %d, index %d, time %d\n", delay, ring_buffer_index, time);
 
         // Add weight to current ring buffer value
         uint32_t accumulation = ring_buffers[ring_buffer_index] + weight;
