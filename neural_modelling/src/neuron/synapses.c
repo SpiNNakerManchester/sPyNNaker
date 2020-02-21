@@ -185,6 +185,10 @@ static inline void process_fixed_synapses(
                 delay + time, combined_synapse_neuron_index,
                 synapse_type_index_bits);
 
+
+        io_printf(IO_BUF, "static weight: %u\n", weight);
+
+
         // Add weight to current ring buffer value
         uint32_t accumulation = ring_buffers[ring_buffer_index] + weight;
 

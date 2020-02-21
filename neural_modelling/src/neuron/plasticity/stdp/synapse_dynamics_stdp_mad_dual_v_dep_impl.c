@@ -366,6 +366,11 @@ bool synapse_dynamics_process_plastic_synapses(
         update_state_t current_state =
                 synapse_structure_get_update_state(*plastic_words, type);
 
+
+        io_printf(IO_BUF, "Current weight: %u\n", current_state.initial_weight);
+
+
+
         // Convert into ring buffer offset
         uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
                 delay_axonal + delay_dendritic + time, type_index,
@@ -396,6 +401,10 @@ bool synapse_dynamics_process_plastic_synapses(
         }
 
         ring_buffers[ring_buffer_index] = accumulation;
+
+
+        io_printf(IO_BUF, "applied plastic weight: %u\n", synapse_structure_get_final_weight(final_state));
+
 
         // Write back updated synaptic word to plastic region
         *plastic_words++ =

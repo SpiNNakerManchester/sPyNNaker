@@ -36,6 +36,9 @@ address_t timing_initialise(address_t address) {
     tau_plus_lookup = maths_copy_int16_lut(&lut_address);
     tau_minus_lookup = maths_copy_int16_lut(&lut_address);
 
+    io_printf(IO_BUF, "tau_plus first value: %d\n", tau_plus_lookup[0]);
+    io_printf(IO_BUF, "tau_minus first value: %d\n", tau_minus_lookup[0]);
+
     log_debug("timing_initialise: completed successfully");
 
     return lut_address;

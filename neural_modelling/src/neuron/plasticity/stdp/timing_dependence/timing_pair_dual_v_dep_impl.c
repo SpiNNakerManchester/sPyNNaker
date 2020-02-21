@@ -44,6 +44,11 @@ uint32_t *timing_initialise(uint32_t* address) {
     tau_exc_lookup = maths_copy_int16_lut(&lut_address);
     tau_inh_lookup = maths_copy_int16_lut(&lut_address);
 
+    io_printf(IO_BUF, "tau_exc first value: %d\n", tau_exc_lookup[0]);
+    io_printf(IO_BUF, "tau_inh first value: %d\n", tau_inh_lookup[0]);
+    io_printf(IO_BUF, "alpha_exc: %d\n", plasticity_trace_region_data_exc.alpha);
+    io_printf(IO_BUF, "alpha_inh: %d\n", plasticity_trace_region_data_inh.alpha);
+
     log_info("timing_initialise: completed successfully");
 
     return lut_address;

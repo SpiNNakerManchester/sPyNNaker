@@ -328,6 +328,7 @@ address_t synapse_dynamics_initialise(
 bool synapse_dynamics_process_plastic_synapses(
         address_t plastic_region_address, address_t fixed_region_address,
         weight_t *ring_buffers, uint32_t time) {
+	io_printf(IO_BUF, "enterred here\n");
     // Extract separate arrays of plastic synapses (from plastic region),
     // Control words (from fixed region) and number of plastic synapses
     plastic_synapse_t *plastic_words =
@@ -386,6 +387,9 @@ bool synapse_dynamics_process_plastic_synapses(
         update_state_t current_state =
                 synapse_structure_get_update_state(*plastic_words, type);
 
+
+        io_printf(IO_BUF, "curr weight: %u\n", synapse_structure_get_weight(*plastic_words));
+
         // Convert into ring buffer offset
         uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
                 delay_axonal + delay_dendritic + time, type_index,
@@ -407,7 +411,6 @@ bool synapse_dynamics_process_plastic_synapses(
         //-------------------------------------------------------------------------
         //-------------------------------------------------------------------------
 
-
         // Add weight to ring-buffer entry
         // **NOTE** Dave suspects that this could be a
         // potential location for overflow
@@ -415,11 +418,15 @@ bool synapse_dynamics_process_plastic_synapses(
         uint32_t accumulation = ring_buffers[ring_buffer_index] +
                 synapse_structure_get_final_weight(final_state);
 
+        io_printf(IO_BUF, "weight: %u\n", synapse_structure_get_final_weight(final_state));
+
         uint32_t sat_test = accumulation & 0x10000;
         if (sat_test) {
             accumulation = sat_test - 1;
             plastic_saturation_count++;
         }
+
+        ring_buffers[ring_buffer_index] = accumulation;
 
         // Write back updated synaptic word to plastic region
         *plastic_words++ =
