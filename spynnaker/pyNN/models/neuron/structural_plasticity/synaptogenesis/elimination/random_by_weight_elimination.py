@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from .abstract_elimination import AbstractElimination
-from pacman.model.decorators.overrides import overrides
+from spinn_utilities.overrides import overrides
 
 
 class RandomByWeightElimination(AbstractElimination):
