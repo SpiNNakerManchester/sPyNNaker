@@ -21,18 +21,21 @@
  */
 #include "common_kernel.h"
 
-uint16_t uidiv(uint16_t dividend, uint16_t divider, uint16_t *remainder) {
+uint16_t uidiv(uint32_t dividend, uint16_t divider, uint16_t *remainder) {
+	uint32_t rem;
+
     if (dividend == 0 || dividend < divider) {
-        *remainder = dividend;
+    	*remainder = (uint16_t) dividend;
         return 0;
     }
 
     uint16_t d = 0;
-    *remainder = dividend;
-    while (*remainder >= divider) {
+    rem = dividend;
+    while (rem >= divider) {
         d++;
-        *remainder -= divider;
+        rem -= divider;
     }
+    *remainder = (uint16_t) rem;
     return d;
 }
 
