@@ -84,7 +84,7 @@ class RedundantPacketCountReport(object):
                         "targets after the DMA stage. {} were detected as "
                         "packets which we should not have received in the "
                         "first place. Overall this makes a redundant "
-                        "percentage of {}".format(
+                        "percentage of {}\n".format(
                             key, total,
                             data[key][
                                 PopulationMachineVertex.

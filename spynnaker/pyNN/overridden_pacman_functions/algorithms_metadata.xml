@@ -346,7 +346,7 @@
         <input_definitions>
             <parameter>
                 <param_name>provenance_items</param_name>
-                <param_type>ProvenanceItems</param_type>
+                <param_type>PlacementsProvenanceItems</param_type>
             </parameter>
             <parameter>
                 <param_name>report_default_directory</param_name>
