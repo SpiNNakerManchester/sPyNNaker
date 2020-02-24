@@ -15,7 +15,7 @@
 
 import numpy
 from .abstract_formation import AbstractFormation
-from pacman.model.decorators.overrides import overrides
+from spinn_utilities.overrides import overrides
 
 
 class DistanceDependentFormation(AbstractFormation):
