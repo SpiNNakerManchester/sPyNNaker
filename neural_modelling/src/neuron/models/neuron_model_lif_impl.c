@@ -55,7 +55,7 @@ state_t neuron_model_state_update(
         neuron->refract_timer--; //still want to decrement refract timer
 	}
     // If outside of the refractory period
-	else if (neuron->refract_timer <= 0) {
+	if (neuron->refract_timer <= 0) {
 		REAL total_exc = 0;
 		REAL total_inh = 0;
 
