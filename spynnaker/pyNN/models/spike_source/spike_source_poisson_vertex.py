@@ -745,8 +745,8 @@ class SpikeSourcePoissonVertex(
                 ends_scaled.astype("uint32"),
                 next_scaled.astype("uint32"),
                 is_fast_source.astype("uint32"),
-                (exp_minus_lambda * (2 ** 32)).astype("uint32"),
-                (sqrt_lambda * (2 ** 15)).astype("uint32"),
+                DataType.U032.encode_as_numpy_int_array(exp_minus_lambda),
+                DataType.S1615.encode_as_numpy_int_array(sqrt_lambda),
                 isi_val.astype("uint32"),
                 time_to_spike.astype("uint32")
             ))[0].flatten()

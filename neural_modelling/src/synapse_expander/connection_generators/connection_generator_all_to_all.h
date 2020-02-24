@@ -31,6 +31,10 @@ static generate_connection_func connection_generator_all_to_all_generate;
  *! \brief The parameters to be passed around for this connector
  */
 struct all_to_all {
+    uint32_t pre_lo;
+    uint32_t pre_hi;
+    uint32_t post_lo;
+    uint32_t post_hi;
     uint32_t allow_self_connections;
 };
 
@@ -43,7 +47,9 @@ static void *connection_generator_all_to_all_initialise(address_t *region) {
     *params = *params_sdram++;
     *region = (void *) params_sdram;
 
-    log_debug("All to all connector, allow self connections = %u",
+    log_debug("All to all connector, pre_lo = %u, pre_hi = %u, "
+            "post_lo = %u, post_hi = %u, allow_self_connections = %u",
+            params->pre_lo, params->pre_hi, params->post_lo, params->post_hi,
             params->allow_self_connections);
 
     return params;
@@ -69,6 +75,12 @@ static uint32_t connection_generator_all_to_all_generate(
         return 0;
     }
 
+    // If not in the pre-population view range, then don't generate
+    if ((pre_neuron_index < obj->pre_lo) ||
+            (pre_neuron_index > obj->pre_hi)) {
+        return 0;
+    }
+
     // Add a connection to this pre-neuron for each post-neuron...
     uint32_t n_conns = 0;
     for (uint32_t i = 0; i < post_slice_count; i++) {
@@ -76,6 +88,10 @@ static uint32_t connection_generator_all_to_all_generate(
         if (!obj->allow_self_connections &&
                 (pre_neuron_index == post_slice_start + i)) {
             log_debug("Not generating for post %u", post_slice_start + i);
+            continue;
+        }
+        // ... or if the value is not in the range of the post-population view
+        if ((i + post_slice_start < obj->post_lo) || (i + post_slice_start > obj->post_hi)) {
             continue;
         }
         indices[n_conns++] = i;

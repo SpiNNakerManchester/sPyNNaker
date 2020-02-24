@@ -13,10 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import decimal
 import numpy
 from data_specification.enums.data_type import DataType
-from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spinn_front_end_common.utilities.constants import (
+    MICRO_TO_MILLISECOND_CONVERSION, BYTES_PER_WORD)
 
 
 class GeneratorData(object):
@@ -76,9 +76,9 @@ class GeneratorData(object):
                     dynamics.gen_matrix_params_size_in_bytes,
                     connector.gen_connector_params_size_in_bytes,
                     connector.gen_weight_params_size_in_bytes(
-                        self.__synapse_information.weight),
+                        self.__synapse_information.weights),
                     connector.gen_delay_params_size_in_bytes(
-                        self.__synapse_information.delay)))
+                        self.__synapse_information.delays)))
 
     @property
     def gen_data(self):
@@ -99,23 +99,24 @@ class GeneratorData(object):
             self.__pre_vertex_slice.lo_atom,
             self.__pre_vertex_slice.n_atoms,
             self.__max_stage,
-            (decimal.Decimal(str(1000.0 / float(self.__machine_time_step))) *
-             DataType.S1615.scale),
+            DataType.S1615.encode_as_int(
+                MICRO_TO_MILLISECOND_CONVERSION / self.__machine_time_step),
             self.__synapse_information.synapse_type,
             synapse_dynamics.gen_matrix_id,
             connector.gen_connector_id,
-            connector.gen_weights_id(self.__synapse_information.weight),
-            connector.gen_delays_id(self.__synapse_information.delay)],
+            connector.gen_weights_id(self.__synapse_information.weights),
+            connector.gen_delays_id(self.__synapse_information.delays)],
             dtype="uint32"))
         items.append(synapse_dynamics.gen_matrix_params)
         items.append(connector.gen_connector_params(
             self.__pre_slices, self.__pre_slice_index, self.__post_slices,
             self.__post_slice_index, self.__pre_vertex_slice,
-            self.__post_vertex_slice, self.__synapse_information.synapse_type))
+            self.__post_vertex_slice, self.__synapse_information.synapse_type,
+            self.__synapse_information))
         items.append(connector.gen_weights_params(
-            self.__synapse_information.weight, self.__pre_vertex_slice,
+            self.__synapse_information.weights, self.__pre_vertex_slice,
             self.__post_vertex_slice))
         items.append(connector.gen_delay_params(
-            self.__synapse_information.delay, self.__pre_vertex_slice,
+            self.__synapse_information.delays, self.__pre_vertex_slice,
             self.__post_vertex_slice))
         return numpy.concatenate(items)

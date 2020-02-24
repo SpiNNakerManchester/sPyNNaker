@@ -14,10 +14,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy
+from pyNN.random import RandomDistribution
 from .abstract_connector import AbstractConnector
 from spynnaker.pyNN.exceptions import SpynnakerException
-from spinn_front_end_common.utilities.globals_variables import get_simulator
-from pacman.model.decorators.overrides import overrides
+from spinn_utilities.overrides import overrides
 from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from .abstract_generate_connector_on_machine \
@@ -47,8 +47,9 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
 
     def __init__(
             self, shape_pre, shape_post, shape_kernel, weight_kernel,
-            delay_kernel, shape_common, pre_sample_steps, pre_start_coords,
-            post_sample_steps, post_start_coords, safe, verbose,
+            delay_kernel, shape_common, pre_sample_steps_in_post,
+            pre_start_coords_in_post, post_sample_steps_in_pre,
+            post_start_coords_in_pre, safe, verbose,
             callback=None):
         """
         :param shape_pre:\
@@ -65,10 +66,10 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
         :param shape_common (optional):\
             2D shape of common coordinate system (for both pre and post, \
             usually the input image sizes)
-        :param pre/post_sample_steps (optional):\
+        :param pre/post_sample_steps_in_post/pre (optional):\
             Sampling steps/jumps for pre/post pop <=> (startX, endX, _stepX_)
             None or 2-item array
-        :param pre/post_start_coords (optional):\
+        :param pre/post_start_coords_in_post/pre (optional):\
             Starting row/col for pre/post sampling <=> (_startX_, endX, stepX)
             None or 2-item array
         """
@@ -90,33 +91,33 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
         self._post_h = shape_post[HEIGHT]
 
         # Get the starting coords and step sizes (or defaults if not given)
-        if pre_start_coords is None:
+        if pre_start_coords_in_post is None:
             self._pre_start_w = 0
             self._pre_start_h = 0
         else:
-            self._pre_start_w = pre_start_coords[WIDTH]
-            self._pre_start_h = pre_start_coords[HEIGHT]
+            self._pre_start_w = pre_start_coords_in_post[WIDTH]
+            self._pre_start_h = pre_start_coords_in_post[HEIGHT]
 
-        if post_start_coords is None:
+        if post_start_coords_in_pre is None:
             self._post_start_w = 0
             self._post_start_h = 0
         else:
-            self._post_start_w = post_start_coords[WIDTH]
-            self._post_start_h = post_start_coords[HEIGHT]
+            self._post_start_w = post_start_coords_in_pre[WIDTH]
+            self._post_start_h = post_start_coords_in_pre[HEIGHT]
 
-        if pre_sample_steps is None:
+        if pre_sample_steps_in_post is None:
             self._pre_step_w = 1
             self._pre_step_h = 1
         else:
-            self._pre_step_w = pre_sample_steps[WIDTH]
-            self._pre_step_h = pre_sample_steps[HEIGHT]
+            self._pre_step_w = pre_sample_steps_in_post[WIDTH]
+            self._pre_step_h = pre_sample_steps_in_post[HEIGHT]
 
-        if post_sample_steps is None:
+        if post_sample_steps_in_pre is None:
             self._post_step_w = 1
             self._post_step_h = 1
         else:
-            self._post_step_w = post_sample_steps[WIDTH]
-            self._post_step_h = post_sample_steps[HEIGHT]
+            self._post_step_w = post_sample_steps_in_pre[WIDTH]
+            self._post_step_h = post_sample_steps_in_pre[HEIGHT]
 
         # Make sure the supplied values are in the correct format
         self._krn_weights = self.get_kernel_vals(weight_kernel)
@@ -164,7 +165,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
             return None
         krn_size = self._kernel_h * self._kernel_w
         krn_shape = (self._kernel_h, self._kernel_w)
-        if get_simulator().is_a_pynn_random(vals):
+        if isinstance(vals, RandomDistribution):
             return numpy.array(vals.next(krn_size)).reshape(krn_shape)
         elif numpy.isscalar(vals):
             return vals * numpy.ones(krn_shape)
@@ -245,7 +246,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
                 numpy.array(all_delays), numpy.array(all_weights))
 
     @overrides(AbstractConnector.get_delay_maximum)
-    def get_delay_maximum(self, delays):
+    def get_delay_maximum(self, synapse_info):
         # I think this is overestimated, but not by much
         n_conns = (
             self._pre_w * self._pre_h * self._kernel_w * self._kernel_h)
@@ -254,11 +255,12 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
             return self._get_delay_maximum(self._krn_delays, n_conns)
 
         # if not then use the values that came in
-        return self._get_delay_maximum(delays, n_conns)
+        return self._get_delay_maximum(synapse_info.delays, n_conns)
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, delays, post_vertex_slice, min_delay=None, max_delay=None):
+            self, post_vertex_slice, synapse_info, min_delay=None,
+            max_delay=None):
         # This is clearly a cop-out, but it works at the moment:
         # I haven't been able to make this break for "standard usage"
         return numpy.clip(
@@ -266,14 +268,15 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
             0, 255)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
-    def get_n_connections_to_post_vertex_maximum(self):
+    def get_n_connections_to_post_vertex_maximum(self, synapse_info):
         # Again as above this is something of a cop-out and we can
         # probably do better
         return numpy.clip(
-            self._kernel_h * self._kernel_w * self._n_pre_neurons, 0, 255)
+            self._kernel_h * self._kernel_w * synapse_info.n_pre_neurons,
+            0, 255)
 
     @overrides(AbstractConnector.get_weight_maximum)
-    def get_weight_maximum(self, weights):
+    def get_weight_maximum(self, synapse_info):
         # I think this is overestimated, but not by much
         n_conns = (
             self._pre_w * self._pre_h * self._kernel_w * self._kernel_h)
@@ -281,7 +284,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
         if self._krn_weights is not None:
             return self._get_weight_maximum(self._krn_weights, n_conns)
 
-        return self._get_weight_maximum(weights, n_conns)
+        return self._get_weight_maximum(synapse_info.weights, n_conns)
 
     def __repr__(self):
         return "KernelConnector(shape_kernel[{},{}])".format(
@@ -289,12 +292,13 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, weights, delays, pre_slices, pre_slice_index, post_slices,
+            self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type):
+            synapse_type, synapse_info):
         (n_connections, all_post, all_pre_in_range, all_pre_in_range_delays,
          all_pre_in_range_weights) = self.compute_statistics(
-            weights, delays, pre_vertex_slice, post_vertex_slice)
+            synapse_info.weights, synapse_info.delays, pre_vertex_slice,
+            post_vertex_slice)
 
         syn_dtypes = AbstractConnector.NUMPY_SYNAPSES_DTYPE
 
@@ -344,8 +348,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
             properties = self._kernel_properties
             properties.append(post_vertex_slice.lo_atom)
             data = numpy.array(properties, dtype="uint32")
-            values = numpy.round(self._krn_delays * float(
-                DataType.S1615.scale)).astype("uint32")
+            values = DataType.S1615.encode_as_numpy_int_array(self._krn_delays)
             return numpy.concatenate((data, values.flatten()))
         return super(KernelConnector, self).gen_delay_params(
             delays, pre_vertex_slice, post_vertex_slice)
@@ -371,8 +374,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
             properties = self._kernel_properties
             properties.append(post_vertex_slice.lo_atom)
             data = numpy.array(properties, dtype="uint32")
-            values = numpy.round(self._krn_weights * float(
-                DataType.S1615.scale)).astype("uint32")
+            values = DataType.S1615.encode_as_numpy_int_array(
+                self._krn_weights)
             return numpy.concatenate((data, values.flatten()))
         return super(KernelConnector, self).gen_weights_params(
             weights, pre_vertex_slice, post_vertex_slice)
@@ -387,7 +390,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
     def gen_connector_params(
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type):
+            synapse_type, synapse_info):
         return numpy.array(self._kernel_properties, dtype="uint32")
 
     @property

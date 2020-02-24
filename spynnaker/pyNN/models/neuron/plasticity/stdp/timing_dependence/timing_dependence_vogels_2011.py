@@ -87,8 +87,7 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
     def write_parameters(self, spec, machine_time_step, weight_scales):
 
         # Write alpha to spec
-        fixed_point_alpha = plasticity_helpers.float_to_fixed(
-            self.__alpha, plasticity_helpers.STDP_FIXED_POINT_ONE)
+        fixed_point_alpha = plasticity_helpers.float_to_fixed(self.__alpha)
         spec.write_value(data=fixed_point_alpha, data_type=DataType.INT32)
 
         # Write lookup table

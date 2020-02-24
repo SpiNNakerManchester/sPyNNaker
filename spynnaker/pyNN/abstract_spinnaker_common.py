@@ -17,6 +17,9 @@ import logging
 import math
 import os
 from six import with_metaclass
+
+from spinn_front_end_common.utilities.constants import \
+    MICRO_TO_MILLISECOND_CONVERSION
 from spinn_utilities.abstract_base import AbstractBase
 from spinn_utilities.log import FormatAdapter
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
@@ -219,20 +222,22 @@ class AbstractSpiNNakerCommon(with_metaclass(
             self.set_up_timings(timestep, time_scale_factor)
         else:
             self.set_up_timings(
-                math.ceil(timestep * 1000.0), time_scale_factor)
+                math.ceil(timestep * MICRO_TO_MILLISECOND_CONVERSION),
+                time_scale_factor)
 
-        machine_time_step = self.machine_time_step
         # Sort out the minimum delay
         if (min_delay is not None and
-                min_delay * 1000.0 < machine_time_step):
+                (min_delay * MICRO_TO_MILLISECOND_CONVERSION) <
+                self.machine_time_step):
             raise ConfigurationException(
                 "Pacman does not support min delays below {} ms with the "
                 "current machine time step".format(
-                    constants.MIN_SUPPORTED_DELAY * machine_time_step))
+                    constants.MIN_SUPPORTED_DELAY * self.machine_time_step))
         if min_delay is not None:
             self.__min_delay = min_delay
         else:
-            self.__min_delay = machine_time_step / 1000.0
+            self.__min_delay = (
+                self.machine_time_step / MICRO_TO_MILLISECOND_CONVERSION)
 
         # Sort out the maximum delay
         natively_supported_delay_for_models = \
@@ -243,23 +248,27 @@ class AbstractSpiNNakerCommon(with_metaclass(
         max_delay_tics_supported = \
             natively_supported_delay_for_models + \
             delay_extension_max_supported_delay
-        if (max_delay is not None and max_delay * 1000.0 >
-                max_delay_tics_supported * machine_time_step):
+        if (max_delay is not None and
+                max_delay * MICRO_TO_MILLISECOND_CONVERSION >
+                max_delay_tics_supported * self.machine_time_step):
             raise ConfigurationException(
                 "Pacman does not support max delays above {} ms with the "
                 "current machine time step".format(
-                    0.144 * machine_time_step))
+                    0.144 * self.machine_time_step))
         if max_delay is not None:
             self.__max_delay = max_delay
         else:
             self.__max_delay = (
-                max_delay_tics_supported * (machine_time_step / 1000.0))
+                max_delay_tics_supported * (
+                    self.machine_time_step /
+                    MICRO_TO_MILLISECOND_CONVERSION))
 
         # Sort out the time scale factor if not user specified
         # (including config)
         if self.time_scale_factor is None:
             self.time_scale_factor = max(
-                1.0, math.ceil(1000.0 / machine_time_step))
+                1.0, math.ceil(
+                    MICRO_TO_MILLISECOND_CONVERSION / self.machine_time_step))
             if self.time_scale_factor > 1:
                 logger.warning(
                     "A timestep was entered that has forced sPyNNaker to "
@@ -269,7 +278,8 @@ class AbstractSpiNNakerCommon(with_metaclass(
                     self.time_scale_factor, self.CONFIG_FILE_NAME)
 
         # Check the combination of machine time step and time scale factor
-        if machine_time_step * self.time_scale_factor < 1000:
+        if (self.machine_time_step * self.time_scale_factor <
+                MICRO_TO_MILLISECOND_CONVERSION):
             if not config.getboolean(
                     "Mode", "violate_1ms_wall_clock_restriction"):
                 raise ConfigurationException(
@@ -444,6 +454,10 @@ class AbstractSpiNNakerCommon(with_metaclass(
 
         # set up the router timeouts to stop packet loss
         for data_receiver, extra_monitor_cores in receivers:
+            data_receiver.load_system_routing_tables(
+                self._txrx,
+                self.get_generated_output("MemoryExtraMonitorVertices"),
+                self._placements)
             data_receiver.set_cores_for_data_streaming(
                 self._txrx, list(extra_monitor_cores), self._placements)
 
@@ -460,6 +474,10 @@ class AbstractSpiNNakerCommon(with_metaclass(
         for data_receiver, extra_monitor_cores in receivers:
             data_receiver.unset_cores_for_data_streaming(
                 self._txrx, list(extra_monitor_cores), self._placements)
+            data_receiver.load_application_routing_tables(
+                self._txrx,
+                self.get_generated_output("MemoryExtraMonitorVertices"),
+                self._placements)
 
         # return data items
         return mother_lode
