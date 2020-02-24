@@ -1206,7 +1206,11 @@ class SynapticManager(object):
             # if the weights are high enough and the population size large
             # enough, then weight_scales < 1 will result in a zero scale
             # if converted to an int, so this needs to be an S1615
-            spec.write_value(data=w, data_type=DataType.S1615)
+            dtype = DataType.S1615
+            if w > dtype.max:
+                spec.write_value(data=dtype.max, data_type=dtype)
+            else:
+                spec.write_value(data=w, data_type=dtype)
 
         for data in generator_data:
             spec.write_array(data.gen_data)
