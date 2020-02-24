@@ -31,15 +31,12 @@ from spinn_storage_handlers import FileDataWriter, FileDataReader
 from data_specification import (
     DataSpecificationGenerator, DataSpecificationExecutor)
 from spynnaker.pyNN.models.neuron import SynapticManager
-import spynnaker.pyNN.models.neural_projections.connectors.\
-    abstract_generate_connector_on_machine as \
-    abstract_generate_connector_on_machine
 from spynnaker.pyNN.abstract_spinnaker_common import AbstractSpiNNakerCommon
 import spynnaker.pyNN.abstract_spinnaker_common as abstract_spinnaker_common
 from spynnaker.pyNN.models.neural_projections import (
     ProjectionApplicationEdge, ProjectionMachineEdge, SynapseInformation)
 from spynnaker.pyNN.models.neural_projections.connectors import (
-    OneToOneConnector, AllToAllConnector)
+    AbstractGenerateConnectorOnMachine, AllToAllConnector, OneToOneConnector)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     SynapseDynamicsStatic, SynapseDynamicsStructuralSTDP,
     SynapseDynamicsSTDP, SynapseDynamicsStructuralStatic)
@@ -203,11 +200,16 @@ class TestSynapticManager(unittest.TestCase):
         assert data_1 == direct_matrix_1_expanded
         assert data_2 == direct_matrix_2_expanded
 
+    def say_false(self, weights, delays):
+        return False
+
     def test_write_synaptic_matrix_and_master_population_table(self):
         MockSimulator.setup()
         # Add an sdram so max SDRAM is high enough
         SDRAM(10000)
 
+        # UGLY but the mock transceiver NEED generate_on_machine to be False
+        AbstractGenerateConnectorOnMachine.generate_on_machine = self.say_false
         default_config_paths = os.path.join(
             os.path.dirname(abstract_spinnaker_common.__file__),
             AbstractSpiNNakerCommon.CONFIG_FILE_NAME)
@@ -288,8 +290,6 @@ class TestSynapticManager(unittest.TestCase):
         synaptic_manager = SynapticManager(
             n_synapse_types=2, ring_buffer_sigma=5.0,
             spikes_per_second=100.0, config=config)
-        # UGLY but the mock transceiver NEED generate_on_machine be False
-        abstract_generate_connector_on_machine.IS_PYNN_8 = False
         synaptic_manager._write_synaptic_matrix_and_master_population_table(
             spec, [post_vertex_slice], post_slice_index, post_vertex,
             post_vertex_slice, all_syn_block_sz, weight_scales,
@@ -344,8 +344,7 @@ class TestSynapticManager(unittest.TestCase):
             using_monitors=False)
         connections_1 = synaptic_manager._read_synapses(
             direct_synapse_information_1, pre_vertex_slice, post_vertex_slice,
-            row_len_1, 0, 2, weight_scales, data_1, None,
-            app_edge.n_delay_stages, machine_time_step)
+            row_len_1, 0, 2, weight_scales, data_1, None, machine_time_step)
 
         # The first matrix is a 1-1 matrix, so row length is 1
         assert row_len_1 == 1
@@ -364,8 +363,7 @@ class TestSynapticManager(unittest.TestCase):
             using_monitors=False)
         connections_2 = synaptic_manager._read_synapses(
             direct_synapse_information_2, pre_vertex_slice, post_vertex_slice,
-            row_len_2, 0, 2, weight_scales, data_2, None,
-            app_edge.n_delay_stages, machine_time_step)
+            row_len_2, 0, 2, weight_scales, data_2, None, machine_time_step)
 
         # The second matrix is a 1-1 matrix, so row length is 1
         assert row_len_2 == 1
@@ -385,7 +383,7 @@ class TestSynapticManager(unittest.TestCase):
         connections_3 = synaptic_manager._read_synapses(
             all_to_all_synapse_information, pre_vertex_slice,
             post_vertex_slice, row_len_3, 0, 2, weight_scales, data_3, None,
-            app_edge.n_delay_stages, machine_time_step)
+            machine_time_step)
 
         # The third matrix is an all-to-all matrix, so length is n_atoms
         assert row_len_3 == post_vertex_slice.n_atoms

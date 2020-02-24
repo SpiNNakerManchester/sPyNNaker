@@ -16,17 +16,34 @@
 """
 utility class containing simple helper methods
 """
-from decimal import Decimal
 import os
 import logging
 import math
 import numpy
+from pyNN.random import RandomDistribution
 from scipy.stats import binom
 from spinn_utilities.safe_eval import SafeEval
-from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
+from spynnaker.pyNN.utilities.random_stats import (
+    RandomStatsExponentialImpl, RandomStatsGammaImpl, RandomStatsLogNormalImpl,
+    RandomStatsNormalClippedImpl, RandomStatsNormalImpl,
+    RandomStatsPoissonImpl, RandomStatsRandIntImpl, RandomStatsUniformImpl,
+    RandomStatsVonmisesImpl, RandomStatsBinomialImpl)
 
 MAX_RATE = 2 ** 32 - 1  # To allow a unit32_t to be used to store the rate
+
+STATS_BY_NAME = {
+    'binomial': RandomStatsBinomialImpl(),
+    'gamma': RandomStatsGammaImpl(),
+    'exponential': RandomStatsExponentialImpl(),
+    'lognormal': RandomStatsLogNormalImpl(),
+    'normal': RandomStatsNormalImpl(),
+    'normal_clipped': RandomStatsNormalClippedImpl(),
+    'normal_clipped_to_boundary': RandomStatsNormalClippedImpl(),
+    'poisson': RandomStatsPoissonImpl(),
+    'uniform': RandomStatsUniformImpl(),
+    'randint': RandomStatsRandIntImpl(),
+    'vonmises': RandomStatsVonmisesImpl()}
 
 logger = logging.getLogger(__name__)
 
@@ -50,7 +67,7 @@ def convert_param_to_numpy(param, no_atoms):
     """
 
     # Deal with random distributions by generating values
-    if globals_variables.get_simulator().is_a_pynn_random(param):
+    if isinstance(param, RandomDistribution):
 
         # numpy reduces a single valued array to a single value, so enforce
         # that it is an array
@@ -80,9 +97,8 @@ def convert_to(value, data_type):
     :param data_type: The data type to convert to
     :return: The converted data as a numpy data type
     """
-    return numpy.round(
-        float(Decimal(str(value)) * data_type.scale)).astype(
-            numpy.dtype(data_type.struct_encoding))
+    return numpy.round(data_type.encode_as_int(value)).astype(
+        data_type.struct_encoding)
 
 
 def read_in_data_from_file(
@@ -151,17 +167,17 @@ def read_spikes_from_file(file_path, min_atom=0, max_atom=float('inf'),
     # For backward compatibility as previous version tested for None rather
     # than having default values
     if min_atom is None:
-        min_atom = 0
+        min_atom = 0.0
     if max_atom is None:
         max_atom = float('inf')
     if min_time is None:
-        min_time = 0
+        min_time = 0.0
     if max_time is None:
         max_time = float('inf')
 
     data = []
-    with open(file_path, 'r') as fsource:
-        read_data = fsource.readlines()
+    with open(file_path, 'r') as f_source:
+        read_data = f_source.readlines()
 
     evaluator = SafeEval()
     for line in read_data:
@@ -191,8 +207,7 @@ def get_probability_within_range(dist, lower, upper):
     """ Get the probability that a value will fall within the given range for\
         a given RandomDistribution
     """
-    simulator = globals_variables.get_simulator()
-    stats = simulator.get_distribution_to_stats()[dist.name]
+    stats = STATS_BY_NAME[dist.name]
     return (stats.cdf(dist, upper) - stats.cdf(dist, lower))
 
 
@@ -200,8 +215,7 @@ def get_maximum_probable_value(dist, n_items, chance=(1.0 / 100.0)):
     """ Get the likely maximum value of a RandomDistribution given a\
         number of draws
     """
-    simulator = globals_variables.get_simulator()
-    stats = simulator.get_distribution_to_stats()[dist.name]
+    stats = STATS_BY_NAME[dist.name]
     prob = 1.0 - (chance / float(n_items))
     return stats.ppf(dist, prob)
 
@@ -210,8 +224,7 @@ def get_minimum_probable_value(dist, n_items, chance=(1.0 / 100.0)):
     """ Get the likely minimum value of a RandomDistribution given a\
         number of draws
     """
-    simulator = globals_variables.get_simulator()
-    stats = simulator.get_distribution_to_stats()[dist.name]
+    stats = STATS_BY_NAME[dist.name]
     prob = chance / float(n_items)
     return stats.ppf(dist, prob)
 
@@ -219,24 +232,21 @@ def get_minimum_probable_value(dist, n_items, chance=(1.0 / 100.0)):
 def get_mean(dist):
     """ Get the mean of a RandomDistribution
     """
-    simulator = globals_variables.get_simulator()
-    stats = simulator.get_distribution_to_stats()[dist.name]
+    stats = STATS_BY_NAME[dist.name]
     return stats.mean(dist)
 
 
 def get_standard_deviation(dist):
     """ Get the standard deviation of a RandomDistribution
     """
-    simulator = globals_variables.get_simulator()
-    stats = simulator.get_distribution_to_stats()[dist.name]
+    stats = STATS_BY_NAME[dist.name]
     return stats.std(dist)
 
 
 def get_variance(dist):
     """ Get the variance of a RandomDistribution
     """
-    simulator = globals_variables.get_simulator()
-    stats = simulator.get_distribution_to_stats()[dist.name]
+    stats = STATS_BY_NAME[dist.name]
     return stats.var(dist)
 
 
@@ -245,8 +255,7 @@ def high(dist):
 
     Could return None
     """
-    simulator = globals_variables.get_simulator()
-    stats = simulator.get_distribution_to_stats()[dist.name]
+    stats = STATS_BY_NAME[dist.name]
     return stats.high(dist)
 
 
@@ -255,8 +264,7 @@ def low(dist):
 
     Could return None
     """
-    simulator = globals_variables.get_simulator()
-    stats = simulator.get_distribution_to_stats()[dist.name]
+    stats = STATS_BY_NAME[dist.name]
     return stats.low(dist)
 
 
@@ -270,23 +278,6 @@ def validate_mars_kiss_64_seed(seed):
     # avoid z=c=0 and make < 698769069
     seed[3] = seed[3] % 698769068 + 1
     return seed
-
-
-def check_sampling_interval(sampling_interval):
-    step = globals_variables.get_simulator().machine_time_step / 1000
-    if sampling_interval is None:
-        return step
-    rate = int(sampling_interval / step)
-    if sampling_interval != rate * step:
-        msg = "sampling_interval {} is not an an integer " \
-              "multiple of the simulation timestep {}" \
-              "".format(sampling_interval, step)
-        raise ConfigurationException(msg)
-    if rate > MAX_RATE:
-        msg = "sampling_interval {} higher than max allowed which is {}" \
-              "".format(sampling_interval, step * MAX_RATE)
-        raise ConfigurationException(msg)
-    return sampling_interval
 
 
 def get_n_bits(n_values):

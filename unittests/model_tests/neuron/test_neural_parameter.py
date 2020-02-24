@@ -13,6 +13,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import os
+import platform
 import struct
 import tempfile
 from six.moves import xrange
@@ -39,20 +41,37 @@ def _iterate_parameter_values(iterator, data_type):
             return alist
 
 
-def test_range_list():
-    MockSimulator().setup()
-    with tempfile.NamedTemporaryFile() as temp:
-        spec = DataSpecificationGenerator(FileDataWriter(temp.name), None)
+def run_spec_check(method):
+    MockSimulator.setup()
+    if platform.system() == "Windows":
+        spec_writer = FileDataWriter("test.dat")
+        spec = DataSpecificationGenerator(spec_writer, None)
         try:
-            value = SpynnakerRangedList(size=10, value=1.0, key="test")
-            value[2:4] = 2.0
-            param = NeuronParameter(value, DataType.S1615)
-            iterator = param.iterator_by_slice(0, 5, spec)
-            values = _iterate_parameter_values(iterator, DataType.S1615)
-            assert list(value[0:5]) == values
-            assert isinstance(iterator, _Range_Iterator)
+            method(spec)
         finally:
             spec.end_specification()
+            os.remove("test.dat")
+    else:
+        with tempfile.NamedTemporaryFile() as temp:
+            spec = DataSpecificationGenerator(FileDataWriter(temp.name), None)
+            try:
+                method(spec)
+            finally:
+                spec.end_specification()
+
+
+def range_list(spec):
+    value = SpynnakerRangedList(size=10, value=1.0, key="test")
+    value[2:4] = 2.0
+    param = NeuronParameter(value, DataType.S1615)
+    iterator = param.iterator_by_slice(0, 5, spec)
+    values = _iterate_parameter_values(iterator, DataType.S1615)
+    assert list(value[0:5]) == values
+    assert isinstance(iterator, _Range_Iterator)
+
+
+def test_range_list():
+    run_spec_check(range_list)
 
 
 def _generator(size):
@@ -60,47 +79,40 @@ def _generator(size):
         yield i
 
 
+def range_list_as_list(spec):
+    value = SpynnakerRangedList(size=10, value=_generator(10), key="test")
+    param = NeuronParameter(value, DataType.S1615)
+    iterator = param.iterator_by_slice(0, 5, spec)
+    values = _iterate_parameter_values(iterator, DataType.S1615)
+    assert list(value[0:5]) == values
+    assert isinstance(iterator, _Range_Iterator)
+
+
 def test_range_list_as_list():
-    MockSimulator.setup()
-    with tempfile.NamedTemporaryFile() as temp:
-        spec = DataSpecificationGenerator(FileDataWriter(temp.name), None)
-        try:
-            value = SpynnakerRangedList(
-                size=10, value=_generator(10), key="test")
-            param = NeuronParameter(value, DataType.S1615)
-            iterator = param.iterator_by_slice(0, 5, spec)
-            values = _iterate_parameter_values(iterator, DataType.S1615)
-            assert list(value[0:5]) == values
-            assert isinstance(iterator, _Range_Iterator)
-        finally:
-            spec.end_specification()
+    run_spec_check(range_list_as_list)
+
+
+def real_list(spec):
+    value = range(10)
+    param = NeuronParameter(value, DataType.S1615)
+    iterator = param.iterator_by_slice(0, 5, spec)
+    values = _iterate_parameter_values(iterator, DataType.S1615)
+    assert list(value[0:5]) == values
+    assert isinstance(iterator, _Get_Iterator)
 
 
 def test_real_list():
-    MockSimulator.setup()
-    with tempfile.NamedTemporaryFile() as temp:
-        spec = DataSpecificationGenerator(FileDataWriter(temp.name), None)
-        try:
-            value = range(10)
-            param = NeuronParameter(value, DataType.S1615)
-            iterator = param.iterator_by_slice(0, 5, spec)
-            values = _iterate_parameter_values(iterator, DataType.S1615)
-            assert list(value[0:5]) == values
-            assert isinstance(iterator, _Get_Iterator)
-        finally:
-            spec.end_specification()
+    run_spec_check(real_list)
+
+
+def single_value(spec):
+    value = 1.0
+    param = NeuronParameter(value, DataType.S1615)
+    iterator = param.iterator_by_slice(0, 5, spec)
+    values = _iterate_parameter_values(iterator, DataType.S1615)
+    assert [value] * 5 == values
+    assert isinstance(iterator, _SingleValue_Iterator)
 
 
 def test_single_value():
-    MockSimulator.setup()
-    with tempfile.NamedTemporaryFile() as temp:
-        spec = DataSpecificationGenerator(FileDataWriter(temp.name), None)
-        try:
-            value = 1.0
-            param = NeuronParameter(value, DataType.S1615)
-            iterator = param.iterator_by_slice(0, 5, spec)
-            values = _iterate_parameter_values(iterator, DataType.S1615)
-            assert [value] * 5 == values
-            assert isinstance(iterator, _SingleValue_Iterator)
-        finally:
-            spec.end_specification()
+    run_spec_check(single_value)
