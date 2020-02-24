@@ -44,11 +44,11 @@ state_t neuron_model_state_update(
 		input_t external_bias, neuron_pointer_t neuron) {
 	log_debug("Exc 1: %12.6k, Exc 2: %12.6k", exc_input[0], exc_input[1]);
 	log_debug("Inh 1: %12.6k, Inh 2: %12.6k", inh_input[0], inh_input[1]);
-
+/*
 	if (spiked_last_timestep == 1){
 		spiked_last_timestep == 0;
 	    neuron->V_membrane = neuron->V_reset;
-	}
+	}*/
     // If outside of the refractory period
     if (neuron->refract_timer <= 0) {
 		REAL total_exc = 0;
@@ -62,8 +62,8 @@ state_t neuron_model_state_update(
 		}
         // Get the input in nA
         input_t input_this_timestep =
-                //total_exc - total_inh + external_bias + neuron->I_offset;
-                total_exc - total_inh + external_bias + I_dynamic[idx];
+                total_exc - total_inh + external_bias + neuron->I_offset;
+                //total_exc - total_inh + external_bias + I_dynamic[idx];
 
         lif_neuron_closed_form(
                 neuron, neuron->V_membrane, input_this_timestep);
@@ -78,7 +78,7 @@ state_t neuron_model_state_update(
 
 void neuron_model_has_spiked(neuron_pointer_t neuron) {
     // reset membrane voltage
-    //neuron->V_membrane = neuron->V_reset;
+    neuron->V_membrane = neuron->V_reset;
 	spiked_last_timestep = 1;
 
     // reset refractory timer
