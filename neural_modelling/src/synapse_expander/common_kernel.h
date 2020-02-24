@@ -24,7 +24,7 @@
 /**
  *! \brief Function to do integer division without using divide
  */
-uint16_t uidiv(uint16_t dividend, uint16_t divider, uint16_t *remainder);
+uint16_t uidiv(uint32_t dividend, uint16_t divider, uint16_t *remainder);
 
 /**
  *! \brief Get the post's coordinates in the pre's coordinate system
