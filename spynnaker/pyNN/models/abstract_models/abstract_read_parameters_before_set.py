@@ -19,7 +19,7 @@ from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 @add_metaclass(AbstractBase)
 class AbstractReadParametersBeforeSet(object):
-    """ A vertex whose parameters must be read before any can be set
+    """ A vertex whose parameters must be read before any can be set.
     """
 
     __slots__ = ()
@@ -27,9 +27,13 @@ class AbstractReadParametersBeforeSet(object):
     @abstractmethod
     def read_parameters_from_machine(
             self, transceiver, placement, vertex_slice):
-        """ Read the parameters from the machine before any are changed
+        """ Read the parameters from the machine before any are changed.
 
-        :param transceiver: the SpinnMan interface
-        :param placement: the placement of a vertex
-        :param vertex_slice: the slice of atoms for this vertex
+        :param ~spinnman.transceiver.Transceiver transceiver:
+            the SpinnMan interface
+        :param ~pacman.model.placements.Placement placement:
+            the placement of a vertex
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            the slice of atoms for this vertex
+        :rtype: None
         """
