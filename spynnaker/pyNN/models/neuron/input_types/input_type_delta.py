@@ -43,6 +43,7 @@ class InputTypeDelta(AbstractInputType):
     @inject_items({"ts": "MachineTimeStep"})
     @overrides(AbstractInputType.get_values, additional_arguments={'ts'})
     def get_values(self, parameters, state_variables, vertex_slice, ts):
+        # pylint: disable=arguments-differ
         scale_factor = 1000.0 / float(ts)
         return [scale_factor]
 

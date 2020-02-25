@@ -28,6 +28,18 @@ class PushBotEthernetRetinaDevice(
             self, protocol, resolution, pushbot_ip_address, pushbot_port=56000,
             injector_port=None, local_host=None, local_port=None,
             retina_injector_label="PushBotRetinaInjector"):
+        """
+        :param protocol:
+        :type protocol: MunichIoEthernetProtocol
+        :param resolution:
+        :type resolution: PushBotRetinaResolution
+        :param pushbot_ip_address:
+        :param pushbot_port:
+        :param injector_port:
+        :param local_host:
+        :param local_port:
+        :param retina_injector_label:
+        """
         # pylint: disable=too-many-arguments
         super(PushBotEthernetRetinaDevice, self).__init__(protocol, resolution)
         pushbot_wifi_connection = get_pushbot_wifi_connection(
@@ -59,4 +71,7 @@ class PushBotEthernetRetinaDevice(
 
     @overrides(AbstractEthernetSensor.get_database_connection)
     def get_database_connection(self):
+        """
+        :rtype: PushBotRetinaConnection
+        """
         return self.__database_connection

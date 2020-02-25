@@ -24,6 +24,20 @@ _IZK_THRESHOLD = 30.0
 
 
 class IzkCurrExpBase(AbstractPyNNNeuronModelStandard):
+    """ Izhikevich neuron model with current inputs.
+
+    :param float a: :math:`a`
+    :param float b: :math:`b`
+    :param float c: :math:`c`
+    :param float d: :math:`d`
+    :param float i_offset: :math:`I_{offset}`
+    :param float u: :math:`u_{init} = \\delta V_{init}`
+    :param float v: :math:`v_{init} = V_{init}`
+    :param float tau_syn_E: :math:`\\tau^{syn}_e`
+    :param float tau_syn_I: :math:`\\tau^{syn}_i`
+    :param float isyn_exc: :math:`I^{syn}_e`
+    :param float isyn_inh: :math:`I^{syn}_i`
+    """
 
     # noinspection PyPep8Naming
     @default_initial_values({"v", "u", "isyn_exc", "isyn_inh"})
