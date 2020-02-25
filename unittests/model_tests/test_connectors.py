@@ -17,6 +17,7 @@ from __future__ import print_function
 import functools
 import numpy
 import pytest
+import random
 from pacman.model.graphs.common import Slice
 from spynnaker.pyNN.models.neural_projections.connectors import (
     FixedNumberPreConnector, FixedNumberPostConnector,
@@ -90,8 +91,8 @@ def test_connectors(
     max_source = 0
     max_row_length = None
     max_col_length = None
-    for seed in range(1000):
-        numpy.random.seed(seed)
+    for seed in range(10):
+        numpy.random.seed(random.randint(0, 1000))
         connector = create_connector()
         mock_synapse_info = MockSynapseInfo(MockPopulation(n_pre, "Pre"),
                                             MockPopulation(n_post, "Post"),
