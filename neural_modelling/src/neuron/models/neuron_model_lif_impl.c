@@ -56,7 +56,7 @@ state_t neuron_model_state_update(
 
 	if (spiked_last_timestep == 1){
 	    //neuron->V_membrane = neuron->V_reset;
-	    neuron->V_membrane = neuron->V_membrane - (REAL)4.0;
+	    neuron->V_membrane = neuron->V_membrane - 2*(neuron->V_rest - neuron->V_reset);
 		io_printf(IO_BUF, "RESET NEURON!\n");
 		io_printf(IO_BUF, "reset to membrane pot = %12.6k\n", neuron->V_membrane);
 		spiked_last_timestep = 0;

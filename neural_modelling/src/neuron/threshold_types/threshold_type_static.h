@@ -27,7 +27,10 @@ typedef struct threshold_type_t {
 
 static inline bool threshold_type_is_above_threshold(
         state_t value, threshold_type_pointer_t threshold_type) {
+	//io_printf(IO_BUF, "\nAbove threshold %d", REAL_COMPARE(value, >=, threshold_type->threshold_value));
+
     return REAL_COMPARE(value, >=, threshold_type->threshold_value);
+
 }
 
 #endif // _THRESHOLD_TYPE_STATIC_H_
