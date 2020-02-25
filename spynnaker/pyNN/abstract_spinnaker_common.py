@@ -190,14 +190,6 @@ class AbstractSpiNNakerCommon(with_metaclass(
         if user_extra_algorithms_pre_run is not None:
             extra_algorithms_pre_run.extend(user_extra_algorithms_pre_run)
 
-        if self.config.getboolean("Reports", "reports_enabled"):
-            if (self.config.getboolean(
-                    "Reports", "write_redundant_packet_count_report") and
-                    not self._use_virtual_board and
-                    self._config.getboolean(
-                        "Reports", "writeProvenanceData")):
-                extra_post_run_algorithms.append("RedundantPacketCountReport")
-
         self.update_extra_mapping_inputs(extra_mapping_inputs)
         self.extend_extra_mapping_algorithms(extra_mapping_algorithms)
         self.prepend_extra_pre_run_algorithms(extra_algorithms_pre_run)
@@ -396,6 +388,17 @@ class AbstractSpiNNakerCommon(with_metaclass(
         self._dsg_algorithm = "SpynnakerDataSpecificationWriter"
         for projection in self._projections:
             projection._clear_cache()
+
+        if self.config.getboolean("Reports", "reports_enabled"):
+            if (self.config.getboolean(
+                    "Reports", "write_redundant_packet_count_report") and
+                    not self._use_virtual_board and
+                    run_time is not None and
+                    self._config.getboolean(
+                        "Reports", "writeProvenanceData")):
+                self.extend_extra_post_run_algorithms(
+                    ["RedundantPacketCountReport"])
+
         super(AbstractSpiNNakerCommon, self).run(run_time)
 
     @staticmethod
