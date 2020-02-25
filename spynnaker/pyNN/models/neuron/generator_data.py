@@ -81,9 +81,9 @@ class GeneratorData(object):
                             timestep_in_us))))
 
     def gen_data(self, timestep_in_us):
-        """ Get the data to be written for this connection
+        """ The data to be written for this connection
 
-        :rtype: numpy array of uint32
+        :rtype: ~numpy.ndarray(~numpy.uint32)
         """
         connector = self.__synapse_information.connector
         synapse_dynamics = self.__synapse_information.synapse_dynamics

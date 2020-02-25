@@ -18,7 +18,7 @@ from .abstract_input_type import AbstractInputType
 
 
 class InputTypeCurrent(AbstractInputType):
-    """ The current input type
+    """ The current input type.
     """
     __slots__ = []
 

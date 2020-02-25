@@ -52,6 +52,14 @@ class SynapseTypeAlpha(AbstractSynapseType):
 
     def __init__(self, exc_response, exc_exp_response,
                  tau_syn_E, inh_response, inh_exp_response, tau_syn_I):
+        r"""
+        :param float exc_response: :math:`response^\mathrm{linear}_e`
+        :param float exc_exp_response: :math:`response^\mathrm{exponential}_e`
+        :param float tau_syn_E: :math:`\tau^{syn}_e`
+        :param float inh_response: :math:`response^\mathrm{linear}_i`
+        :param float inh_exp_response: :math:`response^\mathrm{exponential}_i`
+        :param float tau_syn_I: :math:`\tau^{syn}_i`
+        """
         super(SynapseTypeAlpha, self).__init__([
             DataType.S1615,   # exc_response
             DataType.S1615,   # exc_exp_response
@@ -101,7 +109,6 @@ class SynapseTypeAlpha(AbstractSynapseType):
     @overrides(AbstractSynapseType.get_values)
     def get_values(
             self, parameters, state_variables, vertex_slice, timestamp_in_us):
-
         init = lambda x: (float(timestamp_in_us) / 1000.0) / (x * x)  # noqa
         decay = lambda x: numpy.exp((-float(timestamp_in_us) / 1000.0) / x)  # noqa
 

@@ -42,6 +42,19 @@ class DelayGeneratorData(object):
             pre_slices, pre_slice_index, post_slices, post_slice_index,
             pre_vertex_slice, post_vertex_slice, synapse_information,
             max_stage, timestep_in_us):
+        """
+        :param int max_row_n_synapses:
+        :param int max_delayed_row_n_synapses:
+        :param list(~pacman.model.graphs.common.Slice) pre_slices:
+        :param int pre_slice_index:
+        :param list(~pacman.model.graphs.common.Slice) post_slices:
+        :param int post_slice_index:
+        :param ~pacman.model.graphs.common.Slicepre_vertex_slice:
+        :param ~pacman.model.graphs.common.Slicepost_vertex_slice:
+        :param SynapseInformation synapse_information:
+        :param int max_stage:
+        :param int timestep_in_us:
+        """
         self.__max_row_n_synapses = max_row_n_synapses
         self.__max_delayed_row_n_synapses = max_delayed_row_n_synapses
         self.__pre_slices = pre_slices
@@ -72,7 +85,7 @@ class DelayGeneratorData(object):
     def gen_data(self):
         """ Get the data to be written for this connection
 
-        :rtype: numpy array of uint32
+        :rtype: ~numpy.ndarray(~numpy.uint32)
         """
         connector = self.__synapse_information.connector
         items = list()
