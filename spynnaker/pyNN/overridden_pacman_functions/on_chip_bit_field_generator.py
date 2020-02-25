@@ -27,6 +27,7 @@ from spinn_front_end_common.interface.interface_functions import \
 from spinn_front_end_common.utilities.exceptions import SpinnFrontEndException
 from spinn_front_end_common.utilities import system_control_logic
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spinn_front_end_common.utilities.utility_objs import ExecutableType
 
 from spinn_utilities.progress_bar import ProgressBar
 
@@ -448,9 +449,16 @@ class OnChipBitFieldGenerator(object):
         """
         logger.info("bit field expander has failed")
         iobuf_extractor = ChipIOBufExtractor()
+
+        executable_types = dict()
+        for binary in executable_targets.binaries:
+            executable_types[binary] = ExecutableType.SYSTEM
+
         io_errors, io_warnings = iobuf_extractor(
             transceiver, executable_targets, executable_finder,
-            provenance_file_path)
+            system_provenance_file_path=provenance_file_path,
+            app_provenance_file_path=None,
+            binary_executable_types=executable_types)
         for warning in io_warnings:
             logger.warning(warning)
         for error in io_errors:

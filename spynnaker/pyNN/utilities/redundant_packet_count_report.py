@@ -39,7 +39,6 @@ class RedundantPacketCountReport(object):
 
     @staticmethod
     def _write_report(output, provenance_items):
-
         data = defaultdict(dict)
 
         for provenance_item in provenance_items:
@@ -78,12 +77,16 @@ class RedundantPacketCountReport(object):
                             PopulationMachineVertex.INVALID_MASTER_POP_HITS])
 
                     output.write(
-                        "core {} has received a total of {} packets. Of "
-                        "these, {} were detected as redundant packets by the "
-                        "bitfield filter. {} were detected as having no "
-                        "targets after the DMA stage. {} were detected as "
+                        "core {} \n\n"
+                        "    {} packets received.\n"
+                        "    {} were detected as redundant packets by the "
+                        "bitfield filter.\n"
+                        "    {} were detected as having no "
+                        "targets after the DMA stage.\n"
+                        "    {} were detected as "
                         "packets which we should not have received in the "
-                        "first place. Overall this makes a redundant "
+                        "first place. \n"
+                        "    Overall this makes a redundant "
                         "percentage of {}\n".format(
                             key, total,
                             data[key][
