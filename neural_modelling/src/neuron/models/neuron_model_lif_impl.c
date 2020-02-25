@@ -18,19 +18,25 @@
 #include "neuron_model_lif_impl.h"
 
 #include <debug.h>
+#include <random.h>
 
-static input_t I_dynamic [20] = { 0.01, 0.02, 0.03, 0.04, 0.05, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01 };
+static input_t I_dynamic [1000] = { 0 };
 static input_t dynamic_input_this_timestep;
 static int idx = 0;
 static bool spiked_last_timestep = 0;
+//static mars_kiss64_seed_t spike_source_seed;
 
 // simple Leaky I&F ODE
 static inline void lif_neuron_closed_form(
         neuron_pointer_t neuron, REAL V_prev, input_t input_this_timestep) {
+
+	REAL noise = (gaussian_dist_variate(mars_kiss64_seed, NULL)
+	            * REAL_CONST(0.1));
+	io_printf(IO_BUF, "membrane gaussian white noise = %12.6k\n", noise);
     REAL alpha = input_this_timestep * neuron->R_membrane + neuron->V_rest;
 
     // update membrane voltage
-    neuron->V_membrane = alpha - (neuron->exp_TC * (alpha - V_prev));
+    neuron->V_membrane = alpha - (neuron->exp_TC * (alpha - V_prev)) + noise;
 }
 
 void neuron_model_set_global_neuron_params(
@@ -49,8 +55,10 @@ state_t neuron_model_state_update(
 	io_printf(IO_BUF, "\nTIMESTEP = %d\n", idx);
 
 	if (spiked_last_timestep == 1){
-	    neuron->V_membrane = neuron->V_reset;
-		io_printf(IO_BUF, "reset neuron\n");
+	    //neuron->V_membrane = neuron->V_reset;
+	    neuron->V_membrane = neuron->V_membrane - (REAL)4.0;
+		io_printf(IO_BUF, "RESET NEURON!\n");
+		io_printf(IO_BUF, "reset to membrane pot = %12.6k\n", neuron->V_membrane);
 		spiked_last_timestep = 0;
         neuron->refract_timer--; //still want to decrement refract timer
 	}
@@ -71,6 +79,7 @@ state_t neuron_model_state_update(
         // Get the input in nA
 		dynamic_input_this_timestep = idx < sizeof(I_dynamic)/sizeof(input_t)? I_dynamic[idx] : (input_t)0;
 		io_printf(IO_BUF, "dynamic current input = %12.6k\n", dynamic_input_this_timestep);
+		io_printf(IO_BUF, "DC current input = %12.6k\n", neuron->I_offset);
 
         input_t input_this_timestep =
                 //total_exc - total_inh + external_bias + neuron->I_offset;
@@ -84,6 +93,8 @@ state_t neuron_model_state_update(
     }
 
     idx++;
+	io_printf(IO_BUF, "membrane pot = %12.6k\n", neuron->V_membrane);
+
     return neuron->V_membrane;
 }
 
@@ -91,7 +102,7 @@ void neuron_model_has_spiked(neuron_pointer_t neuron) {
     // reset membrane voltage
     //neuron->V_membrane = neuron->V_reset;
 	spiked_last_timestep = 1;
-	io_printf(IO_BUF, "spiked_last_timestep = 1\n");
+	io_printf(IO_BUF, "NEURON HAS SPIKED!\n");
 
 
     // reset refractory timer
