@@ -193,7 +193,9 @@ class AbstractSpiNNakerCommon(with_metaclass(
         if self.config.getboolean("Reports", "reports_enabled"):
             if (self.config.getboolean(
                     "Reports", "write_redundant_packet_count_report") and
-                    not self._use_virtual_board):
+                    not self._use_virtual_board and
+                    self._config.getboolean(
+                        "Reports", "writeProvenanceData")):
                 extra_post_run_algorithms.append("RedundantPacketCountReport")
 
         self.update_extra_mapping_inputs(extra_mapping_inputs)
