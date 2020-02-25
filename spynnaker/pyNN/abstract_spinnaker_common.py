@@ -389,14 +389,14 @@ class AbstractSpiNNakerCommon(with_metaclass(
         for projection in self._projections:
             projection._clear_cache()
 
-        if self.config.getboolean("Reports", "reports_enabled"):
-            if (self.config.getboolean(
+        if (self.config.getboolean("Reports", "reports_enabled") and
+                self.config.getboolean(
                     "Reports", "write_redundant_packet_count_report") and
-                    not self._use_virtual_board and run_time is not None and
-                    self._config.getboolean(
-                        "Reports", "writeProvenanceData")):
-                self.extend_extra_post_run_algorithms(
-                    ["RedundantPacketCountReport"])
+                not self._use_virtual_board and run_time is not None and
+                not self._has_ran and self._config.getboolean(
+                    "Reports", "writeProvenanceData")):
+            self.extend_extra_post_run_algorithms(
+                ["RedundantPacketCountReport"])
 
         super(AbstractSpiNNakerCommon, self).run(run_time)
 
