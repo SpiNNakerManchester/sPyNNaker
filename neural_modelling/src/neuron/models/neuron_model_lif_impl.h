@@ -48,6 +48,9 @@ typedef struct neuron_t {
 
     // refractory time of neuron [timesteps]
     int32_t  T_refract;
+
+    //
+    REAL	 V_noise;
 } neuron_t;
 
 typedef struct global_neuron_params_t {

@@ -31,7 +31,7 @@ static inline void lif_neuron_closed_form(
         neuron_pointer_t neuron, REAL V_prev, input_t input_this_timestep) {
 
 	REAL noise = (gaussian_dist_variate(mars_kiss64_seed, NULL)
-	            * REAL_CONST(0.1));
+	            * neuron->V_noise);
 	io_printf(IO_BUF, "membrane gaussian white noise = %12.6k\n", noise);
     REAL alpha = input_this_timestep * neuron->R_membrane + neuron->V_rest;
 

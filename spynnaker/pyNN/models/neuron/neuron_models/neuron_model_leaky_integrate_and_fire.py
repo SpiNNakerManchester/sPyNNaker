@@ -27,6 +27,7 @@ I_OFFSET = "i_offset"
 V_RESET = "v_reset"
 TAU_REFRAC = "tau_refrac"
 COUNT_REFRAC = "count_refrac"
+V_NOISE = "v_noise"
 
 UNITS = {
     V: 'mV',
@@ -35,7 +36,8 @@ UNITS = {
     CM: 'nF',
     I_OFFSET: 'nA',
     V_RESET: 'mV',
-    TAU_REFRAC: 'ms'
+    TAU_REFRAC: 'ms',
+    V_NOISE: 'mV'
 }
 
 
@@ -47,10 +49,11 @@ class NeuronModelLeakyIntegrateAndFire(AbstractNeuronModel):
         "__cm",
         "__i_offset",
         "__v_reset",
-        "__tau_refrac"]
+        "__tau_refrac",
+        "__v_noise"]
 
     def __init__(
-            self, v_init, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac):
+            self, v_init, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac, v_noise):
         super(NeuronModelLeakyIntegrateAndFire, self).__init__(
             [DataType.S1615,   # v
              DataType.S1615,   # v_rest
@@ -59,7 +62,8 @@ class NeuronModelLeakyIntegrateAndFire(AbstractNeuronModel):
              DataType.S1615,   # i_offset
              DataType.INT32,   # count_refrac
              DataType.S1615,   # v_reset
-             DataType.INT32])  # tau_refrac
+             DataType.INT32,   # tau_refrac
+             DataType.S1615])  # v_noise
 
         if v_init is None:
             v_init = v_rest
@@ -70,6 +74,7 @@ class NeuronModelLeakyIntegrateAndFire(AbstractNeuronModel):
         self.__i_offset = i_offset
         self.__v_reset = v_reset
         self.__tau_refrac = tau_refrac
+        self.__v_noise = v_noise
 
     @overrides(AbstractNeuronModel.get_n_cpu_cycles)
     def get_n_cpu_cycles(self, n_neurons):
@@ -84,6 +89,7 @@ class NeuronModelLeakyIntegrateAndFire(AbstractNeuronModel):
         parameters[I_OFFSET] = self.__i_offset
         parameters[V_RESET] = self.__v_reset
         parameters[TAU_REFRAC] = self.__tau_refrac
+        parameters[V_NOISE] = self.__v_noise
 
     @overrides(AbstractNeuronModel.add_state_variables)
     def add_state_variables(self, state_variables):
@@ -111,14 +117,15 @@ class NeuronModelLeakyIntegrateAndFire(AbstractNeuronModel):
                 parameters[I_OFFSET], state_variables[COUNT_REFRAC],
                 parameters[V_RESET],
                 parameters[TAU_REFRAC].apply_operation(
-                    operation=lambda x: int(numpy.ceil(x / (ts / 1000.0))))]
+                    operation=lambda x: int(numpy.ceil(x / (ts / 1000.0)))),
+                parameters[V_NOISE]]
 
     @overrides(AbstractNeuronModel.update_values)
     def update_values(self, values, parameters, state_variables):
 
         # Read the data
         (v, _v_rest, _r_membrane, _exp_tc, _i_offset, count_refrac,
-         _v_reset, _tau_refrac) = values
+         _v_reset, _tau_refrac, __v_noise) = values
 
         # Copy the changed data only
         state_variables[V] = v
@@ -179,3 +186,11 @@ class NeuronModelLeakyIntegrateAndFire(AbstractNeuronModel):
     @tau_refrac.setter
     def tau_refrac(self, tau_refrac):
         self.__tau_refrac = tau_refrac
+
+    @property
+    def v_noise(self):
+        return self.__v_noise
+
+    @v_reset.setter
+    def v_noise(self, v_noise):
+        self.__v_noise = v_noise
