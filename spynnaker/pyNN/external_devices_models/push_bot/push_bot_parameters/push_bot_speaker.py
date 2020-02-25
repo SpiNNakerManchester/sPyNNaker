@@ -20,6 +20,8 @@ from spynnaker.pyNN.external_devices_models.push_bot import (
 
 
 class PushBotSpeaker(AbstractPushBotOutputDevice):
+    """ The properties of the speaker device that may be set.
+    """
 
     SPEAKER_TOTAL_PERIOD = (
         0,

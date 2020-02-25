@@ -25,9 +25,11 @@ class AbstractWeightDependence(object):
     def get_provenance_data(self, pre_population_label, post_population_label):
         """ Get any provenance data
 
-        :param pre_population_label: label of pre.
-        :param post_population_label: label of post.
+        :param str pre_population_label: label of pre.
+        :param str post_population_label: label of post.
         :return: the provenance data of the weight dependency
+        :rtype: \
+            list(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)
         """
         # pylint: disable=unused-argument
         return list()
@@ -42,27 +44,43 @@ class AbstractWeightDependence(object):
     @abstractmethod
     def is_same_as(self, weight_dependence):
         """ Determine if this weight dependence is the same as another
+
+        :param AbstractWeightDependence weight_dependence:
+        :rtype: bool
         """
 
     @abstractproperty
     def vertex_executable_suffix(self):
         """ The suffix to be appended to the vertex executable for this rule
+
+        :rtype: str
         """
 
     @abstractmethod
     def get_parameters_sdram_usage_in_bytes(
             self, n_synapse_types, n_weight_terms):
         """ Get the amount of SDRAM used by the parameters of this rule
+
+        :param int n_synapse_types:
+        :param int n_weight_terms:
+        :rtype: int
         """
 
     @abstractmethod
     def write_parameters(
             self, spec, machine_time_step, weight_scales, n_weight_terms):
         """ Write the parameters of the rule to the spec
-        """
+
+        :param ~data_specification.DataSpecificationGenerator spec:
+        :param int machine_time_step: (unused?)
+        :param iterable(float) weight_scales:
+        :param int n_weight_terms:
+       """
 
     @abstractproperty
     def weight_maximum(self):
         """ The maximum weight that will ever be set in a synapse as a result\
             of this rule
+
+        :rtype: float
         """
