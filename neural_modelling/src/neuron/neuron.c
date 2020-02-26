@@ -261,6 +261,7 @@ bool neuron_do_timestep_update(
 
     current_time = time;
 
+    uint32_t dma_clock_cycles = tc[T1_COUNT];
     // DMA read of the synaptic contribution for this timestep
     spin1_dma_transfer(
         DMA_TAG_READ_SYNAPTIC_CONTRIBUTION, synaptic_region, synaptic_contributions,
@@ -270,6 +271,9 @@ bool neuron_do_timestep_update(
 
         // Do Nothing
     }
+
+    //Number of clock cycles used for the dma read
+    dma_clock_cycles -= tc[T1_COUNT];
 
     dma_finished = false;
 
@@ -293,6 +297,9 @@ bool neuron_do_timestep_update(
     // Set up an array for storing the recorded variable values
     state_t recorded_variable_values[n_recorded_vars];
 
+    uint32_t state_update_clock_cycles = tc[T1_COUNT];
+    uint32_t partition_sum_clock_cycles;
+
     // update each neuron individually
     for (index_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
 
@@ -300,11 +307,11 @@ bool neuron_do_timestep_update(
 
             uint32_t buff_index = ((synapse_type_index << synapse_index_bits) | neuron_index);
 
-            sum = synaptic_contributions[buff_index];
-
-            // Some way to do it a bit better?
-
             if(synapse_type_index == 0) {
+
+                partition_sum_clock_cycles = tc[T1_COUNT];
+
+                sum = synaptic_contributions[buff_index];
 
                 buff_index += n_neurons_power_2;
 
@@ -318,7 +325,14 @@ bool neuron_do_timestep_update(
                 if(sum & 0x10000) {
 
                     sum = SAT_VALUE;
+                    io_printf(IO_BUF, "%d\n", time);
                 }
+
+                partition_sum_clock_cycles -= tc[T1_COUNT];
+            }
+            else {
+
+                sum = synaptic_contributions[buff_index];
             }
 
             neuron_impl_add_inputs(
@@ -336,6 +350,8 @@ bool neuron_do_timestep_update(
         // call the implementation function (boolean for spike)
         bool spike = neuron_impl_do_timestep_update(
             neuron_index, external_bias, recorded_variable_values);
+
+        recorded_variable_values[1] = partition_sum_clock_cycles;
 
         // Write the recorded variable values
         for (uint32_t i = 0; i < n_recorded_vars; i++) {
@@ -376,6 +392,11 @@ bool neuron_do_timestep_update(
                       neuron_index);
          }
     }
+
+    state_update_clock_cycles -= tc[T1_COUNT];
+
+    var_recording_values[2]->states[var_recording_indexes[2][0]] = dma_clock_cycles;
+    var_recording_values[2]->states[var_recording_indexes[2][1]] = state_update_clock_cycles;
 
     // Disable interrupts to avoid possible concurrent access
     uint cpsr = 0;

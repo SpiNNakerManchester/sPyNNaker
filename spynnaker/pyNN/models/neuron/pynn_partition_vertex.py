@@ -38,7 +38,7 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
         "_synapse_vertices",  # List of lists, each list corresponds to a neuron vertex
         "_n_atoms",
         "_n_syn_types",
-        "_offset",
+        "_neurons_partition",
         "_n_outgoing_partitions",
         "_n_incoming_partitions"]
 
@@ -61,18 +61,18 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
         self._synapse_vertices = list()
         self._n_syn_types = neuron_model.get_n_synapse_types()
 
-        self._offset = self._compute_partition_and_offset_size()
+        self._neurons_partition = self._compute_partition_and_offset_size()
+
+        offset = 0
 
         for i in range(self._n_outgoing_partitions):
 
             # Distribute neurons in order to have the low neuron cores completely filled
             #atoms = self._offset if (self._n_atoms - (self._offset * (i + 1)) >= 0) \
             #    else self._n_atoms - (self._offset * i)
-            atoms = self._offset if i < (self._n_outgoing_partitions - 1) \
-                    else self._n_atoms - (self._offset * i)
 
             self._neuron_vertices.append(AbstractPopulationVertex(
-                atoms, self._offset*i, label + "_" + str(i) + "_neuron_vertex",
+                self._neurons_partition[i], offset, label + "_" + str(i) + "_neuron_vertex",
                 constraints, max_atoms_neuron_core, spikes_per_second,
                 ring_buffer_sigma, neuron_model, pynn_model))
 
@@ -96,7 +96,7 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
 
                     for j in range(partition_vertices):
 
-                        vertex = SynapticManager(1, 0, atoms, self._offset*i, syn_constraints,
+                        vertex = SynapticManager(1, 0, self._neurons_partition[i], offset, syn_constraints,
                                                 label + "_p" + str(i) + "_e" + str(j) + "_syn_vertex_" + str(index),
                                                 max_atoms_neuron_core, neuron_model.get_global_weight_scale(),
                                                 ring_buffer_sigma, spikes_per_second, incoming_spike_buffer_size,
@@ -107,7 +107,7 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
 
                 else:
 
-                    vertex = SynapticManager(1, index, atoms, self._offset*i, syn_constraints,
+                    vertex = SynapticManager(1, index, self._neurons_partition[i], offset, syn_constraints,
                                              label + "_p" + str(i) + "_i1" + "_syn_vertex_" + str(index),
                                              max_atoms_neuron_core, neuron_model.get_global_weight_scale(),
                                              ring_buffer_sigma, spikes_per_second, incoming_spike_buffer_size,
@@ -120,6 +120,8 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
 
             self._neuron_vertices[i].connected_app_vertices = syn_vertices
             self._synapse_vertices.append(syn_vertices)
+
+            offset += self._neurons_partition[i]
 
         for syn_index in range(len(self._synapse_vertices[0])):
 
@@ -139,15 +141,29 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
         return int(math.ceil(float(self._n_atoms) / DEFAULT_MAX_ATOMS_PER_NEURON_CORE))
 
     def _compute_partition_and_offset_size(self):
+
+        min_neurons_per_partition = int(math.floor((self._n_atoms/self._n_outgoing_partitions) / DEFAULT_MAX_ATOMS_PER_NEURON_CORE) * DEFAULT_MAX_ATOMS_PER_NEURON_CORE)
+
+        remaining_neurons = self._n_atoms - (min_neurons_per_partition * self._n_outgoing_partitions)
+
+        contents = [min_neurons_per_partition for i in range(self._n_outgoing_partitions)]
+        for i in range(self._n_outgoing_partitions):
+            if remaining_neurons - DEFAULT_MAX_ATOMS_PER_NEURON_CORE >= 0:
+                remaining_neurons -= DEFAULT_MAX_ATOMS_PER_NEURON_CORE
+                contents[i] += DEFAULT_MAX_ATOMS_PER_NEURON_CORE
+            else:
+                contents[self._n_outgoing_partitions - 1] += remaining_neurons
+                break
         #return -((-self._n_atoms / self._n_outgoing_partitions) // DEFAULT_MAX_ATOMS_PER_NEURON_CORE) * DEFAULT_MAX_ATOMS_PER_NEURON_CORE
 
         # Allows to compute the optimal number of neurons on each partition.
         # Avoids to have the last partitions without neurons in case of odd numbering
         # &\LPimprove\&
-        i = 1
-        while self._n_outgoing_partitions * (i + 1) * DEFAULT_MAX_ATOMS_PER_NEURON_CORE < self._n_atoms:
-            i += 1
-        return DEFAULT_MAX_ATOMS_PER_NEURON_CORE * i
+        # i = 1
+        # while self._n_outgoing_partitions * (i + 1) * DEFAULT_MAX_ATOMS_PER_NEURON_CORE < self._n_atoms:
+        #     i += 1
+        # return DEFAULT_MAX_ATOMS_PER_NEURON_CORE * i
+        return contents
 
     def get_application_vertices(self):
 
