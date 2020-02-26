@@ -62,7 +62,12 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
     ]
 
     def __init__(self, safe=True, callback=None, verbose=False):
-        AbstractConnector.__init__(
+        """
+        :param bool safe:
+        :param callable callback: Ignored
+        :param bool verbose:
+        """
+        AbstractConnector.__init__(  # pylint: disable=non-parent-init-called
             self, safe=safe, callback=callback, verbose=verbose)
         self.__delay_seed = dict()
         self.__weight_seed = dict()
@@ -72,6 +77,10 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         """ Checks if the connector should generate lists on machine rather\
             than trying to generate the connectivity data on host, based on\
             the types of the weights and/or delays
+
+        :param values:
+        :type values: int or ~pyNN.random.NumpyRNG
+        :rtype: bool
         """
 
         # Scalars are fine on the machine
@@ -87,6 +96,10 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
 
     def _get_connector_seed(self, pre_vertex_slice, post_vertex_slice, rng):
         """ Get the seed of the connector for a given pre-post pairing
+
+        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param ~pyNN.random.NumpyRNG rng:
         """
         key = (id(pre_vertex_slice), id(post_vertex_slice))
         if key not in self.__connector_seed:
@@ -98,6 +111,13 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
     def _generate_param_seed(
             pre_vertex_slice, post_vertex_slice, values, seeds):
         """ Get the seed of a parameter generator for a given pre-post pairing
+
+        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param values:
+        :type values: int or ~pyNN.random.NumpyRNG
+        :param dict(list(int)) seeds:
+        :rtype: list(int)
         """
         if not isinstance(values, RandomDistribution):
             return None
@@ -109,6 +129,11 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
     @staticmethod
     def _param_generator_params(values, seed):
         """ Get the parameter generator parameters as a numpy array
+
+        :param values:
+        :type values: int or ~pyNN.random.NumpyRNG
+        :param list(int) seed:
+        :rtype: ~numpy.ndarray
         """
         if numpy.isscalar(values):
             return numpy.array(
@@ -133,6 +158,10 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
     @staticmethod
     def _param_generator_params_size_in_bytes(values):
         """ Get the size of the parameter generator parameters in bytes
+
+        :param values:
+        :type values: int or ~pyNN.random.NumpyRNG
+        :rtype: int
         """
         if numpy.isscalar(values):
             return BYTES_PER_WORD
@@ -146,6 +175,10 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
     @staticmethod
     def _param_generator_id(values):
         """ Get the id of the parameter generator
+
+        :param values:
+        :type values: int or ~pyNN.random.NumpyRNG
+        :rtype: int
         """
         if numpy.isscalar(values):
             return PARAM_TYPE_CONSTANT_ID
@@ -161,15 +194,23 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         Default implementation returns True if the weights and delays can\
         be generated on the machine
 
+        :param weights:
+        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\
+            float or list(int) or list(float)
+        :param delays:
+        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\
+            float or list(int) or list(float)
         :rtype: bool
         """
-
         return (self._generate_lists_on_machine(weights) and
                 self._generate_lists_on_machine(delays))
 
     def gen_weights_id(self, weights):
         """ Get the id of the weight generator on the machine
 
+        :param weights:
+        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\
+            float or list(int) or list(float)
         :rtype: int
         """
         return self._param_generator_id(weights)
@@ -177,7 +218,12 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
     def gen_weights_params(self, weights, pre_vertex_slice, post_vertex_slice):
         """ Get the parameters of the weight generator on the machine
 
-        :rtype: numpy array of uint32
+        :param weights:
+        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\
+            float or list(int) or list(float)
+        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :rtype: ~numpy.ndarray(~numpy.uint32)
         """
         seed = self._generate_param_seed(
             pre_vertex_slice, post_vertex_slice, weights,
@@ -187,6 +233,9 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
     def gen_weight_params_size_in_bytes(self, weights):
         """ The size of the weight parameters in bytes
 
+        :param weights:
+        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\
+            float or list(int) or list(float)
         :rtype: int
         """
         return self._param_generator_params_size_in_bytes(weights)
@@ -194,6 +243,9 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
     def gen_delays_id(self, delays):
         """ Get the id of the delay generator on the machine
 
+        :param delays:
+        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\
+            float or list(int) or list(float)
         :rtype: int
         """
         return self._param_generator_id(delays)
@@ -201,7 +253,12 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
     def gen_delay_params(self, delays, pre_vertex_slice, post_vertex_slice):
         """ Get the parameters of the delay generator on the machine
 
-        :rtype: numpy array of uint32
+        :param delays:
+        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\
+            float or list(int) or list(float)
+        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :rtype: ~numpy.ndarray(~numpy.uint32)
         """
         seed = self._generate_param_seed(
             pre_vertex_slice, post_vertex_slice, delays,
@@ -211,13 +268,16 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
     def gen_delay_params_size_in_bytes(self, delays):
         """ The size of the delay parameters in bytes
 
+        :param delays:
+        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\
+            float or list(int) or list(float)
         :rtype: int
         """
         return self._param_generator_params_size_in_bytes(delays)
 
     @abstractproperty
     def gen_connector_id(self):
-        """ Get the id of the connection generator on the machine
+        """ The ID of the connection generator on the machine.
 
         :rtype: int
         """
@@ -228,8 +288,17 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
             synapse_type, synapse_info):
         """ Get the parameters of the on machine generation.
 
-        :rtype: numpy array of uint32
+        :param list(~pacman.model.graphs.common.Slice) pre_slices:
+        :param int pre_slice_index:
+        :param list(~pacman.model.graphs.common.Slice) post_slices:
+        :param int post_slice_index:
+        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param AbstractSynapseType synapse_type:
+        :param SynapseInformation synapse_info:
+        :rtype: ~numpy.ndarray(uint32)
         """
+        # pylint: disable=unused-argument
         return numpy.zeros(0, dtype="uint32")
 
     @property
@@ -239,3 +308,16 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         :rtype: int
         """
         return 0
+
+    @staticmethod
+    def _get_view_lo_hi(view):
+        """ Get the range of neuron IDs covered by a view.
+
+        :param spynnaker8.models.populations.PopulationView view:
+        :rtype: tuple(int,int)
+        """
+        # Evil forward reference to subpackage implementation of type!
+        indexes = view._indexes
+        view_lo = indexes[0]
+        view_hi = indexes[-1]
+        return view_lo, view_hi

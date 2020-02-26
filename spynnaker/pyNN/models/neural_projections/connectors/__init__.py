@@ -36,5 +36,5 @@ __all__ = ["AbstractConnector", "AbstractGenerateConnectorOnMachine",
            "DistanceDependentProbabilityConnector", "FixedNumberPostConnector",
            "FixedNumberPreConnector", "FixedProbabilityConnector",
            "FromListConnector", "IndexBasedProbabilityConnector",
-           "MultapseConnector", "OneToOneConnector", "SmallWorldConnector",
-           "KernelConnector"]
+           "KernelConnector",
+           "MultapseConnector", "OneToOneConnector", "SmallWorldConnector"]

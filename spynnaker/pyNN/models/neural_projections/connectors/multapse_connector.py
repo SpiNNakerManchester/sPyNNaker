@@ -48,15 +48,18 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
                  with_replacement=True, safe=True, callback=None,
                  verbose=False, rng=None):
         """
-        :param num_synapses:
+        :param int num_synapses:
             This is the total number of synapses in the connection.
-        :type num_synapses: int
-        :param allow_self_connections:
+        :param bool allow_self_connections:
             Allow a neuron to connect to itself or not.
-        :type allow_self_connections: bool
-        :param with_replacement:
+        :param bool with_replacement:
             When selecting, allow a neuron to be re-selected or not.
-        :type with_replacement: bool
+        :param bool safe:
+        :param callable callback: Ignored
+        :param bool verbose:
+        :param rng:
+            Seeded random number generator, or None to make one when needed
+        :type rng: ~pyNN.random.NumpyRNG or None
         """
         super(MultapseConnector, self).__init__(safe, callback, verbose)
         self.__num_synapses = num_synapses
@@ -70,6 +73,11 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
     @abstractmethod
     def get_rng_next(self, num_synapses, prob_connect):
         """ Get the required RNGs
+
+        :param int num_synapses:
+            The number of synapses to make random numbers for in this call
+        :param float prob_connect: The probability of connection
+        :rtype: ~numpy.ndarray
         """
 
     @overrides(AbstractConnector.get_delay_maximum)
@@ -78,6 +86,10 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
             synapse_info.delays, self.__num_synapses)
 
     def _update_synapses_per_post_vertex(self, pre_slices, post_slices):
+        """
+        :param list(~pacman.model.graphs.common.Slice) pre_slices:
+        :param list(~pacman.model.graphs.common.Slice) post_slices:
+        """
         if (self.__synapses_per_edge is None or
                 len(self.__pre_slices) != len(pre_slices) or
                 len(self.__post_slices) != len(post_slices)):
@@ -101,10 +113,20 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
             self.__post_slices = post_slices
 
     def _get_n_connections(self, pre_slice_index, post_slice_index):
+        """
+        :param int pre_slice_index:
+        :param int post_slice_index:
+        :rtype: int
+        """
         index = (len(self.__post_slices) * pre_slice_index) + post_slice_index
         return self.__synapses_per_edge[index]
 
     def _get_connection_slice(self, pre_slice_index, post_slice_index):
+        """
+        :param int pre_slice_index:
+        :param int post_slice_index:
+        :rtype: slice
+        """
         index = (len(self.__post_slices) * pre_slice_index) + post_slice_index
         n_connections = self.__synapses_per_edge[index]
         start_connection = 0
@@ -147,9 +169,8 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type, synapse_info):
+            self, pre_slices, pre_slice_index, post_slices, post_slice_index,
+            pre_vertex_slice, post_vertex_slice, synapse_type, synapse_info):
         # pylint: disable=too-many-arguments
         # update the synapses as required, and get the number of connections
         self._update_synapses_per_post_vertex(pre_slices, post_slices)
@@ -206,12 +227,10 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
     def gen_connector_id(self):
         return ConnectorIDs.FIXED_TOTAL_NUMBER_CONNECTOR.value
 
-    @overrides(AbstractGenerateConnectorOnMachine.
-               gen_connector_params)
+    @overrides(AbstractGenerateConnectorOnMachine.gen_connector_params)
     def gen_connector_params(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type, synapse_info):
+            self, pre_slices, pre_slice_index, post_slices, post_slice_index,
+            pre_vertex_slice, post_vertex_slice, synapse_type, synapse_info):
         self._update_synapses_per_post_vertex(pre_slices, post_slices)
         n_connections = self._get_n_connections(
             pre_slice_index, post_slice_index)
@@ -225,7 +244,7 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine):
         return numpy.array(params, dtype="uint32")
 
     @property
-    @overrides(AbstractGenerateConnectorOnMachine.
-               gen_connector_params_size_in_bytes)
+    @overrides(
+        AbstractGenerateConnectorOnMachine.gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
         return (4 + 4) * BYTES_PER_WORD

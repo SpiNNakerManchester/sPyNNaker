@@ -33,6 +33,10 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
     def __init__(self, random_number_class,
                  safe=True, callback=None, verbose=False):
         """
+        :param type random_number_class:
+        :param bool safe:
+        :param callable callback: Ignored
+        :param bool verbose:
         """
         self.__random_number_class = random_number_class
         super(OneToOneConnector, self).__init__(safe, callback, verbose)
@@ -76,21 +80,20 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
     def get_weight_maximum(self, synapse_info):
         return self._get_weight_maximum(
             synapse_info.weights,
-            max((synapse_info.n_pre_neurons, synapse_info.n_post_neurons)))
+            max(synapse_info.n_pre_neurons, synapse_info.n_post_neurons))
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type, synapse_info):
+            self, pre_slices, pre_slice_index, post_slices, post_slice_index,
+            pre_vertex_slice, post_vertex_slice, synapse_type, synapse_info):
         # pylint: disable=too-many-arguments
         pre_lo, post_lo, pre_hi, post_hi = self._get_pre_post_limits(
             pre_vertex_slice, post_vertex_slice, synapse_info)
 
-        max_lo_atom = max((pre_lo, post_lo))
-        min_hi_atom = min((pre_hi, post_hi))
+        max_lo_atom = max(pre_lo, post_lo)
+        min_hi_atom = min(pre_hi, post_hi)
 
-        n_connections = max((0, (min_hi_atom - max_lo_atom) + 1))
+        n_connections = max(0, (min_hi_atom - max_lo_atom) + 1)
         if n_connections <= 0:
             return numpy.zeros(0, dtype=self.NUMPY_SYNAPSES_DTYPE)
         connection_slice = slice(max_lo_atom, min_hi_atom + 1)
@@ -110,49 +113,47 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
         return "OneToOneConnector()"
 
     def _get_pre_post_limits(
-            self, pre_vertex_slice, post_vertex_slice, synapse_info):
+            self, pre_slice, post_slice, synapse_info):
+        """
+        :param ~pacman.model.graphs.common.Slice pre_slice:
+        :param ~pacman.model.graphs.common.Slice post_slice:
+        :param SynapseInformation synapse_info:
+        :return: (pre_lo, post_lo, pre_hi, post_hi)
+        :rtype: tuple(int,int,int,int)
+        """
         if synapse_info.prepop_is_view:
             # work out which atoms are on this pre-slice
             view_lo, view_hi = self._get_view_lo_hi(
-                synapse_info.pre_population._indexes)
-            if ((view_lo > pre_vertex_slice.lo_atom) and
-                    (view_lo < pre_vertex_slice.hi_atom)):
+                synapse_info.pre_population)
+            if pre_slice.lo_atom < view_lo < pre_slice.hi_atom:
                 pre_lo = view_lo
             else:
-                pre_lo = pre_vertex_slice.lo_atom
-            if ((view_hi > pre_vertex_slice.lo_atom) and
-                    (view_hi < pre_vertex_slice.hi_atom)):
+                pre_lo = pre_slice.lo_atom
+            if pre_slice.lo_atom < view_hi < pre_slice.hi_atom:
                 pre_hi = view_hi
             else:
-                pre_hi = pre_vertex_slice.hi_atom
+                pre_hi = pre_slice.hi_atom
         else:
-            pre_lo = pre_vertex_slice.lo_atom
-            pre_hi = pre_vertex_slice.hi_atom
+            pre_lo = pre_slice.lo_atom
+            pre_hi = pre_slice.hi_atom
 
         if synapse_info.postpop_is_view:
             # work out which atoms are on this post-slice
             view_lo, view_hi = self._get_view_lo_hi(
-                synapse_info.post_population._indexes)
-            if ((view_lo > post_vertex_slice.lo_atom) and
-                    (view_lo < post_vertex_slice.hi_atom)):
+                synapse_info.post_population)
+            if post_slice.lo_atom < view_lo < post_slice.hi_atom:
                 post_lo = view_lo
             else:
-                post_lo = post_vertex_slice.lo_atom
-            if ((view_hi > post_vertex_slice.lo_atom) and
-                    (view_hi < post_vertex_slice.hi_atom)):
+                post_lo = post_slice.lo_atom
+            if post_slice.lo_atom < view_hi < post_slice.hi_atom:
                 post_hi = view_hi
             else:
-                post_hi = post_vertex_slice.hi_atom
+                post_hi = post_slice.hi_atom
         else:
-            post_lo = post_vertex_slice.lo_atom
-            post_hi = post_vertex_slice.hi_atom
+            post_lo = post_slice.lo_atom
+            post_hi = post_slice.hi_atom
 
         return pre_lo, post_lo, pre_hi, post_hi
-
-    def _get_view_lo_hi(self, indexes):
-        view_lo = indexes[0]
-        view_hi = indexes[-1]
-        return view_lo, view_hi
 
     @overrides(AbstractConnector.use_direct_matrix)
     def use_direct_matrix(self, synapse_info):
@@ -165,32 +166,26 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
     def gen_connector_id(self):
         return ConnectorIDs.ONE_TO_ONE_CONNECTOR.value
 
-    @overrides(AbstractGenerateConnectorOnMachine.
-               gen_connector_params)
+    @overrides(AbstractGenerateConnectorOnMachine.gen_connector_params)
     def gen_connector_params(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type, synapse_info):
+            self, pre_slices, pre_slice_index, post_slices, post_slice_index,
+            pre_vertex_slice, post_vertex_slice, synapse_type, synapse_info):
         params = []
-        pre_view_lo = 0
-        pre_view_hi = synapse_info.n_pre_neurons - 1
+
+        view_range = 0, synapse_info.n_pre_neurons - 1
         if synapse_info.prepop_is_view:
-            pre_view_lo, pre_view_hi = self._get_view_lo_hi(
-                synapse_info.pre_population._indexes)
+            view_range = self._get_view_lo_hi(synapse_info.pre_population)
+        params.extend(view_range)
 
-        params.extend([pre_view_lo, pre_view_hi])
-
-        post_view_lo = 0
-        post_view_hi = synapse_info.n_post_neurons - 1
+        view_range = 0, synapse_info.n_post_neurons - 1
         if synapse_info.postpop_is_view:
-            post_view_lo, post_view_hi = self._get_view_lo_hi(
-                synapse_info.post_population._indexes)
+            view_range = self._get_view_lo_hi(synapse_info.post_population)
+        params.extend(view_range)
 
-        params.extend([post_view_lo, post_view_hi])
         return numpy.array(params, dtype="uint32")
 
     @property
-    @overrides(AbstractGenerateConnectorOnMachine.
-               gen_connector_params_size_in_bytes)
+    @overrides(
+        AbstractGenerateConnectorOnMachine.gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
         return 16

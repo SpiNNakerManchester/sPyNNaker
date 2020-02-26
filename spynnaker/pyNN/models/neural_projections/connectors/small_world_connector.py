@@ -29,6 +29,16 @@ class SmallWorldConnector(AbstractConnector):
     def __init__(
             self, degree, rewiring, allow_self_connections=True, safe=True,
             callback=None, verbose=False, n_connections=None):
+        """
+        :param float degree:
+        :param float rewiring:
+        :param bool allow_self_connections:
+        :param bool safe:
+        :param callable callback: Ignored
+        :param bool verbose:
+        :param n_connections:
+        :type n_connections: int or None
+        """
         # pylint: disable=too-many-arguments
         super(SmallWorldConnector, self).__init__(safe, callback, verbose)
         self.__rewiring = rewiring
@@ -47,6 +57,9 @@ class SmallWorldConnector(AbstractConnector):
         self._set_n_connections(synapse_info)
 
     def _set_n_connections(self, synapse_info):
+        """
+        :param SynapseInformation synapse_info:
+        """
         # Get the probabilities up-front for now
         # TODO: Work out how this can be done statistically
         # space.distances(...) expects N,3 array in PyNN0.7, but 3,N in PyNN0.8
@@ -105,9 +118,8 @@ class SmallWorldConnector(AbstractConnector):
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type, synapse_info):
+            self, pre_slices, pre_slice_index, post_slices, post_slice_index,
+            pre_vertex_slice, post_vertex_slice, synapse_type, synapse_info):
         # pylint: disable=too-many-arguments
         ids = numpy.where(self.__mask[
             pre_vertex_slice.as_slice, post_vertex_slice.as_slice])

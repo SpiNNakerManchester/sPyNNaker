@@ -41,6 +41,13 @@ def _precheck(data, title):
 
 
 def line_plot(data_sets, title=None):
+    """ Build a line plot or plots.
+
+    :param data_sets: Numpy array of data, or list of numpy arrays of data
+    :type data_sets: ~numpy.ndarray or list(~numpy.ndarray)
+    :param title: The title for the plot
+    :type title: str or None
+    """
     if not _precheck(data_sets, title):
         return
     print("Setting up line graph")
@@ -48,7 +55,7 @@ def line_plot(data_sets, title=None):
         data_sets = [data_sets]
 
     print("Setting up {} sets of line plots".format(len(data_sets)))
-    (numrows, numcols) = grid(len(data_sets))
+    (numrows, numcols) = _grid(len(data_sets))
     for index in range(len(data_sets)):
         data = data_sets[index]
         plt.subplot(numrows, numcols, index+1)
@@ -68,13 +75,22 @@ def line_plot(data_sets, title=None):
 
 
 def heat_plot(data_sets, ylabel=None, title=None):
+    """ Build a heatmap plot or plots.
+
+    :param data_sets: Numpy array of data, or list of numpy arrays of data
+    :type data_sets: ~numpy.ndarray or list(~numpy.ndarray)
+    :param ylabel: The label for the Y axis
+    :type ylabel: str or None
+    :param title: The title for the plot
+    :type title: str or None
+    """
     if not _precheck(data_sets, title):
         return
     if isinstance(data_sets, np.ndarray):
         data_sets = [data_sets]
 
     print("Setting up {} sets of heat graph".format(len(data_sets)))
-    (numrows, numcols) = grid(len(data_sets))
+    (numrows, numcols) = _grid(len(data_sets))
     for index in range(len(data_sets)):
         data = data_sets[index]
         plt.subplot(numrows, numcols, index+1)
@@ -94,7 +110,7 @@ def heat_plot(data_sets, ylabel=None, title=None):
     plt.show()
 
 
-def get_colour():
+def _get_colour():
     yield "b."
     yield "g."
     yield "r."
@@ -104,7 +120,7 @@ def get_colour():
     yield "k."
 
 
-def grid(length):
+def _grid(length):
     if length == 1:
         return (1, 1)
     if length == 2:
@@ -117,9 +133,11 @@ def grid(length):
 
 
 def plot_spikes(spikes, title="spikes"):
-    """
+    """ Build a spike plot or plots.
 
-    :param spikes: Numpy array of spikes
+    :param spikes: Numpy array of spikes, or list of numpy arrays of spikes
+    :type spikes: ~numpy.ndarray or list(~numpy.ndarray)
+    :param str title: The title for the plot
     """
     if not _precheck(spikes, title):
         return
@@ -127,7 +145,7 @@ def plot_spikes(spikes, title="spikes"):
     if isinstance(spikes, np.ndarray):
         spikes = [spikes]
 
-    colours = get_colour()
+    colours = _get_colour()
 
     minTime = sys.maxsize
     maxTime = 0
@@ -135,7 +153,7 @@ def plot_spikes(spikes, title="spikes"):
     maxSpike = 0
 
     print("Plotting {} set of spikes".format(len(spikes)))
-    (numrows, numcols) = grid(len(spikes))
+    (numrows, numcols) = _grid(len(spikes))
     for index in range(len(spikes)):
         plt.subplot(numrows, numcols, index+1)
         single_spikes = spikes[index]
