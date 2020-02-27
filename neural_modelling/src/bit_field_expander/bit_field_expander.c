@@ -24,6 +24,9 @@
 #include <neuron/direct_synapses.h>
 #include <neuron/synapse_row.h>
 
+// stuff needed for the structural stuff to work
+#include <neuron/structural_plasticity/synaptogenesis/sp_structs.h>
+
 #include <filter_info.h>
 #include <key_atom_map.h>
 
@@ -36,6 +39,9 @@
 // does minimum synapse types to sort out dtcm and get though the synapse init.
 #define N_SYNAPSE_TYPES 1
 
+// magic flag for if the region id is not setup
+int FAILED_REGION_ID = 0xFFFFFFFF;
+
 //! master pop address
 address_t master_pop_base_address;
 
@@ -47,6 +53,9 @@ filter_region_t* bit_field_base_address;
 
 // direct matrix base address
 address_t direct_matrix_region_base_address;
+
+// structural matrix region base address
+address_t structural_matrix_region_base_address = NULL;
 
 // used to store the dtcm based master pop entries. (used during pop table
 // init, and reading back synaptic rows).
@@ -76,6 +85,19 @@ uint32_t * row_data;
 //! \brief bool holder saying if we should run
 bool can_run = true;
 
+/*****************************stuff needed for strcutral stuff to work*/
+
+// the instantiation of the previous struct
+rewiring_data_t rewiring_data;
+
+// inverse of synaptic matrix
+static post_to_pre_entry *post_to_pre_table;
+
+// pre-population information table
+pre_pop_info_table_t pre_info;
+
+/***************************************************************/
+
 //! \brief struct for builder region
 typedef struct builder_region_struct{
     int master_pop_region_id;
@@ -83,6 +105,7 @@ typedef struct builder_region_struct{
     int direct_matrix_region_id;
     int bit_field_region_id;
     int bit_field_key_map_region_id;
+    int structural_matrix_region_id;
 } builder_region_struct;
 
 
@@ -125,6 +148,10 @@ void read_in_addresses(){
             builder_data.bit_field_region_id, core_address);
     direct_matrix_region_base_address = data_specification_get_region(
         builder_data.direct_matrix_region_id, core_address);
+    if (builder_data.structural_matrix_region_id != FAILED_REGION_ID) {
+        structural_matrix_region_base_address = data_specification_get_region(
+            builder_data.structural_matrix_region_id, core_address);
+    }
     keys_to_max_atoms = (key_atom_data_t*) data_specification_get_region(
         builder_data.bit_field_key_map_region_id, core_address);
 
@@ -224,6 +251,16 @@ bool initialise(){
             direct_synapses_address, &row_max_n_words)) {
         log_error("failed to init the master pop table. failing");
         return false;
+    }
+
+    log_info("structural plastic if needed");
+    if (structural_matrix_region_base_address != 0) {
+        if (! sp_structs_read_in_common(
+                structural_matrix_region_base_address, &rewiring_data,
+                &pre_info, post_to_pre_table)) {
+            log_error("failed to init the synaptogenesis");
+            return false;
+        }
     }
 
     log_info(" elements in master pop table is %d \n and max rows is %d",
@@ -351,11 +388,23 @@ bool generate_bit_field(){
 
         // iterate through neurons and ask for rows from master pop table
         log_debug("searching neuron ids");
-        for (uint32_t neuron_id=0; neuron_id < n_neurons; neuron_id++){
+        for (uint32_t neuron_id=0; neuron_id < n_neurons; neuron_id++) {
 
             // update key with neuron id
             spike_t new_key = (spike_t) (key + neuron_id);
             log_debug("new key for neurons %d is %0x", neuron_id, new_key);
+
+            // check if this is goverened by the structural stuff. if so,
+            // avoid filtering as it could change over time
+            bool bit_found = false;
+            if (structural_matrix_region_base_address != NULL) {
+                uint32_t rubbish = 0;
+                if(sp_structs_find_by_spike(
+                        &pre_info, new_key,
+                        &rubbish, &rubbish, &rubbish, &rubbish)){
+                    bit_found = true;
+                }
+            }
 
             // holder for the bytes to transfer if we need to read sdram.
             size_t n_bytes_to_transfer;
@@ -363,25 +412,9 @@ bool generate_bit_field(){
             // used to store the row from the master pop / synaptic matrix,
             // not going to be used in reality.
             address_t row_address;
-            bool bit_found = false;
-            if (population_table_get_first_address(
-                    new_key, &row_address, &n_bytes_to_transfer)){
-                log_debug("%d", neuron_id);
-
-                // This is a direct row to process, so will have 1 target, so
-                // no need to go further
-                if (n_bytes_to_transfer == 0) {
-                    log_debug("direct synapse");
-                    bit_found = true;
-                } else {
-                    // sdram read (faking dma transfer)
-                    log_debug("dma read synapse");
-                    bit_found = _do_sdram_read_and_test(
-                        row_address, n_bytes_to_transfer);
-                }
-
-                while (!bit_found && population_table_get_next_address(
-                        &new_key, &row_address, &n_bytes_to_transfer)){
+            if (!bit_found) {
+                if (population_table_get_first_address(
+                        new_key, &row_address, &n_bytes_to_transfer)){
                     log_debug("%d", neuron_id);
 
                     // This is a direct row to process, so will have 1 target,
@@ -394,6 +427,23 @@ bool generate_bit_field(){
                         log_debug("dma read synapse");
                         bit_found = _do_sdram_read_and_test(
                             row_address, n_bytes_to_transfer);
+                    }
+
+                    while (!bit_found && population_table_get_next_address(
+                            &new_key, &row_address, &n_bytes_to_transfer)){
+                        log_debug("%d", neuron_id);
+
+                        // This is a direct row to process, so will have 1
+                        // target, so no need to go further
+                        if (n_bytes_to_transfer == 0) {
+                            log_debug("direct synapse");
+                            bit_found = true;
+                        } else {
+                            // sdram read (faking dma transfer)
+                            log_debug("dma read synapse");
+                            bit_found = _do_sdram_read_and_test(
+                                row_address, n_bytes_to_transfer);
+                        }
                     }
                 }
             }

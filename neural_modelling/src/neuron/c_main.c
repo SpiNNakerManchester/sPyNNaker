@@ -202,17 +202,17 @@ static bool initialise(void) {
     // Set up the synapse dynamics
     address_t synapse_dynamics_region_address =
             data_specification_get_region(SYNAPSE_DYNAMICS_REGION, ds_regions);
-    address_t syn_dyn_end_address = synapse_dynamics_initialise(
+    if(!synapse_dynamics_initialise(
             synapse_dynamics_region_address, n_neurons, n_synapse_types,
-            ring_buffer_to_input_buffer_left_shifts);
-
-    if (synapse_dynamics_region_address && !syn_dyn_end_address) {
+            ring_buffer_to_input_buffer_left_shifts)) {
         return false;
     }
 
     // Set up structural plasticity dynamics
-    if (synapse_dynamics_region_address &&
-            !synaptogenesis_dynamics_initialise(syn_dyn_end_address)) {
+    address_t structural_plastic_region_address =
+        data_specification_get_region(STRUCTURAL_DYNAMICS_REGION, ds_regions);
+    if (!synaptogenesis_dynamics_initialise(
+            structural_plastic_region_address)) {
         return false;
     }
 

@@ -35,7 +35,7 @@ static uint32_t synapse_index_mask;
 static uint32_t synapse_type_bits;
 static uint32_t synapse_type_mask;
 
-address_t synapse_dynamics_initialise(
+bool synapse_dynamics_initialise(
         address_t address, uint32_t n_neurons, uint32_t n_synapse_types,
         uint32_t *ring_buffer_to_input_buffer_left_shifts) {
     use(address);
@@ -61,7 +61,7 @@ address_t synapse_dynamics_initialise(
     synapse_index_bits = log_n_neurons;
     synapse_index_mask = (1 << synapse_index_bits) - 1;
     synapse_type_mask = (1 << synapse_type_bits) - 1;
-    return address;
+    return true;
 }
 
 //---------------------------------------

@@ -367,12 +367,33 @@ class SynapticManager(object):
                 region=POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
                 size=all_syn_block_sz, label='SynBlocks')
 
-        synapse_dynamics_sz = self._get_synapse_dynamics_parameter_size(
-            vertex_slice, application_graph, application_vertex)
+        # return if not got a synapse dynamics
+        if self.__synapse_dynamics is None:
+            return
+
+        synapse_dynamics_sz = \
+            self.__synapse_dynamics.get_parameters_sdram_usage_in_bytes(
+                vertex_slice.n_atoms, self.__n_synapse_types)
         if synapse_dynamics_sz != 0:
             spec.reserve_memory_region(
                 region=POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value,
                 size=synapse_dynamics_sz, label='synapseDynamicsParams')
+
+        # if structural, create structural region
+        if isinstance(
+                self.__synapse_dynamics, AbstractSynapseDynamicsStructural):
+
+            synapse_structural_dynamics_sz = (
+                self.__synapse_dynamics.
+                get_structural_parameters_sdram_usage_in_bytes(
+                    application_graph, application_vertex,
+                    vertex_slice.n_atoms, self.__n_synapse_types))
+
+            if synapse_structural_dynamics_sz != 0:
+                spec.reserve_memory_region(
+                    region=POPULATION_BASED_REGIONS.STRUCTURAL_DYNAMICS.value,
+                    size=synapse_structural_dynamics_sz,
+                    label='synapseDynamicsStructuralParams')
 
     @staticmethod
     def _ring_buffer_expected_upper_bound(
@@ -988,18 +1009,17 @@ class SynapticManager(object):
             routing_info, graph_mapper, machine_graph, machine_time_step)
 
         if self.__synapse_dynamics is not None:
+            self.__synapse_dynamics.write_parameters(
+                spec, POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value,
+                machine_time_step, weight_scales)
+
             if isinstance(self.__synapse_dynamics,
                           AbstractSynapseDynamicsStructural):
                 self.__synapse_dynamics.write_structural_parameters(
-                    spec, POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value,
+                    spec, POPULATION_BASED_REGIONS.STRUCTURAL_DYNAMICS.value,
                     machine_time_step, weight_scales, application_graph,
                     application_vertex, post_vertex_slice, graph_mapper,
                     routing_info, self.__synapse_indices)
-            else:
-                self.__synapse_dynamics.write_parameters(
-                    spec,
-                    POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value,
-                    machine_time_step, weight_scales)
 
         self.__weight_scales[placement] = weight_scales
 
@@ -1166,8 +1186,9 @@ class SynapticManager(object):
         return transceiver.read_memory(
             placement.x, placement.y, address, synaptic_block_size)
 
+    @staticmethod
     def __read_single_synaptic_block(
-            self, transceiver, data_receiver, placement, n_rows, address,
+            transceiver, data_receiver, placement, n_rows, address,
             using_monitors, extra_monitor, fixed_routes, placements):
         """ Read in a single synaptic block.
         """

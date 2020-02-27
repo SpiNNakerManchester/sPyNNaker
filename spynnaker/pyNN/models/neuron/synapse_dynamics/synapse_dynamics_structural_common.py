@@ -173,9 +173,7 @@ class SynapseDynamicsStructuralCommon(object):
         """ Write the synapse parameters to the spec.
         """
         spec.comment("Writing structural plasticity parameters")
-        if spec.current_region != constants.POPULATION_BASED_REGIONS. \
-                SYNAPSE_DYNAMICS.value:
-            spec.switch_write_focus(region)
+        spec.switch_write_focus(region)
 
         # Get relevant edges
         structural_edges = self.__get_structural_edges(

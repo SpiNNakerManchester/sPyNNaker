@@ -49,6 +49,7 @@ from spynnaker.pyNN.models.abstract_models import (
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.utilities.ranged import (
     SpynnakerRangeDictionary, SpynnakerRangedList)
+from .synapse_dynamics import AbstractSynapseDynamicsStructural
 from .synaptic_manager import SynapticManager
 from .population_machine_vertex import PopulationMachineVertex
 
@@ -534,7 +535,10 @@ class AbstractPopulationVertex(
             POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
             POPULATION_BASED_REGIONS.DIRECT_MATRIX.value,
             POPULATION_BASED_REGIONS.BIT_FIELD_FILTER.value,
-            POPULATION_BASED_REGIONS.BIT_FIELD_KEY_MAP.value)
+            POPULATION_BASED_REGIONS.BIT_FIELD_KEY_MAP.value,
+            POPULATION_BASED_REGIONS.STRUCTURAL_DYNAMICS.value,
+            isinstance(
+                self.__synapse_manager, AbstractSynapseDynamicsStructural))
 
         # End the writing of this specification:
         spec.end_specification()

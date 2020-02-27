@@ -181,4 +181,38 @@ static inline bool sp_structs_add_synapse(
 
 }
 
+static inline uint8_t* sp_structs_read_in_common(
+        address_t sdram_sp_address, rewiring_data_t* rewiring_data,
+        pre_pop_info_table_t* pre_info, post_to_pre_entry* post_to_pre_table) {
+    uint8_t *data = (uint8_t *) sdram_sp_address;
+    spin1_memcpy(rewiring_data, data, sizeof(rewiring_data_t));
+    data += sizeof(rewiring_data_t);
+    log_info("Topographic Map Impl, s_max=%u", rewiring_data->s_max);
+
+    pre_info->no_pre_pops = rewiring_data->no_pre_pops;
+    pre_info->prepop_info = spin1_malloc(
+            rewiring_data->no_pre_pops * sizeof(pre_info_t *));
+    if (pre_info->prepop_info == NULL) {
+        log_error("Could not initialise pre population info");
+        rt_error(RTE_SWERR);
+    }
+    for (uint32_t i = 0; i < rewiring_data->no_pre_pops; i++) {
+        pre_info->prepop_info[i] = (pre_info_t *) data;
+        uint32_t pre_size = (pre_info->prepop_info[i]->no_pre_vertices
+                * sizeof(key_atom_info_t)) + sizeof(pre_info_t);
+        pre_info->prepop_info[i] = spin1_malloc(pre_size);
+        if (pre_info->prepop_info[i] == NULL) {
+            log_error("Could not initialise pre population info %d", i);
+            rt_error(RTE_SWERR);
+        }
+        spin1_memcpy(pre_info->prepop_info[i], data, pre_size);
+        data += pre_size;
+    }
+
+    post_to_pre_table = (post_to_pre_entry *) data;
+    uint32_t n_elements =
+        rewiring_data->s_max * rewiring_data->machine_no_atoms;
+    return (uint8_t *) &post_to_pre_table[n_elements];
+}
+
 #endif // _SP_STRUCTS_H_

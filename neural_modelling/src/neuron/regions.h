@@ -15,22 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#pragma once
-
 typedef enum regions_e {
-    SYSTEM_REGION,            // 0
-    NEURON_PARAMS_REGION,     // 1
-    SYNAPSE_PARAMS_REGION,    // 2
-    POPULATION_TABLE_REGION,  // 3
-    SYNAPTIC_MATRIX_REGION,   // 4
-    SYNAPSE_DYNAMICS_REGION,  // 5
-    NEURON_RECORDING_REGION,  // 6
-    PROVENANCE_DATA_REGION,   // 7
-    PROFILER_REGION,          // 8
-    CONNECTOR_BUILDER_REGION, // 9
-    DIRECT_MATRIX_REGION,     // 10
-    BIT_FIELD_FILTER_REGION,  // 11
-    BIT_FIELD_BUILDER,        // 12
-    BIT_FIELD_KEY_MAP         // 13
+    SYSTEM_REGION,              // 0
+    NEURON_PARAMS_REGION,       // 1
+    SYNAPSE_PARAMS_REGION,      // 2
+    POPULATION_TABLE_REGION,    // 3
+    SYNAPTIC_MATRIX_REGION,     // 4
+    SYNAPSE_DYNAMICS_REGION,    // 5
+    STRUCTURAL_DYNAMICS_REGION, // 6
+    NEURON_RECORDING_REGION,    // 7
+    PROVENANCE_DATA_REGION,     // 8
+    PROFILER_REGION,            // 9
+    CONNECTOR_BUILDER_REGION,   // 10
+    DIRECT_MATRIX_REGION,       // 11
+    BIT_FIELD_FILTER_REGION,    // 12
+    BIT_FIELD_BUILDER,          // 13
+    BIT_FIELD_KEY_MAP           // 14
 
 } regions_e;
