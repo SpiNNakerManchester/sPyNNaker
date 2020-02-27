@@ -325,7 +325,6 @@ bool neuron_do_timestep_update(
                 if(sum & 0x10000) {
 
                     sum = SAT_VALUE;
-                    io_printf(IO_BUF, "%d\n", time);
                 }
 
                 partition_sum_clock_cycles -= tc[T1_COUNT];
