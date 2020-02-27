@@ -21,7 +21,7 @@
 #include <common-typedefs.h>
 
 // Constants
-#define DELAY_STAGE_LENGTH  16
+#define DELAY_STAGE_LENGTH  64
 
 //! region identifiers
 typedef enum region_identifiers {
