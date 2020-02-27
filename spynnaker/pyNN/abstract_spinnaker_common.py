@@ -196,7 +196,7 @@ class AbstractSpiNNakerCommon(with_metaclass(
             raise ConfigurationException(
                 "Pacman does not support max delays above {} ms with the "
                 "current machine time step".format(
-                    0.144 * machine_time_step))
+                    max_delay_tics_supported * machine_time_step / 1000.0))
         if max_delay is not None:
             self.__max_delay = max_delay
         else:
