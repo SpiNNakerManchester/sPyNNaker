@@ -12,8 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from spinn_front_end_common.utilities.constants import \
-    MICRO_TO_SECOND_CONVERSION
 
 from collections import defaultdict
 import math
@@ -25,7 +23,8 @@ from pyNN.random import RandomDistribution
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
-from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spinn_front_end_common.utilities.constants import (
+    BYTES_PER_WORD, MICRO_TO_SECOND_CONVERSION)
 from spynnaker.pyNN.models.neuron.generator_data import GeneratorData
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractGenerateConnectorOnMachine)
@@ -53,17 +52,45 @@ _SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES = 0
 _SYNAPSES_BASE_N_CPU_CYCLES_PER_NEURON = 10
 _SYNAPSES_BASE_N_CPU_CYCLES = 8
 
-# 4 for n_edges
-# 8 for post_vertex_slice.lo_atom, post_vertex_slice.n_atoms
-# 4 for n_synapse_types
-# 4 for n_synapse_type_bits
-# 4 for n_synapse_index_bits
-_SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES = 6 * BYTES_PER_WORD
+# 1 word for n_edges
+# 2 words for post_vertex_slice.lo_atom, post_vertex_slice.n_atoms
+# 1 word for n_synapse_types
+# 1 word for n_synapse_type_bits
+# 1 word for n_synapse_index_bits
+_SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES = (
+    1 + 2 + 1 + 1 + 1) * BYTES_PER_WORD
 
 # Amount to scale synapse SDRAM estimate by to make sure the synapses fit
 _SYNAPSE_SDRAM_OVERSCALE = 1.1
 
 _ONE_WORD = struct.Struct("<I")
+
+
+class _GenOnMachine(object):
+    """ Information about a connector to be generated on machine.
+    """
+
+    __slots__ = [
+        "synapse_info", "pre_slices", "pre_slice", "pre_index", "app_edge",
+        "rinfo"]
+
+    def __init__(
+            self, synapse_info, pre_slices, pre_slice, pre_index, app_edge,
+            rinfo):
+        """
+        :param SynapseInformation synapse_info:
+        :param list(.Slice) pre_slices:
+        :param .Slice pre_slice:
+        :param inde pre_index:
+        :param ProjectionApplicationEdge app_edge:
+        :param RoutingInfo rinfo:
+        """
+        self.synapse_info = synapse_info
+        self.pre_slices = pre_slices
+        self.pre_slice = pre_slice
+        self.pre_index = pre_index
+        self.app_edge = app_edge
+        self.rinfo = rinfo
 
 
 class SynapticManager(object):
@@ -89,6 +116,24 @@ class SynapticManager(object):
 
     def __init__(self, n_synapse_types, ring_buffer_sigma, spikes_per_second,
                  config, population_table_type=None, synapse_io=None):
+        """
+        :param int n_synapse_types:
+            number of synapse types on a neuron (e.g., 2 for excitatory and
+            inhibitory)
+        :param ring_buffer_sigma:
+            How many SD above the mean to go for upper bound; a
+            good starting choice is 5.0. Given length of simulation we can
+            set this for approximate number of saturation events.
+        :type ring_buffer_sigma: float or None
+        :param spikes_per_second: Estimated spikes per second
+        :type spikes_per_second: float or None
+        :param ~configparser.RawConfigParser config: The system configuration
+        :param population_table_type:
+            What type of master population table is used
+        :type population_table_type: MasterPopTableAsBinarySearch or None
+        :param synapse_io: How IO for synapses is performed
+        :type synapse_io: SynapseIORowBased or None
+        """
         self.__n_synapse_types = n_synapse_types
         self.__ring_buffer_sigma = ring_buffer_sigma
         self.__spikes_per_second = spikes_per_second
@@ -141,9 +186,19 @@ class SynapticManager(object):
 
     @property
     def synapse_dynamics(self):
+        """ Settable.
+
+        :rtype: AbstractSynapseDynamics or None
+        """
         return self.__synapse_dynamics
 
-    def __combine_structural_stdp_dynamics(self, structural, stdp):
+    @staticmethod
+    def __combine_structural_stdp_dynamics(structural, stdp):
+        """
+        :param AbstractSynapseDynamicsStructural structural:
+        :param SynapseDynamicsSTDP stdp:
+        :rtype: SynapseDynamicsStructuralSTDP
+        """
         return SynapseDynamicsStructuralSTDP(
             structural.partner_selection, structural.formation,
             structural.elimination,
@@ -155,7 +210,6 @@ class SynapticManager(object):
 
     @synapse_dynamics.setter
     def synapse_dynamics(self, synapse_dynamics):
-
         if self.__synapse_dynamics is None:
             self.__synapse_dynamics = synapse_dynamics
         else:
@@ -164,6 +218,10 @@ class SynapticManager(object):
 
     @property
     def ring_buffer_sigma(self):
+        """ Settable.
+
+        :rtype: float
+        """
         return self.__ring_buffer_sigma
 
     @ring_buffer_sigma.setter
@@ -172,6 +230,10 @@ class SynapticManager(object):
 
     @property
     def spikes_per_second(self):
+        """ Settable.
+
+        :rtype: float
+        """
         return self.__spikes_per_second
 
     @spikes_per_second.setter
@@ -179,39 +241,68 @@ class SynapticManager(object):
         self.__spikes_per_second = spikes_per_second
 
     def get_maximum_delay_supported_in_ms(self, machine_time_step):
+        """
+        :param int machine_time_step:
+        :rtype: int or None
+        """
         return self.__synapse_io.get_maximum_delay_supported_in_ms(
             machine_time_step)
 
     @property
     def vertex_executable_suffix(self):
+        """ The suffix of the executable name due to the type of synapses \
+            in use.
+
+        :rtype: str
+        """
         if self.__synapse_dynamics is None:
             return ""
         return self.__synapse_dynamics.get_vertex_executable_suffix()
 
     def add_pre_run_connection_holder(
             self, connection_holder, edge, synapse_info):
+        """
+        :param ConnectionHolder connection_holder:
+        :param ProjectionApplicationEdge edge:
+        :param SynapseInformation synapse_info:
+        """
         self.__pre_run_connection_holders[edge, synapse_info].append(
             connection_holder)
 
     def get_connection_holders(self):
+        """
+        :rtype: dict(tuple(ProjectionApplicationEdge,SynapseInformation),\
+            ConnectionHolder)
+        """
         return self.__pre_run_connection_holders
 
     def get_n_cpu_cycles(self):
+        """
+        :rtype: int
+        """
         # TODO: Calculate this correctly
         return 0
 
     def get_dtcm_usage_in_bytes(self):
+        """
+        :rtype: int
+        """
         # TODO: Calculate this correctly
         return 0
 
     def _get_synapse_params_size(self):
+        """
+        :rtype: int
+        """
         return (_SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES +
                 (BYTES_PER_WORD * self.__n_synapse_types))
 
     def _get_static_synaptic_matrix_sdram_requirements(self):
-
-        # 4 for address of direct addresses, and
-        # 4 for the size of the direct addresses matrix in bytes
+        """
+        :rtype: int
+        """
+        # 1 word for address of direct addresses, and
+        # 1 word for the size of the direct addresses matrix in bytes
         return 2 * BYTES_PER_WORD
 
     def __get_max_row_info(
@@ -219,6 +310,10 @@ class SynapticManager(object):
             machine_time_step):
         """ Get the maximum size of each row for a given slice of the vertex
 
+        :param SynapseInformation synapse_info:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param ProjectionApplicationEdge app_edge:
+        :param int machine_time_step:
         :rtype: MaxRowInfo
         """
         key = (synapse_info, post_vertex_slice.lo_atom,
@@ -232,7 +327,12 @@ class SynapticManager(object):
 
     def _get_synaptic_blocks_size(
             self, post_vertex_slice, in_edges, machine_time_step):
-        """ Get the size of the synaptic blocks in bytes
+        """ Get the size of the synaptic blocks in bytes.
+
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param list(.ApplicationEdge) in_edges:
+        :param int machine_time_step:
+        :rtype: int
         """
         memory_size = self._get_static_synaptic_matrix_sdram_requirements()
         for in_edge in in_edges:
@@ -245,6 +345,14 @@ class SynapticManager(object):
 
     def __add_synapse_size(self, memory_size, synapse_info, post_vertex_slice,
                            in_edge, machine_time_step):
+        """
+        :param int memory_size:
+        :param SynapseInformation synapse_info:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param ProjectionApplicationEdge in_edge:
+        :param int machine_time_step:
+        :rtype: int
+        """
         max_row_info = self.__get_max_row_info(
             synapse_info, post_vertex_slice, in_edge, machine_time_step)
         n_atoms = in_edge.pre_vertex.n_atoms
@@ -258,7 +366,10 @@ class SynapticManager(object):
         return memory_size
 
     def _get_size_of_generator_information(self, in_edges):
-        """ Get the size of the synaptic expander parameters
+        """ Get the size of the synaptic expander parameters.
+
+        :param list(.ApplicationEdge) in_edges:
+        :rtype: int
         """
         gen_on_machine = False
         size = 0
@@ -301,7 +412,12 @@ class SynapticManager(object):
 
     def _get_synapse_dynamics_parameter_size(
             self, vertex_slice, application_graph, app_vertex):
-        """ Get the size of the synapse dynamics region
+        """ Get the size of the synapse dynamics region.
+
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :param ~.ApplicationGraph application_graph:
+        :param ~.ApplicationVertex app_vertex:
+        :rtype: int
         """
         if self.__synapse_dynamics is None:
             return 0
@@ -321,6 +437,14 @@ class SynapticManager(object):
     def get_sdram_usage_in_bytes(
             self, vertex_slice, machine_time_step, application_graph,
             app_vertex):
+        """
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :param int machine_time_step:
+        :param ~pacman.model.graphs.application.ApplicationGraph \
+                application_graph:
+        :param AbstractPopulationVertex app_vertex:
+        :rtype: int
+        """
         in_edges = application_graph.get_edges_ending_at_vertex(app_vertex)
         return (
             self._get_synapse_params_size() +
@@ -335,6 +459,16 @@ class SynapticManager(object):
             self, spec, machine_vertex, vertex_slice,
             machine_graph, all_syn_block_sz, graph_mapper,
             application_graph, application_vertex):
+        """
+        :param ~.DataSpecificationGenerator spec:
+        :param ~.MachineVertex machine_vertex:
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :param ~.MachineGraph machine_graph:
+        :param int all_syn_block_sz:
+        :param ~.GraphMapper graph_mapper:
+        :param ~.ApplicationGraph application_graph:
+        :param ~.ApplicationVertex application_vertex:
+        """
         spec.reserve_memory_region(
             region=POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value,
             size=self._get_synapse_params_size(),
@@ -374,15 +508,16 @@ class SynapticManager(object):
         All arguments should be assumed real values except n_synapses_in\
         which will be an integer.
 
-        :param weight_mean: Mean of weight distribution (in either nA or\
+        :param float weight_mean: Mean of weight distribution (in either nA or
             microSiemens as required)
-        :param weight_std_dev: SD of weight distribution
-        :param spikes_per_second: Maximum expected Poisson rate in Hz
-        :param machine_timestep: in us
-        :param n_synapses_in: No of connected synapses
-        :param sigma: How many SD above the mean to go for upper bound; a\
-            good starting choice is 5.0. Given length of simulation we can\
+        :param float weight_std_dev: SD of weight distribution
+        :param float spikes_per_second: Maximum expected Poisson rate in Hz
+        :param int machine_timestep: in us
+        :param int n_synapses_in: No of connected synapses
+        :param float sigma: How many SD above the mean to go for upper bound;
+            a good starting choice is 5.0. Given length of simulation we can
             set this for approximate number of saturation events.
+        :rtype: float
         """
         # E[ number of spikes ] in a timestep
         steps_per_second = MICRO_TO_SECOND_CONVERSION / machine_timestep
@@ -435,6 +570,12 @@ class SynapticManager(object):
             weight_scale):
         """ Get the scaling of the ring buffer to provide as much accuracy as\
             possible without too much overflow
+
+        :param .ApplicationVertex application_vertex:
+        :param .ApplicationGraph application_graph:
+        :param int machine_timestep:
+        :param float weight_scale:
+        :rtype: list(int)
         """
         weight_scale_squared = weight_scale * weight_scale
         n_synapse_types = self.__n_synapse_types
@@ -543,13 +684,21 @@ class SynapticManager(object):
             floating point values to 16-bit fixed point numbers which can be \
             shifted left by ring_buffer_to_input_left_shift to produce an\
             s1615 fixed point number
+
+        :param int ring_buffer_to_input_left_shift:
+        :rtype: float
         """
         return float(math.pow(2, 16 - (ring_buffer_to_input_left_shift + 1)))
 
     def _write_synapse_parameters(
             self, spec, ring_buffer_shifts, weight_scale):
-        """Get the ring buffer shifts and scaling factors."""
+        """ Get the ring buffer shifts and scaling factors.
 
+        :param ~.DataSpecificationGenerator spec:
+        :param ~numpy.ndarray ring_buffer_shifts:
+        :param float weight_scale:
+        :rtype: ~numpy.ndarray
+        """
         # Write the ring buffer shifts
         spec.switch_write_focus(POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value)
         spec.write_array(ring_buffer_shifts)
@@ -561,10 +710,15 @@ class SynapticManager(object):
 
     def _write_padding(
             self, spec, synaptic_matrix_region, next_block_start_address):
+        """
+        :param ~.DataSpecificationGenerator spec:
+        :param int synaptic_matrix_region:
+        :param int next_block_start_address:
+        :rtype: int
+        """
         next_block_allowed_address = self.__poptable_type\
             .get_next_allowed_address(next_block_start_address)
         if next_block_allowed_address != next_block_start_address:
-
             # Pad out data file with the added alignment bytes:
             spec.comment("\nWriting population table required padding\n")
             spec.switch_write_focus(synaptic_matrix_region)
@@ -585,6 +739,22 @@ class SynapticManager(object):
             graph_mapper, machine_graph, machine_time_step):
         """ Simultaneously generates both the master population table and
             the synaptic matrix.
+
+        :param ~.DataSpecificationGenerator spec:
+        :param list(~pacman.model.graphs.common.Slice) post_slices:
+        :param int post_slice_index:
+        :param .MachineVertex machine_vertex:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param all_syn_block_sz:
+        :param weight_scales:
+        :param int master_pop_table_region:
+        :param int synaptic_matrix_region:
+        :param int direct_matrix_region:
+        :param .RoutingInfo routing_info:
+        :param .GraphMapper graph_mapper:
+        :param .MachineGraph machine_graph:
+        :param int machine_time_step:
+        :rtype: list(GeneratorData)
         """
         spec.comment(
             "\nWriting Synaptic Matrix and Master Population Table:\n")
@@ -640,7 +810,7 @@ class SynapticManager(object):
                             not isinstance(
                                 self.synapse_dynamics,
                                 AbstractSynapseDynamicsStructural)):
-                        generate_on_machine.append((
+                        generate_on_machine.append(_GenOnMachine(
                             synapse_info, pre_slices, pre_vertex_slice,
                             pre_slice_index, app_edge, rinfo))
                     else:
@@ -661,14 +831,11 @@ class SynapticManager(object):
         # to the master population table
         generator_data = list()
         for gen_data in generate_on_machine:
-            (synapse_info, pre_slices, pre_vertex_slice, pre_slice_index,
-                app_edge, rinfo) = gen_data
             block_addr, index = self.__generate_on_chip_data(
-                synapse_info, pre_slices, pre_slice_index, post_slices,
-                post_slice_index, pre_vertex_slice, post_vertex_slice, rinfo,
-                all_syn_block_sz, block_addr, machine_time_step, app_edge,
+                gen_data, post_slices, post_slice_index, post_vertex_slice,
+                all_syn_block_sz, block_addr, machine_time_step,
                 generator_data)
-            key = (synapse_info, pre_vertex_slice.lo_atom,
+            key = (gen_data.synapse_info, gen_data.pre_slice.lo_atom,
                    post_vertex_slice.lo_atom)
             self.__synapse_indices[key] = index
 
@@ -695,31 +862,41 @@ class SynapticManager(object):
         return generator_data
 
     def __generate_on_chip_data(
-            self, synapse_info, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice, rinfo,
-            all_syn_block_sz, block_addr, machine_time_step, app_edge,
-            generator_data):
-        """ Generate data for the synapse expander
+            self, gen, post_slices, post_slice_index, post_vertex_slice,
+            all_syn_block_sz, block_addr, machine_time_step, generator_data):
+        """ Generate data for the synapse expander.
+
+        :param _GenOnMachine gen:
+        :param list(.Slice) post_slices:
+        :param int post_slice_index:
+        :param .Slice post_vertex_slice:
+        :param int all_syn_block_sz:
+        :param int block_addr:
+        :param int machine_time_step:
+        :param list(GeneratorData) generator_data:
+        :rtype: tuple(int,int)
         """
 
         # Get the size of the matrices that will be required
         max_row_info = self.__get_max_row_info(
-            synapse_info, post_vertex_slice, app_edge, machine_time_step)
+            gen.synapse_info, post_vertex_slice, gen.app_edge,
+            machine_time_step)
 
         # If delay edge exists, tell this about the data too, so it can
         # generate its own data
         if (max_row_info.delayed_max_n_synapses > 0 and
-                app_edge.delay_edge is not None):
-            app_edge.delay_edge.pre_vertex.add_generator_data(
+                gen.app_edge.delay_edge is not None):
+            gen.app_edge.delay_edge.pre_vertex.add_generator_data(
                 max_row_info.undelayed_max_n_synapses,
                 max_row_info.delayed_max_n_synapses,
-                pre_slices, pre_slice_index, post_slices, post_slice_index,
-                pre_vertex_slice, post_vertex_slice, synapse_info,
-                app_edge.n_delay_stages + 1, machine_time_step)
+                gen.pre_slices, gen.pre_index, post_slices,
+                post_slice_index, gen.pre_slice, post_vertex_slice,
+                gen.synapse_info, gen.app_edge.n_delay_stages + 1,
+                machine_time_step)
         elif max_row_info.delayed_max_n_synapses != 0:
             raise Exception(
                 "Found delayed items but no delay "
-                "machine edge for {}".format(app_edge.label))
+                "machine edge for {}".format(gen.app_edge.label))
 
         # Skip over the normal bytes but still write a master pop entry
         synaptic_matrix_offset = 0xFFFFFFFF
@@ -729,16 +906,16 @@ class SynapticManager(object):
                 self.__poptable_type.get_next_allowed_address(block_addr)
             index = self.__poptable_type.update_master_population_table(
                 synaptic_matrix_offset, max_row_info.undelayed_max_words,
-                rinfo.first_key_and_mask)
-            n_bytes_undelayed = (
-                max_row_info.undelayed_max_bytes * pre_vertex_slice.n_atoms)
+                gen.rinfo.first_key_and_mask)
+            n_bytes_undelayed = (max_row_info.undelayed_max_bytes *
+                                 gen.pre_slice.n_atoms)
             block_addr = synaptic_matrix_offset + n_bytes_undelayed
 
             # The synaptic matrix offset is in words for the generator
             synaptic_matrix_offset //= BYTES_PER_WORD
-        elif rinfo is not None:
+        elif gen.rinfo is not None:
             index = self.__poptable_type.update_master_population_table(
-                0, 0, rinfo.first_key_and_mask)
+                0, 0, gen.rinfo.first_key_and_mask)
 
         if block_addr > all_syn_block_sz:
             raise Exception(
@@ -749,13 +926,13 @@ class SynapticManager(object):
         delayed_synaptic_matrix_offset = 0xFFFFFFFF
         delay_rinfo = None
         n_delay_stages = 0
-        delay_key = (app_edge.pre_vertex, pre_vertex_slice.lo_atom,
-                     pre_vertex_slice.hi_atom)
+        delay_key = (gen.app_edge.pre_vertex, gen.pre_slice.lo_atom,
+                     gen.pre_slice.hi_atom)
         if delay_key in self.__delay_key_index:
             delay_rinfo = self.__delay_key_index[delay_key]
         d_index = None
         if max_row_info.delayed_max_n_synapses:
-            n_delay_stages = app_edge.n_delay_stages
+            n_delay_stages = gen.app_edge.n_delay_stages
             delayed_synaptic_matrix_offset = \
                 self.__poptable_type.get_next_allowed_address(
                     block_addr)
@@ -763,7 +940,7 @@ class SynapticManager(object):
                 delayed_synaptic_matrix_offset, max_row_info.delayed_max_words,
                 delay_rinfo.first_key_and_mask)
             n_bytes_delayed = (
-                max_row_info.delayed_max_bytes * pre_vertex_slice.n_atoms *
+                max_row_info.delayed_max_bytes * gen.pre_slice.n_atoms *
                 n_delay_stages)
             block_addr = delayed_synaptic_matrix_offset + n_bytes_delayed
 
@@ -784,10 +961,10 @@ class SynapticManager(object):
             synaptic_matrix_offset, delayed_synaptic_matrix_offset,
             max_row_info.undelayed_max_words, max_row_info.delayed_max_words,
             max_row_info.undelayed_max_n_synapses,
-            max_row_info.delayed_max_n_synapses, pre_slices, pre_slice_index,
-            post_slices, post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_info, n_delay_stages + 1,
-            machine_time_step))
+            max_row_info.delayed_max_n_synapses, gen.pre_slices,
+            gen.pre_index, post_slices, post_slice_index,
+            gen.pre_slice, post_vertex_slice, gen.synapse_info,
+            n_delay_stages + 1, machine_time_step))
         key = (post_vertex_slice.lo_atom, post_vertex_slice.hi_atom)
         self.__gen_on_machine[key] = True
 
@@ -802,6 +979,28 @@ class SynapticManager(object):
             post_vertex_slice, app_edge, n_synapse_types, single_synapses,
             weight_scales, machine_time_step, rinfo, all_syn_block_sz,
             block_addr, single_addr, machine_edge):
+        """
+        :param ~.DataSpecificationGenerator spec:
+        :param int synaptic_matrix_region:
+        :param SynapseInformation synapse_info:
+        :param list(.Slice) pre_slices:
+        :param int pre_slice_index:
+        :param list(.Slice) post_slices:
+        :param int post_slice_index:
+        :param .Slice pre_vertex_slice:
+        :param .Slice post_vertex_slice:
+        :param ProjectionApplicationEdge app_edge:
+        :param int n_synapse_types:
+        :param list(~numpy.ndarray) single_synapses:
+        :param dict(AbstractSynapseType,float) weight_scales:
+        :param int machine_time_step:
+        :param .PartitionRoutingInfo rinfo:
+        :param int all_syn_block_sz:
+        :param int block_addr:
+        :param int single_addr:
+        :param ProjectionMachineEdge machine_edge:
+        :rtype: tuple(int,int,int)
+        """
         (row_data, row_length, delayed_row_data, delayed_row_length,
          delayed_source_ids, delay_stages) = self.__synapse_io.get_synapses(
              synapse_info, pre_slices, pre_slice_index, post_slices,
@@ -877,6 +1076,14 @@ class SynapticManager(object):
             app_edge, synapse_info):
         """ Determine if the given connection can be done with a "direct"\
             synaptic matrix - this must have an exactly 1 entry per row
+
+        :param int single_addr:
+        :param AbstractConnector connector:
+        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param ProjectionApplicationEdge app_edge:
+        :param SynapseInformation synapse_info:
+        :rtype: bool
         """
         return (
             app_edge.n_delay_stages == 0 and
@@ -891,6 +1098,22 @@ class SynapticManager(object):
             row_length, row_data, rinfo, single_synapses,
             synaptic_matrix_region, block_addr, single_addr, app_edge,
             synapse_info):
+        """
+        :param ~.DataSpecificationGenerator spec:
+        :param AbstractConnector connector:
+        :param ~.Slice pre_vertex_slice:
+        :param ~.Slice post_vertex_slice:
+        :param int row_length:
+        :param ~numpy.ndarray row_data:
+        :param .PartitionRoutingInfo rinfo:
+        :param list(~numpy.ndarray) single_synapses:
+        :param int synaptic_matrix_region:
+        :param int block_addr:
+        :param int single_addr:
+        :param ProjectionApplicationEdge app_edge:
+        :param SynapseInfornation synapse_info:
+        :rtype: tuple(int,int,int)
+        """
         if row_length == 1 and self.__is_direct(
                 single_addr, connector, pre_vertex_slice, post_vertex_slice,
                 app_edge, synapse_info):
@@ -912,7 +1135,13 @@ class SynapticManager(object):
     def _get_ring_buffer_shifts(
             self, application_vertex, application_graph, machine_timestep,
             weight_scale):
-        """ Get the ring buffer shifts for this vertex
+        """ Get the ring buffer shifts for this vertex.
+
+        :param .ApplicationVertex application_vertex:
+        :param .ApplicationGraph application_graph:
+        :param int machine_timestep:
+        :param float weight_scale:
+        :rtype: list(int)
         """
         if self.__ring_buffer_shifts is None:
             self.__ring_buffer_shifts = \
@@ -925,6 +1154,26 @@ class SynapticManager(object):
             self, spec, application_vertex, post_vertex_slice, machine_vertex,
             placement, machine_graph, application_graph, routing_info,
             graph_mapper, weight_scale, machine_time_step):
+        """
+        :param ~data_specification.DataSpecificationGenerator spec:
+            The data specification to write to
+        :param AbstractPopulationVertex application_vertex:
+            The vertex owning the synapses
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+            The part of the vertex we're dealing with
+        :param PopulationMachineVertex machine_vertex: The machine vertex
+        :param ~pacman.model.placements.Placement placement:
+            Where the vertex is placed
+        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
+            The graph containing the machine vertex
+        :param ~pacman.model.graphs.application.ApplicationGraph \
+                application_graph:
+            The graph containing the application vertex
+        :param ~pacman.model.routing_info.RoutingInfo routing_info:
+            How messages are routed
+        :param float weight_scale: How to scale the weights of the synapses
+        :param int machine_time_step:
+        """
         # Create an index of delay keys into this vertex
         for m_edge in machine_graph.get_edges_ending_at_vertex(machine_vertex):
             app_edge = graph_mapper.get_application_edge(m_edge)
@@ -983,6 +1232,8 @@ class SynapticManager(object):
             spec, post_vertex_slice, weight_scales, gen_data)
 
     def clear_connection_cache(self):
+        """ Flush the cache of connection information.
+        """
         self.__retrieved_blocks = dict()
 
     def get_connections_from_machine(
@@ -991,6 +1242,47 @@ class SynapticManager(object):
             using_extra_monitor_cores, placements=None, monitor_api=None,
             monitor_cores=None, handle_time_out_configuration=True,
             fixed_routes=None, extra_monitor=None):
+        """
+        :param ~spinnman.transceiver.Transceiver transceiver:
+            How to talk to the machine
+        :param ~pacman.model.placements.Placement placement:
+            Where on the machine are we talking to?
+        :param ProjectionMachineEdge machine_edge:
+            What edge's connections are we talking about?
+        :param ~pacman.model.routing_info.RoutingInfo routing_infos:
+            Where did the edge go?
+        :param SynapseInformation synapse_info:
+            What do we know about the edge's synapses?
+        :param int machine_time_step: How fast the clock ticks
+        :param bool using_extra_monitor_cores:
+            Are we to use the fast download protocol?
+        :param placements: Where are all the vertices?
+            Must not be ``None`` if ``using_extra_monitor_cores`` is true.
+        :type placements: ~pacman.model.placements.Placements or None
+        :param monitor_api:
+            How do we talk the fast protocol?
+            Must not be ``None`` if ``using_extra_monitor_cores`` is true.
+        :type monitor_api:
+            ~spinn_front_end_common.utility_models.DataSpeedUpPacketGatherMachineVertex
+        :param monitor_cores: Where are all the monitors?
+            Must not be ``None`` if ``using_extra_monitor_cores`` is true.
+        :type monitor_cores:
+            list(~spinn_front_end_common.utility_models.ExtraMonitorSupportMachineVertex)
+            or None
+        :param bool handle_time_out_configuration:
+            Should we reconfigure the on-chip network to not time out?
+            (Should be true under all normal circumstances.)
+        :param fixed_routes:
+            What is the planned configuration of the Fixed Route packet
+            routing?
+            Must not be ``None`` if ``using_extra_monitor_cores`` is true.
+        :type fixed_routes:
+            dict(tuple(int,int),~spinn_machine.FixedRouteEntry) or None
+        :param extra_monitor:
+        :type extra_monitor:
+            ~spinn_front_end_common.utility_models.ExtraMonitorSupportMachineVertex
+        :rtype: ~numpy.ndarray
+        """
         app_edge = graph_mapper.get_application_edge(machine_edge)
         if not isinstance(app_edge, ProjectionApplicationEdge):
             return None
@@ -1043,6 +1335,10 @@ class SynapticManager(object):
     def __compute_addresses(self, transceiver, placement):
         """ Helper for computing the addresses of the master pop table and\
             synaptic-matrix-related bits.
+
+        :param ~.Transceiver transceiver:
+        :param ~.Placement placement:
+        :rtype: tuple(int, int, int)
         """
         master_pop_table = locate_memory_region_for_placement(
             placement, POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
@@ -1057,6 +1353,13 @@ class SynapticManager(object):
 
     def _extract_synaptic_matrix_data_location(
             self, key, master_pop_table_address, transceiver, placement):
+        """
+        :param int key:
+        :param int master_pop_table_address:
+        :param ~spinnman.transceiver.Transceiver txrx:
+        :param ~.Placement placement:
+        :rtype: int
+        """
         return self.__poptable_type.extract_synaptic_matrix_data_location(
             key, master_pop_table_address, transceiver,
             placement.x, placement.y)
@@ -1064,6 +1367,22 @@ class SynapticManager(object):
     def _read_synapses(self, info, pre_slice, post_slice, max_row_length,
                        delayed_max_row_length, n_synapse_types, weight_scales,
                        data, delayed_data, timestep):
+        """
+        :param SynapseInformation synapse_info:
+        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param int max_row_length:
+        :param int delayed_max_row_length:
+        :param int n_synapse_types:
+        :param dict(AbstractSynapseType,float) weight_scales:
+        :param data:
+        :type data: bytes or bytearray or memoryview
+        :param delayed_data:
+        :type delayed_data: bytes or bytearray or memoryview
+        :param int machine_time_step:
+        :return: array with ``weight`` and ``delay`` columns
+        :rtype: ~numpy.ndarray
+        """
         return self.__synapse_io.read_synapses(
             info, pre_slice, post_slice, max_row_length,
             delayed_max_row_length, n_synapse_types, weight_scales, data,
@@ -1076,7 +1395,24 @@ class SynapticManager(object):
             monitor_api=None, extra_monitor=None, monitor_cores=None,
             handle_time_out_configuration=True, fixed_routes=None):
         """ Read in a synaptic block from a given processor and vertex on\
-            the machine
+            the machine.
+
+        :param ~.Transceiver txrx:
+        :param ~.Placement placement:
+        :param int master_pop_table_address:
+        :param int indirect_synapses_address:
+        :param int direct_synapses_address:
+        :param int key:
+        :param int n_rows:
+        :param int index:
+        :param bool using_monitors:
+        :param ~.Placements placements:
+        :param ~.DataSpeedUpPacketGatherMachineVertex data_receiver:
+        :param ~.ExtraMonitorSupportMachineVertex extra_monitor:
+        :param list(~.ExtraMonitorSupportMachineVertex) monitor_cores:
+        :param bool handle_time_out_configuration:
+        :param dict(tuple(int,int),~.FixedRouteEntry) fixed_routes:
+        :rtype: tuple(bytearray, int)
         """
         # See if we have already got this block
         if (placement, key, index) in self.__retrieved_blocks:
@@ -1127,6 +1463,18 @@ class SynapticManager(object):
             self, transceiver, monitor_api, placement, n_rows, max_row_length,
             address, using_monitors, extra_monitor, fixed_routes, placements):
         """ Read in an array of synaptic blocks.
+
+        :param ~.Transceiver transceiver:
+        :param ~.DataSpeedUpPacketGatherMachineVertex data_receiver:
+        :param ~.Placement placement:
+        :param int n_rows:
+        :param int max_row_length:
+        :param int address:
+        :param bool using_monitors:
+        :param ~.ExtraMonitorSupportMachineVertex extra_monitor:
+        :param dict(tuple(int,int),~.FixedRouteEntry) fixed_routes:
+        :param ~.Placements placements:
+        :rtype: bytearray
         """
         # calculate the synaptic block size in bytes
         synaptic_block_size = self.__synapse_io.get_block_n_bytes(
@@ -1146,6 +1494,17 @@ class SynapticManager(object):
             self, transceiver, data_receiver, placement, n_rows, address,
             using_monitors, extra_monitor, fixed_routes, placements):
         """ Read in a single synaptic block.
+
+        :param ~.Transceiver transceiver:
+        :param ~.DataSpeedUpPacketGatherMachineVertex data_receiver:
+        :param ~.Placement placement:
+        :param int n_rows:
+        :param int address:
+        :param bool using_monitors:
+        :param ~.ExtraMonitorSupportMachineVertex extra_monitor:
+        :param dict(tuple(int,int),~.FixedRouteEntry) fixed_routes:
+        :param ~.Placements placements:
+        :rtype: tuple(bytearray, int)
         """
         # The data is one per row
         synaptic_block_size = n_rows * BYTES_PER_WORD
@@ -1170,15 +1529,24 @@ class SynapticManager(object):
 
     # inherited from AbstractProvidesIncomingPartitionConstraints
     def get_incoming_partition_constraints(self):
+        """ Gets the constraints due to synapses managed by this class.
+
+        :return: a list of constraints
+        :rtype: list(~pacman.model.constraints.AbstractConstraint)
+        """
         return self.__poptable_type.get_edge_constraints()
 
     def _write_on_machine_data_spec(
             self, spec, post_vertex_slice, weight_scales, generator_data):
         """ Write the data spec for the synapse expander
 
-        :param spec: The specification to write to
-        :param post_vertex_slice: The slice of the vertex being written
+        :param ~.DataSpecificationGenerator spec:
+            The specification to write to
+        :param ~pacman.model.common.Slice post_vertex_slice:
+            The slice of the vertex being written
         :param weight_scales: scaling of weights on each synapse
+        :type weight_scales: list(int or float)
+        :param list(GeneratorData) generator_data:
         """
         if not generator_data:
             return
@@ -1216,13 +1584,20 @@ class SynapticManager(object):
             spec.write_array(data.gen_data)
 
     def gen_on_machine(self, vertex_slice):
-        """ True if the synapses should be generated on the machine
+        """ True if the synapses should be generated on the machine.
+
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :rtype: bool
         """
         key = (vertex_slice.lo_atom, vertex_slice.hi_atom)
         return self.__gen_on_machine.get(key, False)
 
     @property
     def changes_during_run(self):
+        """ Whether the synapses being managed change during running.
+
+        :rtype: bool
+        """
         if self.__synapse_dynamics is None:
             return False
         return self.__synapse_dynamics.changes_during_run
