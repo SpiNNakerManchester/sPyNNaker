@@ -371,6 +371,7 @@ void c_main(void) {
 
     // Initialise the incoming spike buffer
     if (!in_spikes_initialize_spike_buffer(256)) {
+        log_error("Error in initialisation of spike buffer!");
         rt_error(RTE_SWERR);
     }
 
