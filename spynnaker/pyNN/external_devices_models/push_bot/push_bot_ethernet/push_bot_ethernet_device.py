@@ -29,8 +29,11 @@ class PushBotEthernetDevice(with_metaclass(
             self, protocol, device, uses_payload, time_between_send):
         """
         :param protocol: The protocol instance to get commands from
+        :type protocol: MunichIoEthernetProtocol
         :param device: The Enum instance of the device to control
+        :type device: AbstractPushBotOutputDevice
         :param uses_payload: True if the device uses a payload for control
+        :type uses_payload: bool
         """
         self.__protocol = protocol
         self.__device = device
@@ -79,11 +82,16 @@ class PushBotEthernetDevice(with_metaclass(
     @property
     def protocol(self):
         """ The protocol instance, for use in the subclass
+
+        :rtype: MunichIoEthernetProtocol
         """
         return self.__protocol
 
     @abstractmethod
     def set_command_protocol(self, command_protocol):
         """ Set the protocol use to send setup and shutdown commands,\
-            separately from the protocol used to control the device
+            separately from the protocol used to control the device.
+
+        :param command_protocol: The protocol to use for this device
+        :type command_protocol: MunichIoSpiNNakerLinkProtocol
         """

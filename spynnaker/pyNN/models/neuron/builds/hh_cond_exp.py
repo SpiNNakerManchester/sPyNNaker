@@ -21,6 +21,10 @@ from spynnaker.pyNN.models.defaults import defaults, default_initial_values
 class HHCondExp(object):
     """ Single-compartment Hodgkin-Huxley model with exponentially decaying \
         current input.
+
+    .. warning::
+
+        Not currently supported by the tool chain.
     """
 
     # noinspection PyPep8Naming

@@ -41,7 +41,9 @@ class PushBotTranslator(AbstractEthernetTranslator):
     def __init__(self, protocol, pushbot_wifi_connection):
         """
         :param protocol: The instance of the PushBot protocol to get keys from
+        :type protocol: MunichIoEthernetProtocol
         :param pushbot_wifi_connection: A Wi-Fi connection to the PushBot
+        :type pushbot_wifi_connection: PushBotWIFIConnection
         """
         self.__protocol = protocol
         self.__pushbot_wifi_connection = pushbot_wifi_connection

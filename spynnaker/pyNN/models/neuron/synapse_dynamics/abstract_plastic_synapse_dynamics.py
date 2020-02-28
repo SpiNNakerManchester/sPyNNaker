@@ -28,7 +28,10 @@ class AbstractPlasticSynapseDynamics(AbstractSynapseDynamics):
 
     @abstractmethod
     def get_n_words_for_plastic_connections(self, n_connections):
-        """ Get the number of 32-bit words for n_connections in a single row
+        """ Get the number of 32-bit words for `n_connections` in a single row.
+
+        :param int n_connections:
+        :rtype: int
         """
 
     @abstractmethod
@@ -42,27 +45,44 @@ class AbstractPlasticSynapseDynamics(AbstractSynapseDynamics):
         Data is returned as an array made up of an array of 32-bit words for\
         each row, for each of the fixed-plastic and plastic-plastic data\
         regions.  The row into which connection should go is given by\
-        connection_row_indices, and the total number of rows is given by\
-        n_rows.
+        `connection_row_indices`, and the total number of rows is given by\
+        `n_rows`.
 
         Lengths are returned as an array made up of an integer for each row,\
         for each of the fixed-plastic and plastic-plastic regions.
+
+        :param ~numpy.ndarray connections:
+        :param ~numpy.ndarray connection_row_indices:
+        :param int n_rows:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param int n_synapse_types:
+        :return: (fp_data, pp_data, fp_size, pp_size)
+        :rtype:
+            tuple(~numpy.ndarray, ~numpy.ndarray, ~numpy.ndarray,
+            ~numpy.ndarray)
         """
 
     @abstractmethod
     def get_n_plastic_plastic_words_per_row(self, pp_size):
-        """ Get the number of plastic plastic words to be read from each row
+        """ Get the number of plastic plastic words to be read from each row.
+
+        :param ~numpy.ndarray pp_size:
         """
 
     @abstractmethod
     def get_n_fixed_plastic_words_per_row(self, fp_size):
-        """ Get the number of fixed plastic words to be read from each row
+        """ Get the number of fixed plastic words to be read from each row.
+
+        :param ~numpy.ndarray fp_size:
         """
 
     @abstractmethod
     def get_n_synapses_in_rows(self, pp_size, fp_size):
         """ Get the number of synapses in each of the rows with plastic sizes\
-            pp_size and fp_size
+            `pp_size` and `fp_size`.
+
+        :param ~numpy.ndarray pp_size:
+        :param ~numpy.ndarray fp_size:
         """
 
     @abstractmethod
@@ -70,5 +90,15 @@ class AbstractPlasticSynapseDynamics(AbstractSynapseDynamics):
             self, post_vertex_slice, n_synapse_types, pp_size, pp_data,
             fp_size, fp_data):
         """ Read the connections indicated in the connection indices from the\
-            data in pp_data and fp_data
+            data in `pp_data` and `fp_data`.
+
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param int n_synapse_types:
+        :param ~numpy.ndarray pp_size: 1D
+        :param ~numpy.ndarray pp_data: 2D
+        :param ~numpy.ndarray fp_size: 1D
+        :param ~numpy.ndarray fp_data: 2D
+        :return:
+            array with columns ``source``, ``target``, ``weight``, ``delay``
+        :rtype: ~numpy.ndarray
         """

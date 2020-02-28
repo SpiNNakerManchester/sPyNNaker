@@ -53,6 +53,14 @@ class SynapseTypeAlpha(AbstractSynapseType):
 
     def __init__(self, exc_response, exc_exp_response,
                  tau_syn_E, inh_response, inh_exp_response, tau_syn_I):
+        r"""
+        :param float exc_response: :math:`response^\mathrm{linear}_e`
+        :param float exc_exp_response: :math:`response^\mathrm{exponential}_e`
+        :param float tau_syn_E: :math:`\tau^{syn}_e`
+        :param float inh_response: :math:`response^\mathrm{linear}_i`
+        :param float inh_exp_response: :math:`response^\mathrm{exponential}_i`
+        :param float tau_syn_I: :math:`\tau^{syn}_i`
+        """
         super(SynapseTypeAlpha, self).__init__([
             DataType.S1615,   # exc_response
             DataType.S1615,   # exc_exp_response
@@ -102,6 +110,9 @@ class SynapseTypeAlpha(AbstractSynapseType):
     @inject_items({"ts": "MachineTimeStep"})
     @overrides(AbstractSynapseType.get_values, additional_arguments={'ts'})
     def get_values(self, parameters, state_variables, vertex_slice, ts):
+        """
+        :param int ts: machine time step
+        """
         # pylint: disable=arguments-differ
 
         init = lambda x: (float(ts) / 1000.0) / (x * x)  # noqa
