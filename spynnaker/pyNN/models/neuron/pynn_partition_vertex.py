@@ -252,8 +252,27 @@ class PyNNPartitionVertex(AbstractPopulationInitializable, AbstractPopulationSet
         return self._neuron_vertices[0].requires_mapping()
 
     def set_initial_value(self, variable, value, selector=None):
+
+        offset = 0
+        j = 0
+
+        if selector is None:
+            sel = None
+
         for i in range(self._n_outgoing_partitions):
-            self._neuron_vertices[i].set_initial_value(variable, value, selector)
+
+            if selector is not None:
+
+                sel = []
+
+                while j < len(selector) and selector[j] < self._neuron_vertices[i].n_atoms + offset:
+
+                    sel.append(selector[j] - offset)
+                    j += 1
+
+            self._neuron_vertices[i].set_initial_value(variable, value, sel)
+
+            offset += self._neurons_partition[i]
 
     # SHOULD BE THE SAME FOR BOTH THE VERTICES!!!!
     def get_initial_value(self, variable, selector=None):

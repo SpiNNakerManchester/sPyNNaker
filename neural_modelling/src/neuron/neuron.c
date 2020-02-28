@@ -281,7 +281,7 @@ bool neuron_do_timestep_update(
     //dma[DMA_CTRL] |= 0x8;
 
     // Set the next expected time to wait for between spike sending
-    expected_time = sv->cpu_clk * timer_period;
+    //expected_time = sv->cpu_clk * timer_period;
 
     // Wait until recordings have completed, to ensure the recording space
     // can be re-written
@@ -343,12 +343,12 @@ bool neuron_do_timestep_update(
         }
 
         // Get external bias from any source of intrinsic plasticity
-        input_t external_bias =
-            synapse_dynamics_get_intrinsic_bias(time, neuron_index);
+//        input_t external_bias =
+//            synapse_dynamics_get_intrinsic_bias(time, neuron_index);
 
         // call the implementation function (boolean for spike)
         bool spike = neuron_impl_do_timestep_update(
-            neuron_index, external_bias, recorded_variable_values);
+            neuron_index, 0.0k, recorded_variable_values);
 
         recorded_variable_values[1] = partition_sum_clock_cycles;
 
@@ -368,17 +368,17 @@ bool neuron_do_timestep_update(
             out_spikes_set_spike(spike_recording_indexes[neuron_index]);
 
             // Do any required synapse processing
-            synapse_dynamics_process_post_synaptic_event(time, neuron_index);
+            //synapse_dynamics_process_post_synaptic_event(time, neuron_index);
 
             if (use_key) {
 
                 // Wait until the expected time to send
-                while ((ticks == timer_count) &&
-                        (tc[T1_COUNT] > expected_time)) {
-
-                    // Do Nothing
-                }
-                expected_time -= time_between_spikes;
+//                while ((ticks == timer_count) &&
+//                        (tc[T1_COUNT] > expected_time)) {
+//
+//                    // Do Nothing
+//                }
+//                expected_time -= time_between_spikes;
 
                 // Send the spike
                 while (!spin1_send_mc_packet(
@@ -428,7 +428,7 @@ bool neuron_do_timestep_update(
     }
 
     // do logging stuff if required
-    out_spikes_print();
+    //out_spikes_print();
 
     // Re-enable interrupts
     spin1_mode_restore(cpsr);
