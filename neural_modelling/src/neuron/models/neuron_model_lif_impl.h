@@ -51,6 +51,9 @@ typedef struct neuron_t {
 
     //
     REAL	 V_noise;
+
+    //
+    int32_t spiked_last_timestep;
 } neuron_t;
 
 typedef struct global_neuron_params_t {

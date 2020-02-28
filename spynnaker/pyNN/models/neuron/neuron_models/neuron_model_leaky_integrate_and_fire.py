@@ -28,6 +28,7 @@ V_RESET = "v_reset"
 TAU_REFRAC = "tau_refrac"
 COUNT_REFRAC = "count_refrac"
 V_NOISE = "v_noise"
+SPIKED_LAST_TIMESTEP = "spiked_last_timestep"
 
 UNITS = {
     V: 'mV',
@@ -37,7 +38,7 @@ UNITS = {
     I_OFFSET: 'nA',
     V_RESET: 'mV',
     TAU_REFRAC: 'ms',
-    V_NOISE: 'mV'
+    V_NOISE: 'mV',
 }
 
 
@@ -63,7 +64,8 @@ class NeuronModelLeakyIntegrateAndFire(AbstractNeuronModel):
              DataType.INT32,   # count_refrac
              DataType.S1615,   # v_reset
              DataType.INT32,   # tau_refrac
-             DataType.S1615])  # v_noise
+             DataType.S1615,   # v_noise
+             DataType.INT32])  #spiked_last_timestep
 
         if v_init is None:
             v_init = v_rest
