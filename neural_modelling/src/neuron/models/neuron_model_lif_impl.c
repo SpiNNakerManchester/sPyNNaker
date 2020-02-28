@@ -33,7 +33,9 @@ static inline void lif_neuron_closed_form(
 
 	REAL noise = (gaussian_dist_variate(mars_kiss64_seed, NULL)
 	            * neuron->V_noise);
+#if debug_print
 	io_printf(IO_BUF, "membrane gaussian white noise = %12.6k\n", noise);
+#endif
     REAL alpha = input_this_timestep * neuron->R_membrane + neuron->V_rest;
 
     // update membrane voltage
@@ -68,6 +70,7 @@ state_t neuron_model_state_update(
 	    //neuron->V_membrane = neuron->V_reset;
 		neuron->spiked_last_timestep = 0;
 	    neuron->V_membrane = neuron->V_membrane - 2*(neuron->V_rest - neuron->V_reset);
+		//neuron->V_membrane = neuron->V_reset;
 #if debug_print
 		io_printf(IO_BUF, "RESET NEURON!\n");
 		io_printf(IO_BUF, "V_rest = %12.6k, V_reset = %12.6k, pot to subtract = %12.6k\n",
