@@ -21,6 +21,8 @@ from spynnaker.pyNN.spynnaker_simulator_interface import (
 
 
 class SpynnakerFailedState(SpynnakerSimulatorInterface, FailedState, object):
+    """ Marks the simulation as failed.
+    """
 
     __slots__ = ()
 
