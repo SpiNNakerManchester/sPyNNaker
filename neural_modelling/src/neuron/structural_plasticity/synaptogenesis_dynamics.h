@@ -33,7 +33,7 @@
 //! \param[in] sdram_sp_address Address of the start of the SDRAM region
 //! which contains synaptic rewiring params.
 //! \return address_t Address after the final word read from SDRAM.
-address_t synaptogenesis_dynamics_initialise(
+bool synaptogenesis_dynamics_initialise(
         address_t sdram_sp_address);
 
 //! \brief Function called (usually on a timer from c_main) to

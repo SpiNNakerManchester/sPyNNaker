@@ -78,8 +78,8 @@ static circular_buffer free_states;
 //! parameters (random seed, spread of receptive field etc.)
 //! \param[in] sdram_sp_address Address of the start of the SDRAM region
 //! which contains synaptic rewiring params.
-//! \return address_t Address after the final word read from SDRAM.
-address_t synaptogenesis_dynamics_initialise(address_t sdram_sp_address) {
+//! \return true when successful
+bool synaptogenesis_dynamics_initialise(address_t sdram_sp_address) {
     log_info("SR init.");
 
     uint8_t *data = sp_structs_read_in_common(
@@ -137,7 +137,7 @@ address_t synaptogenesis_dynamics_initialise(address_t sdram_sp_address) {
         elimination_params[i] = synaptogenesis_elimination_init(&data);
     }
 
-    return (address_t) data;
+    return true;
 }
 
 bool synaptogenesis_dynamics_rewire(

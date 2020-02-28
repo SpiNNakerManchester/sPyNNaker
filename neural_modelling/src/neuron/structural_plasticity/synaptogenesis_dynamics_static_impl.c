@@ -25,10 +25,10 @@
 #include "synaptogenesis_dynamics.h"
 #include <debug.h>
 
-address_t synaptogenesis_dynamics_initialise(
+bool synaptogenesis_dynamics_initialise(
     address_t sdram_sp_address) {
     use(sdram_sp_address);
-    return sdram_sp_address;
+    return true;
 }
 
 bool synaptogenesis_dynamics_rewire(uint32_t time,
