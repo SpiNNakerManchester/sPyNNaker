@@ -125,7 +125,7 @@ void success_shut_down(void){
 
 
 //! \brief reads in the vertex region addresses
-void read_in_addresses(){
+void read_in_addresses(void){
 
     // get the data (linked to sdram tag 2 and assume the app ids match)
     data_specification_metadata_t *core_address =
@@ -172,14 +172,14 @@ void read_in_addresses(){
 }
 
 
-void _print_key_to_max_atom_map(){
+void _print_key_to_max_atom_map(void){
 
     log_info("n items is %d", keys_to_max_atoms->n_pairs);
 
     // put map into dtcm
     for (int key_to_max_atom_index = 0;
             key_to_max_atom_index < keys_to_max_atoms->n_pairs;
-            key_to_max_atom_index++){
+            key_to_max_atom_index++) {
 
         // print
         log_info("entry %d has key %x and n_atoms of %d",
@@ -193,7 +193,7 @@ void _print_key_to_max_atom_map(){
 //! \brief deduces n neurons from the key
 //! \param[in] mask: the key to convert to n_neurons
 //! \return the number of neurons from the key map based off this key
-uint32_t _n_neurons_from_key(uint32_t key){
+uint32_t _n_neurons_from_key(uint32_t key) {
     int key_index = 0;
     log_debug("n pairs is %d", keys_to_max_atoms->n_pairs);
     while (key_index < keys_to_max_atoms->n_pairs){
@@ -219,7 +219,7 @@ uint32_t _n_neurons_from_key(uint32_t key){
 //! \brief creates a fake bitfield where every bit is set to 1.
 //! \return bool, which states if the creation of the fake bitfield was
 //!               successful or not.
-bool _create_fake_bit_field(){
+bool _create_fake_bit_field(void) {
     fake_bit_fields = spin1_malloc(
         population_table_length() * sizeof(bit_field_t));
     if (fake_bit_fields == NULL){
@@ -230,7 +230,7 @@ bool _create_fake_bit_field(){
     // iterate through the master pop entries
     for (uint32_t master_pop_entry=0;
             master_pop_entry < population_table_length();
-            master_pop_entry++){
+            master_pop_entry++) {
         fake_bit_fields[master_pop_entry] = NULL;
     }
     log_info("finished fake bit field");
@@ -240,7 +240,7 @@ bool _create_fake_bit_field(){
 //! \brief sets up the master pop table and synaptic matrix for the bit field
 //!        processing
 //! \return: bool that states if the init was successful or not.
-bool initialise(){
+bool initialise(void) {
 
     // init the synapses to get direct synapse address
     log_info("direct synapse init");
@@ -272,7 +272,7 @@ bool initialise(){
     log_info(" elements in master pop table is %d \n and max rows is %d",
              population_table_length(), row_max_n_words);
 
-    if (population_table_length() == 0){
+    if (population_table_length() == 0) {
          success_shut_down();
          log_info("successfully processed the bitfields as there wasnt any");
          can_run = false;
@@ -283,7 +283,7 @@ bool initialise(){
     //_print_key_to_max_atom_map();
 
     // set up a fake bitfield so that it always says there's something to read
-    if (!_create_fake_bit_field()){
+    if (!_create_fake_bit_field()) {
         log_error("failed to create fake bit field");
         return false;
     }
@@ -291,7 +291,7 @@ bool initialise(){
     // set up a sdram read for a row
     log_info("allocating dtcm for row data");
     row_data = spin1_malloc(row_max_n_words * sizeof(uint32_t));
-    if (row_data == NULL){
+    if (row_data == NULL) {
         log_error("could not allocate dtcm for the row data");
         return false;
     }
@@ -307,18 +307,18 @@ bool initialise(){
 //! \brief checks plastic and fixed elements to see if there is a target.
 //! \param[in] row: the synaptic row
 //! \return bool stating true if there is target, false if no target.
-bool process_synaptic_row(synaptic_row_t row){
+bool process_synaptic_row(synaptic_row_t row) {
     // get address of plastic region from row
-    if (synapse_row_plastic_size(row) > 0){
+    if (synapse_row_plastic_size(row) > 0) {
         log_debug("plastic row had entries, so cant be pruned");
         return true;
     }
-    else{
+    else {
         // Get address of non-plastic region from row
         address_t fixed_region_address = synapse_row_fixed_region(row);
         uint32_t fixed_synapse =
             synapse_row_num_fixed_synapses(fixed_region_address);
-        if (fixed_synapse == 0){
+        if (fixed_synapse == 0) {
             log_debug(
                 "plastic and fixed do not have entries, so can be pruned");
             return false;
@@ -336,7 +336,7 @@ bool process_synaptic_row(synaptic_row_t row){
 //!                                 synaptic row
 //! \return bool which states true if there is target, false if no target.
 bool _do_sdram_read_and_test(
-        address_t row_address, uint32_t n_bytes_to_transfer){
+        address_t row_address, uint32_t n_bytes_to_transfer) {
     spin1_memcpy(row_data, row_address, n_bytes_to_transfer);
     log_debug("process synaptic row");
     return process_synaptic_row(row_data);
@@ -345,7 +345,7 @@ bool _do_sdram_read_and_test(
 //! \brief creates the bitfield for this master pop table and synaptic matrix
 //! \param[in] vertex_id: the index in the regions.
 //! \return bool that states if it was successful at generating the bitfield
-bool generate_bit_field(){
+bool generate_bit_field(void) {
 
     // write how many entries (thus bitfields) are to be generated into sdram
     log_debug("update by pop length");
@@ -362,7 +362,7 @@ bool generate_bit_field(){
     log_debug("starting master pop entry bit field generation");
     for (uint32_t master_pop_entry=0;
             master_pop_entry < population_table_length();
-            master_pop_entry++){
+            master_pop_entry++) {
 
         // determine keys masks and n_neurons
         spike_t key = population_table_get_spike_for_index(master_pop_entry);
@@ -375,7 +375,7 @@ bool generate_bit_field(){
         log_debug("pop entry %d, key = %d, mask = %0x, n_neurons = %d",
                   master_pop_entry, (uint32_t) key, mask, n_neurons);
         bit_field_t bit_field = bit_field_alloc(n_neurons);
-        if (bit_field == NULL){
+        if (bit_field == NULL) {
             log_error("could not allocate dtcm for bit field");
             return false;
         }
@@ -409,6 +409,7 @@ bool generate_bit_field(){
                         &pre_info, new_key,
                         &rubbish, &rubbish, &rubbish, &rubbish)) {
                     bit_found = true;
+                }
             }
 
             // holder for the bytes to transfer if we need to read sdram.
