@@ -23,7 +23,6 @@ from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
-from spynnaker.pyNN.utilities import constants
 import math
 
 

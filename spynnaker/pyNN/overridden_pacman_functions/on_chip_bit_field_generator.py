@@ -33,8 +33,6 @@ from spinn_utilities.progress_bar import ProgressBar
 
 from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState
-from spynnaker.pyNN.models.neuron.synapse_dynamics import \
-    AbstractSynapseDynamicsStructural
 
 logger = logging.getLogger(__name__)
 
