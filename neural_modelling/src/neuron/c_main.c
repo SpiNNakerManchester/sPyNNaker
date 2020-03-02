@@ -202,7 +202,7 @@ static bool initialise(void) {
     // Set up the synapse dynamics
     address_t synapse_dynamics_region_address =
             data_specification_get_region(SYNAPSE_DYNAMICS_REGION, ds_regions);
-    if(!synapse_dynamics_initialise(
+    if( !synapse_dynamics_initialise(
             synapse_dynamics_region_address, n_neurons, n_synapse_types,
             ring_buffer_to_input_buffer_left_shifts)) {
         return false;

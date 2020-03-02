@@ -128,7 +128,7 @@ bool synapse_dynamics_find_neuron(
             *weight = synapse_row_sparse_weight(synaptic_word);
             *delay = synapse_row_sparse_delay(synaptic_word, synapse_type_index_bits);
             *synapse_type = synapse_row_sparse_type(
-                    synaptic_word, synapse_index_bits, synapse_type_mask);
+                synaptic_word, synapse_index_bits, synapse_type_mask);
             return true;
         }
     }
