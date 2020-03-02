@@ -32,6 +32,9 @@
 #include <neuron/plasticity/synapse_dynamics.h>
 
 
+#include <neuron/models/neuron_model.h>
+#include <neuron/models/neuron_model_eprop_adaptive_impl.h>
+
 extern neuron_pointer_t neuron_array;
 
 static uint32_t synapse_type_index_bits;
@@ -72,6 +75,9 @@ uint32_t plastic_saturation_count = 0;
 
 #define SYNAPSE_AXONAL_DELAY_MASK \
     ((1 << SYNAPSE_AXONAL_DELAY_BITS) - 1)
+
+
+uint32_t RECURRENT_SYNAPSE_OFFSET = 100;
 
 //---------------------------------------
 // Structures
@@ -269,6 +275,34 @@ address_t synapse_dynamics_initialise(
     return weight_result;
 }
 
+
+static inline final_state_t eprop_plasticity_update(update_state_t current_state,
+		REAL delta_w){
+
+	// Test weight change
+    // delta_w = -0.1k;
+
+
+	// Convert delta_w to int16_t (same as weight) - take only integer bits from REAL?
+	int16_t delta_w_int = bitsk(delta_w) >> 1; // THIS NEEDS UPDATING TO APPROPRIATE SCALING
+//	int16_t delta_w_int = (int) delta_w; // >> 15;
+
+	io_printf(IO_BUF, "delta_w: %k, delta_w_int: %d\n",
+			delta_w, delta_w_int);
+
+	if (delta_w_int <= 0){
+		current_state = weight_one_term_apply_depression(current_state,  delta_w_int);
+	} else {
+		current_state = weight_one_term_apply_potentiation(current_state,  delta_w_int);
+	}
+
+    // Return final synaptic word and weight
+    return synapse_structure_get_final_state(current_state);
+}
+
+
+
+
 bool synapse_dynamics_process_plastic_synapses(
         address_t plastic_region_address, address_t fixed_region_address,
         weight_t *ring_buffers, uint32_t time) {
@@ -283,19 +317,9 @@ bool synapse_dynamics_process_plastic_synapses(
 
     num_plastic_pre_synaptic_events += plastic_synapse;
 
-//    // Get event history from synaptic row
-//    pre_event_history_t *event_history =
-//            plastic_event_history(plastic_region_address);
-//
-//    // Get last pre-synaptic event from event history
-//    const uint32_t last_pre_time = event_history->prev_time;
-//    const pre_trace_t last_pre_trace = event_history->prev_trace;
-//
-//    // Update pre-synaptic trace
-//    log_debug("Adding pre-synaptic event to trace at time:%u", time);
-//    event_history->prev_time = time;
-//    event_history->prev_trace =
-//            timing_add_pre_spike(time, last_pre_time, last_pre_trace);
+    // Could maybe have a single z_bar for the entire synaptic row and update it once here for all synaptic words?
+
+
 
     // Loop through plastic synapses
     for (; plastic_synapse > 0; plastic_synapse--) {
@@ -307,12 +331,12 @@ bool synapse_dynamics_process_plastic_synapses(
         // 16-bits of 32-bit fixed synapse so same functions can be used
 //        uint32_t delay_axonal = sparse_axonal_delay(control_word);
 
-        uint32_t delay = 1;
+        uint32_t delay = 1.0k;
         uint32_t syn_ind_from_delay =
-         		synapse_row_sparse_delay(synaptic_word, synapse_type_index_bits);
+         		synapse_row_sparse_delay(control_word, synapse_type_index_bits);
 
-        uint32_t delay_dendritic = synapse_row_sparse_delay(
-                control_word, synapse_type_index_bits);
+//        uint32_t delay_dendritic = synapse_row_sparse_delay(
+//                control_word, synapse_type_index_bits);
         uint32_t type = synapse_row_sparse_type(
                 control_word, synapse_index_bits, synapse_type_mask);
         uint32_t index =
@@ -320,16 +344,40 @@ bool synapse_dynamics_process_plastic_synapses(
         uint32_t type_index = synapse_row_sparse_type_index(
                 control_word, synapse_type_index_mask);
 
+
+        int32_t neuron_ind = synapse_row_sparse_index(control_word, synapse_index_mask);
+
+        // For low pass filter of incoming spike train on this synapse
+        // Use postsynaptic neuron index to access neuron struct,
+
+        if (type==1){
+        	// this is a recurrent synapse: add 100 to index to correct array location
+        	syn_ind_from_delay += RECURRENT_SYNAPSE_OFFSET;
+        }
+
+
+        neuron_pointer_t neuron = &neuron_array[neuron_ind];
+        neuron->syn_state[syn_ind_from_delay].z_bar_inp = 1024; // !!!! Check what units this is in - same as weight? !!!!
+
+
         // Create update state from the plastic synaptic word
         update_state_t current_state =
                 synapse_structure_get_update_state(*plastic_words, type);
 
-        // Access weight change from synaptic state in DTCM
-        neuron_pointer_t neuron = &neuron_array[
-												synapse_row_sparse_index(synaptic_word, synapse_type_mask)
-												];
-        neuron->syn_state[syn_ind_from_delay].delta_w;
 
+        io_printf(IO_BUF, "neuron ind: %u, synapse ind: %u, type: %u init w (plas): %d, summed_dw: %k\n",
+        		neuron_ind, syn_ind_from_delay, type,
+				current_state.initial_weight,
+				neuron->syn_state[syn_ind_from_delay].delta_w);
+
+
+        // Perform weight update:
+        // Go through typical weight update process to clip to limits
+        final_state_t final_state = eprop_plasticity_update(current_state,
+        		neuron->syn_state[syn_ind_from_delay].delta_w);
+
+        // reset delta_w as weight change has now been applied
+        neuron->syn_state[syn_ind_from_delay].delta_w = 0.0k;
 
 //        // Update the synapse state
 //        final_state_t final_state = plasticity_update_synapse(
@@ -338,28 +386,23 @@ bool synapse_dynamics_process_plastic_synapses(
 //                &post_event_history[index]);
 
 
-        // Access and apply weight change from synaptic state array
-        // Use neuron id to index into neuron array, and delay to index into synapse array
 
-
-
+        // Add contribution to synaptic input
         // Convert into ring buffer offset
         uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
-                delay_axonal + delay_dendritic + time, type_index,
+                // delay_axonal + delay_dendritic +
+				time, type_index,
                 synapse_type_index_bits);
 
-        // Add weight to ring-buffer entry
-        // **NOTE** Dave suspects that this could be a
-        // potential location for overflow
-
-        uint32_t accumulation = ring_buffers[ring_buffer_index] +
+        // Check for ring buffer saturation
+        int32_t accumulation = ring_buffers[ring_buffer_index] +
                 synapse_structure_get_final_weight(final_state);
 
-        uint32_t sat_test = accumulation & 0x10000;
-        if (sat_test) {
-            accumulation = sat_test - 1;
-            plastic_saturation_count++;
-        }
+//        uint32_t sat_test = accumulation & 0x10000;
+//        if (sat_test) {
+//            accumulation = sat_test - 1;
+//            plastic_saturation_count++;
+//        }
 
         ring_buffers[ring_buffer_index] = accumulation;
 

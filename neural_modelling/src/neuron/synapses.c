@@ -34,8 +34,6 @@
 uint32_t  num_fixed_pre_synaptic_events = 0;
 extern neuron_pointer_t neuron_array;
 
-uint32_t RECURRENT_SYNAPSE_OFFSET = 100;
-
 // The number of neurons
 static uint32_t n_neurons;
 
@@ -186,25 +184,7 @@ static inline void process_fixed_synapses(
                 synaptic_word, synapse_type_index_mask);
         int32_t weight = synapse_row_sparse_weight(synaptic_word);
 
-        int32_t neuron_ind = synapse_row_sparse_index(synaptic_word, synapse_index_mask);
-
-        uint32_t type = synapse_row_sparse_type(synaptic_word, synapse_index_bits, synapse_type_mask);
-
-        // For low pass filter of incoming spike train on this synapse
-        // Use postsynaptic neuron index to access neuron struct,
-
-        if (type==1){
-        	// this is a recurrent synapse: add 100 to index to correct array location
-        	syn_ind_from_delay =+ RECURRENT_SYNAPSE_OFFSET;
-        }
-
-        io_printf(IO_BUF, "neuron ind: %u, synapse ind: %u, type: %u \n", neuron_ind, syn_ind_from_delay, type);
-
-        neuron_pointer_t neuron = &neuron_array[neuron_ind];
-
-        neuron->syn_state[syn_ind_from_delay].z_bar_inp = 1024; // !!!! Check what units this is in !!!!
-
-        io_printf(IO_BUF, "signed w: %d \n", weight);
+        io_printf(IO_BUF, "static signed w: %d \n", weight);
 
         // Convert into ring buffer offset
         uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
