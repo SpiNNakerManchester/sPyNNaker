@@ -493,10 +493,11 @@ void c_main(void) {
     read_in_addresses();
 
     // generate bit field for each vertex regions
-    if (!initialise()){
+    if (!initialise()) {
         log_error("failed to init the master pop and synaptic matrix");
         fail_shut_down();
     }
+
     if (can_run) {
         log_info("generating bit field");
         if (!generate_bit_field()){
