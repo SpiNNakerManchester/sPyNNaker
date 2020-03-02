@@ -332,8 +332,10 @@ void user_event_callback(uint unused0, uint unused1) {
         // If the DMA buffer is full of valid data, attempt to reuse it on the
         // next data to be used, as this might be able to make use of the buffer
         // without transferring data
+        log_info("setting off dma complete callback directly");
         dma_complete_callback(0, DMA_TAG_READ_SYNAPTIC_ROW);
     } else {
+        log_info("invalud");
         // If the DMA buffer is invalid, just do the first transfer possible
         setup_synaptic_dma_read(NULL, NULL, NULL);
     }

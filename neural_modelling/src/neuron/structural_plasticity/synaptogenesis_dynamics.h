@@ -64,4 +64,6 @@ bool synaptogenesis_is_fast(void);
 //! Indicates that a spike has been received
 void synaptogenesis_spike_received(uint32_t time, spike_t spike);
 
+void print_post_to_pre_entry(void);
+
 #endif // _SYNAPTOGENESIS_DYNAMICS_H_

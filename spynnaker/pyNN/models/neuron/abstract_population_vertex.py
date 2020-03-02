@@ -538,7 +538,8 @@ class AbstractPopulationVertex(
             POPULATION_BASED_REGIONS.BIT_FIELD_KEY_MAP.value,
             POPULATION_BASED_REGIONS.STRUCTURAL_DYNAMICS.value,
             isinstance(
-                self.__synapse_manager, AbstractSynapseDynamicsStructural))
+                self.__synapse_manager.synapse_dynamics,
+                AbstractSynapseDynamicsStructural))
 
         # End the writing of this specification:
         spec.end_specification()

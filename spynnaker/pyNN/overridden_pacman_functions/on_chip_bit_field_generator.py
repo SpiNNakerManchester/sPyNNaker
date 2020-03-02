@@ -368,7 +368,6 @@ class OnChipBitFieldGenerator(object):
 
         # cores to place bitfield expander
         expander_cores = ExecutableTargets()
-        return expander_cores
 
         # bit field expander executable file path
         bit_field_expander_path = executable_finder.get_executable_path(
@@ -378,14 +377,8 @@ class OnChipBitFieldGenerator(object):
         for app_vertex in progress.over(app_graph.vertices, False):
             machine_verts = graph_mapper.get_machine_vertices(app_vertex)
             for machine_vertex in machine_verts:
-                app_vertex = \
-                    graph_mapper.get_application_vertex(machine_vertex)
                 if (isinstance(
-                        machine_vertex,
-                        AbstractSupportsBitFieldGeneration) and not
-                        isinstance(
-                            app_vertex.synapse_dynamics,
-                            AbstractSynapseDynamicsStructural)):
+                        machine_vertex, AbstractSupportsBitFieldGeneration)):
                     placement = \
                         placements.get_placement_of_vertex(machine_vertex)
 

@@ -215,24 +215,37 @@ static bool initialise(void) {
             structural_plastic_region_address)) {
         return false;
     }
+    log_info("a");
+    print_post_to_pre_entry();
 
     rewiring_period = synaptogenesis_rewiring_period();
     rewiring = rewiring_period != -1;
 
+    log_info("b");
+    print_post_to_pre_entry();
     if (!spike_processing_initialise(
             row_max_n_words, MC, USER, incoming_spike_buffer_size)) {
         return false;
     }
+    log_info("c");
+    print_post_to_pre_entry();
 
     // Setup profiler
+    log_info("d");
+    print_post_to_pre_entry();
     profiler_init(data_specification_get_region(PROFILER_REGION, ds_regions));
+    log_info("e");
+    print_post_to_pre_entry();
 
     log_info("initialising the bit field region");
+    print_post_to_pre_entry();
     if (!bit_field_filter_initialise(
             data_specification_get_region(
                 BIT_FIELD_FILTER_REGION, ds_regions))){
         return false;
     }
+    log_info("f");
+    print_post_to_pre_entry();
 
     log_debug("Initialise: finished");
     return true;

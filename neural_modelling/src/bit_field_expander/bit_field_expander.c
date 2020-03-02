@@ -148,6 +148,10 @@ void read_in_addresses(){
             builder_data.bit_field_region_id, core_address);
     direct_matrix_region_base_address = data_specification_get_region(
         builder_data.direct_matrix_region_id, core_address);
+
+    log_info(
+        "structural matrix region id = %d",
+        builder_data.structural_matrix_region_id);
     if (builder_data.structural_matrix_region_id != FAILED_REGION_ID) {
         structural_matrix_region_base_address = data_specification_get_region(
             builder_data.structural_matrix_region_id, core_address);
@@ -162,6 +166,8 @@ void read_in_addresses(){
     log_debug("bit_field_base_address = %0x", bit_field_base_address);
     log_debug("direct_matrix_region_base_address = %0x",
               direct_matrix_region_base_address);
+    log_info("structural matrix region base address = %0x",
+             structural_matrix_region_base_address);
     log_info("finished reading in vertex data region addresses");
 }
 
@@ -257,7 +263,7 @@ bool initialise(){
     if (structural_matrix_region_base_address != 0) {
         if (! sp_structs_read_in_common(
                 structural_matrix_region_base_address, &rewiring_data,
-                &pre_info, post_to_pre_table)) {
+                &pre_info, &post_to_pre_table)) {
             log_error("failed to init the synaptogenesis");
             return false;
         }
@@ -380,29 +386,34 @@ bool generate_bit_field(){
 
         // update sdram with size of this bitfield
         bit_field_base_address->filters[master_pop_entry].key = key;
-        log_debug(
+        log_info(
             "putting master pop key %d in entry %d",
             key, master_pop_entry);
         bit_field_base_address->filters[master_pop_entry].n_words = n_words;
         log_debug("putting n words %d in entry %d", n_words, master_pop_entry);
 
         // iterate through neurons and ask for rows from master pop table
-        log_debug("searching neuron ids");
+        log_info("searching neuron ids");
         for (uint32_t neuron_id=0; neuron_id < n_neurons; neuron_id++) {
 
             // update key with neuron id
             spike_t new_key = (spike_t) (key + neuron_id);
-            log_debug("new key for neurons %d is %0x", neuron_id, new_key);
+            log_info("new key for neurons %d is %0x", neuron_id, new_key);
 
             // check if this is goverened by the structural stuff. if so,
             // avoid filtering as it could change over time
             bool bit_found = false;
+            log_info("data = %d", structural_matrix_region_base_address != NULL);
             if (structural_matrix_region_base_address != NULL) {
                 uint32_t rubbish = 0;
                 if(sp_structs_find_by_spike(
                         &pre_info, new_key,
                         &rubbish, &rubbish, &rubbish, &rubbish)){
                     bit_found = true;
+                    log_info("passed");
+                }
+                else {
+                    log_info("faILED");
                 }
             }
 
@@ -450,6 +461,7 @@ bool generate_bit_field(){
 
             // if returned false, then the bitfield should be set to 0.
             // Which its by default already set to. so do nothing. so no else.
+            log_info("bit_found %d", bit_found);
             if (bit_found) {
                 bit_field_set(bit_field, neuron_id);
             }

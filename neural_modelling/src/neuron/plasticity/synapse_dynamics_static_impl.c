@@ -115,6 +115,11 @@ bool synapse_dynamics_find_neuron(
     int32_t fixed_synapse = synapse_row_num_fixed_synapses(fixed_region);
     uint32_t *synaptic_words = synapse_row_fixed_weight_controls(
         fixed_region);
+    int32_t plastic = synapse_row_plastic_size(row);
+    log_info(
+        "fixed synapse = %d, synaptic words= %d plastic = %d",
+        fixed_synapse, *synaptic_words, plastic);
+
 
     // Loop through plastic synapses
     for (; fixed_synapse > 0; fixed_synapse--) {
@@ -122,6 +127,7 @@ bool synapse_dynamics_find_neuron(
         // Get next control word (auto incrementing)
         // Check if index is the one I'm looking for
         uint32_t synaptic_word = *synaptic_words++;
+        log_info(" does %d meet %d", synapse_row_sparse_index(synaptic_word, synapse_index_mask), id);
         if (synapse_row_sparse_index(synaptic_word, synapse_index_mask) == id) {
             *offset = synapse_row_num_fixed_synapses(fixed_region) -
                     fixed_synapse;

@@ -43,6 +43,7 @@ static inline bool synaptogenesis_elimination_rule(
         return false;
     }
 
+    log_info("trying to remove a synapse");
     return sp_structs_remove_synapse(current_state, row);
 }
 
