@@ -30,6 +30,7 @@
 #include <debug.h>
 #include <utils.h>
 #include <neuron/plasticity/synapse_dynamics.h>
+#include "models/neuron_model_eprop_adaptive_impl.h"
 
 
 extern neuron_pointer_t neuron_array;
@@ -328,9 +329,17 @@ bool synapse_dynamics_process_plastic_synapses(
         neuron_pointer_t neuron = &neuron_array[
 												synapse_row_sparse_index(synaptic_word, synapse_type_mask)
 												];
-        neuron->syn_state[syn_ind_from_delay].delta_w;
 
+//        neuron->syn_state[syn_ind_from_delay].delta_w;
 
+        io_printf(IO_BUF, "neuron ind: %u, synapse ind: %u, type: %u, zbar: %k\n",
+            synapse_row_sparse_index(synaptic_word, synapse_type_mask),
+            syn_ind_from_delay, type, neuron->syn_state[syn_ind_from_delay].z_bar_inp);
+
+        neuron->syn_state[syn_ind_from_delay].z_bar_inp = 1024; // !!!! Check what units this is in !!!!
+
+        final_state = neuron->syn_state[syn_ind_from_delay].delta_w + current_state;
+        io_printf(IO_BUF, "current %u + d_weight %u = new %u", current_state, neuron->syn_state[syn_ind_from_delay].delta_w, final_state);
 //        // Update the synapse state
 //        final_state_t final_state = plasticity_update_synapse(
 //                time, last_pre_time, last_pre_trace, event_history->prev_trace,

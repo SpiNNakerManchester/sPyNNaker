@@ -248,7 +248,7 @@ static void multicast_packet_wpayload_received_callback(uint key, uint payload){
 	learning_signal = kbits(payload);
 
 	// Print payload to test transmission of error
-	io_printf(IO_BUF, "payload: %k\n", learning_signal);
+//	io_printf(IO_BUF, "payload: %k\n", learning_signal);
 
 	// Assign learning signal to global memory
 

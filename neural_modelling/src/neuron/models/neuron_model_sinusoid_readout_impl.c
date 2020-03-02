@@ -2,6 +2,9 @@
 
 #include <debug.h>
 
+extern REAL learning_signal;
+REAL local_eta;
+
 // simple Leaky I&F ODE
 static inline void _lif_neuron_closed_form(
         neuron_pointer_t neuron, REAL V_prev, input_t input_this_timestep) {
@@ -15,6 +18,9 @@ static inline void _lif_neuron_closed_form(
 void neuron_model_set_global_neuron_params(
         global_neuron_params_pointer_t params) {
     use(params);
+
+    local_eta = params->eta;
+    io_printf(IO_BUF, "local eta = %k\n", local_eta);
 
     // Does Nothing - no params
 }
@@ -52,6 +58,64 @@ state_t neuron_model_state_update(
         // countdown refractory timer
         neuron->refract_timer -= 1;
     }
+
+    uint32_t total_synapses_per_neuron = 1; //todo should this be fixed
+
+    neuron->L = learning_signal * neuron->w_fb;
+
+    // All operations now need doing once per eprop synapse
+    for (uint32_t syn_ind=0; syn_ind < total_synapses_per_neuron; syn_ind++){
+		// ******************************************************************
+		// Low-pass filter incoming spike train
+		// ******************************************************************
+    	neuron->syn_state[syn_ind].z_bar =
+    			neuron->syn_state[syn_ind].z_bar * neuron->exp_TC
+    			+ (1 - neuron->exp_TC) * neuron->syn_state[syn_ind].z_bar_inp; // updating z_bar is problematic, if spike could come and interrupt neuron update
+    	// reset input (can't have more than one spike per timestep
+        if (!syn_ind){// || neuron->syn_state[syn_ind].z_bar_inp){
+            io_printf(IO_BUF, "total synapses = %u - syn_ind = %u\n"
+                              "z_bar_inp = %k - z_bar = %k\n"
+                              "L = %k = l * w_fb = %k * %k\n"
+                              ,
+                total_synapses_per_neuron,
+                syn_ind,
+                neuron->syn_state[syn_ind].z_bar_inp,
+                neuron->syn_state[syn_ind].z_bar,
+                neuron->L, learning_signal, neuron -> w_fb
+                );
+        }
+    	neuron->syn_state[syn_ind].z_bar_inp = 0;
+
+
+		// ******************************************************************
+		// Update eligibility vector
+		// ******************************************************************
+//    	neuron->syn_state[syn_ind].el_a =
+//    			(neuron->psi * neuron->syn_state[syn_ind].z_bar) +
+//    		(rho - neuron->psi * neuron->beta) *
+//			neuron->syn_state[syn_ind].el_a;
+
+
+    	// ******************************************************************
+		// Update eligibility trace
+		// ******************************************************************
+//    	REAL temp_elig_trace = neuron->psi * (neuron->syn_state[syn_ind].z_bar -
+//    		neuron->beta * neuron->syn_state[syn_ind].el_a);
+//
+//    	neuron->syn_state[syn_ind].e_bar =
+//    			neuron->exp_TC * neuron->syn_state[syn_ind].e_bar
+//				+ (1 - neuron->exp_TC) * temp_elig_trace;
+
+		// ******************************************************************
+		// Update cached total weight change
+		// ******************************************************************
+    	REAL this_dt_weight_change =
+//    			-local_eta * neuron->L * neuron->syn_state[syn_ind].e_bar;
+    			-local_eta * neuron->L * neuron->syn_state[syn_ind].z_bar;
+    	neuron->syn_state[syn_ind].delta_w += this_dt_weight_change;
+
+    }
+
     return neuron->V_membrane;
 }
 
@@ -82,6 +146,12 @@ void neuron_model_print_parameters(restrict neuron_pointer_t neuron) {
     io_printf(IO_BUF, "exp(-ms/(RC)) = %11.4k [.]\n", neuron->exp_TC);
 
     io_printf(IO_BUF, "T refract     = %u timesteps\n", neuron->T_refract);
+
+    io_printf(IO_BUF, "learning      = %k n/a\n", neuron->L);
+
+    io_printf(IO_BUF, "feedback w    = %k n/a\n", neuron->w_fb);
+
+//    io_printf(IO_BUF, "T refract     = %u timesteps\n", neuron->T_refract);
 //    io_printf(IO_BUF, "mean_isi_ticks  = %k\n", neuron->mean_isi_ticks);
 //    io_printf(IO_BUF, "time_to_spike_ticks  = %k \n",
 //    		neuron->time_to_spike_ticks);

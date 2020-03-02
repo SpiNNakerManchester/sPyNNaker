@@ -46,6 +46,10 @@ ifndef SYNAPSE_DEBUG
     SYNAPSE_DEBUG = LOG_INFO
 endif
 
+ifndef SINUSYNAPSES
+    SINUSYNAPSES = neuron/synapses.c
+endif
+
 ifndef PLASTIC_DEBUG
     PLASTIC_DEBUG = LOG_INFO
 endif
@@ -198,7 +202,7 @@ OTHER_SOURCES_CONVERTED := $(call strip_source_dirs,$(OTHER_SOURCES))
 # List all the sources relative to one of SOURCE_DIRS
 SOURCES = common/out_spikes.c \
           neuron/c_main.c \
-          neuron/synapses.c \
+          $(SINUSYNAPSES) \
           neuron/neuron.c \
           neuron/spike_processing.c \
           neuron/population_table/population_table_$(POPULATION_TABLE_IMPL)_impl.c \
@@ -214,6 +218,11 @@ SYNAPSE_TYPE_COMPILE = $(CC) -DLOG_LEVEL=$(SYNAPSE_DEBUG) $(CFLAGS) -DSTDP_ENABL
 
 $(BUILD_DIR)neuron/c_main.o: $(MODIFIED_DIR)neuron/c_main.c
 	#c_main.c
+	-@mkdir -p $(dir $@)
+	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
+
+$(BUILD_DIR)neuron/sinusynapses.o: $(MODIFIED_DIR)neuron/sinusynapses.c
+	#sinusynapses.c
 	-@mkdir -p $(dir $@)
 	$(SYNAPSE_TYPE_COMPILE) -o $@ $<
 

@@ -182,7 +182,7 @@ static void neuron_impl_load_neuron_parameters(
 //    io_printf(IO_BUF, "seed 2: %u \n", global_parameters->spike_source_seed[1]);
 //    io_printf(IO_BUF, "seed 3: %u \n", global_parameters->spike_source_seed[2]);
 //    io_printf(IO_BUF, "seed 4: %u \n", global_parameters->spike_source_seed[3]);
-//    io_printf(IO_BUF, "ticks_per_second: %k \n\n", global_parameters->ticks_per_second);
+    io_printf(IO_BUF, "eta: %k \n\n", global_parameters->eta);
 
 
     for (index_t n = 0; n < n_neurons; n++) {
@@ -284,12 +284,14 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     recorded_variable_values[V_RECORDING_INDEX] = result;
     // Record target
     recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] =
-        			global_parameters->target_V[target_ind];
+//        			global_parameters->target_V[target_ind];
+        			neuron->syn_state[0].delta_w;
     // Record Error
     recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
     		error;
 
     // Send error (learning signal) as packet with payload
+    // ToDo can't I just alter the global variable here?
     while (!spin1_send_mc_packet(
             key | neuron_index,  bitsk(error), 1 )) {
         spin1_delay_us(1);

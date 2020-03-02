@@ -319,11 +319,12 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
          _v_reset, _tau_refrac, psi,
          big_b, small_b, _small_b_0, _e_to_dt_on_tau_a, _beta, adpt, scalar,
          l, __w_fb) = values # Not sure this will work with the new array of synapse!!!
+        # todo check alignment on this
 
         # Copy the changed data only
         state_variables[V] = v
         state_variables[COUNT_REFRAC] = count_refrac
-        state_vairables[PSI] = psi
+        state_variables[PSI] = psi
 
         state_variables[BIG_B] = big_b
         state_variables[SMALL_B] = small_b
@@ -429,7 +430,7 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
         
     @property
     def w_fb(self):
-        return self.__w_fb#
+        return self.__w_fb
     
     @w_fb.setter
     def w_fb(self, new_value):

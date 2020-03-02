@@ -4,6 +4,9 @@ from data_specification.enums import DataType
 from pacman.executor.injection_decorator import inject_items
 from .abstract_neuron_model import AbstractNeuronModel
 
+# constants
+SYNAPSES_PER_NEURON = 250   # around 415 with only 3 in syn_state
+
 MICROSECONDS_PER_SECOND = 1000000.0
 MICROSECONDS_PER_MILLISECOND = 1000.0
 
@@ -26,6 +29,9 @@ COUNT_REFRAC = "count_refrac"
 # RATE_AT_LAST_SETTING = "rate_at_last_setting"
 # RATE_UPDATE_THRESHOLD = "rate_update_threshold"
 TARGET_DATA = "target_data"
+# Learning signal
+L = "learning_signal"
+W_FB = "feedback_weight"
 
 UNITS = {
     V: 'mV',
@@ -47,29 +53,54 @@ class NeuronModelLeakyIntegrateAndFireSinusoidReadout(AbstractNeuronModel):
         "_i_offset",
         "_v_reset",
         "_tau_refrac",
-        "_target_data"
+        "_target_data",
+
+        # learning signal
+        "__l",
+        "__w_fb",
+        "__eta"
         ]
 
     def __init__(
             self, v_init, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac,
 #             mean_isi_ticks, time_to_spike_ticks, rate_update_threshold,
-            target_data):
+            target_data,
+            l,
+            w_fb,
+            eta):
+
+        data_types = [
+            DataType.S1615,  # v
+            DataType.S1615,  # v_rest
+            DataType.S1615,  # r_membrane (= tau_m / cm)
+            DataType.S1615,  # exp_tc (= e^(-ts / tau_m))
+            DataType.S1615,  # i_offset
+            DataType.INT32,  # count_refrac
+            DataType.S1615,  # v_reset
+            DataType.INT32,  # tau_refrac
+            # Learning signal
+            DataType.S1615,  # L
+            DataType.S1615  # w_fb
+        ]
+
+        # Synapse states - always initialise to zero
+        eprop_syn_state = [ # synaptic state, one per synapse (kept in DTCM)
+                DataType.S1615, # delta_w
+                DataType.S1615, # z_bar_old
+                DataType.S1615, # z_bar
+                # DataType.S1615, # ep_a
+                # DataType.S1615, # e_bar
+            ]
+        # Extend to include fan-in for each neuron
+        data_types.extend(eprop_syn_state * SYNAPSES_PER_NEURON)
 
         global_data_types=[]
         global_data_types.extend([DataType.S1615 for i in range(1024)])
+        global_data_types.extend([DataType.S1615])    # eta (learning rate)
 
 
         super(NeuronModelLeakyIntegrateAndFireSinusoidReadout, self).__init__(
-            data_types= [
-                DataType.S1615,   #  v
-                DataType.S1615,   #  v_rest
-                DataType.S1615,   #  r_membrane (= tau_m / cm)
-                DataType.S1615,   #  exp_tc (= e^(-ts / tau_m))
-                DataType.S1615,   #  i_offset
-                DataType.INT32,   #  count_refrac
-                DataType.S1615,   #  v_reset
-                DataType.INT32,   #  tau_refrac
-                ],
+            data_types= data_types,
 
             global_data_types=global_data_types
             )
@@ -86,6 +117,12 @@ class NeuronModelLeakyIntegrateAndFireSinusoidReadout(AbstractNeuronModel):
         self._tau_refrac = tau_refrac
         self._target_data = target_data
 
+        # learning signal
+        self.__l = l
+        self.__w_fb = w_fb
+
+        self.__eta = eta
+
     @overrides(AbstractNeuronModel.get_n_cpu_cycles)
     def get_n_cpu_cycles(self, n_neurons):
         # A bit of a guess
@@ -100,12 +137,18 @@ class NeuronModelLeakyIntegrateAndFireSinusoidReadout(AbstractNeuronModel):
         parameters[V_RESET] = self._v_reset
         parameters[TAU_REFRAC] = self._tau_refrac
         parameters[TARGET_DATA] = 0.0
+
+        #learning params
+        parameters[W_FB] = self.__w_fb
         
 
     @overrides(AbstractNeuronModel.add_state_variables)
     def add_state_variables(self, state_variables):
         state_variables[V] = self._v_init
         state_variables[COUNT_REFRAC] = 0
+
+        #learning params
+        state_variables[L] = self.__l
 
 
     @overrides(AbstractNeuronModel.get_units)
@@ -121,7 +164,7 @@ class NeuronModelLeakyIntegrateAndFireSinusoidReadout(AbstractNeuronModel):
     def get_values(self, parameters, state_variables, vertex_slice, ts):
 
         # Add the rest of the data
-        return [state_variables[V],
+        values = [state_variables[V],
                 parameters[V_REST],
                 parameters[TAU_M] / parameters[CM],
                 parameters[TAU_M].apply_operation(
@@ -130,17 +173,35 @@ class NeuronModelLeakyIntegrateAndFireSinusoidReadout(AbstractNeuronModel):
                 parameters[V_RESET],
                 parameters[TAU_REFRAC].apply_operation(
                     operation=lambda x: int(numpy.ceil(x / (ts / 1000.0)))),
+
+                state_variables[L],
+                parameters[W_FB]
                 ]
+
+        # create synaptic state - init all state to zero
+        eprop_syn_init = [0,    # delta w
+                          0,    # z_bar_inp
+                          0]#,    # z_bar
+                          # 0,    # el_a
+                          # 0]    # e_bar
+        # extend to appropriate fan-in
+        values.extend(eprop_syn_init * SYNAPSES_PER_NEURON)
+
+        return values
 
     @overrides(AbstractNeuronModel.update_values)
     def update_values(self, values, parameters, state_variables):
 
         # Read the data
         (v, _v_rest, _r_membrane, _exp_tc, _i_offset, count_refrac,
-         _v_reset, _tau_refrac) = values
+        _v_reset, _tau_refrac,
+        l, __w_fb) = values  # Not sure this will work with the new array of synapse!!!
+        # todo check alignment on this
 
         # Copy the changed data only
         state_variables[V] = v
+
+        state_variables[L] = l
 
 
     # Global params
@@ -151,6 +212,7 @@ class NeuronModelLeakyIntegrateAndFireSinusoidReadout(AbstractNeuronModel):
         vals = []
 
         vals.extend(self._target_data)
+        vals.extend([self.__eta])
         return vals
 
     @property
@@ -216,4 +278,12 @@ class NeuronModelLeakyIntegrateAndFireSinusoidReadout(AbstractNeuronModel):
     @tau_refrac.setter
     def tau_refrac(self, tau_refrac):
         self._tau_refrac = tau_refrac
+
+    @property
+    def w_fb(self):
+        return self.__w_fb
+
+    @w_fb.setter
+    def w_fb(self, new_value):
+        self.__w_fb = new_value
 

@@ -207,6 +207,10 @@ static void neuron_impl_load_neuron_parameters(
     		* n_neurons; // scale initial value, too
 
 
+    for (index_t n = 0; n < n_neurons; n++) {
+        neuron_model_print_parameters(&neuron_array[n]);
+    }
+
 #if LOG_LEVEL >= LOG_DEBUG
     log_debug("-------------------------------------\n");
     for (index_t n = 0; n < n_neurons; n++) {
@@ -323,9 +327,9 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
 
     recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] =
-//    		neuron->syn_state[0].delta_w;
+    		neuron->syn_state[0].delta_w;
 //    		neuron->syn_state[0].z_bar;
-    		exc_input_values[0]; // record input input (signed)
+//    		exc_input_values[0]; // record input input (signed)
 //    		z_t;
 //    		global_parameters->core_pop_rate;
 //    		neuron->psi;

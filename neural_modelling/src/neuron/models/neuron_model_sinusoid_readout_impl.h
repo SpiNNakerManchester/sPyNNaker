@@ -4,6 +4,17 @@
 #include "neuron_model.h"
 #include "random.h"
 
+#define SYNAPSES_PER_NEURON 250
+
+
+typedef struct eprop_syn_state_t {
+	REAL delta_w; // weight change to apply
+	REAL z_bar_inp;
+	REAL z_bar; // low-pass filtered spike train
+//	REAL el_a; // adaptive component of eligibility vector
+//	REAL e_bar; // low-pass filtered eligibility trace
+}eprop_syn_state_t;
+
 /////////////////////////////////////////////////////////////
 // definition for LIF neuron parameters
 typedef struct neuron_t {
@@ -33,6 +44,12 @@ typedef struct neuron_t {
     // refractory time of neuron [timesteps]
     int32_t  T_refract;
 
+    REAL    L; // learning signal
+    REAL w_fb; // feedback weight
+
+    // array of synaptic states - peak fan-in of >250 for this case
+    eprop_syn_state_t syn_state[SYNAPSES_PER_NEURON];
+
 
     // Poisson compartment params
 //    REAL mean_isi_ticks;
@@ -55,6 +72,7 @@ typedef struct global_neuron_params_t {
 //	REAL ticks_per_second;
 //	REAL readout_V;
 	REAL target_V[1024];
+	REAL eta;
 } global_neuron_params_t;
 
 #endif // _NEURON_MODEL_SINUSOID_READOUT_IMPL_H_

@@ -23,8 +23,8 @@
 #include <debug.h>
 #include <spin1_api.h>
 #include <utils.h>
-#include "models/neuron_model_eprop_adaptive_impl.h"
-//#include "models/neuron_model_sinusoid_readout_impl.h"
+//#include "models/neuron_model_eprop_adaptive_impl.h"
+#include "models/neuron_model_sinusoid_readout_impl.h"
 
 //! if using profiler import profiler tags
 #ifdef PROFILER_ENABLED

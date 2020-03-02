@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 MODELS = eprop_adaptive \
+         sinusoid_readout \
 	 # IF_curr_exp \
          IF_cond_exp \
          IZK_curr_exp \
