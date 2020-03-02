@@ -75,7 +75,7 @@ void print_post_to_pre_entry(void) {
         rewiring_data.s_max * rewiring_data.machine_no_atoms;
 
     for (uint32_t i=0; i < n_elements; i++){
-        log_info(
+        log_debug(
             "index %d, pop index %d, sub pop index %d, neuron_index %d",
             i, post_to_pre_table[i].pop_index,
             post_to_pre_table[i].sub_pop_index,
@@ -97,8 +97,6 @@ bool synaptogenesis_dynamics_initialise(address_t sdram_sp_address) {
 
     uint8_t *data = sp_structs_read_in_common(
         sdram_sp_address, &rewiring_data, &pre_info, &post_to_pre_table);
-    log_info("aaa");
-    print_post_to_pre_entry();
 
     // Allocate current states
     uint32_t n_states = 1;
@@ -129,17 +127,11 @@ bool synaptogenesis_dynamics_initialise(address_t sdram_sp_address) {
             rt_error(RTE_SWERR);
         }
     }
-    log_info("bbb");
-    print_post_to_pre_entry();
 
     partner_init(&data);
 
-    log_info("ccc");
-    print_post_to_pre_entry();
-
     formation_params = spin1_malloc(
         rewiring_data.no_pre_pops * sizeof(struct formation_params *));
-
     if (formation_params == NULL) {
         log_error("Could not initialise formation parameters");
         rt_error(RTE_SWERR);
@@ -147,9 +139,6 @@ bool synaptogenesis_dynamics_initialise(address_t sdram_sp_address) {
     for (uint32_t i = 0; i < rewiring_data.no_pre_pops; i++) {
         formation_params[i] = synaptogenesis_formation_init(&data);
     }
-
-    log_info("ddd");
-    print_post_to_pre_entry();
 
     elimination_params = spin1_malloc(
         rewiring_data.no_pre_pops * sizeof(struct elimination_params *));
@@ -160,9 +149,6 @@ bool synaptogenesis_dynamics_initialise(address_t sdram_sp_address) {
     for (uint32_t i = 0; i < rewiring_data.no_pre_pops; i++) {
         elimination_params[i] = synaptogenesis_elimination_init(&data);
     }
-
-    log_info("eee");
-    print_post_to_pre_entry();
 
     return true;
 }
@@ -240,11 +226,6 @@ bool synaptogenesis_dynamics_rewire(
     current_state->local_seed = &rewiring_data.local_seed;
     current_state->post_low_atom = rewiring_data.low_atom;
     circular_buffer_add(current_state_queue, (uint32_t) current_state);
-
-    log_info(
-        "pre syn id = %d, post_syn id = %d, element_exists = %d",
-        current_state->pre_syn_id, current_state->post_syn_id,
-        current_state->element_exists);
     return true;
 }
 
@@ -283,7 +264,7 @@ bool synaptogenesis_row_restructure(uint32_t time, address_t row) {
         uint32_t no_elems = synapse_dynamics_n_connections_in_row(
                 synapse_row_fixed_region(row));
         if (no_elems >= rewiring_data.s_max) {
-            log_info("row is full");
+            log_debug("row is full");
             return_value = false;
         } else {
             return_value = synaptogenesis_formation_rule(current_state,

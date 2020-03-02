@@ -87,13 +87,11 @@ static inline bool synaptogenesis_formation_rule(
     int16_t controls = current_state->pre_population_info->sp_control;
     if (!(controls & IS_CONNECTION_LAT)) {
         if (distance >= params->ff_prob_size) {
-            log_info("a");
             return false;
         }
         probability = params->prob_tables[distance];
     } else {
         if (distance >= params->lat_prob_size) {
-            log_info("b");
             return false;
         }
         probability = params->prob_tables[params->ff_prob_size + distance];
@@ -101,11 +99,9 @@ static inline bool synaptogenesis_formation_rule(
     uint16_t r = ulrbits(mars_kiss64_seed(*(current_state->local_seed)))
             * MAX_SHORT;
     if (r > probability) {
-        log_info("c");
         return false;
     }
 
-    log_info("adding a synapse");
     return sp_structs_add_synapse(current_state, row);
 }
 

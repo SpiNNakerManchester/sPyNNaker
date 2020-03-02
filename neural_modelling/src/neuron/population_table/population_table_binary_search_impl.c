@@ -130,7 +130,6 @@ bool population_table_initialise(
         address_t direct_rows_address, uint32_t *row_max_n_words) {
     log_debug("population_table_initialise: starting");
 
-    log_debug("master pop base address is %d", &table_address[0]);
     master_population_table_length = table_address[0];
     log_debug("master pop table length is %d\n", master_population_table_length);
     log_debug("master pop table entry size is %d\n",
@@ -206,26 +205,25 @@ bool population_table_get_first_address(
 
         log_debug("about to try to find neuron id");
         last_neuron_id = get_neuron_id(entry, spike);
-        log_info("found neuron id of %d for key %x", last_neuron_id, spike);
 
         // check we have a entry in the bit field for this (possible not to due
         // to dtcm limitations or router table compression). If not, go to
         // DMA check.
         log_debug("checking bit field");
         if (connectivity_bit_field[position] != NULL){
-            log_info("can be checked, bitfield is allocated");
+            log_debug("can be checked, bitfield is allocated");
             // check that the bit flagged for this neuron id does hit a
             // neuron here. If not return false and avoid the DMA check.
             if (!bit_field_test(
                     connectivity_bit_field[position],  last_neuron_id)){
-                log_info("tested and was not set");
+                log_debug("tested and was not set");
                 bit_field_filtered_packets += 1;
                 return false;
             }
-            log_info("was set, carrying on");
+            log_debug("was set, carrying on");
         }
         else{
-            log_info(
+            log_debug(
                 "bit_field was not set up. either its due to a lack of dtcm, "
                 "or because the bitfield was merged into the routing table");
         }
@@ -248,7 +246,7 @@ bool population_table_get_first_address(
 
         // tracks surplus dmas
         if (!get_next){
-            log_info(
+            log_debug(
                 "found a entry which has a ghost entry for key %d", spike);
             ghost_pop_table_searches ++;
         }
@@ -259,7 +257,7 @@ bool population_table_get_first_address(
     }
 
     log_debug("Ghost searches: %u\n", ghost_pop_table_searches);
-    log_info(
+    log_debug(
         "spike %u (= %x): population not found in master population table",
         spike, spike);
     return false;
@@ -320,10 +318,11 @@ bool population_table_get_next_address(
 
                 *row_address = (address_t) (block_address + neuron_offset);
                 *n_bytes_to_transfer = stride * sizeof(uint32_t);
-                log_info("neuron_id = %u, block_address = 0x%.8x,"
-                        "row_length = %u, row_address = 0x%.8x, n_bytes = %u",
-                        last_neuron_id, block_address, row_length, *row_address,
-                        *n_bytes_to_transfer);
+                log_debug(
+                    "neuron_id = %u, block_address = 0x%.8x,"
+                    "row_length = %u, row_address = 0x%.8x, n_bytes = %u",
+                    last_neuron_id, block_address, row_length, *row_address,
+                    *n_bytes_to_transfer);
                 *spike = last_spike;
                 is_valid = true;
             }
