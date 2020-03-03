@@ -19,12 +19,18 @@ from spynnaker.pyNN.external_devices_models.push_bot import (
 
 
 class PushBotMotor(AbstractPushBotOutputDevice):
+    """ The properties of the motor devices that may be set.
+    The pushbot has two motors, 0 (left) and 1 (right).
+    """
+    # TODO: is that the right way round?
 
+    #: For motor 0, set a particular speed
     MOTOR_0_PERMANENT = (
         0, MunichIoSpiNNakerLinkProtocol.push_bot_motor_0_permanent_key,
         -100, 100, 20
     )
 
+    #: For motor 0, set a variable speed depending on time since event receive
     MOTOR_0_LEAKY = (
         1,
         (MunichIoSpiNNakerLinkProtocol
@@ -32,11 +38,13 @@ class PushBotMotor(AbstractPushBotOutputDevice):
         -100, 100, 20
     )
 
+    #: For motor 0, set a particular speed
     MOTOR_1_PERMANENT = (
         2, MunichIoSpiNNakerLinkProtocol.push_bot_motor_1_permanent_key,
         -100, 100, 20
     )
 
+    #: For motor 1, set a variable speed depending on time since event receive
     MOTOR_1_LEAKY = (
         3,
         (MunichIoSpiNNakerLinkProtocol

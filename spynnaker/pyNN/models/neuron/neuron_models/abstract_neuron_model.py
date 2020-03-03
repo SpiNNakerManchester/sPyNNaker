@@ -32,12 +32,14 @@ class AbstractNeuronModel(
 
     def __init__(self, data_types, global_data_types=None):
         """
-        :param data_types:\
-            A list of data types in the neuron structure, in the order that\
+        :param list(~data_specification.enums.DataType) data_types:
+            A list of data types in the neuron structure, in the order that
             they appear
-        :param global_data_types:\
-            A list of data types in the neuron global structure, in the order\
+        :param global_data_types:
+            A list of data types in the neuron global structure, in the order
             that they appear
+        :type global_data_types:
+            list(~data_specification.enums.DataType) or None
         """
         super(AbstractNeuronModel, self).__init__(data_types)
         if global_data_types is None:
@@ -47,6 +49,8 @@ class AbstractNeuronModel(
     @property
     def global_struct(self):
         """ Get the global parameters structure
+
+        :rtype: Struct
         """
         return self.__global_struct
 
@@ -68,7 +72,7 @@ class AbstractNeuronModel(
         """ Get the global values to be written to the machine for this model
 
         :return: A list with the same length as self.global_struct.field_types
-        :rtype: A list of single values
+        :rtype: list(int or float) or ~numpy.ndarray
         """
         return numpy.zeros(0, dtype="uint32")
 

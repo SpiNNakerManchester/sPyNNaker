@@ -19,8 +19,7 @@ from spinn_front_end_common.utilities import helpful_functions
 from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spinn_front_end_common.utility_models import (
     ReverseIpTagMultiCastSource)
-from spinn_front_end_common.utilities.notification_protocol import (
-    SocketAddress)
+from spinn_utilities.socket_address import SocketAddress
 from spinn_front_end_common.utilities.utility_objs import (
     LivePacketGatherParameters)
 from spynnaker.pyNN.utilities import constants

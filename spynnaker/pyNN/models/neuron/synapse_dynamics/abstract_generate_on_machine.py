@@ -26,7 +26,7 @@ class MatrixGeneratorID(Enum):
 
 @add_metaclass(AbstractBase)
 class AbstractGenerateOnMachine(object):
-    """ A synapse dynamics that can be generated on the machine
+    """ A synapse dynamics that can be generated on the machine.
     """
     __slots__ = []
 
@@ -41,22 +41,22 @@ class AbstractGenerateOnMachine(object):
 
     @abstractproperty
     def gen_matrix_id(self):
-        """ The ID of the on-machine matrix generator
+        """ The ID of the on-machine matrix generator.
 
         :rtype: int
         """
 
     @property
     def gen_matrix_params(self):
-        """ Any parameters required by the matrix generator
+        """ Any parameters required by the matrix generator.
 
-        :rtype: numpy array of uint32
+        :rtype: ~numpy.ndarray(uint32)
         """
         return numpy.zeros(0, dtype="uint32")
 
     @property
     def gen_matrix_params_size_in_bytes(self):
-        """ The size of the parameters of the matrix generator in bytes
+        """ The size of the parameters of the matrix generator in bytes.
 
         :rtype: int
         """

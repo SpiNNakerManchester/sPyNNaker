@@ -31,10 +31,8 @@ _existing_connections = dict()
 def get_pushbot_wifi_connection(remote_host, remote_port=56000):
     """ Get an existing connection to a PushBot, or make a new one.
 
-    :param remote_host: The IP address of the PushBot
-    :type remote_host: str
-    :param remote_port: The port number of the PushBot (default 56000)
-    :type remote_port: int
+    :param str remote_host: The IP address of the PushBot
+    :param int remote_port: The port number of the PushBot (default 56000)
     """
     key = (remote_host, remote_port)
     if key not in _existing_connections:
@@ -57,11 +55,9 @@ class PushBotWIFIConnection(Connection, Listenable):
 
     def __init__(self, remote_host, remote_port=56000):
         """
-        :param remote_host: The IP address of the PushBot
-        :type remote_host: str
-        :param remote_port: The port number of the PushBot (default 56000)
-        :type remote_port: int
-        :raise spinnman.exceptions.SpinnmanIOException: \
+        :param str remote_host: The IP address of the PushBot
+        :param int remote_port: The port number of the PushBot (default 56000)
+        :raise SpinnmanIOException:
             If there is an error setting up the communication channel
         """
         try:
@@ -108,7 +104,7 @@ class PushBotWIFIConnection(Connection, Listenable):
 
     def is_connected(self):
         """ See\
-            :py:meth:`spinnman.connections.Connection.is_connected`
+            :py:meth:`~spinnman.connections.Connection.is_connected`
         """
         if platform.platform().lower().startswith("windows"):
             cmd_args = "-n 1 -w 1"
@@ -131,11 +127,10 @@ class PushBotWIFIConnection(Connection, Listenable):
 
     @property
     def local_ip_address(self):
-        """ The local IP address to which the connection is bound.
+        """ The local IP address to which the connection is bound, \
+            as a dotted string, e.g. `0.0.0.0`
 
-        :return: The local IP address as a dotted string, e.g. `0.0.0.0`
         :rtype: str
-        :raise None: No known exceptions are thrown
         """
         return self.__local_ip_address
 
@@ -143,28 +138,25 @@ class PushBotWIFIConnection(Connection, Listenable):
     def local_port(self):
         """ The local port to which the connection is bound.
 
-        :return: The local port number
         :rtype: int
-        :raise None: No known exceptions are thrown
         """
         return self.__local_port
 
     @property
     def remote_ip_address(self):
-        """ The remote IP address to which the connection is connected.
+        """ The remote IP address to which the connection is connected, \
+            as a dotted string, or None if not connected remotely
 
-        :return: The remote IP address as a dotted string, or None if not\
-            connected remotely
-        :rtype: str
+        :rtype: str or None
         """
         return self.__remote_ip_address
 
     @property
     def remote_port(self):
-        """ The remote port to which the connection is connected.
+        """ The remote port to which the connection is connected, \
+            or None if not connected remotely
 
-        :return: The remote port, or None if not connected remotely
-        :rtype: int
+        :rtype: int or None
         """
         return self.__remote_port
 
@@ -174,8 +166,8 @@ class PushBotWIFIConnection(Connection, Listenable):
         :param timeout: The timeout, or None to wait forever
         :type timeout: float or None
         :return: The data received
-        :rtype: bytestring
-        :raise SpinnmanTimeoutException: \
+        :rtype: bytes
+        :raise SpinnmanTimeoutException:
             If a timeout occurs before any data is received
         :raise SpinnmanIOException: If an error occurs receiving the data
         """
@@ -190,8 +182,7 @@ class PushBotWIFIConnection(Connection, Listenable):
     def send(self, data):
         """ Send data down this connection
 
-        :param data: The data to be sent
-        :type data: bytestring
+        :param bytearray data: The data to be sent
         :raise SpinnmanIOException: If there is an error sending the data
         """
         try:

@@ -36,6 +36,10 @@ TIME_STAMP_BYTES = BYTES_PER_WORD
 class SynapseDynamicsSTDP(
         AbstractPlasticSynapseDynamics, AbstractSettable,
         AbstractChangableAfterRun, AbstractGenerateOnMachine):
+    """ The dynamics of a synapse that changes over time using a \
+        Spike Timing Dependent Plasticity (STDP) rule.
+    """
+
     __slots__ = [
         # Flag: whether there is state in this class that is not reflected on
         # the SpiNNaker system
@@ -60,6 +64,17 @@ class SynapseDynamicsSTDP(
             voltage_dependence=None, dendritic_delay_fraction=1.0,
             weight=0.0, delay=1.0, pad_to_length=None,
             backprop_delay=True):
+        """
+        :param AbstractTimingDependence timing_dependence:
+        :param AbstractWeightDependence weight_dependence:
+        :param None voltage_dependence: not supported
+        :param flooat dendritic_delay_fraction: [0.5, 1.0]
+        :param float weight:
+        :param float delay:
+        :param pad_to_length:
+        :type pad_to_length: int or None
+        :param bool backprop_delay:
+        """
         self.__timing_dependence = timing_dependence
         self.__weight_dependence = weight_dependence
         self.__dendritic_delay_fraction = float(dendritic_delay_fraction)
@@ -115,7 +130,7 @@ class SynapseDynamicsSTDP(
         return self
 
     @property
-    @overrides(AbstractChangableAfterRun.requires_mapping)
+    @overrides(AbstractChangableAfterRun.requires_mapping, extend_doc=False)
     def requires_mapping(self):
         """ True if changes that have been made require that mapping be\
             performed.  Note that this should return True the first time it\
@@ -124,7 +139,7 @@ class SynapseDynamicsSTDP(
         """
         return self.__change_requires_mapping
 
-    @overrides(AbstractChangableAfterRun.mark_no_changes)
+    @overrides(AbstractChangableAfterRun.mark_no_changes, extend_doc=False)
     def mark_no_changes(self):
         """ Marks the point after which changes are reported.  Immediately\
             after calling this method, requires_mapping should return False.
@@ -133,8 +148,6 @@ class SynapseDynamicsSTDP(
 
     @overrides(AbstractSettable.get_value)
     def get_value(self, key):
-        """ Get a property
-        """
         for obj in [self.__timing_dependence, self.__weight_dependence, self]:
             if hasattr(obj, key):
                 return getattr(obj, key)
@@ -143,11 +156,6 @@ class SynapseDynamicsSTDP(
 
     @overrides(AbstractSettable.set_value)
     def set_value(self, key, value):
-        """ Set a property
-
-        :param key: the name of the parameter to change
-        :param value: the new value of the parameter to assign
-        """
         for obj in [self.__timing_dependence, self.__weight_dependence, self]:
             if hasattr(obj, key):
                 setattr(obj, key, value)
@@ -158,14 +166,24 @@ class SynapseDynamicsSTDP(
 
     @property
     def weight_dependence(self):
+        """
+        :rtype: AbstractTimingDependence
+        """
         return self.__weight_dependence
 
     @property
     def timing_dependence(self):
+        """
+        :rtype: AbstractTimingDependence
+        """
         return self.__timing_dependence
 
     @property
     def dendritic_delay_fraction(self):
+        """ Settable.
+
+        :rtype: float
+        """
         return self.__dendritic_delay_fraction
 
     @dendritic_delay_fraction.setter
@@ -174,13 +192,21 @@ class SynapseDynamicsSTDP(
 
     @property
     def backprop_delay(self):
+        """ Settable.
+
+        :rtype: bool
+        """
         return self.__backprop_delay
 
     @backprop_delay.setter
     def backprop_delay(self, backprop_delay):
-        self.__backprop_delay = backprop_delay
+        self.__backprop_delay = bool(backprop_delay)
 
     def is_same_as(self, synapse_dynamics):
+        """
+        :param AbstractSynapseDynamics synapse_dynamics:
+        :rtype: bool
+        """
         # pylint: disable=protected-access
         if not isinstance(synapse_dynamics, SynapseDynamicsSTDP):
             return False
@@ -193,15 +219,26 @@ class SynapseDynamicsSTDP(
              synapse_dynamics.dendritic_delay_fraction))
 
     def are_weights_signed(self):
+        """
+        :rtype: bool
+        """
         return False
 
     def get_vertex_executable_suffix(self):
+        """
+        :rtype: str
+        """
         name = "_stdp_mad"
         name += "_" + self.__timing_dependence.vertex_executable_suffix
         name += "_" + self.__weight_dependence.vertex_executable_suffix
         return name
 
     def get_parameters_sdram_usage_in_bytes(self, n_neurons, n_synapse_types):
+        """
+        :param int n_neurons:
+        :param int n_synapse_types:
+        :rtype: int
+        """
         # 32-bits for back-prop delay
         size = 4
         size += self.__timing_dependence.get_parameters_sdram_usage_in_bytes()
@@ -210,6 +247,12 @@ class SynapseDynamicsSTDP(
         return size
 
     def write_parameters(self, spec, region, machine_time_step, weight_scales):
+        """
+        :param ~data_specification.DataSpecificationGenerator spec:
+        :param int region: region ID
+        :param int machine_time_step:
+        :param list(float) weight_scales:
+        """
         spec.comment("Writing Plastic Parameters")
 
         # Switch focus to the region:
@@ -229,6 +272,9 @@ class SynapseDynamicsSTDP(
 
     @property
     def _n_header_bytes(self):
+        """
+        :rtype: int
+        """
         # The header contains a single timestamp and pre-trace
         n_bytes = (
             TIME_STAMP_BYTES + self.__timing_dependence.pre_trace_n_bytes)
@@ -238,6 +284,10 @@ class SynapseDynamicsSTDP(
         return int(math.ceil(float(n_bytes) / BYTES_PER_WORD)) * BYTES_PER_WORD
 
     def get_n_words_for_plastic_connections(self, n_connections):
+        """
+        :param int n_connections:
+        :rtype: int
+        """
         synapse_structure = self.__timing_dependence.synaptic_structure
         if self.__pad_to_length is not None:
             n_connections = max(n_connections, self.__pad_to_length)
@@ -323,6 +373,11 @@ class SynapseDynamicsSTDP(
         return fp_data, pp_data, fp_size, pp_size
 
     def _pad_row(self, rows, no_bytes_per_connection):
+        """
+        :param list(~numpy.ndarray) rows:
+        :param int no_bytes_per_connection:
+        :rtype: list(~numpy.ndarray)
+        """
         # Row elements are (individual) bytes
         return [
             numpy.concatenate((
@@ -409,6 +464,12 @@ class SynapseDynamicsSTDP(
         return max(w_max, self.__weight_dependence.weight_maximum)
 
     def get_provenance_data(self, pre_population_label, post_population_label):
+        """
+        :param str pre_population_label:
+        :param str post_population_label:
+        :rtype: \
+            list(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)
+        """
         prov_data = list()
         if self.__timing_dependence is not None:
             prov_data.extend(self.__timing_dependence.get_provenance_data(

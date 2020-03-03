@@ -54,16 +54,24 @@ class ExternalDeviceLifControlVertex(
             ring_buffer_sigma=None, incoming_spike_buffer_size=None,
             constraints=None):
         """
-        :param n_neurons: The number of neurons in the population
-        :param devices:\
-            The AbstractMulticastControllableDevice instances to be controlled\
+        :param list(AbstractMulticastControllableDevice) devices:
+            The AbstractMulticastControllableDevice instances to be controlled
             by the population
-        :param create_edges:\
-            True if edges to the devices should be added by this dev (set\
+        :param bool create_edges:
+            True if edges to the devices should be added by this dev (set
             to False if using the dev over Ethernet using a translator)
-        :param translator:\
-            Translator to be used when used for Ethernet communication.  Must\
+        :param int max_atoms_per_core:
+        :param AbstractNeuronImpl neuron_impl:
+        :param pynn_model:
+        :param translator:
+            Translator to be used when used for Ethernet communication.  Must
             be provided if the dev is to be controlled over Ethernet.
+        :type translator: AbstractEthernetTranslator or None
+        :param float spikes_per_second:
+        :param str label:
+        :param float ring_buffer_sigma:
+        :param int incoming_spike_buffer_size:
+        :param list(~pacman.model.constraints.AbstractConstraint) constraints:
         """
         # pylint: disable=too-many-arguments, too-many-locals
 

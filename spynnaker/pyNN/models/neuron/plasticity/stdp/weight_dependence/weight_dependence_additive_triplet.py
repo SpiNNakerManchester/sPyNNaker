@@ -24,6 +24,8 @@ _SPACE_PER_SYNAPSE_TYPE = 6 * BYTES_PER_WORD
 
 class WeightDependenceAdditiveTriplet(
         AbstractHasAPlusAMinus, AbstractWeightDependence):
+    """ An triplet-based additive weight dependence STDP rule.
+    """
     __slots__ = [
         "__a3_minus",
         "__a3_plus",
@@ -39,6 +41,12 @@ class WeightDependenceAdditiveTriplet(
             w_max=default_parameters['w_max'],
             A3_plus=default_parameters['A3_plus'],
             A3_minus=default_parameters['A3_minus']):
+        """
+        :param float w_min: :math:`w^{min}`
+        :param float w_max: :math:`w^{max}`
+        :param float A3_plus: :math:`A_3^+`
+        :param float A3_minus: :math:`A_3^-`
+        """
         super(WeightDependenceAdditiveTriplet, self).__init__()
         self.__w_min = w_min
         self.__w_max = w_max
@@ -47,18 +55,34 @@ class WeightDependenceAdditiveTriplet(
 
     @property
     def w_min(self):
+        """ :math:`w^{min}`
+
+        :rtype: float
+        """
         return self.__w_min
 
     @property
     def w_max(self):
+        """ :math:`w^{max}`
+
+        :rtype: float
+        """
         return self.__w_max
 
     @property
     def A3_plus(self):
+        """ :math:`A_3^+`
+
+        :rtype: float
+        """
         return self.__a3_plus
 
     @property
     def A3_minus(self):
+        """ :math:`A_3^-`
+
+        :rtype: float
+        """
         return self.__a3_minus
 
     @overrides(AbstractWeightDependence.is_same_as)
@@ -75,6 +99,10 @@ class WeightDependenceAdditiveTriplet(
 
     @property
     def vertex_executable_suffix(self):
+        """ The suffix to be appended to the vertex executable for this rule
+
+        :rtype: str
+        """
         return "additive"
 
     @overrides(AbstractWeightDependence.get_parameters_sdram_usage_in_bytes)
@@ -116,6 +144,11 @@ class WeightDependenceAdditiveTriplet(
 
     @property
     def weight_maximum(self):
+        """ The maximum weight that will ever be set in a synapse as a result\
+            of this rule
+
+        :rtype: float
+        """
         return self.__w_max
 
     @overrides(AbstractWeightDependence.get_parameter_names)
