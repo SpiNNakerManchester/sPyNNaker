@@ -23,12 +23,14 @@ class WeightDependenceEpropReg(
         AbstractHasAPlusAMinus, AbstractWeightDependence):
     __slots__ = [
         "__w_max",
-        "__w_min"]
+        "__w_min",
+        "__reg_rate"]
 
-    def __init__(self, w_min=0.0, w_max=1.0):
+    def __init__(self, w_min=0.0, w_max=1.0, reg_rate=0.0):
         super(WeightDependenceEpropReg, self).__init__()
         self.__w_min = w_min
         self.__w_max = w_max
+        self.__reg_rate = reg_rate
 
     @property
     def w_min(self):
@@ -37,6 +39,10 @@ class WeightDependenceEpropReg(
     @property
     def w_max(self):
         return self.__w_max
+    
+    @property
+    def reg_rate(self):
+        return self.__reg_rate
 
     @overrides(AbstractWeightDependence.is_same_as)
     def is_same_as(self, weight_dependence):
@@ -60,7 +66,7 @@ class WeightDependenceEpropReg(
             raise NotImplementedError(
                 "Multiplicative weight dependence only supports single terms")
 
-        return (2  # Number of 32-bit parameters
+        return (3  # Number of 32-bit parameters
                 * 4) * n_synapse_types
 
     @overrides(AbstractWeightDependence.write_parameters)
@@ -81,6 +87,8 @@ class WeightDependenceEpropReg(
 #                 data=int(round(self.A_plus * w)), data_type=DataType.INT32)
 #             spec.write_value(
 #                 data=int(round(self.A_minus * w)), data_type=DataType.INT32)
+
+            spec.write_value(self.__reg_rate, data_type=DataType.S1615)
 
     @property
     def weight_maximum(self):

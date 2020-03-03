@@ -66,7 +66,7 @@ static additional_input_pointer_t additional_input_array;
 static threshold_type_pointer_t threshold_type_array;
 
 //! Global parameters for the neurons
-static global_neuron_params_pointer_t global_parameters;
+global_neuron_params_pointer_t global_parameters;
 
 // The synapse shaping parameters
 static synapse_param_t *neuron_synapse_shaping_params;

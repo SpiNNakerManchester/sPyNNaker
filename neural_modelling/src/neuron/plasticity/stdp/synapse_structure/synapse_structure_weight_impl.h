@@ -41,8 +41,8 @@ static inline update_state_t synapse_structure_get_update_state(
 
 //---------------------------------------
 static inline final_state_t synapse_structure_get_final_state(
-        update_state_t state) {
-    return weight_get_final(state);
+        update_state_t state, REAL reg_error) {
+    return weight_get_final(state, reg_error);
 }
 
 //---------------------------------------

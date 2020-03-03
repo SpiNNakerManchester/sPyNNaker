@@ -46,14 +46,17 @@ address_t weight_initialise(
     for (uint32_t s = 0; s < n_synapse_types; s++) {
         plasticity_weight_region_data[s].min_weight = *plasticity_word++;
         plasticity_weight_region_data[s].max_weight = *plasticity_word++;
+        plasticity_weight_region_data[s].reg_rate = kbits(*plasticity_word++);
+
 //        plasticity_weight_region_data[s].a2_plus = *plasticity_word++;
 //        plasticity_weight_region_data[s].a2_minus = *plasticity_word++;
 
-        io_printf(IO_BUF, "\tSynapse type %u: Min weight:%d, Max weight:%d \n"
+        io_printf(IO_BUF, "\tSynapse type %u: Min weight:%d, Max weight:%d, reg_rate: %k \n"
 //        		"A2+:%d, A2-:%d"
         		,
                 s, plasticity_weight_region_data[s].min_weight,
-                plasticity_weight_region_data[s].max_weight
+                plasticity_weight_region_data[s].max_weight,
+				plasticity_weight_region_data[s].reg_rate
 //                plasticity_weight_region_data[s].a2_plus,
 //                plasticity_weight_region_data[s].a2_minus
 				);

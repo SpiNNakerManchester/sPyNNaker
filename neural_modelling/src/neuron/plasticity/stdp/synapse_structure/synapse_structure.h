@@ -24,7 +24,7 @@ static update_state_t synapse_structure_get_update_state(
         plastic_synapse_t synaptic_word, index_t synapse_type);
 
 static final_state_t synapse_structure_get_final_state(
-        update_state_t state);
+        update_state_t state, REAL reg_error);
 
 static weight_t synapse_structure_get_final_weight(
         final_state_t final_state);
