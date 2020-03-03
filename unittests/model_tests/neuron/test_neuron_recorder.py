@@ -28,9 +28,6 @@ def test_simple_record():
     globals_variables.set_failed_state(SpynnakerFailedState())
     globals_variables.set_simulator(simulator)
 
-#allowed_variables, data_types, bitfield_variables,
-#                 min_id, max_id, timestep_in_us
-
     recordables = ["v", "gsyn_exc", "gsyn_inh"]
 
     data_types = {

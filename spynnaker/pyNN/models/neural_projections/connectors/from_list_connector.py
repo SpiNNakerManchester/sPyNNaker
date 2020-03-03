@@ -13,11 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import division
 import logging
 import numpy
 
-from spinn_front_end_common.utilities.constants import \
-    MICRO_TO_MILLISECOND_CONVERSION
+from spinn_front_end_common.utilities.constants import US_TO_MS
 from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
 from spynnaker.pyNN.exceptions import InvalidParameterType
@@ -357,7 +357,8 @@ class FromListConnector(AbstractConnector):
             delay_column = column_names.index('delay') + _FIRST_PARAM
             self.__delays = numpy.rint(
                 numpy.array(self.__conn_list[:, delay_column]) * (
-                    1000.0 / machine_time_step)) * (machine_time_step / 1000.0)
+                        US_TO_MS / machine_time_step)) \
+                            * (machine_time_step / US_TO_MS)
         except ValueError:
             pass
 

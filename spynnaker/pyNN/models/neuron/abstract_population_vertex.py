@@ -261,7 +261,6 @@ class AbstractPopulationVertex(
             self.BYTES_TILL_START_OF_GLOBAL_PARAMETERS +
             self.__neuron_impl.get_sdram_usage_in_bytes(vertex_slice.n_atoms))
 
-
     def _get_sdram_usage_for_atoms(self, vertex_slice, graph):
         sdram_requirement = (
             SYSTEM_BYTES_REQUIREMENT +
@@ -554,10 +553,6 @@ class AbstractPopulationVertex(
     def get_data(self, variable, current_time_in_us, placements,
                  graph_mapper, buffer_manager):
         # pylint: disable=too-many-arguments
-        index = 0
-        if variable != "spikes":
-            index = 1 + self.__neuron_impl.get_recordable_variable_index(
-                variable)
         n_machine_time_steps = self.simtime_in_us_to_timesteps(
             current_time_in_us)
         machine_vertices = graph_mapper.get_machine_vertices(self)

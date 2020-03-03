@@ -212,8 +212,8 @@ class AbstractSpiNNakerCommon(with_metaclass(
             self.__max_delay = max_delay
         else:
             self.__max_delay = (
-                max_delay_tics_supported * (user_timestep_in_us /
-                    MICRO_TO_MILLISECOND_CONVERSION))
+                max_delay_tics_supported * (
+                    user_timestep_in_us / MICRO_TO_MILLISECOND_CONVERSION))
 
         # Sort out the time scale factor if not user specified
         # (including config)
