@@ -383,7 +383,7 @@ uint32_t synapses_get_pre_synaptic_events(void) {
             synapse_dynamics_get_plastic_pre_synaptic_events());
 }
 
-void synapses_flush_ring_buffers() {
+void synapses_flush_ring_buffers(void) {
     uint32_t n_neurons_power_2 = n_neurons;
     uint32_t log_n_neurons = 1;
     if (n_neurons != 1) {
