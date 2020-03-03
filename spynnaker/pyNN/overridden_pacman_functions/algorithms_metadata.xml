@@ -116,7 +116,7 @@
             </parameter>
             <parameter>
                 <param_name>provenance_data_objects</param_name>
-                <param_type>ProvenanceItems</param_type>
+                <param_type>RouterCompressorProvenanceItems</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
@@ -150,7 +150,7 @@
         </optional_inputs>
         <outputs>
             <token part="MulticastRoutesLoaded">DataLoaded</token>
-            <param_type>ProvenanceItems</param_type>
+            <param_type>RouterCompressorProvenanceItems</param_type>
         </outputs>
     </algorithm>
     <algorithm name="OnChipBitFieldGenerator">
