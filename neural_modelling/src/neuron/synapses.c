@@ -382,3 +382,28 @@ uint32_t synapses_get_pre_synaptic_events(void) {
     return (num_fixed_pre_synaptic_events +
             synapse_dynamics_get_plastic_pre_synaptic_events());
 }
+
+void synapses_flush_ring_buffers() {
+    uint32_t n_neurons_power_2 = n_neurons;
+    uint32_t log_n_neurons = 1;
+    if (n_neurons != 1) {
+        if (!is_power_of_2(n_neurons)) {
+            n_neurons_power_2 = next_power_of_2(n_neurons);
+        }
+        log_n_neurons = ilog_2(n_neurons_power_2);
+    }
+
+    uint32_t n_synapse_types_power_2 = n_synapse_types;
+    if (!is_power_of_2(n_synapse_types)) {
+        n_synapse_types_power_2 = next_power_of_2(n_synapse_types);
+    }
+    uint32_t log_n_synapse_types = ilog_2(n_synapse_types_power_2);
+
+    uint32_t n_ring_buffer_bits =
+            log_n_neurons + log_n_synapse_types + SYNAPSE_DELAY_BITS;
+    uint32_t ring_buffer_size = 1 << (n_ring_buffer_bits);
+
+	for (uint32_t i = 0; i < ring_buffer_size; i++) {
+        ring_buffers[i] = 0;
+    }
+}

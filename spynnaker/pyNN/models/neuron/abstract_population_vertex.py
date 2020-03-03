@@ -849,13 +849,7 @@ class AbstractPopulationVertex(
         self.__has_reset_last = True
         self.__change_requires_neuron_parameters_reload = True
 
-        # This is overkill in most cases, but in some instances it's necessary;
-        # for example, to prevent a delayed spike from a previous run being
-        # processed. (It's also not necessarily that easy to work out when
-        # there is a delayed spike left over, particularly if the delays come
-        # from a RandomDistribution).
-        self.__change_requires_data_generation = True
-
         # If synapses change during the run,
         if self.__synapse_manager.changes_during_run:
+            self.__change_requires_data_generation = True
             self.__change_requires_neuron_parameters_reload = False

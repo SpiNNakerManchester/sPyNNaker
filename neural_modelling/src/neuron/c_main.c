@@ -282,7 +282,14 @@ void timer_callback(uint timer_count, uint unused) {
         }
         count_rewires++;
     }
-    // otherwise do synapse and neuron time step updates
+
+    // If the time has been reset to zero then the ring buffers need to be
+    // flushed in case there is a delayed spike left over from a previous run
+    if (time == 0) {
+    	synapses_flush_ring_buffers();
+    }
+
+    // Now do synapse and neuron time step updates
     synapses_do_timestep_update(time);
     neuron_do_timestep_update(time, timer_count, timer_period);
 
