@@ -54,6 +54,6 @@ address_t weight_initialise(
  */
 static weight_state_t weight_get_initial(weight_t weight, index_t synapse_type);
 
-static weight_t weight_get_final(weight_state_t new_state);
+static weight_t weight_get_final(weight_state_t new_state, REAL reg_error);
 
 #endif // _WEIGHT_H_

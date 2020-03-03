@@ -236,7 +236,9 @@ class SynapseDynamicsSTDP(
         plastic_plastic = numpy.zeros(
             len(connections) * n_half_words, dtype="uint16")
         plastic_plastic[half_word::n_half_words] = \
-            numpy.rint(numpy.abs(connections["weight"])).astype("uint16")
+            numpy.rint(connections["weight"]).astype("uint16")
+
+        # numpy.rint(numpy.abs(connections["weight"])).astype("uint16")
 
         # Convert the plastic data into groups of bytes per connection and
         # then into rows

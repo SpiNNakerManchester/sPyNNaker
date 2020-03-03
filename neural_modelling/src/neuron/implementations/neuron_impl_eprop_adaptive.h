@@ -66,7 +66,7 @@ static additional_input_pointer_t additional_input_array;
 static threshold_type_pointer_t threshold_type_array;
 
 //! Global parameters for the neurons
-static global_neuron_params_pointer_t global_parameters;
+global_neuron_params_pointer_t global_parameters;
 
 // The synapse shaping parameters
 static synapse_param_t *neuron_synapse_shaping_params;
@@ -294,10 +294,11 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     // Record B
     recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
 //    		B_t; // neuron->B;
+//    		neuron->syn_state[0].z_bar;
 //    		global_parameters->core_target_rate;
 //    	neuron->syn_state[0].e_bar;
 //    	neuron->syn_state[0].el_a;
-    		exc_input_values[1]; // record recurrent input (signed)
+    		exc_input_values[0]; // record input input (signed)
 //    		learning_signal * neuron->w_fb;
 
     // update neuron parameters
