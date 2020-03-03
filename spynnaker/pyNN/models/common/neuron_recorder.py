@@ -60,7 +60,8 @@ class NeuronRecorder(object):
         "__min_id",
         "__max_id",
         "__sampling_rates",
-        "__timestep_in_ms"
+        "__timestep_in_ms",
+        "__timestep_in_us"
         ]
 
     N_BYTES_FOR_TIMESTAMP = DataType.UINT32.size
@@ -117,6 +118,7 @@ class NeuronRecorder(object):
         self.__bitfield_variables = bitfield_variables
         self.__min_id = min_id
         self.__max_id = max_id
+        self.__timestep_in_us = timestep_in_us
         self.__timestep_in_ms = timestep_in_us / US_TO_MS
         for variable in itertools.chain(allowed_variables, bitfield_variables):
             self.__sampling_rates[variable] = 0
@@ -745,7 +747,7 @@ class NeuronRecorder(object):
                     # Add the rest once to fixed for worst case
                     fixed_sdram += (per_record - average_per_timestep)
         return VariableSDRAM(
-            fixed_sdram, per_timestep_sdram, self.__timestep_in_ms)
+            fixed_sdram, per_timestep_sdram, self.__timestep_in_us)
 
     def get_dtcm_usage_in_bytes(self, vertex_slice):
         # *_rate + n_neurons_recording_* + *_indexes

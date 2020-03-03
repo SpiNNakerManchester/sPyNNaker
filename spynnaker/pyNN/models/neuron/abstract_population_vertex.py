@@ -195,7 +195,7 @@ class AbstractPopulationVertex(
         # pylint: disable=arguments-differ
 
         variableSDRAM = self.__neuron_recorder.get_variable_sdram_usage(
-            vertex_slice, self.timestep_in_us)
+            vertex_slice)
         constantSDRAM = ConstantSDRAM(
                 self._get_sdram_usage_for_atoms(vertex_slice, graph))
 
