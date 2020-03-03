@@ -15,20 +15,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _STDP_TYPEDEFS_H_
-#define _STDP_TYPEDEFS_H_
+#include "timing_eprop_impl.h"
 
 //---------------------------------------
-// Macros
+// Globals
 //---------------------------------------
-// Fixed-point number system used STDP
-#define STDP_FIXED_POINT 11
-#define STDP_FIXED_POINT_ONE    (1 << STDP_FIXED_POINT)
+// Exponential lookup-tables
+int16_t tau_plus_lookup[TAU_PLUS_SIZE];
+int16_t tau_minus_lookup[TAU_MINUS_SIZE];
 
-// Helper macros for 16-bit fixed-point multiplication
-#define STDP_FIXED_MUL_16X16(a, b) maths_fixed_mul16(a, b, STDP_FIXED_POINT)
+//---------------------------------------
+// Functions
+//---------------------------------------
+address_t timing_initialise(address_t address) {
+    io_printf(IO_BUF, "timing_initialise: starting\n");
+    io_printf(IO_BUF, "\t Nothing to be done\n");
 
-
-#define PRINT_PLASTICITY 1
-
-#endif  // _STDP_TYPEDEFS_H_
+    return address;
+}
