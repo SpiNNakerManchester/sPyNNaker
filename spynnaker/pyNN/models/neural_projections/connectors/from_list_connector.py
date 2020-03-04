@@ -350,15 +350,28 @@ class FromListConnector(AbstractConnector):
                         n_columns))
         return column_names
 
-    def _calc_delays(self, machine_time_step):
+    def _calc_delays(self, timestep_in_us):
+        """
+        Round the delays to the nearest multiple of a timestep
+
+        This is done by first converting the delays from ms into n timesteps
+        Then rounding
+        Then converting back to ms
+
+        :param timestep_in_us:
+        :return:
+        """
         column_names = self._calc_column_names()
         self.__delays = None
+
         try:
             delay_column = column_names.index('delay') + _FIRST_PARAM
-            self.__delays = numpy.rint(
-                numpy.array(self.__conn_list[:, delay_column]) * (
-                        US_TO_MS / machine_time_step)) \
-                            * (machine_time_step / US_TO_MS)
+            # The fraction of a timestep donein each ms
+            per_ms = (US_TO_MS / timestep_in_us)
+            # The timestep in ms
+            in_ms = timestep_in_us / US_TO_MS
+            self.__delays = numpy.rint(numpy.array(
+                self.__conn_list[:, delay_column]) * per_ms) * in_ms
         except ValueError:
             pass
 
