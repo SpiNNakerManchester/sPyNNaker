@@ -36,7 +36,7 @@
 #include <neuron/models/neuron_model_eprop_adaptive_impl.h>
 
 extern neuron_pointer_t neuron_array;
-extern global_neuron_params_pointer_t global_params;
+extern global_neuron_params_pointer_t global_parameters;
 
 static uint32_t synapse_type_index_bits;
 static uint32_t synapse_index_bits;
@@ -285,24 +285,25 @@ static inline final_state_t eprop_plasticity_update(update_state_t current_state
 
 
 	// Convert delta_w to int16_t (same as weight) - take only integer bits from REAL?
-	int16_t delta_w_int = bitsk(delta_w); // THIS NEEDS UPDATING TO APPROPRIATE SCALING
+//	int16_t delta_w_int = bitsk(delta_w); // THIS NEEDS UPDATING TO APPROPRIATE SCALING
+	int32_t delta_w_int = (int32_t)roundk(delta_w, 15); // THIS NEEDS UPDATING TO APPROPRIATE SCALING
 //	int16_t delta_w_int = (int) delta_w; // >> 15;
 
 
 	if (PRINT_PLASTICITY){
-		io_printf(IO_BUF, "delta_w: %k, delta_w_int: %d\n",
-				delta_w, delta_w_int);
+		io_printf(IO_BUF, "delta_w: %k, delta_w_int: %d, 16b delta_w_int: %d, delta << 9: %d, delta << 12: %d, delta << 16: %d\n",
+				delta_w, delta_w_int, (int16_t)delta_w_int, (int16_t)delta_w_int << 9, (int16_t)delta_w_int << 12, (int16_t)delta_w_int << 16);
 	}
 
 	if (delta_w_int <= 0){
-		current_state = weight_one_term_apply_depression(current_state,  delta_w_int);
+		current_state = weight_one_term_apply_depression(current_state,  (int16_t)(delta_w_int << 9));
 	} else {
-		current_state = weight_one_term_apply_potentiation(current_state,  delta_w_int);
+		current_state = weight_one_term_apply_potentiation(current_state,  (int16_t)(delta_w_int << 9));
 	}
 
 
 	// Calculate regularisation error
-	REAL reg_error = global_params->core_target_rate - global_params->core_pop_rate;
+	REAL reg_error = global_parameters->core_target_rate - global_parameters->core_pop_rate;
 
 
     // Return final synaptic word and weight
@@ -373,6 +374,9 @@ bool synapse_dynamics_process_plastic_synapses(
                 synapse_structure_get_update_state(*plastic_words, type);
 
     	if (PRINT_PLASTICITY){
+            io_printf(IO_BUF, "neuron ind: %u, synapse ind: %u, type: %u, zbar: %k\n",
+                neuron_ind, syn_ind_from_delay, type, neuron->syn_state[syn_ind_from_delay].z_bar_inp);
+
     		io_printf(IO_BUF, "neuron ind: %u, synapse ind: %u, type: %u init w (plas): %d, summed_dw: %k\n",
         		neuron_ind, syn_ind_from_delay, type,
 				current_state.initial_weight,

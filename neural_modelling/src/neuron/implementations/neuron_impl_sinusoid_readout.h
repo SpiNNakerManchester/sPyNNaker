@@ -55,6 +55,7 @@ static synapse_param_t *neuron_synapse_shaping_params;
 static REAL next_spike_time = 0;
 extern uint32_t time;
 extern key_t key;
+extern REAL learning_signal;
 static uint32_t target_ind = 0;
 
 
@@ -279,9 +280,12 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
     // Calculate error
     REAL error = result - global_parameters->target_V[target_ind];
+    learning_signal = error;
 
     // Record readout
-    recorded_variable_values[V_RECORDING_INDEX] = result;
+    recorded_variable_values[V_RECORDING_INDEX] =
+//                    result;
+                    neuron->syn_state[0].z_bar;
     // Record target
     recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] =
 //        			global_parameters->target_V[target_ind];
