@@ -725,7 +725,7 @@ class AbstractPopulationVertex(
     @overrides(AbstractAcceptsIncomingSynapses.get_connections_from_machine)
     def get_connections_from_machine(
             self, transceiver, placements, app_edge, graph_mapper,
-            synapse_info, machine_time_step, buffer_manager):
+            synapse_info, machine_time_step):
         # pylint: disable=too-many-arguments
         return self.__synapse_manager.get_connections_from_machine(
             self, transceiver, placements, app_edge, graph_mapper,

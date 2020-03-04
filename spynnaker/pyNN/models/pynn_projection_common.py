@@ -320,7 +320,7 @@ class PyNNProjectionCommon(object):
         connections = post_vertex.get_connections_from_machine(
             ctl.transceiver, ctl.placements, self.__projection_edge,
             ctl.graph_mapper, self.__synapse_information,
-            ctl.machine_time_step, ctl.buffer_manager)
+            ctl.machine_time_step)
         if connections is not None:
             connection_holder.add_connections(connections)
         connection_holder.finish()
