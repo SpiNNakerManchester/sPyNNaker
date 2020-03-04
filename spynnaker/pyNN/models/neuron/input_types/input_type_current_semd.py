@@ -27,13 +27,17 @@ UNITS = {
 
 
 class InputTypeCurrentSEMD(AbstractInputType):
-    """ The current sEMD input type
+    """ The current sEMD input type.
     """
     __slots__ = [
         "__multiplicator",
         "__inh_input_previous"]
 
     def __init__(self, multiplicator, inh_input_previous):
+        """
+        :param float multiplicator:
+        :param float inh_input_previous:
+        """
         super(InputTypeCurrentSEMD, self).__init__([
             DataType.S1615,   # multiplicator
             DataType.S1615])  # inh_input_previous

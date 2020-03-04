@@ -15,7 +15,8 @@
 
 import numpy
 from data_specification.enums.data_type import DataType
-from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spinn_front_end_common.utilities.constants import (
+    MICRO_TO_MILLISECOND_CONVERSION, BYTES_PER_WORD)
 
 
 class DelayGeneratorData(object):
@@ -41,6 +42,19 @@ class DelayGeneratorData(object):
             pre_slices, pre_slice_index, post_slices, post_slice_index,
             pre_vertex_slice, post_vertex_slice, synapse_information,
             max_stage, machine_time_step):
+        """
+        :param int max_row_n_synapses:
+        :param int max_delayed_row_n_synapses:
+        :param list(~pacman.model.graphs.common.Slice) pre_slices:
+        :param int pre_slice_index:
+        :param list(~pacman.model.graphs.common.Slice) post_slices:
+        :param int post_slice_index:
+        :param ~pacman.model.graphs.common.Slicepre_vertex_slice:
+        :param ~pacman.model.graphs.common.Slicepost_vertex_slice:
+        :param SynapseInformation synapse_information:
+        :param int max_stage:
+        :param int machine_time_step:
+        """
         self.__max_row_n_synapses = max_row_n_synapses
         self.__max_delayed_row_n_synapses = max_delayed_row_n_synapses
         self.__pre_slices = pre_slices
@@ -70,7 +84,7 @@ class DelayGeneratorData(object):
     def gen_data(self):
         """ Get the data to be written for this connection
 
-        :rtype: numpy array of uint32
+        :rtype: ~numpy.ndarray(~numpy.uint32)
         """
         connector = self.__synapse_information.connector
         items = list()
@@ -80,7 +94,8 @@ class DelayGeneratorData(object):
             self.__pre_vertex_slice.lo_atom,
             self.__pre_vertex_slice.n_atoms,
             self.__max_stage,
-            DataType.S1615.encode_as_int(1000.0 / self.__machine_time_step),
+            DataType.S1615.encode_as_int(
+                MICRO_TO_MILLISECOND_CONVERSION / self.__machine_time_step),
             connector.gen_connector_id,
             connector.gen_delays_id(self.__synapse_information.delays)],
             dtype="uint32"))

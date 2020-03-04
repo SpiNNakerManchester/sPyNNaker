@@ -18,10 +18,10 @@ from spinn_utilities.abstract_base import AbstractBase
 
 
 class AbstractHasAPlusAMinus(with_metaclass(AbstractBase, object)):
+    r""" An object that has A\ :sup:`+` and A\ :sup:`-` properties.
+    """
     __slots__ = [
-        # things
         '__a_plus',
-        # more things
         '__a_minus'
     ]
 
@@ -30,11 +30,20 @@ class AbstractHasAPlusAMinus(with_metaclass(AbstractBase, object)):
         self.__a_minus = None
 
     def set_a_plus_a_minus(self, a_plus, a_minus):
+        """ Set the values of :math:`A^+` and :math:`A^-`.
+
+        :param float a_plus: :math:`A^+`
+        :param float a_minus: :math:`A^-`
+        """
         self.__a_plus = a_plus
         self.__a_minus = a_minus
 
     @property
     def A_plus(self):
+        """ Settable model parameter: :math:`A^+`
+
+        :rtype: float
+        """
         return self.__a_plus
 
     @A_plus.setter
@@ -43,6 +52,10 @@ class AbstractHasAPlusAMinus(with_metaclass(AbstractBase, object)):
 
     @property
     def A_minus(self):
+        """ Settable model parameter: :math:`A^-`
+
+        :rtype: float
+        """
         return self.__a_minus
 
     @A_minus.setter

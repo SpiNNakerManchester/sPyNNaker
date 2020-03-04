@@ -65,9 +65,13 @@ class InvalidParameterType(SpynnakerException):
 
 
 class SynapseRowTooBigException(SpynnakerException):
-    """ Raised when a synapse row is bigger than is allowed.PyNN
+    """ Raised when a synapse row is bigger than is allowed.
     """
     def __init__(self, max_size, message):
+        """
+        :param max_size: the maximum permitted size of row
+        :param message: the excepton message
+        """
         super(SynapseRowTooBigException, self).__init__(message)
         self._max_size = max_size
 

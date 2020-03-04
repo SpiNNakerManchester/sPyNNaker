@@ -14,7 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from .abstract_partner_selection import AbstractPartnerSelection
-from pacman.model.decorators.overrides import overrides
+from spinn_utilities.overrides import overrides
 
 
 class RandomSelection(AbstractPartnerSelection):
