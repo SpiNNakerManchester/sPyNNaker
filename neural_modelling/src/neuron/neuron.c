@@ -142,6 +142,9 @@ static weight_t *synaptic_region;
 //! Placeholder for synaptic contributions sum
 static uint32_t sum;
 
+uint32_t dma_times[3];
+uint32_t update_times[3];
+
 
 //! parameters that reside in the neuron_parameter_data_region in human
 //! readable form
@@ -298,7 +301,7 @@ bool neuron_do_timestep_update(
     state_t recorded_variable_values[n_recorded_vars];
 
     uint32_t state_update_clock_cycles = tc[T1_COUNT];
-    uint32_t partition_sum_clock_cycles;
+    //uint32_t partition_sum_clock_cycles;
 
     // update each neuron individually
     for (index_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
@@ -309,7 +312,7 @@ bool neuron_do_timestep_update(
 
             if(synapse_type_index == 0) {
 
-                partition_sum_clock_cycles = tc[T1_COUNT];
+                //partition_sum_clock_cycles = tc[T1_COUNT];
 
                 sum = synaptic_contributions[buff_index];
 
@@ -327,7 +330,7 @@ bool neuron_do_timestep_update(
                     sum = SAT_VALUE;
                 }
 
-                partition_sum_clock_cycles -= tc[T1_COUNT];
+                //partition_sum_clock_cycles -= tc[T1_COUNT];
             }
             else {
 
@@ -350,19 +353,19 @@ bool neuron_do_timestep_update(
         bool spike = neuron_impl_do_timestep_update(
             neuron_index, 0.0k, recorded_variable_values);
 
-        recorded_variable_values[1] = partition_sum_clock_cycles;
+        //recorded_variable_values[1] = partition_sum_clock_cycles;
 
-        // Write the recorded variable values
-        for (uint32_t i = 0; i < n_recorded_vars; i++) {
-            uint32_t index = var_recording_indexes[i][neuron_index];
-            var_recording_values[i]->states[index] =
-                recorded_variable_values[i];
-        }
+//        // Write the recorded variable values
+//        for (uint32_t i = 0; i < n_recorded_vars; i++) {
+//            uint32_t index = var_recording_indexes[i][neuron_index];
+//            var_recording_values[i]->states[index] =
+//                recorded_variable_values[i];
+//        }
 
         // If the neuron has spiked
         if (spike) {
 
-            log_debug("neuron %u spiked at time %u", neuron_index, time);
+            //log_debug("neuron %u spiked at time %u", neuron_index, time);
 
             // Record the spike
             out_spikes_set_spike(spike_recording_indexes[neuron_index]);
@@ -394,26 +397,29 @@ bool neuron_do_timestep_update(
 
     state_update_clock_cycles -= tc[T1_COUNT];
 
-    var_recording_values[2]->states[var_recording_indexes[2][0]] = dma_clock_cycles;
-    var_recording_values[2]->states[var_recording_indexes[2][1]] = state_update_clock_cycles;
+    dma_times[time] = dma_clock_cycles;
+    update_times[time] = state_update_clock_cycles;
+
+//    var_recording_values[2]->states[var_recording_indexes[2][0]] = dma_clock_cycles;
+//    var_recording_values[2]->states[var_recording_indexes[2][1]] = state_update_clock_cycles;
 
     // Disable interrupts to avoid possible concurrent access
     uint cpsr = 0;
     cpsr = spin1_int_disable();
 
     // Record the recorded variables
-    for (uint32_t i = 0; i < n_recorded_vars; i++) {
-        if (var_recording_count[i] == var_recording_rate[i]) {
-            var_recording_count[i] = 1;
-            n_recordings_outstanding += 1;
-            var_recording_values[i]->time = time;
-            recording_record_and_notify(
-                i + 1, var_recording_values[i], var_recording_size[i],
-                recording_done_callback);
-        } else {
-            var_recording_count[i] += var_recording_increment[i];
-        }
-    }
+//    for (uint32_t i = 0; i < n_recorded_vars; i++) {
+//        if (var_recording_count[i] == var_recording_rate[i]) {
+//            var_recording_count[i] = 1;
+//            n_recordings_outstanding += 1;
+//            var_recording_values[i]->time = time;
+//            recording_record_and_notify(
+//                i + 1, var_recording_values[i], var_recording_size[i],
+//                recording_done_callback);
+//        } else {
+//            var_recording_count[i] += var_recording_increment[i];
+//        }
+//    }
 
     // Record any spikes this timestep
     if (spike_recording_count == spike_recording_rate) {
@@ -620,6 +626,18 @@ bool neuron_initialise(address_t address, uint32_t *timer_offset) {
         DMA_TAG_READ_SYNAPTIC_CONTRIBUTION, _dma_done_callback);
 
     return true;
+}
+
+
+void rec_data(uint32_t *dma, uint32_t *update) {
+
+    for(uint32_t i = 0 ; i < 3; i++)
+        io_printf(IO_BUF, "%d ", dma_times[i]);
+    io_printf(IO_BUF, "\n");
+
+    for(uint32_t j = 0 ; j < 3; j++)
+        io_printf(IO_BUF, "%d ", update_times[j]);
+    io_printf(IO_BUF, "\n");
 }
 
 #if LOG_LEVEL >= LOG_DEBUG

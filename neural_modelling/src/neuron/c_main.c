@@ -230,7 +230,10 @@ void timer_callback(uint timer_count, uint unused) {
         // run
         time -= 1;
 
-        log_debug("Rewire tries = %d", count_rewires);
+        uint32_t dma_times[3];
+        uint32_t update_times[3];
+
+        rec_data(dma_times, update_times);
 
         simulation_ready_to_read();
 

@@ -72,6 +72,8 @@ void neuron_add_inputs(
         index_t synapse_type_index, index_t neuron_index,
         input_t weights_this_timestep);
 
+void rec_data(uint32_t *dma, uint32_t *update);
+
 #if LOG_LEVEL >= LOG_DEBUG
 void neuron_print_inputs();
 
