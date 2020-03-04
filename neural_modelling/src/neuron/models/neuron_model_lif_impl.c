@@ -36,7 +36,7 @@ void neuron_model_set_global_neuron_params(
     // Does Nothing - no params
 }
 
-state_t neuron_model_state_update(
+inline state_t neuron_model_state_update(
 		//uint16_t num_excitatory_inputs,
 		input_t* exc_input,
 		//uint16_t num_inhibitory_inputs,

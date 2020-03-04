@@ -288,9 +288,9 @@ bool neuron_do_timestep_update(
 
     // Wait until recordings have completed, to ensure the recording space
     // can be re-written
-    while (n_recordings_outstanding > 0) {
-        spin1_wfi();
-    }
+//    while (n_recordings_outstanding > 0) {
+//        spin1_wfi();
+//    }
 
     // Reset the out spikes before starting if a beginning of recording
     if (spike_recording_count == 1) {
@@ -396,6 +396,10 @@ bool neuron_do_timestep_update(
     }
 
     state_update_clock_cycles -= tc[T1_COUNT];
+
+    for (index_t neuron_index = 0; neuron_index < n_neurons; neuron_index++) {
+    	neuron_impl_shape_synapses(neuron_index);
+    }
 
     dma_times[time] = dma_clock_cycles;
     update_times[time] = state_update_clock_cycles;

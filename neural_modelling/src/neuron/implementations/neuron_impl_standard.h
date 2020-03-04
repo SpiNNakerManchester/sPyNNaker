@@ -277,6 +277,12 @@ static inline bool neuron_impl_do_timestep_update(index_t neuron_index,
     return spike;
 }
 
+static inline void neuron_impl_shape_synapses(index_t neuron_index){
+    synapse_param_pointer_t synapse_type =
+        &neuron_synapse_shaping_params[neuron_index];
+    synapse_types_shape_input(synapse_type);
+}
+
 //! \brief stores neuron parameter back into sdram
 //! \param[in] address: the address in sdram to start the store
 static void neuron_impl_store_neuron_parameters(

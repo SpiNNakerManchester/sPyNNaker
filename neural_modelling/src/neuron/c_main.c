@@ -243,33 +243,33 @@ void timer_callback(uint timer_count, uint unused) {
 
     uint cpsr = 0;
     // Do rewiring
-    if (rewiring &&
-        ((last_rewiring_time >= rewiring_period && !is_fast()) || is_fast())) {
-        update_goal_posts(time);
-        last_rewiring_time = 0;
-        // put flag in spike processing to do synaptic rewiring
-//        synaptogenesis_dynamics_rewire(time);
-        if (is_fast()) {
-            do_rewiring(rewiring_period);
-        } else {
-            do_rewiring(1);
-        }
-        // disable interrupts
-        cpsr = spin1_int_disable();
-//       // If we're not already processing synaptic DMAs,
-//        // flag pipeline as busy and trigger a feed event
-        if (!get_dma_busy()) {
-            log_debug("Sending user event for new spike");
-            if (spin1_trigger_user_event(0, 0)) {
-                set_dma_busy(true);
-            } else {
-                log_debug("Could not trigger user event\n");
-            }
-        }
-        // enable interrupts
-        spin1_mode_restore(cpsr);
-        count_rewires++;
-    }
+//    if (rewiring &&
+//        ((last_rewiring_time >= rewiring_period && !is_fast()) || is_fast())) {
+//        update_goal_posts(time);
+//        last_rewiring_time = 0;
+//        // put flag in spike processing to do synaptic rewiring
+////        synaptogenesis_dynamics_rewire(time);
+//        if (is_fast()) {
+//            do_rewiring(rewiring_period);
+//        } else {
+//            do_rewiring(1);
+//        }
+//        // disable interrupts
+//        cpsr = spin1_int_disable();
+////       // If we're not already processing synaptic DMAs,
+////        // flag pipeline as busy and trigger a feed event
+//        if (!get_dma_busy()) {
+//            log_debug("Sending user event for new spike");
+//            if (spin1_trigger_user_event(0, 0)) {
+//                set_dma_busy(true);
+//            } else {
+//                log_debug("Could not trigger user event\n");
+//            }
+//        }
+//        // enable interrupts
+//        spin1_mode_restore(cpsr);
+//        count_rewires++;
+//    }
     // otherwise do neuron time step update
     if(!neuron_do_timestep_update(time, timer_count, timer_period)) {
         rt_error(RTE_SWERR);
