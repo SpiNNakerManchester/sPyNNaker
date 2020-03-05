@@ -40,6 +40,12 @@ class SynapseTypeExpIzhikevichNeuromodulated(AbstractSynapseType):
         "_isyn_inh"]
 
     def __init__(self, tau_syn_E, tau_syn_I, isyn_exc, isyn_inh):
+        r"""
+        :param float tau_syn_E: :math:`\tau^{syn}_e`
+        :param float tau_syn_I: :math:`\tau^{syn}_i`
+        :param float isyn_exc: :math:`I^{syn}_e`
+        :param float isyn_inh: :math:`I^{syn}_i`
+        """
         super(SynapseTypeExpIzhikevichNeuromodulated, self).__init__([
             DataType.U032,    # decay_E
             DataType.U032,    # init_E
@@ -77,6 +83,10 @@ class SynapseTypeExpIzhikevichNeuromodulated(AbstractSynapseType):
     @inject_items({"ts": "MachineTimeStep"})
     @overrides(AbstractSynapseType.get_values, additional_arguments={'ts'})
     def get_values(self, parameters, state_variables, vertex_slice, ts):
+        """
+        :param int ts: machine time step
+        """
+        # pylint: disable=arguments-differ
 
         tsfloat = float(ts) / 1000.0
         decay = lambda x: numpy.exp(-tsfloat / x)  # noqa E731

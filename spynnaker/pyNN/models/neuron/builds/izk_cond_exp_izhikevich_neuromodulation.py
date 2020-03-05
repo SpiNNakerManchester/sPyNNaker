@@ -25,7 +25,24 @@ _IZK_THRESHOLD = 30.0
 
 
 class IZKCondExpIzhikevichNeuromodulation(AbstractPyNNNeuronModelStandard):
-    # noinspection PyPep8Naming
+    """ Izhikevich neuron model with conductance inputs and neuromodulated
+        synapses.
+
+    :param float a: :math:`a`
+    :param float b: :math:`b`
+    :param float c: :math:`c`
+    :param float d: :math:`d`
+    :param float i_offset: :math:`I_{offset}`
+    :param float u: :math:`u_{init} = \\delta V_{init}`
+    :param float v: :math:`v_{init} = V_{init}`
+    :param float tau_syn_E: :math:`\\tau^{syn}_e`
+    :param float tau_syn_I: :math:`\\tau^{syn}_i`
+    :param float e_rev_E: :math:`E^{rev}_e`
+    :param float e_rev_I: :math:`E^{rev}_i`
+    :param float isyn_exc: :math:`I^{syn}_e`
+    :param float isyn_inh: :math:`I^{syn}_i`
+    """
+
     @default_initial_values({"v", "u", "isyn_exc", "isyn_inh"})
     def __init__(
             self, a=0.02, b=0.2, c=-65.0, d=2.0, i_offset=0.0, u=-14.0,
