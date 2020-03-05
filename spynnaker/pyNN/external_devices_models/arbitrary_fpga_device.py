@@ -25,6 +25,13 @@ class ArbitraryFPGADevice(
     def __init__(
             self, n_neurons, fpga_link_id, fpga_id, board_address=None,
             label=None):
+        """
+        :param n_neurons: Number of neurons
+        :param fpga_link_id:
+        :param fpga_id:
+        :param board_address:
+        :param label:
+        """
         # pylint: disable=too-many-arguments
         super(ArbitraryFPGADevice, self).__init__(
             n_neurons, fpga_id, fpga_link_id, board_address, label)

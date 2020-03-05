@@ -31,9 +31,9 @@ RECORDING_ENTRY_BYTE_SIZE = BYTES_PER_WORD
 # From neuron common-typedefs.h
 SYNAPSE_INDEX_BITS = 8
 MAX_NEURON_SIZE = 1 << SYNAPSE_INDEX_BITS
-# The size of each output spike line
+#: The size of each output spike line
 OUT_SPIKE_SIZE = MAX_NEURON_SIZE >> 5
-# The number of bytes for each spike line
+#: The number of bytes for each spike line
 OUT_SPIKE_BYTES = OUT_SPIKE_SIZE * BYTES_PER_WORD
 V_BUFFER_SIZE_PER_TICK_PER_NEURON = BYTES_PER_WORD
 GSYN_BUFFER_SIZE_PER_TICK_PER_NEURON = 2 * BYTES_PER_WORD
@@ -45,8 +45,8 @@ EIEIO_BUFFER_SIZE_BEFORE_RECEIVE = 512 * BYTES_PER_KB
 INFINITE_SIMULATION = 4294967295
 
 # from synaptic manager
-# Words - 2 for row length and number of rows and 1 for plastic region size
-# (which might be 0)
+#: Words: 2 for row length and number of rows and 1 for plastic region size
+#: (which might be 0)
 SYNAPTIC_ROW_HEADER_WORDS = 2 + 1
 
 NA_TO_PA_SCALE = 1000.0
@@ -60,7 +60,7 @@ MAX_SUPPORTED_DELAY_TICS = 16
 MAX_DELAY_BLOCKS = 8
 MAX_TIMER_TICS_SUPPORTED_PER_BLOCK = 16
 
-# the minimum supported delay slot between two neurons
+#: the minimum supported delay slot between two neurons
 MIN_SUPPORTED_DELAY = 1
 
 
@@ -72,14 +72,14 @@ class POPULATION_BASED_REGIONS(Enum):
     POPULATION_TABLE = 3
     SYNAPTIC_MATRIX = 4
     SYNAPSE_DYNAMICS = 5
-    RECORDING = 6
+    NEURON_RECORDING = 6
     PROVENANCE_DATA = 7
     PROFILING = 8
     CONNECTOR_BUILDER = 9
     DIRECT_MATRIX = 10
 
 
-# The partition ID used for spike data
+#: The partition ID used for spike data
 SPIKE_PARTITION_ID = "SPIKE"
 
 # names for recording components
@@ -88,5 +88,5 @@ MEMBRANE_POTENTIAL = "v"
 GSYN_EXCIT = "gsyn_exc"
 GSYN_INHIB = "gsyn_inh"
 
-# The partition ID used for Poisson live control data
+#: The partition ID used for Poisson live control data
 LIVE_POISSON_CONTROL_PARTITION_ID = "CONTROL"

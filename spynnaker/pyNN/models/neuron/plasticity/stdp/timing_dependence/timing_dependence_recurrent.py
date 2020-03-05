@@ -13,7 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import math
+import numpy
+from spinn_front_end_common.utilities.constants import \
+    MICRO_TO_MILLISECOND_CONVERSION
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.constants import (
@@ -21,8 +23,9 @@ from spinn_front_end_common.utilities.constants import (
 from .abstract_timing_dependence import AbstractTimingDependence
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
     SynapseStructureWeightAccumulator)
-from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
-    plasticity_helpers)
+from spynnaker.pyNN.models.neuron.plasticity.stdp.common.plasticity_helpers \
+    import (
+        STDP_FIXED_POINT_ONE)
 
 
 class TimingDependenceRecurrent(AbstractTimingDependence):
@@ -87,7 +90,7 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
         # 2 * 32-bit parameters
         # 2 * LUTS with STDP_FIXED_POINT_ONE * 16-bit entries
         return (BYTES_PER_WORD * 2) + (
-            BYTES_PER_SHORT * (2 * plasticity_helpers.STDP_FIXED_POINT_ONE))
+            BYTES_PER_SHORT * (2 * STDP_FIXED_POINT_ONE))
 
     @property
     def n_weight_terms(self):
@@ -103,24 +106,27 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
                          data_type=DataType.INT32)
 
         # Convert mean times into machine timesteps
-        mean_pre_timesteps = (float(self.__mean_pre_window) *
-                              (1000.0 / float(machine_time_step)))
-        mean_post_timesteps = (float(self.__mean_post_window) *
-                               (1000.0 / float(machine_time_step)))
+        mean_pre_timesteps = (
+            float(self.__mean_pre_window) *
+            (MICRO_TO_MILLISECOND_CONVERSION / float(machine_time_step)))
+        mean_post_timesteps = (
+            float(self.__mean_post_window) *
+            (MICRO_TO_MILLISECOND_CONVERSION / float(machine_time_step)))
 
         # Write lookup tables
         self._write_exp_dist_lut(spec, mean_pre_timesteps)
         self._write_exp_dist_lut(spec, mean_post_timesteps)
 
-    def _write_exp_dist_lut(self, spec, mean):
-        for x in range(plasticity_helpers.STDP_FIXED_POINT_ONE):
-
-            # Calculate inverse CDF
-            x_float = float(x) / float(plasticity_helpers.STDP_FIXED_POINT_ONE)
-            p_float = math.log(1.0 - x_float) * -mean
-
-            p = round(p_float)
-            spec.write_value(data=p, data_type=DataType.UINT16)
+    @staticmethod
+    def _write_exp_dist_lut(spec, mean):
+        """
+        :param .DataSpecificationGenerator spec:
+        :param float mean:
+        """
+        indices = numpy.arange(STDP_FIXED_POINT_ONE)
+        inv_cdf = numpy.log(1.0 - indices/float(STDP_FIXED_POINT_ONE)) * -mean
+        spec.write_array(
+            inv_cdf.astype(numpy.uint16), data_type=DataType.UINT16)
 
     @property
     def synaptic_structure(self):

@@ -27,8 +27,25 @@ from spynnaker.pyNN.models.neuron.additional_inputs import (
 class IFCurrExpCa2Adaptive(AbstractPyNNNeuronModelStandard):
     """ Model from Liu, Y. H., & Wang, X. J. (2001). Spike-frequency\
         adaptation of a generalized leaky integrate-and-fire model neuron. \
-        Journal of Computational Neuroscience, 10(1), 25-45. \
-        doi:10.1023/A:1008916026143
+        *Journal of Computational Neuroscience*, 10(1), 25-45. \
+        `doi:10.1023/A:1008916026143 \
+        <https://doi.org/10.1023/A:1008916026143>`_
+
+    :param float tau_m: :math:`\\tau_m`
+    :param float cm: :math:`C_m`
+    :param float v_rest: :math:`V_{rest}`
+    :param float v_reset: :math:`V_{reset}`
+    :param float v_thresh: :math:`V_{thresh}`
+    :param float tau_syn_E: :math:`\\tau^{syn}_e`
+    :param float tau_syn_I: :math:`\\tau^{syn}_i`
+    :param float tau_refrac: :math:`\\tau_{refrac}`
+    :param float i_offset: :math:`I_{offset}`
+    :param float tau_ca2: :math:`\\tau_{\\mathrm{Ca}^{+2}}`
+    :param float i_ca2: :math:`I_{\\mathrm{Ca}^{+2}}`
+    :param float i_alpha: :math:`\\tau_\\alpha`
+    :param float v: :math:`V_{init}`
+    :param float isyn_exc: :math:`I^{syn}_e`
+    :param float isyn_inh: :math:`I^{syn}_i`
     """
 
     @default_initial_values({"v", "isyn_exc", "isyn_inh", "i_ca2"})

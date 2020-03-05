@@ -16,21 +16,98 @@
 import math
 import numpy
 from six import raise_from
-from spinn_utilities.overrides import overrides
-from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+
+from spinn_front_end_common.utilities.constants import \
+    MICRO_TO_MILLISECOND_CONVERSION, BYTES_PER_WORD
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector)
+from spynnaker.pyNN.utilities.constants import MAX_SUPPORTED_DELAY_TICS
 from spynnaker.pyNN.exceptions import SynapseRowTooBigException
-from .abstract_synapse_io import AbstractSynapseIO
-from .max_row_info import MaxRowInfo
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractStaticSynapseDynamics, AbstractSynapseDynamicsStructural,
     AbstractSynapseDynamics)
 
 _N_HEADER_WORDS = 3
+# There are 16 slots, one per time step
+_STD_DELAY_SLOTS = 16
 
 
-class SynapseIORowBased(AbstractSynapseIO):
+class MaxRowInfo(object):
+    """ Information about the maximums for rows in a synaptic matrix.
+    """
+
+    __slots__ = [
+        "__undelayed_max_n_synapses",
+        "__delayed_max_n_synapses",
+        "__undelayed_max_bytes",
+        "__delayed_max_bytes",
+        "__undelayed_max_words",
+        "__delayed_max_words",
+    ]
+
+    def __init__(
+            self, undelayed_max_n_synapses, delayed_max_n_synapses,
+            undelayed_max_bytes, delayed_max_bytes,
+            undelayed_max_words, delayed_max_words):
+        """
+        :param int undelayed_max_n_synapses:
+        :param int delayed_max_n_synapses:
+        :param int undelayed_max_bytes:
+        :param int delayed_max_bytes:
+        :param int undelayed_max_words:
+        :param int delayed_max_words:
+        """
+        self.__undelayed_max_n_synapses = undelayed_max_n_synapses
+        self.__delayed_max_n_synapses = delayed_max_n_synapses
+        self.__undelayed_max_bytes = undelayed_max_bytes
+        self.__delayed_max_bytes = delayed_max_bytes
+        self.__undelayed_max_words = undelayed_max_words
+        self.__delayed_max_words = delayed_max_words
+
+    @property
+    def undelayed_max_n_synapses(self):
+        """
+        :rtype: int
+        """
+        return self.__undelayed_max_n_synapses
+
+    @property
+    def delayed_max_n_synapses(self):
+        """
+        :rtype: int
+        """
+        return self.__delayed_max_n_synapses
+
+    @property
+    def undelayed_max_bytes(self):
+        """
+        :rtype: int
+        """
+        return self.__undelayed_max_bytes
+
+    @property
+    def delayed_max_bytes(self):
+        """
+        :rtype: int
+        """
+        return self.__delayed_max_bytes
+
+    @property
+    def undelayed_max_words(self):
+        """
+        :rtype: int
+        """
+        return self.__undelayed_max_words
+
+    @property
+    def delayed_max_words(self):
+        """
+        :rtype: int
+        """
+        return self.__delayed_max_words
+
+
+class SynapseIORowBased(object):
     """ A SynapseRowIO implementation that uses a row for each source neuron,\
         where each row consists of a fixed region, a plastic region, and a\
         fixed-plastic region (this is the bits of the plastic row that don't\
@@ -39,18 +116,37 @@ class SynapseIORowBased(AbstractSynapseIO):
     """
     __slots__ = []
 
-    @overrides(AbstractSynapseIO.get_maximum_delay_supported_in_ms)
     def get_maximum_delay_supported_in_ms(self, machine_time_step):
+        """ Get the maximum delay supported by the synapse representation \
+            before extensions are required, or None if any delay is supported
+
+        :param int machine_time_step:
+        :rtype: int or None
+        """
         # There are 16 slots, one per time step
-        return 16 * (machine_time_step / 1000.0)
+        return MAX_SUPPORTED_DELAY_TICS * (
+            machine_time_step / MICRO_TO_MILLISECOND_CONVERSION)
 
     @staticmethod
     def _n_words(n_bytes):
+        """
+        :param int n_bytes:
+        :rtype: int
+        """
         return math.ceil(float(n_bytes) / BYTES_PER_WORD)
 
+    @staticmethod
     def _get_max_row_length(
-            self, size, dynamics, population_table, in_edge, row_length):
-        # pylint: disable=too-many-arguments
+            size, dynamics, population_table, in_edge, row_length):
+        """
+        :param int size:
+        :param AbstractSynapseDynamics dynamics:
+        :param MasterPopTableAsBinarySearch population_table:
+        :param in_edge:
+        :type in_edge: ProjectionApplicationEdge or ProjectionMachineEdge
+        :param int row_length:
+        :raises SynapseRowTooBigException:
+        """
         try:
             return population_table.get_allowed_row_length(size)
         except SynapseRowTooBigException as e:
@@ -65,10 +161,23 @@ class SynapseIORowBased(AbstractSynapseIO):
                     in_edge.pre_vertex, in_edge.post_vertex, row_length,
                     max_synapses)), e)
 
-    @overrides(AbstractSynapseIO.get_max_row_info)
     def get_max_row_info(
             self, synapse_info, post_vertex_slice, n_delay_stages,
             population_table, machine_time_step, in_edge):
+        """ Get the information about the maximum lengths of delayed and\
+            undelayed rows in bytes (including header), words (without header)\
+            and number of synapses
+
+        :param SynapseInformation synapse_info:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param int n_delay_stages:
+        :param MasterPopTableAsBinarySearch population_table:
+        :param int machine_time_step:
+        :param in_edge:
+        :type in_edge: ProjectionApplicationEdge or ProjectionMachineEdge
+        :rtype: MaxRowInfo
+        :raises SynapseRowTooBigException:
+        """
         max_delay_supported = self.get_maximum_delay_supported_in_ms(
             machine_time_step)
         max_delay = max_delay_supported * (n_delay_stages + 1)
@@ -113,12 +222,12 @@ class SynapseIORowBased(AbstractSynapseIO):
 
         undelayed_max_bytes = 0
         if undelayed_max_n_words > 0:
-            undelayed_max_bytes = (undelayed_max_n_words + _N_HEADER_WORDS) * \
-                BYTES_PER_WORD
+            undelayed_max_bytes = (
+                undelayed_max_n_words + _N_HEADER_WORDS) * BYTES_PER_WORD
         delayed_max_bytes = 0
         if delayed_max_n_words > 0:
-            delayed_max_bytes = (delayed_max_n_words + _N_HEADER_WORDS) * \
-                BYTES_PER_WORD
+            delayed_max_bytes = (
+                delayed_max_n_words + _N_HEADER_WORDS) * BYTES_PER_WORD
 
         return MaxRowInfo(
             max_undelayed_n_synapses, max_delayed_n_synapses,
@@ -129,6 +238,16 @@ class SynapseIORowBased(AbstractSynapseIO):
     def _get_max_row_length_and_row_data(
             connections, row_indices, n_rows, post_vertex_slice,
             n_synapse_types, population_table, synapse_dynamics):
+        """
+        :param ~numpy.ndarray connections:
+        :param ~numpy.ndarray row_indices:
+        :param int n_rows:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param int n_synapse_types:
+        :param MasterPopTableAsBinarySearch population_table:
+        :param AbstractSynapseDynamics synapse_dynamics:
+        :rtype: tuple(int, ~numpy.ndarray)
+        """
         # pylint: disable=too-many-arguments, too-many-locals
         row_ids = range(n_rows)
         ff_data, ff_size = None, None
@@ -178,19 +297,42 @@ class SynapseIORowBased(AbstractSynapseIO):
         # Return the data
         return max_row_length, row_data
 
-    @overrides(AbstractSynapseIO.get_synapses)
     def get_synapses(
             self, synapse_info, pre_slices, pre_slice_index,
             post_slices, post_slice_index, pre_vertex_slice,
             post_vertex_slice, n_delay_stages, population_table,
             n_synapse_types, weight_scales, machine_time_step,
             app_edge, machine_edge):
-        # pylint: disable=too-many-arguments, too-many-locals, arguments-differ
+        """ Get the synapses as an array of words for non-delayed synapses and\
+            an array of words for delayed synapses. This is used to prepare\
+            information for *deployment to SpiNNaker*.
+
+        :param SynapseInformation synapse_info:
+        :param list(~pacman.model.graphs.common.Slice) pre_slices:
+        :param int pre_slice_index:
+        :param list(~pacman.model.graphs.common.Slice) post_slices:
+        :param int post_slice_index:
+        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param int n_delay_stages:
+        :param MasterPopTableAsBinarySearch population_table:
+        :param int n_synapse_types:
+        :param dict(AbstractSynapseType,float) weight_scales:
+        :param int machine_time_step:
+        :param ProjectionApplicationEdge app_edge:
+        :param ProjectionMachineEdge machine_edge:
+        :return: (row_data, max_row_length, delayed_row_data,
+            max_delayed_row_length, delayed_source_ids, stages)
+        :rtype:
+            tuple(~numpy.ndarray, int, ~numpy.ndarray, int, ~numpy.ndarray,\
+            ~numpy.ndarray)
+        """
+        # pylint: disable=too-many-arguments, too-many-locals
         # pylint: disable=assignment-from-no-return
         # Get delays in timesteps
         max_delay = self.get_maximum_delay_supported_in_ms(machine_time_step)
         if max_delay is not None:
-            max_delay *= (1000.0 / machine_time_step)
+            max_delay *= (MICRO_TO_MILLISECOND_CONVERSION / machine_time_step)
 
         # Get the actual connections
         connections = synapse_info.connector.create_synaptic_block(
@@ -200,7 +342,8 @@ class SynapseIORowBased(AbstractSynapseIO):
 
         # Convert delays to timesteps
         connections["delay"] = numpy.rint(
-            connections["delay"] * (1000.0 / machine_time_step))
+            connections["delay"] * (
+                MICRO_TO_MILLISECOND_CONVERSION / machine_time_step))
 
         # Scale weights
         connections["weight"] = (connections["weight"] * weight_scales[
@@ -275,13 +418,28 @@ class SynapseIORowBased(AbstractSynapseIO):
         return (row_data, max_row_length, delayed_row_data,
                 max_delayed_row_length, delayed_source_ids, stages)
 
-    @overrides(AbstractSynapseIO.read_synapses)
     def read_synapses(
             self, synapse_info, pre_vertex_slice, post_vertex_slice,
             max_row_length, delayed_max_row_length, n_synapse_types,
-            weight_scales, data, delayed_data, n_delay_stages,
-            machine_time_step):
-        # pylint: disable=too-many-arguments, too-many-locals, arguments-differ
+            weight_scales, data, delayed_data, machine_time_step):
+        """ Read the synapses for a given projection synapse information\
+            object out of the given data. This is used to parse information\
+            *read from SpiNNaker*.
+
+        :param SynapseInformation synapse_info:
+        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param int max_row_length:
+        :param int delayed_max_row_length:
+        :param int n_synapse_types:
+        :param dict(AbstractSynapseType,float) weight_scales:
+        :param bytearray data:
+        :param bytearray delayed_data:
+        :param int machine_time_step:
+        :return: array with ``weight`` and ``delay`` columns
+        :rtype: ~numpy.ndarray
+        """
+        # pylint: disable=too-many-arguments, too-many-locals
 
         # Translate the data into rows
         row_data = None
@@ -314,7 +472,8 @@ class SynapseIORowBased(AbstractSynapseIO):
         connections = numpy.concatenate(connections)
 
         # Return the delays values to milliseconds
-        connections["delay"] /= 1000.0 / machine_time_step
+        connections["delay"] /= (
+                MICRO_TO_MILLISECOND_CONVERSION / machine_time_step)
 
         # Undo the weight scaling
         connections["weight"] /= weight_scales[synapse_info.synapse_type]
@@ -324,6 +483,11 @@ class SynapseIORowBased(AbstractSynapseIO):
 
     @staticmethod
     def _parse_static_data(row_data, dynamics):
+        """
+        :param ~numpy.ndarray row_data:
+        :param AbstractStaticSynapseDynamics dynamics:
+        :rtype: tuple(int, list(~numpy.ndarray))
+        """
         n_rows = row_data.shape[0]
         ff_size = row_data[:, 1]
         ff_words = dynamics.get_n_static_words_per_row(ff_size)
@@ -333,9 +497,40 @@ class SynapseIORowBased(AbstractSynapseIO):
             ff_size,
             [row_data[row, ff_start:ff_end[row]] for row in range(n_rows)])
 
+    def __convert_delayed_data(
+            self, n_synapses, pre_vertex_slice, delayed_connections):
+        """ Take the delayed_connections and convert the source ids and delay\
+            values
+        """
+        synapse_ids = range(len(n_synapses))
+        row_stage = numpy.array([
+            i // pre_vertex_slice.n_atoms
+            for i in synapse_ids], dtype="uint32")
+        row_min_delay = (row_stage + 1) * 16
+        connection_min_delay = numpy.concatenate([
+            numpy.repeat(row_min_delay[i], n_synapses[i])
+            for i in synapse_ids])
+        connection_source_extra = numpy.concatenate([
+            numpy.repeat(
+                row_stage[i] * numpy.uint32(pre_vertex_slice.n_atoms),
+                n_synapses[i])
+            for i in synapse_ids])
+        delayed_connections["source"] -= connection_source_extra
+        delayed_connections["source"] += pre_vertex_slice.lo_atom
+        delayed_connections["delay"] += connection_min_delay
+        return delayed_connections
+
     def _read_static_data(self, dynamics, pre_vertex_slice, post_vertex_slice,
                           n_synapse_types, row_data, delayed_row_data):
         """ Read static data.
+
+        :param AbstractStaticSynapseDynamics dynamics:
+        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param int n_synapse_types:
+        :param ~numpy.ndarray row_data:
+        :param ~numpy.ndarray delayed_row_data:
+        :rtype: list(~numpy.ndarray)
         """
         # pylint: disable=too-many-arguments, too-many-locals
         connections = []
@@ -355,28 +550,19 @@ class SynapseIORowBased(AbstractSynapseIO):
 
             # Use the row index to work out the actual delay and source
             n_synapses = dynamics.get_n_synapses_in_rows(ff_size)
-            synapse_ids = range(len(n_synapses))
-            row_stage = numpy.array([
-                i // pre_vertex_slice.n_atoms
-                for i in synapse_ids], dtype="uint32")
-            row_min_delay = (row_stage + 1) * 16
-            connection_min_delay = numpy.concatenate([
-                numpy.repeat(row_min_delay[i], n_synapses[i])
-                for i in synapse_ids])
-            connection_source_extra = numpy.concatenate([
-                numpy.repeat(
-                    row_stage[i] * numpy.uint32(pre_vertex_slice.n_atoms),
-                    n_synapses[i])
-                for i in synapse_ids])
-            delayed_connections["source"] -= connection_source_extra
-            delayed_connections["source"] += pre_vertex_slice.lo_atom
-            delayed_connections["delay"] += connection_min_delay
+            delayed_connections = self.__convert_delayed_data(
+                n_synapses, pre_vertex_slice, delayed_connections)
             connections.append(delayed_connections)
 
         return connections
 
     @staticmethod
     def _parse_plastic_data(row_data, dynamics):
+        """
+        :param ~numpy.ndarray row_data:
+        :param AbstractPlasticSynapseDynamics dynamics:
+        :rtype: tuple(int, list(~numpy.ndarray))
+        """
         n_rows = row_data.shape[0]
         pp_size = row_data[:, 0]
         pp_words = dynamics.get_n_plastic_plastic_words_per_row(pp_size)
@@ -395,6 +581,14 @@ class SynapseIORowBased(AbstractSynapseIO):
             self, dynamics, pre_vertex_slice, post_vertex_slice,
             n_synapse_types, row_data, delayed_row_data):
         """ Read plastic data.
+
+        :param AbstractPlasticSynapseDynamics dynamics:
+        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param int n_synapse_types:
+        :param ~numpy.ndarray row_data:
+        :param ~numpy.ndarray delayed_row_data:
+        :rtype: list(~numpy.ndarray)
         """
         # pylint: disable=too-many-arguments, too-many-locals
         connections = []
@@ -417,27 +611,18 @@ class SynapseIORowBased(AbstractSynapseIO):
 
             # Use the row index to work out the actual delay and source
             n_synapses = dynamics.get_n_synapses_in_rows(pp_size, fp_size)
-            synapse_ids = range(len(n_synapses))
-            row_stage = numpy.array([
-                (i // pre_vertex_slice.n_atoms)
-                for i in synapse_ids], dtype="uint32")
-            row_min_delay = (row_stage + 1) * 16
-            connection_min_delay = numpy.concatenate([
-                numpy.repeat(row_min_delay[i], n_synapses[i])
-                for i in synapse_ids])
-            connection_source_extra = numpy.concatenate([
-                numpy.repeat(
-                    row_stage[i] * numpy.uint32(pre_vertex_slice.n_atoms),
-                    n_synapses[i])
-                for i in synapse_ids])
-
-            delayed_connections["source"] -= connection_source_extra
-            delayed_connections["source"] += pre_vertex_slice.lo_atom
-            delayed_connections["delay"] += connection_min_delay
+            delayed_connections = self.__convert_delayed_data(
+                n_synapses, pre_vertex_slice, delayed_connections)
             connections.append(delayed_connections)
 
         return connections
 
-    @overrides(AbstractSynapseIO.get_block_n_bytes)
     def get_block_n_bytes(self, max_row_length, n_rows):
+        """ Get the number of bytes in a block given the max row length and\
+            number of rows
+
+        :param int max_row_length:
+        :param int n_rows:
+        :rtype: int
+        """
         return (_N_HEADER_WORDS + max_row_length) * BYTES_PER_WORD * n_rows
