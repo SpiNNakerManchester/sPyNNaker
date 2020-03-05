@@ -15,9 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// NOTE: If we want neuromodulation and structural plasticity to
-//       work together then this will need a bit of a rethink
-
 // Include post_events and common
 #include "post_events_with_da.h"
 #include "synapse_dynamics_stdp_common.h"
