@@ -190,7 +190,7 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
         selection_prob = 1.0 / float(synapse_info.n_post_neurons)
         n_connections = utility_calls.get_probable_maximum_selected(
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
-            self.__n_post, selection_prob,
+            self.__n_post * synapse_info.n_pre_neurons, selection_prob,
             chance=1.0/100000.0)
         return int(math.ceil(n_connections))
 

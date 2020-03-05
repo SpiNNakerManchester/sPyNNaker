@@ -14,10 +14,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy
+from pyNN.random import RandomDistribution
 from .abstract_connector import AbstractConnector
 from spynnaker.pyNN.exceptions import SpynnakerException
-from spinn_front_end_common.utilities.globals_variables import get_simulator
-from pacman.model.decorators.overrides import overrides
+from spinn_utilities.overrides import overrides
 from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from .abstract_generate_connector_on_machine \
@@ -47,8 +47,9 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
 
     def __init__(
             self, shape_pre, shape_post, shape_kernel, weight_kernel,
-            delay_kernel, shape_common, pre_sample_steps, pre_start_coords,
-            post_sample_steps, post_start_coords, safe, verbose,
+            delay_kernel, shape_common, pre_sample_steps_in_post,
+            pre_start_coords_in_post, post_sample_steps_in_pre,
+            post_start_coords_in_pre, safe, verbose,
             callback=None):
         """
         :param shape_pre:\
@@ -65,10 +66,10 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
         :param shape_common (optional):\
             2D shape of common coordinate system (for both pre and post, \
             usually the input image sizes)
-        :param pre/post_sample_steps (optional):\
+        :param pre/post_sample_steps_in_post/pre (optional):\
             Sampling steps/jumps for pre/post pop <=> (startX, endX, _stepX_)
             None or 2-item array
-        :param pre/post_start_coords (optional):\
+        :param pre/post_start_coords_in_post/pre (optional):\
             Starting row/col for pre/post sampling <=> (_startX_, endX, stepX)
             None or 2-item array
         """
@@ -90,33 +91,33 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
         self._post_h = shape_post[HEIGHT]
 
         # Get the starting coords and step sizes (or defaults if not given)
-        if pre_start_coords is None:
+        if pre_start_coords_in_post is None:
             self._pre_start_w = 0
             self._pre_start_h = 0
         else:
-            self._pre_start_w = pre_start_coords[WIDTH]
-            self._pre_start_h = pre_start_coords[HEIGHT]
+            self._pre_start_w = pre_start_coords_in_post[WIDTH]
+            self._pre_start_h = pre_start_coords_in_post[HEIGHT]
 
-        if post_start_coords is None:
+        if post_start_coords_in_pre is None:
             self._post_start_w = 0
             self._post_start_h = 0
         else:
-            self._post_start_w = post_start_coords[WIDTH]
-            self._post_start_h = post_start_coords[HEIGHT]
+            self._post_start_w = post_start_coords_in_pre[WIDTH]
+            self._post_start_h = post_start_coords_in_pre[HEIGHT]
 
-        if pre_sample_steps is None:
+        if pre_sample_steps_in_post is None:
             self._pre_step_w = 1
             self._pre_step_h = 1
         else:
-            self._pre_step_w = pre_sample_steps[WIDTH]
-            self._pre_step_h = pre_sample_steps[HEIGHT]
+            self._pre_step_w = pre_sample_steps_in_post[WIDTH]
+            self._pre_step_h = pre_sample_steps_in_post[HEIGHT]
 
-        if post_sample_steps is None:
+        if post_sample_steps_in_pre is None:
             self._post_step_w = 1
             self._post_step_h = 1
         else:
-            self._post_step_w = post_sample_steps[WIDTH]
-            self._post_step_h = post_sample_steps[HEIGHT]
+            self._post_step_w = post_sample_steps_in_pre[WIDTH]
+            self._post_step_h = post_sample_steps_in_pre[HEIGHT]
 
         # Make sure the supplied values are in the correct format
         self._krn_weights = self.get_kernel_vals(weight_kernel)
@@ -164,7 +165,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
             return None
         krn_size = self._kernel_h * self._kernel_w
         krn_shape = (self._kernel_h, self._kernel_w)
-        if get_simulator().is_a_pynn_random(vals):
+        if isinstance(vals, RandomDistribution):
             return numpy.array(vals.next(krn_size)).reshape(krn_shape)
         elif numpy.isscalar(vals):
             return vals * numpy.ones(krn_shape)

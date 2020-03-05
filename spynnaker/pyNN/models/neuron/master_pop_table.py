@@ -17,13 +17,11 @@ import logging
 import math
 import struct
 import numpy
-from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.models.neural_projections import (
     ProjectionApplicationEdge, ProjectionMachineEdge)
 from spynnaker.pyNN.exceptions import (
     SynapseRowTooBigException, SynapticConfigurationException)
-from .abstract_master_pop_table_factory import AbstractMasterPopTableFactory
 
 logger = logging.getLogger(__name__)
 _TWO_WORDS = struct.Struct("<II")
@@ -76,7 +74,7 @@ class _MasterPopEntry(object):
         return self.__addresses_and_row_lengths
 
 
-class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
+class MasterPopTableAsBinarySearch(object):
     """ Master population table, implemented as binary search master.
     """
     __slots__ = [
@@ -103,9 +101,9 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         self.__n_addresses = 0
         self.__n_single_entries = None
 
-    @overrides(AbstractMasterPopTableFactory.get_master_population_table_size)
-    def get_master_population_table_size(self, vertex_slice, in_edges):
-        """
+    def get_master_population_table_size(self, in_edges):
+        """ Get the size of the master population table in SDRAM
+
         :param vertex_slice: the slice of the vertex
         :param in_edges: the in coming edges
         :return: the size the master pop table will take in SDRAM (in bytes)
@@ -116,9 +114,7 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         n_vertices = 0
         n_entries = 0
         for in_edge in in_edges:
-
             if isinstance(in_edge, ProjectionApplicationEdge):
-
                 # TODO: Fix this to be more accurate!
                 # May require modification to the master population table
                 # Get the number of atoms per core incoming
@@ -192,17 +188,16 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         self.__n_addresses = 0
         self.__n_single_entries = 0
 
-    @overrides(AbstractMasterPopTableFactory.update_master_population_table,
-               extend_doc=False)
     def update_master_population_table(
-            self, spec, block_start_addr, row_length, key_and_mask,
-            master_pop_table_region, is_single=False):
+            self, block_start_addr, row_length, key_and_mask, is_single=False):
         """ Add an entry in the binary search to deal with the synaptic matrix
 
         :param spec: the writer for DSG
         :param block_start_addr: where the synaptic matrix block starts
         :param row_length: how long in bytes each synaptic entry is
         :param key_and_mask: the key and mask for this master pop entry
+        :type key_and_mask: \
+            :py:class:`pacman.model.routing_info.BaseKeyAndMask`
         :param master_pop_table_region: the region ID for the master pop
         :param is_single: \
             Flag that states if the entry is a direct entry for a single row.
@@ -223,8 +218,13 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
         self.__n_addresses += 1
         return index
 
-    @overrides(AbstractMasterPopTableFactory.finish_master_pop_table)
     def finish_master_pop_table(self, spec, master_pop_table_region):
+        """ Complete the master pop table in the data specification.
+
+        :param spec: the data specification to write the master pop entry to
+        :param master_pop_table_region: \
+            the region to which the master pop table is being stored
+        """
         spec.switch_write_focus(region=master_pop_table_region)
 
         # sort entries by key
@@ -270,11 +270,23 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
                 (row_length & self.ROW_LENGTH_MASK))
         return count
 
-    @overrides(
-        AbstractMasterPopTableFactory.extract_synaptic_matrix_data_location)
     def extract_synaptic_matrix_data_location(
             self, incoming_key, master_pop_base_mem_address, txrx,
             chip_x, chip_y):
+        """
+        :param incoming_key: \
+            the source key which the synaptic matrix needs to be mapped to
+        :param master_pop_base_mem_address: the base address of the master pop
+        :param txrx: the transceiver object
+        :param chip_y: the y coordinate of the chip of this master pop
+        :param chip_x: the x coordinate of the chip of this master pop
+        :type incoming_key: int
+        :type master_pop_base_mem_address: int
+        :type chip_y: int
+        :type chip_x: int
+        :type txrx: :py:class:`spinnman.transceiver.Transceiver`
+        :return: a synaptic matrix memory position.
+        """
         # pylint: disable=too-many-arguments, too-many-locals, arguments-differ
 
         # get entries in master pop
@@ -343,6 +355,10 @@ class MasterPopTableAsBinarySearch(AbstractMasterPopTableFactory):
                 imax = imid
         return None
 
-    @overrides(AbstractMasterPopTableFactory.get_edge_constraints)
     def get_edge_constraints(self):
+        """ Gets the constraints for this table on edges coming in to a vertex.
+
+        :return: a list of constraints
+        :rtype: list(:py:class:`pacman.model.constraints.AbstractConstraint`)
+        """
         return list()

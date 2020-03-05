@@ -48,9 +48,9 @@ static void *connection_generator_all_to_all_initialise(address_t *region) {
     *region = (void *) params_sdram;
 
     log_debug("All to all connector, pre_lo = %u, pre_hi = %u, "
-    		"post_lo = %u, post_hi = %u, count_post = %u, allow_self_connections = %u",
+            "post_lo = %u, post_hi = %u, allow_self_connections = %u",
             params->pre_lo, params->pre_hi, params->post_lo, params->post_hi,
-			count_post, params->allow_self_connections);
+            params->allow_self_connections);
 
     return params;
 }
@@ -77,8 +77,8 @@ static uint32_t connection_generator_all_to_all_generate(
 
     // If not in the pre-population view range, then don't generate
     if ((pre_neuron_index < obj->pre_lo) ||
-    		(pre_neuron_index > obj->pre_hi)) {
-    	return 0;
+            (pre_neuron_index > obj->pre_hi)) {
+        return 0;
     }
 
     // Add a connection to this pre-neuron for each post-neuron...
@@ -92,7 +92,7 @@ static uint32_t connection_generator_all_to_all_generate(
         }
         // ... or if the value is not in the range of the post-population view
         if ((i + post_slice_start < obj->post_lo) || (i + post_slice_start > obj->post_hi)) {
-        	continue;
+            continue;
         }
         indices[n_conns++] = i;
     }

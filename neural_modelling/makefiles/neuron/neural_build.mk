@@ -226,10 +226,10 @@ endif
 OTHER_SOURCES_CONVERTED := $(call strip_source_dirs,$(OTHER_SOURCES))
 
 # List all the sources relative to one of SOURCE_DIRS
-SOURCES = common/out_spikes.c \
-          neuron/c_main.c \
+SOURCES = neuron/c_main.c \
           neuron/synapses.c \
           neuron/neuron.c \
+          neuron/neuron_recording.c \
           neuron/spike_processing.c \
           neuron/population_table/population_table_$(POPULATION_TABLE_IMPL)_impl.c \
           $(NEURON_MODEL) $(SYNAPSE_DYNAMICS) $(WEIGHT_DEPENDENCE) \
@@ -335,6 +335,12 @@ $(ELIMINATION_O): $(ELIMINATION_C) $(SYNAPSE_TYPE_H)
 $(BUILD_DIR)neuron/neuron.o: $(MODIFIED_DIR)neuron/neuron.c $(NEURON_MODEL_H) \
                              $(SYNAPSE_TYPE_H)
 	# neuron.o
+	-@mkdir -p $(dir $@)
+	$(CC) -DLOG_LEVEL=$(NEURON_DEBUG) $(CFLAGS) $(NEURON_INCLUDES) -o $@ $<
+	
+$(BUILD_DIR)neuron/neuron_recording.o: $(MODIFIED_DIR)neuron/neuron_recording.c $(NEURON_MODEL_H) \
+                             $(SYNAPSE_TYPE_H)
+	# neuron_recording.o
 	-@mkdir -p $(dir $@)
 	$(CC) -DLOG_LEVEL=$(NEURON_DEBUG) $(CFLAGS) $(NEURON_INCLUDES) -o $@ $<
 

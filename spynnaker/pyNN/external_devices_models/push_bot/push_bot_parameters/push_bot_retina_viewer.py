@@ -28,6 +28,12 @@ _BUFFER_SIZE = 512
 
 
 class PushBotRetinaViewer(Thread):
+    """ A viewer for the pushbot's retina. This is a thread that can be \
+        launched in parallel with the control code.
+
+    Based on matplotlib
+    """
+
     def __init__(
             self, resolution, port=0, display_max=_DISPLAY_MAX,
             frame_time_ms=_FRAME_TIME_MS,
@@ -115,10 +121,12 @@ class PushBotRetinaViewer(Thread):
         return [self.__image]
 
     def run(self):
+        """ How the viewer works when the thread is running.
+        """
         # Create image plot of retina output
         fig = self.__pyplot.figure()
         self.__image = self.__pyplot.imshow(
-            self.__image_data_view, cmap="jet", vmin=0.0,
+            self.__image_data_view, cmap="viridis", vmin=0.0,
             vmax=self.__display_max)
 
         # Play animation
