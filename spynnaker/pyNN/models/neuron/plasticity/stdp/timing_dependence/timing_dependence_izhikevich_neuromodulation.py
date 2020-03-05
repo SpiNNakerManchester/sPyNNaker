@@ -26,13 +26,13 @@ from spinn_front_end_common.utilities.globals_variables import get_simulator
 
 logger = logging.getLogger(__name__)
 
-LOOKUP_TAU_PLUS_SIZE = 256
+# LOOKUP_TAU_PLUS_SIZE = 256
 LOOKUP_TAU_PLUS_SHIFT = 0
-LOOKUP_TAU_MINUS_SIZE = 256
+# LOOKUP_TAU_MINUS_SIZE = 256
 LOOKUP_TAU_MINUS_SHIFT = 0
-LOOKUP_TAU_C_SIZE = 520
+# LOOKUP_TAU_C_SIZE = 520
 LOOKUP_TAU_C_SHIFT = 4
-LOOKUP_TAU_D_SIZE = 370
+# LOOKUP_TAU_D_SIZE = 370
 LOOKUP_TAU_D_SHIFT = 2
 
 
@@ -59,20 +59,16 @@ class TimingDependenceIzhikevichNeuromodulation(AbstractTimingDependence):
         ts = get_simulator().machine_time_step / 1000.0
         self.__tau_plus_data = get_exp_lut_array(
             ts, self.__tau_plus,
-            shift=LOOKUP_TAU_PLUS_SHIFT,
-            size=LOOKUP_TAU_PLUS_SIZE)
+            shift=LOOKUP_TAU_PLUS_SHIFT)
         self.__tau_minus_data = get_exp_lut_array(
             ts, self.__tau_minus,
-            shift=LOOKUP_TAU_MINUS_SHIFT,
-            size=LOOKUP_TAU_MINUS_SIZE)
+            shift=LOOKUP_TAU_MINUS_SHIFT)
         self.__tau_c_data = get_exp_lut_array(
             ts, self.__tau_c,
-            shift=LOOKUP_TAU_C_SHIFT,
-            size=LOOKUP_TAU_C_SIZE)
+            shift=LOOKUP_TAU_C_SHIFT)
         self.__tau_d_data = get_exp_lut_array(
             ts, self.__tau_d,
-            shift=LOOKUP_TAU_D_SHIFT,
-            size=LOOKUP_TAU_D_SIZE)
+            shift=LOOKUP_TAU_D_SHIFT)
 
     @property
     def tau_plus(self):
