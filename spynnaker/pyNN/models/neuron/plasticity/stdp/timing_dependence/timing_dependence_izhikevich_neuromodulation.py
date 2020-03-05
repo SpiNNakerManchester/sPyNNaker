@@ -130,8 +130,8 @@ class TimingDependenceIzhikevichNeuromodulation(AbstractTimingDependence):
         # function and write to SDRAM.
         weight_update_component = \
             1 / (-((1.0/self.__tau_c) + (1.0/self.__tau_d)))
-        weight_update_component = float_to_fixed(weight_update_component,
-                                                 (1 << 11))
+        weight_update_component = int(round(float(
+            weight_update_component) * float(1 << 11)))
         spec.write_value(data=weight_update_component,
                          data_type=DataType.INT32)
 
