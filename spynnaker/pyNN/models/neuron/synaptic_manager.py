@@ -936,11 +936,23 @@ class SynapticManager(object):
             weight_scale):
         """ Get the ring buffer shifts for this vertex
         """
+        if (self.__ring_buffer_shifts is None and
+                hasattr(application_vertex, "rb_left_shifts")):
+            print("=" * 80)
+            print("Using given values for RB left shifts.")
+            self.__ring_buffer_shifts = application_vertex.rb_left_shifts
+            print("RB left shifts for {:20}".format(application_vertex.label),
+                  "=", self.__ring_buffer_shifts)
+            print("-" * 80)
         if self.__ring_buffer_shifts is None:
+            print("=" * 80)
+            print("Computing values for RB left shifts...")
             self.__ring_buffer_shifts = \
                 self._get_ring_buffer_to_input_left_shifts(
                     application_vertex, application_graph, machine_timestep,
                     weight_scale)
+            print("RB left shifts for {:20}".format(application_vertex.label),
+                  "=", self.__ring_buffer_shifts)
         return self.__ring_buffer_shifts
 
     def write_data_spec(
@@ -971,18 +983,9 @@ class SynapticManager(object):
             all_syn_block_sz, graph_mapper, application_graph,
             application_vertex)
 
-        print("=" * 80)
-        if hasattr(application_vertex, "rb_left_shifts"):
-            print("Using given values for RB left shifts.")
-            ring_buffer_shifts = application_vertex.rb_left_shifts
-        else:
-            print("Computing values for RB left shifts...")
-            ring_buffer_shifts = self._get_ring_buffer_shifts(
-                application_vertex, application_graph, machine_time_step,
-                weight_scale)
-        print("RB left shifts for {:20}".format(application_vertex.label),
-              "=", ring_buffer_shifts)
-        print("-" * 80)
+        ring_buffer_shifts = self._get_ring_buffer_shifts(
+            application_vertex, application_graph, machine_time_step,
+            weight_scale)
         weight_scales = self._write_synapse_parameters(
             spec, ring_buffer_shifts, weight_scale)
 

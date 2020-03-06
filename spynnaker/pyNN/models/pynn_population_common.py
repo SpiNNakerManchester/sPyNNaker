@@ -84,7 +84,7 @@ class PyNNPopulationCommon(object):
                 population_parameters.update(additional_parameters)
             self.__vertex = model.create_vertex(
                 size, label, constraints, **population_parameters)
-            if rb_left_shifts:
+            if rb_left_shifts is not None:
                 self.__vertex.rb_left_shifts = rb_left_shifts
 
         # Use a provided application vertex directly
