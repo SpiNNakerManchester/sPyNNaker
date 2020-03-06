@@ -545,10 +545,6 @@ class SynapticManager(object):
         if weights_signed:
             max_weight_powers = (m + 1 for m in max_weight_powers)
         rb_ls = list(max_weight_powers)
-        print("=" * 60)
-        print("RB left shifts for {:20}".format(application_vertex.label),
-              "=", rb_ls)
-        print("-" * 60)
         return rb_ls
 
     @staticmethod
@@ -975,9 +971,18 @@ class SynapticManager(object):
             all_syn_block_sz, graph_mapper, application_graph,
             application_vertex)
 
-        ring_buffer_shifts = self._get_ring_buffer_shifts(
-            application_vertex, application_graph, machine_time_step,
-            weight_scale)
+        print("=" * 80)
+        if hasattr(application_vertex, "rb_left_shifts"):
+            print("Using given values for RB left shifts.")
+            ring_buffer_shifts = application_vertex.rb_left_shifts
+        else:
+            print("Computing values for RB left shifts...")
+            ring_buffer_shifts = self._get_ring_buffer_shifts(
+                application_vertex, application_graph, machine_time_step,
+                weight_scale)
+        print("RB left shifts for {:20}".format(application_vertex.label),
+              "=", ring_buffer_shifts)
+        print("-" * 80)
         weight_scales = self._write_synapse_parameters(
             spec, ring_buffer_shifts, weight_scale)
 
