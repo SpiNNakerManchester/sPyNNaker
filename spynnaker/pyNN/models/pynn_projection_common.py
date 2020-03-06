@@ -189,13 +189,16 @@ class PyNNProjectionCommon(object):
         # add projection to the SpiNNaker control system
         spinnaker_control.add_projection(self)
 
+        # reset the ring buffer shifts
+        post_vertex = post_synaptic_population._get_vertex
+        post_vertex.reset_ring_buffer_shifts()
+
         # If there is a virtual board, we need to hold the data in case the
         # user asks for it
         self.__virtual_connection_list = None
         if spinnaker_control.use_virtual_board:
             self.__virtual_connection_list = list()
             pre_vertex = pre_synaptic_population._get_vertex
-            post_vertex = post_synaptic_population._get_vertex
             connection_holder = ConnectionHolder(
                 None, False, pre_vertex.n_atoms, post_vertex.n_atoms,
                 self.__virtual_connection_list)

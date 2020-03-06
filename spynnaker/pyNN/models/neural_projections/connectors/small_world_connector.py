@@ -27,10 +27,11 @@ class SmallWorldConnector(AbstractConnector):
         "__rewiring"]
 
     def __init__(
-            self, degree, rewiring, allow_self_connections=True, safe=True,
-            callback=None, verbose=False, n_connections=None):
+            self, degree, rewiring, allow_self_connections=True,
+            n_connections=None, rng=None, safe=True, callback=None,
+            verbose=False):
         # pylint: disable=too-many-arguments
-        super(SmallWorldConnector, self).__init__(safe, callback, verbose)
+        super(SmallWorldConnector, self).__init__(safe, callback, verbose, rng)
         self.__rewiring = rewiring
         self.__degree = degree
         self.__allow_self_connections = allow_self_connections
