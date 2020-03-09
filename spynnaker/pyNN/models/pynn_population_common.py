@@ -75,7 +75,8 @@ class PyNNPopulationCommon(object):
                     "A population cannot have a negative or zero size.")
             population_parameters = dict(model.default_population_parameters)
 
-            if "rb_left_shifts" in additional_parameters.keys():
+            if (additional_parameters is not None and
+                    "rb_left_shifts" in additional_parameters.keys()):
                 rb_left_shifts = additional_parameters['rb_left_shifts']
                 del additional_parameters['rb_left_shifts']
             else:
