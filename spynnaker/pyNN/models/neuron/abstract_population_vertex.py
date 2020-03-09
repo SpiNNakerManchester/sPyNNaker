@@ -17,6 +17,8 @@ import logging
 import os
 import math
 from spinn_utilities.overrides import overrides
+from data_specification.constants import (
+    APP_PTR_TABLE_HEADER_BYTE_SIZE, MAX_MEM_REGIONS)
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
 from pacman.executor.injection_decorator import inject_items
@@ -33,7 +35,7 @@ from spinn_front_end_common.abstract_models.impl import (
 from spinn_front_end_common.utilities import (
     constants as common_constants, helpful_functions, globals_variables)
 from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, SYSTEM_BYTES_REQUIREMENT)
+    BYTES_PER_WORD, SYSTEM_BYTES_REQUIREMENT, SARK_PER_MALLOC_SDRAM_USAGE, SIMULATION_N_BYTES)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
@@ -192,15 +194,15 @@ class AbstractPopulationVertex(
             self, vertex_slice, graph, machine_time_step):
         # pylint: disable=arguments-differ
 
-        variableSDRAM = self.__neuron_recorder.get_variable_sdram_usage(
+        recordingSDRAM = self.__neuron_recorder.get_recording_sdram_usage(
             vertex_slice)
-        constantSDRAM = ConstantSDRAM(
+        dsgSDRAM = ConstantSDRAM(
                 self._get_sdram_usage_for_atoms(
                     vertex_slice, graph, machine_time_step))
 
         # set resources required from this object
         container = ResourceContainer(
-            sdram=variableSDRAM + constantSDRAM,
+            sdram=recordingSDRAM + dsgSDRAM,
             dtcm=DTCMResource(self.get_dtcm_usage_for_atoms(vertex_slice)),
             cpu_cycles=CPUCyclesPerTickResource(
                 self.get_cpu_usage_for_atoms(vertex_slice)))
@@ -262,15 +264,46 @@ class AbstractPopulationVertex(
 
     def _get_sdram_usage_for_atoms(
             self, vertex_slice, graph, machine_time_step):
+
+        old_overhead = SYSTEM_BYTES_REQUIREMENT
+        #DATA_SPECABLE_BASIC_SETUP_INFO_N_BYTES + SIMULATION_N_BYTES
+        #APP_PTR_TABLE_BYTE_SIZE + SARK_PER_MALLOC_SDRAM_USAGE + SIMULATION_N_BYTES
+        #APP_PTR_TABLE_HEADER_BYTE_SIZE + MAX_MEM_REGIONS * 4 + SARK_PER_MALLOC_SDRAM_USAGE + SIMULATION_N_BYTES
+        #8 + 16 * 4 + (2 * 4) + (3 * 4) = 92
+
+        new_overhead = APP_PTR_TABLE_HEADER_BYTE_SIZE + MAX_MEM_REGIONS * 4
+        #SYSTEM = 0
+        region_0 = SIMULATION_N_BYTES
+        # NEURON_PARAMS = 1
+        region_1 = self._get_sdram_usage_for_neuron_params(vertex_slice)
+        # NEURON_RECORDING = 6
+        region_6 = self._neuron_recorder.get_data_spec_sdram_usage(vertex_slice)
+        # PROVENANCE_DATA = 7
+        region_7 = PopulationMachineVertex.get_provenance_data_size(
+                PopulationMachineVertex.N_ADDITIONAL_PROVENANCE_DATA_ITEMS)
+        # SYNAPSE_PARAMS = 2
+        # POPULATION_TABLE = 3
+        # SYNAPTIC_MATRIX = 4
+        # DIRECT_MATRIX = 10
+        sm_regions = self.__synapse_manager.get_sdram_usage_in_bytes(
+                vertex_slice, machine_time_step, graph, self)
+        # PROFILING = 8
+        region_8 = profile_utils.get_profile_region_size(
+            self.__n_profile_samples)
+
+        region_sum = region_0 + region_1 + sm_regions + region_6 + region_7 + region_8
+        malloced = new_overhead + region_sum
+        sdram_cost = malloced + SARK_PER_MALLOC_SDRAM_USAGE
+
         sdram_requirement = (
-            SYSTEM_BYTES_REQUIREMENT +
-            self._get_sdram_usage_for_neuron_params(vertex_slice) +
-            self._neuron_recorder.get_static_sdram_usage(vertex_slice) +
-            PopulationMachineVertex.get_provenance_data_size(
+                SYSTEM_BYTES_REQUIREMENT +
+                self._get_sdram_usage_for_neuron_params(vertex_slice) +
+                self._neuron_recorder.get_data_spec_sdram_usage(vertex_slice) +
+                PopulationMachineVertex.get_provenance_data_size(
                 PopulationMachineVertex.N_ADDITIONAL_PROVENANCE_DATA_ITEMS) +
-            self.__synapse_manager.get_sdram_usage_in_bytes(
+                self.__synapse_manager.get_sdram_usage_in_bytes(
                 vertex_slice, machine_time_step, graph, self) +
-            profile_utils.get_profile_region_size(self.__n_profile_samples))
+                profile_utils.get_profile_region_size(self.__n_profile_samples))
 
         return sdram_requirement
 
@@ -288,7 +321,7 @@ class AbstractPopulationVertex(
 
         spec.reserve_memory_region(
             region=POPULATION_BASED_REGIONS.NEURON_RECORDING.value,
-            size=self._neuron_recorder.get_static_sdram_usage(vertex_slice),
+            size=self._neuron_recorder.get_data_spec_sdram_usage(vertex_slice),
             label="neuron recording")
 
         profile_utils.reserve_profile_region(

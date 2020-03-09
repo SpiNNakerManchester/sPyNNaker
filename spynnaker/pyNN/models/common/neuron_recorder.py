@@ -641,7 +641,7 @@ class NeuronRecorder(object):
 
     def get_sdram_usage_in_bytes(self, vertex_slice):
         n_words_for_n_neurons = int(
-            math.ceil(vertex_slice.n_atoms // BYTES_PER_WORD))
+            math.ceil(vertex_slice.n_atoms / BYTES_PER_WORD))
         n_bytes_for_n_neurons = n_words_for_n_neurons * BYTES_PER_WORD
         var_bytes = (
             (self.N_BYTES_PER_RATE + self.N_BYTES_PER_SIZE +
@@ -666,21 +666,23 @@ class NeuronRecorder(object):
         fixed_sdram += self.N_BYTES_PER_INDEX * total_neurons
         return fixed_sdram
 
-    def get_static_sdram_usage(self, vertex_slice):
+    def get_data_spec_sdram_usage(self, vertex_slice):
         n_record = len(self.__sampling_rates)
-        sdram = (
-            recording_utilities.get_recording_header_size(n_record) +
-            recording_utilities.get_recording_data_constant_size(n_record) +
-            self.get_sdram_usage_in_bytes(vertex_slice))
+        header_size = recording_utilities.get_recording_header_size(n_record)
+        # Size for n_vars, n_bitfields and _get_data
+        sdram_size = self.get_sdram_usage_in_bytes(vertex_slice)
+        sdram = (header_size + sdram_size)
         return int(sdram)
 
-    def get_variable_sdram_usage(self, vertex_slice):
+    def get_recording_sdram_usage(self, vertex_slice):
         fixed_sdram = 0
         per_timestep_sdram = 0
         for variable in self.__sampling_rates:
             rate = self.__sampling_rates[variable]
             fixed_sdram += self._get_fixed_sdram_usage(vertex_slice)
             if rate > 0:
+                fixed_sdram += \
+                    recording_utilities.get_recording_data_constant_size(1)
                 fixed_sdram += self.SARK_BLOCK_SIZE
                 per_record = self.get_buffered_sdram_per_record(
                     variable, vertex_slice)
@@ -773,6 +775,7 @@ class NeuronRecorder(object):
         return numpy.concatenate(data)
 
     def get_global_parameters(self, vertex_slice):
+        # DEAD?
         params = []
         for variable in self.__sampling_rates:
             params.append(NeuronParameter(
