@@ -168,8 +168,8 @@ static inline void setup_synaptic_dma_write(uint32_t dma_buffer_index) {
 static void multicast_packet_received_callback(uint key, uint payload) {
     use(payload);
     any_spike = true;
-    io_printf(IO_BUF, "mc packet received \n");
-    log_debug("Received spike %x at %d, DMA Busy = %d", key, time, dma_busy);
+//    io_printf(IO_BUF, "mc packet received \n");
+//    io_printf(IO_BUF, "Received spike %x at %d, DMA Busy = %d", key, time, dma_busy);
 
     // If there was space to add spike to incoming spike queue
     if (in_spikes_add_spike(key)) {
@@ -204,7 +204,7 @@ static void dma_complete_callback(uint unused, uint tag) {
 
     log_debug("DMA transfer complete at time %u with tag %u", time, tag);
 
-    io_printf(IO_BUF, "Entering DMA Complete...\n");
+//    io_printf(IO_BUF, "Entering DMA Complete...\n");
     log_info("Entering DMA Complete...\n");
 
     // Get pointer to current buffer
@@ -248,7 +248,7 @@ static void multicast_packet_wpayload_received_callback(uint key, uint payload){
 	learning_signal = kbits(payload);
 
 	// Print payload to test transmission of error
-	io_printf(IO_BUF, "payload: %k\n", learning_signal);
+//	io_printf(IO_BUF, "payload: %k\n", learning_signal);
 
 	// Assign learning signal to global memory
 

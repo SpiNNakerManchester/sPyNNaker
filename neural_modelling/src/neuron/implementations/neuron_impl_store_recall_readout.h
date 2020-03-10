@@ -233,7 +233,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
     // Change broadcasted value and state with probability
     // State - 0: idle, 1: storing, 2:stored-idle, 3:recall
-    if (timer % 200 == 0){
+    if (timer % 200 == 0 && neuron_index == 2){ //todo check this isn't changing for every neuron
         if (store_recall_state == STATE_RECALL || store_recall_state == STATE_STORING){
             store_recall_state = (store_recall_state + 1) % STATE_SHIFT;
         }
@@ -317,30 +317,12 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     external_bias += additional_input_get_input_value_as_current(
     		additional_input, voltage);
 
-    // If during recall calculate error
-    if (neuron_index == 2 && store_recall_state == STATE_RECALL){
-        ticks_for_mean += 1;
-        // Softmax of the exc and inh inputs representing 1 and 0 respectively
-        // may need to scale to stop huge numbers going in the exp
-        global_parameters->mean_0 += global_parameters->readout_V_0;
-        global_parameters->mean_1 += global_parameters->readout_V_1;
-        accum exp_0 = expk(global_parameters->mean_0 / ticks_for_mean);
-        accum exp_1 = expk(global_parameters->mean_1 / ticks_for_mean);
-        accum softmax_0 = exp_0 / (exp_1 + exp_0);
-        accum softmax_1 = exp_1 / (exp_1 + exp_0);
-        // What to do if log(0)?
-        if (stored_value){
-            global_parameters->cross_entropy = -logk(softmax_1);
-        }
-        else{
-            global_parameters->cross_entropy = -logk(softmax_0);
-        }
-    }
     // Reset values after recall
     if (store_recall_state == STATE_IDLE){
         ticks_for_mean = 0;
         global_parameters->mean_0 == 0;
         global_parameters->mean_1 == 0;
+        //todo check if readout_V_0/1 need resetting too
     }
 
     if (neuron_index == 0){
@@ -370,18 +352,38 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
     	recorded_variable_values[V_RECORDING_INDEX] = stored_value;
     	// Switched to always broadcasting error but with packet
-    	if (store_recall_state == STATE_RECALL){
-    	    // Broadcast error
+    	if (store_recall_state == STATE_RECALL){ //todo ensure this neuron id is correct
+            ticks_for_mean += 1; //todo is it a running error like this over recall?
+            // Softmax of the exc and inh inputs representing 1 and 0 respectively
+            // may need to scale to stop huge numbers going in the exp
+            global_parameters->mean_0 += global_parameters->readout_V_0;
+            global_parameters->mean_1 += global_parameters->readout_V_1;
+            accum exp_0 = expk(global_parameters->mean_0 / ticks_for_mean);
+            accum exp_1 = expk(global_parameters->mean_1 / ticks_for_mean);
+            accum softmax_0 = exp_0 / (exp_1 + exp_0);
+            accum softmax_1 = exp_1 / (exp_1 + exp_0);
+            // What to do if log(0)?
+            if (stored_value){
+                global_parameters->cross_entropy = -logk(softmax_1);
+            }
+            else{
+                global_parameters->cross_entropy = -logk(softmax_0);
+            }
+            while (!spin1_send_mc_packet(
+                    key | neuron_index,  bitsk(error), 1 )) {
+                spin1_delay_us(1);
+            }
     	}
-
-    } else if (neuron_index == 3){ // this is the deprecated
-
-    	// Boundary of -0.7 because ln(0.5) =~= -0.7 representing random choice point, > -0.7 is more correct than not
-    	if (global_parameters->cross_entropy < -0.7){
-            // it's incorrect so change doing what you're doing or suppress synapses?
-    	}
-        timer++; // update this here, as needs to be done once per iteration over all the neurons
+        timer++;
     }
+//    else if (neuron_index == 3){ // this is the deprecated
+//
+//    	// Boundary of -0.7 because ln(0.5) =~= -0.7 representing random choice point, > -0.7 is more correct than not
+//    	if (global_parameters->cross_entropy < -0.7){
+//            // it's incorrect so change doing what you're doing or suppress synapses?
+//    	}
+//        timer++; // update this here, as needs to be done once per iteration over all the neurons
+//    }
 
     // Shape the existing input according to the included rule
     synapse_types_shape_input(synapse_type);

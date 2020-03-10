@@ -39,7 +39,7 @@ void neuron_model_set_global_neuron_params(
     use(params);
 
     local_eta = params->eta;
-    io_printf(IO_BUF, "local eta = %k", local_eta);
+    io_printf(IO_BUF, "local eta = %k\n", local_eta);
     // Does Nothing - no params
 }
 
@@ -65,8 +65,8 @@ state_t neuron_model_state_update(
     input_t input_this_timestep =
     		exc_input[0] + exc_input[1] + neuron->I_offset;
 
-        lif_neuron_closed_form(
-                neuron, neuron->V_membrane, input_this_timestep, B_t);
+    lif_neuron_closed_form(
+            neuron, neuron->V_membrane, input_this_timestep, B_t);
 
     // If outside of the refractory period
     if (neuron->refract_timer <= 0) {
@@ -89,7 +89,7 @@ state_t neuron_model_state_update(
 //			0.3k *
 			(1.0k - psi_temp2) : 0.0k;
 
-    uint32_t total_synapses_per_neuron = 1;
+    uint32_t total_synapses_per_neuron = 1; //todo should this be fixed
 
 
 //    neuron->psi = neuron->psi << 10;
@@ -102,7 +102,6 @@ state_t neuron_model_state_update(
 
     // All operations now need doing once per eprop synapse
     for (uint32_t syn_ind=0; syn_ind < total_synapses_per_neuron; syn_ind++){
-
 		// ******************************************************************
 		// Low-pass filter incoming spike train
 		// ******************************************************************
@@ -110,6 +109,14 @@ state_t neuron_model_state_update(
     			neuron->syn_state[syn_ind].z_bar * neuron->exp_TC
     			+ (1 - neuron->exp_TC) * neuron->syn_state[syn_ind].z_bar_inp; // updating z_bar is problematic, if spike could come and interrupt neuron update
     	// reset input (can't have more than one spike per timestep
+        if (!syn_ind){
+            io_printf(IO_BUF, "total synapses = %u\n"
+                              "z_bar_inp = %k - z_bar = %k\n"
+                              "L = %k = l * w_fb = %k * %k\n",
+                total_synapses_per_neuron,
+                neuron->syn_state[syn_ind].z_bar_inp, neuron->syn_state[syn_ind].z_bar,
+                neuron->L, learning_signal, neuron -> w_fb);
+        }
     	neuron->syn_state[syn_ind].z_bar_inp = 0;
 
 
@@ -139,6 +146,10 @@ state_t neuron_model_state_update(
     			-local_eta * neuron->L * neuron->syn_state[syn_ind].e_bar;
     	neuron->syn_state[syn_ind].delta_w += this_dt_weight_change;
 
+
+//        io_printf(IO_BUF, "eta: %k, l: %k, ebar: %k, delta_w: %k, this dt: %k\n",
+//            local_eta, neuron->L, neuron->syn_state[syn_ind].e_bar, neuron->syn_state[syn_ind].delta_w, this_dt_weight_change);
+
     }
 
     return neuron->V_membrane;
@@ -162,13 +173,17 @@ void neuron_model_print_state_variables(restrict neuron_pointer_t neuron) {
 }
 
 void neuron_model_print_parameters(restrict neuron_pointer_t neuron) {
-    log_debug("V reset       = %11.4k mv", neuron->V_reset);
-    log_debug("V rest        = %11.4k mv", neuron->V_rest);
+    io_printf(IO_BUF, "V reset       = %11.4k mv\n", neuron->V_reset);
+    io_printf(IO_BUF, "V rest        = %11.4k mv\n", neuron->V_rest);
 
-    log_debug("I offset      = %11.4k nA", neuron->I_offset);
-    log_debug("R membrane    = %11.4k Mohm", neuron->R_membrane);
+    io_printf(IO_BUF, "I offset      = %11.4k nA\n", neuron->I_offset);
+    io_printf(IO_BUF, "R membrane    = %11.4k Mohm\n", neuron->R_membrane);
 
-    log_debug("exp(-ms/(RC)) = %11.4k [.]", neuron->exp_TC);
+    io_printf(IO_BUF, "exp(-ms/(RC)) = %11.4k [.]\n", neuron->exp_TC);
 
-    log_debug("T refract     = %u timesteps", neuron->T_refract);
+    io_printf(IO_BUF, "T refract     = %u timesteps\n", neuron->T_refract);
+
+    io_printf(IO_BUF, "learning      = %k n/a\n", neuron->L);
+
+    io_printf(IO_BUF, "feedback w    = %k n/a\n", neuron->w_fb);
 }
