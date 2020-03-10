@@ -775,7 +775,6 @@ class NeuronRecorder(object):
         return numpy.concatenate(data)
 
     def get_global_parameters(self, vertex_slice):
-        # DEAD?
         params = []
         for variable in self.__sampling_rates:
             params.append(NeuronParameter(

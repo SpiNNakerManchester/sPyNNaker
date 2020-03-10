@@ -265,14 +265,8 @@ class AbstractPopulationVertex(
     def _get_sdram_usage_for_atoms(
             self, vertex_slice, graph, machine_time_step):
 
-        old_overhead = SYSTEM_BYTES_REQUIREMENT
-        #DATA_SPECABLE_BASIC_SETUP_INFO_N_BYTES + SIMULATION_N_BYTES
-        #APP_PTR_TABLE_BYTE_SIZE + SARK_PER_MALLOC_SDRAM_USAGE + SIMULATION_N_BYTES
-        #APP_PTR_TABLE_HEADER_BYTE_SIZE + MAX_MEM_REGIONS * 4 + SARK_PER_MALLOC_SDRAM_USAGE + SIMULATION_N_BYTES
-        #8 + 16 * 4 + (2 * 4) + (3 * 4) = 92
-
-        new_overhead = APP_PTR_TABLE_HEADER_BYTE_SIZE + MAX_MEM_REGIONS * 4
-        #SYSTEM = 0
+        # These values can be cross checked with the data_spec_text_files
+        # SYSTEM = 0
         region_0 = SIMULATION_N_BYTES
         # NEURON_PARAMS = 1
         region_1 = self._get_sdram_usage_for_neuron_params(vertex_slice)
@@ -292,21 +286,13 @@ class AbstractPopulationVertex(
         region_8 = profile_utils.get_profile_region_size(
             self.__n_profile_samples)
 
-        region_sum = region_0 + region_1 + sm_regions + region_6 + region_7 + region_8
-        malloced = new_overhead + region_sum
-        sdram_cost = malloced + SARK_PER_MALLOC_SDRAM_USAGE
+        overhead = APP_PTR_TABLE_HEADER_BYTE_SIZE + MAX_MEM_REGIONS * 4
 
-        sdram_requirement = (
-                SYSTEM_BYTES_REQUIREMENT +
-                self._get_sdram_usage_for_neuron_params(vertex_slice) +
-                self._neuron_recorder.get_data_spec_sdram_usage(vertex_slice) +
-                PopulationMachineVertex.get_provenance_data_size(
-                PopulationMachineVertex.N_ADDITIONAL_PROVENANCE_DATA_ITEMS) +
-                self.__synapse_manager.get_sdram_usage_in_bytes(
-                vertex_slice, machine_time_step, graph, self) +
-                profile_utils.get_profile_region_size(self.__n_profile_samples))
-
-        return sdram_requirement
+        # Should match HostExecuteDataSpecification.__malloc_region_storage
+        malloced =  overhead + region_0 + region_1 + sm_regions + region_6 + \
+                    region_7 + region_8
+        # Don't forget the cost of doing a malloc
+        return (malloced + SARK_PER_MALLOC_SDRAM_USAGE)
 
     def _reserve_memory_regions(self, spec, vertex_slice, vertex):
 

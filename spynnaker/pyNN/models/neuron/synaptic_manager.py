@@ -323,6 +323,7 @@ class SynapticManager(object):
             self, vertex_slice, machine_time_step, application_graph,
             app_vertex):
         in_edges = application_graph.get_edges_ending_at_vertex(app_vertex)
+        # These values can be cross checked with the data_spec_text_files
         # SYNAPSE_PARAMS = 2
         region_2 = self._get_synapse_params_size()
         # SYNAPSE_DYNAMICS = 5
@@ -335,15 +336,7 @@ class SynapticManager(object):
         region_3 = self.__poptable_type.get_master_population_table_size(in_edges)
         #  DIRECT_MATRIX = 10
         region_10 = self._get_size_of_generator_information(in_edges)
-        total = region_2 + region_5 + region_4 + region_3 + region_10
-        return (
-            self._get_synapse_params_size() +
-            self._get_synapse_dynamics_parameter_size(
-                vertex_slice, application_graph, app_vertex) +
-            self._get_synaptic_blocks_size(
-                vertex_slice, in_edges, machine_time_step) +
-            self.__poptable_type.get_master_population_table_size(in_edges) +
-            self._get_size_of_generator_information(in_edges))
+        return region_2 + region_5 + region_4 + region_3 + region_10
 
     def _reserve_memory_regions(
             self, spec, machine_vertex, vertex_slice,
