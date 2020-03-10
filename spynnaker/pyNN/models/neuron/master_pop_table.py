@@ -30,24 +30,41 @@ _SINGLE_BIT_FLAG_BIT = 0x80000000
 _ROW_LENGTH_MASK = 0xFF
 # Address is 23 bits, but scaled by a factor of 16
 _ADDRESS_MASK = 0x7FFFFF
+# Address Mask after shifting
 _ADDRESS_MASK_SHIFTED = 0x7FFFFF00
+# Scale factor for an address
 _ADDRESS_SCALE = 16
-# The address is shifted by 8, but also multiplied by 16 so this shift will
-# undo both
+# The address is shifted by 8, but also multiplied by 16 (= shifted by 4)
+# so this shift will undo both
 _ADDRESS_SCALED_SHIFT = 8 - 4
 # Shift of addresses within the address and row length field
 _ADDRESS_SHIFT = 8
 # The shift of n_neurons in the n_neurons_and_core_shift field
 _N_NEURONS_SHIFT = 5
+# Maximum number of neurons supported per core (= 11-bits of neurons)
+_MAX_N_NEURONS = (2 ** 11) - 1
+# Maximum core mask (i.e. number of cores) (=16-bits of mask)
+_MAX_CORE_MASK = 0xFFFF
 # An invalid entry in the address and row length list
 _INVALID_ADDDRESS_AND_ROW_LENGTH = 0xFFFFFFFF
+# Flag of extra info at the start of the address list
+_EXTRA_INFO_FLAG = 0x8000
+# Mask to get the start of the address list
+_START_MASK = 0x7FFF
+# Maximum start position in the address list
+_MAX_ADDRESS_START = _START_MASK
+# Maximum count of address list entries for a single pop table entry
+_MAX_ADDRESS_COUNT = 0xFFFF
 # DTypes of the structs
 _MASTER_POP_ENTRY_DTYPE = [
-    ("key", "<u4"), ("mask", "<u4"), ("start", "<u2"), ("count", "<u2"),
-    ("core_mask", "<u2"), ("n_neurons_and_core_shift", "<u2")]
+    ("key", "<u4"), ("mask", "<u4"),
+    ("start_and_flag", "<u2"), ("count", "<u2")]
 _ADDRESS_LIST_DTYPE = "<u4"
+_EXTRA_INFO_DTYPE = [
+    ("core_mask", "<u2"), ("n_neurons_and_core_shift", "<u2")]
 _MASTER_POP_ENTRY_SIZE_BYTES = numpy.dtype(_MASTER_POP_ENTRY_DTYPE).itemsize
 _ADDRESS_LIST_ENTRY_SIZE_BYTES = numpy.dtype(_ADDRESS_LIST_DTYPE).itemsize
+_EXTRA_INFO_ENTRY_SIZE_BYTES = numpy.dtype(_EXTRA_INFO_DTYPE).itemsize
 
 
 class _MasterPopEntry(object):
@@ -76,6 +93,10 @@ class _MasterPopEntry(object):
 
     def append(self, address, row_length, is_single):
         index = len(self.__addresses_and_row_lengths)
+        if index > _MAX_ADDRESS_COUNT:
+            raise SynapticConfigurationException(
+                "{} connections for the same source key (maximum {})".format(
+                    index, _MAX_ADDRESS_COUNT))
         self.__addresses_and_row_lengths.append(
             (address, row_length, is_single, True))
         return index
@@ -110,19 +131,26 @@ class _MasterPopEntry(object):
     def write_to_table(self, entry, address_list, start):
         entry["key"] = self.__routing_key
         entry["mask"] = self.__mask
-        entry["start"] = start
+        entry["start_and_flag"] = start
         count = len(self.__addresses_and_row_lengths)
         entry["count"] = count
-        entry["core_mask"] = self.__core_mask
-        entry["n_neurons_and_core_shift"] = (
-            (self.__n_neurons << _N_NEURONS_SHIFT) | self.__core_shift)
+        next_addr = start
+        if self.__core_mask != 0:
+            entry["start_and_flag"] |= _EXTRA_INFO_FLAG
+            extra_info = numpy.zeros(1, dtype=_EXTRA_INFO_DTYPE)
+            extra_info["core_mask"] = self.__core_mask
+            extra_info["n_neurons_and_core_shift"] = (
+                (self.__n_neurons << _N_NEURONS_SHIFT) | self.__core_shift)
+            address_list[start] = extra_info.view(_ADDRESS_LIST_DTYPE)[0]
+            next_addr += 1
+
         for j, (address, row_length, is_single, is_valid) in enumerate(
                 self.__addresses_and_row_lengths):
             if not is_valid:
-                address_list[start + j] = _INVALID_ADDDRESS_AND_ROW_LENGTH
+                address_list[next_addr + j] = _INVALID_ADDDRESS_AND_ROW_LENGTH
             else:
                 single_bit = _SINGLE_BIT_FLAG_BIT if is_single else 0
-                address_list[start + j] = (
+                address_list[next_addr + j] = (
                     single_bit |
                     ((address & _ADDRESS_MASK) << _ADDRESS_SHIFT) |
                     (row_length & _ROW_LENGTH_MASK))
@@ -134,13 +162,11 @@ class MasterPopTableAsBinarySearch(object):
     """
     __slots__ = [
         "__entries",
-        "__n_addresses",
-        "__n_single_entries"]
+        "__n_addresses"]
 
     def __init__(self):
         self.__entries = None
         self.__n_addresses = 0
-        self.__n_single_entries = None
 
     def get_master_population_table_size(self, in_edges):
         """ Get the size of the master population table in SDRAM
@@ -172,6 +198,7 @@ class MasterPopTableAsBinarySearch(object):
         # Multiply by 2 to get an upper bound
         return (
             (n_vertices * 2 * _MASTER_POP_ENTRY_SIZE_BYTES) +
+            (n_vertices * 2 * _EXTRA_INFO_ENTRY_SIZE_BYTES) +
             (n_entries * 2 * _ADDRESS_LIST_ENTRY_SIZE_BYTES) +
             8)
 
@@ -192,6 +219,7 @@ class MasterPopTableAsBinarySearch(object):
         # Multiply by 2 to get an upper bound
         return (
             (n_vertices * 2 * _MASTER_POP_ENTRY_SIZE_BYTES) +
+            (n_vertices * 2 * _EXTRA_INFO_ENTRY_SIZE_BYTES) +
             (n_entries * 2 * _ADDRESS_LIST_ENTRY_SIZE_BYTES) +
             8)
 
@@ -211,7 +239,7 @@ class MasterPopTableAsBinarySearch(object):
         :return: The next address that can be used following next_address
         """
         addr_scaled = (next_address + (_ADDRESS_SCALE - 1)) // _ADDRESS_SCALE
-        if addr_scaled > 0x7FFFFF:
+        if addr_scaled > _ADDRESS_MASK:
             raise SynapticConfigurationException(
                 "Address {} is out of range for this population table!".format(
                     hex(addr_scaled * _ADDRESS_SCALE)))
@@ -224,7 +252,6 @@ class MasterPopTableAsBinarySearch(object):
         """
         self.__entries = dict()
         self.__n_addresses = 0
-        self.__n_single_entries = 0
 
     def update_master_population_table(
             self, block_start_addr, row_length, key_and_mask, core_mask,
@@ -246,11 +273,30 @@ class MasterPopTableAsBinarySearch(object):
         :rtype: int
         :raises SynapticConfigurationException: If a bad address is used.
         """
+        # If there are too many neurons per core, fail
+        if n_neurons > _MAX_N_NEURONS:
+            raise SynapticConfigurationException(
+                "The parameter n_neurons of {} is too big (maximum {})".format(
+                    n_neurons, _MAX_N_NEURONS))
+
+        # If the core mask is too big, fail
+        if core_mask > _MAX_CORE_MASK:
+            raise SynapticConfigurationException(
+                "The core mask of {} is too big (maximum {})".format(
+                    core_mask, _MAX_CORE_MASK))
+
         # pylint: disable=too-many-arguments, arguments-differ
         if key_and_mask.key not in self.__entries:
+            if self.__n_addresses > _MAX_ADDRESS_START:
+                raise SynapticConfigurationException(
+                    "The table already contains too many entries of {}".format(
+                        self.__n_addresses))
             self.__entries[key_and_mask.key] = _MasterPopEntry(
                 key_and_mask.key, key_and_mask.mask, core_mask, core_shift,
                 n_neurons)
+            # Need to add an extra "address" for the extra_info if needed
+            if core_mask != 0:
+                self.__n_addresses += 1
 
         # if not single, scale the address
         start_addr = block_start_addr
@@ -422,3 +468,22 @@ class MasterPopTableAsBinarySearch(object):
         :rtype: list(:py:class:`pacman.model.constraints.AbstractConstraint`)
         """
         return list()
+
+    @property
+    def max_n_neurons_per_core(self):
+        """ The maximum number of neurons per core supported when a core-mask\
+            is > 0.
+        """
+        return _MAX_N_NEURONS
+
+    @property
+    def max_core_mask(self):
+        """ The maximum core mask supported when n_neurons is > 0
+        """
+        return _MAX_CORE_MASK
+
+    @property
+    def max_index(self):
+        """ The maximum index of a synaptic connection
+        """
+        return _MAX_ADDRESS_COUNT

@@ -953,6 +953,7 @@ class SynapticManager(object):
         slice_atoms = slices[-1].hi_atom - slices[0].lo_atom + 1
         if slice_atoms != n_atoms:
             return False
+        # Check that all slices are also there in between
         next_high = 0
         for s in slices:
             if s.lo_atom != next_high:
