@@ -320,6 +320,9 @@ void synapses_do_timestep_update(timer_t time) {
 
             // Convert ring-buffer entry to input and add on to correct
             // input for this synapse type and neuron
+//            if (ring_buffers[ring_buffer_index]){
+//                io_printf(IO_BUF, "weight: %u, shift: %u\n", ring_buffers[ring_buffer_index], ring_buffer_to_input_left_shifts[synapse_type_index]);
+//            }
             neuron_add_inputs(
                     synapse_type_index, neuron_index,
                     synapses_convert_weight_to_input(
@@ -343,7 +346,7 @@ bool synapses_process_synaptic_row(
 
     // Get address of non-plastic region from row
     address_t fixed_region_address = synapse_row_fixed_region(row);
-    io_printf(IO_BUF, "Processing Spike...\n");
+//    io_printf(IO_BUF, "Processing Spike...\n");
     // **TODO** multiple optimised synaptic row formats
     //if (plastic_tag(row) == 0) {
     // If this row has a plastic region

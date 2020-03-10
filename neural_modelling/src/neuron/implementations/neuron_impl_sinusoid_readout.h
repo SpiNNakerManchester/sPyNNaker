@@ -247,15 +247,15 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
            inh_value, input_type, NUM_INHIBITORY_RECEPTORS);
 
     // Sum g_syn contributions from all receptors for recording
-    REAL total_exc = 0;
-    REAL total_inh = 0;
-
-    for (int i = 0; i < NUM_EXCITATORY_RECEPTORS-1; i++){
-    	total_exc += exc_input_values[i];
-    }
-    for (int i = 0; i < NUM_INHIBITORY_RECEPTORS-1; i++){
-    	total_inh += inh_input_values[i];
-    }
+//    REAL total_exc = 0;
+//    REAL total_inh = 0;
+//
+//    for (int i = 0; i < NUM_EXCITATORY_RECEPTORS-1; i++){
+//    	total_exc += exc_input_values[i];
+//    }
+//    for (int i = 0; i < NUM_INHIBITORY_RECEPTORS-1; i++){
+//    	total_inh += inh_input_values[i];
+//    }
 
     // Call functions to get the input values to be recorded
 //    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = total_exc;
@@ -270,36 +270,48 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     external_bias += additional_input_get_input_value_as_current(
     		additional_input, voltage);
 
-//    if (neuron_index == 0){
     recorded_variable_values[V_RECORDING_INDEX] = voltage;
-    	// update neuron parameters
-    state_t result = neuron_model_state_update(
-    			NUM_EXCITATORY_RECEPTORS, exc_input_values,
-				NUM_INHIBITORY_RECEPTORS, inh_input_values,
-				external_bias, neuron, 0.0k);
+    if (neuron_index == 0){
+            // update neuron parameters
+        state_t result = neuron_model_state_update(
+                    NUM_EXCITATORY_RECEPTORS, exc_input_values,
+                    NUM_INHIBITORY_RECEPTORS, inh_input_values,
+                    external_bias, neuron, 0.0k);
 
-    // Calculate error
-    REAL error = result - global_parameters->target_V[target_ind];
-    learning_signal = error;
+        // Calculate error
+        REAL error = result - global_parameters->target_V[target_ind];
+        learning_signal = error;
+        // Record Error
+        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
+                error;
+//                neuron->syn_state[3].delta_w;
 
-    // Record readout
-    recorded_variable_values[V_RECORDING_INDEX] =
-//                    result;
-                    neuron->syn_state[0].z_bar;
+        // Record readout
+        recorded_variable_values[V_RECORDING_INDEX] =
+                        result;
+    //                    neuron->syn_state[0].z_bar;
+
+        // Send error (learning signal) as packet with payload
+        // ToDo can't I just alter the global variable here?
+        while (!spin1_send_mc_packet(
+                key | neuron_index,  bitsk(error), 1 )) {
+            spin1_delay_us(1);
+        }
+    }
+    else{
+        // Record 'Error'
+        recorded_variable_values[V_RECORDING_INDEX] =
+//                neuron->syn_state[0].z_bar;
+                global_parameters->target_V[target_ind];
+        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
+                - global_parameters->target_V[target_ind];
+    }
     // Record target
     recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] =
 //        			global_parameters->target_V[target_ind];
-        			neuron->syn_state[0].delta_w;
-    // Record Error
-    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
-    		error;
+//        			neuron->syn_state[0].delta_w;
+        			exc_input_values[0];
 
-    // Send error (learning signal) as packet with payload
-    // ToDo can't I just alter the global variable here?
-    while (!spin1_send_mc_packet(
-            key | neuron_index,  bitsk(error), 1 )) {
-        spin1_delay_us(1);
-    }
 
     // If spike occurs, communicate to relevant parts of model
     if (spike) {

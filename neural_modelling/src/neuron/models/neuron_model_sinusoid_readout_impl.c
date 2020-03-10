@@ -2,6 +2,7 @@
 
 #include <debug.h>
 
+extern uint32_t time;
 extern REAL learning_signal;
 REAL local_eta;
 
@@ -49,7 +50,7 @@ state_t neuron_model_state_update(
 //		}
         // Get the input in nA
         input_t input_this_timestep =
-            total_exc - total_inh + external_bias + neuron->I_offset;
+                exc_input[0] + exc_input[1] + neuron->I_offset;
 
         _lif_neuron_closed_form(
             neuron, neuron->V_membrane, input_this_timestep);
@@ -59,7 +60,7 @@ state_t neuron_model_state_update(
         neuron->refract_timer -= 1;
     }
 
-    uint32_t total_synapses_per_neuron = 1; //todo should this be fixed
+    uint32_t total_synapses_per_neuron = 2; //todo should this be fixed?
 
     neuron->L = learning_signal * neuron->w_fb;
 
@@ -71,20 +72,6 @@ state_t neuron_model_state_update(
     	neuron->syn_state[syn_ind].z_bar =
     			neuron->syn_state[syn_ind].z_bar * neuron->exp_TC
     			+ (1 - neuron->exp_TC) * neuron->syn_state[syn_ind].z_bar_inp; // updating z_bar is problematic, if spike could come and interrupt neuron update
-    	// reset input (can't have more than one spike per timestep
-        if (!syn_ind){// || neuron->syn_state[syn_ind].z_bar_inp){
-            io_printf(IO_BUF, "total synapses = %u - syn_ind = %u\n"
-                              "z_bar_inp = %k - z_bar = %k\n"
-                              "L = %k = l * w_fb = %k * %k\n"
-                              ,
-                total_synapses_per_neuron,
-                syn_ind,
-                neuron->syn_state[syn_ind].z_bar_inp,
-                neuron->syn_state[syn_ind].z_bar,
-                neuron->L, learning_signal, neuron -> w_fb
-                );
-        }
-    	neuron->syn_state[syn_ind].z_bar_inp = 0;
 
 
 		// ******************************************************************
@@ -112,7 +99,25 @@ state_t neuron_model_state_update(
     	REAL this_dt_weight_change =
 //    			-local_eta * neuron->L * neuron->syn_state[syn_ind].e_bar;
     			-local_eta * neuron->L * neuron->syn_state[syn_ind].z_bar;
+
     	neuron->syn_state[syn_ind].delta_w += this_dt_weight_change;
+//    	if (!syn_ind || neuron->syn_state[syn_ind].z_bar){// || neuron->syn_state[syn_ind].z_bar_inp){
+//            io_printf(IO_BUF, "total synapses = %u \t syn_ind = %u \t "
+//                              "z_bar_inp = %k \t z_bar = %k \t time:%u\n"
+//                              "L = %k = %k * %k = l * w_fb\n"
+//                              "this dw = %k \t tot dw %k\n"
+//                              ,
+//                total_synapses_per_neuron,
+//                syn_ind,
+//                neuron->syn_state[syn_ind].z_bar_inp,
+//                neuron->syn_state[syn_ind].z_bar,
+//                time,
+//                neuron->L, learning_signal, neuron -> w_fb,
+//                this_dt_weight_change, neuron->syn_state[syn_ind].delta_w
+//                );
+//        }
+    	// reset input (can't have more than one spike per timestep
+        neuron->syn_state[syn_ind].z_bar_inp = 0;
 
     }
 

@@ -95,6 +95,9 @@ static inline void synapse_types_shape_input(
 static inline void synapse_types_add_neuron_input(
         index_t synapse_type_index, synapse_param_pointer_t parameter,
         input_t input) {
+//    if (input){
+//        io_printf(IO_BUF, "index = %u, %d \t input = %u, %d\t%u\n", synapse_type_index, synapse_type_index, input, input, input>>3);
+//    }
     if (synapse_type_index == EXCITATORY_ONE) {
         parameter->input_buffer_excitatory_value += input;
 //		=
