@@ -261,7 +261,8 @@ class SynapticManager(object):
         """ Get the size of the synaptic expander parameters
         """
         gen_on_machine = False
-        size = 0
+        # Overhead added by _write_synaptic_matrix_and_master_population_table
+        size = 1 * BYTES_PER_WORD
         for in_edge in in_edges:
             if isinstance(in_edge, ProjectionApplicationEdge):
                 for synapse_info in in_edge.synapse_information:
@@ -322,6 +323,19 @@ class SynapticManager(object):
             self, vertex_slice, machine_time_step, application_graph,
             app_vertex):
         in_edges = application_graph.get_edges_ending_at_vertex(app_vertex)
+        # SYNAPSE_PARAMS = 2
+        region_2 = self._get_synapse_params_size()
+        # SYNAPSE_DYNAMICS = 5
+        region_5 = self._get_synapse_dynamics_parameter_size(
+            vertex_slice, application_graph, app_vertex)
+        # SYNAPTIC_MATRIX = 4
+        region_4 = self._get_synaptic_blocks_size(
+            vertex_slice, in_edges, machine_time_step)
+        # POPULATION_TABLE = 3
+        region_3 = self.__poptable_type.get_master_population_table_size(in_edges)
+        #  DIRECT_MATRIX = 10
+        region_10 = self._get_size_of_generator_information(in_edges)
+        total = region_2 + region_5 + region_4 + region_3 + region_10
         return (
             self._get_synapse_params_size() +
             self._get_synapse_dynamics_parameter_size(
