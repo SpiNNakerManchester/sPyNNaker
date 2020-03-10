@@ -333,7 +333,8 @@ class SynapticManager(object):
         region_4 = self._get_synaptic_blocks_size(
             vertex_slice, in_edges, machine_time_step)
         # POPULATION_TABLE = 3
-        region_3 = self.__poptable_type.get_master_population_table_size(in_edges)
+        region_3 = self.__poptable_type.get_master_population_table_size(
+            in_edges)
         #  DIRECT_MATRIX = 10
         region_10 = self._get_size_of_generator_information(in_edges)
         return region_2 + region_5 + region_4 + region_3 + region_10

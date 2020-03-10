@@ -35,7 +35,7 @@ from spinn_front_end_common.abstract_models.impl import (
 from spinn_front_end_common.utilities import (
     constants as common_constants, helpful_functions, globals_variables)
 from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, SYSTEM_BYTES_REQUIREMENT, SARK_PER_MALLOC_SDRAM_USAGE, SIMULATION_N_BYTES)
+    BYTES_PER_WORD, SARK_PER_MALLOC_SDRAM_USAGE, SIMULATION_N_BYTES)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
@@ -271,7 +271,8 @@ class AbstractPopulationVertex(
         # NEURON_PARAMS = 1
         region_1 = self._get_sdram_usage_for_neuron_params(vertex_slice)
         # NEURON_RECORDING = 6
-        region_6 = self._neuron_recorder.get_data_spec_sdram_usage(vertex_slice)
+        region_6 = self._neuron_recorder.get_data_spec_sdram_usage(
+            vertex_slice)
         # PROVENANCE_DATA = 7
         region_7 = PopulationMachineVertex.get_provenance_data_size(
                 PopulationMachineVertex.N_ADDITIONAL_PROVENANCE_DATA_ITEMS)
@@ -289,8 +290,8 @@ class AbstractPopulationVertex(
         overhead = APP_PTR_TABLE_HEADER_BYTE_SIZE + MAX_MEM_REGIONS * 4
 
         # Should match HostExecuteDataSpecification.__malloc_region_storage
-        malloced =  overhead + region_0 + region_1 + sm_regions + region_6 + \
-                    region_7 + region_8
+        malloced = (overhead + region_0 + region_1 + sm_regions + region_6 +
+                    region_7 + region_8)
         # Don't forget the cost of doing a malloc
         return (malloced + SARK_PER_MALLOC_SDRAM_USAGE)
 
