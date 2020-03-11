@@ -60,7 +60,7 @@ state_t neuron_model_state_update(
         neuron->refract_timer -= 1;
     }
 
-    uint32_t total_synapses_per_neuron = 2; //todo should this be fixed?
+    uint32_t total_synapses_per_neuron = 100; //todo should this be fixed?
 
     neuron->L = learning_signal * neuron->w_fb;
 

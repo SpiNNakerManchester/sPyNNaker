@@ -288,15 +288,19 @@ static inline final_state_t eprop_plasticity_update(update_state_t current_state
 	// Convert delta_w to int16_t (same as weight) - take only integer bits from REAL?
 //	int32_t delta_w_int = bitsk(delta_w); // THIS NEEDS UPDATING TO APPROPRIATE SCALING
 	int32_t delta_w_int = (int32_t)roundk(delta_w, 15); // THIS NEEDS UPDATING TO APPROPRIATE SCALING
-	int32_t delta_w_int_shift = (int32_t)roundk(delta_w << 3, 15); // THIS NEEDS UPDATING TO APPROPRIATE SCALING
+//	int32_t delta_w_int_shift = (int32_t)roundk(delta_w << 3, 15); // THIS NEEDS UPDATING TO APPROPRIATE SCALING
 //	int16_t delta_w_int = (int) delta_w; // >> 15;
 
     if (delta_w){
         if (PRINT_PLASTICITY){
-            io_printf(IO_BUF, "delta_w: %k, delta_w_int: %d, 16b delta_w_int: %d, delta << 7: %d, delta << 9: %d, delta << 11: %d\n",
-                    delta_w, delta_w_int, (int16_t)delta_w_int, (int16_t)(delta_w_int << 7), (int16_t)(delta_w_int << 9), (int16_t)(delta_w_int << 11));
-            io_printf(IO_BUF, "shift delta_w_int: %d, 16b delta_w_int: %d, delta << 7: %d, delta << 9: %d, delta << 11: %d\n",
-                    delta_w_int_shift, (int16_t)delta_w_int_shift, (int16_t)(delta_w_int_shift << 1), (int16_t)(delta_w_int_shift << 2), (int16_t)(delta_w_int_shift << 4));
+            io_printf(IO_BUF, "delta_w: %k, delta_w_int: %d"
+//                    ", 16b delta_w_int: %d, delta << 7: %d, delta << 9: %d, delta << 11: %d"
+                    "\n",
+                    delta_w, delta_w_int
+//                    , (int16_t)delta_w_int, (int16_t)(delta_w_int << 7), (int16_t)(delta_w_int << 9), (int16_t)(delta_w_int << 11)
+                    );
+//            io_printf(IO_BUF, "shift delta_w_int: %d, 16b delta_w_int: %d, delta << 7: %d, delta << 9: %d, delta << 11: %d\n",
+//                    delta_w_int_shift, (int16_t)delta_w_int_shift, (int16_t)(delta_w_int_shift << 1), (int16_t)(delta_w_int_shift << 2), (int16_t)(delta_w_int_shift << 4));
         }
 
         if (delta_w_int < 0){
@@ -387,8 +391,9 @@ bool synapse_dynamics_process_plastic_synapses(
 //            io_printf(IO_BUF, "neuron ind: %u, synapse ind: %u, type: %u, zbar: %k\n",
 //                neuron_ind, syn_ind_from_delay, type, neuron->syn_state[syn_ind_from_delay].z_bar_inp);
 
-    		io_printf(IO_BUF, "neuron ind: %u, synapse ind: %u, type: %u init w (plas): %d, summed_dw: %k, time: %u\n",
-        		neuron_ind, syn_ind_from_delay, type,
+    		io_printf(IO_BUF, "neuron ind: %u, synapse ind: %u, idx_bits: %u, %type: %u init w (plas): %d, summed_dw: %k, time: %u\n",
+        		neuron_ind, syn_ind_from_delay,
+        		synapse_type_index_bits, type,
 				current_state.initial_weight,
 				neuron->syn_state[syn_ind_from_delay].delta_w, time);
     	}

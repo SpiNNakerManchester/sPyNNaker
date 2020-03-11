@@ -285,6 +285,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
         recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
                 error;
 //                neuron->syn_state[3].delta_w;
+//                neuron->syn_state[0].z_bar;
 
         // Record readout
         recorded_variable_values[V_RECORDING_INDEX] =
@@ -309,8 +310,8 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     // Record target
     recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] =
 //        			global_parameters->target_V[target_ind];
-//        			neuron->syn_state[0].delta_w;
-        			exc_input_values[0];
+        			neuron->syn_state[neuron_index].delta_w;
+//        			exc_input_values[0];
 
 
     // If spike occurs, communicate to relevant parts of model

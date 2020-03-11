@@ -296,9 +296,9 @@ static inline final_state_t eprop_plasticity_update(update_state_t current_state
 	}
 
 	if (delta_w_int <= 0){
-		current_state = weight_one_term_apply_depression(current_state,  (int16_t)(delta_w_int << 9));
+		current_state = weight_one_term_apply_depression(current_state,  (int16_t)(delta_w_int << 0));
 	} else {
-		current_state = weight_one_term_apply_potentiation(current_state,  (int16_t)(delta_w_int << 9));
+		current_state = weight_one_term_apply_potentiation(current_state,  (int16_t)(delta_w_int << 0));
 	}
 
 

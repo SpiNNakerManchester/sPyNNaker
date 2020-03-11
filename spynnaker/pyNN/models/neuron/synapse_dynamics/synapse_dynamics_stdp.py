@@ -211,7 +211,7 @@ class SynapseDynamicsSTDP(
 
         # Get the fixed data
         fixed_plastic = (
-            ((dendritic_delays.astype("uint16") & 0xF) <<
+            ((dendritic_delays.astype("uint16") & 0xFF) <<
              (n_neuron_id_bits + n_synapse_type_bits)) |
             ((axonal_delays.astype("uint16") & 0xF) <<
              (4 + n_neuron_id_bits + n_synapse_type_bits)) |

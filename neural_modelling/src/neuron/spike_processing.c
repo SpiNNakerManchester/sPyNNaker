@@ -193,7 +193,7 @@ static void user_event_callback(uint unused0, uint unused1) {
     use(unused0);
     use(unused1);
 
-    io_printf(IO_BUF, "user callback triggered \n");
+//    io_printf(IO_BUF, "user callback triggered \n");
 
     setup_synaptic_dma_read();
 }
