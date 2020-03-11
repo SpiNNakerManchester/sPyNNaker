@@ -655,6 +655,7 @@ class NeuronRecorder(object):
                 bitfield_bytes)
 
     def _get_indexes_sdram_usage(self, vertex_slice):
+        """ DEAD I think"""
         total_neurons = vertex_slice.hi_atom - vertex_slice.lo_atom + 1
         fixed_sdram = 0
         # Recording rate for each neuron
@@ -684,29 +685,25 @@ class NeuronRecorder(object):
         """
         costs = MultiRegionSDRAM()
         for variable in self.__sampling_rates:
-            variable_costs = MultiRegionSDRAM()
             rate = self.__sampling_rates[variable]
-            variable_costs.add_cost(
-                "indexes", self._get_indexes_sdram_usage(vertex_slice))
             if rate > 0:
-                variable_costs.add_cost(
+                costs.add_cost(
                     "recording_channel_t",
                     recording_utilities.get_recording_data_constant_size(1))
                 per_record = self.get_buffered_sdram_per_record(
                     variable, vertex_slice)
                 if rate == 1:
                     # Add size for one record as recording every timestep
-                    variable_costs.add_cost("recording", 0, per_record)
+                    costs.add_cost(variable, 0, per_record)
                 else:
                     # Get the average cost per timestep
                     average_per_timestep = per_record / rate
-                    variable_costs.add_cost(
-                        "recording",
+                    costs.add_cost(
+                        variable,
                         # Add the rest once to fixed for worst case
                         (per_record - average_per_timestep),
                         average_per_timestep)
-                costs.add_cost("malloc", self.SARK_BLOCK_SIZE)
-            costs.nest(variable, variable_costs)
+                costs.add_cost("recording malloc", self.SARK_BLOCK_SIZE)
         return costs
 
     def get_dtcm_usage_in_bytes(self, vertex_slice):
