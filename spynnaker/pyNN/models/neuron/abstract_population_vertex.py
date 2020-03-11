@@ -24,7 +24,7 @@ from pacman.model.constraints.key_allocator_constraints import (
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.resources import (
-    ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
+    CPUCyclesPerTickResource, DTCMResource, MultiRegionSDRAM, ResourceContainer)
 from spinn_front_end_common.abstract_models import (
     AbstractChangableAfterRun, AbstractProvidesIncomingPartitionConstraints,
     AbstractProvidesOutgoingPartitionConstraints, AbstractHasAssociatedBinary,
@@ -194,15 +194,14 @@ class AbstractPopulationVertex(
             self, vertex_slice, graph, machine_time_step):
         # pylint: disable=arguments-differ
 
-        recordingSDRAM = self.__neuron_recorder.get_recording_sdram_usage(
+        sdram_costs = self.__neuron_recorder.get_recording_sdram_usage(
             vertex_slice)
-        dsgSDRAM = ConstantSDRAM(
-                self._get_sdram_usage_for_atoms(
+        sdram_costs.merge(self._get_sdram_usage_for_atoms(
                     vertex_slice, graph, machine_time_step))
 
         # set resources required from this object
         container = ResourceContainer(
-            sdram=recordingSDRAM + dsgSDRAM,
+            sdram=sdram_costs,
             dtcm=DTCMResource(self.get_dtcm_usage_for_atoms(vertex_slice)),
             cpu_cycles=CPUCyclesPerTickResource(
                 self.get_cpu_usage_for_atoms(vertex_slice)))
@@ -264,37 +263,30 @@ class AbstractPopulationVertex(
 
     def _get_sdram_usage_for_atoms(
             self, vertex_slice, graph, machine_time_step):
-
+        costs = MultiRegionSDRAM()
+        region_costs = MultiRegionSDRAM()
         # These values can be cross checked with the data_spec_text_files
-        # SYSTEM = 0
-        region_0 = SIMULATION_N_BYTES
-        # NEURON_PARAMS = 1
-        region_1 = self._get_sdram_usage_for_neuron_params(vertex_slice)
-        # NEURON_RECORDING = 6
-        region_6 = self._neuron_recorder.get_data_spec_sdram_usage(
-            vertex_slice)
-        # PROVENANCE_DATA = 7
-        region_7 = PopulationMachineVertex.get_provenance_data_size(
-                PopulationMachineVertex.N_ADDITIONAL_PROVENANCE_DATA_ITEMS)
-        # SYNAPSE_PARAMS = 2
-        # POPULATION_TABLE = 3
-        # SYNAPTIC_MATRIX = 4
-        # SYNAPSE_DYNAMICS = 5
-        # CONNECTOR_BUILDER = 9
-        # DIRECT_MATRIX = 10
-        sm_regions = self.__synapse_manager.get_sdram_usage_in_bytes(
-                vertex_slice, machine_time_step, graph, self)
-        # PROFILING = 8
-        region_8 = profile_utils.get_profile_region_size(
-            self.__n_profile_samples)
-
-        overhead = APP_PTR_TABLE_HEADER_BYTE_SIZE + MAX_MEM_REGIONS * 4
-
-        # Should match HostExecuteDataSpecification.__malloc_region_storage
-        malloced = (overhead + region_0 + region_1 + sm_regions + region_6 +
-                    region_7 + region_8)
-        # Don't forget the cost of doing a malloc
-        return (malloced + SARK_PER_MALLOC_SDRAM_USAGE)
+        region_costs.add_cost(POPULATION_BASED_REGIONS.SYSTEM, SIMULATION_N_BYTES)
+        region_costs.add_cost(
+            POPULATION_BASED_REGIONS.NEURON_RECORDING,
+            self._get_sdram_usage_for_neuron_params(vertex_slice))
+        region_costs.add_cost(
+            POPULATION_BASED_REGIONS.NEURON_RECORDING,
+            self._neuron_recorder.get_data_spec_sdram_usage(vertex_slice))
+        region_costs.add_cost(
+            POPULATION_BASED_REGIONS.PROVENANCE_DATA,
+            PopulationMachineVertex.get_provenance_data_size(
+                PopulationMachineVertex.N_ADDITIONAL_PROVENANCE_DATA_ITEMS))
+        region_costs.merge(self.__synapse_manager.get_sdram_usage_in_bytes(
+                vertex_slice, machine_time_step, graph, self))
+        region_costs.add_cost(
+            POPULATION_BASED_REGIONS.PROFILING,
+            profile_utils.get_profile_region_size(self.__n_profile_samples))
+        region_costs.add_cost("dsg overhead",
+                       APP_PTR_TABLE_HEADER_BYTE_SIZE + MAX_MEM_REGIONS * 4)
+        costs.nest("Data_Spec_size", region_costs)
+        costs.add_cost("DSG_malloc", SARK_PER_MALLOC_SDRAM_USAGE)
+        return costs
 
     def _reserve_memory_regions(self, spec, vertex_slice, vertex):
 

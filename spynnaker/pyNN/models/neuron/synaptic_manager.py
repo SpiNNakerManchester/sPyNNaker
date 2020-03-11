@@ -23,6 +23,7 @@ import scipy.stats  # @UnresolvedImport
 from scipy import special  # @UnresolvedImport
 from pyNN.random import RandomDistribution
 from data_specification.enums import DataType
+from pacman.model.resources import MultiRegionSDRAM
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
@@ -323,23 +324,26 @@ class SynapticManager(object):
     def get_sdram_usage_in_bytes(
             self, vertex_slice, machine_time_step, application_graph,
             app_vertex):
+        costs = MultiRegionSDRAM()
         in_edges = application_graph.get_edges_ending_at_vertex(app_vertex)
         # These values can be cross checked with the data_spec_text_files
-        # SYNAPSE_PARAMS = 2
-        region_2 = self._get_synapse_params_size()
-        # SYNAPSE_DYNAMICS = 5
-        region_5 = self._get_synapse_dynamics_parameter_size(
-            vertex_slice, application_graph, app_vertex)
-        # SYNAPTIC_MATRIX = 4
-        # DIRECT_MATRIX = 10
-        region_4_10 = self._get_synaptic_blocks_size(
-            vertex_slice, in_edges, machine_time_step)
-        # POPULATION_TABLE = 3
-        region_3 = self.__poptable_type.get_master_population_table_size(
-            in_edges)
-        # CONNECTOR_BUILDER = 9
-        region_9 = self._get_size_of_generator_information(in_edges)
-        return region_2 + region_5 + region_4_10 + region_3 + region_9
+        costs.add_cost(POPULATION_BASED_REGIONS.SYNAPSE_PARAMS,
+                       self._get_synapse_params_size())
+        costs.add_cost(
+            POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS,
+            self._get_synapse_dynamics_parameter_size(
+                vertex_slice, application_graph, app_vertex))
+        costs.add_cost(
+            "SYNAPTIC_MATRIX/DIRECT_MATRIX",
+            self._get_synaptic_blocks_size(
+                vertex_slice, in_edges, machine_time_step))
+        costs.add_cost(
+            POPULATION_BASED_REGIONS.POPULATION_TABLE,
+            self.__poptable_type.get_master_population_table_size(in_edges))
+        costs.add_cost(
+            POPULATION_BASED_REGIONS.CONNECTOR_BUILDER,
+            self._get_size_of_generator_information(in_edges))
+        return costs
 
     def _reserve_memory_regions(
             self, spec, machine_vertex, vertex_slice,

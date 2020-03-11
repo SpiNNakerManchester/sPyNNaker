@@ -22,7 +22,7 @@ from six import raise_from, iteritems
 from six.moves import range, xrange
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
-from pacman.model.resources.variable_sdram import VariableSDRAM
+from pacman.model.resources import MultiRegionSDRAM
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities import globals_variables
@@ -654,7 +654,7 @@ class NeuronRecorder(object):
         return ((self.N_ITEM_TYPES * DataType.UINT32.size) + var_bytes +
                 bitfield_bytes)
 
-    def _get_fixed_sdram_usage(self, vertex_slice):
+    def _get_indexes_sdram_usage(self, vertex_slice):
         total_neurons = vertex_slice.hi_atom - vertex_slice.lo_atom + 1
         fixed_sdram = 0
         # Recording rate for each neuron
@@ -675,27 +675,39 @@ class NeuronRecorder(object):
         return int(sdram)
 
     def get_recording_sdram_usage(self, vertex_slice):
-        fixed_sdram = 0
-        per_timestep_sdram = 0
+        """
+        Find the SDRAM cost for recording this slice
+
+        :param vertex_slice: Slice being costed
+        :return: SDRAM cost
+        rtype: MultiRegionSDRAM
+        """
+        costs = MultiRegionSDRAM()
         for variable in self.__sampling_rates:
+            variable_costs = MultiRegionSDRAM()
             rate = self.__sampling_rates[variable]
-            fixed_sdram += self._get_fixed_sdram_usage(vertex_slice)
+            variable_costs.add_cost(
+                "indexes", self._get_indexes_sdram_usage(vertex_slice))
             if rate > 0:
-                fixed_sdram += \
-                    recording_utilities.get_recording_data_constant_size(1)
-                fixed_sdram += self.SARK_BLOCK_SIZE
+                variable_costs.add_cost(
+                    "recording_channel_t",
+                    recording_utilities.get_recording_data_constant_size(1))
                 per_record = self.get_buffered_sdram_per_record(
                     variable, vertex_slice)
                 if rate == 1:
                     # Add size for one record as recording every timestep
-                    per_timestep_sdram += per_record
+                    variable_costs.add_cost("recording", 0, per_record)
                 else:
                     # Get the average cost per timestep
                     average_per_timestep = per_record / rate
-                    per_timestep_sdram += average_per_timestep
-                    # Add the rest once to fixed for worst case
-                    fixed_sdram += (per_record - average_per_timestep)
-        return VariableSDRAM(fixed_sdram, per_timestep_sdram)
+                    variable_costs.add_cost(
+                        "recording",
+                        # Add the rest once to fixed for worst case
+                        (per_record - average_per_timestep),
+                        average_per_timestep)
+                costs.add_cost("malloc", self.SARK_BLOCK_SIZE)
+            costs.nest(variable, variable_costs)
+        return costs
 
     def get_dtcm_usage_in_bytes(self, vertex_slice):
         # *_rate + n_neurons_recording_* + *_indexes
