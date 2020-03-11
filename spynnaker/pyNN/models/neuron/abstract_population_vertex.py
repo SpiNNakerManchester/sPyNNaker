@@ -280,6 +280,7 @@ class AbstractPopulationVertex(
         # POPULATION_TABLE = 3
         # SYNAPTIC_MATRIX = 4
         # SYNAPSE_DYNAMICS = 5
+        # CONNECTOR_BUILDER = 9
         # DIRECT_MATRIX = 10
         sm_regions = self.__synapse_manager.get_sdram_usage_in_bytes(
                 vertex_slice, machine_time_step, graph, self)

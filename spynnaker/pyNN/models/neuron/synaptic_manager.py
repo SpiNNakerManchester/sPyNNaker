@@ -241,7 +241,9 @@ class SynapticManager(object):
                     memory_size = self.__add_synapse_size(
                         memory_size, synapse_info, post_vertex_slice, in_edge,
                         machine_time_step)
-        return int(memory_size * _SYNAPSE_SDRAM_OVERSCALE)
+        # Overhead added by _write_synaptic_matrix_and_master_population_table
+        delay_overhead = 1 * BYTES_PER_WORD
+        return int(memory_size * _SYNAPSE_SDRAM_OVERSCALE) + delay_overhead
 
     def __add_synapse_size(self, memory_size, synapse_info, post_vertex_slice,
                            in_edge, machine_time_step):
@@ -261,8 +263,7 @@ class SynapticManager(object):
         """ Get the size of the synaptic expander parameters
         """
         gen_on_machine = False
-        # Overhead added by _write_synaptic_matrix_and_master_population_table
-        size = 1 * BYTES_PER_WORD
+        size = 0
         for in_edge in in_edges:
             if isinstance(in_edge, ProjectionApplicationEdge):
                 for synapse_info in in_edge.synapse_information:
@@ -330,14 +331,15 @@ class SynapticManager(object):
         region_5 = self._get_synapse_dynamics_parameter_size(
             vertex_slice, application_graph, app_vertex)
         # SYNAPTIC_MATRIX = 4
-        region_4 = self._get_synaptic_blocks_size(
+        # DIRECT_MATRIX = 10
+        region_4_10 = self._get_synaptic_blocks_size(
             vertex_slice, in_edges, machine_time_step)
         # POPULATION_TABLE = 3
         region_3 = self.__poptable_type.get_master_population_table_size(
             in_edges)
-        #  DIRECT_MATRIX = 10
-        region_10 = self._get_size_of_generator_information(in_edges)
-        return region_2 + region_5 + region_4 + region_3 + region_10
+        # CONNECTOR_BUILDER = 9
+        region_9 = self._get_size_of_generator_information(in_edges)
+        return region_2 + region_5 + region_4_10 + region_3 + region_9
 
     def _reserve_memory_regions(
             self, spec, machine_vertex, vertex_slice,
