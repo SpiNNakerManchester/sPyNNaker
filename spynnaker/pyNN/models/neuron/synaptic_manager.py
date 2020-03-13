@@ -621,12 +621,14 @@ class SynapticManager(object):
         # Set up the master population table
         self.__poptable_type.initialise_table()
 
-        # Set up for single synapses - write the offset of the single synapses
-        # initially 0. The list is seeded with an empty array so we can just
-        # concatenate the right blindly.
+        # Set up for single synapses
+        # The list is seeded with an empty array so we can just concatenate
+        # later (as numpy doesn't let you concatenate nothing)
         single_synapses = [numpy.array([], dtype="uint32")]
-        spec.switch_write_focus(POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value)
         single_addr = 0
+
+        # Lets write some synapses
+        spec.switch_write_focus(POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value)
 
         # Store a list of synapse info to be generated on the machine
         generate_on_machine = list()
