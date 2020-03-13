@@ -96,16 +96,24 @@ static uint16_t next_item = 0;
 // The count of items in the address list of the last master pop entry matched
 static uint16_t items_to_go = 0;
 
+//! \brief Get the direct row offset from an entry
+static inline uint32_t get_direct_offset(address_and_row_length entry) {
+    return ((entry & ADDRESS_MASK) >> DIRECT_ADDRESS_SHIFT);
+}
+
 //! \brief Get the direct row address from an entry
 static inline uint32_t get_direct_address(address_and_row_length entry) {
-    return ((entry & ADDRESS_MASK) >> DIRECT_ADDRESS_SHIFT) +
-            direct_rows_base_address;
+    return get_direct_offset(entry) + direct_rows_base_address;
+}
+
+//! \brief Get the offset from an entry
+static inline uint32_t get_offset(address_and_row_length entry) {
+    return ((entry & ADDRESS_MASK) >> INDIRECT_ADDRESS_SHIFT);
 }
 
 //! \brief Get the address from an entry
 static inline uint32_t get_address(address_and_row_length entry) {
-    return ((entry & ADDRESS_MASK) >> INDIRECT_ADDRESS_SHIFT) +
-            synaptic_rows_base_address;
+    return get_offset(entry) + synaptic_rows_base_address;
 }
 
 //! \brief Get the row length of an entry
@@ -178,11 +186,11 @@ static inline void print_master_population_table(void) {
             if (addr == INVALID_ADDRESS_AND_ROW_LENGTH) {
                 log_info("    index %d: INVALID", j);
             } else if (!is_single(addr)) {
-                log_info("    index %d: address: 0x%08x, row_length: %u",
-                    j, get_address(addr), get_row_length(addr));
+                log_info("    index %d: offset: %u, address: 0x%08x, row_length: %u",
+                    j, get_offset(addr), get_address(addr), get_row_length(addr));
             } else {
-                log_info("    index %d: address: 0x%08x, single",
-                    j, get_direct_address(addr));
+                log_info("    index %d: offset: %u, address: 0x%08x, single",
+                    j, get_direct_offset(addr), get_direct_address(addr));
             }
         }
     }
@@ -241,7 +249,7 @@ bool population_table_initialise(
             synapse_rows_address);
     log_info("the direct synaptic matrix base address is located at: 0x%08x",
             direct_rows_address);
-    synaptic_rows_base_address = synapse_rows_address;
+    synaptic_rows_base_address = (uint32_t) synapse_rows_address;
     direct_rows_base_address = (uint32_t) direct_rows_address;
 
     *row_max_n_words = 0xFF + N_SYNAPSE_ROW_HEADER_WORDS;
