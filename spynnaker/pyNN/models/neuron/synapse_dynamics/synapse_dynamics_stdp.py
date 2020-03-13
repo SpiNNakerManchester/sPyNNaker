@@ -131,8 +131,8 @@ class SynapseDynamicsSTDP(
         if not isinstance(synapse_dynamics, SynapseDynamicsSTDP):
             return False
         return (
-            self.__timing_dependence.is_same_as(
-                synapse_dynamics.timing_dependence) and
+            # self.__timing_dependence.is_same_as(
+            #     synapse_dynamics.timing_dependence) and
             self.__weight_dependence.is_same_as(
                 synapse_dynamics.weight_dependence) and
             (self.__dendritic_delay_fraction ==
@@ -313,7 +313,7 @@ class SynapseDynamicsSTDP(
         n_half_words = synapse_structure.get_n_half_words_per_connection()
         half_word = synapse_structure.get_weight_half_word()
         pp_half_words = numpy.concatenate([
-            pp[:size * n_half_words * 2].view("uint16")[
+            pp[:size * n_half_words * 2].view("int16")[
                 half_word::n_half_words]
             for pp, size in zip(pp_without_headers, fp_size)])
 
@@ -325,7 +325,7 @@ class SynapseDynamicsSTDP(
             (data_fixed & neuron_id_mask) + post_vertex_slice.lo_atom)
         connections["weight"] = pp_half_words
         connections["delay"] = (data_fixed >> (
-            n_neuron_id_bits + n_synapse_type_bits)) & 0xF
+            n_neuron_id_bits + n_synapse_type_bits)) & 0xFF
         connections["delay"][connections["delay"] == 0] = 16
         return connections
 
