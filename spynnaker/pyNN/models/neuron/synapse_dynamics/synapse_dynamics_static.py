@@ -22,6 +22,7 @@ from .abstract_generate_on_machine import (
     AbstractGenerateOnMachine, MatrixGeneratorID)
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
+from spynnaker.pyNN.utilities.constants import DELAY_MASK
 
 
 class SynapseDynamicsStatic(
@@ -91,7 +92,7 @@ class SynapseDynamicsStatic(
         fixed_fixed = (
             ((numpy.rint(numpy.abs(connections["weight"])).astype("uint32") &
               0xFFFF) << 16) |
-            ((connections["delay"].astype("uint32") & 0xF) <<
+            ((connections["delay"].astype("uint32") & DELAY_MASK) <<
              (n_neuron_id_bits + n_synapse_type_bits)) |
             (connections["synapse_type"].astype(
                 "uint32") << n_neuron_id_bits) |
@@ -148,7 +149,7 @@ class SynapseDynamicsStatic(
             (data & neuron_id_mask) + post_vertex_slice.lo_atom)
         connections["weight"] = (data >> 16) & 0xFFFF
         connections["delay"] = (data >> (n_neuron_id_bits +
-                                         n_synapse_type_bits)) & 0xF
+                                         n_synapse_type_bits)) & DELAY_MASK
         connections["delay"][connections["delay"] == 0] = 16
 
         return connections
