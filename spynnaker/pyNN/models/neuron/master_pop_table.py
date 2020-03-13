@@ -135,6 +135,7 @@ class _MasterPopEntry(object):
         count = len(self.__addresses_and_row_lengths)
         entry["count"] = count
         next_addr = start
+        n_entries = count
         if self.__core_mask != 0:
             entry["start_and_flag"] |= _EXTRA_INFO_FLAG
             extra_info = numpy.zeros(1, dtype=_EXTRA_INFO_DTYPE)
@@ -143,6 +144,7 @@ class _MasterPopEntry(object):
                 (self.__n_neurons << _N_NEURONS_SHIFT) | self.__core_shift)
             address_list[start] = extra_info.view(_ADDRESS_LIST_DTYPE)[0]
             next_addr += 1
+            n_entries += 1
 
         for j, (address, row_length, is_single, is_valid) in enumerate(
                 self.__addresses_and_row_lengths):
@@ -154,7 +156,7 @@ class _MasterPopEntry(object):
                     single_bit |
                     ((address & _ADDRESS_MASK) << _ADDRESS_SHIFT) |
                     (row_length & _ROW_LENGTH_MASK))
-        return count
+        return n_entries
 
 
 class MasterPopTableAsBinarySearch(object):
@@ -289,8 +291,8 @@ class MasterPopTableAsBinarySearch(object):
         if key_and_mask.key not in self.__entries:
             if self.__n_addresses > _MAX_ADDRESS_START:
                 raise SynapticConfigurationException(
-                    "The table already contains too many entries of {}".format(
-                        self.__n_addresses))
+                    "The table already contains {} entries;"
+                    " adding another is too many".format(self.__n_addresses))
             self.__entries[key_and_mask.key] = _MasterPopEntry(
                 key_and_mask.key, key_and_mask.mask, core_mask, core_shift,
                 n_neurons)
@@ -478,7 +480,8 @@ class MasterPopTableAsBinarySearch(object):
 
     @property
     def max_core_mask(self):
-        """ The maximum core mask supported when n_neurons is > 0
+        """ The maximum core mask supported when n_neurons is > 0; this is the\
+            maximum number of cores that can be supported in a joined mask
         """
         return _MAX_CORE_MASK
 
