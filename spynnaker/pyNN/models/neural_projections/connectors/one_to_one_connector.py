@@ -154,12 +154,6 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
         view_hi = indexes[-1]
         return view_lo, view_hi
 
-    @overrides(AbstractConnector.use_direct_matrix)
-    def use_direct_matrix(self, synapse_info):
-        if synapse_info.prepop_is_view or synapse_info.postpop_is_view:
-            return False
-        return True
-
     @property
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_id)
     def gen_connector_id(self):
