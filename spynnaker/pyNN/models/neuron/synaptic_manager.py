@@ -71,7 +71,11 @@ _SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES = 6 * BYTES_PER_WORD
 # Amount to scale synapse SDRAM estimate by to make sure the synapses fit
 _SYNAPSE_SDRAM_OVERSCALE = 1.1
 
+# Struct to read or write a word
 _ONE_WORD = struct.Struct("<I")
+
+# A padding byte
+_PADDING_BYTE = 0xDD
 
 
 class SynapticManager(object):
@@ -583,15 +587,10 @@ class SynapticManager(object):
 
             # Pad out data file with the added alignment bytes:
             spec.comment("\nWriting population table required padding\n")
-            self._write_padding(spec, padding, 0xDD)
+            spec.write_array(numpy.repeat(
+                numpy.array(_PADDING_BYTE, dtype="uint8"), padding))
             return next_block_allowed_address
         return next_block_start_address
-
-    def _write_padding(self, spec, length, value):
-        spec.set_register_value(register_id=15, data=length)
-        spec.write_repeated_value(
-            data=value, repeats=15, repeats_is_register=True,
-            data_type=DataType.UINT8)
 
     def _write_synaptic_matrix_and_master_population_table(
             self, spec, post_slices, post_slice_index, machine_vertex,
