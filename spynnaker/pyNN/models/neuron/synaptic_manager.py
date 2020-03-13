@@ -1233,12 +1233,13 @@ class SynapticManager(object):
         if (app_edge, synapse_info) in self.__pre_run_connection_holders:
             for conn_holder in self.__pre_run_connection_holders[
                     app_edge, synapse_info]:
-                conn_holder.add_connections(self._read_synapses(
-                    synapse_info, pre_vertex_slice, post_vertex_slice,
-                    max_row_info.undelayed_max_words,
-                    max_row_info.delayed_max_words, n_synapse_types,
-                    weight_scales, row_data, delayed_row_data,
-                    machine_time_step))
+                conn_holder.add_connections(
+                    self.__synapse_io.read_all_synapses(
+                        synapse_info, pre_vertex_slice, post_vertex_slice,
+                        max_row_info.undelayed_max_words,
+                        max_row_info.delayed_max_words, n_synapse_types,
+                        weight_scales, row_data, delayed_row_data,
+                        machine_time_step))
                 conn_holder.finish()
 
         return (row_data, delayed_row_data)
@@ -1345,12 +1346,12 @@ class SynapticManager(object):
     def _read_connections(
             self, row_len, block_sz, transceiver, placement,
             address, synapse_info, pre_slice, post_slice, machine_time_step,
-            read_synapses_function):
+            delayed):
         block = self._get_block(transceiver, placement, address, block_sz)
-        return read_synapses_function(
+        return self.__synapse_io.read_some_synapses(
             synapse_info, pre_slice, post_slice, row_len,
             self.__n_synapse_types, self.__weight_scales[placement], block,
-            machine_time_step)
+            machine_time_step, delayed)
 
     def _get_single_block(self, transceiver, placement, address, size):
         block = self._get_block(transceiver, placement, address, size)
@@ -1363,18 +1364,18 @@ class SynapticManager(object):
 
     def _read_single_connections(
             self, block_sz, transceiver, placement, address, synapse_info,
-            pre_slice, post_slice, machine_time_step, read_synapses_function):
+            pre_slice, post_slice, machine_time_step, delayed):
         block = self._get_single_block(
             transceiver, placement, address, block_sz)
-        return read_synapses_function(
+        return self.__synapse_io.read_some_synapses(
             synapse_info, pre_slice, post_slice, 1,
             self.__n_synapse_types, self.__weight_scales[placement], block,
-            machine_time_step)
+            machine_time_step, delayed)
 
     def _get_connections(
             self, app_edge, synapse_info, post_slice, transceiver, placement,
             direct_synapses, indirect_synapses, machine_time_step,
-            graph_mapper, edge_info, m_edge_info, read_synapses_function):
+            graph_mapper, edge_info, m_edge_info, delayed):
         key = (app_edge, synapse_info, post_slice.lo_atom)
         connections = []
         if key in edge_info:
@@ -1383,7 +1384,7 @@ class SynapticManager(object):
             connections.append(self._read_connections(
                 row_len, block_sz, transceiver, placement,
                 indirect_synapses + offset, synapse_info, pre_slice,
-                post_slice, machine_time_step, read_synapses_function))
+                post_slice, machine_time_step, delayed))
         else:
             m_edges = graph_mapper.get_machine_edges(app_edge)
             for m_edge in m_edges:
@@ -1396,14 +1397,12 @@ class SynapticManager(object):
                     connections.append(self._read_single_connections(
                         block_sz, transceiver,
                         placement, direct_synapses + offset, synapse_info,
-                        pre_slice, post_slice, machine_time_step,
-                        read_synapses_function))
+                        pre_slice, post_slice, machine_time_step, delayed))
                 else:
                     connections.append(self._read_connections(
                         row_len, block_sz, transceiver,
                         placement, indirect_synapses + offset, synapse_info,
-                        pre_slice, post_slice, machine_time_step,
-                        read_synapses_function))
+                        pre_slice, post_slice, machine_time_step, delayed))
         return connections
 
     def get_connections_from_machine(
@@ -1429,13 +1428,12 @@ class SynapticManager(object):
                 app_edge, synapse_info, post_slice,
                 transceiver, placement, direct_synapses, indirect_synapses,
                 machine_time_step, graph_mapper, self.__app_edge_info,
-                self.__m_edge_info, self.__synapse_io.read_undelayed_synapses))
+                self.__m_edge_info, delayed=False))
             connections.extend(self._get_connections(
                 app_edge, synapse_info, post_slice,
                 transceiver, placement, direct_synapses, indirect_synapses,
-                machine_time_step, graph_mapper,
-                self.__delay_edge_info, self.__delay_m_edge_info,
-                self.__synapse_io.read_delayed_synapses))
+                machine_time_step, graph_mapper, self.__delay_edge_info,
+                self.__delay_m_edge_info, delayed=True))
         return numpy.concatenate(connections)
 
     @staticmethod
@@ -1456,14 +1454,6 @@ class SynapticManager(object):
         return self.__poptable_type.extract_synaptic_matrix_data_location(
             key, master_pop_table_address, transceiver,
             placement.x, placement.y)
-
-    def _read_synapses(self, info, pre_slice, post_slice, max_row_length,
-                       delayed_max_row_length, n_synapse_types, weight_scales,
-                       data, delayed_data, timestep):
-        return self.__synapse_io.read_synapses(
-            info, pre_slice, post_slice, max_row_length,
-            delayed_max_row_length, n_synapse_types, weight_scales, data,
-            delayed_data, timestep)
 
     # inherited from AbstractProvidesIncomingPartitionConstraints
     def get_incoming_partition_constraints(self):
