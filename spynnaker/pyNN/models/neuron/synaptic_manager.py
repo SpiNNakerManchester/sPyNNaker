@@ -946,23 +946,38 @@ class SynapticManager(object):
         return _AppKeyInfo(key, new_mask, core_mask, mask_size,
                            keys[0][1].n_atoms * n_stages)
 
-    @staticmethod
-    def __check_key_slices(n_atoms, slices):
+    def __check_key_slices(self, n_atoms, slices):
         # Check that the slices cover all atoms
         slices = sorted(slices, key=lambda s: s.lo_atom)
         slice_atoms = slices[-1].hi_atom - slices[0].lo_atom + 1
         if slice_atoms != n_atoms:
             return False
-        # Check that all slices are also there in between
+
+        # Check that all slices are also there in between, and that all are
+        # the same size (except the last one)
         next_high = 0
+        n_atoms_per_core = None
+        last_slice = slices[-1]
         for s in slices:
             if s.lo_atom != next_high:
                 return False
+            if (n_atoms_per_core is not None and s != last_slice and
+                    n_atoms_per_core != s.n_atoms):
+                return None
             next_high = s.hi_atom + 1
+            n_atoms_per_core = s.n_atoms
+
+        # If the number of atoms per core is too big, this can't be done
+        if n_atoms_per_core > self.__poptable_type.max_n_neurons_per_core:
+            return False
         return True
 
     def __app_key_and_mask(self, graph_mapper, m_edges, app_edge, routing_info,
                            key_space_tracker):
+        # If there are too many pre-cores, give up now
+        if len(m_edges) > self.__poptable_type.max_core_mask:
+            return None
+
         # Work out if the keys allow the machine vertices to be merged
         mask = None
         keys = list()
@@ -973,8 +988,10 @@ class SynapticManager(object):
             rinfo = routing_info.get_routing_info_for_edge(m_edge)
             vertex_slice = graph_mapper.get_slice(m_edge.pre_vertex)
             pre_slices.append(vertex_slice)
+            # No routing info at all? Odd but doesn't work...
             if rinfo is None:
                 return None
+            # Mask is not the same as the last mask?  Doesn't work...
             if mask is not None and rinfo.first_mask != mask:
                 return None
             mask = rinfo.first_mask
