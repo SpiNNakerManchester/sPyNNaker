@@ -79,3 +79,5 @@ class EPropAdaptive(AbstractPyNNNeuronModelStandard):
             model_name="eprop_adaptive", binary="eprop_adaptive.aplx",
             neuron_model=neuron_model, input_type=input_type,
             synapse_type=synapse_type, threshold_type=threshold_type)
+
+

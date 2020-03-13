@@ -100,35 +100,33 @@ static inline weight_t weight_get_final(weight_state_t new_state,
     // Apply eprop plasticity updates to initial weight
     int32_t new_weight =
             new_state.initial_weight + new_state.a2_plus + new_state.a2_minus;
+    int32_t reg_weight = new_weight;
+    int32_t reg_change = 0;
 
     // Calculate regularisation
-    if (new_state.weight_region->reg_rate > 0.0k) { // if reg rate is zero, regularisation is turned off
-    	if (reg_error > 0.1k) {
-    		// increase weight (core rate is below target)
-    		new_weight = new_weight
-    				+ (new_weight * new_state.weight_region->reg_rate * reg_error);
-
-    	} else if (reg_error < -0.1k){
-    		// reduce weight (core rate is above target)
-    		new_weight = new_weight
-    				- (new_weight * new_state.weight_region->reg_rate * reg_error);
+    if (new_state.weight_region->reg_rate > 0.0k){ // if reg rate is zero, regularisation is turned off
+        reg_change = new_weight * new_state.weight_region->reg_rate * reg_error;
+    	if (new_weight > 0){
+    		reg_weight = new_weight + reg_change;
+    	} else if (new_weight < 0){
+    		reg_weight = new_weight - reg_change;
     	}
     }
-
+    io_printf(IO_BUF, "\tbefore minmax reg_w:%d, reg_shift:%d, /8:%d", reg_weight, reg_change, reg_change/8);
     // Clamp new weight to bounds
-    new_weight = MIN(new_state.weight_region->max_weight,
-            MAX(new_weight, new_state.weight_region->min_weight));
+    reg_weight = MIN(new_state.weight_region->max_weight,
+            MAX(reg_weight, new_state.weight_region->min_weight));
 
 	if (PRINT_PLASTICITY){
 		io_printf(IO_BUF, "\told_weight:%d, a2+:%d, a2-:%d, "
 				//    		"scaled a2+:%d, scaled a2-:%d,"
-            " new_weight:%d\n",
+            " new_weight:%d, reg_weight:%d, reg_l_rate:%k, reg_error:%k\n",
             new_state.initial_weight, new_state.a2_plus, new_state.a2_minus,
 			//            scaled_a2_plus, scaled_a2_minus,
-			new_weight);
+			new_weight, reg_weight, new_state.weight_region->reg_rate, reg_error);
 	}
 
-    return (weight_t) new_weight;
+    return (weight_t) reg_weight;
 }
 
 #endif // _WEIGHT_ADDITIVE_ONE_TERM_IMPL_H_

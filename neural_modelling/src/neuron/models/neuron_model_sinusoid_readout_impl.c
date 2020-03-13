@@ -37,11 +37,11 @@ state_t neuron_model_state_update(
 
     // If outside of the refractory period
     if (neuron->refract_timer <= 0) {
-		REAL total_exc = 0;
-		REAL total_inh = 0;
-
-		total_exc += exc_input[0];
-		total_inh += inh_input[0];
+//		REAL total_exc = 0;
+//		REAL total_inh = 0;
+//
+//		total_exc += exc_input[0];
+//		total_inh += inh_input[0];
 //		for (int i=0; i < num_excitatory_inputs; i++){
 //			total_exc += exc_input[i];
 //		}

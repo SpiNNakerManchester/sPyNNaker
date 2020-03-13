@@ -290,20 +290,35 @@ static inline final_state_t eprop_plasticity_update(update_state_t current_state
 //	int16_t delta_w_int = (int) delta_w; // >> 15;
 
 
-	if (PRINT_PLASTICITY){
-		io_printf(IO_BUF, "delta_w: %k, delta_w_int: %d, 16b delta_w_int: %d, delta << 9: %d, delta << 12: %d, delta << 16: %d\n",
-				delta_w, delta_w_int, (int16_t)delta_w_int, (int16_t)delta_w_int << 9, (int16_t)delta_w_int << 12, (int16_t)delta_w_int << 16);
-	}
+    if (delta_w){
+        if (PRINT_PLASTICITY){
+            io_printf(IO_BUF, "delta_w: %k, delta_w_int: %d"
+//                    ", 16b delta_w_int: %d, delta << 7: %d, delta << 9: %d, delta << 11: %d"
+                    "\n",
+                    delta_w, delta_w_int
+//                    , (int16_t)delta_w_int, (int16_t)(delta_w_int << 7), (int16_t)(delta_w_int << 9), (int16_t)(delta_w_int << 11)
+                    );
+//            io_printf(IO_BUF, "shift delta_w_int: %d, 16b delta_w_int: %d, delta << 7: %d, delta << 9: %d, delta << 11: %d\n",
+//                    delta_w_int_shift, (int16_t)delta_w_int_shift, (int16_t)(delta_w_int_shift << 1), (int16_t)(delta_w_int_shift << 2), (int16_t)(delta_w_int_shift << 4));
+        }
 
-	if (delta_w_int <= 0){
-		current_state = weight_one_term_apply_depression(current_state,  (int16_t)(delta_w_int << 0));
-	} else {
-		current_state = weight_one_term_apply_potentiation(current_state,  (int16_t)(delta_w_int << 0));
+        if (delta_w_int < 0){
+            current_state = weight_one_term_apply_depression(current_state,  (int16_t)(delta_w_int << 0));
+        } else {
+            current_state = weight_one_term_apply_potentiation(current_state,  (int16_t)(delta_w_int << 0));
+        }
+    }
+	else {
+//        if (PRINT_PLASTICITY){
+//            io_printf(IO_BUF, "delta_w: %k\n", delta_w);
+//        }
+		current_state = current_state;
 	}
 
 
 	// Calculate regularisation error
 	REAL reg_error = global_parameters->core_target_rate - global_parameters->core_pop_rate;
+    io_printf(IO_BUF, "core_pop_rate = %k, target = %k, error = %k\n", global_parameters->core_pop_rate, global_parameters->core_target_rate, reg_error);
 
 
     // Return final synaptic word and weight
@@ -328,8 +343,6 @@ bool synapse_dynamics_process_plastic_synapses(
     num_plastic_pre_synaptic_events += plastic_synapse;
 
     // Could maybe have a single z_bar for the entire synaptic row and update it once here for all synaptic words?
-
-
 
     // Loop through plastic synapses
     for (; plastic_synapse > 0; plastic_synapse--) {
@@ -374,13 +387,13 @@ bool synapse_dynamics_process_plastic_synapses(
                 synapse_structure_get_update_state(*plastic_words, type);
 
     	if (PRINT_PLASTICITY){
-            io_printf(IO_BUF, "neuron ind: %u, synapse ind: %u, type: %u, zbar: %k\n",
-                neuron_ind, syn_ind_from_delay, type, neuron->syn_state[syn_ind_from_delay].z_bar_inp);
+//            io_printf(IO_BUF, "neuron ind: %u, synapse ind: %u, type: %u, zbar: %k\n",
+//                neuron_ind, syn_ind_from_delay, type, neuron->syn_state[syn_ind_from_delay].z_bar_inp);
 
-    		io_printf(IO_BUF, "neuron ind: %u, synapse ind: %u, type: %u init w (plas): %d, summed_dw: %k\n",
+    		io_printf(IO_BUF, "neuron ind: %u, synapse ind: %u, %type: %u init w (plas): %d, summed_dw: %k, time: %u\n",
         		neuron_ind, syn_ind_from_delay, type,
 				current_state.initial_weight,
-				neuron->syn_state[syn_ind_from_delay].delta_w);
+				neuron->syn_state[syn_ind_from_delay].delta_w, time);
     	}
 
         // Perform weight update:
@@ -399,7 +412,7 @@ bool synapse_dynamics_process_plastic_synapses(
                 synapse_type_index_bits);
 
         // Check for ring buffer saturation
-        int32_t accumulation = ring_buffers[ring_buffer_index] +
+        int16_t accumulation = ring_buffers[ring_buffer_index] +
                 synapse_structure_get_final_weight(final_state);
 
 //        uint32_t sat_test = accumulation & 0x10000;

@@ -292,15 +292,20 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
 
     // Record B
-    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
-//    		B_t; // neuron->B;
-//    		neuron->syn_state[0].z_bar;
-//    		global_parameters->core_target_rate;
-//    	neuron->syn_state[0].e_bar;
-    	neuron->syn_state[0].el_a;
-//    		exc_input_values[0]; // record input input (signed)
-//    		learning_signal * neuron->w_fb;
-
+    if (neuron_index == 1){
+        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = global_parameters->core_pop_rate;
+    }
+    else{
+        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
+    //    		B_t; // neuron->B;
+                neuron->L;
+    //    		neuron->syn_state[0].z_bar;
+    //    		global_parameters->core_target_rate;
+    //    	neuron->syn_state[0].e_bar;
+    //    	neuron->syn_state[neuron_index].el_a;
+    //    		exc_input_values[0]; // record input input (signed)
+    //    		learning_signal * neuron->w_fb;
+    }
     // update neuron parameters
     state_t result = neuron_model_state_update(
             NUM_EXCITATORY_RECEPTORS, exc_input_values,
