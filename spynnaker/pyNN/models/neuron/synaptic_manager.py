@@ -608,14 +608,8 @@ class SynapticManager(object):
         # Get the application projection edges incoming to this machine vertex
         in_machine_edges = machine_graph.get_edges_ending_at_vertex(
             machine_vertex)
-        in_edges_by_app_edge = defaultdict(list)
-        key_space_tracker = KeySpaceTracker()
-        for edge in in_machine_edges:
-            rinfo = routing_info.get_routing_info_for_edge(edge)
-            key_space_tracker.allocate_keys(rinfo)
-            app_edge = graph_mapper.get_application_edge(edge)
-            if isinstance(app_edge, ProjectionApplicationEdge):
-                in_edges_by_app_edge[app_edge].append(edge)
+        in_edges_by_app_edge, key_space_tracker = self.__in_edges_by_app_edge(
+            in_machine_edges, routing_info, graph_mapper)
 
         # Set up the master population table
         self.__poptable_type.initialise_table()
@@ -645,22 +639,11 @@ class SynapticManager(object):
             pre_slices = graph_mapper.get_slices(app_edge.pre_vertex)
 
             for synapse_info in app_edge.synapse_information:
-                connector = synapse_info.connector
-                dynamics = synapse_info.synapse_dynamics
 
                 # If we can generate the connector on the machine, do so
-                if (isinstance(
-                        connector, AbstractGenerateConnectorOnMachine) and
-                        connector.generate_on_machine(
-                            synapse_info.weights, synapse_info.delays) and
-                        isinstance(dynamics, AbstractGenerateOnMachine) and
-                        dynamics.generate_on_machine and
-                        not self.__is_app_edge_direct(
-                            app_edge, synapse_info, m_edges, graph_mapper,
-                            post_vertex_slice, single_addr) and
-                        not isinstance(
-                            self.synapse_dynamics,
-                            AbstractSynapseDynamicsStructural)):
+                if self.__can_generate_on_machine(
+                        app_edge, synapse_info, m_edges, graph_mapper,
+                        post_vertex_slice, single_addr):
                     generate_on_machine.append(
                         (app_edge, m_edges, synapse_info, app_key_info,
                          d_app_key_info, pre_slices))
@@ -702,9 +685,45 @@ class SynapticManager(object):
 
         return generator_data
 
+    def __in_edges_by_app_edge(
+            self, in_machine_edges, routing_info, graph_mapper):
+        """ Get machine edges by application edge dictionary
+        """
+        in_edges_by_app_edge = defaultdict(list)
+        key_space_tracker = KeySpaceTracker()
+        for edge in in_machine_edges:
+            rinfo = routing_info.get_routing_info_for_edge(edge)
+            key_space_tracker.allocate_keys(rinfo)
+            app_edge = graph_mapper.get_application_edge(edge)
+            if isinstance(app_edge, ProjectionApplicationEdge):
+                in_edges_by_app_edge[app_edge].append(edge)
+        return in_edges_by_app_edge, key_space_tracker
+
+    def __can_generate_on_machine(
+            self, app_edge, s_info, m_edges, graph_mapper, post_vertex_slice,
+            single_addr):
+        """ Determine if an app edge can be generated on the machine
+        """
+        return (
+            isinstance(
+                s_info.connector, AbstractGenerateConnectorOnMachine) and
+            s_info.connector.generate_on_machine(
+                s_info.weights, s_info.delays) and
+            isinstance(s_info.synapse_dynamics, AbstractGenerateOnMachine) and
+            s_info.synapse_dynamics.generate_on_machine and
+            not self.__is_app_edge_direct(
+                app_edge, s_info, m_edges, graph_mapper, post_vertex_slice,
+                single_addr) and
+            not isinstance(
+                self.synapse_dynamics, AbstractSynapseDynamicsStructural)
+        )
+
     def __is_app_edge_direct(
             self, app_edge, synapse_info, m_edges, graph_mapper,
             post_vertex_slice, single_addr):
+        """ Determine if an app edge can use the direct matrix for all of its\
+            synapse information
+        """
         next_single_addr = single_addr
         for m_edge in m_edges:
             pre_slice = graph_mapper.get_slice(m_edge.pre_vertex)
@@ -712,7 +731,7 @@ class SynapticManager(object):
                     next_single_addr, synapse_info, pre_slice,
                     post_vertex_slice, app_edge.n_delay_stages > 0):
                 return False
-            next_single_addr += pre_slice.n_atoms * 4
+            next_single_addr += pre_slice.n_atoms * BYTES_PER_WORD
         return True
 
     def __write_matrix(
