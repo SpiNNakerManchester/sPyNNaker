@@ -421,7 +421,7 @@ class SynapseIORowBased(object):
             del delayed_row_indices
         del delayed_connections
 
-        return (row_data, delayed_row_data, delayed_source_ids, stages)
+        return row_data, delayed_row_data, delayed_source_ids, stages
 
     @staticmethod
     def _rescale_connections(
