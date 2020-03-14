@@ -62,7 +62,7 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
     ]
 
     def __init__(self, safe=True, callback=None, verbose=False):
-        AbstractConnector.__init__(
+        super(AbstractGenerateConnectorOnMachine, self).__init__(
             self, safe=safe, callback=callback, verbose=verbose)
         self.__delay_seed = dict()
         self.__weight_seed = dict()
@@ -230,6 +230,7 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
 
         :rtype: numpy array of uint32
         """
+        # pylint: disable=unused-argument
         return numpy.zeros(0, dtype="uint32")
 
     @property
