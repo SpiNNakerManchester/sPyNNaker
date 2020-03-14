@@ -342,6 +342,9 @@ class MasterPopTableAsBinarySearch(object):
             self.__entries[key_and_mask.key] = _MasterPopEntry(
                 key_and_mask.key, key_and_mask.mask, core_mask, core_shift,
                 n_neurons)
+            # Need to add an extra "address" for the extra_info if needed
+            if core_mask != 0:
+                self.__n_addresses += 1
         index = self.__entries[key_and_mask.key].append_invalid()
         self.__n_addresses += 1
         return index
