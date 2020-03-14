@@ -77,7 +77,6 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         self.__space = None
         self.__verbose = verbose
 
-        # something needs to be done about this?
         self._rng = rng
 
         self.__n_clipped_delays = 0
