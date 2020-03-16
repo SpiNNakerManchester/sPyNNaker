@@ -588,7 +588,8 @@ class SynapticManager(object):
             # Pad out data file with the added alignment bytes:
             spec.comment("\nWriting population table required padding\n")
             spec.write_array(numpy.repeat(
-                numpy.array(_PADDING_BYTE, dtype="uint8"), padding))
+                numpy.array(_PADDING_BYTE, dtype="uint8"), padding).view(
+                    "uint32"))
             return next_block_allowed_address
         return next_block_start_address
 
