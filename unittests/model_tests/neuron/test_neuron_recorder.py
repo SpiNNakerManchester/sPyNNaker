@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from data_specification.enums import DataType
 from unittests.mocks import MockSimulator
-from pacman.model.graphs.common import Slice
 from spinn_front_end_common.utilities import globals_variables
 from spynnaker.pyNN.models.common import NeuronRecorder
 from spynnaker.pyNN.utilities.spynnaker_failed_state import (

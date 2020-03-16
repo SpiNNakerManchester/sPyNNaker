@@ -30,7 +30,6 @@ from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, MICRO_TO_MILLISECOND_CONVERSION, BITS_PER_WORD)
 from spinn_front_end_common.interface.buffer_management import \
     recording_utilities
-from spynnaker.pyNN.models.neural_properties import NeuronParameter
 import itertools
 
 logger = FormatAdapter(logging.getLogger(__name__))
