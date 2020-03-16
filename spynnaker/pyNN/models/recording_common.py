@@ -18,7 +18,6 @@ import numpy
 from six.moves import xrange
 from spinn_utilities import logger_utils
 from spinn_utilities.log import FormatAdapter
-from spinn_utilities.timer import Timer
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spynnaker.pyNN.models.common import (
@@ -125,10 +124,9 @@ class RecordingCommon(object):
 
         :param variable: the variable name to read. supported variable names
             are :'gsyn_exc', 'gsyn_inh', 'v'
-        :return: the data
+        :return: data, indexes, sampling_interval
+        :rtype: tuple(~numpy.ndarray, list(int), float)
         """
-        timer = Timer()
-        timer.start_timing()
         data = None
         sim = get_simulator()
 
@@ -171,8 +169,6 @@ class RecordingCommon(object):
                 sim.graph_mapper, sim.buffer_manager, sim.machine_time_step)
             (data, indexes, sampling_interval) = results
 
-        get_simulator().add_extraction_timing(
-            timer.take_sample())
         return (data, indexes, sampling_interval)
 
     def _get_spikes(self):
