@@ -237,7 +237,7 @@ static inline void _process_fixed_synapses(
 
 //    num_fixed_pre_synaptic_events += fixed_synapse;
     num_fixed_pre_synaptic_events += 1; // count processed spikes instead
-    num_fixed_pre_synaptic_events_per_timestep++;
+    num_fixed_pre_synaptic_events_per_timestep += fixed_synapse;
 
     for (; fixed_synapse > 0; fixed_synapse--) {
 
