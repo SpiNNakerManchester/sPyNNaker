@@ -24,7 +24,8 @@ from pacman.model.constraints.key_allocator_constraints import (
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.resources import (
-    CPUCyclesPerTickResource, DTCMResource, MultiRegionSDRAM, ResourceContainer)
+    CPUCyclesPerTickResource, DTCMResource, MultiRegionSDRAM,
+    ResourceContainer)
 from spinn_front_end_common.abstract_models import (
     AbstractChangableAfterRun, AbstractProvidesIncomingPartitionConstraints,
     AbstractProvidesOutgoingPartitionConstraints, AbstractHasAssociatedBinary,
@@ -266,7 +267,8 @@ class AbstractPopulationVertex(
         costs = MultiRegionSDRAM()
         region_costs = MultiRegionSDRAM()
         # These values can be cross checked with the data_spec_text_files
-        region_costs.add_cost(POPULATION_BASED_REGIONS.SYSTEM, SIMULATION_N_BYTES)
+        region_costs.add_cost(
+            POPULATION_BASED_REGIONS.SYSTEM, SIMULATION_N_BYTES)
         region_costs.add_cost(
             POPULATION_BASED_REGIONS.NEURON_RECORDING,
             self._get_sdram_usage_for_neuron_params(vertex_slice))
@@ -282,8 +284,9 @@ class AbstractPopulationVertex(
         region_costs.add_cost(
             POPULATION_BASED_REGIONS.PROFILING,
             profile_utils.get_profile_region_size(self.__n_profile_samples))
-        region_costs.add_cost("dsg overhead",
-                       APP_PTR_TABLE_HEADER_BYTE_SIZE + MAX_MEM_REGIONS * 4)
+        region_costs.add_cost(
+            "dsg overhead",
+            APP_PTR_TABLE_HEADER_BYTE_SIZE + MAX_MEM_REGIONS * 4)
         costs.nest("Data_Spec_size", region_costs)
         costs.add_cost("DSG_malloc", SARK_PER_MALLOC_SDRAM_USAGE)
         return costs
