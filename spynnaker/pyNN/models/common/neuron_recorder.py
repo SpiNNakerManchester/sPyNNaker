@@ -772,17 +772,6 @@ class NeuronRecorder(object):
 
         return numpy.concatenate(data)
 
-    def get_global_parameters(self, vertex_slice):
-        params = []
-        for variable in self.__sampling_rates:
-            params.append(NeuronParameter(
-                self.__sampling_rates[variable], DataType.UINT32))
-        for variable in self.__sampling_rates:
-            n_recording = self._count_recording_per_slice(
-                variable, vertex_slice)
-            params.append(NeuronParameter(n_recording, DataType.UINT8))
-        return params
-
     @property
     def _indexes(self):  # for testing only
         return _ReadOnlyDict(self.__indexes)

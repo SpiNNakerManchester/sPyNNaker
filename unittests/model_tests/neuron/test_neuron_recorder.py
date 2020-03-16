@@ -40,12 +40,6 @@ def test_simple_record():
     assert([] == nr.recording_variables)
     nr.set_recording("v", True)
     assert(["v"] == nr.recording_variables)
-    _slice = Slice(0, 50)
-    gps = nr.get_global_parameters(_slice)
-    # 3 rates (index "0" is v)
-    assert (gps[0].get_value() == 1)
-    # 3 n_neurons  (index "3" is v)
-    assert (gps[3].get_value() == _slice.n_atoms)
 
 
 def test_recording_variables():
