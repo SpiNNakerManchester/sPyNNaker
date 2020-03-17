@@ -1100,7 +1100,7 @@ class SynapticManager(object):
 
         # Reserve the space in the matrix for an application-level key,
         # and tell the pop table
-        (block_addr, syn_block_addr, delay_block_addr, syn_max_addr,
+        (block_addr, syn_addr, delay_addr, syn_max_addr,
          delay_max_addr) = self.__reserve_app_blocks(
              is_undelayed, is_delayed, app_key_info, delay_app_key_info,
              block_addr, max_row_info, all_syn_block_sz, app_edge,
@@ -1109,8 +1109,12 @@ class SynapticManager(object):
         # Go through the edges of the application edge and write data for the
         # generator
         for m_edge in m_edges:
-            syn_mat_offset = syn_block_addr
-            d_mat_offset = delay_block_addr
+            # Store the address to generate the matrix from, assuming an
+            # application vertex matrix; this will change later if not
+            syn_mat_offset = syn_addr
+            d_mat_offset = delay_addr
+
+            # Get machine pre-vertex information
             pre_idx = graph_mapper.get_machine_vertex_index(m_edge.pre_vertex)
             pre_slice = graph_mapper.get_slice(m_edge.pre_vertex)
 
@@ -1120,51 +1124,29 @@ class SynapticManager(object):
                 post_slice_index, pre_slice, post_vertex_slice, synapse_info,
                 machine_time_step)
 
-            if is_undelayed and app_key_info is not None:
-                # If there is a single matrix for the app vertex, jump over the
-                # matrix and any padding space
-                syn_block_addr = self.__next_app_syn_block_addr(
-                    syn_block_addr, pre_slice.n_atoms,
-                    max_row_info.undelayed_max_bytes, syn_max_addr)
-            elif app_key_info is None:
-                # If there isn't a single matrix, add master population table
-                # entries for each incoming machine vertex
-                r_info = routing_info.get_routing_info_for_edge(m_edge)
-                if is_undelayed:
-                    block_addr, syn_mat_offset = self.__reserve_machine_block(
-                        r_info, block_addr, max_row_info.undelayed_max_bytes,
-                        max_row_info.undelayed_max_words, all_syn_block_sz,
-                        pre_slice.n_atoms, post_vertex_slice, synapse_info,
-                        m_edge, self.__m_edge_info)
-                elif r_info is not None:
-                    self.__poptable_type.add_invalid_entry(
-                        r_info.first_key_and_mask)
+            # Update addresses for undelayed vertices
+            syn_addr, block_addr, syn_mat_offset = self.__on_chip_addresses(
+                is_undelayed, app_key_info, syn_addr, pre_slice.n_atoms,
+                max_row_info.undelayed_max_bytes,
+                max_row_info.undelayed_max_words, syn_max_addr, routing_info,
+                m_edge, block_addr, all_syn_block_sz, post_vertex_slice,
+                synapse_info, syn_mat_offset, self.__m_edge_info)
 
-            # Do the same as the above for delay vertices too
-            if is_delayed and delay_app_key_info is not None:
-                delay_block_addr = self.__next_app_syn_block_addr(
-                    delay_block_addr,
-                    pre_slice.n_atoms * app_edge.n_delay_stages,
-                    max_row_info.delayed_max_bytes, delay_max_addr)
-            elif delay_app_key_info is None:
-                delay_key = (app_edge.pre_vertex, pre_slice.lo_atom,
-                             pre_slice.hi_atom)
-                r_info = self.__delay_key_index.get(delay_key, None)
-                if is_delayed:
-                    block_addr, d_mat_offset = self.__reserve_machine_block(
-                        r_info, block_addr, max_row_info.delayed_max_bytes,
-                        max_row_info.delayed_max_words, all_syn_block_sz,
-                        pre_slice.n_atoms * app_edge.n_delay_stages,
-                        post_vertex_slice, synapse_info, m_edge,
-                        self.__delay_m_edge_info)
-                elif r_info is not None:
-                    self.__poptable_type.add_invalid_entry(
-                        r_info.first_key_and_mask)
+            # Update addresses for delayed vertices
+            delay_addr, block_addr, d_mat_offset = self.__on_chip_addresses(
+                is_delayed, delay_app_key_info, delay_addr,
+                pre_slice.n_atoms * app_edge.n_delay_stages,
+                max_row_info.delayed_max_bytes, max_row_info.delayed_max_words,
+                delay_max_addr, routing_info, m_edge, block_addr,
+                all_syn_block_sz, post_vertex_slice, synapse_info,
+                syn_mat_offset, self.__delay_m_edge_info)
 
             # Create the generator data and note it exists for this post vertex
             # Note generator data is written per machine-edge even when a whole
             # application vertex matrix exists, because these are just appended
-            # to each other in the latter case
+            # to each other in the latter case; this makes it easier to
+            # generate since it is still doing it in chunks, so less local
+            # memory is needed.
             generator_data.append(GeneratorData(
                 syn_mat_offset, d_mat_offset,
                 max_row_info.undelayed_max_words,
@@ -1176,6 +1158,38 @@ class SynapticManager(object):
             key = (post_vertex_slice.lo_atom, post_vertex_slice.hi_atom)
             self.__gen_on_machine[key] = True
         return block_addr
+
+    def __on_chip_addresses(
+            self, is_synapses, app_key_info, syn_block_addr, n_atoms,
+            max_bytes, max_words, max_addr, routing_info, m_edge,
+            block_addr, all_syn_block_sz, post_vertex_slice, synapse_info,
+            syn_mat_offset, m_edge_info):
+        """ Get and update addresses where data is to be written to by the\
+            on-chip expander.
+        """
+        if is_synapses and app_key_info is not None:
+            # If there is a single matrix for the app vertex, jump over the
+            # matrix and any padding space
+            syn_block_addr = self.__next_app_syn_block_addr(
+                syn_block_addr, n_atoms, max_bytes, max_addr)
+            return syn_block_addr, block_addr, syn_mat_offset
+
+        if app_key_info is None:
+            # If there isn't a single matrix, add master population table
+            # entries for each incoming machine vertex
+            r_info = routing_info.get_routing_info_for_edge(m_edge)
+            if is_synapses:
+                block_addr, syn_mat_offset = self.__reserve_machine_block(
+                    r_info, block_addr, max_bytes, max_words, all_syn_block_sz,
+                    n_atoms, post_vertex_slice, synapse_info, m_edge,
+                    m_edge_info)
+                return syn_block_addr, block_addr, syn_mat_offset
+
+            if r_info is not None:
+                self.__poptable_type.add_invalid_entry(
+                    r_info.first_key_and_mask)
+
+        return syn_block_addr, block_addr, syn_mat_offset
 
     def __reserve_app_blocks(
             self, is_undelayed, is_delayed, app_key_info, delay_app_key_info,
