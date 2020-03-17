@@ -1125,19 +1125,23 @@ class SynapticManager(object):
                 machine_time_step)
 
             # Update addresses for undelayed vertices
+            r_info = routing_info.get_routing_info_for_edge(m_edge)
             syn_addr, block_addr, syn_mat_offset = self.__on_chip_addresses(
                 is_undelayed, app_key_info, syn_addr, pre_slice.n_atoms,
                 max_row_info.undelayed_max_bytes,
-                max_row_info.undelayed_max_words, syn_max_addr, routing_info,
+                max_row_info.undelayed_max_words, syn_max_addr, r_info,
                 m_edge, block_addr, all_syn_block_sz, post_vertex_slice,
                 synapse_info, syn_mat_offset, self.__m_edge_info)
 
             # Update addresses for delayed vertices
+            delay_key = (app_edge.pre_vertex, pre_slice.lo_atom,
+                         pre_slice.hi_atom)
+            delay_r_info = self.__delay_key_index.get(delay_key, None)
             delay_addr, block_addr, d_mat_offset = self.__on_chip_addresses(
                 is_delayed, delay_app_key_info, delay_addr,
                 pre_slice.n_atoms * app_edge.n_delay_stages,
                 max_row_info.delayed_max_bytes, max_row_info.delayed_max_words,
-                delay_max_addr, routing_info, m_edge, block_addr,
+                delay_max_addr, delay_r_info, m_edge, block_addr,
                 all_syn_block_sz, post_vertex_slice, synapse_info,
                 d_mat_offset, self.__delay_m_edge_info)
 
@@ -1160,8 +1164,8 @@ class SynapticManager(object):
         return block_addr
 
     def __on_chip_addresses(
-            self, is_synapses, app_key_info, syn_block_addr, n_atoms,
-            max_bytes, max_words, max_addr, routing_info, m_edge,
+            self, is_synapses, app_key_info, syn_block_addr, n_rows,
+            max_bytes, max_words, max_addr, r_info, m_edge,
             block_addr, all_syn_block_sz, post_vertex_slice, synapse_info,
             syn_mat_offset, m_edge_info):
         """ Get and update addresses where data is to be written to by the\
@@ -1171,17 +1175,16 @@ class SynapticManager(object):
             # If there is a single matrix for the app vertex, jump over the
             # matrix and any padding space
             syn_block_addr = self.__next_app_syn_block_addr(
-                syn_block_addr, n_atoms, max_bytes, max_addr)
+                syn_block_addr, n_rows, max_bytes, max_addr)
             return syn_block_addr, block_addr, syn_mat_offset
 
         if app_key_info is None:
             # If there isn't a single matrix, add master population table
             # entries for each incoming machine vertex
-            r_info = routing_info.get_routing_info_for_edge(m_edge)
             if is_synapses:
                 block_addr, syn_mat_offset = self.__reserve_machine_block(
                     r_info, block_addr, max_bytes, max_words, all_syn_block_sz,
-                    n_atoms, post_vertex_slice, synapse_info, m_edge,
+                    n_rows, post_vertex_slice, synapse_info, m_edge,
                     m_edge_info)
                 return syn_block_addr, block_addr, syn_mat_offset
 
@@ -1204,8 +1207,8 @@ class SynapticManager(object):
             block_addr, syn_block_addr = self.__reserve_app_block(
                 block_addr, max_row_info.undelayed_max_bytes,
                 max_row_info.undelayed_max_words, app_key_info,
-                all_syn_block_sz, app_edge, post_vertex_slice, synapse_info,
-                self.__app_edge_info)
+                all_syn_block_sz, app_edge, app_edge.pre_vertex.n_atoms,
+                post_vertex_slice, synapse_info, self.__app_edge_info)
             syn_max_addr = block_addr
         elif app_key_info is not None:
             self.__poptable_type.add_invalid_entry(
@@ -1218,8 +1221,9 @@ class SynapticManager(object):
             block_addr, delay_block_addr = self.__reserve_app_block(
                 block_addr, max_row_info.delayed_max_bytes,
                 max_row_info.delayed_max_words, delay_app_key_info,
-                all_syn_block_sz, app_edge, post_vertex_slice, synapse_info,
-                self.__delay_edge_info)
+                all_syn_block_sz, app_edge,
+                app_edge.pre_vertex.n_atoms * app_edge.n_delay_stages,
+                post_vertex_slice, synapse_info, self.__delay_edge_info)
             delay_max_addr = block_addr
         elif delay_app_key_info is not None:
             self.__poptable_type.add_invalid_entry(
@@ -1230,14 +1234,14 @@ class SynapticManager(object):
 
     def __reserve_app_block(
             self, block_addr, max_bytes, max_words, app_key_info,
-            all_syn_block_sz, app_edge, post_vertex_slice, synapse_info,
-            edge_info):
+            all_syn_block_sz, app_edge, n_rows, post_vertex_slice,
+            synapse_info, edge_info):
         """ Reserve a block for the matrix of an incoming application vertex,\
             and store the details for later retrieval
         """
         block_addr, syn_block_addr = self.__reserve_mpop_block(
             block_addr, max_bytes, max_words, app_key_info.key_and_mask,
-            all_syn_block_sz, app_edge.pre_vertex.n_atoms, post_vertex_slice,
+            all_syn_block_sz, n_rows, post_vertex_slice,
             synapse_info, app_key_info.core_mask, app_key_info.core_shift,
             app_key_info.n_neurons)
         key = (app_edge, synapse_info, post_vertex_slice.lo_atom)
@@ -1247,13 +1251,13 @@ class SynapticManager(object):
 
     def __reserve_machine_block(
             self, r_info, block_addr, max_bytes, max_words, all_syn_block_sz,
-            n_pre_atoms, post_vertex_slice, synapse_info, m_edge, m_edge_info):
+            n_rows, post_vertex_slice, synapse_info, m_edge, m_edge_info):
         """ Reserve a block for the matrix of an incoming machine vertex,\
             and store the details for later retrieval
         """
         block_addr, syn_mat_offset = self.__reserve_mpop_block(
             block_addr, max_bytes, max_words, r_info.first_key_and_mask,
-            all_syn_block_sz, n_pre_atoms, post_vertex_slice, synapse_info)
+            all_syn_block_sz, n_rows, post_vertex_slice, synapse_info)
         key = (m_edge, synapse_info, post_vertex_slice.lo_atom)
         size = block_addr - syn_mat_offset
         m_edge_info[key] = (syn_mat_offset, max_words, size, False)
