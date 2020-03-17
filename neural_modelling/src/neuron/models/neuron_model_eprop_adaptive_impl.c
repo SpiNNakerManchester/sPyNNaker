@@ -89,7 +89,7 @@ state_t neuron_model_state_update(
 //			0.3k *
 			(1.0k - psi_temp2) : 0.0k;
 
-    uint32_t total_synapses_per_neuron = 10; //todo should this be fixed
+    uint32_t total_synapses_per_neuron = 20; //todo should this be fixed
 
 
 //    neuron->psi = neuron->psi << 10;
