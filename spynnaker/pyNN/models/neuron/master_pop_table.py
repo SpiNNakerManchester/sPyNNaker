@@ -177,7 +177,8 @@ class MasterPopTableAsBinarySearch(object):
         self.__entries = None
         self.__n_addresses = 0
 
-    def get_master_population_table_size(self, in_edges):
+    @staticmethod
+    def get_master_population_table_size(in_edges):
         """ Get the size of the master population table in SDRAM
 
         :param in_edges: the in coming edges
