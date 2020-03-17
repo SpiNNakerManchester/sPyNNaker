@@ -1199,6 +1199,7 @@ class SynapticManager(object):
             and tell the master population table
         """
         syn_block_addr = _SYN_REGION_UNUSED
+        syn_max_addr = None
         if is_undelayed and app_key_info is not None:
             block_addr, syn_block_addr = self.__reserve_app_block(
                 block_addr, max_row_info.undelayed_max_bytes,
@@ -1210,7 +1211,9 @@ class SynapticManager(object):
             self.__poptable_type.add_invalid_entry(
                 app_key_info.key_and_mask, app_key_info.core_mask,
                 app_key_info.core_shift, app_key_info.n_neurons)
+
         delay_block_addr = _SYN_REGION_UNUSED
+        delay_max_addr = None
         if is_delayed and delay_app_key_info is not None:
             block_addr, delay_block_addr = self.__reserve_app_block(
                 block_addr, max_row_info.delayed_max_bytes,
