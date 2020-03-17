@@ -1139,7 +1139,7 @@ class SynapticManager(object):
                 max_row_info.delayed_max_bytes, max_row_info.delayed_max_words,
                 delay_max_addr, routing_info, m_edge, block_addr,
                 all_syn_block_sz, post_vertex_slice, synapse_info,
-                syn_mat_offset, self.__delay_m_edge_info)
+                d_mat_offset, self.__delay_m_edge_info)
 
             # Create the generator data and note it exists for this post vertex
             # Note generator data is written per machine-edge even when a whole
