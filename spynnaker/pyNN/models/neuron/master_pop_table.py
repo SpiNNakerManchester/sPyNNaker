@@ -128,6 +128,13 @@ class _MasterPopEntry(object):
         return self.__addresses_and_row_lengths
 
     def write_to_table(self, entry, address_list, start):
+        """ Write entries to the master population table
+
+        :param entry: The entry to write to
+        :param address_list: The address_list to write to
+        :param start: The index of the entry of the address list to start at
+        :return: The number of entries written to the address list
+        """
         entry["key"] = self.__routing_key
         entry["mask"] = self.__mask
         entry["start_and_flag"] = start
@@ -135,6 +142,7 @@ class _MasterPopEntry(object):
         entry["count"] = count
         next_addr = start
         n_entries = count
+        # If there is a core mask, add a special entry for it
         if self.__core_mask != 0:
             entry["start_and_flag"] |= _EXTRA_INFO_FLAG
             extra_info = numpy.zeros(1, dtype=_EXTRA_INFO_DTYPE)
