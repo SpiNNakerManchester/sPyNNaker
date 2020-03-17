@@ -1376,8 +1376,7 @@ class SynapticManager(object):
         all_syn_block_sz = self._get_synaptic_blocks_size(
             post_vertex_slice, in_edges, machine_time_step)
         self._reserve_memory_regions(
-            spec, machine_vertex, post_vertex_slice, machine_graph,
-            all_syn_block_sz, graph_mapper, application_graph,
+            spec, post_vertex_slice, all_syn_block_sz, application_graph,
             application_vertex)
 
         ring_buffer_shifts = self._get_ring_buffer_shifts(
