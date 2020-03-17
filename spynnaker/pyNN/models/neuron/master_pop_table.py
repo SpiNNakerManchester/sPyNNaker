@@ -175,7 +175,6 @@ class MasterPopTableAsBinarySearch(object):
     def get_master_population_table_size(self, in_edges):
         """ Get the size of the master population table in SDRAM
 
-        :param vertex_slice: the slice of the vertex
         :param in_edges: the in coming edges
         :return: the size the master pop table will take in SDRAM (in bytes)
         """
