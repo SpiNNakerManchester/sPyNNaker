@@ -1343,7 +1343,7 @@ class SynapticManager(object):
             not is_delayed and
             isinstance(s_info.connector, OneToOneConnector) and
             isinstance(s_info.synapse_dynamics, SynapseDynamicsStatic) and
-            (single_addr + (pre_vertex_slice.n_atoms * 4) <=
+            (single_addr + (pre_vertex_slice.n_atoms * BYTES_PER_WORD) <=
                 self.__one_to_one_connection_dtcm_max_bytes) and
             (pre_vertex_slice.lo_atom == post_vertex_slice.lo_atom) and
             (pre_vertex_slice.hi_atom == post_vertex_slice.hi_atom) and
