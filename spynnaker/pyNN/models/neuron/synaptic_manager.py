@@ -355,21 +355,13 @@ class SynapticManager(object):
             self._get_size_of_generator_information(in_edges))
 
     def _reserve_memory_regions(
-            self, spec, machine_vertex, vertex_slice,
-            machine_graph, all_syn_block_sz, graph_mapper,
-            application_graph, application_vertex):
+            self, spec, vertex_slice, all_syn_block_sz, application_graph,
+            application_vertex):
         spec.reserve_memory_region(
             region=POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value,
             size=self._get_synapse_params_size(),
             label='SynapseParams')
 
-        master_pop_table_sz = \
-            self.__poptable_type.get_exact_master_population_table_size(
-                machine_vertex, machine_graph, graph_mapper)
-        if master_pop_table_sz > 0:
-            spec.reserve_memory_region(
-                region=POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
-                size=master_pop_table_sz, label='PopTable')
         if all_syn_block_sz > 0:
             spec.reserve_memory_region(
                 region=POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,

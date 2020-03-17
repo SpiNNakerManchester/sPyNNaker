@@ -15,15 +15,13 @@
 
 import logging
 import math
-import struct
 import numpy
-from spynnaker.pyNN.models.neural_projections import (
-    ProjectionApplicationEdge, ProjectionMachineEdge)
+from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.exceptions import (
     SynapseRowTooBigException, SynapticConfigurationException)
+from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
 
 logger = logging.getLogger(__name__)
-_TWO_WORDS = struct.Struct("<II")
 # "single" flag is top bit of the 32 bit number
 _SINGLE_BIT_FLAG_BIT = 0x80000000
 # Row length is 1-256 (with subtraction of 1)
@@ -32,13 +30,8 @@ _ROW_LENGTH_MASK = 0xFF
 MAX_ROW_LENGTH = _ROW_LENGTH_MASK + 1
 # Address is 23 bits, but scaled by a factor of 16
 _ADDRESS_MASK = 0x7FFFFF
-# Address Mask after shifting
-_ADDRESS_MASK_SHIFTED = 0x7FFFFF00
 # Scale factor for an address
 _ADDRESS_SCALE = 16
-# The address is shifted by 8, but also multiplied by 16 (= shifted by 4)
-# so this shift will undo both
-_ADDRESS_SCALED_SHIFT = 8 - 4
 # Shift of addresses within the address and row length field
 _ADDRESS_SHIFT = 8
 # The shift of n_neurons in the n_neurons_and_core_shift field
@@ -61,12 +54,17 @@ _MAX_ADDRESS_COUNT = 0xFFFF
 _MASTER_POP_ENTRY_DTYPE = [
     ("key", "<u4"), ("mask", "<u4"),
     ("start_and_flag", "<u2"), ("count", "<u2")]
-_ADDRESS_LIST_DTYPE = "<u4"
+_ADDRESS_DTYPE = "<u4"
 _EXTRA_INFO_DTYPE = [
     ("core_mask", "<u2"), ("n_neurons_and_core_shift", "<u2")]
+# Sizes of structs
 _MASTER_POP_ENTRY_SIZE_BYTES = numpy.dtype(_MASTER_POP_ENTRY_DTYPE).itemsize
-_ADDRESS_LIST_ENTRY_SIZE_BYTES = numpy.dtype(_ADDRESS_LIST_DTYPE).itemsize
+_ADDRESS_LIST_ENTRY_SIZE_BYTES = numpy.dtype(_ADDRESS_DTYPE).itemsize
 _EXTRA_INFO_ENTRY_SIZE_BYTES = numpy.dtype(_EXTRA_INFO_DTYPE).itemsize
+# Base size - 2 words for size of table and address list
+_BASE_SIZE_BYTES = 8
+# Over-scale of estimate for safety
+_OVERSCALE = 2
 
 
 class _MasterPopEntry(object):
@@ -144,7 +142,7 @@ class _MasterPopEntry(object):
             extra_info["core_mask"] = self.__core_mask
             extra_info["n_neurons_and_core_shift"] = (
                 (self.__n_neurons << _N_NEURONS_SHIFT) | self.__core_shift)
-            address_list[start] = extra_info.view(_ADDRESS_LIST_DTYPE)[0]
+            address_list[start] = extra_info.view(_ADDRESS_DTYPE)[0]
             next_addr += 1
             n_entries += 1
 
@@ -200,31 +198,10 @@ class MasterPopTableAsBinarySearch(object):
 
         # Multiply by 2 to get an upper bound
         return (
-            (n_vertices * 2 * _MASTER_POP_ENTRY_SIZE_BYTES) +
-            (n_vertices * 2 * _EXTRA_INFO_ENTRY_SIZE_BYTES) +
-            (n_entries * 2 * _ADDRESS_LIST_ENTRY_SIZE_BYTES) +
-            8)
-
-    def get_exact_master_population_table_size(
-            self, vertex, machine_graph, graph_mapper):
-        """
-        :return: the size the master pop table will take in SDRAM (in bytes)
-        """
-        in_edges = machine_graph.get_edges_ending_at_vertex(vertex)
-
-        n_vertices = len(in_edges)
-        n_entries = 0
-        for in_edge in in_edges:
-            if isinstance(in_edge, ProjectionMachineEdge):
-                edge = graph_mapper.get_application_edge(in_edge)
-                n_entries += len(edge.synapse_information)
-
-        # Multiply by 2 to get an upper bound
-        return (
-            (n_vertices * 2 * _MASTER_POP_ENTRY_SIZE_BYTES) +
-            (n_vertices * 2 * _EXTRA_INFO_ENTRY_SIZE_BYTES) +
-            (n_entries * 2 * _ADDRESS_LIST_ENTRY_SIZE_BYTES) +
-            8)
+            _BASE_SIZE_BYTES
+            (n_vertices * _OVERSCALE * _MASTER_POP_ENTRY_SIZE_BYTES) +
+            (n_vertices * _OVERSCALE * _EXTRA_INFO_ENTRY_SIZE_BYTES) +
+            (n_entries * _OVERSCALE * _ADDRESS_LIST_ENTRY_SIZE_BYTES))
 
     def get_allowed_row_length(self, row_length):
         """
@@ -357,22 +334,29 @@ class MasterPopTableAsBinarySearch(object):
         :param master_pop_table_region: \
             the region to which the master pop table is being stored
         """
-        spec.switch_write_focus(region=master_pop_table_region)
-
         # sort entries by key
         entries = sorted(
             self.__entries.values(),
             key=lambda entry: entry.routing_key)
+        n_entries = len(entries)
+
+        # reserve space and switch
+        master_pop_table_sz = (
+            _BASE_SIZE_BYTES +
+            n_entries * _MASTER_POP_ENTRY_SIZE_BYTES +
+            self.__n_addresses * _ADDRESS_LIST_ENTRY_SIZE_BYTES)
+        spec.reserve_memory_region(
+            region=POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
+            size=master_pop_table_sz, label='PopTable')
+        spec.switch_write_focus(region=master_pop_table_region)
 
         # write no master pop entries and the address list size
-        n_entries = len(entries)
         spec.write_value(n_entries)
         spec.write_value(self.__n_addresses)
 
         # Generate the table and list as arrays
         pop_table = numpy.zeros(n_entries, dtype=_MASTER_POP_ENTRY_DTYPE)
-        address_list = numpy.zeros(
-            self.__n_addresses, dtype=_ADDRESS_LIST_DTYPE)
+        address_list = numpy.zeros(self.__n_addresses, dtype=_ADDRESS_DTYPE)
         start = 0
         for i, entry in enumerate(entries):
             table_entry = pop_table[i]
