@@ -83,6 +83,14 @@ class _MasterPopEntry(object):
         "__n_neurons"]
 
     def __init__(self, routing_key, mask, core_mask, core_shift, n_neurons):
+        """ Create a new table entry
+
+        :param routing_key: The key to match for this entry
+        :param mask: The mask to match for this entry
+        :param core_mask: The part of the routing_key where the core id is held
+        :param core_shift: Where in the routing_key the core_id is held
+        :param n_neurons: The number of neurons on each core, except the last
+        """
         self.__routing_key = routing_key
         self.__mask = mask
         self.__core_mask = core_mask
@@ -91,6 +99,13 @@ class _MasterPopEntry(object):
         self.__addresses_and_row_lengths = list()
 
     def append(self, address, row_length, is_single):
+        """ Add a synaptic matrix pointer to the entry
+
+        :param address: The address of the synaptic matrix
+        :param row_length: The length of each row in the matrix
+        :param is_single: True if the address is to the direct matrix
+        :return: The index of the pointer within the entry
+        """
         index = len(self.__addresses_and_row_lengths)
         if index > _MAX_ADDRESS_COUNT:
             raise SynapticConfigurationException(
@@ -101,6 +116,11 @@ class _MasterPopEntry(object):
         return index
 
     def append_invalid(self):
+        """ Add an invalid marker to the entry; used to ensure index alignment\
+            between multiple entries when necessary
+
+        :return: The index of the marker within the entry
+        """
         index = len(self.__addresses_and_row_lengths)
         self.__addresses_and_row_lengths.append((0, 0, 0, False))
         return index
@@ -211,7 +231,8 @@ class MasterPopTableAsBinarySearch(object):
             (n_vertices * _OVERSCALE * _EXTRA_INFO_ENTRY_SIZE_BYTES) +
             (n_entries * _OVERSCALE * _ADDRESS_LIST_ENTRY_SIZE_BYTES))
 
-    def get_allowed_row_length(self, row_length):
+    @staticmethod
+    def get_allowed_row_length(row_length):
         """
         :param row_length: the row length being considered
         :return: the row length available
@@ -224,7 +245,8 @@ class MasterPopTableAsBinarySearch(object):
                     POP_TABLE_MAX_ROW_LENGTH))
         return row_length
 
-    def get_next_allowed_address(self, next_address):
+    @staticmethod
+    def get_next_allowed_address(next_address):
         """
         :param next_address: The next address that would be used
         :return: The next address that can be used following next_address
@@ -379,7 +401,8 @@ class MasterPopTableAsBinarySearch(object):
         self.__entries = None
         self.__n_addresses = 0
 
-    def get_edge_constraints(self):
+    @staticmethod
+    def get_edge_constraints():
         """ Gets the constraints for this table on edges coming in to a vertex.
 
         :return: a list of constraints
