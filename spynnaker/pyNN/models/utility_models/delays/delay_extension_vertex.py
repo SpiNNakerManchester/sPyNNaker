@@ -42,6 +42,8 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractGenerateConnectorOnMachine)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractGenerateOnMachine)
+from spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model import (
+    DEFAULT_MAX_ATOMS_PER_CORE)
 
 logger = logging.getLogger(__name__)
 
@@ -87,7 +89,8 @@ class DelayExtensionVertex(
         :param label: the vertex label
         """
         # pylint: disable=too-many-arguments
-        super(DelayExtensionVertex, self).__init__(label, constraints, 256)
+        super(DelayExtensionVertex, self).__init__(
+            label, constraints, DEFAULT_MAX_ATOMS_PER_CORE)
 
         self.__source_vertex = source_vertex
         self.__n_delay_stages = 0
