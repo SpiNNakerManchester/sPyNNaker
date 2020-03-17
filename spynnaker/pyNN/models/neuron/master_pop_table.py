@@ -28,6 +28,8 @@ _TWO_WORDS = struct.Struct("<II")
 _SINGLE_BIT_FLAG_BIT = 0x80000000
 # Row length is 1-256 (with subtraction of 1)
 _ROW_LENGTH_MASK = 0xFF
+# The maximum row length is the row mask + 1
+MAX_ROW_LENGTH = _ROW_LENGTH_MASK + 1
 # Address is 23 bits, but scaled by a factor of 16
 _ADDRESS_MASK = 0x7FFFFF
 # Address Mask after shifting
@@ -230,9 +232,12 @@ class MasterPopTableAsBinarySearch(object):
         :param row_length: the row length being considered
         :return: the row length available
         """
-        if (row_length - 1) & _ROW_LENGTH_MASK != (row_length - 1):
+
+        if row_length > MAX_ROW_LENGTH:
             raise SynapseRowTooBigException(
-                256, "Only rows of up to 256 entries are allowed")
+                MAX_ROW_LENGTH,
+                "Only rows of up to {} entries are allowed".format(
+                    MAX_ROW_LENGTH))
         return row_length
 
     def get_next_allowed_address(self, next_address):
@@ -261,7 +266,7 @@ class MasterPopTableAsBinarySearch(object):
         """ Add an entry in the binary search to deal with the synaptic matrix
 
         :param block_start_addr: where the synaptic matrix block starts
-        :param row_length: how long in bytes each synaptic entry is
+        :param row_length: how long in words each row is
         :param key_and_mask: the key and mask for this master pop entry
         :type key_and_mask: \
             :py:class:`pacman.model.routing_info.BaseKeyAndMask`
@@ -312,10 +317,7 @@ class MasterPopTableAsBinarySearch(object):
                 raise SynapticConfigurationException(
                     "Address {} is too big for this table".format(
                         block_start_addr))
-        if (row_length - 1) & _ROW_LENGTH_MASK != (row_length - 1):
-            raise SynapticConfigurationException(
-                "Row length {} is outside of allowed range for "
-                "this table".format(row_length))
+        row_length = self.get_allowed_row_length(row_length)
         index = self.__entries[key_and_mask.key].append(
             start_addr, row_length - 1, is_single)
         self.__n_addresses += 1
