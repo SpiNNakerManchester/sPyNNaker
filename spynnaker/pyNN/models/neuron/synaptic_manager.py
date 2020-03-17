@@ -861,7 +861,7 @@ class SynapticManager(object):
 
         # Store the data to be used to read synapses
         key = (app_edge, synapse_info, post_slice.lo_atom)
-        size = syn_mat_addr - block_addr
+        size = block_addr - syn_mat_addr
         edge_info[key] = (syn_mat_addr, max_words, size)
         return block_addr
 
