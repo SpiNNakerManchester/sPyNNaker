@@ -1538,12 +1538,6 @@ class SynapticManager(object):
             transceiver) + BYTES_PER_WORD
         return direct_synapses, synaptic_matrix
 
-    def _extract_synaptic_matrix_data_location(
-            self, key, master_pop_table_address, transceiver, placement):
-        return self.__poptable_type.extract_synaptic_matrix_data_location(
-            key, master_pop_table_address, transceiver,
-            placement.x, placement.y)
-
     # inherited from AbstractProvidesIncomingPartitionConstraints
     def get_incoming_partition_constraints(self):
         return self.__poptable_type.get_edge_constraints()
