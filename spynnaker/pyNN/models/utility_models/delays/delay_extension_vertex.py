@@ -36,14 +36,13 @@ from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from .delay_block import DelayBlock
 from .delay_extension_machine_vertex import DelayExtensionMachineVertex
 from .delay_generator_data import DelayGeneratorData
-from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
+from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID,\
+    POP_TABLE_MAX_ROW_LENGTH
 from spynnaker.pyNN.models.neural_projections import DelayedApplicationEdge
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractGenerateConnectorOnMachine)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractGenerateOnMachine)
-from spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model import (
-    DEFAULT_MAX_ATOMS_PER_CORE)
 
 logger = logging.getLogger(__name__)
 
@@ -90,7 +89,7 @@ class DelayExtensionVertex(
         """
         # pylint: disable=too-many-arguments
         super(DelayExtensionVertex, self).__init__(
-            label, constraints, DEFAULT_MAX_ATOMS_PER_CORE)
+            label, constraints, POP_TABLE_MAX_ROW_LENGTH)
 
         self.__source_vertex = source_vertex
         self.__n_delay_stages = 0

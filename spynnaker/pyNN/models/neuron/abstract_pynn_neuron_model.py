@@ -16,11 +16,11 @@
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 from spynnaker.pyNN.models.abstract_pynn_model import AbstractPyNNModel
-from spynnaker.pyNN.models.neuron.master_pop_table import MAX_ROW_LENGTH
+from spynnaker.pyNN.utilities.constants import POP_TABLE_MAX_ROW_LENGTH
 
 # The maximum atoms per core is the master population table row length to
 # make it easier when all-to-all-connector is used
-DEFAULT_MAX_ATOMS_PER_CORE = MAX_ROW_LENGTH
+DEFAULT_MAX_ATOMS_PER_CORE = POP_TABLE_MAX_ROW_LENGTH
 
 _population_parameters = {
     "spikes_per_second": None, "ring_buffer_sigma": None,

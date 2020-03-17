@@ -19,15 +19,14 @@ import numpy
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.exceptions import (
     SynapseRowTooBigException, SynapticConfigurationException)
-from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
+from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS,\
+    POP_TABLE_MAX_ROW_LENGTH
 
 logger = logging.getLogger(__name__)
 # "single" flag is top bit of the 32 bit number
 _SINGLE_BIT_FLAG_BIT = 0x80000000
 # Row length is 1-256 (with subtraction of 1)
-_ROW_LENGTH_MASK = 0xFF
-# The maximum row length is the row mask + 1
-MAX_ROW_LENGTH = _ROW_LENGTH_MASK + 1
+_ROW_LENGTH_MASK = POP_TABLE_MAX_ROW_LENGTH - 1
 # Address is 23 bits, but scaled by a factor of 16
 _ADDRESS_MASK = 0x7FFFFF
 # Scale factor for an address
@@ -209,11 +208,11 @@ class MasterPopTableAsBinarySearch(object):
         :return: the row length available
         """
 
-        if row_length > MAX_ROW_LENGTH:
+        if row_length > POP_TABLE_MAX_ROW_LENGTH:
             raise SynapseRowTooBigException(
-                MAX_ROW_LENGTH,
+                POP_TABLE_MAX_ROW_LENGTH,
                 "Only rows of up to {} entries are allowed".format(
-                    MAX_ROW_LENGTH))
+                    POP_TABLE_MAX_ROW_LENGTH))
         return row_length
 
     def get_next_allowed_address(self, next_address):
