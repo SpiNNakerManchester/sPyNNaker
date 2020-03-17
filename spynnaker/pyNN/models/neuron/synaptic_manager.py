@@ -972,7 +972,7 @@ class SynapticManager(object):
         # enough keys
         key = keys[0][0]
         n_extra_mask_bits = int(math.ceil(math.log(len(keys), 2)))
-        core_mask = (((2 ** n_extra_mask_bits) - 1))
+        core_mask = (2 ** n_extra_mask_bits) - 1
         new_mask = mask & ~(core_mask << mask_size)
 
         # Final check because adjacent keys don't mean they all fit under a
