@@ -1030,7 +1030,7 @@ class SynapticManager(object):
         mask = None
         keys = list()
 
-        # Can be merged only of all the masks are the same
+        # Can be merged only if all the masks are the same
         pre_slices = list()
         for m_edge in m_edges:
             rinfo = routing_info.get_routing_info_for_edge(m_edge)
@@ -1064,7 +1064,7 @@ class SynapticManager(object):
         mask = None
         keys = list()
 
-        # Can be merged only of all the masks are the same
+        # Can be merged only if all the masks are the same
         pre_slices = list()
         for m_edge in m_edges:
             pre_vertex_slice = graph_mapper.get_slice(m_edge.pre_vertex)
