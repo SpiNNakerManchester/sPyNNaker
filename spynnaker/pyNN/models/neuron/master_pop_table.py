@@ -322,7 +322,7 @@ class MasterPopTableAsBinarySearch(object):
         return index
 
     def add_invalid_entry(
-            self, key_and_mask, core_mask, core_shift, n_neurons):
+            self, key_and_mask, core_mask=0, core_shift=0, n_neurons=0):
         """ Add an entry to the table that doesn't point to anywhere.  Used\
             to keep indices in synchronisation between e.g. normal and delay\
             entries and between entries on different cores

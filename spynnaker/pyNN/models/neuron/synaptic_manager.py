@@ -885,7 +885,7 @@ class SynapticManager(object):
             # If there is routing information, write an invalid entry
             if r_info is not None:
                 self.__poptable_type.add_invalid_entry(
-                    r_info.first_key_and_mask, 0, 0, 0)
+                    r_info.first_key_and_mask)
             return block_addr, single_addr
 
         # If the matrix is direct, write direct
@@ -1136,7 +1136,7 @@ class SynapticManager(object):
                         m_edge, self.__m_edge_info)
                 elif r_info is not None:
                     self.__poptable_type.add_invalid_entry(
-                        r_info.first_key_and_mask, 0, 0, 0)
+                        r_info.first_key_and_mask)
 
             # Do the same as the above for delay vertices too
             if is_delayed and delay_app_key_info is not None:
@@ -1157,7 +1157,7 @@ class SynapticManager(object):
                         self.__delay_m_edge_info)
                 elif r_info is not None:
                     self.__poptable_type.add_invalid_entry(
-                        r_info.first_key_and_mask, 0, 0, 0)
+                        r_info.first_key_and_mask)
 
             # Create the generator data and note it exists for this post vertex
             # Note generator data is written per machine-edge even when a whole
