@@ -226,7 +226,7 @@ class MasterPopTableAsBinarySearch(object):
 
         # Multiply by 2 to get an upper bound
         return (
-            _BASE_SIZE_BYTES
+            _BASE_SIZE_BYTES +
             (n_vertices * _OVERSCALE * _MASTER_POP_ENTRY_SIZE_BYTES) +
             (n_vertices * _OVERSCALE * _EXTRA_INFO_ENTRY_SIZE_BYTES) +
             (n_entries * _OVERSCALE * _ADDRESS_LIST_ENTRY_SIZE_BYTES))
