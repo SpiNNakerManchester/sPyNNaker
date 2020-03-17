@@ -934,17 +934,27 @@ class SynapticManager(object):
         last_key = None
         last_slice = None
         for i, (key, v_slice) in enumerate(keys):
-            if last_key is None:
-                last_key = key
-                last_slice = v_slice
-            elif (last_key + key_increment) != key:
-                return False
-            elif (i + 1) < len(keys) and last_slice.n_atoms != v_slice.n_atoms:
-                return False
-            elif (last_slice.hi_atom + 1) != v_slice.lo_atom:
-                return False
+            # If the first round, we can skip the checks and just store
+            if last_key is not None:
+                # Fail if next key is not adjacent to last key
+                if (last_key + key_increment) != key:
+                    return False
+
+                # Fail if this is not the last key and the number of atoms
+                # don't match the other keys (last is OK to be different)
+                elif ((i + 1) < len(keys) and
+                        last_slice.n_atoms != v_slice.n_atoms):
+                    return False
+
+                # Fail if the atoms are not adjacent
+                elif (last_slice.hi_atom + 1) != v_slice.lo_atom:
+                    return False
+
+            # Store for the next round
             last_key = key
             last_slice = v_slice
+
+        # Pass if nothing failed
         return True
 
     def __get_app_key_and_mask(self, keys, mask, n_stages, key_space_tracker):
