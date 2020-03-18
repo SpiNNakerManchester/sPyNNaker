@@ -61,6 +61,7 @@ struct neuron_provenance {
     uint32_t n_input_buffer_overflows;
     uint32_t current_timer_tick;
     uint32_t n_plastic_synaptic_weight_saturations;
+    uint32_t n_rewires;
 };
 
 //! values for the priority for each callback
@@ -95,7 +96,7 @@ int32_t rewiring_period = 0;
 //! Flag representing whether rewiring is enabled
 bool rewiring = false;
 
-// FOR DEBUGGING!
+//! For counting the number of rewires to report back
 uint32_t count_rewires = 0;
 
 //! The number of neurons on the core
@@ -113,6 +114,7 @@ void c_main_store_provenance_data(address_t provenance_region) {
     prov->current_timer_tick = time;
     prov->n_plastic_synaptic_weight_saturations =
             synapse_dynamics_get_plastic_saturation_count();
+    prov->n_rewires = count_rewires;
     log_debug("finished other provenance data");
 }
 
