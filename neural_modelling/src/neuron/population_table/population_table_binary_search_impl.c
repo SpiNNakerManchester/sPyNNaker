@@ -278,6 +278,11 @@ bool population_table_get_first_address(
             if (is_extended(entry)) {
                 extra_info extra = address_list[next_item++].extra;
                 last_neuron_id = get_extended_neuron_id(entry, extra, spike);
+                uint32_t n_neurons = get_n_neurons(extra);
+                if (last_neuron_id > n_neurons) {
+                    log_error("Spike %u is outside of expected neuron id range"
+                        "(neuron id %u of maximum %u)", spike, last_neuron_id, n_neurons);
+                }
             } else {
                 last_neuron_id = get_neuron_id(entry, spike);
             }
