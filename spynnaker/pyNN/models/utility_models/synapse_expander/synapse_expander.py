@@ -171,6 +171,6 @@ def _fill_in_connection_data(
             if connector_gen and synapse_gen:
                 conns = vertex.get_connections_from_machine(
                     transceiver, placements, app_edge, graph_mapper,
-                    synapse_info, ctl.machine_time_step, ctl.buffer_manager)
+                    synapse_info, ctl.machine_time_step)
                 for conn_holder in conn_holder_list:
                     conn_holder.add_connections(conns)
