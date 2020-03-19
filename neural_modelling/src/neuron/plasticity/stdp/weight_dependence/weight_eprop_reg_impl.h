@@ -104,7 +104,7 @@ static inline weight_t weight_get_final(weight_state_t new_state,
     int32_t reg_change = 0;
 
     // Calculate regularisation
-    if (new_state.weight_region->reg_rate > 0.0k && (reg_error > 1.k || reg_error < -1.k)){ // if reg rate is zero or error small, regularisation is turned off
+    if (new_state.weight_region->reg_rate > 0.0k && (reg_error > 0.2k || reg_error < -0.2k)){ // if reg rate is zero or error small, regularisation is turned off
         reg_change = new_weight * new_state.weight_region->reg_rate * reg_error;
     	if (new_weight > 0){
     		reg_weight = new_weight + reg_change;
