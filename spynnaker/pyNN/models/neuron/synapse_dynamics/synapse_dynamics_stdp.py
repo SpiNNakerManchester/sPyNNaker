@@ -289,8 +289,6 @@ class SynapseDynamicsSTDP(
         :rtype: int
         """
         synapse_structure = self.__timing_dependence.synaptic_structure
-        if self.__pad_to_length is not None:
-            n_connections = max(n_connections, self.__pad_to_length)
         if n_connections == 0:
             return 0
         # 2 == two half words per word
@@ -508,12 +506,14 @@ class SynapseDynamicsSTDP(
         n_connections = (n_words_space * BYTES_PER_WORD) // (
             bytes_per_pp + bytes_per_fp)
 
-        # Reduce until correct, if padding (i.e. structural plasticity)
-        # is not present (otherwise this can underflow)
-        if self.__pad_to_length is None:
-            while (self.get_n_words_for_plastic_connections(n_connections) >
+        # Calculate n_connections if padding
+        if self.__pad_to_length is not None:
+            n_connections = max(n_connections, self.__pad_to_length)
+
+        # Reduce until correct
+        while (self.get_n_words_for_plastic_connections(n_connections) >
                    n_words):
-                n_connections -= 1
+            n_connections -= 1
 
         return n_connections
 
