@@ -159,11 +159,17 @@ static inline uint32_t get_neuron_id(
     return spike & ~entry.mask;
 }
 
+//! \brief Get the neuron id of the source neuron on the core, for a spike with
+//         extra info
+static inline uint32_t get_local_neuron_id(
+        master_population_table_entry entry, extra_info extra, spike_t spike) {
+    return spike & ~(entry.mask | (extra.core_mask << get_core_shift(extra)));
+}
+
 //! \brief Get the neuron id for a spike with extra info
 static inline uint32_t get_extended_neuron_id(
         master_population_table_entry entry, extra_info extra, spike_t spike) {
-    return (spike & ~(entry.mask | (extra.core_mask << get_core_shift(extra)))) +
-            get_core_sum(extra, spike);
+    return get_local_neuron_id(entry, extra, spike) + get_core_sum(extra, spike);
 }
 
 //! \brief Print the population table
@@ -279,9 +285,11 @@ bool population_table_get_first_address(
                 extra_info extra = address_list[next_item++].extra;
                 last_neuron_id = get_extended_neuron_id(entry, extra, spike);
                 uint32_t n_neurons = get_n_neurons(extra);
-                if (last_neuron_id > n_neurons) {
+                uint32_t local_neuron_id = get_local_neuron_id(entry, extra, spike);
+                if (local_neuron_id > n_neurons) {
                     log_error("Spike %u is outside of expected neuron id range"
                         "(neuron id %u of maximum %u)", spike, last_neuron_id, n_neurons);
+                    rt_error(RTE_SWERR);
                 }
             } else {
                 last_neuron_id = get_neuron_id(entry, spike);
