@@ -216,7 +216,7 @@ class SynapseIORowBased(object):
         undelayed_max_n_words = 0
         if undelayed_n_words > 0:
             undelayed_max_n_words = self._get_max_row_length(
-                ndelayed_n_words, dynamics, population_table, in_edge,
+                undelayed_n_words, dynamics, population_table, in_edge,
                 max_undelayed_n_synapses)
         delayed_max_n_words = 0
         if delayed_n_words > 0:
