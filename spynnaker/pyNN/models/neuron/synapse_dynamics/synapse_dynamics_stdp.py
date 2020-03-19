@@ -283,12 +283,16 @@ class SynapseDynamicsSTDP(
         # the number of bytes as a number of words
         return int(math.ceil(float(n_bytes) / BYTES_PER_WORD)) * BYTES_PER_WORD
 
-    def get_n_words_for_plastic_connections(self, n_connections):
+    def __get_n_connections(self, n_connections, check_length_padded=True):
         """
         :param int n_connections:
         :rtype: int
+        :param bool check_length_padded:
+        :rtype: bool
         """
         synapse_structure = self.__timing_dependence.synaptic_structure
+        if self.__pad_to_length is not None and check_length_padded:
+            n_connections = max(n_connections, self.__pad_to_length)
         if n_connections == 0:
             return 0
         # 2 == two half words per word
@@ -302,6 +306,13 @@ class SynapseDynamicsSTDP(
         pp_size_words = int(math.ceil(float(pp_size_bytes) / BYTES_PER_WORD))
 
         return fp_size_words + pp_size_words
+
+    def get_n_words_for_plastic_connections(self, n_connections):
+        """
+        :param int n_connections:
+        :rtype: int
+        """
+        return self.__get_n_connections(n_connections)
 
     @overrides(AbstractPlasticSynapseDynamics.get_plastic_synaptic_data)
     def get_plastic_synaptic_data(
@@ -506,12 +517,10 @@ class SynapseDynamicsSTDP(
         n_connections = (n_words_space * BYTES_PER_WORD) // (
             bytes_per_pp + bytes_per_fp)
 
-        # Calculate n_connections if padding
-        if self.__pad_to_length is not None:
-            n_connections = max(n_connections, self.__pad_to_length)
+        check_length_padded = False
 
         # Reduce until correct
-        while (self.get_n_words_for_plastic_connections(n_connections) >
+        while (self.__get_n_connections(n_connections, check_length_padded) >
                n_words):
             n_connections -= 1
 
