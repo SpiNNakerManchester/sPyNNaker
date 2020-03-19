@@ -512,7 +512,7 @@ class SynapseDynamicsSTDP(
 
         # Reduce until correct
         while (self.get_n_words_for_plastic_connections(n_connections) >
-                   n_words):
+               n_words):
             n_connections -= 1
 
         return n_connections
