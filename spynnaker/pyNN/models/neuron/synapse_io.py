@@ -213,12 +213,16 @@ class SynapseIORowBased(object):
                 max_delayed_n_synapses)
 
         # Adjust for the allowed row lengths from the population table
-        undelayed_max_n_words = self._get_max_row_length(
-            undelayed_n_words, dynamics, population_table, in_edge,
-            max_undelayed_n_synapses)
-        delayed_max_n_words = self._get_max_row_length(
-            delayed_n_words, dynamics, population_table, in_edge,
-            max_delayed_n_synapses)
+        undelayed_max_n_words = 0
+        if undelayed_n_words > 0:
+            undelayed_max_n_words = self._get_max_row_length(
+                ndelayed_n_words, dynamics, population_table, in_edge,
+                max_undelayed_n_synapses)
+        delayed_max_n_words = 0
+        if delayed_n_words > 0:
+            delayed_max_n_words = self._get_max_row_length(
+                delayed_n_words, dynamics, population_table, in_edge,
+                max_delayed_n_synapses)
 
         undelayed_max_bytes = 0
         if undelayed_max_n_words > 0:
