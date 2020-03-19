@@ -153,47 +153,6 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
             expander_app_id = transceiver.app_id_tracker.get_new_id()
             system_control_logic.run_system_application(
                 synaptic_expander_rerun_cores, expander_app_id, transceiver,
-                provenance_file_path, executable_finder, True, None,
-                self._handle_failure_for_synaptic_expander_rerun,
-                [CPUState.FINISHED], needs_sync_barrier, no_sync_changes)
-
-    def _handle_failure_for_synaptic_expander_rerun(
-            self, executable_targets, transceiver, provenance_file_path,
-            compressor_app_id, executable_finder):
-        """handles the state where some cores have failed.
-
-        :param executable_targets: cores which are running the router \
-        compressor with bitfield.
-        :param transceiver: SpiNNMan instance
-        :param provenance_file_path: provenance file path
-        :param executable_finder: executable finder
-        :rtype: None
-        """
-        logger.info("rerunning of the synaptic expander has failed")
-        self._call_iobuf_and_clean_up(
-            executable_targets, transceiver, provenance_file_path,
-            compressor_app_id, executable_finder)
-
-    @staticmethod
-    def _call_iobuf_and_clean_up(
-            executable_targets, transceiver, provenance_file_path,
-            compressor_app_id, executable_finder):
-        """handles the reading of iobuf and cleaning the cores off the machine
-
-        :param executable_targets: cores which are running the router \
-        compressor with bitfield.
-        :param transceiver: SpiNNMan instance
-        :param provenance_file_path: provenance file path
-        :param executable_finder: executable finder
-        :rtype: None
-        """
-        iobuf_extractor = ChipIOBufExtractor()
-        io_errors, io_warnings = iobuf_extractor(
-            transceiver, executable_targets, executable_finder,
-            provenance_file_path)
-        for warning in io_warnings:
-            logger.warning(warning)
-        for error in io_errors:
-            logger.error(error)
-        transceiver.stop_application(compressor_app_id)
-        transceiver.app_id_tracker.free_id(compressor_app_id)
+                provenance_file_path, executable_finder, True, None, None,
+                [CPUState.FINISHED], needs_sync_barrier, no_sync_changes,
+                "rerun_of_synaptic_expander_on_{}_{}_{}")

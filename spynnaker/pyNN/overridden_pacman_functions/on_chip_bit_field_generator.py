@@ -119,12 +119,8 @@ class OnChipBitFieldGenerator(object):
             expander_cores, bit_field_app_id, transceiver,
             provenance_file_path, executable_finder,
             read_bit_field_generator_iobuf, self._check_for_success,
-            functools.partial(
-                self._handle_failure, transceiver=transceiver,
-                provenance_file_path=provenance_file_path,
-                compressor_app_id=bit_field_app_id,
-                executable_finder=executable_finder),
-            [CPUState.FINISHED], False, 0)
+            None, [CPUState.FINISHED], False, 0,
+            "bit_field_expander_on_{}_{}_{}")
         # update progress bar
         progress.end()
 
@@ -399,17 +395,12 @@ class OnChipBitFieldGenerator(object):
 
         return expander_cores
 
-    def _check_for_success(
-            self, executable_targets, transceiver, provenance_file_path,
-            compressor_app_id, executable_finder):
+    def _check_for_success(self, executable_targets, transceiver):
         """ Goes through the cores checking for cores that have failed to\
             expand the bitfield to the core
 
         :param executable_targets: cores to load bitfield on
         :param transceiver: SpiNNMan instance
-        :param provenance_file_path: path to provenance folder
-        :param compressor_app_id: the app id for the compressor c code
-        :param executable_finder: executable path finder
         :rtype: None
         """
 
@@ -426,42 +417,5 @@ class OnChipBitFieldGenerator(object):
 
                 # The result is 0 if success, otherwise failure
                 if result != self._SUCCESS:
-                    self._handle_failure(
-                        executable_targets, transceiver, provenance_file_path,
-                        compressor_app_id, executable_finder)
-
-                    raise SpinnFrontEndException(
-                        "The bit field expander on {}, {} failed to complete"
-                        .format(x, y))
-
-    @staticmethod
-    def _handle_failure(
-            executable_targets, transceiver, provenance_file_path,
-            compressor_app_id, executable_finder):
-        """handles the state where some cores have failed.
-
-        :param executable_targets: cores which are running the bitfield \
-        expander
-        :param transceiver: SpiNNMan instance
-        :param provenance_file_path: provenance file path
-        :param executable_finder: executable finder
-        :rtype: None
-        """
-        logger.info("bit field expander has failed")
-        iobuf_extractor = ChipIOBufExtractor()
-
-        executable_types = dict()
-        for binary in executable_targets.binaries:
-            executable_types[binary] = ExecutableType.SYSTEM
-
-        io_errors, io_warnings = iobuf_extractor(
-            transceiver, executable_targets, executable_finder,
-            system_provenance_file_path=provenance_file_path,
-            app_provenance_file_path=None,
-            binary_executable_types=executable_types)
-        for warning in io_warnings:
-            logger.warning(warning)
-        for error in io_errors:
-            logger.error(error)
-        transceiver.stop_application(compressor_app_id)
-        transceiver.app_id_tracker.free_id(compressor_app_id)
+                    return False
+        return True
