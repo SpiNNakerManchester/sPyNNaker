@@ -92,7 +92,7 @@
             </parameter>
             <parameter>
                 <param_name>target_length</param_name>
-                <param_type>RouterCompressorBitFieldTargetLength</param_type>
+                <param_type>CompressionTargetSize</param_type>
             </parameter>
             <parameter>
                 <param_name>routing_infos</param_name>

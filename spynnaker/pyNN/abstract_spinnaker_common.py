@@ -135,13 +135,6 @@ class AbstractSpiNNakerCommon(with_metaclass(
             time = int(time)
         extra_mapping_inputs['RouterCompressorBitFieldTimePerAttempt'] = time
 
-        target_length = read_config(
-            self.config, "Mapping",
-            "router_table_compression_with_bit_field_target_length")
-        if target_length is not None:
-            target_length = int(target_length)
-        extra_mapping_inputs[
-            'RouterCompressorBitFieldTargetLength'] = target_length
         extra_mapping_inputs["RouterCompressorBitFieldPreAllocSize"] = \
             self.config.getint(
                 "Mapping",
