@@ -51,6 +51,7 @@
 
 
 extern REAL learning_signal;
+uint32_t neurons_in_pop;
 
 
 //! Array of neuron states
@@ -153,6 +154,8 @@ static void neuron_impl_load_neuron_parameters(
         address_t address, uint32_t next, uint32_t n_neurons) {
     log_debug("reading parameters, next is %u, n_neurons is %u ",
             next, n_neurons);
+
+    neurons_in_pop = n_neurons; // get number of neurons running on this core for use during execution
 
     if (sizeof(global_neuron_params_t)) {
         log_debug("writing neuron global parameters");
@@ -292,15 +295,20 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
 
     // Record B
-    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
-//    		B_t; // neuron->B;
-//    		neuron->syn_state[0].z_bar;
-//    		global_parameters->core_target_rate;
-//    	neuron->syn_state[0].e_bar;
-    	neuron->syn_state[0].el_a;
-//    		exc_input_values[0]; // record input input (signed)
-//    		learning_signal * neuron->w_fb;
-
+    if (neuron_index == 1){
+        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = global_parameters->core_pop_rate / neurons_in_pop; // divide by neurons on core to get average per neuron contribution to core pop rate
+    }
+    else{
+        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
+    //    		B_t; // neuron->B;
+                neuron->L;
+    //    		neuron->syn_state[0].z_bar;
+    //    		global_parameters->core_target_rate;
+    //    	neuron->syn_state[0].e_bar;
+    //    	neuron->syn_state[neuron_index].el_a;
+    //    		exc_input_values[0]; // record input input (signed)
+    //    		learning_signal * neuron->w_fb;
+    }
     // update neuron parameters
     state_t result = neuron_model_state_update(
             NUM_EXCITATORY_RECEPTORS, exc_input_values,

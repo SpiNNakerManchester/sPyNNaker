@@ -391,9 +391,8 @@ bool synapse_dynamics_process_plastic_synapses(
 //            io_printf(IO_BUF, "neuron ind: %u, synapse ind: %u, type: %u, zbar: %k\n",
 //                neuron_ind, syn_ind_from_delay, type, neuron->syn_state[syn_ind_from_delay].z_bar_inp);
 
-    		io_printf(IO_BUF, "neuron ind: %u, synapse ind: %u, idx_bits: %u, %type: %u init w (plas): %d, summed_dw: %k, time: %u\n",
-        		neuron_ind, syn_ind_from_delay,
-        		synapse_type_index_bits, type,
+    		io_printf(IO_BUF, "neuron ind: %u, synapse ind: %u, %type: %u init w (plas): %d, summed_dw: %k, time: %u\n",
+        		neuron_ind, syn_ind_from_delay, type,
 				current_state.initial_weight,
 				neuron->syn_state[syn_ind_from_delay].delta_w, time);
     	}

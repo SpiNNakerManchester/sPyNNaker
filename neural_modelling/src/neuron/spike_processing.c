@@ -205,7 +205,7 @@ static void dma_complete_callback(uint unused, uint tag) {
     log_debug("DMA transfer complete at time %u with tag %u", time, tag);
 
 //    io_printf(IO_BUF, "Entering DMA Complete...\n");
-    log_info("Entering DMA Complete...\n");
+//    log_info("Entering DMA Complete...\n");
 
     // Get pointer to current buffer
     uint32_t current_buffer_index = buffer_being_read;

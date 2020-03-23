@@ -89,7 +89,7 @@ state_t neuron_model_state_update(
 //			0.3k *
 			(1.0k - psi_temp2) : 0.0k;
 
-    uint32_t total_synapses_per_neuron = 1; //todo should this be fixed
+    uint32_t total_synapses_per_neuron = 100; // This parameter is OK to update, as the actual size of the array is set in the header file, which matches the Python code. This should make it possible to do a pause and resume cycle and have reliable unloading of data.
 
 
 //    neuron->psi = neuron->psi << 10;
@@ -108,16 +108,6 @@ state_t neuron_model_state_update(
     	neuron->syn_state[syn_ind].z_bar =
     			neuron->syn_state[syn_ind].z_bar * neuron->exp_TC
     			+ (1 - neuron->exp_TC) * neuron->syn_state[syn_ind].z_bar_inp; // updating z_bar is problematic, if spike could come and interrupt neuron update
-    	// reset input (can't have more than one spike per timestep
-        if (!syn_ind){
-            io_printf(IO_BUF, "total synapses = %u\n"
-                              "z_bar_inp = %k - z_bar = %k\n"
-                              "L = %k = l * w_fb = %k * %k\n",
-                total_synapses_per_neuron,
-                neuron->syn_state[syn_ind].z_bar_inp, neuron->syn_state[syn_ind].z_bar,
-                neuron->L, learning_signal, neuron -> w_fb);
-        }
-    	neuron->syn_state[syn_ind].z_bar_inp = 0;
 
 
 		// ******************************************************************
@@ -146,6 +136,23 @@ state_t neuron_model_state_update(
     			-local_eta * neuron->L * neuron->syn_state[syn_ind].e_bar;
     	neuron->syn_state[syn_ind].delta_w += this_dt_weight_change;
 
+//    	if (!syn_ind || neuron->syn_state[syn_ind].z_bar){// || neuron->syn_state[syn_ind].z_bar_inp){
+//            io_printf(IO_BUF, "total synapses = %u \t syn_ind = %u \t "
+//                              "z_bar_inp = %k \t z_bar = %k \t time:%u\n"
+//                              "L = %k = %k * %k = l * w_fb\n"
+//                              "this dw = %k \t tot dw %k\n"
+//                              ,
+//                total_synapses_per_neuron,
+//                syn_ind,
+//                neuron->syn_state[syn_ind].z_bar_inp,
+//                neuron->syn_state[syn_ind].z_bar,
+//                time,
+//                neuron->L, learning_signal, neuron -> w_fb,
+//                this_dt_weight_change, neuron->syn_state[syn_ind].delta_w
+//                );
+//        }
+    	// reset input (can't have more than one spike per timestep
+    	neuron->syn_state[syn_ind].z_bar_inp = 0;
 
 //        io_printf(IO_BUF, "eta: %k, l: %k, ebar: %k, delta_w: %k, this dt: %k\n",
 //            local_eta, neuron->L, neuron->syn_state[syn_ind].e_bar, neuron->syn_state[syn_ind].delta_w, this_dt_weight_change);
