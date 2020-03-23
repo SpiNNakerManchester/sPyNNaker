@@ -89,7 +89,7 @@ state_t neuron_model_state_update(
 //			0.3k *
 			(1.0k - psi_temp2) : 0.0k;
 
-    uint32_t total_synapses_per_neuron = 100; //todo should this be fixed
+    uint32_t total_synapses_per_neuron = 100; // This parameter is OK to update, as the actual size of the array is set in the header file, which matches the Python code. This should make it possible to do a pause and resume cycle and have reliable unloading of data.
 
 
 //    neuron->psi = neuron->psi << 10;
