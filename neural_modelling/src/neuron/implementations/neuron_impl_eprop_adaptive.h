@@ -51,7 +51,7 @@
 
 
 extern REAL learning_signal;
-uint32_t neurons_in_pop = 1;
+uint32_t neurons_in_pop;
 
 
 //! Array of neuron states
@@ -155,7 +155,7 @@ static void neuron_impl_load_neuron_parameters(
     log_debug("reading parameters, next is %u, n_neurons is %u ",
             next, n_neurons);
 
-    neurons_in_pop = n_neurons;
+    neurons_in_pop = n_neurons; // get number of neurons running on this core for use during execution
 
     if (sizeof(global_neuron_params_t)) {
         log_debug("writing neuron global parameters");
@@ -296,7 +296,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
     // Record B
     if (neuron_index == 1){
-        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = global_parameters->core_pop_rate / neurons_in_pop;
+        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = global_parameters->core_pop_rate / neurons_in_pop; // divide by neurons on core to get average per neuron contribution to core pop rate
     }
     else{
         recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
