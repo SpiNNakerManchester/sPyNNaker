@@ -48,10 +48,10 @@ from spynnaker.pyNN.models.common import (
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.abstract_models import (
     AbstractReadParametersBeforeSet)
-from spynnaker.pyNN.models.neuron.implementations import Struct
 from .spike_source_poisson_machine_vertex import (
     SpikeSourcePoissonMachineVertex)
 from spynnaker.pyNN.utilities.utility_calls import validate_mars_kiss_64_seed
+from spynnaker.pyNN.utilities.struct import Struct
 from spynnaker.pyNN.utilities.ranged.spynnaker_ranged_dict \
     import SpynnakerRangeDictionary
 from spynnaker.pyNN.utilities.ranged.spynnaker_ranged_list \
