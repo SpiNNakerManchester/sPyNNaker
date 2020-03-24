@@ -327,12 +327,12 @@ class SynapseDynamicsStructuralCommon(object):
             for machine_edge in machine_edges:
                 r_info = routing_info.get_routing_info_for_edge(machine_edge)
                 vertex_slice = graph_mapper.get_slice(machine_edge.pre_vertex)
-                skey = (synapse_info, vertex_slice.lo_atom, post_slice.lo_atom)
                 spec.write_value(r_info.first_key)
                 spec.write_value(r_info.first_mask)
                 spec.write_value(vertex_slice.n_atoms)
                 spec.write_value(vertex_slice.lo_atom)
-                spec.write_value(synapse_indices[skey])
+                spec.write_value(synapse_indices[
+                    synapse_info, post_slice.lo_atom])
         return pop_index
 
     def __write_post_to_pre_table(

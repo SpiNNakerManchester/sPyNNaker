@@ -51,11 +51,8 @@ class AbstractAcceptsIncomingSynapses(object):
 
     @abstractmethod
     def get_connections_from_machine(
-            self, transceiver, placement, edge, graph_mapper, routing_infos,
-            synapse_information, machine_time_step, using_extra_monitor_cores,
-            placements=None, monitor_api=None, monitor_cores=None,
-            handle_time_out_configuration=True, fixed_routes=None,
-            extra_monitor=None):
+            self, transceiver, placements, app_edge, graph_mapper,
+            synapse_info, machine_time_step):
         # pylint: disable=too-many-arguments
         """ Get the connections from the machine post-run.
         """

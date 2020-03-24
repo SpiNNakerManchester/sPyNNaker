@@ -727,17 +727,12 @@ class AbstractPopulationVertex(
 
     @overrides(AbstractAcceptsIncomingSynapses.get_connections_from_machine)
     def get_connections_from_machine(
-            self, transceiver, placement, edge, graph_mapper, routing_infos,
-            synapse_information, machine_time_step, using_extra_monitor_cores,
-            placements=None, monitor_api=None, monitor_cores=None,
-            handle_time_out_configuration=True, fixed_routes=None,
-            extra_monitor=None):
+            self, transceiver, placements, app_edge, graph_mapper,
+            synapse_info, machine_time_step):
         # pylint: disable=too-many-arguments
         return self.__synapse_manager.get_connections_from_machine(
-            transceiver, placement, edge, graph_mapper, routing_infos,
-            synapse_information, machine_time_step, using_extra_monitor_cores,
-            placements, monitor_api, monitor_cores,
-            handle_time_out_configuration, fixed_routes, extra_monitor)
+            self, transceiver, placements, app_edge, graph_mapper,
+            synapse_info, machine_time_step)
 
     def clear_connection_cache(self):
         self.__synapse_manager.clear_connection_cache()

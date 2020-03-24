@@ -153,7 +153,6 @@ def _fill_in_connection_data(
     :rtype: None
     """
     ctl = globals_variables.get_simulator()
-    use_extra_monitors = False
 
     for vertex in gen_on_machine_vertices:
         conn_holders = vertex.get_connection_holders()
@@ -170,13 +169,8 @@ def _fill_in_connection_data(
             synapse_gen = isinstance(
                 dynamics, AbstractGenerateOnMachine)
             if connector_gen and synapse_gen:
-                machine_edges = graph_mapper.get_machine_edges(app_edge)
-                for machine_edge in machine_edges:
-                    placement = placements.get_placement_of_vertex(
-                        machine_edge.post_vertex)
-                    conns = vertex.get_connections_from_machine(
-                        transceiver, placement, machine_edge, graph_mapper,
-                        ctl.routing_infos, synapse_info, ctl.machine_time_step,
-                        use_extra_monitors)
-                    for conn_holder in conn_holder_list:
-                        conn_holder.add_connections(conns)
+                conns = vertex.get_connections_from_machine(
+                    transceiver, placements, app_edge, graph_mapper,
+                    synapse_info, ctl.machine_time_step)
+                for conn_holder in conn_holder_list:
+                    conn_holder.add_connections(conns)

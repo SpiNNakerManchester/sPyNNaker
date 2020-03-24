@@ -548,10 +548,3 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
     @verbose.setter
     def verbose(self, new_value):
         self.__verbose = new_value
-
-    def use_direct_matrix(self, synapse_info):
-        """
-        :param SynapseInformation synapse_info:
-        """
-        # pylint: disable=unused-argument
-        return False
