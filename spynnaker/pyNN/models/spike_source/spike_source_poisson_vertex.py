@@ -961,7 +961,6 @@ class SpikeSourcePoissonVertex(
         self.__machine_time_step = machine_time_step
         vertex = placement.vertex
         vertex_slice = graph_mapper.get_slice(vertex)
-        logger.info("Writing spec for %s slice %s", self.label, vertex_slice)
 
         spec.comment("\n*** Spec for SpikeSourcePoisson Instance ***\n\n")
 
