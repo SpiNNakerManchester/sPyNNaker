@@ -731,6 +731,7 @@ class SpikeSourcePoissonVertex(
         is_fast_source = spikes_per_tick >= SLOW_RATE_PER_TICK_CUTOFF
         is_faster_source = spikes_per_tick >= FAST_RATE_PER_TICK_CUTOFF
         not_zero = spikes_per_tick > 0
+        # pylint: disable=assignment-from-no-return
         is_slow_source = numpy.logical_not(is_fast_source)
 
         # Compute the e^-(spikes_per_tick) for fast sources to allow fast
