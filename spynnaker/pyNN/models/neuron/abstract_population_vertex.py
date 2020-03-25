@@ -698,6 +698,9 @@ class AbstractPopulationVertex(
     def ring_buffer_sigma(self, ring_buffer_sigma):
         self.__synapse_manager.ring_buffer_sigma = ring_buffer_sigma
 
+    def reset_ring_buffer_shifts(self):
+        self.__synapse_manager.reset_ring_buffer_shifts()
+
     @property
     def spikes_per_second(self):
         return self.__synapse_manager.spikes_per_second
