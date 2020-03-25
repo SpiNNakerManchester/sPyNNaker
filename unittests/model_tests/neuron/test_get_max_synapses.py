@@ -13,11 +13,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .abstract_standard_neuron_component import AbstractStandardNeuronComponent
-from .abstract_neuron_impl import AbstractNeuronImpl
-from .neuron_impl_standard import NeuronImplStandard
-from .ranged_dict_vertex_slice import RangedDictVertexSlice
+import pytest
+from spynnaker.pyNN.models.neuron.synapse_dynamics import SynapseDynamicsSTDP
+from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
+    TimingDependenceSpikePair)
+from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
+    WeightDependenceAdditive)
+from unittests.mocks import MockSimulator
 
-__all__ = [
-    "AbstractStandardNeuronComponent", "NeuronImplStandard",
-    "AbstractNeuronImpl", "RangedDictVertexSlice"]
+
+@pytest.mark.timeout(1)
+def test_get_max_synapses():
+    MockSimulator.setup()
+    d = SynapseDynamicsSTDP(timing_dependence=TimingDependenceSpikePair(),
+                            weight_dependence=WeightDependenceAdditive(),
+                            pad_to_length=258)
+    assert d.get_max_synapses(256) <= 256
