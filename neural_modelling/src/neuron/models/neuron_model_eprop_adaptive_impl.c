@@ -133,8 +133,8 @@ state_t neuron_model_state_update(
 		// Update cached total weight change
 		// ******************************************************************
     	REAL this_dt_weight_change =
-    			-local_eta * neuron->L * neuron->syn_state[syn_ind].e_bar;
-    	neuron->syn_state[syn_ind].delta_w += this_dt_weight_change;
+    			local_eta * neuron->L * neuron->syn_state[syn_ind].e_bar;
+    	neuron->syn_state[syn_ind].delta_w -= this_dt_weight_change;
 
 //    	if (!syn_ind || neuron->syn_state[syn_ind].z_bar){// || neuron->syn_state[syn_ind].z_bar_inp){
 //            io_printf(IO_BUF, "total synapses = %u \t syn_ind = %u \t "
