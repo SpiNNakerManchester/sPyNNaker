@@ -22,7 +22,7 @@ class RandomStatsPoissonImpl(AbstractRandomStats):
     """
 
     def _get_params(self, dist):
-        return [dist.parameters['mu'], dist.parameters['lambda_']]
+        return [dist.parameters['lambda_']]
 
     def cdf(self, dist, v):
         return poisson.cdf(v, *self._get_params(dist))

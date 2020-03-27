@@ -45,6 +45,8 @@ class MunichRetinaDevice(
         ApplicationSpiNNakerLinkVertex, AbstractSendMeMulticastCommandsVertex,
         AbstractProvidesOutgoingPartitionConstraints,
         ProvidesKeyToAtomMappingImpl):
+    """ An Omnibot silicon retina device.
+    """
     __slots__ = [
         "__fixed_key",
         "__fixed_mask",
@@ -79,6 +81,15 @@ class MunichRetinaDevice(
             label=None,
             polarity=default_parameters['polarity'],
             board_address=default_parameters['board_address']):
+        """
+        :param int retina_key:
+        :param int spinnaker_link_id:
+            The SpiNNaker link to which the retina is connected
+        :param str position: ``LEFT`` or ``RIGHT``
+        :param str label:
+        :param str polarity: ``UP``, ``DOWN`` or ``MERGED``
+        :param str board_address:
+        """
         # pylint: disable=too-many-arguments
         if polarity is None:
             polarity = MunichRetinaDevice.MERGED_POLARITY

@@ -93,4 +93,7 @@ uint32_t synapses_get_saturation_count(void);
 //! \return the counter for plastic and fixed pre synaptic events or 0
 uint32_t synapses_get_pre_synaptic_events(void);
 
+//! \brief flush the ring buffers
+void synapses_flush_ring_buffers(void);
+
 #endif // _SYNAPSES_H_

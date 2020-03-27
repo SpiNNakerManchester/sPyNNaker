@@ -30,21 +30,28 @@ class AbstractPopulationInitializable(object):
     def initialize(self, variable, value):
         """ Set the initial value of one of the state variables of the neurons\
             in this population.
+
+        :param str variable: The name of the variable to set
+        :param value: The value of the variable to set
+        :type value: float or int or Any
         """
 
     @property
     def initial_values(self):
         """ A dict containing the initial values of the state variables.
+
+        :rtype: dict(str,Any)
         """
         return self.get_initial_values(None)
 
     def get_initial_values(self, selector=None):
         """ A dict containing the initial values of the state variables.
 
-        :param selector: a description of the subrange to accept. \
-            Or None for all. \
-            See: _selector_to_ids in \
-            SpiNNUtils.spinn_utilities.ranged.abstract_sized.py
+        :param selector: a description of the subrange to accept, or None for
+            all. See:
+            :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
+        :type selector: None or slice or int or list(bool) or list(int)
+        :rtype: dict(str,Any)
         """
         results = dict()
         for variable_init in self.initialize_parameters:
@@ -62,15 +69,15 @@ class AbstractPopulationInitializable(object):
         Should return the current value not the default one.
 
         Must support the variable as listed in initialize_parameters.keys, \
-        ideally also with `_init` removed or added.
+        ideally also with ``_init`` removed or added.
 
-        :param variable: variable name with our without _init
-        :type variable: str
-        :param selector: a description of the subrange to accept. \
-            Or None for all. \
-            See: _selector_to_ids in \
-            SpiNNUtils.spinn_utilities.ranged.abstract_sized.py
+        :param str variable: variable name with or without ``_init``
+        :param selector: a description of the subrange to accept, or None for
+            all. See:
+            :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
+        :type selector: None or slice or int or list(bool) or list(int)
         :return: A list or an Object which act like a list
+        :rtype: iterable
         """
 
     @abstractmethod
@@ -79,25 +86,27 @@ class AbstractPopulationInitializable(object):
             initialize_parameters.keys
 
         Must support the variable as listed in initialize_parameters.keys,\
-        ideally also with `_init` removed or added
+        ideally also with ``_init`` removed or added
 
-        :param variable: variable name with our without `_init`
-        :type variable: str
+        :param str variable: variable name with or without ``_init``
         :param value: New value for the variable
-        :param selector: a description of the subrange to accept. \
-            Or None for all. \
-            See: _selector_to_ids in \
-            SpiNNUtils.spinn_utilities.ranged.abstract_sized.py
+        :type value: int or float or list(int) or list(float)
+        :param selector: a description of the subrange to accept, or None for
+            all. See:
+            :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
+        :type selector: None or slice or int or list(bool) or list(int)
         :return: A list or an Object which act like a list
+        :rtype: iterable
         """
 
     @abstractproperty
     def initialize_parameters(self):
         """ List the parameters that are initializable.
 
-        If "foo" is initializable there should be a setter initialize_foo \
-        and a getter property foo_init
+        If "foo" is initializable there should be a setter ``initialize_foo``\
+        and a getter property ``foo_init``
 
         :return: list of property names
+        :rtype: iterable(str)
         """
         # Note: this will have been non_pynn_default_parameters

@@ -31,20 +31,16 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
             self, poisson_labels=None, local_host=None, local_port=NOTIFY_PORT,
             control_label_extension="_control"):
         """
-
-        :param poisson_labels: Labels of Poisson populations to be controlled
-        :type poisson_labels: iterable of str
-        :param local_host: Optional specification of the local hostname or\
+        :param iterable(str) poisson_labels:
+            Labels of Poisson populations to be controlled
+        :param str local_host: Optional specification of the local hostname or\
             IP address of the interface to listen on
-        :type local_host: str
-        :param local_port: Optional specification of the local port to listen\
-            on.  Must match the port that the toolchain will send the\
-            notification on (19999 by default)
-        :type local_port: int
-        :param control_label_extension:\
+        :param int local_port:
+            Optional specification of the local port to listen on. Must match
+            the port that the toolchain will send the notification on (19999
+            by default)
+        :param str control_label_extension:
             The extra name added to the label of each Poisson source
-        :type control_label_extension: str
-
         """
         self.__control_label_extension = control_label_extension
 
@@ -68,6 +64,9 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
             local_host=local_host, local_port=local_port)
 
     def add_poisson_label(self, label):
+        """
+        :param str label: The label of the Poisson source population.
+        """
         control = self.__convert_to_control_label(label)
         self.__control_label_to_label[control] = label
         self.__label_to_control_label[label] = control
@@ -129,17 +128,18 @@ class SpynnakerPoissonControlConnection(LiveEventConnection):
     def set_rate(self, label, neuron_id, rate):
         """ Set the rate of a Poisson neuron within a Poisson source
 
-        :param label: The label of the Population to set the rates of
-        :param neuron_id: The neuron ID to set the rate of
-        :param rate: The rate to set in Hz
+        :param str label: The label of the Population to set the rates of
+        :param int neuron_id: The neuron ID to set the rate of
+        :param float rate: The rate to set in Hz
         """
         self.set_rates(label, [(neuron_id, rate)])
 
     def set_rates(self, label, neuron_id_rates):
         """ Set the rates of multiple Poisson neurons within a Poisson source
 
-        :param label: The label of the Population to set the rates of
-        :param neuron_id_rates: A list of tuples of (neuron ID, rate) to be set
+        :param str label: The label of the Population to set the rates of
+        :param list(tuple(int,float)) neuron_id_rates:
+            A list of tuples of (neuron ID, rate) to be set
         """
         control = self.__control_label(label)
         datatype = DataType.S1615

@@ -37,17 +37,17 @@ class PushBotSpiNNakerLinkLaserDevice(
             start_total_period=default_parameters['start_total_period'],
             start_frequency=default_parameters['start_frequency']):
         """
-
-        :param laser: The PushBotLaser value to control
-        :param protocol: The protocol instance to get commands from
-        :param spinnaker_link_id:\
+        :param PushBotLaser laser: Which laser device to control
+        :param MunichIoSpiNNakerLinkProtocol protocol:
+            The protocol instance to get commands from
+        :param int spinnaker_link_id:
             The SpiNNakerLink that the PushBot is connected to
-        :param n_neurons: The number of neurons in the device
-        :param label: A label for the device
-        :param board_address:\
+        :param int n_neurons: The number of neurons in the device
+        :param str label: A label for the device
+        :param str board_address:
             The IP address of the board that the device is connected to
         :param start_active_time: The "active time" value to send at the start
-        :param start_total_period:\
+        :param start_total_period:
             The "total period" value to send at the start
         :param start_frequency: The "frequency" to send at the start
         """
