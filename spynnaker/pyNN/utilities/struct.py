@@ -17,30 +17,28 @@ import numpy
 from pyNN.random import RandomDistribution
 from spinn_utilities.helpful_functions import is_singleton
 from spinn_utilities.ranged.ranged_list import RangedList
-from spynnaker.pyNN.utilities.utility_calls import convert_to
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spynnaker.pyNN.utilities.utility_calls import convert_to
 
 
 class Struct(object):
-    """ Represents a C code structure
+    """ Represents a C code structure.
     """
 
     __slots__ = ["__field_types"]
 
     def __init__(self, field_types):
         """
-        :param field_types:\
-            The types of the fields, ordered as they appear in the struct
-        :type field_types:\
-            list of :py:class:`data_specification.enums.data_type.DataType`
+        :param list(~data_specification.enums.DataType) field_types:
+            The types of the fields, ordered as they appear in the struct.
         """
         self.__field_types = field_types
 
     @property
     def field_types(self):
-        """ The types of the fields, ordered as they appear in the struct
+        """ The types of the fields, ordered as they appear in the struct.
 
-        :rtype: list of :py:class:`data_specification.enums.data_type.DataType`
+        :rtype: list(~data_specification.enums.DataType)
         """
         return self.__field_types
 
@@ -48,7 +46,7 @@ class Struct(object):
     def numpy_dtype(self):
         """ The numpy data type of the struct
 
-        :rtype: :py:class:`numpy.dtype`
+        :rtype: ~numpy.dtype
         """
         return numpy.dtype(
             [("f" + str(i), numpy.dtype(data_type.struct_encoding))
@@ -59,7 +57,7 @@ class Struct(object):
         """ Get the size of the struct in whole words in an array of given\
             size (default 1 item)
 
-        :param array_size: The number of elements in an array of structs
+        :param int array_size: The number of elements in an array of structs
         :rtype: int
         """
         datatype = self.numpy_dtype
@@ -69,14 +67,15 @@ class Struct(object):
     def get_data(self, values, offset=0, array_size=1):
         """ Get a numpy array of uint32 of data for the given values
 
-        :param values:\
-            A list of values with length the same size as the number of fields\
+        :param values:
+            A list of values with length the same size as the number of fields
             returned by field_types
-        :type values:\
-            list of (single value or list of values or RangedList of values)
-        :param offset: The offset into each of the values where to start
-        :param array_size: The number of structs to generate
-        :rtype: numpy.array(dtype="uint32")
+        :type values:
+            list(int or float or list(int) or list(float) or
+            ~spinn_utilities.ranged.RangedList)
+        :param int offset: The offset into each of the values where to start
+        :param int array_size: The number of structs to generate
+        :rtype: ~numpy.ndarray(dtype="uint32")
         """
         # Create an array to store values in
         data = numpy.zeros(array_size, dtype=self.numpy_dtype)
@@ -94,7 +93,6 @@ class Struct(object):
             else:
                 for start, end, value in values.iter_ranges_by_slice(
                         offset, offset + array_size):
-
                     # Get the values and get them into the correct data type
                     if isinstance(value, RandomDistribution):
                         values = value.next(end - start)
@@ -116,10 +114,12 @@ class Struct(object):
         """ Read a bytearray of data and convert to struct values
 
         :param data: The data to be read
-        :param offset: Index of the byte at the start of the valid data
-        :param array_size: The number of struct elements to read
-        :return:\
+        :type data: bytes or bytearray
+        :param int offset: Index of the byte at the start of the valid data
+        :param int array_size: The number of struct elements to read
+        :return:
             a list of lists of data values, one list for each struct element
+        :rtype: list(float)
         """
         if self.numpy_dtype.itemsize == 0:
             return numpy.zeros(0, dtype=self.numpy_dtype)
@@ -132,19 +132,18 @@ class Struct(object):
         # as numpy.frombuffer does not like an empty type
         if len(self.numpy_dtype) == 0:
             return items_to_return
-        else:
-            # Read in the data values
-            numpy_data = numpy.frombuffer(
-                data, offset=offset, dtype=self.numpy_dtype, count=array_size)
 
-            # Go through the things to be set
-            items_to_return = list()
-            for i, data_type in enumerate(self.field_types):
+        # Read in the data values
+        numpy_data = numpy.frombuffer(
+            data, offset=offset, dtype=self.numpy_dtype, count=array_size)
 
-                # Get the data to set for this item
-                values = numpy_data["f" + str(i)]
+        # Go through the things to be set
+        items_to_return = list()
+        for i, data_type in enumerate(self.field_types):
+            # Get the data to set for this item
+            values = numpy_data["f" + str(i)]
+            # TODO: types that are integers should become integers
+            items_to_return.append(values / float(data_type.scale))
 
-                items_to_return.append(values / float(data_type.scale))
-
-            # Return values read
-            return items_to_return
+        # Return values read
+        return items_to_return
