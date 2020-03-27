@@ -221,6 +221,14 @@ void resume_callback(void) {
         log_error("failed to resume neuron.");
         rt_error(RTE_SWERR);
     }
+
+    // If the time has been reset to zero then the ring buffers need to be
+    // flushed in case there is a delayed spike left over from a previous run
+    // NOTE: at reset, time is set to UINT_MAX ahead of timer_callback(...)
+    if ((time+1) == 0) {
+    	synapses_flush_ring_buffers();
+    }
+
 }
 
 //! \brief Timer interrupt callback
@@ -282,7 +290,8 @@ void timer_callback(uint timer_count, uint unused) {
         }
         count_rewires++;
     }
-    // otherwise do synapse and neuron time step updates
+
+    // Now do synapse and neuron time step updates
     synapses_do_timestep_update(time);
     neuron_do_timestep_update(time, timer_count, timer_period);
 

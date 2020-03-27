@@ -27,20 +27,24 @@ class SmallWorldConnector(AbstractConnector):
         "__rewiring"]
 
     def __init__(
-            self, degree, rewiring, allow_self_connections=True, safe=True,
-            callback=None, verbose=False, n_connections=None):
+            self, degree, rewiring, allow_self_connections=True,
+            n_connections=None, rng=None, safe=True, callback=None,
+            verbose=False):
         """
         :param float degree:
         :param float rewiring:
         :param bool allow_self_connections:
+        :param n_connections:
+        :type n_connections: int or None
+        :param rng:
+            Seeded random number generator, or None to make one when needed
+        :type rng: ~pyNN.random.NumpyRNG or None
         :param bool safe:
         :param callable callback: Ignored
         :param bool verbose:
-        :param n_connections:
-        :type n_connections: int or None
         """
         # pylint: disable=too-many-arguments
-        super(SmallWorldConnector, self).__init__(safe, callback, verbose)
+        super(SmallWorldConnector, self).__init__(safe, callback, verbose, rng)
         self.__rewiring = rewiring
         self.__degree = degree
         self.__allow_self_connections = allow_self_connections

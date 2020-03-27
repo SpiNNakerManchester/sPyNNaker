@@ -64,7 +64,41 @@ class ProjectionMachineEdge(
             if isinstance(synapse_info.connector, OneToOneConnector):
                 pre = self.pre_vertex.vertex_slice
                 post = self.post_vertex.vertex_slice
-                if pre.hi_atom < post.lo_atom or pre.lo_atom > post.hi_atom:
+                # Filter edge if both are views and outside limits
+                if synapse_info.prepop_is_view and synapse_info.postpop_is_view:
+                    pre_lo = synapse_info.pre_population._indexes[0]
+                    pre_hi = synapse_info.pre_population._indexes[-1]
+                    post_lo = synapse_info.post_population._indexes[0]
+                    post_hi = synapse_info.post_population._indexes[-1]
+                    if ((pre.hi_atom - pre_lo < post.lo_atom - post_lo) or
+                            (pre.lo_atom - pre_lo > post.hi_atom - post_lo) or
+                            (pre.hi_atom < pre_lo) or
+                            (pre.lo_atom > pre_hi) or
+                            (post.hi_atom < post_lo) or
+                            (post.lo_atom > post_hi)):
+                        n_filtered += 1
+                # Filter edge if pre-pop is outside limit and post_lo is bigger
+                # than n_pre_neurons
+                elif synapse_info.prepop_is_view:
+                    pre_lo = synapse_info.pre_population._indexes[0]
+                    pre_hi = synapse_info.pre_population._indexes[-1]
+                    if ((pre.hi_atom - pre_lo < post.lo_atom) or
+                            (pre.lo_atom - pre_lo > post.hi_atom) or
+                            (pre.hi_atom < pre_lo) or
+                            (pre.lo_atom > pre_hi)):
+                        n_filtered += 1
+                # Filter edge if post-pop is outside limit and pre_lo is bigger
+                # than n_post_neurons
+                elif synapse_info.postpop_is_view:
+                    post_lo = synapse_info.post_population._indexes[0]
+                    post_hi = synapse_info.post_population._indexes[-1]
+                    if ((pre.hi_atom < post.lo_atom - post_lo) or
+                            (pre.lo_atom > post.hi_atom - post_lo) or
+                            (post.hi_atom < post_lo) or
+                            (post.lo_atom > post_hi)):
+                        n_filtered += 1
+                # Filter edge in the usual scenario with normal populations
+                elif pre.hi_atom < post.lo_atom or pre.lo_atom > post.hi_atom:
                     n_filtered += 1
             elif isinstance(synapse_info.connector, FromListConnector):
                 pre_hi = self.pre_vertex.vertex_slice.hi_atom

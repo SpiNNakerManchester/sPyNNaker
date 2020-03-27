@@ -16,7 +16,7 @@
 from six import with_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-from .struct import Struct
+from spynnaker.pyNN.utilities.struct import Struct
 from .ranged_dict_vertex_slice import RangedDictVertexSlice
 
 
@@ -40,7 +40,7 @@ class AbstractStandardNeuronComponent(with_metaclass(AbstractBase, object)):
         """ The structure of the component. This structure will have copies in\
             both SDRAM (the initialisation values) and DTCM (the working copy).
 
-        :rtype: ~spynnaker.pyNN.models.neuron.implementations.Struct
+        :rtype: ~spynnaker.pyNN.utilities.struct.Struct
         """
         return self.__struct
 

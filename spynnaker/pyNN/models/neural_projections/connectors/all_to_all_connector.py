@@ -20,11 +20,16 @@ from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
+from .abstract_connector_supports_views_on_machine import (
+    AbstractConnectorSupportsViewsOnMachine)
+
+N_GEN_PARAMS = 1
 
 logger = logging.getLogger(__file__)
 
 
-class AllToAllConnector(AbstractGenerateConnectorOnMachine):
+class AllToAllConnector(AbstractGenerateConnectorOnMachine,
+                        AbstractConnectorSupportsViewsOnMachine):
     """ Connects all cells in the presynaptic population to all cells in \
         the postsynaptic population.
     """
@@ -161,20 +166,8 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
     def gen_connector_params(
             self, pre_slices, pre_slice_index, post_slices, post_slice_index,
             pre_vertex_slice, post_vertex_slice, synapse_type, synapse_info):
-        params = []
-
-        view_range = 0, synapse_info.n_pre_neurons - 1
-        if synapse_info.prepop_is_view:
-            view_range = self._get_view_lo_hi(synapse_info.pre_population)
-        params.extend(view_range)
-
-        view_range = 0, synapse_info.n_post_neurons - 1
-        if synapse_info.postpop_is_view:
-            view_range = self._get_view_lo_hi(synapse_info.post_population)
-        params.extend(view_range)
-
+        params = self._basic_connector_params(synapse_info)
         params.append(self.__allow_self_connections)
-
         return numpy.array(params, dtype="uint32")
 
     @property
@@ -182,4 +175,4 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine):
         AbstractGenerateConnectorOnMachine.gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
         # view parameters + allow_self_connections
-        return (4 + 1) * BYTES_PER_WORD
+        return self._view_params_bytes + (N_GEN_PARAMS * BYTES_PER_WORD)

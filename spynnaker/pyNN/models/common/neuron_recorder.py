@@ -15,12 +15,12 @@
 
 from __future__ import division
 from collections import OrderedDict
+import itertools
 import logging
 import math
 import numpy
 from six import raise_from, iteritems
 from six.moves import range, xrange
-from spinn_utilities.index_is_value import IndexIsValue
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.resources.variable_sdram import VariableSDRAM
@@ -33,8 +33,6 @@ from spinn_front_end_common.interface.buffer_management.recording_utilities \
     import (
         get_recording_header_array, get_recording_header_size,
         get_recording_data_constant_size)
-from spynnaker.pyNN.models.neural_properties import NeuronParameter
-import itertools
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -926,50 +924,6 @@ class NeuronRecorder(object):
             self.__add_indices(data, variable, rate, n_recording, vertex_slice)
 
         return numpy.concatenate(data)
-
-    def get_global_parameters(self, vertex_slice):
-        """
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-        :rtype: list(NeuronParameter)
-        """
-        params = []
-        for variable in self.__sampling_rates:
-            params.append(NeuronParameter(
-                self.__sampling_rates[variable], DataType.UINT32))
-        for variable in self.__sampling_rates:
-            n_recording = self._count_recording_per_slice(
-                variable, vertex_slice)
-            params.append(NeuronParameter(n_recording, DataType.UINT8))
-        return params
-
-    def get_index_parameters(self, vertex_slice):
-        """
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-        :rtype: list(NeuronParameter)
-        """
-        params = []
-        for variable in self.__sampling_rates:
-            if self.__sampling_rates[variable] <= 0:
-                local_indexes = 0
-            elif self.__indexes[variable] is None:
-                local_indexes = IndexIsValue()
-            else:
-                local_indexes = []
-                n_recording = sum(
-                    vertex_slice.lo_atom <= index <= vertex_slice.hi_atom
-                    for index in self.__indexes[variable])
-                indexes = self.__indexes[variable]
-                local_index = 0
-                for index in xrange(
-                        vertex_slice.lo_atom, vertex_slice.hi_atom+1):
-                    if index in indexes:
-                        local_indexes.append(local_index)
-                        local_index += 1
-                    else:
-                        # write to one beyond recording range
-                        local_indexes.append(n_recording)
-            params.append(NeuronParameter(local_indexes, DataType.UINT8))
-        return params
 
     @property
     def _indexes(self):  # for testing only

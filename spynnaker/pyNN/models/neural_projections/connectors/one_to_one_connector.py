@@ -19,11 +19,14 @@ from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
+from .abstract_connector_supports_views_on_machine import (
+    AbstractConnectorSupportsViewsOnMachine)
 
 logger = logging.getLogger(__name__)
 
 
-class OneToOneConnector(AbstractGenerateConnectorOnMachine):
+class OneToOneConnector(AbstractGenerateConnectorOnMachine,
+                        AbstractConnectorSupportsViewsOnMachine):
     """ Where the pre- and postsynaptic populations have the same size,\
         connect cell i in the presynaptic pynn_population.py to cell i in the\
         postsynaptic pynn_population.py for all i.
@@ -45,7 +48,7 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
     def get_delay_maximum(self, synapse_info):
         return self._get_delay_maximum(
             synapse_info.delays,
-            max((synapse_info.n_pre_neurons, synapse_info.n_post_neurons)))
+            max(synapse_info.n_pre_neurons, synapse_info.n_post_neurons))
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
@@ -58,9 +61,7 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
         delays = synapse_info.delays
 
         if numpy.isscalar(delays):
-            if delays >= min_delay and delays <= max_delay:
-                return 1
-            return 0
+            return int(min_delay <= delays <= max_delay)
         if isinstance(delays, self.__random_number_class):
             return 1
 
@@ -123,8 +124,8 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
         """
         if synapse_info.prepop_is_view:
             # work out which atoms are on this pre-slice
-            view_lo, view_hi = self._get_view_lo_hi(
-                synapse_info.pre_population)
+            view_lo, view_hi = self.get_view_lo_hi(
+                synapse_info.pre_population._indexes)
             if pre_slice.lo_atom < view_lo < pre_slice.hi_atom:
                 pre_lo = view_lo
             else:
@@ -139,8 +140,8 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
 
         if synapse_info.postpop_is_view:
             # work out which atoms are on this post-slice
-            view_lo, view_hi = self._get_view_lo_hi(
-                synapse_info.post_population)
+            view_lo, view_hi = self.get_view_lo_hi(
+                synapse_info.post_population._indexes)
             if post_slice.lo_atom < view_lo < post_slice.hi_atom:
                 post_lo = view_lo
             else:
@@ -157,9 +158,8 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
 
     @overrides(AbstractConnector.use_direct_matrix)
     def use_direct_matrix(self, synapse_info):
-        if synapse_info.prepop_is_view or synapse_info.postpop_is_view:
-            return False
-        return True
+        return not (
+            synapse_info.prepop_is_view or synapse_info.postpop_is_view)
 
     @property
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_id)
@@ -170,22 +170,11 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
     def gen_connector_params(
             self, pre_slices, pre_slice_index, post_slices, post_slice_index,
             pre_vertex_slice, post_vertex_slice, synapse_type, synapse_info):
-        params = []
-
-        view_range = 0, synapse_info.n_pre_neurons - 1
-        if synapse_info.prepop_is_view:
-            view_range = self._get_view_lo_hi(synapse_info.pre_population)
-        params.extend(view_range)
-
-        view_range = 0, synapse_info.n_post_neurons - 1
-        if synapse_info.postpop_is_view:
-            view_range = self._get_view_lo_hi(synapse_info.post_population)
-        params.extend(view_range)
-
+        params = self._basic_connector_params(synapse_info)
         return numpy.array(params, dtype="uint32")
 
     @property
     @overrides(
         AbstractGenerateConnectorOnMachine.gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
-        return 16
+        return self._view_params_bytes

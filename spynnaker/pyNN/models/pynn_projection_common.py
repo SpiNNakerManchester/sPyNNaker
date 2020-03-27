@@ -17,12 +17,13 @@ import logging
 import math
 import numpy
 from pyNN.random import RandomDistribution
-from spinn_front_end_common.utilities.constants import \
-    MICRO_TO_MILLISECOND_CONVERSION
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.constraints.partitioner_constraints import (
     SameAtomsAsVertexConstraint)
-from spinn_front_end_common.utilities import helpful_functions
+from spinn_front_end_common.utilities.constants import (
+    MICRO_TO_MILLISECOND_CONVERSION)
+from spinn_front_end_common.utilities.helpful_functions import (
+    locate_extra_monitor_mc_receiver)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.models.abstract_models import (
     AbstractAcceptsIncomingSynapses)
@@ -190,6 +191,10 @@ class PyNNProjectionCommon(object):
 
         # add projection to the SpiNNaker control system
         spinnaker_control.add_projection(self)
+
+        # reset the ring buffer shifts
+        post_vertex = post_synaptic_population._get_vertex
+        post_vertex.reset_ring_buffer_shifts()
 
         # If there is a virtual board, we need to hold the data in case the
         # user asks for it
@@ -396,7 +401,7 @@ class PyNNProjectionCommon(object):
 
             # if using extra monitor data extractor find local receiver
             if extra_monitors is not None:
-                receiver = helpful_functions.locate_extra_monitor_mc_receiver(
+                receiver = locate_extra_monitor_mc_receiver(
                     placement_x=placement.x, placement_y=placement.y,
                     machine=ctl.machine,
                     packet_gather_cores_to_ethernet_connection_map=receivers)

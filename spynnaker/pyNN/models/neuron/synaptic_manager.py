@@ -1541,6 +1541,9 @@ class SynapticManager(object):
         """
         return self.__gen_on_machine.get(vertex_slice, False)
 
+    def reset_ring_buffer_shifts(self):
+        self.__ring_buffer_shifts = None
+
     @property
     def changes_during_run(self):
         """ Whether the synapses being managed change during running.

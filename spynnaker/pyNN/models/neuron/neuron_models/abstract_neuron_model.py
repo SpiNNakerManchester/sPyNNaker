@@ -18,8 +18,9 @@ from six import with_metaclass
 from spinn_utilities.abstract_base import AbstractBase
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.neuron.implementations import (
-    AbstractStandardNeuronComponent, Struct)
+    AbstractStandardNeuronComponent)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spynnaker.pyNN.utilities.struct import Struct
 
 
 # with_metaclass due to https://github.com/benjaminp/six/issues/219
@@ -50,7 +51,7 @@ class AbstractNeuronModel(
     def global_struct(self):
         """ Get the global parameters structure
 
-        :rtype: Struct
+        :rtype: ~spynnaker.pyNN.utilities.struct.Struct
         """
         return self.__global_struct
 
