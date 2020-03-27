@@ -16,7 +16,6 @@
 import logging
 import numpy
 from spinn_utilities.overrides import overrides
-from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
