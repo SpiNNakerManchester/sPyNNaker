@@ -12,11 +12,14 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
 
 class AbstractConnectorSupportsViewsOnMachine(object):
     """ Connector that generates on machine and supports using PopulationViews
     """
+
+    N_VIEWS_PARAMS = 4
 
     __slots__ = ()
 
@@ -50,3 +53,7 @@ class AbstractConnectorSupportsViewsOnMachine(object):
         params.extend([post_view_lo, post_view_hi])
 
         return params
+
+    @property
+    def _view_params_bytes(self):
+        return self.N_VIEWS_PARAMS * BYTES_PER_WORD

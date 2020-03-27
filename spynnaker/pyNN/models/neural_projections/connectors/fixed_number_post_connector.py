@@ -27,7 +27,6 @@ from .abstract_connector_supports_views_on_machine import (
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.exceptions import SpynnakerException
 
-N_VIEWS_PARAMS = 4
 N_GEN_PARAMS = 8
 
 logger = logging.getLogger(__file__)
@@ -289,4 +288,4 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
     @overrides(AbstractGenerateConnectorOnMachine.
                gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
-        return (N_VIEWS_PARAMS + N_GEN_PARAMS) * BYTES_PER_WORD
+        return self._view_params_bytes + (N_GEN_PARAMS * BYTES_PER_WORD)

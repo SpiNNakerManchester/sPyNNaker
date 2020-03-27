@@ -26,7 +26,6 @@ from .abstract_connector_supports_views_on_machine import (
     AbstractConnectorSupportsViewsOnMachine)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
-N_VIEWS_PARAMS = 4
 N_GEN_PARAMS = 6
 
 
@@ -172,4 +171,4 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
                gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
         # view + params + seeds
-        return (N_VIEWS_PARAMS + N_GEN_PARAMS) * BYTES_PER_WORD
+        return self._view_params_bytes + (N_GEN_PARAMS * BYTES_PER_WORD)

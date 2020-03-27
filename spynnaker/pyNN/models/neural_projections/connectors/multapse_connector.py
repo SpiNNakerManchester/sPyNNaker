@@ -29,7 +29,6 @@ from .abstract_generate_connector_on_machine import (
 from .abstract_connector_supports_views_on_machine import (
     AbstractConnectorSupportsViewsOnMachine)
 
-N_VIEWS_PARAMS = 4
 N_GEN_PARAMS = 8
 
 logger = logging.getLogger(__name__)
@@ -340,4 +339,4 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
     @overrides(AbstractGenerateConnectorOnMachine.
                gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
-        return (N_VIEWS_PARAMS + N_GEN_PARAMS) * BYTES_PER_WORD
+        return self._view_params_bytes + (N_GEN_PARAMS * BYTES_PER_WORD)
