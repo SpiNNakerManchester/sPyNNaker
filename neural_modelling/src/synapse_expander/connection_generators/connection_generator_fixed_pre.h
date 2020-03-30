@@ -28,6 +28,10 @@
  *! \brief The parameters that can be copied from SDRAM
  */
 struct fixed_pre_params {
+    uint32_t pre_lo;
+    uint32_t pre_hi;
+    uint32_t post_lo;
+    uint32_t post_hi;
     uint32_t allow_self_connections;
     uint32_t with_replacement;
     uint32_t n_pre;
@@ -59,8 +63,10 @@ static void *connection_generator_fixed_pre_initialise(address_t *region) {
 
     // Initialise the RNG
     obj->rng = rng_init(region);
-    log_debug("Fixed Total Number Connector, allow self connections = %u, "
+    log_debug("Fixed Total Number Connector,  pre_lo = %u, pre_hi = %u, "
+    		"post_lo = %u, post_hi = %u, allow self connections = %u, "
             "with replacement = %u, n_pre = %u, n pre neurons = %u",
+			obj->params.pre_lo, obj->params.pre_hi, obj->params.post_lo, obj->params.post_hi,
             obj->params.allow_self_connections,
             obj->params.with_replacement, obj->params.n_pre,
             obj->params.n_pre_neurons);
@@ -197,17 +203,28 @@ uint32_t connection_generator_fixed_pre_generate(
         }
     }
 
+    // If not in the pre-population view range, then don't generate
+    if ((pre_neuron_index < obj->params.pre_lo) ||
+    		(pre_neuron_index > obj->params.pre_hi)) {
+    	return 0;
+    }
+
     uint16_t (*array)[n_columns][n_conns] = full_indices;
 
-    // Loop over the full indices array, and only use pre_neuron_index
+    // Loop over the full indices array, only use pre_neuron_index, and
+    // only generate for required columns
     uint32_t count_indices = 0;
     for (uint32_t n = 0; n < n_columns; n++) {
-        for (uint32_t i = 0; i < n_conns; i++) {
-            uint32_t j = (*array)[n][i];
-            if (j == pre_neuron_index) {
-                indices[count_indices] = n; // On this slice!
-                count_indices++;
-            }
+    	// Only generate within the specified lo and hi of the population view
+    	if ((n + post_slice_start >= obj->params.post_lo) &&
+    			(n + post_slice_start <= obj->params.post_hi)) {
+    		for (uint32_t i = 0; i < n_conns; i++) {
+    			uint32_t j = (*array)[n][i] + obj->params.pre_lo;
+    			if (j == pre_neuron_index) {
+    				indices[count_indices] = n; // On this slice!
+    				count_indices++;
+    			}
+    		}
         }
     }
 
