@@ -89,7 +89,10 @@ state_t neuron_model_state_update(
 //			0.3k *
 			(1.0k - psi_temp2) : 0.0k;
 
-    uint32_t total_synapses_per_neuron = 100; // This parameter is OK to update, as the actual size of the array is set in the header file, which matches the Python code. This should make it possible to do a pause and resume cycle and have reliable unloading of data.
+    // This parameter is OK to update, as the actual size of the array is set in the
+    // header file, which matches the Python code. This should make it possible to do
+    // a pause and resume cycle and have reliable unloading of data.
+    uint32_t total_synapses_per_neuron = 100;
 
 
 //    neuron->psi = neuron->psi << 10;
@@ -133,8 +136,8 @@ state_t neuron_model_state_update(
 		// Update cached total weight change
 		// ******************************************************************
     	REAL this_dt_weight_change =
-    			-local_eta * neuron->L * neuron->syn_state[syn_ind].e_bar;
-    	neuron->syn_state[syn_ind].delta_w += this_dt_weight_change;
+    			local_eta * neuron->L * neuron->syn_state[syn_ind].e_bar;
+    	neuron->syn_state[syn_ind].delta_w -= this_dt_weight_change;
 
 //    	if (!syn_ind || neuron->syn_state[syn_ind].z_bar){// || neuron->syn_state[syn_ind].z_bar_inp){
 //            io_printf(IO_BUF, "total synapses = %u \t syn_ind = %u \t "
@@ -177,6 +180,15 @@ state_t neuron_model_get_membrane_voltage(neuron_pointer_t neuron) {
 
 void neuron_model_print_state_variables(restrict neuron_pointer_t neuron) {
     log_debug("V membrane    = %11.4k mv", neuron->V_membrane);
+    log_debug("learning      = %k ", neuron->L);
+
+    log_debug("Printing synapse state values:");
+    for (uint32_t syn_ind=0; syn_ind < 100; syn_ind++){
+    	log_debug("synapse number %u delta_w, z_bar, z_bar_inp, e_bar, el_a %11.4k %11.4k %11.4k %11.4k %11.4k",
+    			syn_ind, neuron->syn_state[syn_ind].delta_w,
+				neuron->syn_state[syn_ind].z_bar, neuron->syn_state[syn_ind].z_bar_inp,
+				neuron->syn_state[syn_ind].e_bar, neuron->syn_state[syn_ind].el_a);
+    }
 }
 
 void neuron_model_print_parameters(restrict neuron_pointer_t neuron) {
