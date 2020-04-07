@@ -411,13 +411,13 @@ static void neuron_impl_store_neuron_parameters(
         next += n_words_needed(n_neurons * sizeof(neuron_t));
     }
 
-    log_info("****** STORING ******");
+    log_debug("****** STORING ******");
     for (index_t n = 0; n < n_neurons; n++) {
         neuron_model_print_parameters(&neuron_array[n]);
         log_debug("Neuron id %u", n);
         neuron_model_print_state_variables(&neuron_array[n]);
     }
-    log_info("****** STORING COMPLETE ******");
+    log_debug("****** STORING COMPLETE ******");
 
     if (sizeof(input_type_t)) {
         log_debug("writing input type parameters");
@@ -447,7 +447,7 @@ static void neuron_impl_store_neuron_parameters(
         next += n_words_needed(n_neurons * sizeof(additional_input_t));
     }
 
-    log_info("global_parameters, core_target_rate, core_pop_rate %k %k",
+    log_debug("global_parameters, core_target_rate, core_pop_rate %k %k",
     		global_parameters->core_target_rate, global_parameters->core_pop_rate);
 }
 
