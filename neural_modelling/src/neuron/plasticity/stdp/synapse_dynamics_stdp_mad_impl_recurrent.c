@@ -109,12 +109,12 @@ static inline final_state_t _plasticity_update_synapse(
         post_window.num_events);
 
 
-     io_printf(IO_BUF, "PRINTING ENTIRE HISTORY\n");
-     print_event_history(post_event_history);
+     //io_printf(IO_BUF, "PRINTING ENTIRE HISTORY\n");
+     //print_event_history(post_event_history);
 
-     io_printf(IO_BUF, "PRINTING WINDOW \n");
-     print_delayed_window_events(post_event_history, window_begin_time,
-    		window_end_time, delay_dendritic);
+     //io_printf(IO_BUF, "PRINTING WINDOW \n");
+     //print_delayed_window_events(post_event_history, window_begin_time,
+     // 		window_end_time, delay_dendritic);
 
     // Process events in post-synaptic window
     while (post_window.num_events > 0) {
@@ -150,14 +150,14 @@ static inline final_state_t _plasticity_update_synapse(
     	io_printf(IO_BUF, "Weight is: %u\n", current_state.weight_state.weight);
     }
 
-    io_printf(IO_BUF, "PRINTING POST HISTORY BEFORE DEPRESSION\n");
-    io_printf(IO_BUF, "Spike: %u, Time: %u, Trace: %u, Mem_V: %k\n",
-		post_window.num_events, post_window.prev_time,
-		post_window.prev_trace, post_window.prev_post_synaptic_v);
+    //io_printf(IO_BUF, "PRINTING POST HISTORY BEFORE DEPRESSION\n");
+    //io_printf(IO_BUF, "Spike: %u, Time: %u, Trace: %u, Mem_V: %k\n",
+//		post_window.num_events, post_window.prev_time,
+//		post_window.prev_trace, post_window.prev_post_synaptic_v);
 
 
 
-    io_printf(IO_BUF, "\n\n\n");
+ //   io_printf(IO_BUF, "\n\n\n");
 
     current_state = timing_apply_pre_spike(
         delayed_pre_time, new_pre_trace, delayed_last_pre_time, last_pre_trace,
@@ -363,7 +363,7 @@ bool synapse_dynamics_process_plastic_synapses(
 //        io_printf(IO_BUF, "Initial weight is: %u\n", current_state.weight_state.weight);
 
         uint32_t full_delay = delay_dendritic;
-        delay_dendritic = 20; // SD 2.0 ms back propo time at 0.1 ms time step
+        delay_dendritic = 10; // SD 2.0 ms back propo time at 0.2 ms time step
 
         // Update the synapse state
         final_state_t final_state = _plasticity_update_synapse(
