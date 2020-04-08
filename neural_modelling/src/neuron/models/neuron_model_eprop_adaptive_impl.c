@@ -137,7 +137,7 @@ state_t neuron_model_state_update(
 		// ******************************************************************
     	REAL this_dt_weight_change =
     			local_eta * neuron->L * neuron->syn_state[syn_ind].e_bar;
-    	neuron->syn_state[syn_ind].delta_w -= this_dt_weight_change;
+    	neuron->syn_state[syn_ind].delta_w -= this_dt_weight_change; // -= here to enable compiler to handle previous line (can crash when -ve is at beginning of previous line)
 
 //    	if (!syn_ind || neuron->syn_state[syn_ind].z_bar){// || neuron->syn_state[syn_ind].z_bar_inp){
 //            io_printf(IO_BUF, "total synapses = %u \t syn_ind = %u \t "
