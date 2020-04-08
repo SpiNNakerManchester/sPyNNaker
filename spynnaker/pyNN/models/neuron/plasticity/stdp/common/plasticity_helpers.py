@@ -12,7 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+from __future__ import division
 import math
 import logging
 import numpy
@@ -43,3 +43,17 @@ def get_exp_lut_array(time_step, time_constant, shift=0):
     # Concatenate with the header
     header = numpy.array([len(a), shift], dtype="uint16")
     return numpy.concatenate((header, a.astype("uint16"))).view("uint32")
+
+def get_min_lut_value(exp_lut_array):
+    """ Get the smallest non-zero value of an exponential lookup array,\
+        or zero if no such value
+
+    :param numpy.ndarray exp_lut_array: The lookup array
+    :rtype: float
+    """
+    if not len(exp_lut_array):
+        return 0
+    values = exp_lut_array.view("uint16")
+    if values[-1] != 0:
+        return values[-1] / STDP_FIXED_POINT_ONE
+    return values[-2] / STDP_FIXED_POINT_ONE

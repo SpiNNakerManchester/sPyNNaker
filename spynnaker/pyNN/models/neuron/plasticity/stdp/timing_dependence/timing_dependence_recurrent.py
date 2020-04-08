@@ -136,3 +136,9 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
     def get_parameter_names(self):
         return ['accumulator_depression', 'accumulator_potentiation',
                 'mean_pre_window', 'mean_post_window', 'dual_fsm']
+
+    @property
+    @overrides(AbstractTimingDependence.minimum_delta)
+    def minimum_delta(self):
+        # This rule always has a delta of 1
+        return [1.0, 1.0]

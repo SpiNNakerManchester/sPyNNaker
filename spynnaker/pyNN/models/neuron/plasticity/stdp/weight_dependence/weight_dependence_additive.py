@@ -114,6 +114,11 @@ class WeightDependenceAdditive(
         """
         return self.__w_max
 
+    @overrides(AbstractWeightDependence.weight_change_minimum)
+    def weight_change_minimum(self, min_delta):
+        pot, dep = min_delta
+        return min(pot * self.A_plus, dep * self.A_minus)
+
     @overrides(AbstractWeightDependence.get_parameter_names)
     def get_parameter_names(self):
         return ['w_min', 'w_max', 'A_plus', 'A_minus']

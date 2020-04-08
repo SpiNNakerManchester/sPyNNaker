@@ -84,6 +84,17 @@ class AbstractTimingDependence(object):
         :rtype: iterable(str)
         """
 
+    @abstractproperty
+    def minimum_delta(self):
+        """ The smallest non-zero changes that will be passed to the weight\
+            rule
+
+        :return: An array of minimum change values, one for potentiation,\
+            one for depression.  If this requires a 2-parameter weight rule,
+            each of the values of the arrays must then be an array of arrays
+        :rtype: list of (float or list of float)
+        """
+
     def get_provenance_data(self, pre_population_label, post_population_label):
         """ Get any provenance data
 

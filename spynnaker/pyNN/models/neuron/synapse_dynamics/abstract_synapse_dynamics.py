@@ -133,7 +133,7 @@ class AbstractSynapseDynamics(object):
         """ Get the maximum delay for the synapses
 
         :param AbstractConnector connector:
-        :param ~numpy.ndarray delays:
+        :param SynapseInformation synapse_info:
         """
         return connector.get_delay_maximum(synapse_info)
 
@@ -141,7 +141,7 @@ class AbstractSynapseDynamics(object):
         """ Get the variance in delay for the synapses
 
         :param AbstractConnector connector:
-        :param ~numpy.ndarray delays:
+        :param SynapseInformation synapse_info:
         """
         # pylint: disable=too-many-arguments
         return connector.get_delay_variance(delays)
@@ -150,7 +150,7 @@ class AbstractSynapseDynamics(object):
         """ Get the mean weight for the synapses
 
         :param AbstractConnector connector:
-        :param ~numpy.ndarray weights:
+        :param SynapseInformation synapse_info:
         """
         # pylint: disable=too-many-arguments
         return connector.get_weight_mean(synapse_info.weights)
@@ -159,7 +159,7 @@ class AbstractSynapseDynamics(object):
         """ Get the maximum weight for the synapses
 
         :param AbstractConnector connector:
-        :param ~numpy.ndarray weights:
+        :param SynapseInformation synapse_info:
         """
         # pylint: disable=too-many-arguments
         return connector.get_weight_maximum(synapse_info)
@@ -172,6 +172,18 @@ class AbstractSynapseDynamics(object):
         """
         # pylint: disable=too-many-arguments
         return connector.get_weight_variance(weights)
+
+    def get_weight_minimum(self, connector, synapse_info, sigma):
+        """ Get the minimum non-zero weight for the synapses, or 0 if all\
+            synapses are zero
+
+        :param AbstractConnector connector: The connector in use
+        :param SynapseInformation synapse_info:
+        :param float sigma: The number of standard deviations of accuracy
+        """
+        weights = synapse_info.weights
+        return (connector.get_weight_mean(weights) -
+                connector.get_weight_variance(weights) * sigma)
 
     def convert_per_connection_data_to_rows(
             self, connection_row_indices, n_rows, data):

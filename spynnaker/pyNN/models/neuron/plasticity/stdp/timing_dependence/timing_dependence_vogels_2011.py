@@ -26,7 +26,7 @@ from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
     plasticity_helpers)
 from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common\
-    .plasticity_helpers import get_exp_lut_array
+    .plasticity_helpers import get_exp_lut_array, get_min_lut_value
 
 logger = logging.getLogger(__name__)
 
@@ -100,3 +100,9 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
     @overrides(AbstractTimingDependence.get_parameter_names)
     def get_parameter_names(self):
         return ['alpha', 'tau']
+
+    @property
+    @overrides(AbstractTimingDependence.minimum_delta)
+    def minimum_delta(self):
+        min_tau = get_min_lut_value(self.__tau_data)
+        return [min_tau - self.__alpha, min_tau]

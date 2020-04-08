@@ -84,3 +84,11 @@ class AbstractWeightDependence(object):
 
         :rtype: float
         """
+
+    @abstractmethod
+    def weight_change_minimum(self, min_delta):
+        """ The minimum non-zero change in weight that will occur
+
+        :param list min_delta: The minimum delta values from the timing rules
+        :rtype: float
+        """

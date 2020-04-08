@@ -17,7 +17,7 @@ import logging
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common\
-    .plasticity_helpers import get_exp_lut_array
+    .plasticity_helpers import get_exp_lut_array, get_min_lut_value
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
     SynapseStructureWeightOnly)
 from .abstract_timing_dependence import AbstractTimingDependence
@@ -97,3 +97,9 @@ class TimingDependenceSpikeNearestPair(AbstractTimingDependence):
     @overrides(AbstractTimingDependence.get_parameter_names)
     def get_parameter_names(self):
         return ['tau_plus', 'tau_minus']
+
+    @property
+    @overrides(AbstractTimingDependence.minimum_delta)
+    def minimum_delta(self):
+        return [get_min_lut_value(self.__tau_plus_data),
+                get_min_lut_value(self.__tau_minus_data)]
