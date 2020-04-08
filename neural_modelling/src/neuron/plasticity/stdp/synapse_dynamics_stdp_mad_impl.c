@@ -178,10 +178,9 @@ static inline pre_event_history_t *plastic_event_history(
 
 void synapse_dynamics_print_plastic_synapses(
         address_t plastic_region_address, address_t fixed_region_address,
-        uint32_t *ring_buffer_to_input_buffer_left_shifts) {
+        REAL *min_weights) {
     use(plastic_region_address);
     use(fixed_region_address);
-    use(ring_buffer_to_input_buffer_left_shifts);
 
 #if LOG_LEVEL >= LOG_DEBUG
     // Extract separate arrays of weights (from plastic region),
@@ -209,8 +208,7 @@ void synapse_dynamics_print_plastic_synapses(
         weight_t weight = synapse_structure_get_final_weight(final_state);
 
         log_debug("%08x [%3d: (w: %5u (=", control_word, i, weight);
-        synapses_print_weight(
-                weight, ring_buffer_to_input_buffer_left_shifts[synapse_type]);
+        synapses_print_weight(weight, min_weights[synapse_type]);
         log_debug("nA) d: %2u, %s, n = %3u)] - {%08x %08x}\n",
             synapse_row_sparse_delay(control_word, synapse_type_index_bits),
             synapse_types_get_type_char(synapse_type),
@@ -232,7 +230,7 @@ static inline index_t sparse_axonal_delay(uint32_t x) {
 
 address_t synapse_dynamics_initialise(
         address_t address, uint32_t n_neurons, uint32_t n_synapse_types,
-        uint32_t *ring_buffer_to_input_buffer_left_shifts) {
+        REAL *min_weights) {
 
     stdp_params *sdram_params = (stdp_params *) address;
     spin1_memcpy(&params, sdram_params, sizeof(stdp_params));
@@ -246,8 +244,7 @@ address_t synapse_dynamics_initialise(
 
     // Load weight dependence data
     address_t weight_result = weight_initialise(
-            weight_region_address, n_synapse_types,
-            ring_buffer_to_input_buffer_left_shifts);
+            weight_region_address, n_synapse_types, min_weights);
     if (weight_result == NULL) {
         return NULL;
     }

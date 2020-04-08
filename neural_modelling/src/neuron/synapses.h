@@ -45,22 +45,15 @@ static inline index_t synapses_get_ring_buffer_index_combined(
 
 // Converts a weight stored in a synapse row to an input
 static inline input_t synapses_convert_weight_to_input(
-        weight_t weight, uint32_t left_shift) {
-    union {
-        int_k_t input_type;
-        s1615 output_type;
-    } converter;
-
-    converter.input_type = (int_k_t) (weight) << left_shift;
-
-    return converter.output_type;
+        weight_t weight, REAL min_weight) {
+    return weight * min_weight;
 }
 
 static inline void synapses_print_weight(
-        weight_t weight, uint32_t left_shift) {
+        weight_t weight, REAL min_weight) {
     if (weight != 0) {
         io_printf(IO_BUF, "%12.6k",
-                synapses_convert_weight_to_input(weight, left_shift));
+                synapses_convert_weight_to_input(weight, min_weight));
     } else {
         io_printf(IO_BUF, "      ");
     }
@@ -69,8 +62,7 @@ static inline void synapses_print_weight(
 bool synapses_initialise(
         address_t synapse_params_address, address_t direct_matrix_address,
         uint32_t n_neurons, uint32_t n_synapse_types,
-        uint32_t **ring_buffer_to_input_buffer_left_shifts,
-        address_t *direct_synapses_address);
+        REAL **min_weights_out, address_t *direct_synapses_address);
 
 void synapses_do_timestep_update(timer_t time);
 

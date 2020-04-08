@@ -22,14 +22,13 @@
 //---------------------------------------
 // Global plasticity parameter data
 plasticity_weight_region_data_t *plasticity_weight_region_data;
-uint32_t *weight_multiply_right_shift;
 
 //---------------------------------------
 // Functions
 //---------------------------------------
 uint32_t *weight_initialise(
-        uint32_t *address, uint32_t n_synapse_types,
-        uint32_t *ring_buffer_to_input_buffer_left_shifts) {
+        uint32_t *address, uint32_t n_synapse_types, REAL *min_weights) {
+    use(min_weights);
     log_debug("weight_initialise: starting");
     log_debug("\tSTDP multiplicative weight dependence");
 
@@ -38,12 +37,6 @@ uint32_t *weight_initialise(
     plasticity_weight_region_data =
             spin1_malloc(sizeof(plasticity_weight_region_data_t) * n_synapse_types);
     if (plasticity_weight_region_data == NULL) {
-        log_error("Could not initialise weight region data");
-        return NULL;
-    }
-    weight_multiply_right_shift =
-            spin1_malloc(sizeof(uint32_t) * n_synapse_types);
-    if (weight_multiply_right_shift == NULL) {
         log_error("Could not initialise weight region data");
         return NULL;
     }
@@ -56,17 +49,11 @@ uint32_t *weight_initialise(
         plasticity_weight_region_data[s].a2_plus = *plasticity_word++;
         plasticity_weight_region_data[s].a2_minus = *plasticity_word++;
 
-        // Calculate the right shift required to fixed-point multiply weights
-        weight_multiply_right_shift[s] =
-                16 - (ring_buffer_to_input_buffer_left_shifts[s] + 1);
-
-        log_debug("\tSynapse type %u: Min weight:%d, Max weight:%d, A2+:%d, A2-:%d,"
-                " Weight multiply right shift:%u",
+        log_debug("\tSynapse type %u: Min weight:%d, Max weight:%d, A2+:%d, A2-:%d",
                 s, plasticity_weight_region_data[s].min_weight,
                 plasticity_weight_region_data[s].max_weight,
                 plasticity_weight_region_data[s].a2_plus,
-                plasticity_weight_region_data[s].a2_minus,
-                weight_multiply_right_shift[s]);
+                plasticity_weight_region_data[s].a2_minus);
     }
 
     log_debug("weight_initialise: completed successfully");

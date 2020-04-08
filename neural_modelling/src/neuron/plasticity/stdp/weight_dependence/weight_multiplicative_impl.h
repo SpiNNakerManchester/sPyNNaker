@@ -38,8 +38,6 @@ typedef struct {
 
 typedef struct {
     int32_t weight;
-
-    uint32_t weight_multiply_right_shift;
     const plasticity_weight_region_data_t *weight_region;
 } weight_state_t;
 
@@ -49,7 +47,6 @@ typedef struct {
 // Externals
 //---------------------------------------
 extern plasticity_weight_region_data_t *plasticity_weight_region_data;
-extern uint32_t *weight_multiply_right_shift;
 
 //---------------------------------------
 // Weight dependance functions
@@ -58,8 +55,6 @@ static inline weight_state_t weight_get_initial(
         weight_t weight, index_t synapse_type) {
     return (weight_state_t ) {
         .weight = (int32_t) weight,
-        .weight_multiply_right_shift =
-                weight_multiply_right_shift[synapse_type],
         .weight_region = &plasticity_weight_region_data[synapse_type]
     };
 }
@@ -72,7 +67,7 @@ static inline weight_state_t weight_one_term_apply_depression(
     // fixed-point format
     int32_t scale = maths_fixed_mul16(
             state.weight - state.weight_region->min_weight,
-            state.weight_region->a2_minus, state.weight_multiply_right_shift);
+            state.weight_region->a2_minus, 0);
 
     // Multiply scale by depression and subtract
     // **NOTE** using standard STDP fixed-point format handles format conversion
@@ -87,7 +82,7 @@ static inline weight_state_t weight_one_term_apply_potentiation(
     // fixed-point format
     int32_t scale = maths_fixed_mul16(
             state.weight_region->max_weight - state.weight,
-            state.weight_region->a2_plus, state.weight_multiply_right_shift);
+            state.weight_region->a2_plus, 0);
 
     // Multiply scale by potentiation and add
     // **NOTE** using standard STDP fixed-point format handles format conversion

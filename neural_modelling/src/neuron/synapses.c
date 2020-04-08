@@ -44,8 +44,8 @@ static weight_t *ring_buffers;
 // Ring buffer size
 static uint32_t ring_buffer_size;
 
-// Amount to left shift the ring buffer by to make it an input
-static uint32_t *ring_buffer_to_input_left_shifts;
+// The weight value represented by the LSB of a weight
+static REAL *min_weights;
 
 // Count of the number of times the ring buffers have saturated
 static uint32_t saturation_count = 0;
@@ -93,7 +93,7 @@ static inline void print_synaptic_row(synaptic_row_t synaptic_row) {
         log_debug("%08x [%3d: (w: %5u (=",
                 synapse, i, synapse_row_sparse_weight(synapse));
         synapses_print_weight(synapse_row_sparse_weight(synapse),
-                ring_buffer_to_input_left_shifts[synapse_type]);
+                min_weights[synapse_type]);
         log_debug(
                 "nA) d: %2u, %s, n = %3u)] - {%08x %08x}\n",
                 synapse_row_sparse_delay(synapse, synapse_type_index_bits),
@@ -108,8 +108,7 @@ static inline void print_synaptic_row(synaptic_row_t synaptic_row) {
         address_t plastic_region_address =
                 synapse_row_plastic_region(synaptic_row);
         synapse_dynamics_print_plastic_synapses(
-                plastic_region_address, fixed_region_address,
-                ring_buffer_to_input_left_shifts);
+                plastic_region_address, fixed_region_address, min_weights);
     }
 
     log_debug("----------------------------------------\n");
@@ -139,7 +138,7 @@ static inline void print_ring_buffers(uint32_t time) {
                             d + time, t, n,
                             synapse_type_index_bits, synapse_index_bits);
                     synapses_print_weight(ring_buffers[ring_buffer_index],
-                            ring_buffer_to_input_left_shifts[t]);
+                            min_weights[t]);
                 }
                 io_printf(IO_BUF, "\n");
             }
@@ -220,24 +219,19 @@ static inline void print_synapse_parameters(void) {
 bool synapses_initialise(
         address_t synapse_params_address, address_t direct_matrix_address,
         uint32_t n_neurons_value, uint32_t n_synapse_types_value,
-        uint32_t **ring_buffer_to_input_buffer_left_shifts,
-        address_t *direct_synapses_address) {
+        REAL **min_weights_out, address_t *direct_synapses_address) {
     log_debug("synapses_initialise: starting");
     n_neurons = n_neurons_value;
     n_synapse_types = n_synapse_types_value;
 
     // Set up ring buffer left shifts
-    ring_buffer_to_input_left_shifts =
-            spin1_malloc(n_synapse_types * sizeof(uint32_t));
-    if (ring_buffer_to_input_left_shifts == NULL) {
+    min_weights = spin1_malloc(n_synapse_types * sizeof(REAL));
+    if (min_weights == NULL) {
         log_error("Not enough memory to allocate ring buffer");
         return false;
     }
-    spin1_memcpy(
-            ring_buffer_to_input_left_shifts, synapse_params_address,
-            n_synapse_types * sizeof(uint32_t));
-    *ring_buffer_to_input_buffer_left_shifts =
-            ring_buffer_to_input_left_shifts;
+    spin1_memcpy(min_weights, synapse_params_address, n_synapse_types * sizeof(REAL));
+    *min_weights_out = min_weights;
 
     // Work out the positions of the direct and indirect synaptic matrices
     // and copy the direct matrix to DTCM
@@ -321,7 +315,7 @@ void synapses_do_timestep_update(timer_t time) {
                     synapse_type_index, neuron_index,
                     synapses_convert_weight_to_input(
                             ring_buffers[ring_buffer_index],
-                            ring_buffer_to_input_left_shifts[synapse_type_index]));
+                            min_weights[synapse_type_index]));
 
             // Clear ring buffer
             ring_buffers[ring_buffer_index] = 0;
@@ -387,7 +381,7 @@ uint32_t synapses_get_pre_synaptic_events(void) {
 }
 
 void synapses_flush_ring_buffers(void) {
-	for (uint32_t i = 0; i < ring_buffer_size; i++) {
+    for (uint32_t i = 0; i < ring_buffer_size; i++) {
         ring_buffers[i] = 0;
     }
 }

@@ -156,16 +156,14 @@ static bool initialise(void) {
     }
 
     // Set up the synapses
-    uint32_t *ring_buffer_to_input_buffer_left_shifts;
+    REAL *min_weights;
     address_t indirect_synapses_address =
             data_specification_get_region(SYNAPTIC_MATRIX_REGION, ds_regions);
     address_t direct_synapses_address;
     if (!synapses_initialise(
             data_specification_get_region(SYNAPSE_PARAMS_REGION, ds_regions),
             data_specification_get_region(DIRECT_MATRIX_REGION, ds_regions),
-            n_neurons, n_synapse_types,
-            &ring_buffer_to_input_buffer_left_shifts,
-            &direct_synapses_address)) {
+            n_neurons, n_synapse_types, &min_weights, &direct_synapses_address)) {
         return false;
     }
 
@@ -182,7 +180,7 @@ static bool initialise(void) {
             data_specification_get_region(SYNAPSE_DYNAMICS_REGION, ds_regions);
     address_t syn_dyn_end_address = synapse_dynamics_initialise(
             synapse_dynamics_region_address, n_neurons, n_synapse_types,
-            ring_buffer_to_input_buffer_left_shifts);
+            min_weights);
 
     if (synapse_dynamics_region_address && !syn_dyn_end_address) {
         return false;
@@ -226,7 +224,7 @@ void resume_callback(void) {
     // flushed in case there is a delayed spike left over from a previous run
     // NOTE: at reset, time is set to UINT_MAX ahead of timer_callback(...)
     if ((time+1) == 0) {
-    	synapses_flush_ring_buffers();
+        synapses_flush_ring_buffers();
     }
 
 }
