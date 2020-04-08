@@ -32,6 +32,10 @@ static generate_connection_func connection_generator_fixed_total_generate;
  *! \brief The parameters that can be copied from SDRAM
  */
 struct fixed_total_params {
+    uint32_t pre_lo;
+    uint32_t pre_hi;
+    uint32_t post_lo;
+    uint32_t post_hi;
     uint32_t allow_self_connections;
     uint32_t with_replacement;
     uint32_t n_connections;
@@ -58,9 +62,11 @@ static void *connection_generator_fixed_total_initialise(address_t *region) {
 
     // Initialise the RNG
     obj->rng = rng_init(region);
-    log_debug("Fixed Total Number Connector, allow self connections = %u, "
+    log_debug("Fixed Total Number Connector, pre_lo = %u, pre_hi = %u, "
+    		"post_lo = %u, post_hi = %u, allow self connections = %u, "
             "with replacement = %u, n connections = %u, "
             "n potential connections = %u",
+			obj->params.pre_lo, obj->params.pre_hi, obj->params.post_lo, obj->params.post_hi,
             obj->params.allow_self_connections,
             obj->params.with_replacement, obj->params.n_connections,
             obj->params.n_potential_synapses);
@@ -124,6 +130,7 @@ static uint32_t connection_generator_fixed_total_generate(
         uint32_t pre_neuron_index, uint32_t post_slice_start,
         uint32_t post_slice_count, uint32_t max_row_length, uint16_t *indices) {
     use(pre_slice_start);
+    use(pre_slice_count);
 
     // If there are no connections left or none to be made, return 0
     struct fixed_total *obj = data;
@@ -131,18 +138,52 @@ static uint32_t connection_generator_fixed_total_generate(
         return 0;
     }
 
-    // Work out how many values can be sampled from
-    uint32_t n_values = post_slice_count;
+    // If not in the pre-population view range, then don't generate
+    if ((pre_neuron_index < obj->params.pre_lo) ||
+    		(pre_neuron_index > obj->params.pre_hi)) {
+    	return 0;
+    }
+
+    // Work out how many values can be sampled from (on this slice)
+    uint32_t slice_lo = post_slice_start;
+    uint32_t slice_hi = post_slice_start + post_slice_count - 1;
+
+    // If everything is off the current slice then don't generate
+    if ((obj->params.post_hi < slice_lo) ||
+    		(obj->params.post_lo > slice_hi)) {
+    	return 0;
+    }
+
+    // Otherwise work out how many values can be sampled from
+    if ((obj->params.post_lo >= post_slice_start) &&
+    		(obj->params.post_lo < post_slice_start + post_slice_count)) {
+    	slice_lo = obj->params.post_lo;
+    	if (obj->params.post_hi >= post_slice_start + post_slice_count) {
+    		slice_hi = post_slice_start + post_slice_count - 1;
+    	} else {
+    		slice_hi = obj->params.post_hi;
+    	}
+    } else { // post_lo is less than slice_start
+    	slice_lo = post_slice_start;
+    	if (obj->params.post_hi >= post_slice_start + post_slice_count) {
+    		slice_hi = post_slice_start + post_slice_count - 1;
+    	}
+    	else {
+    		slice_hi = obj->params.post_hi;
+    	}
+    }
+
+    uint32_t n_values = slice_hi - slice_lo + 1;
     if (!obj->params.allow_self_connections
-            && pre_neuron_index >= post_slice_start
-            && pre_neuron_index < (post_slice_start + post_slice_count)) {
+            && pre_neuron_index >= obj->params.post_lo
+            && pre_neuron_index <= obj->params.post_hi) {
         n_values--;
     }
     uint32_t n_conns = 0;
 
     // If we're on the last row of the sub-matrix, then all of the remaining
     // sub-matrix connections get allocated to this row
-    if (pre_neuron_index == (pre_slice_start + pre_slice_count - 1)) {
+    if (pre_neuron_index == obj->params.pre_hi) {
         n_conns = obj->params.n_connections;
     } else {
         // If with replacement, generate a binomial for this row
@@ -160,40 +201,40 @@ static uint32_t connection_generator_fixed_total_generate(
 
     // If too many connections, limit
     if (n_conns > max_row_length) {
-        if (pre_neuron_index == (pre_slice_start + pre_slice_count - 1)) {
+        if (pre_neuron_index == obj->params.pre_hi) {
             log_warning("Could not create %u connections",
                     n_conns - max_row_length);
         }
         n_conns = max_row_length;
     }
     log_debug("Generating %u of %u synapses",
-            n_conns, obj->params.n_connections);
+    		n_conns, obj->params.n_connections);
 
     // Sample from the possible connections in this row n_conns times
     if (obj->params.with_replacement) {
         // Sample them with replacement
         for (unsigned int i = 0; i < n_conns; i++) {
             uint32_t u01 = rng_generator(obj->rng) & 0x00007fff;
-            uint32_t j = (u01 * post_slice_count) >> 15;
-            indices[i] = j;
+            uint32_t j = (u01 * n_values) >> 15;
+            indices[i] = j + slice_lo - post_slice_start;
         }
     } else {
         // Sample them without replacement using reservoir sampling
         for (unsigned int i = 0; i < n_conns; i++) {
-            indices[i] = i;
+            indices[i] = i + slice_lo - post_slice_start;
         }
-        for (unsigned int i = n_conns; i < post_slice_count; i++) {
+        for (unsigned int i = n_conns; i < n_values; i++) {
             // j = random(0, i) (inclusive)
             const unsigned int u01 = rng_generator(obj->rng) & 0x00007fff;
             const unsigned int j = (u01 * (i + 1)) >> 15;
             if (j < n_conns) {
-                indices[j] = i;
+                indices[j] = i + slice_lo - post_slice_start;
             }
         }
     }
 
     obj->params.n_connections -= n_conns;
-    obj->params.n_potential_synapses -= post_slice_count;
+    obj->params.n_potential_synapses -= n_values;
 
     return n_conns;
 }
