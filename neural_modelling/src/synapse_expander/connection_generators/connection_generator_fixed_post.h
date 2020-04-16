@@ -28,6 +28,10 @@
  *! \brief The parameters that can be copied from SDRAM
  */
 struct fixed_post_params {
+    uint32_t pre_lo;
+    uint32_t pre_hi;
+    uint32_t post_lo;
+    uint32_t post_hi;
     uint32_t allow_self_connections;
     uint32_t with_replacement;
     uint32_t n_post;
@@ -54,8 +58,10 @@ static void *connection_generator_fixed_post_initialise(address_t *region) {
 
     // Initialise the RNG
     obj->rng = rng_init(region);
-    log_debug("Fixed Number Post Connector, allow self connections = %u, "
+    log_debug("Fixed Number Post Connector, pre_lo = %u, pre_hi = %u, "
+    		"post_lo = %u, post_hi = %u, allow self connections = %u, "
             "with replacement = %u, n_post = %u, n post neurons = %u",
+			obj->params.pre_lo, obj->params.pre_hi, obj->params.post_lo, obj->params.post_hi,
             obj->params.allow_self_connections,
             obj->params.with_replacement, obj->params.n_post,
             obj->params.n_post_neurons);
@@ -84,6 +90,12 @@ static uint32_t connection_generator_fixed_post_generate(
     struct fixed_post *obj = data;
     if (max_row_length == 0 || obj->params.n_post == 0) {
         return 0;
+    }
+
+    // If not in the pre-population view range, then don't generate
+    if ((pre_neuron_index < obj->params.pre_lo) ||
+    		(pre_neuron_index > obj->params.pre_hi)) {
+    	return 0;
     }
 
     // Get how many values can be sampled from
@@ -157,11 +169,13 @@ static uint32_t connection_generator_fixed_post_generate(
         }
     }
 
-    // Loop over the full indices array, and only keep indices on this post-slice
+    // Loop over the full indices array, and only keep indices that are on this
+    // post-slice and within the range of the specified post-population view
     uint32_t count_indices = 0;
     for (uint32_t i = 0; i < n_conns; i++) {
-        uint32_t j = full_indices[i];
+        uint32_t j = full_indices[i] + obj->params.post_lo;
         if ((j >= post_slice_start) && (j < post_slice_start + post_slice_count)) {
+//        		(j >= obj->params.post_lo) && (j <= obj->params.post_hi)) {
             indices[count_indices] = j - post_slice_start; // On this slice!
             count_indices++;
         }

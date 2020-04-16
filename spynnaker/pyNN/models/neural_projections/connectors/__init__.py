@@ -16,6 +16,8 @@
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine)
+from .abstract_connector_supports_views_on_machine import (
+    AbstractConnectorSupportsViewsOnMachine)
 from .all_to_all_connector import AllToAllConnector
 from .array_connector import ArrayConnector
 from .csa_connector import CSAConnector
@@ -32,7 +34,8 @@ from .small_world_connector import SmallWorldConnector
 from .kernel_connector import KernelConnector
 
 __all__ = ["AbstractConnector", "AbstractGenerateConnectorOnMachine",
-           "AllToAllConnector", "ArrayConnector", "CSAConnector",
+           "AbstractConnectorSupportsViewsOnMachine", "AllToAllConnector",
+           "ArrayConnector", "CSAConnector",
            "DistanceDependentProbabilityConnector", "FixedNumberPostConnector",
            "FixedNumberPreConnector", "FixedProbabilityConnector",
            "FromListConnector", "IndexBasedProbabilityConnector",

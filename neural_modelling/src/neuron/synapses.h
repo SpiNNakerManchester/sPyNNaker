@@ -102,6 +102,9 @@ uint32_t synapses_get_saturation_count(void);
 //! \return the counter for plastic and fixed pre synaptic events or 0
 uint32_t synapses_get_pre_synaptic_events(void);
 
+//! \brief flush the ring buffers
+void synapses_flush_ring_buffers(void);
+
 //! \brief allows clearing of dtcm used by synapses
 //! \return bool true if successful false otherwise
 bool synapses_shut_down();

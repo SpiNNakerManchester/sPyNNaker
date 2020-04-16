@@ -41,6 +41,9 @@ static uint32_t n_synapse_types;
 // Ring buffers to handle delays between synapses and neurons
 static weight_t *ring_buffers;
 
+// Ring buffer size
+static uint32_t ring_buffer_size;
+
 // Amount to left shift the ring buffer by to make it an input
 static uint32_t *ring_buffer_to_input_left_shifts;
 
@@ -255,7 +258,7 @@ bool synapses_initialise(
 
     uint32_t n_ring_buffer_bits =
             log_n_neurons + log_n_synapse_types + SYNAPSE_DELAY_BITS;
-    uint32_t ring_buffer_size = 1 << (n_ring_buffer_bits);
+    ring_buffer_size = 1 << (n_ring_buffer_bits);
 
     ring_buffers = spin1_malloc(ring_buffer_size * sizeof(weight_t));
     if (ring_buffers == NULL) {
@@ -362,6 +365,12 @@ uint32_t synapses_get_saturation_count(void) {
 uint32_t synapses_get_pre_synaptic_events(void) {
     return (num_fixed_pre_synaptic_events +
             synapse_dynamics_get_plastic_pre_synaptic_events());
+}
+
+void synapses_flush_ring_buffers(void) {
+	for (uint32_t i = 0; i < ring_buffer_size; i++) {
+        ring_buffers[i] = 0;
+    }
 }
 
 //! \brief allows clearing of dtcm used by synapses
