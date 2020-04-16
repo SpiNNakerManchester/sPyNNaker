@@ -96,7 +96,7 @@ int32_t rewiring_period = 0;
 //! Flag representing whether rewiring is enabled
 bool rewiring = false;
 
-//! DEBGGING: for counting the number of rewiring attempts
+//! Count the number of rewiring attempts
 uint32_t count_rewire_attempts = 0;
 
 //! The number of neurons on the core
