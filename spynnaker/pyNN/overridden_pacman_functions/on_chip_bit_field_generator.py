@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import functools
 import math
 import struct
 import logging
@@ -22,12 +21,8 @@ from collections import defaultdict
 
 from spinn_front_end_common.abstract_models import \
     AbstractSupportsBitFieldGeneration
-from spinn_front_end_common.interface.interface_functions import \
-    ChipIOBufExtractor
-from spinn_front_end_common.utilities.exceptions import SpinnFrontEndException
 from spinn_front_end_common.utilities import system_control_logic
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-from spinn_front_end_common.utilities.utility_objs import ExecutableType
 
 from spinn_utilities.progress_bar import ProgressBar
 

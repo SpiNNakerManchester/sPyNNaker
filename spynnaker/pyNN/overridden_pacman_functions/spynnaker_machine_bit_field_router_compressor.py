@@ -18,8 +18,6 @@ import logging
 from spinn_front_end_common.abstract_models.\
     abstract_supports_bit_field_generation import \
     AbstractSupportsBitFieldGeneration
-from spinn_front_end_common.interface.interface_functions import \
-    ChipIOBufExtractor
 from spinn_front_end_common.interface.interface_functions.\
     machine_bit_field_router_compressor import \
     MachineBitFieldRouterCompressor
