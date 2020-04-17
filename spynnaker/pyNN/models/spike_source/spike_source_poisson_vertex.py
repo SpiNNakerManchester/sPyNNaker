@@ -48,10 +48,10 @@ from spynnaker.pyNN.models.common import (
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.abstract_models import (
     AbstractReadParametersBeforeSet)
-from spynnaker.pyNN.models.neuron.implementations import Struct
 from .spike_source_poisson_machine_vertex import (
     SpikeSourcePoissonMachineVertex)
 from spynnaker.pyNN.utilities.utility_calls import validate_mars_kiss_64_seed
+from spynnaker.pyNN.utilities.struct import Struct
 from spynnaker.pyNN.utilities.ranged.spynnaker_ranged_dict \
     import SpynnakerRangeDictionary
 from spynnaker.pyNN.utilities.ranged.spynnaker_ranged_list \
@@ -87,6 +87,9 @@ OVERFLOW_TIMESTEPS_FOR_SDRAM = 5
 
 # The microseconds per timestep will be divided by this to get the max offset
 _MAX_OFFSET_DENOMINATOR = 10
+
+# The maximum timestep - this is the maximum value of a uint32
+_MAX_TIMESTEP = 0xFFFFFFFF
 
 
 _PoissonStruct = Struct([
@@ -139,7 +142,8 @@ class SpikeSourcePoissonVertex(
         "__rate_change",
         "__n_profile_samples",
         "__data",
-        "__is_variable_rate"]
+        "__is_variable_rate",
+        "__max_spikes"]
 
     SPIKE_RECORDING_REGION_ID = 0
 
@@ -300,6 +304,15 @@ class SpikeSourcePoissonVertex(
             self.__max_rate = numpy.amax(all_rates)
         elif max_rate is None:
             self.__max_rate = 0
+
+        total_rate = numpy.sum(all_rates)
+        self.__max_spikes = 0
+        if total_rate > 0:
+            # Note we have to do this per rate, as the whole array is not numpy
+            max_rates = numpy.array(
+                [numpy.max(r) for r in self.__data["rates"]])
+            self.__max_spikes = numpy.sum(scipy.stats.poisson.ppf(
+                1.0 - (1.0 / max_rates), max_rates))
 
     @property
     def rate(self):
@@ -606,16 +619,10 @@ class SpikeSourcePoissonVertex(
             self.__n_data_specs)
         self.__n_data_specs += 1
 
-        # Write the number of microseconds between sending spikes
-        all_rates = numpy.fromiter(_flatten(self.__data["rates"]), numpy.float)
-        # Note we have to do this per rate, as the whole array is not numpy
-        max_rates = numpy.array([numpy.max(r) for r in self.__data["rates"]])
-        total_mean_rate = numpy.sum(all_rates)
-        if total_mean_rate > 0:
-            max_spikes = numpy.sum(scipy.stats.poisson.ppf(
-                1.0 - (1.0 / max_rates), max_rates))
+        if self.__max_spikes > 0:
             spikes_per_timestep = (
-                max_spikes / (MICROSECONDS_PER_SECOND // machine_time_step))
+                self.__max_spikes /
+                (MICROSECONDS_PER_SECOND // machine_time_step))
             # avoid a possible division by zero / small number (which may
             # result in a value that doesn't fit in a uint32) by only
             # setting time_between_spikes if spikes_per_timestep is > 1
@@ -624,6 +631,7 @@ class SpikeSourcePoissonVertex(
                 time_between_spikes = (
                     (machine_time_step * time_scale_factor) /
                     (spikes_per_timestep * 2.0))
+
             spec.write_value(data=int(time_between_spikes))
         else:
 
@@ -684,88 +692,101 @@ class SpikeSourcePoissonVertex(
         # Set the focus to the memory region 2 (neuron parameters):
         spec.switch_write_focus(_REGIONS.RATES_REGION.value)
 
-        # For each source, write the number of rates, followed by the rate data
-        for i in range(vertex_slice.lo_atom, vertex_slice.hi_atom + 1):
+        # Extract the data on which to work and convert to appropriate form
+        starts = numpy.array(list(_flatten(
+            self.__data["starts"][vertex_slice.as_slice]))).astype("float")
+        durations = numpy.array(list(_flatten(
+            self.__data["durations"][vertex_slice.as_slice]))).astype("float")
+        local_rates = self.__data["rates"][vertex_slice.as_slice]
+        n_rates = numpy.array([len(r) for r in local_rates])
+        splits = numpy.cumsum(n_rates)
+        rates = numpy.array(list(_flatten(local_rates)))
+        time_to_spike = numpy.array(list(_flatten(
+            self.__data["time_to_spike"][vertex_slice.as_slice]))).astype("u4")
+        rate_change = self.__rate_change[vertex_slice.as_slice]
 
-            # Convert start times to start time steps
-            starts = self.__data["starts"][i].astype("float")
-            starts_scaled = self._convert_ms_to_n_timesteps(
-                starts, machine_time_step)
+        # Convert start times to start time steps
+        starts_scaled = self._convert_ms_to_n_timesteps(
+            starts, machine_time_step)
 
-            # Convert durations to end time steps
-            durations = self.__data["durations"][i].astype("float")
-            ends_scaled = numpy.zeros(len(durations), dtype="uint32")
-            none_positions = numpy.isnan(durations)
-            positions = numpy.invert(none_positions)
-            ends_scaled[none_positions] = 0xFFFFFFFF
-            ends_scaled[positions] = self._convert_ms_to_n_timesteps(
-                starts[positions] + durations[positions], machine_time_step)
+        # Convert durations to end time steps, using the maximum for "None"
+        # duration (which means "until the end")
+        no_duration = numpy.isnan(durations)
+        durations_filtered = numpy.where(no_duration, 0, durations)
+        ends_scaled = self._convert_ms_to_n_timesteps(
+            durations_filtered, machine_time_step) + starts_scaled
+        ends_scaled = numpy.where(no_duration, _MAX_TIMESTEP, ends_scaled)
 
-            # Convert start times to next steps, adding max uint to end
-            next_scaled = numpy.append(starts_scaled[1:], 0xFFFFFFFF)
+        # Work out the timestep at which the next rate activates, using
+        # the maximum value at the end (meaning there is no "next")
+        starts_split = numpy.array_split(starts_scaled, splits)
+        next_scaled = numpy.concatenate([numpy.append(s[1:], _MAX_TIMESTEP)
+                                         for s in starts_split[:-1]])
 
-            # Compute the spikes per tick for each atom
-            rates = self.__data["rates"][i].astype("float")
-            spikes_per_tick = (
-                rates * (float(machine_time_step) / MICROSECONDS_PER_SECOND))
+        # Compute the spikes per tick for each rate for each atom
+        spikes_per_tick = rates * (float(machine_time_step) /
+                                   MICROSECONDS_PER_SECOND)
 
-            # Determine which sources are fast and which are slow
-            is_fast_source = spikes_per_tick >= SLOW_RATE_PER_TICK_CUTOFF
-            is_faster_source = spikes_per_tick >= FAST_RATE_PER_TICK_CUTOFF
+        # Determine the properties of the sources
+        is_fast_source = spikes_per_tick >= SLOW_RATE_PER_TICK_CUTOFF
+        is_faster_source = spikes_per_tick >= FAST_RATE_PER_TICK_CUTOFF
+        not_zero = spikes_per_tick > 0
+        # pylint: disable=assignment-from-no-return
+        is_slow_source = numpy.logical_not(is_fast_source)
 
-            # Compute the e^-(spikes_per_tick) for fast sources to allow fast
-            # computation of the Poisson distribution to get the number of
-            # spikes per timestep
-            exp_minus_lambda = numpy.zeros(len(spikes_per_tick), dtype="float")
-            exp_minus_lambda[is_fast_source] = numpy.exp(
-                -1.0 * spikes_per_tick[is_fast_source])
+        # Compute the e^-(spikes_per_tick) for fast sources to allow fast
+        # computation of the Poisson distribution to get the number of
+        # spikes per timestep
+        exp_minus_lambda = DataType.U032.encode_as_numpy_int_array(
+            numpy.where(is_fast_source, numpy.exp(-1.0 * spikes_per_tick), 0))
 
-            # Compute sqrt(lambda) for "faster" sources to allow Gaussian
-            # approximation of the Poisson distribution to get the number of
-            # spikes per timestep
-            sqrt_lambda = numpy.zeros(len(spikes_per_tick), dtype="float")
-            sqrt_lambda[is_faster_source] = numpy.sqrt(
-                spikes_per_tick[is_faster_source])
+        # Compute sqrt(lambda) for "faster" sources to allow Gaussian
+        # approximation of the Poisson distribution to get the number of
+        # spikes per timestep
+        sqrt_lambda = DataType.S1615.encode_as_numpy_int_array(
+            numpy.where(is_faster_source, numpy.sqrt(spikes_per_tick), 0))
 
-            # Compute the inter-spike-interval for slow sources to get the
-            # average number of timesteps between spikes
-            isi_val = numpy.zeros(len(spikes_per_tick), dtype="uint32")
-            elements = numpy.logical_not(
-                is_fast_source) & (spikes_per_tick > 0)
-            isi_val[elements] = (1.0 / spikes_per_tick[elements]).astype(int)
+        # Compute the inter-spike-interval for slow sources to get the
+        # average number of timesteps between spikes
+        isi_val = numpy.where(
+            not_zero & is_slow_source,
+            (1.0 / spikes_per_tick).astype(int), 0).astype("uint32")
 
-            # Get the time to spike value
-            time_to_spike = self.__data["time_to_spike"][i]
-            if self.__rate_change[i]:
-                time_to_spike = numpy.array([0.0])
+        # Reuse the time-to-spike read from the machine (if has been run)
+        # or don't if the rate has since been changed
+        time_to_spike_split = numpy.array_split(time_to_spike, splits)
+        time_to_spike = numpy.concatenate(
+            [t if rate_change[i] else numpy.repeat(0, len(t))
+             for i, t in enumerate(time_to_spike_split[:-1])])
 
-            # Merge the arrays as parameters per atom
-            data = numpy.dstack((
-                starts_scaled.astype("uint32"),
-                ends_scaled.astype("uint32"),
-                next_scaled.astype("uint32"),
-                is_fast_source.astype("uint32"),
-                DataType.U032.encode_as_numpy_int_array(exp_minus_lambda),
-                DataType.S1615.encode_as_numpy_int_array(sqrt_lambda),
-                isi_val.astype("uint32"),
-                time_to_spike.astype("uint32")
-            ))[0].flatten()
+        # Turn the fast source booleans into uint32
+        is_fast_source = is_fast_source.astype("uint32")
 
-            # Find the index to start at
-            index = 0
-            while (ends_scaled[index] < first_machine_time_step and
-                   (index + 1) < len(ends_scaled)):
-                index += 1
+        # Group together the rate data for the core by rate
+        core_data = numpy.dstack((
+            starts_scaled, ends_scaled, next_scaled, is_fast_source,
+            exp_minus_lambda, sqrt_lambda, isi_val, time_to_spike))[0]
 
-            # Write the values to the spec
-            spec.write_value(len(self.__data["rates"][i]))
-            spec.write_value(index)
-            spec.write_array(data)
+        # Group data by neuron id
+        core_data_split = numpy.array_split(core_data, splits)
+
+        # Work out the index where the core should start based on the given
+        # first timestep
+        ends_scaled_split = numpy.array_split(ends_scaled, splits)
+        indices = [numpy.argmax(e > first_machine_time_step)
+                   for e in ends_scaled_split[:-1]]
+
+        # Build the final data for this core, and write it
+        final_data = numpy.concatenate([
+            numpy.concatenate(([len(d), indices[i]], numpy.concatenate(d)))
+            for i, d in enumerate(core_data_split[:-1])])
+        spec.write_array(final_data)
 
     @staticmethod
     def _convert_ms_to_n_timesteps(value, machine_time_step):
         return numpy.round(
-            value * (MICROSECONDS_PER_MILLISECOND / float(machine_time_step)))
+            value * (MICROSECONDS_PER_MILLISECOND /
+                     float(machine_time_step))).astype("uint32")
 
     @staticmethod
     def _convert_n_timesteps_to_ms(value, machine_time_step):
