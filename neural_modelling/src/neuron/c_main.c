@@ -61,6 +61,7 @@ struct neuron_provenance {
     uint32_t n_input_buffer_overflows;
     uint32_t current_timer_tick;
     uint32_t n_plastic_synaptic_weight_saturations;
+    uint32_t n_rewires;
 };
 
 //! values for the priority for each callback
@@ -95,8 +96,8 @@ int32_t rewiring_period = 0;
 //! Flag representing whether rewiring is enabled
 bool rewiring = false;
 
-// FOR DEBUGGING!
-uint32_t count_rewires = 0;
+//! Count the number of rewiring attempts
+uint32_t count_rewire_attempts = 0;
 
 //! The number of neurons on the core
 static uint32_t n_neurons;
@@ -113,6 +114,7 @@ void c_main_store_provenance_data(address_t provenance_region) {
     prov->current_timer_tick = time;
     prov->n_plastic_synaptic_weight_saturations =
             synapse_dynamics_get_plastic_saturation_count();
+    prov->n_rewires = spike_processing_get_successful_rewires();
     log_debug("finished other provenance data");
 }
 
@@ -272,7 +274,7 @@ void timer_callback(uint timer_count, uint unused) {
         // run
         time--;
 
-        log_debug("Rewire tries = %d", count_rewires);
+        log_debug("Rewire tries = %d", count_rewire_attempts);
         simulation_ready_to_read();
         return;
     }
@@ -288,7 +290,7 @@ void timer_callback(uint timer_count, uint unused) {
         } else {
             spike_processing_do_rewiring(1);
         }
-        count_rewires++;
+        count_rewire_attempts++;
     }
 
     // Now do synapse and neuron time step updates
