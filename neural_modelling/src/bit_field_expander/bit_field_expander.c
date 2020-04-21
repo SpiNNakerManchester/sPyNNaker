@@ -382,7 +382,10 @@ bool generate_bit_field(void) {
 
         // set the bitfield to 0. so assuming a miss on everything
         clear_bit_field(bit_field, n_words);
-        log_debug("cleared bit field");
+        // Set the padding bits to 1
+        for (uint32_t pad = n_neurons; pad < n_words * 32; pad++){
+            bit_field_set(bit_field, pad);
+        }
 
         // update sdram with size of this bitfield
         bit_field_base_address->filters[master_pop_entry].key = key;
