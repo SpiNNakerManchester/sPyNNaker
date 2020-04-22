@@ -16,17 +16,16 @@
  */
 
 /**
- *! \file
- *! \brief Fixed-Number-Post (fan-out) Connection generator implementation
- *!        Each post-neuron is connected to exactly n_pre pre-neurons (chosen at random)
+ * \file
+ * \brief Fixed-Number-Post (fan-out) Connection generator implementation
+ *
+ * Each post-neuron is connected to exactly n_pre pre-neurons (chosen at random)
  */
 
 #include <log.h>
 #include <synapse_expander/rng.h>
 
-/**
- *! \brief The parameters that can be copied from SDRAM
- */
+//! The parameters that can be copied from SDRAM.
 struct fixed_post_params {
     uint32_t pre_lo;
     uint32_t pre_hi;
@@ -39,8 +38,9 @@ struct fixed_post_params {
 };
 
 /**
- *! \brief The data to be passed around.  This includes the parameters, and the
- *!        RNG of the connector
+ * \brief The data to be passed around.
+ *
+ * This includes the parameters, and the RNG of the connector.
  */
 struct fixed_post {
     struct fixed_post_params params;
@@ -61,7 +61,8 @@ static void *connection_generator_fixed_post_initialise(address_t *region) {
     log_debug("Fixed Number Post Connector, pre_lo = %u, pre_hi = %u, "
     		"post_lo = %u, post_hi = %u, allow self connections = %u, "
             "with replacement = %u, n_post = %u, n post neurons = %u",
-			obj->params.pre_lo, obj->params.pre_hi, obj->params.post_lo, obj->params.post_hi,
+			obj->params.pre_lo, obj->params.pre_hi,
+			obj->params.post_lo, obj->params.post_hi,
             obj->params.allow_self_connections,
             obj->params.with_replacement, obj->params.n_post,
             obj->params.n_post_neurons);

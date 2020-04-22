@@ -16,8 +16,8 @@
  */
 
 /**
- *! \file
- *! \brief All-to-All connection generator implementation
+ * \file
+ * \brief All-to-All connection generator implementation
  */
 
 #include <stdbool.h>
@@ -27,9 +27,7 @@ static initialize_func connection_generator_all_to_all_initialise;
 static free_func connection_generator_all_to_all_free;
 static generate_connection_func connection_generator_all_to_all_generate;
 
-/**
- *! \brief The parameters to be passed around for this connector
- */
+//! The parameters to be passed around for this connector
 struct all_to_all {
     uint32_t pre_lo;
     uint32_t pre_hi;

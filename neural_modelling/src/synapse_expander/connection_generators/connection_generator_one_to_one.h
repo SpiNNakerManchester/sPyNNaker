@@ -16,8 +16,8 @@
  */
 
 /**
- *! \file
- *! \brief One-to-One Connection generator implementation
+ * \file
+ * \brief One-to-One Connection generator implementation
  */
 
 #include <synapse_expander/generator_types.h>
@@ -27,7 +27,7 @@ static free_func connection_generator_one_to_one_free;
 static generate_connection_func connection_generator_one_to_one_generate;
 
 /**
- *! \brief The parameters to be passed around for this connector
+ * \brief The parameters to be passed around for this connector
  */
 struct one_to_one {
     uint32_t pre_lo;
@@ -49,9 +49,6 @@ static void *connection_generator_one_to_one_initialise(address_t *region) {
             params->pre_lo, params->pre_hi, params->post_lo, params->post_hi);
 
     return params;
-//    use(region);
-//    log_debug("One to One connector");
-//    return NULL;
 }
 
 static void connection_generator_one_to_one_free(void *data) {

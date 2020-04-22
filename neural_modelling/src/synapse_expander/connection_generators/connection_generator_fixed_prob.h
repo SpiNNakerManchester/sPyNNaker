@@ -16,8 +16,8 @@
  */
 
 /**
- *! \file
- *! \brief Fixed-Probability Connection generator implementation
+ * \file
+ * \brief Fixed-Probability Connection generator implementation
  */
 
 #include <synapse_expander/rng.h>
@@ -27,9 +27,7 @@ static initialize_func connection_generator_fixed_prob_initialise;
 static free_func connection_generator_fixed_prob_free;
 static generate_connection_func connection_generator_fixed_prob_generate;
 
-/**
- *! \brief The parameters that can be copied in from SDRAM
- */
+//! The parameters that can be copied in from SDRAM
 struct fixed_prob_params {
     uint32_t pre_lo;
     uint32_t pre_hi;
@@ -40,8 +38,9 @@ struct fixed_prob_params {
 };
 
 /**
- *! \brief The data structure to be passed around for this connector.  This
- *!        includes the parameters and an RNG.
+ * \brief The data structure to be passed around for this connector.
+ *
+ * This includes the parameters and an RNG.
  */
 struct fixed_prob {
     struct fixed_prob_params params;

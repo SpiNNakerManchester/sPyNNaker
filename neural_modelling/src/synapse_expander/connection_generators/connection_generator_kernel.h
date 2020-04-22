@@ -16,8 +16,8 @@
  */
 
 /**
- *! \file
- *! \brief Kernel connection generator implementation
+ * \file
+ * \brief Kernel connection generator implementation
  */
 
 #include <stdbool.h>
@@ -30,7 +30,7 @@ static free_func connection_generator_kernel_free;
 static generate_connection_func connection_generator_kernel_generate;
 
 /**
- *! \brief The parameters to be passed around for this connector
+ * \brief The parameters to be passed around for this connector
  */
 struct kernel {
 	// put in the relevant kernel connector parameters here

@@ -16,8 +16,8 @@
  */
 
 /**
- *! \file
- *! \brief Static synaptic matrix implementation
+ * \file
+ * \brief Static synaptic matrix implementation
  */
 
 #include <stdbool.h>
@@ -40,49 +40,49 @@ static void matrix_generator_static_free(void *data) {
 }
 
 /**
- *! \brief The shift of the weight within a synaptic word
+ * \brief The shift of the weight within a synaptic word
  */
 #define SYNAPSE_WEIGHT_SHIFT 16
 
 /**
- *! \brief The mask of a weight before shifting
+ * \brief The mask of a weight before shifting
  */
 #define SYNAPSE_WEIGHT_MASK 0xFFFF
 
 /**
- *! \brief The mask of a delay before shifting
+ * \brief The mask of a delay before shifting
  */
 #define SYNAPSE_DELAY_MASK 0xFF
 
 /**
- *! \brief The position of the plastic-plastic size within a row
+ * \brief The position of the plastic-plastic size within a row
  */
 #define STATIC_PLASTIC_PLASTIC_SIZE 0
 
 /**
- *! \brief The position of the fixed-plastic size within a row
+ * \brief The position of the fixed-plastic size within a row
  */
 #define STATIC_FIXED_PLASTIC_SIZE 2
 
 /**
- *! \brief The position of the fixed-fixed size within a row
+ * \brief The position of the fixed-fixed size within a row
  */
 #define STATIC_FIXED_FIXED_SIZE 1
 
 /**
- *! \brief The starting position of the fixed-fixed data within a row
+ * \brief The starting position of the fixed-fixed data within a row
  */
 #define STATIC_FIXED_FIXED_OFFSET 3
 
 /**
- *! \brief Build a static synaptic word from components
- *! \param[in] weight The weight of the synapse
- *! \param[in] delay The delay of the synapse
- *! \param[in] type The synapse type
- *! \param[in] post_index The core-relative index of the target neuron
- *! \param[in] synapse_type_bits The number of bits for the synapse type
- *! \param[in] synapse_index_bits The number of bits for the target neuron id
- *! \return a synaptic word
+ * \brief Build a static synaptic word from components
+ * \param[in] weight: The weight of the synapse
+ * \param[in] delay: The delay of the synapse
+ * \param[in] type: The synapse type
+ * \param[in] post_index: The core-relative index of the target neuron
+ * \param[in] synapse_type_bits: The number of bits for the synapse type
+ * \param[in] synapse_index_bits: The number of bits for the target neuron id
+ * \return a synaptic word
  */
 static uint32_t build_static_word(
         uint16_t weight, uint16_t delay, uint32_t type,

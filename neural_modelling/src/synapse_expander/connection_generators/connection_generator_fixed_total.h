@@ -16,8 +16,8 @@
  */
 
 /**
- *! \file
- *! \brief Fixed-Total-Number (Multapse) Connection generator implementation
+ * \file
+ * \brief Fixed-Total-Number (Multapse) Connection generator implementation
  */
 
 #include <log.h>
@@ -28,9 +28,7 @@ static initialize_func connection_generator_fixed_total_initialise;
 static free_func connection_generator_fixed_total_free;
 static generate_connection_func connection_generator_fixed_total_generate;
 
-/**
- *! \brief The parameters that can be copied from SDRAM
- */
+//! The parameters that can be copied from SDRAM
 struct fixed_total_params {
     uint32_t pre_lo;
     uint32_t pre_hi;
@@ -43,8 +41,9 @@ struct fixed_total_params {
 };
 
 /**
- *! \brief The data to be passed around.  This includes the parameters, and the
- *!        RNG of the connector
+ * \brief The data to be passed around.
+ *
+ * This includes the parameters, and the RNG of the connector.
  */
 struct fixed_total {
     struct fixed_total_params params;
@@ -80,12 +79,12 @@ static void connection_generator_fixed_total_free(void *data) {
 }
 
 /**
- *! \brief Draw from a binomial distribution i.e. with replacement
- *! \param[in] n The number of times the experiment is run
- *! \param[in] N The number of items in the bag
- *! \param[in] K The number of items that are valid
- *! \param[in] rng The uniform random number generator
- *! \return The number of times a valid item was drawn
+ * \brief Draw from a binomial distribution i.e. with replacement
+ * \param[in] n: The number of times the experiment is run
+ * \param[in] N: The number of items in the bag
+ * \param[in] K: The number of items that are valid
+ * \param[in] rng: The uniform random number generator
+ * \return The number of times a valid item was drawn
  */
 static uint32_t binomial(uint32_t n, uint32_t N, uint32_t K, rng_t rng) {
     uint32_t count = 0;
@@ -102,10 +101,10 @@ static uint32_t binomial(uint32_t n, uint32_t N, uint32_t K, rng_t rng) {
 
 /**
  * \brief Draw from a hyper-geometric distribution i.e. without replacement
- * \param[in] n The number of times the experiment is run
- * \param[in] N The number of items in the bag at the start
- * \param[in] K The number of valid items in the bag at the start
- * \param[in] rng The uniform random number generator
+ * \param[in] n: The number of times the experiment is run
+ * \param[in] N: The number of items in the bag at the start
+ * \param[in] K: The number of valid items in the bag at the start
+ * \param[in] rng: The uniform random number generator
  * \return The number of times a valid item was drawn
  */
 static uint32_t hypergeom(uint32_t n, uint32_t N, uint32_t K, rng_t rng) {

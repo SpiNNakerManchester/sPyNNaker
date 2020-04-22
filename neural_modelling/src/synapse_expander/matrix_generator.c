@@ -16,8 +16,8 @@
  */
 
 /**
- *! \file
- *! \brief The implementation of the matrix generator
+ * \file
+ * \brief The implementation of the matrix generator
  */
 #include "matrix_generator.h"
 #include <spin1_api.h>
@@ -32,77 +32,34 @@ enum {
     STATIC_MATRIX_GENERATOR,
     PLASTIC_MATRIX_GENERATOR,
     /**
-     *! \brief The number of known generators
+     * \brief The number of known generators
      */
     N_MATRIX_GENERATORS
 };
 
 /**
- *! \brief A "class" for matrix generators
+ * \brief A "class" for matrix generators
  */
 typedef struct matrix_generator_info {
     /**
-     *! \brief The hash of the generator
-     *! For now, hash is just an index agreed between Python and here.
+     * \brief The hash of the generator
+     *
+     * For now, hash is just an index agreed between Python and here.
      */
     generator_hash_t hash;
 
-    /**
-     *! \brief Initialise the generator
-     *! \param[in/out] region Region to read parameters from.  Should be updated
-     *!                       to position just after parameters after calling.
-     *! \return A data item to be passed in to other functions later on
-     */
+    //! Initialise the generator
     initialize_func *initialize;
 
-    /**
-     *! \brief Generate a row of a matrix with a matrix generator
-     *! \param[in] data The data for the matrix generator, returned by the
-     *!                 initialise function
-     *! \param[in] synaptic_matrix The address of the synaptic matrix to
-     *!                            write to
-     *! \param[in] delayed_synaptic_matrix The address of the synaptic matrix to
-     *!                                    write delayed connections to
-     *! \param[in] max_row_n_words The maximum number of words in a normal row
-     *! \param[in] max_delayed_row_n_words The maximum number of words in a
-     *!                                     delayed row
-     *! \param[in] max_row_n_synapses The maximum number of synapses in a
-     *!                               normal row
-     *! \param[in] max_delayed_row_n_synapses The maximum number of synapses in
-     *!                                       a delayed row
-     *! \param[in] n_synapse_type_bits The number of bits used for the
-     *!                                synapse type
-     *! \param[in] n_synapse_index_bits The number of bits used for the
-     *!                                 neuron id
-     *! \param[in] synapse_type The synapse type of each connection
-     *! \param[in] weight_scales An array of weight scales, one for each synapse
-     *!                          type
-     *! \param[in] post_slice_start The start of the slice of the
-     *!                             post-population being generated
-     *! \param[in] post_slice_count The number of neurons in the slice of the
-     *!                             post-population being generated
-     *! \param[in] pre_slice_start The start of the slice of the pre-population
-     *!                            being generated
-     *! \param[in] pre_slice_count The number of neurons in the slice of the
-     *!                            pre-population being generated
-     *! \param[in] connection_generator The generator of connections
-     *! \param[in] delay_generator The generator of delay values
-     *! \param[in] weight_generator The generator of weight values
-     *! \param[in] max_stage The maximum delay stage to support
-     *! \param[in] timestep_per_delay The delay value multiplier to get to
-     *!                               timesteps
-     */
+    //! Generate a row of a matrix with a matrix generator
     generate_row_func *write_row;
 
-    /**
-     *! \brief Free any data for the generator
-     *! \param[in] data The data to free
-     */
+    //! Free any data for the generator
     free_func *free;
 } matrix_generator_info;
 
 /**
- *! \brief The data for a matrix generator
+ * \brief The data for a matrix generator
  */
 struct matrix_generator {
     const matrix_generator_info *type;
@@ -110,7 +67,7 @@ struct matrix_generator {
 };
 
 /**
- *! \brief An Array of known generators
+ * \brief An Array of known generators
  */
 static const struct matrix_generator_info matrix_generators[] = {
     {STATIC_MATRIX_GENERATOR,

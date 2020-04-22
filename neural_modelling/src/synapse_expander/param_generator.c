@@ -16,8 +16,8 @@
  */
 
 /**
- *! \file
- *! \brief The implementation of a parameter generator
+ * \file
+ * \brief The implementation of a parameter generator
  */
 #include "param_generator.h"
 #include <spin1_api.h>
@@ -40,9 +40,7 @@ enum {
     NORMAL_CLIPPED_BOUNDARY,
     EXPONENTIAL,
     KERNEL,
-    /**
-     *! \brief The number of known generators
-     */
+    //! The number of known generators
     N_PARAM_GENERATORS = 7
 };
 
@@ -51,38 +49,21 @@ enum {
  */
 typedef struct param_generator_info {
     /**
-     *! \brief The hash of the generator.
-     *! For now, hash is just an index agreed between Python and here.
+     * \brief The hash of the generator.
+     *
+     * For now, hash is just an index agreed between Python and here.
      */
     generator_hash_t hash;
-    /**
-     *! \brief Initialise the generator
-     *! \param[in/out] region Region to read parameters from.  Should be updated
-     *!                       to position just after parameters after calling.
-     *! \return A data item to be passed in to other functions later on
-     */
+    //! Initialise the generator
     initialize_func *initialize;
-    /**
-     *! \brief Generate values with a parameter generator
-     *! \param[in] data The data for the parameter generator, returned by the
-     *!                 initialise function
-     *! \param[in] n_indices The number of values to generate
-     *! \param[in] pre_neuron_index The index of the neuron in the pre-population
-     *!                             being generated
-     *! \param[in] indices The n_indices post-neuron indices for each connection
-     *! \param[in/out] values An array into which to place the values; will be
-     *!                       n_indices in size
-     */
+    //! Generate values with a parameter generator
     generate_param_func *generate;
-    /**
-     *! \brief Free any data for the generator
-     *! \param[in] data The data to free
-     */
+    //! Free any data for the generator
     free_func *free;
 } param_generator_info;
 
 /**
- *! \brief The data for a parameter generator
+ * \brief The data for a parameter generator
  */
 struct param_generator {
     const param_generator_info *type;
@@ -90,7 +71,7 @@ struct param_generator {
 };
 
 /**
- *! \brief An Array of known generators
+ * \brief An Array of known generators
  */
 static const struct param_generator_info param_generators[] = {
     {CONSTANT,

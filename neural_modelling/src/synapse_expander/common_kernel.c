@@ -16,8 +16,8 @@
  */
 
 /**
- *! \file
- *! \brief Common functions for kernel generation
+ * \file
+ * \brief Common functions for kernel generation
  */
 #include "common_kernel.h"
 #include <stdlib.h>

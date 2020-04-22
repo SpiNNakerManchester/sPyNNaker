@@ -16,17 +16,16 @@
  */
 
 /**
- *! \file
- *! \brief Fixed-Number-Pre (fan-in) Connection generator implementation
- *!        Each post-neuron is connected to exactly n pre-neurons (chosen at random)
+ * \file
+ * \brief Fixed-Number-Pre (fan-in) Connection generator implementation
+ *
+ * Each post-neuron is connected to exactly n pre-neurons (chosen at random).
  */
 
 #include <log.h>
 #include <synapse_expander/rng.h>
 
-/**
- *! \brief The parameters that can be copied from SDRAM
- */
+//! The parameters that can be copied from SDRAM.
 struct fixed_pre_params {
     uint32_t pre_lo;
     uint32_t pre_hi;
@@ -39,15 +38,16 @@ struct fixed_pre_params {
 };
 
 /**
- *! \brief The data to be passed around.  This includes the parameters, and the
- *!        RNG of the connector
+ * \brief The data to be passed around.
+ *
+ * This includes the parameters, and the RNG of the connector.
  */
 struct fixed_pre {
     struct fixed_pre_params params;
     rng_t rng;
 };
 
-// An array containing the indices for each column
+//! An array containing the indices for each column
 static void *full_indices = NULL;
 static uint32_t n_pre_neurons_done;
 static uint32_t in_sdram = 0;

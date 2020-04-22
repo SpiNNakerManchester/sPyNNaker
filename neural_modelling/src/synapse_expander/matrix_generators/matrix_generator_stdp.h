@@ -16,8 +16,8 @@
  */
 
 /**
- *! \file
- *! \brief STDP synaptic matrix implementation
+ * \file
+ * \brief STDP synaptic matrix implementation
  */
 
 
@@ -33,50 +33,42 @@ static free_func matrix_generator_stdp_free;
 static generate_row_func matrix_generator_stdp_write_row;
 
 /**
- *! \brief The mask for a delay before shifting
+ * \brief The mask for a delay before shifting
  */
 #define SYNAPSE_DELAY_MASK 0xFF
 
 /**
- *! \brief The position of the plastic-plastic size within the row
+ * \brief The position of the plastic-plastic size within the row
  */
 #define STDP_PLASTIC_PLASTIC_SIZE 0
 
 /**
- *! \brief The position of the plastic-plastic data within the row
+ * \brief The position of the plastic-plastic data within the row
  */
 #define STDP_PLASTIC_PLASTIC_OFFSET 1
 
 /**
- *! \brief The position of the fixed-fixed size within the fixed region
+ * \brief The position of the fixed-fixed size within the fixed region
  */
 #define STDP_FIXED_FIXED_SIZE 0
 
 /**
- *! \brief The position of the fixed-plastic size within the fixed region
+ * \brief The position of the fixed-plastic size within the fixed region
  */
 #define STDP_FIXED_PLASTIC_SIZE 1
 
 /**
- *! \brief The position of the fixed-plastic data within the fixed region
+ * \brief The position of the fixed-plastic data within the fixed region
  */
 #define STDP_FIXED_PLASTIC_OFFSET 2
 
-/**
- *! \brief Data for the generator
- */
+//! Data for the generator
 struct matrix_generator_stdp {
-    /**
-     *! \brief The number of half-words in a plastic-plastic row header
-     */
+    //! The number of half-words in a plastic-plastic row header
     uint32_t n_half_words_per_pp_row_header;
-    /**
-     *! \brief The number of half-words in each plastic-plastic synapse
-     */
+    //! The number of half-words in each plastic-plastic synapse
     uint32_t n_half_words_per_pp_synapse;
-    /**
-     *! \brief The index of the half-word that will contain the weight
-     */
+    //! The index of the half-word that will contain the weight
     uint32_t weight_half_word;
 };
 
@@ -97,13 +89,13 @@ void matrix_generator_stdp_free(void *data) {
 }
 
 /**
- *! \brief Build a fixed-plastic half-word from the components
- *! \param[in] delay The delay of the synapse
- *! \param[in] type The synapse type
- *! \param[in] post_index The core-relative index of the target neuron
- *! \param[in[ synapse_type_bits The number of bits for the synapse type
- *! \param[in] synapse_index_bits The number of bits for the target neuron id
- *! \return A half-word fixed-plastic synapse
+ * \brief Build a fixed-plastic half-word from the components
+ * \param[in] delay: The delay of the synapse
+ * \param[in] type: The synapse type
+ * \param[in] post_index: The core-relative index of the target neuron
+ * \param[in[ synapse_type_bits: The number of bits for the synapse type
+ * \param[in] synapse_index_bits: The number of bits for the target neuron id
+ * \return A half-word fixed-plastic synapse
  */
 static uint16_t build_fixed_plastic_half_word(
         uint16_t delay, uint32_t type,
