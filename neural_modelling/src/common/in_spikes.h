@@ -23,17 +23,20 @@
 
 static circular_buffer buffer;
 
-// initialize_spike_buffer
-//
-// This function initializes the input spike buffer.
-// It configures:
-//    buffer:     the buffer to hold the spikes (initialized with size spaces)
-//    input:      index for next spike inserted into buffer
-//    output:     index for next spike extracted from buffer
-//    overflows:  a counter for the number of times the buffer overflows
-//    underflows: a counter for the number of times the buffer underflows
-//
-// If underflows is ever non-zero, then there is a problem with this code.
+//! \brief This function initializes the input spike buffer.
+//!
+//! It configures:
+//!
+//!    buffer:     the buffer to hold the spikes (initialized with size spaces)
+//!    input:      index for next spike inserted into buffer
+//!    output:     index for next spike extracted from buffer
+//!    overflows:  a counter for the number of times the buffer overflows
+//!    underflows: a counter for the number of times the buffer underflows
+//!
+//! If underflows is ever non-zero, then there is a problem with this code.
+//!
+//! \param[in] size: The number of spikes we expect to handle in the buffer
+//! \return True if the buffer was successfully initialised
 static inline bool in_spikes_initialize_spike_buffer(uint32_t size) {
     buffer = circular_buffer_initialize(size);
     return buffer != 0;

@@ -29,6 +29,7 @@
 #include <debug.h>
 #include "common_mem.h"
 
+//! The configuration of the connection builder
 struct connection_builder_config {
     // the per-connector parameters
     uint32_t offset;
@@ -49,6 +50,7 @@ struct connection_builder_config {
     uint32_t delay_type;
 };
 
+//! The configuration of the synapse expander
 struct expander_config {
     uint32_t n_in_edges;
     uint32_t post_slice_start;

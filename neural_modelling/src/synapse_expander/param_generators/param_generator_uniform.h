@@ -16,9 +16,9 @@
  */
 
 /**
- *! \file
- *! \brief Uniformly distributed random set to boundary parameter generator
- *!        implementation
+ * \file
+ * \brief Uniformly distributed random set to boundary parameter generator
+ *        implementation
  */
 #include <stdfix.h>
 #include <spin1_api.h>
@@ -31,7 +31,7 @@ static free_func param_generator_uniform_free;
 static generate_param_func param_generator_uniform_generate;
 
 /**
- *! \brief The parameters that can be copied in from SDRAM
+ * \brief The parameters that can be copied in from SDRAM
  */
 struct uniform_params {
     accum low;
@@ -39,8 +39,8 @@ struct uniform_params {
 };
 
 /**
- *! \brief The data structure to be passed around for this generator.  This
- *!        includes the parameters and an RNG.
+ * \brief The data structure to be passed around for this generator.  This
+ *        includes the parameters and an RNG.
  */
 struct param_generator_uniform {
     struct uniform_params params;

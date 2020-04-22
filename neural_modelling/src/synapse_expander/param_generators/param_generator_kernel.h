@@ -15,6 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+/**
+ * \file
+ * \brief Parameter generator implementation for convolution kernels
+ */
 #include <stdfix.h>
 #include <spin1_api.h>
 #include <stdfix-full-iso.h>

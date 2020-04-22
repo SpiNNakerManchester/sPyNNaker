@@ -30,6 +30,7 @@
 #include <delay_extension/delay_extension.h>
 #include <bit_field.h>
 
+//! The configuration of the delay builder
 struct delay_builder_config {
     // the parameters
     uint32_t max_row_n_synapses;

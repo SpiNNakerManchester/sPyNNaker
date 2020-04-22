@@ -16,9 +16,9 @@
  */
 
 /**
- *! \file
- *! \brief Normally distributed random set to boundary parameter generator
- *!        implementation
+ * \file
+ * \brief Normally distributed random set to boundary parameter generator
+ *        implementation
  */
 #include <stdfix.h>
 #include <spin1_api.h>
@@ -32,7 +32,7 @@ static free_func param_generator_normal_clipped_boundary_free;
 static generate_param_func param_generator_normal_clipped_boundary_generate;
 
 /**
- *! \brief The parameters that can be copied in from SDRAM
+ * \brief The parameters that can be copied in from SDRAM
  */
 struct normal_clipped_boundary_params {
     accum mu;
@@ -42,8 +42,8 @@ struct normal_clipped_boundary_params {
 };
 
 /**
- *! \brief The data structure to be passed around for this generator.  This
- *!        includes the parameters and an RNG.
+ * \brief The data structure to be passed around for this generator.  This
+ *        includes the parameters and an RNG.
  */
 struct param_generator_normal_clipped_boundary {
     struct normal_clipped_boundary_params params;

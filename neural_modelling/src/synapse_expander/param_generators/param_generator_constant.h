@@ -16,8 +16,8 @@
  */
 
 /**
- *! \file
- *! \brief Contant value parameter generator implementation
+ * \file
+ * \brief Constant value parameter generator implementation
  */
 #include <stdfix.h>
 #include <spin1_api.h>
@@ -28,7 +28,7 @@ static free_func param_generator_constant_free;
 static generate_param_func param_generator_constant_generate;
 
 /**
- *! \brief The data for the constant value generation
+ * \brief The data for the constant value generation
  */
 struct param_generator_constant {
     accum value;

@@ -16,8 +16,8 @@
  */
 
 /**
- *! \file
- *! \brief Exponentially distributed random parameter generator implementation
+ * \file
+ * \brief Exponentially distributed random parameter generator implementation
  */
 #include <stdfix.h>
 #include <spin1_api.h>
@@ -31,15 +31,15 @@ static free_func param_generator_exponential_free;
 static generate_param_func param_generator_exponential_generate;
 
 /**
- *! \brief The parameters that can be copied in from SDRAM
+ * \brief The parameters that can be copied in from SDRAM
  */
 typedef struct param_generator_exponential_params {
     accum beta;
 } param_generator_exponential_params;
 
 /**
- *! \brief The data structure to be passed around for this generator.  This
- *!        includes the parameters and an RNG.
+ * \brief The data structure to be passed around for this generator.  This
+ *        includes the parameters and an RNG.
  */
 struct param_generator_exponential {
     param_generator_exponential_params params;
