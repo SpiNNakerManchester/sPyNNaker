@@ -16,7 +16,6 @@ from spinn_front_end_common.utilities.constants import \
     MICRO_TO_MILLISECOND_CONVERSION
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
-from pacman.executor.injection_decorator import inject_items
 from .abstract_neuron_model import AbstractNeuronModel
 
 A = 'a'
@@ -88,15 +87,12 @@ class NeuronModelIzh(AbstractNeuronModel):
     def has_variable(self, variable):
         return variable in UNITS
 
-    @inject_items({"machine_time_step": "MachineTimeStep"})
-    @overrides(AbstractNeuronModel.get_global_values,
-               additional_arguments={'machine_time_step'})
-    def get_global_values(self, machine_time_step):
+    @overrides(AbstractNeuronModel.get_global_values)
+    def get_global_values(self, ts):
         # pylint: disable=arguments-differ
-        return [float(machine_time_step) / MICRO_TO_MILLISECOND_CONVERSION]
+        return [float(ts) / MICRO_TO_MILLISECOND_CONVERSION]
 
-    @inject_items({"ts": "MachineTimeStep"})
-    @overrides(AbstractNeuronModel.get_values, additional_arguments={'ts'})
+    @overrides(AbstractNeuronModel.get_values)
     def get_values(self, parameters, state_variables, vertex_slice, ts):
         # pylint: disable=arguments-differ
 
