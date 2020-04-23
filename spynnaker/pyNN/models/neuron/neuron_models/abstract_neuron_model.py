@@ -60,7 +60,7 @@ class AbstractNeuronModel(AbstractStandardNeuronComponent):
         return usage + (self.__global_struct.get_size_in_whole_words() *
                         BYTES_PER_WORD)
 
-    def get_global_values(self):
+    def get_global_values(self, ts):
         """ Get the global values to be written to the machine for this model
 
         :return: A list with the same length as self.global_struct.field_types
@@ -69,10 +69,10 @@ class AbstractNeuronModel(AbstractStandardNeuronComponent):
         return numpy.zeros(0, dtype="uint32")
 
     @overrides(AbstractStandardNeuronComponent.get_data)
-    def get_data(self, parameters, state_variables, vertex_slice):
+    def get_data(self, parameters, state_variables, vertex_slice, ts):
         super_data = super(AbstractNeuronModel, self).get_data(
-            parameters, state_variables, vertex_slice)
-        values = self.get_global_values()
+            parameters, state_variables, vertex_slice, ts)
+        values = self.get_global_values(ts)
         global_data = self.__global_struct.get_data(values)
         return numpy.concatenate([global_data, super_data])
 

@@ -90,7 +90,7 @@ class AbstractStandardNeuronComponent(with_metaclass(AbstractBase, object)):
         """
 
     @abstractmethod
-    def get_values(self, parameters, state_variables, vertex_slice):
+    def get_values(self, parameters, state_variables, vertex_slice, ts):
         """ Get the values to be written to the machine for this model
 
         :param parameters: The holder of the parameters
