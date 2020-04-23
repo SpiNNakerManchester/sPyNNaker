@@ -15,6 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Functions for immediate handling of incoming spikes.
+
 #ifndef _IN_SPIKES_H_
 #define _IN_SPIKES_H_
 

@@ -27,23 +27,33 @@
 
 //! The parameters that can be copied from SDRAM.
 struct fixed_post_params {
+    //! Low index of range of pre-neuron population
     uint32_t pre_lo;
+    //! High index of range of pre-neuron population
     uint32_t pre_hi;
+    //! Low index of range of post-neuron population
     uint32_t post_lo;
+    //! High index of range of post-neuron population
     uint32_t post_hi;
+    //! Do we allow self connections?
     uint32_t allow_self_connections;
+    //! Do we allow any neuron to be multiply connected by this connector?
     uint32_t with_replacement;
+    //! Number of connections (= number of post neurons we care about)
     uint32_t n_post;
+    //! Total number of post neurons
     uint32_t n_post_neurons;
 };
 
 /**
- * \brief The data to be passed around.
+ * \brief The state of this connection generator.
  *
  * This includes the parameters, and the RNG of the connector.
  */
 struct fixed_post {
+    //! Parameters read from SDRAM
     struct fixed_post_params params;
+    //! Configured random number generator
     rng_t rng;
 };
 

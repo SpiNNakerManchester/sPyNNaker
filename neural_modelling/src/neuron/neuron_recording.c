@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Implementation of non-inlined API in neuron_recording.h
 #include "neuron_recording.h"
 #include <bit_field.h>
 #include <stddef.h>

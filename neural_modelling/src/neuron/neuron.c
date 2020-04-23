@@ -16,9 +16,7 @@
  */
 
 /*! \file
- *
  * \brief implementation of the neuron.h interface.
- *
  */
 
 #include "neuron.h"

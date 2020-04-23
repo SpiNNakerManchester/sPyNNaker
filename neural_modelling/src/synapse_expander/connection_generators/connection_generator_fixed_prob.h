@@ -27,6 +27,9 @@ static initialize_func connection_generator_fixed_prob_initialise;
 static free_func connection_generator_fixed_prob_free;
 static generate_connection_func connection_generator_fixed_prob_generate;
 
+// Eclipse does *NOT* like this type!
+typedef unsigned long fract _probability_t;
+
 //! The parameters that can be copied in from SDRAM
 struct fixed_prob_params {
     uint32_t pre_lo;
@@ -34,7 +37,7 @@ struct fixed_prob_params {
     uint32_t post_lo;
     uint32_t post_hi;
     uint32_t allow_self_connections;
-    unsigned long fract probability;
+    _probability_t probability;
 };
 
 /**
@@ -109,7 +112,7 @@ static uint32_t connection_generator_fixed_prob_generate(
         }
 
         // Generate a random number
-        unsigned long fract value = ulrbits(rng_generator(obj->rng));
+        _probability_t value = ulrbits(rng_generator(obj->rng));
 
         // If less than our probability, generate a connection if possible
         if ((value <= obj->params.probability) &&

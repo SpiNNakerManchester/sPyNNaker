@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Implementation of non-inlined API in synapses.h
 #include "synapses.h"
 #include "spike_processing.h"
 #include "neuron.h"
@@ -29,25 +31,25 @@
     #include "profile_tags.h"
 #endif
 
-// Globals required for synapse benchmarking to work.
+//! Globals required for synapse benchmarking to work.
 uint32_t  num_fixed_pre_synaptic_events = 0;
 
-// The number of neurons
+//! The number of neurons
 static uint32_t n_neurons;
 
-// The number of synapse types
+//! The number of synapse types
 static uint32_t n_synapse_types;
 
-// Ring buffers to handle delays between synapses and neurons
+//! Ring buffers to handle delays between synapses and neurons
 static weight_t *ring_buffers;
 
-// Ring buffer size
+//! Ring buffer size
 static uint32_t ring_buffer_size;
 
-// Amount to left shift the ring buffer by to make it an input
+//! Amount to left shift the ring buffer by to make it an input
 static uint32_t *ring_buffer_to_input_left_shifts;
 
-// Count of the number of times the ring buffers have saturated
+//! Count of the number of times the ring buffers have saturated
 static uint32_t saturation_count = 0;
 
 static uint32_t synapse_type_index_bits;
@@ -159,9 +161,10 @@ static inline void print_inputs(void) {
 }
 
 
-// This is the "inner loop" of the neural simulation.
-// Every spike event could cause up to 256 different weights to
-// be put into the ring buffer.
+//! \brief This is the "inner loop" of the neural simulation.
+//!
+//! Every spike event could cause up to 256 different weights to
+//! be put into the ring buffer.
 static inline void process_fixed_synapses(
         address_t fixed_region_address, uint32_t time) {
     register uint32_t *synaptic_words =

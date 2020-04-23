@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Implementation of non-inlined API in spike_processing.h
 #include "spike_processing.h"
 #include "population_table/population_table.h"
 #include "synapse_row.h"
@@ -42,10 +44,10 @@ typedef struct dma_buffer {
 
 } dma_buffer;
 
-// The number of DMA Buffers to use
+//! The number of DMA Buffers to use
 #define N_DMA_BUFFERS 2
 
-// DMA tags
+//! DMA tags
 enum spike_processing_dma_tags {
     DMA_TAG_READ_SYNAPTIC_ROW,
     DMA_TAG_WRITE_PLASTIC_REGION
@@ -53,16 +55,16 @@ enum spike_processing_dma_tags {
 
 extern uint32_t time;
 
-// True if the DMA "loop" is currently running
+//! True if the DMA "loop" is currently running
 static volatile bool dma_busy;
 
-// The DTCM buffers for the synapse rows
+//! The DTCM buffers for the synapse rows
 static dma_buffer dma_buffers[N_DMA_BUFFERS];
 
-// The index of the next buffer to be filled by a DMA
+//! The index of the next buffer to be filled by a DMA
 static uint32_t next_buffer_to_fill;
 
-// The index of the buffer currently being filled by a DMA read
+//! The index of the buffer currently being filled by a DMA read
 static uint32_t buffer_being_read;
 
 static uint32_t max_n_words;
@@ -71,17 +73,16 @@ static uint32_t single_fixed_synapse[4];
 
 static volatile uint32_t rewires_to_do = 0;
 
-// The number of rewires to do when the DMA completes.  When a DMA is first set
-// up, only this or dma_n_spikes can be 1 with the other being 0.
+//! The number of rewires to do when the DMA completes.  When a DMA is first set
+//! up, only this or dma_n_spikes can be 1 with the other being 0.
 static uint32_t dma_n_rewires;
 
-// The number of spikes to do when the DMA completes.  When a DMA is first set
-// up, only this or dma_n_rewires can be 1 with the other being 0.
+//! The number of spikes to do when the DMA completes.  When a DMA is first set
+//! up, only this or dma_n_rewires can be 1 with the other being 0.
 static uint32_t dma_n_spikes;
 
-// The number of successful rewires
+//! The number of successful rewires
 static uint32_t n_successful_rewires = 0;
-
 
 /* PRIVATE FUNCTIONS - static for inlining */
 
@@ -113,7 +114,7 @@ static inline void do_direct_row(address_t row_address) {
     synapses_process_synaptic_row(time, single_fixed_synapse, &write_back);
 }
 
-// Check if there is anything to do - if not, DMA is not busy
+//! Check if there is anything to do. If not, DMA is not busy
 static inline bool is_something_to_do(
         address_t *row_address, size_t *n_bytes_to_transfer,
         spike_t *spike, uint32_t *n_rewire, uint32_t *n_process_spike) {
@@ -164,11 +165,12 @@ static inline bool is_something_to_do(
     return false;
 }
 
-// Set up a new synaptic DMA read.  If a current_buffer is passed in, any spike
-// found that matches the originating spike of the buffer will increment a
-// count, and the DMA of that row will be skipped.  The number of times a row
-// should be rewired and the number of times synaptic processing should be
-// done on a row is returned.
+//! \brief Set up a new synaptic DMA read.
+//!
+//! If a current_buffer is passed in, any spike found that matches the
+//! originating spike of the buffer will increment a count, and the DMA of that
+//! row will be skipped.  The number of times a row should be rewired and the
+//! number of times synaptic processing should be done on a row is returned.
 static void setup_synaptic_dma_read(dma_buffer *current_buffer,
         uint32_t *n_rewires, uint32_t *n_synapse_processes) {
 
@@ -232,7 +234,7 @@ static inline void setup_synaptic_dma_write(
     }
 }
 
-// Called when a multicast packet is received
+//! Called when a multicast packet is received
 static void multicast_packet_received_callback(uint key, uint payload) {
     use(payload);
     log_debug("Received spike %x at %d, DMA Busy = %d", key, time, dma_busy);
@@ -255,7 +257,7 @@ static void multicast_packet_received_callback(uint key, uint payload) {
     }
 }
 
-// Called when a DMA completes
+//! Called when a DMA completes
 static void dma_complete_callback(uint unused, uint tag) {
     use(unused);
 
@@ -320,7 +322,7 @@ static void dma_complete_callback(uint unused, uint tag) {
     }
 }
 
-// Called when a user event is received
+//! Called when a user event is received
 void user_event_callback(uint unused0, uint unused1) {
     use(unused0);
     use(unused1);

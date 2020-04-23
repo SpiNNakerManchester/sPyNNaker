@@ -38,8 +38,8 @@ typedef struct int16_lut {
 // Plasticity maths function inline implementation
 //---------------------------------------
 //! \brief Copy a Lookup Table from SDRAM to DTCM, updating the address
-//! \param[in/out] address Pointer to the SDRAM address to copy from.  This is
-//!                        updated to point to the space after the structure.
+//! \param[in,out] address: Pointer to the SDRAM address to copy from.  This is
+//!                         updated to point to the space after the structure.
 //! \return A pointer to the copied lookup table
 static inline int16_lut *maths_copy_int16_lut(address_t *address) {
     int16_lut *sdram_lut = (int16_lut *) *address;
@@ -80,7 +80,9 @@ static inline int32_t maths_clamp_pot(int32_t x, uint32_t shift) {
 }
 
 //---------------------------------------
-// **NOTE** this should 'encourage' GCC to insert SMULxy 16x16 multiply
+//! \brief multiply two 16-bit numbers to get a 32-bit number.
+//!
+//! **NOTE:** this should 'encourage' GCC to insert SMULxy 16x16 multiply
 static inline int32_t maths_mul_16x16(int16_t x, int16_t y) {
     return x * y;
 }

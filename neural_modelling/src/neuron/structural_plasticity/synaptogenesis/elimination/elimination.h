@@ -21,9 +21,9 @@
 #include <neuron/structural_plasticity/synaptogenesis/sp_structs.h>
 
 //! \brief Read and return an elimination parameter data structure from the
-//!        data stream
-//! \param[in/out] The data stream to read from, updated to the new position
-//!                after the read is done
+//!     data stream
+//! \param[in,out] data: The data stream to read from, updated to the new
+//!     position after the read is done
 //! \return the read parameters data structure
 struct elimination_params *synaptogenesis_elimination_init(uint8_t **data);
 

@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Inlined neuron implementation following standard component model
 #ifndef _NEURON_IMPL_STANDARD_H_
 #define _NEURON_IMPL_STANDARD_H_
 
@@ -54,24 +56,29 @@
 #endif
 
 //! Array of neuron states
-static neuron_pointer_t neuron_array;
+static neuron_t *neuron_array;
 
 //! Input states array
-static input_type_pointer_t input_type_array;
+static input_type_t *input_type_array;
 
 //! Additional input array
-static additional_input_pointer_t additional_input_array;
+static additional_input_t *additional_input_array;
 
 //! Threshold states array
-static threshold_type_pointer_t threshold_type_array;
+static threshold_type_t *threshold_type_array;
 
 //! Global parameters for the neurons
-static global_neuron_params_pointer_t global_parameters;
+static global_neuron_params_t *global_parameters;
 
-// The synapse shaping parameters
+//! The synapse shaping parameters
 static synapse_param_t *neuron_synapse_shaping_params;
 
-__attribute__((unused)) // Marked unused as only used sometimes
+#ifndef SOMETIMES_UNUSED
+#define SOMETIMES_UNUSED __attribute__((unused))
+#endif // !SOMETIMES_UNUSED
+
+SOMETIMES_UNUSED // Marked unused as only used sometimes
+//! \param[in] n_neurons: number of neurons
 static bool neuron_impl_initialise(uint32_t n_neurons) {
     // allocate DTCM for the global parameter details
     if (sizeof(global_neuron_params_t)) {
@@ -136,12 +143,12 @@ static bool neuron_impl_initialise(uint32_t n_neurons) {
     return true;
 }
 
-__attribute__((unused)) // Marked unused as only used sometimes
+SOMETIMES_UNUSED // Marked unused as only used sometimes
 static void neuron_impl_add_inputs(
         index_t synapse_type_index, index_t neuron_index,
         input_t weights_this_timestep) {
     // simple wrapper to synapse type input function
-    synapse_param_pointer_t parameters =
+    synapse_param_t *parameters =
             &neuron_synapse_shaping_params[neuron_index];
     synapse_types_add_neuron_input(synapse_type_index,
             parameters, weights_this_timestep);
@@ -151,7 +158,10 @@ static uint32_t n_words_needed(uint32_t size) {
     return (size + (sizeof(uint32_t) - 1)) / sizeof(uint32_t);
 }
 
-__attribute__((unused)) // Marked unused as only used sometimes
+SOMETIMES_UNUSED // Marked unused as only used sometimes
+//! \param[in] address: SDRAM block to read parameters from
+//! \param[in] next: Offset of next address in store
+//! \param[in] n_neurons: number of neurons
 static void neuron_impl_load_neuron_parameters(
         address_t address, uint32_t next, uint32_t n_neurons) {
     log_debug("reading parameters, next is %u, n_neurons is %u ",
@@ -210,36 +220,35 @@ static void neuron_impl_load_neuron_parameters(
 #endif // LOG_LEVEL >= LOG_DEBUG
 }
 
-__attribute__((unused)) // Marked unused as only used sometimes
+SOMETIMES_UNUSED // Marked unused as only used sometimes
 static bool neuron_impl_do_timestep_update(index_t neuron_index,
         input_t external_bias) {
     // Get the neuron itself
-    neuron_pointer_t neuron = &neuron_array[neuron_index];
+    neuron_t *_neuron = &neuron_array[neuron_index];
 
     // Get the input_type parameters and voltage for this neuron
-    input_type_pointer_t input_type = &input_type_array[neuron_index];
+    input_type_t *_input_type = &input_type_array[neuron_index];
 
     // Get threshold and additional input parameters for this neuron
-    threshold_type_pointer_t threshold_type =
-            &threshold_type_array[neuron_index];
-    additional_input_pointer_t additional_input =
+    threshold_type_t *_threshold_type = &threshold_type_array[neuron_index];
+    additional_input_t *_additional_input =
             &additional_input_array[neuron_index];
-    synapse_param_pointer_t synapse_type =
+    synapse_param_t *_synapse_type =
             &neuron_synapse_shaping_params[neuron_index];
 
     // Get the voltage
-    state_t voltage = neuron_model_get_membrane_voltage(neuron);
-    neuron_recording_record_accum(V_RECORDING_INDEX, neuron_index, voltage);
+    state_t _voltage = neuron_model_get_membrane_voltage(_neuron);
+    neuron_recording_record_accum(V_RECORDING_INDEX, neuron_index, _voltage);
 
     // Get the exc and inh values from the synapses
-    input_t* exc_value = synapse_types_get_excitatory_input(synapse_type);
-    input_t* inh_value = synapse_types_get_inhibitory_input(synapse_type);
+    input_t* _exc_value = synapse_types_get_excitatory_input(_synapse_type);
+    input_t* _inh_value = synapse_types_get_inhibitory_input(_synapse_type);
 
     // Call functions to obtain exc_input and inh_input
     input_t* exc_input_values = input_type_get_input_value(
-            exc_value, input_type, NUM_EXCITATORY_RECEPTORS);
+            _exc_value, _input_type, NUM_EXCITATORY_RECEPTORS);
     input_t* inh_input_values = input_type_get_input_value(
-            inh_value, input_type, NUM_INHIBITORY_RECEPTORS);
+            _inh_value, _input_type, NUM_INHIBITORY_RECEPTORS);
 
     // Sum g_syn contributions from all receptors for recording
     REAL total_exc = 0;
@@ -258,49 +267,51 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
     // Call functions to convert exc_input and inh_input to current
     input_type_convert_excitatory_input_to_current(
-            exc_input_values, input_type, voltage);
+            exc_input_values, _input_type, _voltage);
     input_type_convert_inhibitory_input_to_current(
-            inh_input_values, input_type, voltage);
+            inh_input_values, _input_type, _voltage);
 
     external_bias += additional_input_get_input_value_as_current(
-            additional_input, voltage);
+            _additional_input, _voltage);
 
     // update neuron parameters
     state_t result = neuron_model_state_update(
             NUM_EXCITATORY_RECEPTORS, exc_input_values,
             NUM_INHIBITORY_RECEPTORS, inh_input_values,
-            external_bias, neuron);
+            external_bias, _neuron);
 
     // determine if a spike should occur
-    bool spike = threshold_type_is_above_threshold(result, threshold_type);
+    bool _spike = threshold_type_is_above_threshold(result, _threshold_type);
 
     // If spike occurs, communicate to relevant parts of model
-    if (spike) {
+    if (_spike) {
         // Call relevant model-based functions
         // Tell the neuron model
-        neuron_model_has_spiked(neuron);
+        neuron_model_has_spiked(_neuron);
 
         // Tell the additional input
-        additional_input_has_spiked(additional_input);
+        additional_input_has_spiked(_additional_input);
 
         // Record the spike
         neuron_recording_record_bit(SPIKE_RECORDING_BITFIELD, neuron_index);
     }
 
     // Shape the existing input according to the included rule
-    synapse_types_shape_input(synapse_type);
+    synapse_types_shape_input(_synapse_type);
 
 #if LOG_LEVEL >= LOG_DEBUG
-    neuron_model_print_state_variables(neuron);
+    neuron_model_print_state_variables(_neuron);
 #endif // LOG_LEVEL >= LOG_DEBUG
 
     // Return the boolean to the model timestep update
-    return spike;
+    return _spike;
 }
 
+SOMETIMES_UNUSED // Marked unused as only used sometimes
 //! \brief stores neuron parameter back into sdram
-//! \param[in] address: the address in sdram to start the store
-__attribute__((unused)) // Marked unused as only used sometimes
+//! \param[out] address: the address in sdram to start the store
+//! \param[in] next: Offset of next address in store
+//! \param[in] n_neurons: number of neurons
 static void neuron_impl_store_neuron_parameters(
         address_t address, uint32_t next, uint32_t n_neurons) {
     log_debug("writing parameters");

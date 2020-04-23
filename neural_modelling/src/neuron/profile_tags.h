@@ -15,7 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// Profiler tags
+//! \file
+//! \brief Profiler tags
 #pragma once
 
 enum profiler_tags_e {

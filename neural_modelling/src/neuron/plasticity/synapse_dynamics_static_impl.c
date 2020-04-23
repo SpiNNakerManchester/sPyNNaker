@@ -15,15 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*! \file
+/*!
+ * \file
+ * \brief This file contains the main interface for structural plasticity
+ * and some shared code. For the main implementation, see topographic_map_impl.c
  *
- * SUMMARY
- *  \brief This file contains the main interface for structural plasticity
- * but no actual code. For that, look at topographic_map_impl.c
- *
- *
- * Author: Petrut Bogdan
- *
+ * \author Petrut Bogdan
  */
 #include "synapse_dynamics.h"
 #include <debug.h>

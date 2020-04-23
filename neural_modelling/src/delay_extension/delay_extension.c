@@ -15,6 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Implementation of delay extensions
+
 #include "delay_extension.h"
 
 #include <common/neuron-typedefs.h>
@@ -73,7 +76,7 @@ static uint32_t expected_time;
 
 static uint32_t n_delays = 0;
 
-// Spin1 API ticks - to know when the timer wraps
+//! Spin1 API ticks - to know when the timer wraps
 extern uint ticks;
 
 // Initialise
@@ -228,7 +231,7 @@ static void incoming_spike_callback(uint key, uint payload) {
     in_spikes_add_spike(key);
 }
 
-// Gets the neuron ID of the incoming spike
+//! Gets the neuron ID of the incoming spike
 static inline key_t key_n(key_t k) {
     return k & incoming_neuron_mask;
 }
@@ -359,7 +362,7 @@ static void timer_callback(uint timer_count, uint unused1) {
     zero_spike_counters(spike_counters[current_time_slot], num_neurons);
 }
 
-// Entry point
+//! Entry point
 void c_main(void) {
     if (!initialize()) {
         log_error("Error in initialisation - exiting!");

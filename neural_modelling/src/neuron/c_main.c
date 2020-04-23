@@ -15,12 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*!\file
+/*!
+ * @dir
+ * @brief Implementation of simulator for a single neural population on a
+ *      SpiNNaker CPU core. Or rather of a slice of a population.
  *
- * SUMMARY
- *  \brief This file contains the main function of the application framework,
- *  which the application programmer uses to configure and run applications.
- *
+ * @file
+ * @brief This file contains the main function of the application framework,
+ *      which the application programmer uses to configure and run applications.
  *
  * This is the main entrance class for most of the neural models. The following
  * Figure shows how all of the c code
@@ -29,7 +31,6 @@
  * (such as plasticity, spike processing, utilities, synapse types, models)
  *
  * @image html spynnaker_c_code_flow.png
- *
  */
 
 #include <common/in_spikes.h>

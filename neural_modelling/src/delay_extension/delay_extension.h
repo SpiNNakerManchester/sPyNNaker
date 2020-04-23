@@ -15,6 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \dir
+//! \brief Delay Extension Process
+//! \file
+//! \brief Delcarations for delay extensions
+
 #ifndef __DELAY_EXTENSION_H__
 #define __DELAY_EXTENSION_H__
 

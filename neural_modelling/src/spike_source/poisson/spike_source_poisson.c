@@ -15,8 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*! \file
- *
+/*!
+ * \dir
+ * \brief Implementation of the Poisson spike source
+ * \file
  * \brief This file contains the main functions for a Poisson spike generator.
  */
 
@@ -35,10 +37,10 @@
 #include "profile_tags.h"
 #include <profiler.h>
 
-// Declare spin1_wfi
+//! Declare spin1_wfi, missing from spin1api header
 extern void spin1_wfi(void);
 
-// Spin1 API ticks - to know when the timer wraps
+//! Spin1 API ticks, to know when the timer wraps
 extern uint ticks;
 
 //! data structure for Poisson sources
@@ -248,7 +250,7 @@ static void print_spike_sources(void) {
 
 //! \brief entry method for reading the global parameters stored in Poisson
 //!        parameter region
-//! \param[in] address the absolute SDRAm memory address to which the
+//! \param[in] sdram_globals: the absolute SDRAM memory address to which the
 //!            Poisson parameter region starts.
 //! \return a boolean which is True if the parameters were read successfully or
 //!         False otherwise
@@ -289,7 +291,7 @@ static inline void read_next_rates(uint32_t id) {
 }
 
 //! \brief method for reading the rates of the Poisson
-//! \param[in] config the configuration in SDRAM
+//! \param[in] sdram_sources: the configuration in SDRAM
 //! \return a boolean which is True if the rates were read successfully or
 //!         False otherwise
 static bool read_rates(source_info *sdram_sources) {
@@ -299,13 +301,15 @@ static bool read_rates(source_info *sdram_sources) {
         // the first time around, the array is set to NULL, afterwards,
         // assuming all goes well, there's an address here.
         if (source == NULL) {
-            source = spin1_malloc(params.n_spike_sources * sizeof(spike_source_t));
+            source = spin1_malloc(
+                    params.n_spike_sources * sizeof(spike_source_t));
             // if failed to alloc memory, report and fail.
             if (source == NULL) {
                 log_error("Failed to allocate local sources");
                 return false;
             }
-            source_data = spin1_malloc(params.n_spike_sources * sizeof(source_info *));
+            source_data = spin1_malloc(
+                    params.n_spike_sources * sizeof(source_info *));
             if (source_data == NULL) {
                 log_error("Failed to allocate SDRAM source links");
                 return false;
@@ -316,7 +320,7 @@ static bool read_rates(source_info *sdram_sources) {
             for (uint32_t i = 0; i < params.n_spike_sources; i++) {
                 source_data[i] = sdram_source;
                 sdram_source = (source_info *)
-                        &(sdram_source->poissons[sdram_source->n_rates]);
+                        &sdram_source->poissons[sdram_source->n_rates];
             }
         }
 
@@ -349,10 +353,6 @@ static bool initialise_recording(data_specification_metadata_t *ds_regions) {
 
 //! Initialises the model by reading in the regions and checking recording
 //! data.
-//! \param[out] timer_period a pointer for the memory address where the timer
-//!            period should be stored during the function.
-//! \param[out] update_sdp_port The SDP port on which to listen for rate
-//!             updates
 //! \return boolean of True if it successfully read all the regions and set up
 //!         all its internal data structures. Otherwise returns False
 static bool initialize(void) {
@@ -452,7 +452,7 @@ static void resume_callback(void) {
 
 //! \brief stores the Poisson parameters back into SDRAM for reading by the
 //! host when needed
-//! \return None
+//! \return True if successful
 static bool store_poisson_parameters(void) {
     log_info("store_parameters: starting");
 
@@ -476,7 +476,6 @@ static bool store_poisson_parameters(void) {
 //! \brief handles spreading of Poisson spikes for even packet reception at
 //! destination
 //! \param[in] spike_key: the key to transmit
-//! \return None
 static void send_spike(uint32_t spike_key, uint32_t timer_count) {
     // Wait until the expected time to send
     while ((ticks == timer_count) && (tc[T1_COUNT] > expected_time)) {
@@ -492,6 +491,7 @@ static void send_spike(uint32_t spike_key, uint32_t timer_count) {
 }
 
 //! \brief Expand the space for recording spikes.
+//! \param[in] n_spikes: New number of spikes to hold
 static inline void expand_spike_recording_buffer(uint32_t n_spikes) {
     uint32_t new_size = 8 + (n_spikes * spike_buffer_size);
     timed_out_spikes *new_spikes = spin1_malloc(new_size);
@@ -520,7 +520,6 @@ static inline void expand_spike_recording_buffer(uint32_t n_spikes) {
 //! \brief records spikes as needed
 //! \param[in] neuron_id: the neurons to store spikes from
 //! \param[in] n_spikes: the number of times this neuron has spiked
-//!
 static inline void mark_spike(uint32_t neuron_id, uint32_t n_spikes) {
     if (recording_flags > 0) {
         if (n_spike_buffers_allocated < n_spikes) {
@@ -557,6 +556,9 @@ static inline void record_spikes(uint32_t time) {
 }
 
 //! \brief Handle a fast spike source
+//! \param s_id
+//! \param source
+//! \param timer_count
 static void process_fast_source(
         index_t s_id, spike_source_t *source, uint timer_count) {
     if ((time >= source->start_ticks) && (time < source->end_ticks)) {
@@ -595,6 +597,9 @@ static void process_fast_source(
 }
 
 //! \brief Handle a slow spike source
+//! \param s_id
+//! \param source
+//! \param timer_count
 static void process_slow_source(
         index_t s_id, spike_source_t *source, uint timer_count) {
     if ((time >= source->start_ticks) && (time < source->end_ticks)
@@ -624,9 +629,9 @@ static void process_slow_source(
 }
 
 //! \brief Timer interrupt callback
-//! \param[in] timer_count the number of times this call back has been
+//! \param[in] timer_count: the number of times this call back has been
 //!            executed since start of simulation
-//! \param[in] unused for consistency sake of the API always returning two
+//! \param[in] unused: for consistency sake of the API always returning two
 //!            parameters, this parameter has no semantics currently and thus
 //!            is set to 0
 //! \return None
@@ -699,8 +704,8 @@ static void timer_callback(uint timer_count, uint unused) {
 }
 
 //! \brief set the spike source rate as required
-//! \param[in] id, the ID of the source to be updated
-//! \param[in] rate, the REAL-valued rate in Hz, to be multiplied
+//! \param[in] id: the ID of the source to be updated
+//! \param[in] rate: the REAL-valued rate in Hz, to be multiplied
 //!            to get per_tick values
 void set_spike_source_rate(uint32_t id, REAL rate) {
     if ((id < params.first_source_id) ||
@@ -736,7 +741,9 @@ void set_spike_source_rate(uint32_t id, REAL rate) {
     }
 }
 
-//! multicast callback used to set rate when injected in a live example
+//! \brief multicast callback used to set rate when injected in a live example
+//! \param key
+//! \param payload
 static void multicast_packet_callback(uint key, uint payload) {
     uint32_t id = key & params.set_rate_neuron_id_mask;
     REAL rate = kbits(payload);

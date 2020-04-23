@@ -15,7 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*! \file
+/*!
+ * \file
  * \brief implementation of synapse_types.h for an alpha synapse behaviour
  */
 
@@ -58,12 +59,12 @@ typedef struct alpha_params_t {
 
     // Temporary value of
     input_t q_buff;
-}alpha_params_t;
+} alpha_params_t;
 
-typedef struct synapse_param_t {
+struct synapse_param_t {
     alpha_params_t exc;
     alpha_params_t inh;
-} synapse_param_t;
+};
 
 //! human readable definition for the positions in the input regions for the
 //! different synapse types.
@@ -87,7 +88,7 @@ static inline void alpha_shaping(alpha_params_t* a_params) {
 
 // Synapse shaping - called every timestep to evolve PSC
 static inline void synapse_types_shape_input(
-		synapse_param_pointer_t parameter) {
+		synapse_param_t *parameter) {
     alpha_shaping(&parameter->exc);
     alpha_shaping(&parameter->inh);
 
@@ -116,7 +117,7 @@ static inline void add_input_alpha(alpha_params_t* a_params, input_t input) {
 // Add input from ring buffer - zero if no spikes, otherwise one or more weights
 static inline void synapse_types_add_neuron_input(
         index_t synapse_type_index,
-        synapse_param_pointer_t parameter,
+        synapse_param_t *parameter,
         input_t input) {
     if (input > ZERO) {
         if (synapse_type_index == EXCITATORY) {
@@ -128,13 +129,13 @@ static inline void synapse_types_add_neuron_input(
 }
 
 static inline input_t* synapse_types_get_excitatory_input(
-        synapse_param_pointer_t parameter) {
+        synapse_param_t *parameter) {
     excitatory_response[0] = parameter->exc.lin_buff * parameter->exc.exp_buff;
     return &excitatory_response[0];
 }
 
 static inline input_t* synapse_types_get_inhibitory_input(
-        synapse_param_pointer_t parameter) {
+        synapse_param_t *parameter) {
     inhibitory_response[0] = parameter->inh.lin_buff * parameter->inh.exp_buff;
     return &inhibitory_response[0];
 }
@@ -152,13 +153,13 @@ static inline const char *synapse_types_get_type_char(
 }
 
 static inline void synapse_types_print_input(
-        synapse_param_pointer_t parameter) {
+        synapse_param_t *parameter) {
     io_printf(IO_BUF, "%12.6k - %12.6k",
             parameter->exc.lin_buff * parameter->exc.exp_buff,
             parameter->inh.lin_buff * parameter->inh.exp_buff);
 }
 
-static inline void synapse_types_print_parameters(synapse_param_pointer_t parameter) {
+static inline void synapse_types_print_parameters(synapse_param_t *parameter) {
     log_debug("-------------------------------------\n");
     log_debug("exc_response  = %11.4k\n", parameter->exc.lin_buff * parameter->exc.exp_buff);
     log_debug("inh_response  = %11.4k\n", parameter->inh.lin_buff * parameter->inh.exp_buff);

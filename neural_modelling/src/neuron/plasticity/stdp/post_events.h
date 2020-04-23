@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Post-synaptic events
 #ifndef _POST_EVENTS_H_
 #define _POST_EVENTS_H_
 

@@ -26,8 +26,8 @@ void partner_init(uint8_t **data) {
     last_spikes_buffer_size = ((uint32_t *) *data)[0];
     log_info("Last neuron selection, buffer size = %u", last_spikes_buffer_size);
     for (uint32_t i = 0; i < 2; i++) {
-        last_spikes_buffer[i] = (spike_t *) spin1_malloc(
-            last_spikes_buffer_size * sizeof(spike_t));
+        last_spikes_buffer[i] =
+                spin1_malloc(last_spikes_buffer_size * sizeof(spike_t));
         if (last_spikes_buffer[i] == NULL) {
             log_error("Out of memory when creating last spikes buffer");
             rt_error(RTE_SWERR);

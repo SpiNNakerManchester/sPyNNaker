@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Spike processing API
 #ifndef _SPIKE_PROCESSING_H_
 #define _SPIKE_PROCESSING_H_
 

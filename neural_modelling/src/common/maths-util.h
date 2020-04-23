@@ -15,9 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
+/**
 
- maths-util.h -  first created 7/10/2013  version 0.1
+\file
+
+\brief maths-util.h -  first created 7/10/2013  version 0.1
 
  some defines and other helper types/functions for applying ACS/HR types and
  ideas to SpiNNaker numerical coding
@@ -36,10 +38,10 @@
 // disabled for production SpiNNaker builds but here for various testing
 //#define FLOATING_POINT
 
-// A Cardinal type
+//! A Cardinal type
 typedef unsigned int	Card;
 
-// just for my convenience with zero offset arrays
+//! just for my convenience with zero offset arrays
 #define START		0
 
 // this is where you switch between double precision (or float?) and
@@ -84,9 +86,13 @@ static REAL macro_arg_1, macro_arg_2, macro_arg_3, macro_arg_4;
 #include <stdfix-exp.h>
 #include <sqrt.h>
 
+//! Type used for "real" numbers
 typedef accum			REAL;
+//! Type used for "unsigned real" numbers
 typedef unsigned accum	UREAL;
+//! Type used for "fractional" numbers
 typedef long fract		FRACT;
+//! Type used for "unsigned fractional" numbers
 typedef unsigned long fract	UFRACT;
 #define REAL_CONST(x)	x##k		// accum -> k
 #define UREAL_CONST(x)	x##uk		// unsigned accum -> uk
@@ -110,7 +116,7 @@ typedef unsigned long fract	UFRACT;
 //#define MAX(x, y)	maxfx(x, y)
 #define SIGN(x, y)	((macro_arg_1=(y)) >= ZERO ? ABS(x) : -ABS(x))
 
-#endif
+#endif // FLOATING_POINT
 
 // some common operations that could be usefully speeded up
 #ifdef FLOATING_POINT
@@ -119,13 +125,13 @@ typedef unsigned long fract	UFRACT;
 #define REAL_TWICE(x)	((x) * 2.00000)
 #define REAL_HALF(x)	((x) * 0.50000)
 
-#else
+#else // !FLOATING_POINT
 
 #define REAL_COMPARE(x, op, y)	(bitsk((x)) op bitsk((y)))
 #define REAL_TWICE(x)	((x) * 2.000000k)
 #define REAL_HALF(x)	((x) * 0.500000k)
 
-#endif
+#endif // FLOATING_POINT
 
 #define MIN_HR(a, b) ({\
     __type_of__(a) _a = (a); \

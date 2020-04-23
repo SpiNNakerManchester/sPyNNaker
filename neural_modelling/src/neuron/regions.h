@@ -15,6 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Standard layout of DSG regions in neuron code.
+//!
+//! Note that not all models use all of these regions, but they all use the same
+//! region identifier mapping.
 #pragma once
 
 typedef enum regions_e {

@@ -15,6 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \dir
+//! \brief Robot motor controller pseudo-neuron implementation
+//! \file
+//! \brief Implementation of Robot Motor Control model
+
 #include <common/neuron-typedefs.h>
 #include <common/in_spikes.h>
 
@@ -56,6 +61,9 @@ enum callback_priorities {
     MC = -1, SDP = 0, TIMER = 2, DMA = 1
 };
 
+//! \brief Send a SpiNNaker multicast-with-payload message to the motor hardware
+//! \param[in] direction: Which direction to move in
+//! \param[in] speed: What speed to move at
 static inline void send(uint32_t direction, uint32_t speed) {
     uint32_t direction_key = direction | key;
     while (!spin1_send_mc_packet(direction_key, speed, WITH_PAYLOAD)) {
@@ -115,6 +123,10 @@ static inline void do_update(
 }
 
 // Callbacks
+//! \brief Regular 1ms callback. Takes spikes from circular buffer and converts
+//! to motor activity level.
+//! \param unused0 unused
+//! \param unused1 unused
 void timer_callback(uint unused0, uint unused1) {
     use(unused0);
     use(unused1);
@@ -187,6 +199,7 @@ void read_parameters(address_t region_address) {
             continue_if_not_different);
 }
 
+//! Add incoming spike message (in FIQ) to circular buffer
 void incoming_spike_callback(uint key, uint payload) {
     use(payload);
 
@@ -224,7 +237,7 @@ static bool initialize(uint32_t *timer_period) {
     return true;
 }
 
-// Entry point
+//! Entry point
 void c_main(void) {
     // Initialise
     uint32_t timer_period = 0;

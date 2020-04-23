@@ -32,22 +32,25 @@
 
 #include "input_type.h"
 
-typedef struct input_type_t {
+struct input_type_t {
 	// scale factor (1000.0 / timestep)
 	REAL scale_factor;
-} input_type_t;
+};
 
-static inline input_t* input_type_get_input_value(
-        input_t* value, input_type_pointer_t input_type, uint16_t num_receptors) {
+static const REAL INPUT_SCALE_FACTOR = REAL_CONST(1.0);
+
+static inline input_t *input_type_get_input_value(
+        input_t *restrict value, const input_type_t *input_type,
+        uint16_t num_receptors) {
     use(input_type);
     for (int i = 0; i < num_receptors; i++) {
-        value[i] = value[i];    // not sure this is needed here... ?
+        value[i] = value[i] * INPUT_SCALE_FACTOR; // not sure this is needed here... ?
     }
     return &value[0];
 }
 
 static inline void input_type_convert_excitatory_input_to_current(
-        input_t* exc_input, input_type_pointer_t input_type,
+        input_t *restrict exc_input, const input_type_t *input_type,
         state_t membrane_voltage) {
     use(membrane_voltage);
     for (int i=0; i < NUM_EXCITATORY_RECEPTORS; i++) {
@@ -56,7 +59,7 @@ static inline void input_type_convert_excitatory_input_to_current(
 }
 
 static inline void input_type_convert_inhibitory_input_to_current(
-        input_t* inh_input, input_type_pointer_t input_type,
+        input_t *restrict inh_input, const input_type_t *input_type,
         state_t membrane_voltage) {
     use(membrane_voltage);
     for (int i=0; i < NUM_INHIBITORY_RECEPTORS; i++) {

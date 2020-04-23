@@ -15,9 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Distance-dependent synaptogenesis formation rule initialisation
 #include "formation_distance_dependent_impl.h"
 
-struct formation_params *synaptogenesis_formation_init(uint8_t **data) {
+formation_params_t *synaptogenesis_formation_init(uint8_t **data) {
     // Reference the parameters to read the sizes
     struct formation_params *form_params = (struct formation_params *) *data;
     uint32_t data_size = sizeof(struct formation_params) + (sizeof(uint16_t) *

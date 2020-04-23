@@ -15,6 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief
+
 #ifndef _NEURON_RECORDING_H_
 #define _NEURON_RECORDING_H_
 
@@ -36,20 +39,20 @@
 // declare spin1_wfi
 void spin1_wfi();
 
-// A struct of the different types of recorded data
+//! A struct of the different types of recorded data
 // Note data is just bytes here but actual type is used on writing
 typedef struct recording_values_t {
     uint32_t time;
     uint8_t data[];
 } recording_values_t;
 
-// A struct for bitfield data
+//! A struct for bitfield data
 typedef struct bitfield_values_t {
     uint32_t time;
     uint32_t bits[];
 } bitfield_values_t;
 
-// A struct for information for a non-bitfield recording
+//! A struct for information for a non-bitfield recording
 typedef struct recording_info_t {
     uint32_t element_size;
     uint32_t rate;
@@ -59,7 +62,7 @@ typedef struct recording_info_t {
     recording_values_t *values;
 } recording_info_t;
 
-// A struct for information on a bitfield recording
+//! A struct for information on a bitfield recording
 typedef struct bitfield_info_t {
     uint32_t rate;
     uint32_t count;

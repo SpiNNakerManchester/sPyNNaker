@@ -16,6 +16,8 @@
  */
 
 /**
+ * \dir
+ * \brief Implementation of the synapse expander and delay expander
  * \file
  * \brief The synapse expander for neuron cores
  */
@@ -62,7 +64,7 @@ struct expander_config {
 
 /**
  * \brief Generate the synapses for a single connector
- * \param[in/out] in_region: The address to read the parameters from. Should be
+ * \param[in,out] in_region: The address to read the parameters from. Should be
  *                           updated to the position just after the parameters
  *                           after calling.
  * \param[in] synaptic_matrix_region: The address of the synaptic matrices

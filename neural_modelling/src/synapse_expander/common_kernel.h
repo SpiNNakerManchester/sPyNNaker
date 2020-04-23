@@ -21,9 +21,6 @@
  */
 #include <common-typedefs.h>
 
-/**
- * \brief Function to do integer division without using divide
- */
 uint16_t uidiv(uint32_t dividend, uint16_t divider, uint16_t *remainder);
 
 /**

@@ -16,7 +16,7 @@
  */
 
 // Spinn_common includes
-#include "static-assert.h"
+#include <static-assert.h>
 
 // sPyNNaker neural modelling includes
 #include <neuron/synapses.h>
@@ -89,7 +89,7 @@ post_event_history_t *post_event_history;
 /* PRIVATE FUNCTIONS */
 
 //---------------------------------------
-// Synapse update loop
+//! Synapse update loop
 //---------------------------------------
 static inline final_state_t plasticity_update_synapse(
         const uint32_t time,
@@ -155,7 +155,7 @@ static inline final_state_t plasticity_update_synapse(
 }
 
 //---------------------------------------
-// Synaptic row plastic-region implementation
+//! Synaptic row plastic-region implementation
 //---------------------------------------
 static inline plastic_synapse_t* plastic_synapses(
         address_t plastic_region_address) {
@@ -429,7 +429,7 @@ bool synapse_dynamics_find_neuron(
     return false;
 }
 
-bool synapse_dynamics_remove_neuron(uint32_t offset, address_t row){
+bool synapse_dynamics_remove_neuron(uint32_t offset, address_t row) {
     address_t fixed_region = synapse_row_fixed_region(row);
     plastic_synapse_t *plastic_words =
             plastic_synapses(synapse_row_plastic_region(row));

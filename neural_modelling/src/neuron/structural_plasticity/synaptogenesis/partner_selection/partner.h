@@ -15,6 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \dir
+//! \brief Partner selection rule
+//! \file
+//! \brief Partner selection rule common API
 #ifndef _PARTNER_SELECTION_H_
 #define _PARTNER_SELECTION_H_
 
@@ -27,7 +31,7 @@
 
 #include <neuron/structural_plasticity/synaptogenesis/sp_structs.h>
 
-// value to be returned when there is no valid partner selection
+//! value to be returned when there is no valid partner selection
 #define INVALID_SELECTION ((spike_t) - 1)
 
 void partner_init(uint8_t **data);

@@ -34,7 +34,7 @@ enum send_type {
     SEND_TYPE_UFRACT,
 };
 
-typedef struct threshold_type_t {
+struct threshold_type_t {
     // The key to send to update the value
     uint32_t key;
     // A scaling factor (>0) if the value is to be sent as payload, False (0) if just the key
@@ -51,15 +51,15 @@ typedef struct threshold_type_t {
     uint32_t time_until_next_send;
     // Send type
     enum send_type type;
-} threshold_type_t;
+};
 
-typedef union int_bits_union {
+typedef union _int_bits_union {
     int int_value;
     uint uint_value;
-} int_bits_union;
+} _int_bits_union;
 
 static inline uint int_bits(int value) {
-    int_bits_union converter;
+    _int_bits_union converter;
     converter.int_value = value;
     return converter.uint_value;
 }
@@ -109,7 +109,7 @@ static inline uint get_payload(enum send_type type, accum value) {
 }
 
 static bool threshold_type_is_above_threshold(
-        state_t value, threshold_type_pointer_t threshold_type) {
+        state_t value, threshold_type_t *threshold_type) {
     if (threshold_type->time_until_next_send == 0) {
         if (threshold_type->value_as_payload) {
             accum value_to_send = value;

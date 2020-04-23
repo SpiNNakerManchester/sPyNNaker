@@ -15,6 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \dir
+//! \brief Structural plasticity through formation and elimination of synapses
+//! \file
+//! \brief Miscellaneous structures
 #ifndef _SP_STRUCTS_H_
 #define _SP_STRUCTS_H_
 
@@ -78,32 +82,32 @@ typedef struct {
 
 //! struct representing the current state of rewiring
 typedef struct {
-    // Seed referenced from rewiring data
+    //! Seed referenced from rewiring data
     mars_kiss64_seed_t *local_seed;
-    // Low atom copied from rewiring data
+    //! Low atom copied from rewiring data
     uint32_t post_low_atom;
     // what are the currently selecting pre- and post-synaptic neurons
     uint32_t pre_syn_id;
     uint32_t post_syn_id;
-    // does the connection already exist
+    //! does the connection already exist
     uint32_t element_exists;
     // information extracted from the post to pre table
     post_to_pre_entry *post_to_pre_table_entry;
     pre_info_t *pre_population_info;
     key_atom_info_t *key_atom_info;
     post_to_pre_entry post_to_pre;
-    // offset in synaptic row (if exists)
+    //! offset in synaptic row (if exists)
     uint32_t offset;
-    // current delay (if exists)
+    //! current delay (if exists)
     uint16_t delay;
-    // current weight (if exists)
+    //! current weight (if exists)
     uint16_t weight;
-    // synapse type
+    //! synapse type
     uint32_t synapse_type;
 } current_state_t;
 
-// \!brief unpack the spike into key and identifying information for the neuron;
-//         Identify pop, sub-population and low and high atoms
+//! \brief unpack the spike into key and identifying information for the
+//!     neuron; Identify pop, sub-population and low and high atoms
 static inline bool sp_structs_find_by_spike(
         pre_pop_info_table_t *pre_pop_info_table, spike_t spike,
         uint32_t *neuron_id, uint32_t *population_id,
@@ -129,13 +133,13 @@ static inline bool sp_structs_find_by_spike(
     return false;
 }
 
-// \brief Get the sub-population id and sub-population-based neuron id given
-//        the population id and the population-based neuron id
+//! \brief Get the sub-population id and sub-population-based neuron id given
+//!        the population id and the population-based neuron id
 static inline bool sp_structs_get_sub_pop_info(
-        pre_pop_info_table_t *pre_pop_table_info, uint32_t population_id,
-        uint32_t pop_neuron_id, uint32_t *sub_population_id,
-        uint32_t *sub_pop_neuron_id, uint32_t *spike) {
-    pre_info_t *app_pop_info =
+        const pre_pop_info_table_t *pre_pop_table_info, uint32_t population_id,
+        uint32_t pop_neuron_id, uint32_t *restrict sub_population_id,
+        uint32_t *restrict sub_pop_neuron_id, uint32_t *restrict spike) {
+    const pre_info_t *app_pop_info =
             pre_pop_table_info->prepop_info[population_id];
     uint32_t neuron_id = pop_neuron_id;
     for (uint32_t i = 0; i < app_pop_info->no_pre_vertices; i++) {
@@ -152,7 +156,7 @@ static inline bool sp_structs_get_sub_pop_info(
 }
 
 static inline bool sp_structs_remove_synapse(
-        current_state_t *current_state, address_t row) {
+        current_state_t *restrict current_state, address_t row) {
     if (!synapse_dynamics_remove_neuron(current_state->offset, row)) {
         return false;
     }
@@ -161,7 +165,7 @@ static inline bool sp_structs_remove_synapse(
 }
 
 static inline bool sp_structs_add_synapse(
-        current_state_t *current_state, address_t row) {
+        current_state_t *restrict current_state, address_t row) {
     uint32_t appr_scaled_weight = current_state->pre_population_info->weight;
 
     uint32_t actual_delay;

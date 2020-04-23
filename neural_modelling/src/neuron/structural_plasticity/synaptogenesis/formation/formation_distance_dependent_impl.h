@@ -37,7 +37,7 @@ static int my_abs(int a) {
 }
 
 static inline bool synaptogenesis_formation_rule(
-        current_state_t *current_state, struct formation_params *params,
+        current_state_t *current_state, const formation_params_t *params,
         uint32_t time, address_t row) {
     use(time);
 

@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Operations on synapses
 #ifndef _SYNAPSES_H_
 #define _SYNAPSES_H_
 
@@ -22,8 +24,8 @@
 #include "synapse_row.h"
 #include "neuron.h"
 
-// Get the index of the ring buffer for a given timestep, synapse type and
-// neuron index
+//! \brief Get the index of the ring buffer for a given timestep, synapse type
+//! and neuron index
 static inline index_t synapses_get_ring_buffer_index(
         uint32_t simuation_timestep, uint32_t synapse_type_index,
         uint32_t neuron_index, uint32_t synapse_type_index_bits,
@@ -33,8 +35,8 @@ static inline index_t synapses_get_ring_buffer_index(
             | neuron_index;
 }
 
-// Get the index of the ring buffer for a given timestep and combined
-// synapse type and neuron index (as stored in a synapse row)
+//! \brief Get the index of the ring buffer for a given timestep and combined
+//! synapse type and neuron index (as stored in a synapse row)
 static inline index_t synapses_get_ring_buffer_index_combined(
         uint32_t simulation_timestep,
         uint32_t combined_synapse_neuron_index,
@@ -43,7 +45,7 @@ static inline index_t synapses_get_ring_buffer_index_combined(
             | combined_synapse_neuron_index;
 }
 
-// Converts a weight stored in a synapse row to an input
+//! Converts a weight stored in a synapse row to an input
 static inline input_t synapses_convert_weight_to_input(
         weight_t weight, uint32_t left_shift) {
     union {

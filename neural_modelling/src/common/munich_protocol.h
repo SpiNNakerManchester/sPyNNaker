@@ -15,21 +15,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// structure of multicast key of command is KKKKKKKKKKKKKKKKKKKKK-IIIIIII-F-DDD
-// K is ignored "instance key"
-// I is instruction
-// F is payload format
-// D is device
+//! \file
+//! \brief Description of the Munich robot device protocol
+//!
+//! structure of multicast key of command is
+//! `KKKKKKKKKKKKKKKKKKKKK-IIIIIII-F-DDD`
+//!
+//! `K` is ignored "instance key",
+//! `I` is instruction,
+//! `F` is payload format,
+//! `D` is device
 #include <debug.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 enum {
-    OFFSET_TO_I = 4,
-    OFFSET_TO_F = 3,
-    OFFSET_TO_D = 0
+    OFFSET_TO_I = 4,//!< OFFSET_TO_I
+    OFFSET_TO_F = 3,//!< OFFSET_TO_F
+    OFFSET_TO_D = 0 //!< OFFSET_TO_D
 };
 
-// Specific fields in the key
+//! Specific fields in the key
 enum {
     OFFSET_FOR_UART_ID = 29,
     PUSH_BOT_UART_OFFSET_SPEAKER_LED_LASER = 1

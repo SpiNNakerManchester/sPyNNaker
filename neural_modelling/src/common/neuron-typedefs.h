@@ -16,14 +16,7 @@
  */
 
 /*! \file
- *
- *
- * neuron-typedefs.h
- *
- *
- *  SUMMARY
  * \brief   Data type definitions for SpiNNaker Neuron-modelling
- *
  */
 
 #ifndef __NEURON_TYPEDEFS_H__
@@ -41,11 +34,14 @@
  */
 #ifndef __SPIKE_T__
 
+//! The type of a SpiNNaker multicast message key word
 typedef uint32_t key_t;
+//! The type of a SpiNNaker multicast message payload word
 typedef uint32_t payload_t;
 
 #ifdef SPIKES_WITH_PAYLOADS
 
+//! The type of a spike
 typedef uint64_t spike_t;
 
 //! \brief helper method to retrieve the key from a spike
@@ -65,6 +61,7 @@ static inline payload_t spike_payload (spike_t s) {
 
 #else  /*SPIKES_WITHOUT_PAYLOADS*/
 
+//! The type of a spike
 typedef uint32_t spike_t;
 
 //! \brief helper method to retrieve the key from a spike
@@ -81,18 +78,18 @@ static inline key_t spike_key(spike_t s) {
 
 static inline payload_t spike_payload(spike_t s) {
     use(s);
-    return (0);
+    return 0;
 }
 #endif /*SPIKES_WITH_PAYLOADS*/
 #endif /*__SPIKE_T__*/
 
-// The type of a synaptic row
+//! The type of a synaptic row
 typedef address_t synaptic_row_t;
 
-// The type of an input
+//! The type of an input
 typedef REAL input_t;
 
-// The type of a state variable
+//! The type of a state variable
 typedef REAL state_t;
 
 #endif /* __NEURON_TYPEDEFS_H__ */
