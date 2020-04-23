@@ -162,6 +162,7 @@ static void neuron_impl_load_neuron_parameters(
 
     // Read the number of steps per timestep
     n_steps_per_timestep = address[next];
+    log_info("Looping over %u steps each timestep", n_steps_per_timestep);
     next += 1;
 
     if (sizeof(global_neuron_params_t)) {
@@ -270,6 +271,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
         neuron_recording_record_accum(GSYN_INH_RECORDING_INDEX, neuron_index, total_inh);
 
         // Call functions to convert exc_input and inh_input to current
+        voltage = neuron_model_get_membrane_voltage(neuron);
         input_type_convert_excitatory_input_to_current(
                 exc_input_values, input_type, voltage);
         input_type_convert_inhibitory_input_to_current(
