@@ -342,6 +342,25 @@ bool _do_sdram_read_and_test(
     return process_synaptic_row(row_data);
 }
 
+void _sort_by_redunancy(){
+    for (int i = 0; i < bit_field_base_address->n_filters -1; i++){
+        int i_atoms = bit_field_base_address->filters[i].n_atoms;
+        int i_words = get_bit_field_size(i_atoms);
+        int i_redunant = i_atoms - count_bit_field(bit_field_base_address->filters[i].data, i_words);
+        for (int j = i + 1; j < bit_field_base_address->n_filters; j++){
+            int j_atoms = bit_field_base_address->filters[j].n_atoms;
+                        int j_words = get_bit_field_size(j_atoms);
+            int j_redunant = j_atoms - count_bit_field(bit_field_base_address->filters[j].data, j_words);
+            if (i_redunant < j_redunant) {
+                filter_info_t bit_field_temp = bit_field_base_address->filters[i];
+                bit_field_base_address->filters[i] = bit_field_base_address->filters[j];
+                bit_field_base_address->filters[j] = bit_field_temp;
+                int i_redunant = j_redunant;
+            }
+        }
+    }
+}
+
 //! \brief creates the bitfield for this master pop table and synaptic matrix
 //! \param[in] vertex_id: the index in the regions.
 //! \return bool that states if it was successful at generating the bitfield
@@ -349,16 +368,15 @@ bool generate_bit_field(void) {
 
     // write how many entries (thus bitfields) are to be generated into sdram
     log_debug("update by pop length");
-    bit_field_base_address->n_filters = population_table_length();
+    bit_field_base_address->n_filters = 0;
 
     // location where to dump the bitfields into (right after the filter structs
     address_t bit_field_words_location =
-        (address_t) &bit_field_base_address->filters[
-            bit_field_base_address->n_filters];
+        (address_t) &bit_field_base_address->filters[population_table_length()];
     log_info("words location is %x", bit_field_words_location);
     int position = 0;
 
-    // iterate through the master pop entries
+     // iterate through the master pop entries
     log_debug("starting master pop entry bit field generation");
     for (uint32_t master_pop_entry=0;
             master_pop_entry < population_table_length();
@@ -382,18 +400,6 @@ bool generate_bit_field(void) {
 
         // set the bitfield to 0. so assuming a miss on everything
         clear_bit_field(bit_field, n_words);
-        // Set the padding bits to 1
-        for (uint32_t pad = n_neurons; pad < n_words * 32; pad++){
-            bit_field_set(bit_field, pad);
-        }
-
-        // update sdram with size of this bitfield
-        bit_field_base_address->filters[master_pop_entry].key = key;
-        log_debug(
-            "putting master pop key %d in entry %d",
-            key, master_pop_entry);
-        bit_field_base_address->filters[master_pop_entry].n_atoms = n_neurons;
-        log_debug("putting n words %d in entry %d", n_words, master_pop_entry);
 
         // iterate through neurons and ask for rows from master pop table
         log_debug("searching neuron ids");
@@ -465,25 +471,32 @@ bool generate_bit_field(void) {
             }
         }
 
-        // write bitfield to sdram.
-        log_debug("writing bitfield to sdram for core use");
-        log_debug("writing to address %0x, %d words to write",
+        if (n_neurons != count_bit_field(bit_field, n_words)){
+            log_debug("writing bitfield to sdram for core use");
+            bit_field_base_address->filters[bit_field_base_address->n_filters].key = key;
+            log_debug("putting master pop key %d in entry %d", key, bit_field_base_address->n_filters);
+            bit_field_base_address->filters[bit_field_base_address->n_filters].n_atoms = n_neurons;
+            log_debug("putting n_atom %d in entry %d", n_neurons, bit_field_base_address->n_filters);
+            // write bitfield to sdram.
+            log_debug("writing to address %0x, %d words to write",
                   &bit_field_words_location[position], n_words);
-        spin1_memcpy(
-            &bit_field_words_location[position], bit_field,
-            n_words * BYTE_TO_WORD_CONVERSION);
+            spin1_memcpy(
+                &bit_field_words_location[position], bit_field,
+                n_words * BYTE_TO_WORD_CONVERSION);
+            // update pointer to correct place
+            bit_field_base_address->filters[bit_field_base_address->n_filters].data =
+                (bit_field_t) &bit_field_words_location[position];
 
-        // update pointer to correct place
-        bit_field_base_address->filters[master_pop_entry].data =
-            (bit_field_t) &bit_field_words_location[position];
+            // update tracker
+            position += n_words;
 
-        // update tracker
-        position += n_words;
-
+            bit_field_base_address->n_filters++;
+        }
         // free dtcm of bitfield.
         log_debug("freeing the bitfield dtcm");
         sark_free(bit_field);
     }
+    _sort_by_redunancy();
     return true;
 }
 
