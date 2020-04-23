@@ -261,14 +261,13 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
     def get_n_connections_from_pre_vertex_maximum(
             self, post_vertex_slice, synapse_info, min_delay=None,
             max_delay=None):
-        return numpy.clip(self._kernel_h * self._kernel_w, 0, 255)
+        return numpy.clip(self._kernel_h * self._kernel_w, 0, # 255)
+                          post_vertex_slice.n_atoms)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self, synapse_info):
-        # This is something of a cop-out and we can probably do better
         return numpy.clip(
-            self._kernel_h * self._kernel_w * synapse_info.n_pre_neurons,
-            0, 255)
+            self._kernel_h * self._kernel_w, 0, 255)
 
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, synapse_info):
