@@ -54,8 +54,9 @@ static bool bit_field_filter_initialise(address_t bitfield_region_address){
             cur_bit_field++){
         // get the key associated with this bitfield
         uint32_t key = filter_region->filters[cur_bit_field].key;
-        uint32_t n_words = filter_region->filters[cur_bit_field].n_words;
 
+        uint32_t n_words = get_bit_field_size(
+            filter_region->filters[cur_bit_field].n_atoms);
         // locate the position in the array to match the master pop element.
         int position_in_array =
             population_table_position_in_the_master_pop_array(key);

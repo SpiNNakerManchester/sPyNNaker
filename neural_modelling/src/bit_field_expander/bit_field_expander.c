@@ -392,7 +392,7 @@ bool generate_bit_field(void) {
         log_debug(
             "putting master pop key %d in entry %d",
             key, master_pop_entry);
-        bit_field_base_address->filters[master_pop_entry].n_words = n_words;
+        bit_field_base_address->filters[master_pop_entry].n_atoms = n_neurons;
         log_debug("putting n words %d in entry %d", n_words, master_pop_entry);
 
         // iterate through neurons and ask for rows from master pop table
