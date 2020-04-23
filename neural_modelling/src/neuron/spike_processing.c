@@ -79,6 +79,9 @@ static uint32_t dma_n_rewires;
 // up, only this or dma_n_rewires can be 1 with the other being 0.
 static uint32_t dma_n_spikes;
 
+// The number of successful rewires
+static uint32_t n_successful_rewires = 0;
+
 
 /* PRIVATE FUNCTIONS - static for inlining */
 
@@ -281,6 +284,7 @@ static void dma_complete_callback(uint unused, uint tag) {
         if (synaptogenesis_row_restructure(time, current_buffer->row)) {
             write_back = true;
             plastic_only = false;
+            n_successful_rewires++;
         }
     }
 
@@ -388,6 +392,12 @@ uint32_t spike_processing_get_buffer_overflows(void) { // EXPORTED
 //! \return address of circular buffer
 circular_buffer get_circular_buffer(void) { // EXPORTED
     return buffer;
+}
+
+//! \brief returns the number of successful rewires performed
+//! \return the number of successful rewires
+uint32_t spike_processing_get_successful_rewires(void) { // EXPORTED
+    return n_successful_rewires;
 }
 
 //! \brief set the number of times spike_processing has to attempt rewiring
