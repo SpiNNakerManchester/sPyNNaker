@@ -198,6 +198,7 @@ class NeuronImplStandard(AbstractNeuronImpl):
     @overrides(AbstractNeuronImpl.read_data)
     def read_data(
             self, data, offset, vertex_slice, parameters, state_variables):
+        offset += _BASE_SIZE
         for component in self.__components:
             offset = component.read_data(
                 data, offset, vertex_slice, parameters, state_variables)

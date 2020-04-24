@@ -324,11 +324,9 @@ __attribute__((unused)) // Marked unused as only used sometimes
 static void neuron_impl_store_neuron_parameters(
         address_t address, uint32_t next, uint32_t n_neurons) {
     log_debug("writing parameters");
-    //if (global_parameters == NULL) {
-    //   log_error("global parameter storage not allocated");
-    //   rt_error(RTE_SWERR);
-    //   return;
-    //}
+
+    // Skip over the steps per timestep
+    next += 1;
 
     if (sizeof(global_neuron_params_t)) {
         log_debug("writing neuron global parameters");
