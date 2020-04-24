@@ -102,6 +102,7 @@ deploy:
   provider: pages
   cleanup: false
   keep_history: true
+  token: $GITHUB_TOKEN
   local_dir: neural_modelling/html
   on:
     branch: doxygen
