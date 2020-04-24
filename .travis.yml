@@ -98,3 +98,13 @@ script:
 after_success:
   - cd $TRAVIS_BUILD_DIR
   - coveralls
+
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: $GITHUB_TOKEN
+  keep_history: true
+  local_dir: neural_modelling/html
+  on:
+    branch: doxygen
+    python: 3.6
