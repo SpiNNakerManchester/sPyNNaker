@@ -96,8 +96,7 @@ script:
   - (cd neural_modelling; exec doxygen)
 
 after_success:
-  - cd $TRAVIS_BUILD_DIR
-  - coveralls
+  - (cd $TRAVIS_BUILD_DIR; exec coveralls)
 
 deploy:
   provider: pages
