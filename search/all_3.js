@@ -1,0 +1,25 @@
+var searchData=
+[
+  ['decay_2eh',['decay.h',['../decay_8h.html',1,'']]],
+  ['decay_5fs015',['decay_s015',['../decay_8h.html#aa227505964f87337ca85b3c20da50c19',1,'decay.h']]],
+  ['decay_5fs1615',['decay_s1615',['../decay_8h.html#a6f0906eff09adaaf873d19d20f2a120f',1,'decay.h']]],
+  ['decay_5ft',['decay_t',['../decay_8h.html#a2d8155d52b7e3ac155ddc14cbe1efb25',1,'decay.h']]],
+  ['decay_5fu016',['decay_u016',['../decay_8h.html#a9ff362327565c924c464ad439daab18e',1,'decay.h']]],
+  ['decay_5fu1616',['decay_u1616',['../decay_8h.html#a4ea143b76b7a8ab080171ac1c099db1c',1,'decay.h']]],
+  ['delay',['delay',['../sp__structs_8h.html#ac2d5306d2023cbb2fb5993e24ead4dd6',1,'current_state_t']]],
+  ['delay_5fbuilder_5fconfig',['delay_builder_config',['../delay__expander_8c.html#structdelay__builder__config',1,'']]],
+  ['delay_5fexpander_2ec',['delay_expander.c',['../delay__expander_8c.html',1,'']]],
+  ['delay_5fextension_2ec',['delay_extension.c',['../delay__extension_8c.html',1,'']]],
+  ['delay_5fextension_2eh',['delay_extension.h',['../delay__extension_8h.html',1,'']]],
+  ['delay_5fextension_5fprovenance',['delay_extension_provenance',['../delay__extension_8c.html#structdelay__extension__provenance',1,'']]],
+  ['delay_5fparameters',['delay_parameters',['../delay__extension_8h.html#structdelay__parameters',1,'']]],
+  ['delay_5fvalue',['delay_value',['../matrix__generator__common_8h.html#structdelay__value',1,'']]],
+  ['delta_5fparams_5ft',['delta_params_t',['../synapse__types__delta__impl_8h.html#structdelta__params__t',1,'']]],
+  ['delta_5fshaping',['delta_shaping',['../synapse__types__delta__impl_8h.html#a04ee3f07d20f9cbc78f7084849ffa211',1,'synapse_types_delta_impl.h']]],
+  ['dma_5fbuffer',['dma_buffer',['../spike__processing_8c.html#structdma__buffer',1,'']]],
+  ['dma_5fbuffers',['dma_buffers',['../spike__processing_8c.html#a6952d0c3ce89e17b53834243600e6745',1,'spike_processing.c']]],
+  ['dma_5fbusy',['dma_busy',['../spike__processing_8c.html#a6d745b360c9ad1e3de0fe2ea134209f9',1,'spike_processing.c']]],
+  ['dma_5fcomplete_5fcallback',['dma_complete_callback',['../spike__processing_8c.html#a318b48bbfe01e9d1142dcdfed6763d76',1,'spike_processing.c']]],
+  ['dma_5fn_5frewires',['dma_n_rewires',['../spike__processing_8c.html#af760c32944840948570708761ca97038',1,'spike_processing.c']]],
+  ['dma_5fn_5fspikes',['dma_n_spikes',['../spike__processing_8c.html#a2b782d1e539bf132657dd7c00abd91f5',1,'spike_processing.c']]]
+];
