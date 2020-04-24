@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Support code for last_neuron_selection_impl.h
 #include "last_neuron_selection_impl.h"
 
 spike_t* last_spikes_buffer[2];

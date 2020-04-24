@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Synapses made of weight, accumulator, other state, and window
 #ifndef _SYNAPSE_STRUCTURE_WEIGHT_STATE_ACCUMULATOR_WINDOW_H_
 #define _SYNAPSE_STRUCTURE_WEIGHT_STATE_ACCUMULATOR_WINDOW_H_
 

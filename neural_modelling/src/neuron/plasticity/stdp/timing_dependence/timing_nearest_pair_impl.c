@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Initialisation for timing_nearest_pair_impl.h
 #include "timing_nearest_pair_impl.h"
 
 //---------------------------------------

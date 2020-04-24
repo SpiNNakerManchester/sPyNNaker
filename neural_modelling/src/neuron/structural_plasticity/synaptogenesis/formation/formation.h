@@ -15,6 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \dir
+//! \brief Synapse formation algorithms
+//! \file
+//! \brief API for synapse formation
 #ifndef _FORMATION_H_
 #define _FORMATION_H_
 

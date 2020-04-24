@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Timing rule using spike triplets
 #ifndef _TIMING_PFISTER_TRIPLET_IMPL_H_
 #define _TIMING_PFISTER_TRIPLET_IMPL_H_
 

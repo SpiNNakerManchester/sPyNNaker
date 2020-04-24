@@ -15,6 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \dir
+//! \brief Dynamic synapses
+//! \file
+//! \brief API for synapse dynamics
 #ifndef _SYNAPSE_DYNAMICS_H_
 #define _SYNAPSE_DYNAMICS_H_
 
@@ -39,14 +43,13 @@ void synapse_dynamics_print_plastic_synapses(
         address_t plastic_region_address, address_t fixed_region_address,
         uint32_t *ring_buffer_to_input_buffer_left_shifts);
 
-//! \brief returns the counters for plastic pre synaptic events based
-//!        on (if the model was compiled with SYNAPSE_BENCHMARK parameter) or
-//!        returns 0
+//! \brief returns the counters for plastic pre synaptic events based on (if
+//!     the model was compiled with SYNAPSE_BENCHMARK parameter) or returns 0
 //! \return counters for plastic pre synaptic events or 0
 uint32_t synapse_dynamics_get_plastic_pre_synaptic_events(void);
 
 //! \brief returns the number of ring buffer saturation events due to adding
-//! plastic weights.
+//!     plastic weights.
 //! \return counter for saturation events or 0
 uint32_t synapse_dynamics_get_plastic_saturation_count(void);
 
@@ -54,10 +57,10 @@ uint32_t synapse_dynamics_get_plastic_saturation_count(void);
 // Synaptic rewiring functions
 //-----------------------------------------------------------------------------
 
-//! \brief  Searches the synaptic row for the the connection with the
-//!         specified post-synaptic ID
+//! \brief Searches the synaptic row for the the connection with the
+//!     specified post-synaptic ID
 //! \param[in] id: the (core-local) ID of the neuron to search for in the
-//! synaptic row
+//!     synaptic row
 //! \param[in] row: the core-local address of the synaptic row
 //! \param[out] weight: address to contain the weight of the connection
 //! \param[out] delay: address to contain the delay of the connection
@@ -68,13 +71,13 @@ bool synapse_dynamics_find_neuron(
         uint32_t id, address_t row, weight_t *weight, uint16_t *delay,
         uint32_t *offset, uint32_t *synapse_type);
 
-//! \brief  Remove the entry at the specified offset in the synaptic row
+//! \brief Remove the entry at the specified offset in the synaptic row
 //! \param[in] offset: the offset in the row at which to remove the entry
 //! \param[in] row: the core-local address of the synaptic row
 //! \return was the removal successful?
 bool synapse_dynamics_remove_neuron(uint32_t offset, address_t row);
 
-//! \brief  Add an entry in the synaptic row
+//! \brief Add an entry in the synaptic row
 //! \param[in] id: the (core-local) ID of the post-synaptic neuron to be added
 //! \param[in] row: the core-local address of the synaptic row
 //! \param[in] weight: the initial weight associated with the connection

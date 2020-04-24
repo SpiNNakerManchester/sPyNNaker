@@ -16,6 +16,8 @@
  */
 
 /**
+ * \dir
+ * \brief Parameter generators
  * \file
  * \brief Constant value parameter generator implementation
  */

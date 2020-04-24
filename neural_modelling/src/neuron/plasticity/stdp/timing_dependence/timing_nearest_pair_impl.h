@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Timing rule using msot recent spike pair
 #ifndef _TIMING_NEAREST_PAIR_IMPL_H_
 #define _TIMING_NEAREST_PAIR_IMPL_H_
 

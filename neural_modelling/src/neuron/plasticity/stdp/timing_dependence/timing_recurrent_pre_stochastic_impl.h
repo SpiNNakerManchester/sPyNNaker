@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Recurrent stochastic timing rule
 #ifndef _TIMING_RECURRENT_PRE_STOCHASTIC_IMPL_H_
 #define _TIMING_RECURRENT_PRE_STOCHASTIC_IMPL_H_
 

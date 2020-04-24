@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Support code for weight_additive_one_term_impl.h
 #include "weight_additive_one_term_impl.h"
 
 //---------------------------------------

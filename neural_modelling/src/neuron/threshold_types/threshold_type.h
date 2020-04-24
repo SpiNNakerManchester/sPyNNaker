@@ -16,9 +16,9 @@
  */
 
 //! \dir
-//! Neuron firing thresholds
+//! \brief Neuron firing thresholds
 //! \file
-//! API for threshold types
+//! \brief API for threshold types
 
 #ifndef _THRESHOLD_TYPE_H_
 #define _THRESHOLD_TYPE_H_

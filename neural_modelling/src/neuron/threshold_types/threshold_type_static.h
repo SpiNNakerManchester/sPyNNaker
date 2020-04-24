@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Threshold that fires at a fixed level
 #ifndef _THRESHOLD_TYPE_STATIC_H_
 #define _THRESHOLD_TYPE_STATIC_H_
 

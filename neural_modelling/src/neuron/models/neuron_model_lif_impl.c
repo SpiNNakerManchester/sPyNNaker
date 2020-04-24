@@ -15,11 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Leaky Integrate and Fire neuron implementation
 #include "neuron_model_lif_impl.h"
 
 #include <debug.h>
 
-// simple Leaky I&F ODE
+//! simple Leaky I&F ODE
 static inline void lif_neuron_closed_form(
         neuron_t *neuron, REAL V_prev, input_t input_this_timestep) {
     REAL alpha = input_this_timestep * neuron->R_membrane + neuron->V_rest;

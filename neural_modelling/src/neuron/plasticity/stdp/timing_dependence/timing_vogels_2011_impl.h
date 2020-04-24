@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Timing rule from Vogels 2011
 #ifndef VOGELS_2011_IMPL_H
 #define VOGELS_2011_IMPL_H
 

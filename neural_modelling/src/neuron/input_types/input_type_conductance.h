@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Input type is standard conductance-based model
 #ifndef _INPUT_TYPE_CONDUCTANCE_H_
 #define _INPUT_TYPE_CONDUCTANCE_H_
 
@@ -33,9 +35,9 @@
 #include "input_type.h"
 
 typedef struct input_type_t {
-    // reversal voltage - Excitatory [mV]
+    //! reversal voltage - Excitatory [mV]
     REAL     V_rev_E;
-    // reversal voltage - Inhibitory [mV]
+    //! reversal voltage - Inhibitory [mV]
     REAL     V_rev_I;
 } input_type_t;
 

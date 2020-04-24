@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Izhekevich neuron implementation
 #include "neuron_model_izh_impl.h"
 
 #include <debug.h>

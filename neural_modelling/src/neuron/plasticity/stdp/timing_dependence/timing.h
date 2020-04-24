@@ -15,6 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \dir
+//! \brief STDP timing dependence rules
+//! \file
+//! \brief API for timing rules
 #ifndef _TIMING_H_
 #define _TIMING_H_
 

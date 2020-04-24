@@ -15,6 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \dir
+//! \brief Spike Timing Dependent Plasticity (STDP)
+//! \file
+//! \brief Basic definitions for STDP
 #ifndef _STDP_TYPEDEFS_H_
 #define _STDP_TYPEDEFS_H_
 

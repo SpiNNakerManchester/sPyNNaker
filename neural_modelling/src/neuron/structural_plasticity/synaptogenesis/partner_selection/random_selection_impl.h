@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Random partner selection rule
 #ifndef _RANDOM_SELECTION_IMPL_H_
 #define _RANDOM_SELECTION_IMPL_H_
 

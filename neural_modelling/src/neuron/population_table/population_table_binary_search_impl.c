@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Pop table implementation that uses binary search
 #include "population_table.h"
 #include <neuron/synapse_row.h>
 #include <debug.h>

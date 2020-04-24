@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Initialisation for timing_recurrent_dual_fsm_impl.h
 #include "timing_recurrent_dual_fsm_impl.h"
 
 //---------------------------------------

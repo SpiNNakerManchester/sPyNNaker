@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Recurrent timing rule using finite state machine
 #ifndef _TIMING_RECURRENT_DUAL_FSM_IMPL_H_
 #define _TIMING_RECURRENT_DUAL_FSM_IMPL_H_
 

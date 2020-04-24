@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Izhekevich neuron type
 #ifndef _NEURON_MODEL_IZH_CURR_IMPL_H_
 #define _NEURON_MODEL_IZH_CURR_IMPL_H_
 

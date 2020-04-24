@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Multiplicative single-term weight dependence rule
 #ifndef _WEIGHT_MULTIPLICATIVE_IMPL_H_
 #define _WEIGHT_MULTIPLICATIVE_IMPL_H_
 

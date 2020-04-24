@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief The no-input input type
 #ifndef _INPUT_TYPE_NONE_H_
 #define _INPUT_TYPE_NONE_H_
 

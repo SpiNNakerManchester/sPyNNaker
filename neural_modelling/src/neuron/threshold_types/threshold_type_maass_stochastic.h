@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Stochastic threshold, due to Wolfgang Maass _et al._
 #ifndef _THRESHOLD_TYPE_STOCHASTIC_H_
 #define _THRESHOLD_TYPE_STOCHASTIC_H_
 

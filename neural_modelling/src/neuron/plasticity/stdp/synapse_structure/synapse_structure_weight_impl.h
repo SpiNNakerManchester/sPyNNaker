@@ -15,20 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Synapses just hold weight
 #ifndef _SYNAPSE_STRUCUTRE_WEIGHT_IMPL_H_
 #define _SYNAPSE_STRUCUTRE_WEIGHT_IMPL_H_
 
 //---------------------------------------
 // Structures
 //---------------------------------------
-// Plastic synapse types are just weights;
+//! Plastic synapse types are just weights;
 typedef weight_t plastic_synapse_t;
 
-// The update state is purely a weight state
+//! The update state is purely a weight state
 typedef weight_state_t update_state_t;
 
 // The final state is just a weight as this is
-// Both the weight and the synaptic word
+//! Both the weight and the synaptic word
 typedef weight_t final_state_t;
 
 //---------------------------------------

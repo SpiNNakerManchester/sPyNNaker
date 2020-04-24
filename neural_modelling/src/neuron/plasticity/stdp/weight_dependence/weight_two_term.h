@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief API for dual-term weight dependence rules
 #ifndef _WEIGHT_TWO_TERM_H_
 #define _WEIGHT_TWO_TERM_H_
 

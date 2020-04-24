@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Synapse elimination by weighted random selection
 #ifndef _ELIMINATION_RANDOM_BY_WEIGHT_IMPL_H_
 #define _ELIMINATION_RANDOM_BY_WEIGHT_IMPL_H_
 

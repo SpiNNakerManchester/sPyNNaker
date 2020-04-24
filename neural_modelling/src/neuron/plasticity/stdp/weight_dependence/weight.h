@@ -16,6 +16,8 @@
  */
 
 /*!
+ * \dir
+ * \brief STDP weight dependence rules
  * \file
  * \brief interface for different weight implementations for the weight half of
  *  a STDP rule.

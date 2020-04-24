@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Support code for elimination_random_by_weight_impl.h
 #include "elimination_random_by_weight_impl.h"
 
 struct elimination_params *synaptogenesis_elimination_init(uint8_t **data) {

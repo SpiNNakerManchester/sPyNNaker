@@ -15,6 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \dir
+//! \brief Synapse elimination algorithms
+//! \file
+//! \brief API for synapse elimination
 #ifndef _ELIMINATION_H_
 #define _ELIMINATION_H_
 

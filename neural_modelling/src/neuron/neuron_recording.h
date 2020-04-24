@@ -16,7 +16,7 @@
  */
 
 //! \file
-//! \brief
+//! \brief Recording of the state of a neuron (spiking, voltage, etc.)
 
 #ifndef _NEURON_RECORDING_H_
 #define _NEURON_RECORDING_H_

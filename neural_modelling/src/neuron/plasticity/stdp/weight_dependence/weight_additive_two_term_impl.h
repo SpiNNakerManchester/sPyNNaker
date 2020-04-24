@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Additive dual-term weight dependence rule
 #ifndef _WEIGHT_ADDITIVE_TWO_TERM_IMPL_H_
 #define _WEIGHT_ADDITIVE_TWO_TERM_IMPL_H_
 

@@ -16,13 +16,10 @@
  */
 
 /*! \file
+ * \brief This file contains the main functions for probabilistic
+ * synaptogenesis.
  *
- * SUMMARY
- *  \brief This file contains the main functions for probabilistic
- *  synaptogenesis.
- *
- * Author: Petrut Bogdan
- *
+ * \author Petrut Bogdan
  */
 #include <neuron/structural_plasticity/synaptogenesis_dynamics.h>
 #include <neuron/population_table/population_table.h>

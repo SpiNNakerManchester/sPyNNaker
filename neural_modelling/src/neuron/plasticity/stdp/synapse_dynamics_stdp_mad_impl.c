@@ -15,6 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief STDP core implementation
+//!
+//! "mad" for "Mapping and Debugging"?
 // Spinn_common includes
 #include <static-assert.h>
 

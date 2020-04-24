@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Threshold that never fires
 #ifndef _THRESHOLD_TYPE_NONE_H_
 #define _THRESHOLD_TYPE_NONE_H_
 

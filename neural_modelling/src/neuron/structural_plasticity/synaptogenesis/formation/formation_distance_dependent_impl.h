@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Synapse formation using a distance-dependent rule
 #ifndef _FORMATION_DISTANCE_DEPENDENT_H_
 #define _FORMATION_DISTANCE_DEPENDENT_H_
 

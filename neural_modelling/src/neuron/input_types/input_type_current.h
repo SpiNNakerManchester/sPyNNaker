@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Input type is standard current-based model
 #ifndef _INPUT_TYPE_CURRENT_H_
 #define _INPUT_TYPE_CURRENT_H_
 

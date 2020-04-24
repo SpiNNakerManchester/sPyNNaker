@@ -15,6 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \dir
+//! \brief Synaptic state management
+//! \file
+//! \brief API for synaptic state
+//!
+//! Implementations of this have one or more of:
+//! * weight
+//! * state
+//! * accumulator
+//! * event window
 #ifndef _SYNAPSE_STRUCTURE_H_
 #define _SYNAPSE_STRUCTURE_H_
 

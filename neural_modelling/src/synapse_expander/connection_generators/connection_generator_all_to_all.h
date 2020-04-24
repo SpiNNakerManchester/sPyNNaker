@@ -16,6 +16,8 @@
  */
 
 /**
+ * \dir
+ * \brief Connection generators
  * \file
  * \brief All-to-All connection generator implementation
  */

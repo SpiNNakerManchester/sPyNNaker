@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Support functions for STDP
 #ifndef MATHS_H
 #define MATHS_H
 
@@ -28,10 +30,13 @@
 #define MIN(X, Y)	((X) < (Y) ? (X) : (Y))
 #define MAX(X, Y)	((X) > (Y) ? (X) : (Y))
 
+//! \brief Lookup Table of 16-bit integers.
+//!
+//! Will be padded to a word boundary at the end.
 typedef struct int16_lut {
-    uint16_t size;
-    uint16_t shift;
-    int16_t values[];
+    uint16_t size;    //!< Number of entries in table
+    uint16_t shift;   //!< Mapping from time to table index
+    int16_t values[]; //!< Table of actual values
 } int16_lut;
 
 //---------------------------------------
@@ -59,8 +64,10 @@ static inline int16_lut *maths_copy_int16_lut(address_t *address) {
     return lut;
 }
 
-
-//---------------------------------------
+//! \brief Get value from lookup table
+//! \param[in] time: The time that we are mapping
+//! \param[in] lut: The lookup table (result of maths_copy_int16_lut())
+//! \return The value from the LUT, or zero if out of range
 static inline int32_t maths_lut_exponential_decay(
         uint32_t time, const int16_lut *lut) {
     // Calculate lut index

@@ -16,7 +16,7 @@
  */
 
 //! \file
-//! \brief Distance-dependent synaptogenesis formation rule initialisation
+//! \brief Support code for formation_distance_dependent_impl.h
 #include "formation_distance_dependent_impl.h"
 
 formation_params_t *synaptogenesis_formation_init(uint8_t **data) {

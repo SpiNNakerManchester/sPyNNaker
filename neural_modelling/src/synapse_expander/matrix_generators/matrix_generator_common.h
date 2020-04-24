@@ -16,6 +16,8 @@
  */
 
 /**
+ * \dir
+ * \brief Synaptic matrix generators
  * \file
  * \brief Common functions for matrix generation
  */

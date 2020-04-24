@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief A "threshold" that maps onto an external device. Never fires.
 #ifndef _THRESHOLD_TYPE_PUSH_BOT_CONTROL_MODULE_H_
 #define _THRESHOLD_TYPE_PUSH_BOT_CONTROL_MODULE_H_
 
@@ -35,21 +37,22 @@ enum send_type {
 };
 
 struct threshold_type_t {
-    // The key to send to update the value
+    //! The key to send to update the value
     uint32_t key;
-    // A scaling factor (>0) if the value is to be sent as payload, False (0) if just the key
+    //! A scaling factor (>0) if the value is to be sent as payload,
+    //! False (0) if just the key
     uint32_t value_as_payload;
-    // The minimum allowed value to send as the payload.
-    // Values below are clipped to this value
+    //! The minimum allowed value to send as the payload.
+    //! Values below are clipped to this value
     accum min_value;
-    // The maximum allowed value to send as the payload.
-    // Values above are clipped to this value
+    //! The maximum allowed value to send as the payload.
+    //! Values above are clipped to this value
     accum max_value;
-    // The time between sending the value
+    //! The time between sending the value
     uint32_t timesteps_between_sending;
-    // The time until the next sending of the value (initially 0)
+    //! The time until the next sending of the value (initially 0)
     uint32_t time_until_next_send;
-    // Send type
+    //! Send type
     enum send_type type;
 };
 

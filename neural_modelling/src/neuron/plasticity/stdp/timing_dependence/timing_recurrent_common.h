@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Common code for recurrent timing rules
 #ifndef _TIMING_RECURRENT_COMMON_H_
 #define _TIMING_RECURRENT_COMMON_H_
 

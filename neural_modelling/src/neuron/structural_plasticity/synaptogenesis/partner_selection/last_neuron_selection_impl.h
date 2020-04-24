@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Recently spiked partners selection rule
 #ifndef _LAST_NEURON_SELECTION_IMPL_H_
 #define _LAST_NEURON_SELECTION_IMPL_H_
 
@@ -51,7 +53,7 @@ static inline bool potential_presynaptic_partner(
         return false;
     }
     uint32_t offset = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) *
-        n_spikes[buffer];
+            n_spikes[buffer];
     *spike = last_spikes_buffer[buffer][offset];
     return sp_structs_find_by_spike(&pre_info, *spike, neuron_id,
             population_id, sub_population_id, m_pop_index);

@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Input type shaped as Dirac delta
 #ifndef _INPUT_TYPE_DELTA_H_
 #define _INPUT_TYPE_DELTA_H_
 
