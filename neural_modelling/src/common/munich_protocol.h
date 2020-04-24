@@ -30,9 +30,9 @@
 #include <stdbool.h>
 
 enum {
-    OFFSET_TO_I = 4,//!< OFFSET_TO_I
-    OFFSET_TO_F = 3,//!< OFFSET_TO_F
-    OFFSET_TO_D = 0 //!< OFFSET_TO_D
+    OFFSET_TO_I = 4, //!< Offset to I (instruction) field in command word
+    OFFSET_TO_F = 3, //!< Offset to F (format) field in command word
+    OFFSET_TO_D = 0  //!< Offset to D (device) field in command word
 };
 
 //! Specific fields in the key

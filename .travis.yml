@@ -100,9 +100,8 @@ after_success:
   - coveralls
 
 deploy:
-  provider: pages
-  skip_cleanup: true
-  github_token: $GITHUB_TOKEN
+  provider: pages:git
+  cleanup: false
   keep_history: true
   local_dir: neural_modelling/html
   on:
