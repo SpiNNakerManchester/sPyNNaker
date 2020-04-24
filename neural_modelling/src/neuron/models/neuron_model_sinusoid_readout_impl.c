@@ -60,7 +60,7 @@ state_t neuron_model_state_update(
         neuron->refract_timer -= 1;
     }
 
-    uint32_t total_synapses_per_neuron = 100; //todo should this be fixed?
+    uint32_t total_synapses_per_neuron = 200; //todo should this be fixed?
 
     neuron->L = learning_signal * neuron->w_fb;
 
@@ -71,7 +71,9 @@ state_t neuron_model_state_update(
 		// ******************************************************************
     	neuron->syn_state[syn_ind].z_bar =
     			neuron->syn_state[syn_ind].z_bar * neuron->exp_TC
-    			+ (1 - neuron->exp_TC) * neuron->syn_state[syn_ind].z_bar_inp; // updating z_bar is problematic, if spike could come and interrupt neuron update
+    			+ (1 - neuron->exp_TC) *
+//    			+
+    			neuron->syn_state[syn_ind].z_bar_inp; // updating z_bar is problematic, if spike could come and interrupt neuron update
 
 
 		// ******************************************************************
@@ -154,7 +156,7 @@ void neuron_model_print_parameters(restrict neuron_pointer_t neuron) {
 
     io_printf(IO_BUF, "learning      = %k n/a\n", neuron->L);
 
-    io_printf(IO_BUF, "feedback w    = %k n/a\n", neuron->w_fb);
+    io_printf(IO_BUF, "feedback w    = %k n/a\n\n", neuron->w_fb);
 
 //    io_printf(IO_BUF, "T refract     = %u timesteps\n", neuron->T_refract);
 //    io_printf(IO_BUF, "mean_isi_ticks  = %k\n", neuron->mean_isi_ticks);

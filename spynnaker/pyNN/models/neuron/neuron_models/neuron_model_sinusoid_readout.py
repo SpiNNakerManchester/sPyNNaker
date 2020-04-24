@@ -100,7 +100,7 @@ class NeuronModelLeakyIntegrateAndFireSinusoidReadout(AbstractNeuronModel):
 
 
         super(NeuronModelLeakyIntegrateAndFireSinusoidReadout, self).__init__(
-            data_types= data_types,
+            data_types=data_types,
 
             global_data_types=global_data_types
             )

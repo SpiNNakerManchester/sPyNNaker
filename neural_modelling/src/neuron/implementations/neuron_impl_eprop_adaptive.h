@@ -51,7 +51,7 @@
 
 
 extern REAL learning_signal;
-uint32_t neurons_in_pop = 1;
+uint32_t neurons_in_pop;
 
 
 //! Array of neuron states
@@ -71,6 +71,9 @@ global_neuron_params_pointer_t global_parameters;
 
 // The synapse shaping parameters
 static synapse_param_t *neuron_synapse_shaping_params;
+
+// Bool to regularise on the first run
+static bool initial_regularise = true;
 
 static bool neuron_impl_initialise(uint32_t n_neurons) {
     // allocate DTCM for the global parameter details
@@ -155,7 +158,7 @@ static void neuron_impl_load_neuron_parameters(
     log_debug("reading parameters, next is %u, n_neurons is %u ",
             next, n_neurons);
 
-    neurons_in_pop = n_neurons;
+    neurons_in_pop = n_neurons; // get number of neurons running on this core for use during execution
 
     if (sizeof(global_neuron_params_t)) {
         log_debug("writing neuron global parameters");
@@ -204,14 +207,19 @@ static void neuron_impl_load_neuron_parameters(
     // **********************************************
     // ******** for eprop regularisation ************
     // **********************************************
-    global_parameters->core_target_rate = global_parameters->core_target_rate
-    		* n_neurons; // scales target rate depending on number of neurons
-    global_parameters->core_pop_rate = global_parameters->core_pop_rate
-    		* n_neurons; // scale initial value, too
+    if (initial_regularise) {
+    	global_parameters->core_target_rate = global_parameters->core_target_rate
+    			* n_neurons; // scales target rate depending on number of neurons
+    	global_parameters->core_pop_rate = global_parameters->core_pop_rate
+    			* n_neurons; // scale initial value, too
 
+    	initial_regularise = false;
+    }
 
     for (index_t n = 0; n < n_neurons; n++) {
         neuron_model_print_parameters(&neuron_array[n]);
+        log_debug("Neuron id %u", n);
+        neuron_model_print_state_variables(&neuron_array[n]);
     }
 
 #if LOG_LEVEL >= LOG_DEBUG
@@ -296,7 +304,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
     // Record B
     if (neuron_index == 1){
-        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = global_parameters->core_pop_rate / neurons_in_pop;
+        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = global_parameters->core_pop_rate / neurons_in_pop; // divide by neurons on core to get average per neuron contribution to core pop rate
     }
     else{
         recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
@@ -403,6 +411,14 @@ static void neuron_impl_store_neuron_parameters(
         next += n_words_needed(n_neurons * sizeof(neuron_t));
     }
 
+    log_debug("****** STORING ******");
+    for (index_t n = 0; n < n_neurons; n++) {
+        neuron_model_print_parameters(&neuron_array[n]);
+        log_debug("Neuron id %u", n);
+        neuron_model_print_state_variables(&neuron_array[n]);
+    }
+    log_debug("****** STORING COMPLETE ******");
+
     if (sizeof(input_type_t)) {
         log_debug("writing input type parameters");
         spin1_memcpy(&address[next], input_type_array,
@@ -430,6 +446,9 @@ static void neuron_impl_store_neuron_parameters(
                 n_neurons * sizeof(additional_input_t));
         next += n_words_needed(n_neurons * sizeof(additional_input_t));
     }
+
+    log_debug("global_parameters, core_target_rate, core_pop_rate %k %k",
+    		global_parameters->core_target_rate, global_parameters->core_pop_rate);
 }
 
 #if LOG_LEVEL >= LOG_DEBUG

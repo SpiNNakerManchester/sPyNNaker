@@ -47,6 +47,12 @@ SCALAR = "scalar"
 L = "learning_signal"
 W_FB = "feedback_weight"
 
+DELTA_W = "delta_w"
+Z_BAR_OLD = "z_bar_old"
+Z_BAR = "z_bar"
+EP_A = "ep_a"
+E_BAR = "e_bar"
+
 UNITS = {
     V: 'mV',
     V_REST: 'mV',
@@ -80,7 +86,7 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
         "__z",
         "__a",
         "__psi",
-        
+
         # threshold params
         "__B",
         "__small_b",
@@ -89,11 +95,11 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
         "__beta",
         # "_adpt"
         "__scalar",
-        
+
         # reg params
         "__target_rate",
         "__tau_err",
-        
+
         # learning signal
         "__l",
         "__w_fb",
@@ -110,14 +116,14 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
             v_reset,
             tau_refrac,
             psi,
-            
+
             # threshold params
             B,
             small_b,
             small_b_0,
             tau_a,
             beta,
-            
+
             # regularisation params
             target_rate,
             tau_err,
@@ -199,7 +205,7 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
         # learning signal
         self.__l = l
         self.__w_fb = w_fb
-        
+
         self.__eta = eta
 
 
@@ -231,11 +237,18 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
         state_variables[PSI] = self.__psi
         state_variables[Z] = 0  # initalise to zero
         state_variables[A] = 0  # initialise to zero
-        
+
         state_variables[BIG_B] = self.__B
         state_variables[SMALL_B] = self.__small_b
-        
-        state_variables[L] = self.__l  
+
+        state_variables[L] = self.__l
+
+        for n in range(SYNAPSES_PER_NEURON):
+            state_variables[DELTA_W+str(n)] = 0
+            state_variables[Z_BAR_OLD+str(n)] = 0
+            state_variables[Z_BAR+str(n)] = 0
+            state_variables[EP_A+str(n)] = 0
+            state_variables[E_BAR+str(n)] = 0
 
     @overrides(AbstractNeuronModel.get_units)
     def get_units(self, variable):
@@ -283,13 +296,14 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
                 ]
 
         # create synaptic state - init all state to zero
-        eprop_syn_init = [0,
-                          0,
-                          0,
-                          0,
-                          0]
-        # extend to appropriate fan-in
-        values.extend(eprop_syn_init * SYNAPSES_PER_NEURON)
+        for n in range(SYNAPSES_PER_NEURON):
+            eprop_syn_init = [state_variables[DELTA_W+str(n)],
+                              state_variables[Z_BAR_OLD+str(n)],
+                              state_variables[Z_BAR+str(n)],
+                              state_variables[EP_A+str(n)],
+                              state_variables[E_BAR+str(n)]]
+            # extend to appropriate fan-in
+            values.extend(eprop_syn_init)  # * SYNAPSES_PER_NEURON)
 
         return values
 
@@ -314,11 +328,21 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
     @overrides(AbstractNeuronModel.update_values)
     def update_values(self, values, parameters, state_variables):
 
+        delta_w = [0] * SYNAPSES_PER_NEURON
+        z_bar_old = [0] * SYNAPSES_PER_NEURON
+        z_bar = [0] * SYNAPSES_PER_NEURON
+        ep_a = [0] * SYNAPSES_PER_NEURON
+        e_bar = [0] * SYNAPSES_PER_NEURON
         # Read the data
         (v, _v_rest, _r_membrane, _exp_tc, _i_offset, count_refrac,
          _v_reset, _tau_refrac, psi,
          big_b, small_b, _small_b_0, _e_to_dt_on_tau_a, _beta, adpt, scalar,
-         l, __w_fb) = values # Not sure this will work with the new array of synapse!!!
+         l, __w_fb, delta_w, z_bar_old, z_bar, ep_a, e_bar) = values
+
+        # Not sure this will work with the new array of synapse!!!
+        # (Note that this function is only called if you do e.g. run(), set(),
+        # run() i.e. it's not used by auto-pause and resume, so this is
+        # untested)
         # todo check alignment on this
 
         # Copy the changed data only
@@ -330,6 +354,13 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
         state_variables[SMALL_B] = small_b
 
         state_variables[L] = l
+
+        for n in range(SYNAPSES_PER_NEURON):
+            state_variables[DELTA_W+str(n)] = delta_w[n]
+            state_variables[Z_BAR_OLD+str(n)] = z_bar_old[n]
+            state_variables[Z_BAR+str(n)] = z_bar[n]
+            state_variables[EP_A+str(n)] = ep_a[n]
+            state_variables[E_BAR+str(n)] = e_bar[n]
 
 
     @property
@@ -427,11 +458,11 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
     @beta.setter
     def beta(self, new_value):
         self.__beta = new_value
-        
+
     @property
     def w_fb(self):
         return self.__w_fb
-    
+
     @w_fb.setter
     def w_fb(self, new_value):
         self.__w_fb = new_value

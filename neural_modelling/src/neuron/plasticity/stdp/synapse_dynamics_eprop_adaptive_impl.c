@@ -48,7 +48,7 @@ static uint32_t synapse_type_mask;
 uint32_t num_plastic_pre_synaptic_events = 0;
 uint32_t plastic_saturation_count = 0;
 
-uint32_t neurons_in_partition = 1;
+uint32_t syn_dynamics_neurons_in_partition;
 
 //---------------------------------------
 // Macros
@@ -239,7 +239,7 @@ address_t synapse_dynamics_initialise(
         return NULL;
     }
 
-    neurons_in_partition = n_neurons;
+    syn_dynamics_neurons_in_partition = n_neurons;
 
     // Load weight dependence data
     address_t weight_result = weight_initialise(
@@ -287,12 +287,7 @@ static inline final_state_t eprop_plasticity_update(update_state_t current_state
 	// Test weight change
     // delta_w = -0.1k;
 
-
-	// Convert delta_w to int16_t (same as weight) - take only integer bits from REAL?
-//	int16_t delta_w_int = bitsk(delta_w); // THIS NEEDS UPDATING TO APPROPRIATE SCALING
 	int32_t delta_w_int = (int32_t)roundk(delta_w, 15); // THIS NEEDS UPDATING TO APPROPRIATE SCALING
-//	int16_t delta_w_int = (int) delta_w; // >> 15;
-
 
     if (delta_w){
         if (PRINT_PLASTICITY){
@@ -320,7 +315,8 @@ static inline final_state_t eprop_plasticity_update(update_state_t current_state
 	}
 
 	// Calculate regularisation error
-	REAL reg_error = (global_parameters->core_target_rate - global_parameters->core_pop_rate) / neurons_in_partition;
+	REAL reg_error = (global_parameters->core_target_rate - global_parameters->core_pop_rate) / syn_dynamics_neurons_in_partition; // this needs swapping for an inverse multiply - too expensive to do divide on every spike
+//	REAL reg_error = ((global_parameters->core_target_rate + ((neuron_array->w_fb - 0.5) * 20)) - global_parameters->core_pop_rate) / syn_dynamics_neurons_in_partition; // this needs swapping for an inverse multiply - too expensive to do divide on every spike
 //    io_printf(IO_BUF, "core_pop_rate = %k, target = %k, error = %k\n", global_parameters->core_pop_rate, global_parameters->core_target_rate, reg_error);
 
 
