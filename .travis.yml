@@ -100,7 +100,7 @@ after_success:
 
 deploy:
   provider: pages
-  cleanup: false
+  skip_cleanup: true
   keep_history: true
   token: $GITHUB_TOKEN
   local_dir: neural_modelling/html
