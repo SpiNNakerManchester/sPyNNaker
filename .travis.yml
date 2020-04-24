@@ -100,7 +100,7 @@ after_success:
   - coveralls
 
 deploy:
-  provider: pages:git
+  provider: pages
   cleanup: false
   keep_history: true
   local_dir: neural_modelling/html
