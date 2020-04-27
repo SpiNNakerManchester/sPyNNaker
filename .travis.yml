@@ -98,12 +98,31 @@ script:
 after_success:
   - (cd $TRAVIS_BUILD_DIR; exec coveralls)
 
+before_deploy:
+  - cp doc/global deploy
+  - mkdir -p deploy/c; mkdir -p deploy/python
+  - cp -a neural_modelling/html/* deploy/c
+  - cp -a doc/source/_build/html/* deploy/python
+after_deploy:
+  - rm -rf deploy
 deploy:
-  provider: pages
-  skip_cleanup: true
-  keep_history: true
-  token: $GITHUB_TOKEN
-  local_dir: neural_modelling/html
-  on:
-    branch: doxygen
-    python: 3.6
+  # TODO: merge these two once the doxygen branch is done
+  - provider: pages
+    skip_cleanup: true
+    keep_history: true
+    # Inject magic environment variable from Travis Job Configuration page
+    token: $GITHUB_TOKEN
+    local_dir: neural_modelling/html
+    on:
+      branch: master
+      python: 3.6
+      # Only enable deployment on master if we actually have supplied a token
+      condition: -n "$GITHUB_TOKEN"
+  - provider: pages
+    skip_cleanup: true
+    keep_history: true
+    token: $GITHUB_TOKEN
+    local_dir: neural_modelling/html
+    on:
+      branch: doxygen
+      python: 3.6
