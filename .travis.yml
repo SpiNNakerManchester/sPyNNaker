@@ -14,14 +14,16 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 language: python
-python:
-  - 2.7
-  - 3.6
-  - 3.7
+jobs:
+  include:
+    - name: Py3.6 (and doc deploy)
+      python: 3.6
+    - name: Py3.7
+      python: 3.7
+    - name: Py2.7 (legacy)
+      python: 2.7
 dist: xenial
 cache: pip
-env:
-  - MPLBACKEND=module://matplotlib.backends.backend_agg
 addons:
   apt:
     packages:
@@ -35,6 +37,8 @@ addons:
       - doxygen
 
 before_install:
+  # Work around weird installation/configuration issue with matplotlib
+  - export MPLBACKEND=module://matplotlib.backends.backend_agg
   # Work around ludicrous Travis bug
   - git clone https://github.com/SpiNNakerManchester/SupportScripts.git support
   - python support/travis_blocking_stdout.py
@@ -106,23 +110,23 @@ before_deploy:
 after_deploy:
   - rm -rf deploy
 deploy:
-  # TODO: merge these two once the doxygen branch is done
   - provider: pages
     skip_cleanup: true
     keep_history: true
     # Inject magic environment variable from Travis Job Configuration page
     token: $GITHUB_TOKEN
-    local_dir: neural_modelling/html
+    local_dir: deploy
     on:
       branch: master
       python: 3.6
       # Only enable deployment on master if we actually have supplied a token
       condition: -n "$GITHUB_TOKEN"
+  # TODO: Remove this auxilary deployment before finalizing
   - provider: pages
     skip_cleanup: true
     keep_history: true
     token: $GITHUB_TOKEN
-    local_dir: neural_modelling/html
+    local_dir: deploy
     on:
       branch: doxygen
       python: 3.6
