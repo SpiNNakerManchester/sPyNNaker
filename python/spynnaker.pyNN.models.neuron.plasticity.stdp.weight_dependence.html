@@ -24,6 +24,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="spynnaker.pyNN.models.neuron.structural_plasticity package" href="spynnaker.pyNN.models.neuron.structural_plasticity.html" />
@@ -116,7 +117,7 @@
 <dl class="attribute">
 <dt id="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.abstract_has_a_plus_a_minus.AbstractHasAPlusAMinus.A_minus">
 <code class="descname">A_minus</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.abstract_has_a_plus_a_minus.AbstractHasAPlusAMinus.A_minus" title="Permalink to this definition">¶</a></dt>
-<dd><p>Settable model parameter: </p>
+<dd><p>Settable model parameter: <span class="math">\(A^-\)</span></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -130,7 +131,7 @@
 <dl class="attribute">
 <dt id="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.abstract_has_a_plus_a_minus.AbstractHasAPlusAMinus.A_plus">
 <code class="descname">A_plus</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.abstract_has_a_plus_a_minus.AbstractHasAPlusAMinus.A_plus" title="Permalink to this definition">¶</a></dt>
-<dd><p>Settable model parameter: </p>
+<dd><p>Settable model parameter: <span class="math">\(A^+\)</span></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -144,14 +145,14 @@
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.abstract_has_a_plus_a_minus.AbstractHasAPlusAMinus.set_a_plus_a_minus">
 <code class="descname">set_a_plus_a_minus</code><span class="sig-paren">(</span><em>a_plus</em>, <em>a_minus</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/plasticity/stdp/weight_dependence/abstract_has_a_plus_a_minus.html#AbstractHasAPlusAMinus.set_a_plus_a_minus"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.abstract_has_a_plus_a_minus.AbstractHasAPlusAMinus.set_a_plus_a_minus" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the values of  and .</p>
+<dd><p>Set the values of <span class="math">\(A^+\)</span> and <span class="math">\(A^-\)</span>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>a_plus</strong> (<em>float</em>) &#8211; </li>
-<li><strong>a_minus</strong> (<em>float</em>) &#8211; </li>
+<li><strong>a_plus</strong> (<em>float</em>) &#8211; <span class="math">\(A^+\)</span></li>
+<li><strong>a_minus</strong> (<em>float</em>) &#8211; <span class="math">\(A^-\)</span></li>
 </ul>
 </td>
 </tr>
@@ -306,8 +307,8 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>w_min</strong> (<em>float</em>) &#8211; </li>
-<li><strong>w_max</strong> (<em>float</em>) &#8211; </li>
+<li><strong>w_min</strong> (<em>float</em>) &#8211; <span class="math">\(w^{min}\)</span></li>
+<li><strong>w_max</strong> (<em>float</em>) &#8211; <span class="math">\(w^{max}\)</span></li>
 </ul>
 </td>
 </tr>
@@ -381,7 +382,7 @@
 <dl class="attribute">
 <dt id="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.weight_dependence_additive.WeightDependenceAdditive.w_max">
 <code class="descname">w_max</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.weight_dependence_additive.WeightDependenceAdditive.w_max" title="Permalink to this definition">¶</a></dt>
-<dd><p></p>
+<dd><p><span class="math">\(w^{max}\)</span></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -395,7 +396,7 @@
 <dl class="attribute">
 <dt id="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.weight_dependence_additive.WeightDependenceAdditive.w_min">
 <code class="descname">w_min</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.weight_dependence_additive.WeightDependenceAdditive.w_min" title="Permalink to this definition">¶</a></dt>
-<dd><p></p>
+<dd><p><span class="math">\(w^{min}\)</span></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -455,10 +456,10 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>w_min</strong> (<em>float</em>) &#8211; </li>
-<li><strong>w_max</strong> (<em>float</em>) &#8211; </li>
-<li><strong>A3_plus</strong> (<em>float</em>) &#8211; </li>
-<li><strong>A3_minus</strong> (<em>float</em>) &#8211; </li>
+<li><strong>w_min</strong> (<em>float</em>) &#8211; <span class="math">\(w^{min}\)</span></li>
+<li><strong>w_max</strong> (<em>float</em>) &#8211; <span class="math">\(w^{max}\)</span></li>
+<li><strong>A3_plus</strong> (<em>float</em>) &#8211; <span class="math">\(A_3^+\)</span></li>
+<li><strong>A3_minus</strong> (<em>float</em>) &#8211; <span class="math">\(A_3^-\)</span></li>
 </ul>
 </td>
 </tr>
@@ -467,7 +468,7 @@
 <dl class="attribute">
 <dt id="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.weight_dependence_additive_triplet.WeightDependenceAdditiveTriplet.A3_minus">
 <code class="descname">A3_minus</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.weight_dependence_additive_triplet.WeightDependenceAdditiveTriplet.A3_minus" title="Permalink to this definition">¶</a></dt>
-<dd><p></p>
+<dd><p><span class="math">\(A_3^-\)</span></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -481,7 +482,7 @@
 <dl class="attribute">
 <dt id="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.weight_dependence_additive_triplet.WeightDependenceAdditiveTriplet.A3_plus">
 <code class="descname">A3_plus</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.weight_dependence_additive_triplet.WeightDependenceAdditiveTriplet.A3_plus" title="Permalink to this definition">¶</a></dt>
-<dd><p></p>
+<dd><p><span class="math">\(A_3^+\)</span></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -565,7 +566,7 @@
 <dl class="attribute">
 <dt id="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.weight_dependence_additive_triplet.WeightDependenceAdditiveTriplet.w_max">
 <code class="descname">w_max</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.weight_dependence_additive_triplet.WeightDependenceAdditiveTriplet.w_max" title="Permalink to this definition">¶</a></dt>
-<dd><p></p>
+<dd><p><span class="math">\(w^{max}\)</span></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -579,7 +580,7 @@
 <dl class="attribute">
 <dt id="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.weight_dependence_additive_triplet.WeightDependenceAdditiveTriplet.w_min">
 <code class="descname">w_min</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.weight_dependence_additive_triplet.WeightDependenceAdditiveTriplet.w_min" title="Permalink to this definition">¶</a></dt>
-<dd><p></p>
+<dd><p><span class="math">\(w^{min}\)</span></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -639,8 +640,8 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>w_min</strong> (<em>float</em>) &#8211; </li>
-<li><strong>w_max</strong> (<em>float</em>) &#8211; </li>
+<li><strong>w_min</strong> (<em>float</em>) &#8211; <span class="math">\(w^{min}\)</span></li>
+<li><strong>w_max</strong> (<em>float</em>) &#8211; <span class="math">\(w^{max}\)</span></li>
 </ul>
 </td>
 </tr>
@@ -714,7 +715,7 @@
 <dl class="attribute">
 <dt id="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.weight_dependence_multiplicative.WeightDependenceMultiplicative.w_max">
 <code class="descname">w_max</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.weight_dependence_multiplicative.WeightDependenceMultiplicative.w_max" title="Permalink to this definition">¶</a></dt>
-<dd><p></p>
+<dd><p><span class="math">\(w^{max}\)</span></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -728,7 +729,7 @@
 <dl class="attribute">
 <dt id="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.weight_dependence_multiplicative.WeightDependenceMultiplicative.w_min">
 <code class="descname">w_min</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.weight_dependence_multiplicative.WeightDependenceMultiplicative.w_min" title="Permalink to this definition">¶</a></dt>
-<dd><p></p>
+<dd><p><span class="math">\(w^{min}\)</span></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -786,7 +787,7 @@
 <dl class="attribute">
 <dt id="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractHasAPlusAMinus.A_minus">
 <code class="descname">A_minus</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractHasAPlusAMinus.A_minus" title="Permalink to this definition">¶</a></dt>
-<dd><p>Settable model parameter: </p>
+<dd><p>Settable model parameter: <span class="math">\(A^-\)</span></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -800,7 +801,7 @@
 <dl class="attribute">
 <dt id="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractHasAPlusAMinus.A_plus">
 <code class="descname">A_plus</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractHasAPlusAMinus.A_plus" title="Permalink to this definition">¶</a></dt>
-<dd><p>Settable model parameter: </p>
+<dd><p>Settable model parameter: <span class="math">\(A^+\)</span></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -814,14 +815,14 @@
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractHasAPlusAMinus.set_a_plus_a_minus">
 <code class="descname">set_a_plus_a_minus</code><span class="sig-paren">(</span><em>a_plus</em>, <em>a_minus</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/plasticity/stdp/weight_dependence/abstract_has_a_plus_a_minus.html#AbstractHasAPlusAMinus.set_a_plus_a_minus"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractHasAPlusAMinus.set_a_plus_a_minus" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the values of  and .</p>
+<dd><p>Set the values of <span class="math">\(A^+\)</span> and <span class="math">\(A^-\)</span>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>a_plus</strong> (<em>float</em>) &#8211; </li>
-<li><strong>a_minus</strong> (<em>float</em>) &#8211; </li>
+<li><strong>a_plus</strong> (<em>float</em>) &#8211; <span class="math">\(A^+\)</span></li>
+<li><strong>a_minus</strong> (<em>float</em>) &#8211; <span class="math">\(A^-\)</span></li>
 </ul>
 </td>
 </tr>
@@ -970,8 +971,8 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>w_min</strong> (<em>float</em>) &#8211; </li>
-<li><strong>w_max</strong> (<em>float</em>) &#8211; </li>
+<li><strong>w_min</strong> (<em>float</em>) &#8211; <span class="math">\(w^{min}\)</span></li>
+<li><strong>w_max</strong> (<em>float</em>) &#8211; <span class="math">\(w^{max}\)</span></li>
 </ul>
 </td>
 </tr>
@@ -1045,7 +1046,7 @@
 <dl class="attribute">
 <dt id="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditive.w_max">
 <code class="descname">w_max</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditive.w_max" title="Permalink to this definition">¶</a></dt>
-<dd><p></p>
+<dd><p><span class="math">\(w^{max}\)</span></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1059,7 +1060,7 @@
 <dl class="attribute">
 <dt id="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditive.w_min">
 <code class="descname">w_min</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditive.w_min" title="Permalink to this definition">¶</a></dt>
-<dd><p></p>
+<dd><p><span class="math">\(w^{min}\)</span></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1116,8 +1117,8 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>w_min</strong> (<em>float</em>) &#8211; </li>
-<li><strong>w_max</strong> (<em>float</em>) &#8211; </li>
+<li><strong>w_min</strong> (<em>float</em>) &#8211; <span class="math">\(w^{min}\)</span></li>
+<li><strong>w_max</strong> (<em>float</em>) &#8211; <span class="math">\(w^{max}\)</span></li>
 </ul>
 </td>
 </tr>
@@ -1191,7 +1192,7 @@
 <dl class="attribute">
 <dt id="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceMultiplicative.w_max">
 <code class="descname">w_max</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceMultiplicative.w_max" title="Permalink to this definition">¶</a></dt>
-<dd><p></p>
+<dd><p><span class="math">\(w^{max}\)</span></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1205,7 +1206,7 @@
 <dl class="attribute">
 <dt id="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceMultiplicative.w_min">
 <code class="descname">w_min</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceMultiplicative.w_min" title="Permalink to this definition">¶</a></dt>
-<dd><p></p>
+<dd><p><span class="math">\(w^{min}\)</span></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1262,10 +1263,10 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>w_min</strong> (<em>float</em>) &#8211; </li>
-<li><strong>w_max</strong> (<em>float</em>) &#8211; </li>
-<li><strong>A3_plus</strong> (<em>float</em>) &#8211; </li>
-<li><strong>A3_minus</strong> (<em>float</em>) &#8211; </li>
+<li><strong>w_min</strong> (<em>float</em>) &#8211; <span class="math">\(w^{min}\)</span></li>
+<li><strong>w_max</strong> (<em>float</em>) &#8211; <span class="math">\(w^{max}\)</span></li>
+<li><strong>A3_plus</strong> (<em>float</em>) &#8211; <span class="math">\(A_3^+\)</span></li>
+<li><strong>A3_minus</strong> (<em>float</em>) &#8211; <span class="math">\(A_3^-\)</span></li>
 </ul>
 </td>
 </tr>
@@ -1274,7 +1275,7 @@
 <dl class="attribute">
 <dt id="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditiveTriplet.A3_minus">
 <code class="descname">A3_minus</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditiveTriplet.A3_minus" title="Permalink to this definition">¶</a></dt>
-<dd><p></p>
+<dd><p><span class="math">\(A_3^-\)</span></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1288,7 +1289,7 @@
 <dl class="attribute">
 <dt id="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditiveTriplet.A3_plus">
 <code class="descname">A3_plus</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditiveTriplet.A3_plus" title="Permalink to this definition">¶</a></dt>
-<dd><p></p>
+<dd><p><span class="math">\(A_3^+\)</span></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1372,7 +1373,7 @@
 <dl class="attribute">
 <dt id="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditiveTriplet.w_max">
 <code class="descname">w_max</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditiveTriplet.w_max" title="Permalink to this definition">¶</a></dt>
-<dd><p></p>
+<dd><p><span class="math">\(w^{max}\)</span></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1386,7 +1387,7 @@
 <dl class="attribute">
 <dt id="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditiveTriplet.w_min">
 <code class="descname">w_min</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.WeightDependenceAdditiveTriplet.w_min" title="Permalink to this definition">¶</a></dt>
-<dd><p></p>
+<dd><p><span class="math">\(w^{min}\)</span></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />

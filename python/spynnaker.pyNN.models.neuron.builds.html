@@ -24,6 +24,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="spynnaker.pyNN.models.neuron.implementations package" href="spynnaker.pyNN.models.neuron.implementations.html" />
@@ -197,20 +198,20 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>tau_m</strong> (<em>float</em>) &#8211; </li>
-<li><strong>cm</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v_rest</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v_reset</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v_thresh</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_syn_E</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_syn_I</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_refrac</strong> (<em>float</em>) &#8211; </li>
-<li><strong>i_offset</strong> (<em>float</em>) &#8211; </li>
-<li><strong>e_rev_E</strong> (<em>float</em>) &#8211; </li>
-<li><strong>e_rev_I</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v</strong> (<em>float</em>) &#8211; </li>
-<li><strong>isyn_exc</strong> (<em>float</em>) &#8211; </li>
-<li><strong>isyn_inh</strong> (<em>float</em>) &#8211; </li>
+<li><strong>tau_m</strong> (<em>float</em>) &#8211; <span class="math">\(\tau_m\)</span></li>
+<li><strong>cm</strong> (<em>float</em>) &#8211; <span class="math">\(C_m\)</span></li>
+<li><strong>v_rest</strong> (<em>float</em>) &#8211; <span class="math">\(V_{rest}\)</span></li>
+<li><strong>v_reset</strong> (<em>float</em>) &#8211; <span class="math">\(V_{reset}\)</span></li>
+<li><strong>v_thresh</strong> (<em>float</em>) &#8211; <span class="math">\(V_{thresh}\)</span></li>
+<li><strong>tau_syn_E</strong> (<em>float</em>) &#8211; <span class="math">\(\tau^{syn}_e\)</span></li>
+<li><strong>tau_syn_I</strong> (<em>float</em>) &#8211; <span class="math">\(\tau^{syn}_i\)</span></li>
+<li><strong>tau_refrac</strong> (<em>float</em>) &#8211; <span class="math">\(\tau_{refrac}\)</span></li>
+<li><strong>i_offset</strong> (<em>float</em>) &#8211; <span class="math">\(I_{offset}\)</span></li>
+<li><strong>e_rev_E</strong> (<em>float</em>) &#8211; <span class="math">\(E^{rev}_e\)</span></li>
+<li><strong>e_rev_I</strong> (<em>float</em>) &#8211; <span class="math">\(E^{rev}_i\)</span></li>
+<li><strong>v</strong> (<em>float</em>) &#8211; <span class="math">\(V_{init}\)</span></li>
+<li><strong>isyn_exc</strong> (<em>float</em>) &#8211; <span class="math">\(I^{syn}_e\)</span></li>
+<li><strong>isyn_inh</strong> (<em>float</em>) &#8211; <span class="math">\(I^{syn}_i\)</span></li>
 </ul>
 </td>
 </tr>
@@ -232,22 +233,22 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>tau_m</strong> &#8211; </li>
-<li><strong>cm</strong> &#8211; </li>
-<li><strong>v_rest</strong> &#8211; </li>
-<li><strong>v_reset</strong> &#8211; </li>
-<li><strong>v_thresh</strong> &#8211; </li>
-<li><strong>tau_syn_E</strong> &#8211; </li>
-<li><strong>tau_syn_I</strong> &#8211; </li>
-<li><strong>tau_refrac</strong> &#8211; </li>
-<li><strong>i_offset</strong> &#8211; </li>
-<li><strong>e_rev_E</strong> &#8211; </li>
-<li><strong>e_rev_I</strong> &#8211; </li>
-<li><strong>du_th</strong> &#8211; </li>
-<li><strong>tau_th</strong> &#8211; </li>
-<li><strong>v</strong> &#8211; </li>
-<li><strong>isyn_exc</strong> &#8211; </li>
-<li><strong>isyn_inh</strong> &#8211; </li>
+<li><strong>tau_m</strong> &#8211; <span class="math">\(\tau_m\)</span></li>
+<li><strong>cm</strong> &#8211; <span class="math">\(C_m\)</span></li>
+<li><strong>v_rest</strong> &#8211; <span class="math">\(V_{rest}\)</span></li>
+<li><strong>v_reset</strong> &#8211; <span class="math">\(V_{reset}\)</span></li>
+<li><strong>v_thresh</strong> &#8211; <span class="math">\(V_{thresh}\)</span></li>
+<li><strong>tau_syn_E</strong> &#8211; <span class="math">\(\tau^{syn}_e\)</span></li>
+<li><strong>tau_syn_I</strong> &#8211; <span class="math">\(\tau^{syn}_i\)</span></li>
+<li><strong>tau_refrac</strong> &#8211; <span class="math">\(\tau_{refrac}\)</span></li>
+<li><strong>i_offset</strong> &#8211; <span class="math">\(I_{offset}\)</span></li>
+<li><strong>e_rev_E</strong> &#8211; <span class="math">\(E^{rev}_e\)</span></li>
+<li><strong>e_rev_I</strong> &#8211; <span class="math">\(E^{rev}_i\)</span></li>
+<li><strong>du_th</strong> &#8211; <span class="math">\(du_{thresh}\)</span></li>
+<li><strong>tau_th</strong> &#8211; <span class="math">\(\tau_{thresh}\)</span></li>
+<li><strong>v</strong> &#8211; <span class="math">\(V_{init}\)</span></li>
+<li><strong>isyn_exc</strong> &#8211; <span class="math">\(I^{syn}_e\)</span></li>
+<li><strong>isyn_inh</strong> &#8211; <span class="math">\(I^{syn}_i\)</span></li>
 </ul>
 </td>
 </tr>
@@ -268,20 +269,20 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>tau_m</strong> (<em>float</em>) &#8211; </li>
-<li><strong>cm</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v_rest</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v_reset</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v_thresh</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_syn_E</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_syn_I</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_refrac</strong> (<em>float</em>) &#8211; </li>
-<li><strong>i_offset</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v</strong> (<em>float</em>) &#8211; </li>
-<li><strong>exc_response</strong> (<em>float</em>) &#8211; </li>
-<li><strong>exc_exp_response</strong> (<em>float</em>) &#8211; </li>
-<li><strong>inh_response</strong> (<em>float</em>) &#8211; </li>
-<li><strong>inh_exp_response</strong> (<em>float</em>) &#8211; </li>
+<li><strong>tau_m</strong> (<em>float</em>) &#8211; <span class="math">\(\tau_m\)</span></li>
+<li><strong>cm</strong> (<em>float</em>) &#8211; <span class="math">\(C_m\)</span></li>
+<li><strong>v_rest</strong> (<em>float</em>) &#8211; <span class="math">\(V_{rest}\)</span></li>
+<li><strong>v_reset</strong> (<em>float</em>) &#8211; <span class="math">\(V_{reset}\)</span></li>
+<li><strong>v_thresh</strong> (<em>float</em>) &#8211; <span class="math">\(V_{thresh}\)</span></li>
+<li><strong>tau_syn_E</strong> (<em>float</em>) &#8211; <span class="math">\(\tau^{syn}_e\)</span></li>
+<li><strong>tau_syn_I</strong> (<em>float</em>) &#8211; <span class="math">\(\tau^{syn}_i\)</span></li>
+<li><strong>tau_refrac</strong> (<em>float</em>) &#8211; <span class="math">\(\tau_{refrac}\)</span></li>
+<li><strong>i_offset</strong> (<em>float</em>) &#8211; <span class="math">\(I_{offset}\)</span></li>
+<li><strong>v</strong> (<em>float</em>) &#8211; <span class="math">\(V_{init}\)</span></li>
+<li><strong>exc_response</strong> (<em>float</em>) &#8211; <span class="math">\(response^\mathrm{linear}_e\)</span></li>
+<li><strong>exc_exp_response</strong> (<em>float</em>) &#8211; <span class="math">\(response^\mathrm{exponential}_e\)</span></li>
+<li><strong>inh_response</strong> (<em>float</em>) &#8211; <span class="math">\(response^\mathrm{linear}_i\)</span></li>
+<li><strong>inh_exp_response</strong> (<em>float</em>) &#8211; <span class="math">\(response^\mathrm{exponential}_i\)</span></li>
 </ul>
 </td>
 </tr>
@@ -302,16 +303,16 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>tau_m</strong> (<em>float</em>) &#8211; </li>
-<li><strong>cm</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v_rest</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v_reset</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v_thresh</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_refrac</strong> (<em>float</em>) &#8211; </li>
-<li><strong>i_offset</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v</strong> (<em>float</em>) &#8211; </li>
-<li><strong>isyn_exc</strong> (<em>float</em>) &#8211; </li>
-<li><strong>isyn_inh</strong> (<em>float</em>) &#8211; </li>
+<li><strong>tau_m</strong> (<em>float</em>) &#8211; <span class="math">\(\tau_m\)</span></li>
+<li><strong>cm</strong> (<em>float</em>) &#8211; <span class="math">\(C_m\)</span></li>
+<li><strong>v_rest</strong> (<em>float</em>) &#8211; <span class="math">\(V_{rest}\)</span></li>
+<li><strong>v_reset</strong> (<em>float</em>) &#8211; <span class="math">\(V_{reset}\)</span></li>
+<li><strong>v_thresh</strong> (<em>float</em>) &#8211; <span class="math">\(V_{thresh}\)</span></li>
+<li><strong>tau_refrac</strong> (<em>float</em>) &#8211; <span class="math">\(\tau_{refrac}\)</span></li>
+<li><strong>i_offset</strong> (<em>float</em>) &#8211; <span class="math">\(I_{offset}\)</span></li>
+<li><strong>v</strong> (<em>float</em>) &#8211; <span class="math">\(V_{init}\)</span></li>
+<li><strong>isyn_exc</strong> (<em>float</em>) &#8211; <span class="math">\(I^{syn}_e\)</span></li>
+<li><strong>isyn_inh</strong> (<em>float</em>) &#8211; <span class="math">\(I^{syn}_i\)</span></li>
 </ul>
 </td>
 </tr>
@@ -332,20 +333,20 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>tau_m</strong> (<em>float</em>) &#8211; </li>
-<li><strong>cm</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v_rest</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v_reset</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v_thresh</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_syn_E</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_syn_E2</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_syn_I</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_refrac</strong> (<em>float</em>) &#8211; </li>
-<li><strong>i_offset</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v</strong> (<em>float</em>) &#8211; </li>
-<li><strong>isyn_exc</strong> (<em>float</em>) &#8211; </li>
-<li><strong>isyn_inh</strong> (<em>float</em>) &#8211; </li>
-<li><strong>isyn_exc2</strong> (<em>float</em>) &#8211; </li>
+<li><strong>tau_m</strong> (<em>float</em>) &#8211; <span class="math">\(\tau_m\)</span></li>
+<li><strong>cm</strong> (<em>float</em>) &#8211; <span class="math">\(C_m\)</span></li>
+<li><strong>v_rest</strong> (<em>float</em>) &#8211; <span class="math">\(V_{rest}\)</span></li>
+<li><strong>v_reset</strong> (<em>float</em>) &#8211; <span class="math">\(V_{reset}\)</span></li>
+<li><strong>v_thresh</strong> (<em>float</em>) &#8211; <span class="math">\(V_{thresh}\)</span></li>
+<li><strong>tau_syn_E</strong> (<em>float</em>) &#8211; <span class="math">\(\tau^{syn}_{e_1}\)</span></li>
+<li><strong>tau_syn_E2</strong> (<em>float</em>) &#8211; <span class="math">\(\tau^{syn}_{e_2}\)</span></li>
+<li><strong>tau_syn_I</strong> (<em>float</em>) &#8211; <span class="math">\(\tau^{syn}_i\)</span></li>
+<li><strong>tau_refrac</strong> (<em>float</em>) &#8211; <span class="math">\(\tau_{refrac}\)</span></li>
+<li><strong>i_offset</strong> (<em>float</em>) &#8211; <span class="math">\(I_{offset}\)</span></li>
+<li><strong>v</strong> (<em>float</em>) &#8211; <span class="math">\(V_{init}\)</span></li>
+<li><strong>isyn_exc</strong> (<em>float</em>) &#8211; <span class="math">\(I^{syn}_{e_1}\)</span></li>
+<li><strong>isyn_inh</strong> (<em>float</em>) &#8211; <span class="math">\(I^{syn}_i\)</span></li>
+<li><strong>isyn_exc2</strong> (<em>float</em>) &#8211; <span class="math">\(I^{syn}_{e_2}\)</span></li>
 </ul>
 </td>
 </tr>
@@ -366,18 +367,18 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>tau_m</strong> (<em>float</em>) &#8211; </li>
-<li><strong>cm</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v_rest</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v_reset</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v_thresh</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_syn_E</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_syn_I</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_refrac</strong> (<em>float</em>) &#8211; </li>
-<li><strong>i_offset</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v</strong> (<em>float</em>) &#8211; </li>
-<li><strong>isyn_exc</strong> (<em>float</em>) &#8211; </li>
-<li><strong>isyn_inh</strong> (<em>float</em>) &#8211; </li>
+<li><strong>tau_m</strong> (<em>float</em>) &#8211; <span class="math">\(\tau_m\)</span></li>
+<li><strong>cm</strong> (<em>float</em>) &#8211; <span class="math">\(C_m\)</span></li>
+<li><strong>v_rest</strong> (<em>float</em>) &#8211; <span class="math">\(V_{rest}\)</span></li>
+<li><strong>v_reset</strong> (<em>float</em>) &#8211; <span class="math">\(V_{reset}\)</span></li>
+<li><strong>v_thresh</strong> (<em>float</em>) &#8211; <span class="math">\(V_{thresh}\)</span></li>
+<li><strong>tau_syn_E</strong> (<em>float</em>) &#8211; <span class="math">\(\tau^{syn}_e\)</span></li>
+<li><strong>tau_syn_I</strong> (<em>float</em>) &#8211; <span class="math">\(\tau^{syn}_i\)</span></li>
+<li><strong>tau_refrac</strong> (<em>float</em>) &#8211; <span class="math">\(\tau_{refrac}\)</span></li>
+<li><strong>i_offset</strong> (<em>float</em>) &#8211; <span class="math">\(I_{offset}\)</span></li>
+<li><strong>v</strong> (<em>float</em>) &#8211; <span class="math">\(V_{init}\)</span></li>
+<li><strong>isyn_exc</strong> (<em>float</em>) &#8211; <span class="math">\(I^{syn}_e\)</span></li>
+<li><strong>isyn_inh</strong> (<em>float</em>) &#8211; <span class="math">\(I^{syn}_i\)</span></li>
 </ul>
 </td>
 </tr>
@@ -398,21 +399,21 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>tau_m</strong> (<em>float</em>) &#8211; </li>
-<li><strong>cm</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v_rest</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v_reset</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v_thresh</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_syn_E</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_syn_I</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_refrac</strong> (<em>float</em>) &#8211; </li>
-<li><strong>i_offset</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_ca2</strong> (<em>float</em>) &#8211; </li>
-<li><strong>i_ca2</strong> (<em>float</em>) &#8211; </li>
-<li><strong>i_alpha</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v</strong> (<em>float</em>) &#8211; </li>
-<li><strong>isyn_exc</strong> (<em>float</em>) &#8211; </li>
-<li><strong>isyn_inh</strong> (<em>float</em>) &#8211; </li>
+<li><strong>tau_m</strong> (<em>float</em>) &#8211; <span class="math">\(\tau_m\)</span></li>
+<li><strong>cm</strong> (<em>float</em>) &#8211; <span class="math">\(C_m\)</span></li>
+<li><strong>v_rest</strong> (<em>float</em>) &#8211; <span class="math">\(V_{rest}\)</span></li>
+<li><strong>v_reset</strong> (<em>float</em>) &#8211; <span class="math">\(V_{reset}\)</span></li>
+<li><strong>v_thresh</strong> (<em>float</em>) &#8211; <span class="math">\(V_{thresh}\)</span></li>
+<li><strong>tau_syn_E</strong> (<em>float</em>) &#8211; <span class="math">\(\tau^{syn}_e\)</span></li>
+<li><strong>tau_syn_I</strong> (<em>float</em>) &#8211; <span class="math">\(\tau^{syn}_i\)</span></li>
+<li><strong>tau_refrac</strong> (<em>float</em>) &#8211; <span class="math">\(\tau_{refrac}\)</span></li>
+<li><strong>i_offset</strong> (<em>float</em>) &#8211; <span class="math">\(I_{offset}\)</span></li>
+<li><strong>tau_ca2</strong> (<em>float</em>) &#8211; <span class="math">\(\tau_{\mathrm{Ca}^{+2}}\)</span></li>
+<li><strong>i_ca2</strong> (<em>float</em>) &#8211; <span class="math">\(I_{\mathrm{Ca}^{+2}}\)</span></li>
+<li><strong>i_alpha</strong> (<em>float</em>) &#8211; <span class="math">\(\tau_\alpha\)</span></li>
+<li><strong>v</strong> (<em>float</em>) &#8211; <span class="math">\(V_{init}\)</span></li>
+<li><strong>isyn_exc</strong> (<em>float</em>) &#8211; <span class="math">\(I^{syn}_e\)</span></li>
+<li><strong>isyn_inh</strong> (<em>float</em>) &#8211; <span class="math">\(I^{syn}_i\)</span></li>
 </ul>
 </td>
 </tr>
@@ -433,20 +434,20 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>tau_m</strong> (<em>float</em>) &#8211; </li>
-<li><strong>cm</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v_rest</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v_reset</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v_thresh</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_syn_E</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_syn_E2</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_syn_I</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_refrac</strong> (<em>float</em>) &#8211; </li>
-<li><strong>i_offset</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v</strong> (<em>float</em>) &#8211; </li>
-<li><strong>isyn_exc</strong> (<em>float</em>) &#8211; </li>
-<li><strong>isyn_exc2</strong> (<em>float</em>) &#8211; </li>
-<li><strong>isyn_inh</strong> (<em>float</em>) &#8211; </li>
+<li><strong>tau_m</strong> (<em>float</em>) &#8211; <span class="math">\(\tau_m\)</span></li>
+<li><strong>cm</strong> (<em>float</em>) &#8211; <span class="math">\(C_m\)</span></li>
+<li><strong>v_rest</strong> (<em>float</em>) &#8211; <span class="math">\(V_{rest}\)</span></li>
+<li><strong>v_reset</strong> (<em>float</em>) &#8211; <span class="math">\(V_{reset}\)</span></li>
+<li><strong>v_thresh</strong> (<em>float</em>) &#8211; <span class="math">\(V_{thresh}\)</span></li>
+<li><strong>tau_syn_E</strong> (<em>float</em>) &#8211; <span class="math">\(\tau^{syn}_{e_1}\)</span></li>
+<li><strong>tau_syn_E2</strong> (<em>float</em>) &#8211; <span class="math">\(\tau^{syn}_{e_2}\)</span></li>
+<li><strong>tau_syn_I</strong> (<em>float</em>) &#8211; <span class="math">\(\tau^{syn}_i\)</span></li>
+<li><strong>tau_refrac</strong> (<em>float</em>) &#8211; <span class="math">\(\tau_{refrac}\)</span></li>
+<li><strong>i_offset</strong> (<em>float</em>) &#8211; <span class="math">\(I_{offset}\)</span></li>
+<li><strong>v</strong> (<em>float</em>) &#8211; <span class="math">\(V_{init}\)</span></li>
+<li><strong>isyn_exc</strong> (<em>float</em>) &#8211; <span class="math">\(I^{syn}_{e_1}\)</span></li>
+<li><strong>isyn_exc2</strong> (<em>float</em>) &#8211; <span class="math">\(I^{syn}_{e_2}\)</span></li>
+<li><strong>isyn_inh</strong> (<em>float</em>) &#8211; <span class="math">\(I^{syn}_i\)</span></li>
 <li><strong>multiplicator</strong> (<em>float</em>) &#8211; </li>
 <li><strong>exc2_old</strong> (<em>float</em>) &#8211; </li>
 </ul>
@@ -493,19 +494,19 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>a</strong> (<em>float</em>) &#8211; </li>
-<li><strong>b</strong> (<em>float</em>) &#8211; </li>
-<li><strong>c</strong> (<em>float</em>) &#8211; </li>
-<li><strong>d</strong> (<em>float</em>) &#8211; </li>
-<li><strong>i_offset</strong> (<em>float</em>) &#8211; </li>
-<li><strong>u</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_syn_E</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_syn_I</strong> (<em>float</em>) &#8211; </li>
-<li><strong>e_rev_E</strong> (<em>float</em>) &#8211; </li>
-<li><strong>e_rev_I</strong> (<em>float</em>) &#8211; </li>
-<li><strong>isyn_exc</strong> (<em>float</em>) &#8211; </li>
-<li><strong>isyn_inh</strong> (<em>float</em>) &#8211; </li>
+<li><strong>a</strong> (<em>float</em>) &#8211; <span class="math">\(a\)</span></li>
+<li><strong>b</strong> (<em>float</em>) &#8211; <span class="math">\(b\)</span></li>
+<li><strong>c</strong> (<em>float</em>) &#8211; <span class="math">\(c\)</span></li>
+<li><strong>d</strong> (<em>float</em>) &#8211; <span class="math">\(d\)</span></li>
+<li><strong>i_offset</strong> (<em>float</em>) &#8211; <span class="math">\(I_{offset}\)</span></li>
+<li><strong>u</strong> (<em>float</em>) &#8211; <span class="math">\(u_{init} = \delta V_{init}\)</span></li>
+<li><strong>v</strong> (<em>float</em>) &#8211; <span class="math">\(v_{init} = V_{init}\)</span></li>
+<li><strong>tau_syn_E</strong> (<em>float</em>) &#8211; <span class="math">\(\tau^{syn}_e\)</span></li>
+<li><strong>tau_syn_I</strong> (<em>float</em>) &#8211; <span class="math">\(\tau^{syn}_i\)</span></li>
+<li><strong>e_rev_E</strong> (<em>float</em>) &#8211; <span class="math">\(E^{rev}_e\)</span></li>
+<li><strong>e_rev_I</strong> (<em>float</em>) &#8211; <span class="math">\(E^{rev}_i\)</span></li>
+<li><strong>isyn_exc</strong> (<em>float</em>) &#8211; <span class="math">\(I^{syn}_e\)</span></li>
+<li><strong>isyn_inh</strong> (<em>float</em>) &#8211; <span class="math">\(I^{syn}_i\)</span></li>
 </ul>
 </td>
 </tr>
@@ -526,17 +527,17 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>a</strong> (<em>float</em>) &#8211; </li>
-<li><strong>b</strong> (<em>float</em>) &#8211; </li>
-<li><strong>c</strong> (<em>float</em>) &#8211; </li>
-<li><strong>d</strong> (<em>float</em>) &#8211; </li>
-<li><strong>i_offset</strong> (<em>float</em>) &#8211; </li>
-<li><strong>u</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_syn_E</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_syn_I</strong> (<em>float</em>) &#8211; </li>
-<li><strong>isyn_exc</strong> (<em>float</em>) &#8211; </li>
-<li><strong>isyn_inh</strong> (<em>float</em>) &#8211; </li>
+<li><strong>a</strong> (<em>float</em>) &#8211; <span class="math">\(a\)</span></li>
+<li><strong>b</strong> (<em>float</em>) &#8211; <span class="math">\(b\)</span></li>
+<li><strong>c</strong> (<em>float</em>) &#8211; <span class="math">\(c\)</span></li>
+<li><strong>d</strong> (<em>float</em>) &#8211; <span class="math">\(d\)</span></li>
+<li><strong>i_offset</strong> (<em>float</em>) &#8211; <span class="math">\(I_{offset}\)</span></li>
+<li><strong>u</strong> (<em>float</em>) &#8211; <span class="math">\(u_{init} = \delta V_{init}\)</span></li>
+<li><strong>v</strong> (<em>float</em>) &#8211; <span class="math">\(v_{init} = V_{init}\)</span></li>
+<li><strong>tau_syn_E</strong> (<em>float</em>) &#8211; <span class="math">\(\tau^{syn}_e\)</span></li>
+<li><strong>tau_syn_I</strong> (<em>float</em>) &#8211; <span class="math">\(\tau^{syn}_i\)</span></li>
+<li><strong>isyn_exc</strong> (<em>float</em>) &#8211; <span class="math">\(I^{syn}_e\)</span></li>
+<li><strong>isyn_inh</strong> (<em>float</em>) &#8211; <span class="math">\(I^{syn}_i\)</span></li>
 </ul>
 </td>
 </tr>
@@ -620,20 +621,20 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>tau_m</strong> (<em>float</em>) &#8211; </li>
-<li><strong>cm</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v_rest</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v_reset</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v_thresh</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_syn_E</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_syn_I</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_refrac</strong> (<em>float</em>) &#8211; </li>
-<li><strong>i_offset</strong> (<em>float</em>) &#8211; </li>
-<li><strong>e_rev_E</strong> (<em>float</em>) &#8211; </li>
-<li><strong>e_rev_I</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v</strong> (<em>float</em>) &#8211; </li>
-<li><strong>isyn_exc</strong> (<em>float</em>) &#8211; </li>
-<li><strong>isyn_inh</strong> (<em>float</em>) &#8211; </li>
+<li><strong>tau_m</strong> (<em>float</em>) &#8211; <span class="math">\(\tau_m\)</span></li>
+<li><strong>cm</strong> (<em>float</em>) &#8211; <span class="math">\(C_m\)</span></li>
+<li><strong>v_rest</strong> (<em>float</em>) &#8211; <span class="math">\(V_{rest}\)</span></li>
+<li><strong>v_reset</strong> (<em>float</em>) &#8211; <span class="math">\(V_{reset}\)</span></li>
+<li><strong>v_thresh</strong> (<em>float</em>) &#8211; <span class="math">\(V_{thresh}\)</span></li>
+<li><strong>tau_syn_E</strong> (<em>float</em>) &#8211; <span class="math">\(\tau^{syn}_e\)</span></li>
+<li><strong>tau_syn_I</strong> (<em>float</em>) &#8211; <span class="math">\(\tau^{syn}_i\)</span></li>
+<li><strong>tau_refrac</strong> (<em>float</em>) &#8211; <span class="math">\(\tau_{refrac}\)</span></li>
+<li><strong>i_offset</strong> (<em>float</em>) &#8211; <span class="math">\(I_{offset}\)</span></li>
+<li><strong>e_rev_E</strong> (<em>float</em>) &#8211; <span class="math">\(E^{rev}_e\)</span></li>
+<li><strong>e_rev_I</strong> (<em>float</em>) &#8211; <span class="math">\(E^{rev}_i\)</span></li>
+<li><strong>v</strong> (<em>float</em>) &#8211; <span class="math">\(V_{init}\)</span></li>
+<li><strong>isyn_exc</strong> (<em>float</em>) &#8211; <span class="math">\(I^{syn}_e\)</span></li>
+<li><strong>isyn_inh</strong> (<em>float</em>) &#8211; <span class="math">\(I^{syn}_i\)</span></li>
 </ul>
 </td>
 </tr>
@@ -651,20 +652,20 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>tau_m</strong> (<em>float</em>) &#8211; </li>
-<li><strong>cm</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v_rest</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v_reset</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v_thresh</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_syn_E</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_syn_I</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_refrac</strong> (<em>float</em>) &#8211; </li>
-<li><strong>i_offset</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v</strong> (<em>float</em>) &#8211; </li>
-<li><strong>exc_response</strong> (<em>float</em>) &#8211; </li>
-<li><strong>exc_exp_response</strong> (<em>float</em>) &#8211; </li>
-<li><strong>inh_response</strong> (<em>float</em>) &#8211; </li>
-<li><strong>inh_exp_response</strong> (<em>float</em>) &#8211; </li>
+<li><strong>tau_m</strong> (<em>float</em>) &#8211; <span class="math">\(\tau_m\)</span></li>
+<li><strong>cm</strong> (<em>float</em>) &#8211; <span class="math">\(C_m\)</span></li>
+<li><strong>v_rest</strong> (<em>float</em>) &#8211; <span class="math">\(V_{rest}\)</span></li>
+<li><strong>v_reset</strong> (<em>float</em>) &#8211; <span class="math">\(V_{reset}\)</span></li>
+<li><strong>v_thresh</strong> (<em>float</em>) &#8211; <span class="math">\(V_{thresh}\)</span></li>
+<li><strong>tau_syn_E</strong> (<em>float</em>) &#8211; <span class="math">\(\tau^{syn}_e\)</span></li>
+<li><strong>tau_syn_I</strong> (<em>float</em>) &#8211; <span class="math">\(\tau^{syn}_i\)</span></li>
+<li><strong>tau_refrac</strong> (<em>float</em>) &#8211; <span class="math">\(\tau_{refrac}\)</span></li>
+<li><strong>i_offset</strong> (<em>float</em>) &#8211; <span class="math">\(I_{offset}\)</span></li>
+<li><strong>v</strong> (<em>float</em>) &#8211; <span class="math">\(V_{init}\)</span></li>
+<li><strong>exc_response</strong> (<em>float</em>) &#8211; <span class="math">\(response^\mathrm{linear}_e\)</span></li>
+<li><strong>exc_exp_response</strong> (<em>float</em>) &#8211; <span class="math">\(response^\mathrm{exponential}_e\)</span></li>
+<li><strong>inh_response</strong> (<em>float</em>) &#8211; <span class="math">\(response^\mathrm{linear}_i\)</span></li>
+<li><strong>inh_exp_response</strong> (<em>float</em>) &#8211; <span class="math">\(response^\mathrm{exponential}_i\)</span></li>
 </ul>
 </td>
 </tr>
@@ -682,20 +683,20 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>tau_m</strong> (<em>float</em>) &#8211; </li>
-<li><strong>cm</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v_rest</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v_reset</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v_thresh</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_syn_E</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_syn_E2</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_syn_I</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_refrac</strong> (<em>float</em>) &#8211; </li>
-<li><strong>i_offset</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v</strong> (<em>float</em>) &#8211; </li>
-<li><strong>isyn_exc</strong> (<em>float</em>) &#8211; </li>
-<li><strong>isyn_inh</strong> (<em>float</em>) &#8211; </li>
-<li><strong>isyn_exc2</strong> (<em>float</em>) &#8211; </li>
+<li><strong>tau_m</strong> (<em>float</em>) &#8211; <span class="math">\(\tau_m\)</span></li>
+<li><strong>cm</strong> (<em>float</em>) &#8211; <span class="math">\(C_m\)</span></li>
+<li><strong>v_rest</strong> (<em>float</em>) &#8211; <span class="math">\(V_{rest}\)</span></li>
+<li><strong>v_reset</strong> (<em>float</em>) &#8211; <span class="math">\(V_{reset}\)</span></li>
+<li><strong>v_thresh</strong> (<em>float</em>) &#8211; <span class="math">\(V_{thresh}\)</span></li>
+<li><strong>tau_syn_E</strong> (<em>float</em>) &#8211; <span class="math">\(\tau^{syn}_{e_1}\)</span></li>
+<li><strong>tau_syn_E2</strong> (<em>float</em>) &#8211; <span class="math">\(\tau^{syn}_{e_2}\)</span></li>
+<li><strong>tau_syn_I</strong> (<em>float</em>) &#8211; <span class="math">\(\tau^{syn}_i\)</span></li>
+<li><strong>tau_refrac</strong> (<em>float</em>) &#8211; <span class="math">\(\tau_{refrac}\)</span></li>
+<li><strong>i_offset</strong> (<em>float</em>) &#8211; <span class="math">\(I_{offset}\)</span></li>
+<li><strong>v</strong> (<em>float</em>) &#8211; <span class="math">\(V_{init}\)</span></li>
+<li><strong>isyn_exc</strong> (<em>float</em>) &#8211; <span class="math">\(I^{syn}_{e_1}\)</span></li>
+<li><strong>isyn_inh</strong> (<em>float</em>) &#8211; <span class="math">\(I^{syn}_i\)</span></li>
+<li><strong>isyn_exc2</strong> (<em>float</em>) &#8211; <span class="math">\(I^{syn}_{e_2}\)</span></li>
 </ul>
 </td>
 </tr>
@@ -713,18 +714,18 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>tau_m</strong> (<em>float</em>) &#8211; </li>
-<li><strong>cm</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v_rest</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v_reset</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v_thresh</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_syn_E</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_syn_I</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_refrac</strong> (<em>float</em>) &#8211; </li>
-<li><strong>i_offset</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v</strong> (<em>float</em>) &#8211; </li>
-<li><strong>isyn_exc</strong> (<em>float</em>) &#8211; </li>
-<li><strong>isyn_inh</strong> (<em>float</em>) &#8211; </li>
+<li><strong>tau_m</strong> (<em>float</em>) &#8211; <span class="math">\(\tau_m\)</span></li>
+<li><strong>cm</strong> (<em>float</em>) &#8211; <span class="math">\(C_m\)</span></li>
+<li><strong>v_rest</strong> (<em>float</em>) &#8211; <span class="math">\(V_{rest}\)</span></li>
+<li><strong>v_reset</strong> (<em>float</em>) &#8211; <span class="math">\(V_{reset}\)</span></li>
+<li><strong>v_thresh</strong> (<em>float</em>) &#8211; <span class="math">\(V_{thresh}\)</span></li>
+<li><strong>tau_syn_E</strong> (<em>float</em>) &#8211; <span class="math">\(\tau^{syn}_e\)</span></li>
+<li><strong>tau_syn_I</strong> (<em>float</em>) &#8211; <span class="math">\(\tau^{syn}_i\)</span></li>
+<li><strong>tau_refrac</strong> (<em>float</em>) &#8211; <span class="math">\(\tau_{refrac}\)</span></li>
+<li><strong>i_offset</strong> (<em>float</em>) &#8211; <span class="math">\(I_{offset}\)</span></li>
+<li><strong>v</strong> (<em>float</em>) &#8211; <span class="math">\(V_{init}\)</span></li>
+<li><strong>isyn_exc</strong> (<em>float</em>) &#8211; <span class="math">\(I^{syn}_e\)</span></li>
+<li><strong>isyn_inh</strong> (<em>float</em>) &#8211; <span class="math">\(I^{syn}_i\)</span></li>
 </ul>
 </td>
 </tr>
@@ -763,19 +764,19 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>a</strong> (<em>float</em>) &#8211; </li>
-<li><strong>b</strong> (<em>float</em>) &#8211; </li>
-<li><strong>c</strong> (<em>float</em>) &#8211; </li>
-<li><strong>d</strong> (<em>float</em>) &#8211; </li>
-<li><strong>i_offset</strong> (<em>float</em>) &#8211; </li>
-<li><strong>u</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_syn_E</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_syn_I</strong> (<em>float</em>) &#8211; </li>
-<li><strong>e_rev_E</strong> (<em>float</em>) &#8211; </li>
-<li><strong>e_rev_I</strong> (<em>float</em>) &#8211; </li>
-<li><strong>isyn_exc</strong> (<em>float</em>) &#8211; </li>
-<li><strong>isyn_inh</strong> (<em>float</em>) &#8211; </li>
+<li><strong>a</strong> (<em>float</em>) &#8211; <span class="math">\(a\)</span></li>
+<li><strong>b</strong> (<em>float</em>) &#8211; <span class="math">\(b\)</span></li>
+<li><strong>c</strong> (<em>float</em>) &#8211; <span class="math">\(c\)</span></li>
+<li><strong>d</strong> (<em>float</em>) &#8211; <span class="math">\(d\)</span></li>
+<li><strong>i_offset</strong> (<em>float</em>) &#8211; <span class="math">\(I_{offset}\)</span></li>
+<li><strong>u</strong> (<em>float</em>) &#8211; <span class="math">\(u_{init} = \delta V_{init}\)</span></li>
+<li><strong>v</strong> (<em>float</em>) &#8211; <span class="math">\(v_{init} = V_{init}\)</span></li>
+<li><strong>tau_syn_E</strong> (<em>float</em>) &#8211; <span class="math">\(\tau^{syn}_e\)</span></li>
+<li><strong>tau_syn_I</strong> (<em>float</em>) &#8211; <span class="math">\(\tau^{syn}_i\)</span></li>
+<li><strong>e_rev_E</strong> (<em>float</em>) &#8211; <span class="math">\(E^{rev}_e\)</span></li>
+<li><strong>e_rev_I</strong> (<em>float</em>) &#8211; <span class="math">\(E^{rev}_i\)</span></li>
+<li><strong>isyn_exc</strong> (<em>float</em>) &#8211; <span class="math">\(I^{syn}_e\)</span></li>
+<li><strong>isyn_inh</strong> (<em>float</em>) &#8211; <span class="math">\(I^{syn}_i\)</span></li>
 </ul>
 </td>
 </tr>
@@ -793,17 +794,17 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>a</strong> (<em>float</em>) &#8211; </li>
-<li><strong>b</strong> (<em>float</em>) &#8211; </li>
-<li><strong>c</strong> (<em>float</em>) &#8211; </li>
-<li><strong>d</strong> (<em>float</em>) &#8211; </li>
-<li><strong>i_offset</strong> (<em>float</em>) &#8211; </li>
-<li><strong>u</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_syn_E</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_syn_I</strong> (<em>float</em>) &#8211; </li>
-<li><strong>isyn_exc</strong> (<em>float</em>) &#8211; </li>
-<li><strong>isyn_inh</strong> (<em>float</em>) &#8211; </li>
+<li><strong>a</strong> (<em>float</em>) &#8211; <span class="math">\(a\)</span></li>
+<li><strong>b</strong> (<em>float</em>) &#8211; <span class="math">\(b\)</span></li>
+<li><strong>c</strong> (<em>float</em>) &#8211; <span class="math">\(c\)</span></li>
+<li><strong>d</strong> (<em>float</em>) &#8211; <span class="math">\(d\)</span></li>
+<li><strong>i_offset</strong> (<em>float</em>) &#8211; <span class="math">\(I_{offset}\)</span></li>
+<li><strong>u</strong> (<em>float</em>) &#8211; <span class="math">\(u_{init} = \delta V_{init}\)</span></li>
+<li><strong>v</strong> (<em>float</em>) &#8211; <span class="math">\(v_{init} = V_{init}\)</span></li>
+<li><strong>tau_syn_E</strong> (<em>float</em>) &#8211; <span class="math">\(\tau^{syn}_e\)</span></li>
+<li><strong>tau_syn_I</strong> (<em>float</em>) &#8211; <span class="math">\(\tau^{syn}_i\)</span></li>
+<li><strong>isyn_exc</strong> (<em>float</em>) &#8211; <span class="math">\(I^{syn}_e\)</span></li>
+<li><strong>isyn_inh</strong> (<em>float</em>) &#8211; <span class="math">\(I^{syn}_i\)</span></li>
 </ul>
 </td>
 </tr>
@@ -822,22 +823,22 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>tau_m</strong> &#8211; </li>
-<li><strong>cm</strong> &#8211; </li>
-<li><strong>v_rest</strong> &#8211; </li>
-<li><strong>v_reset</strong> &#8211; </li>
-<li><strong>v_thresh</strong> &#8211; </li>
-<li><strong>tau_syn_E</strong> &#8211; </li>
-<li><strong>tau_syn_I</strong> &#8211; </li>
-<li><strong>tau_refrac</strong> &#8211; </li>
-<li><strong>i_offset</strong> &#8211; </li>
-<li><strong>e_rev_E</strong> &#8211; </li>
-<li><strong>e_rev_I</strong> &#8211; </li>
-<li><strong>du_th</strong> &#8211; </li>
-<li><strong>tau_th</strong> &#8211; </li>
-<li><strong>v</strong> &#8211; </li>
-<li><strong>isyn_exc</strong> &#8211; </li>
-<li><strong>isyn_inh</strong> &#8211; </li>
+<li><strong>tau_m</strong> &#8211; <span class="math">\(\tau_m\)</span></li>
+<li><strong>cm</strong> &#8211; <span class="math">\(C_m\)</span></li>
+<li><strong>v_rest</strong> &#8211; <span class="math">\(V_{rest}\)</span></li>
+<li><strong>v_reset</strong> &#8211; <span class="math">\(V_{reset}\)</span></li>
+<li><strong>v_thresh</strong> &#8211; <span class="math">\(V_{thresh}\)</span></li>
+<li><strong>tau_syn_E</strong> &#8211; <span class="math">\(\tau^{syn}_e\)</span></li>
+<li><strong>tau_syn_I</strong> &#8211; <span class="math">\(\tau^{syn}_i\)</span></li>
+<li><strong>tau_refrac</strong> &#8211; <span class="math">\(\tau_{refrac}\)</span></li>
+<li><strong>i_offset</strong> &#8211; <span class="math">\(I_{offset}\)</span></li>
+<li><strong>e_rev_E</strong> &#8211; <span class="math">\(E^{rev}_e\)</span></li>
+<li><strong>e_rev_I</strong> &#8211; <span class="math">\(E^{rev}_i\)</span></li>
+<li><strong>du_th</strong> &#8211; <span class="math">\(du_{thresh}\)</span></li>
+<li><strong>tau_th</strong> &#8211; <span class="math">\(\tau_{thresh}\)</span></li>
+<li><strong>v</strong> &#8211; <span class="math">\(V_{init}\)</span></li>
+<li><strong>isyn_exc</strong> &#8211; <span class="math">\(I^{syn}_e\)</span></li>
+<li><strong>isyn_inh</strong> &#8211; <span class="math">\(I^{syn}_i\)</span></li>
 </ul>
 </td>
 </tr>
@@ -855,16 +856,16 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>tau_m</strong> (<em>float</em>) &#8211; </li>
-<li><strong>cm</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v_rest</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v_reset</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v_thresh</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_refrac</strong> (<em>float</em>) &#8211; </li>
-<li><strong>i_offset</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v</strong> (<em>float</em>) &#8211; </li>
-<li><strong>isyn_exc</strong> (<em>float</em>) &#8211; </li>
-<li><strong>isyn_inh</strong> (<em>float</em>) &#8211; </li>
+<li><strong>tau_m</strong> (<em>float</em>) &#8211; <span class="math">\(\tau_m\)</span></li>
+<li><strong>cm</strong> (<em>float</em>) &#8211; <span class="math">\(C_m\)</span></li>
+<li><strong>v_rest</strong> (<em>float</em>) &#8211; <span class="math">\(V_{rest}\)</span></li>
+<li><strong>v_reset</strong> (<em>float</em>) &#8211; <span class="math">\(V_{reset}\)</span></li>
+<li><strong>v_thresh</strong> (<em>float</em>) &#8211; <span class="math">\(V_{thresh}\)</span></li>
+<li><strong>tau_refrac</strong> (<em>float</em>) &#8211; <span class="math">\(\tau_{refrac}\)</span></li>
+<li><strong>i_offset</strong> (<em>float</em>) &#8211; <span class="math">\(I_{offset}\)</span></li>
+<li><strong>v</strong> (<em>float</em>) &#8211; <span class="math">\(V_{init}\)</span></li>
+<li><strong>isyn_exc</strong> (<em>float</em>) &#8211; <span class="math">\(I^{syn}_e\)</span></li>
+<li><strong>isyn_inh</strong> (<em>float</em>) &#8211; <span class="math">\(I^{syn}_i\)</span></li>
 </ul>
 </td>
 </tr>
@@ -882,21 +883,21 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>tau_m</strong> (<em>float</em>) &#8211; </li>
-<li><strong>cm</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v_rest</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v_reset</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v_thresh</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_syn_E</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_syn_I</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_refrac</strong> (<em>float</em>) &#8211; </li>
-<li><strong>i_offset</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_ca2</strong> (<em>float</em>) &#8211; </li>
-<li><strong>i_ca2</strong> (<em>float</em>) &#8211; </li>
-<li><strong>i_alpha</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v</strong> (<em>float</em>) &#8211; </li>
-<li><strong>isyn_exc</strong> (<em>float</em>) &#8211; </li>
-<li><strong>isyn_inh</strong> (<em>float</em>) &#8211; </li>
+<li><strong>tau_m</strong> (<em>float</em>) &#8211; <span class="math">\(\tau_m\)</span></li>
+<li><strong>cm</strong> (<em>float</em>) &#8211; <span class="math">\(C_m\)</span></li>
+<li><strong>v_rest</strong> (<em>float</em>) &#8211; <span class="math">\(V_{rest}\)</span></li>
+<li><strong>v_reset</strong> (<em>float</em>) &#8211; <span class="math">\(V_{reset}\)</span></li>
+<li><strong>v_thresh</strong> (<em>float</em>) &#8211; <span class="math">\(V_{thresh}\)</span></li>
+<li><strong>tau_syn_E</strong> (<em>float</em>) &#8211; <span class="math">\(\tau^{syn}_e\)</span></li>
+<li><strong>tau_syn_I</strong> (<em>float</em>) &#8211; <span class="math">\(\tau^{syn}_i\)</span></li>
+<li><strong>tau_refrac</strong> (<em>float</em>) &#8211; <span class="math">\(\tau_{refrac}\)</span></li>
+<li><strong>i_offset</strong> (<em>float</em>) &#8211; <span class="math">\(I_{offset}\)</span></li>
+<li><strong>tau_ca2</strong> (<em>float</em>) &#8211; <span class="math">\(\tau_{\mathrm{Ca}^{+2}}\)</span></li>
+<li><strong>i_ca2</strong> (<em>float</em>) &#8211; <span class="math">\(I_{\mathrm{Ca}^{+2}}\)</span></li>
+<li><strong>i_alpha</strong> (<em>float</em>) &#8211; <span class="math">\(\tau_\alpha\)</span></li>
+<li><strong>v</strong> (<em>float</em>) &#8211; <span class="math">\(V_{init}\)</span></li>
+<li><strong>isyn_exc</strong> (<em>float</em>) &#8211; <span class="math">\(I^{syn}_e\)</span></li>
+<li><strong>isyn_inh</strong> (<em>float</em>) &#8211; <span class="math">\(I^{syn}_i\)</span></li>
 </ul>
 </td>
 </tr>
@@ -914,20 +915,20 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>tau_m</strong> (<em>float</em>) &#8211; </li>
-<li><strong>cm</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v_rest</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v_reset</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v_thresh</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_syn_E</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_syn_E2</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_syn_I</strong> (<em>float</em>) &#8211; </li>
-<li><strong>tau_refrac</strong> (<em>float</em>) &#8211; </li>
-<li><strong>i_offset</strong> (<em>float</em>) &#8211; </li>
-<li><strong>v</strong> (<em>float</em>) &#8211; </li>
-<li><strong>isyn_exc</strong> (<em>float</em>) &#8211; </li>
-<li><strong>isyn_exc2</strong> (<em>float</em>) &#8211; </li>
-<li><strong>isyn_inh</strong> (<em>float</em>) &#8211; </li>
+<li><strong>tau_m</strong> (<em>float</em>) &#8211; <span class="math">\(\tau_m\)</span></li>
+<li><strong>cm</strong> (<em>float</em>) &#8211; <span class="math">\(C_m\)</span></li>
+<li><strong>v_rest</strong> (<em>float</em>) &#8211; <span class="math">\(V_{rest}\)</span></li>
+<li><strong>v_reset</strong> (<em>float</em>) &#8211; <span class="math">\(V_{reset}\)</span></li>
+<li><strong>v_thresh</strong> (<em>float</em>) &#8211; <span class="math">\(V_{thresh}\)</span></li>
+<li><strong>tau_syn_E</strong> (<em>float</em>) &#8211; <span class="math">\(\tau^{syn}_{e_1}\)</span></li>
+<li><strong>tau_syn_E2</strong> (<em>float</em>) &#8211; <span class="math">\(\tau^{syn}_{e_2}\)</span></li>
+<li><strong>tau_syn_I</strong> (<em>float</em>) &#8211; <span class="math">\(\tau^{syn}_i\)</span></li>
+<li><strong>tau_refrac</strong> (<em>float</em>) &#8211; <span class="math">\(\tau_{refrac}\)</span></li>
+<li><strong>i_offset</strong> (<em>float</em>) &#8211; <span class="math">\(I_{offset}\)</span></li>
+<li><strong>v</strong> (<em>float</em>) &#8211; <span class="math">\(V_{init}\)</span></li>
+<li><strong>isyn_exc</strong> (<em>float</em>) &#8211; <span class="math">\(I^{syn}_{e_1}\)</span></li>
+<li><strong>isyn_exc2</strong> (<em>float</em>) &#8211; <span class="math">\(I^{syn}_{e_2}\)</span></li>
+<li><strong>isyn_inh</strong> (<em>float</em>) &#8211; <span class="math">\(I^{syn}_i\)</span></li>
 <li><strong>multiplicator</strong> (<em>float</em>) &#8211; </li>
 <li><strong>exc2_old</strong> (<em>float</em>) &#8211; </li>
 </ul>
