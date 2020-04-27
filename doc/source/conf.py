@@ -51,7 +51,8 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
     'sphinx.ext.autosummary',
-    'sphinx.ext.intersphinx'
+    'sphinx.ext.intersphinx',
+    'sphinx.ext.mathjax'
 ]
 
 ds_link = 'http://dataspecification.readthedocs.io/en/latest/'

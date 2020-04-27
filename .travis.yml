@@ -106,7 +106,7 @@ before_deploy:
   - cp -a doc/global deploy
   - mkdir -p deploy/c; mkdir -p deploy/python
   - cp -a neural_modelling/html/* deploy/c
-  - cp -a doc/build/html/* deploy/python
+  - cp -a doc/_build/html/* deploy/python
 after_deploy:
   - rm -rf deploy
 deploy:
