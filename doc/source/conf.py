@@ -221,6 +221,7 @@ html_static_path = ['_static']
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'sPyNNakerdoc'
 
+mathjax_path = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js'
 
 # -- Options for LaTeX output ---------------------------------------------
 
