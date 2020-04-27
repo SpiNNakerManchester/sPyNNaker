@@ -113,13 +113,13 @@ after_success:
 before_deploy:
   - mkdir -p $DEPLOY_DIR/c $DEPLOY_DIR/python
   - >
-    [ -d $ROOT_DOC_DIR ] && cp -a $ROOT_DOC_DIR $DEPLOY_DIR
+    [ -d $ROOT_DOC_DIR ] && cp -va $ROOT_DOC_DIR/* $DEPLOY_DIR
   - >
-    [ -d $C_DOC_DIR ] && cp -a $C_DOC_DIR/* $DEPLOY_DIR/c
+    [ -d $C_DOC_DIR ] && cp -va $C_DOC_DIR/* $DEPLOY_DIR/c
   - >
-    [ -d $PY_DOC_DIR ] && cp -a $PY_DOC_DIR/* $DEPLOY_DIR/python
+    [ -d $PY_DOC_DIR ] && cp -va $PY_DOC_DIR/* $DEPLOY_DIR/python
 after_deploy:
-  - rm -rf deploy
+  - rm -rf $DEPLOY_DIR
 deploy:
   - provider: pages
     skip_cleanup: true
