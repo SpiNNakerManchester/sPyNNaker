@@ -1,0 +1,38 @@
+spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure package
+======================================================================
+
+Submodules
+----------
+
+spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.abstract_synapse_structure module
+------------------------------------------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.abstract_synapse_structure
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.synapse_structure_weight_accumulator module
+----------------------------------------------------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.synapse_structure_weight_accumulator
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.synapse_structure_weight_only module
+---------------------------------------------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.synapse_structure_weight_only
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure
+    :members:
+    :undoc-members:
+    :show-inheritance:

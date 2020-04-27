@@ -1,0 +1,542 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>spynnaker.pyNN.models.neuron.additional_inputs package &#8212; sPyNNaker  documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="spynnaker.pyNN.models.neuron.builds package" href="spynnaker.pyNN.models.neuron.builds.html" />
+    <link rel="prev" title="spynnaker.pyNN.models.neuron package" href="spynnaker.pyNN.models.neuron.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="spynnaker.pyNN.models.neuron.builds.html" title="spynnaker.pyNN.models.neuron.builds package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="spynnaker.pyNN.models.neuron.html" title="spynnaker.pyNN.models.neuron package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.models.html" >spynnaker.pyNN.models package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="spynnaker.pyNN.models.neuron.html" accesskey="U">spynnaker.pyNN.models.neuron package</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">spynnaker.pyNN.models.neuron.additional_inputs package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.models.neuron.additional_inputs.abstract_additional_input">spynnaker.pyNN.models.neuron.additional_inputs.abstract_additional_input module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.models.neuron.additional_inputs.additional_input_ca2_adaptive">spynnaker.pyNN.models.neuron.additional_inputs.additional_input_ca2_adaptive module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.models.neuron.additional_inputs">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="spynnaker.pyNN.models.neuron.html"
+                        title="previous chapter">spynnaker.pyNN.models.neuron package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="spynnaker.pyNN.models.neuron.builds.html"
+                        title="next chapter">spynnaker.pyNN.models.neuron.builds package</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/spynnaker.pyNN.models.neuron.additional_inputs.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="spynnaker-pynn-models-neuron-additional-inputs-package">
+<h1>spynnaker.pyNN.models.neuron.additional_inputs package<a class="headerlink" href="#spynnaker-pynn-models-neuron-additional-inputs-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-spynnaker.pyNN.models.neuron.additional_inputs.abstract_additional_input">
+<span id="spynnaker-pynn-models-neuron-additional-inputs-abstract-additional-input-module"></span><h2>spynnaker.pyNN.models.neuron.additional_inputs.abstract_additional_input module<a class="headerlink" href="#module-spynnaker.pyNN.models.neuron.additional_inputs.abstract_additional_input" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="spynnaker.pyNN.models.neuron.additional_inputs.abstract_additional_input.AbstractAdditionalInput">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.additional_inputs.abstract_additional_input.</code><code class="descname">AbstractAdditionalInput</code><span class="sig-paren">(</span><em>data_types</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/additional_inputs/abstract_additional_input.html#AbstractAdditionalInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.additional_inputs.abstract_additional_input.AbstractAdditionalInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent" title="spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent</span></code></a></p>
+<p>Represents a possible additional independent input for a model.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data_types</strong> (<em>list</em><em>(</em><a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification.enums/#data_specification.enums.DataType" title="(in DataSpecification v)"><em>DataType</em></a><em>)</em><em></em>) &#8211; A list of data types in the component structure, in the order that
+they appear</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-spynnaker.pyNN.models.neuron.additional_inputs.additional_input_ca2_adaptive">
+<span id="spynnaker-pynn-models-neuron-additional-inputs-additional-input-ca2-adaptive-module"></span><h2>spynnaker.pyNN.models.neuron.additional_inputs.additional_input_ca2_adaptive module<a class="headerlink" href="#module-spynnaker.pyNN.models.neuron.additional_inputs.additional_input_ca2_adaptive" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="spynnaker.pyNN.models.neuron.additional_inputs.additional_input_ca2_adaptive.AdditionalInputCa2Adaptive">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.additional_inputs.additional_input_ca2_adaptive.</code><code class="descname">AdditionalInputCa2Adaptive</code><span class="sig-paren">(</span><em>tau_ca2</em>, <em>i_ca2</em>, <em>i_alpha</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/additional_inputs/additional_input_ca2_adaptive.html#AdditionalInputCa2Adaptive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.additional_inputs.additional_input_ca2_adaptive.AdditionalInputCa2Adaptive" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.neuron.additional_inputs.abstract_additional_input.AbstractAdditionalInput" title="spynnaker.pyNN.models.neuron.additional_inputs.abstract_additional_input.AbstractAdditionalInput"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.neuron.additional_inputs.abstract_additional_input.AbstractAdditionalInput</span></code></a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>tau_ca2</strong> (<em>float</em>) &#8211; </li>
+<li><strong>i_ca2</strong> (<em>float</em>) &#8211; </li>
+<li><strong>i_alpha</strong> (<em>float</em>) &#8211; </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.additional_inputs.additional_input_ca2_adaptive.AdditionalInputCa2Adaptive.add_parameters">
+<code class="descname">add_parameters</code><span class="sig-paren">(</span><em>parameters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/additional_inputs/additional_input_ca2_adaptive.html#AdditionalInputCa2Adaptive.add_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.additional_inputs.additional_input_ca2_adaptive.AdditionalInputCa2Adaptive.add_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the initial values of the parameters to the parameter holder</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; A holder of the parameters</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.additional_inputs.additional_input_ca2_adaptive.AdditionalInputCa2Adaptive.add_state_variables">
+<code class="descname">add_state_variables</code><span class="sig-paren">(</span><em>state_variables</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/additional_inputs/additional_input_ca2_adaptive.html#AdditionalInputCa2Adaptive.add_state_variables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.additional_inputs.additional_input_ca2_adaptive.AdditionalInputCa2Adaptive.add_state_variables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the initial values of the state variables to the state            variables holder</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; A holder of the state variables</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.additional_inputs.additional_input_ca2_adaptive.AdditionalInputCa2Adaptive.get_n_cpu_cycles">
+<code class="descname">get_n_cpu_cycles</code><span class="sig-paren">(</span><em>n_neurons</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/additional_inputs/additional_input_ca2_adaptive.html#AdditionalInputCa2Adaptive.get_n_cpu_cycles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.additional_inputs.additional_input_ca2_adaptive.AdditionalInputCa2Adaptive.get_n_cpu_cycles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the number of CPU cycles required to update the state</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons to get the cycles for</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.additional_inputs.additional_input_ca2_adaptive.AdditionalInputCa2Adaptive.get_units">
+<code class="descname">get_units</code><span class="sig-paren">(</span><em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/additional_inputs/additional_input_ca2_adaptive.html#AdditionalInputCa2Adaptive.get_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.additional_inputs.additional_input_ca2_adaptive.AdditionalInputCa2Adaptive.get_units" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the units of the given variable</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.additional_inputs.additional_input_ca2_adaptive.AdditionalInputCa2Adaptive.get_values">
+<code class="descname">get_values</code><span class="sig-paren">(</span><em>parameters</em>, <em>state_variables</em>, <em>vertex_slice</em>, <em>ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/additional_inputs/additional_input_ca2_adaptive.html#AdditionalInputCa2Adaptive.get_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.additional_inputs.additional_input_ca2_adaptive.AdditionalInputCa2Adaptive.get_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the values to be written to the machine for this model</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters</li>
+<li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables</li>
+<li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; The slice of variables being retrieved</li>
+<li><strong>ts</strong> (<em>int</em>) &#8211; machine time step</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A list with the same length as self.struct.field_types</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list(int or float or list(int) or list(float) or
+RangedList)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.additional_inputs.additional_input_ca2_adaptive.AdditionalInputCa2Adaptive.has_variable">
+<code class="descname">has_variable</code><span class="sig-paren">(</span><em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/additional_inputs/additional_input_ca2_adaptive.html#AdditionalInputCa2Adaptive.has_variable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.additional_inputs.additional_input_ca2_adaptive.AdditionalInputCa2Adaptive.has_variable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if this component has a variable by the given name</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.neuron.additional_inputs.additional_input_ca2_adaptive.AdditionalInputCa2Adaptive.i_alpha">
+<code class="descname">i_alpha</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.additional_inputs.additional_input_ca2_adaptive.AdditionalInputCa2Adaptive.i_alpha" title="Permalink to this definition">¶</a></dt>
+<dd><p>Settable model parameter: </p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.neuron.additional_inputs.additional_input_ca2_adaptive.AdditionalInputCa2Adaptive.i_ca2">
+<code class="descname">i_ca2</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.additional_inputs.additional_input_ca2_adaptive.AdditionalInputCa2Adaptive.i_ca2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Settable model parameter: </p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.neuron.additional_inputs.additional_input_ca2_adaptive.AdditionalInputCa2Adaptive.tau_ca2">
+<code class="descname">tau_ca2</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.additional_inputs.additional_input_ca2_adaptive.AdditionalInputCa2Adaptive.tau_ca2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Settable model parameter: </p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.additional_inputs.additional_input_ca2_adaptive.AdditionalInputCa2Adaptive.update_values">
+<code class="descname">update_values</code><span class="sig-paren">(</span><em>values</em>, <em>parameters</em>, <em>state_variables</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/additional_inputs/additional_input_ca2_adaptive.html#AdditionalInputCa2Adaptive.update_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.additional_inputs.additional_input_ca2_adaptive.AdditionalInputCa2Adaptive.update_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the parameters and state variables with the given struct            values that have been read from the machine</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>values</strong> (<em>list</em><em>(</em><em>list</em><em>)</em><em></em>) &#8211; The values read from the machine, one for each struct element</li>
+<li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters to update</li>
+<li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables to update</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-spynnaker.pyNN.models.neuron.additional_inputs">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.models.neuron.additional_inputs" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="spynnaker.pyNN.models.neuron.additional_inputs.AbstractAdditionalInput">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.additional_inputs.</code><code class="descname">AbstractAdditionalInput</code><span class="sig-paren">(</span><em>data_types</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/additional_inputs/abstract_additional_input.html#AbstractAdditionalInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.additional_inputs.AbstractAdditionalInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent" title="spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent</span></code></a></p>
+<p>Represents a possible additional independent input for a model.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data_types</strong> (<em>list</em><em>(</em><a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification.enums/#data_specification.enums.DataType" title="(in DataSpecification v)"><em>DataType</em></a><em>)</em><em></em>) &#8211; A list of data types in the component structure, in the order that
+they appear</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="spynnaker.pyNN.models.neuron.additional_inputs.AdditionalInputCa2Adaptive">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.additional_inputs.</code><code class="descname">AdditionalInputCa2Adaptive</code><span class="sig-paren">(</span><em>tau_ca2</em>, <em>i_ca2</em>, <em>i_alpha</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/additional_inputs/additional_input_ca2_adaptive.html#AdditionalInputCa2Adaptive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.additional_inputs.AdditionalInputCa2Adaptive" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.neuron.additional_inputs.abstract_additional_input.AbstractAdditionalInput" title="spynnaker.pyNN.models.neuron.additional_inputs.abstract_additional_input.AbstractAdditionalInput"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.neuron.additional_inputs.abstract_additional_input.AbstractAdditionalInput</span></code></a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>tau_ca2</strong> (<em>float</em>) &#8211; </li>
+<li><strong>i_ca2</strong> (<em>float</em>) &#8211; </li>
+<li><strong>i_alpha</strong> (<em>float</em>) &#8211; </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.additional_inputs.AdditionalInputCa2Adaptive.add_parameters">
+<code class="descname">add_parameters</code><span class="sig-paren">(</span><em>parameters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/additional_inputs/additional_input_ca2_adaptive.html#AdditionalInputCa2Adaptive.add_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.additional_inputs.AdditionalInputCa2Adaptive.add_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the initial values of the parameters to the parameter holder</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; A holder of the parameters</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.additional_inputs.AdditionalInputCa2Adaptive.add_state_variables">
+<code class="descname">add_state_variables</code><span class="sig-paren">(</span><em>state_variables</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/additional_inputs/additional_input_ca2_adaptive.html#AdditionalInputCa2Adaptive.add_state_variables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.additional_inputs.AdditionalInputCa2Adaptive.add_state_variables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the initial values of the state variables to the state            variables holder</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; A holder of the state variables</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.additional_inputs.AdditionalInputCa2Adaptive.get_n_cpu_cycles">
+<code class="descname">get_n_cpu_cycles</code><span class="sig-paren">(</span><em>n_neurons</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/additional_inputs/additional_input_ca2_adaptive.html#AdditionalInputCa2Adaptive.get_n_cpu_cycles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.additional_inputs.AdditionalInputCa2Adaptive.get_n_cpu_cycles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the number of CPU cycles required to update the state</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons to get the cycles for</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.additional_inputs.AdditionalInputCa2Adaptive.get_units">
+<code class="descname">get_units</code><span class="sig-paren">(</span><em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/additional_inputs/additional_input_ca2_adaptive.html#AdditionalInputCa2Adaptive.get_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.additional_inputs.AdditionalInputCa2Adaptive.get_units" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the units of the given variable</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.additional_inputs.AdditionalInputCa2Adaptive.get_values">
+<code class="descname">get_values</code><span class="sig-paren">(</span><em>parameters</em>, <em>state_variables</em>, <em>vertex_slice</em>, <em>ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/additional_inputs/additional_input_ca2_adaptive.html#AdditionalInputCa2Adaptive.get_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.additional_inputs.AdditionalInputCa2Adaptive.get_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the values to be written to the machine for this model</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters</li>
+<li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables</li>
+<li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; The slice of variables being retrieved</li>
+<li><strong>ts</strong> (<em>int</em>) &#8211; machine time step</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A list with the same length as self.struct.field_types</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list(int or float or list(int) or list(float) or
+RangedList)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.additional_inputs.AdditionalInputCa2Adaptive.has_variable">
+<code class="descname">has_variable</code><span class="sig-paren">(</span><em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/additional_inputs/additional_input_ca2_adaptive.html#AdditionalInputCa2Adaptive.has_variable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.additional_inputs.AdditionalInputCa2Adaptive.has_variable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if this component has a variable by the given name</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.neuron.additional_inputs.AdditionalInputCa2Adaptive.i_alpha">
+<code class="descname">i_alpha</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.additional_inputs.AdditionalInputCa2Adaptive.i_alpha" title="Permalink to this definition">¶</a></dt>
+<dd><p>Settable model parameter: </p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.neuron.additional_inputs.AdditionalInputCa2Adaptive.i_ca2">
+<code class="descname">i_ca2</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.additional_inputs.AdditionalInputCa2Adaptive.i_ca2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Settable model parameter: </p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.neuron.additional_inputs.AdditionalInputCa2Adaptive.tau_ca2">
+<code class="descname">tau_ca2</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.additional_inputs.AdditionalInputCa2Adaptive.tau_ca2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Settable model parameter: </p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.additional_inputs.AdditionalInputCa2Adaptive.update_values">
+<code class="descname">update_values</code><span class="sig-paren">(</span><em>values</em>, <em>parameters</em>, <em>state_variables</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/additional_inputs/additional_input_ca2_adaptive.html#AdditionalInputCa2Adaptive.update_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.additional_inputs.AdditionalInputCa2Adaptive.update_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the parameters and state variables with the given struct            values that have been read from the machine</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>values</strong> (<em>list</em><em>(</em><em>list</em><em>)</em><em></em>) &#8211; The values read from the machine, one for each struct element</li>
+<li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters to update</li>
+<li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables to update</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="spynnaker.pyNN.models.neuron.builds.html" title="spynnaker.pyNN.models.neuron.builds package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="spynnaker.pyNN.models.neuron.html" title="spynnaker.pyNN.models.neuron package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.models.html" >spynnaker.pyNN.models package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="spynnaker.pyNN.models.neuron.html" >spynnaker.pyNN.models.neuron package</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+    </div>
+  </body>
+</html>

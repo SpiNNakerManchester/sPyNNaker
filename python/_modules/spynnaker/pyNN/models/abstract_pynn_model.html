@@ -1,0 +1,211 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>spynnaker.pyNN.models.abstract_pynn_model &#8212; sPyNNaker  documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">sPyNNaker  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for spynnaker.pyNN.models.abstract_pynn_model</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2017-2019 The University of Manchester</span>
+<span class="c1">#</span>
+<span class="c1"># This program is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">six</span> <span class="kn">import</span> <span class="n">add_metaclass</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.classproperty</span> <span class="kn">import</span> <span class="n">classproperty</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.abstract_base</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AbstractBase</span><span class="p">,</span> <span class="n">abstractmethod</span><span class="p">,</span> <span class="n">abstractproperty</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.defaults</span> <span class="kn">import</span> <span class="n">get_dict_from_init</span>
+
+
+<span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">AbstractBase</span><span class="p">)</span>
+<div class="viewcode-block" id="AbstractPyNNModel"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel">[docs]</a><span class="k">class</span> <span class="nc">AbstractPyNNModel</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; A Model that can be passed in to a Population object in PyNN</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">_max_atoms_per_core</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">sys</span><span class="o">.</span><span class="n">maxsize</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="AbstractPyNNModel.set_model_max_atoms_per_core"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.set_model_max_atoms_per_core">[docs]</a>    <span class="k">def</span> <span class="nf">set_model_max_atoms_per_core</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">n_atoms</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">maxsize</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Set the maximum number of atoms per core for this model</span>
+
+<span class="sd">        :param n_atoms: The new maximum, or None for the largest possible</span>
+<span class="sd">        :type n_atoms: int or None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">AbstractPyNNModel</span><span class="o">.</span><span class="n">_max_atoms_per_core</span><span class="p">[</span><span class="bp">cls</span><span class="p">]</span> <span class="o">=</span> <span class="n">n_atoms</span></div>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="AbstractPyNNModel.get_max_atoms_per_core"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.get_max_atoms_per_core">[docs]</a>    <span class="k">def</span> <span class="nf">get_max_atoms_per_core</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the maximum number of atoms per core for this model</span>
+
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">AbstractPyNNModel</span><span class="o">.</span><span class="n">_max_atoms_per_core</span><span class="p">[</span><span class="bp">cls</span><span class="p">]</span></div>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">__get_init_params_and_svars</span><span class="p">(</span><span class="n">the_cls</span><span class="p">):</span>
+        <span class="n">init</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">the_cls</span><span class="p">,</span> <span class="s2">&quot;__init__&quot;</span><span class="p">)</span>
+        <span class="k">while</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="s2">&quot;_method&quot;</span><span class="p">):</span>
+            <span class="n">init</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="s2">&quot;_method&quot;</span><span class="p">)</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="s2">&quot;_parameters&quot;</span><span class="p">):</span>
+            <span class="n">params</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="s2">&quot;_parameters&quot;</span><span class="p">)</span>
+        <span class="n">svars</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="s2">&quot;_state_variables&quot;</span><span class="p">):</span>
+            <span class="n">svars</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="s2">&quot;_state_variables&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">init</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">svars</span>
+
+    <span class="nd">@classproperty</span>
+    <span class="k">def</span> <span class="nf">default_parameters</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>  <span class="c1"># pylint: disable=no-self-argument</span>
+        <span class="sd">&quot;&quot;&quot; Get the default values for the parameters of the model.</span>
+
+<span class="sd">        :rtype: dict(str, Any)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">init</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">svars</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__get_init_params_and_svars</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">get_dict_from_init</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="n">skip</span><span class="o">=</span><span class="n">svars</span><span class="p">,</span> <span class="n">include</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+
+    <span class="nd">@classproperty</span>
+    <span class="k">def</span> <span class="nf">default_initial_values</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>  <span class="c1"># pylint: disable=no-self-argument</span>
+        <span class="sd">&quot;&quot;&quot; Get the default initial values for the state variables of the model</span>
+
+<span class="sd">        :rtype: dict(str, Any)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">init</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">svars</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__get_init_params_and_svars</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">params</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">svars</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">{}</span>
+        <span class="k">return</span> <span class="n">get_dict_from_init</span><span class="p">(</span><span class="n">init</span><span class="p">,</span> <span class="n">skip</span><span class="o">=</span><span class="n">params</span><span class="p">,</span> <span class="n">include</span><span class="o">=</span><span class="n">svars</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="AbstractPyNNModel.get_parameter_names"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.get_parameter_names">[docs]</a>    <span class="k">def</span> <span class="nf">get_parameter_names</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the names of the parameters of the model</span>
+
+<span class="sd">        :rtype: list(str)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">default_parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>  <span class="c1"># pylint: disable=no-member</span></div>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="AbstractPyNNModel.has_parameter"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.has_parameter">[docs]</a>    <span class="k">def</span> <span class="nf">has_parameter</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Determine if the model has a parameter with the given name</span>
+
+<span class="sd">        :param str name: The name of the parameter to check for</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">default_parameters</span></div>
+
+    <span class="nd">@abstractproperty</span>
+    <span class="k">def</span> <span class="nf">default_population_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the default values for the parameters at the population level</span>
+<span class="sd">            These are parameters that can be passed in to the Population\</span>
+<span class="sd">            constructor in addition to the standard PyNN options</span>
+
+<span class="sd">        :rtype: dict(str, Any)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="nd">@abstractmethod</span>
+<div class="viewcode-block" id="AbstractPyNNModel.create_vertex"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.create_vertex">[docs]</a>    <span class="k">def</span> <span class="nf">create_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Create a vertex for a population of the model</span>
+
+<span class="sd">        :param int n_neurons: The number of neurons in the population</span>
+<span class="sd">        :param str label: The label to give to the vertex</span>
+<span class="sd">        :param constraints:</span>
+<span class="sd">            A list of constraints to give to the vertex, or None</span>
+<span class="sd">        :type constraints:</span>
+<span class="sd">            list(~pacman.model.constraints.AbstractConstraint) or None</span>
+<span class="sd">        :return: An application vertex for the population</span>
+<span class="sd">        :rtype: ~pacman.model.graphs.application.ApplicationVertex</span>
+<span class="sd">        &quot;&quot;&quot;</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">sPyNNaker  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+    </div>
+  </body>
+</html>

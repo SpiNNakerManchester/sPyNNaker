@@ -1,0 +1,38 @@
+spynnaker.pyNN.models.neuron.threshold_types package
+====================================================
+
+Submodules
+----------
+
+spynnaker.pyNN.models.neuron.threshold_types.abstract_threshold_type module
+---------------------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neuron.threshold_types.abstract_threshold_type
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.models.neuron.threshold_types.threshold_type_maass_stochastic module
+-----------------------------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neuron.threshold_types.threshold_type_maass_stochastic
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.models.neuron.threshold_types.threshold_type_static module
+-------------------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neuron.threshold_types.threshold_type_static
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: spynnaker.pyNN.models.neuron.threshold_types
+    :members:
+    :undoc-members:
+    :show-inheritance:

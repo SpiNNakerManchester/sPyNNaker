@@ -1,0 +1,454 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>spynnaker.pyNN.models.neuron.master_pop_table &#8212; sPyNNaker  documentation</title>
+    
+    <link rel="stylesheet" href="../../../../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">sPyNNaker  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for spynnaker.pyNN.models.neuron.master_pop_table</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2017-2019 The University of Manchester</span>
+<span class="c1">#</span>
+<span class="c1"># This program is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">struct</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="n">BYTES_PER_WORD</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neural_projections</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ProjectionApplicationEdge</span><span class="p">,</span> <span class="n">ProjectionMachineEdge</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">SynapseRowTooBigException</span><span class="p">,</span> <span class="n">SynapticConfigurationException</span><span class="p">)</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">_TWO_WORDS</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">Struct</span><span class="p">(</span><span class="s2">&quot;&lt;II&quot;</span><span class="p">)</span>
+
+
+<span class="k">class</span> <span class="nc">_MasterPopEntry</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Internal class that contains a master population table entry</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;__addresses_and_row_lengths&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__mask&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__routing_key&quot;</span><span class="p">]</span>
+
+    <span class="n">MASTER_POP_ENTRY_SIZE_WORDS</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">MASTER_POP_ENTRY_SIZE_BYTES</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
+    <span class="n">ADDRESS_LIST_ENTRY_SIZE_WORDS</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">ADDRESS_LIST_ENTRY_SIZE_BYTES</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">routing_key</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__routing_key</span> <span class="o">=</span> <span class="n">routing_key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__mask</span> <span class="o">=</span> <span class="n">mask</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__addresses_and_row_lengths</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">row_length</span><span class="p">,</span> <span class="n">is_single</span><span class="p">):</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__addresses_and_row_lengths</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__addresses_and_row_lengths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">address</span><span class="p">,</span> <span class="n">row_length</span><span class="p">,</span> <span class="n">is_single</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">index</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">routing_key</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :return: the key combo of this entry</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__routing_key</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">mask</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :return: the mask of the key for this master pop entry</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__mask</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">addresses_and_row_lengths</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :return: the memory address that this master pop entry points at\</span>
+<span class="sd">            (synaptic matrix)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__addresses_and_row_lengths</span>
+
+
+<div class="viewcode-block" id="MasterPopTableAsBinarySearch"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch">[docs]</a><span class="k">class</span> <span class="nc">MasterPopTableAsBinarySearch</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Master population table, implemented as binary search master.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;__entries&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__n_addresses&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__n_single_entries&quot;</span><span class="p">]</span>
+
+    <span class="c1"># Switched ordering of count and start as numpy will switch them back</span>
+    <span class="c1"># when asked for view(&quot;&lt;4&quot;)</span>
+    <span class="n">MASTER_POP_ENTRY_DTYPE</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s2">&quot;key&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;u4&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;mask&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;u4&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;start&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;u2&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;count&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;u2&quot;</span><span class="p">)]</span>
+
+    <span class="n">ADDRESS_LIST_DTYPE</span> <span class="o">=</span> <span class="s2">&quot;&lt;u4&quot;</span>
+
+    <span class="c1"># top bit of the 32 bit number</span>
+    <span class="n">SINGLE_BIT_FLAG_BIT</span> <span class="o">=</span> <span class="mh">0x80000000</span>
+    <span class="n">ROW_LENGTH_MASK</span> <span class="o">=</span> <span class="mh">0xFF</span>
+    <span class="n">ADDRESS_MASK</span> <span class="o">=</span> <span class="mh">0x7FFFFF00</span>
+    <span class="n">ADDRESS_SCALE</span> <span class="o">=</span> <span class="mi">16</span>
+    <span class="n">ADDRESS_SCALED_SHIFT</span> <span class="o">=</span> <span class="mi">8</span> <span class="o">-</span> <span class="mi">4</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__n_addresses</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__n_single_entries</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="MasterPopTableAsBinarySearch.get_master_population_table_size"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.get_master_population_table_size">[docs]</a>    <span class="k">def</span> <span class="nf">get_master_population_table_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_edges</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the size of the master population table in SDRAM</span>
+
+<span class="sd">        :param vertex_slice: the slice of the vertex</span>
+<span class="sd">        :param in_edges: the in coming edges</span>
+<span class="sd">        :return: the size the master pop table will take in SDRAM (in bytes)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># Entry for each edge - but don&#39;t know the edges yet, so</span>
+        <span class="c1"># assume multiple entries for each edge</span>
+        <span class="n">n_vertices</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">n_entries</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">in_edge</span> <span class="ow">in</span> <span class="n">in_edges</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">in_edge</span><span class="p">,</span> <span class="n">ProjectionApplicationEdge</span><span class="p">):</span>
+                <span class="c1"># TODO: Fix this to be more accurate!</span>
+                <span class="c1"># May require modification to the master population table</span>
+                <span class="c1"># Get the number of atoms per core incoming</span>
+                <span class="n">max_atoms</span> <span class="o">=</span> <span class="n">in_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">get_max_atoms_per_core</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">in_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">&lt;</span> <span class="n">max_atoms</span><span class="p">:</span>
+                    <span class="n">max_atoms</span> <span class="o">=</span> <span class="n">in_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_atoms</span>
+
+                <span class="c1"># Get the number of likely vertices</span>
+                <span class="n">n_edge_vertices</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span>
+                    <span class="nb">float</span><span class="p">(</span><span class="n">in_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">max_atoms</span><span class="p">)))</span>
+                <span class="n">n_vertices</span> <span class="o">+=</span> <span class="n">n_edge_vertices</span>
+                <span class="n">n_entries</span> <span class="o">+=</span> <span class="p">(</span>
+                    <span class="n">n_edge_vertices</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">in_edge</span><span class="o">.</span><span class="n">synapse_information</span><span class="p">))</span>
+
+        <span class="c1"># Multiply by 2 to get an upper bound</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="p">(</span><span class="n">n_vertices</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">_MasterPopEntry</span><span class="o">.</span><span class="n">MASTER_POP_ENTRY_SIZE_BYTES</span><span class="p">)</span> <span class="o">+</span>
+            <span class="p">(</span><span class="n">n_entries</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">_MasterPopEntry</span><span class="o">.</span><span class="n">ADDRESS_LIST_ENTRY_SIZE_BYTES</span><span class="p">)</span> <span class="o">+</span>
+            <span class="mi">8</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MasterPopTableAsBinarySearch.get_exact_master_population_table_size"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.get_exact_master_population_table_size">[docs]</a>    <span class="k">def</span> <span class="nf">get_exact_master_population_table_size</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">vertex</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">,</span> <span class="n">graph_mapper</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :return: the size the master pop table will take in SDRAM (in bytes)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">in_edges</span> <span class="o">=</span> <span class="n">machine_graph</span><span class="o">.</span><span class="n">get_edges_ending_at_vertex</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span>
+
+        <span class="n">n_vertices</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">in_edges</span><span class="p">)</span>
+        <span class="n">n_entries</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">in_edge</span> <span class="ow">in</span> <span class="n">in_edges</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">in_edge</span><span class="p">,</span> <span class="n">ProjectionMachineEdge</span><span class="p">):</span>
+                <span class="n">edge</span> <span class="o">=</span> <span class="n">graph_mapper</span><span class="o">.</span><span class="n">get_application_edge</span><span class="p">(</span><span class="n">in_edge</span><span class="p">)</span>
+                <span class="n">n_entries</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">edge</span><span class="o">.</span><span class="n">synapse_information</span><span class="p">)</span>
+
+        <span class="c1"># Multiply by 2 to get an upper bound</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="p">(</span><span class="n">n_vertices</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">_MasterPopEntry</span><span class="o">.</span><span class="n">MASTER_POP_ENTRY_SIZE_BYTES</span><span class="p">)</span> <span class="o">+</span>
+            <span class="p">(</span><span class="n">n_entries</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">_MasterPopEntry</span><span class="o">.</span><span class="n">ADDRESS_LIST_ENTRY_SIZE_BYTES</span><span class="p">)</span> <span class="o">+</span>
+            <span class="mi">8</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="MasterPopTableAsBinarySearch.get_allowed_row_length"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.get_allowed_row_length">[docs]</a>    <span class="k">def</span> <span class="nf">get_allowed_row_length</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row_length</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param row_length: the row length being considered</span>
+<span class="sd">        :return: the row length available</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">row_length</span> <span class="o">&gt;</span> <span class="mi">255</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SynapseRowTooBigException</span><span class="p">(</span>
+                <span class="mi">255</span><span class="p">,</span> <span class="s2">&quot;Only rows of up to 255 entries are allowed&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">row_length</span></div>
+
+<div class="viewcode-block" id="MasterPopTableAsBinarySearch.get_next_allowed_address"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.get_next_allowed_address">[docs]</a>    <span class="k">def</span> <span class="nf">get_next_allowed_address</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">next_address</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param next_address: The next address that would be used</span>
+<span class="sd">        :return: The next address that can be used following next_address</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">next_address</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">(</span><span class="n">next_address</span> <span class="o">+</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ADDRESS_SCALE</span> <span class="o">-</span> <span class="mi">1</span><span class="p">))</span> <span class="o">//</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ADDRESS_SCALE</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">ADDRESS_SCALE</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">next_address</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">ADDRESS_SCALE</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mh">0x7FFFFF</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SynapticConfigurationException</span><span class="p">(</span>
+                <span class="s2">&quot;Address </span><span class="si">{}</span><span class="s2"> is out of range for this population table!&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="nb">hex</span><span class="p">(</span><span class="n">next_address</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">next_address</span></div>
+
+<div class="viewcode-block" id="MasterPopTableAsBinarySearch.initialise_table"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.initialise_table">[docs]</a>    <span class="k">def</span> <span class="nf">initialise_table</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Initialise the master pop data structure.</span>
+
+<span class="sd">        :rtype: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__n_addresses</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__n_single_entries</span> <span class="o">=</span> <span class="mi">0</span></div>
+
+<div class="viewcode-block" id="MasterPopTableAsBinarySearch.update_master_population_table"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.update_master_population_table">[docs]</a>    <span class="k">def</span> <span class="nf">update_master_population_table</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">block_start_addr</span><span class="p">,</span> <span class="n">row_length</span><span class="p">,</span> <span class="n">key_and_mask</span><span class="p">,</span> <span class="n">is_single</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Add an entry in the binary search to deal with the synaptic matrix</span>
+
+<span class="sd">        :param spec: the writer for DSG</span>
+<span class="sd">        :param block_start_addr: where the synaptic matrix block starts</span>
+<span class="sd">        :param row_length: how long in bytes each synaptic entry is</span>
+<span class="sd">        :param key_and_mask: the key and mask for this master pop entry</span>
+<span class="sd">        :type key_and_mask: \</span>
+<span class="sd">            :py:class:`pacman.model.routing_info.BaseKeyAndMask`</span>
+<span class="sd">        :param master_pop_table_region: the region ID for the master pop</span>
+<span class="sd">        :param is_single: \</span>
+<span class="sd">            Flag that states if the entry is a direct entry for a single row.</span>
+<span class="sd">        :return: The index of the entry, to be used to retrieve it</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># pylint: disable=too-many-arguments, arguments-differ</span>
+        <span class="k">if</span> <span class="n">key_and_mask</span><span class="o">.</span><span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span><span class="p">[</span><span class="n">key_and_mask</span><span class="o">.</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">_MasterPopEntry</span><span class="p">(</span>
+                <span class="n">key_and_mask</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="n">key_and_mask</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span>
+        <span class="n">start_addr</span> <span class="o">=</span> <span class="n">block_start_addr</span>
+
+        <span class="c1"># if single, don&#39; t add to start address as its going in its own block</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_single</span><span class="p">:</span>
+            <span class="n">start_addr</span> <span class="o">=</span> <span class="n">block_start_addr</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">ADDRESS_SCALE</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span><span class="p">[</span><span class="n">key_and_mask</span><span class="o">.</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="n">start_addr</span><span class="p">,</span> <span class="n">row_length</span><span class="p">,</span> <span class="n">is_single</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__n_addresses</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">index</span></div>
+
+<div class="viewcode-block" id="MasterPopTableAsBinarySearch.finish_master_pop_table"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.finish_master_pop_table">[docs]</a>    <span class="k">def</span> <span class="nf">finish_master_pop_table</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">master_pop_table_region</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Complete the master pop table in the data specification.</span>
+
+<span class="sd">        :param spec: the data specification to write the master pop entry to</span>
+<span class="sd">        :param master_pop_table_region: \</span>
+<span class="sd">            the region to which the master pop table is being stored</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span><span class="n">region</span><span class="o">=</span><span class="n">master_pop_table_region</span><span class="p">)</span>
+
+        <span class="c1"># sort entries by key</span>
+        <span class="n">entries</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span>
+            <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">entry</span><span class="p">:</span> <span class="n">entry</span><span class="o">.</span><span class="n">routing_key</span><span class="p">)</span>
+
+        <span class="c1"># write no master pop entries and the address list size</span>
+        <span class="n">n_entries</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">entries</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">n_entries</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__n_addresses</span><span class="p">)</span>
+
+        <span class="c1"># Generate the table and list as arrays</span>
+        <span class="n">pop_table</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_entries</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">MASTER_POP_ENTRY_DTYPE</span><span class="p">)</span>
+        <span class="n">address_list</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__n_addresses</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ADDRESS_LIST_DTYPE</span><span class="p">)</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">entry</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">entries</span><span class="p">):</span>
+            <span class="n">start</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_pop_table_entry</span><span class="p">(</span>
+                <span class="n">entry</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">pop_table</span><span class="p">,</span> <span class="n">address_list</span><span class="p">)</span>
+
+        <span class="c1"># Write the arrays</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">pop_table</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="s2">&quot;&lt;u4&quot;</span><span class="p">))</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">address_list</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__entries</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__n_addresses</span> <span class="o">=</span> <span class="mi">0</span></div>
+
+    <span class="k">def</span> <span class="nf">_make_pop_table_entry</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">entry</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">pop_table</span><span class="p">,</span> <span class="n">address_list</span><span class="p">):</span>
+        <span class="c1"># pylint: disable=too-many-arguments</span>
+        <span class="n">pop_table</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;key&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">routing_key</span>
+        <span class="n">pop_table</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;mask&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">entry</span><span class="o">.</span><span class="n">mask</span>
+        <span class="n">pop_table</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;start&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">start</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">addresses_and_row_lengths</span><span class="p">)</span>
+        <span class="n">pop_table</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="s2">&quot;count&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">count</span>
+        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="p">(</span><span class="n">address</span><span class="p">,</span> <span class="n">row_length</span><span class="p">,</span> <span class="n">is_single</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
+                <span class="n">entry</span><span class="o">.</span><span class="n">addresses_and_row_lengths</span><span class="p">):</span>
+            <span class="n">single_bit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">SINGLE_BIT_FLAG_BIT</span> <span class="k">if</span> <span class="n">is_single</span> <span class="k">else</span> <span class="mi">0</span>
+            <span class="n">address_list</span><span class="p">[</span><span class="n">start</span> <span class="o">+</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="p">(</span><span class="n">single_bit</span> <span class="o">|</span> <span class="p">(</span><span class="n">address</span> <span class="o">&amp;</span> <span class="mh">0x7FFFFF</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span><span class="p">)</span> <span class="o">|</span>
+                <span class="p">(</span><span class="n">row_length</span> <span class="o">&amp;</span> <span class="bp">self</span><span class="o">.</span><span class="n">ROW_LENGTH_MASK</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">count</span>
+
+<div class="viewcode-block" id="MasterPopTableAsBinarySearch.extract_synaptic_matrix_data_location"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.extract_synaptic_matrix_data_location">[docs]</a>    <span class="k">def</span> <span class="nf">extract_synaptic_matrix_data_location</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">incoming_key</span><span class="p">,</span> <span class="n">master_pop_base_mem_address</span><span class="p">,</span> <span class="n">txrx</span><span class="p">,</span>
+            <span class="n">chip_x</span><span class="p">,</span> <span class="n">chip_y</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param incoming_key: \</span>
+<span class="sd">            the source key which the synaptic matrix needs to be mapped to</span>
+<span class="sd">        :param master_pop_base_mem_address: the base address of the master pop</span>
+<span class="sd">        :param txrx: the transceiver object</span>
+<span class="sd">        :param chip_y: the y coordinate of the chip of this master pop</span>
+<span class="sd">        :param chip_x: the x coordinate of the chip of this master pop</span>
+<span class="sd">        :type incoming_key: int</span>
+<span class="sd">        :type master_pop_base_mem_address: int</span>
+<span class="sd">        :type chip_y: int</span>
+<span class="sd">        :type chip_x: int</span>
+<span class="sd">        :type txrx: :py:class:`spinnman.transceiver.Transceiver`</span>
+<span class="sd">        :return: a synaptic matrix memory position.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># pylint: disable=too-many-arguments, too-many-locals, arguments-differ</span>
+
+        <span class="c1"># get entries in master pop</span>
+        <span class="n">n_entries</span><span class="p">,</span> <span class="n">n_addresses</span> <span class="o">=</span> <span class="n">_TWO_WORDS</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span><span class="n">txrx</span><span class="o">.</span><span class="n">read_memory</span><span class="p">(</span>
+            <span class="n">chip_x</span><span class="p">,</span> <span class="n">chip_y</span><span class="p">,</span> <span class="n">master_pop_base_mem_address</span><span class="p">,</span> <span class="n">_TWO_WORDS</span><span class="o">.</span><span class="n">size</span><span class="p">))</span>
+        <span class="n">n_entry_bytes</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">n_entries</span> <span class="o">*</span> <span class="n">_MasterPopEntry</span><span class="o">.</span><span class="n">MASTER_POP_ENTRY_SIZE_BYTES</span><span class="p">)</span>
+        <span class="n">n_address_bytes</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">n_addresses</span> <span class="o">*</span> <span class="n">_MasterPopEntry</span><span class="o">.</span><span class="n">ADDRESS_LIST_ENTRY_SIZE_BYTES</span><span class="p">)</span>
+
+        <span class="c1"># read in master pop structure</span>
+        <span class="n">full_data</span> <span class="o">=</span> <span class="n">txrx</span><span class="o">.</span><span class="n">read_memory</span><span class="p">(</span>
+            <span class="n">chip_x</span><span class="p">,</span> <span class="n">chip_y</span><span class="p">,</span> <span class="n">master_pop_base_mem_address</span> <span class="o">+</span> <span class="n">_TWO_WORDS</span><span class="o">.</span><span class="n">size</span><span class="p">,</span>
+            <span class="n">n_entry_bytes</span> <span class="o">+</span> <span class="n">n_address_bytes</span><span class="p">)</span>
+
+        <span class="c1"># convert into a numpy arrays</span>
+        <span class="n">entry_list</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span>
+            <span class="n">full_data</span><span class="p">,</span> <span class="s1">&#39;uint8&#39;</span><span class="p">,</span> <span class="n">n_entry_bytes</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span>
+                <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">MASTER_POP_ENTRY_DTYPE</span><span class="p">)</span>
+        <span class="n">address_list</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span>
+            <span class="n">full_data</span><span class="p">,</span> <span class="s1">&#39;uint8&#39;</span><span class="p">,</span> <span class="n">n_address_bytes</span><span class="p">,</span> <span class="n">n_entry_bytes</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span>
+                <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ADDRESS_LIST_DTYPE</span><span class="p">)</span>
+
+        <span class="n">entry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_locate_entry</span><span class="p">(</span><span class="n">entry_list</span><span class="p">,</span> <span class="n">incoming_key</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">entry</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+        <span class="n">addresses</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">entry</span><span class="p">[</span><span class="s2">&quot;start&quot;</span><span class="p">],</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;start&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;count&quot;</span><span class="p">]):</span>
+            <span class="n">address_and_row_length</span> <span class="o">=</span> <span class="n">address_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">is_single</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">address_and_row_length</span> <span class="o">&amp;</span>
+                <span class="n">MasterPopTableAsBinarySearch</span><span class="o">.</span><span class="n">SINGLE_BIT_FLAG_BIT</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+            <span class="n">address</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">address_and_row_length</span> <span class="o">&amp;</span>
+                <span class="n">MasterPopTableAsBinarySearch</span><span class="o">.</span><span class="n">ADDRESS_MASK</span><span class="p">)</span>
+            <span class="n">row_length</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">address_and_row_length</span> <span class="o">&amp;</span>
+                <span class="n">MasterPopTableAsBinarySearch</span><span class="o">.</span><span class="n">ROW_LENGTH_MASK</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">is_single</span><span class="p">:</span>
+                <span class="n">address</span> <span class="o">=</span> <span class="n">address</span> <span class="o">&gt;&gt;</span> <span class="mi">8</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">address</span> <span class="o">=</span> <span class="n">address</span> <span class="o">&gt;&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">ADDRESS_SCALED_SHIFT</span>
+
+            <span class="n">addresses</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">row_length</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">is_single</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">addresses</span></div>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_locate_entry</span><span class="p">(</span><span class="n">entries</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Search the binary tree structure for the correct entry.</span>
+
+<span class="sd">        :param key: the key to search the master pop table for a given entry</span>
+<span class="sd">        :return: the entry for this given key</span>
+<span class="sd">        :rtype: :py:class:`_MasterPopEntry`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">imin</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">imax</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">entries</span><span class="p">)</span>
+
+        <span class="k">while</span> <span class="n">imin</span> <span class="o">&lt;</span> <span class="n">imax</span><span class="p">:</span>
+            <span class="n">imid</span> <span class="o">=</span> <span class="p">(</span><span class="n">imax</span> <span class="o">+</span> <span class="n">imin</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+            <span class="n">entry</span> <span class="o">=</span> <span class="n">entries</span><span class="p">[</span><span class="n">imid</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="o">&amp;</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;mask&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;key&quot;</span><span class="p">]:</span>
+                <span class="k">return</span> <span class="n">entry</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="o">&gt;</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;key&quot;</span><span class="p">]:</span>
+                <span class="n">imin</span> <span class="o">=</span> <span class="n">imid</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">imax</span> <span class="o">=</span> <span class="n">imid</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="MasterPopTableAsBinarySearch.get_edge_constraints"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.master_pop_table.MasterPopTableAsBinarySearch.get_edge_constraints">[docs]</a>    <span class="k">def</span> <span class="nf">get_edge_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Gets the constraints for this table on edges coming in to a vertex.</span>
+
+<span class="sd">        :return: a list of constraints</span>
+<span class="sd">        :rtype: list(:py:class:`pacman.model.constraints.AbstractConstraint`)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">()</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">sPyNNaker  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+    </div>
+  </body>
+</html>

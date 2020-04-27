@@ -1,0 +1,247 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>spynnaker.pyNN.models.neural_projections.projection_machine_edge &#8212; sPyNNaker  documentation</title>
+    
+    <link rel="stylesheet" href="../../../../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">sPyNNaker  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for spynnaker.pyNN.models.neural_projections.projection_machine_edge</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2017-2019 The University of Manchester</span>
+<span class="c1">#</span>
+<span class="c1"># This program is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+
+<span class="kn">from</span> <span class="nn">pyNN.random</span> <span class="kn">import</span> <span class="n">RandomDistribution</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities</span> <span class="kn">import</span> <span class="n">utility_calls</span>
+<span class="kn">from</span> <span class="nn">pacman.model.graphs.machine</span> <span class="kn">import</span> <span class="n">MachineEdge</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.provenance</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AbstractProvidesLocalProvenanceData</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neural_projections.connectors</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">OneToOneConnector</span><span class="p">,</span> <span class="n">FromListConnector</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AbstractWeightUpdatable</span><span class="p">,</span> <span class="n">AbstractFilterableEdge</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="ProjectionMachineEdge"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.projection_machine_edge.ProjectionMachineEdge">[docs]</a><span class="k">class</span> <span class="nc">ProjectionMachineEdge</span><span class="p">(</span>
+        <span class="n">MachineEdge</span><span class="p">,</span> <span class="n">AbstractFilterableEdge</span><span class="p">,</span>
+        <span class="n">AbstractWeightUpdatable</span><span class="p">,</span> <span class="n">AbstractProvidesLocalProvenanceData</span><span class="p">):</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;__synapse_information&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">synapse_information</span><span class="p">,</span> <span class="n">pre_vertex</span><span class="p">,</span> <span class="n">post_vertex</span><span class="p">,</span>
+            <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">traffic_weight</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="c1"># pylint: disable=too-many-arguments</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ProjectionMachineEdge</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">pre_vertex</span><span class="p">,</span> <span class="n">post_vertex</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span>
+            <span class="n">traffic_weight</span><span class="o">=</span><span class="n">traffic_weight</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_information</span> <span class="o">=</span> <span class="n">synapse_information</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">synapse_information</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_information</span>
+
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractFilterableEdge</span><span class="o">.</span><span class="n">filter_edge</span><span class="p">)</span>
+<div class="viewcode-block" id="ProjectionMachineEdge.filter_edge"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.projection_machine_edge.ProjectionMachineEdge.filter_edge">[docs]</a>    <span class="k">def</span> <span class="nf">filter_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">graph_mapper</span><span class="p">):</span>
+        <span class="c1"># Filter one-to-one connections that are out of range</span>
+        <span class="c1"># Note: there may be other connectors stored on the same edge!</span>
+        <span class="n">n_filtered</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">synapse_info</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_information</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">synapse_info</span><span class="o">.</span><span class="n">connector</span><span class="p">,</span> <span class="n">OneToOneConnector</span><span class="p">):</span>
+                <span class="n">pre_lo</span> <span class="o">=</span> <span class="n">graph_mapper</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pre_vertex</span><span class="p">)</span><span class="o">.</span><span class="n">lo_atom</span>
+                <span class="n">pre_hi</span> <span class="o">=</span> <span class="n">graph_mapper</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pre_vertex</span><span class="p">)</span><span class="o">.</span><span class="n">hi_atom</span>
+                <span class="n">post_lo</span> <span class="o">=</span> <span class="n">graph_mapper</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">post_vertex</span><span class="p">)</span><span class="o">.</span><span class="n">lo_atom</span>
+                <span class="n">post_hi</span> <span class="o">=</span> <span class="n">graph_mapper</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">post_vertex</span><span class="p">)</span><span class="o">.</span><span class="n">hi_atom</span>
+                <span class="c1"># Filter edge if both are views and outside limits</span>
+                <span class="k">if</span> <span class="p">((</span><span class="n">synapse_info</span><span class="o">.</span><span class="n">prepop_is_view</span><span class="p">)</span> <span class="ow">and</span>
+                        <span class="p">(</span><span class="n">synapse_info</span><span class="o">.</span><span class="n">postpop_is_view</span><span class="p">)):</span>
+                    <span class="n">prepop_lo</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">pre_population</span><span class="o">.</span><span class="n">_indexes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">prepop_hi</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">pre_population</span><span class="o">.</span><span class="n">_indexes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">postpop_lo</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">post_population</span><span class="o">.</span><span class="n">_indexes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">postpop_hi</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">post_population</span><span class="o">.</span><span class="n">_indexes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="c1"># Get test values</span>
+                    <span class="n">pre_lo_test</span> <span class="o">=</span> <span class="n">pre_lo</span> <span class="o">-</span> <span class="n">prepop_lo</span>
+                    <span class="n">pre_hi_test</span> <span class="o">=</span> <span class="n">pre_hi</span> <span class="o">-</span> <span class="n">prepop_lo</span>
+                    <span class="n">post_lo_test</span> <span class="o">=</span> <span class="n">post_lo</span> <span class="o">-</span> <span class="n">postpop_lo</span>
+                    <span class="n">post_hi_test</span> <span class="o">=</span> <span class="n">post_hi</span> <span class="o">-</span> <span class="n">postpop_lo</span>
+                    <span class="k">if</span> <span class="p">((</span><span class="n">pre_hi_test</span> <span class="o">&lt;</span> <span class="n">post_lo_test</span><span class="p">)</span> <span class="ow">or</span>
+                            <span class="p">(</span><span class="n">pre_lo_test</span> <span class="o">&gt;</span> <span class="n">post_hi_test</span><span class="p">)</span> <span class="ow">or</span>
+                            <span class="p">(</span><span class="n">pre_hi</span> <span class="o">&lt;</span> <span class="n">prepop_lo</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">pre_lo</span> <span class="o">&gt;</span> <span class="n">prepop_hi</span><span class="p">)</span> <span class="ow">or</span>
+                            <span class="p">(</span><span class="n">post_hi</span> <span class="o">&lt;</span> <span class="n">postpop_lo</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">post_lo</span> <span class="o">&gt;</span> <span class="n">postpop_hi</span><span class="p">)):</span>
+                        <span class="n">n_filtered</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="c1"># Filter edge if pre-pop is outside limit and post_lo is bigger</span>
+                <span class="c1"># than n_pre_neurons</span>
+                <span class="k">elif</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">prepop_is_view</span><span class="p">:</span>
+                    <span class="n">prepop_lo</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">pre_population</span><span class="o">.</span><span class="n">_indexes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">prepop_hi</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">pre_population</span><span class="o">.</span><span class="n">_indexes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="c1"># Get test values</span>
+                    <span class="n">pre_lo_test</span> <span class="o">=</span> <span class="n">pre_lo</span> <span class="o">-</span> <span class="n">prepop_lo</span>
+                    <span class="n">pre_hi_test</span> <span class="o">=</span> <span class="n">pre_hi</span> <span class="o">-</span> <span class="n">prepop_lo</span>
+                    <span class="k">if</span> <span class="p">((</span><span class="n">pre_hi_test</span> <span class="o">&lt;</span> <span class="n">post_lo</span><span class="p">)</span> <span class="ow">or</span>
+                            <span class="p">(</span><span class="n">pre_lo_test</span> <span class="o">&gt;</span> <span class="n">post_hi</span><span class="p">)</span> <span class="ow">or</span>
+                            <span class="p">(</span><span class="n">pre_hi</span> <span class="o">&lt;</span> <span class="n">prepop_lo</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">pre_lo</span> <span class="o">&gt;</span> <span class="n">prepop_hi</span><span class="p">)):</span>
+                        <span class="n">n_filtered</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="c1"># Filter edge if post-pop is outside limit and pre_lo is bigger</span>
+                <span class="c1"># than n_post_neurons</span>
+                <span class="k">elif</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">postpop_is_view</span><span class="p">:</span>
+                    <span class="n">postpop_lo</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">post_population</span><span class="o">.</span><span class="n">_indexes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">postpop_hi</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">post_population</span><span class="o">.</span><span class="n">_indexes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="c1"># Get test values</span>
+                    <span class="n">post_lo_test</span> <span class="o">=</span> <span class="n">post_lo</span> <span class="o">-</span> <span class="n">postpop_lo</span>
+                    <span class="n">post_hi_test</span> <span class="o">=</span> <span class="n">post_hi</span> <span class="o">-</span> <span class="n">postpop_lo</span>
+                    <span class="k">if</span> <span class="p">((</span><span class="n">pre_hi</span> <span class="o">&lt;</span> <span class="n">post_lo_test</span><span class="p">)</span> <span class="ow">or</span>
+                            <span class="p">(</span><span class="n">pre_lo</span> <span class="o">&gt;</span> <span class="n">post_hi_test</span><span class="p">)</span> <span class="ow">or</span>
+                            <span class="p">(</span><span class="n">post_hi</span> <span class="o">&lt;</span> <span class="n">postpop_lo</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">post_lo</span> <span class="o">&gt;</span> <span class="n">postpop_hi</span><span class="p">)):</span>
+                        <span class="n">n_filtered</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="c1"># Filter edge in the usual scenario with normal populations</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">pre_hi</span> <span class="o">&lt;</span> <span class="n">post_lo</span> <span class="ow">or</span> <span class="n">pre_lo</span> <span class="o">&gt;</span> <span class="n">post_hi</span><span class="p">:</span>
+                        <span class="n">n_filtered</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">synapse_info</span><span class="o">.</span><span class="n">connector</span><span class="p">,</span> <span class="n">FromListConnector</span><span class="p">):</span>
+                <span class="n">pre_hi</span> <span class="o">=</span> <span class="n">graph_mapper</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pre_vertex</span><span class="p">)</span><span class="o">.</span><span class="n">hi_atom</span>
+                <span class="n">post_hi</span> <span class="o">=</span> <span class="n">graph_mapper</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">post_vertex</span><span class="p">)</span><span class="o">.</span><span class="n">hi_atom</span>
+                <span class="n">pre_app_vertex</span> <span class="o">=</span> <span class="n">graph_mapper</span><span class="o">.</span><span class="n">get_application_vertex</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">pre_vertex</span><span class="p">)</span>
+                <span class="n">post_app_vertex</span> <span class="o">=</span> <span class="n">graph_mapper</span><span class="o">.</span><span class="n">get_application_vertex</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">post_vertex</span><span class="p">)</span>
+                <span class="n">pre_slices</span> <span class="o">=</span> <span class="n">graph_mapper</span><span class="o">.</span><span class="n">get_slices</span><span class="p">(</span><span class="n">pre_app_vertex</span><span class="p">)</span>
+                <span class="n">post_slices</span> <span class="o">=</span> <span class="n">graph_mapper</span><span class="o">.</span><span class="n">get_slices</span><span class="p">(</span><span class="n">post_app_vertex</span><span class="p">)</span>
+                <span class="c1"># run through connection list and check for any connections</span>
+                <span class="c1"># between the pre and post vertices that could be filtered</span>
+                <span class="n">n_connections</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">connector</span><span class="o">.</span><span class="n">get_n_connections</span><span class="p">(</span>
+                    <span class="n">pre_slices</span><span class="p">,</span> <span class="n">post_slices</span><span class="p">,</span> <span class="n">pre_hi</span><span class="p">,</span> <span class="n">post_hi</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">n_connections</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">n_filtered</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">return</span> <span class="n">n_filtered</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__synapse_information</span><span class="p">)</span></div>
+
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractWeightUpdatable</span><span class="o">.</span><span class="n">update_weight</span><span class="p">)</span>
+<div class="viewcode-block" id="ProjectionMachineEdge.update_weight"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.projection_machine_edge.ProjectionMachineEdge.update_weight">[docs]</a>    <span class="k">def</span> <span class="nf">update_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">graph_mapper</span><span class="p">):</span>
+        <span class="n">pre_vertex</span> <span class="o">=</span> <span class="n">graph_mapper</span><span class="o">.</span><span class="n">get_application_vertex</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pre_vertex</span><span class="p">)</span>
+        <span class="n">pre_vertex_slice</span> <span class="o">=</span> <span class="n">graph_mapper</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pre_vertex</span><span class="p">)</span>
+
+        <span class="n">weight</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">synapse_info</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_information</span><span class="p">:</span>
+            <span class="n">new_weight</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">connector</span><span class="o">.</span>\
+                <span class="n">get_n_connections_to_post_vertex_maximum</span><span class="p">(</span><span class="n">synapse_info</span><span class="p">)</span>
+            <span class="n">new_weight</span> <span class="o">*=</span> <span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">pre_vertex</span><span class="p">,</span> <span class="s2">&quot;rate&quot;</span><span class="p">):</span>
+                <span class="n">rate</span> <span class="o">=</span> <span class="n">pre_vertex</span><span class="o">.</span><span class="n">rate</span>
+                <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">rate</span><span class="p">,</span> <span class="s2">&quot;__getitem__&quot;</span><span class="p">):</span>
+                    <span class="n">rate</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">rate</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rate</span><span class="p">,</span> <span class="n">RandomDistribution</span><span class="p">):</span>
+                    <span class="n">rate</span> <span class="o">=</span> <span class="n">utility_calls</span><span class="o">.</span><span class="n">get_maximum_probable_value</span><span class="p">(</span>
+                        <span class="n">rate</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span>
+                <span class="n">new_weight</span> <span class="o">*=</span> <span class="n">rate</span>
+            <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">pre_vertex</span><span class="p">,</span> <span class="s2">&quot;spikes_per_second&quot;</span><span class="p">):</span>
+                <span class="n">new_weight</span> <span class="o">*=</span> <span class="n">pre_vertex</span><span class="o">.</span><span class="n">spikes_per_second</span>
+            <span class="n">weight</span> <span class="o">+=</span> <span class="n">new_weight</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_traffic_weight</span> <span class="o">=</span> <span class="n">weight</span></div>
+
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractProvidesLocalProvenanceData</span><span class="o">.</span><span class="n">get_local_provenance_data</span><span class="p">)</span>
+<div class="viewcode-block" id="ProjectionMachineEdge.get_local_provenance_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.projection_machine_edge.ProjectionMachineEdge.get_local_provenance_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_local_provenance_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">prov_items</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">synapse_info</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_information</span><span class="p">:</span>
+            <span class="n">prov_items</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                <span class="n">synapse_info</span><span class="o">.</span><span class="n">connector</span><span class="o">.</span><span class="n">get_provenance_data</span><span class="p">(</span><span class="n">synapse_info</span><span class="p">))</span>
+            <span class="n">prov_items</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                <span class="n">synapse_info</span><span class="o">.</span><span class="n">synapse_dynamics</span><span class="o">.</span><span class="n">get_provenance_data</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">label</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">prov_items</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">sPyNNaker  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+    </div>
+  </body>
+</html>

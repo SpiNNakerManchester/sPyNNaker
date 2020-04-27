@@ -1,0 +1,221 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>spynnaker.pyNN.models.neuron.additional_inputs.additional_input_ca2_adaptive &#8212; sPyNNaker  documentation</title>
+    
+    <link rel="stylesheet" href="../../../../../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">sPyNNaker  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for spynnaker.pyNN.models.neuron.additional_inputs.additional_input_ca2_adaptive</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2017-2019 The University of Manchester</span>
+<span class="c1">#</span>
+<span class="c1"># This program is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
+<span class="kn">from</span> <span class="nn">data_specification.enums</span> <span class="kn">import</span> <span class="n">DataType</span>
+<span class="kn">from</span> <span class="nn">pacman.executor.injection_decorator</span> <span class="kn">import</span> <span class="n">inject_items</span>
+<span class="kn">from</span> <span class="nn">.abstract_additional_input</span> <span class="kn">import</span> <span class="n">AbstractAdditionalInput</span>
+
+<span class="n">I_ALPHA</span> <span class="o">=</span> <span class="s2">&quot;i_alpha&quot;</span>
+<span class="n">I_CA2</span> <span class="o">=</span> <span class="s2">&quot;i_ca2&quot;</span>
+<span class="n">TAU_CA2</span> <span class="o">=</span> <span class="s2">&quot;tau_ca2&quot;</span>
+
+<span class="n">UNITS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">I_ALPHA</span><span class="p">:</span> <span class="s2">&quot;nA&quot;</span><span class="p">,</span>
+    <span class="n">I_CA2</span><span class="p">:</span> <span class="s2">&quot;nA&quot;</span><span class="p">,</span>
+    <span class="n">TAU_CA2</span><span class="p">:</span> <span class="s2">&quot;ms&quot;</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="AdditionalInputCa2Adaptive"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.additional_inputs.html#spynnaker.pyNN.models.neuron.additional_inputs.additional_input_ca2_adaptive.AdditionalInputCa2Adaptive">[docs]</a><span class="k">class</span> <span class="nc">AdditionalInputCa2Adaptive</span><span class="p">(</span><span class="n">AbstractAdditionalInput</span><span class="p">):</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;__tau_ca2&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__i_ca2&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__i_alpha&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>  <span class="n">tau_ca2</span><span class="p">,</span> <span class="n">i_ca2</span><span class="p">,</span> <span class="n">i_alpha</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param float tau_ca2: :math:`\tau_{\mathrm{Ca}^{+2}}`</span>
+<span class="sd">        :param float i_ca2: :math:`I_{\mathrm{Ca}^{+2}}`</span>
+<span class="sd">        :param float i_alpha: :math:`I_{\alpha}`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">AdditionalInputCa2Adaptive</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">([</span>
+            <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span>   <span class="c1"># e^(-ts / tau_ca2)</span>
+            <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span>   <span class="c1"># i_ca_2</span>
+            <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">])</span>  <span class="c1"># i_alpha</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__tau_ca2</span> <span class="o">=</span> <span class="n">tau_ca2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__i_ca2</span> <span class="o">=</span> <span class="n">i_ca2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__i_alpha</span> <span class="o">=</span> <span class="n">i_alpha</span>
+
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractAdditionalInput</span><span class="o">.</span><span class="n">get_n_cpu_cycles</span><span class="p">)</span>
+<div class="viewcode-block" id="AdditionalInputCa2Adaptive.get_n_cpu_cycles"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.additional_inputs.html#spynnaker.pyNN.models.neuron.additional_inputs.additional_input_ca2_adaptive.AdditionalInputCa2Adaptive.get_n_cpu_cycles">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_cpu_cycles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">):</span>
+        <span class="c1"># A bit of a guess</span>
+        <span class="k">return</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">n_neurons</span></div>
+
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractAdditionalInput</span><span class="o">.</span><span class="n">add_parameters</span><span class="p">)</span>
+<div class="viewcode-block" id="AdditionalInputCa2Adaptive.add_parameters"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.additional_inputs.html#spynnaker.pyNN.models.neuron.additional_inputs.additional_input_ca2_adaptive.AdditionalInputCa2Adaptive.add_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">add_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
+        <span class="n">parameters</span><span class="p">[</span><span class="n">TAU_CA2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tau_ca2</span>
+        <span class="n">parameters</span><span class="p">[</span><span class="n">I_ALPHA</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__i_alpha</span></div>
+
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractAdditionalInput</span><span class="o">.</span><span class="n">add_state_variables</span><span class="p">)</span>
+<div class="viewcode-block" id="AdditionalInputCa2Adaptive.add_state_variables"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.additional_inputs.html#spynnaker.pyNN.models.neuron.additional_inputs.additional_input_ca2_adaptive.AdditionalInputCa2Adaptive.add_state_variables">[docs]</a>    <span class="k">def</span> <span class="nf">add_state_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">):</span>
+        <span class="n">state_variables</span><span class="p">[</span><span class="n">I_CA2</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__i_ca2</span></div>
+
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractAdditionalInput</span><span class="o">.</span><span class="n">get_units</span><span class="p">)</span>
+<div class="viewcode-block" id="AdditionalInputCa2Adaptive.get_units"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.additional_inputs.html#spynnaker.pyNN.models.neuron.additional_inputs.additional_input_ca2_adaptive.AdditionalInputCa2Adaptive.get_units">[docs]</a>    <span class="k">def</span> <span class="nf">get_units</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">UNITS</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span></div>
+
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractAdditionalInput</span><span class="o">.</span><span class="n">has_variable</span><span class="p">)</span>
+<div class="viewcode-block" id="AdditionalInputCa2Adaptive.has_variable"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.additional_inputs.html#spynnaker.pyNN.models.neuron.additional_inputs.additional_input_ca2_adaptive.AdditionalInputCa2Adaptive.has_variable">[docs]</a>    <span class="k">def</span> <span class="nf">has_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">UNITS</span></div>
+
+    <span class="nd">@inject_items</span><span class="p">({</span><span class="s2">&quot;ts&quot;</span><span class="p">:</span> <span class="s2">&quot;MachineTimeStep&quot;</span><span class="p">})</span>
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractAdditionalInput</span><span class="o">.</span><span class="n">get_values</span><span class="p">,</span> <span class="n">additional_arguments</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;ts&#39;</span><span class="p">})</span>
+<div class="viewcode-block" id="AdditionalInputCa2Adaptive.get_values"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.additional_inputs.html#spynnaker.pyNN.models.neuron.additional_inputs.additional_input_ca2_adaptive.AdditionalInputCa2Adaptive.get_values">[docs]</a>    <span class="k">def</span> <span class="nf">get_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param int ts: machine time step</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># pylint: disable=arguments-differ</span>
+
+        <span class="c1"># Add the rest of the data</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">parameters</span><span class="p">[</span><span class="n">TAU_CA2</span><span class="p">]</span><span class="o">.</span><span class="n">apply_operation</span><span class="p">(</span>
+                    <span class="n">operation</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="o">-</span><span class="n">ts</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1000.0</span> <span class="o">*</span> <span class="n">x</span><span class="p">))),</span>
+                <span class="n">state_variables</span><span class="p">[</span><span class="n">I_CA2</span><span class="p">],</span> <span class="n">parameters</span><span class="p">[</span><span class="n">I_ALPHA</span><span class="p">]]</span></div>
+
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractAdditionalInput</span><span class="o">.</span><span class="n">update_values</span><span class="p">)</span>
+<div class="viewcode-block" id="AdditionalInputCa2Adaptive.update_values"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.additional_inputs.html#spynnaker.pyNN.models.neuron.additional_inputs.additional_input_ca2_adaptive.AdditionalInputCa2Adaptive.update_values">[docs]</a>    <span class="k">def</span> <span class="nf">update_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">):</span>
+
+        <span class="c1"># Read the data</span>
+        <span class="p">(</span><span class="n">_exp_tau_ca2</span><span class="p">,</span> <span class="n">i_ca2</span><span class="p">,</span> <span class="n">_i_alpha</span><span class="p">)</span> <span class="o">=</span> <span class="n">values</span>
+
+        <span class="c1"># Copy the changed data only</span>
+        <span class="n">state_variables</span><span class="p">[</span><span class="n">I_CA2</span><span class="p">]</span> <span class="o">=</span> <span class="n">i_ca2</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">tau_ca2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Settable model parameter: :math:`\tau_{\mathrm{Ca}^{+2}}`</span>
+
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tau_ca2</span>
+
+    <span class="nd">@tau_ca2</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">tau_ca2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tau_ca2</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__tau_ca2</span> <span class="o">=</span> <span class="n">tau_ca2</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">i_ca2</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Settable model parameter: :math:`I_{\mathrm{Ca}^{+2}}`</span>
+
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__i_ca2</span>
+
+    <span class="nd">@i_ca2</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">i_ca2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i_ca2</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__i_ca2</span> <span class="o">=</span> <span class="n">i_ca2</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">i_alpha</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot; Settable model parameter: :math:`I_{\alpha}`</span>
+
+<span class="sd">        :rtype: float</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__i_alpha</span>
+
+    <span class="nd">@i_alpha</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">i_alpha</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i_alpha</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__i_alpha</span> <span class="o">=</span> <span class="n">i_alpha</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">sPyNNaker  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,1212 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>spynnaker.pyNN.utilities.random_stats package &#8212; sPyNNaker  documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="spynnaker.pyNN.utilities.ranged package" href="spynnaker.pyNN.utilities.ranged.html" />
+    <link rel="prev" title="spynnaker.pyNN.utilities package" href="spynnaker.pyNN.utilities.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="spynnaker.pyNN.utilities.ranged.html" title="spynnaker.pyNN.utilities.ranged package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="spynnaker.pyNN.utilities.html" title="spynnaker.pyNN.utilities package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.utilities.html" accesskey="U">spynnaker.pyNN.utilities package</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">spynnaker.pyNN.utilities.random_stats package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.random_stats.abstract_random_stats">spynnaker.pyNN.utilities.random_stats.abstract_random_stats module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.random_stats.random_stats_binomial_impl">spynnaker.pyNN.utilities.random_stats.random_stats_binomial_impl module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.random_stats.random_stats_exponential_impl">spynnaker.pyNN.utilities.random_stats.random_stats_exponential_impl module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.random_stats.random_stats_gamma_impl">spynnaker.pyNN.utilities.random_stats.random_stats_gamma_impl module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.random_stats.random_stats_log_normal_impl">spynnaker.pyNN.utilities.random_stats.random_stats_log_normal_impl module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.random_stats.random_stats_normal_clipped_impl">spynnaker.pyNN.utilities.random_stats.random_stats_normal_clipped_impl module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.random_stats.random_stats_normal_impl">spynnaker.pyNN.utilities.random_stats.random_stats_normal_impl module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.random_stats.random_stats_poisson_impl">spynnaker.pyNN.utilities.random_stats.random_stats_poisson_impl module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.random_stats.random_stats_randint_impl">spynnaker.pyNN.utilities.random_stats.random_stats_randint_impl module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.random_stats.random_stats_scipy_impl">spynnaker.pyNN.utilities.random_stats.random_stats_scipy_impl module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.random_stats.random_stats_uniform_impl">spynnaker.pyNN.utilities.random_stats.random_stats_uniform_impl module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.random_stats.random_stats_vonmises_impl">spynnaker.pyNN.utilities.random_stats.random_stats_vonmises_impl module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.random_stats">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="spynnaker.pyNN.utilities.html"
+                        title="previous chapter">spynnaker.pyNN.utilities package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="spynnaker.pyNN.utilities.ranged.html"
+                        title="next chapter">spynnaker.pyNN.utilities.ranged package</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/spynnaker.pyNN.utilities.random_stats.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="spynnaker-pynn-utilities-random-stats-package">
+<h1>spynnaker.pyNN.utilities.random_stats package<a class="headerlink" href="#spynnaker-pynn-utilities-random-stats-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-spynnaker.pyNN.utilities.random_stats.abstract_random_stats">
+<span id="spynnaker-pynn-utilities-random-stats-abstract-random-stats-module"></span><h2>spynnaker.pyNN.utilities.random_stats.abstract_random_stats module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.random_stats.abstract_random_stats" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.utilities.random_stats.abstract_random_stats.</code><code class="descname">AbstractRandomStats</code><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/abstract_random_stats.html#AbstractRandomStats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Statistics about PyNN RandomDistribution objects</p>
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats.cdf">
+<code class="descname">cdf</code><span class="sig-paren">(</span><em>dist</em>, <em>v</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/abstract_random_stats.html#AbstractRandomStats.cdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats.cdf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the cumulative distribution function value for the value v</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats.high">
+<code class="descname">high</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/abstract_random_stats.html#AbstractRandomStats.high"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats.high" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the high cutoff value of the distribution, or None if the            distribution is unbounded</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats.low">
+<code class="descname">low</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/abstract_random_stats.html#AbstractRandomStats.low"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats.low" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the low cutoff value of the distribution, or None if the            distribution is unbounded</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats.mean">
+<code class="descname">mean</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/abstract_random_stats.html#AbstractRandomStats.mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats.mean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the mean of the distribution</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats.ppf">
+<code class="descname">ppf</code><span class="sig-paren">(</span><em>dist</em>, <em>p</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/abstract_random_stats.html#AbstractRandomStats.ppf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats.ppf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the percent point function value for the probability p</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats.std">
+<code class="descname">std</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/abstract_random_stats.html#AbstractRandomStats.std"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats.std" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the standard deviation of the distribution</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats.var">
+<code class="descname">var</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/abstract_random_stats.html#AbstractRandomStats.var"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats.var" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the variance of the distribution</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-spynnaker.pyNN.utilities.random_stats.random_stats_binomial_impl">
+<span id="spynnaker-pynn-utilities-random-stats-random-stats-binomial-impl-module"></span><h2>spynnaker.pyNN.utilities.random_stats.random_stats_binomial_impl module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.random_stats.random_stats_binomial_impl" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_binomial_impl.RandomStatsBinomialImpl">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.utilities.random_stats.random_stats_binomial_impl.</code><code class="descname">RandomStatsBinomialImpl</code><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_binomial_impl.html#RandomStatsBinomialImpl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_binomial_impl.RandomStatsBinomialImpl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats" title="spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats</span></code></a></p>
+<p>An implementation of AbstractRandomStats for binomial distributions</p>
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_binomial_impl.RandomStatsBinomialImpl.cdf">
+<code class="descname">cdf</code><span class="sig-paren">(</span><em>dist</em>, <em>v</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_binomial_impl.html#RandomStatsBinomialImpl.cdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_binomial_impl.RandomStatsBinomialImpl.cdf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_binomial_impl.RandomStatsBinomialImpl.high">
+<code class="descname">high</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_binomial_impl.html#RandomStatsBinomialImpl.high"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_binomial_impl.RandomStatsBinomialImpl.high" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_binomial_impl.RandomStatsBinomialImpl.low">
+<code class="descname">low</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_binomial_impl.html#RandomStatsBinomialImpl.low"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_binomial_impl.RandomStatsBinomialImpl.low" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_binomial_impl.RandomStatsBinomialImpl.mean">
+<code class="descname">mean</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_binomial_impl.html#RandomStatsBinomialImpl.mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_binomial_impl.RandomStatsBinomialImpl.mean" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_binomial_impl.RandomStatsBinomialImpl.ppf">
+<code class="descname">ppf</code><span class="sig-paren">(</span><em>dist</em>, <em>p</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_binomial_impl.html#RandomStatsBinomialImpl.ppf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_binomial_impl.RandomStatsBinomialImpl.ppf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_binomial_impl.RandomStatsBinomialImpl.std">
+<code class="descname">std</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_binomial_impl.html#RandomStatsBinomialImpl.std"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_binomial_impl.RandomStatsBinomialImpl.std" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_binomial_impl.RandomStatsBinomialImpl.var">
+<code class="descname">var</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_binomial_impl.html#RandomStatsBinomialImpl.var"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_binomial_impl.RandomStatsBinomialImpl.var" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-spynnaker.pyNN.utilities.random_stats.random_stats_exponential_impl">
+<span id="spynnaker-pynn-utilities-random-stats-random-stats-exponential-impl-module"></span><h2>spynnaker.pyNN.utilities.random_stats.random_stats_exponential_impl module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.random_stats.random_stats_exponential_impl" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_exponential_impl.RandomStatsExponentialImpl">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.utilities.random_stats.random_stats_exponential_impl.</code><code class="descname">RandomStatsExponentialImpl</code><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_exponential_impl.html#RandomStatsExponentialImpl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_exponential_impl.RandomStatsExponentialImpl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats" title="spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats</span></code></a></p>
+<p>An implementation of AbstractRandomStats for exponential distributions</p>
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_exponential_impl.RandomStatsExponentialImpl.cdf">
+<code class="descname">cdf</code><span class="sig-paren">(</span><em>dist</em>, <em>v</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_exponential_impl.html#RandomStatsExponentialImpl.cdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_exponential_impl.RandomStatsExponentialImpl.cdf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_exponential_impl.RandomStatsExponentialImpl.high">
+<code class="descname">high</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_exponential_impl.html#RandomStatsExponentialImpl.high"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_exponential_impl.RandomStatsExponentialImpl.high" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_exponential_impl.RandomStatsExponentialImpl.low">
+<code class="descname">low</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_exponential_impl.html#RandomStatsExponentialImpl.low"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_exponential_impl.RandomStatsExponentialImpl.low" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_exponential_impl.RandomStatsExponentialImpl.mean">
+<code class="descname">mean</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_exponential_impl.html#RandomStatsExponentialImpl.mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_exponential_impl.RandomStatsExponentialImpl.mean" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_exponential_impl.RandomStatsExponentialImpl.ppf">
+<code class="descname">ppf</code><span class="sig-paren">(</span><em>dist</em>, <em>p</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_exponential_impl.html#RandomStatsExponentialImpl.ppf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_exponential_impl.RandomStatsExponentialImpl.ppf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_exponential_impl.RandomStatsExponentialImpl.std">
+<code class="descname">std</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_exponential_impl.html#RandomStatsExponentialImpl.std"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_exponential_impl.RandomStatsExponentialImpl.std" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_exponential_impl.RandomStatsExponentialImpl.var">
+<code class="descname">var</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_exponential_impl.html#RandomStatsExponentialImpl.var"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_exponential_impl.RandomStatsExponentialImpl.var" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-spynnaker.pyNN.utilities.random_stats.random_stats_gamma_impl">
+<span id="spynnaker-pynn-utilities-random-stats-random-stats-gamma-impl-module"></span><h2>spynnaker.pyNN.utilities.random_stats.random_stats_gamma_impl module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.random_stats.random_stats_gamma_impl" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_gamma_impl.RandomStatsGammaImpl">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.utilities.random_stats.random_stats_gamma_impl.</code><code class="descname">RandomStatsGammaImpl</code><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_gamma_impl.html#RandomStatsGammaImpl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_gamma_impl.RandomStatsGammaImpl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats" title="spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats</span></code></a></p>
+<p>An implementation of AbstractRandomStats for gamma distributions</p>
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_gamma_impl.RandomStatsGammaImpl.cdf">
+<code class="descname">cdf</code><span class="sig-paren">(</span><em>dist</em>, <em>v</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_gamma_impl.html#RandomStatsGammaImpl.cdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_gamma_impl.RandomStatsGammaImpl.cdf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_gamma_impl.RandomStatsGammaImpl.high">
+<code class="descname">high</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_gamma_impl.html#RandomStatsGammaImpl.high"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_gamma_impl.RandomStatsGammaImpl.high" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_gamma_impl.RandomStatsGammaImpl.low">
+<code class="descname">low</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_gamma_impl.html#RandomStatsGammaImpl.low"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_gamma_impl.RandomStatsGammaImpl.low" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_gamma_impl.RandomStatsGammaImpl.mean">
+<code class="descname">mean</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_gamma_impl.html#RandomStatsGammaImpl.mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_gamma_impl.RandomStatsGammaImpl.mean" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_gamma_impl.RandomStatsGammaImpl.ppf">
+<code class="descname">ppf</code><span class="sig-paren">(</span><em>dist</em>, <em>p</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_gamma_impl.html#RandomStatsGammaImpl.ppf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_gamma_impl.RandomStatsGammaImpl.ppf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_gamma_impl.RandomStatsGammaImpl.std">
+<code class="descname">std</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_gamma_impl.html#RandomStatsGammaImpl.std"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_gamma_impl.RandomStatsGammaImpl.std" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_gamma_impl.RandomStatsGammaImpl.var">
+<code class="descname">var</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_gamma_impl.html#RandomStatsGammaImpl.var"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_gamma_impl.RandomStatsGammaImpl.var" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-spynnaker.pyNN.utilities.random_stats.random_stats_log_normal_impl">
+<span id="spynnaker-pynn-utilities-random-stats-random-stats-log-normal-impl-module"></span><h2>spynnaker.pyNN.utilities.random_stats.random_stats_log_normal_impl module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.random_stats.random_stats_log_normal_impl" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_log_normal_impl.RandomStatsLogNormalImpl">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.utilities.random_stats.random_stats_log_normal_impl.</code><code class="descname">RandomStatsLogNormalImpl</code><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_log_normal_impl.html#RandomStatsLogNormalImpl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_log_normal_impl.RandomStatsLogNormalImpl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats" title="spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats</span></code></a></p>
+<p>An implementation of AbstractRandomStats for log normal distributions</p>
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_log_normal_impl.RandomStatsLogNormalImpl.cdf">
+<code class="descname">cdf</code><span class="sig-paren">(</span><em>dist</em>, <em>v</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_log_normal_impl.html#RandomStatsLogNormalImpl.cdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_log_normal_impl.RandomStatsLogNormalImpl.cdf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_log_normal_impl.RandomStatsLogNormalImpl.high">
+<code class="descname">high</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_log_normal_impl.html#RandomStatsLogNormalImpl.high"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_log_normal_impl.RandomStatsLogNormalImpl.high" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the variance of the distribution</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_log_normal_impl.RandomStatsLogNormalImpl.low">
+<code class="descname">low</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_log_normal_impl.html#RandomStatsLogNormalImpl.low"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_log_normal_impl.RandomStatsLogNormalImpl.low" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the variance of the distribution</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_log_normal_impl.RandomStatsLogNormalImpl.mean">
+<code class="descname">mean</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_log_normal_impl.html#RandomStatsLogNormalImpl.mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_log_normal_impl.RandomStatsLogNormalImpl.mean" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_log_normal_impl.RandomStatsLogNormalImpl.ppf">
+<code class="descname">ppf</code><span class="sig-paren">(</span><em>dist</em>, <em>p</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_log_normal_impl.html#RandomStatsLogNormalImpl.ppf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_log_normal_impl.RandomStatsLogNormalImpl.ppf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_log_normal_impl.RandomStatsLogNormalImpl.std">
+<code class="descname">std</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_log_normal_impl.html#RandomStatsLogNormalImpl.std"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_log_normal_impl.RandomStatsLogNormalImpl.std" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_log_normal_impl.RandomStatsLogNormalImpl.var">
+<code class="descname">var</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_log_normal_impl.html#RandomStatsLogNormalImpl.var"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_log_normal_impl.RandomStatsLogNormalImpl.var" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-spynnaker.pyNN.utilities.random_stats.random_stats_normal_clipped_impl">
+<span id="spynnaker-pynn-utilities-random-stats-random-stats-normal-clipped-impl-module"></span><h2>spynnaker.pyNN.utilities.random_stats.random_stats_normal_clipped_impl module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.random_stats.random_stats_normal_clipped_impl" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_normal_clipped_impl.RandomStatsNormalClippedImpl">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.utilities.random_stats.random_stats_normal_clipped_impl.</code><code class="descname">RandomStatsNormalClippedImpl</code><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_normal_clipped_impl.html#RandomStatsNormalClippedImpl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_normal_clipped_impl.RandomStatsNormalClippedImpl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats" title="spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats</span></code></a></p>
+<p>An implementation of AbstractRandomStats for normal distributions that        are clipped to a boundary (redrawn)</p>
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_normal_clipped_impl.RandomStatsNormalClippedImpl.cdf">
+<code class="descname">cdf</code><span class="sig-paren">(</span><em>dist</em>, <em>v</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_normal_clipped_impl.html#RandomStatsNormalClippedImpl.cdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_normal_clipped_impl.RandomStatsNormalClippedImpl.cdf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_normal_clipped_impl.RandomStatsNormalClippedImpl.high">
+<code class="descname">high</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_normal_clipped_impl.html#RandomStatsNormalClippedImpl.high"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_normal_clipped_impl.RandomStatsNormalClippedImpl.high" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_normal_clipped_impl.RandomStatsNormalClippedImpl.low">
+<code class="descname">low</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_normal_clipped_impl.html#RandomStatsNormalClippedImpl.low"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_normal_clipped_impl.RandomStatsNormalClippedImpl.low" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_normal_clipped_impl.RandomStatsNormalClippedImpl.mean">
+<code class="descname">mean</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_normal_clipped_impl.html#RandomStatsNormalClippedImpl.mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_normal_clipped_impl.RandomStatsNormalClippedImpl.mean" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_normal_clipped_impl.RandomStatsNormalClippedImpl.ppf">
+<code class="descname">ppf</code><span class="sig-paren">(</span><em>dist</em>, <em>p</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_normal_clipped_impl.html#RandomStatsNormalClippedImpl.ppf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_normal_clipped_impl.RandomStatsNormalClippedImpl.ppf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_normal_clipped_impl.RandomStatsNormalClippedImpl.std">
+<code class="descname">std</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_normal_clipped_impl.html#RandomStatsNormalClippedImpl.std"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_normal_clipped_impl.RandomStatsNormalClippedImpl.std" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_normal_clipped_impl.RandomStatsNormalClippedImpl.var">
+<code class="descname">var</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_normal_clipped_impl.html#RandomStatsNormalClippedImpl.var"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_normal_clipped_impl.RandomStatsNormalClippedImpl.var" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-spynnaker.pyNN.utilities.random_stats.random_stats_normal_impl">
+<span id="spynnaker-pynn-utilities-random-stats-random-stats-normal-impl-module"></span><h2>spynnaker.pyNN.utilities.random_stats.random_stats_normal_impl module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.random_stats.random_stats_normal_impl" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_normal_impl.RandomStatsNormalImpl">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.utilities.random_stats.random_stats_normal_impl.</code><code class="descname">RandomStatsNormalImpl</code><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_normal_impl.html#RandomStatsNormalImpl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_normal_impl.RandomStatsNormalImpl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats" title="spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats</span></code></a></p>
+<p>An implementation of AbstractRandomStats for normal distributions</p>
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_normal_impl.RandomStatsNormalImpl.cdf">
+<code class="descname">cdf</code><span class="sig-paren">(</span><em>dist</em>, <em>v</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_normal_impl.html#RandomStatsNormalImpl.cdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_normal_impl.RandomStatsNormalImpl.cdf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_normal_impl.RandomStatsNormalImpl.high">
+<code class="descname">high</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_normal_impl.html#RandomStatsNormalImpl.high"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_normal_impl.RandomStatsNormalImpl.high" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_normal_impl.RandomStatsNormalImpl.low">
+<code class="descname">low</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_normal_impl.html#RandomStatsNormalImpl.low"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_normal_impl.RandomStatsNormalImpl.low" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_normal_impl.RandomStatsNormalImpl.mean">
+<code class="descname">mean</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_normal_impl.html#RandomStatsNormalImpl.mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_normal_impl.RandomStatsNormalImpl.mean" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_normal_impl.RandomStatsNormalImpl.ppf">
+<code class="descname">ppf</code><span class="sig-paren">(</span><em>dist</em>, <em>p</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_normal_impl.html#RandomStatsNormalImpl.ppf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_normal_impl.RandomStatsNormalImpl.ppf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_normal_impl.RandomStatsNormalImpl.std">
+<code class="descname">std</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_normal_impl.html#RandomStatsNormalImpl.std"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_normal_impl.RandomStatsNormalImpl.std" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_normal_impl.RandomStatsNormalImpl.var">
+<code class="descname">var</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_normal_impl.html#RandomStatsNormalImpl.var"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_normal_impl.RandomStatsNormalImpl.var" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-spynnaker.pyNN.utilities.random_stats.random_stats_poisson_impl">
+<span id="spynnaker-pynn-utilities-random-stats-random-stats-poisson-impl-module"></span><h2>spynnaker.pyNN.utilities.random_stats.random_stats_poisson_impl module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.random_stats.random_stats_poisson_impl" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_poisson_impl.RandomStatsPoissonImpl">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.utilities.random_stats.random_stats_poisson_impl.</code><code class="descname">RandomStatsPoissonImpl</code><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_poisson_impl.html#RandomStatsPoissonImpl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_poisson_impl.RandomStatsPoissonImpl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats" title="spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats</span></code></a></p>
+<p>An implementation of AbstractRandomStats for poisson distributions</p>
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_poisson_impl.RandomStatsPoissonImpl.cdf">
+<code class="descname">cdf</code><span class="sig-paren">(</span><em>dist</em>, <em>v</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_poisson_impl.html#RandomStatsPoissonImpl.cdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_poisson_impl.RandomStatsPoissonImpl.cdf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_poisson_impl.RandomStatsPoissonImpl.high">
+<code class="descname">high</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_poisson_impl.html#RandomStatsPoissonImpl.high"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_poisson_impl.RandomStatsPoissonImpl.high" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_poisson_impl.RandomStatsPoissonImpl.low">
+<code class="descname">low</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_poisson_impl.html#RandomStatsPoissonImpl.low"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_poisson_impl.RandomStatsPoissonImpl.low" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_poisson_impl.RandomStatsPoissonImpl.mean">
+<code class="descname">mean</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_poisson_impl.html#RandomStatsPoissonImpl.mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_poisson_impl.RandomStatsPoissonImpl.mean" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_poisson_impl.RandomStatsPoissonImpl.ppf">
+<code class="descname">ppf</code><span class="sig-paren">(</span><em>dist</em>, <em>p</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_poisson_impl.html#RandomStatsPoissonImpl.ppf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_poisson_impl.RandomStatsPoissonImpl.ppf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_poisson_impl.RandomStatsPoissonImpl.std">
+<code class="descname">std</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_poisson_impl.html#RandomStatsPoissonImpl.std"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_poisson_impl.RandomStatsPoissonImpl.std" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_poisson_impl.RandomStatsPoissonImpl.var">
+<code class="descname">var</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_poisson_impl.html#RandomStatsPoissonImpl.var"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_poisson_impl.RandomStatsPoissonImpl.var" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-spynnaker.pyNN.utilities.random_stats.random_stats_randint_impl">
+<span id="spynnaker-pynn-utilities-random-stats-random-stats-randint-impl-module"></span><h2>spynnaker.pyNN.utilities.random_stats.random_stats_randint_impl module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.random_stats.random_stats_randint_impl" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_randint_impl.RandomStatsRandIntImpl">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.utilities.random_stats.random_stats_randint_impl.</code><code class="descname">RandomStatsRandIntImpl</code><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_randint_impl.html#RandomStatsRandIntImpl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_randint_impl.RandomStatsRandIntImpl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats" title="spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats</span></code></a></p>
+<p>An implementation of AbstractRandomStats for uniform distributions</p>
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_randint_impl.RandomStatsRandIntImpl.cdf">
+<code class="descname">cdf</code><span class="sig-paren">(</span><em>dist</em>, <em>v</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_randint_impl.html#RandomStatsRandIntImpl.cdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_randint_impl.RandomStatsRandIntImpl.cdf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_randint_impl.RandomStatsRandIntImpl.high">
+<code class="descname">high</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_randint_impl.html#RandomStatsRandIntImpl.high"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_randint_impl.RandomStatsRandIntImpl.high" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_randint_impl.RandomStatsRandIntImpl.low">
+<code class="descname">low</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_randint_impl.html#RandomStatsRandIntImpl.low"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_randint_impl.RandomStatsRandIntImpl.low" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_randint_impl.RandomStatsRandIntImpl.mean">
+<code class="descname">mean</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_randint_impl.html#RandomStatsRandIntImpl.mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_randint_impl.RandomStatsRandIntImpl.mean" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_randint_impl.RandomStatsRandIntImpl.ppf">
+<code class="descname">ppf</code><span class="sig-paren">(</span><em>dist</em>, <em>p</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_randint_impl.html#RandomStatsRandIntImpl.ppf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_randint_impl.RandomStatsRandIntImpl.ppf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_randint_impl.RandomStatsRandIntImpl.std">
+<code class="descname">std</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_randint_impl.html#RandomStatsRandIntImpl.std"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_randint_impl.RandomStatsRandIntImpl.std" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_randint_impl.RandomStatsRandIntImpl.var">
+<code class="descname">var</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_randint_impl.html#RandomStatsRandIntImpl.var"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_randint_impl.RandomStatsRandIntImpl.var" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-spynnaker.pyNN.utilities.random_stats.random_stats_scipy_impl">
+<span id="spynnaker-pynn-utilities-random-stats-random-stats-scipy-impl-module"></span><h2>spynnaker.pyNN.utilities.random_stats.random_stats_scipy_impl module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.random_stats.random_stats_scipy_impl" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_scipy_impl.RandomStatsScipyImpl">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.utilities.random_stats.random_stats_scipy_impl.</code><code class="descname">RandomStatsScipyImpl</code><span class="sig-paren">(</span><em>distribution_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_scipy_impl.html#RandomStatsScipyImpl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_scipy_impl.RandomStatsScipyImpl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats" title="spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats</span></code></a></p>
+<p>A Random Statistics object that uses scipy directly</p>
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_scipy_impl.RandomStatsScipyImpl.cdf">
+<code class="descname">cdf</code><span class="sig-paren">(</span><em>dist</em>, <em>v</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_scipy_impl.html#RandomStatsScipyImpl.cdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_scipy_impl.RandomStatsScipyImpl.cdf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_scipy_impl.RandomStatsScipyImpl.high">
+<code class="descname">high</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_scipy_impl.html#RandomStatsScipyImpl.high"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_scipy_impl.RandomStatsScipyImpl.high" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_scipy_impl.RandomStatsScipyImpl.low">
+<code class="descname">low</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_scipy_impl.html#RandomStatsScipyImpl.low"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_scipy_impl.RandomStatsScipyImpl.low" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_scipy_impl.RandomStatsScipyImpl.mean">
+<code class="descname">mean</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_scipy_impl.html#RandomStatsScipyImpl.mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_scipy_impl.RandomStatsScipyImpl.mean" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_scipy_impl.RandomStatsScipyImpl.ppf">
+<code class="descname">ppf</code><span class="sig-paren">(</span><em>dist</em>, <em>p</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_scipy_impl.html#RandomStatsScipyImpl.ppf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_scipy_impl.RandomStatsScipyImpl.ppf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_scipy_impl.RandomStatsScipyImpl.std">
+<code class="descname">std</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_scipy_impl.html#RandomStatsScipyImpl.std"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_scipy_impl.RandomStatsScipyImpl.std" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_scipy_impl.RandomStatsScipyImpl.var">
+<code class="descname">var</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_scipy_impl.html#RandomStatsScipyImpl.var"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_scipy_impl.RandomStatsScipyImpl.var" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-spynnaker.pyNN.utilities.random_stats.random_stats_uniform_impl">
+<span id="spynnaker-pynn-utilities-random-stats-random-stats-uniform-impl-module"></span><h2>spynnaker.pyNN.utilities.random_stats.random_stats_uniform_impl module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.random_stats.random_stats_uniform_impl" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_uniform_impl.RandomStatsUniformImpl">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.utilities.random_stats.random_stats_uniform_impl.</code><code class="descname">RandomStatsUniformImpl</code><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_uniform_impl.html#RandomStatsUniformImpl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_uniform_impl.RandomStatsUniformImpl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats" title="spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats</span></code></a></p>
+<p>An implementation of AbstractRandomStats for uniform distributions</p>
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_uniform_impl.RandomStatsUniformImpl.cdf">
+<code class="descname">cdf</code><span class="sig-paren">(</span><em>dist</em>, <em>v</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_uniform_impl.html#RandomStatsUniformImpl.cdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_uniform_impl.RandomStatsUniformImpl.cdf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_uniform_impl.RandomStatsUniformImpl.high">
+<code class="descname">high</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_uniform_impl.html#RandomStatsUniformImpl.high"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_uniform_impl.RandomStatsUniformImpl.high" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_uniform_impl.RandomStatsUniformImpl.low">
+<code class="descname">low</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_uniform_impl.html#RandomStatsUniformImpl.low"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_uniform_impl.RandomStatsUniformImpl.low" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_uniform_impl.RandomStatsUniformImpl.mean">
+<code class="descname">mean</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_uniform_impl.html#RandomStatsUniformImpl.mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_uniform_impl.RandomStatsUniformImpl.mean" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_uniform_impl.RandomStatsUniformImpl.ppf">
+<code class="descname">ppf</code><span class="sig-paren">(</span><em>dist</em>, <em>p</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_uniform_impl.html#RandomStatsUniformImpl.ppf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_uniform_impl.RandomStatsUniformImpl.ppf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_uniform_impl.RandomStatsUniformImpl.std">
+<code class="descname">std</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_uniform_impl.html#RandomStatsUniformImpl.std"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_uniform_impl.RandomStatsUniformImpl.std" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_uniform_impl.RandomStatsUniformImpl.var">
+<code class="descname">var</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_uniform_impl.html#RandomStatsUniformImpl.var"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_uniform_impl.RandomStatsUniformImpl.var" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-spynnaker.pyNN.utilities.random_stats.random_stats_vonmises_impl">
+<span id="spynnaker-pynn-utilities-random-stats-random-stats-vonmises-impl-module"></span><h2>spynnaker.pyNN.utilities.random_stats.random_stats_vonmises_impl module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.random_stats.random_stats_vonmises_impl" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_vonmises_impl.RandomStatsVonmisesImpl">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.utilities.random_stats.random_stats_vonmises_impl.</code><code class="descname">RandomStatsVonmisesImpl</code><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_vonmises_impl.html#RandomStatsVonmisesImpl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_vonmises_impl.RandomStatsVonmisesImpl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats" title="spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats</span></code></a></p>
+<p>An implementation of AbstractRandomStats for vonmises distributions</p>
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_vonmises_impl.RandomStatsVonmisesImpl.cdf">
+<code class="descname">cdf</code><span class="sig-paren">(</span><em>dist</em>, <em>v</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_vonmises_impl.html#RandomStatsVonmisesImpl.cdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_vonmises_impl.RandomStatsVonmisesImpl.cdf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_vonmises_impl.RandomStatsVonmisesImpl.high">
+<code class="descname">high</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_vonmises_impl.html#RandomStatsVonmisesImpl.high"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_vonmises_impl.RandomStatsVonmisesImpl.high" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_vonmises_impl.RandomStatsVonmisesImpl.low">
+<code class="descname">low</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_vonmises_impl.html#RandomStatsVonmisesImpl.low"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_vonmises_impl.RandomStatsVonmisesImpl.low" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_vonmises_impl.RandomStatsVonmisesImpl.mean">
+<code class="descname">mean</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_vonmises_impl.html#RandomStatsVonmisesImpl.mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_vonmises_impl.RandomStatsVonmisesImpl.mean" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_vonmises_impl.RandomStatsVonmisesImpl.ppf">
+<code class="descname">ppf</code><span class="sig-paren">(</span><em>dist</em>, <em>p</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_vonmises_impl.html#RandomStatsVonmisesImpl.ppf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_vonmises_impl.RandomStatsVonmisesImpl.ppf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_vonmises_impl.RandomStatsVonmisesImpl.std">
+<code class="descname">std</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_vonmises_impl.html#RandomStatsVonmisesImpl.std"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_vonmises_impl.RandomStatsVonmisesImpl.std" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.random_stats_vonmises_impl.RandomStatsVonmisesImpl.var">
+<code class="descname">var</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_vonmises_impl.html#RandomStatsVonmisesImpl.var"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.random_stats_vonmises_impl.RandomStatsVonmisesImpl.var" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-spynnaker.pyNN.utilities.random_stats">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.utilities.random_stats" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="spynnaker.pyNN.utilities.random_stats.AbstractRandomStats">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.utilities.random_stats.</code><code class="descname">AbstractRandomStats</code><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/abstract_random_stats.html#AbstractRandomStats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Statistics about PyNN RandomDistribution objects</p>
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.cdf">
+<code class="descname">cdf</code><span class="sig-paren">(</span><em>dist</em>, <em>v</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/abstract_random_stats.html#AbstractRandomStats.cdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.cdf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the cumulative distribution function value for the value v</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.high">
+<code class="descname">high</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/abstract_random_stats.html#AbstractRandomStats.high"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.high" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the high cutoff value of the distribution, or None if the            distribution is unbounded</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.low">
+<code class="descname">low</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/abstract_random_stats.html#AbstractRandomStats.low"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.low" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the low cutoff value of the distribution, or None if the            distribution is unbounded</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.mean">
+<code class="descname">mean</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/abstract_random_stats.html#AbstractRandomStats.mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.mean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the mean of the distribution</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.ppf">
+<code class="descname">ppf</code><span class="sig-paren">(</span><em>dist</em>, <em>p</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/abstract_random_stats.html#AbstractRandomStats.ppf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.ppf" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the percent point function value for the probability p</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.std">
+<code class="descname">std</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/abstract_random_stats.html#AbstractRandomStats.std"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.std" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the standard deviation of the distribution</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.var">
+<code class="descname">var</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/abstract_random_stats.html#AbstractRandomStats.var"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.AbstractRandomStats.var" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the variance of the distribution</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsBinomialImpl">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.utilities.random_stats.</code><code class="descname">RandomStatsBinomialImpl</code><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_binomial_impl.html#RandomStatsBinomialImpl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsBinomialImpl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats" title="spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats</span></code></a></p>
+<p>An implementation of AbstractRandomStats for binomial distributions</p>
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsBinomialImpl.cdf">
+<code class="descname">cdf</code><span class="sig-paren">(</span><em>dist</em>, <em>v</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_binomial_impl.html#RandomStatsBinomialImpl.cdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsBinomialImpl.cdf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsBinomialImpl.high">
+<code class="descname">high</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_binomial_impl.html#RandomStatsBinomialImpl.high"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsBinomialImpl.high" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsBinomialImpl.low">
+<code class="descname">low</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_binomial_impl.html#RandomStatsBinomialImpl.low"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsBinomialImpl.low" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsBinomialImpl.mean">
+<code class="descname">mean</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_binomial_impl.html#RandomStatsBinomialImpl.mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsBinomialImpl.mean" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsBinomialImpl.ppf">
+<code class="descname">ppf</code><span class="sig-paren">(</span><em>dist</em>, <em>p</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_binomial_impl.html#RandomStatsBinomialImpl.ppf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsBinomialImpl.ppf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsBinomialImpl.std">
+<code class="descname">std</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_binomial_impl.html#RandomStatsBinomialImpl.std"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsBinomialImpl.std" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsBinomialImpl.var">
+<code class="descname">var</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_binomial_impl.html#RandomStatsBinomialImpl.var"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsBinomialImpl.var" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsExponentialImpl">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.utilities.random_stats.</code><code class="descname">RandomStatsExponentialImpl</code><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_exponential_impl.html#RandomStatsExponentialImpl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsExponentialImpl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats" title="spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats</span></code></a></p>
+<p>An implementation of AbstractRandomStats for exponential distributions</p>
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsExponentialImpl.cdf">
+<code class="descname">cdf</code><span class="sig-paren">(</span><em>dist</em>, <em>v</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_exponential_impl.html#RandomStatsExponentialImpl.cdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsExponentialImpl.cdf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsExponentialImpl.high">
+<code class="descname">high</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_exponential_impl.html#RandomStatsExponentialImpl.high"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsExponentialImpl.high" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsExponentialImpl.low">
+<code class="descname">low</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_exponential_impl.html#RandomStatsExponentialImpl.low"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsExponentialImpl.low" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsExponentialImpl.mean">
+<code class="descname">mean</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_exponential_impl.html#RandomStatsExponentialImpl.mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsExponentialImpl.mean" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsExponentialImpl.ppf">
+<code class="descname">ppf</code><span class="sig-paren">(</span><em>dist</em>, <em>p</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_exponential_impl.html#RandomStatsExponentialImpl.ppf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsExponentialImpl.ppf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsExponentialImpl.std">
+<code class="descname">std</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_exponential_impl.html#RandomStatsExponentialImpl.std"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsExponentialImpl.std" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsExponentialImpl.var">
+<code class="descname">var</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_exponential_impl.html#RandomStatsExponentialImpl.var"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsExponentialImpl.var" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsGammaImpl">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.utilities.random_stats.</code><code class="descname">RandomStatsGammaImpl</code><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_gamma_impl.html#RandomStatsGammaImpl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsGammaImpl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats" title="spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats</span></code></a></p>
+<p>An implementation of AbstractRandomStats for gamma distributions</p>
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsGammaImpl.cdf">
+<code class="descname">cdf</code><span class="sig-paren">(</span><em>dist</em>, <em>v</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_gamma_impl.html#RandomStatsGammaImpl.cdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsGammaImpl.cdf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsGammaImpl.high">
+<code class="descname">high</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_gamma_impl.html#RandomStatsGammaImpl.high"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsGammaImpl.high" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsGammaImpl.low">
+<code class="descname">low</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_gamma_impl.html#RandomStatsGammaImpl.low"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsGammaImpl.low" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsGammaImpl.mean">
+<code class="descname">mean</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_gamma_impl.html#RandomStatsGammaImpl.mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsGammaImpl.mean" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsGammaImpl.ppf">
+<code class="descname">ppf</code><span class="sig-paren">(</span><em>dist</em>, <em>p</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_gamma_impl.html#RandomStatsGammaImpl.ppf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsGammaImpl.ppf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsGammaImpl.std">
+<code class="descname">std</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_gamma_impl.html#RandomStatsGammaImpl.std"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsGammaImpl.std" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsGammaImpl.var">
+<code class="descname">var</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_gamma_impl.html#RandomStatsGammaImpl.var"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsGammaImpl.var" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsLogNormalImpl">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.utilities.random_stats.</code><code class="descname">RandomStatsLogNormalImpl</code><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_log_normal_impl.html#RandomStatsLogNormalImpl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsLogNormalImpl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats" title="spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats</span></code></a></p>
+<p>An implementation of AbstractRandomStats for log normal distributions</p>
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsLogNormalImpl.cdf">
+<code class="descname">cdf</code><span class="sig-paren">(</span><em>dist</em>, <em>v</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_log_normal_impl.html#RandomStatsLogNormalImpl.cdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsLogNormalImpl.cdf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsLogNormalImpl.high">
+<code class="descname">high</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_log_normal_impl.html#RandomStatsLogNormalImpl.high"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsLogNormalImpl.high" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the variance of the distribution</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsLogNormalImpl.low">
+<code class="descname">low</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_log_normal_impl.html#RandomStatsLogNormalImpl.low"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsLogNormalImpl.low" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the variance of the distribution</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsLogNormalImpl.mean">
+<code class="descname">mean</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_log_normal_impl.html#RandomStatsLogNormalImpl.mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsLogNormalImpl.mean" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsLogNormalImpl.ppf">
+<code class="descname">ppf</code><span class="sig-paren">(</span><em>dist</em>, <em>p</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_log_normal_impl.html#RandomStatsLogNormalImpl.ppf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsLogNormalImpl.ppf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsLogNormalImpl.std">
+<code class="descname">std</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_log_normal_impl.html#RandomStatsLogNormalImpl.std"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsLogNormalImpl.std" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsLogNormalImpl.var">
+<code class="descname">var</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_log_normal_impl.html#RandomStatsLogNormalImpl.var"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsLogNormalImpl.var" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsNormalClippedImpl">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.utilities.random_stats.</code><code class="descname">RandomStatsNormalClippedImpl</code><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_normal_clipped_impl.html#RandomStatsNormalClippedImpl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalClippedImpl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats" title="spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats</span></code></a></p>
+<p>An implementation of AbstractRandomStats for normal distributions that        are clipped to a boundary (redrawn)</p>
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsNormalClippedImpl.cdf">
+<code class="descname">cdf</code><span class="sig-paren">(</span><em>dist</em>, <em>v</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_normal_clipped_impl.html#RandomStatsNormalClippedImpl.cdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalClippedImpl.cdf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsNormalClippedImpl.high">
+<code class="descname">high</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_normal_clipped_impl.html#RandomStatsNormalClippedImpl.high"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalClippedImpl.high" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsNormalClippedImpl.low">
+<code class="descname">low</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_normal_clipped_impl.html#RandomStatsNormalClippedImpl.low"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalClippedImpl.low" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsNormalClippedImpl.mean">
+<code class="descname">mean</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_normal_clipped_impl.html#RandomStatsNormalClippedImpl.mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalClippedImpl.mean" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsNormalClippedImpl.ppf">
+<code class="descname">ppf</code><span class="sig-paren">(</span><em>dist</em>, <em>p</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_normal_clipped_impl.html#RandomStatsNormalClippedImpl.ppf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalClippedImpl.ppf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsNormalClippedImpl.std">
+<code class="descname">std</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_normal_clipped_impl.html#RandomStatsNormalClippedImpl.std"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalClippedImpl.std" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsNormalClippedImpl.var">
+<code class="descname">var</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_normal_clipped_impl.html#RandomStatsNormalClippedImpl.var"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalClippedImpl.var" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsNormalImpl">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.utilities.random_stats.</code><code class="descname">RandomStatsNormalImpl</code><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_normal_impl.html#RandomStatsNormalImpl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalImpl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats" title="spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats</span></code></a></p>
+<p>An implementation of AbstractRandomStats for normal distributions</p>
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsNormalImpl.cdf">
+<code class="descname">cdf</code><span class="sig-paren">(</span><em>dist</em>, <em>v</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_normal_impl.html#RandomStatsNormalImpl.cdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalImpl.cdf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsNormalImpl.high">
+<code class="descname">high</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_normal_impl.html#RandomStatsNormalImpl.high"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalImpl.high" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsNormalImpl.low">
+<code class="descname">low</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_normal_impl.html#RandomStatsNormalImpl.low"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalImpl.low" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsNormalImpl.mean">
+<code class="descname">mean</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_normal_impl.html#RandomStatsNormalImpl.mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalImpl.mean" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsNormalImpl.ppf">
+<code class="descname">ppf</code><span class="sig-paren">(</span><em>dist</em>, <em>p</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_normal_impl.html#RandomStatsNormalImpl.ppf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalImpl.ppf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsNormalImpl.std">
+<code class="descname">std</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_normal_impl.html#RandomStatsNormalImpl.std"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalImpl.std" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsNormalImpl.var">
+<code class="descname">var</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_normal_impl.html#RandomStatsNormalImpl.var"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsNormalImpl.var" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsPoissonImpl">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.utilities.random_stats.</code><code class="descname">RandomStatsPoissonImpl</code><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_poisson_impl.html#RandomStatsPoissonImpl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsPoissonImpl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats" title="spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats</span></code></a></p>
+<p>An implementation of AbstractRandomStats for poisson distributions</p>
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsPoissonImpl.cdf">
+<code class="descname">cdf</code><span class="sig-paren">(</span><em>dist</em>, <em>v</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_poisson_impl.html#RandomStatsPoissonImpl.cdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsPoissonImpl.cdf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsPoissonImpl.high">
+<code class="descname">high</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_poisson_impl.html#RandomStatsPoissonImpl.high"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsPoissonImpl.high" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsPoissonImpl.low">
+<code class="descname">low</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_poisson_impl.html#RandomStatsPoissonImpl.low"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsPoissonImpl.low" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsPoissonImpl.mean">
+<code class="descname">mean</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_poisson_impl.html#RandomStatsPoissonImpl.mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsPoissonImpl.mean" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsPoissonImpl.ppf">
+<code class="descname">ppf</code><span class="sig-paren">(</span><em>dist</em>, <em>p</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_poisson_impl.html#RandomStatsPoissonImpl.ppf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsPoissonImpl.ppf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsPoissonImpl.std">
+<code class="descname">std</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_poisson_impl.html#RandomStatsPoissonImpl.std"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsPoissonImpl.std" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsPoissonImpl.var">
+<code class="descname">var</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_poisson_impl.html#RandomStatsPoissonImpl.var"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsPoissonImpl.var" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsRandIntImpl">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.utilities.random_stats.</code><code class="descname">RandomStatsRandIntImpl</code><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_randint_impl.html#RandomStatsRandIntImpl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsRandIntImpl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats" title="spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats</span></code></a></p>
+<p>An implementation of AbstractRandomStats for uniform distributions</p>
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsRandIntImpl.cdf">
+<code class="descname">cdf</code><span class="sig-paren">(</span><em>dist</em>, <em>v</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_randint_impl.html#RandomStatsRandIntImpl.cdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsRandIntImpl.cdf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsRandIntImpl.high">
+<code class="descname">high</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_randint_impl.html#RandomStatsRandIntImpl.high"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsRandIntImpl.high" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsRandIntImpl.low">
+<code class="descname">low</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_randint_impl.html#RandomStatsRandIntImpl.low"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsRandIntImpl.low" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsRandIntImpl.mean">
+<code class="descname">mean</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_randint_impl.html#RandomStatsRandIntImpl.mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsRandIntImpl.mean" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsRandIntImpl.ppf">
+<code class="descname">ppf</code><span class="sig-paren">(</span><em>dist</em>, <em>p</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_randint_impl.html#RandomStatsRandIntImpl.ppf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsRandIntImpl.ppf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsRandIntImpl.std">
+<code class="descname">std</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_randint_impl.html#RandomStatsRandIntImpl.std"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsRandIntImpl.std" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsRandIntImpl.var">
+<code class="descname">var</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_randint_impl.html#RandomStatsRandIntImpl.var"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsRandIntImpl.var" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsScipyImpl">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.utilities.random_stats.</code><code class="descname">RandomStatsScipyImpl</code><span class="sig-paren">(</span><em>distribution_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_scipy_impl.html#RandomStatsScipyImpl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsScipyImpl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats" title="spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats</span></code></a></p>
+<p>A Random Statistics object that uses scipy directly</p>
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsScipyImpl.cdf">
+<code class="descname">cdf</code><span class="sig-paren">(</span><em>dist</em>, <em>v</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_scipy_impl.html#RandomStatsScipyImpl.cdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsScipyImpl.cdf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsScipyImpl.high">
+<code class="descname">high</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_scipy_impl.html#RandomStatsScipyImpl.high"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsScipyImpl.high" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsScipyImpl.low">
+<code class="descname">low</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_scipy_impl.html#RandomStatsScipyImpl.low"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsScipyImpl.low" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsScipyImpl.mean">
+<code class="descname">mean</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_scipy_impl.html#RandomStatsScipyImpl.mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsScipyImpl.mean" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsScipyImpl.ppf">
+<code class="descname">ppf</code><span class="sig-paren">(</span><em>dist</em>, <em>p</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_scipy_impl.html#RandomStatsScipyImpl.ppf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsScipyImpl.ppf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsScipyImpl.std">
+<code class="descname">std</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_scipy_impl.html#RandomStatsScipyImpl.std"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsScipyImpl.std" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsScipyImpl.var">
+<code class="descname">var</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_scipy_impl.html#RandomStatsScipyImpl.var"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsScipyImpl.var" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsUniformImpl">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.utilities.random_stats.</code><code class="descname">RandomStatsUniformImpl</code><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_uniform_impl.html#RandomStatsUniformImpl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsUniformImpl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats" title="spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats</span></code></a></p>
+<p>An implementation of AbstractRandomStats for uniform distributions</p>
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsUniformImpl.cdf">
+<code class="descname">cdf</code><span class="sig-paren">(</span><em>dist</em>, <em>v</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_uniform_impl.html#RandomStatsUniformImpl.cdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsUniformImpl.cdf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsUniformImpl.high">
+<code class="descname">high</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_uniform_impl.html#RandomStatsUniformImpl.high"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsUniformImpl.high" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsUniformImpl.low">
+<code class="descname">low</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_uniform_impl.html#RandomStatsUniformImpl.low"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsUniformImpl.low" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsUniformImpl.mean">
+<code class="descname">mean</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_uniform_impl.html#RandomStatsUniformImpl.mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsUniformImpl.mean" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsUniformImpl.ppf">
+<code class="descname">ppf</code><span class="sig-paren">(</span><em>dist</em>, <em>p</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_uniform_impl.html#RandomStatsUniformImpl.ppf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsUniformImpl.ppf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsUniformImpl.std">
+<code class="descname">std</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_uniform_impl.html#RandomStatsUniformImpl.std"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsUniformImpl.std" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsUniformImpl.var">
+<code class="descname">var</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_uniform_impl.html#RandomStatsUniformImpl.var"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsUniformImpl.var" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsVonmisesImpl">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.utilities.random_stats.</code><code class="descname">RandomStatsVonmisesImpl</code><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_vonmises_impl.html#RandomStatsVonmisesImpl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsVonmisesImpl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats" title="spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.utilities.random_stats.abstract_random_stats.AbstractRandomStats</span></code></a></p>
+<p>An implementation of AbstractRandomStats for vonmises distributions</p>
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsVonmisesImpl.cdf">
+<code class="descname">cdf</code><span class="sig-paren">(</span><em>dist</em>, <em>v</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_vonmises_impl.html#RandomStatsVonmisesImpl.cdf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsVonmisesImpl.cdf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsVonmisesImpl.high">
+<code class="descname">high</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_vonmises_impl.html#RandomStatsVonmisesImpl.high"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsVonmisesImpl.high" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsVonmisesImpl.low">
+<code class="descname">low</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_vonmises_impl.html#RandomStatsVonmisesImpl.low"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsVonmisesImpl.low" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsVonmisesImpl.mean">
+<code class="descname">mean</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_vonmises_impl.html#RandomStatsVonmisesImpl.mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsVonmisesImpl.mean" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsVonmisesImpl.ppf">
+<code class="descname">ppf</code><span class="sig-paren">(</span><em>dist</em>, <em>p</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_vonmises_impl.html#RandomStatsVonmisesImpl.ppf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsVonmisesImpl.ppf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsVonmisesImpl.std">
+<code class="descname">std</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_vonmises_impl.html#RandomStatsVonmisesImpl.std"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsVonmisesImpl.std" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.random_stats.RandomStatsVonmisesImpl.var">
+<code class="descname">var</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/random_stats/random_stats_vonmises_impl.html#RandomStatsVonmisesImpl.var"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.random_stats.RandomStatsVonmisesImpl.var" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="spynnaker.pyNN.utilities.ranged.html" title="spynnaker.pyNN.utilities.ranged package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="spynnaker.pyNN.utilities.html" title="spynnaker.pyNN.utilities package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.utilities.html" >spynnaker.pyNN.utilities package</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+    </div>
+  </body>
+</html>

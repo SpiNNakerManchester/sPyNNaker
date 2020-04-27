@@ -1,0 +1,215 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>spynnaker.pyNN.protocols.munich_io_ethernet_protocol &#8212; sPyNNaker  documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">sPyNNaker  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for spynnaker.pyNN.protocols.munich_io_ethernet_protocol</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2017-2019 The University of Manchester</span>
+<span class="c1">#</span>
+<span class="c1"># This program is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+
+
+<span class="k">def</span> <span class="nf">_active_time_for_frequency</span><span class="p">(</span><span class="n">frequency</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">frequency</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="mf">1000000.0</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">frequency</span><span class="p">))</span>
+    <span class="k">return</span> <span class="mi">0</span>
+
+
+<div class="viewcode-block" id="MunichIoEthernetProtocol"><a class="viewcode-back" href="../../../../spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.munich_io_ethernet_protocol.MunichIoEthernetProtocol">[docs]</a><span class="k">class</span> <span class="nc">MunichIoEthernetProtocol</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Nothing to do here</span>
+        <span class="k">pass</span>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="MunichIoEthernetProtocol.enable_retina"><a class="viewcode-back" href="../../../../spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.munich_io_ethernet_protocol.MunichIoEthernetProtocol.enable_retina">[docs]</a>    <span class="k">def</span> <span class="nf">enable_retina</span><span class="p">():</span>
+        <span class="k">return</span> <span class="s2">&quot;E+</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;ascii&quot;</span><span class="p">)</span></div>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="MunichIoEthernetProtocol.disable_retina"><a class="viewcode-back" href="../../../../spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.munich_io_ethernet_protocol.MunichIoEthernetProtocol.disable_retina">[docs]</a>    <span class="k">def</span> <span class="nf">disable_retina</span><span class="p">():</span>
+        <span class="k">return</span> <span class="s2">&quot;E-</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;ascii&quot;</span><span class="p">)</span></div>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="MunichIoEthernetProtocol.set_retina_transmission"><a class="viewcode-back" href="../../../../spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.munich_io_ethernet_protocol.MunichIoEthernetProtocol.set_retina_transmission">[docs]</a>    <span class="k">def</span> <span class="nf">set_retina_transmission</span><span class="p">(</span><span class="n">event_format</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;!E</span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">event_format</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;ascii&quot;</span><span class="p">)</span></div>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="MunichIoEthernetProtocol.disable_motor"><a class="viewcode-back" href="../../../../spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.munich_io_ethernet_protocol.MunichIoEthernetProtocol.disable_motor">[docs]</a>    <span class="k">def</span> <span class="nf">disable_motor</span><span class="p">():</span>
+        <span class="k">return</span> <span class="s2">&quot;!M-</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;ascii&quot;</span><span class="p">)</span></div>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="MunichIoEthernetProtocol.enable_motor"><a class="viewcode-back" href="../../../../spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.munich_io_ethernet_protocol.MunichIoEthernetProtocol.enable_motor">[docs]</a>    <span class="k">def</span> <span class="nf">enable_motor</span><span class="p">():</span>
+        <span class="k">return</span> <span class="s2">&quot;!M+</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;ascii&quot;</span><span class="p">)</span></div>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="MunichIoEthernetProtocol.motor_0_permanent_velocity"><a class="viewcode-back" href="../../../../spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.munich_io_ethernet_protocol.MunichIoEthernetProtocol.motor_0_permanent_velocity">[docs]</a>    <span class="k">def</span> <span class="nf">motor_0_permanent_velocity</span><span class="p">(</span><span class="n">velocity</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">velocity</span> <span class="o">&gt;=</span> <span class="mi">100</span><span class="p">:</span>
+            <span class="n">velocity</span> <span class="o">=</span> <span class="mi">100</span>
+        <span class="k">if</span> <span class="n">velocity</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">100</span><span class="p">:</span>
+            <span class="n">velocity</span> <span class="o">=</span> <span class="o">-</span><span class="mi">100</span>
+        <span class="k">return</span> <span class="s2">&quot;!MV0=</span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">velocity</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;ascii&quot;</span><span class="p">)</span></div>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="MunichIoEthernetProtocol.motor_1_permanent_velocity"><a class="viewcode-back" href="../../../../spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.munich_io_ethernet_protocol.MunichIoEthernetProtocol.motor_1_permanent_velocity">[docs]</a>    <span class="k">def</span> <span class="nf">motor_1_permanent_velocity</span><span class="p">(</span><span class="n">velocity</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">velocity</span> <span class="o">&gt;=</span> <span class="mi">100</span><span class="p">:</span>
+            <span class="n">velocity</span> <span class="o">=</span> <span class="mi">100</span>
+        <span class="k">if</span> <span class="n">velocity</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">100</span><span class="p">:</span>
+            <span class="n">velocity</span> <span class="o">=</span> <span class="o">-</span><span class="mi">100</span>
+        <span class="k">return</span> <span class="s2">&quot;!MV1=</span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">velocity</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;ascii&quot;</span><span class="p">)</span></div>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="MunichIoEthernetProtocol.motor_0_leaky_velocity"><a class="viewcode-back" href="../../../../spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.munich_io_ethernet_protocol.MunichIoEthernetProtocol.motor_0_leaky_velocity">[docs]</a>    <span class="k">def</span> <span class="nf">motor_0_leaky_velocity</span><span class="p">(</span><span class="n">velocity</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">velocity</span> <span class="o">&gt;=</span> <span class="mi">100</span><span class="p">:</span>
+            <span class="n">velocity</span> <span class="o">=</span> <span class="mi">100</span>
+        <span class="k">if</span> <span class="n">velocity</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">100</span><span class="p">:</span>
+            <span class="n">velocity</span> <span class="o">=</span> <span class="o">-</span><span class="mi">100</span>
+        <span class="k">return</span> <span class="s2">&quot;!MVD0=</span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">velocity</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;ascii&quot;</span><span class="p">)</span></div>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="MunichIoEthernetProtocol.motor_1_leaky_velocity"><a class="viewcode-back" href="../../../../spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.munich_io_ethernet_protocol.MunichIoEthernetProtocol.motor_1_leaky_velocity">[docs]</a>    <span class="k">def</span> <span class="nf">motor_1_leaky_velocity</span><span class="p">(</span><span class="n">velocity</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">velocity</span> <span class="o">&gt;=</span> <span class="mi">100</span><span class="p">:</span>
+            <span class="n">velocity</span> <span class="o">=</span> <span class="mi">100</span>
+        <span class="k">if</span> <span class="n">velocity</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">100</span><span class="p">:</span>
+            <span class="n">velocity</span> <span class="o">=</span> <span class="o">-</span><span class="mi">100</span>
+        <span class="k">return</span> <span class="s2">&quot;!MVD1=</span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">velocity</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;ascii&quot;</span><span class="p">)</span></div>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="MunichIoEthernetProtocol.led_total_period"><a class="viewcode-back" href="../../../../spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.munich_io_ethernet_protocol.MunichIoEthernetProtocol.led_total_period">[docs]</a>    <span class="k">def</span> <span class="nf">led_total_period</span><span class="p">(</span><span class="n">total_period</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;!PC=</span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">total_period</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;ascii&quot;</span><span class="p">)</span></div>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="MunichIoEthernetProtocol.led_front_active_time"><a class="viewcode-back" href="../../../../spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.munich_io_ethernet_protocol.MunichIoEthernetProtocol.led_front_active_time">[docs]</a>    <span class="k">def</span> <span class="nf">led_front_active_time</span><span class="p">(</span><span class="n">active_time</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;!PC1=</span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">active_time</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;ascii&quot;</span><span class="p">)</span></div>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="MunichIoEthernetProtocol.led_back_active_time"><a class="viewcode-back" href="../../../../spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.munich_io_ethernet_protocol.MunichIoEthernetProtocol.led_back_active_time">[docs]</a>    <span class="k">def</span> <span class="nf">led_back_active_time</span><span class="p">(</span><span class="n">active_time</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;!PC0=</span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">active_time</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;ascii&quot;</span><span class="p">)</span></div>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="MunichIoEthernetProtocol.led_frequency"><a class="viewcode-back" href="../../../../spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.munich_io_ethernet_protocol.MunichIoEthernetProtocol.led_frequency">[docs]</a>    <span class="k">def</span> <span class="nf">led_frequency</span><span class="p">(</span><span class="n">frequency</span><span class="p">):</span>
+        <span class="n">active_time</span> <span class="o">=</span> <span class="n">_active_time_for_frequency</span><span class="p">(</span><span class="n">frequency</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;!PC=</span><span class="si">{}</span><span class="se">\n</span><span class="s2">!PC0=</span><span class="si">{}</span><span class="se">\n</span><span class="s2">!PC1=</span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">active_time</span><span class="p">,</span> <span class="n">active_time</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="n">active_time</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;ascii&quot;</span><span class="p">)</span></div>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="MunichIoEthernetProtocol.speaker_frequency"><a class="viewcode-back" href="../../../../spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.munich_io_ethernet_protocol.MunichIoEthernetProtocol.speaker_frequency">[docs]</a>    <span class="k">def</span> <span class="nf">speaker_frequency</span><span class="p">(</span><span class="n">frequency</span><span class="p">):</span>
+        <span class="n">active_time</span> <span class="o">=</span> <span class="n">_active_time_for_frequency</span><span class="p">(</span><span class="n">frequency</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;!PB=</span><span class="si">{}</span><span class="se">\n</span><span class="s2">!PB0=</span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">active_time</span><span class="p">,</span> <span class="n">active_time</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;ascii&quot;</span><span class="p">)</span></div>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="MunichIoEthernetProtocol.speaker_total_period"><a class="viewcode-back" href="../../../../spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.munich_io_ethernet_protocol.MunichIoEthernetProtocol.speaker_total_period">[docs]</a>    <span class="k">def</span> <span class="nf">speaker_total_period</span><span class="p">(</span><span class="n">total_period</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;!PB=</span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">total_period</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;ascii&quot;</span><span class="p">)</span></div>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="MunichIoEthernetProtocol.speaker_active_time"><a class="viewcode-back" href="../../../../spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.munich_io_ethernet_protocol.MunichIoEthernetProtocol.speaker_active_time">[docs]</a>    <span class="k">def</span> <span class="nf">speaker_active_time</span><span class="p">(</span><span class="n">active_time</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;!PB0=</span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">active_time</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;ascii&quot;</span><span class="p">)</span></div>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="MunichIoEthernetProtocol.laser_frequency"><a class="viewcode-back" href="../../../../spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.munich_io_ethernet_protocol.MunichIoEthernetProtocol.laser_frequency">[docs]</a>    <span class="k">def</span> <span class="nf">laser_frequency</span><span class="p">(</span><span class="n">frequency</span><span class="p">):</span>
+        <span class="n">active_time</span> <span class="o">=</span> <span class="n">_active_time_for_frequency</span><span class="p">(</span><span class="n">frequency</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;!PA=</span><span class="si">{}</span><span class="se">\n</span><span class="s2">!PA0=</span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">active_time</span><span class="p">,</span> <span class="n">active_time</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;ascii&quot;</span><span class="p">)</span></div>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="MunichIoEthernetProtocol.laser_total_period"><a class="viewcode-back" href="../../../../spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.munich_io_ethernet_protocol.MunichIoEthernetProtocol.laser_total_period">[docs]</a>    <span class="k">def</span> <span class="nf">laser_total_period</span><span class="p">(</span><span class="n">total_period</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;!PA=</span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">total_period</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;ascii&quot;</span><span class="p">)</span></div>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="MunichIoEthernetProtocol.laser_active_time"><a class="viewcode-back" href="../../../../spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.munich_io_ethernet_protocol.MunichIoEthernetProtocol.laser_active_time">[docs]</a>    <span class="k">def</span> <span class="nf">laser_active_time</span><span class="p">(</span><span class="n">active_time</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;!PA0=</span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">active_time</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;ascii&quot;</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">sPyNNaker  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+    </div>
+  </body>
+</html>

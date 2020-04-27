@@ -1,0 +1,62 @@
+spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence package
+======================================================================
+
+Submodules
+----------
+
+spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.abstract_timing_dependence module
+------------------------------------------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.abstract_timing_dependence
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.timing_dependence_pfister_spike_triplet module
+-------------------------------------------------------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.timing_dependence_pfister_spike_triplet
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.timing_dependence_recurrent module
+-------------------------------------------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.timing_dependence_recurrent
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.timing_dependence_spike_nearest_pair module
+----------------------------------------------------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.timing_dependence_spike_nearest_pair
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.timing_dependence_spike_pair module
+--------------------------------------------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.timing_dependence_spike_pair
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.timing_dependence_vogels_2011 module
+---------------------------------------------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.timing_dependence_vogels_2011
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence
+    :members:
+    :undoc-members:
+    :show-inheritance:

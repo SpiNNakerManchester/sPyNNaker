@@ -1,0 +1,54 @@
+spynnaker.pyNN.models.neuron.input_types package
+================================================
+
+Submodules
+----------
+
+spynnaker.pyNN.models.neuron.input_types.abstract_input_type module
+-------------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neuron.input_types.abstract_input_type
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.models.neuron.input_types.input_type_conductance module
+----------------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neuron.input_types.input_type_conductance
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.models.neuron.input_types.input_type_current module
+------------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neuron.input_types.input_type_current
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.models.neuron.input_types.input_type_current_semd module
+-----------------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neuron.input_types.input_type_current_semd
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.models.neuron.input_types.input_type_delta module
+----------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neuron.input_types.input_type_delta
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: spynnaker.pyNN.models.neuron.input_types
+    :members:
+    :undoc-members:
+    :show-inheritance:

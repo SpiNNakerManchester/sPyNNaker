@@ -1,0 +1,142 @@
+spynnaker.pyNN.models.neural_projections.connectors package
+===========================================================
+
+Submodules
+----------
+
+spynnaker.pyNN.models.neural_projections.connectors.abstract_connector module
+-----------------------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neural_projections.connectors.abstract_connector
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.models.neural_projections.connectors.abstract_connector_supports_views_on_machine module
+-------------------------------------------------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neural_projections.connectors.abstract_connector_supports_views_on_machine
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.models.neural_projections.connectors.abstract_generate_connector_on_machine module
+-------------------------------------------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neural_projections.connectors.abstract_generate_connector_on_machine
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.models.neural_projections.connectors.all_to_all_connector module
+-------------------------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neural_projections.connectors.all_to_all_connector
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.models.neural_projections.connectors.array_connector module
+--------------------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neural_projections.connectors.array_connector
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.models.neural_projections.connectors.csa_connector module
+------------------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neural_projections.connectors.csa_connector
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.models.neural_projections.connectors.distance_dependent_probability_connector module
+---------------------------------------------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neural_projections.connectors.distance_dependent_probability_connector
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.models.neural_projections.connectors.fixed_number_post_connector module
+--------------------------------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neural_projections.connectors.fixed_number_post_connector
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.models.neural_projections.connectors.fixed_number_pre_connector module
+-------------------------------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neural_projections.connectors.fixed_number_pre_connector
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.models.neural_projections.connectors.fixed_probability_connector module
+--------------------------------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neural_projections.connectors.fixed_probability_connector
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.models.neural_projections.connectors.from_list_connector module
+------------------------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neural_projections.connectors.from_list_connector
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.models.neural_projections.connectors.index_based_probability_connector module
+--------------------------------------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neural_projections.connectors.index_based_probability_connector
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.models.neural_projections.connectors.kernel_connector module
+---------------------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neural_projections.connectors.kernel_connector
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.models.neural_projections.connectors.multapse_connector module
+-----------------------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neural_projections.connectors.multapse_connector
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.models.neural_projections.connectors.one_to_one_connector module
+-------------------------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neural_projections.connectors.one_to_one_connector
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.models.neural_projections.connectors.small_world_connector module
+--------------------------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neural_projections.connectors.small_world_connector
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: spynnaker.pyNN.models.neural_projections.connectors
+    :members:
+    :undoc-members:
+    :show-inheritance:

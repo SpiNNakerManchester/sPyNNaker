@@ -1,0 +1,30 @@
+spynnaker.pyNN.external_devices_models.push_bot.push_bot_control_modules package
+================================================================================
+
+Submodules
+----------
+
+spynnaker.pyNN.external_devices_models.push_bot.push_bot_control_modules.push_bot_lif_ethernet module
+-----------------------------------------------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.external_devices_models.push_bot.push_bot_control_modules.push_bot_lif_ethernet
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.external_devices_models.push_bot.push_bot_control_modules.push_bot_lif_spinnaker_link module
+-----------------------------------------------------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.external_devices_models.push_bot.push_bot_control_modules.push_bot_lif_spinnaker_link
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: spynnaker.pyNN.external_devices_models.push_bot.push_bot_control_modules
+    :members:
+    :undoc-members:
+    :show-inheritance:

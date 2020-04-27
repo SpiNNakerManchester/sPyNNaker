@@ -1,0 +1,45 @@
+spynnaker package
+=================
+
+Subpackages
+-----------
+
+.. toctree::
+
+    spynnaker.pyNN
+
+Submodules
+----------
+
+spynnaker.gsyn_tools module
+---------------------------
+
+.. automodule:: spynnaker.gsyn_tools
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.plot_utils module
+---------------------------
+
+.. automodule:: spynnaker.plot_utils
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.spike_checker module
+------------------------------
+
+.. automodule:: spynnaker.spike_checker
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: spynnaker
+    :members:
+    :undoc-members:
+    :show-inheritance:

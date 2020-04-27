@@ -1,0 +1,269 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>spynnaker.pyNN.models.neural_projections.connectors.one_to_one_connector &#8212; sPyNNaker  documentation</title>
+    
+    <link rel="stylesheet" href="../../../../../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">sPyNNaker  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for spynnaker.pyNN.models.neural_projections.connectors.one_to_one_connector</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2017-2019 The University of Manchester</span>
+<span class="c1">#</span>
+<span class="c1"># This program is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
+<span class="kn">from</span> <span class="nn">.abstract_connector</span> <span class="kn">import</span> <span class="n">AbstractConnector</span>
+<span class="kn">from</span> <span class="nn">.abstract_generate_connector_on_machine</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AbstractGenerateConnectorOnMachine</span><span class="p">,</span> <span class="n">ConnectorIDs</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.abstract_connector_supports_views_on_machine</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AbstractConnectorSupportsViewsOnMachine</span><span class="p">)</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="OneToOneConnector"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.one_to_one_connector.OneToOneConnector">[docs]</a><span class="k">class</span> <span class="nc">OneToOneConnector</span><span class="p">(</span><span class="n">AbstractGenerateConnectorOnMachine</span><span class="p">,</span>
+                        <span class="n">AbstractConnectorSupportsViewsOnMachine</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Where the pre- and postsynaptic populations have the same size,\</span>
+<span class="sd">        connect cell i in the presynaptic pynn_population.py to cell i in the\</span>
+<span class="sd">        postsynaptic pynn_population.py for all i.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;__random_number_class&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">random_number_class</span><span class="p">,</span>
+                 <span class="n">safe</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__random_number_class</span> <span class="o">=</span> <span class="n">random_number_class</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">OneToOneConnector</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">safe</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
+
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_delay_maximum</span><span class="p">)</span>
+<div class="viewcode-block" id="OneToOneConnector.get_delay_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.one_to_one_connector.OneToOneConnector.get_delay_maximum">[docs]</a>    <span class="k">def</span> <span class="nf">get_delay_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_delay_maximum</span><span class="p">(</span>
+            <span class="n">synapse_info</span><span class="o">.</span><span class="n">delays</span><span class="p">,</span>
+            <span class="nb">max</span><span class="p">((</span><span class="n">synapse_info</span><span class="o">.</span><span class="n">n_pre_neurons</span><span class="p">,</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_post_neurons</span><span class="p">)))</span></div>
+
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_n_connections_from_pre_vertex_maximum</span><span class="p">)</span>
+<div class="viewcode-block" id="OneToOneConnector.get_n_connections_from_pre_vertex_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.one_to_one_connector.OneToOneConnector.get_n_connections_from_pre_vertex_maximum">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_connections_from_pre_vertex_maximum</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">min_delay</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">max_delay</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># pylint: disable=too-many-arguments</span>
+        <span class="k">if</span> <span class="n">min_delay</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">max_delay</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">1</span>
+
+        <span class="n">delays</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">delays</span>
+
+        <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">isscalar</span><span class="p">(</span><span class="n">delays</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">delays</span> <span class="o">&gt;=</span> <span class="n">min_delay</span> <span class="ow">and</span> <span class="n">delays</span> <span class="o">&lt;=</span> <span class="n">max_delay</span><span class="p">:</span>
+                <span class="k">return</span> <span class="mi">1</span>
+            <span class="k">return</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">delays</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__random_number_class</span><span class="p">):</span>
+            <span class="k">return</span> <span class="mi">1</span>
+
+        <span class="n">slice_min_delay</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">delays</span><span class="p">)</span>
+        <span class="n">slice_max_delay</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">delays</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">((</span><span class="n">min_delay</span> <span class="o">&lt;=</span> <span class="n">slice_max_delay</span> <span class="o">&lt;=</span> <span class="n">max_delay</span><span class="p">)</span> <span class="ow">or</span>
+                <span class="p">(</span><span class="n">min_delay</span> <span class="o">&lt;=</span> <span class="n">slice_min_delay</span> <span class="o">&lt;=</span> <span class="n">max_delay</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="mi">1</span>
+
+        <span class="k">return</span> <span class="mi">0</span></div>
+
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_n_connections_to_post_vertex_maximum</span><span class="p">)</span>
+<div class="viewcode-block" id="OneToOneConnector.get_n_connections_to_post_vertex_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.one_to_one_connector.OneToOneConnector.get_n_connections_to_post_vertex_maximum">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_connections_to_post_vertex_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">1</span></div>
+
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_weight_maximum</span><span class="p">)</span>
+<div class="viewcode-block" id="OneToOneConnector.get_weight_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.one_to_one_connector.OneToOneConnector.get_weight_maximum">[docs]</a>    <span class="k">def</span> <span class="nf">get_weight_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_weight_maximum</span><span class="p">(</span>
+            <span class="n">synapse_info</span><span class="o">.</span><span class="n">weights</span><span class="p">,</span>
+            <span class="nb">max</span><span class="p">((</span><span class="n">synapse_info</span><span class="o">.</span><span class="n">n_pre_neurons</span><span class="p">,</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_post_neurons</span><span class="p">)))</span></div>
+
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">create_synaptic_block</span><span class="p">)</span>
+<div class="viewcode-block" id="OneToOneConnector.create_synaptic_block"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.one_to_one_connector.OneToOneConnector.create_synaptic_block">[docs]</a>    <span class="k">def</span> <span class="nf">create_synaptic_block</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">pre_slices</span><span class="p">,</span> <span class="n">pre_slice_index</span><span class="p">,</span> <span class="n">post_slices</span><span class="p">,</span>
+            <span class="n">post_slice_index</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
+            <span class="n">synapse_type</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
+        <span class="c1"># pylint: disable=too-many-arguments</span>
+        <span class="n">pre_lo</span><span class="p">,</span> <span class="n">post_lo</span><span class="p">,</span> <span class="n">pre_hi</span><span class="p">,</span> <span class="n">post_hi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_pre_post_limits</span><span class="p">(</span>
+            <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span>
+
+        <span class="n">max_lo_atom</span> <span class="o">=</span> <span class="nb">max</span><span class="p">((</span><span class="n">pre_lo</span><span class="p">,</span> <span class="n">post_lo</span><span class="p">))</span>
+        <span class="n">min_hi_atom</span> <span class="o">=</span> <span class="nb">min</span><span class="p">((</span><span class="n">pre_hi</span><span class="p">,</span> <span class="n">post_hi</span><span class="p">))</span>
+
+        <span class="n">n_connections</span> <span class="o">=</span> <span class="nb">max</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="n">min_hi_atom</span> <span class="o">-</span> <span class="n">max_lo_atom</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">n_connections</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">NUMPY_SYNAPSES_DTYPE</span><span class="p">)</span>
+        <span class="n">connection_slice</span> <span class="o">=</span> <span class="nb">slice</span><span class="p">(</span><span class="n">max_lo_atom</span><span class="p">,</span> <span class="n">min_hi_atom</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">block</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_connections</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">NUMPY_SYNAPSES_DTYPE</span><span class="p">)</span>
+        <span class="n">block</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">max_lo_atom</span><span class="p">,</span> <span class="n">min_hi_atom</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">block</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">max_lo_atom</span><span class="p">,</span> <span class="n">min_hi_atom</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">block</span><span class="p">[</span><span class="s2">&quot;weight&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_weights</span><span class="p">(</span>
+            <span class="n">n_connections</span><span class="p">,</span> <span class="p">[</span><span class="n">connection_slice</span><span class="p">],</span> <span class="n">pre_vertex_slice</span><span class="p">,</span>
+            <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span>
+        <span class="n">block</span><span class="p">[</span><span class="s2">&quot;delay&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_generate_delays</span><span class="p">(</span>
+            <span class="n">n_connections</span><span class="p">,</span> <span class="p">[</span><span class="n">connection_slice</span><span class="p">],</span> <span class="n">pre_vertex_slice</span><span class="p">,</span>
+            <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span>
+        <span class="n">block</span><span class="p">[</span><span class="s2">&quot;synapse_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">synapse_type</span>
+        <span class="k">return</span> <span class="n">block</span></div>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;OneToOneConnector()&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_get_pre_post_limits</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">prepop_is_view</span><span class="p">:</span>
+            <span class="c1"># work out which atoms are on this pre-slice</span>
+            <span class="n">view_lo</span><span class="p">,</span> <span class="n">view_hi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_view_lo_hi</span><span class="p">(</span>
+                <span class="n">synapse_info</span><span class="o">.</span><span class="n">pre_population</span><span class="o">.</span><span class="n">_indexes</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">((</span><span class="n">view_lo</span> <span class="o">&gt;</span> <span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">)</span> <span class="ow">and</span>
+                    <span class="p">(</span><span class="n">view_lo</span> <span class="o">&lt;</span> <span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span><span class="p">)):</span>
+                <span class="n">pre_lo</span> <span class="o">=</span> <span class="n">view_lo</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">pre_lo</span> <span class="o">=</span> <span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span>
+            <span class="k">if</span> <span class="p">((</span><span class="n">view_hi</span> <span class="o">&gt;</span> <span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">)</span> <span class="ow">and</span>
+                    <span class="p">(</span><span class="n">view_hi</span> <span class="o">&lt;</span> <span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span><span class="p">)):</span>
+                <span class="n">pre_hi</span> <span class="o">=</span> <span class="n">view_hi</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">pre_hi</span> <span class="o">=</span> <span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">pre_lo</span> <span class="o">=</span> <span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span>
+            <span class="n">pre_hi</span> <span class="o">=</span> <span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span>
+
+        <span class="k">if</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">postpop_is_view</span><span class="p">:</span>
+            <span class="c1"># work out which atoms are on this post-slice</span>
+            <span class="n">view_lo</span><span class="p">,</span> <span class="n">view_hi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_view_lo_hi</span><span class="p">(</span>
+                <span class="n">synapse_info</span><span class="o">.</span><span class="n">post_population</span><span class="o">.</span><span class="n">_indexes</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">((</span><span class="n">view_lo</span> <span class="o">&gt;</span> <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">)</span> <span class="ow">and</span>
+                    <span class="p">(</span><span class="n">view_lo</span> <span class="o">&lt;</span> <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span><span class="p">)):</span>
+                <span class="n">post_lo</span> <span class="o">=</span> <span class="n">view_lo</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">post_lo</span> <span class="o">=</span> <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span>
+            <span class="k">if</span> <span class="p">((</span><span class="n">view_hi</span> <span class="o">&gt;</span> <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">)</span> <span class="ow">and</span>
+                    <span class="p">(</span><span class="n">view_hi</span> <span class="o">&lt;</span> <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span><span class="p">)):</span>
+                <span class="n">post_hi</span> <span class="o">=</span> <span class="n">view_hi</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">post_hi</span> <span class="o">=</span> <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">post_lo</span> <span class="o">=</span> <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span>
+            <span class="n">post_hi</span> <span class="o">=</span> <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span>
+
+        <span class="k">return</span> <span class="n">pre_lo</span><span class="p">,</span> <span class="n">post_lo</span><span class="p">,</span> <span class="n">pre_hi</span><span class="p">,</span> <span class="n">post_hi</span>
+
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">use_direct_matrix</span><span class="p">)</span>
+<div class="viewcode-block" id="OneToOneConnector.use_direct_matrix"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.one_to_one_connector.OneToOneConnector.use_direct_matrix">[docs]</a>    <span class="k">def</span> <span class="nf">use_direct_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">prepop_is_view</span> <span class="ow">or</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">postpop_is_view</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+    <span class="nd">@property</span>
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractGenerateConnectorOnMachine</span><span class="o">.</span><span class="n">gen_connector_id</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">gen_connector_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">ConnectorIDs</span><span class="o">.</span><span class="n">ONE_TO_ONE_CONNECTOR</span><span class="o">.</span><span class="n">value</span>
+
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractGenerateConnectorOnMachine</span><span class="o">.</span>
+               <span class="n">gen_connector_params</span><span class="p">)</span>
+<div class="viewcode-block" id="OneToOneConnector.gen_connector_params"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.one_to_one_connector.OneToOneConnector.gen_connector_params">[docs]</a>    <span class="k">def</span> <span class="nf">gen_connector_params</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">pre_slices</span><span class="p">,</span> <span class="n">pre_slice_index</span><span class="p">,</span> <span class="n">post_slices</span><span class="p">,</span>
+            <span class="n">post_slice_index</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
+            <span class="n">synapse_type</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_basic_connector_params</span><span class="p">(</span><span class="n">synapse_info</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint32&quot;</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractGenerateConnectorOnMachine</span><span class="o">.</span>
+               <span class="n">gen_connector_params_size_in_bytes</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">gen_connector_params_size_in_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_view_params_bytes</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">sPyNNaker  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+    </div>
+  </body>
+</html>

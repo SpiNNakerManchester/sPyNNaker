@@ -1,0 +1,19 @@
+spynnaker.pyNN.models.utility_models package
+============================================
+
+Subpackages
+-----------
+
+.. toctree::
+
+    spynnaker.pyNN.models.utility_models.delays
+    spynnaker.pyNN.models.utility_models.spike_injector
+    spynnaker.pyNN.models.utility_models.synapse_expander
+
+Module contents
+---------------
+
+.. automodule:: spynnaker.pyNN.models.utility_models
+    :members:
+    :undoc-members:
+    :show-inheritance:

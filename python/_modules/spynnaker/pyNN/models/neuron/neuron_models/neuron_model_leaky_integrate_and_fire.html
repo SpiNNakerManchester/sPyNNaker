@@ -1,0 +1,271 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>spynnaker.pyNN.models.neuron.neuron_models.neuron_model_leaky_integrate_and_fire &#8212; sPyNNaker  documentation</title>
+    
+    <link rel="stylesheet" href="../../../../../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">sPyNNaker  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for spynnaker.pyNN.models.neuron.neuron_models.neuron_model_leaky_integrate_and_fire</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2017-2019 The University of Manchester</span>
+<span class="c1">#</span>
+<span class="c1"># This program is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
+<span class="kn">from</span> <span class="nn">data_specification.enums</span> <span class="kn">import</span> <span class="n">DataType</span>
+<span class="kn">from</span> <span class="nn">pacman.executor.injection_decorator</span> <span class="kn">import</span> <span class="n">inject_items</span>
+<span class="kn">from</span> <span class="nn">.abstract_neuron_model</span> <span class="kn">import</span> <span class="n">AbstractNeuronModel</span>
+
+<span class="n">V</span> <span class="o">=</span> <span class="s2">&quot;v&quot;</span>
+<span class="n">V_REST</span> <span class="o">=</span> <span class="s2">&quot;v_rest&quot;</span>
+<span class="n">TAU_M</span> <span class="o">=</span> <span class="s2">&quot;tau_m&quot;</span>
+<span class="n">CM</span> <span class="o">=</span> <span class="s2">&quot;cm&quot;</span>
+<span class="n">I_OFFSET</span> <span class="o">=</span> <span class="s2">&quot;i_offset&quot;</span>
+<span class="n">V_RESET</span> <span class="o">=</span> <span class="s2">&quot;v_reset&quot;</span>
+<span class="n">TAU_REFRAC</span> <span class="o">=</span> <span class="s2">&quot;tau_refrac&quot;</span>
+<span class="n">COUNT_REFRAC</span> <span class="o">=</span> <span class="s2">&quot;count_refrac&quot;</span>
+
+<span class="n">UNITS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">V</span><span class="p">:</span> <span class="s1">&#39;mV&#39;</span><span class="p">,</span>
+    <span class="n">V_REST</span><span class="p">:</span> <span class="s1">&#39;mV&#39;</span><span class="p">,</span>
+    <span class="n">TAU_M</span><span class="p">:</span> <span class="s1">&#39;ms&#39;</span><span class="p">,</span>
+    <span class="n">CM</span><span class="p">:</span> <span class="s1">&#39;nF&#39;</span><span class="p">,</span>
+    <span class="n">I_OFFSET</span><span class="p">:</span> <span class="s1">&#39;nA&#39;</span><span class="p">,</span>
+    <span class="n">V_RESET</span><span class="p">:</span> <span class="s1">&#39;mV&#39;</span><span class="p">,</span>
+    <span class="n">TAU_REFRAC</span><span class="p">:</span> <span class="s1">&#39;ms&#39;</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="NeuronModelLeakyIntegrateAndFire"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.neuron_models.html#spynnaker.pyNN.models.neuron.neuron_models.neuron_model_leaky_integrate_and_fire.NeuronModelLeakyIntegrateAndFire">[docs]</a><span class="k">class</span> <span class="nc">NeuronModelLeakyIntegrateAndFire</span><span class="p">(</span><span class="n">AbstractNeuronModel</span><span class="p">):</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;__v_init&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__v_rest&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__tau_m&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__cm&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__i_offset&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__v_reset&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__tau_refrac&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">v_init</span><span class="p">,</span> <span class="n">v_rest</span><span class="p">,</span> <span class="n">tau_m</span><span class="p">,</span> <span class="n">cm</span><span class="p">,</span> <span class="n">i_offset</span><span class="p">,</span> <span class="n">v_reset</span><span class="p">,</span> <span class="n">tau_refrac</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">NeuronModelLeakyIntegrateAndFire</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span>   <span class="c1"># v</span>
+             <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span>   <span class="c1"># v_rest</span>
+             <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span>   <span class="c1"># r_membrane (= tau_m / cm)</span>
+             <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span>   <span class="c1"># exp_tc (= e^(-ts / tau_m))</span>
+             <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span>   <span class="c1"># i_offset</span>
+             <span class="n">DataType</span><span class="o">.</span><span class="n">INT32</span><span class="p">,</span>   <span class="c1"># count_refrac</span>
+             <span class="n">DataType</span><span class="o">.</span><span class="n">S1615</span><span class="p">,</span>   <span class="c1"># v_reset</span>
+             <span class="n">DataType</span><span class="o">.</span><span class="n">INT32</span><span class="p">])</span>  <span class="c1"># tau_refrac</span>
+
+        <span class="k">if</span> <span class="n">v_init</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">v_init</span> <span class="o">=</span> <span class="n">v_rest</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__v_init</span> <span class="o">=</span> <span class="n">v_init</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__v_rest</span> <span class="o">=</span> <span class="n">v_rest</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__tau_m</span> <span class="o">=</span> <span class="n">tau_m</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cm</span> <span class="o">=</span> <span class="n">cm</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__i_offset</span> <span class="o">=</span> <span class="n">i_offset</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__v_reset</span> <span class="o">=</span> <span class="n">v_reset</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__tau_refrac</span> <span class="o">=</span> <span class="n">tau_refrac</span>
+
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractNeuronModel</span><span class="o">.</span><span class="n">get_n_cpu_cycles</span><span class="p">)</span>
+<div class="viewcode-block" id="NeuronModelLeakyIntegrateAndFire.get_n_cpu_cycles"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.neuron_models.html#spynnaker.pyNN.models.neuron.neuron_models.neuron_model_leaky_integrate_and_fire.NeuronModelLeakyIntegrateAndFire.get_n_cpu_cycles">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_cpu_cycles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">):</span>
+        <span class="c1"># A bit of a guess</span>
+        <span class="k">return</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">n_neurons</span></div>
+
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractNeuronModel</span><span class="o">.</span><span class="n">add_parameters</span><span class="p">)</span>
+<div class="viewcode-block" id="NeuronModelLeakyIntegrateAndFire.add_parameters"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.neuron_models.html#spynnaker.pyNN.models.neuron.neuron_models.neuron_model_leaky_integrate_and_fire.NeuronModelLeakyIntegrateAndFire.add_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">add_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
+        <span class="n">parameters</span><span class="p">[</span><span class="n">V_REST</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__v_rest</span>
+        <span class="n">parameters</span><span class="p">[</span><span class="n">TAU_M</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tau_m</span>
+        <span class="n">parameters</span><span class="p">[</span><span class="n">CM</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cm</span>
+        <span class="n">parameters</span><span class="p">[</span><span class="n">I_OFFSET</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__i_offset</span>
+        <span class="n">parameters</span><span class="p">[</span><span class="n">V_RESET</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__v_reset</span>
+        <span class="n">parameters</span><span class="p">[</span><span class="n">TAU_REFRAC</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tau_refrac</span></div>
+
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractNeuronModel</span><span class="o">.</span><span class="n">add_state_variables</span><span class="p">)</span>
+<div class="viewcode-block" id="NeuronModelLeakyIntegrateAndFire.add_state_variables"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.neuron_models.html#spynnaker.pyNN.models.neuron.neuron_models.neuron_model_leaky_integrate_and_fire.NeuronModelLeakyIntegrateAndFire.add_state_variables">[docs]</a>    <span class="k">def</span> <span class="nf">add_state_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">):</span>
+        <span class="n">state_variables</span><span class="p">[</span><span class="n">V</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__v_init</span>
+        <span class="n">state_variables</span><span class="p">[</span><span class="n">COUNT_REFRAC</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span></div>
+
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractNeuronModel</span><span class="o">.</span><span class="n">get_units</span><span class="p">)</span>
+<div class="viewcode-block" id="NeuronModelLeakyIntegrateAndFire.get_units"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.neuron_models.html#spynnaker.pyNN.models.neuron.neuron_models.neuron_model_leaky_integrate_and_fire.NeuronModelLeakyIntegrateAndFire.get_units">[docs]</a>    <span class="k">def</span> <span class="nf">get_units</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">UNITS</span><span class="p">[</span><span class="n">variable</span><span class="p">]</span></div>
+
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractNeuronModel</span><span class="o">.</span><span class="n">has_variable</span><span class="p">)</span>
+<div class="viewcode-block" id="NeuronModelLeakyIntegrateAndFire.has_variable"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.neuron_models.html#spynnaker.pyNN.models.neuron.neuron_models.neuron_model_leaky_integrate_and_fire.NeuronModelLeakyIntegrateAndFire.has_variable">[docs]</a>    <span class="k">def</span> <span class="nf">has_variable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">variable</span> <span class="ow">in</span> <span class="n">UNITS</span></div>
+
+    <span class="nd">@inject_items</span><span class="p">({</span><span class="s2">&quot;ts&quot;</span><span class="p">:</span> <span class="s2">&quot;MachineTimeStep&quot;</span><span class="p">})</span>
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractNeuronModel</span><span class="o">.</span><span class="n">get_values</span><span class="p">,</span> <span class="n">additional_arguments</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;ts&#39;</span><span class="p">})</span>
+<div class="viewcode-block" id="NeuronModelLeakyIntegrateAndFire.get_values"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.neuron_models.html#spynnaker.pyNN.models.neuron.neuron_models.neuron_model_leaky_integrate_and_fire.NeuronModelLeakyIntegrateAndFire.get_values">[docs]</a>    <span class="k">def</span> <span class="nf">get_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">ts</span><span class="p">):</span>
+        <span class="c1"># pylint: disable=arguments-differ</span>
+
+        <span class="c1"># Add the rest of the data</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">state_variables</span><span class="p">[</span><span class="n">V</span><span class="p">],</span> <span class="n">parameters</span><span class="p">[</span><span class="n">V_REST</span><span class="p">],</span>
+                <span class="n">parameters</span><span class="p">[</span><span class="n">TAU_M</span><span class="p">]</span> <span class="o">/</span> <span class="n">parameters</span><span class="p">[</span><span class="n">CM</span><span class="p">],</span>
+                <span class="n">parameters</span><span class="p">[</span><span class="n">TAU_M</span><span class="p">]</span><span class="o">.</span><span class="n">apply_operation</span><span class="p">(</span>
+                    <span class="n">operation</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="o">-</span><span class="n">ts</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1000.0</span> <span class="o">*</span> <span class="n">x</span><span class="p">))),</span>
+                <span class="n">parameters</span><span class="p">[</span><span class="n">I_OFFSET</span><span class="p">],</span> <span class="n">state_variables</span><span class="p">[</span><span class="n">COUNT_REFRAC</span><span class="p">],</span>
+                <span class="n">parameters</span><span class="p">[</span><span class="n">V_RESET</span><span class="p">],</span>
+                <span class="n">parameters</span><span class="p">[</span><span class="n">TAU_REFRAC</span><span class="p">]</span><span class="o">.</span><span class="n">apply_operation</span><span class="p">(</span>
+                    <span class="n">operation</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">x</span> <span class="o">/</span> <span class="p">(</span><span class="n">ts</span> <span class="o">/</span> <span class="mf">1000.0</span><span class="p">))))]</span></div>
+
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractNeuronModel</span><span class="o">.</span><span class="n">update_values</span><span class="p">)</span>
+<div class="viewcode-block" id="NeuronModelLeakyIntegrateAndFire.update_values"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.neuron_models.html#spynnaker.pyNN.models.neuron.neuron_models.neuron_model_leaky_integrate_and_fire.NeuronModelLeakyIntegrateAndFire.update_values">[docs]</a>    <span class="k">def</span> <span class="nf">update_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">):</span>
+
+        <span class="c1"># Read the data</span>
+        <span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">_v_rest</span><span class="p">,</span> <span class="n">_r_membrane</span><span class="p">,</span> <span class="n">_exp_tc</span><span class="p">,</span> <span class="n">_i_offset</span><span class="p">,</span> <span class="n">count_refrac</span><span class="p">,</span>
+         <span class="n">_v_reset</span><span class="p">,</span> <span class="n">_tau_refrac</span><span class="p">)</span> <span class="o">=</span> <span class="n">values</span>
+
+        <span class="c1"># Copy the changed data only</span>
+        <span class="n">state_variables</span><span class="p">[</span><span class="n">V</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+        <span class="n">state_variables</span><span class="p">[</span><span class="n">COUNT_REFRAC</span><span class="p">]</span> <span class="o">=</span> <span class="n">count_refrac</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">v_init</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__v_init</span>
+
+    <span class="nd">@v_init</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">v_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v_init</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__v_init</span> <span class="o">=</span> <span class="n">v_init</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">v_rest</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__v_rest</span>
+
+    <span class="nd">@v_rest</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">v_rest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v_rest</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__v_rest</span> <span class="o">=</span> <span class="n">v_rest</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">tau_m</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tau_m</span>
+
+    <span class="nd">@tau_m</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">tau_m</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tau_m</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__tau_m</span> <span class="o">=</span> <span class="n">tau_m</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">cm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cm</span>
+
+    <span class="nd">@cm</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">cm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cm</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cm</span> <span class="o">=</span> <span class="n">cm</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">i_offset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__i_offset</span>
+
+    <span class="nd">@i_offset</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">i_offset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i_offset</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__i_offset</span> <span class="o">=</span> <span class="n">i_offset</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">v_reset</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__v_reset</span>
+
+    <span class="nd">@v_reset</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">v_reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">v_reset</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__v_reset</span> <span class="o">=</span> <span class="n">v_reset</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">tau_refrac</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__tau_refrac</span>
+
+    <span class="nd">@tau_refrac</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">tau_refrac</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tau_refrac</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__tau_refrac</span> <span class="o">=</span> <span class="n">tau_refrac</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">sPyNNaker  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+    </div>
+  </body>
+</html>

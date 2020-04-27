@@ -1,0 +1,272 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>spynnaker.pyNN.models.utility_models.synapse_expander.synapse_expander &#8212; sPyNNaker  documentation</title>
+    
+    <link rel="stylesheet" href="../../../../../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">sPyNNaker  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for spynnaker.pyNN.models.utility_models.synapse_expander.synapse_expander</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2017-2019 The University of Manchester</span>
+<span class="c1">#</span>
+<span class="c1"># This program is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.progress_bar</span> <span class="kn">import</span> <span class="n">ProgressBar</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.make_tools.replacer</span> <span class="kn">import</span> <span class="n">Replacer</span>
+<span class="kn">from</span> <span class="nn">spinnman.model</span> <span class="kn">import</span> <span class="n">ExecutableTargets</span>
+<span class="kn">from</span> <span class="nn">spinnman.model.enums</span> <span class="kn">import</span> <span class="n">CPUState</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities</span> <span class="kn">import</span> <span class="n">globals_variables</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">SpynnakerException</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron</span> <span class="kn">import</span> <span class="n">AbstractPopulationVertex</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.utility_models.delays</span> <span class="kn">import</span> <span class="n">DelayExtensionVertex</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neural_projections.connectors</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AbstractGenerateConnectorOnMachine</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.synapse_dynamics</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AbstractGenerateOnMachine</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">six</span> <span class="kn">import</span> <span class="n">iteritems</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="n">SYNAPSE_EXPANDER</span> <span class="o">=</span> <span class="s2">&quot;synapse_expander.aplx&quot;</span>
+<span class="n">DELAY_EXPANDER</span> <span class="o">=</span> <span class="s2">&quot;delay_expander.aplx&quot;</span>
+
+
+<div class="viewcode-block" id="synapse_expander"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.synapse_expander.html#spynnaker.pyNN.models.utility_models.synapse_expander.synapse_expander.synapse_expander">[docs]</a><span class="k">def</span> <span class="nf">synapse_expander</span><span class="p">(</span>
+        <span class="n">app_graph</span><span class="p">,</span> <span class="n">graph_mapper</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span>
+        <span class="n">provenance_file_path</span><span class="p">,</span> <span class="n">executable_finder</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Run the synapse expander - needs to be done after data has been loaded</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">synapse_bin</span> <span class="o">=</span> <span class="n">executable_finder</span><span class="o">.</span><span class="n">get_executable_path</span><span class="p">(</span><span class="n">SYNAPSE_EXPANDER</span><span class="p">)</span>
+    <span class="n">delay_bin</span> <span class="o">=</span> <span class="n">executable_finder</span><span class="o">.</span><span class="n">get_executable_path</span><span class="p">(</span><span class="n">DELAY_EXPANDER</span><span class="p">)</span>
+    <span class="n">expandable</span> <span class="o">=</span> <span class="p">(</span><span class="n">AbstractPopulationVertex</span><span class="p">,</span> <span class="n">DelayExtensionVertex</span><span class="p">)</span>
+
+    <span class="n">progress</span> <span class="o">=</span> <span class="n">ProgressBar</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">app_graph</span><span class="o">.</span><span class="n">vertices</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;Expanding Synapses&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Find the places where the synapse expander and delay receivers should run</span>
+    <span class="n">expander_cores</span> <span class="o">=</span> <span class="n">ExecutableTargets</span><span class="p">()</span>
+    <span class="n">gen_on_machine_vertices</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">vertex</span> <span class="ow">in</span> <span class="n">progress</span><span class="o">.</span><span class="n">over</span><span class="p">(</span><span class="n">app_graph</span><span class="o">.</span><span class="n">vertices</span><span class="p">,</span> <span class="n">finish_at_end</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+        <span class="c1"># Find population vertices</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vertex</span><span class="p">,</span> <span class="n">expandable</span><span class="p">):</span>
+            <span class="c1"># Add all machine vertices of the population vertex to ones</span>
+            <span class="c1"># that need synapse expansion</span>
+            <span class="n">gen_on_machine</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">for</span> <span class="n">m_vertex</span> <span class="ow">in</span> <span class="n">graph_mapper</span><span class="o">.</span><span class="n">get_machine_vertices</span><span class="p">(</span><span class="n">vertex</span><span class="p">):</span>
+                <span class="n">vertex_slice</span> <span class="o">=</span> <span class="n">graph_mapper</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">m_vertex</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">vertex</span><span class="o">.</span><span class="n">gen_on_machine</span><span class="p">(</span><span class="n">vertex_slice</span><span class="p">):</span>
+                    <span class="n">placement</span> <span class="o">=</span> <span class="n">placements</span><span class="o">.</span><span class="n">get_placement_of_vertex</span><span class="p">(</span><span class="n">m_vertex</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vertex</span><span class="p">,</span> <span class="n">AbstractPopulationVertex</span><span class="p">):</span>
+                        <span class="n">binary</span> <span class="o">=</span> <span class="n">synapse_bin</span>
+                        <span class="n">gen_on_machine</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">binary</span> <span class="o">=</span> <span class="n">delay_bin</span>
+                    <span class="n">expander_cores</span><span class="o">.</span><span class="n">add_processor</span><span class="p">(</span>
+                        <span class="n">binary</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">p</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">gen_on_machine</span><span class="p">:</span>
+                <span class="n">gen_on_machine_vertices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span>
+
+    <span class="c1"># Launch the delay receivers</span>
+    <span class="n">expander_app_id</span> <span class="o">=</span> <span class="n">transceiver</span><span class="o">.</span><span class="n">app_id_tracker</span><span class="o">.</span><span class="n">get_new_id</span><span class="p">()</span>
+    <span class="n">transceiver</span><span class="o">.</span><span class="n">execute_application</span><span class="p">(</span><span class="n">expander_cores</span><span class="p">,</span> <span class="n">expander_app_id</span><span class="p">)</span>
+    <span class="n">progress</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+
+    <span class="c1"># Wait for everything to finish</span>
+    <span class="n">finished</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">transceiver</span><span class="o">.</span><span class="n">wait_for_cores_to_be_in_state</span><span class="p">(</span>
+            <span class="n">expander_cores</span><span class="o">.</span><span class="n">all_core_subsets</span><span class="p">,</span> <span class="n">expander_app_id</span><span class="p">,</span>
+            <span class="p">[</span><span class="n">CPUState</span><span class="o">.</span><span class="n">FINISHED</span><span class="p">])</span>
+        <span class="n">progress</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+        <span class="n">finished</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">_fill_in_connection_data</span><span class="p">(</span>
+            <span class="n">gen_on_machine_vertices</span><span class="p">,</span> <span class="n">graph_mapper</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">)</span>
+        <span class="n">_extract_iobuf</span><span class="p">(</span><span class="n">expander_cores</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">provenance_file_path</span><span class="p">)</span>
+        <span class="n">progress</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>  <span class="c1"># pylint: disable=broad-except</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Synapse expander has failed&quot;</span><span class="p">)</span>
+        <span class="n">_handle_failure</span><span class="p">(</span>
+            <span class="n">expander_cores</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">provenance_file_path</span><span class="p">)</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">transceiver</span><span class="o">.</span><span class="n">stop_application</span><span class="p">(</span><span class="n">expander_app_id</span><span class="p">)</span>
+        <span class="n">transceiver</span><span class="o">.</span><span class="n">app_id_tracker</span><span class="o">.</span><span class="n">free_id</span><span class="p">(</span><span class="n">expander_app_id</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">finished</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SpynnakerException</span><span class="p">(</span>
+                <span class="s2">&quot;The synapse expander failed to complete&quot;</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_extract_iobuf</span><span class="p">(</span><span class="n">expander_cores</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">provenance_file_path</span><span class="p">,</span>
+                   <span class="n">display</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Extract IOBuf from the cores</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">io_buffers</span> <span class="o">=</span> <span class="n">transceiver</span><span class="o">.</span><span class="n">get_iobuf</span><span class="p">(</span><span class="n">expander_cores</span><span class="o">.</span><span class="n">all_core_subsets</span><span class="p">)</span>
+    <span class="n">core_to_replacer</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">binary</span> <span class="ow">in</span> <span class="n">expander_cores</span><span class="o">.</span><span class="n">binaries</span><span class="p">:</span>
+        <span class="n">replacer</span> <span class="o">=</span> <span class="n">Replacer</span><span class="p">(</span><span class="n">binary</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">core_subset</span> <span class="ow">in</span> <span class="n">expander_cores</span><span class="o">.</span><span class="n">get_cores_for_binary</span><span class="p">(</span><span class="n">binary</span><span class="p">):</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">core_subset</span><span class="o">.</span><span class="n">x</span>
+            <span class="n">y</span> <span class="o">=</span> <span class="n">core_subset</span><span class="o">.</span><span class="n">y</span>
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">core_subset</span><span class="o">.</span><span class="n">processor_ids</span><span class="p">:</span>
+                <span class="n">core_to_replacer</span><span class="p">[</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">]</span> <span class="o">=</span> <span class="n">replacer</span>
+
+    <span class="k">for</span> <span class="n">io_buf</span> <span class="ow">in</span> <span class="n">io_buffers</span><span class="p">:</span>
+        <span class="n">file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="n">provenance_file_path</span><span class="p">,</span> <span class="s2">&quot;expander_</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">.txt&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">io_buf</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">io_buf</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">io_buf</span><span class="o">.</span><span class="n">p</span><span class="p">))</span>
+        <span class="n">replacer</span> <span class="o">=</span> <span class="n">core_to_replacer</span><span class="p">[</span><span class="n">io_buf</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">io_buf</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">io_buf</span><span class="o">.</span><span class="n">p</span><span class="p">]</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">io_buf</span><span class="o">.</span><span class="n">iobuf</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">):</span>
+            <span class="n">text</span> <span class="o">+=</span> <span class="n">replacer</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">line</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">writer</span><span class="p">:</span>
+            <span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">display</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2">:</span><span class="si">{}</span><span class="s2">:</span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">io_buf</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">io_buf</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">io_buf</span><span class="o">.</span><span class="n">p</span><span class="p">,</span> <span class="n">text</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">_handle_failure</span><span class="p">(</span><span class="n">expander_cores</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">provenance_file_path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Handle failure of the expander</span>
+
+<span class="sd">    :param executable_targets:</span>
+<span class="sd">    :param txrx:</span>
+<span class="sd">    :param provenance_file_path:</span>
+<span class="sd">    :rtype: None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">core_subsets</span> <span class="o">=</span> <span class="n">expander_cores</span><span class="o">.</span><span class="n">all_core_subsets</span>
+    <span class="n">error_cores</span> <span class="o">=</span> <span class="n">transceiver</span><span class="o">.</span><span class="n">get_cores_not_in_state</span><span class="p">(</span>
+        <span class="n">core_subsets</span><span class="p">,</span> <span class="p">[</span><span class="n">CPUState</span><span class="o">.</span><span class="n">RUNNING</span><span class="p">,</span> <span class="n">CPUState</span><span class="o">.</span><span class="n">FINISHED</span><span class="p">])</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">transceiver</span><span class="o">.</span><span class="n">get_core_status_string</span><span class="p">(</span><span class="n">error_cores</span><span class="p">))</span>
+    <span class="n">_extract_iobuf</span><span class="p">(</span><span class="n">expander_cores</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">provenance_file_path</span><span class="p">,</span>
+                   <span class="n">display</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_fill_in_connection_data</span><span class="p">(</span>
+        <span class="n">gen_on_machine_vertices</span><span class="p">,</span> <span class="n">graph_mapper</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Once expander has run, fill in the connection data</span>
+<span class="sd">    :param app_graph</span>
+<span class="sd">    :param graph_mapper</span>
+<span class="sd">    :rtype: None</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">ctl</span> <span class="o">=</span> <span class="n">globals_variables</span><span class="o">.</span><span class="n">get_simulator</span><span class="p">()</span>
+    <span class="n">use_extra_monitors</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">for</span> <span class="n">vertex</span> <span class="ow">in</span> <span class="n">gen_on_machine_vertices</span><span class="p">:</span>
+        <span class="n">conn_holders</span> <span class="o">=</span> <span class="n">vertex</span><span class="o">.</span><span class="n">get_connection_holders</span><span class="p">()</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">app_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">),</span> <span class="n">conn_holder_list</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span>
+                <span class="n">conn_holders</span><span class="p">):</span>
+            <span class="c1"># Only do this if this synapse_info has been generated</span>
+            <span class="c1"># on the machine using the expander</span>
+            <span class="n">connector</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">connector</span>
+            <span class="n">dynamics</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">synapse_dynamics</span>
+            <span class="n">connector_gen</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span>
+                <span class="n">connector</span><span class="p">,</span> <span class="n">AbstractGenerateConnectorOnMachine</span><span class="p">)</span> <span class="ow">and</span> \
+                <span class="n">connector</span><span class="o">.</span><span class="n">generate_on_machine</span><span class="p">(</span>
+                    <span class="n">synapse_info</span><span class="o">.</span><span class="n">weights</span><span class="p">,</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">delays</span><span class="p">)</span>
+            <span class="n">synapse_gen</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span>
+                <span class="n">dynamics</span><span class="p">,</span> <span class="n">AbstractGenerateOnMachine</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">connector_gen</span> <span class="ow">and</span> <span class="n">synapse_gen</span><span class="p">:</span>
+                <span class="n">machine_edges</span> <span class="o">=</span> <span class="n">graph_mapper</span><span class="o">.</span><span class="n">get_machine_edges</span><span class="p">(</span><span class="n">app_edge</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">machine_edge</span> <span class="ow">in</span> <span class="n">machine_edges</span><span class="p">:</span>
+                    <span class="n">placement</span> <span class="o">=</span> <span class="n">placements</span><span class="o">.</span><span class="n">get_placement_of_vertex</span><span class="p">(</span>
+                        <span class="n">machine_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="p">)</span>
+                    <span class="n">conns</span> <span class="o">=</span> <span class="n">vertex</span><span class="o">.</span><span class="n">get_connections_from_machine</span><span class="p">(</span>
+                        <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">machine_edge</span><span class="p">,</span> <span class="n">graph_mapper</span><span class="p">,</span>
+                        <span class="n">ctl</span><span class="o">.</span><span class="n">routing_infos</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">machine_time_step</span><span class="p">,</span>
+                        <span class="n">use_extra_monitors</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">conn_holder</span> <span class="ow">in</span> <span class="n">conn_holder_list</span><span class="p">:</span>
+                        <span class="n">conn_holder</span><span class="o">.</span><span class="n">add_connections</span><span class="p">(</span><span class="n">conns</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../../index.html">sPyNNaker  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+    </div>
+  </body>
+</html>

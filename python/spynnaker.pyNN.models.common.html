@@ -1,0 +1,1591 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>spynnaker.pyNN.models.common package &#8212; sPyNNaker  documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="spynnaker.pyNN.models.neural_projections package" href="spynnaker.pyNN.models.neural_projections.html" />
+    <link rel="prev" title="spynnaker.pyNN.models.abstract_models package" href="spynnaker.pyNN.models.abstract_models.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="spynnaker.pyNN.models.neural_projections.html" title="spynnaker.pyNN.models.neural_projections package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="spynnaker.pyNN.models.abstract_models.html" title="spynnaker.pyNN.models.abstract_models package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.models.html" accesskey="U">spynnaker.pyNN.models package</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">spynnaker.pyNN.models.common package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.models.common.abstract_neuron_recordable">spynnaker.pyNN.models.common.abstract_neuron_recordable module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.models.common.abstract_spike_recordable">spynnaker.pyNN.models.common.abstract_spike_recordable module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.models.common.eieio_spike_recorder">spynnaker.pyNN.models.common.eieio_spike_recorder module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.models.common.multi_spike_recorder">spynnaker.pyNN.models.common.multi_spike_recorder module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.models.common.neuron_recorder">spynnaker.pyNN.models.common.neuron_recorder module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.models.common.recording_utils">spynnaker.pyNN.models.common.recording_utils module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.models.common.simple_population_settable">spynnaker.pyNN.models.common.simple_population_settable module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.models.common">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="spynnaker.pyNN.models.abstract_models.html"
+                        title="previous chapter">spynnaker.pyNN.models.abstract_models package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="spynnaker.pyNN.models.neural_projections.html"
+                        title="next chapter">spynnaker.pyNN.models.neural_projections package</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/spynnaker.pyNN.models.common.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="spynnaker-pynn-models-common-package">
+<h1>spynnaker.pyNN.models.common package<a class="headerlink" href="#spynnaker-pynn-models-common-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-spynnaker.pyNN.models.common.abstract_neuron_recordable">
+<span id="spynnaker-pynn-models-common-abstract-neuron-recordable-module"></span><h2>spynnaker.pyNN.models.common.abstract_neuron_recordable module<a class="headerlink" href="#module-spynnaker.pyNN.models.common.abstract_neuron_recordable" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="spynnaker.pyNN.models.common.abstract_neuron_recordable.AbstractNeuronRecordable">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.common.abstract_neuron_recordable.</code><code class="descname">AbstractNeuronRecordable</code><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/abstract_neuron_recordable.html#AbstractNeuronRecordable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.abstract_neuron_recordable.AbstractNeuronRecordable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Indicates that a variable (e.g., membrane voltage) can be recorded        from this object</p>
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.abstract_neuron_recordable.AbstractNeuronRecordable.clear_recording">
+<code class="descname">clear_recording</code><span class="sig-paren">(</span><em>variable</em>, <em>buffer_manager</em>, <em>placements</em>, <em>graph_mapper</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/abstract_neuron_recordable.html#AbstractNeuronRecordable.clear_recording"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.abstract_neuron_recordable.AbstractNeuronRecordable.clear_recording" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clear the recorded data from the object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>buffer_manager</strong> &#8211; the buffer manager object</li>
+<li><strong>placements</strong> &#8211; the placements object</li>
+<li><strong>graph_mapper</strong> &#8211; the graph mapper object</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.abstract_neuron_recordable.AbstractNeuronRecordable.get_data">
+<code class="descname">get_data</code><span class="sig-paren">(</span><em>variable</em>, <em>n_machine_time_steps</em>, <em>placements</em>, <em>graph_mapper</em>, <em>buffer_manager</em>, <em>machine_time_step</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/abstract_neuron_recordable.html#AbstractNeuronRecordable.get_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.abstract_neuron_recordable.AbstractNeuronRecordable.get_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the recorded data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>variable</strong> &#8211; </li>
+<li><strong>n_machine_time_steps</strong> &#8211; </li>
+<li><strong>placements</strong> &#8211; </li>
+<li><strong>graph_mapper</strong> &#8211; </li>
+<li><strong>buffer_manager</strong> &#8211; </li>
+<li><strong>machine_time_step</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.abstract_neuron_recordable.AbstractNeuronRecordable.get_neuron_sampling_interval">
+<code class="descname">get_neuron_sampling_interval</code><span class="sig-paren">(</span><em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/abstract_neuron_recordable.html#AbstractNeuronRecordable.get_neuron_sampling_interval"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.abstract_neuron_recordable.AbstractNeuronRecordable.get_neuron_sampling_interval" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the current sampling interval for this variable</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> &#8211; PyNN name of the variable</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Sampling interval in micro seconds</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.abstract_neuron_recordable.AbstractNeuronRecordable.get_recordable_variables">
+<code class="descname">get_recordable_variables</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/abstract_neuron_recordable.html#AbstractNeuronRecordable.get_recordable_variables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.abstract_neuron_recordable.AbstractNeuronRecordable.get_recordable_variables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of the variables this models is expected to collect</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.abstract_neuron_recordable.AbstractNeuronRecordable.is_recording">
+<code class="descname">is_recording</code><span class="sig-paren">(</span><em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/abstract_neuron_recordable.html#AbstractNeuronRecordable.is_recording"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.abstract_neuron_recordable.AbstractNeuronRecordable.is_recording" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines if variable is being recorded</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if variable are being recorded, False otherwise</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.abstract_neuron_recordable.AbstractNeuronRecordable.set_recording">
+<code class="descname">set_recording</code><span class="sig-paren">(</span><em>variable</em>, <em>new_state=True</em>, <em>sampling_interval=None</em>, <em>indexes=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/abstract_neuron_recordable.html#AbstractNeuronRecordable.set_recording"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.abstract_neuron_recordable.AbstractNeuronRecordable.set_recording" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets variable to being recorded</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-spynnaker.pyNN.models.common.abstract_spike_recordable">
+<span id="spynnaker-pynn-models-common-abstract-spike-recordable-module"></span><h2>spynnaker.pyNN.models.common.abstract_spike_recordable module<a class="headerlink" href="#module-spynnaker.pyNN.models.common.abstract_spike_recordable" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="spynnaker.pyNN.models.common.abstract_spike_recordable.AbstractSpikeRecordable">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.common.abstract_spike_recordable.</code><code class="descname">AbstractSpikeRecordable</code><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/abstract_spike_recordable.html#AbstractSpikeRecordable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.abstract_spike_recordable.AbstractSpikeRecordable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Indicates that spikes can be recorded from this object</p>
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.abstract_spike_recordable.AbstractSpikeRecordable.clear_spike_recording">
+<code class="descname">clear_spike_recording</code><span class="sig-paren">(</span><em>buffer_manager</em>, <em>placements</em>, <em>graph_mapper</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/abstract_spike_recordable.html#AbstractSpikeRecordable.clear_spike_recording"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.abstract_spike_recordable.AbstractSpikeRecordable.clear_spike_recording" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clear the recorded data from the object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>buffer_manager</strong> &#8211; the buffer manager object</li>
+<li><strong>placements</strong> &#8211; the placements object</li>
+<li><strong>graph_mapper</strong> &#8211; the graph mapper object</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.abstract_spike_recordable.AbstractSpikeRecordable.get_spikes">
+<code class="descname">get_spikes</code><span class="sig-paren">(</span><em>placements</em>, <em>graph_mapper</em>, <em>buffer_manager</em>, <em>machine_time_step</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/abstract_spike_recordable.html#AbstractSpikeRecordable.get_spikes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.abstract_spike_recordable.AbstractSpikeRecordable.get_spikes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the recorded spikes from the object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>placements</strong> &#8211; the placements object</li>
+<li><strong>graph_mapper</strong> &#8211; the graph mapper object</li>
+<li><strong>buffer_manager</strong> &#8211; the buffer manager object</li>
+<li><strong>machine_time_step</strong> &#8211; the time step of the simulation</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A numpy array of 2-element arrays of (neuron_id, time)            ordered by time</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.abstract_spike_recordable.AbstractSpikeRecordable.get_spikes_sampling_interval">
+<code class="descname">get_spikes_sampling_interval</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/abstract_spike_recordable.html#AbstractSpikeRecordable.get_spikes_sampling_interval"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.abstract_spike_recordable.AbstractSpikeRecordable.get_spikes_sampling_interval" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the current sampling interval for spikes</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Sampling interval in micro seconds</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.abstract_spike_recordable.AbstractSpikeRecordable.is_recording_spikes">
+<code class="descname">is_recording_spikes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/abstract_spike_recordable.html#AbstractSpikeRecordable.is_recording_spikes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.abstract_spike_recordable.AbstractSpikeRecordable.is_recording_spikes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if spikes are being recorded</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if spikes are being recorded, False otherwise</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.abstract_spike_recordable.AbstractSpikeRecordable.set_recording_spikes">
+<code class="descname">set_recording_spikes</code><span class="sig-paren">(</span><em>new_state=True</em>, <em>sampling_interval=None</em>, <em>indexes=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/abstract_spike_recordable.html#AbstractSpikeRecordable.set_recording_spikes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.abstract_spike_recordable.AbstractSpikeRecordable.set_recording_spikes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set spikes to being recorded.             If new_state is false all other parameters are ignored.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>new_state</strong> (<em>bool</em>) &#8211; Set if the spikes are recording or not</li>
+<li><strong>sampling_interval</strong> &#8211; The interval at which spikes are recorded.            Must be a whole multiple of the timestep
+None will be taken as the timestep</li>
+<li><strong>indexes</strong> &#8211; The indexes of the neurons that will record spikes.
+If None the assumption is all neurons are recording</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-spynnaker.pyNN.models.common.eieio_spike_recorder">
+<span id="spynnaker-pynn-models-common-eieio-spike-recorder-module"></span><h2>spynnaker.pyNN.models.common.eieio_spike_recorder module<a class="headerlink" href="#module-spynnaker.pyNN.models.common.eieio_spike_recorder" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="spynnaker.pyNN.models.common.eieio_spike_recorder.EIEIOSpikeRecorder">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.common.eieio_spike_recorder.</code><code class="descname">EIEIOSpikeRecorder</code><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/eieio_spike_recorder.html#EIEIOSpikeRecorder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.eieio_spike_recorder.EIEIOSpikeRecorder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Records spikes using EIEIO format</p>
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.eieio_spike_recorder.EIEIOSpikeRecorder.get_dtcm_usage_in_bytes">
+<code class="descname">get_dtcm_usage_in_bytes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/eieio_spike_recorder.html#EIEIOSpikeRecorder.get_dtcm_usage_in_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.eieio_spike_recorder.EIEIOSpikeRecorder.get_dtcm_usage_in_bytes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.eieio_spike_recorder.EIEIOSpikeRecorder.get_n_cpu_cycles">
+<code class="descname">get_n_cpu_cycles</code><span class="sig-paren">(</span><em>n_neurons</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/eieio_spike_recorder.html#EIEIOSpikeRecorder.get_n_cpu_cycles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.eieio_spike_recorder.EIEIOSpikeRecorder.get_n_cpu_cycles" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.eieio_spike_recorder.EIEIOSpikeRecorder.get_spikes">
+<code class="descname">get_spikes</code><span class="sig-paren">(</span><em>label</em>, <em>buffer_manager</em>, <em>region</em>, <em>placements</em>, <em>graph_mapper</em>, <em>application_vertex</em>, <em>base_key_function</em>, <em>machine_time_step</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/eieio_spike_recorder.html#EIEIOSpikeRecorder.get_spikes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.eieio_spike_recorder.EIEIOSpikeRecorder.get_spikes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.common.eieio_spike_recorder.EIEIOSpikeRecorder.record">
+<code class="descname">record</code><a class="headerlink" href="#spynnaker.pyNN.models.common.eieio_spike_recorder.EIEIOSpikeRecorder.record" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.eieio_spike_recorder.EIEIOSpikeRecorder.set_recording">
+<code class="descname">set_recording</code><span class="sig-paren">(</span><em>new_state</em>, <em>sampling_interval=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/eieio_spike_recorder.html#EIEIOSpikeRecorder.set_recording"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.eieio_spike_recorder.EIEIOSpikeRecorder.set_recording" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-spynnaker.pyNN.models.common.multi_spike_recorder">
+<span id="spynnaker-pynn-models-common-multi-spike-recorder-module"></span><h2>spynnaker.pyNN.models.common.multi_spike_recorder module<a class="headerlink" href="#module-spynnaker.pyNN.models.common.multi_spike_recorder" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="spynnaker.pyNN.models.common.multi_spike_recorder.MultiSpikeRecorder">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.common.multi_spike_recorder.</code><code class="descname">MultiSpikeRecorder</code><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/multi_spike_recorder.html#MultiSpikeRecorder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.multi_spike_recorder.MultiSpikeRecorder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.multi_spike_recorder.MultiSpikeRecorder.get_dtcm_usage_in_bytes">
+<code class="descname">get_dtcm_usage_in_bytes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/multi_spike_recorder.html#MultiSpikeRecorder.get_dtcm_usage_in_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.multi_spike_recorder.MultiSpikeRecorder.get_dtcm_usage_in_bytes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.multi_spike_recorder.MultiSpikeRecorder.get_n_cpu_cycles">
+<code class="descname">get_n_cpu_cycles</code><span class="sig-paren">(</span><em>n_neurons</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/multi_spike_recorder.html#MultiSpikeRecorder.get_n_cpu_cycles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.multi_spike_recorder.MultiSpikeRecorder.get_n_cpu_cycles" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.multi_spike_recorder.MultiSpikeRecorder.get_sdram_usage_in_bytes">
+<code class="descname">get_sdram_usage_in_bytes</code><span class="sig-paren">(</span><em>n_neurons</em>, <em>spikes_per_timestep</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/multi_spike_recorder.html#MultiSpikeRecorder.get_sdram_usage_in_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.multi_spike_recorder.MultiSpikeRecorder.get_sdram_usage_in_bytes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.multi_spike_recorder.MultiSpikeRecorder.get_spikes">
+<code class="descname">get_spikes</code><span class="sig-paren">(</span><em>label</em>, <em>buffer_manager</em>, <em>region</em>, <em>placements</em>, <em>graph_mapper</em>, <em>application_vertex</em>, <em>machine_time_step</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/multi_spike_recorder.html#MultiSpikeRecorder.get_spikes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.multi_spike_recorder.MultiSpikeRecorder.get_spikes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.common.multi_spike_recorder.MultiSpikeRecorder.record">
+<code class="descname">record</code><a class="headerlink" href="#spynnaker.pyNN.models.common.multi_spike_recorder.MultiSpikeRecorder.record" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-spynnaker.pyNN.models.common.neuron_recorder">
+<span id="spynnaker-pynn-models-common-neuron-recorder-module"></span><h2>spynnaker.pyNN.models.common.neuron_recorder module<a class="headerlink" href="#module-spynnaker.pyNN.models.common.neuron_recorder" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.common.neuron_recorder.</code><code class="descname">NeuronRecorder</code><span class="sig-paren">(</span><em>allowed_variables</em>, <em>data_types</em>, <em>bitfield_variables</em>, <em>n_neurons</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.MAX_RATE">
+<code class="descname">MAX_RATE</code><em class="property"> = 4294967295</em><a class="headerlink" href="#spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.MAX_RATE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.N_BYTES_FOR_TIMESTAMP">
+<code class="descname">N_BYTES_FOR_TIMESTAMP</code><em class="property"> = 4</em><a class="headerlink" href="#spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.N_BYTES_FOR_TIMESTAMP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.N_BYTES_PER_COUNT">
+<code class="descname">N_BYTES_PER_COUNT</code><em class="property"> = 4</em><a class="headerlink" href="#spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.N_BYTES_PER_COUNT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.N_BYTES_PER_ENUM">
+<code class="descname">N_BYTES_PER_ENUM</code><em class="property"> = 4</em><a class="headerlink" href="#spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.N_BYTES_PER_ENUM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.N_BYTES_PER_INCREMENT">
+<code class="descname">N_BYTES_PER_INCREMENT</code><em class="property"> = 4</em><a class="headerlink" href="#spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.N_BYTES_PER_INCREMENT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.N_BYTES_PER_INDEX">
+<code class="descname">N_BYTES_PER_INDEX</code><em class="property"> = 1</em><a class="headerlink" href="#spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.N_BYTES_PER_INDEX" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.N_BYTES_PER_OUTSTANDING_RECORDING">
+<code class="descname">N_BYTES_PER_OUTSTANDING_RECORDING</code><em class="property"> = 4</em><a class="headerlink" href="#spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.N_BYTES_PER_OUTSTANDING_RECORDING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.N_BYTES_PER_POINTER">
+<code class="descname">N_BYTES_PER_POINTER</code><em class="property"> = 4</em><a class="headerlink" href="#spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.N_BYTES_PER_POINTER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.N_BYTES_PER_RATE">
+<code class="descname">N_BYTES_PER_RATE</code><em class="property"> = 4</em><a class="headerlink" href="#spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.N_BYTES_PER_RATE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.N_BYTES_PER_SIZE">
+<code class="descname">N_BYTES_PER_SIZE</code><em class="property"> = 4</em><a class="headerlink" href="#spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.N_BYTES_PER_SIZE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.N_CPU_CYCLES_PER_NEURON">
+<code class="descname">N_CPU_CYCLES_PER_NEURON</code><em class="property"> = 8</em><a class="headerlink" href="#spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.N_CPU_CYCLES_PER_NEURON" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.N_ITEM_TYPES">
+<code class="descname">N_ITEM_TYPES</code><em class="property"> = 2</em><a class="headerlink" href="#spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.N_ITEM_TYPES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.SARK_BLOCK_SIZE">
+<code class="descname">SARK_BLOCK_SIZE</code><em class="property"> = 8</em><a class="headerlink" href="#spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.SARK_BLOCK_SIZE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.SPIKES">
+<code class="descname">SPIKES</code><em class="property"> = 'spikes'</em><a class="headerlink" href="#spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.SPIKES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.check_indexes">
+<code class="descname">check_indexes</code><span class="sig-paren">(</span><em>indexes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.check_indexes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.check_indexes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.expected_rows_for_a_run_time">
+<em class="property">static </em><code class="descname">expected_rows_for_a_run_time</code><span class="sig-paren">(</span><em>n_machine_time_steps</em>, <em>sampling_rate</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.expected_rows_for_a_run_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.expected_rows_for_a_run_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>determines how many rows to see based off how long its ran for</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>n_machine_time_steps</strong> &#8211; map of vertex to time steps</li>
+<li><strong>sampling_rate</strong> &#8211; the sampling rate for a given variable</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">how many rows there should be.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.get_buffered_sdram">
+<code class="descname">get_buffered_sdram</code><span class="sig-paren">(</span><em>variable</em>, <em>vertex_slice</em>, <em>n_machine_time_steps</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.get_buffered_sdram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.get_buffered_sdram" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the SDRAM used for this may time steps</p>
+<p>If required the total is rounded up so the space will always fit</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>variable</strong> &#8211; The variable to get buffered sdram of</li>
+<li><strong>vertex_slice</strong> &#8211; vertex slice</li>
+<li><strong>n_machine_time_steps</strong> &#8211; how many machine time steps to run for</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">data size</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.get_buffered_sdram_per_record">
+<code class="descname">get_buffered_sdram_per_record</code><span class="sig-paren">(</span><em>variable</em>, <em>vertex_slice</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.get_buffered_sdram_per_record"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.get_buffered_sdram_per_record" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the SDRAM used per record</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>variable</strong> &#8211; </li>
+<li><strong>vertex_slice</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.get_dtcm_usage_in_bytes">
+<code class="descname">get_dtcm_usage_in_bytes</code><span class="sig-paren">(</span><em>vertex_slice</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.get_dtcm_usage_in_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.get_dtcm_usage_in_bytes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.get_matrix_data">
+<code class="descname">get_matrix_data</code><span class="sig-paren">(</span><em>label</em>, <em>buffer_manager</em>, <em>region</em>, <em>placements</em>, <em>graph_mapper</em>, <em>application_vertex</em>, <em>variable</em>, <em>n_machine_time_steps</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.get_matrix_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.get_matrix_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a uint32 mapped to time and neuron IDs from the SpiNNaker            machine and converts to required data types with scaling if needed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>label</strong> &#8211; vertex label</li>
+<li><strong>buffer_manager</strong> &#8211; the manager for buffered data</li>
+<li><strong>region</strong> &#8211; the DSG region ID used for this data</li>
+<li><strong>placements</strong> &#8211; the placements object</li>
+<li><strong>graph_mapper</strong> &#8211; the mapping between application and machine vertices</li>
+<li><strong>application_vertex</strong> &#8211; </li>
+<li><strong>variable</strong> (<em>str</em>) &#8211; PyNN name for the variable (V, gsy_inh etc.)</li>
+<li><strong>n_machine_time_steps</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.get_n_cpu_cycles">
+<code class="descname">get_n_cpu_cycles</code><span class="sig-paren">(</span><em>n_neurons</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.get_n_cpu_cycles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.get_n_cpu_cycles" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.get_neuron_sampling_interval">
+<code class="descname">get_neuron_sampling_interval</code><span class="sig-paren">(</span><em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.get_neuron_sampling_interval"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.get_neuron_sampling_interval" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the current sampling interval for this variable</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> &#8211; PyNN name of the variable</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Sampling interval in micro seconds</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.get_recordable_variables">
+<code class="descname">get_recordable_variables</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.get_recordable_variables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.get_recordable_variables" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.get_sampling_overflow_sdram">
+<code class="descname">get_sampling_overflow_sdram</code><span class="sig-paren">(</span><em>vertex_slice</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.get_sampling_overflow_sdram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.get_sampling_overflow_sdram" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the extra SDRAM that should be reserved if using per_timestep</p>
+<p>This is the extra that must be reserved if per_timestep is an average        rather than fixed for every timestep.</p>
+<p>When sampling the average * time_steps may not be quite enough.        This returns the extra space in the worst case        where time_steps is a multiple of sampling rate + 1,        and recording is done in the first and last time_step</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>vertex_slice</strong> &#8211; </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Highest possible overflow needed</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.get_sdram_usage_in_bytes">
+<code class="descname">get_sdram_usage_in_bytes</code><span class="sig-paren">(</span><em>vertex_slice</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.get_sdram_usage_in_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.get_sdram_usage_in_bytes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.get_spikes">
+<code class="descname">get_spikes</code><span class="sig-paren">(</span><em>label</em>, <em>buffer_manager</em>, <em>region</em>, <em>placements</em>, <em>graph_mapper</em>, <em>application_vertex</em>, <em>variable</em>, <em>machine_time_step</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.get_spikes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.get_spikes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.get_static_sdram_usage">
+<code class="descname">get_static_sdram_usage</code><span class="sig-paren">(</span><em>vertex_slice</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.get_static_sdram_usage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.get_static_sdram_usage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.get_variable_sdram_usage">
+<code class="descname">get_variable_sdram_usage</code><span class="sig-paren">(</span><em>vertex_slice</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.get_variable_sdram_usage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.get_variable_sdram_usage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.is_recording">
+<code class="descname">is_recording</code><span class="sig-paren">(</span><em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.is_recording"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.is_recording" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.recorded_ids_by_slice">
+<code class="descname">recorded_ids_by_slice</code><span class="sig-paren">(</span><em>vertex_slice</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.recorded_ids_by_slice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.recorded_ids_by_slice" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.recorded_region_ids">
+<code class="descname">recorded_region_ids</code><a class="headerlink" href="#spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.recorded_region_ids" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.recording_variables">
+<code class="descname">recording_variables</code><a class="headerlink" href="#spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.recording_variables" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.set_recording">
+<code class="descname">set_recording</code><span class="sig-paren">(</span><em>variable</em>, <em>new_state</em>, <em>sampling_interval=None</em>, <em>indexes=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.set_recording"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.set_recording" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.write_neuron_recording_region">
+<code class="descname">write_neuron_recording_region</code><span class="sig-paren">(</span><em>spec</em>, <em>neuron_recording_region</em>, <em>vertex_slice</em>, <em>data_n_time_steps</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.write_neuron_recording_region"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.neuron_recorder.NeuronRecorder.write_neuron_recording_region" title="Permalink to this definition">¶</a></dt>
+<dd><p>recording data specification</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>spec</strong> &#8211; dsg spec</li>
+<li><strong>neuron_recording_region</strong> &#8211; the recording region</li>
+<li><strong>vertex_slice</strong> &#8211; the vertex slice</li>
+<li><strong>data_n_time_steps</strong> &#8211; how many time steps to run this time</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-spynnaker.pyNN.models.common.recording_utils">
+<span id="spynnaker-pynn-models-common-recording-utils-module"></span><h2>spynnaker.pyNN.models.common.recording_utils module<a class="headerlink" href="#module-spynnaker.pyNN.models.common.recording_utils" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="spynnaker.pyNN.models.common.recording_utils.get_buffer_sizes">
+<code class="descclassname">spynnaker.pyNN.models.common.recording_utils.</code><code class="descname">get_buffer_sizes</code><span class="sig-paren">(</span><em>buffer_max</em>, <em>space_needed</em>, <em>enable_buffered_recording</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/recording_utils.html#get_buffer_sizes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.recording_utils.get_buffer_sizes" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>buffer_max</strong> (<em>int</em>) &#8211; </li>
+<li><strong>space_needed</strong> (<em>int</em>) &#8211; </li>
+<li><strong>enable_buffered_recording</strong> (<em>bool</em>) &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">int</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="spynnaker.pyNN.models.common.recording_utils.get_data">
+<code class="descclassname">spynnaker.pyNN.models.common.recording_utils.</code><code class="descname">get_data</code><span class="sig-paren">(</span><em>transceiver</em>, <em>placement</em>, <em>region</em>, <em>region_size</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/recording_utils.html#get_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.recording_utils.get_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the recorded data from a region.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>transceiver</strong> (<a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman/#spinnman.transceiver.Transceiver" title="(in SpiNNMan v)"><em>Transceiver</em></a>) &#8211; </li>
+<li><strong>placement</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placement" title="(in PACMAN v)"><em>Placement</em></a>) &#8211; </li>
+<li><strong>region</strong> (<em>int</em>) &#8211; </li>
+<li><strong>region_size</strong> (<em>int</em>) &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">tuple(bytearray, int)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="spynnaker.pyNN.models.common.recording_utils.get_recording_region_size_in_bytes">
+<code class="descclassname">spynnaker.pyNN.models.common.recording_utils.</code><code class="descname">get_recording_region_size_in_bytes</code><span class="sig-paren">(</span><em>n_machine_time_steps</em>, <em>bytes_per_timestep</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/recording_utils.html#get_recording_region_size_in_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.recording_utils.get_recording_region_size_in_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the size of a recording region in bytes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>n_machine_time_steps</strong> (<em>int</em>) &#8211; </li>
+<li><strong>bytes_per_timestep</strong> (<em>int</em>) &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">int</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="spynnaker.pyNN.models.common.recording_utils.make_missing_string">
+<code class="descclassname">spynnaker.pyNN.models.common.recording_utils.</code><code class="descname">make_missing_string</code><span class="sig-paren">(</span><em>missing</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/recording_utils.html#make_missing_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.recording_utils.make_missing_string" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>missing</strong> (<em>iterable</em><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placement" title="(in PACMAN v)"><em>Placement</em></a><em>)</em><em></em>) &#8211; </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="spynnaker.pyNN.models.common.recording_utils.needs_buffering">
+<code class="descclassname">spynnaker.pyNN.models.common.recording_utils.</code><code class="descname">needs_buffering</code><span class="sig-paren">(</span><em>buffer_max</em>, <em>space_needed</em>, <em>enable_buffered_recording</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/recording_utils.html#needs_buffering"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.recording_utils.needs_buffering" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>buffer_max</strong> (<em>int</em>) &#8211; </li>
+<li><strong>space_needed</strong> (<em>int</em>) &#8211; </li>
+<li><strong>enable_buffered_recording</strong> (<em>bool</em>) &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">bool</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="spynnaker.pyNN.models.common.recording_utils.pull_off_cached_lists">
+<code class="descclassname">spynnaker.pyNN.models.common.recording_utils.</code><code class="descname">pull_off_cached_lists</code><span class="sig-paren">(</span><em>no_loads</em>, <em>cache_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/recording_utils.html#pull_off_cached_lists"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.recording_utils.pull_off_cached_lists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts numpy based data from a file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>no_loads</strong> (<em>int</em>) &#8211; the number of numpy elements in the file</li>
+<li><strong>cache_file</strong> (<em>FileIO</em>) &#8211; the file to extract from</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The extracted data</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">ndarray</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-spynnaker.pyNN.models.common.simple_population_settable">
+<span id="spynnaker-pynn-models-common-simple-population-settable-module"></span><h2>spynnaker.pyNN.models.common.simple_population_settable module<a class="headerlink" href="#module-spynnaker.pyNN.models.common.simple_population_settable" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="spynnaker.pyNN.models.common.simple_population_settable.SimplePopulationSettable">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.common.simple_population_settable.</code><code class="descname">SimplePopulationSettable</code><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/simple_population_settable.html#SimplePopulationSettable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.simple_population_settable.SimplePopulationSettable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.abstract_population_settable.AbstractPopulationSettable" title="spynnaker.pyNN.models.abstract_models.abstract_population_settable.AbstractPopulationSettable"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.abstract_models.abstract_population_settable.AbstractPopulationSettable</span></code></a></p>
+<p>An object all of whose properties can be accessed from a PyNN        Population i.e. no properties are hidden</p>
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.simple_population_settable.SimplePopulationSettable.get_value">
+<code class="descname">get_value</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/simple_population_settable.html#SimplePopulationSettable.get_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.simple_population_settable.SimplePopulationSettable.get_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a property</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<em>str</em>) &#8211; the name of the property</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">Any or float or int or list(float) or list(int)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.simple_population_settable.SimplePopulationSettable.set_value">
+<code class="descname">set_value</code><span class="sig-paren">(</span><em>key</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/simple_population_settable.html#SimplePopulationSettable.set_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.simple_population_settable.SimplePopulationSettable.set_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set a property</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>key</strong> (<em>str</em>) &#8211; the name of the parameter to change</li>
+<li><strong>value</strong> (<em>Any</em><em> or </em><em>float</em><em> or </em><em>int</em><em> or </em><em>list</em><em>(</em><em>float</em><em>) or </em><em>list</em><em>(</em><em>int</em><em>)</em><em></em>) &#8211; the new value of the parameter to assign</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-spynnaker.pyNN.models.common">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.models.common" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="spynnaker.pyNN.models.common.AbstractNeuronRecordable">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.common.</code><code class="descname">AbstractNeuronRecordable</code><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/abstract_neuron_recordable.html#AbstractNeuronRecordable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.AbstractNeuronRecordable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Indicates that a variable (e.g., membrane voltage) can be recorded        from this object</p>
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.AbstractNeuronRecordable.clear_recording">
+<code class="descname">clear_recording</code><span class="sig-paren">(</span><em>variable</em>, <em>buffer_manager</em>, <em>placements</em>, <em>graph_mapper</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/abstract_neuron_recordable.html#AbstractNeuronRecordable.clear_recording"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.AbstractNeuronRecordable.clear_recording" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clear the recorded data from the object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>buffer_manager</strong> &#8211; the buffer manager object</li>
+<li><strong>placements</strong> &#8211; the placements object</li>
+<li><strong>graph_mapper</strong> &#8211; the graph mapper object</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.AbstractNeuronRecordable.get_data">
+<code class="descname">get_data</code><span class="sig-paren">(</span><em>variable</em>, <em>n_machine_time_steps</em>, <em>placements</em>, <em>graph_mapper</em>, <em>buffer_manager</em>, <em>machine_time_step</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/abstract_neuron_recordable.html#AbstractNeuronRecordable.get_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.AbstractNeuronRecordable.get_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the recorded data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>variable</strong> &#8211; </li>
+<li><strong>n_machine_time_steps</strong> &#8211; </li>
+<li><strong>placements</strong> &#8211; </li>
+<li><strong>graph_mapper</strong> &#8211; </li>
+<li><strong>buffer_manager</strong> &#8211; </li>
+<li><strong>machine_time_step</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.AbstractNeuronRecordable.get_neuron_sampling_interval">
+<code class="descname">get_neuron_sampling_interval</code><span class="sig-paren">(</span><em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/abstract_neuron_recordable.html#AbstractNeuronRecordable.get_neuron_sampling_interval"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.AbstractNeuronRecordable.get_neuron_sampling_interval" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the current sampling interval for this variable</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> &#8211; PyNN name of the variable</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Sampling interval in micro seconds</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.AbstractNeuronRecordable.get_recordable_variables">
+<code class="descname">get_recordable_variables</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/abstract_neuron_recordable.html#AbstractNeuronRecordable.get_recordable_variables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.AbstractNeuronRecordable.get_recordable_variables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a list of the variables this models is expected to collect</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.AbstractNeuronRecordable.is_recording">
+<code class="descname">is_recording</code><span class="sig-paren">(</span><em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/abstract_neuron_recordable.html#AbstractNeuronRecordable.is_recording"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.AbstractNeuronRecordable.is_recording" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines if variable is being recorded</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if variable are being recorded, False otherwise</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.AbstractNeuronRecordable.set_recording">
+<code class="descname">set_recording</code><span class="sig-paren">(</span><em>variable</em>, <em>new_state=True</em>, <em>sampling_interval=None</em>, <em>indexes=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/abstract_neuron_recordable.html#AbstractNeuronRecordable.set_recording"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.AbstractNeuronRecordable.set_recording" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets variable to being recorded</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="spynnaker.pyNN.models.common.AbstractSpikeRecordable">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.common.</code><code class="descname">AbstractSpikeRecordable</code><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/abstract_spike_recordable.html#AbstractSpikeRecordable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.AbstractSpikeRecordable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Indicates that spikes can be recorded from this object</p>
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.AbstractSpikeRecordable.clear_spike_recording">
+<code class="descname">clear_spike_recording</code><span class="sig-paren">(</span><em>buffer_manager</em>, <em>placements</em>, <em>graph_mapper</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/abstract_spike_recordable.html#AbstractSpikeRecordable.clear_spike_recording"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.AbstractSpikeRecordable.clear_spike_recording" title="Permalink to this definition">¶</a></dt>
+<dd><p>Clear the recorded data from the object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>buffer_manager</strong> &#8211; the buffer manager object</li>
+<li><strong>placements</strong> &#8211; the placements object</li>
+<li><strong>graph_mapper</strong> &#8211; the graph mapper object</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.AbstractSpikeRecordable.get_spikes">
+<code class="descname">get_spikes</code><span class="sig-paren">(</span><em>placements</em>, <em>graph_mapper</em>, <em>buffer_manager</em>, <em>machine_time_step</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/abstract_spike_recordable.html#AbstractSpikeRecordable.get_spikes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.AbstractSpikeRecordable.get_spikes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the recorded spikes from the object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>placements</strong> &#8211; the placements object</li>
+<li><strong>graph_mapper</strong> &#8211; the graph mapper object</li>
+<li><strong>buffer_manager</strong> &#8211; the buffer manager object</li>
+<li><strong>machine_time_step</strong> &#8211; the time step of the simulation</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A numpy array of 2-element arrays of (neuron_id, time)            ordered by time</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.AbstractSpikeRecordable.get_spikes_sampling_interval">
+<code class="descname">get_spikes_sampling_interval</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/abstract_spike_recordable.html#AbstractSpikeRecordable.get_spikes_sampling_interval"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.AbstractSpikeRecordable.get_spikes_sampling_interval" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the current sampling interval for spikes</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Sampling interval in micro seconds</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.AbstractSpikeRecordable.is_recording_spikes">
+<code class="descname">is_recording_spikes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/abstract_spike_recordable.html#AbstractSpikeRecordable.is_recording_spikes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.AbstractSpikeRecordable.is_recording_spikes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if spikes are being recorded</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if spikes are being recorded, False otherwise</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.AbstractSpikeRecordable.set_recording_spikes">
+<code class="descname">set_recording_spikes</code><span class="sig-paren">(</span><em>new_state=True</em>, <em>sampling_interval=None</em>, <em>indexes=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/abstract_spike_recordable.html#AbstractSpikeRecordable.set_recording_spikes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.AbstractSpikeRecordable.set_recording_spikes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set spikes to being recorded.             If new_state is false all other parameters are ignored.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>new_state</strong> (<em>bool</em>) &#8211; Set if the spikes are recording or not</li>
+<li><strong>sampling_interval</strong> &#8211; The interval at which spikes are recorded.            Must be a whole multiple of the timestep
+None will be taken as the timestep</li>
+<li><strong>indexes</strong> &#8211; The indexes of the neurons that will record spikes.
+If None the assumption is all neurons are recording</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="spynnaker.pyNN.models.common.EIEIOSpikeRecorder">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.common.</code><code class="descname">EIEIOSpikeRecorder</code><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/eieio_spike_recorder.html#EIEIOSpikeRecorder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.EIEIOSpikeRecorder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Records spikes using EIEIO format</p>
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.EIEIOSpikeRecorder.get_dtcm_usage_in_bytes">
+<code class="descname">get_dtcm_usage_in_bytes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/eieio_spike_recorder.html#EIEIOSpikeRecorder.get_dtcm_usage_in_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.EIEIOSpikeRecorder.get_dtcm_usage_in_bytes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.EIEIOSpikeRecorder.get_n_cpu_cycles">
+<code class="descname">get_n_cpu_cycles</code><span class="sig-paren">(</span><em>n_neurons</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/eieio_spike_recorder.html#EIEIOSpikeRecorder.get_n_cpu_cycles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.EIEIOSpikeRecorder.get_n_cpu_cycles" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.EIEIOSpikeRecorder.get_spikes">
+<code class="descname">get_spikes</code><span class="sig-paren">(</span><em>label</em>, <em>buffer_manager</em>, <em>region</em>, <em>placements</em>, <em>graph_mapper</em>, <em>application_vertex</em>, <em>base_key_function</em>, <em>machine_time_step</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/eieio_spike_recorder.html#EIEIOSpikeRecorder.get_spikes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.EIEIOSpikeRecorder.get_spikes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.common.EIEIOSpikeRecorder.record">
+<code class="descname">record</code><a class="headerlink" href="#spynnaker.pyNN.models.common.EIEIOSpikeRecorder.record" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.EIEIOSpikeRecorder.set_recording">
+<code class="descname">set_recording</code><span class="sig-paren">(</span><em>new_state</em>, <em>sampling_interval=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/eieio_spike_recorder.html#EIEIOSpikeRecorder.set_recording"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.EIEIOSpikeRecorder.set_recording" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="spynnaker.pyNN.models.common.NeuronRecorder">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.common.</code><code class="descname">NeuronRecorder</code><span class="sig-paren">(</span><em>allowed_variables</em>, <em>data_types</em>, <em>bitfield_variables</em>, <em>n_neurons</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.common.NeuronRecorder.MAX_RATE">
+<code class="descname">MAX_RATE</code><em class="property"> = 4294967295</em><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.MAX_RATE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.common.NeuronRecorder.N_BYTES_FOR_TIMESTAMP">
+<code class="descname">N_BYTES_FOR_TIMESTAMP</code><em class="property"> = 4</em><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.N_BYTES_FOR_TIMESTAMP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.common.NeuronRecorder.N_BYTES_PER_COUNT">
+<code class="descname">N_BYTES_PER_COUNT</code><em class="property"> = 4</em><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.N_BYTES_PER_COUNT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.common.NeuronRecorder.N_BYTES_PER_ENUM">
+<code class="descname">N_BYTES_PER_ENUM</code><em class="property"> = 4</em><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.N_BYTES_PER_ENUM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.common.NeuronRecorder.N_BYTES_PER_INCREMENT">
+<code class="descname">N_BYTES_PER_INCREMENT</code><em class="property"> = 4</em><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.N_BYTES_PER_INCREMENT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.common.NeuronRecorder.N_BYTES_PER_INDEX">
+<code class="descname">N_BYTES_PER_INDEX</code><em class="property"> = 1</em><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.N_BYTES_PER_INDEX" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.common.NeuronRecorder.N_BYTES_PER_OUTSTANDING_RECORDING">
+<code class="descname">N_BYTES_PER_OUTSTANDING_RECORDING</code><em class="property"> = 4</em><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.N_BYTES_PER_OUTSTANDING_RECORDING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.common.NeuronRecorder.N_BYTES_PER_POINTER">
+<code class="descname">N_BYTES_PER_POINTER</code><em class="property"> = 4</em><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.N_BYTES_PER_POINTER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.common.NeuronRecorder.N_BYTES_PER_RATE">
+<code class="descname">N_BYTES_PER_RATE</code><em class="property"> = 4</em><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.N_BYTES_PER_RATE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.common.NeuronRecorder.N_BYTES_PER_SIZE">
+<code class="descname">N_BYTES_PER_SIZE</code><em class="property"> = 4</em><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.N_BYTES_PER_SIZE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.common.NeuronRecorder.N_CPU_CYCLES_PER_NEURON">
+<code class="descname">N_CPU_CYCLES_PER_NEURON</code><em class="property"> = 8</em><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.N_CPU_CYCLES_PER_NEURON" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.common.NeuronRecorder.N_ITEM_TYPES">
+<code class="descname">N_ITEM_TYPES</code><em class="property"> = 2</em><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.N_ITEM_TYPES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.common.NeuronRecorder.SARK_BLOCK_SIZE">
+<code class="descname">SARK_BLOCK_SIZE</code><em class="property"> = 8</em><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.SARK_BLOCK_SIZE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.common.NeuronRecorder.SPIKES">
+<code class="descname">SPIKES</code><em class="property"> = 'spikes'</em><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.SPIKES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.NeuronRecorder.check_indexes">
+<code class="descname">check_indexes</code><span class="sig-paren">(</span><em>indexes</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.check_indexes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.check_indexes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="spynnaker.pyNN.models.common.NeuronRecorder.expected_rows_for_a_run_time">
+<em class="property">static </em><code class="descname">expected_rows_for_a_run_time</code><span class="sig-paren">(</span><em>n_machine_time_steps</em>, <em>sampling_rate</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.expected_rows_for_a_run_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.expected_rows_for_a_run_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>determines how many rows to see based off how long its ran for</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>n_machine_time_steps</strong> &#8211; map of vertex to time steps</li>
+<li><strong>sampling_rate</strong> &#8211; the sampling rate for a given variable</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">how many rows there should be.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.NeuronRecorder.get_buffered_sdram">
+<code class="descname">get_buffered_sdram</code><span class="sig-paren">(</span><em>variable</em>, <em>vertex_slice</em>, <em>n_machine_time_steps</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.get_buffered_sdram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.get_buffered_sdram" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the SDRAM used for this may time steps</p>
+<p>If required the total is rounded up so the space will always fit</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>variable</strong> &#8211; The variable to get buffered sdram of</li>
+<li><strong>vertex_slice</strong> &#8211; vertex slice</li>
+<li><strong>n_machine_time_steps</strong> &#8211; how many machine time steps to run for</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">data size</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.NeuronRecorder.get_buffered_sdram_per_record">
+<code class="descname">get_buffered_sdram_per_record</code><span class="sig-paren">(</span><em>variable</em>, <em>vertex_slice</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.get_buffered_sdram_per_record"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.get_buffered_sdram_per_record" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the SDRAM used per record</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>variable</strong> &#8211; </li>
+<li><strong>vertex_slice</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.NeuronRecorder.get_dtcm_usage_in_bytes">
+<code class="descname">get_dtcm_usage_in_bytes</code><span class="sig-paren">(</span><em>vertex_slice</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.get_dtcm_usage_in_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.get_dtcm_usage_in_bytes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.NeuronRecorder.get_matrix_data">
+<code class="descname">get_matrix_data</code><span class="sig-paren">(</span><em>label</em>, <em>buffer_manager</em>, <em>region</em>, <em>placements</em>, <em>graph_mapper</em>, <em>application_vertex</em>, <em>variable</em>, <em>n_machine_time_steps</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.get_matrix_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.get_matrix_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a uint32 mapped to time and neuron IDs from the SpiNNaker            machine and converts to required data types with scaling if needed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>label</strong> &#8211; vertex label</li>
+<li><strong>buffer_manager</strong> &#8211; the manager for buffered data</li>
+<li><strong>region</strong> &#8211; the DSG region ID used for this data</li>
+<li><strong>placements</strong> &#8211; the placements object</li>
+<li><strong>graph_mapper</strong> &#8211; the mapping between application and machine vertices</li>
+<li><strong>application_vertex</strong> &#8211; </li>
+<li><strong>variable</strong> (<em>str</em>) &#8211; PyNN name for the variable (V, gsy_inh etc.)</li>
+<li><strong>n_machine_time_steps</strong> &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.NeuronRecorder.get_n_cpu_cycles">
+<code class="descname">get_n_cpu_cycles</code><span class="sig-paren">(</span><em>n_neurons</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.get_n_cpu_cycles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.get_n_cpu_cycles" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.NeuronRecorder.get_neuron_sampling_interval">
+<code class="descname">get_neuron_sampling_interval</code><span class="sig-paren">(</span><em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.get_neuron_sampling_interval"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.get_neuron_sampling_interval" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the current sampling interval for this variable</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> &#8211; PyNN name of the variable</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Sampling interval in micro seconds</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.NeuronRecorder.get_recordable_variables">
+<code class="descname">get_recordable_variables</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.get_recordable_variables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.get_recordable_variables" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.NeuronRecorder.get_sampling_overflow_sdram">
+<code class="descname">get_sampling_overflow_sdram</code><span class="sig-paren">(</span><em>vertex_slice</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.get_sampling_overflow_sdram"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.get_sampling_overflow_sdram" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the extra SDRAM that should be reserved if using per_timestep</p>
+<p>This is the extra that must be reserved if per_timestep is an average        rather than fixed for every timestep.</p>
+<p>When sampling the average * time_steps may not be quite enough.        This returns the extra space in the worst case        where time_steps is a multiple of sampling rate + 1,        and recording is done in the first and last time_step</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>vertex_slice</strong> &#8211; </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Highest possible overflow needed</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.NeuronRecorder.get_sdram_usage_in_bytes">
+<code class="descname">get_sdram_usage_in_bytes</code><span class="sig-paren">(</span><em>vertex_slice</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.get_sdram_usage_in_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.get_sdram_usage_in_bytes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.NeuronRecorder.get_spikes">
+<code class="descname">get_spikes</code><span class="sig-paren">(</span><em>label</em>, <em>buffer_manager</em>, <em>region</em>, <em>placements</em>, <em>graph_mapper</em>, <em>application_vertex</em>, <em>variable</em>, <em>machine_time_step</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.get_spikes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.get_spikes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.NeuronRecorder.get_static_sdram_usage">
+<code class="descname">get_static_sdram_usage</code><span class="sig-paren">(</span><em>vertex_slice</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.get_static_sdram_usage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.get_static_sdram_usage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.NeuronRecorder.get_variable_sdram_usage">
+<code class="descname">get_variable_sdram_usage</code><span class="sig-paren">(</span><em>vertex_slice</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.get_variable_sdram_usage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.get_variable_sdram_usage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.NeuronRecorder.is_recording">
+<code class="descname">is_recording</code><span class="sig-paren">(</span><em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.is_recording"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.is_recording" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.NeuronRecorder.recorded_ids_by_slice">
+<code class="descname">recorded_ids_by_slice</code><span class="sig-paren">(</span><em>vertex_slice</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.recorded_ids_by_slice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.recorded_ids_by_slice" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.common.NeuronRecorder.recorded_region_ids">
+<code class="descname">recorded_region_ids</code><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.recorded_region_ids" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.common.NeuronRecorder.recording_variables">
+<code class="descname">recording_variables</code><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.recording_variables" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.NeuronRecorder.set_recording">
+<code class="descname">set_recording</code><span class="sig-paren">(</span><em>variable</em>, <em>new_state</em>, <em>sampling_interval=None</em>, <em>indexes=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.set_recording"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.set_recording" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.NeuronRecorder.write_neuron_recording_region">
+<code class="descname">write_neuron_recording_region</code><span class="sig-paren">(</span><em>spec</em>, <em>neuron_recording_region</em>, <em>vertex_slice</em>, <em>data_n_time_steps</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/neuron_recorder.html#NeuronRecorder.write_neuron_recording_region"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.NeuronRecorder.write_neuron_recording_region" title="Permalink to this definition">¶</a></dt>
+<dd><p>recording data specification</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>spec</strong> &#8211; dsg spec</li>
+<li><strong>neuron_recording_region</strong> &#8211; the recording region</li>
+<li><strong>vertex_slice</strong> &#8211; the vertex slice</li>
+<li><strong>data_n_time_steps</strong> &#8211; how many time steps to run this time</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="spynnaker.pyNN.models.common.MultiSpikeRecorder">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.common.</code><code class="descname">MultiSpikeRecorder</code><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/multi_spike_recorder.html#MultiSpikeRecorder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.MultiSpikeRecorder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.MultiSpikeRecorder.get_dtcm_usage_in_bytes">
+<code class="descname">get_dtcm_usage_in_bytes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/multi_spike_recorder.html#MultiSpikeRecorder.get_dtcm_usage_in_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.MultiSpikeRecorder.get_dtcm_usage_in_bytes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.MultiSpikeRecorder.get_n_cpu_cycles">
+<code class="descname">get_n_cpu_cycles</code><span class="sig-paren">(</span><em>n_neurons</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/multi_spike_recorder.html#MultiSpikeRecorder.get_n_cpu_cycles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.MultiSpikeRecorder.get_n_cpu_cycles" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.MultiSpikeRecorder.get_sdram_usage_in_bytes">
+<code class="descname">get_sdram_usage_in_bytes</code><span class="sig-paren">(</span><em>n_neurons</em>, <em>spikes_per_timestep</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/multi_spike_recorder.html#MultiSpikeRecorder.get_sdram_usage_in_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.MultiSpikeRecorder.get_sdram_usage_in_bytes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.MultiSpikeRecorder.get_spikes">
+<code class="descname">get_spikes</code><span class="sig-paren">(</span><em>label</em>, <em>buffer_manager</em>, <em>region</em>, <em>placements</em>, <em>graph_mapper</em>, <em>application_vertex</em>, <em>machine_time_step</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/multi_spike_recorder.html#MultiSpikeRecorder.get_spikes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.MultiSpikeRecorder.get_spikes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.common.MultiSpikeRecorder.record">
+<code class="descname">record</code><a class="headerlink" href="#spynnaker.pyNN.models.common.MultiSpikeRecorder.record" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="spynnaker.pyNN.models.common.SimplePopulationSettable">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.common.</code><code class="descname">SimplePopulationSettable</code><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/simple_population_settable.html#SimplePopulationSettable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.SimplePopulationSettable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.abstract_population_settable.AbstractPopulationSettable" title="spynnaker.pyNN.models.abstract_models.abstract_population_settable.AbstractPopulationSettable"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.abstract_models.abstract_population_settable.AbstractPopulationSettable</span></code></a></p>
+<p>An object all of whose properties can be accessed from a PyNN        Population i.e. no properties are hidden</p>
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.SimplePopulationSettable.get_value">
+<code class="descname">get_value</code><span class="sig-paren">(</span><em>key</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/simple_population_settable.html#SimplePopulationSettable.get_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.SimplePopulationSettable.get_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a property</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>key</strong> (<em>str</em>) &#8211; the name of the property</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">Any or float or int or list(float) or list(int)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.common.SimplePopulationSettable.set_value">
+<code class="descname">set_value</code><span class="sig-paren">(</span><em>key</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/simple_population_settable.html#SimplePopulationSettable.set_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.SimplePopulationSettable.set_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set a property</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>key</strong> (<em>str</em>) &#8211; the name of the parameter to change</li>
+<li><strong>value</strong> (<em>Any</em><em> or </em><em>float</em><em> or </em><em>int</em><em> or </em><em>list</em><em>(</em><em>float</em><em>) or </em><em>list</em><em>(</em><em>int</em><em>)</em><em></em>) &#8211; the new value of the parameter to assign</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="spynnaker.pyNN.models.common.get_buffer_sizes">
+<code class="descclassname">spynnaker.pyNN.models.common.</code><code class="descname">get_buffer_sizes</code><span class="sig-paren">(</span><em>buffer_max</em>, <em>space_needed</em>, <em>enable_buffered_recording</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/recording_utils.html#get_buffer_sizes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.get_buffer_sizes" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>buffer_max</strong> (<em>int</em>) &#8211; </li>
+<li><strong>space_needed</strong> (<em>int</em>) &#8211; </li>
+<li><strong>enable_buffered_recording</strong> (<em>bool</em>) &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">int</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="spynnaker.pyNN.models.common.get_data">
+<code class="descclassname">spynnaker.pyNN.models.common.</code><code class="descname">get_data</code><span class="sig-paren">(</span><em>transceiver</em>, <em>placement</em>, <em>region</em>, <em>region_size</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/recording_utils.html#get_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.get_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the recorded data from a region.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>transceiver</strong> (<a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman/#spinnman.transceiver.Transceiver" title="(in SpiNNMan v)"><em>Transceiver</em></a>) &#8211; </li>
+<li><strong>placement</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placement" title="(in PACMAN v)"><em>Placement</em></a>) &#8211; </li>
+<li><strong>region</strong> (<em>int</em>) &#8211; </li>
+<li><strong>region_size</strong> (<em>int</em>) &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">tuple(bytearray, int)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="spynnaker.pyNN.models.common.needs_buffering">
+<code class="descclassname">spynnaker.pyNN.models.common.</code><code class="descname">needs_buffering</code><span class="sig-paren">(</span><em>buffer_max</em>, <em>space_needed</em>, <em>enable_buffered_recording</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/recording_utils.html#needs_buffering"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.needs_buffering" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>buffer_max</strong> (<em>int</em>) &#8211; </li>
+<li><strong>space_needed</strong> (<em>int</em>) &#8211; </li>
+<li><strong>enable_buffered_recording</strong> (<em>bool</em>) &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">bool</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="spynnaker.pyNN.models.common.get_recording_region_size_in_bytes">
+<code class="descclassname">spynnaker.pyNN.models.common.</code><code class="descname">get_recording_region_size_in_bytes</code><span class="sig-paren">(</span><em>n_machine_time_steps</em>, <em>bytes_per_timestep</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/recording_utils.html#get_recording_region_size_in_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.get_recording_region_size_in_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the size of a recording region in bytes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>n_machine_time_steps</strong> (<em>int</em>) &#8211; </li>
+<li><strong>bytes_per_timestep</strong> (<em>int</em>) &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">int</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="spynnaker.pyNN.models.common.pull_off_cached_lists">
+<code class="descclassname">spynnaker.pyNN.models.common.</code><code class="descname">pull_off_cached_lists</code><span class="sig-paren">(</span><em>no_loads</em>, <em>cache_file</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/common/recording_utils.html#pull_off_cached_lists"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.common.pull_off_cached_lists" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts numpy based data from a file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>no_loads</strong> (<em>int</em>) &#8211; the number of numpy elements in the file</li>
+<li><strong>cache_file</strong> (<em>FileIO</em>) &#8211; the file to extract from</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The extracted data</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">ndarray</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="spynnaker.pyNN.models.neural_projections.html" title="spynnaker.pyNN.models.neural_projections package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="spynnaker.pyNN.models.abstract_models.html" title="spynnaker.pyNN.models.abstract_models package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.models.html" >spynnaker.pyNN.models package</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+    </div>
+  </body>
+</html>

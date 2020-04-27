@@ -1,0 +1,266 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>spynnaker.pyNN.models.neuron.population_machine_vertex &#8212; sPyNNaker  documentation</title>
+    
+    <link rel="stylesheet" href="../../../../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">sPyNNaker  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for spynnaker.pyNN.models.neuron.population_machine_vertex</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2017-2019 The University of Manchester</span>
+<span class="c1">#</span>
+<span class="c1"># This program is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+
+<span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
+<span class="kn">from</span> <span class="nn">pacman.model.graphs.machine</span> <span class="kn">import</span> <span class="n">MachineVertex</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.utility_objs</span> <span class="kn">import</span> <span class="n">ProvenanceDataItem</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.provenance</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ProvidesProvenanceDataFromMachineImpl</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.buffer_management.buffer_models</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AbstractReceiveBuffersToHost</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.helpful_functions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">locate_memory_region_for_placement</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models</span> <span class="kn">import</span> <span class="n">AbstractRecordable</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.profiling</span> <span class="kn">import</span> <span class="n">AbstractHasProfileData</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.profiling.profile_utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">get_profiling_data</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.constants</span> <span class="kn">import</span> <span class="n">POPULATION_BASED_REGIONS</span>
+
+
+<div class="viewcode-block" id="PopulationMachineVertex"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.population_machine_vertex.PopulationMachineVertex">[docs]</a><span class="k">class</span> <span class="nc">PopulationMachineVertex</span><span class="p">(</span>
+        <span class="n">MachineVertex</span><span class="p">,</span> <span class="n">AbstractReceiveBuffersToHost</span><span class="p">,</span>
+        <span class="n">ProvidesProvenanceDataFromMachineImpl</span><span class="p">,</span> <span class="n">AbstractRecordable</span><span class="p">,</span>
+        <span class="n">AbstractHasProfileData</span><span class="p">):</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;__recorded_region_ids&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__resources&quot;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="PopulationMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.population_machine_vertex.PopulationMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES">[docs]</a>    <span class="k">class</span> <span class="nc">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Entries for the provenance data generated by standard neuron \</span>
+<span class="sd">            models.&quot;&quot;&quot;</span>
+        <span class="n">PRE_SYNAPTIC_EVENT_COUNT</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">SATURATION_COUNT</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="n">BUFFER_OVERFLOW_COUNT</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="n">CURRENT_TIMER_TIC</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="n">PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT</span> <span class="o">=</span> <span class="mi">4</span>
+        <span class="n">N_REWIRES</span> <span class="o">=</span> <span class="mi">5</span></div>
+
+    <span class="n">PROFILE_TAG_LABELS</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="mi">0</span><span class="p">:</span> <span class="s2">&quot;TIMER&quot;</span><span class="p">,</span>
+        <span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;DMA_READ&quot;</span><span class="p">,</span>
+        <span class="mi">2</span><span class="p">:</span> <span class="s2">&quot;INCOMING_SPIKE&quot;</span><span class="p">,</span>
+        <span class="mi">3</span><span class="p">:</span> <span class="s2">&quot;PROCESS_FIXED_SYNAPSES&quot;</span><span class="p">,</span>
+        <span class="mi">4</span><span class="p">:</span> <span class="s2">&quot;PROCESS_PLASTIC_SYNAPSES&quot;</span><span class="p">}</span>
+
+    <span class="n">N_ADDITIONAL_PROVENANCE_DATA_ITEMS</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">resources_required</span><span class="p">,</span> <span class="n">recorded_region_ids</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param resources_required:</span>
+<span class="sd">        :param recorded_region_ids:</span>
+<span class="sd">        :param label:</span>
+<span class="sd">        :param constraints:</span>
+<span class="sd">        :type sampling: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">MachineVertex</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="p">)</span>
+        <span class="n">AbstractRecordable</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__recorded_region_ids</span> <span class="o">=</span> <span class="n">recorded_region_ids</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__resources</span> <span class="o">=</span> <span class="n">resources_required</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">MachineVertex</span><span class="o">.</span><span class="n">resources_required</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">resources_required</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__resources</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">ProvidesProvenanceDataFromMachineImpl</span><span class="o">.</span><span class="n">_provenance_region_id</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_provenance_region_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">PROVENANCE_DATA</span><span class="o">.</span><span class="n">value</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">ProvidesProvenanceDataFromMachineImpl</span><span class="o">.</span><span class="n">_n_additional_data_items</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_n_additional_data_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">N_ADDITIONAL_PROVENANCE_DATA_ITEMS</span>
+
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractRecordable</span><span class="o">.</span><span class="n">is_recording</span><span class="p">)</span>
+<div class="viewcode-block" id="PopulationMachineVertex.is_recording"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.population_machine_vertex.PopulationMachineVertex.is_recording">[docs]</a>    <span class="k">def</span> <span class="nf">is_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__recorded_region_ids</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span></div>
+
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">ProvidesProvenanceDataFromMachineImpl</span><span class="o">.</span>
+               <span class="n">get_provenance_data_from_machine</span><span class="p">)</span>
+<div class="viewcode-block" id="PopulationMachineVertex.get_provenance_data_from_machine"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.population_machine_vertex.PopulationMachineVertex.get_provenance_data_from_machine">[docs]</a>    <span class="k">def</span> <span class="nf">get_provenance_data_from_machine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
+        <span class="n">provenance_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_provenance_data</span><span class="p">(</span><span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">)</span>
+        <span class="n">provenance_items</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_basic_provenance_items</span><span class="p">(</span>
+            <span class="n">provenance_data</span><span class="p">,</span> <span class="n">placement</span><span class="p">)</span>
+        <span class="n">provenance_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_remaining_provenance_data_items</span><span class="p">(</span>
+            <span class="n">provenance_data</span><span class="p">)</span>
+
+        <span class="n">n_saturations</span> <span class="o">=</span> <span class="n">provenance_data</span><span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="o">.</span><span class="n">SATURATION_COUNT</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
+        <span class="n">n_buffer_overflows</span> <span class="o">=</span> <span class="n">provenance_data</span><span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="o">.</span><span class="n">BUFFER_OVERFLOW_COUNT</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
+        <span class="n">n_pre_synaptic_events</span> <span class="o">=</span> <span class="n">provenance_data</span><span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="o">.</span><span class="n">PRE_SYNAPTIC_EVENT_COUNT</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
+        <span class="n">last_timer_tick</span> <span class="o">=</span> <span class="n">provenance_data</span><span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="o">.</span><span class="n">CURRENT_TIMER_TIC</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
+        <span class="n">n_plastic_saturations</span> <span class="o">=</span> <span class="n">provenance_data</span><span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="o">.</span>
+            <span class="n">PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
+        <span class="n">n_rewires</span> <span class="o">=</span> <span class="n">provenance_data</span><span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="o">.</span><span class="n">N_REWIRES</span><span class="o">.</span><span class="n">value</span><span class="p">]</span>
+
+        <span class="n">label</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_placement_details</span><span class="p">(</span><span class="n">placement</span><span class="p">)</span>
+
+        <span class="c1"># translate into provenance data items</span>
+        <span class="n">provenance_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ProvenanceDataItem</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_add_name</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="s2">&quot;Times_synaptic_weights_have_saturated&quot;</span><span class="p">),</span>
+            <span class="n">n_saturations</span><span class="p">,</span>
+            <span class="n">report</span><span class="o">=</span><span class="n">n_saturations</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="n">message</span><span class="o">=</span><span class="p">(</span>
+                <span class="s2">&quot;The weights from the synapses for </span><span class="si">{}</span><span class="s2"> on </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2"> saturated &quot;</span>
+                <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> times. If this causes issues you can increase the &quot;</span>
+                <span class="s2">&quot;spikes_per_second and / or ring_buffer_sigma &quot;</span>
+                <span class="s2">&quot;values located within the .spynnaker.cfg file.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">label</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">n_saturations</span><span class="p">))))</span>
+        <span class="n">provenance_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ProvenanceDataItem</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_add_name</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="s2">&quot;Times_the_input_buffer_lost_packets&quot;</span><span class="p">),</span>
+            <span class="n">n_buffer_overflows</span><span class="p">,</span>
+            <span class="n">report</span><span class="o">=</span><span class="n">n_buffer_overflows</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="n">message</span><span class="o">=</span><span class="p">(</span>
+                <span class="s2">&quot;The input buffer for </span><span class="si">{}</span><span class="s2"> on </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2"> lost packets on </span><span class="si">{}</span><span class="s2"> &quot;</span>
+                <span class="s2">&quot;occasions. This is often a sign that the system is running &quot;</span>
+                <span class="s2">&quot;too quickly for the number of neurons per core.  Please &quot;</span>
+                <span class="s2">&quot;increase the timer_tic or time_scale_factor or decrease the &quot;</span>
+                <span class="s2">&quot;number of neurons per core.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">label</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">n_buffer_overflows</span><span class="p">))))</span>
+        <span class="n">provenance_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ProvenanceDataItem</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_add_name</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="s2">&quot;Total_pre_synaptic_events&quot;</span><span class="p">),</span>
+            <span class="n">n_pre_synaptic_events</span><span class="p">))</span>
+        <span class="n">provenance_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ProvenanceDataItem</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_add_name</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="s2">&quot;Last_timer_tic_the_core_ran_to&quot;</span><span class="p">),</span>
+            <span class="n">last_timer_tick</span><span class="p">))</span>
+        <span class="n">provenance_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ProvenanceDataItem</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_add_name</span><span class="p">(</span><span class="n">names</span><span class="p">,</span>
+                           <span class="s2">&quot;Times_plastic_synaptic_weights_have_saturated&quot;</span><span class="p">),</span>
+            <span class="n">n_plastic_saturations</span><span class="p">,</span>
+            <span class="n">report</span><span class="o">=</span><span class="n">n_plastic_saturations</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="n">message</span><span class="o">=</span><span class="p">(</span>
+                <span class="s2">&quot;The weights from the plastic synapses for </span><span class="si">{}</span><span class="s2"> on </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2"> &quot;</span>
+                <span class="s2">&quot;saturated </span><span class="si">{}</span><span class="s2"> times. If this causes issue increase the &quot;</span>
+                <span class="s2">&quot;spikes_per_second and / or ring_buffer_sigma values located &quot;</span>
+                <span class="s2">&quot;within the .spynnaker.cfg file.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">label</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">n_plastic_saturations</span><span class="p">))))</span>
+        <span class="n">provenance_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ProvenanceDataItem</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_add_name</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="s2">&quot;Number_of_rewires&quot;</span><span class="p">),</span>
+            <span class="n">n_rewires</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">provenance_items</span></div>
+
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractReceiveBuffersToHost</span><span class="o">.</span><span class="n">get_recorded_region_ids</span><span class="p">)</span>
+<div class="viewcode-block" id="PopulationMachineVertex.get_recorded_region_ids"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.population_machine_vertex.PopulationMachineVertex.get_recorded_region_ids">[docs]</a>    <span class="k">def</span> <span class="nf">get_recorded_region_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__recorded_region_ids</span></div>
+
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractReceiveBuffersToHost</span><span class="o">.</span><span class="n">get_recording_region_base_address</span><span class="p">)</span>
+<div class="viewcode-block" id="PopulationMachineVertex.get_recording_region_base_address"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.population_machine_vertex.PopulationMachineVertex.get_recording_region_base_address">[docs]</a>    <span class="k">def</span> <span class="nf">get_recording_region_base_address</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">txrx</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">locate_memory_region_for_placement</span><span class="p">(</span>
+            <span class="n">placement</span><span class="p">,</span> <span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">NEURON_RECORDING</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">txrx</span><span class="p">)</span></div>
+
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractHasProfileData</span><span class="o">.</span><span class="n">get_profile_data</span><span class="p">)</span>
+<div class="viewcode-block" id="PopulationMachineVertex.get_profile_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.population_machine_vertex.PopulationMachineVertex.get_profile_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_profile_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">get_profiling_data</span><span class="p">(</span>
+            <span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">PROFILING</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">PROFILE_TAG_LABELS</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">sPyNNaker  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+    </div>
+  </body>
+</html>

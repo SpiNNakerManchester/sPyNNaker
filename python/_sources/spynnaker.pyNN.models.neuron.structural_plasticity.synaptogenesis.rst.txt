@@ -1,0 +1,19 @@
+spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis package
+=========================================================================
+
+Subpackages
+-----------
+
+.. toctree::
+
+    spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination
+    spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.formation
+    spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.partner_selection
+
+Module contents
+---------------
+
+.. automodule:: spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis
+    :members:
+    :undoc-members:
+    :show-inheritance:

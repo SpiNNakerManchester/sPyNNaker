@@ -1,0 +1,22 @@
+spynnaker.pyNN.models.utility_models.synapse_expander package
+=============================================================
+
+Submodules
+----------
+
+spynnaker.pyNN.models.utility_models.synapse_expander.synapse_expander module
+-----------------------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.utility_models.synapse_expander.synapse_expander
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: spynnaker.pyNN.models.utility_models.synapse_expander
+    :members:
+    :undoc-members:
+    :show-inheritance:

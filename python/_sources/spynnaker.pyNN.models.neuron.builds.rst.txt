@@ -1,0 +1,126 @@
+spynnaker.pyNN.models.neuron.builds package
+===========================================
+
+Submodules
+----------
+
+spynnaker.pyNN.models.neuron.builds.eif_cond_alpha_isfa_ista module
+-------------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neuron.builds.eif_cond_alpha_isfa_ista
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.models.neuron.builds.hh_cond_exp module
+------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neuron.builds.hh_cond_exp
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.models.neuron.builds.if_cond_alpha module
+--------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neuron.builds.if_cond_alpha
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.models.neuron.builds.if_cond_exp_base module
+-----------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neuron.builds.if_cond_exp_base
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.models.neuron.builds.if_cond_exp_stoc module
+-----------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neuron.builds.if_cond_exp_stoc
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.models.neuron.builds.if_curr_alpha module
+--------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neuron.builds.if_curr_alpha
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.models.neuron.builds.if_curr_delta module
+--------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neuron.builds.if_curr_delta
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.models.neuron.builds.if_curr_dual_exp_base module
+----------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neuron.builds.if_curr_dual_exp_base
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.models.neuron.builds.if_curr_exp_base module
+-----------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neuron.builds.if_curr_exp_base
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.models.neuron.builds.if_curr_exp_ca2_adaptive module
+-------------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neuron.builds.if_curr_exp_ca2_adaptive
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.models.neuron.builds.if_curr_exp_semd_base module
+----------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neuron.builds.if_curr_exp_semd_base
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.models.neuron.builds.if_facets_hardware1 module
+--------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neuron.builds.if_facets_hardware1
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.models.neuron.builds.izk_cond_exp_base module
+------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neuron.builds.izk_cond_exp_base
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.models.neuron.builds.izk_curr_exp_base module
+------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neuron.builds.izk_curr_exp_base
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: spynnaker.pyNN.models.neuron.builds
+    :members:
+    :undoc-members:
+    :show-inheritance:

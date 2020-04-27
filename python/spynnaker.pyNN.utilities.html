@@ -1,0 +1,895 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>spynnaker.pyNN.utilities package &#8212; sPyNNaker  documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="spynnaker.pyNN.utilities.random_stats package" href="spynnaker.pyNN.utilities.random_stats.html" />
+    <link rel="prev" title="spynnaker.pyNN.protocols package" href="spynnaker.pyNN.protocols.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="spynnaker.pyNN.utilities.random_stats.html" title="spynnaker.pyNN.utilities.random_stats package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="spynnaker.pyNN.protocols.html" title="spynnaker.pyNN.protocols package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="spynnaker.pyNN.html" accesskey="U">spynnaker.pyNN package</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">spynnaker.pyNN.utilities package</a><ul>
+<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.constants">spynnaker.pyNN.utilities.constants module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.extracted_data">spynnaker.pyNN.utilities.extracted_data module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.fake_HBP_Portal_machine_provider">spynnaker.pyNN.utilities.fake_HBP_Portal_machine_provider module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.reports">spynnaker.pyNN.utilities.reports module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.running_stats">spynnaker.pyNN.utilities.running_stats module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.spynnaker_connection_holder_generations">spynnaker.pyNN.utilities.spynnaker_connection_holder_generations module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.spynnaker_failed_state">spynnaker.pyNN.utilities.spynnaker_failed_state module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.spynnaker_neuron_network_specification_report">spynnaker.pyNN.utilities.spynnaker_neuron_network_specification_report module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.spynnaker_synaptic_matrix_report">spynnaker.pyNN.utilities.spynnaker_synaptic_matrix_report module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.struct">spynnaker.pyNN.utilities.struct module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.utility_calls">spynnaker.pyNN.utilities.utility_calls module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="spynnaker.pyNN.protocols.html"
+                        title="previous chapter">spynnaker.pyNN.protocols package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="spynnaker.pyNN.utilities.random_stats.html"
+                        title="next chapter">spynnaker.pyNN.utilities.random_stats package</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/spynnaker.pyNN.utilities.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="spynnaker-pynn-utilities-package">
+<h1>spynnaker.pyNN.utilities package<a class="headerlink" href="#spynnaker-pynn-utilities-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html">spynnaker.pyNN.utilities.random_stats package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#module-spynnaker.pyNN.utilities.random_stats.abstract_random_stats">spynnaker.pyNN.utilities.random_stats.abstract_random_stats module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#module-spynnaker.pyNN.utilities.random_stats.random_stats_binomial_impl">spynnaker.pyNN.utilities.random_stats.random_stats_binomial_impl module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#module-spynnaker.pyNN.utilities.random_stats.random_stats_exponential_impl">spynnaker.pyNN.utilities.random_stats.random_stats_exponential_impl module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#module-spynnaker.pyNN.utilities.random_stats.random_stats_gamma_impl">spynnaker.pyNN.utilities.random_stats.random_stats_gamma_impl module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#module-spynnaker.pyNN.utilities.random_stats.random_stats_log_normal_impl">spynnaker.pyNN.utilities.random_stats.random_stats_log_normal_impl module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#module-spynnaker.pyNN.utilities.random_stats.random_stats_normal_clipped_impl">spynnaker.pyNN.utilities.random_stats.random_stats_normal_clipped_impl module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#module-spynnaker.pyNN.utilities.random_stats.random_stats_normal_impl">spynnaker.pyNN.utilities.random_stats.random_stats_normal_impl module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#module-spynnaker.pyNN.utilities.random_stats.random_stats_poisson_impl">spynnaker.pyNN.utilities.random_stats.random_stats_poisson_impl module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#module-spynnaker.pyNN.utilities.random_stats.random_stats_randint_impl">spynnaker.pyNN.utilities.random_stats.random_stats_randint_impl module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#module-spynnaker.pyNN.utilities.random_stats.random_stats_scipy_impl">spynnaker.pyNN.utilities.random_stats.random_stats_scipy_impl module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#module-spynnaker.pyNN.utilities.random_stats.random_stats_uniform_impl">spynnaker.pyNN.utilities.random_stats.random_stats_uniform_impl module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#module-spynnaker.pyNN.utilities.random_stats.random_stats_vonmises_impl">spynnaker.pyNN.utilities.random_stats.random_stats_vonmises_impl module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.utilities.random_stats.html#module-spynnaker.pyNN.utilities.random_stats">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="spynnaker.pyNN.utilities.ranged.html">spynnaker.pyNN.utilities.ranged package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.utilities.ranged.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.utilities.ranged.html#module-spynnaker.pyNN.utilities.ranged.spynnaker_ranged_dict">spynnaker.pyNN.utilities.ranged.spynnaker_ranged_dict module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.utilities.ranged.html#module-spynnaker.pyNN.utilities.ranged.spynnaker_ranged_list">spynnaker.pyNN.utilities.ranged.spynnaker_ranged_list module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.utilities.ranged.html#module-spynnaker.pyNN.utilities.ranged">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-spynnaker.pyNN.utilities.constants">
+<span id="spynnaker-pynn-utilities-constants-module"></span><h2>spynnaker.pyNN.utilities.constants module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.constants" title="Permalink to this headline">¶</a></h2>
+<dl class="data">
+<dt id="spynnaker.pyNN.utilities.constants.LIVE_POISSON_CONTROL_PARTITION_ID">
+<code class="descclassname">spynnaker.pyNN.utilities.constants.</code><code class="descname">LIVE_POISSON_CONTROL_PARTITION_ID</code><em class="property"> = 'CONTROL'</em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.LIVE_POISSON_CONTROL_PARTITION_ID" title="Permalink to this definition">¶</a></dt>
+<dd><p>The partition ID used for Poisson live control data</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="spynnaker.pyNN.utilities.constants.MIN_SUPPORTED_DELAY">
+<code class="descclassname">spynnaker.pyNN.utilities.constants.</code><code class="descname">MIN_SUPPORTED_DELAY</code><em class="property"> = 1</em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.MIN_SUPPORTED_DELAY" title="Permalink to this definition">¶</a></dt>
+<dd><p>the minimum supported delay slot between two neurons</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="spynnaker.pyNN.utilities.constants.OUT_SPIKE_BYTES">
+<code class="descclassname">spynnaker.pyNN.utilities.constants.</code><code class="descname">OUT_SPIKE_BYTES</code><em class="property"> = 32</em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.OUT_SPIKE_BYTES" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of bytes for each spike line</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="spynnaker.pyNN.utilities.constants.OUT_SPIKE_SIZE">
+<code class="descclassname">spynnaker.pyNN.utilities.constants.</code><code class="descname">OUT_SPIKE_SIZE</code><em class="property"> = 8</em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.OUT_SPIKE_SIZE" title="Permalink to this definition">¶</a></dt>
+<dd><p>The size of each output spike line</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.utilities.constants.</code><code class="descname">POPULATION_BASED_REGIONS</code><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/constants.html#POPULATION_BASED_REGIONS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">enum.Enum</span></code></p>
+<p>Regions for populations.</p>
+<dl class="attribute">
+<dt id="spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.CONNECTOR_BUILDER">
+<code class="descname">CONNECTOR_BUILDER</code><em class="property"> = 9</em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.CONNECTOR_BUILDER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.DIRECT_MATRIX">
+<code class="descname">DIRECT_MATRIX</code><em class="property"> = 10</em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.DIRECT_MATRIX" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.NEURON_PARAMS">
+<code class="descname">NEURON_PARAMS</code><em class="property"> = 1</em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.NEURON_PARAMS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.NEURON_RECORDING">
+<code class="descname">NEURON_RECORDING</code><em class="property"> = 6</em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.NEURON_RECORDING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.POPULATION_TABLE">
+<code class="descname">POPULATION_TABLE</code><em class="property"> = 3</em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.POPULATION_TABLE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.PROFILING">
+<code class="descname">PROFILING</code><em class="property"> = 8</em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.PROFILING" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.PROVENANCE_DATA">
+<code class="descname">PROVENANCE_DATA</code><em class="property"> = 7</em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.PROVENANCE_DATA" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS">
+<code class="descname">SYNAPSE_DYNAMICS</code><em class="property"> = 5</em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.SYNAPSE_PARAMS">
+<code class="descname">SYNAPSE_PARAMS</code><em class="property"> = 2</em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.SYNAPSE_PARAMS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX">
+<code class="descname">SYNAPTIC_MATRIX</code><em class="property"> = 4</em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.SYSTEM">
+<code class="descname">SYSTEM</code><em class="property"> = 0</em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.SYSTEM" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="data">
+<dt id="spynnaker.pyNN.utilities.constants.SPIKE_PARTITION_ID">
+<code class="descclassname">spynnaker.pyNN.utilities.constants.</code><code class="descname">SPIKE_PARTITION_ID</code><em class="property"> = 'SPIKE'</em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.SPIKE_PARTITION_ID" title="Permalink to this definition">¶</a></dt>
+<dd><p>The partition ID used for spike data</p>
+</dd></dl>
+
+<dl class="data">
+<dt id="spynnaker.pyNN.utilities.constants.SYNAPTIC_ROW_HEADER_WORDS">
+<code class="descclassname">spynnaker.pyNN.utilities.constants.</code><code class="descname">SYNAPTIC_ROW_HEADER_WORDS</code><em class="property"> = 3</em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.SYNAPTIC_ROW_HEADER_WORDS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Words: 2 for row length and number of rows and 1 for plastic region size
+(which might be 0)</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-spynnaker.pyNN.utilities.extracted_data">
+<span id="spynnaker-pynn-utilities-extracted-data-module"></span><h2>spynnaker.pyNN.utilities.extracted_data module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.extracted_data" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="spynnaker.pyNN.utilities.extracted_data.ExtractedData">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.utilities.extracted_data.</code><code class="descname">ExtractedData</code><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/extracted_data.html#ExtractedData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.extracted_data.ExtractedData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Data holder for all synaptic data being extracted in parallel.</p>
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.extracted_data.ExtractedData.get">
+<code class="descname">get</code><span class="sig-paren">(</span><em>projection</em>, <em>attribute</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/extracted_data.html#ExtractedData.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.extracted_data.ExtractedData.get" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allow getting data from a given projection and attribute</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>projection</strong> (<a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.pynn_projection_common.PyNNProjectionCommon" title="spynnaker.pyNN.models.pynn_projection_common.PyNNProjectionCommon"><em>PyNNProjectionCommon</em></a>) &#8211; the projection data was extracted from</li>
+<li><strong>attribute</strong> (<em>list</em><em>(</em><em>int</em><em>) or </em><em>tuple</em><em>(</em><em>int</em><em>) or </em><em>None</em>) &#8211; the attribute to retrieve</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the attribute data in a connection holder</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.connection_holder.ConnectionHolder" title="spynnaker.pyNN.models.neuron.connection_holder.ConnectionHolder">ConnectionHolder</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.extracted_data.ExtractedData.set">
+<code class="descname">set</code><span class="sig-paren">(</span><em>projection</em>, <em>attribute</em>, <em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/extracted_data.html#ExtractedData.set"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.extracted_data.ExtractedData.set" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allow the addition of data from a projection and attribute.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>projection</strong> (<a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.pynn_projection_common.PyNNProjectionCommon" title="spynnaker.pyNN.models.pynn_projection_common.PyNNProjectionCommon"><em>PyNNProjectionCommon</em></a>) &#8211; the projection data was extracted from</li>
+<li><strong>attribute</strong> (<em>list</em><em>(</em><em>int</em><em>) or </em><em>tuple</em><em>(</em><em>int</em><em>) or </em><em>None</em>) &#8211; the attribute to store</li>
+<li><strong>data</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.connection_holder.ConnectionHolder" title="spynnaker.pyNN.models.neuron.connection_holder.ConnectionHolder"><em>ConnectionHolder</em></a>) &#8211; attribute data in a connection holder</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-spynnaker.pyNN.utilities.fake_HBP_Portal_machine_provider">
+<span id="spynnaker-pynn-utilities-fake-hbp-portal-machine-provider-module"></span><h2>spynnaker.pyNN.utilities.fake_HBP_Portal_machine_provider module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.fake_HBP_Portal_machine_provider" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="spynnaker.pyNN.utilities.fake_HBP_Portal_machine_provider.FakeHBPPortalMachineProvider">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.utilities.fake_HBP_Portal_machine_provider.</code><code class="descname">FakeHBPPortalMachineProvider</code><span class="sig-paren">(</span><em>n_boards</em>, <em>config</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/fake_HBP_Portal_machine_provider.html#FakeHBPPortalMachineProvider"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.fake_HBP_Portal_machine_provider.FakeHBPPortalMachineProvider" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.fake_HBP_Portal_machine_provider.FakeHBPPortalMachineProvider.create">
+<code class="descname">create</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/fake_HBP_Portal_machine_provider.html#FakeHBPPortalMachineProvider.create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.fake_HBP_Portal_machine_provider.FakeHBPPortalMachineProvider.create" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.fake_HBP_Portal_machine_provider.FakeHBPPortalMachineProvider.destroy">
+<code class="descname">destroy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/fake_HBP_Portal_machine_provider.html#FakeHBPPortalMachineProvider.destroy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.fake_HBP_Portal_machine_provider.FakeHBPPortalMachineProvider.destroy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.fake_HBP_Portal_machine_provider.FakeHBPPortalMachineProvider.get_machine_info">
+<code class="descname">get_machine_info</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/fake_HBP_Portal_machine_provider.html#FakeHBPPortalMachineProvider.get_machine_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.fake_HBP_Portal_machine_provider.FakeHBPPortalMachineProvider.get_machine_info" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.fake_HBP_Portal_machine_provider.FakeHBPPortalMachineProvider.wait_till_not_ready">
+<code class="descname">wait_till_not_ready</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/fake_HBP_Portal_machine_provider.html#FakeHBPPortalMachineProvider.wait_till_not_ready"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.fake_HBP_Portal_machine_provider.FakeHBPPortalMachineProvider.wait_till_not_ready" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.fake_HBP_Portal_machine_provider.FakeHBPPortalMachineProvider.wait_until_ready">
+<code class="descname">wait_until_ready</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/fake_HBP_Portal_machine_provider.html#FakeHBPPortalMachineProvider.wait_until_ready"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.fake_HBP_Portal_machine_provider.FakeHBPPortalMachineProvider.wait_until_ready" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-spynnaker.pyNN.utilities.reports">
+<span id="spynnaker-pynn-utilities-reports-module"></span><h2>spynnaker.pyNN.utilities.reports module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.reports" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-spynnaker.pyNN.utilities.running_stats">
+<span id="spynnaker-pynn-utilities-running-stats-module"></span><h2>spynnaker.pyNN.utilities.running_stats module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.running_stats" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="spynnaker.pyNN.utilities.running_stats.RunningStats">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.utilities.running_stats.</code><code class="descname">RunningStats</code><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/running_stats.html#RunningStats"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.running_stats.RunningStats" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Keeps running statistics.
+From: <a class="reference external" href="http://www.johndcook.com/blog/skewness_kurtosis/">http://www.johndcook.com/blog/skewness_kurtosis/</a></p>
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.running_stats.RunningStats.add_item">
+<code class="descname">add_item</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/running_stats.html#RunningStats.add_item"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.running_stats.RunningStats.add_item" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds an item to the running statistics.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>x</strong> (<em>int</em><em> or </em><em>float</em>) &#8211; The item to add</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.running_stats.RunningStats.add_items">
+<code class="descname">add_items</code><span class="sig-paren">(</span><em>mean</em>, <em>variance</em>, <em>n_items</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/running_stats.html#RunningStats.add_items"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.running_stats.RunningStats.add_items" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a bunch of items (via their statistics).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>mean</strong> (<em>float</em>) &#8211; The mean of the items to add.</li>
+<li><strong>variance</strong> (<em>float</em>) &#8211; The variance of the items to add.</li>
+<li><strong>n_items</strong> (<em>int</em>) &#8211; The number of items represented.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.utilities.running_stats.RunningStats.mean">
+<code class="descname">mean</code><a class="headerlink" href="#spynnaker.pyNN.utilities.running_stats.RunningStats.mean" title="Permalink to this definition">¶</a></dt>
+<dd><p>The mean of the items seen.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.utilities.running_stats.RunningStats.n_items">
+<code class="descname">n_items</code><a class="headerlink" href="#spynnaker.pyNN.utilities.running_stats.RunningStats.n_items" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of items seen.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.utilities.running_stats.RunningStats.standard_deviation">
+<code class="descname">standard_deviation</code><a class="headerlink" href="#spynnaker.pyNN.utilities.running_stats.RunningStats.standard_deviation" title="Permalink to this definition">¶</a></dt>
+<dd><p>The population standard deviation of the items seen.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.utilities.running_stats.RunningStats.variance">
+<code class="descname">variance</code><a class="headerlink" href="#spynnaker.pyNN.utilities.running_stats.RunningStats.variance" title="Permalink to this definition">¶</a></dt>
+<dd><p>The variance of the items seen.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-spynnaker.pyNN.utilities.spynnaker_connection_holder_generations">
+<span id="spynnaker-pynn-utilities-spynnaker-connection-holder-generations-module"></span><h2>spynnaker.pyNN.utilities.spynnaker_connection_holder_generations module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.spynnaker_connection_holder_generations" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="spynnaker.pyNN.utilities.spynnaker_connection_holder_generations.SpYNNakerConnectionHolderGenerator">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.utilities.spynnaker_connection_holder_generations.</code><code class="descname">SpYNNakerConnectionHolderGenerator</code><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/spynnaker_connection_holder_generations.html#SpYNNakerConnectionHolderGenerator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.spynnaker_connection_holder_generations.SpYNNakerConnectionHolderGenerator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Sets up connection holders for reports to use.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>application_graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationGraph" title="(in PACMAN v)"><em>ApplicationGraph</em></a>) &#8211; app graph</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the set of connection holders for after DSG generation</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">dict(tuple(<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.projection_application_edge.ProjectionApplicationEdge" title="spynnaker.pyNN.models.neural_projections.projection_application_edge.ProjectionApplicationEdge">ProjectionApplicationEdge</a>, <a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.synapse_information.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.synapse_information.SynapseInformation">SynapseInformation</a>),         <a class="reference internal" href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.connection_holder.ConnectionHolder" title="spynnaker.pyNN.models.neuron.connection_holder.ConnectionHolder">ConnectionHolder</a>)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-spynnaker.pyNN.utilities.spynnaker_failed_state">
+<span id="spynnaker-pynn-utilities-spynnaker-failed-state-module"></span><h2>spynnaker.pyNN.utilities.spynnaker_failed_state module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.spynnaker_failed_state" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.utilities.spynnaker_failed_state.</code><code class="descname">SpynnakerFailedState</code><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/spynnaker_failed_state.html#SpynnakerFailedState"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.html#spynnaker.pyNN.spynnaker_simulator_interface.SpynnakerSimulatorInterface" title="spynnaker.pyNN.spynnaker_simulator_interface.SpynnakerSimulatorInterface"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.spynnaker_simulator_interface.SpynnakerSimulatorInterface</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.utilities.failed_state.FailedState</span></code>, <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Marks the simulation as failed.</p>
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.get_current_time">
+<code class="descname">get_current_time</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/spynnaker_failed_state.html#SpynnakerFailedState.get_current_time"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.get_current_time" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.has_reset_last">
+<code class="descname">has_reset_last</code><a class="headerlink" href="#spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.has_reset_last" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.max_delay">
+<code class="descname">max_delay</code><a class="headerlink" href="#spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.max_delay" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.min_delay">
+<code class="descname">min_delay</code><a class="headerlink" href="#spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.min_delay" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.reset">
+<em class="property">static </em><code class="descname">reset</code><span class="sig-paren">(</span><em>annotations=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/spynnaker_failed_state.html#SpynnakerFailedState.reset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.reset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.set_number_of_neurons_per_core">
+<code class="descname">set_number_of_neurons_per_core</code><span class="sig-paren">(</span><em>neuron_type</em>, <em>max_permitted</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/spynnaker_failed_state.html#SpynnakerFailedState.set_number_of_neurons_per_core"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.set_number_of_neurons_per_core" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-spynnaker.pyNN.utilities.spynnaker_neuron_network_specification_report">
+<span id="spynnaker-pynn-utilities-spynnaker-neuron-network-specification-report-module"></span><h2>spynnaker.pyNN.utilities.spynnaker_neuron_network_specification_report module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.spynnaker_neuron_network_specification_report" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="spynnaker.pyNN.utilities.spynnaker_neuron_network_specification_report.SpYNNakerNeuronGraphNetworkSpecificationReport">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.utilities.spynnaker_neuron_network_specification_report.</code><code class="descname">SpYNNakerNeuronGraphNetworkSpecificationReport</code><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/spynnaker_neuron_network_specification_report.html#SpYNNakerNeuronGraphNetworkSpecificationReport"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.spynnaker_neuron_network_specification_report.SpYNNakerNeuronGraphNetworkSpecificationReport" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Produces a report describing the graph created from the neural         populations and projections.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>report_folder</strong> (<em>str</em>) &#8211; the report folder to put figure into</li>
+<li><strong>application_graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationGraph" title="(in PACMAN v)"><em>ApplicationGraph</em></a>) &#8211; the app graph</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-spynnaker.pyNN.utilities.spynnaker_synaptic_matrix_report">
+<span id="spynnaker-pynn-utilities-spynnaker-synaptic-matrix-report-module"></span><h2>spynnaker.pyNN.utilities.spynnaker_synaptic_matrix_report module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.spynnaker_synaptic_matrix_report" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="spynnaker.pyNN.utilities.spynnaker_synaptic_matrix_report.SpYNNakerSynapticMatrixReport">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.utilities.spynnaker_synaptic_matrix_report.</code><code class="descname">SpYNNakerSynapticMatrixReport</code><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/spynnaker_synaptic_matrix_report.html#SpYNNakerSynapticMatrixReport"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.spynnaker_synaptic_matrix_report.SpYNNakerSynapticMatrixReport" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Generate the synaptic matrices for reporting purposes.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>report_folder</strong> (<em>str</em>) &#8211; where to write the report</li>
+<li><strong>connection_holder</strong> (<em>dict</em><em>(</em><em>tuple</em><em>(</em><a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.projection_application_edge.ProjectionApplicationEdge" title="spynnaker.pyNN.models.neural_projections.projection_application_edge.ProjectionApplicationEdge"><em>ProjectionApplicationEdge</em></a><em>, </em><a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.synapse_information.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.synapse_information.SynapseInformation"><em>SynapseInformation</em></a><em>)</em><em></em><em>,         </em><a class="reference internal" href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.connection_holder.ConnectionHolder" title="spynnaker.pyNN.models.neuron.connection_holder.ConnectionHolder"><em>ConnectionHolder</em></a><em>)</em><em></em>) &#8211; where the synaptic matrices are stored         (possibly after retrieval from the machine)</li>
+<li><strong>dsg_targets</strong> &#8211; used to check if connection holders are populated</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-spynnaker.pyNN.utilities.struct">
+<span id="spynnaker-pynn-utilities-struct-module"></span><h2>spynnaker.pyNN.utilities.struct module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.struct" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="spynnaker.pyNN.utilities.struct.Struct">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.utilities.struct.</code><code class="descname">Struct</code><span class="sig-paren">(</span><em>field_types</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/struct.html#Struct"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.struct.Struct" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Represents a C code structure</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>field_types</strong> (list of <code class="xref py py-class docutils literal"><span class="pre">data_specification.enums.data_type.DataType</span></code>) &#8211; The types of the fields, ordered as they appear in the struct</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="spynnaker.pyNN.utilities.struct.Struct.field_types">
+<code class="descname">field_types</code><a class="headerlink" href="#spynnaker.pyNN.utilities.struct.Struct.field_types" title="Permalink to this definition">¶</a></dt>
+<dd><p>The types of the fields, ordered as they appear in the struct</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list of <code class="xref py py-class docutils literal"><span class="pre">data_specification.enums.data_type.DataType</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.struct.Struct.get_data">
+<code class="descname">get_data</code><span class="sig-paren">(</span><em>values</em>, <em>offset=0</em>, <em>array_size=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/struct.html#Struct.get_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.struct.Struct.get_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a numpy array of uint32 of data for the given values</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>values</strong> (<em>list of</em><em> (</em><em>single value</em><em> or </em><em>list of values</em><em> or </em><em>RangedList of values</em><em>)</em><em></em>) &#8211; A list of values with length the same size as the number of fields            returned by field_types</li>
+<li><strong>offset</strong> &#8211; The offset into each of the values where to start</li>
+<li><strong>array_size</strong> &#8211; The number of structs to generate</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">numpy.array(dtype=&#8221;uint32&#8221;)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.struct.Struct.get_size_in_whole_words">
+<code class="descname">get_size_in_whole_words</code><span class="sig-paren">(</span><em>array_size=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/struct.html#Struct.get_size_in_whole_words"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.struct.Struct.get_size_in_whole_words" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the size of the struct in whole words in an array of given            size (default 1 item)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>array_size</strong> &#8211; The number of elements in an array of structs</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.utilities.struct.Struct.numpy_dtype">
+<code class="descname">numpy_dtype</code><a class="headerlink" href="#spynnaker.pyNN.utilities.struct.Struct.numpy_dtype" title="Permalink to this definition">¶</a></dt>
+<dd><p>The numpy data type of the struct</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">numpy.dtype</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.utilities.struct.Struct.read_data">
+<code class="descname">read_data</code><span class="sig-paren">(</span><em>data</em>, <em>offset=0</em>, <em>array_size=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/struct.html#Struct.read_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.struct.Struct.read_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a bytearray of data and convert to struct values</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>data</strong> &#8211; The data to be read</li>
+<li><strong>offset</strong> &#8211; Index of the byte at the start of the valid data</li>
+<li><strong>array_size</strong> &#8211; The number of struct elements to read</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">a list of lists of data values, one list for each struct element</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-spynnaker.pyNN.utilities.utility_calls">
+<span id="spynnaker-pynn-utilities-utility-calls-module"></span><h2>spynnaker.pyNN.utilities.utility_calls module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.utility_calls" title="Permalink to this headline">¶</a></h2>
+<p>utility class containing simple helper methods</p>
+<dl class="function">
+<dt id="spynnaker.pyNN.utilities.utility_calls.check_directory_exists_and_create_if_not">
+<code class="descclassname">spynnaker.pyNN.utilities.utility_calls.</code><code class="descname">check_directory_exists_and_create_if_not</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/utility_calls.html#check_directory_exists_and_create_if_not"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.utility_calls.check_directory_exists_and_create_if_not" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a parent directory for a file if it doesn&#8217;t exist</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename</strong> (<em>str</em>) &#8211; The file whose parent directory is to be created</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="spynnaker.pyNN.utilities.utility_calls.convert_param_to_numpy">
+<code class="descclassname">spynnaker.pyNN.utilities.utility_calls.</code><code class="descname">convert_param_to_numpy</code><span class="sig-paren">(</span><em>param</em>, <em>no_atoms</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/utility_calls.html#convert_param_to_numpy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.utility_calls.convert_param_to_numpy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert parameters into numpy arrays.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>param</strong> (<em>NumpyRNG</em><em> or </em><em>int</em><em> or </em><em>float</em><em> or </em><em>list</em><em>(</em><em>int</em><em>) or
+</em><em>list</em><em>(</em><em>float</em><em>) or </em><em>ndarray</em>) &#8211; the param to convert</li>
+<li><strong>no_atoms</strong> (<em>int</em>) &#8211; the number of atoms available for conversion of param</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the converted param as an array of floats</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">ndarray(float)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="spynnaker.pyNN.utilities.utility_calls.convert_to">
+<code class="descclassname">spynnaker.pyNN.utilities.utility_calls.</code><code class="descname">convert_to</code><span class="sig-paren">(</span><em>value</em>, <em>data_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/utility_calls.html#convert_to"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.utility_calls.convert_to" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert a value to a given data type</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>value</strong> &#8211; The value to convert</li>
+<li><strong>data_type</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification.enums/#data_specification.enums.DataType" title="(in DataSpecification v)"><em>DataType</em></a>) &#8211; The data type to convert to</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The converted data as a numpy data type</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">ndarray(int32)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="spynnaker.pyNN.utilities.utility_calls.get_maximum_probable_value">
+<code class="descclassname">spynnaker.pyNN.utilities.utility_calls.</code><code class="descname">get_maximum_probable_value</code><span class="sig-paren">(</span><em>dist</em>, <em>n_items</em>, <em>chance=0.01</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/utility_calls.html#get_maximum_probable_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.utility_calls.get_maximum_probable_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the likely maximum value of a RandomDistribution given a        number of draws</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="spynnaker.pyNN.utilities.utility_calls.get_mean">
+<code class="descclassname">spynnaker.pyNN.utilities.utility_calls.</code><code class="descname">get_mean</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/utility_calls.html#get_mean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.utility_calls.get_mean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the mean of a RandomDistribution</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="spynnaker.pyNN.utilities.utility_calls.get_minimum_probable_value">
+<code class="descclassname">spynnaker.pyNN.utilities.utility_calls.</code><code class="descname">get_minimum_probable_value</code><span class="sig-paren">(</span><em>dist</em>, <em>n_items</em>, <em>chance=0.01</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/utility_calls.html#get_minimum_probable_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.utility_calls.get_minimum_probable_value" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the likely minimum value of a RandomDistribution given a        number of draws</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="spynnaker.pyNN.utilities.utility_calls.get_n_bits">
+<code class="descclassname">spynnaker.pyNN.utilities.utility_calls.</code><code class="descname">get_n_bits</code><span class="sig-paren">(</span><em>n_values</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/utility_calls.html#get_n_bits"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.utility_calls.get_n_bits" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine how many bits are required for the given number of values</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_values</strong> (<em>int</em>) &#8211; the number of values (starting at 0)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the number of bits required to express that many values</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="spynnaker.pyNN.utilities.utility_calls.get_probability_within_range">
+<code class="descclassname">spynnaker.pyNN.utilities.utility_calls.</code><code class="descname">get_probability_within_range</code><span class="sig-paren">(</span><em>dist</em>, <em>lower</em>, <em>upper</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/utility_calls.html#get_probability_within_range"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.utility_calls.get_probability_within_range" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the probability that a value will fall within the given range for        a given RandomDistribution</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="spynnaker.pyNN.utilities.utility_calls.get_probable_maximum_selected">
+<code class="descclassname">spynnaker.pyNN.utilities.utility_calls.</code><code class="descname">get_probable_maximum_selected</code><span class="sig-paren">(</span><em>n_total_trials</em>, <em>n_trials</em>, <em>selection_prob</em>, <em>chance=0.01</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/utility_calls.html#get_probable_maximum_selected"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.utility_calls.get_probable_maximum_selected" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the likely maximum number of items that will be selected from a        set of n_trials from a total set of n_total_trials        with a probability of selection of selection_prob</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="spynnaker.pyNN.utilities.utility_calls.get_standard_deviation">
+<code class="descclassname">spynnaker.pyNN.utilities.utility_calls.</code><code class="descname">get_standard_deviation</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/utility_calls.html#get_standard_deviation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.utility_calls.get_standard_deviation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the standard deviation of a RandomDistribution</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="spynnaker.pyNN.utilities.utility_calls.get_variance">
+<code class="descclassname">spynnaker.pyNN.utilities.utility_calls.</code><code class="descname">get_variance</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/utility_calls.html#get_variance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.utility_calls.get_variance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the variance of a RandomDistribution</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="spynnaker.pyNN.utilities.utility_calls.high">
+<code class="descclassname">spynnaker.pyNN.utilities.utility_calls.</code><code class="descname">high</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/utility_calls.html#high"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.utility_calls.high" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the high or max boundary value for this distribution</p>
+<p>Could return None</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="spynnaker.pyNN.utilities.utility_calls.low">
+<code class="descclassname">spynnaker.pyNN.utilities.utility_calls.</code><code class="descname">low</code><span class="sig-paren">(</span><em>dist</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/utility_calls.html#low"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.utility_calls.low" title="Permalink to this definition">¶</a></dt>
+<dd><p>Gets the high or min boundary value for this distribution</p>
+<p>Could return None</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="spynnaker.pyNN.utilities.utility_calls.read_in_data_from_file">
+<code class="descclassname">spynnaker.pyNN.utilities.utility_calls.</code><code class="descname">read_in_data_from_file</code><span class="sig-paren">(</span><em>file_path</em>, <em>min_atom</em>, <em>max_atom</em>, <em>min_time</em>, <em>max_time</em>, <em>extra=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/utility_calls.html#read_in_data_from_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.utility_calls.read_in_data_from_file" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Read in a file of data values where the values are in a format of:</dt>
+<dd>&lt;time&gt;  &lt;atom ID&gt;       &lt;data value&gt;</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>file_path</strong> (<em>str</em>) &#8211; absolute path to a file containing the data</li>
+<li><strong>min_atom</strong> (<em>int</em>) &#8211; min neuron ID to which neurons to read in</li>
+<li><strong>max_atom</strong> (<em>int</em>) &#8211; max neuron ID to which neurons to read in</li>
+<li><strong>min_time</strong> (<em>float</em><em> or </em><em>int</em>) &#8211; min time slot to read neurons values of.</li>
+<li><strong>max_time</strong> (<em>float</em><em> or </em><em>int</em>) &#8211; max time slot to read neurons values of.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">a numpy array of (time stamp, atom ID, data value)</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">ndarray(tuple(float, int, float))</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="spynnaker.pyNN.utilities.utility_calls.read_spikes_from_file">
+<code class="descclassname">spynnaker.pyNN.utilities.utility_calls.</code><code class="descname">read_spikes_from_file</code><span class="sig-paren">(</span><em>file_path</em>, <em>min_atom=0</em>, <em>max_atom=inf</em>, <em>min_time=0</em>, <em>max_time=inf</em>, <em>split_value='\t'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/utility_calls.html#read_spikes_from_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.utility_calls.read_spikes_from_file" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Read spikes from a file formatted as:</dt>
+<dd>&lt;time&gt;  &lt;neuron ID&gt;</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>file_path</strong> (<em>str</em>) &#8211; absolute path to a file containing spike values</li>
+<li><strong>min_atom</strong> (<em>int</em><em> or </em><em>float</em>) &#8211; min neuron ID to which neurons to read in</li>
+<li><strong>max_atom</strong> (<em>int</em><em> or </em><em>float</em>) &#8211; max neuron ID to which neurons to read in</li>
+<li><strong>min_time</strong> (<em>float</em><em> or </em><em>int</em>) &#8211; min time slot to read neurons values of.</li>
+<li><strong>max_time</strong> (<em>float</em><em> or </em><em>int</em>) &#8211; max time slot to read neurons values of.</li>
+<li><strong>split_value</strong> (<em>str</em>) &#8211; the pattern to split by</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">a numpy array with max_atom elements each of which is a list of        spike times.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">numpy.ndarray(int, int)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="spynnaker.pyNN.utilities.utility_calls.validate_mars_kiss_64_seed">
+<code class="descclassname">spynnaker.pyNN.utilities.utility_calls.</code><code class="descname">validate_mars_kiss_64_seed</code><span class="sig-paren">(</span><em>seed</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/utility_calls.html#validate_mars_kiss_64_seed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.utility_calls.validate_mars_kiss_64_seed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the seed to make it compatible with the RNG algorithm</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-spynnaker.pyNN.utilities">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.utilities" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="spynnaker.pyNN.utilities.random_stats.html" title="spynnaker.pyNN.utilities.random_stats package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="spynnaker.pyNN.protocols.html" title="spynnaker.pyNN.protocols package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+    </div>
+  </body>
+</html>

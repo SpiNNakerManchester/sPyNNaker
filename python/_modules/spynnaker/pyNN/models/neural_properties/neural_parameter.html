@@ -1,0 +1,290 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>spynnaker.pyNN.models.neural_properties.neural_parameter &#8212; sPyNNaker  documentation</title>
+    
+    <link rel="stylesheet" href="../../../../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">sPyNNaker  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for spynnaker.pyNN.models.neural_properties.neural_parameter</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2017-2019 The University of Manchester</span>
+<span class="c1">#</span>
+<span class="c1"># This program is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+
+<span class="kn">from</span> <span class="nn">six</span> <span class="kn">import</span> <span class="n">Iterator</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.ranged.abstract_list</span> <span class="kn">import</span> <span class="n">AbstractList</span>
+<span class="kn">from</span> <span class="nn">data_specification.enums</span> <span class="kn">import</span> <span class="n">DataType</span><span class="p">,</span> <span class="n">Commands</span>
+<span class="kn">from</span> <span class="nn">data_specification.exceptions</span> <span class="kn">import</span> <span class="n">UnknownTypeException</span>
+
+
+<span class="k">class</span> <span class="nc">_Range_Iterator</span><span class="p">(</span><span class="n">Iterator</span><span class="p">):</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;__cmd_pair&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__datatype&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__index&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__iterator&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__spec&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__stop_range&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">datatype</span><span class="p">,</span> <span class="n">slice_start</span><span class="p">,</span> <span class="n">slice_stop</span><span class="p">,</span> <span class="n">spec</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Iterator over a :py:class:`~spinn_utilities.ranged.RangedList`</span>
+<span class="sd">            which is range based</span>
+
+<span class="sd">        :param ~spinn_utilities.ranged.AbstractList value:</span>
+<span class="sd">            The abstract list holding the data</span>
+<span class="sd">        :param ~data_specification.enums.DataType datatype:</span>
+<span class="sd">            The type of each element of data</span>
+<span class="sd">        :param int slice_start: Inclusive start of the range</span>
+<span class="sd">        :param int slice_stop: Exclusive end of the range</span>
+<span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
+<span class="sd">            The data specification to write to</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># pylint: disable=too-many-arguments</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__iterator</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">iter_ranges_by_slice</span><span class="p">(</span><span class="n">slice_start</span><span class="p">,</span> <span class="n">slice_stop</span><span class="p">)</span>
+
+        <span class="c1"># Initially the index will be out of range which will force the</span>
+        <span class="c1"># iterator to be called, and set self._cmd_pair</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__stop_range</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__datatype</span> <span class="o">=</span> <span class="n">datatype</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__spec</span> <span class="o">=</span> <span class="n">spec</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cmd_pair</span> <span class="o">=</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># We pre-update the index here as the first value in the range</span>
+        <span class="c1"># was done at the last iteration, or else this is the first iteration</span>
+        <span class="c1"># and we need to force the iterator to be called</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__index</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__index</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">__stop_range</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cmd_pair</span>
+        <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__index</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__stop_range</span><span class="p">,</span> <span class="n">current</span><span class="p">)</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__iterator</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cmd_pair</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__spec</span><span class="o">.</span><span class="n">create_cmd</span><span class="p">(</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">current</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__datatype</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cmd_pair</span>
+
+
+<span class="k">class</span> <span class="nc">_Get_Iterator</span><span class="p">(</span><span class="n">Iterator</span><span class="p">):</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;__datatype&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__index&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__slice_stop&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__spec&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__value&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">datatype</span><span class="p">,</span> <span class="n">slice_start</span><span class="p">,</span> <span class="n">slice_stop</span><span class="p">,</span> <span class="n">spec</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Iterator over a standard collection that supports __getitem__</span>
+
+<span class="sd">        :param value: The list holding the data</span>
+<span class="sd">        :type value: list(int) or list(float) or list(bool) or ~numpy.ndarray</span>
+<span class="sd">        :param ~data_specification.enums.DataType datatype:</span>
+<span class="sd">            The type of each element of data</span>
+<span class="sd">        :param int slice_start: Inclusive start of the range</span>
+<span class="sd">        :param int slice_stop: Exclusive end of the range</span>
+<span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
+<span class="sd">            The data specification to write to</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># pylint: disable=too-many-arguments</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__value</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__datatype</span> <span class="o">=</span> <span class="n">datatype</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__index</span> <span class="o">=</span> <span class="n">slice_start</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__slice_stop</span> <span class="o">=</span> <span class="n">slice_stop</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__spec</span> <span class="o">=</span> <span class="n">spec</span>
+
+    <span class="k">def</span> <span class="fm">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__index</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__slice_stop</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">StopIteration</span>
+        <span class="n">cmd_pair</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__spec</span><span class="o">.</span><span class="n">create_cmd</span><span class="p">(</span>
+            <span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__value</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__index</span><span class="p">],</span> <span class="n">data_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__datatype</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__index</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">cmd_pair</span>
+
+
+<span class="k">class</span> <span class="nc">_SingleValue_Iterator</span><span class="p">(</span><span class="n">Iterator</span><span class="p">):</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;__cmd_pair&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__index&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__stop&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">datatype</span><span class="p">,</span> <span class="n">slice_start</span><span class="p">,</span> <span class="n">slice_stop</span><span class="p">,</span> <span class="n">spec</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Iterator that repeats the single values the required number of\</span>
+<span class="sd">            times.</span>
+
+<span class="sd">        Allows a single Value parameter to be treated the same as parameters\</span>
+<span class="sd">        with len. \</span>
+<span class="sd">        Caches `cmd_word_list` and `cmd_string` so they are only created once.</span>
+
+<span class="sd">        :param value: The simple value that is the data for each element</span>
+<span class="sd">        :type value: int or float or bool</span>
+<span class="sd">        :param ~data_specification.enums.DataType datatype:</span>
+<span class="sd">            The type of each element of data</span>
+<span class="sd">        :param int slice_start: Inclusive start of the range</span>
+<span class="sd">        :param int slice_stop: Exclusive end of the range</span>
+<span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
+<span class="sd">            The data specification to write to</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># pylint: disable=too-many-arguments</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__cmd_pair</span> <span class="o">=</span> <span class="n">spec</span><span class="o">.</span><span class="n">create_cmd</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">value</span><span class="p">,</span> <span class="n">data_type</span><span class="o">=</span><span class="n">datatype</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__index</span> <span class="o">=</span> <span class="n">slice_start</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__stop</span> <span class="o">=</span> <span class="n">slice_stop</span>
+
+    <span class="k">def</span> <span class="fm">__next__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__index</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__stop</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">StopIteration</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__index</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cmd_pair</span>
+
+
+<div class="viewcode-block" id="NeuronParameter"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_properties.html#spynnaker.pyNN.models.neural_properties.neural_parameter.NeuronParameter">[docs]</a><span class="k">class</span> <span class="nc">NeuronParameter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; A settable parameter of a neuron model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;__data_type&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__value&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">data_type</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param value: what the value of the parameter is; if a list or array,\</span>
+<span class="sd">            potentially provides a different value for each neuron</span>
+<span class="sd">        :type value: int or float or bool or list(int) or list(float) or \</span>
+<span class="sd">            list(bool) or ~numpy.ndarray or \</span>
+<span class="sd">            ~spinn_utilities.ranged.AbstractList</span>
+<span class="sd">        :param ~data_specification.enums.DataType data_type:</span>
+<span class="sd">            The serialization type of the parameter in the neuron model.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__value</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">if</span> <span class="n">data_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">DataType</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UnknownTypeException</span><span class="p">(</span>
+                <span class="n">data_type</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">Commands</span><span class="o">.</span><span class="n">WRITE</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>  <span class="c1"># @UndefinedVariable</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__data_type</span> <span class="o">=</span> <span class="n">data_type</span>
+
+<div class="viewcode-block" id="NeuronParameter.get_value"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_properties.html#spynnaker.pyNN.models.neural_properties.neural_parameter.NeuronParameter.get_value">[docs]</a>    <span class="k">def</span> <span class="nf">get_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; What the value of the parameter is; if a list or array,\</span>
+<span class="sd">            potentially provides a different value for each neuron.</span>
+
+<span class="sd">        :rtype: int or float or bool or list(int) or list(float) or \</span>
+<span class="sd">            list(bool) or ~numpy.ndarray or \</span>
+<span class="sd">            ~spinn_utilities.ranged.AbstractList</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__value</span></div>
+
+<div class="viewcode-block" id="NeuronParameter.get_dataspec_datatype"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_properties.html#spynnaker.pyNN.models.neural_properties.neural_parameter.NeuronParameter.get_dataspec_datatype">[docs]</a>    <span class="k">def</span> <span class="nf">get_dataspec_datatype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the serialization type of the parameter in the neuron model.</span>
+
+<span class="sd">        :rtype: ~data_specification.enums.DataType</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__data_type</span></div>
+
+<div class="viewcode-block" id="NeuronParameter.iterator_by_slice"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_properties.html#spynnaker.pyNN.models.neural_properties.neural_parameter.NeuronParameter.iterator_by_slice">[docs]</a>    <span class="k">def</span> <span class="nf">iterator_by_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slice_start</span><span class="p">,</span> <span class="n">slice_stop</span><span class="p">,</span> <span class="n">spec</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Creates an iterator over the commands to use to write the\</span>
+<span class="sd">            parameter to the data specification being generated.</span>
+
+<span class="sd">        :param int slice_start: Inclusive start of the range</span>
+<span class="sd">        :param int slice_stop: Exclusive end of the range</span>
+<span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
+<span class="sd">            The data specification to eventually write to.</span>
+<span class="sd">            (Note that this does not actually do the write).</span>
+<span class="sd">        :return: Iterator that produces a command to write to the\</span>
+<span class="sd">            specification for each element in the slice.</span>
+<span class="sd">        :rtype: six.Iterator(tuple(bytearray, str))</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__value</span><span class="p">,</span> <span class="n">AbstractList</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">_Range_Iterator</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__data_type</span><span class="p">,</span> <span class="n">slice_start</span><span class="p">,</span> <span class="n">slice_stop</span><span class="p">,</span> <span class="n">spec</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__value</span><span class="p">,</span> <span class="s1">&#39;__getitem__&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">_Get_Iterator</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__data_type</span><span class="p">,</span> <span class="n">slice_start</span><span class="p">,</span> <span class="n">slice_stop</span><span class="p">,</span> <span class="n">spec</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_SingleValue_Iterator</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__data_type</span><span class="p">,</span> <span class="n">slice_start</span><span class="p">,</span> <span class="n">slice_stop</span><span class="p">,</span> <span class="n">spec</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../index.html">sPyNNaker  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+    </div>
+  </body>
+</html>

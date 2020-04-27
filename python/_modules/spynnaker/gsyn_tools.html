@@ -1,0 +1,155 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>spynnaker.gsyn_tools &#8212; sPyNNaker  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">sPyNNaker  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for spynnaker.gsyn_tools</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2017-2019 The University of Manchester</span>
+<span class="c1">#</span>
+<span class="c1"># This program is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">spynnaker.pyNN.utilities.utility_calls</span> <span class="k">as</span> <span class="nn">utility_calls</span>
+
+
+<div class="viewcode-block" id="check_gsyn"><a class="viewcode-back" href="../../spynnaker.html#spynnaker.gsyn_tools.check_gsyn">[docs]</a><span class="k">def</span> <span class="nf">check_gsyn</span><span class="p">(</span><span class="n">gsyn1</span><span class="p">,</span> <span class="n">gsyn2</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Compare two arrays of conductances. For testing.</span>
+
+<span class="sd">    :param gsyn1: An array of conductances.</span>
+<span class="sd">    :param gsyn2: An array of conductances.</span>
+<span class="sd">    :raise Exception: If the arrays differ.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">gsyn1</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">gsyn2</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Length of gsyn does not match expected </span><span class="si">{}</span><span class="s2"> but &quot;</span>
+                        <span class="s2">&quot;found </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">gsyn1</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">gsyn2</span><span class="p">)))</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">gsyn1</span><span class="p">)):</span>  <span class="c1"># pylint: disable=consider-using-enumerate</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">round</span><span class="p">(</span><span class="n">gsyn1</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">round</span><span class="p">(</span><span class="n">gsyn2</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">],</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Mismatch between gsyn found at position </span><span class="si">{}{}</span><span class="s2">&quot;</span>
+                                <span class="s2">&quot;expected </span><span class="si">{}</span><span class="s2"> but found </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span>
+                                <span class="nb">format</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">gsyn1</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">],</span> <span class="n">gsyn2</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]))</span></div>
+
+
+<div class="viewcode-block" id="check_path_gysn"><a class="viewcode-back" href="../../spynnaker.html#spynnaker.gsyn_tools.check_path_gysn">[docs]</a><span class="k">def</span> <span class="nf">check_path_gysn</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">runtime</span><span class="p">,</span> <span class="n">gsyn</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Compare an arrays of conductances with baseline data from a file. \</span>
+<span class="sd">        For testing.</span>
+
+<span class="sd">    :param path: A file path.</span>
+<span class="sd">    :param n_neurons: The number of neurons that produced the data.</span>
+<span class="sd">    :param runtime: The length of time that the generated data represents.</span>
+<span class="sd">    :param gsyn: An array of conductances.</span>
+<span class="sd">    :raise Exception: If the arrays differ.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">gsyn2</span> <span class="o">=</span> <span class="n">utility_calls</span><span class="o">.</span><span class="n">read_in_data_from_file</span><span class="p">(</span>
+        <span class="n">path</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">runtime</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+    <span class="n">check_gsyn</span><span class="p">(</span><span class="n">gsyn</span><span class="p">,</span> <span class="n">gsyn2</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="check_sister_gysn"><a class="viewcode-back" href="../../spynnaker.html#spynnaker.gsyn_tools.check_sister_gysn">[docs]</a><span class="k">def</span> <span class="nf">check_sister_gysn</span><span class="p">(</span><span class="n">sister</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">runtime</span><span class="p">,</span> <span class="n">gsyn</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Compare an arrays of conductances with baseline data from a file next\</span>
+<span class="sd">        to a specified module. For testing.</span>
+
+<span class="sd">    :param sister: A module. The file read from will be ``gsyn.data`` \</span>
+<span class="sd">        adjacent to this module.</span>
+<span class="sd">    :param n_neurons: The number of neurons that produced the data.</span>
+<span class="sd">    :param runtime: The length of time that the generated data represents.</span>
+<span class="sd">    :param gsyn: An array of conductances.</span>
+<span class="sd">    :raise Exception: If the arrays differ.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">sister</span><span class="p">)),</span> <span class="s2">&quot;gsyn.data&quot;</span><span class="p">)</span>
+    <span class="n">check_path_gysn</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">runtime</span><span class="p">,</span> <span class="n">gsyn</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">sPyNNaker  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+    </div>
+  </body>
+</html>

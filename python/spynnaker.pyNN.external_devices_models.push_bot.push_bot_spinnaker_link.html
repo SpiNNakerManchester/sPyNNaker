@@ -1,0 +1,476 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link package &#8212; sPyNNaker  documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="spynnaker.pyNN.model_binaries package" href="spynnaker.pyNN.model_binaries.html" />
+    <link rel="prev" title="spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters package" href="spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="spynnaker.pyNN.model_binaries.html" title="spynnaker.pyNN.model_binaries package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters.html" title="spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.external_devices_models.html" >spynnaker.pyNN.external_devices_models package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="spynnaker.pyNN.external_devices_models.push_bot.html" accesskey="U">spynnaker.pyNN.external_devices_models.push_bot package</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_laser_device">spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_laser_device module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_led_device">spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_led_device module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_motor_device">spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_motor_device module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_retina_device">spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_retina_device module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_speaker_device">spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_speaker_device module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters.html"
+                        title="previous chapter">spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="spynnaker.pyNN.model_binaries.html"
+                        title="next chapter">spynnaker.pyNN.model_binaries package</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="spynnaker-pynn-external-devices-models-push-bot-push-bot-spinnaker-link-package">
+<h1>spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link package<a class="headerlink" href="#spynnaker-pynn-external-devices-models-push-bot-push-bot-spinnaker-link-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_laser_device">
+<span id="spynnaker-pynn-external-devices-models-push-bot-push-bot-spinnaker-link-push-bot-spinnaker-link-laser-device-module"></span><h2>spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_laser_device module<a class="headerlink" href="#module-spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_laser_device" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_laser_device.PushBotSpiNNakerLinkLaserDevice">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_laser_device.</code><code class="descname">PushBotSpiNNakerLinkLaserDevice</code><span class="sig-paren">(</span><em>laser</em>, <em>protocol</em>, <em>spinnaker_link_id</em>, <em>n_neurons=1</em>, <em>label=None</em>, <em>board_address=None</em>, <em>start_active_time=0</em>, <em>start_total_period=0</em>, <em>start_frequency=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/push_bot/push_bot_spinnaker_link/push_bot_spinnaker_link_laser_device.html#PushBotSpiNNakerLinkLaserDevice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_laser_device.PushBotSpiNNakerLinkLaserDevice" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet.html#spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet.push_bot_ethernet_laser_device.PushBotEthernetLaserDevice" title="spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet.push_bot_ethernet_laser_device.PushBotEthernetLaserDevice"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet.push_bot_ethernet_laser_device.PushBotEthernetLaserDevice</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">pacman.model.graphs.application.application_spinnaker_link_vertex.ApplicationSpiNNakerLinkVertex</span></code></p>
+<p>The Laser of a PushBot</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>laser</strong> (<a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters.html#spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters.push_bot_laser.PushBotLaser" title="spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters.push_bot_laser.PushBotLaser"><em>PushBotLaser</em></a>) &#8211; Which laser device to control</li>
+<li><strong>protocol</strong> (<a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.munich_io_spinnaker_link_protocol.MunichIoSpiNNakerLinkProtocol" title="spynnaker.pyNN.protocols.munich_io_spinnaker_link_protocol.MunichIoSpiNNakerLinkProtocol"><em>MunichIoSpiNNakerLinkProtocol</em></a>) &#8211; The protocol instance to get commands from</li>
+<li><strong>spinnaker_link_id</strong> (<em>int</em>) &#8211; The SpiNNakerLink that the PushBot is connected to</li>
+<li><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons in the device</li>
+<li><strong>label</strong> (<em>str</em>) &#8211; A label for the device</li>
+<li><strong>board_address</strong> (<em>str</em>) &#8211; The IP address of the board that the device is connected to</li>
+<li><strong>start_active_time</strong> &#8211; The &#8220;active time&#8221; value to send at the start</li>
+<li><strong>start_total_period</strong> &#8211; The &#8220;total period&#8221; value to send at the start</li>
+<li><strong>start_frequency</strong> &#8211; The &#8220;frequency&#8221; to send at the start</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_laser_device.PushBotSpiNNakerLinkLaserDevice.default_parameters">
+<code class="descname">default_parameters</code><em class="property"> = {'n_neurons': 1, 'label': None, 'board_address': None, 'start_active_time': 0, 'start_total_period': 0, 'start_frequency': 0}</em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_laser_device.PushBotSpiNNakerLinkLaserDevice.default_parameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_led_device">
+<span id="spynnaker-pynn-external-devices-models-push-bot-push-bot-spinnaker-link-push-bot-spinnaker-link-led-device-module"></span><h2>spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_led_device module<a class="headerlink" href="#module-spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_led_device" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_led_device.PushBotSpiNNakerLinkLEDDevice">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_led_device.</code><code class="descname">PushBotSpiNNakerLinkLEDDevice</code><span class="sig-paren">(</span><em>led</em>, <em>protocol</em>, <em>spinnaker_link_id</em>, <em>n_neurons=1</em>, <em>label=None</em>, <em>board_address=None</em>, <em>start_active_time_front=None</em>, <em>start_active_time_back=None</em>, <em>start_total_period=None</em>, <em>start_frequency=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/push_bot/push_bot_spinnaker_link/push_bot_spinnaker_link_led_device.html#PushBotSpiNNakerLinkLEDDevice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_led_device.PushBotSpiNNakerLinkLEDDevice" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet.html#spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet.push_bot_ethernet_led_device.PushBotEthernetLEDDevice" title="spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet.push_bot_ethernet_led_device.PushBotEthernetLEDDevice"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet.push_bot_ethernet_led_device.PushBotEthernetLEDDevice</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">pacman.model.graphs.application.application_spinnaker_link_vertex.ApplicationSpiNNakerLinkVertex</span></code></p>
+<p>The LED of a PushBot</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>led</strong> (<a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters.html#spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters.push_bot_led.PushBotLED" title="spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters.push_bot_led.PushBotLED"><em>PushBotLED</em></a>) &#8211; The LED devic to control</li>
+<li><strong>protocol</strong> (<a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.munich_io_spinnaker_link_protocol.MunichIoSpiNNakerLinkProtocol" title="spynnaker.pyNN.protocols.munich_io_spinnaker_link_protocol.MunichIoSpiNNakerLinkProtocol"><em>MunichIoSpiNNakerLinkProtocol</em></a>) &#8211; The protocol instance to get commands from</li>
+<li><strong>spinnaker_link_id</strong> (<em>int</em>) &#8211; The SpiNNakerLink connected to</li>
+<li><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons in the device</li>
+<li><strong>label</strong> (<em>str</em>) &#8211; The label of the device</li>
+<li><strong>board_address</strong> (<em>str</em>) &#8211; The IP address of the board that the device is connected to</li>
+<li><strong>start_active_time_front</strong> &#8211; The &#8220;active time&#8221; to set for the front LED at the start</li>
+<li><strong>start_active_time_back</strong> &#8211; The &#8220;active time&#8221; to set for the back LED at the start</li>
+<li><strong>start_total_period</strong> &#8211; The &#8220;total period&#8221; to set at the start</li>
+<li><strong>start_frequency</strong> &#8211; The &#8220;frequency&#8221; to set at the start</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_led_device.PushBotSpiNNakerLinkLEDDevice.default_parameters">
+<code class="descname">default_parameters</code><em class="property"> = {'n_neurons': 1, 'label': None, 'board_address': None, 'start_active_time_front': None, 'start_active_time_back': None, 'start_total_period': None, 'start_frequency': None}</em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_led_device.PushBotSpiNNakerLinkLEDDevice.default_parameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_motor_device">
+<span id="spynnaker-pynn-external-devices-models-push-bot-push-bot-spinnaker-link-push-bot-spinnaker-link-motor-device-module"></span><h2>spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_motor_device module<a class="headerlink" href="#module-spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_motor_device" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_motor_device.PushBotSpiNNakerLinkMotorDevice">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_motor_device.</code><code class="descname">PushBotSpiNNakerLinkMotorDevice</code><span class="sig-paren">(</span><em>motor</em>, <em>protocol</em>, <em>spinnaker_link_id</em>, <em>n_neurons=1</em>, <em>label=None</em>, <em>board_address=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/push_bot/push_bot_spinnaker_link/push_bot_spinnaker_link_motor_device.html#PushBotSpiNNakerLinkMotorDevice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_motor_device.PushBotSpiNNakerLinkMotorDevice" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet.html#spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet.push_bot_ethernet_motor_device.PushBotEthernetMotorDevice" title="spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet.push_bot_ethernet_motor_device.PushBotEthernetMotorDevice"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet.push_bot_ethernet_motor_device.PushBotEthernetMotorDevice</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">pacman.model.graphs.application.application_spinnaker_link_vertex.ApplicationSpiNNakerLinkVertex</span></code></p>
+<p>The motor of a PushBot</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>motor</strong> (<a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters.html#spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters.push_bot_motor.PushBotMotor" title="spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters.push_bot_motor.PushBotMotor"><em>PushBotMotor</em></a>) &#8211; the motor to control</li>
+<li><strong>protocol</strong> (<a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.munich_io_spinnaker_link_protocol.MunichIoSpiNNakerLinkProtocol" title="spynnaker.pyNN.protocols.munich_io_spinnaker_link_protocol.MunichIoSpiNNakerLinkProtocol"><em>MunichIoSpiNNakerLinkProtocol</em></a>) &#8211; The protocol used to control the device</li>
+<li><strong>spinnaker_link_id</strong> (<em>int</em>) &#8211; The SpiNNakerLink connected to</li>
+<li><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons in the device</li>
+<li><strong>label</strong> (<em>str</em>) &#8211; The label of the device</li>
+<li><strong>board_address</strong> (<em>str</em>) &#8211; The IP address of the board that the device is connected to</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_motor_device.PushBotSpiNNakerLinkMotorDevice.default_parameters">
+<code class="descname">default_parameters</code><em class="property"> = {'n_neurons': 1, 'label': None, 'board_address': None}</em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_motor_device.PushBotSpiNNakerLinkMotorDevice.default_parameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_retina_device">
+<span id="spynnaker-pynn-external-devices-models-push-bot-push-bot-spinnaker-link-push-bot-spinnaker-link-retina-device-module"></span><h2>spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_retina_device module<a class="headerlink" href="#module-spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_retina_device" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_retina_device.PushBotSpiNNakerLinkRetinaDevice">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_retina_device.</code><code class="descname">PushBotSpiNNakerLinkRetinaDevice</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/push_bot/push_bot_spinnaker_link/push_bot_spinnaker_link_retina_device.html#PushBotSpiNNakerLinkRetinaDevice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_retina_device.PushBotSpiNNakerLinkRetinaDevice" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.html#spynnaker.pyNN.external_devices_models.push_bot.abstract_push_bot_retina_device.AbstractPushBotRetinaDevice" title="spynnaker.pyNN.external_devices_models.push_bot.abstract_push_bot_retina_device.AbstractPushBotRetinaDevice"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.external_devices_models.push_bot.abstract_push_bot_retina_device.AbstractPushBotRetinaDevice</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">pacman.model.graphs.application.application_spinnaker_link_vertex.ApplicationSpiNNakerLinkVertex</span></code></p>
+<dl class="attribute">
+<dt id="spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_retina_device.PushBotSpiNNakerLinkRetinaDevice.default_parameters">
+<code class="descname">default_parameters</code><em class="property"> = {'label': None, 'board_address': None}</em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_retina_device.PushBotSpiNNakerLinkRetinaDevice.default_parameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_retina_device.PushBotSpiNNakerLinkRetinaDevice.graph_mapper">
+<code class="descname">graph_mapper</code><span class="sig-paren">(</span><em>graph_mapper</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/push_bot/push_bot_spinnaker_link/push_bot_spinnaker_link_retina_device.html#PushBotSpiNNakerLinkRetinaDevice.graph_mapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_retina_device.PushBotSpiNNakerLinkRetinaDevice.graph_mapper" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_retina_device.PushBotSpiNNakerLinkRetinaDevice.routing_info">
+<code class="descname">routing_info</code><span class="sig-paren">(</span><em>routing_info</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/push_bot/push_bot_spinnaker_link/push_bot_spinnaker_link_retina_device.html#PushBotSpiNNakerLinkRetinaDevice.routing_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_retina_device.PushBotSpiNNakerLinkRetinaDevice.routing_info" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_retina_device.PushBotSpiNNakerLinkRetinaDevice.start_resume_commands">
+<code class="descname">start_resume_commands</code><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_retina_device.PushBotSpiNNakerLinkRetinaDevice.start_resume_commands" title="Permalink to this definition">¶</a></dt>
+<dd><p>The commands needed when starting or resuming simulation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models.html#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v)">MultiCastCommand</a>)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_speaker_device">
+<span id="spynnaker-pynn-external-devices-models-push-bot-push-bot-spinnaker-link-push-bot-spinnaker-link-speaker-device-module"></span><h2>spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_speaker_device module<a class="headerlink" href="#module-spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_speaker_device" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_speaker_device.PushBotSpiNNakerLinkSpeakerDevice">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_speaker_device.</code><code class="descname">PushBotSpiNNakerLinkSpeakerDevice</code><span class="sig-paren">(</span><em>speaker</em>, <em>protocol</em>, <em>spinnaker_link_id</em>, <em>n_neurons=1</em>, <em>label=None</em>, <em>board_address=None</em>, <em>start_active_time=50</em>, <em>start_total_period=100</em>, <em>start_frequency=None</em>, <em>start_melody=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/push_bot/push_bot_spinnaker_link/push_bot_spinnaker_link_speaker_device.html#PushBotSpiNNakerLinkSpeakerDevice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_speaker_device.PushBotSpiNNakerLinkSpeakerDevice" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet.html#spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet.push_bot_ethernet_speaker_device.PushBotEthernetSpeakerDevice" title="spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet.push_bot_ethernet_speaker_device.PushBotEthernetSpeakerDevice"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet.push_bot_ethernet_speaker_device.PushBotEthernetSpeakerDevice</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">pacman.model.graphs.application.application_spinnaker_link_vertex.ApplicationSpiNNakerLinkVertex</span></code></p>
+<p>The speaker of a PushBot</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>speaker</strong> (<a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters.html#spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters.push_bot_speaker.PushBotSpeaker" title="spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters.push_bot_speaker.PushBotSpeaker"><em>PushBotSpeaker</em></a>) &#8211; The PushBotSpeaker value to control</li>
+<li><strong>protocol</strong> (<a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.munich_io_spinnaker_link_protocol.MunichIoSpiNNakerLinkProtocol" title="spynnaker.pyNN.protocols.munich_io_spinnaker_link_protocol.MunichIoSpiNNakerLinkProtocol"><em>MunichIoSpiNNakerLinkProtocol</em></a>) &#8211; The protocol instance to get commands from</li>
+<li><strong>spinnaker_link_id</strong> (<em>int</em>) &#8211; The SpiNNakerLink connected to</li>
+<li><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons in the device</li>
+<li><strong>label</strong> (<em>str</em>) &#8211; The label of the device</li>
+<li><strong>board_address</strong> (<em>str</em>) &#8211; The IP address of the board that the device is connected to</li>
+<li><strong>start_active_time</strong> &#8211; The &#8220;active time&#8221; to set at the start</li>
+<li><strong>start_total_period</strong> &#8211; The &#8220;total period&#8221; to set at the start</li>
+<li><strong>start_frequency</strong> &#8211; The &#8220;frequency&#8221; to set at the start</li>
+<li><strong>start_melody</strong> &#8211; The &#8220;melody&#8221; to set at the start</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_speaker_device.PushBotSpiNNakerLinkSpeakerDevice.default_parameters">
+<code class="descname">default_parameters</code><em class="property"> = {'n_neurons': 1, 'label': None, 'board_address': None, 'start_active_time': 50, 'start_total_period': 100, 'start_frequency': None, 'start_melody': None}</em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_speaker_device.PushBotSpiNNakerLinkSpeakerDevice.default_parameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.PushBotSpiNNakerLinkLaserDevice">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.</code><code class="descname">PushBotSpiNNakerLinkLaserDevice</code><span class="sig-paren">(</span><em>laser</em>, <em>protocol</em>, <em>spinnaker_link_id</em>, <em>n_neurons=1</em>, <em>label=None</em>, <em>board_address=None</em>, <em>start_active_time=0</em>, <em>start_total_period=0</em>, <em>start_frequency=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/push_bot/push_bot_spinnaker_link/push_bot_spinnaker_link_laser_device.html#PushBotSpiNNakerLinkLaserDevice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.PushBotSpiNNakerLinkLaserDevice" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet.html#spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet.push_bot_ethernet_laser_device.PushBotEthernetLaserDevice" title="spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet.push_bot_ethernet_laser_device.PushBotEthernetLaserDevice"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet.push_bot_ethernet_laser_device.PushBotEthernetLaserDevice</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">pacman.model.graphs.application.application_spinnaker_link_vertex.ApplicationSpiNNakerLinkVertex</span></code></p>
+<p>The Laser of a PushBot</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>laser</strong> (<a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters.html#spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters.push_bot_laser.PushBotLaser" title="spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters.push_bot_laser.PushBotLaser"><em>PushBotLaser</em></a>) &#8211; Which laser device to control</li>
+<li><strong>protocol</strong> (<a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.munich_io_spinnaker_link_protocol.MunichIoSpiNNakerLinkProtocol" title="spynnaker.pyNN.protocols.munich_io_spinnaker_link_protocol.MunichIoSpiNNakerLinkProtocol"><em>MunichIoSpiNNakerLinkProtocol</em></a>) &#8211; The protocol instance to get commands from</li>
+<li><strong>spinnaker_link_id</strong> (<em>int</em>) &#8211; The SpiNNakerLink that the PushBot is connected to</li>
+<li><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons in the device</li>
+<li><strong>label</strong> (<em>str</em>) &#8211; A label for the device</li>
+<li><strong>board_address</strong> (<em>str</em>) &#8211; The IP address of the board that the device is connected to</li>
+<li><strong>start_active_time</strong> &#8211; The &#8220;active time&#8221; value to send at the start</li>
+<li><strong>start_total_period</strong> &#8211; The &#8220;total period&#8221; value to send at the start</li>
+<li><strong>start_frequency</strong> &#8211; The &#8220;frequency&#8221; to send at the start</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.PushBotSpiNNakerLinkLaserDevice.default_parameters">
+<code class="descname">default_parameters</code><em class="property"> = {'n_neurons': 1, 'label': None, 'board_address': None, 'start_active_time': 0, 'start_total_period': 0, 'start_frequency': 0}</em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.PushBotSpiNNakerLinkLaserDevice.default_parameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.PushBotSpiNNakerLinkLEDDevice">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.</code><code class="descname">PushBotSpiNNakerLinkLEDDevice</code><span class="sig-paren">(</span><em>led</em>, <em>protocol</em>, <em>spinnaker_link_id</em>, <em>n_neurons=1</em>, <em>label=None</em>, <em>board_address=None</em>, <em>start_active_time_front=None</em>, <em>start_active_time_back=None</em>, <em>start_total_period=None</em>, <em>start_frequency=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/push_bot/push_bot_spinnaker_link/push_bot_spinnaker_link_led_device.html#PushBotSpiNNakerLinkLEDDevice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.PushBotSpiNNakerLinkLEDDevice" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet.html#spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet.push_bot_ethernet_led_device.PushBotEthernetLEDDevice" title="spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet.push_bot_ethernet_led_device.PushBotEthernetLEDDevice"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet.push_bot_ethernet_led_device.PushBotEthernetLEDDevice</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">pacman.model.graphs.application.application_spinnaker_link_vertex.ApplicationSpiNNakerLinkVertex</span></code></p>
+<p>The LED of a PushBot</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>led</strong> (<a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters.html#spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters.push_bot_led.PushBotLED" title="spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters.push_bot_led.PushBotLED"><em>PushBotLED</em></a>) &#8211; The LED devic to control</li>
+<li><strong>protocol</strong> (<a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.munich_io_spinnaker_link_protocol.MunichIoSpiNNakerLinkProtocol" title="spynnaker.pyNN.protocols.munich_io_spinnaker_link_protocol.MunichIoSpiNNakerLinkProtocol"><em>MunichIoSpiNNakerLinkProtocol</em></a>) &#8211; The protocol instance to get commands from</li>
+<li><strong>spinnaker_link_id</strong> (<em>int</em>) &#8211; The SpiNNakerLink connected to</li>
+<li><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons in the device</li>
+<li><strong>label</strong> (<em>str</em>) &#8211; The label of the device</li>
+<li><strong>board_address</strong> (<em>str</em>) &#8211; The IP address of the board that the device is connected to</li>
+<li><strong>start_active_time_front</strong> &#8211; The &#8220;active time&#8221; to set for the front LED at the start</li>
+<li><strong>start_active_time_back</strong> &#8211; The &#8220;active time&#8221; to set for the back LED at the start</li>
+<li><strong>start_total_period</strong> &#8211; The &#8220;total period&#8221; to set at the start</li>
+<li><strong>start_frequency</strong> &#8211; The &#8220;frequency&#8221; to set at the start</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.PushBotSpiNNakerLinkLEDDevice.default_parameters">
+<code class="descname">default_parameters</code><em class="property"> = {'n_neurons': 1, 'label': None, 'board_address': None, 'start_active_time_front': None, 'start_active_time_back': None, 'start_total_period': None, 'start_frequency': None}</em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.PushBotSpiNNakerLinkLEDDevice.default_parameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.PushBotSpiNNakerLinkMotorDevice">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.</code><code class="descname">PushBotSpiNNakerLinkMotorDevice</code><span class="sig-paren">(</span><em>motor</em>, <em>protocol</em>, <em>spinnaker_link_id</em>, <em>n_neurons=1</em>, <em>label=None</em>, <em>board_address=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/push_bot/push_bot_spinnaker_link/push_bot_spinnaker_link_motor_device.html#PushBotSpiNNakerLinkMotorDevice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.PushBotSpiNNakerLinkMotorDevice" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet.html#spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet.push_bot_ethernet_motor_device.PushBotEthernetMotorDevice" title="spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet.push_bot_ethernet_motor_device.PushBotEthernetMotorDevice"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet.push_bot_ethernet_motor_device.PushBotEthernetMotorDevice</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">pacman.model.graphs.application.application_spinnaker_link_vertex.ApplicationSpiNNakerLinkVertex</span></code></p>
+<p>The motor of a PushBot</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>motor</strong> (<a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters.html#spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters.push_bot_motor.PushBotMotor" title="spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters.push_bot_motor.PushBotMotor"><em>PushBotMotor</em></a>) &#8211; the motor to control</li>
+<li><strong>protocol</strong> (<a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.munich_io_spinnaker_link_protocol.MunichIoSpiNNakerLinkProtocol" title="spynnaker.pyNN.protocols.munich_io_spinnaker_link_protocol.MunichIoSpiNNakerLinkProtocol"><em>MunichIoSpiNNakerLinkProtocol</em></a>) &#8211; The protocol used to control the device</li>
+<li><strong>spinnaker_link_id</strong> (<em>int</em>) &#8211; The SpiNNakerLink connected to</li>
+<li><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons in the device</li>
+<li><strong>label</strong> (<em>str</em>) &#8211; The label of the device</li>
+<li><strong>board_address</strong> (<em>str</em>) &#8211; The IP address of the board that the device is connected to</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.PushBotSpiNNakerLinkMotorDevice.default_parameters">
+<code class="descname">default_parameters</code><em class="property"> = {'n_neurons': 1, 'label': None, 'board_address': None}</em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.PushBotSpiNNakerLinkMotorDevice.default_parameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.PushBotSpiNNakerLinkRetinaDevice">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.</code><code class="descname">PushBotSpiNNakerLinkRetinaDevice</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/push_bot/push_bot_spinnaker_link/push_bot_spinnaker_link_retina_device.html#PushBotSpiNNakerLinkRetinaDevice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.PushBotSpiNNakerLinkRetinaDevice" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.html#spynnaker.pyNN.external_devices_models.push_bot.abstract_push_bot_retina_device.AbstractPushBotRetinaDevice" title="spynnaker.pyNN.external_devices_models.push_bot.abstract_push_bot_retina_device.AbstractPushBotRetinaDevice"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.external_devices_models.push_bot.abstract_push_bot_retina_device.AbstractPushBotRetinaDevice</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">pacman.model.graphs.application.application_spinnaker_link_vertex.ApplicationSpiNNakerLinkVertex</span></code></p>
+<dl class="attribute">
+<dt id="spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.PushBotSpiNNakerLinkRetinaDevice.default_parameters">
+<code class="descname">default_parameters</code><em class="property"> = {'label': None, 'board_address': None}</em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.PushBotSpiNNakerLinkRetinaDevice.default_parameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.PushBotSpiNNakerLinkRetinaDevice.graph_mapper">
+<code class="descname">graph_mapper</code><span class="sig-paren">(</span><em>graph_mapper</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/push_bot/push_bot_spinnaker_link/push_bot_spinnaker_link_retina_device.html#PushBotSpiNNakerLinkRetinaDevice.graph_mapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.PushBotSpiNNakerLinkRetinaDevice.graph_mapper" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.PushBotSpiNNakerLinkRetinaDevice.routing_info">
+<code class="descname">routing_info</code><span class="sig-paren">(</span><em>routing_info</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/push_bot/push_bot_spinnaker_link/push_bot_spinnaker_link_retina_device.html#PushBotSpiNNakerLinkRetinaDevice.routing_info"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.PushBotSpiNNakerLinkRetinaDevice.routing_info" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.PushBotSpiNNakerLinkRetinaDevice.start_resume_commands">
+<code class="descname">start_resume_commands</code><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.PushBotSpiNNakerLinkRetinaDevice.start_resume_commands" title="Permalink to this definition">¶</a></dt>
+<dd><p>The commands needed when starting or resuming simulation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">iterable(<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utility_models.html#spinn_front_end_common.utility_models.MultiCastCommand" title="(in SpiNNFrontEndCommon v)">MultiCastCommand</a>)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.PushBotSpiNNakerLinkSpeakerDevice">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.</code><code class="descname">PushBotSpiNNakerLinkSpeakerDevice</code><span class="sig-paren">(</span><em>speaker</em>, <em>protocol</em>, <em>spinnaker_link_id</em>, <em>n_neurons=1</em>, <em>label=None</em>, <em>board_address=None</em>, <em>start_active_time=50</em>, <em>start_total_period=100</em>, <em>start_frequency=None</em>, <em>start_melody=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/push_bot/push_bot_spinnaker_link/push_bot_spinnaker_link_speaker_device.html#PushBotSpiNNakerLinkSpeakerDevice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.PushBotSpiNNakerLinkSpeakerDevice" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet.html#spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet.push_bot_ethernet_speaker_device.PushBotEthernetSpeakerDevice" title="spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet.push_bot_ethernet_speaker_device.PushBotEthernetSpeakerDevice"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet.push_bot_ethernet_speaker_device.PushBotEthernetSpeakerDevice</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">pacman.model.graphs.application.application_spinnaker_link_vertex.ApplicationSpiNNakerLinkVertex</span></code></p>
+<p>The speaker of a PushBot</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>speaker</strong> (<a class="reference internal" href="spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters.html#spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters.push_bot_speaker.PushBotSpeaker" title="spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters.push_bot_speaker.PushBotSpeaker"><em>PushBotSpeaker</em></a>) &#8211; The PushBotSpeaker value to control</li>
+<li><strong>protocol</strong> (<a class="reference internal" href="spynnaker.pyNN.protocols.html#spynnaker.pyNN.protocols.munich_io_spinnaker_link_protocol.MunichIoSpiNNakerLinkProtocol" title="spynnaker.pyNN.protocols.munich_io_spinnaker_link_protocol.MunichIoSpiNNakerLinkProtocol"><em>MunichIoSpiNNakerLinkProtocol</em></a>) &#8211; The protocol instance to get commands from</li>
+<li><strong>spinnaker_link_id</strong> (<em>int</em>) &#8211; The SpiNNakerLink connected to</li>
+<li><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons in the device</li>
+<li><strong>label</strong> (<em>str</em>) &#8211; The label of the device</li>
+<li><strong>board_address</strong> (<em>str</em>) &#8211; The IP address of the board that the device is connected to</li>
+<li><strong>start_active_time</strong> &#8211; The &#8220;active time&#8221; to set at the start</li>
+<li><strong>start_total_period</strong> &#8211; The &#8220;total period&#8221; to set at the start</li>
+<li><strong>start_frequency</strong> &#8211; The &#8220;frequency&#8221; to set at the start</li>
+<li><strong>start_melody</strong> &#8211; The &#8220;melody&#8221; to set at the start</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.PushBotSpiNNakerLinkSpeakerDevice.default_parameters">
+<code class="descname">default_parameters</code><em class="property"> = {'n_neurons': 1, 'label': None, 'board_address': None, 'start_active_time': 50, 'start_total_period': 100, 'start_frequency': None, 'start_melody': None}</em><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.PushBotSpiNNakerLinkSpeakerDevice.default_parameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="spynnaker.pyNN.model_binaries.html" title="spynnaker.pyNN.model_binaries package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters.html" title="spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.external_devices_models.html" >spynnaker.pyNN.external_devices_models package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="spynnaker.pyNN.external_devices_models.push_bot.html" >spynnaker.pyNN.external_devices_models.push_bot package</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+    </div>
+  </body>
+</html>

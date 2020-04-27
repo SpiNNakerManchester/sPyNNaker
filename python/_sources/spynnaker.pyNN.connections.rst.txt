@@ -1,0 +1,46 @@
+spynnaker.pyNN.connections package
+==================================
+
+Submodules
+----------
+
+spynnaker.pyNN.connections.ethernet_command_connection module
+-------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.connections.ethernet_command_connection
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.connections.ethernet_control_connection module
+-------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.connections.ethernet_control_connection
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.connections.spynnaker_live_spikes_connection module
+------------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.connections.spynnaker_live_spikes_connection
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.connections.spynnaker_poisson_control_connection module
+----------------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.connections.spynnaker_poisson_control_connection
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: spynnaker.pyNN.connections
+    :members:
+    :undoc-members:
+    :show-inheritance:

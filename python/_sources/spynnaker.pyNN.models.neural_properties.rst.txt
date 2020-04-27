@@ -1,0 +1,22 @@
+spynnaker.pyNN.models.neural_properties package
+===============================================
+
+Submodules
+----------
+
+spynnaker.pyNN.models.neural_properties.neural_parameter module
+---------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neural_properties.neural_parameter
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: spynnaker.pyNN.models.neural_properties
+    :members:
+    :undoc-members:
+    :show-inheritance:

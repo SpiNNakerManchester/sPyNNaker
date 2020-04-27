@@ -1,0 +1,748 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>spynnaker.pyNN.connections package &#8212; sPyNNaker  documentation</title>
+    
+    <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="spynnaker.pyNN.external_devices_models package" href="spynnaker.pyNN.external_devices_models.html" />
+    <link rel="prev" title="spynnaker.pyNN package" href="spynnaker.pyNN.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="spynnaker.pyNN.external_devices_models.html" title="spynnaker.pyNN.external_devices_models package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="spynnaker.pyNN.html" title="spynnaker.pyNN package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="spynnaker.pyNN.html" accesskey="U">spynnaker.pyNN package</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">spynnaker.pyNN.connections package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.connections.ethernet_command_connection">spynnaker.pyNN.connections.ethernet_command_connection module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.connections.ethernet_control_connection">spynnaker.pyNN.connections.ethernet_control_connection module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.connections.spynnaker_live_spikes_connection">spynnaker.pyNN.connections.spynnaker_live_spikes_connection module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.connections.spynnaker_poisson_control_connection">spynnaker.pyNN.connections.spynnaker_poisson_control_connection module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.connections">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="spynnaker.pyNN.html"
+                        title="previous chapter">spynnaker.pyNN package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="spynnaker.pyNN.external_devices_models.html"
+                        title="next chapter">spynnaker.pyNN.external_devices_models package</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/spynnaker.pyNN.connections.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="spynnaker-pynn-connections-package">
+<h1>spynnaker.pyNN.connections package<a class="headerlink" href="#spynnaker-pynn-connections-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-spynnaker.pyNN.connections.ethernet_command_connection">
+<span id="spynnaker-pynn-connections-ethernet-command-connection-module"></span><h2>spynnaker.pyNN.connections.ethernet_command_connection module<a class="headerlink" href="#module-spynnaker.pyNN.connections.ethernet_command_connection" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="spynnaker.pyNN.connections.ethernet_command_connection.EthernetCommandConnection">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.connections.ethernet_command_connection.</code><code class="descname">EthernetCommandConnection</code><span class="sig-paren">(</span><em>translator</em>, <em>command_containers=None</em>, <em>local_host=None</em>, <em>local_port=19999</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/connections/ethernet_command_connection.html#EthernetCommandConnection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.connections.ethernet_command_connection.EthernetCommandConnection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.utilities.database.database_connection.DatabaseConnection</span></code></p>
+<p>A connection that can send commands to a device at the start and end        of a simulation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>translator</strong> (<a class="reference internal" href="spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.abstract_ethernet_translator.AbstractEthernetTranslator" title="spynnaker.pyNN.external_devices_models.abstract_ethernet_translator.AbstractEthernetTranslator"><em>AbstractEthernetTranslator</em></a>) &#8211; A translator of multicast commands to device commands</li>
+<li><strong>command_containers</strong> (<em>list</em><em>(</em><a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.abstract_models.html#spinn_front_end_common.abstract_models.AbstractSendMeMulticastCommandsVertex" title="(in SpiNNFrontEndCommon v)"><em>AbstractSendMeMulticastCommandsVertex</em></a><em>)</em><em></em>) &#8211; A list of vertices that have commands to be sent at the start             and end of simulation</li>
+<li><strong>local_host</strong> (<em>str</em>) &#8211; The optional host to listen on for the start/resume message</li>
+<li><strong>local_port</strong> (<em>int</em>) &#8211; The optional port to listen on for the stop/pause message</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="spynnaker.pyNN.connections.ethernet_command_connection.EthernetCommandConnection.add_command_container">
+<code class="descname">add_command_container</code><span class="sig-paren">(</span><em>command_container</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/connections/ethernet_command_connection.html#EthernetCommandConnection.add_command_container"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.connections.ethernet_command_connection.EthernetCommandConnection.add_command_container" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a command container.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>command_container</strong> (<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.abstract_models.html#spinn_front_end_common.abstract_models.AbstractSendMeMulticastCommandsVertex" title="(in SpiNNFrontEndCommon v)"><em>AbstractSendMeMulticastCommandsVertex</em></a>) &#8211; A vertex that has commands to be sent at the start and end of             simulation</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-spynnaker.pyNN.connections.ethernet_control_connection">
+<span id="spynnaker-pynn-connections-ethernet-control-connection-module"></span><h2>spynnaker.pyNN.connections.ethernet_control_connection module<a class="headerlink" href="#module-spynnaker.pyNN.connections.ethernet_control_connection" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="spynnaker.pyNN.connections.ethernet_control_connection.EthernetControlConnection">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.connections.ethernet_control_connection.</code><code class="descname">EthernetControlConnection</code><span class="sig-paren">(</span><em>translator</em>, <em>label</em>, <em>live_packet_gather_label</em>, <em>local_host=None</em>, <em>local_port=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/connections/ethernet_control_connection.html#EthernetControlConnection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.connections.ethernet_control_connection.EthernetControlConnection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.utilities.connections.live_event_connection.LiveEventConnection</span></code></p>
+<p>A connection that can translate Ethernet control messages received        from a Population</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>translator</strong> &#8211; The translator of multicast to control commands</li>
+<li><strong>local_host</strong> &#8211; The optional host to listen on</li>
+<li><strong>local_port</strong> &#8211; The optional port to listen on</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="spynnaker.pyNN.connections.ethernet_control_connection.EthernetControlConnection.add_translator">
+<code class="descname">add_translator</code><span class="sig-paren">(</span><em>label</em>, <em>translator</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/connections/ethernet_control_connection.html#EthernetControlConnection.add_translator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.connections.ethernet_control_connection.EthernetControlConnection.add_translator" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-spynnaker.pyNN.connections.spynnaker_live_spikes_connection">
+<span id="spynnaker-pynn-connections-spynnaker-live-spikes-connection-module"></span><h2>spynnaker.pyNN.connections.spynnaker_live_spikes_connection module<a class="headerlink" href="#module-spynnaker.pyNN.connections.spynnaker_live_spikes_connection" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="spynnaker.pyNN.connections.spynnaker_live_spikes_connection.SpynnakerLiveSpikesConnection">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.connections.spynnaker_live_spikes_connection.</code><code class="descname">SpynnakerLiveSpikesConnection</code><span class="sig-paren">(</span><em>receive_labels=None</em>, <em>send_labels=None</em>, <em>local_host=None</em>, <em>local_port=19999</em>, <em>live_packet_gather_label='LiveSpikeReceiver'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/connections/spynnaker_live_spikes_connection.html#SpynnakerLiveSpikesConnection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.connections.spynnaker_live_spikes_connection.SpynnakerLiveSpikesConnection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.utilities.connections.live_event_connection.LiveEventConnection</span></code></p>
+<p>A connection for receiving and sending live spikes from and to        SpiNNaker</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>receive_labels</strong> (<em>iterable</em><em>(</em><em>str</em><em>)</em><em></em>) &#8211; Labels of population from which live spikes will be received.</li>
+<li><strong>send_labels</strong> (<em>iterable</em><em>(</em><em>str</em><em>)</em><em></em>) &#8211; Labels of population to which live spikes will be sent</li>
+<li><strong>local_host</strong> (<em>str</em>) &#8211; Optional specification of the local hostname or IP address of the
+interface to listen on</li>
+<li><strong>local_port</strong> (<em>int</em>) &#8211; Optional specification of the local port to listen on. Must match
+the port that the toolchain will send the notification on (19999
+by default)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="spynnaker.pyNN.connections.spynnaker_live_spikes_connection.SpynnakerLiveSpikesConnection.send_spike">
+<code class="descname">send_spike</code><span class="sig-paren">(</span><em>label</em>, <em>neuron_id</em>, <em>send_full_keys=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/connections/spynnaker_live_spikes_connection.html#SpynnakerLiveSpikesConnection.send_spike"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.connections.spynnaker_live_spikes_connection.SpynnakerLiveSpikesConnection.send_spike" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send a spike from a single neuron</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>label</strong> (<em>str</em>) &#8211; The label of the population from which the spike will originate</li>
+<li><strong>neuron_id</strong> (<em>int</em>) &#8211; The ID of the neuron sending a spike</li>
+<li><strong>send_full_keys</strong> (<em>bool</em>) &#8211; Determines whether to send full 32-bit
+keys, getting the key for each neuron from the database, or
+whether to send 16-bit neuron IDs directly</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.connections.spynnaker_live_spikes_connection.SpynnakerLiveSpikesConnection.send_spikes">
+<code class="descname">send_spikes</code><span class="sig-paren">(</span><em>label</em>, <em>neuron_ids</em>, <em>send_full_keys=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/connections/spynnaker_live_spikes_connection.html#SpynnakerLiveSpikesConnection.send_spikes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.connections.spynnaker_live_spikes_connection.SpynnakerLiveSpikesConnection.send_spikes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send a number of spikes</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>label</strong> (<em>str</em>) &#8211; The label of the population from which the spikes will originate</li>
+<li><strong>neuron_ids</strong> (<em>list</em><em>(</em><em>int</em><em>)</em><em></em>) &#8211; array-like of neuron IDs sending spikes</li>
+<li><strong>send_full_keys</strong> (<em>bool</em>) &#8211; Determines whether to send full 32-bit
+keys, getting the key for each neuron from the database, or
+whether to send 16-bit neuron IDs directly</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-spynnaker.pyNN.connections.spynnaker_poisson_control_connection">
+<span id="spynnaker-pynn-connections-spynnaker-poisson-control-connection-module"></span><h2>spynnaker.pyNN.connections.spynnaker_poisson_control_connection module<a class="headerlink" href="#module-spynnaker.pyNN.connections.spynnaker_poisson_control_connection" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="spynnaker.pyNN.connections.spynnaker_poisson_control_connection.SpynnakerPoissonControlConnection">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.connections.spynnaker_poisson_control_connection.</code><code class="descname">SpynnakerPoissonControlConnection</code><span class="sig-paren">(</span><em>poisson_labels=None</em>, <em>local_host=None</em>, <em>local_port=19999</em>, <em>control_label_extension='_control'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/connections/spynnaker_poisson_control_connection.html#SpynnakerPoissonControlConnection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.connections.spynnaker_poisson_control_connection.SpynnakerPoissonControlConnection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.utilities.connections.live_event_connection.LiveEventConnection</span></code></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>poisson_labels</strong> (<em>iterable</em><em>(</em><em>str</em><em>)</em><em></em>) &#8211; Labels of Poisson populations to be controlled</li>
+<li><strong>local_host</strong> (<em>str</em>) &#8211; Optional specification of the local hostname or            IP address of the interface to listen on</li>
+<li><strong>local_port</strong> (<em>int</em>) &#8211; Optional specification of the local port to listen on. Must match
+the port that the toolchain will send the notification on (19999
+by default)</li>
+<li><strong>control_label_extension</strong> (<em>str</em>) &#8211; The extra name added to the label of each Poisson source</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="spynnaker.pyNN.connections.spynnaker_poisson_control_connection.SpynnakerPoissonControlConnection.add_init_callback">
+<code class="descname">add_init_callback</code><span class="sig-paren">(</span><em>label</em>, <em>init_callback</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/connections/spynnaker_poisson_control_connection.html#SpynnakerPoissonControlConnection.add_init_callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.connections.spynnaker_poisson_control_connection.SpynnakerPoissonControlConnection.add_init_callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a callback to be called to initialise a vertex</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>label</strong> (<em>str</em>) &#8211; The label of the vertex to be notified about. Must be one of the
+vertices listed in the constructor</li>
+<li><strong>init_callback</strong> (<em>callable</em><em>(</em><em>str</em><em>, </em><em>int</em><em>, </em><em>float</em><em>, </em><em>float</em><em>) </em><em>-&gt; None</em>) &#8211; A function to be called to initialise the            vertex. This should take as parameters the label of the vertex,            the number of neurons in the population, the run time of the            simulation in milliseconds, and the simulation timestep in            milliseconds</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.connections.spynnaker_poisson_control_connection.SpynnakerPoissonControlConnection.add_pause_stop_callback">
+<code class="descname">add_pause_stop_callback</code><span class="sig-paren">(</span><em>label</em>, <em>pause_stop_callback</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/connections/spynnaker_poisson_control_connection.html#SpynnakerPoissonControlConnection.add_pause_stop_callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.connections.spynnaker_poisson_control_connection.SpynnakerPoissonControlConnection.add_pause_stop_callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a callback for the pause and stop state of the simulation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>label</strong> (<em>str</em>) &#8211; the label of the function to be sent</li>
+<li><strong>pause_stop_callback</strong> (<em>callable</em><em>(</em><em>str</em><em>, </em><em>LiveEventConnection</em><em>) </em><em>-&gt; None</em>) &#8211; A function to be called when the pause            or stop message has been received. This function should take the            label of the referenced  vertex, and an instance of this class,            which can be used to send events.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.connections.spynnaker_poisson_control_connection.SpynnakerPoissonControlConnection.add_poisson_label">
+<code class="descname">add_poisson_label</code><span class="sig-paren">(</span><em>label</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/connections/spynnaker_poisson_control_connection.html#SpynnakerPoissonControlConnection.add_poisson_label"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.connections.spynnaker_poisson_control_connection.SpynnakerPoissonControlConnection.add_poisson_label" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>label</strong> (<em>str</em>) &#8211; The label of the Poisson source population.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.connections.spynnaker_poisson_control_connection.SpynnakerPoissonControlConnection.add_receive_callback">
+<code class="descname">add_receive_callback</code><span class="sig-paren">(</span><em>label</em>, <em>live_event_callback</em>, <em>translate_key=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/connections/spynnaker_poisson_control_connection.html#SpynnakerPoissonControlConnection.add_receive_callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.connections.spynnaker_poisson_control_connection.SpynnakerPoissonControlConnection.add_receive_callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a callback for the reception of live events from a vertex</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>label</strong> (<em>str</em>) &#8211; The label of the vertex to be notified about.
+Must be one of the vertices listed in the constructor</li>
+<li><strong>live_event_callback</strong> (<em>callable</em><em>(</em><em>str</em><em>, </em><em>int</em><em>, </em><em>list</em><em>(</em><em>int</em><em>)</em><em></em><em>) </em><em>-&gt; None</em>) &#8211; A function to be called when events are            received. This should take as parameters the label of the vertex,            the simulation timestep when the event occurred, and an            array-like of atom IDs.</li>
+<li><strong>translate_key</strong> (<em>bool</em>) &#8211; True if the key is to be converted to an atom ID, False if the
+key should stay a key</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.connections.spynnaker_poisson_control_connection.SpynnakerPoissonControlConnection.add_start_callback">
+<code class="descname">add_start_callback</code><span class="sig-paren">(</span><em>label</em>, <em>start_callback</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/connections/spynnaker_poisson_control_connection.html#SpynnakerPoissonControlConnection.add_start_callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.connections.spynnaker_poisson_control_connection.SpynnakerPoissonControlConnection.add_start_callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a callback for the start of the simulation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>start_callback</strong> (<em>callable</em><em>(</em><em>str</em><em>, </em><em>LiveEventConnection</em><em>) </em><em>-&gt; None</em>) &#8211; A function to be called when the start            message has been received. This function should take the label of            the referenced vertex, and an instance of this class, which can            be used to send events</li>
+<li><strong>label</strong> (<em>str</em>) &#8211; the label of the function to be sent</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.connections.spynnaker_poisson_control_connection.SpynnakerPoissonControlConnection.add_start_resume_callback">
+<code class="descname">add_start_resume_callback</code><span class="sig-paren">(</span><em>label</em>, <em>start_resume_callback</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/connections/spynnaker_poisson_control_connection.html#SpynnakerPoissonControlConnection.add_start_resume_callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.connections.spynnaker_poisson_control_connection.SpynnakerPoissonControlConnection.add_start_resume_callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a callback for the start and resume state of the simulation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>label</strong> (<em>str</em>) &#8211; the label of the function to be sent</li>
+<li><strong>start_resume_callback</strong> (<em>callable</em><em>(</em><em>str</em><em>, </em><em>LiveEventConnection</em><em>) </em><em>-&gt; None</em>) &#8211; A function to be called when the start            or resume message has been received. This function should take             the label of the referenced vertex, and an instance of this             class, which can be used to send events.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.connections.spynnaker_poisson_control_connection.SpynnakerPoissonControlConnection.set_rate">
+<code class="descname">set_rate</code><span class="sig-paren">(</span><em>label</em>, <em>neuron_id</em>, <em>rate</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/connections/spynnaker_poisson_control_connection.html#SpynnakerPoissonControlConnection.set_rate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.connections.spynnaker_poisson_control_connection.SpynnakerPoissonControlConnection.set_rate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the rate of a Poisson neuron within a Poisson source</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>label</strong> (<em>str</em>) &#8211; The label of the Population to set the rates of</li>
+<li><strong>neuron_id</strong> (<em>int</em>) &#8211; The neuron ID to set the rate of</li>
+<li><strong>rate</strong> (<em>float</em>) &#8211; The rate to set in Hz</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.connections.spynnaker_poisson_control_connection.SpynnakerPoissonControlConnection.set_rates">
+<code class="descname">set_rates</code><span class="sig-paren">(</span><em>label</em>, <em>neuron_id_rates</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/connections/spynnaker_poisson_control_connection.html#SpynnakerPoissonControlConnection.set_rates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.connections.spynnaker_poisson_control_connection.SpynnakerPoissonControlConnection.set_rates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the rates of multiple Poisson neurons within a Poisson source</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>label</strong> (<em>str</em>) &#8211; The label of the Population to set the rates of</li>
+<li><strong>neuron_id_rates</strong> (<em>list</em><em>(</em><em>tuple</em><em>(</em><em>int</em><em>,</em><em>float</em><em>)</em><em></em><em>)</em><em></em>) &#8211; A list of tuples of (neuron ID, rate) to be set</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-spynnaker.pyNN.connections">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.connections" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="spynnaker.pyNN.connections.EthernetCommandConnection">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.connections.</code><code class="descname">EthernetCommandConnection</code><span class="sig-paren">(</span><em>translator</em>, <em>command_containers=None</em>, <em>local_host=None</em>, <em>local_port=19999</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/connections/ethernet_command_connection.html#EthernetCommandConnection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.connections.EthernetCommandConnection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.utilities.database.database_connection.DatabaseConnection</span></code></p>
+<p>A connection that can send commands to a device at the start and end        of a simulation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>translator</strong> (<a class="reference internal" href="spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.abstract_ethernet_translator.AbstractEthernetTranslator" title="spynnaker.pyNN.external_devices_models.abstract_ethernet_translator.AbstractEthernetTranslator"><em>AbstractEthernetTranslator</em></a>) &#8211; A translator of multicast commands to device commands</li>
+<li><strong>command_containers</strong> (<em>list</em><em>(</em><a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.abstract_models.html#spinn_front_end_common.abstract_models.AbstractSendMeMulticastCommandsVertex" title="(in SpiNNFrontEndCommon v)"><em>AbstractSendMeMulticastCommandsVertex</em></a><em>)</em><em></em>) &#8211; A list of vertices that have commands to be sent at the start             and end of simulation</li>
+<li><strong>local_host</strong> (<em>str</em>) &#8211; The optional host to listen on for the start/resume message</li>
+<li><strong>local_port</strong> (<em>int</em>) &#8211; The optional port to listen on for the stop/pause message</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="spynnaker.pyNN.connections.EthernetCommandConnection.add_command_container">
+<code class="descname">add_command_container</code><span class="sig-paren">(</span><em>command_container</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/connections/ethernet_command_connection.html#EthernetCommandConnection.add_command_container"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.connections.EthernetCommandConnection.add_command_container" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a command container.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>command_container</strong> (<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.abstract_models.html#spinn_front_end_common.abstract_models.AbstractSendMeMulticastCommandsVertex" title="(in SpiNNFrontEndCommon v)"><em>AbstractSendMeMulticastCommandsVertex</em></a>) &#8211; A vertex that has commands to be sent at the start and end of             simulation</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="spynnaker.pyNN.connections.EthernetControlConnection">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.connections.</code><code class="descname">EthernetControlConnection</code><span class="sig-paren">(</span><em>translator</em>, <em>label</em>, <em>live_packet_gather_label</em>, <em>local_host=None</em>, <em>local_port=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/connections/ethernet_control_connection.html#EthernetControlConnection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.connections.EthernetControlConnection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.utilities.connections.live_event_connection.LiveEventConnection</span></code></p>
+<p>A connection that can translate Ethernet control messages received        from a Population</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>translator</strong> &#8211; The translator of multicast to control commands</li>
+<li><strong>local_host</strong> &#8211; The optional host to listen on</li>
+<li><strong>local_port</strong> &#8211; The optional port to listen on</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="spynnaker.pyNN.connections.EthernetControlConnection.add_translator">
+<code class="descname">add_translator</code><span class="sig-paren">(</span><em>label</em>, <em>translator</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/connections/ethernet_control_connection.html#EthernetControlConnection.add_translator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.connections.EthernetControlConnection.add_translator" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="spynnaker.pyNN.connections.SpynnakerLiveSpikesConnection">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.connections.</code><code class="descname">SpynnakerLiveSpikesConnection</code><span class="sig-paren">(</span><em>receive_labels=None</em>, <em>send_labels=None</em>, <em>local_host=None</em>, <em>local_port=19999</em>, <em>live_packet_gather_label='LiveSpikeReceiver'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/connections/spynnaker_live_spikes_connection.html#SpynnakerLiveSpikesConnection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.connections.SpynnakerLiveSpikesConnection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.utilities.connections.live_event_connection.LiveEventConnection</span></code></p>
+<p>A connection for receiving and sending live spikes from and to        SpiNNaker</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>receive_labels</strong> (<em>iterable</em><em>(</em><em>str</em><em>)</em><em></em>) &#8211; Labels of population from which live spikes will be received.</li>
+<li><strong>send_labels</strong> (<em>iterable</em><em>(</em><em>str</em><em>)</em><em></em>) &#8211; Labels of population to which live spikes will be sent</li>
+<li><strong>local_host</strong> (<em>str</em>) &#8211; Optional specification of the local hostname or IP address of the
+interface to listen on</li>
+<li><strong>local_port</strong> (<em>int</em>) &#8211; Optional specification of the local port to listen on. Must match
+the port that the toolchain will send the notification on (19999
+by default)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="spynnaker.pyNN.connections.SpynnakerLiveSpikesConnection.send_spike">
+<code class="descname">send_spike</code><span class="sig-paren">(</span><em>label</em>, <em>neuron_id</em>, <em>send_full_keys=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/connections/spynnaker_live_spikes_connection.html#SpynnakerLiveSpikesConnection.send_spike"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.connections.SpynnakerLiveSpikesConnection.send_spike" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send a spike from a single neuron</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>label</strong> (<em>str</em>) &#8211; The label of the population from which the spike will originate</li>
+<li><strong>neuron_id</strong> (<em>int</em>) &#8211; The ID of the neuron sending a spike</li>
+<li><strong>send_full_keys</strong> (<em>bool</em>) &#8211; Determines whether to send full 32-bit
+keys, getting the key for each neuron from the database, or
+whether to send 16-bit neuron IDs directly</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.connections.SpynnakerLiveSpikesConnection.send_spikes">
+<code class="descname">send_spikes</code><span class="sig-paren">(</span><em>label</em>, <em>neuron_ids</em>, <em>send_full_keys=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/connections/spynnaker_live_spikes_connection.html#SpynnakerLiveSpikesConnection.send_spikes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.connections.SpynnakerLiveSpikesConnection.send_spikes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send a number of spikes</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>label</strong> (<em>str</em>) &#8211; The label of the population from which the spikes will originate</li>
+<li><strong>neuron_ids</strong> (<em>list</em><em>(</em><em>int</em><em>)</em><em></em>) &#8211; array-like of neuron IDs sending spikes</li>
+<li><strong>send_full_keys</strong> (<em>bool</em>) &#8211; Determines whether to send full 32-bit
+keys, getting the key for each neuron from the database, or
+whether to send 16-bit neuron IDs directly</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="spynnaker.pyNN.connections.SpynnakerPoissonControlConnection">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.connections.</code><code class="descname">SpynnakerPoissonControlConnection</code><span class="sig-paren">(</span><em>poisson_labels=None</em>, <em>local_host=None</em>, <em>local_port=19999</em>, <em>control_label_extension='_control'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/connections/spynnaker_poisson_control_connection.html#SpynnakerPoissonControlConnection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.connections.SpynnakerPoissonControlConnection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.utilities.connections.live_event_connection.LiveEventConnection</span></code></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>poisson_labels</strong> (<em>iterable</em><em>(</em><em>str</em><em>)</em><em></em>) &#8211; Labels of Poisson populations to be controlled</li>
+<li><strong>local_host</strong> (<em>str</em>) &#8211; Optional specification of the local hostname or            IP address of the interface to listen on</li>
+<li><strong>local_port</strong> (<em>int</em>) &#8211; Optional specification of the local port to listen on. Must match
+the port that the toolchain will send the notification on (19999
+by default)</li>
+<li><strong>control_label_extension</strong> (<em>str</em>) &#8211; The extra name added to the label of each Poisson source</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="spynnaker.pyNN.connections.SpynnakerPoissonControlConnection.add_init_callback">
+<code class="descname">add_init_callback</code><span class="sig-paren">(</span><em>label</em>, <em>init_callback</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/connections/spynnaker_poisson_control_connection.html#SpynnakerPoissonControlConnection.add_init_callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.connections.SpynnakerPoissonControlConnection.add_init_callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a callback to be called to initialise a vertex</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>label</strong> (<em>str</em>) &#8211; The label of the vertex to be notified about. Must be one of the
+vertices listed in the constructor</li>
+<li><strong>init_callback</strong> (<em>callable</em><em>(</em><em>str</em><em>, </em><em>int</em><em>, </em><em>float</em><em>, </em><em>float</em><em>) </em><em>-&gt; None</em>) &#8211; A function to be called to initialise the            vertex. This should take as parameters the label of the vertex,            the number of neurons in the population, the run time of the            simulation in milliseconds, and the simulation timestep in            milliseconds</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.connections.SpynnakerPoissonControlConnection.add_pause_stop_callback">
+<code class="descname">add_pause_stop_callback</code><span class="sig-paren">(</span><em>label</em>, <em>pause_stop_callback</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/connections/spynnaker_poisson_control_connection.html#SpynnakerPoissonControlConnection.add_pause_stop_callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.connections.SpynnakerPoissonControlConnection.add_pause_stop_callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a callback for the pause and stop state of the simulation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>label</strong> (<em>str</em>) &#8211; the label of the function to be sent</li>
+<li><strong>pause_stop_callback</strong> (<em>callable</em><em>(</em><em>str</em><em>, </em><em>LiveEventConnection</em><em>) </em><em>-&gt; None</em>) &#8211; A function to be called when the pause            or stop message has been received. This function should take the            label of the referenced  vertex, and an instance of this class,            which can be used to send events.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.connections.SpynnakerPoissonControlConnection.add_poisson_label">
+<code class="descname">add_poisson_label</code><span class="sig-paren">(</span><em>label</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/connections/spynnaker_poisson_control_connection.html#SpynnakerPoissonControlConnection.add_poisson_label"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.connections.SpynnakerPoissonControlConnection.add_poisson_label" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>label</strong> (<em>str</em>) &#8211; The label of the Poisson source population.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.connections.SpynnakerPoissonControlConnection.add_receive_callback">
+<code class="descname">add_receive_callback</code><span class="sig-paren">(</span><em>label</em>, <em>live_event_callback</em>, <em>translate_key=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/connections/spynnaker_poisson_control_connection.html#SpynnakerPoissonControlConnection.add_receive_callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.connections.SpynnakerPoissonControlConnection.add_receive_callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a callback for the reception of live events from a vertex</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>label</strong> (<em>str</em>) &#8211; The label of the vertex to be notified about.
+Must be one of the vertices listed in the constructor</li>
+<li><strong>live_event_callback</strong> (<em>callable</em><em>(</em><em>str</em><em>, </em><em>int</em><em>, </em><em>list</em><em>(</em><em>int</em><em>)</em><em></em><em>) </em><em>-&gt; None</em>) &#8211; A function to be called when events are            received. This should take as parameters the label of the vertex,            the simulation timestep when the event occurred, and an            array-like of atom IDs.</li>
+<li><strong>translate_key</strong> (<em>bool</em>) &#8211; True if the key is to be converted to an atom ID, False if the
+key should stay a key</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.connections.SpynnakerPoissonControlConnection.add_start_callback">
+<code class="descname">add_start_callback</code><span class="sig-paren">(</span><em>label</em>, <em>start_callback</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/connections/spynnaker_poisson_control_connection.html#SpynnakerPoissonControlConnection.add_start_callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.connections.SpynnakerPoissonControlConnection.add_start_callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a callback for the start of the simulation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>start_callback</strong> (<em>callable</em><em>(</em><em>str</em><em>, </em><em>LiveEventConnection</em><em>) </em><em>-&gt; None</em>) &#8211; A function to be called when the start            message has been received. This function should take the label of            the referenced vertex, and an instance of this class, which can            be used to send events</li>
+<li><strong>label</strong> (<em>str</em>) &#8211; the label of the function to be sent</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.connections.SpynnakerPoissonControlConnection.add_start_resume_callback">
+<code class="descname">add_start_resume_callback</code><span class="sig-paren">(</span><em>label</em>, <em>start_resume_callback</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/connections/spynnaker_poisson_control_connection.html#SpynnakerPoissonControlConnection.add_start_resume_callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.connections.SpynnakerPoissonControlConnection.add_start_resume_callback" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a callback for the start and resume state of the simulation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>label</strong> (<em>str</em>) &#8211; the label of the function to be sent</li>
+<li><strong>start_resume_callback</strong> (<em>callable</em><em>(</em><em>str</em><em>, </em><em>LiveEventConnection</em><em>) </em><em>-&gt; None</em>) &#8211; A function to be called when the start            or resume message has been received. This function should take             the label of the referenced vertex, and an instance of this             class, which can be used to send events.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.connections.SpynnakerPoissonControlConnection.set_rate">
+<code class="descname">set_rate</code><span class="sig-paren">(</span><em>label</em>, <em>neuron_id</em>, <em>rate</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/connections/spynnaker_poisson_control_connection.html#SpynnakerPoissonControlConnection.set_rate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.connections.SpynnakerPoissonControlConnection.set_rate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the rate of a Poisson neuron within a Poisson source</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>label</strong> (<em>str</em>) &#8211; The label of the Population to set the rates of</li>
+<li><strong>neuron_id</strong> (<em>int</em>) &#8211; The neuron ID to set the rate of</li>
+<li><strong>rate</strong> (<em>float</em>) &#8211; The rate to set in Hz</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.connections.SpynnakerPoissonControlConnection.set_rates">
+<code class="descname">set_rates</code><span class="sig-paren">(</span><em>label</em>, <em>neuron_id_rates</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/connections/spynnaker_poisson_control_connection.html#SpynnakerPoissonControlConnection.set_rates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.connections.SpynnakerPoissonControlConnection.set_rates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the rates of multiple Poisson neurons within a Poisson source</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>label</strong> (<em>str</em>) &#8211; The label of the Population to set the rates of</li>
+<li><strong>neuron_id_rates</strong> (<em>list</em><em>(</em><em>tuple</em><em>(</em><em>int</em><em>,</em><em>float</em><em>)</em><em></em><em>)</em><em></em>) &#8211; A list of tuples of (neuron ID, rate) to be set</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="spynnaker.pyNN.external_devices_models.html" title="spynnaker.pyNN.external_devices_models package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="spynnaker.pyNN.html" title="spynnaker.pyNN package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+    </div>
+  </body>
+</html>

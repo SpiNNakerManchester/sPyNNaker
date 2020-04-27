@@ -1,0 +1,10 @@
+spynnaker.pyNN.model_binaries package
+=====================================
+
+Module contents
+---------------
+
+.. automodule:: spynnaker.pyNN.model_binaries
+    :members:
+    :undoc-members:
+    :show-inheritance:

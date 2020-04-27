@@ -1,0 +1,77 @@
+spynnaker.pyNN.models.neural_projections package
+================================================
+
+Subpackages
+-----------
+
+.. toctree::
+
+    spynnaker.pyNN.models.neural_projections.connectors
+
+Submodules
+----------
+
+spynnaker.pyNN.models.neural_projections.delay_afferent_application_edge module
+-------------------------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neural_projections.delay_afferent_application_edge
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.models.neural_projections.delay_afferent_machine_edge module
+---------------------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neural_projections.delay_afferent_machine_edge
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.models.neural_projections.delayed_application_edge module
+------------------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neural_projections.delayed_application_edge
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.models.neural_projections.delayed_machine_edge module
+--------------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neural_projections.delayed_machine_edge
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.models.neural_projections.projection_application_edge module
+---------------------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neural_projections.projection_application_edge
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.models.neural_projections.projection_machine_edge module
+-----------------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neural_projections.projection_machine_edge
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.models.neural_projections.synapse_information module
+-------------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neural_projections.synapse_information
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: spynnaker.pyNN.models.neural_projections
+    :members:
+    :undoc-members:
+    :show-inheritance:

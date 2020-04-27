@@ -1,0 +1,228 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.timing_dependence_recurrent &#8212; sPyNNaker  documentation</title>
+    
+    <link rel="stylesheet" href="../../../../../../../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../../../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../../../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../../../../index.html">sPyNNaker  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.timing_dependence_recurrent</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2017-2019 The University of Manchester</span>
+<span class="c1">#</span>
+<span class="c1"># This program is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> \
+    <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span>
+<span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
+<span class="kn">from</span> <span class="nn">data_specification.enums</span> <span class="kn">import</span> <span class="n">DataType</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">BYTES_PER_WORD</span><span class="p">,</span> <span class="n">BYTES_PER_SHORT</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.abstract_timing_dependence</span> <span class="kn">import</span> <span class="n">AbstractTimingDependence</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">SynapseStructureWeightAccumulator</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.plasticity.stdp.common.plasticity_helpers</span> \
+    <span class="kn">import</span> <span class="p">(</span>
+        <span class="n">STDP_FIXED_POINT_ONE</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="TimingDependenceRecurrent"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.timing_dependence_recurrent.TimingDependenceRecurrent">[docs]</a><span class="k">class</span> <span class="nc">TimingDependenceRecurrent</span><span class="p">(</span><span class="n">AbstractTimingDependence</span><span class="p">):</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;__accumulator_depression_plus_one&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__accumulator_potentiation_minus_one&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__dual_fsm&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__mean_post_window&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__mean_pre_window&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__synapse_structure&quot;</span><span class="p">]</span>
+
+    <span class="n">default_parameters</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;accumulator_depression&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mi">6</span><span class="p">,</span> <span class="s1">&#39;accumulator_potentiation&#39;</span><span class="p">:</span> <span class="mi">6</span><span class="p">,</span>
+        <span class="s1">&#39;mean_pre_window&#39;</span><span class="p">:</span> <span class="mf">35.0</span><span class="p">,</span> <span class="s1">&#39;mean_post_window&#39;</span><span class="p">:</span> <span class="mf">35.0</span><span class="p">,</span> <span class="s1">&#39;dual_fsm&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">accumulator_depression</span><span class="o">=</span><span class="n">default_parameters</span><span class="p">[</span>
+                <span class="s1">&#39;accumulator_depression&#39;</span><span class="p">],</span>
+            <span class="n">accumulator_potentiation</span><span class="o">=</span><span class="n">default_parameters</span><span class="p">[</span>
+                <span class="s1">&#39;accumulator_potentiation&#39;</span><span class="p">],</span>
+            <span class="n">mean_pre_window</span><span class="o">=</span><span class="n">default_parameters</span><span class="p">[</span><span class="s1">&#39;mean_pre_window&#39;</span><span class="p">],</span>
+            <span class="n">mean_post_window</span><span class="o">=</span><span class="n">default_parameters</span><span class="p">[</span><span class="s1">&#39;mean_post_window&#39;</span><span class="p">],</span>
+            <span class="n">dual_fsm</span><span class="o">=</span><span class="n">default_parameters</span><span class="p">[</span><span class="s1">&#39;dual_fsm&#39;</span><span class="p">]):</span>
+        <span class="c1"># pylint: disable=too-many-arguments</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__accumulator_depression_plus_one</span> <span class="o">=</span> <span class="n">accumulator_depression</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__accumulator_potentiation_minus_one</span> <span class="o">=</span> \
+            <span class="n">accumulator_potentiation</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__mean_pre_window</span> <span class="o">=</span> <span class="n">mean_pre_window</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__mean_post_window</span> <span class="o">=</span> <span class="n">mean_post_window</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__dual_fsm</span> <span class="o">=</span> <span class="n">dual_fsm</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_structure</span> <span class="o">=</span> <span class="n">SynapseStructureWeightAccumulator</span><span class="p">()</span>
+
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractTimingDependence</span><span class="o">.</span><span class="n">is_same_as</span><span class="p">)</span>
+<div class="viewcode-block" id="TimingDependenceRecurrent.is_same_as"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.timing_dependence_recurrent.TimingDependenceRecurrent.is_same_as">[docs]</a>    <span class="k">def</span> <span class="nf">is_same_as</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timing_dependence</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">timing_dependence</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
+                <span class="n">timing_dependence</span><span class="p">,</span> <span class="n">TimingDependenceRecurrent</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">__accumulator_depression_plus_one</span> <span class="o">==</span>
+                 <span class="n">timing_dependence</span><span class="o">.</span><span class="n">accumulator_depression_plus_one</span><span class="p">)</span> <span class="ow">and</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__accumulator_potentiation_minus_one</span> <span class="o">==</span>
+                 <span class="n">timing_dependence</span><span class="o">.</span><span class="n">accumulator_potentiation_minus_one</span><span class="p">)</span> <span class="ow">and</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__mean_pre_window</span> <span class="o">==</span>
+                 <span class="n">timing_dependence</span><span class="o">.</span><span class="n">mean_pre_window</span><span class="p">)</span> <span class="ow">and</span>
+                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__mean_post_window</span> <span class="o">==</span>
+                 <span class="n">timing_dependence</span><span class="o">.</span><span class="n">mean_post_window</span><span class="p">))</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">vertex_executable_suffix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dual_fsm</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;recurrent_dual_fsm&quot;</span>
+        <span class="k">return</span> <span class="s2">&quot;recurrent_pre_stochastic&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">pre_trace_n_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># When using the separate FSMs, pre-trace contains window length,</span>
+        <span class="c1"># otherwise it&#39;s in the synapse</span>
+        <span class="k">return</span> <span class="n">BYTES_PER_SHORT</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dual_fsm</span> <span class="k">else</span> <span class="mi">0</span>
+
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractTimingDependence</span><span class="o">.</span><span class="n">get_parameters_sdram_usage_in_bytes</span><span class="p">)</span>
+<div class="viewcode-block" id="TimingDependenceRecurrent.get_parameters_sdram_usage_in_bytes"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.timing_dependence_recurrent.TimingDependenceRecurrent.get_parameters_sdram_usage_in_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">get_parameters_sdram_usage_in_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># 2 * 32-bit parameters</span>
+        <span class="c1"># 2 * LUTS with STDP_FIXED_POINT_ONE * 16-bit entries</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">BYTES_PER_WORD</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span>
+            <span class="n">BYTES_PER_SHORT</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">STDP_FIXED_POINT_ONE</span><span class="p">))</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">n_weight_terms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">1</span>
+
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractTimingDependence</span><span class="o">.</span><span class="n">write_parameters</span><span class="p">)</span>
+<div class="viewcode-block" id="TimingDependenceRecurrent.write_parameters"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.timing_dependence_recurrent.TimingDependenceRecurrent.write_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">write_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">):</span>
+
+        <span class="c1"># Write parameters</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__accumulator_depression_plus_one</span><span class="p">,</span>
+                         <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">INT32</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__accumulator_potentiation_minus_one</span><span class="p">,</span>
+                         <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">INT32</span><span class="p">)</span>
+
+        <span class="c1"># Convert mean times into machine timesteps</span>
+        <span class="n">mean_pre_timesteps</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__mean_pre_window</span><span class="p">)</span> <span class="o">*</span>
+            <span class="p">(</span><span class="n">MICRO_TO_MILLISECOND_CONVERSION</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">machine_time_step</span><span class="p">)))</span>
+        <span class="n">mean_post_timesteps</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__mean_post_window</span><span class="p">)</span> <span class="o">*</span>
+            <span class="p">(</span><span class="n">MICRO_TO_MILLISECOND_CONVERSION</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">machine_time_step</span><span class="p">)))</span>
+
+        <span class="c1"># Write lookup tables</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write_exp_dist_lut</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">mean_pre_timesteps</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write_exp_dist_lut</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">mean_post_timesteps</span><span class="p">)</span></div>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_write_exp_dist_lut</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">mean</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param .DataSpecificationGenerator spec:</span>
+<span class="sd">        :param float mean:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">indices</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">STDP_FIXED_POINT_ONE</span><span class="p">)</span>
+        <span class="n">inv_cdf</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">indices</span><span class="o">/</span><span class="nb">float</span><span class="p">(</span><span class="n">STDP_FIXED_POINT_ONE</span><span class="p">))</span> <span class="o">*</span> <span class="o">-</span><span class="n">mean</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span>
+            <span class="n">inv_cdf</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">uint16</span><span class="p">),</span> <span class="n">data_type</span><span class="o">=</span><span class="n">DataType</span><span class="o">.</span><span class="n">UINT16</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">synaptic_structure</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_structure</span>
+
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractTimingDependence</span><span class="o">.</span><span class="n">get_parameter_names</span><span class="p">)</span>
+<div class="viewcode-block" id="TimingDependenceRecurrent.get_parameter_names"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.timing_dependence_recurrent.TimingDependenceRecurrent.get_parameter_names">[docs]</a>    <span class="k">def</span> <span class="nf">get_parameter_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;accumulator_depression&#39;</span><span class="p">,</span> <span class="s1">&#39;accumulator_potentiation&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;mean_pre_window&#39;</span><span class="p">,</span> <span class="s1">&#39;mean_post_window&#39;</span><span class="p">,</span> <span class="s1">&#39;dual_fsm&#39;</span><span class="p">]</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../../../../../index.html">sPyNNaker  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../../../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+    </div>
+  </body>
+</html>

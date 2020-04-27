@@ -1,0 +1,30 @@
+spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination package
+=====================================================================================
+
+Submodules
+----------
+
+spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.abstract_elimination module
+---------------------------------------------------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.abstract_elimination
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.random_by_weight_elimination module
+-----------------------------------------------------------------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.random_by_weight_elimination
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination
+    :members:
+    :undoc-members:
+    :show-inheritance:
