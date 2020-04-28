@@ -84,6 +84,12 @@ static uint32_t timer_period = 0;
 
 //---------------------------------------
 // Because we don't want to include string.h or strings.h for memset
+//! \brief Sets an array of counters to zero
+//!
+//! This is basically just bzero()
+//!
+//! \param[out] counters: The array to zero
+//! \param[in] num_items: The size of the array
 static inline void zero_spike_counters(
         uint8_t *counters, uint32_t num_items) {
     for (uint32_t i = 0 ; i < num_items ; i++) {
@@ -91,6 +97,9 @@ static inline void zero_spike_counters(
     }
 }
 
+//! \brief Rounds up to the next power of two
+//! \param[in] v: The value to round up
+//! \return The minimum power of two that is no smaller than the argument
 static inline uint32_t round_to_next_pot(uint32_t v) {
     v--;
     v |= v >> 1;
@@ -102,6 +111,9 @@ static inline uint32_t round_to_next_pot(uint32_t v) {
     return v;
 }
 
+//! \brief Read the configuration region.
+//! \param[in] params: The configuration region.
+//! \return True if successful
 static bool read_parameters(struct delay_parameters *params) {
     log_debug("read_parameters: starting");
 
@@ -138,6 +150,11 @@ static bool read_parameters(struct delay_parameters *params) {
     // emit spikes after each delay stage
     neuron_delay_stage_config =
             spin1_malloc(num_delay_stages * sizeof(bit_field_t));
+    if (neuron_delay_stage_config == NULL) {
+        log_error("failed to allocate memory for array of size %u bytes",
+                num_delay_stages * sizeof(bit_field_t));
+        return false;
+    }
 
     // Loop through delay stages
     for (uint32_t d = 0; d < num_delay_stages; d++) {
@@ -146,6 +163,11 @@ static bool read_parameters(struct delay_parameters *params) {
         // Allocate bit-field
         neuron_delay_stage_config[d] =
                 spin1_malloc(neuron_bit_field_words * sizeof(uint32_t));
+        if (neuron_delay_stage_config[d] == NULL) {
+            log_error("failed to allocate memory for bitfield of size %u bytes",
+                    neuron_bit_field_words * sizeof(uint32_t));
+            return false;
+        }
 
         // Copy delay stage configuration bits into delay stage configuration
         // bit-field
@@ -161,10 +183,20 @@ static bool read_parameters(struct delay_parameters *params) {
 
     // Allocate array of counters for each delay slot
     spike_counters = spin1_malloc(num_delay_slots_pot * sizeof(uint8_t*));
+    if (spike_counters == NULL) {
+        log_error("failed to allocate memory for array of size %u bytes",
+                num_delay_slots_pot * sizeof(uint8_t*));
+        return false;
+    }
 
     for (uint32_t s = 0; s < num_delay_slots_pot; s++) {
         // Allocate an array of counters for each neuron and zero
         spike_counters[s] = spin1_malloc(num_neurons * sizeof(uint8_t));
+        if (spike_counters[s] == NULL) {
+            log_error("failed to allocate memory for bitfield of size %u bytes",
+                    num_neurons * sizeof(uint8_t));
+            return false;
+        }
         zero_spike_counters(spike_counters[s], num_neurons);
     }
 
@@ -172,6 +204,7 @@ static bool read_parameters(struct delay_parameters *params) {
     return true;
 }
 
+//! Writes the provenance data
 static void store_provenance_data(address_t provenance_region) {
     log_debug("writing other provenance data");
     struct delay_extension_provenance *prov = (void *) provenance_region;
@@ -186,6 +219,7 @@ static void store_provenance_data(address_t provenance_region) {
     log_debug("finished other provenance data");
 }
 
+//! Read the application configuration
 static bool initialize(void) {
     log_info("initialise: started");
 
@@ -221,6 +255,13 @@ static bool initialize(void) {
 }
 
 // Callbacks
+//! \brief Handles incoming spikes (FIQ)
+//!
+//! Adds the spikes to the circular buffer handling spikes for later handling by
+//! ::spike_process()
+//!
+//! \param[in] key: the key of the multicast message
+//! \param payload: ignored
 static void incoming_spike_callback(uint key, uint payload) {
     use(payload);
 
@@ -236,7 +277,10 @@ static inline key_t key_n(key_t k) {
     return k & incoming_neuron_mask;
 }
 
-static void spike_process(void) {
+//! \brief Processes spikes queued by ::incoming_spike_callback()
+//!
+//! Note that this has to be fairly fast; it is processing with interrupts off.
+static inline void spike_process(void) {
     // turn off interrupts as this function is critical for
     // keeping time in sync.
     uint state = spin1_int_disable();
@@ -275,6 +319,9 @@ static void spike_process(void) {
     spin1_mode_restore(state);
 }
 
+//! \brief Main timer callback
+//! \param[in] timer_count: The current time
+//! \param unused1: unused
 static void timer_callback(uint timer_count, uint unused1) {
     use(unused1);
 

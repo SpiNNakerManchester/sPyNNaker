@@ -536,6 +536,7 @@ munich_protocol_generic_motor1_raw_output_leak_to_0(
     };
 }
 
+//! \param[in] uart_id: Which UART to program
 //! \return Description of what multicast packet to send
 static inline multicast_packet munich_protocol_pwm_pin_output_timer_a_duration(
         uint32_t timer_period, uint32_t uart_id) {
@@ -547,6 +548,7 @@ static inline multicast_packet munich_protocol_pwm_pin_output_timer_a_duration(
     };
 }
 
+//! \param[in] uart_id: Which UART to program
 //! \return Description of what multicast packet to send
 static inline multicast_packet munich_protocol_pwm_pin_output_timer_b_duration(
         uint32_t timer_period, uint32_t uart_id) {
@@ -558,6 +560,7 @@ static inline multicast_packet munich_protocol_pwm_pin_output_timer_b_duration(
     };
 }
 
+//! \param[in] uart_id: Which UART to program
 //! \return Description of what multicast packet to send
 static inline multicast_packet munich_protocol_pwm_pin_output_timer_c_duration(
         uint32_t timer_period, uint32_t uart_id) {
@@ -569,6 +572,7 @@ static inline multicast_packet munich_protocol_pwm_pin_output_timer_c_duration(
     };
 }
 
+//! \param[in] uart_id: Which UART to program
 //! \return Description of what multicast packet to send
 static inline multicast_packet
 munich_protocol_pwm_pin_output_timer_a_channel_0_ratio(
@@ -581,6 +585,7 @@ munich_protocol_pwm_pin_output_timer_a_channel_0_ratio(
     };
 }
 
+//! \param[in] uart_id: Which UART to program
 //! \return Description of what multicast packet to send
 static inline multicast_packet
 munich_protocol_pwm_pin_output_timer_a_channel_1_ratio(
@@ -593,6 +598,7 @@ munich_protocol_pwm_pin_output_timer_a_channel_1_ratio(
     };
 }
 
+//! \param[in] uart_id: Which UART to program
 //! \return Description of what multicast packet to send
 static inline multicast_packet
 munich_protocol_pwm_pin_output_timer_b_channel_0_ratio(
@@ -605,6 +611,7 @@ munich_protocol_pwm_pin_output_timer_b_channel_0_ratio(
     };
 }
 
+//! \param[in] uart_id: Which UART to program
 //! \return Description of what multicast packet to send
 static inline multicast_packet
 munich_protocol_pwm_pin_output_timer_b_channel_1_ratio(
@@ -617,6 +624,7 @@ munich_protocol_pwm_pin_output_timer_b_channel_1_ratio(
     };
 }
 
+//! \param[in] uart_id: Which UART to program
 //! \return Description of what multicast packet to send
 static inline multicast_packet
 munich_protocol_pwm_pin_output_timer_c_channel_0_ratio(
@@ -629,6 +637,7 @@ munich_protocol_pwm_pin_output_timer_c_channel_0_ratio(
     };
 }
 
+//! \param[in] uart_id: Which UART to program
 //! \return Description of what multicast packet to send
 static inline multicast_packet
 munich_protocol_pwm_pin_output_timer_c_channel_1_ratio(
@@ -693,6 +702,7 @@ munich_protocol_set_payload_pins_to_high_impedance(
     };
 }
 
+//! \param[in] uart_id: Which UART to program
 //! \return Description of what multicast packet to send
 static inline multicast_packet
 munich_protocol_push_bot_laser_config_total_period(
@@ -710,6 +720,7 @@ munich_protocol_push_bot_laser_config_total_period(
     };
 }
 
+//! \param[in] uart_id: Which UART to program
 //! \return Description of what multicast packet to send
 static inline multicast_packet
 munich_protocol_push_bot_laser_config_active_time(
@@ -727,6 +738,7 @@ munich_protocol_push_bot_laser_config_active_time(
     };
 }
 
+//! \param[in] uart_id: Which UART to program
 //! \return Description of what multicast packet to send
 static inline multicast_packet munich_protocol_push_bot_laser_set_frequency(
         uint32_t frequency, uint32_t uart_id) {
@@ -743,6 +755,10 @@ static inline multicast_packet munich_protocol_push_bot_laser_set_frequency(
     };
 }
 
+//! \brief Creates a command to configure the speaker to run in PCM mode.
+//! \param[in] total_period: The width of the overall PCM pulse. Affects
+//!     frequency of tone.
+//! \param[in] uart_id: Which UART to program
 //! \return Description of what multicast packet to send
 static inline multicast_packet
 munich_protocol_push_bot_speaker_config_total_period(
@@ -760,6 +776,10 @@ munich_protocol_push_bot_speaker_config_total_period(
     };
 }
 
+//! \brief Creates a command to adjust how the speaker runs in PCM mode.
+//! \param[in] total_period: The width of the active part of the PCM pulse.
+//!     Affects quality of tone.
+//! \param[in] uart_id: Which UART to program
 //! \return Description of what multicast packet to send
 static inline multicast_packet
 munich_protocol_push_bot_speaker_config_active_time(
@@ -777,6 +797,10 @@ munich_protocol_push_bot_speaker_config_active_time(
     };
 }
 
+//! \brief Creates a command to configure the speaker play a particular
+//!     frequency of tone.
+//! \param[in] frequency: What tone to play
+//! \param[in] uart_id: Which UART to program
 //! \return Description of what multicast packet to send
 static inline multicast_packet munich_protocol_push_bot_speaker_set_tone(
         uint32_t frequency, uint32_t uart_id) {
@@ -793,6 +817,10 @@ static inline multicast_packet munich_protocol_push_bot_speaker_set_tone(
     };
 }
 
+//! \brief Creates a command to configure the speaker play a pre-programmed
+//!     "melody".
+//! \param[in] melody: Which melody to play
+//! \param[in] uart_id: Which UART to program
 //! \return Description of what multicast packet to send
 static inline multicast_packet munich_protocol_push_bot_speaker_set_melody(
         uint32_t melody, uint32_t uart_id) {
@@ -809,6 +837,7 @@ static inline multicast_packet munich_protocol_push_bot_speaker_set_melody(
     };
 }
 
+//! \param[in] uart_id: Which UART to program
 //! \return Description of what multicast packet to send
 static inline multicast_packet munich_protocol_push_bot_led_total_period(
         uint32_t total_period, uint32_t uart_id) {
@@ -825,6 +854,7 @@ static inline multicast_packet munich_protocol_push_bot_led_total_period(
     };
 }
 
+//! \param[in] uart_id: Which UART to program
 //! \return Description of what multicast packet to send
 static inline multicast_packet munich_protocol_push_bot_led_back_active_time(
         uint32_t active_time, uint32_t uart_id) {
@@ -841,6 +871,7 @@ static inline multicast_packet munich_protocol_push_bot_led_back_active_time(
     };
 }
 
+//! \param[in] uart_id: Which UART to program
 //! \return Description of what multicast packet to send
 static inline multicast_packet munich_protocol_push_bot_led_front_active_time(
         uint32_t active_time, uint32_t uart_id) {
@@ -857,6 +888,7 @@ static inline multicast_packet munich_protocol_push_bot_led_front_active_time(
     };
 }
 
+//! \param[in] uart_id: Which UART to program
 //! \return Description of what multicast packet to send
 static inline multicast_packet munich_protocol_push_bot_led_set_frequency(
         uint32_t frequency, uint32_t uart_id) {
@@ -873,6 +905,7 @@ static inline multicast_packet munich_protocol_push_bot_led_set_frequency(
     };
 }
 
+//! \param[in] uart_id: Which UART to program
 //! \return Description of what multicast packet to send
 static inline multicast_packet munich_protocol_push_bot_motor_0_permanent(
         state_t velocity, uint32_t uart_id) {
@@ -889,6 +922,7 @@ static inline multicast_packet munich_protocol_push_bot_motor_0_permanent(
     };
 }
 
+//! \param[in] uart_id: Which UART to program
 //! \return Description of what multicast packet to send
 static inline multicast_packet munich_protocol_push_bot_motor_1_permanent(
         uint32_t velocity, uint32_t uart_id) {
@@ -905,6 +939,7 @@ static inline multicast_packet munich_protocol_push_bot_motor_1_permanent(
     };
 }
 
+//! \param[in] uart_id: Which UART to program
 //! \return Description of what multicast packet to send
 static inline multicast_packet
 munich_protocol_push_bot_motor_0_leaking_towards_zero(
@@ -922,6 +957,7 @@ munich_protocol_push_bot_motor_0_leaking_towards_zero(
     };
 }
 
+//! \param[in] uart_id: Which UART to program
 //! \return Description of what multicast packet to send
 static inline multicast_packet
 munich_protocol_push_bot_motor_1_leaking_towards_zero(
@@ -939,8 +975,7 @@ munich_protocol_push_bot_motor_1_leaking_towards_zero(
     };
 }
 
-//! \return Description of what multicast packet to send
-static inline multicast_packet key_retina(
+static inline multicast_packet _key_retina(
         uint32_t retina_pixels, uint32_t time_stamps, uint32_t uart_id) {
     if (retina_pixels == 128 * 128) {
         // if fine, create message
@@ -976,11 +1011,18 @@ static inline multicast_packet key_retina(
         };
     }
 
-    log_error("The no of pixels is not supported in this protocol.");
-    rt_error(RTE_API);
+    log_error("The number of pixels is not supported in this protocol.");
+    rt_error(RTE_SWERR);
     return (multicast_packet) {.key = 0, .payload = 0, .payload_flag = 0};
 }
 
+//! \brief Creates a command to set how silicon retinas transmit.
+//! \param[in] events_in_key: True if events are encoded in the key
+//! \param[in] retina_pixels: The number of pixels in the retina
+//! \param[in] payload_holds_time_stamps:
+//!     Whether the packet payload will hold timestamps
+//! \param[in] size_of_time_stamp_in_bytes: Size of the timestamp
+//! \param[in] uart_id: Which UART to program
 //! \return Description of what multicast packet to send
 static inline multicast_packet munich_protocol_set_retina_transmission(
         bool events_in_key, uint32_t retina_pixels,
@@ -990,21 +1032,21 @@ static inline multicast_packet munich_protocol_set_retina_transmission(
     if (events_in_key) {
         if (!payload_holds_time_stamps) {
             // not using payloads
-            return key_retina(retina_pixels, PAYLOAD_NO_TIMESTAMPS, uart_id);
+            return _key_retina(retina_pixels, PAYLOAD_NO_TIMESTAMPS, uart_id);
         }
         // using payloads
         switch (size_of_time_stamp_in_bytes) {
         case 0:
-            return key_retina(
+            return _key_retina(
                     retina_pixels, PAYLOAD_DELTA_TIMESTAMPS, uart_id);
         case 2:
-            return key_retina(
+            return _key_retina(
                     retina_pixels, PAYLOAD_TWO_BYTE_TIME_STAMPS, uart_id);
         case 3:
-            return key_retina(
+            return _key_retina(
                     retina_pixels, PAYLOAD_THREE_BYTE_TIME_STAMPS, uart_id);
         case 4:
-            return key_retina(
+            return _key_retina(
                     retina_pixels, PAYLOAD_FOUR_BYTE_TIME_STAMPS, uart_id);
         default:
             log_error("Unknown size of timestamp in bytes: %d\n",
@@ -1018,16 +1060,16 @@ static inline multicast_packet munich_protocol_set_retina_transmission(
         // using payloads to hold all events
 
         // warn users about models
-        log_warning("The current SpyNNaker models do not support the reception "
+        log_warning("The current sPyNNaker models do not support the reception "
                 "of packets with payloads, therefore you will need to add a "
-                "adaptor model between the device and spynnaker models.");
+                "adaptor model between the device and sPyNNaker models.");
 
         // verify that its what the end user wants.
         if (payload_holds_time_stamps || (size_of_time_stamp_in_bytes == 0)) {
             log_error(
                 "If you are using payloads to store events, you cannot"
                 " have time stamps at all.");
-            rt_error(RTE_API);
+            rt_error(RTE_SWERR);
         }
 
         // if fine, create message

@@ -57,6 +57,12 @@ struct fixed_post {
     rng_t rng;
 };
 
+/**
+ * \brief Initialise the fixed-post connection generator
+ * \param[in,out] region: Region to read parameters from.  Should be updated
+ *                        to position just after parameters after calling.
+ * \return A data item to be passed in to other functions later on
+ */
 static void *connection_generator_fixed_post_initialise(address_t *region) {
     // Allocate memory for the parameters
     struct fixed_post *obj = spin1_malloc(sizeof(struct fixed_post));
@@ -79,10 +85,14 @@ static void *connection_generator_fixed_post_initialise(address_t *region) {
     return obj;
 }
 
-static void connection_generator_fixed_post_free(void *data) {
-    struct fixed_post *obj = data;
+/**
+ * \brief Free the fixed-post connection generator
+ * \param[in] generator: The data to free
+ */
+static void connection_generator_fixed_post_free(void *generator) {
+    struct fixed_post *obj = generator;
     rng_free(obj->rng);
-    sark_free(data);
+    sark_free(generator);
 }
 
 static uint32_t post_random_in_range(struct fixed_post *obj, uint32_t range) {
@@ -90,15 +100,34 @@ static uint32_t post_random_in_range(struct fixed_post *obj, uint32_t range) {
     return (u01 * range) >> 15;
 }
 
+/**
+ * \brief Generate connections with the fixed-post connection generator
+ * \param[in] generator: The generator to use to generate connections
+ * \param[in] pre_slice_start: The start of the slice of the pre-population
+ *                             being generated
+ * \param[in] pre_slice_count: The number of neurons in the slice of the
+ *                             pre-population being generated
+ * \param[in] pre_neuron_index: The index of the neuron in the pre-population
+ *                              being generated
+ * \param[in] post_slice_start: The start of the slice of the post-population
+ *                              being generated
+ * \param[in] post_slice_count: The number of neurons in the slice of the
+ *                              post-population being generated
+ * \param[in] max_row_length: The maximum number of connections to generate
+ * \param[in,out] indices: An array into which the core-relative post-indices
+ *                         should be placed.  This will be initialised to be
+ *                         \p max_row_length in size
+ * \return The number of connections generated
+ */
 static uint32_t connection_generator_fixed_post_generate(
-        void *data, uint32_t pre_slice_start, uint32_t pre_slice_count,
+        void *generator, uint32_t pre_slice_start, uint32_t pre_slice_count,
         uint32_t pre_neuron_index, uint32_t post_slice_start,
         uint32_t post_slice_count, uint32_t max_row_length, uint16_t *indices) {
     use(pre_slice_start);
     use(pre_slice_count);
 
     // If there are no connections to be made, return 0
-    struct fixed_post *obj = data;
+    struct fixed_post *obj = generator;
     if (max_row_length == 0 || obj->params.n_post == 0) {
         return 0;
     }

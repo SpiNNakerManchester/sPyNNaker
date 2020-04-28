@@ -44,19 +44,31 @@ typedef uint32_t payload_t;
 //! The type of a spike
 typedef uint64_t spike_t;
 
+union _spike_t {
+    spike_t pair;
+    struct {
+        payload_t payload;
+        key_t key;
+    };
+};
+
 //! \brief helper method to retrieve the key from a spike
 //! \param[in] s: the spike to get the key from
 //! \return key_t: the key from the spike
 static inline key_t spike_key(spike_t s) {
-    return (key_t) (s >> 32);
+    union _spike_t spike;
+    spike.pair = s;
+    return spike.key;
 }
 
 //! \brief helper method to retrieve the pay-load from a spike
 //! \param[in] s: the spike to get the pay-load from
 //! \return payload_t: the pay-load from the spike (only used if the model
-//! is compiled with SPIKES_WITH_PAYLOADS)
-static inline payload_t spike_payload (spike_t s) {
-    return (payload_t) (s & UINT32_MAX);
+//!     is compiled with SPIKES_WITH_PAYLOADS)
+static inline payload_t spike_payload(spike_t s) {
+    union _spike_t spike;
+    spike.pair = s;
+    return spike.payload;
 }
 
 #else  /*SPIKES_WITHOUT_PAYLOADS*/
@@ -75,7 +87,6 @@ static inline key_t spike_key(spike_t s) {
 //! \param[in] s: the spike to get the pay-load from
 //! \return payload_t: the pay-load from the spike (default-ly set to zero if
 //!                    the model is not compiled with SPIKES_WITH_PAYLOADS)
-
 static inline payload_t spike_payload(spike_t s) {
     use(s);
     return 0;

@@ -64,7 +64,7 @@ typedef void (free_func)(void *data);
  * \param[in] max_row_length: The maximum number of connections to generate
  * \param[in,out] indices: An array into which the core-relative post-indices
  *                         should be placed.  This will be initialised to be
- *                         max_row_length in size
+ *                         \p max_row_length in size
  * \return The number of connections generated
  */
 typedef uint32_t (generate_connection_func)(
@@ -78,45 +78,34 @@ typedef uint32_t (generate_connection_func)(
  * \param[in] n_indices: The number of values to generate
  * \param[in] pre_neuron_index: The index of the neuron in the pre-population
  *                              being generated
- * \param[in] indices: The n_indices post-neuron indices for each connection
- * \param[in,out] values: An array into which to place the values - will be
- *                        n_indices in size
+ * \param[in] indices: The \p n_indices post-neuron indices for each connection
+ * \param[out] values: An array into which to place the values; will be
+ *                     \p n_indices in size
  */
 typedef void (generate_param_func)(
-        void *generator, uint32_t n_synapses, uint32_t pre_neuron_index,
+        void *generator, uint32_t n_indices, uint32_t pre_neuron_index,
         uint16_t *indices, accum *values);
 
 /**
  * \brief How to generate a row of a matrix with a matrix generator
  * \param[in] generator: The data for the matrix generator, returned by the
  *                       initialise function
- * \param[in] synaptic_matrix: The address of the synaptic matrix to write to
- * \param[in] delayed_synaptic_matrix: The address of the synaptic matrix to
- *                                     write delayed connections to
+ * \param[out] synaptic_matrix: The address of the synaptic matrix to write to
+ * \param[out] delayed_synaptic_matrix: The address of the synaptic matrix to
+ *                                      write delayed connections to
+ * \param[in] n_pre_neurons: The number of pre neurons to generate for
+ * \param[in] pre_neuron_index: The index of the first pre neuron
  * \param[in] max_row_n_words: The maximum number of words in a normal row
  * \param[in] max_delayed_row_n_words: The maximum number of words in a
  *                                     delayed row
- * \param[in] max_row_n_synapses: The maximum number of synapses in a normal row
- * \param[in] max_delayed_row_n_synapses: The maximum number of synapses in a
- *                                        delayed row
- * \param[in] n_synapse_type_bits: The number of bits used for the synapse type
- * \param[in] n_synapse_index_bits: The number of bits used for the neuron id
+ * \param[in] synapse_type_bits: The number of bits used for the synapse type
+ * \param[in] synapse_index_bits: The number of bits used for the neuron id
  * \param[in] synapse_type: The synapse type of each connection
- * \param[in] weight_scales: An array of weight scales, one for each synapse
- *                           type
- * \param[in] post_slice_start: The start of the slice of the
- *                              post-population being generated
- * \param[in] post_slice_count: The number of neurons in the slice of the
- *                              post-population being generated
- * \param[in] pre_slice_start: The start of the slice of the pre-population
- *                             being generated
- * \param[in] pre_slice_count: The number of neurons in the slice of the
- *                             pre-population being generated
- * \param[in] connection_generator: The generator of connections
- * \param[in] delay_generator: The generator of delay values
- * \param[in] weight_generator: The generator of weight values
+ * \param[in] n_synapses: The number of synapses
+ * \param[in] indices: Pointer to table of indices
+ * \param[in] delays: Pointer to table of delays
+ * \param[in] weights: Pointer to table of weights
  * \param[in] max_stage: The maximum delay stage to support
- * \param[in] timestep_per_delay: The delay value multiplier to get to timesteps
  */
 typedef void (generate_row_func)(
         void *generator,

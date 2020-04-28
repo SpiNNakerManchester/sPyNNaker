@@ -25,10 +25,6 @@
 #include <spin1_api.h>
 #include <synapse_expander/generator_types.h>
 
-static initialize_func param_generator_constant_initialize;
-static free_func param_generator_constant_free;
-static generate_param_func param_generator_constant_generate;
-
 /**
  * \brief The data for the constant value generation
  */
@@ -36,6 +32,12 @@ struct param_generator_constant {
     accum value;
 };
 
+/**
+ * \brief How to initialise the constant parameter generator
+ * \param[in,out] region: Region to read setup from.  Should be updated
+ *                        to position just after parameters after calling.
+ * \return A data item to be passed in to other functions later on
+ */
 static void *param_generator_constant_initialize(address_t *region) {
     // Allocate space for the parameters
     struct param_generator_constant *params =
@@ -49,19 +51,33 @@ static void *param_generator_constant_initialize(address_t *region) {
     return params;
 }
 
-static void param_generator_constant_free(void *data) {
-    sark_free(data);
+/**
+ * \brief How to free any data for the constant parameter generator
+ * \param[in] generator: The generator to free
+ */
+static void param_generator_constant_free(void *generator) {
+    sark_free(generator);
 }
 
+/**
+ * \brief How to generate values with the constant parameter generator
+ * \param[in] generator: The generator to use to generate values
+ * \param[in] n_indices: The number of values to generate
+ * \param[in] pre_neuron_index: The index of the neuron in the pre-population
+ *                              being generated
+ * \param[in] indices: The \p n_indices post-neuron indices for each connection
+ * \param[out] values: An array into which to place the values; will be
+ *                     \p n_indices in size
+ */
 static void param_generator_constant_generate(
-        void *data, uint32_t n_synapses, uint32_t pre_neuron_index,
+        void *generator, uint32_t n_indices, uint32_t pre_neuron_index,
         uint16_t *indices, accum *values) {
     use(pre_neuron_index);
     use(indices);
 
     // Generate a constant for each index
-    struct param_generator_constant *params = data;
-    for (uint32_t i = 0; i < n_synapses; i++) {
+    struct param_generator_constant *params = generator;
+    for (uint32_t i = 0; i < n_indices; i++) {
         values[i] = params->value;
     }
 }
