@@ -343,19 +343,23 @@ bool _do_sdram_read_and_test(
 }
 
 void _sort_by_redunancy(){
-    for (int i = 0; i < bit_field_base_address->n_filters -1; i++){
+    for (int i = 0; i < bit_field_base_address->n_filters -1; i++) {
         int i_atoms = bit_field_base_address->filters[i].n_atoms;
         int i_words = get_bit_field_size(i_atoms);
-        int i_redunant = i_atoms - count_bit_field(bit_field_base_address->filters[i].data, i_words);
-        for (int j = i + 1; j < bit_field_base_address->n_filters; j++){
+        int i_redunant = i_atoms - count_bit_field(
+            bit_field_base_address->filters[i].data, i_words);
+        for (int j = i + 1; j < bit_field_base_address->n_filters; j++) {
             int j_atoms = bit_field_base_address->filters[j].n_atoms;
-                        int j_words = get_bit_field_size(j_atoms);
-            int j_redunant = j_atoms - count_bit_field(bit_field_base_address->filters[j].data, j_words);
+            int j_words = get_bit_field_size(j_atoms);
+            int j_redunant = j_atoms - count_bit_field(
+                bit_field_base_address->filters[j].data, j_words);
             if (i_redunant < j_redunant) {
-                filter_info_t bit_field_temp = bit_field_base_address->filters[i];
-                bit_field_base_address->filters[i] = bit_field_base_address->filters[j];
+                filter_info_t bit_field_temp =
+                    bit_field_base_address->filters[i];
+                bit_field_base_address->filters[i] =
+                    bit_field_base_address->filters[j];
                 bit_field_base_address->filters[j] = bit_field_temp;
-                int i_redunant = j_redunant;
+                i_redunant = j_redunant;
             }
         }
     }
