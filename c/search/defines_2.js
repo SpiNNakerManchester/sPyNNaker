@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['exp',['EXP',['../maths-util_8h.html#a179978530f93b1e13bc48dc40dc1960e',1,'maths-util.h']]]
+  ['delay_5fstage_5flength',['DELAY_STAGE_LENGTH',['../delay__extension_8h.html#a48634ce49aad40ac1c5cb1b8be213499',1,'delay_extension.h']]]
 ];

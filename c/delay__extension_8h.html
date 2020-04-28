@@ -95,7 +95,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 
-<p>Delcarations for delay extensions.  
+<p>Declarations for delay extensions.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;common-typedefs.h&gt;</code><br />
 </div>
@@ -109,30 +109,31 @@ Data Structures</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
 <tr class="memitem:a48634ce49aad40ac1c5cb1b8be213499"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a48634ce49aad40ac1c5cb1b8be213499"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>DELAY_STAGE_LENGTH</b>&#160;&#160;&#160;16</td></tr>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="delay__extension_8h.html#a48634ce49aad40ac1c5cb1b8be213499">DELAY_STAGE_LENGTH</a>&#160;&#160;&#160;16</td></tr>
+<tr class="memdesc:a48634ce49aad40ac1c5cb1b8be213499"><td class="mdescLeft">&#160;</td><td class="mdescRight">Length of a single delay stage, in basic timesteps. <br /></td></tr>
 <tr class="separator:a48634ce49aad40ac1c5cb1b8be213499"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a62c01d7388112097a930509cf05f6168"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a62c01d7388112097a930509cf05f6168"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>pack_delay_index_stage</b>(index,  stage)&#160;&#160;&#160;((index &amp; 0xFF) | ((stage &amp; 0xFF) &lt;&lt; 8))</td></tr>
+<tr class="memitem:a62c01d7388112097a930509cf05f6168"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="delay__extension_8h.html#a62c01d7388112097a930509cf05f6168">pack_delay_index_stage</a>(index,  stage)&#160;&#160;&#160;((index &amp; 0xFF) | ((stage &amp; 0xFF) &lt;&lt; 8))</td></tr>
+<tr class="memdesc:a62c01d7388112097a930509cf05f6168"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encode a delay as a 16-bit integer.  <a href="#a62c01d7388112097a930509cf05f6168">More...</a><br /></td></tr>
 <tr class="separator:a62c01d7388112097a930509cf05f6168"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a64494ca55a7d8abb2d9c45c1928da31d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a64494ca55a7d8abb2d9c45c1928da31d"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>unpack_delay_index</b>(packed)&#160;&#160;&#160;(packed &amp; 0xFF)</td></tr>
+<tr class="memitem:a64494ca55a7d8abb2d9c45c1928da31d"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="delay__extension_8h.html#a64494ca55a7d8abb2d9c45c1928da31d">unpack_delay_index</a>(packed)&#160;&#160;&#160;(packed &amp; 0xFF)</td></tr>
+<tr class="memdesc:a64494ca55a7d8abb2d9c45c1928da31d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decode a delay index (encoded with <a class="el" href="delay__extension_8h.html#a62c01d7388112097a930509cf05f6168" title="Encode a delay as a 16-bit integer. ">pack_delay_index_stage()</a>)  <a href="#a64494ca55a7d8abb2d9c45c1928da31d">More...</a><br /></td></tr>
 <tr class="separator:a64494ca55a7d8abb2d9c45c1928da31d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4f6b0f0080036b3baadaebe99a5c4b95"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4f6b0f0080036b3baadaebe99a5c4b95"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>unpack_delay_stage</b>(packed)&#160;&#160;&#160;((packed &gt;&gt; 8) &amp; 0xFF)</td></tr>
+<tr class="memitem:a4f6b0f0080036b3baadaebe99a5c4b95"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="delay__extension_8h.html#a4f6b0f0080036b3baadaebe99a5c4b95">unpack_delay_stage</a>(packed)&#160;&#160;&#160;((packed &gt;&gt; 8) &amp; 0xFF)</td></tr>
+<tr class="memdesc:a4f6b0f0080036b3baadaebe99a5c4b95"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decode a delay stage (encoded with <a class="el" href="delay__extension_8h.html#a62c01d7388112097a930509cf05f6168" title="Encode a delay as a 16-bit integer. ">pack_delay_index_stage()</a>)  <a href="#a4f6b0f0080036b3baadaebe99a5c4b95">More...</a><br /></td></tr>
 <tr class="separator:a4f6b0f0080036b3baadaebe99a5c4b95"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
 Enumerations</h2></td></tr>
-<tr class="memitem:a6e4d67a0bd74db4da98539f8d2e5ab32"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6e4d67a0bd74db4da98539f8d2e5ab32"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="delay__extension_8h.html#a6e4d67a0bd74db4da98539f8d2e5ab32">region_identifiers</a> { <b>SYSTEM</b> = 0, 
-<b>DELAY_PARAMS</b> = 1, 
-<b>PROVENANCE_REGION</b> = 2, 
-<b>EXPANDER_REGION</b> = 3
- }<tr class="memdesc:a6e4d67a0bd74db4da98539f8d2e5ab32"><td class="mdescLeft">&#160;</td><td class="mdescRight">region identifiers <br /></td></tr>
+<tr class="memitem:a6e4d67a0bd74db4da98539f8d2e5ab32"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="delay__extension_8h.html#a6e4d67a0bd74db4da98539f8d2e5ab32">region_identifiers</a> { <a class="el" href="delay__extension_8h.html#a6e4d67a0bd74db4da98539f8d2e5ab32a57cc238145ec1361c72c327674c0d754">SYSTEM</a> = 0, 
+<a class="el" href="delay__extension_8h.html#a6e4d67a0bd74db4da98539f8d2e5ab32ad8afa7b77b25e7899aded1cb7a4f0e66">DELAY_PARAMS</a> = 1, 
+<a class="el" href="delay__extension_8h.html#a6e4d67a0bd74db4da98539f8d2e5ab32a43f0d58cfc0317ea06139b20c9242d1e">PROVENANCE_REGION</a> = 2, 
+<a class="el" href="delay__extension_8h.html#a6e4d67a0bd74db4da98539f8d2e5ab32a719368d00e2ee9a5b0e27a360ea05be4">EXPANDER_REGION</a> = 3
+ }<tr class="memdesc:a6e4d67a0bd74db4da98539f8d2e5ab32"><td class="mdescLeft">&#160;</td><td class="mdescRight">region identifiers  <a href="delay__extension_8h.html#a6e4d67a0bd74db4da98539f8d2e5ab32">More...</a><br /></td></tr>
 </td></tr>
 <tr class="separator:a6e4d67a0bd74db4da98539f8d2e5ab32"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Delcarations for delay extensions. </p>
+<div class="textblock"><p>Declarations for delay extensions. </p>
 </div><hr/><h2 class="groupheader">Data Structure Documentation</h2>
 <a name="structdelay__parameters" id="structdelay__parameters"></a>
 <div class="memitem">
@@ -150,54 +151,170 @@ Enumerations</h2></td></tr>
 <td class="fieldname">
 key</td>
 <td class="fielddoc">
-</td></tr>
+Key to use for sending messages. </td></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="a5ee91b451859232bf69b98d8fe5efeed"></a>uint32_t</td>
 <td class="fieldname">
 incoming_key</td>
 <td class="fielddoc">
-</td></tr>
+Key to accept messages with. </td></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="a6e62350e8d45d7f40dd19e685a06891f"></a>uint32_t</td>
 <td class="fieldname">
 incoming_mask</td>
 <td class="fielddoc">
-</td></tr>
+Mask to filter <a class="el" href="delay__extension_8h.html#a5ee91b451859232bf69b98d8fe5efeed" title="Key to accept messages with. ">delay_parameters::incoming_key</a>. </td></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="a9e45122a1ce77599d6fd04118ddfd33b"></a>uint32_t</td>
 <td class="fieldname">
 n_atoms</td>
 <td class="fielddoc">
-</td></tr>
+Number of atoms. </td></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="ae066739d171e52ac2fa7001f58891b42"></a>uint32_t</td>
 <td class="fieldname">
 n_delay_stages</td>
 <td class="fielddoc">
-</td></tr>
+Number of delay stages. </td></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="ae809890618a4954670c1de81cab1f9c8"></a>uint32_t</td>
 <td class="fieldname">
 random_backoff</td>
 <td class="fielddoc">
-</td></tr>
+Random backoff control parameter. </td></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="aac56fc309dad8cf71c3d5457c699910c"></a>uint32_t</td>
 <td class="fieldname">
 time_between_spikes</td>
 <td class="fielddoc">
-</td></tr>
+Minimum inter-spike interval (in us) </td></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="a2562baafa35b23d8e46ecec32524949f"></a>uint32_t</td>
 <td class="fieldname">
 n_outgoing_edges</td>
 <td class="fielddoc">
-</td></tr>
+Number of outgoing edges. </td></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="ac96e823ff8133a64c9cdc218b44244aa"></a>uint32_t</td>
 <td class="fieldname">
 delay_blocks[]</td>
 <td class="fielddoc">
+Descriptions of delays to apply. </td></tr>
+</table>
+
+</div>
+</div>
+<h2 class="groupheader">Macro Definition Documentation</h2>
+<a class="anchor" id="a62c01d7388112097a930509cf05f6168"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define pack_delay_index_stage</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">index, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">stage&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;((index &amp; 0xFF) | ((stage &amp; 0xFF) &lt;&lt; 8))</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Encode a delay as a 16-bit integer. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">index</td><td>the index within the stage (uint8_t) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">stage</td><td>the stage of the delay (uint8_t) </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The encoded value (uint16_t) </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a64494ca55a7d8abb2d9c45c1928da31d"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define unpack_delay_index</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">packed</td><td>)</td>
+          <td>&#160;&#160;&#160;(packed &amp; 0xFF)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Decode a delay index (encoded with <a class="el" href="delay__extension_8h.html#a62c01d7388112097a930509cf05f6168" title="Encode a delay as a 16-bit integer. ">pack_delay_index_stage()</a>) </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">packet</td><td>the encoded value </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The delay index </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a4f6b0f0080036b3baadaebe99a5c4b95"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define unpack_delay_stage</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">packed</td><td>)</td>
+          <td>&#160;&#160;&#160;((packed &gt;&gt; 8) &amp; 0xFF)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Decode a delay stage (encoded with <a class="el" href="delay__extension_8h.html#a62c01d7388112097a930509cf05f6168" title="Encode a delay as a 16-bit integer. ">pack_delay_index_stage()</a>) </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">packet</td><td>the encoded value </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The delay stage </dd></dl>
+
+</div>
+</div>
+<h2 class="groupheader">Enumeration Type Documentation</h2>
+<a class="anchor" id="a6e4d67a0bd74db4da98539f8d2e5ab32"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="delay__extension_8h.html#a6e4d67a0bd74db4da98539f8d2e5ab32">region_identifiers</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>region identifiers </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a class="anchor" id="a6e4d67a0bd74db4da98539f8d2e5ab32a57cc238145ec1361c72c327674c0d754"></a>SYSTEM&#160;</td><td class="fielddoc">
+<p>General simulation system control. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="a6e4d67a0bd74db4da98539f8d2e5ab32ad8afa7b77b25e7899aded1cb7a4f0e66"></a>DELAY_PARAMS&#160;</td><td class="fielddoc">
+<p>Delay parameters (see <a class="el" href="delay__extension_8h.html#structdelay__parameters">delay_parameters</a>) </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="a6e4d67a0bd74db4da98539f8d2e5ab32a43f0d58cfc0317ea06139b20c9242d1e"></a>PROVENANCE_REGION&#160;</td><td class="fielddoc">
+<p>Provenance recording region. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="a6e4d67a0bd74db4da98539f8d2e5ab32a719368d00e2ee9a5b0e27a360ea05be4"></a>EXPANDER_REGION&#160;</td><td class="fielddoc">
+<p>On-chip delay matrix expansion region. </p>
 </td></tr>
 </table>
 
@@ -206,7 +323,7 @@ delay_blocks[]</td>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 28 2020 12:09:27 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 28 2020 15:40:42 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

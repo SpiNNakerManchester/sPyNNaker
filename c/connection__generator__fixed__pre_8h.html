@@ -99,6 +99,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;log.h&gt;</code><br />
 <code>#include &lt;<a class="el" href="rng_8h_source.html">synapse_expander/rng.h</a>&gt;</code><br />
+<code>#include &lt;stdbool.h&gt;</code><br />
 </div>
 <p><a href="connection__generator__fixed__pre_8h_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
@@ -110,34 +111,30 @@ Data Structures</h2></td></tr>
 <tr class="memitem:structfixed__pre"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="connection__generator__fixed__pre_8h.html#structfixed__pre">fixed_pre</a></td></tr>
 <tr class="memdesc:structfixed__pre"><td class="mdescLeft">&#160;</td><td class="mdescRight">The data to be passed around.  <a href="connection__generator__fixed__pre_8h.html#structfixed__pre">More...</a><br /></td></tr>
 <tr class="separator:structfixed__pre"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:structfixed__pre__globals__t"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="connection__generator__fixed__pre_8h.html#structfixed__pre__globals__t">fixed_pre_globals_t</a></td></tr>
+<tr class="memdesc:structfixed__pre__globals__t"><td class="mdescLeft">&#160;</td><td class="mdescRight">Global values across all the fixed-pre connectors in play on this core.  <a href="connection__generator__fixed__pre_8h.html#structfixed__pre__globals__t">More...</a><br /></td></tr>
+<tr class="separator:structfixed__pre__globals__t"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:abe6fe758cca3bdf0ec27a3aef98d535a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abe6fe758cca3bdf0ec27a3aef98d535a"></a>
-static void *&#160;</td><td class="memItemRight" valign="bottom"><b>connection_generator_fixed_pre_initialise</b> (address_t *<a class="el" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a>)</td></tr>
+<tr class="memitem:abe6fe758cca3bdf0ec27a3aef98d535a"><td class="memItemLeft" align="right" valign="top">static void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="connection__generator__fixed__pre_8h.html#abe6fe758cca3bdf0ec27a3aef98d535a">connection_generator_fixed_pre_initialise</a> (address_t *<a class="el" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a>)</td></tr>
+<tr class="memdesc:abe6fe758cca3bdf0ec27a3aef98d535a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise the fixed-pre connection generator.  <a href="#abe6fe758cca3bdf0ec27a3aef98d535a">More...</a><br /></td></tr>
 <tr class="separator:abe6fe758cca3bdf0ec27a3aef98d535a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0b3698cbbbb2c883905601002fd53739"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0b3698cbbbb2c883905601002fd53739"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>connection_generator_fixed_pre_free</b> (void *data)</td></tr>
-<tr class="separator:a0b3698cbbbb2c883905601002fd53739"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac7bbf4bf4f70b6455cb935e57165a614"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="connection__generator__fixed__pre_8h.html#ac7bbf4bf4f70b6455cb935e57165a614">connection_generator_fixed_pre_free</a> (void *generator)</td></tr>
+<tr class="memdesc:ac7bbf4bf4f70b6455cb935e57165a614"><td class="mdescLeft">&#160;</td><td class="mdescRight">Free the fixed-pre connection generator.  <a href="#ac7bbf4bf4f70b6455cb935e57165a614">More...</a><br /></td></tr>
+<tr class="separator:ac7bbf4bf4f70b6455cb935e57165a614"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a54a7a66e8fd8c26ab3c07eba79adec9b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a54a7a66e8fd8c26ab3c07eba79adec9b"></a>
 static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>pre_random_in_range</b> (struct <a class="el" href="connection__generator__fixed__pre_8h.html#structfixed__pre">fixed_pre</a> *obj, uint32_t range)</td></tr>
 <tr class="separator:a54a7a66e8fd8c26ab3c07eba79adec9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adad22bf81ace59651997c9b9816865d3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adad22bf81ace59651997c9b9816865d3"></a>
-uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>connection_generator_fixed_pre_generate</b> (void *data, uint32_t pre_slice_start, uint32_t pre_slice_count, uint32_t pre_neuron_index, uint32_t post_slice_start, uint32_t post_slice_count, uint32_t max_row_length, uint16_t *indices)</td></tr>
-<tr class="separator:adad22bf81ace59651997c9b9816865d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a935e1c46d26b5ce26a6abaefc0fc004c"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="connection__generator__fixed__pre_8h.html#a935e1c46d26b5ce26a6abaefc0fc004c">connection_generator_fixed_pre_generate</a> (void *generator, uint32_t pre_slice_start, uint32_t pre_slice_count, uint32_t pre_neuron_index, uint32_t post_slice_start, uint32_t post_slice_count, uint32_t max_row_length, uint16_t *indices)</td></tr>
+<tr class="memdesc:a935e1c46d26b5ce26a6abaefc0fc004c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate connections with the fixed-pre connection generator.  <a href="#a935e1c46d26b5ce26a6abaefc0fc004c">More...</a><br /></td></tr>
+<tr class="separator:a935e1c46d26b5ce26a6abaefc0fc004c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:a83dd664589b39a2b2fc18e98a08b6d02"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a83dd664589b39a2b2fc18e98a08b6d02"></a>
-static void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="connection__generator__fixed__pre_8h.html#a83dd664589b39a2b2fc18e98a08b6d02">full_indices</a> = NULL</td></tr>
-<tr class="memdesc:a83dd664589b39a2b2fc18e98a08b6d02"><td class="mdescLeft">&#160;</td><td class="mdescRight">An array containing the indices for each column. <br /></td></tr>
-<tr class="separator:a83dd664589b39a2b2fc18e98a08b6d02"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5ac38753affe7bb29f1431a25294b2d3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5ac38753affe7bb29f1431a25294b2d3"></a>
-static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>n_pre_neurons_done</b></td></tr>
-<tr class="separator:a5ac38753affe7bb29f1431a25294b2d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac7faf0dca4dd101e9d44fb0b0e8ddd3b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac7faf0dca4dd101e9d44fb0b0e8ddd3b"></a>
-static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>in_sdram</b> = 0</td></tr>
-<tr class="separator:ac7faf0dca4dd101e9d44fb0b0e8ddd3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a41013d6c3210c085c7880db23bbcb53e"><td class="memItemLeft" align="right" valign="top">static struct <a class="el" href="connection__generator__fixed__pre_8h.html#structfixed__pre__globals__t">fixed_pre_globals_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="connection__generator__fixed__pre_8h.html#a41013d6c3210c085c7880db23bbcb53e">fixed_pre_globals</a></td></tr>
+<tr class="memdesc:a41013d6c3210c085c7880db23bbcb53e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Global values across all the fixed-pre connectors in play on this core.  <a href="#a41013d6c3210c085c7880db23bbcb53e">More...</a><br /></td></tr>
+<tr class="separator:a41013d6c3210c085c7880db23bbcb53e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Fixed-Number-Pre (fan-in) Connection generator implementation. </p>
@@ -236,10 +233,203 @@ rng</td>
 
 </div>
 </div>
+<a name="structfixed__pre__globals__t" id="structfixed__pre__globals__t"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">struct fixed_pre_globals_t</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="textblock"><p>Global values across all the fixed-pre connectors in play on this core. </p>
+</div><table class="fieldtable">
+<tr><th colspan="3">Data Fields</th></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a9b06d08a35c06fc8558f75338b113065"></a>void *</td>
+<td class="fieldname">
+full_indices</td>
+<td class="fielddoc">
+An array containing the indices for each column. </td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a39a9876a13a2fe1e6700d4fa144de305"></a>uint32_t</td>
+<td class="fieldname">
+n_pre_neurons_done</td>
+<td class="fielddoc">
+How many pre-neurons have been processed so far. </td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a466a132ae35d326ff7de39154149e91d"></a>bool</td>
+<td class="fieldname">
+in_sdram</td>
+<td class="fielddoc">
+Whether <code>full_indices</code> is in SDRAM. </td></tr>
+</table>
+
+</div>
+</div>
+<h2 class="groupheader">Function Documentation</h2>
+<a class="anchor" id="abe6fe758cca3bdf0ec27a3aef98d535a"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void* connection_generator_fixed_pre_initialise </td>
+          <td>(</td>
+          <td class="paramtype">address_t *&#160;</td>
+          <td class="paramname"><em>region</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Initialise the fixed-pre connection generator. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">region</td><td>Region to read parameters from. Should be updated to position just after parameters after calling. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A data item to be passed in to other functions later on </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ac7bbf4bf4f70b6455cb935e57165a614"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void connection_generator_fixed_pre_free </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>generator</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Free the fixed-pre connection generator. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">generator</td><td>The generator to free </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a935e1c46d26b5ce26a6abaefc0fc004c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint32_t connection_generator_fixed_pre_generate </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>generator</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>pre_slice_start</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>pre_slice_count</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>pre_neuron_index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>post_slice_start</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>post_slice_count</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>max_row_length</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint16_t *&#160;</td>
+          <td class="paramname"><em>indices</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Generate connections with the fixed-pre connection generator. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">generator</td><td>The generator to use to generate connections </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">pre_slice_start</td><td>The start of the slice of the pre-population being generated </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">pre_slice_count</td><td>The number of neurons in the slice of the pre-population being generated </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">pre_neuron_index</td><td>The index of the neuron in the pre-population being generated </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">post_slice_start</td><td>The start of the slice of the post-population being generated </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">post_slice_count</td><td>The number of neurons in the slice of the post-population being generated </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">max_row_length</td><td>The maximum number of connections to generate </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">indices</td><td>An array into which the core-relative post-indices should be placed. This will be initialised to be <code>max_row_length</code> in size </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The number of connections generated </dd></dl>
+
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a class="anchor" id="a41013d6c3210c085c7880db23bbcb53e"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">struct <a class="el" href="connection__generator__fixed__pre_8h.html#structfixed__pre__globals__t">fixed_pre_globals_t</a> fixed_pre_globals</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= {</div><div class="line">    NULL, 0, <span class="keyword">false</span></div><div class="line">}</div></div><!-- fragment -->
+<p>Global values across all the fixed-pre connectors in play on this core. </p>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 28 2020 12:09:28 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 28 2020 15:40:43 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

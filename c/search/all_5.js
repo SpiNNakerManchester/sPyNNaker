@@ -9,6 +9,8 @@ var searchData=
   ['fixed_5fpost',['fixed_post',['../connection__generator__fixed__post_8h.html#structfixed__post',1,'fixed_post'],['../connection__generator_8c.html#a0411cd49bb5b71852cecd93bcbf0ca2daa130e7b038fc0ede3b0203931063b116',1,'FIXED_POST():&#160;connection_generator.c']]],
   ['fixed_5fpost_5fparams',['fixed_post_params',['../connection__generator__fixed__post_8h.html#structfixed__post__params',1,'']]],
   ['fixed_5fpre',['fixed_pre',['../connection__generator__fixed__pre_8h.html#structfixed__pre',1,'fixed_pre'],['../connection__generator_8c.html#a0411cd49bb5b71852cecd93bcbf0ca2daa667dfec30c43a0320c7bd76b99bd4c7',1,'FIXED_PRE():&#160;connection_generator.c']]],
+  ['fixed_5fpre_5fglobals',['fixed_pre_globals',['../connection__generator__fixed__pre_8h.html#a41013d6c3210c085c7880db23bbcb53e',1,'connection_generator_fixed_pre.h']]],
+  ['fixed_5fpre_5fglobals_5ft',['fixed_pre_globals_t',['../connection__generator__fixed__pre_8h.html#structfixed__pre__globals__t',1,'']]],
   ['fixed_5fpre_5fparams',['fixed_pre_params',['../connection__generator__fixed__pre_8h.html#structfixed__pre__params',1,'']]],
   ['fixed_5fprob',['fixed_prob',['../connection__generator__fixed__prob_8h.html#structfixed__prob',1,'']]],
   ['fixed_5fprob_5fparams',['fixed_prob_params',['../connection__generator__fixed__prob_8h.html#structfixed__prob__params',1,'']]],
@@ -24,5 +26,5 @@ var searchData=
   ['fract_5fconst',['FRACT_CONST',['../maths-util_8h.html#ade056d60ae7bac69fab1196cc114cfb3',1,'maths-util.h']]],
   ['free',['free',['../connection__generator_8c.html#ab5116cf03d5a141b805d248bb609e9b1',1,'connection_generator_info::free()'],['../matrix__generator_8c.html#aa732cf0409128b2a144d54cf7733c756',1,'matrix_generator_info::free()'],['../param__generator_8c.html#a10a8a08f2a3dd4c64e428987d2c55ab3',1,'param_generator_info::free()']]],
   ['free_5ffunc',['free_func',['../generator__types_8h.html#a6a0f823edb9b15521ad463944eef00e2',1,'generator_types.h']]],
-  ['full_5findices',['full_indices',['../connection__generator__fixed__pre_8h.html#a83dd664589b39a2b2fc18e98a08b6d02',1,'connection_generator_fixed_pre.h']]]
+  ['full_5findices',['full_indices',['../connection__generator__fixed__pre_8h.html#a9b06d08a35c06fc8558f75338b113065',1,'fixed_pre_globals_t']]]
 ];

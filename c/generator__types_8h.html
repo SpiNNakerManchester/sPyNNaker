@@ -115,9 +115,9 @@ typedef uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el
 <tr class="memitem:aeecea374609ce4f319912de8bb3373aa"><td class="memItemLeft" align="right" valign="top">typedef uint32_t(&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="generator__types_8h.html#aeecea374609ce4f319912de8bb3373aa">generate_connection_func</a>) (void *generator, uint32_t pre_slice_start, uint32_t pre_slice_count, uint32_t pre_neuron_index, uint32_t post_slice_start, uint32_t post_slice_count, uint32_t max_row_length, uint16_t *indices)</td></tr>
 <tr class="memdesc:aeecea374609ce4f319912de8bb3373aa"><td class="mdescLeft">&#160;</td><td class="mdescRight">How to generate connections with a connection generator.  <a href="#aeecea374609ce4f319912de8bb3373aa">More...</a><br /></td></tr>
 <tr class="separator:aeecea374609ce4f319912de8bb3373aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad20cafafdbc32aa68b7ffd1d0d4e4808"><td class="memItemLeft" align="right" valign="top">typedef void(&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="generator__types_8h.html#ad20cafafdbc32aa68b7ffd1d0d4e4808">generate_param_func</a>) (void *generator, uint32_t n_synapses, uint32_t pre_neuron_index, uint16_t *indices, accum *values)</td></tr>
-<tr class="memdesc:ad20cafafdbc32aa68b7ffd1d0d4e4808"><td class="mdescLeft">&#160;</td><td class="mdescRight">How to generate values with a parameter generator.  <a href="#ad20cafafdbc32aa68b7ffd1d0d4e4808">More...</a><br /></td></tr>
-<tr class="separator:ad20cafafdbc32aa68b7ffd1d0d4e4808"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4bd003486ef73fb965123237b0559f38"><td class="memItemLeft" align="right" valign="top">typedef void(&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="generator__types_8h.html#a4bd003486ef73fb965123237b0559f38">generate_param_func</a>) (void *generator, uint32_t n_indices, uint32_t pre_neuron_index, uint16_t *indices, accum *values)</td></tr>
+<tr class="memdesc:a4bd003486ef73fb965123237b0559f38"><td class="mdescLeft">&#160;</td><td class="mdescRight">How to generate values with a parameter generator.  <a href="#a4bd003486ef73fb965123237b0559f38">More...</a><br /></td></tr>
+<tr class="separator:a4bd003486ef73fb965123237b0559f38"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a93d89ec17e8dd61e706a81874b5241d3"><td class="memItemLeft" align="right" valign="top">typedef void(&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="generator__types_8h.html#a93d89ec17e8dd61e706a81874b5241d3">generate_row_func</a>) (void *generator, address_t synaptic_matrix, address_t delayed_synaptic_matrix, uint32_t n_pre_neurons, uint32_t pre_neuron_index, uint32_t max_row_n_words, uint32_t max_delayed_row_n_words, uint32_t synapse_type_bits, uint32_t synapse_index_bits, uint32_t synapse_type, uint32_t n_synapses, uint16_t *indices, uint16_t *delays, uint16_t *weights, uint32_t max_stage)</td></tr>
 <tr class="memdesc:a93d89ec17e8dd61e706a81874b5241d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">How to generate a row of a matrix with a matrix generator.  <a href="#a93d89ec17e8dd61e706a81874b5241d3">More...</a><br /></td></tr>
 <tr class="separator:a93d89ec17e8dd61e706a81874b5241d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -187,7 +187,7 @@ typedef uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el
     <tr><td class="paramdir">[in]</td><td class="paramname">post_slice_start</td><td>The start of the slice of the post-population being generated </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">post_slice_count</td><td>The number of neurons in the slice of the post-population being generated </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">max_row_length</td><td>The maximum number of connections to generate </td></tr>
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">indices</td><td>An array into which the core-relative post-indices should be placed. This will be initialised to be max_row_length in size </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">indices</td><td>An array into which the core-relative post-indices should be placed. This will be initialised to be <code>max_row_length</code> in size </td></tr>
   </table>
   </dd>
 </dl>
@@ -195,12 +195,12 @@ typedef uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el
 
 </div>
 </div>
-<a class="anchor" id="ad20cafafdbc32aa68b7ffd1d0d4e4808"></a>
+<a class="anchor" id="a4bd003486ef73fb965123237b0559f38"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">typedef void( generate_param_func) (void *generator, uint32_t n_synapses, uint32_t pre_neuron_index, uint16_t *indices, accum *values)</td>
+          <td class="memname">typedef void( generate_param_func) (void *generator, uint32_t n_indices, uint32_t pre_neuron_index, uint16_t *indices, accum *values)</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -211,8 +211,8 @@ typedef uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el
     <tr><td class="paramdir">[in]</td><td class="paramname">generator</td><td>The generator to use to generate values </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">n_indices</td><td>The number of values to generate </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">pre_neuron_index</td><td>The index of the neuron in the pre-population being generated </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">indices</td><td>The n_indices post-neuron indices for each connection </td></tr>
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">values</td><td>An array into which to place the values - will be n_indices in size </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">indices</td><td>The <code>n_indices</code> post-neuron indices for each connection </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">values</td><td>An array into which to place the values; will be <code>n_indices</code> in size </td></tr>
   </table>
   </dd>
 </dl>
@@ -233,25 +233,20 @@ typedef uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">generator</td><td>The data for the matrix generator, returned by the initialise function </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">synaptic_matrix</td><td>The address of the synaptic matrix to write to </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">delayed_synaptic_matrix</td><td>The address of the synaptic matrix to write delayed connections to </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">synaptic_matrix</td><td>The address of the synaptic matrix to write to </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">delayed_synaptic_matrix</td><td>The address of the synaptic matrix to write delayed connections to </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">n_pre_neurons</td><td>The number of pre neurons to generate for </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">pre_neuron_index</td><td>The index of the first pre neuron </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">max_row_n_words</td><td>The maximum number of words in a normal row </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">max_delayed_row_n_words</td><td>The maximum number of words in a delayed row </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">max_row_n_synapses</td><td>The maximum number of synapses in a normal row </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">max_delayed_row_n_synapses</td><td>The maximum number of synapses in a delayed row </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">n_synapse_type_bits</td><td>The number of bits used for the synapse type </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">n_synapse_index_bits</td><td>The number of bits used for the neuron id </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">synapse_type_bits</td><td>The number of bits used for the synapse type </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">synapse_index_bits</td><td>The number of bits used for the neuron id </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">synapse_type</td><td>The synapse type of each connection </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">weight_scales</td><td>An array of weight scales, one for each synapse type </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">post_slice_start</td><td>The start of the slice of the post-population being generated </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">post_slice_count</td><td>The number of neurons in the slice of the post-population being generated </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">pre_slice_start</td><td>The start of the slice of the pre-population being generated </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">pre_slice_count</td><td>The number of neurons in the slice of the pre-population being generated </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname"><a class="el" href="connection__generator_8c.html#structconnection__generator" title="The data for a connection generator. ">connection_generator</a></td><td>The generator of connections </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">delay_generator</td><td>The generator of delay values </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">weight_generator</td><td>The generator of weight values </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">n_synapses</td><td>The number of synapses </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">indices</td><td>Pointer to table of indices </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">delays</td><td>Pointer to table of delays </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">weights</td><td>Pointer to table of weights </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">max_stage</td><td>The maximum delay stage to support </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">timestep_per_delay</td><td>The delay value multiplier to get to timesteps </td></tr>
   </table>
   </dd>
 </dl>
@@ -261,7 +256,7 @@ typedef uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 28 2020 12:09:28 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 28 2020 15:40:43 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

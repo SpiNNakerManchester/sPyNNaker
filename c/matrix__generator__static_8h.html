@@ -88,8 +88,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#define-members">Macros</a> &#124;
-<a href="#func-members">Functions</a> &#124;
-<a href="#var-members">Variables</a>  </div>
+<a href="#func-members">Functions</a>  </div>
   <div class="headertitle">
 <div class="title">matrix_generator_static.h File Reference</div>  </div>
 </div><!--header-->
@@ -138,34 +137,87 @@ Macros</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a34e736f14eb0b8aa28b50e8b1d053acf"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a34e736f14eb0b8aa28b50e8b1d053acf"></a>
-static void *&#160;</td><td class="memItemRight" valign="bottom"><b>matrix_generator_static_initialize</b> (address_t *<a class="el" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a>)</td></tr>
+<tr class="memitem:a34e736f14eb0b8aa28b50e8b1d053acf"><td class="memItemLeft" align="right" valign="top">static void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator__static_8h.html#a34e736f14eb0b8aa28b50e8b1d053acf">matrix_generator_static_initialize</a> (address_t *<a class="el" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a>)</td></tr>
+<tr class="memdesc:a34e736f14eb0b8aa28b50e8b1d053acf"><td class="mdescLeft">&#160;</td><td class="mdescRight">How to initialise the static synaptic matrix generator.  <a href="#a34e736f14eb0b8aa28b50e8b1d053acf">More...</a><br /></td></tr>
 <tr class="separator:a34e736f14eb0b8aa28b50e8b1d053acf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a220b2d805c14fd6ab731277aa235f945"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a220b2d805c14fd6ab731277aa235f945"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><b>matrix_generator_static_free</b> (void *data)</td></tr>
-<tr class="separator:a220b2d805c14fd6ab731277aa235f945"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a21c6ce388b821caaa1268c3d6abb9ef1"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator__static_8h.html#a21c6ce388b821caaa1268c3d6abb9ef1">matrix_generator_static_free</a> (void *generator)</td></tr>
+<tr class="memdesc:a21c6ce388b821caaa1268c3d6abb9ef1"><td class="mdescLeft">&#160;</td><td class="mdescRight">How to free any data for the static synaptic matrix generator.  <a href="#a21c6ce388b821caaa1268c3d6abb9ef1">More...</a><br /></td></tr>
+<tr class="separator:a21c6ce388b821caaa1268c3d6abb9ef1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abef0ba0fc1675b818c5385bb2e99aafa"><td class="memItemLeft" align="right" valign="top">static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator__static_8h.html#abef0ba0fc1675b818c5385bb2e99aafa">build_static_word</a> (uint16_t weight, uint16_t delay, uint32_t type, uint16_t post_index, uint32_t synapse_type_bits, uint32_t synapse_index_bits)</td></tr>
 <tr class="memdesc:abef0ba0fc1675b818c5385bb2e99aafa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Build a static synaptic word from components.  <a href="#abef0ba0fc1675b818c5385bb2e99aafa">More...</a><br /></td></tr>
 <tr class="separator:abef0ba0fc1675b818c5385bb2e99aafa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa94d77ae21a66b3824404e229a1f5ba4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa94d77ae21a66b3824404e229a1f5ba4"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><b>matrix_generator_static_write_row</b> (void *data, address_t synaptic_matrix, address_t delayed_synaptic_matrix, uint32_t n_pre_neurons, uint32_t pre_neuron_index, uint32_t max_row_n_words, uint32_t max_delayed_row_n_words, uint32_t synapse_type_bits, uint32_t synapse_index_bits, uint32_t synapse_type, uint32_t n_synapses, uint16_t *indices, uint16_t *delays, uint16_t *weights, uint32_t max_stage)</td></tr>
-<tr class="separator:aa94d77ae21a66b3824404e229a1f5ba4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
-Variables</h2></td></tr>
-<tr class="memitem:a2b0946448766390e3cfa116d6dbf824d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2b0946448766390e3cfa116d6dbf824d"></a>
-static <a class="el" href="generator__types_8h.html#aee3c3f67a2dbc86e776c251bdc87f8ad">initialize_func</a>&#160;</td><td class="memItemRight" valign="bottom"><b>matrix_generator_static_initialize</b></td></tr>
-<tr class="separator:a2b0946448766390e3cfa116d6dbf824d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a436c4a8f7226a1b758dccf2ac22edd1c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a436c4a8f7226a1b758dccf2ac22edd1c"></a>
-static <a class="el" href="generator__types_8h.html#a6a0f823edb9b15521ad463944eef00e2">free_func</a>&#160;</td><td class="memItemRight" valign="bottom"><b>matrix_generator_static_free</b></td></tr>
-<tr class="separator:a436c4a8f7226a1b758dccf2ac22edd1c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad4801e18bd69515233461805c02d36b6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad4801e18bd69515233461805c02d36b6"></a>
-static <a class="el" href="generator__types_8h.html#a93d89ec17e8dd61e706a81874b5241d3">generate_row_func</a>&#160;</td><td class="memItemRight" valign="bottom"><b>matrix_generator_static_write_row</b></td></tr>
-<tr class="separator:ad4801e18bd69515233461805c02d36b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a691175407865992f7fef972af2aeec92"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator__static_8h.html#a691175407865992f7fef972af2aeec92">matrix_generator_static_write_row</a> (void *generator, address_t synaptic_matrix, address_t delayed_synaptic_matrix, uint32_t n_pre_neurons, uint32_t pre_neuron_index, uint32_t max_row_n_words, uint32_t max_delayed_row_n_words, uint32_t synapse_type_bits, uint32_t synapse_index_bits, uint32_t synapse_type, uint32_t n_synapses, uint16_t *indices, uint16_t *delays, uint16_t *weights, uint32_t max_stage)</td></tr>
+<tr class="memdesc:a691175407865992f7fef972af2aeec92"><td class="mdescLeft">&#160;</td><td class="mdescRight">How to generate a row of a static synaptic matrix.  <a href="#a691175407865992f7fef972af2aeec92">More...</a><br /></td></tr>
+<tr class="separator:a691175407865992f7fef972af2aeec92"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Static synaptic matrix implementation. </p>
 </div><h2 class="groupheader">Function Documentation</h2>
+<a class="anchor" id="a34e736f14eb0b8aa28b50e8b1d053acf"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void* matrix_generator_static_initialize </td>
+          <td>(</td>
+          <td class="paramtype">address_t *&#160;</td>
+          <td class="paramname"><em>region</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>How to initialise the static synaptic matrix generator. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">region</td><td>Region to read parameters from. Should be updated to position just after parameters after calling. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A data item to be passed in to other functions later on </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a21c6ce388b821caaa1268c3d6abb9ef1"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void matrix_generator_static_free </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>generator</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>How to free any data for the static synaptic matrix generator. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">generator</td><td>The data to free </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a class="anchor" id="abef0ba0fc1675b818c5385bb2e99aafa"></a>
 <div class="memitem">
 <div class="memproto">
@@ -238,10 +290,144 @@ static <a class="el" href="generator__types_8h.html#a93d89ec17e8dd61e706a81874b5
 
 </div>
 </div>
+<a class="anchor" id="a691175407865992f7fef972af2aeec92"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void matrix_generator_static_write_row </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>generator</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">address_t&#160;</td>
+          <td class="paramname"><em>synaptic_matrix</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">address_t&#160;</td>
+          <td class="paramname"><em>delayed_synaptic_matrix</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>n_pre_neurons</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>pre_neuron_index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>max_row_n_words</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>max_delayed_row_n_words</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>synapse_type_bits</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>synapse_index_bits</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>synapse_type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>n_synapses</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint16_t *&#160;</td>
+          <td class="paramname"><em>indices</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint16_t *&#160;</td>
+          <td class="paramname"><em>delays</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint16_t *&#160;</td>
+          <td class="paramname"><em>weights</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>max_stage</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>How to generate a row of a static synaptic matrix. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">generator</td><td>The data for the matrix generator, returned by the initialise function </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">synaptic_matrix</td><td>The address of the synaptic matrix to write to </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">delayed_synaptic_matrix</td><td>The address of the synaptic matrix to write delayed connections to </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">n_pre_neurons</td><td>The number of pre neurons to generate for </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">pre_neuron_index</td><td>The index of the first pre neuron </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">max_row_n_words</td><td>The maximum number of words in a normal row </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">max_delayed_row_n_words</td><td>The maximum number of words in a delayed row </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">synapse_type_bits</td><td>The number of bits used for the synapse type </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">synapse_index_bits</td><td>The number of bits used for the neuron id </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">synapse_type</td><td>The synapse type of each connection </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">n_synapses</td><td>The number of synapses </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">indices</td><td>Pointer to table of indices </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">delays</td><td>Pointer to table of delays </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">weights</td><td>Pointer to table of weights </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">max_stage</td><td>The maximum delay stage to support </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 28 2020 12:09:28 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 28 2020 15:40:43 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

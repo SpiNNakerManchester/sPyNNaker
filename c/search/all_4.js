@@ -12,5 +12,6 @@ var searchData=
   ['exp_5ftc',['exp_TC',['../neuron__model__lif__impl_8h.html#ae86326c508ef052f75103f8fec5dff82',1,'neuron_t']]],
   ['expand_5fspike_5frecording_5fbuffer',['expand_spike_recording_buffer',['../spike__source__poisson_8c.html#a09166600548501c6befb79b410cdc98a',1,'spike_source_poisson.c']]],
   ['expander_5fconfig',['expander_config',['../synapse__expander_8c.html#structexpander__config',1,'']]],
+  ['expander_5fregion',['EXPANDER_REGION',['../delay__extension_8h.html#a6e4d67a0bd74db4da98539f8d2e5ab32a719368d00e2ee9a5b0e27a360ea05be4',1,'delay_extension.h']]],
   ['expected_5ftime',['expected_time',['../delay__extension_8c.html#a8a1c8ad4577d74c25e7760e6d653eed5',1,'expected_time():&#160;delay_extension.c'],['../neuron_8c.html#a8a1c8ad4577d74c25e7760e6d653eed5',1,'expected_time():&#160;neuron.c'],['../spike__source__poisson_8c.html#a8a1c8ad4577d74c25e7760e6d653eed5',1,'expected_time():&#160;spike_source_poisson.c']]]
 ];

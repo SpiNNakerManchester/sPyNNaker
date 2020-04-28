@@ -1,9 +1,5 @@
 var searchData=
 [
-  ['max_5fdelay',['MAX_DELAY',['../matrix__generator__common_8h.html#a16027d8acc5301e440cefa086eb9db2a',1,'matrix_generator_common.h']]],
-  ['max_5fhr',['MAX_HR',['../maths-util_8h.html#a4cd8c0908147af30685131571083c3f1',1,'maths-util.h']]],
-  ['min_5fhr',['MIN_HR',['../maths-util_8h.html#a6daffdd851dffa46c5be64d52af96db8',1,'maths-util.h']]],
-  ['munich_5fkey',['MUNICH_KEY',['../munich__protocol_8h.html#a8200ce065b6bf4ef334ad1b33451bf96',1,'munich_protocol.h']]],
-  ['munich_5fkey_5fi',['MUNICH_KEY_I',['../munich__protocol_8h.html#ac9ffc4cc9a38bac6bb565c793d90ec81',1,'munich_protocol.h']]],
-  ['munich_5fkey_5fi_5fd',['MUNICH_KEY_I_D',['../munich__protocol_8h.html#a5dafb96b044783c3b4650c5789f6f08a',1,'munich_protocol.h']]]
+  ['invalid_5fselection',['INVALID_SELECTION',['../partner_8h.html#a2a7bcb70c4ad5d6f163e74c8fa035f91',1,'partner.h']]],
+  ['isi_5fscale_5ffactor',['ISI_SCALE_FACTOR',['../spike__source__poisson_8c.html#af9fc996bed279eea4da4fd5166df447c',1,'spike_source_poisson.c']]]
 ];

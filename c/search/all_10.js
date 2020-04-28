@@ -1,12 +1,14 @@
 var searchData=
 [
   ['r_5fmembrane',['R_membrane',['../neuron__model__lif__impl_8h.html#aea78ba2caa325540d8571d35eba56b13',1,'neuron_t']]],
+  ['random_5fbackoff',['random_backoff',['../delay__extension_8h.html#ae809890618a4954670c1de81cab1f9c8',1,'delay_parameters']]],
   ['random_5fselection_5fimpl_2ec',['random_selection_impl.c',['../random__selection__impl_8c.html',1,'']]],
   ['random_5fselection_5fimpl_2eh',['random_selection_impl.h',['../random__selection__impl_8h.html',1,'']]],
   ['random_5futil_2eh',['random_util.h',['../random__util_8h.html',1,'']]],
   ['read_5fconnection_5fbuilder_5fregion',['read_connection_builder_region',['../synapse__expander_8c.html#a796837af1a5d205aa367196d5a7001bf',1,'synapse_expander.c']]],
   ['read_5fdelay_5fbuilder_5fregion',['read_delay_builder_region',['../delay__expander_8c.html#ac2a97c4437a50fb351aad2db718cf7bf',1,'delay_expander.c']]],
   ['read_5fglobal_5fparameters',['read_global_parameters',['../spike__source__poisson_8c.html#a571b747b9d964eb5af02496ce866130b',1,'spike_source_poisson.c']]],
+  ['read_5fparameters',['read_parameters',['../delay__extension_8c.html#afeb21131569d4edffb884f6564de89dd',1,'delay_extension.c']]],
   ['read_5frates',['read_rates',['../spike__source__poisson_8c.html#af4847de2b9a2d080b0e03eabccb7308d',1,'spike_source_poisson.c']]],
   ['real',['REAL',['../maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6',1,'maths-util.h']]],
   ['real_5fcompare',['REAL_COMPARE',['../maths-util_8h.html#a312d47ef9413a82783b9a70de764d9a2',1,'maths-util.h']]],
@@ -48,6 +50,7 @@ var searchData=
   ['rng_5finit',['rng_init',['../rng_8c.html#ac2b523470897c3c3e4168e8d82579d18',1,'rng_init(address_t *region):&#160;rng.c'],['../rng_8h.html#ac2b523470897c3c3e4168e8d82579d18',1,'rng_init(address_t *region):&#160;rng.c']]],
   ['rng_5fnormal',['rng_normal',['../rng_8c.html#a7afddf66f0bcc73ecd2637231a654f01',1,'rng_normal(rng_t rng):&#160;rng.c'],['../rng_8h.html#a7afddf66f0bcc73ecd2637231a654f01',1,'rng_normal(rng_t rng):&#160;rng.c']]],
   ['robot_5fmotor_5fcontrol_2ec',['robot_motor_control.c',['../robot__motor__control_8c.html',1,'']]],
+  ['round_5fto_5fnext_5fpot',['round_to_next_pot',['../delay__extension_8c.html#ac5c8b24e3b6d606c321ce3cd22ebe8a0',1,'delay_extension.c']]],
   ['run_5fdelay_5fexpander',['run_delay_expander',['../delay__expander_8c.html#ab8e8cac1b4ebc8d1fd0d665b9639988e',1,'delay_expander.c']]],
   ['run_5fsynapse_5fexpander',['run_synapse_expander',['../synapse__expander_8c.html#ab2b96fb3f7cddc88c3b12263c25f0fc1',1,'synapse_expander.c']]]
 ];

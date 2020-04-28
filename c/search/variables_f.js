@@ -1,6 +1,7 @@
 var searchData=
 [
   ['r_5fmembrane',['R_membrane',['../neuron__model__lif__impl_8h.html#aea78ba2caa325540d8571d35eba56b13',1,'neuron_t']]],
+  ['random_5fbackoff',['random_backoff',['../delay__extension_8h.html#ae809890618a4954670c1de81cab1f9c8',1,'delay_parameters']]],
   ['recording_5fflags',['recording_flags',['../neuron_8c.html#a9a97f21dc7fccaac8071bcd29894bccb',1,'recording_flags():&#160;neuron.c'],['../spike__source__poisson_8c.html#a9a97f21dc7fccaac8071bcd29894bccb',1,'recording_flags():&#160;spike_source_poisson.c']]],
   ['recording_5fin_5fprogress',['recording_in_progress',['../spike__source__poisson_8c.html#a79737d2f85cf79db57370f7734c60bba',1,'spike_source_poisson.c']]],
   ['recording_5finfo',['recording_info',['../neuron__recording_8c.html#a96a8e9a2f37a358a5264aadc6bb37263',1,'recording_info():&#160;neuron_recording.c'],['../neuron__recording_8h.html#a96a8e9a2f37a358a5264aadc6bb37263',1,'recording_info():&#160;neuron_recording.c']]],

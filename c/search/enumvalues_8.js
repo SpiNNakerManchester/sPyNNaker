@@ -1,7 +1,6 @@
 var searchData=
 [
-  ['offset_5fto_5fd',['OFFSET_TO_D',['../munich__protocol_8h.html#a06fc87d81c62e9abb8790b6e5713c55baad87c155efc7814564f9b47dfb651b3f',1,'munich_protocol.h']]],
-  ['offset_5fto_5ff',['OFFSET_TO_F',['../munich__protocol_8h.html#a06fc87d81c62e9abb8790b6e5713c55ba964ef105cedcef1b651c6a4e58e33302',1,'munich_protocol.h']]],
-  ['offset_5fto_5fi',['OFFSET_TO_I',['../munich__protocol_8h.html#a06fc87d81c62e9abb8790b6e5713c55baa890a0ce75c6dee9ecbac3a2c87220cc',1,'munich_protocol.h']]],
-  ['one_5fto_5fone',['ONE_TO_ONE',['../connection__generator_8c.html#a0411cd49bb5b71852cecd93bcbf0ca2dadaccc17f840cc67d0e9c1a9a331b2fb4',1,'connection_generator.c']]]
+  ['n_5fconnection_5fgenerators',['N_CONNECTION_GENERATORS',['../connection__generator_8c.html#a0411cd49bb5b71852cecd93bcbf0ca2dab1144285d7382feeb4687af0263e2467',1,'connection_generator.c']]],
+  ['n_5fmatrix_5fgenerators',['N_MATRIX_GENERATORS',['../matrix__generator_8c.html#abed82baf7f470b522273a3e37c24c600aba9a03e4fd023b2837469ea1ff6225a3',1,'matrix_generator.c']]],
+  ['n_5fparam_5fgenerators',['N_PARAM_GENERATORS',['../param__generator_8c.html#ab04a0655cd1e3bcac5e8f48c18df1a57ab8047ff7dfdb2c76ef1e78a7e6347777',1,'param_generator.c']]]
 ];
