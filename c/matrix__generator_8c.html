@@ -166,12 +166,6 @@ Variables</h2></td></tr>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
-<a class="anchor" id="aa732cf0409128b2a144d54cf7733c756"></a><a class="el" href="generator__types_8h.html#a6a0f823edb9b15521ad463944eef00e2">free_func</a> *</td>
-<td class="fieldname">
-free</td>
-<td class="fielddoc">
-Free any data for the generator. </td></tr>
-<tr><td class="fieldtype">
 <a class="anchor" id="a8333d4c3400688570254a1535e918b20"></a><a class="el" href="generator__types_8h.html#a55f8d20fc9350939e3fa6a85d8aed90c">generator_hash_t</a></td>
 <td class="fieldname">
 hash</td>
@@ -190,6 +184,12 @@ Initialise the generator. </td></tr>
 write_row</td>
 <td class="fielddoc">
 Generate a row of a matrix with a matrix generator. </td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="aa732cf0409128b2a144d54cf7733c756"></a><a class="el" href="generator__types_8h.html#a6a0f823edb9b15521ad463944eef00e2">free_func</a> *</td>
+<td class="fieldname">
+free</td>
+<td class="fielddoc">
+Free any data for the generator. </td></tr>
 </table>
 
 </div>
@@ -208,15 +208,15 @@ Generate a row of a matrix with a matrix generator. </td></tr>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
-<a class="anchor" id="a9ec02d14e19474e59d876b289efd38f8"></a>void *</td>
-<td class="fieldname">
-data</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
 <a class="anchor" id="aab7fab4dfa4fbf38cf855ad6eab9d80f"></a>const <a class="el" href="matrix__generator_8c.html#structmatrix__generator__info">matrix_generator_info</a> *</td>
 <td class="fieldname">
 type</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a9ec02d14e19474e59d876b289efd38f8"></a>void *</td>
+<td class="fieldname">
+data</td>
 <td class="fielddoc">
 </td></tr>
 </table>
@@ -242,6 +242,42 @@ type</td>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
+<a class="anchor" id="a9539b11486e767ca5114db0390a505a1"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">matrix_generator_t matrix_generator_init </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>hash</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">address_t *&#160;</td>
+          <td class="paramname"><em>region</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Initialise a specific matrix generator. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">hash</td><td>The identifier of the generator to initialise </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">region</td><td>The address to read data from; updated to position after data has been read </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>An initialised matrix generator that can be used with other functions, or NULL if it couldn't be initialised for any reason </dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="aafbab40316b9861d41999287c65d1dbe"></a>
 <div class="memitem">
 <div class="memproto">
@@ -428,42 +464,6 @@ type</td>
 
 </div>
 </div>
-<a class="anchor" id="a9539b11486e767ca5114db0390a505a1"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">matrix_generator_t matrix_generator_init </td>
-          <td>(</td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>hash</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">address_t *&#160;</td>
-          <td class="paramname"><em>region</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Initialise a specific matrix generator. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">hash</td><td>The identifier of the generator to initialise </td></tr>
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">region</td><td>The address to read data from; updated to position after data has been read </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>An initialised matrix generator that can be used with other functions, or NULL if it couldn't be initialised for any reason </dd></dl>
-
-</div>
-</div>
 <h2 class="groupheader">Variable Documentation</h2>
 <a class="anchor" id="a420abd8627e0860d1b5e902686806ea0"></a>
 <div class="memitem">
@@ -490,7 +490,7 @@ type</td>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 28 2020 09:26:46 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 28 2020 12:09:28 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

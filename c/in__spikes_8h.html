@@ -146,6 +146,52 @@ static circular_buffer&#160;</td><td class="memItemRight" valign="bottom"><b>buf
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Functions for immediate handling of incoming spikes. </p>
 </div><h2 class="groupheader">Function Documentation</h2>
+<a class="anchor" id="a9cc56cd2e4bbe79b5a722357f1959185"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static bool in_spikes_initialize_spike_buffer </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>size</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>This function initialises the input spike buffer. </p>
+<p>It configures: </p><dl>
+<dt>buffer </dt>
+<dd>the buffer to hold the spikes (initialised with size spaces) </dd>
+<dt>input </dt>
+<dd>index for next spike inserted into buffer </dd>
+<dt>output </dt>
+<dd>index for next spike extracted from buffer </dd>
+<dt>overflows </dt>
+<dd>a counter for the number of times the buffer overflows </dd>
+<dt>underflows </dt>
+<dd>a counter for the number of times the buffer underflows </dd>
+</dl>
+<p>If underflows is ever non-zero, then there is a problem with this code.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">size</td><td>The number of spikes we expect to handle in the buffer; this should be a power of 2 (and will be increased to the next one up if it isn't). </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>True if the buffer was successfully initialised </dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="af50c3c392fbfb0d59e24eb90eb06e9f4"></a>
 <div class="memitem">
 <div class="memproto">
@@ -175,6 +221,72 @@ static circular_buffer&#160;</td><td class="memItemRight" valign="bottom"><b>buf
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a class="anchor" id="a27d508007a6c99c3d80caed473318b08"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static bool in_spikes_get_next_spike </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> *&#160;</td>
+          <td class="paramname"><em>spike</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Retrieves a spike from the input spike buffer. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[out]</td><td class="paramname">spike</td><td>The spike that was retrieved. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>True if a spike was retrieved, false if the buffer was empty. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a2ae3e298f1e13b8804dc826a229c6669"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static bool in_spikes_is_next_spike_equal </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a>&#160;</td>
+          <td class="paramname"><em>spike</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Skips the next spike in the buffer if it is equal to an existing spike. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">spike</td><td>The spike to compare against. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>True if a spike was skipped over, false otherwise. </dd></dl>
 
 </div>
 </div>
@@ -232,7 +344,7 @@ static circular_buffer&#160;</td><td class="memItemRight" valign="bottom"><b>buf
 
 </div>
 </div>
-<a class="anchor" id="a27d508007a6c99c3d80caed473318b08"></a>
+<a class="anchor" id="af2c8052da82bc8ce24310a278994ef33"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -240,10 +352,10 @@ static circular_buffer&#160;</td><td class="memItemRight" valign="bottom"><b>buf
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static bool in_spikes_get_next_spike </td>
+          <td class="memname">static void in_spikes_print_buffer </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> *&#160;</td>
-          <td class="paramname"><em>spike</em></td><td>)</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -254,60 +366,8 @@ static circular_buffer&#160;</td><td class="memItemRight" valign="bottom"><b>buf
 </table>
 </div><div class="memdoc">
 
-<p>Retrieves a spike from the input spike buffer. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[out]</td><td class="paramname">spike</td><td>The spike that was retrieved. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>True if a spike was retrieved, false if the buffer was empty. </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="a9cc56cd2e4bbe79b5a722357f1959185"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static bool in_spikes_initialize_spike_buffer </td>
-          <td>(</td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>size</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>This function initialises the input spike buffer. </p>
-<p>It configures: </p><dl>
-<dt>buffer </dt>
-<dd>the buffer to hold the spikes (initialised with size spaces) </dd>
-<dt>input </dt>
-<dd>index for next spike inserted into buffer </dd>
-<dt>output </dt>
-<dd>index for next spike extracted from buffer </dd>
-<dt>overflows </dt>
-<dd>a counter for the number of times the buffer overflows </dd>
-<dt>underflows </dt>
-<dd>a counter for the number of times the buffer underflows </dd>
-</dl>
-<p>If underflows is ever non-zero, then there is a problem with this code.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">size</td><td>The number of spikes we expect to handle in the buffer; this should be a power of 2 (and will be increased to the next one up if it isn't). </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>True if the buffer was successfully initialised </dd></dl>
+<p>Print the input spike buffer. </p>
+<p>Expected to be mainly for debugging. </p>
 
 </div>
 </div>
@@ -338,39 +398,6 @@ static circular_buffer&#160;</td><td class="memItemRight" valign="bottom"><b>buf
 
 </div>
 </div>
-<a class="anchor" id="a2ae3e298f1e13b8804dc826a229c6669"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static bool in_spikes_is_next_spike_equal </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a>&#160;</td>
-          <td class="paramname"><em>spike</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Skips the next spike in the buffer if it is equal to an existing spike. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">spike</td><td>The spike to compare against. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>True if a spike was skipped over, false otherwise. </dd></dl>
-
-</div>
-</div>
 <a class="anchor" id="a06eb057099ca98c17d7aca3cf1754636"></a>
 <div class="memitem">
 <div class="memproto">
@@ -395,33 +422,6 @@ static circular_buffer&#160;</td><td class="memItemRight" valign="bottom"><b>buf
 
 <p>Get the index in the buffer of the point where the next removal comes from. </p>
 <dl class="section return"><dt>Returns</dt><dd>An index. </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="af2c8052da82bc8ce24310a278994ef33"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static void in_spikes_print_buffer </td>
-          <td>(</td>
-          <td class="paramtype">void&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Print the input spike buffer. </p>
-<p>Expected to be mainly for debugging. </p>
 
 </div>
 </div>
@@ -488,7 +488,7 @@ static circular_buffer&#160;</td><td class="memItemRight" valign="bottom"><b>buf
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 28 2020 09:26:45 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 28 2020 12:09:27 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

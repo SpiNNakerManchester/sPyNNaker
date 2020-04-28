@@ -130,103 +130,6 @@ Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>The API for neuron models themselves. </p>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a class="anchor" id="a91774a9b87c1875fcb7659fe0f096857"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="neuron-typedefs_8h.html#ab5816efea940631eca6d71dd4ca99c17">state_t</a> neuron_model_get_membrane_voltage </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_t</a> *&#160;</td>
-          <td class="paramname"><em>neuron</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>get the neuron membrane voltage for a given neuron parameter set </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">neuron</td><td>a pointer to a neuron parameter struct which contains all the parameters for a specific neuron </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>the membrane voltage for a given neuron with the neuron parameters specified in neuron </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="a754ce40c1abe63344ecdd347178ca808"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void neuron_model_has_spiked </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_t</a> *&#160;</td>
-          <td class="paramname"><em>neuron</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Indicates that the neuron has spiked. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">neuron</td><td>pointer to a neuron parameter struct which contains all the parameters for a specific neuron </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a class="anchor" id="a645937167c46b7556757b05250f9864d"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void neuron_model_print_parameters </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_t</a> *&#160;</td>
-          <td class="paramname"><em>neuron</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>printout of parameters i.e. those values that don't change </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">neuron</td><td>a pointer to a neuron parameter struct which contains all the parameters for a specific neuron </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a class="anchor" id="a039b8ee28cccb786e7c67c985e88e3d6"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void neuron_model_print_state_variables </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_t</a> *&#160;</td>
-          <td class="paramname"><em>neuron</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>printout of state variables i.e. those values that might change </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">neuron</td><td>a pointer to a neuron parameter struct which contains all the parameters for a specific neuron </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
 <a class="anchor" id="a2c709e18b3833cf07131b394b0a9b929"></a>
 <div class="memitem">
 <div class="memproto">
@@ -315,10 +218,107 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a754ce40c1abe63344ecdd347178ca808"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void neuron_model_has_spiked </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_t</a> *&#160;</td>
+          <td class="paramname"><em>neuron</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Indicates that the neuron has spiked. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">neuron</td><td>pointer to a neuron parameter struct which contains all the parameters for a specific neuron </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a91774a9b87c1875fcb7659fe0f096857"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="neuron-typedefs_8h.html#ab5816efea940631eca6d71dd4ca99c17">state_t</a> neuron_model_get_membrane_voltage </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_t</a> *&#160;</td>
+          <td class="paramname"><em>neuron</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>get the neuron membrane voltage for a given neuron parameter set </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">neuron</td><td>a pointer to a neuron parameter struct which contains all the parameters for a specific neuron </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the membrane voltage for a given neuron with the neuron parameters specified in neuron </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a039b8ee28cccb786e7c67c985e88e3d6"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void neuron_model_print_state_variables </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_t</a> *&#160;</td>
+          <td class="paramname"><em>neuron</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>printout of state variables i.e. those values that might change </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">neuron</td><td>a pointer to a neuron parameter struct which contains all the parameters for a specific neuron </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a645937167c46b7556757b05250f9864d"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void neuron_model_print_parameters </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_t</a> *&#160;</td>
+          <td class="paramname"><em>neuron</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>printout of parameters i.e. those values that don't change </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">neuron</td><td>a pointer to a neuron parameter struct which contains all the parameters for a specific neuron </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 28 2020 09:26:45 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 28 2020 12:09:27 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

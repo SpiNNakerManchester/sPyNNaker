@@ -135,23 +135,17 @@ static bool&#160;</td><td class="memItemRight" valign="bottom"><b>threshold_type
 <div class="textblock"></div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
-<a class="anchor" id="acaf821c33da7ceffd34956d24bef0d3a"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
-<td class="fieldname">
-du_th_inv</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
 <a class="anchor" id="a22fd617733ea84d268d826b840800e7d"></a>uint32_t</td>
 <td class="fieldname">
 key</td>
 <td class="fielddoc">
 The key to send to update the value. </td></tr>
 <tr><td class="fieldtype">
-<a class="anchor" id="a2f8eb35feb7f40179d95dfd04ee1f7b3"></a>accum</td>
+<a class="anchor" id="ad2d30a17b1fabe86ed294e5aa2732e8f"></a>uint32_t</td>
 <td class="fieldname">
-max_value</td>
+value_as_payload</td>
 <td class="fielddoc">
-<p>The maximum allowed value to send as the payload. Values above are clipped to this value </p>
+<p>A scaling factor (&gt;0) if the value is to be sent as payload, False (0) if just the key </p>
 </td></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="a0465d2ef655e684d6c6746c5e5931fb5"></a>accum</td>
@@ -161,9 +155,34 @@ min_value</td>
 <p>The minimum allowed value to send as the payload. Values below are clipped to this value </p>
 </td></tr>
 <tr><td class="fieldtype">
-<a class="anchor" id="ad4d04f4117f32c07cd86ee51cdc9eb74"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<a class="anchor" id="a2f8eb35feb7f40179d95dfd04ee1f7b3"></a>accum</td>
 <td class="fieldname">
-neg_machine_time_step_ms_div_10</td>
+max_value</td>
+<td class="fielddoc">
+<p>The maximum allowed value to send as the payload. Values above are clipped to this value </p>
+</td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a25f75f467d282762aa75ad06f9d541b6"></a>uint32_t</td>
+<td class="fieldname">
+timesteps_between_sending</td>
+<td class="fielddoc">
+The time between sending the value. </td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a2cb932c3c21c8332038ca50b06f4d05d"></a>uint32_t</td>
+<td class="fieldname">
+time_until_next_send</td>
+<td class="fielddoc">
+The time until the next sending of the value (initially 0) </td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a91ff408c17251a6b8001bb4f31d65764"></a>enum send_type</td>
+<td class="fieldname">
+type</td>
+<td class="fielddoc">
+Send type. </td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="acaf821c33da7ceffd34956d24bef0d3a"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<td class="fieldname">
+du_th_inv</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
@@ -173,41 +192,22 @@ tau_th_inv</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a class="anchor" id="a8d25a3b92dbeffe773c096f0289aeb44"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
-<td class="fieldname">
-threshold_value</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="a2cb932c3c21c8332038ca50b06f4d05d"></a>uint32_t</td>
-<td class="fieldname">
-time_until_next_send</td>
-<td class="fielddoc">
-The time until the next sending of the value (initially 0) </td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="a25f75f467d282762aa75ad06f9d541b6"></a>uint32_t</td>
-<td class="fieldname">
-timesteps_between_sending</td>
-<td class="fielddoc">
-The time between sending the value. </td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="a91ff408c17251a6b8001bb4f31d65764"></a>enum send_type</td>
-<td class="fieldname">
-type</td>
-<td class="fielddoc">
-Send type. </td></tr>
-<tr><td class="fieldtype">
 <a class="anchor" id="ab45ec840ac2e212feee7e2b5782a8ed0"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
 <td class="fieldname">
 v_thresh</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a class="anchor" id="ad2d30a17b1fabe86ed294e5aa2732e8f"></a>uint32_t</td>
+<a class="anchor" id="ad4d04f4117f32c07cd86ee51cdc9eb74"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
 <td class="fieldname">
-value_as_payload</td>
+neg_machine_time_step_ms_div_10</td>
 <td class="fielddoc">
-<p>A scaling factor (&gt;0) if the value is to be sent as payload, False (0) if just the key </p>
+</td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a8d25a3b92dbeffe773c096f0289aeb44"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<td class="fieldname">
+threshold_value</td>
+<td class="fielddoc">
 </td></tr>
 </table>
 
@@ -216,7 +216,7 @@ value_as_payload</td>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 28 2020 09:26:45 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 28 2020 12:09:28 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

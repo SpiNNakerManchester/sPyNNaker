@@ -341,27 +341,15 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
+<a class="anchor" id="a69d2ea442b9a3cd15724c7bf80d02f6a"></a>uint32_t</td>
+<td class="fieldname">
+start_ticks</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
 <a class="anchor" id="a64607ac2fa64b0549d111b2b84cbb51e"></a>uint32_t</td>
 <td class="fieldname">
 end_ticks</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="ad312952bbda1eb46855036a9ec72c738"></a><a class="el" href="maths-util_8h.html#a8cf409d4308be505fbdb5683525213ba">UFRACT</a></td>
-<td class="fieldname">
-exp_minus_lambda</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="a891758695b252c5b4c43c98b8f3232d4"></a>uint32_t</td>
-<td class="fieldname">
-is_fast_source</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="aab41a5a325aec875f6f6b5dc7253aa74"></a>uint32_t</td>
-<td class="fieldname">
-mean_isi_ticks</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
@@ -371,15 +359,27 @@ next_ticks</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
+<a class="anchor" id="a891758695b252c5b4c43c98b8f3232d4"></a>uint32_t</td>
+<td class="fieldname">
+is_fast_source</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="ad312952bbda1eb46855036a9ec72c738"></a><a class="el" href="maths-util_8h.html#a8cf409d4308be505fbdb5683525213ba">UFRACT</a></td>
+<td class="fieldname">
+exp_minus_lambda</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
 <a class="anchor" id="a0f76e635e260b47d8e260740166324cd"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
 <td class="fieldname">
 sqrt_lambda</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a class="anchor" id="a69d2ea442b9a3cd15724c7bf80d02f6a"></a>uint32_t</td>
+<a class="anchor" id="aab41a5a325aec875f6f6b5dc7253aa74"></a>uint32_t</td>
 <td class="fieldname">
-start_ticks</td>
+mean_isi_ticks</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
@@ -405,6 +405,12 @@ time_to_spike_ticks</td>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
+<a class="anchor" id="a33ac2a85b7e7fa98bf0905b205694eb3"></a>uint32_t</td>
+<td class="fieldname">
+time</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
 <a class="anchor" id="a01eac79ac7d1bc6bc5ba8bbe4fcdfa6c"></a>uint32_t</td>
 <td class="fieldname">
 n_buffers</td>
@@ -414,12 +420,6 @@ n_buffers</td>
 <a class="anchor" id="a5e1cb4999f85fa84e66c575788e3bef6"></a>uint32_t</td>
 <td class="fieldname">
 out_spikes[]</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="a33ac2a85b7e7fa98bf0905b205694eb3"></a>uint32_t</td>
-<td class="fieldname">
-time</td>
 <td class="fielddoc">
 </td></tr>
 </table>
@@ -439,18 +439,6 @@ time</td>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
-<a class="anchor" id="afd5bbf1b89c098c3f2bf38a4689f42ba"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
-<td class="fieldname">
-fast_rate_per_tick_cutoff</td>
-<td class="fielddoc">
-The border rate between fast and faster sources. </td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="a4459890055b76bb63c4bd4b9ac2a14e5"></a>uint32_t</td>
-<td class="fieldname">
-first_source_id</td>
-<td class="fielddoc">
-The ID of the first source relative to the population as a whole. </td></tr>
-<tr><td class="fieldtype">
 <a class="anchor" id="af0d05f9a4857217ecc6919484c6f877d"></a>uint32_t</td>
 <td class="fieldname">
 has_key</td>
@@ -463,41 +451,17 @@ key</td>
 <td class="fielddoc">
 The base key to send with (neuron ID to be added to it), or 0 if no key. </td></tr>
 <tr><td class="fieldtype">
-<a class="anchor" id="afb9733b9bd7b0e69c4734ab031561139"></a>uint32_t</td>
-<td class="fieldname">
-n_spike_sources</td>
-<td class="fielddoc">
-The number of sources in this sub-population. </td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="ae0f9eec779642b68ca81ade1b1d1ce10"></a><a class="el" href="maths-util_8h.html#a8cf409d4308be505fbdb5683525213ba">UFRACT</a></td>
-<td class="fieldname">
-seconds_per_tick</td>
-<td class="fielddoc">
-The time between ticks in seconds for setting the rate. </td></tr>
-<tr><td class="fieldtype">
 <a class="anchor" id="ab4adadbc1d477b4c51e123cf3a454d26"></a>uint32_t</td>
 <td class="fieldname">
 set_rate_neuron_id_mask</td>
 <td class="fielddoc">
 The mask to work out the neuron ID when setting the rate. </td></tr>
 <tr><td class="fieldtype">
-<a class="anchor" id="a8fc7a576f718c19bb241c4c6301fd416"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<a class="anchor" id="aada5c514c8b6a817a46be43d64591e1c"></a>uint32_t</td>
 <td class="fieldname">
-slow_rate_per_tick_cutoff</td>
+timer_offset</td>
 <td class="fielddoc">
-The border rate between slow and fast sources. </td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="a1b27dd1091ed50b78407f2c69fb35582"></a>mars_kiss64_seed_t</td>
-<td class="fieldname">
-spike_source_seed</td>
-<td class="fielddoc">
-The seed for the Poisson generation process. </td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="a6725343f8032eb0ad9d37408b92dace8"></a>uint32_t</td>
-<td class="fieldname">
-ticks_per_second</td>
-<td class="fielddoc">
-The number of ticks per second for setting the rate. </td></tr>
+The offset of the timer ticks to desynchronize sources. </td></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="a9713591a49acbe8bae8f0665b4620657"></a>uint32_t</td>
 <td class="fieldname">
@@ -505,11 +469,47 @@ time_between_spikes</td>
 <td class="fielddoc">
 The expected time to wait between spikes. </td></tr>
 <tr><td class="fieldtype">
-<a class="anchor" id="aada5c514c8b6a817a46be43d64591e1c"></a>uint32_t</td>
+<a class="anchor" id="ae0f9eec779642b68ca81ade1b1d1ce10"></a><a class="el" href="maths-util_8h.html#a8cf409d4308be505fbdb5683525213ba">UFRACT</a></td>
 <td class="fieldname">
-timer_offset</td>
+seconds_per_tick</td>
 <td class="fielddoc">
-The offset of the timer ticks to desynchronize sources. </td></tr>
+The time between ticks in seconds for setting the rate. </td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a6725343f8032eb0ad9d37408b92dace8"></a>uint32_t</td>
+<td class="fieldname">
+ticks_per_second</td>
+<td class="fielddoc">
+The number of ticks per second for setting the rate. </td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a8fc7a576f718c19bb241c4c6301fd416"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<td class="fieldname">
+slow_rate_per_tick_cutoff</td>
+<td class="fielddoc">
+The border rate between slow and fast sources. </td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="afd5bbf1b89c098c3f2bf38a4689f42ba"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
+<td class="fieldname">
+fast_rate_per_tick_cutoff</td>
+<td class="fielddoc">
+The border rate between fast and faster sources. </td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a4459890055b76bb63c4bd4b9ac2a14e5"></a>uint32_t</td>
+<td class="fieldname">
+first_source_id</td>
+<td class="fielddoc">
+The ID of the first source relative to the population as a whole. </td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="afb9733b9bd7b0e69c4734ab031561139"></a>uint32_t</td>
+<td class="fieldname">
+n_spike_sources</td>
+<td class="fielddoc">
+The number of sources in this sub-population. </td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a1b27dd1091ed50b78407f2c69fb35582"></a>mars_kiss64_seed_t</td>
+<td class="fieldname">
+spike_source_seed</td>
+<td class="fielddoc">
+The seed for the Poisson generation process. </td></tr>
 </table>
 
 </div>
@@ -526,15 +526,15 @@ The offset of the timer ticks to desynchronize sources. </td></tr>
 <div class="textblock"></div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
-<a class="anchor" id="a5d2b3e7270a501214853d5105f536faf"></a>uint32_t</td>
-<td class="fieldname">
-index</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
 <a class="anchor" id="a62435794d07ae2d9589f23e7e318cf65"></a>uint32_t</td>
 <td class="fieldname">
 n_rates</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a5d2b3e7270a501214853d5105f536faf"></a>uint32_t</td>
+<td class="fieldname">
+index</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
@@ -548,7 +548,7 @@ poissons[]</td>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a class="anchor" id="a09166600548501c6befb79b410cdc98a"></a>
+<a class="anchor" id="af538c1942ccd68490d03067fae37805b"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -556,10 +556,10 @@ poissons[]</td>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static void expand_spike_recording_buffer </td>
+          <td class="memname">static bit_field_t out_spikes_bitfield </td>
           <td>(</td>
           <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>n_spikes</em></td><td>)</td>
+          <td class="paramname"><em>n</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -570,13 +570,74 @@ poissons[]</td>
 </table>
 </div><div class="memdoc">
 
-<p>Expand the space for recording spikes. </p>
+<p>Set specific spikes for recording. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">n_spikes</td><td>New number of spikes to hold </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">n</td><td>is the spike array index </td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>bit field at the location n </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a6965b6994e494500e00730df56c449b5"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void reset_spikes </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Reset the spike buffer by clearing the bit field. </p>
+<dl class="section return"><dt>Returns</dt><dd>None </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="aa2602e67f1b5a03f8e9440743171ef81"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static uint32_t slow_spike_source_get_time_to_spike </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>mean_inter_spike_interval_in_ticks</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Determines the time in timer ticks multiplied by ISI_SCALE_FACTOR until the next spike is to occur given the mean inter-spike interval. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">mean_inter_spike_interval_in_ticks</td><td>The mean number of ticks before a spike is expected to occur in a slow process. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>a uint32_t which represents "time" in timer ticks * ISI_SCALE_FACTOR until the next spike occurs </dd></dl>
 
 </div>
 </div>
@@ -646,6 +707,72 @@ poissons[]</td>
 
 </div>
 </div>
+<a class="anchor" id="a571b747b9d964eb5af02496ce866130b"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static bool read_global_parameters </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="spike__source__poisson_8c.html#structglobal__parameters">global_parameters</a> *&#160;</td>
+          <td class="paramname"><em>sdram_globals</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>entry method for reading the global parameters stored in Poisson parameter region </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">sdram_globals</td><td>the absolute SDRAM memory address to which the Poisson parameter region starts. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>a boolean which is True if the parameters were read successfully or False otherwise </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="af4847de2b9a2d080b0e03eabccb7308d"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static bool read_rates </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="spike__source__poisson_8c.html#structsource__info">source_info</a> *&#160;</td>
+          <td class="paramname"><em>sdram_sources</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>method for reading the rates of the Poisson </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">sdram_sources</td><td>the configuration in SDRAM </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>a boolean which is True if the rates were read successfully or False otherwise </dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="a25d26d2a2c3ec75e4013c7a5e42bc5a7"></a>
 <div class="memitem">
 <div class="memproto">
@@ -698,6 +825,134 @@ poissons[]</td>
 
 </div>
 </div>
+<a class="anchor" id="afb40f588131f69f1d033283921f1a811"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void resume_callback </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>runs any functions needed at resume time. </p>
+<dl class="section return"><dt>Returns</dt><dd>None </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ad3f5360b39be7e95723ff26506d24fbe"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static bool store_poisson_parameters </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>stores the Poisson parameters back into SDRAM for reading by the host when needed </p>
+<dl class="section return"><dt>Returns</dt><dd>True if successful </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a6b8523cb6e82e9b56c93f8f52b47e274"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void send_spike </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>spike_key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>timer_count</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>handles spreading of Poisson spikes for even packet reception at destination </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">spike_key</td><td>the key to transmit </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a09166600548501c6befb79b410cdc98a"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void expand_spike_recording_buffer </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>n_spikes</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Expand the space for recording spikes. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">n_spikes</td><td>New number of spikes to hold </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a class="anchor" id="a285c14edf54c74a6fe624e2968964a12"></a>
 <div class="memitem">
 <div class="memproto">
@@ -741,7 +996,7 @@ poissons[]</td>
 
 </div>
 </div>
-<a class="anchor" id="af5b2c04c7a9d81f1421e15ddfe40b782"></a>
+<a class="anchor" id="a6383f32ff6d54333f83d681ff919d4d0"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -749,53 +1004,10 @@ poissons[]</td>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static void multicast_packet_callback </td>
-          <td>(</td>
-          <td class="paramtype">uint&#160;</td>
-          <td class="paramname"><em>key</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint&#160;</td>
-          <td class="paramname"><em>payload</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>multicast callback used to set rate when injected in a live example </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">key</td><td></td></tr>
-    <tr><td class="paramname">payload</td><td></td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a class="anchor" id="af538c1942ccd68490d03067fae37805b"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static bit_field_t out_spikes_bitfield </td>
+          <td class="memname">static void record_spikes </td>
           <td>(</td>
           <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>n</em></td><td>)</td>
+          <td class="paramname"><em>time</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -806,14 +1018,13 @@ poissons[]</td>
 </table>
 </div><div class="memdoc">
 
-<p>Set specific spikes for recording. </p>
+<p>writing spikes to SDRAM </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">n</td><td>is the spike array index </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">time</td><td>the time to which these spikes are being recorded </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>bit field at the location n </dd></dl>
 
 </div>
 </div>
@@ -917,295 +1128,6 @@ poissons[]</td>
 
 </div>
 </div>
-<a class="anchor" id="a571b747b9d964eb5af02496ce866130b"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static bool read_global_parameters </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="spike__source__poisson_8c.html#structglobal__parameters">global_parameters</a> *&#160;</td>
-          <td class="paramname"><em>sdram_globals</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>entry method for reading the global parameters stored in Poisson parameter region </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">sdram_globals</td><td>the absolute SDRAM memory address to which the Poisson parameter region starts. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>a boolean which is True if the parameters were read successfully or False otherwise </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="af4847de2b9a2d080b0e03eabccb7308d"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static bool read_rates </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="spike__source__poisson_8c.html#structsource__info">source_info</a> *&#160;</td>
-          <td class="paramname"><em>sdram_sources</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>method for reading the rates of the Poisson </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">sdram_sources</td><td>the configuration in SDRAM </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>a boolean which is True if the rates were read successfully or False otherwise </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="a6383f32ff6d54333f83d681ff919d4d0"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static void record_spikes </td>
-          <td>(</td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>time</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>writing spikes to SDRAM </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">time</td><td>the time to which these spikes are being recorded </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a class="anchor" id="a6965b6994e494500e00730df56c449b5"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static void reset_spikes </td>
-          <td>(</td>
-          <td class="paramtype">void&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Reset the spike buffer by clearing the bit field. </p>
-<dl class="section return"><dt>Returns</dt><dd>None </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="afb40f588131f69f1d033283921f1a811"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static void resume_callback </td>
-          <td>(</td>
-          <td class="paramtype">void&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>runs any functions needed at resume time. </p>
-<dl class="section return"><dt>Returns</dt><dd>None </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="a6b8523cb6e82e9b56c93f8f52b47e274"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static void send_spike </td>
-          <td>(</td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>spike_key</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>timer_count</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>handles spreading of Poisson spikes for even packet reception at destination </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">spike_key</td><td>the key to transmit </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a class="anchor" id="a12c72782cb450237076bc0622fc90125"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void set_spike_source_rate </td>
-          <td>(</td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>id</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a>&#160;</td>
-          <td class="paramname"><em>rate</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>set the spike source rate as required </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">id</td><td>the ID of the source to be updated </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">rate</td><td>the REAL-valued rate in Hz, to be multiplied to get per_tick values </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
-<a class="anchor" id="aa2602e67f1b5a03f8e9440743171ef81"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static uint32_t slow_spike_source_get_time_to_spike </td>
-          <td>(</td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>mean_inter_spike_interval_in_ticks</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Determines the time in timer ticks multiplied by ISI_SCALE_FACTOR until the next spike is to occur given the mean inter-spike interval. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">mean_inter_spike_interval_in_ticks</td><td>The mean number of ticks before a spike is expected to occur in a slow process. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>a uint32_t which represents "time" in timer ticks * ISI_SCALE_FACTOR until the next spike occurs </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="ad3f5360b39be7e95723ff26506d24fbe"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static bool store_poisson_parameters </td>
-          <td>(</td>
-          <td class="paramtype">void&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>stores the Poisson parameters back into SDRAM for reading by the host when needed </p>
-<dl class="section return"><dt>Returns</dt><dd>True if successful </dd></dl>
-
-</div>
-</div>
 <a class="anchor" id="ab3ba3db2e11b1db9fd9d1986558eee30"></a>
 <div class="memitem">
 <div class="memproto">
@@ -1250,6 +1172,84 @@ poissons[]</td>
 
 </div>
 </div>
+<a class="anchor" id="a12c72782cb450237076bc0622fc90125"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void set_spike_source_rate </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a>&#160;</td>
+          <td class="paramname"><em>rate</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>set the spike source rate as required </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">id</td><td>the ID of the source to be updated </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">rate</td><td>the REAL-valued rate in Hz, to be multiplied to get per_tick values </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="af5b2c04c7a9d81f1421e15ddfe40b782"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void multicast_packet_callback </td>
+          <td>(</td>
+          <td class="paramtype">uint&#160;</td>
+          <td class="paramname"><em>key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint&#160;</td>
+          <td class="paramname"><em>payload</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>multicast callback used to set rate when injected in a live example </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">key</td><td></td></tr>
+    <tr><td class="paramname">payload</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <h2 class="groupheader">Variable Documentation</h2>
 <a class="anchor" id="ae73654f333e4363463ad8c594eca1905"></a>
 <div class="memitem">
@@ -1275,7 +1275,7 @@ poissons[]</td>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 28 2020 09:26:45 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 28 2020 12:09:28 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

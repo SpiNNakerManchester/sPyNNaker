@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['ceil_5fto_5f4',['CEIL_TO_4',['../neuron__recording_8c.html#a116ca5cd8794f7ac7266ed798720a3d6',1,'neuron_recording.c']]]
+  ['abs',['ABS',['../maths-util_8h.html#a996f7be338ccb40d1a2a5abc1ad61759',1,'maths-util.h']]],
+  ['acs_5fdbl_5ftiny',['ACS_DBL_TINY',['../maths-util_8h.html#a384a1b0ced36846fd8efb19c26c29a35',1,'maths-util.h']]]
 ];

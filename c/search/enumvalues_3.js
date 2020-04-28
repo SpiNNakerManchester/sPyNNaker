@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['n_5fconnection_5fgenerators',['N_CONNECTION_GENERATORS',['../connection__generator_8c.html#a0411cd49bb5b71852cecd93bcbf0ca2dab1144285d7382feeb4687af0263e2467',1,'connection_generator.c']]],
-  ['n_5fmatrix_5fgenerators',['N_MATRIX_GENERATORS',['../matrix__generator_8c.html#abed82baf7f470b522273a3e37c24c600aba9a03e4fd023b2837469ea1ff6225a3',1,'matrix_generator.c']]],
-  ['n_5fparam_5fgenerators',['N_PARAM_GENERATORS',['../param__generator_8c.html#ab04a0655cd1e3bcac5e8f48c18df1a57ab8047ff7dfdb2c76ef1e78a7e6347777',1,'param_generator.c']]]
+  ['disable_5fmotor_5fkey',['DISABLE_MOTOR_KEY',['../munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04aa50cb29eaf9f334bf5a204d2d52ae66e',1,'munich_protocol.h']]],
+  ['disable_5fretina_5fevent_5fstreaming',['DISABLE_RETINA_EVENT_STREAMING',['../munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04a5cc988b8c6e1e4b586915036edcd57f9',1,'munich_protocol.h']]]
 ];

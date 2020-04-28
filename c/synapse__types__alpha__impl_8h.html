@@ -202,15 +202,9 @@ Variables</h2></td></tr>
 <div class="textblock"></div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
-<a class="anchor" id="af030e3f5a4c54671849dfe95356671a8"></a><a class="el" href="decay_8h.html#a2d8155d52b7e3ac155ddc14cbe1efb25">decay_t</a></td>
+<a class="anchor" id="a2b42cfcc4ba66835e143e623afdc99d6"></a><a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a></td>
 <td class="fieldname">
-decay</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="a302d76f88428da70bcddb6d6eae4d078"></a><a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a></td>
-<td class="fieldname">
-dt_divided_by_tau_sqr</td>
+lin_buff</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
@@ -220,9 +214,15 @@ exp_buff</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a class="anchor" id="a2b42cfcc4ba66835e143e623afdc99d6"></a><a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a></td>
+<a class="anchor" id="a302d76f88428da70bcddb6d6eae4d078"></a><a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a></td>
 <td class="fieldname">
-lin_buff</td>
+dt_divided_by_tau_sqr</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="af030e3f5a4c54671849dfe95356671a8"></a><a class="el" href="decay_8h.html#a2d8155d52b7e3ac155ddc14cbe1efb25">decay_t</a></td>
+<td class="fieldname">
+decay</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
@@ -247,19 +247,31 @@ q_buff</td>
 <div class="textblock"></div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
+<a class="anchor" id="a54c6d9b5e32ee070e6f3fc350bd3dc27"></a><a class="el" href="synapse__types__alpha__impl_8h.html#structalpha__params__t">alpha_params_t</a></td>
+<td class="fieldname">
+exc</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a603098082c6122c49eaaee5220b91c36"></a><a class="el" href="synapse__types__alpha__impl_8h.html#structalpha__params__t">alpha_params_t</a></td>
+<td class="fieldname">
+inh</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
 <a class="anchor" id="a8f91b2c0aa9a88c2b44e086fc94e6e24"></a><a class="el" href="synapse__types__delta__impl_8h.html#structdelta__params__t">delta_params_t</a></td>
 <td class="fieldname">
 exc</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a class="anchor" id="a54c6d9b5e32ee070e6f3fc350bd3dc27"></a><a class="el" href="synapse__types__semd__impl_8h.html#structexp__params__t">exp_params_t</a></td>
+<a class="anchor" id="a39087de65c4c33969bbfa69fee75697d"></a><a class="el" href="synapse__types__delta__impl_8h.html#structdelta__params__t">delta_params_t</a></td>
 <td class="fieldname">
-exc</td>
+inh</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a class="anchor" id="a54c6d9b5e32ee070e6f3fc350bd3dc27"></a><a class="el" href="synapse__types__alpha__impl_8h.html#structalpha__params__t">alpha_params_t</a></td>
+<a class="anchor" id="a54c6d9b5e32ee070e6f3fc350bd3dc27"></a><a class="el" href="synapse__types__semd__impl_8h.html#structexp__params__t">exp_params_t</a></td>
 <td class="fieldname">
 exc</td>
 <td class="fielddoc">
@@ -271,25 +283,7 @@ exc2</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a class="anchor" id="a8d690bc6f7611e73dc3f2841d7bfbc91"></a><a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a></td>
-<td class="fieldname">
-exc2_old</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="a39087de65c4c33969bbfa69fee75697d"></a><a class="el" href="synapse__types__delta__impl_8h.html#structdelta__params__t">delta_params_t</a></td>
-<td class="fieldname">
-inh</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
 <a class="anchor" id="a603098082c6122c49eaaee5220b91c36"></a><a class="el" href="synapse__types__semd__impl_8h.html#structexp__params__t">exp_params_t</a></td>
-<td class="fieldname">
-inh</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="a603098082c6122c49eaaee5220b91c36"></a><a class="el" href="synapse__types__alpha__impl_8h.html#structalpha__params__t">alpha_params_t</a></td>
 <td class="fieldname">
 inh</td>
 <td class="fielddoc">
@@ -298,6 +292,12 @@ inh</td>
 <a class="anchor" id="ae5a2dbf2b4410eb054592c7dd981354a"></a><a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a></td>
 <td class="fieldname">
 multiplicator</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a8d690bc6f7611e73dc3f2841d7bfbc91"></a><a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a></td>
+<td class="fieldname">
+exc2_old</td>
 <td class="fielddoc">
 </td></tr>
 </table>
@@ -366,7 +366,7 @@ multiplicator</td>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 28 2020 09:26:45 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 28 2020 12:09:27 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

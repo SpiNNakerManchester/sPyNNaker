@@ -142,11 +142,41 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>connection
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
+<a class="anchor" id="a4eb03d0f757266d94efef44867b62729"></a>uint32_t</td>
+<td class="fieldname">
+pre_lo</td>
+<td class="fielddoc">
+Low index of range of pre-neuron population. </td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a8804d98e8134803269a43f1b560230fc"></a>uint32_t</td>
+<td class="fieldname">
+pre_hi</td>
+<td class="fielddoc">
+High index of range of pre-neuron population. </td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="aab9411033f2f70c87c42301cf42fff13"></a>uint32_t</td>
+<td class="fieldname">
+post_lo</td>
+<td class="fielddoc">
+Low index of range of post-neuron population. </td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a6cc17ffc0a60395bf1697e96ba776d52"></a>uint32_t</td>
+<td class="fieldname">
+post_hi</td>
+<td class="fielddoc">
+High index of range of post-neuron population. </td></tr>
+<tr><td class="fieldtype">
 <a class="anchor" id="a9f473a5b1550bc9c4e4fa5686eacfef0"></a>uint32_t</td>
 <td class="fieldname">
 allow_self_connections</td>
 <td class="fielddoc">
 Do we allow self connections? </td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="ad2798146758f40c69bffa640909166ad"></a>uint32_t</td>
+<td class="fieldname">
+with_replacement</td>
+<td class="fielddoc">
+Do we allow any neuron to be multiply connected by this connector? </td></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="af4c0ed8a643a617c21ce2a377fd1952c"></a>uint32_t</td>
 <td class="fieldname">
@@ -159,36 +189,6 @@ Number of connections (= number of post neurons we care about) </td></tr>
 n_post_neurons</td>
 <td class="fielddoc">
 Total number of post neurons. </td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="a6cc17ffc0a60395bf1697e96ba776d52"></a>uint32_t</td>
-<td class="fieldname">
-post_hi</td>
-<td class="fielddoc">
-High index of range of post-neuron population. </td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="aab9411033f2f70c87c42301cf42fff13"></a>uint32_t</td>
-<td class="fieldname">
-post_lo</td>
-<td class="fielddoc">
-Low index of range of post-neuron population. </td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="a8804d98e8134803269a43f1b560230fc"></a>uint32_t</td>
-<td class="fieldname">
-pre_hi</td>
-<td class="fielddoc">
-High index of range of pre-neuron population. </td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="a4eb03d0f757266d94efef44867b62729"></a>uint32_t</td>
-<td class="fieldname">
-pre_lo</td>
-<td class="fielddoc">
-Low index of range of pre-neuron population. </td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="ad2798146758f40c69bffa640909166ad"></a>uint32_t</td>
-<td class="fieldname">
-with_replacement</td>
-<td class="fielddoc">
-Do we allow any neuron to be multiply connected by this connector? </td></tr>
 </table>
 
 </div>
@@ -225,7 +225,7 @@ Configured random number generator. </td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 28 2020 09:26:46 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 28 2020 12:09:28 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

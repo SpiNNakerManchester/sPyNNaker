@@ -107,19 +107,26 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Data Structures</h2></td></tr>
+<tr class="memitem:structmunich__key__bitfields__t"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#structmunich__key__bitfields__t">munich_key_bitfields_t</a></td></tr>
+<tr class="memdesc:structmunich__key__bitfields__t"><td class="mdescLeft">&#160;</td><td class="mdescRight">The format of Munich device protocol keys.  <a href="munich__protocol_8h.html#structmunich__key__bitfields__t">More...</a><br /></td></tr>
+<tr class="separator:structmunich__key__bitfields__t"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:unionmunich__key__t"><td class="memItemLeft" align="right" valign="top">union &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#unionmunich__key__t">munich_key_t</a></td></tr>
+<tr class="memdesc:unionmunich__key__t"><td class="mdescLeft">&#160;</td><td class="mdescRight">Keys are really uint32_t, but contain bitfields within them.  <a href="munich__protocol_8h.html#unionmunich__key__t">More...</a><br /></td></tr>
+<tr class="separator:unionmunich__key__t"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:structmulticast__packet"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a></td></tr>
+<tr class="memdesc:structmulticast__packet"><td class="mdescLeft">&#160;</td><td class="mdescRight">Description of multicast packet to send as part of Munich protocol.  <a href="munich__protocol_8h.html#structmulticast__packet">More...</a><br /></td></tr>
 <tr class="separator:structmulticast__packet"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
-<tr class="memitem:a8200ce065b6bf4ef334ad1b33451bf96"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8200ce065b6bf4ef334ad1b33451bf96"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>MUNICH_KEY</b>(I,  F,  D)&#160;&#160;&#160;((I &lt;&lt; <a class="el" href="munich__protocol_8h.html#a06fc87d81c62e9abb8790b6e5713c55baa890a0ce75c6dee9ecbac3a2c87220cc">OFFSET_TO_I</a>) | (F &lt;&lt; <a class="el" href="munich__protocol_8h.html#a06fc87d81c62e9abb8790b6e5713c55ba964ef105cedcef1b651c6a4e58e33302">OFFSET_TO_F</a>) | (D &lt;&lt; <a class="el" href="munich__protocol_8h.html#a06fc87d81c62e9abb8790b6e5713c55baad87c155efc7814564f9b47dfb651b3f">OFFSET_TO_D</a>))</td></tr>
+<tr class="memitem:a8200ce065b6bf4ef334ad1b33451bf96"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#a8200ce065b6bf4ef334ad1b33451bf96">MUNICH_KEY</a>(I,  F,  D)&#160;&#160;&#160;((I &lt;&lt; <a class="el" href="munich__protocol_8h.html#a06fc87d81c62e9abb8790b6e5713c55baa890a0ce75c6dee9ecbac3a2c87220cc">OFFSET_TO_I</a>) | (F &lt;&lt; <a class="el" href="munich__protocol_8h.html#a06fc87d81c62e9abb8790b6e5713c55ba964ef105cedcef1b651c6a4e58e33302">OFFSET_TO_F</a>) | (D &lt;&lt; <a class="el" href="munich__protocol_8h.html#a06fc87d81c62e9abb8790b6e5713c55baad87c155efc7814564f9b47dfb651b3f">OFFSET_TO_D</a>))</td></tr>
+<tr class="memdesc:a8200ce065b6bf4ef334ad1b33451bf96"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assembles a Munich key with zero <a class="el" href="munich__protocol_8h.html#af7733652e8cf2dc7a581b66b432ab4c9">munich_key_bitfields_t::instance_key</a>.  <a href="#a8200ce065b6bf4ef334ad1b33451bf96">More...</a><br /></td></tr>
 <tr class="separator:a8200ce065b6bf4ef334ad1b33451bf96"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5dafb96b044783c3b4650c5789f6f08a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5dafb96b044783c3b4650c5789f6f08a"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>MUNICH_KEY_I_D</b>(I,  D)&#160;&#160;&#160;MUNICH_KEY(I, 0, D)</td></tr>
+<tr class="memitem:a5dafb96b044783c3b4650c5789f6f08a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#a5dafb96b044783c3b4650c5789f6f08a">MUNICH_KEY_I_D</a>(I,  D)&#160;&#160;&#160;<a class="el" href="munich__protocol_8h.html#a8200ce065b6bf4ef334ad1b33451bf96">MUNICH_KEY</a>(I, 0, D)</td></tr>
+<tr class="memdesc:a5dafb96b044783c3b4650c5789f6f08a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assembles a Munich key with zero <a class="el" href="munich__protocol_8h.html#af7733652e8cf2dc7a581b66b432ab4c9">munich_key_bitfields_t::instance_key</a> and <a class="el" href="munich__protocol_8h.html#a9923e847eb15caa2f0eb51c7e763901e">munich_key_bitfields_t::payload_format</a>.  <a href="#a5dafb96b044783c3b4650c5789f6f08a">More...</a><br /></td></tr>
 <tr class="separator:a5dafb96b044783c3b4650c5789f6f08a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac9ffc4cc9a38bac6bb565c793d90ec81"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac9ffc4cc9a38bac6bb565c793d90ec81"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>MUNICH_KEY_I</b>(I)&#160;&#160;&#160;MUNICH_KEY(I, 0, 0)</td></tr>
+<tr class="memitem:ac9ffc4cc9a38bac6bb565c793d90ec81"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#ac9ffc4cc9a38bac6bb565c793d90ec81">MUNICH_KEY_I</a>(I)&#160;&#160;&#160;<a class="el" href="munich__protocol_8h.html#a8200ce065b6bf4ef334ad1b33451bf96">MUNICH_KEY</a>(I, 0, 0)</td></tr>
+<tr class="memdesc:ac9ffc4cc9a38bac6bb565c793d90ec81"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assembles a Munich key with zero for all fields except <a class="el" href="munich__protocol_8h.html#af88a58a15f4007a2629456b02fa89685">munich_key_bitfields_t::instruction</a>.  <a href="#ac9ffc4cc9a38bac6bb565c793d90ec81">More...</a><br /></td></tr>
 <tr class="separator:ac9ffc4cc9a38bac6bb565c793d90ec81"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
@@ -138,272 +145,246 @@ Enumerations</h2></td></tr>
 <b>PAYLOAD_OFFSET_FOR_RETINA_SIZE</b> = 26, 
 <b>PAYLOAD_SENSOR_ID_OFFSET</b> = 27, 
 <b>PAYLOAD_OFFSET_FOR_SENSOR_TIME</b> = 31
- }</td></tr>
+ }<tr class="memdesc:a99fb83031ce9923c84392b4e92f956b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Payload fields. <br /></td></tr>
+</td></tr>
 <tr class="separator:a99fb83031ce9923c84392b4e92f956b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abc6126af1d45847bc59afa0aa3216b04"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abc6126af1d45847bc59afa0aa3216b04"></a>enum &#160;</td><td class="memItemRight" valign="bottom">{ <br />
-&#160;&#160;<b>CONFIGURE_MASTER_KEY</b> = MUNICH_KEY_I(127), 
-<b>CHANGE_MODE</b> = MUNICH_KEY_I_D(127, 1), 
-<b>DISABLE_RETINA_EVENT_STREAMING</b> = MUNICH_KEY_I_D(0, 0), 
-<b>ACTIVE_RETINA_EVENT_STREAMING_KEYS_CONFIGURATION</b> = MUNICH_KEY_I_D(0, 1), 
+<tr class="memitem:abc6126af1d45847bc59afa0aa3216b04"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom">{ <br />
+&#160;&#160;<a class="el" href="munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04a635089693fa56b24e14b697b004fc204">CONFIGURE_MASTER_KEY</a> = MUNICH_KEY_I(127), 
+<a class="el" href="munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04a4984f59c2d1880d5dd6b2f81c3bd932b">CHANGE_MODE</a> = MUNICH_KEY_I_D(127, 1), 
+<a class="el" href="munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04a5cc988b8c6e1e4b586915036edcd57f9">DISABLE_RETINA_EVENT_STREAMING</a> = MUNICH_KEY_I_D(0, 0), 
+<a class="el" href="munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04a94eba6b9c22bf274e6ff81d58c229afd">ACTIVE_RETINA_EVENT_STREAMING_KEYS_CONFIGURATION</a> = MUNICH_KEY_I_D(0, 1), 
 <br />
-&#160;&#160;<b>ACTIVE_RETINA_EVENT_STREAMING_SET_KEY</b> = MUNICH_KEY_I_D(0, 2), 
-<b>SET_TIMER_COUNTER_FOR_TIMESTAMPS</b> = MUNICH_KEY_I_D(0, 3), 
-<b>MASTER_SLAVE_KEY</b> = MUNICH_KEY_I_D(0, 4), 
-<b>BIAS_KEY</b> = MUNICH_KEY_I_D(0, 5), 
+&#160;&#160;<a class="el" href="munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04a6aec4d5e40d24d80269f24f186e12ce0">ACTIVE_RETINA_EVENT_STREAMING_SET_KEY</a> = MUNICH_KEY_I_D(0, 2), 
+<a class="el" href="munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04a74cd8f0dde766e3c78118ca85fd4f20e">SET_TIMER_COUNTER_FOR_TIMESTAMPS</a> = MUNICH_KEY_I_D(0, 3), 
+<a class="el" href="munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04acebd4bfb16f8f5acfc2234d9f65207c8">MASTER_SLAVE_KEY</a> = MUNICH_KEY_I_D(0, 4), 
+<a class="el" href="munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04a86e8b86d0f722dc54808c12fc3d5d4e2">BIAS_KEY</a> = MUNICH_KEY_I_D(0, 5), 
 <br />
-&#160;&#160;<b>RESET_RETINA_KEY</b> = MUNICH_KEY_I_D(0, 7), 
-<b>SENSOR_REPORTING_OFF_KEY</b> = MUNICH_KEY_I_D(1, 0), 
-<b>POLL_SENSORS_ONCE_KEY</b> = MUNICH_KEY_I_D(1, 1), 
-<b>POLL_SENSORS_CONTINUOUSLY_KEY</b> = MUNICH_KEY_I_D(1, 2), 
+&#160;&#160;<a class="el" href="munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04aac54162f9b613c9ea627ae35225021d2">RESET_RETINA_KEY</a> = MUNICH_KEY_I_D(0, 7), 
+<a class="el" href="munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04abcc37f6aec28a96a4f0482cdd52db61e">SENSOR_REPORTING_OFF_KEY</a> = MUNICH_KEY_I_D(1, 0), 
+<a class="el" href="munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04af411423d32b0d5b899c3ac16f6d616f7">POLL_SENSORS_ONCE_KEY</a> = MUNICH_KEY_I_D(1, 1), 
+<a class="el" href="munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04ac78ecb26d0149528ab6d114d5a2a7d2d">POLL_SENSORS_CONTINUOUSLY_KEY</a> = MUNICH_KEY_I_D(1, 2), 
 <br />
-&#160;&#160;<b>DISABLE_MOTOR_KEY</b> = MUNICH_KEY_I_D(2, 0), 
-<b>MOTOR_RUN_FOR_PERIOD_KEY</b> = MUNICH_KEY_I_D(2, 1), 
-<b>MOTOR_0_RAW_PERM_KEY</b> = MUNICH_KEY_I_D(2, 4), 
-<b>MOTOR_1_RAW_PERM_KEY</b> = MUNICH_KEY_I_D(2, 5), 
+&#160;&#160;<a class="el" href="munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04aa50cb29eaf9f334bf5a204d2d52ae66e">DISABLE_MOTOR_KEY</a> = MUNICH_KEY_I_D(2, 0), 
+<a class="el" href="munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04a21103f8167edea1b62a71b6d6dc1f093">MOTOR_RUN_FOR_PERIOD_KEY</a> = MUNICH_KEY_I_D(2, 1), 
+<a class="el" href="munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04a687b06affd6532e895d0bc8dc00095be">MOTOR_0_RAW_PERM_KEY</a> = MUNICH_KEY_I_D(2, 4), 
+<a class="el" href="munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04acc148fefb0b2e5151ceb48f46ecbee40">MOTOR_1_RAW_PERM_KEY</a> = MUNICH_KEY_I_D(2, 5), 
 <br />
-&#160;&#160;<b>MOTOR_0_RAW_LEAK_KEY</b> = MUNICH_KEY_I_D(2, 6), 
-<b>MOTOR_1_RAW_LEAK_KEY</b> = MUNICH_KEY_I_D(2, 7), 
-<b>MOTOR_TIMER_A_TOTAL_PERIOD_KEY</b> = MUNICH_KEY_I_D(3, 0), 
-<b>MOTOR_TIMER_B_TOTAL_PERIOD_KEY</b> = MUNICH_KEY_I_D(3, 2), 
+&#160;&#160;<a class="el" href="munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04a914825da898d58ae3921f3d69dae630c">MOTOR_0_RAW_LEAK_KEY</a> = MUNICH_KEY_I_D(2, 6), 
+<a class="el" href="munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04a300052c8eb8452f20d4350e94ca1bb62">MOTOR_1_RAW_LEAK_KEY</a> = MUNICH_KEY_I_D(2, 7), 
+<a class="el" href="munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04aec9017d18ebca73b7369bc5613c1b5c4">MOTOR_TIMER_A_TOTAL_PERIOD_KEY</a> = MUNICH_KEY_I_D(3, 0), 
+<a class="el" href="munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04a3cd79f1f3855fc1706b48ca71d857805">MOTOR_TIMER_B_TOTAL_PERIOD_KEY</a> = MUNICH_KEY_I_D(3, 2), 
 <br />
-&#160;&#160;<b>MOTOR_TIMER_C_TOTAL_PERIOD_KEY</b> = MUNICH_KEY_I_D(3, 4), 
-<b>MOTOR_TIMER_A_CHANNEL_0_ACTIVE_PERIOD_KEY</b> = MUNICH_KEY_I_D(4, 0), 
-<b>MOTOR_TIMER_A_CHANNEL_1_ACTIVE_PERIOD_KEY</b> = MUNICH_KEY_I_D(4, 1), 
-<b>MOTOR_TIMER_B_CHANNEL_0_ACTIVE_PERIOD_KEY</b> = MUNICH_KEY_I_D(4, 2), 
+&#160;&#160;<a class="el" href="munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04a4f3cca726da9976ac97b02a6b4a1a5a2">MOTOR_TIMER_C_TOTAL_PERIOD_KEY</a> = MUNICH_KEY_I_D(3, 4), 
+<a class="el" href="munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04a3efc64a9972b3a6e10d2bacb2b0d7560">MOTOR_TIMER_A_CHANNEL_0_ACTIVE_PERIOD_KEY</a> = MUNICH_KEY_I_D(4, 0), 
+<a class="el" href="munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04a1cdc823f8771ea1e77af9f4f201ff996">MOTOR_TIMER_A_CHANNEL_1_ACTIVE_PERIOD_KEY</a> = MUNICH_KEY_I_D(4, 1), 
+<a class="el" href="munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04afd31f812c1b600519d81a73247a1176b">MOTOR_TIMER_B_CHANNEL_0_ACTIVE_PERIOD_KEY</a> = MUNICH_KEY_I_D(4, 2), 
 <br />
-&#160;&#160;<b>MOTOR_TIMER_B_CHANNEL_1_ACTIVE_PERIOD_KEY</b> = MUNICH_KEY_I_D(4, 3), 
-<b>MOTOR_TIMER_C_CHANNEL_0_ACTIVE_PERIOD_KEY</b> = MUNICH_KEY_I_D(4, 4), 
-<b>MOTOR_TIMER_C_CHANNEL_1_ACTIVE_PERIOD_KEY</b> = MUNICH_KEY_I_D(4, 5), 
-<b>QUERY_STATES_LINES_KEY</b> = MUNICH_KEY_I_D(5, 0), 
+&#160;&#160;<a class="el" href="munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04a80d9d4abcabdb99bf246331a0faa6dea">MOTOR_TIMER_B_CHANNEL_1_ACTIVE_PERIOD_KEY</a> = MUNICH_KEY_I_D(4, 3), 
+<a class="el" href="munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04a3eda075963d5dd6ad7ae6b409716a78b">MOTOR_TIMER_C_CHANNEL_0_ACTIVE_PERIOD_KEY</a> = MUNICH_KEY_I_D(4, 4), 
+<a class="el" href="munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04a0563d2e2bcf2832190ca0b2e1e8436f8">MOTOR_TIMER_C_CHANNEL_1_ACTIVE_PERIOD_KEY</a> = MUNICH_KEY_I_D(4, 5), 
+<a class="el" href="munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04aeff0972ddb0907acd404528f8f246a48">QUERY_STATES_LINES_KEY</a> = MUNICH_KEY_I_D(5, 0), 
 <br />
-&#160;&#160;<b>SET_OUTPUT_PATTERN_KEY</b> = MUNICH_KEY_I_D(5, 1), 
-<b>ADD_PAYLOAD_TO_CURRENT_OUTPUT_KEY</b> = MUNICH_KEY_I_D(5, 2), 
-<b>REMOVE_PAYLOAD_TO_CURRENT_OUTPUT_KEY</b> = MUNICH_KEY_I_D(5, 3), 
-<b>SET_PAYLOAD_TO_HIGH_IMPEDANCE_KEY</b> = MUNICH_KEY_I_D(5, 4), 
+&#160;&#160;<a class="el" href="munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04ab50c8ed18766cbc286dc692db6a44cc4">SET_OUTPUT_PATTERN_KEY</a> = MUNICH_KEY_I_D(5, 1), 
+<a class="el" href="munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04af715c89e8a41d4dda0acbd050c6cd962">ADD_PAYLOAD_TO_CURRENT_OUTPUT_KEY</a> = MUNICH_KEY_I_D(5, 2), 
+<a class="el" href="munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04a1e4713ab52d9efee9beaa14486b59ea4">REMOVE_PAYLOAD_TO_CURRENT_OUTPUT_KEY</a> = MUNICH_KEY_I_D(5, 3), 
+<a class="el" href="munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04af9f1c8e048e0297a7d9b02686fd001b4">SET_PAYLOAD_TO_HIGH_IMPEDANCE_KEY</a> = MUNICH_KEY_I_D(5, 4), 
 <br />
-&#160;&#160;<b>PUSH_BOT_LASER_CONFIG_TOTAL_PERIOD</b> = MUNICH_KEY_I_D(4, 0), 
-<b>PUSH_BOT_LASER_CONFIG_ACTIVE_TIME</b> = MUNICH_KEY_I_D(5, 0), 
-<b>PUSH_BOT_LASER_FREQUENCY</b> = MUNICH_KEY_I_D(37, 1), 
-<b>PUSH_BOT_LED_CONFIG_TOTAL_PERIOD</b> = MUNICH_KEY_I_D(4, 4), 
+&#160;&#160;<a class="el" href="munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04a92aa458811e2d91fa2a2ddc7c6300c08">PUSH_BOT_LASER_CONFIG_TOTAL_PERIOD</a> = MUNICH_KEY_I_D(4, 0), 
+<a class="el" href="munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04aaf64f130ca2b0371a27d61e97ee5dfca">PUSH_BOT_LASER_CONFIG_ACTIVE_TIME</a> = MUNICH_KEY_I_D(5, 0), 
+<a class="el" href="munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04a667772b48cfbd160decaa2e2d59070db">PUSH_BOT_LASER_FREQUENCY</a> = MUNICH_KEY_I_D(37, 1), 
+<a class="el" href="munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04aabd5c2fe1fdf4dbe9591b4bde8912ffe">PUSH_BOT_LED_CONFIG_TOTAL_PERIOD</a> = MUNICH_KEY_I_D(4, 4), 
 <br />
-&#160;&#160;<b>PUSH_BOT_LED_BACK_CONFIG_ACTIVE_TIME</b> = MUNICH_KEY_I_D(5, 4), 
-<b>PUSH_BOT_LED_FRONT_CONFIG_ACTIVE_TIME</b> = MUNICH_KEY_I_D(5, 5), 
-<b>PUSH_BOT_LED_FREQUENCY</b> = MUNICH_KEY_I_D(37, 0), 
-<b>PUSH_BOT_SPEAKER_CONFIG_TOTAL_PERIOD</b> = MUNICH_KEY_I_D(4, 2), 
+&#160;&#160;<a class="el" href="munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04a5b8710ac916aa67a3c2a64837e6b7720">PUSH_BOT_LED_BACK_CONFIG_ACTIVE_TIME</a> = MUNICH_KEY_I_D(5, 4), 
+<a class="el" href="munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04a969de1a1796dd1b7b8664800ab665fd6">PUSH_BOT_LED_FRONT_CONFIG_ACTIVE_TIME</a> = MUNICH_KEY_I_D(5, 5), 
+<a class="el" href="munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04a95841ef9e558fd3a052b371cd2ba2ce4">PUSH_BOT_LED_FREQUENCY</a> = MUNICH_KEY_I_D(37, 0), 
+<a class="el" href="munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04ae0391bb2f6e1b09e79d782783f7d27ed">PUSH_BOT_SPEAKER_CONFIG_TOTAL_PERIOD</a> = MUNICH_KEY_I_D(4, 2), 
 <br />
-&#160;&#160;<b>PUSH_BOT_SPEAKER_CONFIG_ACTIVE_TIME</b> = MUNICH_KEY_I_D(5, 2), 
-<b>PUSH_BOT_SPEAKER_TONE_BEEP</b> = MUNICH_KEY_I_D(36, 0), 
-<b>PUSH_BOT_SPEAKER_TONE_MELODY</b> = MUNICH_KEY_I_D(36, 1), 
-<b>PUSH_BOT_MOTOR_0_PERMANENT_VELOCITY</b> = MUNICH_KEY_I_D(32, 0), 
+&#160;&#160;<a class="el" href="munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04a262224b76c4dcf3cea82ee9465943bda">PUSH_BOT_SPEAKER_CONFIG_ACTIVE_TIME</a> = MUNICH_KEY_I_D(5, 2), 
+<a class="el" href="munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04a265f834c4306024944c8ddddf02a3d0a">PUSH_BOT_SPEAKER_TONE_BEEP</a> = MUNICH_KEY_I_D(36, 0), 
+<a class="el" href="munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04a3d4ccd45e6f44e668908c27f589b0fe2">PUSH_BOT_SPEAKER_TONE_MELODY</a> = MUNICH_KEY_I_D(36, 1), 
+<a class="el" href="munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04a5f40149c92d36bd636720b8355e53069">PUSH_BOT_MOTOR_0_PERMANENT_VELOCITY</a> = MUNICH_KEY_I_D(32, 0), 
 <br />
-&#160;&#160;<b>PUSH_BOT_MOTOR_1_PERMANENT_VELOCITY</b> = MUNICH_KEY_I_D(32, 1), 
-<b>PUSH_BOT_MOTOR_0_LEAKY_VELOCITY</b> = MUNICH_KEY_I_D(32, 2), 
-<b>PUSH_BOT_MOTOR_1_LEAKY_VELOCITY</b> = MUNICH_KEY_I_D(32, 3)
+&#160;&#160;<a class="el" href="munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04abed04f8b344b7771c7816f73ad8cf132">PUSH_BOT_MOTOR_1_PERMANENT_VELOCITY</a> = MUNICH_KEY_I_D(32, 1), 
+<a class="el" href="munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04a4a98ec1f861bba08fda64de0b1f30a92">PUSH_BOT_MOTOR_0_LEAKY_VELOCITY</a> = MUNICH_KEY_I_D(32, 2), 
+<a class="el" href="munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04a1e4f6b8885576368c774183501ae3a6d">PUSH_BOT_MOTOR_1_LEAKY_VELOCITY</a> = MUNICH_KEY_I_D(32, 3)
 <br />
  }</td></tr>
 <tr class="separator:abc6126af1d45847bc59afa0aa3216b04"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adc29c2ff13d900c2f185ee95427fb06c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adc29c2ff13d900c2f185ee95427fb06c"></a>enum &#160;</td><td class="memItemRight" valign="bottom">{ <br />
-&#160;&#160;<b>PAYLOAD_NO_TIMESTAMPS</b> = (0 &lt;&lt; PAYLOAD_OFFSET_FOR_TIMESTAMPS), 
-<b>PAYLOAD_DELTA_TIMESTAMPS</b> = (1 &lt;&lt; PAYLOAD_OFFSET_FOR_TIMESTAMPS), 
-<b>PAYLOAD_TWO_BYTE_TIME_STAMPS</b> = (2 &lt;&lt; PAYLOAD_OFFSET_FOR_TIMESTAMPS), 
-<b>PAYLOAD_THREE_BYTE_TIME_STAMPS</b> = (3 &lt;&lt; PAYLOAD_OFFSET_FOR_TIMESTAMPS), 
+<tr class="memitem:adc29c2ff13d900c2f185ee95427fb06c"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom">{ <br />
+&#160;&#160;<a class="el" href="munich__protocol_8h.html#adc29c2ff13d900c2f185ee95427fb06ca35c35a3d19b4e8bbea2e9c2a345d0cf7">PAYLOAD_NO_TIMESTAMPS</a> = (0 &lt;&lt; PAYLOAD_OFFSET_FOR_TIMESTAMPS), 
+<a class="el" href="munich__protocol_8h.html#adc29c2ff13d900c2f185ee95427fb06ca7e7a925c702fda8735064bd0c71b5de4">PAYLOAD_DELTA_TIMESTAMPS</a> = (1 &lt;&lt; PAYLOAD_OFFSET_FOR_TIMESTAMPS), 
+<a class="el" href="munich__protocol_8h.html#adc29c2ff13d900c2f185ee95427fb06ca3a5dbca82d4fd637a9b24f952c0a3b1d">PAYLOAD_TWO_BYTE_TIME_STAMPS</a> = (2 &lt;&lt; PAYLOAD_OFFSET_FOR_TIMESTAMPS), 
+<a class="el" href="munich__protocol_8h.html#adc29c2ff13d900c2f185ee95427fb06ca5dbc455edb7e576b4b10207499df32d4">PAYLOAD_THREE_BYTE_TIME_STAMPS</a> = (3 &lt;&lt; PAYLOAD_OFFSET_FOR_TIMESTAMPS), 
 <br />
-&#160;&#160;<b>PAYLOAD_FOUR_BYTE_TIME_STAMPS</b> = (4 &lt;&lt; PAYLOAD_OFFSET_FOR_TIMESTAMPS)
+&#160;&#160;<a class="el" href="munich__protocol_8h.html#adc29c2ff13d900c2f185ee95427fb06cafcbea561be57d033de0ec3777485e92e">PAYLOAD_FOUR_BYTE_TIME_STAMPS</a> = (4 &lt;&lt; PAYLOAD_OFFSET_FOR_TIMESTAMPS)
 <br />
- }</td></tr>
+ }<tr class="memdesc:adc29c2ff13d900c2f185ee95427fb06c"><td class="mdescLeft">&#160;</td><td class="mdescRight">payloads for setting different time stamp sizes  <a href="munich__protocol_8h.html#adc29c2ff13d900c2f185ee95427fb06c">More...</a><br /></td></tr>
+</td></tr>
 <tr class="separator:adc29c2ff13d900c2f185ee95427fb06c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a61dadd085c1777f559549e05962b2c9e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a61dadd085c1777f559549e05962b2c9e"></a>enum &#160;</td><td class="memItemRight" valign="bottom">{ <br />
+<tr class="memitem:a61dadd085c1777f559549e05962b2c9e"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom">{ <br />
 &#160;&#160;<b>PAYLOAD_RETINA_NO_DOWN_SAMPLING_IN_PAYLOAD</b>, 
-<b>PAYLOAD_RETINA_NO_DOWN_SAMPLING</b> = (1 &lt;&lt; PAYLOAD_OFFSET_FOR_RETINA_SIZE), 
-<b>PAYLOAD_RETINA_64_DOWN_SAMPLING</b> = (2 &lt;&lt; PAYLOAD_OFFSET_FOR_RETINA_SIZE), 
-<b>PAYLOAD_RETINA_32_DOWN_SAMPLING</b> = (3 &lt;&lt; PAYLOAD_OFFSET_FOR_RETINA_SIZE), 
+<a class="el" href="munich__protocol_8h.html#a61dadd085c1777f559549e05962b2c9ea8de5b4140e590b1afd4610167028e60f">PAYLOAD_RETINA_NO_DOWN_SAMPLING</a> = (1 &lt;&lt; PAYLOAD_OFFSET_FOR_RETINA_SIZE), 
+<a class="el" href="munich__protocol_8h.html#a61dadd085c1777f559549e05962b2c9eafc3113b6039407f4ba93ccfede07921b">PAYLOAD_RETINA_64_DOWN_SAMPLING</a> = (2 &lt;&lt; PAYLOAD_OFFSET_FOR_RETINA_SIZE), 
+<a class="el" href="munich__protocol_8h.html#a61dadd085c1777f559549e05962b2c9ea69237ae9abec2c9a96870f267d951fc1">PAYLOAD_RETINA_32_DOWN_SAMPLING</a> = (3 &lt;&lt; PAYLOAD_OFFSET_FOR_RETINA_SIZE), 
 <br />
-&#160;&#160;<b>PAYLOAD_RETINA_16_DOWN_SAMPLING</b> = (4 &lt;&lt; PAYLOAD_OFFSET_FOR_RETINA_SIZE)
+&#160;&#160;<a class="el" href="munich__protocol_8h.html#a61dadd085c1777f559549e05962b2c9eaff0513e0ecc8dfe19b9c70d891b09534">PAYLOAD_RETINA_16_DOWN_SAMPLING</a> = (4 &lt;&lt; PAYLOAD_OFFSET_FOR_RETINA_SIZE)
 <br />
- }</td></tr>
+ }<tr class="memdesc:a61dadd085c1777f559549e05962b2c9e"><td class="mdescLeft">&#160;</td><td class="mdescRight">payloads for retina size  <a href="munich__protocol_8h.html#a61dadd085c1777f559549e05962b2c9e">More...</a><br /></td></tr>
+</td></tr>
 <tr class="separator:a61dadd085c1777f559549e05962b2c9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a726ca809ffd3d67ab4b8476646f26635"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a726ca809ffd3d67ab4b8476646f26635"></a>enum &#160;</td><td class="memItemRight" valign="bottom">{ <b>PAYLOAD_MASTER_SLAVE_USE_INTERNAL_COUNTER</b> = 0, 
 <b>PAYLOAD_MASTER_SLAVE_SET_SLAVE</b> = 1, 
 <b>PAYLOAD_MASTER_SLAVE_SET_MASTER_CLOCK_NOT_STARTED</b> = 2, 
 <b>PAYLOAD_MASTER_SLAVE_SET_MASTER_CLOCK_ACTIVE</b> = 4
- }</td></tr>
+ }<tr class="memdesc:a726ca809ffd3d67ab4b8476646f26635"><td class="mdescLeft">&#160;</td><td class="mdescRight">payloads for master slave control <br /></td></tr>
+</td></tr>
 <tr class="separator:a726ca809ffd3d67ab4b8476646f26635"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a276ea595faa60fd27301105f3613b2ef"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a276ea595faa60fd27301105f3613b2ef"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#a276ea595faa60fd27301105f3613b2ef">munich_protocol_modes_e</a> { <br />
-&#160;&#160;<b>MUNICH_PROTOCOL_RESET_TO_DEFAULT</b> = 0, 
-<b>MUNICH_PROTOCOL_PUSH_BOT</b> = 1, 
-<b>MUNICH_PROTOCOL_SPOMNIBOT</b> = 2, 
-<b>MUNICH_PROTOCOL_BALL_BALANCER</b> = 3, 
+<tr class="memitem:a276ea595faa60fd27301105f3613b2ef"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#a276ea595faa60fd27301105f3613b2ef">munich_protocol_modes_e</a> { <br />
+&#160;&#160;<a class="el" href="munich__protocol_8h.html#a276ea595faa60fd27301105f3613b2efa8a71e56e25b553379ea228b4a1ded8ba">MUNICH_PROTOCOL_RESET_TO_DEFAULT</a> = 0, 
+<a class="el" href="munich__protocol_8h.html#a276ea595faa60fd27301105f3613b2efa168d928b4999466fb0ee4afe6c0ebf17">MUNICH_PROTOCOL_PUSH_BOT</a> = 1, 
+<a class="el" href="munich__protocol_8h.html#a276ea595faa60fd27301105f3613b2efab59da94c5640da6e33ea55115432aac2">MUNICH_PROTOCOL_SPOMNIBOT</a> = 2, 
+<a class="el" href="munich__protocol_8h.html#a276ea595faa60fd27301105f3613b2efa24993add8c6fbf8110e30b2bec6b5cde">MUNICH_PROTOCOL_BALL_BALANCER</a> = 3, 
 <br />
-&#160;&#160;<b>MUNICH_PROTOCOL_MY_ORO_BOTICS</b> = 4, 
-<b>MUNICH_PROTOCOL_FREE</b> = 5
+&#160;&#160;<a class="el" href="munich__protocol_8h.html#a276ea595faa60fd27301105f3613b2efaac09deb99dbfa656e3055544b6b1a9cc">MUNICH_PROTOCOL_MY_ORO_BOTICS</a> = 4, 
+<a class="el" href="munich__protocol_8h.html#a276ea595faa60fd27301105f3613b2efa591c8c75a63ce2f61e0a20f9ff12da89">MUNICH_PROTOCOL_FREE</a> = 5
 <br />
- }<tr class="memdesc:a276ea595faa60fd27301105f3613b2ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">human readable definitions of each mode <br /></td></tr>
+ }<tr class="memdesc:a276ea595faa60fd27301105f3613b2ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">human readable definitions of each mode  <a href="munich__protocol_8h.html#a276ea595faa60fd27301105f3613b2ef">More...</a><br /></td></tr>
 </td></tr>
 <tr class="separator:a276ea595faa60fd27301105f3613b2ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a63f78c33f4497c8732b5532c3985e627"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a63f78c33f4497c8732b5532c3985e627"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><b>set_protocol_mode</b> (<a class="el" href="munich__protocol_8h.html#a276ea595faa60fd27301105f3613b2ef">munich_protocol_modes_e</a> new_mode, uint32_t new_instance_key)</td></tr>
+<tr class="memitem:a63f78c33f4497c8732b5532c3985e627"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#a63f78c33f4497c8732b5532c3985e627">set_protocol_mode</a> (<a class="el" href="munich__protocol_8h.html#a276ea595faa60fd27301105f3613b2ef">munich_protocol_modes_e</a> new_mode, uint32_t new_instance_key)</td></tr>
+<tr class="memdesc:a63f78c33f4497c8732b5532c3985e627"><td class="mdescLeft">&#160;</td><td class="mdescRight">Configures the protocol mode.  <a href="#a63f78c33f4497c8732b5532c3985e627">More...</a><br /></td></tr>
 <tr class="separator:a63f78c33f4497c8732b5532c3985e627"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8da65ae6eef8fa3846d3194eefdf4b57"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8da65ae6eef8fa3846d3194eefdf4b57"></a>
-static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>munich_protocol_get_configure_master_key_command</b> (uint32_t new_key)</td></tr>
+<tr class="memitem:a8da65ae6eef8fa3846d3194eefdf4b57"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#a8da65ae6eef8fa3846d3194eefdf4b57">munich_protocol_get_configure_master_key_command</a> (uint32_t new_key)</td></tr>
+<tr class="memdesc:a8da65ae6eef8fa3846d3194eefdf4b57"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a command to configure the master key.  <a href="#a8da65ae6eef8fa3846d3194eefdf4b57">More...</a><br /></td></tr>
 <tr class="separator:a8da65ae6eef8fa3846d3194eefdf4b57"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a627df4739d78e9e5593f889923a6e1d8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a627df4739d78e9e5593f889923a6e1d8"></a>
-static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>munich_protocol_get_set_mode_command</b> (void)</td></tr>
+<tr class="memitem:a627df4739d78e9e5593f889923a6e1d8"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#a627df4739d78e9e5593f889923a6e1d8">munich_protocol_get_set_mode_command</a> (void)</td></tr>
+<tr class="memdesc:a627df4739d78e9e5593f889923a6e1d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a command to set the device mode.  <a href="#a627df4739d78e9e5593f889923a6e1d8">More...</a><br /></td></tr>
 <tr class="separator:a627df4739d78e9e5593f889923a6e1d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a343febb69fae0be23a0dae956bc0fa25"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a343febb69fae0be23a0dae956bc0fa25"></a>
-static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>munich_protocol_set_retina_transmission_key</b> (uint32_t new_key, uint32_t uart_id)</td></tr>
+<tr class="memitem:a343febb69fae0be23a0dae956bc0fa25"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#a343febb69fae0be23a0dae956bc0fa25">munich_protocol_set_retina_transmission_key</a> (uint32_t new_key, uint32_t uart_id)</td></tr>
+<tr class="memdesc:a343febb69fae0be23a0dae956bc0fa25"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a command to set the retina base key.  <a href="#a343febb69fae0be23a0dae956bc0fa25">More...</a><br /></td></tr>
 <tr class="separator:a343febb69fae0be23a0dae956bc0fa25"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aeae2e5559f9d20e1cad45654b2f0a73d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aeae2e5559f9d20e1cad45654b2f0a73d"></a>
-static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>munich_protocol_disable_retina_event_streaming</b> (uint32_t uart_id)</td></tr>
+<tr class="memitem:aeae2e5559f9d20e1cad45654b2f0a73d"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#aeae2e5559f9d20e1cad45654b2f0a73d">munich_protocol_disable_retina_event_streaming</a> (uint32_t uart_id)</td></tr>
+<tr class="memdesc:aeae2e5559f9d20e1cad45654b2f0a73d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a command to disable event streaming my a retina.  <a href="#aeae2e5559f9d20e1cad45654b2f0a73d">More...</a><br /></td></tr>
 <tr class="separator:aeae2e5559f9d20e1cad45654b2f0a73d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1d3eb329056e2e12f19d01aed8a9633b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1d3eb329056e2e12f19d01aed8a9633b"></a>
-static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>munich_protocol_master_slave_use_internal_counter</b> (uint32_t uart_id)</td></tr>
+<tr class="memitem:a1d3eb329056e2e12f19d01aed8a9633b"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#a1d3eb329056e2e12f19d01aed8a9633b">munich_protocol_master_slave_use_internal_counter</a> (uint32_t uart_id)</td></tr>
+<tr class="memdesc:a1d3eb329056e2e12f19d01aed8a9633b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a command to tell the master/slave to use its internal event counter.  <a href="#a1d3eb329056e2e12f19d01aed8a9633b">More...</a><br /></td></tr>
 <tr class="separator:a1d3eb329056e2e12f19d01aed8a9633b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab9c08589df340e59104530a6f23bf630"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab9c08589df340e59104530a6f23bf630"></a>
-static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>munich_protocol_master_slave_set_slave</b> (uint32_t uart_id)</td></tr>
+<tr class="memitem:ab9c08589df340e59104530a6f23bf630"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#ab9c08589df340e59104530a6f23bf630">munich_protocol_master_slave_set_slave</a> (uint32_t uart_id)</td></tr>
+<tr class="memdesc:ab9c08589df340e59104530a6f23bf630"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a command to tell a UART to be a slave.  <a href="#ab9c08589df340e59104530a6f23bf630">More...</a><br /></td></tr>
 <tr class="separator:ab9c08589df340e59104530a6f23bf630"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9210c92998123f071fce28a5f4a92fc2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9210c92998123f071fce28a5f4a92fc2"></a>
-static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>munich_protocol_master_slave_set_master_clock_not_started</b> (uint32_t uart_id)</td></tr>
+<tr class="memitem:a9210c92998123f071fce28a5f4a92fc2"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#a9210c92998123f071fce28a5f4a92fc2">munich_protocol_master_slave_set_master_clock_not_started</a> (uint32_t uart_id)</td></tr>
+<tr class="memdesc:a9210c92998123f071fce28a5f4a92fc2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a command to set a UART clock into the not-started state.  <a href="#a9210c92998123f071fce28a5f4a92fc2">More...</a><br /></td></tr>
 <tr class="separator:a9210c92998123f071fce28a5f4a92fc2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7dd1390f27ac38f727d1e3e11d3882f7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7dd1390f27ac38f727d1e3e11d3882f7"></a>
-static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>munich_protocol_master_slave_set_master_clock_active</b> (uint32_t uart_id)</td></tr>
+<tr class="memitem:a7dd1390f27ac38f727d1e3e11d3882f7"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#a7dd1390f27ac38f727d1e3e11d3882f7">munich_protocol_master_slave_set_master_clock_active</a> (uint32_t uart_id)</td></tr>
+<tr class="memdesc:a7dd1390f27ac38f727d1e3e11d3882f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a command to set a UART clock active.  <a href="#a7dd1390f27ac38f727d1e3e11d3882f7">More...</a><br /></td></tr>
 <tr class="separator:a7dd1390f27ac38f727d1e3e11d3882f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9f36c965f338b9ffee8bd0739edd9309"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9f36c965f338b9ffee8bd0739edd9309"></a>
-static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>munich_protocol_bias_values</b> (uint32_t bias_id, uint32_t bias_value, uint32_t uart_id)</td></tr>
+<tr class="memitem:a9f36c965f338b9ffee8bd0739edd9309"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#a9f36c965f338b9ffee8bd0739edd9309">munich_protocol_bias_values</a> (uint32_t bias_id, uint32_t bias_value, uint32_t uart_id)</td></tr>
+<tr class="memdesc:a9f36c965f338b9ffee8bd0739edd9309"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a command to set bias values for a UART.  <a href="#a9f36c965f338b9ffee8bd0739edd9309">More...</a><br /></td></tr>
 <tr class="separator:a9f36c965f338b9ffee8bd0739edd9309"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a301f3f025960b140d2c5f00273e90c66"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a301f3f025960b140d2c5f00273e90c66"></a>
-static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>munich_protocol_reset_retina</b> (uint32_t uart_id)</td></tr>
+<tr class="memitem:a301f3f025960b140d2c5f00273e90c66"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#a301f3f025960b140d2c5f00273e90c66">munich_protocol_reset_retina</a> (uint32_t uart_id)</td></tr>
+<tr class="memdesc:a301f3f025960b140d2c5f00273e90c66"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a command to reset a retina.  <a href="#a301f3f025960b140d2c5f00273e90c66">More...</a><br /></td></tr>
 <tr class="separator:a301f3f025960b140d2c5f00273e90c66"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0431318d389c280a5085ae00842a85f5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0431318d389c280a5085ae00842a85f5"></a>
-static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>munich_protocol_turn_off_sensor_reporting</b> (uint32_t sensor_id)</td></tr>
+<tr class="memitem:a0431318d389c280a5085ae00842a85f5"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#a0431318d389c280a5085ae00842a85f5">munich_protocol_turn_off_sensor_reporting</a> (uint32_t sensor_id)</td></tr>
+<tr class="memdesc:a0431318d389c280a5085ae00842a85f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a command to stop sensor reporting.  <a href="#a0431318d389c280a5085ae00842a85f5">More...</a><br /></td></tr>
 <tr class="separator:a0431318d389c280a5085ae00842a85f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aebf57d61e786656b0062073c0a5789ab"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aebf57d61e786656b0062073c0a5789ab"></a>
-static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>munich_protocol_poll_sensors_once</b> (uint32_t sensor_id)</td></tr>
+<tr class="memitem:aebf57d61e786656b0062073c0a5789ab"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#aebf57d61e786656b0062073c0a5789ab">munich_protocol_poll_sensors_once</a> (uint32_t sensor_id)</td></tr>
+<tr class="memdesc:aebf57d61e786656b0062073c0a5789ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a command to poll a sensor once.  <a href="#aebf57d61e786656b0062073c0a5789ab">More...</a><br /></td></tr>
 <tr class="separator:aebf57d61e786656b0062073c0a5789ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a323f23ea8f3b20cc806f0dcf982718cc"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a323f23ea8f3b20cc806f0dcf982718cc"></a>
-static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>munich_protocol_poll_individual_sensor_continuously</b> (uint32_t sensor_id, uint32_t time_in_ms)</td></tr>
+<tr class="memitem:a323f23ea8f3b20cc806f0dcf982718cc"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#a323f23ea8f3b20cc806f0dcf982718cc">munich_protocol_poll_individual_sensor_continuously</a> (uint32_t sensor_id, uint32_t time_in_ms)</td></tr>
+<tr class="memdesc:a323f23ea8f3b20cc806f0dcf982718cc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a command to continuously poll a sensor.  <a href="#a323f23ea8f3b20cc806f0dcf982718cc">More...</a><br /></td></tr>
 <tr class="separator:a323f23ea8f3b20cc806f0dcf982718cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a963f374194d909f3694963cfc9c4e965"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a963f374194d909f3694963cfc9c4e965"></a>
-static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>munich_protocol_generic_motor_enable_disable</b> (uint32_t enable_disable, uint32_t uart_id)</td></tr>
+<tr class="memitem:a963f374194d909f3694963cfc9c4e965"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#a963f374194d909f3694963cfc9c4e965">munich_protocol_generic_motor_enable_disable</a> (uint32_t enable_disable, uint32_t uart_id)</td></tr>
+<tr class="memdesc:a963f374194d909f3694963cfc9c4e965"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a command to turn a motor on or off.  <a href="#a963f374194d909f3694963cfc9c4e965">More...</a><br /></td></tr>
 <tr class="separator:a963f374194d909f3694963cfc9c4e965"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4fb2104095f3975a76477e08124028ef"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4fb2104095f3975a76477e08124028ef"></a>
-static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>munich_protocol_generic_motor_total_period_duration</b> (uint32_t time_in_ms, uint32_t uart_id)</td></tr>
+<tr class="memitem:a4fb2104095f3975a76477e08124028ef"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#a4fb2104095f3975a76477e08124028ef">munich_protocol_generic_motor_total_period_duration</a> (uint32_t time_in_ms, uint32_t uart_id)</td></tr>
+<tr class="memdesc:a4fb2104095f3975a76477e08124028ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a command to turn a motor on for a period.  <a href="#a4fb2104095f3975a76477e08124028ef">More...</a><br /></td></tr>
 <tr class="separator:a4fb2104095f3975a76477e08124028ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7890f33cda380a0e8fb5c30a94e3ddb4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7890f33cda380a0e8fb5c30a94e3ddb4"></a>
-static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>munich_protocol_generic_motor0_raw_output_permanent</b> (uint32_t pwm_signal, uint32_t uart_id)</td></tr>
+<tr class="memitem:a7890f33cda380a0e8fb5c30a94e3ddb4"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#a7890f33cda380a0e8fb5c30a94e3ddb4">munich_protocol_generic_motor0_raw_output_permanent</a> (uint32_t pwm_signal, uint32_t uart_id)</td></tr>
+<tr class="memdesc:a7890f33cda380a0e8fb5c30a94e3ddb4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a command to turn motor 0 on at a constant rate.  <a href="#a7890f33cda380a0e8fb5c30a94e3ddb4">More...</a><br /></td></tr>
 <tr class="separator:a7890f33cda380a0e8fb5c30a94e3ddb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aba8a19ca1a35ce982dd58ab086c60ef4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aba8a19ca1a35ce982dd58ab086c60ef4"></a>
-static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>munich_protocol_generic_motor1_raw_output_permanent</b> (uint32_t pwm_signal, uint32_t uart_id)</td></tr>
+<tr class="memitem:aba8a19ca1a35ce982dd58ab086c60ef4"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#aba8a19ca1a35ce982dd58ab086c60ef4">munich_protocol_generic_motor1_raw_output_permanent</a> (uint32_t pwm_signal, uint32_t uart_id)</td></tr>
+<tr class="memdesc:aba8a19ca1a35ce982dd58ab086c60ef4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a command to turn motor 1 on at a constant rate.  <a href="#aba8a19ca1a35ce982dd58ab086c60ef4">More...</a><br /></td></tr>
 <tr class="separator:aba8a19ca1a35ce982dd58ab086c60ef4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5c33f32e6993d15042238058920ffd53"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5c33f32e6993d15042238058920ffd53"></a>
-static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>munich_protocol_generic_motor0_raw_output_leak_to_0</b> (uint32_t pwm_signal, uint32_t uart_id)</td></tr>
+<tr class="memitem:a5c33f32e6993d15042238058920ffd53"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#a5c33f32e6993d15042238058920ffd53">munich_protocol_generic_motor0_raw_output_leak_to_0</a> (uint32_t pwm_signal, uint32_t uart_id)</td></tr>
+<tr class="memdesc:a5c33f32e6993d15042238058920ffd53"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a command to turn motor 0 on at a rate that decays to zero.  <a href="#a5c33f32e6993d15042238058920ffd53">More...</a><br /></td></tr>
 <tr class="separator:a5c33f32e6993d15042238058920ffd53"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a837fc869cf029d2a88d09f03674eb316"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a837fc869cf029d2a88d09f03674eb316"></a>
-static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>munich_protocol_generic_motor1_raw_output_leak_to_0</b> (uint32_t pwm_signal, uint32_t uart_id)</td></tr>
+<tr class="memitem:a837fc869cf029d2a88d09f03674eb316"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#a837fc869cf029d2a88d09f03674eb316">munich_protocol_generic_motor1_raw_output_leak_to_0</a> (uint32_t pwm_signal, uint32_t uart_id)</td></tr>
+<tr class="memdesc:a837fc869cf029d2a88d09f03674eb316"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a command to turn motor 1 on at a rate that decays to zero.  <a href="#a837fc869cf029d2a88d09f03674eb316">More...</a><br /></td></tr>
 <tr class="separator:a837fc869cf029d2a88d09f03674eb316"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8043794711243ccbee4ec95026ca23ae"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8043794711243ccbee4ec95026ca23ae"></a>
-static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>munich_protocol_pwm_pin_output_timer_a_duration</b> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ac0c27301e134af3ce80814a553601074">timer_period</a>, uint32_t uart_id)</td></tr>
+<tr class="memitem:a8043794711243ccbee4ec95026ca23ae"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#a8043794711243ccbee4ec95026ca23ae">munich_protocol_pwm_pin_output_timer_a_duration</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ac0c27301e134af3ce80814a553601074">timer_period</a>, uint32_t uart_id)</td></tr>
 <tr class="separator:a8043794711243ccbee4ec95026ca23ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1c42d8d1d730d34c59621bdcd2ac019a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1c42d8d1d730d34c59621bdcd2ac019a"></a>
-static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>munich_protocol_pwm_pin_output_timer_b_duration</b> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ac0c27301e134af3ce80814a553601074">timer_period</a>, uint32_t uart_id)</td></tr>
+<tr class="memitem:a1c42d8d1d730d34c59621bdcd2ac019a"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#a1c42d8d1d730d34c59621bdcd2ac019a">munich_protocol_pwm_pin_output_timer_b_duration</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ac0c27301e134af3ce80814a553601074">timer_period</a>, uint32_t uart_id)</td></tr>
 <tr class="separator:a1c42d8d1d730d34c59621bdcd2ac019a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5f7d1a3fd79abeb1256bbe7be8dc657c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5f7d1a3fd79abeb1256bbe7be8dc657c"></a>
-static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>munich_protocol_pwm_pin_output_timer_c_duration</b> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ac0c27301e134af3ce80814a553601074">timer_period</a>, uint32_t uart_id)</td></tr>
+<tr class="memitem:a5f7d1a3fd79abeb1256bbe7be8dc657c"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#a5f7d1a3fd79abeb1256bbe7be8dc657c">munich_protocol_pwm_pin_output_timer_c_duration</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ac0c27301e134af3ce80814a553601074">timer_period</a>, uint32_t uart_id)</td></tr>
 <tr class="separator:a5f7d1a3fd79abeb1256bbe7be8dc657c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a97f6780c64638e455c245e6bf8abe673"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a97f6780c64638e455c245e6bf8abe673"></a>
-static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>munich_protocol_pwm_pin_output_timer_a_channel_0_ratio</b> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ac0c27301e134af3ce80814a553601074">timer_period</a>, uint32_t uart_id)</td></tr>
+<tr class="memitem:a97f6780c64638e455c245e6bf8abe673"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#a97f6780c64638e455c245e6bf8abe673">munich_protocol_pwm_pin_output_timer_a_channel_0_ratio</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ac0c27301e134af3ce80814a553601074">timer_period</a>, uint32_t uart_id)</td></tr>
 <tr class="separator:a97f6780c64638e455c245e6bf8abe673"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a67c9432aa82f7bee54c2a8ccbafc4eeb"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a67c9432aa82f7bee54c2a8ccbafc4eeb"></a>
-static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>munich_protocol_pwm_pin_output_timer_a_channel_1_ratio</b> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ac0c27301e134af3ce80814a553601074">timer_period</a>, uint32_t uart_id)</td></tr>
+<tr class="memitem:a67c9432aa82f7bee54c2a8ccbafc4eeb"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#a67c9432aa82f7bee54c2a8ccbafc4eeb">munich_protocol_pwm_pin_output_timer_a_channel_1_ratio</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ac0c27301e134af3ce80814a553601074">timer_period</a>, uint32_t uart_id)</td></tr>
 <tr class="separator:a67c9432aa82f7bee54c2a8ccbafc4eeb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab47f25902bc7387b2d4e69423b00e7c1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab47f25902bc7387b2d4e69423b00e7c1"></a>
-static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>munich_protocol_pwm_pin_output_timer_b_channel_0_ratio</b> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ac0c27301e134af3ce80814a553601074">timer_period</a>, uint32_t uart_id)</td></tr>
+<tr class="memitem:ab47f25902bc7387b2d4e69423b00e7c1"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#ab47f25902bc7387b2d4e69423b00e7c1">munich_protocol_pwm_pin_output_timer_b_channel_0_ratio</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ac0c27301e134af3ce80814a553601074">timer_period</a>, uint32_t uart_id)</td></tr>
 <tr class="separator:ab47f25902bc7387b2d4e69423b00e7c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4e079b283a1f225af49d2f551f2e4067"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4e079b283a1f225af49d2f551f2e4067"></a>
-static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>munich_protocol_pwm_pin_output_timer_b_channel_1_ratio</b> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ac0c27301e134af3ce80814a553601074">timer_period</a>, uint32_t uart_id)</td></tr>
+<tr class="memitem:a4e079b283a1f225af49d2f551f2e4067"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#a4e079b283a1f225af49d2f551f2e4067">munich_protocol_pwm_pin_output_timer_b_channel_1_ratio</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ac0c27301e134af3ce80814a553601074">timer_period</a>, uint32_t uart_id)</td></tr>
 <tr class="separator:a4e079b283a1f225af49d2f551f2e4067"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac4d568446b50147c2977f1253669790a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac4d568446b50147c2977f1253669790a"></a>
-static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>munich_protocol_pwm_pin_output_timer_c_channel_0_ratio</b> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ac0c27301e134af3ce80814a553601074">timer_period</a>, uint32_t uart_id)</td></tr>
+<tr class="memitem:ac4d568446b50147c2977f1253669790a"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#ac4d568446b50147c2977f1253669790a">munich_protocol_pwm_pin_output_timer_c_channel_0_ratio</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ac0c27301e134af3ce80814a553601074">timer_period</a>, uint32_t uart_id)</td></tr>
 <tr class="separator:ac4d568446b50147c2977f1253669790a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4c85214107445053137ea974236543e3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4c85214107445053137ea974236543e3"></a>
-static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>munich_protocol_pwm_pin_output_timer_c_channel_1_ratio</b> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ac0c27301e134af3ce80814a553601074">timer_period</a>, uint32_t uart_id)</td></tr>
+<tr class="memitem:a4c85214107445053137ea974236543e3"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#a4c85214107445053137ea974236543e3">munich_protocol_pwm_pin_output_timer_c_channel_1_ratio</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ac0c27301e134af3ce80814a553601074">timer_period</a>, uint32_t uart_id)</td></tr>
 <tr class="separator:a4c85214107445053137ea974236543e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6b528197cc61a44e96c36df0a78232e3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6b528197cc61a44e96c36df0a78232e3"></a>
-static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>munich_protocol_query_state_of_io_lines</b> (void)</td></tr>
+<tr class="memitem:a6b528197cc61a44e96c36df0a78232e3"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#a6b528197cc61a44e96c36df0a78232e3">munich_protocol_query_state_of_io_lines</a> (void)</td></tr>
 <tr class="separator:a6b528197cc61a44e96c36df0a78232e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a40d59634d577ce03a3e63d0ef6c15709"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a40d59634d577ce03a3e63d0ef6c15709"></a>
-static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>munich_protocol_set_output_pattern_for_payload</b> (uint32_t payload)</td></tr>
+<tr class="memitem:a40d59634d577ce03a3e63d0ef6c15709"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#a40d59634d577ce03a3e63d0ef6c15709">munich_protocol_set_output_pattern_for_payload</a> (uint32_t payload)</td></tr>
 <tr class="separator:a40d59634d577ce03a3e63d0ef6c15709"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a401923b4aebaf0d3bd0544f2595f6af7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a401923b4aebaf0d3bd0544f2595f6af7"></a>
-static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>munich_protocol_add_payload_logic_to_current_output</b> (uint32_t payload)</td></tr>
+<tr class="memitem:a401923b4aebaf0d3bd0544f2595f6af7"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#a401923b4aebaf0d3bd0544f2595f6af7">munich_protocol_add_payload_logic_to_current_output</a> (uint32_t payload)</td></tr>
 <tr class="separator:a401923b4aebaf0d3bd0544f2595f6af7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad0f680213cdf6483d3a9ce6c107df75f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad0f680213cdf6483d3a9ce6c107df75f"></a>
-static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>munich_protocol_remove_payload_logic_to_current_output</b> (uint32_t payload)</td></tr>
+<tr class="memitem:ad0f680213cdf6483d3a9ce6c107df75f"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#ad0f680213cdf6483d3a9ce6c107df75f">munich_protocol_remove_payload_logic_to_current_output</a> (uint32_t payload)</td></tr>
 <tr class="separator:ad0f680213cdf6483d3a9ce6c107df75f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a82cab0e2116f047ce871b85ad449492b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a82cab0e2116f047ce871b85ad449492b"></a>
-static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>munich_protocol_set_payload_pins_to_high_impedance</b> (uint32_t payload)</td></tr>
+<tr class="memitem:a82cab0e2116f047ce871b85ad449492b"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#a82cab0e2116f047ce871b85ad449492b">munich_protocol_set_payload_pins_to_high_impedance</a> (uint32_t payload)</td></tr>
 <tr class="separator:a82cab0e2116f047ce871b85ad449492b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a34e031fa12d0c4a94221a368d31666ba"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a34e031fa12d0c4a94221a368d31666ba"></a>
-static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>munich_protocol_push_bot_laser_config_total_period</b> (uint32_t total_period, uint32_t uart_id)</td></tr>
+<tr class="memitem:a34e031fa12d0c4a94221a368d31666ba"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#a34e031fa12d0c4a94221a368d31666ba">munich_protocol_push_bot_laser_config_total_period</a> (uint32_t total_period, uint32_t uart_id)</td></tr>
 <tr class="separator:a34e031fa12d0c4a94221a368d31666ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2aa806d7f6722fdf3f5b58226fee85e8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2aa806d7f6722fdf3f5b58226fee85e8"></a>
-static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>munich_protocol_push_bot_laser_config_active_time</b> (uint32_t active_time, uint32_t uart_id)</td></tr>
+<tr class="memitem:a2aa806d7f6722fdf3f5b58226fee85e8"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#a2aa806d7f6722fdf3f5b58226fee85e8">munich_protocol_push_bot_laser_config_active_time</a> (uint32_t active_time, uint32_t uart_id)</td></tr>
 <tr class="separator:a2aa806d7f6722fdf3f5b58226fee85e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a712450f86219392e5e07f97502962be6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a712450f86219392e5e07f97502962be6"></a>
-static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>munich_protocol_push_bot_laser_set_frequency</b> (uint32_t frequency, uint32_t uart_id)</td></tr>
+<tr class="memitem:a712450f86219392e5e07f97502962be6"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#a712450f86219392e5e07f97502962be6">munich_protocol_push_bot_laser_set_frequency</a> (uint32_t frequency, uint32_t uart_id)</td></tr>
 <tr class="separator:a712450f86219392e5e07f97502962be6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad76c83120ef750a56cb808610c5c9dea"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad76c83120ef750a56cb808610c5c9dea"></a>
-static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>munich_protocol_push_bot_speaker_config_total_period</b> (uint32_t total_period, uint32_t uart_id)</td></tr>
+<tr class="memitem:ad76c83120ef750a56cb808610c5c9dea"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#ad76c83120ef750a56cb808610c5c9dea">munich_protocol_push_bot_speaker_config_total_period</a> (uint32_t total_period, uint32_t uart_id)</td></tr>
 <tr class="separator:ad76c83120ef750a56cb808610c5c9dea"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a65c33170f492a1ccacbd7a6dba2ccddb"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a65c33170f492a1ccacbd7a6dba2ccddb"></a>
-static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>munich_protocol_push_bot_speaker_config_active_time</b> (uint32_t active_time, uint32_t uart_id)</td></tr>
+<tr class="memitem:a65c33170f492a1ccacbd7a6dba2ccddb"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#a65c33170f492a1ccacbd7a6dba2ccddb">munich_protocol_push_bot_speaker_config_active_time</a> (uint32_t active_time, uint32_t uart_id)</td></tr>
 <tr class="separator:a65c33170f492a1ccacbd7a6dba2ccddb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a71aa2936830339beb4fd2b07eb8cc923"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a71aa2936830339beb4fd2b07eb8cc923"></a>
-static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>munich_protocol_push_bot_speaker_set_tone</b> (uint32_t frequency, uint32_t uart_id)</td></tr>
+<tr class="memitem:a71aa2936830339beb4fd2b07eb8cc923"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#a71aa2936830339beb4fd2b07eb8cc923">munich_protocol_push_bot_speaker_set_tone</a> (uint32_t frequency, uint32_t uart_id)</td></tr>
 <tr class="separator:a71aa2936830339beb4fd2b07eb8cc923"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a16c2d7aeb44a9c9a40c358bc95241b20"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a16c2d7aeb44a9c9a40c358bc95241b20"></a>
-static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>munich_protocol_push_bot_speaker_set_melody</b> (uint32_t melody, uint32_t uart_id)</td></tr>
+<tr class="memitem:a16c2d7aeb44a9c9a40c358bc95241b20"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#a16c2d7aeb44a9c9a40c358bc95241b20">munich_protocol_push_bot_speaker_set_melody</a> (uint32_t melody, uint32_t uart_id)</td></tr>
 <tr class="separator:a16c2d7aeb44a9c9a40c358bc95241b20"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9e271be0ca62415cd7218f1059d9f71d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9e271be0ca62415cd7218f1059d9f71d"></a>
-static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>munich_protocol_push_bot_led_total_period</b> (uint32_t total_period, uint32_t uart_id)</td></tr>
+<tr class="memitem:a9e271be0ca62415cd7218f1059d9f71d"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#a9e271be0ca62415cd7218f1059d9f71d">munich_protocol_push_bot_led_total_period</a> (uint32_t total_period, uint32_t uart_id)</td></tr>
 <tr class="separator:a9e271be0ca62415cd7218f1059d9f71d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0b99264f73273a25f9465894c0b7d136"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0b99264f73273a25f9465894c0b7d136"></a>
-static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>munich_protocol_push_bot_led_back_active_time</b> (uint32_t active_time, uint32_t uart_id)</td></tr>
+<tr class="memitem:a0b99264f73273a25f9465894c0b7d136"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#a0b99264f73273a25f9465894c0b7d136">munich_protocol_push_bot_led_back_active_time</a> (uint32_t active_time, uint32_t uart_id)</td></tr>
 <tr class="separator:a0b99264f73273a25f9465894c0b7d136"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a20b8821bbfce788b040b7d4fc7fe619d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a20b8821bbfce788b040b7d4fc7fe619d"></a>
-static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>munich_protocol_push_bot_led_front_active_time</b> (uint32_t active_time, uint32_t uart_id)</td></tr>
+<tr class="memitem:a20b8821bbfce788b040b7d4fc7fe619d"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#a20b8821bbfce788b040b7d4fc7fe619d">munich_protocol_push_bot_led_front_active_time</a> (uint32_t active_time, uint32_t uart_id)</td></tr>
 <tr class="separator:a20b8821bbfce788b040b7d4fc7fe619d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9a1ea485a42a7f01ea15cddaf211bd5e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9a1ea485a42a7f01ea15cddaf211bd5e"></a>
-static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>munich_protocol_push_bot_led_set_frequency</b> (uint32_t frequency, uint32_t uart_id)</td></tr>
+<tr class="memitem:a9a1ea485a42a7f01ea15cddaf211bd5e"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#a9a1ea485a42a7f01ea15cddaf211bd5e">munich_protocol_push_bot_led_set_frequency</a> (uint32_t frequency, uint32_t uart_id)</td></tr>
 <tr class="separator:a9a1ea485a42a7f01ea15cddaf211bd5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aed3bf940b69de066fc80219222b13b2d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aed3bf940b69de066fc80219222b13b2d"></a>
-static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>munich_protocol_push_bot_motor_0_permanent</b> (<a class="el" href="neuron-typedefs_8h.html#ab5816efea940631eca6d71dd4ca99c17">state_t</a> velocity, uint32_t uart_id)</td></tr>
+<tr class="memitem:aed3bf940b69de066fc80219222b13b2d"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#aed3bf940b69de066fc80219222b13b2d">munich_protocol_push_bot_motor_0_permanent</a> (<a class="el" href="neuron-typedefs_8h.html#ab5816efea940631eca6d71dd4ca99c17">state_t</a> velocity, uint32_t uart_id)</td></tr>
 <tr class="separator:aed3bf940b69de066fc80219222b13b2d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af7df99ccd07829378705355efe88f87d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af7df99ccd07829378705355efe88f87d"></a>
-static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>munich_protocol_push_bot_motor_1_permanent</b> (uint32_t velocity, uint32_t uart_id)</td></tr>
+<tr class="memitem:af7df99ccd07829378705355efe88f87d"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#af7df99ccd07829378705355efe88f87d">munich_protocol_push_bot_motor_1_permanent</a> (uint32_t velocity, uint32_t uart_id)</td></tr>
 <tr class="separator:af7df99ccd07829378705355efe88f87d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa3ed949b22452b85a9414826b28fb9ee"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa3ed949b22452b85a9414826b28fb9ee"></a>
-static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>munich_protocol_push_bot_motor_0_leaking_towards_zero</b> (uint32_t velocity, uint32_t uart_id)</td></tr>
+<tr class="memitem:aa3ed949b22452b85a9414826b28fb9ee"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#aa3ed949b22452b85a9414826b28fb9ee">munich_protocol_push_bot_motor_0_leaking_towards_zero</a> (uint32_t velocity, uint32_t uart_id)</td></tr>
 <tr class="separator:aa3ed949b22452b85a9414826b28fb9ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaa130269a76adc15a1c7372c51ac5278"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aaa130269a76adc15a1c7372c51ac5278"></a>
-static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>munich_protocol_push_bot_motor_1_leaking_towards_zero</b> (uint32_t velocity, uint32_t uart_id)</td></tr>
+<tr class="memitem:aaa130269a76adc15a1c7372c51ac5278"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#aaa130269a76adc15a1c7372c51ac5278">munich_protocol_push_bot_motor_1_leaking_towards_zero</a> (uint32_t velocity, uint32_t uart_id)</td></tr>
 <tr class="separator:aaa130269a76adc15a1c7372c51ac5278"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac189b59052f5e39882707c0868ff4104"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac189b59052f5e39882707c0868ff4104"></a>
-static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>key_retina</b> (uint32_t retina_pixels, uint32_t time_stamps, uint32_t uart_id)</td></tr>
+<tr class="memitem:ac189b59052f5e39882707c0868ff4104"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#ac189b59052f5e39882707c0868ff4104">key_retina</a> (uint32_t retina_pixels, uint32_t time_stamps, uint32_t uart_id)</td></tr>
 <tr class="separator:ac189b59052f5e39882707c0868ff4104"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6002f9eecf40f8f0ed68353849500720"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6002f9eecf40f8f0ed68353849500720"></a>
-static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><b>munich_protocol_set_retina_transmission</b> (bool events_in_key, uint32_t retina_pixels, bool payload_holds_time_stamps, uint32_t size_of_time_stamp_in_bytes, uint32_t uart_id)</td></tr>
+<tr class="memitem:a6002f9eecf40f8f0ed68353849500720"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#a6002f9eecf40f8f0ed68353849500720">munich_protocol_set_retina_transmission</a> (bool events_in_key, uint32_t retina_pixels, bool payload_holds_time_stamps, uint32_t size_of_time_stamp_in_bytes, uint32_t uart_id)</td></tr>
 <tr class="separator:a6002f9eecf40f8f0ed68353849500720"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
 <tr class="memitem:a4d725b62e5fd2919183e67af7bdad319"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4d725b62e5fd2919183e67af7bdad319"></a>
-static <a class="el" href="munich__protocol_8h.html#a276ea595faa60fd27301105f3613b2ef">munich_protocol_modes_e</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#a4d725b62e5fd2919183e67af7bdad319">mode</a> = MUNICH_PROTOCOL_RESET_TO_DEFAULT</td></tr>
+static <a class="el" href="munich__protocol_8h.html#a276ea595faa60fd27301105f3613b2ef">munich_protocol_modes_e</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#a4d725b62e5fd2919183e67af7bdad319">mode</a> = <a class="el" href="munich__protocol_8h.html#a276ea595faa60fd27301105f3613b2efa8a71e56e25b553379ea228b4a1ded8ba">MUNICH_PROTOCOL_RESET_TO_DEFAULT</a></td></tr>
 <tr class="memdesc:a4d725b62e5fd2919183e67af7bdad319"><td class="mdescLeft">&#160;</td><td class="mdescRight">The current mode. <br /></td></tr>
 <tr class="separator:a4d725b62e5fd2919183e67af7bdad319"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a21aacafb9f4a3adc7afc7b0e4681e0bc"><td class="memItemLeft" align="right" valign="top">static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="munich__protocol_8h.html#a21aacafb9f4a3adc7afc7b0e4681e0bc">instance_key</a> = 0</td></tr>
+<tr class="memdesc:a21aacafb9f4a3adc7afc7b0e4681e0bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">The value of the ignored part of the key.  <a href="#a21aacafb9f4a3adc7afc7b0e4681e0bc">More...</a><br /></td></tr>
 <tr class="separator:a21aacafb9f4a3adc7afc7b0e4681e0bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -411,6 +392,74 @@ static <a class="el" href="munich__protocol_8h.html#a276ea595faa60fd27301105f361
 <p>structure of multicast key of command is <code>KKKKKKKKKKKKKKKKKKKKK-IIIIIII-F-DDD</code></p>
 <p><code>K</code> is ignored "instance key", <code>I</code> is instruction, <code>F</code> is payload format, <code>D</code> is device </p>
 </div><hr/><h2 class="groupheader">Data Structure Documentation</h2>
+<a name="structmunich__key__bitfields__t" id="structmunich__key__bitfields__t"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">struct munich_key_bitfields_t</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="textblock"><p>The format of Munich device protocol keys. </p>
+</div><table class="fieldtable">
+<tr><th colspan="3">Data Fields</th></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="adbc3297c6b342ffff16c276b3d8f44d7"></a>uint32_t</td>
+<td class="fieldname">
+device: 3</td>
+<td class="fielddoc">
+Device identifier. </td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a9923e847eb15caa2f0eb51c7e763901e"></a>uint32_t</td>
+<td class="fieldname">
+payload_format: 1</td>
+<td class="fielddoc">
+Payload format. </td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="af88a58a15f4007a2629456b02fa89685"></a>uint32_t</td>
+<td class="fieldname">
+instruction: 7</td>
+<td class="fielddoc">
+Device-specific instruction. </td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="af7733652e8cf2dc7a581b66b432ab4c9"></a>uint32_t</td>
+<td class="fieldname">
+instance_key: 21</td>
+<td class="fielddoc">
+Instance key (ignored) </td></tr>
+</table>
+
+</div>
+</div>
+<a name="unionmunich__key__t" id="unionmunich__key__t"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">union munich_key_t</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="textblock"><p>Keys are really uint32_t, but contain bitfields within them. </p>
+</div><table class="fieldtable">
+<tr><th colspan="3">Data Fields</th></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a69c84edcf35be44406679d226d994c32"></a><a class="el" href="munich__protocol_8h.html#structmunich__key__bitfields__t">munich_key_bitfields_t</a></td>
+<td class="fieldname">
+bitfields</td>
+<td class="fielddoc">
+Specific fields within the key. </td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="ae25a937e1086e1ccf5579cdbe4764743"></a>uint32_t</td>
+<td class="fieldname">
+value</td>
+<td class="fielddoc">
+Overall key value. </td></tr>
+</table>
+
+</div>
+</div>
 <a name="structmulticast__packet" id="structmulticast__packet"></a>
 <div class="memitem">
 <div class="memproto">
@@ -420,27 +469,133 @@ static <a class="el" href="munich__protocol_8h.html#a276ea595faa60fd27301105f361
         </tr>
       </table>
 </div><div class="memdoc">
-<div class="textblock"></div><table class="fieldtable">
+<div class="textblock"><p>Description of multicast packet to send as part of Munich protocol. </p>
+</div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="af5492aa5a4cea4a256d88d82fe7e6f4e"></a>uint32_t</td>
 <td class="fieldname">
 key</td>
 <td class="fielddoc">
-</td></tr>
+What key to use. </td></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="a5e71d859cea4c79625e4738a5f8113f4"></a>uint32_t</td>
 <td class="fieldname">
 payload</td>
 <td class="fielddoc">
-</td></tr>
+What payload to use. </td></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="a8a82db9be5294fc0cf7ff5fe241d8b7c"></a>uint32_t</td>
 <td class="fieldname">
 payload_flag</td>
 <td class="fielddoc">
-</td></tr>
+Whether the payload is defined. </td></tr>
 </table>
+
+</div>
+</div>
+<h2 class="groupheader">Macro Definition Documentation</h2>
+<a class="anchor" id="a8200ce065b6bf4ef334ad1b33451bf96"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define MUNICH_KEY</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">I, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">F, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">D&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;((I &lt;&lt; <a class="el" href="munich__protocol_8h.html#a06fc87d81c62e9abb8790b6e5713c55baa890a0ce75c6dee9ecbac3a2c87220cc">OFFSET_TO_I</a>) | (F &lt;&lt; <a class="el" href="munich__protocol_8h.html#a06fc87d81c62e9abb8790b6e5713c55ba964ef105cedcef1b651c6a4e58e33302">OFFSET_TO_F</a>) | (D &lt;&lt; <a class="el" href="munich__protocol_8h.html#a06fc87d81c62e9abb8790b6e5713c55baad87c155efc7814564f9b47dfb651b3f">OFFSET_TO_D</a>))</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Assembles a Munich key with zero <a class="el" href="munich__protocol_8h.html#af7733652e8cf2dc7a581b66b432ab4c9">munich_key_bitfields_t::instance_key</a>. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">I</td><td>The value of the <a class="el" href="munich__protocol_8h.html#af88a58a15f4007a2629456b02fa89685">munich_key_bitfields_t::instruction</a> field </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">F</td><td>The value of the <a class="el" href="munich__protocol_8h.html#a9923e847eb15caa2f0eb51c7e763901e">munich_key_bitfields_t::payload_format</a> field </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">D</td><td>The value of the <a class="el" href="munich__protocol_8h.html#adbc3297c6b342ffff16c276b3d8f44d7">munich_key_bitfields_t::device</a> field </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The instance key as an unsigned 32 bit integer </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a5dafb96b044783c3b4650c5789f6f08a"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define MUNICH_KEY_I_D</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">I, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">D&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;<a class="el" href="munich__protocol_8h.html#a8200ce065b6bf4ef334ad1b33451bf96">MUNICH_KEY</a>(I, 0, D)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Assembles a Munich key with zero <a class="el" href="munich__protocol_8h.html#af7733652e8cf2dc7a581b66b432ab4c9">munich_key_bitfields_t::instance_key</a> and <a class="el" href="munich__protocol_8h.html#a9923e847eb15caa2f0eb51c7e763901e">munich_key_bitfields_t::payload_format</a>. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">I</td><td>The value of the <a class="el" href="munich__protocol_8h.html#af88a58a15f4007a2629456b02fa89685">munich_key_bitfields_t::instruction</a> field </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">D</td><td>The value of the <a class="el" href="munich__protocol_8h.html#adbc3297c6b342ffff16c276b3d8f44d7">munich_key_bitfields_t::device</a> field </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The instance key as an unsigned 32 bit integer </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ac9ffc4cc9a38bac6bb565c793d90ec81"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define MUNICH_KEY_I</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">I</td><td>)</td>
+          <td>&#160;&#160;&#160;<a class="el" href="munich__protocol_8h.html#a8200ce065b6bf4ef334ad1b33451bf96">MUNICH_KEY</a>(I, 0, 0)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Assembles a Munich key with zero for all fields except <a class="el" href="munich__protocol_8h.html#af88a58a15f4007a2629456b02fa89685">munich_key_bitfields_t::instruction</a>. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">I</td><td>The value of the <a class="el" href="munich__protocol_8h.html#af88a58a15f4007a2629456b02fa89685">munich_key_bitfields_t::instruction</a> field </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The instance key as an unsigned 32 bit integer </dd></dl>
 
 </div>
 </div>
@@ -468,6 +623,2085 @@ payload_flag</td>
 
 </div>
 </div>
+<a class="anchor" id="abc6126af1d45847bc59afa0aa3216b04"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">anonymous enum</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a class="anchor" id="abc6126af1d45847bc59afa0aa3216b04a635089693fa56b24e14b697b004fc204"></a>CONFIGURE_MASTER_KEY&#160;</td><td class="fielddoc">
+<p>command key for setting up the master key of the board </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="abc6126af1d45847bc59afa0aa3216b04a4984f59c2d1880d5dd6b2f81c3bd932b"></a>CHANGE_MODE&#160;</td><td class="fielddoc">
+<p>command key for setting up what mode of device running on the board </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="abc6126af1d45847bc59afa0aa3216b04a5cc988b8c6e1e4b586915036edcd57f9"></a>DISABLE_RETINA_EVENT_STREAMING&#160;</td><td class="fielddoc">
+<p>command for turning off retina output </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="abc6126af1d45847bc59afa0aa3216b04a94eba6b9c22bf274e6ff81d58c229afd"></a>ACTIVE_RETINA_EVENT_STREAMING_KEYS_CONFIGURATION&#160;</td><td class="fielddoc">
+<p>command for retina where payload is events </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="abc6126af1d45847bc59afa0aa3216b04a6aec4d5e40d24d80269f24f186e12ce0"></a>ACTIVE_RETINA_EVENT_STREAMING_SET_KEY&#160;</td><td class="fielddoc">
+<p>command for retina where events are the key </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="abc6126af1d45847bc59afa0aa3216b04a74cd8f0dde766e3c78118ca85fd4f20e"></a>SET_TIMER_COUNTER_FOR_TIMESTAMPS&#160;</td><td class="fielddoc">
+<p>set timer / counter for timestamps </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="abc6126af1d45847bc59afa0aa3216b04acebd4bfb16f8f5acfc2234d9f65207c8"></a>MASTER_SLAVE_KEY&#160;</td><td class="fielddoc">
+<p>handle master / slave time sync </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="abc6126af1d45847bc59afa0aa3216b04a86e8b86d0f722dc54808c12fc3d5d4e2"></a>BIAS_KEY&#160;</td><td class="fielddoc">
+<p>command for setting bias </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="abc6126af1d45847bc59afa0aa3216b04aac54162f9b613c9ea627ae35225021d2"></a>RESET_RETINA_KEY&#160;</td><td class="fielddoc">
+<p>reset retina key. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="abc6126af1d45847bc59afa0aa3216b04abcc37f6aec28a96a4f0482cdd52db61e"></a>SENSOR_REPORTING_OFF_KEY&#160;</td><td class="fielddoc">
+<p>request on-board sensor data </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="abc6126af1d45847bc59afa0aa3216b04af411423d32b0d5b899c3ac16f6d616f7"></a>POLL_SENSORS_ONCE_KEY&#160;</td><td class="fielddoc">
+<p>poll sensors once </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="abc6126af1d45847bc59afa0aa3216b04ac78ecb26d0149528ab6d114d5a2a7d2d"></a>POLL_SENSORS_CONTINUOUSLY_KEY&#160;</td><td class="fielddoc">
+<p>poll sensors continuously </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="abc6126af1d45847bc59afa0aa3216b04aa50cb29eaf9f334bf5a204d2d52ae66e"></a>DISABLE_MOTOR_KEY&#160;</td><td class="fielddoc">
+<p>disable motor </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="abc6126af1d45847bc59afa0aa3216b04a21103f8167edea1b62a71b6d6dc1f093"></a>MOTOR_RUN_FOR_PERIOD_KEY&#160;</td><td class="fielddoc">
+<p>run motor for total period </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="abc6126af1d45847bc59afa0aa3216b04a687b06affd6532e895d0bc8dc00095be"></a>MOTOR_0_RAW_PERM_KEY&#160;</td><td class="fielddoc">
+<p>raw output for motor 0 (permanent) </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="abc6126af1d45847bc59afa0aa3216b04acc148fefb0b2e5151ceb48f46ecbee40"></a>MOTOR_1_RAW_PERM_KEY&#160;</td><td class="fielddoc">
+<p>raw output for motor 1 (permanent) </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="abc6126af1d45847bc59afa0aa3216b04a914825da898d58ae3921f3d69dae630c"></a>MOTOR_0_RAW_LEAK_KEY&#160;</td><td class="fielddoc">
+<p>raw output for motor 0 (leak towards 0) </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="abc6126af1d45847bc59afa0aa3216b04a300052c8eb8452f20d4350e94ca1bb62"></a>MOTOR_1_RAW_LEAK_KEY&#160;</td><td class="fielddoc">
+<p>raw output for motor 1 (leak towards 0) </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="abc6126af1d45847bc59afa0aa3216b04aec9017d18ebca73b7369bc5613c1b5c4"></a>MOTOR_TIMER_A_TOTAL_PERIOD_KEY&#160;</td><td class="fielddoc">
+<p>motor output duration timer A period </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="abc6126af1d45847bc59afa0aa3216b04a3cd79f1f3855fc1706b48ca71d857805"></a>MOTOR_TIMER_B_TOTAL_PERIOD_KEY&#160;</td><td class="fielddoc">
+<p>motor output duration timer B period </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="abc6126af1d45847bc59afa0aa3216b04a4f3cca726da9976ac97b02a6b4a1a5a2"></a>MOTOR_TIMER_C_TOTAL_PERIOD_KEY&#160;</td><td class="fielddoc">
+<p>motor output duration timer C period </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="abc6126af1d45847bc59afa0aa3216b04a3efc64a9972b3a6e10d2bacb2b0d7560"></a>MOTOR_TIMER_A_CHANNEL_0_ACTIVE_PERIOD_KEY&#160;</td><td class="fielddoc">
+<p>motor 0 output timer A ratio active period </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="abc6126af1d45847bc59afa0aa3216b04a1cdc823f8771ea1e77af9f4f201ff996"></a>MOTOR_TIMER_A_CHANNEL_1_ACTIVE_PERIOD_KEY&#160;</td><td class="fielddoc">
+<p>motor 1 output timer A ratio active period </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="abc6126af1d45847bc59afa0aa3216b04afd31f812c1b600519d81a73247a1176b"></a>MOTOR_TIMER_B_CHANNEL_0_ACTIVE_PERIOD_KEY&#160;</td><td class="fielddoc">
+<p>motor 0 output timer B ratio active period </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="abc6126af1d45847bc59afa0aa3216b04a80d9d4abcabdb99bf246331a0faa6dea"></a>MOTOR_TIMER_B_CHANNEL_1_ACTIVE_PERIOD_KEY&#160;</td><td class="fielddoc">
+<p>motor 1 output timer B ratio active period </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="abc6126af1d45847bc59afa0aa3216b04a3eda075963d5dd6ad7ae6b409716a78b"></a>MOTOR_TIMER_C_CHANNEL_0_ACTIVE_PERIOD_KEY&#160;</td><td class="fielddoc">
+<p>motor 0 output timer C ratio active period </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="abc6126af1d45847bc59afa0aa3216b04a0563d2e2bcf2832190ca0b2e1e8436f8"></a>MOTOR_TIMER_C_CHANNEL_1_ACTIVE_PERIOD_KEY&#160;</td><td class="fielddoc">
+<p>motor 1 output timer C ratio active period </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="abc6126af1d45847bc59afa0aa3216b04aeff0972ddb0907acd404528f8f246a48"></a>QUERY_STATES_LINES_KEY&#160;</td><td class="fielddoc">
+<p>Query digital IO Signals. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="abc6126af1d45847bc59afa0aa3216b04ab50c8ed18766cbc286dc692db6a44cc4"></a>SET_OUTPUT_PATTERN_KEY&#160;</td><td class="fielddoc">
+<p>set output pattern to payload </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="abc6126af1d45847bc59afa0aa3216b04af715c89e8a41d4dda0acbd050c6cd962"></a>ADD_PAYLOAD_TO_CURRENT_OUTPUT_KEY&#160;</td><td class="fielddoc">
+<p>add payload (logic or (PL)) to current output </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="abc6126af1d45847bc59afa0aa3216b04a1e4713ab52d9efee9beaa14486b59ea4"></a>REMOVE_PAYLOAD_TO_CURRENT_OUTPUT_KEY&#160;</td><td class="fielddoc">
+<p>remove payload (logic or (PL)) to current output from current output </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="abc6126af1d45847bc59afa0aa3216b04af9f1c8e048e0297a7d9b02686fd001b4"></a>SET_PAYLOAD_TO_HIGH_IMPEDANCE_KEY&#160;</td><td class="fielddoc">
+<p>set payload pins to high impedance </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="abc6126af1d45847bc59afa0aa3216b04a92aa458811e2d91fa2a2ddc7c6300c08"></a>PUSH_BOT_LASER_CONFIG_TOTAL_PERIOD&#160;</td><td class="fielddoc">
+<p>Set laser total period. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="abc6126af1d45847bc59afa0aa3216b04aaf64f130ca2b0371a27d61e97ee5dfca"></a>PUSH_BOT_LASER_CONFIG_ACTIVE_TIME&#160;</td><td class="fielddoc">
+<p>Set laser active period (out of total) </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="abc6126af1d45847bc59afa0aa3216b04a667772b48cfbd160decaa2e2d59070db"></a>PUSH_BOT_LASER_FREQUENCY&#160;</td><td class="fielddoc">
+<p>Set laser frequency. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="abc6126af1d45847bc59afa0aa3216b04aabd5c2fe1fdf4dbe9591b4bde8912ffe"></a>PUSH_BOT_LED_CONFIG_TOTAL_PERIOD&#160;</td><td class="fielddoc">
+<p>Set LED total period. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="abc6126af1d45847bc59afa0aa3216b04a5b8710ac916aa67a3c2a64837e6b7720"></a>PUSH_BOT_LED_BACK_CONFIG_ACTIVE_TIME&#160;</td><td class="fielddoc">
+<p>Set LED back active period. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="abc6126af1d45847bc59afa0aa3216b04a969de1a1796dd1b7b8664800ab665fd6"></a>PUSH_BOT_LED_FRONT_CONFIG_ACTIVE_TIME&#160;</td><td class="fielddoc">
+<p>Set LED front active period. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="abc6126af1d45847bc59afa0aa3216b04a95841ef9e558fd3a052b371cd2ba2ce4"></a>PUSH_BOT_LED_FREQUENCY&#160;</td><td class="fielddoc">
+<p>Set LED frequency. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="abc6126af1d45847bc59afa0aa3216b04ae0391bb2f6e1b09e79d782783f7d27ed"></a>PUSH_BOT_SPEAKER_CONFIG_TOTAL_PERIOD&#160;</td><td class="fielddoc">
+<p>Set speaker total time period (PCM) </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="abc6126af1d45847bc59afa0aa3216b04a262224b76c4dcf3cea82ee9465943bda"></a>PUSH_BOT_SPEAKER_CONFIG_ACTIVE_TIME&#160;</td><td class="fielddoc">
+<p>Set speaker active time (PCM) </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="abc6126af1d45847bc59afa0aa3216b04a265f834c4306024944c8ddddf02a3d0a"></a>PUSH_BOT_SPEAKER_TONE_BEEP&#160;</td><td class="fielddoc">
+<p>Tell speaker to beep. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="abc6126af1d45847bc59afa0aa3216b04a3d4ccd45e6f44e668908c27f589b0fe2"></a>PUSH_BOT_SPEAKER_TONE_MELODY&#160;</td><td class="fielddoc">
+<p>Tell speaker to play pre-programmed melody. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="abc6126af1d45847bc59afa0aa3216b04a5f40149c92d36bd636720b8355e53069"></a>PUSH_BOT_MOTOR_0_PERMANENT_VELOCITY&#160;</td><td class="fielddoc">
+<p>Set motor 0 permanent velocity. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="abc6126af1d45847bc59afa0aa3216b04abed04f8b344b7771c7816f73ad8cf132"></a>PUSH_BOT_MOTOR_1_PERMANENT_VELOCITY&#160;</td><td class="fielddoc">
+<p>Set motor 1 permanent velocity. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="abc6126af1d45847bc59afa0aa3216b04a4a98ec1f861bba08fda64de0b1f30a92"></a>PUSH_BOT_MOTOR_0_LEAKY_VELOCITY&#160;</td><td class="fielddoc">
+<p>Set motor 0 leaky velocity. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="abc6126af1d45847bc59afa0aa3216b04a1e4f6b8885576368c774183501ae3a6d"></a>PUSH_BOT_MOTOR_1_LEAKY_VELOCITY&#160;</td><td class="fielddoc">
+<p>Set motor 1 leaky velocity. </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<a class="anchor" id="adc29c2ff13d900c2f185ee95427fb06c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">anonymous enum</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>payloads for setting different time stamp sizes </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a class="anchor" id="adc29c2ff13d900c2f185ee95427fb06ca35c35a3d19b4e8bbea2e9c2a345d0cf7"></a>PAYLOAD_NO_TIMESTAMPS&#160;</td><td class="fielddoc">
+<p>No timestamps. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="adc29c2ff13d900c2f185ee95427fb06ca7e7a925c702fda8735064bd0c71b5de4"></a>PAYLOAD_DELTA_TIMESTAMPS&#160;</td><td class="fielddoc">
+<p>Timestamps are deltas. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="adc29c2ff13d900c2f185ee95427fb06ca3a5dbca82d4fd637a9b24f952c0a3b1d"></a>PAYLOAD_TWO_BYTE_TIME_STAMPS&#160;</td><td class="fielddoc">
+<p>Timestamps are two bytes (absolute) </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="adc29c2ff13d900c2f185ee95427fb06ca5dbc455edb7e576b4b10207499df32d4"></a>PAYLOAD_THREE_BYTE_TIME_STAMPS&#160;</td><td class="fielddoc">
+<p>Timestamps are three bytes (absolute) </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="adc29c2ff13d900c2f185ee95427fb06cafcbea561be57d033de0ec3777485e92e"></a>PAYLOAD_FOUR_BYTE_TIME_STAMPS&#160;</td><td class="fielddoc">
+<p>Timestamps are four bytes (absolute) </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<a class="anchor" id="a61dadd085c1777f559549e05962b2c9e"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">anonymous enum</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>payloads for retina size </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a class="anchor" id="a61dadd085c1777f559549e05962b2c9ea8de5b4140e590b1afd4610167028e60f"></a>PAYLOAD_RETINA_NO_DOWN_SAMPLING&#160;</td><td class="fielddoc">
+<p>Retina is 128&times;128. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="a61dadd085c1777f559549e05962b2c9eafc3113b6039407f4ba93ccfede07921b"></a>PAYLOAD_RETINA_64_DOWN_SAMPLING&#160;</td><td class="fielddoc">
+<p>Retina down-samples to 64&times;64. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="a61dadd085c1777f559549e05962b2c9ea69237ae9abec2c9a96870f267d951fc1"></a>PAYLOAD_RETINA_32_DOWN_SAMPLING&#160;</td><td class="fielddoc">
+<p>Retina down-samples to 32&times;32. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="a61dadd085c1777f559549e05962b2c9eaff0513e0ecc8dfe19b9c70d891b09534"></a>PAYLOAD_RETINA_16_DOWN_SAMPLING&#160;</td><td class="fielddoc">
+<p>Retina down-samples to 16&times;16. </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<a class="anchor" id="a276ea595faa60fd27301105f3613b2ef"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="munich__protocol_8h.html#a276ea595faa60fd27301105f3613b2ef">munich_protocol_modes_e</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>human readable definitions of each mode </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a class="anchor" id="a276ea595faa60fd27301105f3613b2efa8a71e56e25b553379ea228b4a1ded8ba"></a>MUNICH_PROTOCOL_RESET_TO_DEFAULT&#160;</td><td class="fielddoc">
+<p>Reset. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="a276ea595faa60fd27301105f3613b2efa168d928b4999466fb0ee4afe6c0ebf17"></a>MUNICH_PROTOCOL_PUSH_BOT&#160;</td><td class="fielddoc">
+<p>Push Bot. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="a276ea595faa60fd27301105f3613b2efab59da94c5640da6e33ea55115432aac2"></a>MUNICH_PROTOCOL_SPOMNIBOT&#160;</td><td class="fielddoc">
+<p>Omnibot. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="a276ea595faa60fd27301105f3613b2efa24993add8c6fbf8110e30b2bec6b5cde"></a>MUNICH_PROTOCOL_BALL_BALANCER&#160;</td><td class="fielddoc">
+<p>Ball balancer. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="a276ea595faa60fd27301105f3613b2efaac09deb99dbfa656e3055544b6b1a9cc"></a>MUNICH_PROTOCOL_MY_ORO_BOTICS&#160;</td><td class="fielddoc">
+<p>MyORO. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="a276ea595faa60fd27301105f3613b2efa591c8c75a63ce2f61e0a20f9ff12da89"></a>MUNICH_PROTOCOL_FREE&#160;</td><td class="fielddoc">
+<p>Free. </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<h2 class="groupheader">Function Documentation</h2>
+<a class="anchor" id="a63f78c33f4497c8732b5532c3985e627"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void set_protocol_mode </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="munich__protocol_8h.html#a276ea595faa60fd27301105f3613b2ef">munich_protocol_modes_e</a>&#160;</td>
+          <td class="paramname"><em>new_mode</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>new_instance_key</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Configures the protocol mode. </p>
+<p>See also <a class="el" href="munich__protocol_8h.html#a627df4739d78e9e5593f889923a6e1d8" title="Creates a command to set the device mode. ">munich_protocol_get_set_mode_command()</a></p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">new_mode</td><td>The new protocol mode to use </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">new_instance_key</td><td>The instance key to use </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a8da65ae6eef8fa3846d3194eefdf4b57"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a> munich_protocol_get_configure_master_key_command </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>new_key</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Creates a command to configure the master key. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">new_key</td><td>the new master key to use </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Description of what multicast packet to send </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a627df4739d78e9e5593f889923a6e1d8"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a> munich_protocol_get_set_mode_command </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Creates a command to set the device mode. </p>
+<p>Note that the mode must previously have been set with <a class="el" href="munich__protocol_8h.html#a63f78c33f4497c8732b5532c3985e627" title="Configures the protocol mode. ">set_protocol_mode()</a> </p><dl class="section return"><dt>Returns</dt><dd>Description of what multicast packet to send </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a343febb69fae0be23a0dae956bc0fa25"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a> munich_protocol_set_retina_transmission_key </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>new_key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>uart_id</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Creates a command to set the retina base key. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">new_key</td><td>the new key to use </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">uart_id</td><td>the retina UART to program </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Description of what multicast packet to send </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="aeae2e5559f9d20e1cad45654b2f0a73d"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a> munich_protocol_disable_retina_event_streaming </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>uart_id</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Creates a command to disable event streaming my a retina. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">uart_id</td><td>the retina UART to program </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Description of what multicast packet to send </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a1d3eb329056e2e12f19d01aed8a9633b"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a> munich_protocol_master_slave_use_internal_counter </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>uart_id</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Creates a command to tell the master/slave to use its internal event counter. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">uart_id</td><td>the UART to program </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Description of what multicast packet to send </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ab9c08589df340e59104530a6f23bf630"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a> munich_protocol_master_slave_set_slave </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>uart_id</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Creates a command to tell a UART to be a slave. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">uart_id</td><td>the UART to program </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Description of what multicast packet to send </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a9210c92998123f071fce28a5f4a92fc2"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a> munich_protocol_master_slave_set_master_clock_not_started </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>uart_id</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Creates a command to set a UART clock into the not-started state. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">uart_id</td><td>the UART to program </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Description of what multicast packet to send </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a7dd1390f27ac38f727d1e3e11d3882f7"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a> munich_protocol_master_slave_set_master_clock_active </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>uart_id</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Creates a command to set a UART clock active. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">uart_id</td><td>the UART to program </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Description of what multicast packet to send </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a9f36c965f338b9ffee8bd0739edd9309"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a> munich_protocol_bias_values </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>bias_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>bias_value</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>uart_id</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Creates a command to set bias values for a UART. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">bias_id</td><td>which bias to set </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">bias_value</td><td>the bias value to set </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">uart_id</td><td>the UART to program </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Description of what multicast packet to send </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a301f3f025960b140d2c5f00273e90c66"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a> munich_protocol_reset_retina </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>uart_id</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Creates a command to reset a retina. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">uart_id</td><td>the retina UART to program </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Description of what multicast packet to send </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a0431318d389c280a5085ae00842a85f5"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a> munich_protocol_turn_off_sensor_reporting </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>sensor_id</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Creates a command to stop sensor reporting. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">sensor_id</td><td>the sensor to stop </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Description of what multicast packet to send </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="aebf57d61e786656b0062073c0a5789ab"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a> munich_protocol_poll_sensors_once </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>sensor_id</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Creates a command to poll a sensor once. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">sensor_id</td><td>the sensor to poll </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Description of what multicast packet to send </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a323f23ea8f3b20cc806f0dcf982718cc"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a> munich_protocol_poll_individual_sensor_continuously </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>sensor_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>time_in_ms</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Creates a command to continuously poll a sensor. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">sensor_id</td><td>the sensor to poll </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">time_in_ms</td><td>the time between polling (in milliseconds) </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Description of what multicast packet to send </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a963f374194d909f3694963cfc9c4e965"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a> munich_protocol_generic_motor_enable_disable </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>enable_disable</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>uart_id</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Creates a command to turn a motor on or off. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">enable_disable</td><td>True to enable the motor </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">uart_id</td><td>the UART controlling the motor </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Description of what multicast packet to send </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a4fb2104095f3975a76477e08124028ef"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a> munich_protocol_generic_motor_total_period_duration </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>time_in_ms</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>uart_id</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Creates a command to turn a motor on for a period. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">time_in_ms</td><td>How long to run the motor for (in milliseconds) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">uart_id</td><td>the UART controlling the motor </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Description of what multicast packet to send </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a7890f33cda380a0e8fb5c30a94e3ddb4"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a> munich_protocol_generic_motor0_raw_output_permanent </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>pwm_signal</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>uart_id</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Creates a command to turn motor 0 on at a constant rate. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">pwm_signal</td><td>Controls how fast the motor runs </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">uart_id</td><td>the UART controlling the motor </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Description of what multicast packet to send </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="aba8a19ca1a35ce982dd58ab086c60ef4"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a> munich_protocol_generic_motor1_raw_output_permanent </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>pwm_signal</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>uart_id</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Creates a command to turn motor 1 on at a constant rate. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">pwm_signal</td><td>Controls how fast the motor runs </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">uart_id</td><td>the UART controlling the motor </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Description of what multicast packet to send </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a5c33f32e6993d15042238058920ffd53"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a> munich_protocol_generic_motor0_raw_output_leak_to_0 </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>pwm_signal</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>uart_id</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Creates a command to turn motor 0 on at a rate that decays to zero. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">pwm_signal</td><td>Controls how fast the motor runs initially </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">uart_id</td><td>the UART controlling the motor </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Description of what multicast packet to send </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a837fc869cf029d2a88d09f03674eb316"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a> munich_protocol_generic_motor1_raw_output_leak_to_0 </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>pwm_signal</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>uart_id</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Creates a command to turn motor 1 on at a rate that decays to zero. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">pwm_signal</td><td>Controls how fast the motor runs initially </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">uart_id</td><td>the UART controlling the motor </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Description of what multicast packet to send </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a8043794711243ccbee4ec95026ca23ae"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a> munich_protocol_pwm_pin_output_timer_a_duration </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>timer_period</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>uart_id</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>Description of what multicast packet to send </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a1c42d8d1d730d34c59621bdcd2ac019a"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a> munich_protocol_pwm_pin_output_timer_b_duration </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>timer_period</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>uart_id</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>Description of what multicast packet to send </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a5f7d1a3fd79abeb1256bbe7be8dc657c"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a> munich_protocol_pwm_pin_output_timer_c_duration </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>timer_period</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>uart_id</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>Description of what multicast packet to send </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a97f6780c64638e455c245e6bf8abe673"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a> munich_protocol_pwm_pin_output_timer_a_channel_0_ratio </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>timer_period</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>uart_id</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>Description of what multicast packet to send </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a67c9432aa82f7bee54c2a8ccbafc4eeb"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a> munich_protocol_pwm_pin_output_timer_a_channel_1_ratio </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>timer_period</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>uart_id</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>Description of what multicast packet to send </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ab47f25902bc7387b2d4e69423b00e7c1"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a> munich_protocol_pwm_pin_output_timer_b_channel_0_ratio </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>timer_period</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>uart_id</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>Description of what multicast packet to send </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a4e079b283a1f225af49d2f551f2e4067"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a> munich_protocol_pwm_pin_output_timer_b_channel_1_ratio </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>timer_period</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>uart_id</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>Description of what multicast packet to send </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ac4d568446b50147c2977f1253669790a"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a> munich_protocol_pwm_pin_output_timer_c_channel_0_ratio </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>timer_period</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>uart_id</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>Description of what multicast packet to send </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a4c85214107445053137ea974236543e3"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a> munich_protocol_pwm_pin_output_timer_c_channel_1_ratio </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>timer_period</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>uart_id</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>Description of what multicast packet to send </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a6b528197cc61a44e96c36df0a78232e3"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a> munich_protocol_query_state_of_io_lines </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>Description of what multicast packet to send </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a40d59634d577ce03a3e63d0ef6c15709"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a> munich_protocol_set_output_pattern_for_payload </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>payload</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>Description of what multicast packet to send </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a401923b4aebaf0d3bd0544f2595f6af7"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a> munich_protocol_add_payload_logic_to_current_output </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>payload</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>Description of what multicast packet to send </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ad0f680213cdf6483d3a9ce6c107df75f"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a> munich_protocol_remove_payload_logic_to_current_output </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>payload</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>Description of what multicast packet to send </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a82cab0e2116f047ce871b85ad449492b"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a> munich_protocol_set_payload_pins_to_high_impedance </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>payload</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>Description of what multicast packet to send </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a34e031fa12d0c4a94221a368d31666ba"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a> munich_protocol_push_bot_laser_config_total_period </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>total_period</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>uart_id</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>Description of what multicast packet to send </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a2aa806d7f6722fdf3f5b58226fee85e8"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a> munich_protocol_push_bot_laser_config_active_time </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>active_time</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>uart_id</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>Description of what multicast packet to send </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a712450f86219392e5e07f97502962be6"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a> munich_protocol_push_bot_laser_set_frequency </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>frequency</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>uart_id</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>Description of what multicast packet to send </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ad76c83120ef750a56cb808610c5c9dea"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a> munich_protocol_push_bot_speaker_config_total_period </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>total_period</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>uart_id</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>Description of what multicast packet to send </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a65c33170f492a1ccacbd7a6dba2ccddb"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a> munich_protocol_push_bot_speaker_config_active_time </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>active_time</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>uart_id</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>Description of what multicast packet to send </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a71aa2936830339beb4fd2b07eb8cc923"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a> munich_protocol_push_bot_speaker_set_tone </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>frequency</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>uart_id</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>Description of what multicast packet to send </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a16c2d7aeb44a9c9a40c358bc95241b20"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a> munich_protocol_push_bot_speaker_set_melody </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>melody</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>uart_id</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>Description of what multicast packet to send </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a9e271be0ca62415cd7218f1059d9f71d"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a> munich_protocol_push_bot_led_total_period </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>total_period</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>uart_id</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>Description of what multicast packet to send </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a0b99264f73273a25f9465894c0b7d136"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a> munich_protocol_push_bot_led_back_active_time </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>active_time</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>uart_id</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>Description of what multicast packet to send </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a20b8821bbfce788b040b7d4fc7fe619d"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a> munich_protocol_push_bot_led_front_active_time </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>active_time</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>uart_id</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>Description of what multicast packet to send </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a9a1ea485a42a7f01ea15cddaf211bd5e"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a> munich_protocol_push_bot_led_set_frequency </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>frequency</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>uart_id</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>Description of what multicast packet to send </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="aed3bf940b69de066fc80219222b13b2d"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a> munich_protocol_push_bot_motor_0_permanent </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="neuron-typedefs_8h.html#ab5816efea940631eca6d71dd4ca99c17">state_t</a>&#160;</td>
+          <td class="paramname"><em>velocity</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>uart_id</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>Description of what multicast packet to send </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="af7df99ccd07829378705355efe88f87d"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a> munich_protocol_push_bot_motor_1_permanent </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>velocity</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>uart_id</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>Description of what multicast packet to send </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="aa3ed949b22452b85a9414826b28fb9ee"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a> munich_protocol_push_bot_motor_0_leaking_towards_zero </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>velocity</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>uart_id</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>Description of what multicast packet to send </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="aaa130269a76adc15a1c7372c51ac5278"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a> munich_protocol_push_bot_motor_1_leaking_towards_zero </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>velocity</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>uart_id</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>Description of what multicast packet to send </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ac189b59052f5e39882707c0868ff4104"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a> key_retina </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>retina_pixels</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>time_stamps</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>uart_id</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>Description of what multicast packet to send </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a6002f9eecf40f8f0ed68353849500720"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="munich__protocol_8h.html#structmulticast__packet">multicast_packet</a> munich_protocol_set_retina_transmission </td>
+          <td>(</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>events_in_key</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>retina_pixels</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>payload_holds_time_stamps</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>size_of_time_stamp_in_bytes</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>uart_id</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>Description of what multicast packet to send </dd></dl>
+
+</div>
+</div>
 <h2 class="groupheader">Variable Documentation</h2>
 <a class="anchor" id="a21aacafb9f4a3adc7afc7b0e4681e0bc"></a>
 <div class="memitem">
@@ -486,14 +2720,16 @@ payload_flag</td>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>The value of the ignored part of the key - note this is pre-shifted into position so can simply be or'd </p>
+
+<p>The value of the ignored part of the key. </p>
+<p>Note this is pre-shifted into position so can simply be OR'd to apply it </p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 28 2020 09:26:45 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 28 2020 12:09:27 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

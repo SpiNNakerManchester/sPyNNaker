@@ -151,27 +151,9 @@ uint32_t *&#160;</td><td class="memItemRight" valign="bottom"><b>weight_multiply
 <div class="textblock"></div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
-<a class="anchor" id="a1bceb56b2b990e4b5f9c53e73b2e7570"></a>int32_t</td>
+<a class="anchor" id="a36f5f4963507aee1e1b89073beacb446"></a>int32_t</td>
 <td class="fieldname">
-a2_minus</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="a45fa5e6af8e2d8e3b7cc9d1187ea02c0"></a>int32_t</td>
-<td class="fieldname">
-a2_plus</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="a2ae152e07fa65df3ce3b142030adae6e"></a>int32_t</td>
-<td class="fieldname">
-a3_minus</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="a441609a44c135858dab361177ca9aa78"></a>int32_t</td>
-<td class="fieldname">
-a3_plus</td>
+min_weight</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
@@ -181,9 +163,27 @@ max_weight</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a class="anchor" id="a36f5f4963507aee1e1b89073beacb446"></a>int32_t</td>
+<a class="anchor" id="a45fa5e6af8e2d8e3b7cc9d1187ea02c0"></a>int32_t</td>
 <td class="fieldname">
-min_weight</td>
+a2_plus</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a1bceb56b2b990e4b5f9c53e73b2e7570"></a>int32_t</td>
+<td class="fieldname">
+a2_minus</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a441609a44c135858dab361177ca9aa78"></a>int32_t</td>
+<td class="fieldname">
+a3_plus</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a2ae152e07fa65df3ce3b142030adae6e"></a>int32_t</td>
+<td class="fieldname">
+a3_minus</td>
 <td class="fielddoc">
 </td></tr>
 </table>
@@ -202,9 +202,9 @@ min_weight</td>
 <div class="textblock"></div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
-<a class="anchor" id="a7702d7b6ccf0c9b5bf5fd5d56b474069"></a>int32_t</td>
+<a class="anchor" id="a00e03d7e3edfe78ae928b1e3ce668251"></a>int32_t</td>
 <td class="fieldname">
-a2_minus</td>
+initial_weight</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
@@ -214,9 +214,16 @@ a2_plus</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a class="anchor" id="a362de6063e9a54fa204530f8e2c2bdc2"></a>int32_t</td>
+<a class="anchor" id="a7702d7b6ccf0c9b5bf5fd5d56b474069"></a>int32_t</td>
 <td class="fieldname">
-a3_minus</td>
+a2_minus</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a037ff5bb63dd02afd72abd232bfd09ca"></a>const <br class="typebreak" />
+<a class="el" href="weight__multiplicative__impl_8h.html#structplasticity__weight__region__data__t">plasticity_weight_region_data_t</a> *</td>
+<td class="fieldname">
+weight_region</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
@@ -226,9 +233,9 @@ a3_plus</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a class="anchor" id="a00e03d7e3edfe78ae928b1e3ce668251"></a>int32_t</td>
+<a class="anchor" id="a362de6063e9a54fa204530f8e2c2bdc2"></a>int32_t</td>
 <td class="fieldname">
-initial_weight</td>
+a3_minus</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
@@ -243,13 +250,6 @@ weight</td>
 weight_multiply_right_shift</td>
 <td class="fielddoc">
 </td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="a037ff5bb63dd02afd72abd232bfd09ca"></a>const <br class="typebreak" />
-<a class="el" href="weight__multiplicative__impl_8h.html#structplasticity__weight__region__data__t">plasticity_weight_region_data_t</a> *</td>
-<td class="fieldname">
-weight_region</td>
-<td class="fielddoc">
-</td></tr>
 </table>
 
 </div>
@@ -257,7 +257,7 @@ weight_region</td>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 28 2020 09:26:45 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 28 2020 12:09:27 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

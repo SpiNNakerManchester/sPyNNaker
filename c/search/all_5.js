@@ -21,6 +21,7 @@ var searchData=
   ['formation_5fdistance_5fdependent_5fimpl_2eh',['formation_distance_dependent_impl.h',['../formation__distance__dependent__impl_8h.html',1,'']]],
   ['formation_5fparams',['formation_params',['../formation__distance__dependent__impl_8h.html#structformation__params',1,'']]],
   ['fract',['FRACT',['../maths-util_8h.html#a1b5bb55fc4fc8f2e3a5b377aa6ab36ba',1,'maths-util.h']]],
+  ['fract_5fconst',['FRACT_CONST',['../maths-util_8h.html#ade056d60ae7bac69fab1196cc114cfb3',1,'maths-util.h']]],
   ['free',['free',['../connection__generator_8c.html#ab5116cf03d5a141b805d248bb609e9b1',1,'connection_generator_info::free()'],['../matrix__generator_8c.html#aa732cf0409128b2a144d54cf7733c756',1,'matrix_generator_info::free()'],['../param__generator_8c.html#a10a8a08f2a3dd4c64e428987d2c55ab3',1,'param_generator_info::free()']]],
   ['free_5ffunc',['free_func',['../generator__types_8h.html#a6a0f823edb9b15521ad463944eef00e2',1,'generator_types.h']]],
   ['full_5findices',['full_indices',['../connection__generator__fixed__pre_8h.html#a83dd664589b39a2b2fc18e98a08b6d02',1,'connection_generator_fixed_pre.h']]]

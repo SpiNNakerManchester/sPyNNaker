@@ -170,18 +170,6 @@ Variables</h2></td></tr>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
-<a class="anchor" id="a10a8a08f2a3dd4c64e428987d2c55ab3"></a><a class="el" href="generator__types_8h.html#a6a0f823edb9b15521ad463944eef00e2">free_func</a> *</td>
-<td class="fieldname">
-free</td>
-<td class="fielddoc">
-Free any data for the generator. </td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="ad9c1ec831eb4ff50829162738b662847"></a><a class="el" href="generator__types_8h.html#ad20cafafdbc32aa68b7ffd1d0d4e4808">generate_param_func</a> *</td>
-<td class="fieldname">
-generate</td>
-<td class="fielddoc">
-Generate values with a parameter generator. </td></tr>
-<tr><td class="fieldtype">
 <a class="anchor" id="ae88e70178562fa7a877beac81d249d8a"></a><a class="el" href="generator__types_8h.html#a55f8d20fc9350939e3fa6a85d8aed90c">generator_hash_t</a></td>
 <td class="fieldname">
 hash</td>
@@ -194,6 +182,18 @@ The hash of the generator. <p>For now, hash is just an index agreed between Pyth
 initialize</td>
 <td class="fielddoc">
 Initialise the generator. </td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="ad9c1ec831eb4ff50829162738b662847"></a><a class="el" href="generator__types_8h.html#ad20cafafdbc32aa68b7ffd1d0d4e4808">generate_param_func</a> *</td>
+<td class="fieldname">
+generate</td>
+<td class="fielddoc">
+Generate values with a parameter generator. </td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a10a8a08f2a3dd4c64e428987d2c55ab3"></a><a class="el" href="generator__types_8h.html#a6a0f823edb9b15521ad463944eef00e2">free_func</a> *</td>
+<td class="fieldname">
+free</td>
+<td class="fielddoc">
+Free any data for the generator. </td></tr>
 </table>
 
 </div>
@@ -212,15 +212,15 @@ Initialise the generator. </td></tr>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
-<a class="anchor" id="a288013199fedf710fc6b2a02391eb713"></a>void *</td>
-<td class="fieldname">
-data</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
 <a class="anchor" id="a1328e1fc640eec03ee4962c7b3891420"></a>const <a class="el" href="param__generator_8c.html#structparam__generator__info">param_generator_info</a> *</td>
 <td class="fieldname">
 type</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a288013199fedf710fc6b2a02391eb713"></a>void *</td>
+<td class="fieldname">
+data</td>
 <td class="fielddoc">
 </td></tr>
 </table>
@@ -246,27 +246,39 @@ type</td>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a class="anchor" id="a20b9f761fb073750e083d131cf49812e"></a>
+<a class="anchor" id="ae52a45690f00dfe7384a14645b3512de"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void param_generator_free </td>
+          <td class="memname">param_generator_t param_generator_init </td>
           <td>(</td>
-          <td class="paramtype">param_generator_t&#160;</td>
-          <td class="paramname"><em>generator</em></td><td>)</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>hash</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">address_t *&#160;</td>
+          <td class="paramname"><em>region</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Finish with a parameter generator. </p>
+<p>Initialise a specific parameter generator. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">generator</td><td>The generator to free </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">hash</td><td>The identifier of the generator to initialise </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">region</td><td>The address to read data from; updated to position after data has been read </td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>An initialised parameter generator that can be used with other functions, or NULL if it couldn't be initialised for any reason </dd></dl>
 
 </div>
 </div>
@@ -326,39 +338,27 @@ type</td>
 
 </div>
 </div>
-<a class="anchor" id="ae52a45690f00dfe7384a14645b3512de"></a>
+<a class="anchor" id="a20b9f761fb073750e083d131cf49812e"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">param_generator_t param_generator_init </td>
+          <td class="memname">void param_generator_free </td>
           <td>(</td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>hash</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramtype">param_generator_t&#160;</td>
+          <td class="paramname"><em>generator</em></td><td>)</td>
           <td></td>
-          <td class="paramtype">address_t *&#160;</td>
-          <td class="paramname"><em>region</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Initialise a specific parameter generator. </p>
+<p>Finish with a parameter generator. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">hash</td><td>The identifier of the generator to initialise </td></tr>
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">region</td><td>The address to read data from; updated to position after data has been read </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">generator</td><td>The generator to free </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>An initialised parameter generator that can be used with other functions, or NULL if it couldn't be initialised for any reason </dd></dl>
 
 </div>
 </div>
@@ -389,7 +389,7 @@ type</td>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 28 2020 09:26:46 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 28 2020 12:09:28 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

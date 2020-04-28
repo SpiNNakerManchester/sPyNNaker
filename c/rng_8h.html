@@ -120,6 +120,56 @@ Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Random number generator interface. </p>
 </div><h2 class="groupheader">Function Documentation</h2>
+<a class="anchor" id="ac2b523470897c3c3e4168e8d82579d18"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">rng_t rng_init </td>
+          <td>(</td>
+          <td class="paramtype">address_t *&#160;</td>
+          <td class="paramname"><em>region</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Initialise the random number generator. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">region</td><td>The address to read data from; updated to position after data has been read </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>An initialised random number generator that can be used with other functions, or NULL if it couldn't be initialised for any reason </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="aa3c7d931977e162864cb4615442d96b7"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint32_t rng_generator </td>
+          <td>(</td>
+          <td class="paramtype">rng_t&#160;</td>
+          <td class="paramname"><em>rng</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Generate a uniformly-distributed random number. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">rng</td><td>The random number generator instance to generate from </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The number generated between 0 and 0xFFFFFFFF </dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="a12e0ea48f3cf6181063f30ece7b30c2d"></a>
 <div class="memitem">
 <div class="memproto">
@@ -135,6 +185,31 @@ Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Generate an exponentially-distributed random number. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">rng</td><td>The random number generator instance to use </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The number generated </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a7afddf66f0bcc73ecd2637231a654f01"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">accum rng_normal </td>
+          <td>(</td>
+          <td class="paramtype">rng_t&#160;</td>
+          <td class="paramname"><em>rng</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Generate an normally-distributed random number. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">rng</td><td>The random number generator instance to use </td></tr>
@@ -169,85 +244,10 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="aa3c7d931977e162864cb4615442d96b7"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">uint32_t rng_generator </td>
-          <td>(</td>
-          <td class="paramtype">rng_t&#160;</td>
-          <td class="paramname"><em>rng</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Generate a uniformly-distributed random number. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">rng</td><td>The random number generator instance to generate from </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>The number generated between 0 and 0xFFFFFFFF </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="ac2b523470897c3c3e4168e8d82579d18"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">rng_t rng_init </td>
-          <td>(</td>
-          <td class="paramtype">address_t *&#160;</td>
-          <td class="paramname"><em>region</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Initialise the random number generator. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">region</td><td>The address to read data from; updated to position after data has been read </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>An initialised random number generator that can be used with other functions, or NULL if it couldn't be initialised for any reason </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="a7afddf66f0bcc73ecd2637231a654f01"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">accum rng_normal </td>
-          <td>(</td>
-          <td class="paramtype">rng_t&#160;</td>
-          <td class="paramname"><em>rng</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Generate an normally-distributed random number. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">rng</td><td>The random number generator instance to use </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>The number generated </dd></dl>
-
-</div>
-</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 28 2020 09:26:46 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 28 2020 12:09:28 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

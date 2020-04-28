@@ -224,19 +224,31 @@ synaptic_input_value</td>
 <div class="textblock"></div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
+<a class="anchor" id="a54c6d9b5e32ee070e6f3fc350bd3dc27"></a><a class="el" href="synapse__types__alpha__impl_8h.html#structalpha__params__t">alpha_params_t</a></td>
+<td class="fieldname">
+exc</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a603098082c6122c49eaaee5220b91c36"></a><a class="el" href="synapse__types__alpha__impl_8h.html#structalpha__params__t">alpha_params_t</a></td>
+<td class="fieldname">
+inh</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
 <a class="anchor" id="a8f91b2c0aa9a88c2b44e086fc94e6e24"></a><a class="el" href="synapse__types__delta__impl_8h.html#structdelta__params__t">delta_params_t</a></td>
 <td class="fieldname">
 exc</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a class="anchor" id="a54c6d9b5e32ee070e6f3fc350bd3dc27"></a><a class="el" href="synapse__types__semd__impl_8h.html#structexp__params__t">exp_params_t</a></td>
+<a class="anchor" id="a39087de65c4c33969bbfa69fee75697d"></a><a class="el" href="synapse__types__delta__impl_8h.html#structdelta__params__t">delta_params_t</a></td>
 <td class="fieldname">
-exc</td>
+inh</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a class="anchor" id="a54c6d9b5e32ee070e6f3fc350bd3dc27"></a><a class="el" href="synapse__types__alpha__impl_8h.html#structalpha__params__t">alpha_params_t</a></td>
+<a class="anchor" id="a54c6d9b5e32ee070e6f3fc350bd3dc27"></a><a class="el" href="synapse__types__semd__impl_8h.html#structexp__params__t">exp_params_t</a></td>
 <td class="fieldname">
 exc</td>
 <td class="fielddoc">
@@ -248,25 +260,7 @@ exc2</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a class="anchor" id="a8d690bc6f7611e73dc3f2841d7bfbc91"></a><a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a></td>
-<td class="fieldname">
-exc2_old</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="a39087de65c4c33969bbfa69fee75697d"></a><a class="el" href="synapse__types__delta__impl_8h.html#structdelta__params__t">delta_params_t</a></td>
-<td class="fieldname">
-inh</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
 <a class="anchor" id="a603098082c6122c49eaaee5220b91c36"></a><a class="el" href="synapse__types__semd__impl_8h.html#structexp__params__t">exp_params_t</a></td>
-<td class="fieldname">
-inh</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="a603098082c6122c49eaaee5220b91c36"></a><a class="el" href="synapse__types__alpha__impl_8h.html#structalpha__params__t">alpha_params_t</a></td>
 <td class="fieldname">
 inh</td>
 <td class="fielddoc">
@@ -277,11 +271,50 @@ inh</td>
 multiplicator</td>
 <td class="fielddoc">
 </td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a8d690bc6f7611e73dc3f2841d7bfbc91"></a><a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a></td>
+<td class="fieldname">
+exc2_old</td>
+<td class="fielddoc">
+</td></tr>
 </table>
 
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
+<a class="anchor" id="a04ee3f07d20f9cbc78f7084849ffa211"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void delta_shaping </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="synapse__types__delta__impl_8h.html#structdelta__params__t">delta_params_t</a> *&#160;</td>
+          <td class="paramname"><em>delta_params</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>decays the stuff thats sitting in the input buffers In this case a delta shape means returning the value to zero immediately. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">parameter</td><td>the pointer to the parameters to use </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>nothing </dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="ae493d86f73c67ec2420d99179e199fae"></a>
 <div class="memitem">
 <div class="memproto">
@@ -323,39 +356,6 @@ multiplicator</td>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>None </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="a04ee3f07d20f9cbc78f7084849ffa211"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static void delta_shaping </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="synapse__types__delta__impl_8h.html#structdelta__params__t">delta_params_t</a> *&#160;</td>
-          <td class="paramname"><em>delta_params</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>decays the stuff thats sitting in the input buffers In this case a delta shape means returning the value to zero immediately. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">parameter</td><td>the pointer to the parameters to use </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>nothing </dd></dl>
 
 </div>
 </div>
@@ -577,7 +577,7 @@ multiplicator</td>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 28 2020 09:26:45 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 28 2020 12:09:27 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

@@ -147,6 +147,38 @@ Functions</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
+<a class="anchor" id="ad27cadcf085559d6b7c8d926ec01f313"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void synapse_types_shape_input </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="synapse__types__semd__impl_8h.html#structsynapse__param__t">synapse_param_t</a> *&#160;</td>
+          <td class="paramname"><em>parameter</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>decays the stuff thats sitting in the input buffers as these have not yet been processed and applied to the neuron. </p>
+<p>This is to compensate for the valve behaviour of a synapse in biology (spike goes in, synapse opens, then closes slowly). </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">parameters</td><td>the pointer to the parameters to use </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a class="anchor" id="acf288f16ad00e587ffe9057de91c5b4e"></a>
 <div class="memitem">
 <div class="memproto">
@@ -297,38 +329,6 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a4d26d3dff1703c07eca4dbf846a0946d"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static void synapse_types_print_input </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="synapse__types__semd__impl_8h.html#structsynapse__param__t">synapse_param_t</a> *&#160;</td>
-          <td class="paramname"><em>parameters</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>prints the input for a neuron ID given the available inputs currently only executed when the models are in debug mode, as the prints are controlled from the <a class="el" href="synapses_8c.html" title="Implementation of non-inlined API in synapses.h. ">synapses.c</a> print_inputs() method. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">parameters</td><td>the pointer to the parameters to print </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
 <a class="anchor" id="a8c173175ef5d71b07f3bc7d511cc11c7"></a>
 <div class="memitem">
 <div class="memproto">
@@ -361,7 +361,7 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ad27cadcf085559d6b7c8d926ec01f313"></a>
+<a class="anchor" id="a4d26d3dff1703c07eca4dbf846a0946d"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -369,10 +369,10 @@ Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static void synapse_types_shape_input </td>
+          <td class="memname">static void synapse_types_print_input </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="synapse__types__semd__impl_8h.html#structsynapse__param__t">synapse_param_t</a> *&#160;</td>
-          <td class="paramname"><em>parameter</em></td><td>)</td>
+          <td class="paramname"><em>parameters</em></td><td>)</td>
           <td></td>
         </tr>
       </table>
@@ -383,10 +383,10 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>decays the stuff thats sitting in the input buffers as these have not yet been processed and applied to the neuron. </p>
-<p>This is to compensate for the valve behaviour of a synapse in biology (spike goes in, synapse opens, then closes slowly). </p><dl class="params"><dt>Parameters</dt><dd>
+<p>prints the input for a neuron ID given the available inputs currently only executed when the models are in debug mode, as the prints are controlled from the <a class="el" href="synapses_8c.html" title="Implementation of non-inlined API in synapses.h. ">synapses.c</a> print_inputs() method. </p>
+<dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">parameters</td><td>the pointer to the parameters to use </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">parameters</td><td>the pointer to the parameters to print </td></tr>
   </table>
   </dd>
 </dl>
@@ -396,7 +396,7 @@ Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 28 2020 09:26:45 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 28 2020 12:09:27 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

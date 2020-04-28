@@ -5,9 +5,11 @@ var searchData=
   ['callback_5fpriorities',['callback_priorities',['../delay__extension_8c.html#a65b19dabf5283c1ea37df964ca25e964',1,'callback_priorities():&#160;delay_extension.c'],['../c__main_8c.html#a65b19dabf5283c1ea37df964ca25e964',1,'callback_priorities():&#160;c_main.c'],['../robot__motor__control_8c.html#a65b19dabf5283c1ea37df964ca25e964',1,'callback_priorities():&#160;robot_motor_control.c']]],
   ['card',['Card',['../maths-util_8h.html#a63fe77b0ec710597cb0b69eee8d90aaf',1,'maths-util.h']]],
   ['ceil_5fto_5f4',['CEIL_TO_4',['../neuron__recording_8c.html#a116ca5cd8794f7ac7266ed798720a3d6',1,'neuron_recording.c']]],
+  ['change_5fmode',['CHANGE_MODE',['../munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04a4984f59c2d1880d5dd6b2f81c3bd932b',1,'munich_protocol.h']]],
   ['common_5fkernel_2ec',['common_kernel.c',['../common__kernel_8c.html',1,'']]],
   ['common_5fkernel_2eh',['common_kernel.h',['../common__kernel_8h.html',1,'']]],
   ['common_5fmem_2eh',['common_mem.h',['../common__mem_8h.html',1,'']]],
+  ['configure_5fmaster_5fkey',['CONFIGURE_MASTER_KEY',['../munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04a635089693fa56b24e14b697b004fc204',1,'munich_protocol.h']]],
   ['connection_5fbuilder_5fconfig',['connection_builder_config',['../synapse__expander_8c.html#structconnection__builder__config',1,'']]],
   ['connection_5fgenerator',['connection_generator',['../connection__generator_8c.html#structconnection__generator',1,'']]],
   ['connection_5fgenerator_2ec',['connection_generator.c',['../connection__generator_8c.html',1,'']]],
@@ -26,5 +28,6 @@ var searchData=
   ['connection_5fgenerators',['connection_generators',['../connection__generator_8c.html#ab3f5298c96970f1f9b2fbf3cdadbc60f',1,'connection_generator.c']]],
   ['control_5fconversion',['control_conversion',['../synapse__dynamics__stdp__mad__impl_8c.html#a06f2e2d805f0d8aa8b3ca7b687f24a24',1,'synapse_dynamics_stdp_mad_impl.c']]],
   ['count_5frewire_5fattempts',['count_rewire_attempts',['../c__main_8c.html#a113643d98988bc0d1706e0b21d7b4a4e',1,'c_main.c']]],
+  ['cube',['CUBE',['../maths-util_8h.html#a3e97109573f7a38ddc9e9c1a9dbb6758',1,'maths-util.h']]],
   ['current_5fstate_5ft',['current_state_t',['../sp__structs_8h.html#structcurrent__state__t',1,'']]]
 ];

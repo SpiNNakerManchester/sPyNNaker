@@ -5,6 +5,7 @@ var searchData=
   ['elimination_5fparams',['elimination_params',['../elimination__random__by__weight__impl_8h.html#structelimination__params',1,'']]],
   ['elimination_5frandom_5fby_5fweight_5fimpl_2ec',['elimination_random_by_weight_impl.c',['../elimination__random__by__weight__impl_8c.html',1,'']]],
   ['elimination_5frandom_5fby_5fweight_5fimpl_2eh',['elimination_random_by_weight_impl.h',['../elimination__random__by__weight__impl_8h.html',1,'']]],
+  ['exp',['EXP',['../maths-util_8h.html#a179978530f93b1e13bc48dc40dc1960e',1,'maths-util.h']]],
   ['exp_5fparams_5ft',['exp_params_t',['../synapse__types__semd__impl_8h.html#structexp__params__t',1,'']]],
   ['exp_5fshaping',['exp_shaping',['../synapse__types__dual__excitatory__exponential__impl_8h.html#a44c59185e4e709433a431c34fced2580',1,'exp_shaping(exp_params_t *exp_params):&#160;synapse_types_dual_excitatory_exponential_impl.h'],['../synapse__types__exponential__impl_8h.html#a44c59185e4e709433a431c34fced2580',1,'exp_shaping(exp_params_t *exp_params):&#160;synapse_types_exponential_impl.h'],['../synapse__types__semd__impl_8h.html#a44c59185e4e709433a431c34fced2580',1,'exp_shaping(exp_params_t *exp_params):&#160;synapse_types_semd_impl.h']]],
   ['exp_5ftauca',['exp_TauCa',['../additional__input__none__impl_8h.html#a0c1f083f2abaa9a200f9bc6e26ccbb92',1,'additional_input_t']]],

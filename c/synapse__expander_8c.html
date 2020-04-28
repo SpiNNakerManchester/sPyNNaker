@@ -143,15 +143,9 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="syna
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
-<a class="anchor" id="a7c0a0b480431dd332b5d9130996b6847"></a>uint32_t</td>
+<a class="anchor" id="abedc3be2337711ee3676a6f2d9039973"></a>uint32_t</td>
 <td class="fieldname">
-connector_type</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="a1e0c4a4d6187f6f3d638f14fbfe7b236"></a>uint32_t</td>
-<td class="fieldname">
-delay_type</td>
+offset</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
@@ -161,15 +155,9 @@ delayed_offset</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a class="anchor" id="a6c2e4a2079a28128874f4d2989f3cea7"></a>uint32_t</td>
+<a class="anchor" id="ade0d7240099eb915cded29aba4fc1261"></a>uint32_t</td>
 <td class="fieldname">
-matrix_type</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="a2504fc2374c83b4381bd9e47a19295bc"></a>uint32_t</td>
-<td class="fieldname">
-max_delayed_row_n_synapses</td>
+max_row_n_words</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
@@ -185,27 +173,9 @@ max_row_n_synapses</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a class="anchor" id="ade0d7240099eb915cded29aba4fc1261"></a>uint32_t</td>
+<a class="anchor" id="a2504fc2374c83b4381bd9e47a19295bc"></a>uint32_t</td>
 <td class="fieldname">
-max_row_n_words</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="a79563bade6ce3ec332e494558cb3ec43"></a>uint32_t</td>
-<td class="fieldname">
-max_stage</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="abedc3be2337711ee3676a6f2d9039973"></a>uint32_t</td>
-<td class="fieldname">
-offset</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="aa1227e5d74476c300c78f1d63d0a4838"></a>uint32_t</td>
-<td class="fieldname">
-pre_slice_count</td>
+max_delayed_row_n_synapses</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
@@ -215,9 +185,15 @@ pre_slice_start</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a class="anchor" id="a9e77c1f30bdb0a5749de6f7d379e18c5"></a>uint32_t</td>
+<a class="anchor" id="aa1227e5d74476c300c78f1d63d0a4838"></a>uint32_t</td>
 <td class="fieldname">
-synapse_type</td>
+pre_slice_count</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a79563bade6ce3ec332e494558cb3ec43"></a>uint32_t</td>
+<td class="fieldname">
+max_stage</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
@@ -227,9 +203,33 @@ timestep_per_delay</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
+<a class="anchor" id="a9e77c1f30bdb0a5749de6f7d379e18c5"></a>uint32_t</td>
+<td class="fieldname">
+synapse_type</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a6c2e4a2079a28128874f4d2989f3cea7"></a>uint32_t</td>
+<td class="fieldname">
+matrix_type</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a7c0a0b480431dd332b5d9130996b6847"></a>uint32_t</td>
+<td class="fieldname">
+connector_type</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
 <a class="anchor" id="a569914d2e75c76e957b5adfd0e15aeab"></a>uint32_t</td>
 <td class="fieldname">
 weight_type</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a1e0c4a4d6187f6f3d638f14fbfe7b236"></a>uint32_t</td>
+<td class="fieldname">
+delay_type</td>
 <td class="fielddoc">
 </td></tr>
 </table>
@@ -255,21 +255,9 @@ n_in_edges</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a class="anchor" id="ad65dd906e5247e50126f3799e54ddc41"></a>uint32_t</td>
+<a class="anchor" id="a21b0928e12b01de732a67341934ae44b"></a>uint32_t</td>
 <td class="fieldname">
-n_synapse_index_bits</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="a65dfe0b6a99d50301570be665ea68f22"></a>uint32_t</td>
-<td class="fieldname">
-n_synapse_type_bits</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="a8d90acd97d5c0cf0b619e52213bd5997"></a>uint32_t</td>
-<td class="fieldname">
-n_synapse_types</td>
+post_slice_start</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
@@ -279,9 +267,21 @@ post_slice_count</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a class="anchor" id="a21b0928e12b01de732a67341934ae44b"></a>uint32_t</td>
+<a class="anchor" id="a8d90acd97d5c0cf0b619e52213bd5997"></a>uint32_t</td>
 <td class="fieldname">
-post_slice_start</td>
+n_synapse_types</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a65dfe0b6a99d50301570be665ea68f22"></a>uint32_t</td>
+<td class="fieldname">
+n_synapse_type_bits</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="ad65dd906e5247e50126f3799e54ddc41"></a>uint32_t</td>
+<td class="fieldname">
+n_synapse_index_bits</td>
 <td class="fielddoc">
 </td></tr>
 </table>
@@ -414,7 +414,7 @@ post_slice_start</td>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 28 2020 09:26:46 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 28 2020 12:09:28 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

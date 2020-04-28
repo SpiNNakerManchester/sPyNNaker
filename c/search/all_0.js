@@ -1,8 +1,13 @@
 var searchData=
 [
+  ['abs',['ABS',['../maths-util_8h.html#a996f7be338ccb40d1a2a5abc1ad61759',1,'maths-util.h']]],
+  ['acs_5fdbl_5ftiny',['ACS_DBL_TINY',['../maths-util_8h.html#a384a1b0ced36846fd8efb19c26c29a35',1,'maths-util.h']]],
+  ['active_5fretina_5fevent_5fstreaming_5fkeys_5fconfiguration',['ACTIVE_RETINA_EVENT_STREAMING_KEYS_CONFIGURATION',['../munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04a94eba6b9c22bf274e6ff81d58c229afd',1,'munich_protocol.h']]],
+  ['active_5fretina_5fevent_5fstreaming_5fset_5fkey',['ACTIVE_RETINA_EVENT_STREAMING_SET_KEY',['../munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04a6aec4d5e40d24d80269f24f186e12ce0',1,'munich_protocol.h']]],
   ['add_5finput_5falpha',['add_input_alpha',['../synapse__types__alpha__impl_8h.html#a6f1daf43aec061c87d2cfe8cf23ca667',1,'synapse_types_alpha_impl.h']]],
   ['add_5finput_5fdelta',['add_input_delta',['../synapse__types__delta__impl_8h.html#ae493d86f73c67ec2420d99179e199fae',1,'synapse_types_delta_impl.h']]],
   ['add_5finput_5fexp',['add_input_exp',['../synapse__types__dual__excitatory__exponential__impl_8h.html#af6106655bccb288f6c74a75da441d9af',1,'add_input_exp(exp_params_t *exp_params, input_t input):&#160;synapse_types_dual_excitatory_exponential_impl.h'],['../synapse__types__exponential__impl_8h.html#af6106655bccb288f6c74a75da441d9af',1,'add_input_exp(exp_params_t *exp_params, input_t input):&#160;synapse_types_exponential_impl.h'],['../synapse__types__semd__impl_8h.html#af6106655bccb288f6c74a75da441d9af',1,'add_input_exp(exp_params_t *exp_params, input_t input):&#160;synapse_types_semd_impl.h']]],
+  ['add_5fpayload_5fto_5fcurrent_5foutput_5fkey',['ADD_PAYLOAD_TO_CURRENT_OUTPUT_KEY',['../munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04af715c89e8a41d4dda0acbd050c6cd962',1,'munich_protocol.h']]],
   ['additional_5finput_2eh',['additional_input.h',['../additional__input_8h.html',1,'']]],
   ['additional_5finput_5farray',['additional_input_array',['../neuron__impl__standard_8h.html#a9a9983ef2e0e8377f0fc818e32eec11d',1,'neuron_impl_standard.h']]],
   ['additional_5finput_5fca2_5fadaptive_5fimpl_2eh',['additional_input_ca2_adaptive_impl.h',['../additional__input__ca2__adaptive__impl_8h.html',1,'']]],

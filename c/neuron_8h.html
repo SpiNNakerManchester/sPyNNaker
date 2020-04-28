@@ -134,90 +134,6 @@ const char *&#160;</td><td class="memItemRight" valign="bottom"><b>neuron_get_sy
 <li>neuron_do_timestep_update(time): executes all the updates to neural parameters when a given timer period has occurred. </li>
 </ul>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a class="anchor" id="abad40a95ed27eb262884dfd9f59b78d6"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void neuron_add_inputs </td>
-          <td>(</td>
-          <td class="paramtype">index_t&#160;</td>
-          <td class="paramname"><em>synapse_type_index</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">index_t&#160;</td>
-          <td class="paramname"><em>neuron_index</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a>&#160;</td>
-          <td class="paramname"><em>weights_this_timestep</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Add inputs to the neuron. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">synapse_type_index</td><td>the synapse type (e.g. exc. or inh.) </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">neuron_index</td><td>the index of the neuron </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">weights_this_timestep</td><td>weight inputs to be added </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>None </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="a57acfd578d4667623c0364918cbbb7bd"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void neuron_do_timestep_update </td>
-          <td>(</td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>time</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint&#160;</td>
-          <td class="paramname"><em>timer_count</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint&#160;</td>
-          <td class="paramname"><em>timer_period</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>executes all the updates to neural parameters when a given timer period has occurred. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">time</td><td>the timer tick value currently being executed </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>nothing </dd></dl>
-
-</div>
-</div>
 <a class="anchor" id="a883e3b3d586543070a684060e74d1a16"></a>
 <div class="memitem">
 <div class="memproto">
@@ -291,6 +207,72 @@ const char *&#160;</td><td class="memItemRight" valign="bottom"><b>neuron_get_sy
 
 </div>
 </div>
+<a class="anchor" id="a57acfd578d4667623c0364918cbbb7bd"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void neuron_do_timestep_update </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>time</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint&#160;</td>
+          <td class="paramname"><em>timer_count</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint&#160;</td>
+          <td class="paramname"><em>timer_period</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>executes all the updates to neural parameters when a given timer period has occurred. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">time</td><td>the timer tick value currently being executed </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>nothing </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a2511f7541e414899ee44c6260214c6c8"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool neuron_resume </td>
+          <td>(</td>
+          <td class="paramtype">address_t&#160;</td>
+          <td class="paramname"><em>address</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Prepare to resume simulation of the neurons. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">address</td><td>the address where the neuron parameters are stored in SDRAM </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>bool which is true if the resume was successful or not </dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="a4ac44865a6edf62cd9e8c3349023b792"></a>
 <div class="memitem">
 <div class="memproto">
@@ -322,35 +304,53 @@ const char *&#160;</td><td class="memItemRight" valign="bottom"><b>neuron_get_sy
 
 </div>
 </div>
-<a class="anchor" id="a2511f7541e414899ee44c6260214c6c8"></a>
+<a class="anchor" id="abad40a95ed27eb262884dfd9f59b78d6"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool neuron_resume </td>
+          <td class="memname">void neuron_add_inputs </td>
           <td>(</td>
-          <td class="paramtype">address_t&#160;</td>
-          <td class="paramname"><em>address</em></td><td>)</td>
+          <td class="paramtype">index_t&#160;</td>
+          <td class="paramname"><em>synapse_type_index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">index_t&#160;</td>
+          <td class="paramname"><em>neuron_index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a>&#160;</td>
+          <td class="paramname"><em>weights_this_timestep</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Prepare to resume simulation of the neurons. </p>
+<p>Add inputs to the neuron. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">address</td><td>the address where the neuron parameters are stored in SDRAM </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">synapse_type_index</td><td>the synapse type (e.g. exc. or inh.) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">neuron_index</td><td>the index of the neuron </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">weights_this_timestep</td><td>weight inputs to be added </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>bool which is true if the resume was successful or not </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>None </dd></dl>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 28 2020 09:26:45 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 28 2020 12:09:27 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

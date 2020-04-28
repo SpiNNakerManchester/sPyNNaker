@@ -170,18 +170,6 @@ Variables</h2></td></tr>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
-<a class="anchor" id="ab5116cf03d5a141b805d248bb609e9b1"></a><a class="el" href="generator__types_8h.html#a6a0f823edb9b15521ad463944eef00e2">free_func</a> *</td>
-<td class="fieldname">
-free</td>
-<td class="fielddoc">
-Frees any data for the generator. </td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="ac02a18c2c72affcf44c2166cab070a84"></a><a class="el" href="generator__types_8h.html#aeecea374609ce4f319912de8bb3373aa">generate_connection_func</a> *</td>
-<td class="fieldname">
-generate</td>
-<td class="fielddoc">
-Generate connections. </td></tr>
-<tr><td class="fieldtype">
 <a class="anchor" id="ac546f0ebffe9fa2e64d2b822297511b1"></a><a class="el" href="generator__types_8h.html#a55f8d20fc9350939e3fa6a85d8aed90c">generator_hash_t</a></td>
 <td class="fieldname">
 hash</td>
@@ -193,6 +181,18 @@ The hash of the generator. </td></tr>
 initialize</td>
 <td class="fielddoc">
 Initialises the generator. </td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="ac02a18c2c72affcf44c2166cab070a84"></a><a class="el" href="generator__types_8h.html#aeecea374609ce4f319912de8bb3373aa">generate_connection_func</a> *</td>
+<td class="fieldname">
+generate</td>
+<td class="fielddoc">
+Generate connections. </td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="ab5116cf03d5a141b805d248bb609e9b1"></a><a class="el" href="generator__types_8h.html#a6a0f823edb9b15521ad463944eef00e2">free_func</a> *</td>
+<td class="fieldname">
+free</td>
+<td class="fielddoc">
+Frees any data for the generator. </td></tr>
 </table>
 
 </div>
@@ -211,15 +211,15 @@ Initialises the generator. </td></tr>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
-<a class="anchor" id="adccd374b6211357cbe992de17f8b7bd9"></a>void *</td>
-<td class="fieldname">
-data</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
 <a class="anchor" id="a733d52f0f8886dbd2fd8c1f25fd44f59"></a>const <a class="el" href="connection__generator_8c.html#structconnection__generator__info">connection_generator_info</a> *</td>
 <td class="fieldname">
 type</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="adccd374b6211357cbe992de17f8b7bd9"></a>void *</td>
+<td class="fieldname">
+data</td>
 <td class="fielddoc">
 </td></tr>
 </table>
@@ -269,27 +269,39 @@ type</td>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a class="anchor" id="ab9b132e35b3d39240d34e7f225193910"></a>
+<a class="anchor" id="a1a3c815932172e25183bbd6c237d0974"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void connection_generator_free </td>
+          <td class="memname">connection_generator_t connection_generator_init </td>
           <td>(</td>
-          <td class="paramtype">connection_generator_t&#160;</td>
-          <td class="paramname"><em>generator</em></td><td>)</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>hash</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">address_t *&#160;</td>
+          <td class="paramname"><em>region</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Finish with a connection generator. </p>
+<p>Initialise a specific connection generator. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">generator</td><td>The generator to free </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">hash</td><td>The identifier of the generator to initialise </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">region</td><td>The address to read data from; updated to position after data has been read </td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>An initialised connection generator that can be used with other functions, or NULL if it couldn't be initialised for any reason </dd></dl>
 
 </div>
 </div>
@@ -371,39 +383,27 @@ type</td>
 
 </div>
 </div>
-<a class="anchor" id="a1a3c815932172e25183bbd6c237d0974"></a>
+<a class="anchor" id="ab9b132e35b3d39240d34e7f225193910"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">connection_generator_t connection_generator_init </td>
+          <td class="memname">void connection_generator_free </td>
           <td>(</td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>hash</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramtype">connection_generator_t&#160;</td>
+          <td class="paramname"><em>generator</em></td><td>)</td>
           <td></td>
-          <td class="paramtype">address_t *&#160;</td>
-          <td class="paramname"><em>region</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Initialise a specific connection generator. </p>
+<p>Finish with a connection generator. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">hash</td><td>The identifier of the generator to initialise </td></tr>
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">region</td><td>The address to read data from; updated to position after data has been read </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">generator</td><td>The generator to free </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>An initialised connection generator that can be used with other functions, or NULL if it couldn't be initialised for any reason </dd></dl>
 
 </div>
 </div>
@@ -440,7 +440,7 @@ type</td>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 28 2020 09:26:46 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 28 2020 12:09:28 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

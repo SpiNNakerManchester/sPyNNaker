@@ -161,12 +161,6 @@ static bool&#160;</td><td class="memItemRight" valign="bottom"><b>sp_structs_add
 <div class="textblock"></div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
-<a class="anchor" id="af8de9e27cd7cdf44a64e9e2b43abaf23"></a>uint16_t</td>
-<td class="fieldname">
-neuron_index</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
 <a class="anchor" id="aed307e7ad5d062f7de4fdd8cb5b4770b"></a>uint8_t</td>
 <td class="fieldname">
 pop_index</td>
@@ -176,6 +170,12 @@ pop_index</td>
 <a class="anchor" id="a0e4e203a83eacbd014821448c982cb58"></a>uint8_t</td>
 <td class="fieldname">
 sub_pop_index</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="af8de9e27cd7cdf44a64e9e2b43abaf23"></a>uint16_t</td>
+<td class="fieldname">
+neuron_index</td>
 <td class="fielddoc">
 </td></tr>
 </table>
@@ -201,18 +201,6 @@ key</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a class="anchor" id="a7d1fc907efcab0347b15a367b4be27ef"></a>uint32_t</td>
-<td class="fieldname">
-lo_atom</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="a0232385bf65b3b1e0e31f29ecaf28b83"></a>uint32_t</td>
-<td class="fieldname">
-m_pop_index</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
 <a class="anchor" id="ae0d8d8ea82763a10e110412f97a6cc29"></a>uint32_t</td>
 <td class="fieldname">
 mask</td>
@@ -222,6 +210,18 @@ mask</td>
 <a class="anchor" id="a5bf7b8a861f9f6f0d78055c0b96c5c69"></a>uint32_t</td>
 <td class="fieldname">
 n_atoms</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a7d1fc907efcab0347b15a367b4be27ef"></a>uint32_t</td>
+<td class="fieldname">
+lo_atom</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a0232385bf65b3b1e0e31f29ecaf28b83"></a>uint32_t</td>
+<td class="fieldname">
+m_pop_index</td>
 <td class="fielddoc">
 </td></tr>
 </table>
@@ -241,30 +241,6 @@ n_atoms</td>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
-<a class="anchor" id="a45aaf172f7436276a0eaecb8043d4ac5"></a>uint32_t</td>
-<td class="fieldname">
-connection_type</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="a2f62f0806a9dfedb117334f7ca26d541"></a>uint16_t</td>
-<td class="fieldname">
-delay_hi</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="aed40c4b7bc55cafe42ff7392a84693df"></a>uint16_t</td>
-<td class="fieldname">
-delay_lo</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="a83f93f49b53d408eedafb66f7444d49d"></a><a class="el" href="sp__structs_8h.html#structkey__atom__info__t">key_atom_info_t</a></td>
-<td class="fieldname">
-key_atom_info[]</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
 <a class="anchor" id="a1385c3bbe3416a2fac9cc4dbafe7329f"></a>uint16_t</td>
 <td class="fieldname">
 no_pre_vertices</td>
@@ -277,15 +253,39 @@ sp_control</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a class="anchor" id="a1373ce19d0b04f9da8e28944453014e4"></a>uint32_t</td>
+<a class="anchor" id="aed40c4b7bc55cafe42ff7392a84693df"></a>uint16_t</td>
 <td class="fieldname">
-total_no_atoms</td>
+delay_lo</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a2f62f0806a9dfedb117334f7ca26d541"></a>uint16_t</td>
+<td class="fieldname">
+delay_hi</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="aa90ad9838e88e6e12b4dfab21438ac6b"></a>uint32_t</td>
 <td class="fieldname">
 weight</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a45aaf172f7436276a0eaecb8043d4ac5"></a>uint32_t</td>
+<td class="fieldname">
+connection_type</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a1373ce19d0b04f9da8e28944453014e4"></a>uint32_t</td>
+<td class="fieldname">
+total_no_atoms</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a83f93f49b53d408eedafb66f7444d49d"></a><a class="el" href="sp__structs_8h.html#structkey__atom__info__t">key_atom_info_t</a></td>
+<td class="fieldname">
+key_atom_info[]</td>
 <td class="fielddoc">
 </td></tr>
 </table>
@@ -333,45 +333,9 @@ prepop_info</td>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
-<a class="anchor" id="a098b128c5761367fb0eca452c596f9ec"></a>uint32_t</td>
-<td class="fieldname">
-app_no_atoms</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
 <a class="anchor" id="a3d5dbd510850531f4b49b639497108b3"></a>uint32_t</td>
 <td class="fieldname">
 fast</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="a7884e1f468edabc5507ec8787650771d"></a>uint32_t</td>
-<td class="fieldname">
-high_atom</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="a7d9b2747705db7ce4e0ea78b7be0c728"></a>mars_kiss64_seed_t</td>
-<td class="fieldname">
-local_seed</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="a8a698397c16ca7dc58694f2c670cef36"></a>uint32_t</td>
-<td class="fieldname">
-low_atom</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="a84ccc068f491428ce23a0e508ec4dc50"></a>uint32_t</td>
-<td class="fieldname">
-machine_no_atoms</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="a482c2b79ddd887beef21fc71a19e30b7"></a>uint32_t</td>
-<td class="fieldname">
-no_pre_pops</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
@@ -387,9 +351,45 @@ s_max</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
+<a class="anchor" id="a098b128c5761367fb0eca452c596f9ec"></a>uint32_t</td>
+<td class="fieldname">
+app_no_atoms</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a84ccc068f491428ce23a0e508ec4dc50"></a>uint32_t</td>
+<td class="fieldname">
+machine_no_atoms</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a8a698397c16ca7dc58694f2c670cef36"></a>uint32_t</td>
+<td class="fieldname">
+low_atom</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a7884e1f468edabc5507ec8787650771d"></a>uint32_t</td>
+<td class="fieldname">
+high_atom</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
 <a class="anchor" id="a631f7848a7e968513a8c9fe47cf757ce"></a>mars_kiss64_seed_t</td>
 <td class="fieldname">
 shared_seed</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a7d9b2747705db7ce4e0ea78b7be0c728"></a>mars_kiss64_seed_t</td>
+<td class="fieldname">
+local_seed</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a482c2b79ddd887beef21fc71a19e30b7"></a>uint32_t</td>
+<td class="fieldname">
+no_pre_pops</td>
 <td class="fielddoc">
 </td></tr>
 </table>
@@ -409,35 +409,11 @@ shared_seed</td>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
-<a class="anchor" id="ac2d5306d2023cbb2fb5993e24ead4dd6"></a>uint16_t</td>
-<td class="fieldname">
-delay</td>
-<td class="fielddoc">
-current delay (if exists) </td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="a31353ee4e32638f42f20e496de037453"></a>uint32_t</td>
-<td class="fieldname">
-element_exists</td>
-<td class="fielddoc">
-does the connection already exist </td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="a3d0787b86e84f5f3fe4f1cbc663d2d4a"></a><a class="el" href="sp__structs_8h.html#structkey__atom__info__t">key_atom_info_t</a> *</td>
-<td class="fieldname">
-key_atom_info</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
 <a class="anchor" id="a95fc96bd4899b31f5950f74e458fcba2"></a>mars_kiss64_seed_t *</td>
 <td class="fieldname">
 local_seed</td>
 <td class="fielddoc">
 Seed referenced from rewiring data. </td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="a04d6f648c9fbb4c183c041ce6444b07d"></a>uint32_t</td>
-<td class="fieldname">
-offset</td>
-<td class="fielddoc">
-offset in synaptic row (if exists) </td></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="a45fd8cc8643c292363b09acdb024b5a6"></a>uint32_t</td>
 <td class="fieldname">
@@ -445,17 +421,23 @@ post_low_atom</td>
 <td class="fielddoc">
 Low atom copied from rewiring data. </td></tr>
 <tr><td class="fieldtype">
+<a class="anchor" id="aad4ad623519193fd2a823a5896f41f97"></a>uint32_t</td>
+<td class="fieldname">
+pre_syn_id</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
 <a class="anchor" id="aebc77ae31c49492277f1b29d72037ab4"></a>uint32_t</td>
 <td class="fieldname">
 post_syn_id</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a class="anchor" id="a5410c069b412bd79335cd36cdab82b1a"></a><a class="el" href="sp__structs_8h.html#structpost__to__pre__entry">post_to_pre_entry</a></td>
+<a class="anchor" id="a31353ee4e32638f42f20e496de037453"></a>uint32_t</td>
 <td class="fieldname">
-post_to_pre</td>
+element_exists</td>
 <td class="fielddoc">
-</td></tr>
+does the connection already exist </td></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="a7f84199e31e01c39179bbfaebddfb5fd"></a><a class="el" href="sp__structs_8h.html#structpost__to__pre__entry">post_to_pre_entry</a> *</td>
 <td class="fieldname">
@@ -469,23 +451,41 @@ pre_population_info</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a class="anchor" id="aad4ad623519193fd2a823a5896f41f97"></a>uint32_t</td>
+<a class="anchor" id="a3d0787b86e84f5f3fe4f1cbc663d2d4a"></a><a class="el" href="sp__structs_8h.html#structkey__atom__info__t">key_atom_info_t</a> *</td>
 <td class="fieldname">
-pre_syn_id</td>
+key_atom_info</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a class="anchor" id="a3f02cf224adbd87ab374eff348ac8b3a"></a>uint32_t</td>
+<a class="anchor" id="a5410c069b412bd79335cd36cdab82b1a"></a><a class="el" href="sp__structs_8h.html#structpost__to__pre__entry">post_to_pre_entry</a></td>
 <td class="fieldname">
-synapse_type</td>
+post_to_pre</td>
 <td class="fielddoc">
-synapse type </td></tr>
+</td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a04d6f648c9fbb4c183c041ce6444b07d"></a>uint32_t</td>
+<td class="fieldname">
+offset</td>
+<td class="fielddoc">
+offset in synaptic row (if exists) </td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="ac2d5306d2023cbb2fb5993e24ead4dd6"></a>uint16_t</td>
+<td class="fieldname">
+delay</td>
+<td class="fielddoc">
+current delay (if exists) </td></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="a8588f5e975650a2c0d118818575c6b2a"></a>uint16_t</td>
 <td class="fieldname">
 weight</td>
 <td class="fielddoc">
 current weight (if exists) </td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a3f02cf224adbd87ab374eff348ac8b3a"></a>uint32_t</td>
+<td class="fieldname">
+synapse_type</td>
+<td class="fielddoc">
+synapse type </td></tr>
 </table>
 
 </div>
@@ -493,7 +493,7 @@ current weight (if exists) </td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 28 2020 09:26:45 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 28 2020 12:09:27 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

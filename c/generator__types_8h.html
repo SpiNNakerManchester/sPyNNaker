@@ -126,6 +126,27 @@ typedef uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el
 <div class="textblock"><p>General types associated with generators. </p>
 <p>Note that generators are really classes... except this is C so we have to cheat. </p>
 </div><h2 class="groupheader">Typedef Documentation</h2>
+<a class="anchor" id="aee3c3f67a2dbc86e776c251bdc87f8ad"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef void*( initialize_func) (address_t *<a class="el" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a>)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>How to initialise the generator; all generator types use the same signature of initialiser. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">region</td><td>Region to read parameters from. Should be updated to position just after parameters after calling. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A data item to be passed in to other functions later on </dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="a6a0f823edb9b15521ad463944eef00e2"></a>
 <div class="memitem">
 <div class="memproto">
@@ -237,31 +258,10 @@ typedef uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el
 
 </div>
 </div>
-<a class="anchor" id="aee3c3f67a2dbc86e776c251bdc87f8ad"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">typedef void*( initialize_func) (address_t *<a class="el" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a>)</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>How to initialise the generator; all generator types use the same signature of initialiser. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">region</td><td>Region to read parameters from. Should be updated to position just after parameters after calling. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>A data item to be passed in to other functions later on </dd></dl>
-
-</div>
-</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 28 2020 09:26:46 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 28 2020 12:09:28 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

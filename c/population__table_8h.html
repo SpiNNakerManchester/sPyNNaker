@@ -114,6 +114,56 @@ Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Master pop table API. </p>
 </div><h2 class="groupheader">Function Documentation</h2>
+<a class="anchor" id="a5f92af4dd47e65504cbbbcb265083196"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool population_table_initialise </td>
+          <td>(</td>
+          <td class="paramtype">address_t&#160;</td>
+          <td class="paramname"><em>table_address</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">address_t&#160;</td>
+          <td class="paramname"><em>synapse_rows_address</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">address_t&#160;</td>
+          <td class="paramname"><em>direct_rows_address</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t *&#160;</td>
+          <td class="paramname"><em>row_max_n_words</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Sets up the table. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">table_address</td><td>The address of the start of the table data </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">synapse_rows_address</td><td>The address of the start of the synapse data </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">direct_rows_address</td><td>The address of the start of the direct synapse data </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">row_max_n_words</td><td>Updated with the maximum length of any row in the table in words </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>True if the table was initialised successfully, False otherwise </dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="a8bda7c27a3c9d52a2f95c4b6edd58944"></a>
 <div class="memitem">
 <div class="memproto">
@@ -200,60 +250,10 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a5f92af4dd47e65504cbbbcb265083196"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool population_table_initialise </td>
-          <td>(</td>
-          <td class="paramtype">address_t&#160;</td>
-          <td class="paramname"><em>table_address</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">address_t&#160;</td>
-          <td class="paramname"><em>synapse_rows_address</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">address_t&#160;</td>
-          <td class="paramname"><em>direct_rows_address</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t *&#160;</td>
-          <td class="paramname"><em>row_max_n_words</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Sets up the table. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">table_address</td><td>The address of the start of the table data </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">synapse_rows_address</td><td>The address of the start of the synapse data </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">direct_rows_address</td><td>The address of the start of the direct synapse data </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">row_max_n_words</td><td>Updated with the maximum length of any row in the table in words </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>True if the table was initialised successfully, False otherwise </dd></dl>
-
-</div>
-</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 28 2020 09:26:45 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 28 2020 12:09:27 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

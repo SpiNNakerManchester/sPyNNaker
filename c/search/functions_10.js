@@ -3,6 +3,7 @@ var searchData=
   ['send',['send',['../robot__motor__control_8c.html#a48eaa01651c9d941072c086843613dbf',1,'robot_motor_control.c']]],
   ['send_5fpacket',['send_packet',['../threshold__type__external__device__control_8h.html#abd566a3d7a0a4fabe2cbb39e4954e262',1,'threshold_type_external_device_control.h']]],
   ['send_5fspike',['send_spike',['../spike__source__poisson_8c.html#a6b8523cb6e82e9b56c93f8f52b47e274',1,'spike_source_poisson.c']]],
+  ['set_5fprotocol_5fmode',['set_protocol_mode',['../munich__protocol_8h.html#a63f78c33f4497c8732b5532c3985e627',1,'munich_protocol.h']]],
   ['set_5fspike_5fsource_5frate',['set_spike_source_rate',['../spike__source__poisson_8c.html#a12c72782cb450237076bc0622fc90125',1,'spike_source_poisson.c']]],
   ['setup_5fsynaptic_5fdma_5fread',['setup_synaptic_dma_read',['../spike__processing_8c.html#ac734bb4c991f89df03bcbe00e1f87a9f',1,'spike_processing.c']]],
   ['slow_5fspike_5fsource_5fget_5ftime_5fto_5fspike',['slow_spike_source_get_time_to_spike',['../spike__source__poisson_8c.html#aa2602e67f1b5a03f8e9440743171ef81',1,'spike_source_poisson.c']]],

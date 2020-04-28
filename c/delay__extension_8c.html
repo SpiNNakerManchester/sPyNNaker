@@ -264,6 +264,30 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>timer_peri
 <div class="textblock"></div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
+<a class="anchor" id="a69b8bd9382be92bf6854dc5f921ee317"></a>uint32_t</td>
+<td class="fieldname">
+n_packets_received</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a1adc1b0e109a817205eecc7fe26b14e4"></a>uint32_t</td>
+<td class="fieldname">
+n_packets_processed</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="acbaa257f6e6e932abf4010eba0deae93"></a>uint32_t</td>
+<td class="fieldname">
+n_packets_added</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a859939d1c299e24a68bb25e7af803895"></a>uint32_t</td>
+<td class="fieldname">
+n_packets_sent</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
 <a class="anchor" id="a14402f68e6fb5f758c453cd1ef86f954"></a>uint32_t</td>
 <td class="fieldname">
 n_buffer_overflows</td>
@@ -275,56 +299,11 @@ n_buffer_overflows</td>
 n_delays</td>
 <td class="fielddoc">
 </td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="acbaa257f6e6e932abf4010eba0deae93"></a>uint32_t</td>
-<td class="fieldname">
-n_packets_added</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="a1adc1b0e109a817205eecc7fe26b14e4"></a>uint32_t</td>
-<td class="fieldname">
-n_packets_processed</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="a69b8bd9382be92bf6854dc5f921ee317"></a>uint32_t</td>
-<td class="fieldname">
-n_packets_received</td>
-<td class="fielddoc">
-</td></tr>
-<tr><td class="fieldtype">
-<a class="anchor" id="a859939d1c299e24a68bb25e7af803895"></a>uint32_t</td>
-<td class="fieldname">
-n_packets_sent</td>
-<td class="fielddoc">
-</td></tr>
 </table>
 
 </div>
 </div>
 <h2 class="groupheader">Variable Documentation</h2>
-<a class="anchor" id="ab41b4929abf5a9fbed2f869be67bd5f5"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">uint32_t time_between_spikes</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<p>The number of clock ticks between processing each neuron at each delay stage </p>
-
-</div>
-</div>
 <a class="anchor" id="a73996d13ad0b2acf43a8bae560ac63c0"></a>
 <div class="memitem">
 <div class="memproto">
@@ -346,10 +325,31 @@ n_packets_sent</td>
 
 </div>
 </div>
+<a class="anchor" id="ab41b4929abf5a9fbed2f869be67bd5f5"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint32_t time_between_spikes</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>The number of clock ticks between processing each neuron at each delay stage </p>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 28 2020 09:26:45 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 28 2020 12:09:27 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

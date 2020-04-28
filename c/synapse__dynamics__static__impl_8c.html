@@ -158,60 +158,41 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>synapse_ty
 <div class="textblock"><p>This file contains the main interface for structural plasticity and some shared code. For the main implementation, see <a class="el" href="topographic__map__impl_8c.html" title="This file contains the main functions for probabilistic synaptogenesis. ">topographic_map_impl.c</a>. </p>
 <dl class="section author"><dt>Author</dt><dd>Petrut Bogdan </dd></dl>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a class="anchor" id="a30b01777aad5fef37adccffc7cbef483"></a>
+<a class="anchor" id="a24b755e1d96fcab4e950b83796376e75"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool synapse_dynamics_add_neuron </td>
+          <td class="memname">uint32_t synapse_dynamics_get_plastic_pre_synaptic_events </td>
           <td>(</td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>id</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
           <td></td>
-          <td class="paramtype">address_t&#160;</td>
-          <td class="paramname"><em>row</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">weight_t&#160;</td>
-          <td class="paramname"><em>weight</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>delay</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>type</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Add an entry in the synaptic row. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">id</td><td>the (core-local) ID of the post-synaptic neuron to be added </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">row</td><td>the core-local address of the synaptic row </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">weight</td><td>the initial weight associated with the connection </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">delay</td><td>the delay associated with the connection </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">type</td><td>the type of the connection (e.g. inhibitory) </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>was the addition successful? </dd></dl>
+<p>returns the counters for plastic pre synaptic events based on (if the model was compiled with SYNAPSE_BENCHMARK parameter) or returns 0 </p>
+<dl class="section return"><dt>Returns</dt><dd>counters for plastic pre synaptic events or 0 </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a540b2206e6909e8e88c3a98a47ddcb2a"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint32_t synapse_dynamics_get_plastic_saturation_count </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>returns the number of ring buffer saturation events due to adding plastic weights. </p>
+<dl class="section return"><dt>Returns</dt><dd>counter for saturation events or 0 </dd></dl>
 
 </div>
 </div>
@@ -279,69 +260,6 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>synapse_ty
 
 </div>
 </div>
-<a class="anchor" id="a24b755e1d96fcab4e950b83796376e75"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">uint32_t synapse_dynamics_get_plastic_pre_synaptic_events </td>
-          <td>(</td>
-          <td class="paramtype">void&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>returns the counters for plastic pre synaptic events based on (if the model was compiled with SYNAPSE_BENCHMARK parameter) or returns 0 </p>
-<dl class="section return"><dt>Returns</dt><dd>counters for plastic pre synaptic events or 0 </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="a540b2206e6909e8e88c3a98a47ddcb2a"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">uint32_t synapse_dynamics_get_plastic_saturation_count </td>
-          <td>(</td>
-          <td class="paramtype">void&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>returns the number of ring buffer saturation events due to adding plastic weights. </p>
-<dl class="section return"><dt>Returns</dt><dd>counter for saturation events or 0 </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="a9bc6d64da323d9f5b06333efae6ff107"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">uint32_t synapse_dynamics_n_connections_in_row </td>
-          <td>(</td>
-          <td class="paramtype">address_t&#160;</td>
-          <td class="paramname"><em>fixed</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Get the number of connections in the given row. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">fixed</td><td>the fixed region of the synaptic row </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>The number of connections in the row </dd></dl>
-
-</div>
-</div>
 <a class="anchor" id="abc297b864cdfaa0cd6e7115cd064baef"></a>
 <div class="memitem">
 <div class="memproto">
@@ -378,10 +296,92 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>synapse_ty
 
 </div>
 </div>
+<a class="anchor" id="a30b01777aad5fef37adccffc7cbef483"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool synapse_dynamics_add_neuron </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">address_t&#160;</td>
+          <td class="paramname"><em>row</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">weight_t&#160;</td>
+          <td class="paramname"><em>weight</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>delay</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>type</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Add an entry in the synaptic row. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">id</td><td>the (core-local) ID of the post-synaptic neuron to be added </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">row</td><td>the core-local address of the synaptic row </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">weight</td><td>the initial weight associated with the connection </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">delay</td><td>the delay associated with the connection </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">type</td><td>the type of the connection (e.g. inhibitory) </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>was the addition successful? </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a9bc6d64da323d9f5b06333efae6ff107"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint32_t synapse_dynamics_n_connections_in_row </td>
+          <td>(</td>
+          <td class="paramtype">address_t&#160;</td>
+          <td class="paramname"><em>fixed</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the number of connections in the given row. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">fixed</td><td>the fixed region of the synaptic row </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The number of connections in the row </dd></dl>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 28 2020 09:26:45 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 28 2020 12:09:27 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

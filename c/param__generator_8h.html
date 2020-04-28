@@ -114,27 +114,39 @@ Functions</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Interface for parameter generator. </p>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a class="anchor" id="a20b9f761fb073750e083d131cf49812e"></a>
+<a class="anchor" id="a7f47aef417cd5ec8cf73a199d71dced2"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void param_generator_free </td>
+          <td class="memname">param_generator_t param_generator_init </td>
           <td>(</td>
-          <td class="paramtype">param_generator_t&#160;</td>
-          <td class="paramname"><em>generator</em></td><td>)</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>hash</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">address_t *&#160;</td>
+          <td class="paramname"><em>region</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Finish with a parameter generator. </p>
+<p>Initialise a specific parameter generator. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">generator</td><td>The generator to free </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">hash</td><td>The identifier of the generator to initialise </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">region</td><td>The address to read data from; updated to position after data has been read </td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>An initialised parameter generator that can be used with other functions, or NULL if it couldn't be initialised for any reason </dd></dl>
 
 </div>
 </div>
@@ -194,46 +206,34 @@ Functions</h2></td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a7f47aef417cd5ec8cf73a199d71dced2"></a>
+<a class="anchor" id="a20b9f761fb073750e083d131cf49812e"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">param_generator_t param_generator_init </td>
+          <td class="memname">void param_generator_free </td>
           <td>(</td>
-          <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>hash</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramtype">param_generator_t&#160;</td>
+          <td class="paramname"><em>generator</em></td><td>)</td>
           <td></td>
-          <td class="paramtype">address_t *&#160;</td>
-          <td class="paramname"><em>region</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>Initialise a specific parameter generator. </p>
+<p>Finish with a parameter generator. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">hash</td><td>The identifier of the generator to initialise </td></tr>
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">region</td><td>The address to read data from; updated to position after data has been read </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">generator</td><td>The generator to free </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>An initialised parameter generator that can be used with other functions, or NULL if it couldn't be initialised for any reason </dd></dl>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Apr 28 2020 09:26:46 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Apr 28 2020 12:09:28 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>
