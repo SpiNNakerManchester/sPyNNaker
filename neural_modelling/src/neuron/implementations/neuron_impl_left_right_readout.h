@@ -211,8 +211,8 @@ static void neuron_impl_load_neuron_parameters(
     io_printf(IO_BUF, "rate off: %k \n\n", global_parameters->rate_off);
     io_printf(IO_BUF, "mean 0: %k \n\n", global_parameters->mean_0);
     io_printf(IO_BUF, "mean 1: %k \n\n", global_parameters->mean_1);
-    io_printf(IO_BUF, "poisson key: %k \n\n", global_parameters->p_key);
-    io_printf(IO_BUF, "poisson pop size: %k \n\n", global_parameters->p_pop_size);
+    io_printf(IO_BUF, "poisson key: %u \n\n", global_parameters->p_key);
+    io_printf(IO_BUF, "poisson pop size: %u \n\n", global_parameters->p_pop_size);
 
 
     for (index_t n = 0; n < n_neurons; n++) {
@@ -309,7 +309,8 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
         global_parameters->mean_0 == 0k;
         global_parameters->mean_1 == 0k;
     }
-
+    io_printf(IO_BUF, "current_state = %u, current_cue = %u, time = %u\n", current_state, current_cue, time);
+    //
     if (current_state == STATE_CUE){
         if (neuron_index == 2){ // this is the error source
             recorded_variable_values[V_RECORDING_INDEX] = accumulative_direction;
@@ -331,16 +332,18 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
                 accumulative_direction += current_cue_direction;
                 REAL payload;
                 payload = global_parameters->rate_on;
+                io_printf(IO_BUF, "poisson setting 1\n");
                 for (int j = current_cue_direction*global_parameters->p_pop_size;
                         j < current_cue_direction*global_parameters->p_pop_size + global_parameters->p_pop_size; j++){
                     spin1_send_mc_packet(global_parameters->p_key | j, payload, WITH_PAYLOAD);
                 }
             }
-            // turn off and reset if finsihed
+            // turn off and reset if finished
             else if ((time - current_time) % (wait_between_cues + duration_of_cue) == (wait_between_cues + duration_of_cue) - 1){
                 current_cue += 1;
                 REAL payload;
                 payload = global_parameters->rate_off;
+                io_printf(IO_BUF, "poisson setting 2\n");
                 for (int j = current_cue_direction*global_parameters->p_pop_size;
                         j < current_cue_direction*global_parameters->p_pop_size + global_parameters->p_pop_size; j++){
                     spin1_send_mc_packet(global_parameters->p_key | j, payload, WITH_PAYLOAD);
@@ -368,6 +371,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
             for (int i = 0; i < 4; i++){
                 REAL payload;
                 payload = global_parameters->rate_on;
+                io_printf(IO_BUF, "poisson setting 3\n");
                 for (int j = 2*global_parameters->p_pop_size;
                         j < 2*global_parameters->p_pop_size + global_parameters->p_pop_size; j++){
                     spin1_send_mc_packet(global_parameters->p_key | j, payload, WITH_PAYLOAD);

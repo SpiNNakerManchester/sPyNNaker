@@ -5,8 +5,10 @@ from pacman.executor.injection_decorator import inject_items
 from .abstract_neuron_model import AbstractNeuronModel
 
 # from pacman.model.graphs.application.application_vertex import ApplicationVertex
-from spinn_front_end_common.abstract_models.abstract_provides_n_keys_for_partition import AbstractProvidesNKeysForPartition
-from spinn_front_end_common.abstract_models.abstract_generates_data_specification import AbstractGeneratesDataSpecification
+# from spinn_front_end_common.abstract_models.abstract_provides_n_keys_for_partition import AbstractProvidesNKeysForPartition
+# from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
+# from spynnaker.pyNN.models.neuron.implementations import NeuronImplStandard
+
 
 SYNAPSES_PER_NEURON = 250   # around 415 with only 3 in syn_state
 MICROSECONDS_PER_SECOND = 1000000.0
@@ -32,6 +34,7 @@ RATE_AT_LAST_SETTING = "rate_at_last_setting"
 # PROB_COMMAND = "prob_command"
 RATE_ON = "rate_on"
 RATE_OFF = "rate_off"
+POISSON_POP_SIZE = 'poisson_pop_size'
 
 UNITS = {
     V: 'mV',
@@ -44,7 +47,7 @@ UNITS = {
 }
 
 
-class NeuronModelLeftRightReadout(AbstractNeuronModel, AbstractProvidesNKeysForPartition, AbstractGeneratesDataSpecification):
+class NeuronModelLeftRightReadout(AbstractNeuronModel):
     __slots__ = [
         "_v_init",
         "_v_rest",
@@ -162,16 +165,6 @@ class NeuronModelLeftRightReadout(AbstractNeuronModel, AbstractProvidesNKeysForP
     def set_poisson_key(self, p_key):
         self._poisson_key = p_key
 
-    # @overrides(AbstractProvidesNKeysForPartition.get_n_keys_for_partition)
-    # def get_n_keys_for_partition(self, partition, graph_mapper):
-    #     return self._n_keys_in_target
-    #
-    # @inject_items({"routing_info": "MemoryRoutingInfos"})
-    # @overrides(AbstractGeneratesDataSpecification.generate_data_specification, additional_arguments={"routing_info"})
-    # def generate_data_specification(self, spec, placement, routing_info):
-    #     key = routing_info.get_first_key_from_pre_vertex(placement.vertex, "CONTROL")
-    #     self._poisson_key = key
-
     @overrides(AbstractNeuronModel.get_n_cpu_cycles)
     def get_n_cpu_cycles(self, n_neurons):
         # A bit of a guess
@@ -195,6 +188,7 @@ class NeuronModelLeftRightReadout(AbstractNeuronModel, AbstractProvidesNKeysForP
         parameters[RATE_OFF] = self._rate_off
 
         parameters[TICKS_PER_SECOND] = 0 # set in get_valuers()
+        parameters[POISSON_POP_SIZE] = self._poisson_pop_size
         # parameters[RATE_UPDATE_THRESHOLD] = self._rate_update_threshold
 #         parameters[TARGET_DATA] = self._target_data
 
