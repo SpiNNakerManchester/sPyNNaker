@@ -28,8 +28,8 @@
 
 //! if using profiler import profiler tags
 #ifdef PROFILER_ENABLED
-    #include "profile_tags.h"
-#endif
+#include "profile_tags.h"
+#endif //PROFILER_ENABLED
 
 //! Globals required for synapse benchmarking to work.
 uint32_t  num_fixed_pre_synaptic_events = 0;
@@ -63,11 +63,18 @@ static uint32_t synapse_type_mask;
 /* PRIVATE FUNCTIONS */
 
 #if LOG_LEVEL >= LOG_DEBUG
-static const char *get_type_char(uint32_t synapse_type) {
+//! \brief get the synapse type character
+//! \param[in] synapse_type: the synapse type
+//! \return a single character string describing the synapse type
+static inline const char *get_type_char(uint32_t synapse_type) {
     return neuron_get_synapse_type_char(synapse_type);
 }
 #endif // LOG_LEVEL >= LOG_DEBUG
 
+//! \brief Print a synaptic row.
+//!
+//! Only does anything when debugging.
+//! \param[in] synaptic_row: The synaptic row to print
 static inline void print_synaptic_row(synaptic_row_t synaptic_row) {
 #if LOG_LEVEL >= LOG_DEBUG
     log_debug("Synaptic row, at address %08x Num plastic words:%u\n",
@@ -120,39 +127,48 @@ static inline void print_synaptic_row(synaptic_row_t synaptic_row) {
 #endif // LOG_LEVEL >= LOG_DEBUG
 }
 
+//! \brief Print the contents of the ring buffers.
+//!
+//! Only does anything when debugging.
+//! \param[in] time: The current timestamp
 static inline void print_ring_buffers(uint32_t time) {
 #if LOG_LEVEL >= LOG_DEBUG
-    io_printf(IO_BUF, "Ring Buffer at %u\n", time);
-    io_printf(IO_BUF, "----------------------------------------\n");
+    log_debug("Ring Buffer at %u\n", time);
+    log_debug("----------------------------------------\n");
     for (uint32_t n = 0; n < n_neurons; n++) {
         for (uint32_t t = 0; t < n_synapse_types; t++) {
-            const char *type_string = get_type_char(t);
-            bool empty = true;
+            // Determine if this row can be omitted
             for (uint32_t d = 0; d < (1 << SYNAPSE_DELAY_BITS); d++) {
-                empty = empty && (ring_buffers[
-                        synapses_get_ring_buffer_index(d + time, t, n,
-                        synapse_type_index_bits, synapse_index_bits)] == 0);
-            }
-            if (!empty) {
-                io_printf(IO_BUF, "%3d(%s):", n, type_string);
-                for (uint32_t d = 0; d < (1 << SYNAPSE_DELAY_BITS); d++) {
-                    log_debug(" ");
-                    uint32_t ring_buffer_index = synapses_get_ring_buffer_index(
-                            d + time, t, n,
-                            synapse_type_index_bits, synapse_index_bits);
-                    synapses_print_weight(ring_buffers[ring_buffer_index],
-                            ring_buffer_to_input_left_shifts[t]);
+                if (ring_buffers[synapses_get_ring_buffer_index(
+                        d + time, t, n, synapse_type_index_bits,
+                        synapse_index_bits)] != 0) {
+                    goto doPrint;
                 }
-                io_printf(IO_BUF, "\n");
             }
+            continue;
+        doPrint:
+            // Have to print the row
+            log_debug("%3d(%s):", n, get_type_char(t));
+            for (uint32_t d = 0; d < (1 << SYNAPSE_DELAY_BITS); d++) {
+                log_debug(" ");
+                uint32_t ring_buffer_index = synapses_get_ring_buffer_index(
+                        d + time, t, n, synapse_type_index_bits,
+                        synapse_index_bits);
+                synapses_print_weight(ring_buffers[ring_buffer_index],
+                        ring_buffer_to_input_left_shifts[t]);
+            }
+            log_debug("\n");
         }
     }
-    io_printf(IO_BUF, "----------------------------------------\n");
+    log_debug("----------------------------------------\n");
 #else
     use(time);
 #endif // LOG_LEVEL >= LOG_DEBUG
 }
 
+//! \brief Print the neuron inputs.
+//!
+//! Only does anything when debugging.
 static inline void print_inputs(void) {
 #if LOG_LEVEL >= LOG_DEBUG
     log_debug("Inputs\n");
@@ -165,6 +181,8 @@ static inline void print_inputs(void) {
 //!
 //! Every spike event could cause up to 256 different weights to
 //! be put into the ring buffer.
+//! \param[in] fixed_region_address: The fixed region of the synaptic matrix
+//! \param[in] time: The current simulation time
 static inline void process_fixed_synapses(
         address_t fixed_region_address, uint32_t time) {
     register uint32_t *synaptic_words =
@@ -211,8 +229,8 @@ static inline void process_fixed_synapses(
 
 //! private method for doing output debug data on the synapses
 static inline void print_synapse_parameters(void) {
-//! only if the models are compiled in debug mode will this method contain
-//! said lines.
+// only if the models are compiled in debug mode will this method contain
+// said lines.
 #if LOG_LEVEL >= LOG_DEBUG
     // again neuron_synapse_shaping_params has moved to implementation
     neuron_print_synapse_parameters();

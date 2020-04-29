@@ -37,8 +37,7 @@
 #include "profile_tags.h"
 #include <profiler.h>
 
-//! Declare spin1_wfi, missing from spin1api header
-extern void spin1_wfi(void);
+#include "spin1-wfi.h"
 
 //! Spin1 API ticks, to know when the timer wraps
 extern uint ticks;

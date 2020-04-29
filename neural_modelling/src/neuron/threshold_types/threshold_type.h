@@ -25,7 +25,7 @@
 
 #include <common/neuron-typedefs.h>
 
-//! Forward declaration of the threshold pointer type
+// Forward declaration of the threshold pointer type
 struct threshold_type_t;
 typedef struct threshold_type_t threshold_type_t;
 typedef threshold_type_t* threshold_type_pointer_t;
@@ -33,6 +33,7 @@ typedef threshold_type_t* threshold_type_pointer_t;
 //! \brief Determines if the value given is above the threshold value
 //! \param[in] value The value to determine if it is above the threshold
 //! \param[in] params The parameters to use to determine the result
+//! \return True if the neuron should fire
 static bool threshold_type_is_above_threshold(
         state_t value, threshold_type_t *threshold_type);
 

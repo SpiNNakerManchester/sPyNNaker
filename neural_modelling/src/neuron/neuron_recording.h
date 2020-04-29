@@ -24,20 +24,23 @@
 #include <common/neuron-typedefs.h>
 #include <bit_field.h>
 #include <recording.h>
-
+#include "spin1-wfi.h"
 
 #ifndef N_RECORDED_VARS
+//! \brief Number of word-typed variables to be recorded.
+//!
+//! _Actually_ set at compile time or by whatever includes this file.
 #define N_RECORDED_VARS 1
 #error N_RECORDED_VARS was undefined.  It should be defined by a neuron impl include.
 #endif
 
 #ifndef N_BITFIELD_VARS
+//! \brief Number of bitfield-typed variables to be recorded.
+//!
+//! _Actually_ set at compile time or by whatever includes this file.
 #define N_BITFIELD_VARS 1
 #error N_BITFIELD_VARS was undefined.  It should be defined by a neuron impl include.
 #endif
-
-// declare spin1_wfi
-void spin1_wfi();
 
 //! A struct of the different types of recorded data
 // Note data is just bytes here but actual type is used on writing

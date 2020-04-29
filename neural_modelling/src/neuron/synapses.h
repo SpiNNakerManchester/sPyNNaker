@@ -71,6 +71,9 @@ static inline input_t synapses_convert_weight_to_input(
     return converter.output_type;
 }
 
+//! \brief Print the weight of a synapse
+//! \param[in] weight: the weight to print in synapse-row form
+//! \param[in] left_shift: the shift to use when decoding
 static inline void synapses_print_weight(
         weight_t weight, uint32_t left_shift) {
     if (weight != 0) {
@@ -81,12 +84,24 @@ static inline void synapses_print_weight(
     }
 }
 
+//! \brief Initialise the synapses
+//! \param[in] synapse_params_address: Synapse configuration
+//! \param[in] direct_matrix_address: Direct synapse matrix configuration
+//! \param[in] n_neurons: Number of neurons
+//! \param[in] n_synapse_types: Number of synapse types
+//! \param[out] ring_buffer_to_input_buffer_left_shifts:
+//!     Array of shifts to use when converting from ring buffer values to input
+//!     buffer values
+//! \param[out] direct_synapses_address: Direct synapse information
+//! \return True on success, false on failure
 bool synapses_initialise(
         address_t synapse_params_address, address_t direct_matrix_address,
         uint32_t n_neurons, uint32_t n_synapse_types,
         uint32_t **ring_buffer_to_input_buffer_left_shifts,
         address_t *direct_synapses_address);
 
+//! \brief Do all the synapse processing.
+//! \param[in] time: the simulated time
 void synapses_do_timestep_update(timer_t time);
 
 //! \brief process a synaptic row
