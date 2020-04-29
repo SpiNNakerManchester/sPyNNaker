@@ -22,8 +22,8 @@ from .abstract_neuron_impl import AbstractNeuronImpl
 from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
-# The base size of the data
-_BASE_SIZE = 1 * BYTES_PER_WORD
+# The size of the n_steps_per_timestep parameter
+_N_STEPS_PER_TIMESTEP_SIZE = 1 * BYTES_PER_WORD
 
 # The default number of steps per timestep
 _DEFAULT_N_STEPS_PER_TIMESTEP = 1
@@ -116,7 +116,7 @@ class NeuronImplStandard(AbstractNeuronImpl):
 
     @overrides(AbstractNeuronImpl.get_dtcm_usage_in_bytes)
     def get_dtcm_usage_in_bytes(self, n_neurons):
-        total = _BASE_SIZE
+        total = _N_STEPS_PER_TIMESTEP_SIZE
         total += self.__neuron_model.get_dtcm_usage_in_bytes(n_neurons)
         total += self.__synapse_type.get_dtcm_usage_in_bytes(n_neurons)
         total += self.__input_type.get_dtcm_usage_in_bytes(n_neurons)
@@ -128,7 +128,7 @@ class NeuronImplStandard(AbstractNeuronImpl):
 
     @overrides(AbstractNeuronImpl.get_sdram_usage_in_bytes)
     def get_sdram_usage_in_bytes(self, n_neurons):
-        total = _BASE_SIZE
+        total = _N_STEPS_PER_TIMESTEP_SIZE
         total += self.__neuron_model.get_sdram_usage_in_bytes(n_neurons)
         total += self.__synapse_type.get_sdram_usage_in_bytes(n_neurons)
         total += self.__input_type.get_sdram_usage_in_bytes(n_neurons)
@@ -198,7 +198,7 @@ class NeuronImplStandard(AbstractNeuronImpl):
     @overrides(AbstractNeuronImpl.read_data)
     def read_data(
             self, data, offset, vertex_slice, parameters, state_variables):
-        offset += _BASE_SIZE
+        offset += _N_STEPS_PER_TIMESTEP_SIZE
         for component in self.__components:
             offset = component.read_data(
                 data, offset, vertex_slice, parameters, state_variables)
