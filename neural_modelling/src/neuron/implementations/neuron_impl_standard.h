@@ -238,7 +238,8 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     // Store whether the neuron has spiked
     bool spike = false;
 
-    // Loop however many times requested
+    // Loop however many times requested; do this in reverse for efficiency,
+    // and because the index doesn't actually matter
     for (uint32_t i = n_steps_per_timestep; i > 0; i--) {
 
         // Get the voltage
