@@ -19,10 +19,11 @@
 //! \brief Profiler tags
 #pragma once
 
+//! Tags used when profiling sPyNNaker neuron code
 enum profiler_tags_e {
-    PROFILER_TIMER,                     // 0
-    PROFILER_DMA_READ,                  // 1
-    PROFILER_INCOMING_SPIKE,            // 2
-    PROFILER_PROCESS_FIXED_SYNAPSES,    // 3
-    PROFILER_PROCESS_PLASTIC_SYNAPSES   // 4
+    PROFILER_TIMER,                     //!< timer
+    PROFILER_DMA_READ,                  //!< DMA read
+    PROFILER_INCOMING_SPIKE,            //!< incoming spike handling
+    PROFILER_PROCESS_FIXED_SYNAPSES,    //!< fixed synapse processing
+    PROFILER_PROCESS_PLASTIC_SYNAPSES   //!< plastic synapse processing
 };

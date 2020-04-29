@@ -22,16 +22,17 @@
 //! region identifier mapping.
 #pragma once
 
-typedef enum regions_e {
-    SYSTEM_REGION,            // 0
-    NEURON_PARAMS_REGION,     // 1
-    SYNAPSE_PARAMS_REGION,    // 2
-    POPULATION_TABLE_REGION,  // 3
-    SYNAPTIC_MATRIX_REGION,   // 4
-    SYNAPSE_DYNAMICS_REGION,  // 5
-    NEURON_RECORDING_REGION,  // 6
-    PROVENANCE_DATA_REGION,   // 7
-    PROFILER_REGION,          // 8
-    CONNECTOR_BUILDER_REGION, // 9
-    DIRECT_MATRIX_REGION      // 10
+//! DSG region identifiers
+typedef enum neuron_regions_e {
+    SYSTEM_REGION,            //!< simulation system; 0
+    NEURON_PARAMS_REGION,     //!< neuron parameters; 1
+    SYNAPSE_PARAMS_REGION,    //!< synapse parameters; 2
+    POPULATION_TABLE_REGION,  //!< master population table; 3
+    SYNAPTIC_MATRIX_REGION,   //!< synaptic matrix; 4
+    SYNAPSE_DYNAMICS_REGION,  //!< synapse dynamics; 5
+    NEURON_RECORDING_REGION,  //!< recording; 6
+    PROVENANCE_DATA_REGION,   //!< provenance; 7
+    PROFILER_REGION,          //!< profiling; 8
+    CONNECTOR_BUILDER_REGION, //!< connection building; 9
+    DIRECT_MATRIX_REGION      //!< direct synaptic matrix; 10
 } regions_e;

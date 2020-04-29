@@ -51,17 +51,23 @@
 /* validates that the model being compiled does indeed contain a application
  * magic number*/
 #ifndef APPLICATION_NAME_HASH
-#define APPLICATION_NAME_HASH 0
 #error APPLICATION_NAME_HASH was undefined.  Make sure you define this\
     constant
 #endif
 
+//! The provenance information written on application shutdown.
 struct neuron_provenance {
+    //! A count of presynaptic events.
     uint32_t n_pre_synaptic_events;
+    //! A count of synaptic saturations.
     uint32_t n_synaptic_weight_saturations;
+    //! A count of the times that the synaptic input circular buffers overflowed
     uint32_t n_input_buffer_overflows;
+    //! The current time.
     uint32_t current_timer_tick;
+    //! The number of STDP weight saturations.
     uint32_t n_plastic_synaptic_weight_saturations;
+    //! The number of rewirings performed.
     uint32_t n_rewires;
 };
 
@@ -75,8 +81,8 @@ typedef enum callback_priorities {
 
 // Globals
 
-//! the current timer tick value
-//! the timer tick callback returning the same value.
+//! The current timer tick value.
+// the timer tick callback returning the same value.
 uint32_t time;
 
 static uint32_t timer_period;
@@ -103,8 +109,9 @@ uint32_t count_rewire_attempts = 0;
 //! The number of neurons on the core
 static uint32_t n_neurons;
 
-
-void c_main_store_provenance_data(address_t provenance_region) {
+//! \brief Callback to store provenance data (format: neuron_provenance).
+//! \param[out] provenance_region: Where to write the provenance data
+static void c_main_store_provenance_data(address_t provenance_region) {
     log_debug("writing other provenance data");
     struct neuron_provenance *prov = (void *) provenance_region;
 

@@ -51,7 +51,7 @@ static uint32_t continue_if_not_different;
 static uint32_t simulation_ticks;
 static uint32_t infinite_run;
 
-enum regions_e {
+enum robot_motor_control_regions_e {
     SYSTEM_REGION,
     PARAMS_REGION
 };

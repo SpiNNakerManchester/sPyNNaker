@@ -25,7 +25,13 @@
 #include "neuron.h"
 
 //! \brief Get the index of the ring buffer for a given timestep, synapse type
-//! and neuron index
+//!     and neuron index
+//! \param[in] simulation_timestep:
+//! \param[in] synapse_type_index:
+//! \param[in] neuron_index:
+//! \param[in] synapse_type_index_bits:
+//! \param[in] synapse_index_bits:
+//! \return Index into the ring buffer
 static inline index_t synapses_get_ring_buffer_index(
         uint32_t simuation_timestep, uint32_t synapse_type_index,
         uint32_t neuron_index, uint32_t synapse_type_index_bits,
@@ -36,7 +42,11 @@ static inline index_t synapses_get_ring_buffer_index(
 }
 
 //! \brief Get the index of the ring buffer for a given timestep and combined
-//! synapse type and neuron index (as stored in a synapse row)
+//!     synapse type and neuron index (as stored in a synapse row)
+//! \param[in] simulation_timestep:
+//! \param[in] combined_synapse_neuron_index:
+//! \param[in] synapse_type_index_bits:
+//! \return Index into the ring buffer
 static inline index_t synapses_get_ring_buffer_index_combined(
         uint32_t simulation_timestep,
         uint32_t combined_synapse_neuron_index,
@@ -45,7 +55,10 @@ static inline index_t synapses_get_ring_buffer_index_combined(
             | combined_synapse_neuron_index;
 }
 
-//! Converts a weight stored in a synapse row to an input
+//! \brief Converts a weight stored in a synapse row to an input
+//! \param[in] weight: the weight to convert in synapse-row form
+//! \param[in] left_shift: the shift to use when decoding
+//! \return the actual input weight for the model
 static inline input_t synapses_convert_weight_to_input(
         weight_t weight, uint32_t left_shift) {
     union {
