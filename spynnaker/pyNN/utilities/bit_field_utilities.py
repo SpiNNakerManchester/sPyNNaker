@@ -25,7 +25,8 @@ from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 # number of elements
 ELEMENTS_USED_IN_EACH_BIT_FIELD = 3  # n words, key, pointer to bitfield
 
-ELEMENTS_USED_IN_BIT_FIELD_HEADER = 2  # n bitfields,  pointer for array
+# n_merged_filters, n_redunanct_filters,n_filters pointer for array
+ELEMENTS_USED_IN_BIT_FIELD_HEADER = 4
 
 # n elements in each key to n atoms map for bitfield (key, n atoms)
 N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP = 2

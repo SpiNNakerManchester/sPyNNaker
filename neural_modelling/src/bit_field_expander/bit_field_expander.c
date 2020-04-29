@@ -342,19 +342,60 @@ bool _do_sdram_read_and_test(
     return process_synaptic_row(row_data);
 }
 
-void _sort_by_redunancy(){
-    for (int i = 0; i < bit_field_base_address->n_filters -1; i++){
-        int i_atoms = bit_field_base_address->filters[i].n_atoms;
-        int i_words = get_bit_field_size(i_atoms);
-        int i_redunant = i_atoms - count_bit_field(bit_field_base_address->filters[i].data, i_words);
-        for (int j = i + 1; j < bit_field_base_address->n_filters; j++){
-            int j_atoms = bit_field_base_address->filters[j].n_atoms;
-                        int j_words = get_bit_field_size(j_atoms);
-            int j_redunant = j_atoms - count_bit_field(bit_field_base_address->filters[j].data, j_words);
+void _sort_by_redunancy() {
+    // Semantic sugar
+    int n_filters = bit_field_base_address->n_filters;
+    filter_info_t* filters = bit_field_base_address->filters;
+
+    // no filters merged of course
+    bit_field_base_address->n_merged_filters = 0;
+
+    // Avoid indexing if len is 0
+    if (n_filters == 0) {
+        bit_field_base_address->n_redundancy_filters = 0;
+        return;
+    }
+
+    int n_redundancy_filters = n_filters - 1;
+    int i = 0;
+    int i_atoms;
+    int i_words;
+    // move packets without redundancy to the end
+    while (i < n_redundancy_filters) {
+        i_atoms = filters[i].n_atoms;
+        i_words = get_bit_field_size(i_atoms);
+        if (i_atoms > count_bit_field(filters[i].data, i_words)) {
+            // Found redunancy so leave at top
+            i++;
+        } else {
+            filter_info_t bit_field_temp = filters[i];
+            filters[i] = filters[n_redundancy_filters];
+            filters[n_redundancy_filters] = bit_field_temp;
+            n_redundancy_filters--;
+        }
+    }
+    // check if filter at index n_redundancy_filters is redundnant too
+    i_atoms = filters[n_redundancy_filters].n_atoms;
+    i_words = get_bit_field_size(i_atoms);
+    if (i_atoms > count_bit_field(filters[n_redundancy_filters].data, i_words)) {
+        bit_field_base_address->n_redundancy_filters = n_redundancy_filters;
+    } else {
+        bit_field_base_address->n_redundancy_filters = n_redundancy_filters - 1;
+    }
+
+    // bubble sort just the packets with redundancy
+    for (int i = 0; i < n_redundancy_filters -1; i++){
+        i_atoms = filters[i].n_atoms;
+        i_words = get_bit_field_size(i_atoms);
+        int i_redunant = i_atoms - count_bit_field(filters[i].data, i_words);
+        for (int j = i + 1; j < n_redundancy_filters; j++){
+            int j_atoms = filters[j].n_atoms;
+            int j_words = get_bit_field_size(j_atoms);
+            int j_redunant = j_atoms - count_bit_field(filters[j].data, j_words);
             if (i_redunant < j_redunant) {
-                filter_info_t bit_field_temp = bit_field_base_address->filters[i];
-                bit_field_base_address->filters[i] = bit_field_base_address->filters[j];
-                bit_field_base_address->filters[j] = bit_field_temp;
+                filter_info_t bit_field_temp = filters[i];
+                filters[i] = filters[j];
+                filters[j] = bit_field_temp;
                 i_redunant = j_redunant;
             }
         }
@@ -368,7 +409,7 @@ bool generate_bit_field(void) {
 
     // write how many entries (thus bitfields) are to be generated into sdram
     log_debug("update by pop length");
-    bit_field_base_address->n_filters = 0;
+    bit_field_base_address->n_filters = population_table_length();
 
     // location where to dump the bitfields into (right after the filter structs
     address_t bit_field_words_location =
@@ -471,27 +512,24 @@ bool generate_bit_field(void) {
             }
         }
 
-        if (n_neurons != count_bit_field(bit_field, n_words)){
-            log_debug("writing bitfield to sdram for core use");
-            bit_field_base_address->filters[bit_field_base_address->n_filters].key = key;
-            log_debug("putting master pop key %d in entry %d", key, bit_field_base_address->n_filters);
-            bit_field_base_address->filters[bit_field_base_address->n_filters].n_atoms = n_neurons;
-            log_debug("putting n_atom %d in entry %d", n_neurons, bit_field_base_address->n_filters);
-            // write bitfield to sdram.
-            log_debug("writing to address %0x, %d words to write",
-                  &bit_field_words_location[position], n_words);
-            spin1_memcpy(
-                &bit_field_words_location[position], bit_field,
-                n_words * BYTE_TO_WORD_CONVERSION);
-            // update pointer to correct place
-            bit_field_base_address->filters[bit_field_base_address->n_filters].data =
-                (bit_field_t) &bit_field_words_location[position];
+        log_debug("writing bitfield to sdram for core use");
+        bit_field_base_address->filters[master_pop_entry].key = key;
+        log_debug("putting master pop key %d in entry %d", key, master_pop_entry);
+        bit_field_base_address->filters[master_pop_entry].n_atoms = n_neurons;
+        log_debug("putting n_atom %d in entry %d", n_neurons, master_pop_entry);
+        // write bitfield to sdram.
+        log_debug("writing to address %0x, %d words to write",
+              &bit_field_words_location[position], n_words);
+        spin1_memcpy(
+            &bit_field_words_location[position], bit_field,
+            n_words * BYTE_TO_WORD_CONVERSION);
+        // update pointer to correct place
+        bit_field_base_address->filters[master_pop_entry].data =
+            (bit_field_t) &bit_field_words_location[position];
 
-            // update tracker
-            position += n_words;
+        // update tracker
+        position += n_words;
 
-            bit_field_base_address->n_filters++;
-        }
         // free dtcm of bitfield.
         log_debug("freeing the bitfield dtcm");
         sark_free(bit_field);
