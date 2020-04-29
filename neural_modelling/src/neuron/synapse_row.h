@@ -105,12 +105,14 @@
 //! the mask for the synapse delay in the row
 #define SYNAPSE_DELAY_MASK      ((1 << SYNAPSE_DELAY_BITS) - 1)
 
-// Define the type of the weights
 #ifdef SYNAPSE_WEIGHTS_SIGNED
+//! Define the type of the weights
 typedef __int_t(SYNAPSE_WEIGHT_BITS) weight_t;
 #else
+//! Define the type of the weights
 typedef __uint_t(SYNAPSE_WEIGHT_BITS) weight_t;
 #endif
+//! Define the type of the control data
 typedef uint16_t control_t;
 
 //! Number of header words per synaptic row

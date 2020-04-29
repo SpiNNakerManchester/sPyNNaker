@@ -24,9 +24,12 @@
 #include <spin1_api.h>
 #include <stdfix-full-iso.h>
 
+//! Inter-spike interval, in &mu;s
 static uint32_t time_between_spikes;
+//! Timestamp that we won't send our next packet before, in &mu;s
 static uint32_t expected_time;
 
+//! What sort of message payload should we send?
 enum send_type {
     SEND_TYPE_INT = 0,
     SEND_TYPE_UINT,
@@ -36,6 +39,7 @@ enum send_type {
     SEND_TYPE_UFRACT,
 };
 
+//! The definition of the threshold
 struct threshold_type_t {
     //! The key to send to update the value
     uint32_t key;
@@ -56,12 +60,13 @@ struct threshold_type_t {
     enum send_type type;
 };
 
-typedef union _int_bits_union {
-    int int_value;
-    uint uint_value;
-} _int_bits_union;
+// Typesafe magic reinterpret cast
+static inline uint _int_bits(int value) {
+    typedef union _int_bits_union {
+        int int_value;
+        uint uint_value;
+    } _int_bits_union;
 
-static inline uint int_bits(int value) {
     _int_bits_union converter;
     converter.int_value = value;
     return converter.uint_value;
@@ -90,18 +95,22 @@ static inline void send_packet(
     }
 }
 
+//! \brief Converts the value into the right form for sending as a payload
+//! \param[in] type: what type of payload are we really dealing with
+//! \param[in] value: the value, after scaling
+//! \return The word to go in the multicast packet payload
 static inline uint get_payload(enum send_type type, accum value) {
     switch (type) {
     case SEND_TYPE_INT:
-        return int_bits((int) value);
+        return _int_bits((int) value);
     case SEND_TYPE_UINT:
         return (uint) value;
     case SEND_TYPE_ACCUM:
-        return int_bits(bitsk(value));
+        return _int_bits(bitsk(value));
     case SEND_TYPE_UACCUM:
         return bitsuk((unsigned accum) value);
     case SEND_TYPE_FRACT:
-        return int_bits(bitslr((long fract) value));
+        return _int_bits(bitslr((long fract) value));
     case SEND_TYPE_UFRACT:
         return bitsulr((long unsigned fract) value);
     default:
@@ -111,6 +120,10 @@ static inline uint get_payload(enum send_type type, accum value) {
     return 0;
 }
 
+//! \brief Determines if the value given is above the threshold value
+//! \param[in] value The value to determine if it is above the threshold
+//! \param[in] params The parameters to use to determine the result
+//! \return True if the neuron should fire
 static bool threshold_type_is_above_threshold(
         state_t value, threshold_type_t *threshold_type) {
     if (threshold_type->time_until_next_send == 0) {

@@ -25,6 +25,10 @@
 struct threshold_type_t {
 };
 
+//! \brief Determines if the value given is above the threshold value
+//! \param[in] value The value to determine if it is above the threshold
+//! \param[in] params The parameters to use to determine the result
+//! \return True if the neuron should fire
 static inline bool threshold_type_is_above_threshold(
         state_t value, threshold_type_t *threshold_type) {
 	use(value);

@@ -26,47 +26,59 @@
 #include <data_specification.h>
 #include <debug.h>
 #include <simulation.h>
+#include <stdbool.h>
 
 // Counters
 #define N_COUNTERS         6
-#define	MOTION_FORWARD     0x01
-#define MOTION_BACK	       0x02
-#define	MOTION_RIGHT       0x03
-#define	MOTION_LEFT	       0x04
-#define	MOTION_CLOCKWISE   0x05
-#define	MOTION_C_CLOCKWISE 0x06
+//! The "directions" that the motors can move in
+typedef enum {
+    MOTION_FORWARD = 0x01,
+    MOTION_BACK	= 0x02,
+    MOTION_RIGHT = 0x03,
+    MOTION_LEFT	= 0x04,
+    MOTION_CLOCKWISE = 0x05,
+    MOTION_C_CLOCKWISE = 0x06
+} direction_t;
 #define NEURON_ID_MASK     0x7FF
 
 // Globals
+//! The simulation time
 static uint32_t time;
-static uint32_t *counters;
-static uint32_t *last_speed;
+//! Accumulators for each motor direction
+static int *counters;
+//! The last speeds for each motor direction
+static int *last_speed;
+//! The (base) key to use to send to the motor
 static uint32_t key;
-static uint32_t speed;
+//! The standard motor speed, set by configuration
+static int speed;
 static uint32_t sample_time;
 static uint32_t update_time;
 static uint32_t delay_time;
+//! The size of change required to matter
 static int delta_threshold;
-static uint32_t continue_if_not_different;
+//! Whether we should continue moving if there is no change
+static bool continue_if_not_different;
 static uint32_t simulation_ticks;
 static uint32_t infinite_run;
 
+//! DSG regions in use
 enum robot_motor_control_regions_e {
     SYSTEM_REGION,
     PARAMS_REGION
 };
 
 //! values for the priority for each callback
-enum callback_priorities {
+enum robot_motor_control_callback_priorities {
     MC = -1, SDP = 0, TIMER = 2, DMA = 1
 };
 
 //! \brief Send a SpiNNaker multicast-with-payload message to the motor hardware
 //! \param[in] direction: Which direction to move in
-//! \param[in] speed: What speed to move at
-static inline void send(uint32_t direction, uint32_t speed) {
+//! \param[in] the_speed: What speed to move at
+static inline void send_to_motor(uint32_t direction, uint32_t the_speed) {
     uint32_t direction_key = direction | key;
-    while (!spin1_send_mc_packet(direction_key, speed, WITH_PAYLOAD)) {
+    while (!spin1_send_mc_packet(direction_key, the_speed, WITH_PAYLOAD)) {
         spin1_delay_us(1);
     }
     if (delay_time > 0) {
@@ -74,11 +86,16 @@ static inline void send(uint32_t direction, uint32_t speed) {
     }
 }
 
+//! Commands the robot's motors to start doing a motion
+//! \param[in] direction_index: The "forward" sense of motion
+//! \param[in] opposite_index: The "reverse" sense of motion
+//! \param[in] direction: for debugging
+//! \param[in] opposite: for debugging
 static inline void do_motion(
-        uint32_t direction_index, uint32_t opposite_index,
+        direction_t direction_index, direction_t opposite_index,
         const char *direction, const char *opposite) {
-    int direction_count = (int) counters[direction_index - 1];
-    int opposite_count = (int) counters[opposite_index - 1];
+    int direction_count = counters[direction_index - 1];
+    int opposite_count = counters[opposite_index - 1];
     int delta = direction_count - opposite_count;
     log_debug("%s = %d, %s = %d, delta = %d, threshold = %u",
             direction, direction_count, opposite, opposite_count, delta,
@@ -88,43 +105,48 @@ static inline void do_motion(
         log_debug("Moving %s", direction);
         last_speed[direction_index - 1] = speed;
         last_speed[opposite_index - 1] = 0;
-        send(direction_index, speed);
+        send_to_motor(direction_index, speed);
     } else if (delta <= -delta_threshold) {
         log_debug("Moving %s", direction);
         last_speed[direction_index - 1] = 0;
         last_speed[opposite_index - 1] = speed;
-        send(opposite_index, speed);
-    } else if (continue_if_not_different == 0) {
+        send_to_motor(opposite_index, speed);
+    } else if (!continue_if_not_different) {
         log_debug("Motion is indeterminate in %s-%s direction",
                 direction, opposite);
         last_speed[direction_index - 1] = 0;
         last_speed[opposite_index - 1] = 0;
-        send(direction_index, 0);
+        send_to_motor(direction_index, 0);
     }
 }
 
+//! Commands the robot's motors to continue a motion
+//! \param[in] direction_index: The "forward" sense of motion
+//! \param[in] opposite_index: The "reverse" sense of motion
+//! \param[in] direction: for debugging
+//! \param[in] opposite: for debugging
 static inline void do_update(
-        uint32_t direction_index, uint32_t opposite_index,
+        direction_t direction_index, direction_t opposite_index,
         const char *direction, const char *opposite) {
-    int direction_speed = (int) last_speed[direction_index - 1];
-    int opposite_speed = (int) last_speed[opposite_index - 1];
+    int direction_speed = last_speed[direction_index - 1];
+    int opposite_speed = last_speed[opposite_index - 1];
     int delta = direction_speed - opposite_speed;
     if (delta > 0) {
         log_debug("Resending %s = %d", direction, direction_speed);
-        send(direction_index, direction_speed);
+        send_to_motor(direction_index, direction_speed);
     } else if (delta < 0) {
         log_debug("Resending %s = %d", opposite, opposite_speed);
-        send(opposite_index, opposite_speed);
+        send_to_motor(opposite_index, opposite_speed);
     } else {
         log_debug("Resending No Motion in the %s-%s direction", direction,
                 opposite);
-        send(direction_index, 0);
+        send_to_motor(direction_index, 0);
     }
 }
 
 // Callbacks
 //! \brief Regular 1ms callback. Takes spikes from circular buffer and converts
-//! to motor activity level.
+//!     to motor activity level.
 //! \param unused0 unused
 //! \param unused1 unused
 void timer_callback(uint unused0, uint unused1) {
@@ -174,19 +196,20 @@ void timer_callback(uint unused0, uint unused1) {
     }
 }
 
+//! Reads the configuration
 void read_parameters(address_t region_address) {
     log_info("Reading parameters from 0x%.8x", region_address);
     key = region_address[0];
-    speed = region_address[1];
+    speed = (int) region_address[1];
     sample_time = region_address[2];
     update_time = region_address[3];
     delay_time = region_address[4];
-    delta_threshold = region_address[5];
-    continue_if_not_different = region_address[6];
+    delta_threshold = (int) region_address[5];
+    continue_if_not_different = (bool) region_address[6];
 
     // Allocate the space for the schedule
-    counters = spin1_malloc(N_COUNTERS * sizeof(uint32_t));
-    last_speed = spin1_malloc(N_COUNTERS * sizeof(uint32_t));
+    counters = spin1_malloc(N_COUNTERS * sizeof(int));
+    last_speed = spin1_malloc(N_COUNTERS * sizeof(int));
 
     for (uint32_t i = 0; i < N_COUNTERS; i++) {
         counters[i] = 0;
@@ -209,6 +232,7 @@ void incoming_spike_callback(uint key, uint payload) {
     in_spikes_add_spike(key);
 }
 
+//! Read all application configuration
 static bool initialize(uint32_t *timer_period) {
     log_info("initialise: started");
 
