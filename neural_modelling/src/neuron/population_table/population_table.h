@@ -18,7 +18,7 @@
 //! \dir
 //! \brief Master population tables
 //! \file
-//! \brief Master pop table API
+//! \brief Master pop(ulation) table API
 #ifndef _POPULATION_TABLE_H_
 #define _POPULATION_TABLE_H_
 

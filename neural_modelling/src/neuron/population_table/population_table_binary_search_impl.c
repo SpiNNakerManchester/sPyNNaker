@@ -20,6 +20,7 @@
 #include "population_table.h"
 #include <neuron/synapse_row.h>
 #include <debug.h>
+#include <stdbool.h>
 
 typedef struct master_population_table_entry {
     uint32_t key;
@@ -28,7 +29,12 @@ typedef struct master_population_table_entry {
     uint16_t count;
 } master_population_table_entry;
 
-typedef uint32_t address_and_row_length;
+//! \brief A packed address and row length
+typedef struct {
+    uint32_t row_length : 8; //!< the length of the row
+    uint32_t address : 23;   //!< the address
+    uint32_t is_single : 1;  //!< whether this is a direct/single address
+} address_and_row_length;
 
 static master_population_table_entry *master_population_table;
 static uint32_t master_population_table_length;
@@ -41,33 +47,51 @@ static uint32_t last_neuron_id = 0;
 static uint16_t next_item = 0;
 static uint16_t items_to_go = 0;
 
+//! \brief Get the direct address out of an entry
+//! \param[in] entry: the table entry
+//! \return a direct row address
 static inline uint32_t get_direct_address(address_and_row_length entry) {
     // Direct row address is just the direct address bit
-    return (entry & 0x7FFFFF00) >> 8;
+    return entry.address;
 }
 
+//! \brief Get the standard address out of an entry
+//!
+//! The address is in words and is the top 23-bits but 1, so this down
+//! shifts by 8 and then multiplies by 16 (= up shifts by 4)
+//! \param[in] entry: the table entry
+//! \return a row address
 static inline uint32_t get_address(address_and_row_length entry) {
-    // The address is in words and is the top 23-bits but 1, so this down
-    // shifts by 8 and then multiplies by 16 (= up shifts by 4) = down shift by 4
-    // with the given mask 0x7FFFFF00 to fully remove the row length
-    // NOTE: The mask can be removed given the machine spec says it
-    // hard-codes the bottom 2 bits to zero anyhow. BUT BAD CODE PRACTICE
-    return (entry & 0x7FFFFF00) >> 4;
+    return entry.address << 4;
 }
 
+//! \brief Get the length of the row from the entry
+//! \param[in] entry: the table entry
+//! \return the row length
 static inline uint32_t get_row_length(address_and_row_length entry) {
-    return entry & 0xFF;
+    return entry.row_length;
 }
 
-static inline uint32_t is_single(address_and_row_length entry) {
-    return entry & 0x80000000;
+//! \brief Get whether this is a single-valued row (i.e. if it uses direct
+//!     addressing) from the entry
+//! \param[in] entry: the table entry
+//! \return true if this is a single-valued row
+static inline bool is_single(address_and_row_length entry) {
+    return entry.is_single;
 }
 
+//! \brief Get the neuron ID for a spike given its table entry
+//! \param[in] entry: the table entry
+//! \param[in] spike: the spike
+//! \return the neuron ID
 static inline uint32_t get_neuron_id(
         master_population_table_entry entry, spike_t spike) {
     return spike & ~entry.mask;
 }
 
+//! \brief Prints the master pop table.
+//!
+//! For debugging
 static inline void print_master_population_table(void) {
     log_info("master_population\n");
     log_info("------------------------------------------\n");
