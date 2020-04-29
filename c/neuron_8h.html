@@ -104,9 +104,9 @@ Functions</h2></td></tr>
 <tr class="memitem:a883e3b3d586543070a684060e74d1a16"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron_8h.html#a883e3b3d586543070a684060e74d1a16">neuron_initialise</a> (address_t address, address_t recording_address, uint32_t *n_neurons_value, uint32_t *n_synapse_types_value, uint32_t *incoming_spike_buffer_size, uint32_t *<a class="el" href="delay__extension_8c.html#a73996d13ad0b2acf43a8bae560ac63c0">timer_offset</a>)</td></tr>
 <tr class="memdesc:a883e3b3d586543070a684060e74d1a16"><td class="mdescLeft">&#160;</td><td class="mdescRight">translate the data stored in the NEURON_PARAMS data region in SDRAM and convert it into c based objects for use.  <a href="#a883e3b3d586543070a684060e74d1a16">More...</a><br /></td></tr>
 <tr class="separator:a883e3b3d586543070a684060e74d1a16"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a57acfd578d4667623c0364918cbbb7bd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron_8h.html#a57acfd578d4667623c0364918cbbb7bd">neuron_do_timestep_update</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, uint timer_count, uint <a class="el" href="spike__source__poisson_8c.html#ac0c27301e134af3ce80814a553601074">timer_period</a>)</td></tr>
-<tr class="memdesc:a57acfd578d4667623c0364918cbbb7bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">executes all the updates to neural parameters when a given timer period has occurred.  <a href="#a57acfd578d4667623c0364918cbbb7bd">More...</a><br /></td></tr>
-<tr class="separator:a57acfd578d4667623c0364918cbbb7bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abf4cb8bac51f53a1628954d84b0db09d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron_8h.html#abf4cb8bac51f53a1628954d84b0db09d">neuron_do_timestep_update</a> (timer_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, uint timer_count, uint <a class="el" href="spike__source__poisson_8c.html#ac0c27301e134af3ce80814a553601074">timer_period</a>)</td></tr>
+<tr class="memdesc:abf4cb8bac51f53a1628954d84b0db09d"><td class="mdescLeft">&#160;</td><td class="mdescRight">executes all the updates to neural parameters when a given timer period has occurred.  <a href="#abf4cb8bac51f53a1628954d84b0db09d">More...</a><br /></td></tr>
+<tr class="separator:abf4cb8bac51f53a1628954d84b0db09d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2511f7541e414899ee44c6260214c6c8"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron_8h.html#a2511f7541e414899ee44c6260214c6c8">neuron_resume</a> (address_t address)</td></tr>
 <tr class="memdesc:a2511f7541e414899ee44c6260214c6c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prepare to resume simulation of the neurons.  <a href="#a2511f7541e414899ee44c6260214c6c8">More...</a><br /></td></tr>
 <tr class="separator:a2511f7541e414899ee44c6260214c6c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -116,22 +116,22 @@ Functions</h2></td></tr>
 <tr class="memitem:abad40a95ed27eb262884dfd9f59b78d6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron_8h.html#abad40a95ed27eb262884dfd9f59b78d6">neuron_add_inputs</a> (index_t synapse_type_index, index_t neuron_index, <a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> weights_this_timestep)</td></tr>
 <tr class="memdesc:abad40a95ed27eb262884dfd9f59b78d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add inputs to the neuron.  <a href="#abad40a95ed27eb262884dfd9f59b78d6">More...</a><br /></td></tr>
 <tr class="separator:abad40a95ed27eb262884dfd9f59b78d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4bd09a278d3fc33a8f186f405d650c4a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4bd09a278d3fc33a8f186f405d650c4a"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>neuron_print_inputs</b> (void)</td></tr>
+<tr class="memitem:a4bd09a278d3fc33a8f186f405d650c4a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron_8h.html#a4bd09a278d3fc33a8f186f405d650c4a">neuron_print_inputs</a> (void)</td></tr>
+<tr class="memdesc:a4bd09a278d3fc33a8f186f405d650c4a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print the inputs to the neurons.  <a href="#a4bd09a278d3fc33a8f186f405d650c4a">More...</a><br /></td></tr>
 <tr class="separator:a4bd09a278d3fc33a8f186f405d650c4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a243d592c67c1db595bd3e4bf73454d33"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a243d592c67c1db595bd3e4bf73454d33"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>neuron_print_synapse_parameters</b> (void)</td></tr>
+<tr class="memitem:a243d592c67c1db595bd3e4bf73454d33"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron_8h.html#a243d592c67c1db595bd3e4bf73454d33">neuron_print_synapse_parameters</a> (void)</td></tr>
+<tr class="memdesc:a243d592c67c1db595bd3e4bf73454d33"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print the neurons' synapse parameters.  <a href="#a243d592c67c1db595bd3e4bf73454d33">More...</a><br /></td></tr>
 <tr class="separator:a243d592c67c1db595bd3e4bf73454d33"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7a4c98f25d6221625769999846e97204"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7a4c98f25d6221625769999846e97204"></a>
-const char *&#160;</td><td class="memItemRight" valign="bottom"><b>neuron_get_synapse_type_char</b> (uint32_t synapse_type)</td></tr>
+<tr class="memitem:a7a4c98f25d6221625769999846e97204"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron_8h.html#a7a4c98f25d6221625769999846e97204">neuron_get_synapse_type_char</a> (uint32_t synapse_type)</td></tr>
+<tr class="memdesc:a7a4c98f25d6221625769999846e97204"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the synapse <em>type</em> description character.  <a href="#a7a4c98f25d6221625769999846e97204">More...</a><br /></td></tr>
 <tr class="separator:a7a4c98f25d6221625769999846e97204"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>interface for neurons </p>
 <p>The API contains:</p><ul>
-<li>neuron_initialise(address, recording_flags, n_neurons_value): translate the data stored in the NEURON_PARAMS data region in SDRAM and converts it into c based objects for use.</li>
+<li><a class="el" href="neuron_8h.html#a883e3b3d586543070a684060e74d1a16" title="translate the data stored in the NEURON_PARAMS data region in SDRAM and convert it into c based objec...">neuron_initialise()</a>: translate the data stored in the NEURON_PARAMS data region in SDRAM and converts it into C-based objects for use.</li>
 <li>neuron_set_input_buffers(input_buffers_value): setter for the internal input buffers</li>
-<li>neuron_do_timestep_update(time): executes all the updates to neural parameters when a given timer period has occurred. </li>
+<li><a class="el" href="neuron_8h.html#abf4cb8bac51f53a1628954d84b0db09d" title="executes all the updates to neural parameters when a given timer period has occurred. ">neuron_do_timestep_update()</a>: executes all the updates to neural parameters when a given timer period has occurred. </li>
 </ul>
 </div><h2 class="groupheader">Function Documentation</h2>
 <a class="anchor" id="a883e3b3d586543070a684060e74d1a16"></a>
@@ -186,35 +186,26 @@ const char *&#160;</td><td class="memItemRight" valign="bottom"><b>neuron_get_sy
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">address</td><td>the absolute address in SDRAM for the start of the NEURON_PARAMS data region in SDRAM </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">recording_address</td><td></td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">n_neurons_value</td><td>Returns the number of neurons this model is to </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">n_synapse_types_value</td><td>Returns the number of synapse types in </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">incoming_spike_buffer_size</td><td>Returns the number of spikes to support in the incoming spike buffer </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">recording_address</td><td>the recording parameters in SDRAM (contains which regions are active and how big they are) </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">n_neurons_value</td><td>The number of neurons this model is to </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">n_synapse_types_value</td><td>The number of synapse types in </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">incoming_spike_buffer_size</td><td>The number of spikes to support in the incoming spike circular buffer </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">timer_offset</td><td>An offset to use during launching the main simulation loop so that we don't utterly hammer the SpiNNaker network every timestep. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>boolean which is True is the translation was successful otherwise False</dd></dl>
-<p>translate the data stored in the NEURON_PARAMS data region in SDRAM and convert it into c based objects for use.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">address</td><td>the absolute address in SDRAM for the start of the NEURON_PARAMS data region in SDRAM </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">recording_flags_param</td><td>the recordings parameters (contains which regions are active and how big they are) </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">n_neurons_value</td><td>The number of neurons this model is to emulate </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>True is the initialisation was successful, otherwise False </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>True if the translation was successful, otherwise False </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="a57acfd578d4667623c0364918cbbb7bd"></a>
+<a class="anchor" id="abf4cb8bac51f53a1628954d84b0db09d"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
           <td class="memname">void neuron_do_timestep_update </td>
           <td>(</td>
-          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramtype">timer_t&#160;</td>
           <td class="paramname"><em>time</em>, </td>
         </tr>
         <tr>
@@ -241,6 +232,8 @@ const char *&#160;</td><td class="memItemRight" valign="bottom"><b>neuron_get_sy
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">time</td><td>the timer tick value currently being executed </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">timer_count</td><td>used for detecting a wrapping timer </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">timer_period</td><td>the intended amount of time per timer tick </td></tr>
   </table>
   </dd>
 </dl>
@@ -288,16 +281,10 @@ const char *&#160;</td><td class="memItemRight" valign="bottom"><b>neuron_get_sy
 </div><div class="memdoc">
 
 <p>Perform steps needed before pausing a simulation. </p>
+<p>Stores neuron parameters back into SDRAM.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">address</td><td>the address where the neuron parameters are stored in SDRAM</td></tr>
-  </table>
-  </dd>
-</dl>
-<p>Perform steps needed before pausing a simulation.</p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">address</td><td>the address in SDRAM to start the store </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">address</td><td>the address where the neuron parameters are stored in SDRAM </td></tr>
   </table>
   </dd>
 </dl>
@@ -347,10 +334,73 @@ const char *&#160;</td><td class="memItemRight" valign="bottom"><b>neuron_get_sy
 
 </div>
 </div>
+<a class="anchor" id="a4bd09a278d3fc33a8f186f405d650c4a"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void neuron_print_inputs </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Print the inputs to the neurons. </p>
+<p>Only available in debug mode. </p>
+
+</div>
+</div>
+<a class="anchor" id="a243d592c67c1db595bd3e4bf73454d33"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void neuron_print_synapse_parameters </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Print the neurons' synapse parameters. </p>
+<p>Only available in debug mode. </p>
+
+</div>
+</div>
+<a class="anchor" id="a7a4c98f25d6221625769999846e97204"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const char* neuron_get_synapse_type_char </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>synapse_type</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the synapse <em>type</em> description character. </p>
+<p>Only available in debug mode. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">synapse_type</td><td>The synapse type. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>a single character that describes the synapse. </dd></dl>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Apr 29 2020 07:53:03 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Apr 29 2020 10:12:39 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

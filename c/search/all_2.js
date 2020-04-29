@@ -2,6 +2,7 @@ var searchData=
 [
   ['c_5fmain',['c_main',['../delay__extension_8c.html#aa14f4f1d4c84183b7bf7108bf930a23c',1,'c_main(void):&#160;delay_extension.c'],['../c__main_8c.html#aa14f4f1d4c84183b7bf7108bf930a23c',1,'c_main(void):&#160;c_main.c'],['../robot__motor__control_8c.html#aa14f4f1d4c84183b7bf7108bf930a23c',1,'c_main(void):&#160;robot_motor_control.c'],['../spike__source__poisson_8c.html#aa14f4f1d4c84183b7bf7108bf930a23c',1,'c_main(void):&#160;spike_source_poisson.c'],['../delay__expander_8c.html#aa14f4f1d4c84183b7bf7108bf930a23c',1,'c_main(void):&#160;delay_expander.c'],['../synapse__expander_8c.html#aa14f4f1d4c84183b7bf7108bf930a23c',1,'c_main(void):&#160;synapse_expander.c']]],
   ['c_5fmain_2ec',['c_main.c',['../c__main_8c.html',1,'']]],
+  ['c_5fmain_5fstore_5fprovenance_5fdata',['c_main_store_provenance_data',['../c__main_8c.html#a1dc4d17392d4c0a6dac7ab12267da487',1,'c_main.c']]],
   ['callback_5fpriorities',['callback_priorities',['../delay__extension_8c.html#a65b19dabf5283c1ea37df964ca25e964',1,'callback_priorities():&#160;delay_extension.c'],['../c__main_8c.html#a65b19dabf5283c1ea37df964ca25e964',1,'callback_priorities():&#160;c_main.c'],['../robot__motor__control_8c.html#a65b19dabf5283c1ea37df964ca25e964',1,'callback_priorities():&#160;robot_motor_control.c']]],
   ['card',['Card',['../maths-util_8h.html#a63fe77b0ec710597cb0b69eee8d90aaf',1,'maths-util.h']]],
   ['ceil_5fto_5f4',['CEIL_TO_4',['../neuron__recording_8c.html#a116ca5cd8794f7ac7266ed798720a3d6',1,'neuron_recording.c']]],
@@ -47,8 +48,10 @@ var searchData=
   ['connection_5fgenerator_5fone_5fto_5fone_5fgenerate',['connection_generator_one_to_one_generate',['../connection__generator__one__to__one_8h.html#afa595e91deb02bd7ae09d16c0cd3d1de',1,'connection_generator_one_to_one.h']]],
   ['connection_5fgenerator_5fone_5fto_5fone_5finitialise',['connection_generator_one_to_one_initialise',['../connection__generator__one__to__one_8h.html#aacacd3d03b90bd854ba61a48097b0e97',1,'connection_generator_one_to_one.h']]],
   ['connection_5fgenerators',['connection_generators',['../connection__generator_8c.html#ab3f5298c96970f1f9b2fbf3cdadbc60f',1,'connection_generator.c']]],
+  ['connector_5fbuilder_5fregion',['CONNECTOR_BUILDER_REGION',['../regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6adb65127156b69789622d7edc85785aa9',1,'regions.h']]],
   ['control_5fconversion',['control_conversion',['../synapse__dynamics__stdp__mad__impl_8c.html#a06f2e2d805f0d8aa8b3ca7b687f24a24',1,'synapse_dynamics_stdp_mad_impl.c']]],
   ['count_5frewire_5fattempts',['count_rewire_attempts',['../c__main_8c.html#a113643d98988bc0d1706e0b21d7b4a4e',1,'c_main.c']]],
   ['cube',['CUBE',['../maths-util_8h.html#a3e97109573f7a38ddc9e9c1a9dbb6758',1,'maths-util.h']]],
-  ['current_5fstate_5ft',['current_state_t',['../sp__structs_8h.html#structcurrent__state__t',1,'']]]
+  ['current_5fstate_5ft',['current_state_t',['../sp__structs_8h.html#structcurrent__state__t',1,'']]],
+  ['current_5ftimer_5ftick',['current_timer_tick',['../c__main_8c.html#a7971d970224cbcc61d40e13ebd0139cb',1,'neuron_provenance']]]
 ];

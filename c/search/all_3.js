@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['decay',['decay',['../decay_8h.html#a251df1ff8ee78f551bedbd55c451a859',1,'decay.h']]],
   ['decay_2eh',['decay.h',['../decay_8h.html',1,'']]],
   ['decay_5fs015',['decay_s015',['../decay_8h.html#aa227505964f87337ca85b3c20da50c19',1,'decay.h']]],
   ['decay_5fs1615',['decay_s1615',['../decay_8h.html#a6f0906eff09adaaf873d19d20f2a120f',1,'decay.h']]],
@@ -20,6 +21,7 @@ var searchData=
   ['delta_5fparams_5ft',['delta_params_t',['../synapse__types__delta__impl_8h.html#structdelta__params__t',1,'']]],
   ['delta_5fshaping',['delta_shaping',['../synapse__types__delta__impl_8h.html#a04ee3f07d20f9cbc78f7084849ffa211',1,'synapse_types_delta_impl.h']]],
   ['device',['device',['../munich__protocol_8h.html#adbc3297c6b342ffff16c276b3d8f44d7',1,'munich_key_bitfields_t']]],
+  ['direct_5fmatrix_5fregion',['DIRECT_MATRIX_REGION',['../regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6a84d4ee5aba19d8207b0707272b24d31f',1,'regions.h']]],
   ['disable_5fmotor_5fkey',['DISABLE_MOTOR_KEY',['../munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04aa50cb29eaf9f334bf5a204d2d52ae66e',1,'munich_protocol.h']]],
   ['disable_5fretina_5fevent_5fstreaming',['DISABLE_RETINA_EVENT_STREAMING',['../munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04a5cc988b8c6e1e4b586915036edcd57f9',1,'munich_protocol.h']]],
   ['dma_5fbuffer',['dma_buffer',['../spike__processing_8c.html#structdma__buffer',1,'']]],
