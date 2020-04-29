@@ -355,7 +355,7 @@ void _sort_by_redunancy(){
                 filter_info_t bit_field_temp = bit_field_base_address->filters[i];
                 bit_field_base_address->filters[i] = bit_field_base_address->filters[j];
                 bit_field_base_address->filters[j] = bit_field_temp;
-                int i_redunant = j_redunant;
+                i_redunant = j_redunant;
             }
         }
     }
