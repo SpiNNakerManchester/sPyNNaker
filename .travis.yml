@@ -38,7 +38,7 @@ before_install:
   - git clone https://github.com/SpiNNakerManchester/SupportScripts.git support
   - python support/travis_blocking_stdout.py
   - support/rat.sh download
-  # Bring pip up to date 
+  # Bring pip up to date
   - pip install --upgrade pip setuptools wheel
   - pip install --only-binary=numpy,scipy,matplotlib numpy scipy matplotlib
   # SpiNNakerManchester internal dependencies; development mode
@@ -59,7 +59,7 @@ before_install:
 
 install:
   - pip install -r requirements-test.txt
-  - pip install pylint python-coveralls 'coverage>=4.4,<5.0'
+  - pip install 'pylint<2.5' python-coveralls 'coverage>=4.4,<5.0'
   - python ./setup.py install
 
 before_script:
@@ -83,7 +83,7 @@ script:
   - ( pylint --output-format=colorized --disable=R,C spynnaker; exit $(($? & 35)) )
   # XML
   - find spynnaker -name '*.xml' | xargs -n 1 support/validate-xml.sh
-  # C 
+  # C
   - CFLAGS=-fdiagnostics-color make -C neural_modelling
   - support/run-vera.sh neural_modelling/src
   # Copyright check

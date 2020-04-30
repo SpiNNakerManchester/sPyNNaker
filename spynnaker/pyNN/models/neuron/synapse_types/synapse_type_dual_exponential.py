@@ -16,7 +16,6 @@
 import numpy
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
-from pacman.executor.injection_decorator import inject_items
 from .abstract_synapse_type import AbstractSynapseType
 
 TAU_SYN_E = 'tau_syn_E'
@@ -97,8 +96,7 @@ class SynapseTypeDualExponential(AbstractSynapseType):
     def has_variable(self, variable):
         return variable in UNITS
 
-    @inject_items({"ts": "MachineTimeStep"})
-    @overrides(AbstractSynapseType.get_values, additional_arguments={'ts'})
+    @overrides(AbstractSynapseType.get_values)
     def get_values(self, parameters, state_variables, vertex_slice, ts):
         """
         :param int ts: machine time step
