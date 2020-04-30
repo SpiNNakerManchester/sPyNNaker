@@ -168,7 +168,7 @@ state_t neuron_model_state_update(
     }
 
 
-    // All operations now need doing once per eprop synapse
+    // All operations now need doing once per recurrent eprop synapse
     for (uint32_t syn_ind=recurrent_offset; syn_ind < total_recurrent_synapses_per_neuron+recurrent_offset; syn_ind++){
 		// ******************************************************************
 		// Low-pass filter incoming spike train

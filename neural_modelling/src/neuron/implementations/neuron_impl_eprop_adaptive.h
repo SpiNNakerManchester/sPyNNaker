@@ -303,13 +303,13 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
 
     // Record B
-    if (neuron_index == 1){
+    if (neuron_index == 0){
         recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = global_parameters->core_pop_rate / neurons_in_pop; // divide by neurons on core to get average per neuron contribution to core pop rate
     }
     else{
         recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
-    //    		B_t; // neuron->B;
-                neuron->L;
+        		B_t; // neuron->B;
+//                neuron->L;
     //    		neuron->syn_state[0].z_bar;
     //    		global_parameters->core_target_rate;
     //    	neuron->syn_state[0].e_bar;
@@ -364,9 +364,11 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
     // If spike occurs, communicate to relevant parts of model
     if (spike) {
+//        io_printf(IO_BUF, "neuron %u spiked with beta = %k, B_t = %k\n", neuron_index, neuron->beta, neuron->B);
         // Call relevant model-based functions
         // Tell the neuron model
         neuron_model_has_spiked(neuron);
+//        io_printf(IO_BUF, "neuron %u thresholded beta = %k, B_t = %k\n", neuron_index, neuron->beta, neuron->B);
 
         // Tell the additional input
         additional_input_has_spiked(additional_input);

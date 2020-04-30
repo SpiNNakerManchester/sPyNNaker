@@ -116,10 +116,12 @@ static inline void threshold_type_update_threshold(state_t z,
 //			+ decay_s1615(1000k, threshold_type->adpt) // fold scaling into decay to increase precision
 //			* z; // stored on neuron
 //
+//    io_printf(IO_BUF, "before B = %k, temp1 = %k, temp2 = %k, b = %k, b_0 = %k, beta = %k",
+//                    threshold_type->B, temp1, temp2, threshold_type->b, threshold_type->b_0, threshold_type->beta);
 	// Update large B
 	threshold_type->B = threshold_type->b_0 +
 			threshold_type->beta*threshold_type->b;
-
+//    io_printf(IO_BUF, "\nafter B = %k\n", threshold_type->B);
 }
 
 

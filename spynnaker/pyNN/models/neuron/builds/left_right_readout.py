@@ -22,7 +22,7 @@ class LeftRightReadout(AbstractPyNNNeuronModelStandard):
             tau_syn_E=5.0, tau_syn_E2=5.0, tau_syn_I=5.0, tau_syn_I2=5.0,
 #             mean_isi_ticks=65000, time_to_spike_ticks=65000, rate_update_threshold=0.25,
 
-            rate_on=10, rate_off=10, poisson_pop_size=20,
+            rate_on=50, rate_off=0, poisson_pop_size=20,
 
             # Learning signal and weight update constants
             l=0, w_fb=0.5, eta=1.0):
