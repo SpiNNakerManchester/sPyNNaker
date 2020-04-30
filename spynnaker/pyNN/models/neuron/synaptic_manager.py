@@ -379,7 +379,8 @@ class SynapticManager(object):
             spec.write_value(w, data_type=DataType.S1615)
 
         # Return the weight scaling factors
-        return numpy.array([(1 / w) * weight_scale for w in min_weights])
+        return numpy.array([(1 / w) * weight_scale if w != 0 else 0
+                            for w in min_weights])
 
     def _write_padding(
             self, spec, synaptic_matrix_region, next_block_start_address):
