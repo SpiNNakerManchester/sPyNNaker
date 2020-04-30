@@ -43,43 +43,71 @@ struct delay_extension_provenance {
 };
 
 // Globals
+//! Base multicast key for sending messages
 static uint32_t key = 0;
+//! Key for receiving messages
 static uint32_t incoming_key = 0;
+//! Mask for ::incoming_key to say which messages are for this program
 static uint32_t incoming_mask = 0;
+//! \brief Mask for key (that matches ::incoming_key/::incoming_mask) to extract
+//! the neuron ID from it
 static uint32_t incoming_neuron_mask = 0;
+
+//! Number of neurons supported.
 static uint32_t num_neurons = 0;
+
+//! Simulation time
 static uint32_t time = UINT32_MAX;
+//! Simulation speed
 static uint32_t simulation_ticks = 0;
+//! True if we're running forever
 static uint32_t infinite_run;
 
+//! \brief The spike counters, as a 2D array
+//! ```
+//! spike_counters[time_slot][neuron_id]
+//! ```
+//! Time slots are the time of reception of the spike, masked by
+//! ::num_delay_slots_mask, and neuron IDs are extracted from the spike key by
+//! masking with ::incoming_neuron_mask
 static uint8_t **spike_counters = NULL;
+//! \brief Array of bitfields describing which neurons to deliver spikes to,
+//! from which bucket
 static bit_field_t *neuron_delay_stage_config = NULL;
+//! The number of delay stages. A power of 2.
 static uint32_t num_delay_stages = 0;
+//! Mask for converting time into the current delay slot
 static uint32_t num_delay_slots_mask = 0;
+//! Size of each bitfield in ::neuron_delay_stage_config
 static uint32_t neuron_bit_field_words = 0;
 
+//! Number of input spikes
 static uint32_t n_in_spikes = 0;
+//! Number of spikes transferred via queue
 static uint32_t n_processed_spikes = 0;
+//! Number of spikes sent
 static uint32_t n_spikes_sent = 0;
+//! Number of spikes added to delay processing
 static uint32_t n_spikes_added = 0;
 
-//! An amount of microseconds to back off before starting the timer, in an
-//! attempt to avoid overloading the network
+//! \brief An amount of microseconds to back off before starting the timer, in
+//! an attempt to avoid overloading the network
 static uint32_t timer_offset;
 
-//! The number of clock ticks between processing each neuron at each delay
-//! stage
+//! \brief The number of clock ticks between processing each neuron at each
+//! delay stage
 static uint32_t time_between_spikes;
 
 //! The expected current clock tick of timer_1 to wait for
 static uint32_t expected_time;
 
+//! Number of times we had to back off because the comms hardware was busy
 static uint32_t n_delays = 0;
 
 //! Spin1 API ticks - to know when the timer wraps
 extern uint ticks;
 
-// Initialise
+//! Used for configuring the timer hardware
 static uint32_t timer_period = 0;
 
 //---------------------------------------
@@ -204,7 +232,8 @@ static bool read_parameters(struct delay_parameters *params) {
     return true;
 }
 
-//! Writes the provenance data
+//! \brief Writes the provenance data
+//! \param[out] provenance_region: Where to write the provenance
 static void store_provenance_data(address_t provenance_region) {
     log_debug("writing other provenance data");
     struct delay_extension_provenance *prov = (void *) provenance_region;
@@ -219,7 +248,8 @@ static void store_provenance_data(address_t provenance_region) {
     log_debug("finished other provenance data");
 }
 
-//! Read the application configuration
+//! \brief Read the application configuration
+//! \return True if initialisation succeeded.
 static bool initialize(void) {
     log_info("initialise: started");
 
@@ -272,8 +302,10 @@ static void incoming_spike_callback(uint key, uint payload) {
     in_spikes_add_spike(key);
 }
 
-//! Gets the neuron ID of the incoming spike
-static inline key_t key_n(key_t k) {
+//! \brief Gets the neuron ID of the incoming spike
+//! \param[in] k: The key
+//! \return the neuron ID
+static inline index_t key_n(key_t k) {
     return k & incoming_neuron_mask;
 }
 

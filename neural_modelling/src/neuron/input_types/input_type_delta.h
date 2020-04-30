@@ -21,12 +21,14 @@
 #define _INPUT_TYPE_DELTA_H_
 
 #ifndef NUM_EXCITATORY_RECEPTORS
+//! \private
 #define NUM_EXCITATORY_RECEPTORS 1
 #error NUM_EXCITATORY_RECEPTORS was undefined.  It should be defined by a synapse\
 	shaping include
 #endif
 
 #ifndef NUM_INHIBITORY_RECEPTORS
+//! \private
 #define NUM_INHIBITORY_RECEPTORS 1
 #error NUM_INHIBITORY_RECEPTORS was undefined.  It should be defined by a synapse\
 	shaping include
@@ -39,7 +41,7 @@ struct input_type_t {
 	REAL scale_factor;
 };
 
-static const REAL INPUT_SCALE_FACTOR = REAL_CONST(1.0);
+static const REAL INPUT_SCALE_FACTOR = ONE;
 
 static inline input_t *input_type_get_input_value(
         input_t *restrict value, const input_type_t *input_type,

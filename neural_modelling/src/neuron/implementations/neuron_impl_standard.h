@@ -32,24 +32,36 @@
 // Further includes
 #include <debug.h>
 
-#define V_RECORDING_INDEX 0
-#define GSYN_EXC_RECORDING_INDEX 1
-#define GSYN_INH_RECORDING_INDEX 2
-#define N_RECORDED_VARS 3
+enum word_recording_indices {
+    //! V (somatic potential) recording index
+    V_RECORDING_INDEX = 0,
+    //! Gsyn_exc (excitatory synaptic conductance/current) recording index
+    GSYN_EXC_RECORDING_INDEX = 1,
+    //! Gsyn_inh (excitatory synaptic conductance/current) recording index
+    GSYN_INH_RECORDING_INDEX = 2,
+    //! Number of recorded word-sized state variables
+    N_RECORDED_VARS = 3
+};
 
-#define SPIKE_RECORDING_BITFIELD 0
-#define N_BITFIELD_VARS 1
+enum bitfield_recording_indices {
+    //! Spike event recording index
+    SPIKE_RECORDING_BITFIELD = 0,
+    //! Number of recorded bitfields
+    N_BITFIELD_VARS = 1
+};
 
 // This import depends on variables defined above
 #include <neuron/neuron_recording.h>
 
 #ifndef NUM_EXCITATORY_RECEPTORS
+//! Number of excitatory receptors (may be overridden by build)
 #define NUM_EXCITATORY_RECEPTORS 1
 #error NUM_EXCITATORY_RECEPTORS was undefined.  It should be defined by a synapse\
     shaping include
 #endif
 
 #ifndef NUM_INHIBITORY_RECEPTORS
+//! Number of inhibitory receptors (may be overridden by build)
 #define NUM_INHIBITORY_RECEPTORS 1
 #error NUM_INHIBITORY_RECEPTORS was undefined.  It should be defined by a synapse\
     shaping include
@@ -78,7 +90,9 @@ static synapse_param_t *neuron_synapse_shaping_params;
 #endif // !SOMETIMES_UNUSED
 
 SOMETIMES_UNUSED // Marked unused as only used sometimes
-//! \param[in] n_neurons: number of neurons
+//! \brief Initialise the particular implementation of the data
+//! \param[in] n_neurons: The number of neurons
+//! \return True if successful
 static bool neuron_impl_initialise(uint32_t n_neurons) {
     // allocate DTCM for the global parameter details
     if (sizeof(global_neuron_params_t)) {
@@ -144,6 +158,10 @@ static bool neuron_impl_initialise(uint32_t n_neurons) {
 }
 
 SOMETIMES_UNUSED // Marked unused as only used sometimes
+//! \brief Add inputs to the neuron
+//! \param[in] synapse_type_index: the synapse type (e.g. exc. or inh.)
+//! \param[in] neuron_index: the index of the neuron
+//! \param[in] weights_this_timestep: weight inputs to be added
 static void neuron_impl_add_inputs(
         index_t synapse_type_index, index_t neuron_index,
         input_t weights_this_timestep) {
@@ -154,11 +172,15 @@ static void neuron_impl_add_inputs(
             parameters, weights_this_timestep);
 }
 
-static uint32_t n_words_needed(uint32_t size) {
+//! \brief The number of _words_ required to hold an object of given size
+//! \param[in] size: The size of object
+//! \return Number of words needed to hold the object (not bytes!)
+static uint32_t n_words_needed(size_t size) {
     return (size + (sizeof(uint32_t) - 1)) / sizeof(uint32_t);
 }
 
 SOMETIMES_UNUSED // Marked unused as only used sometimes
+//! \brief Load in the neuron parameters
 //! \param[in] address: SDRAM block to read parameters from
 //! \param[in] next: Offset of next address in store
 //! \param[in] n_neurons: number of neurons
@@ -221,6 +243,10 @@ static void neuron_impl_load_neuron_parameters(
 }
 
 SOMETIMES_UNUSED // Marked unused as only used sometimes
+//! \brief Do the timestep update for the particular implementation
+//! \param[in] neuron_index: The index of the neuron to update
+//! \param[in] external_bias: External input to be applied to the neuron
+//! \return True if a spike has occurred
 static bool neuron_impl_do_timestep_update(index_t neuron_index,
         input_t external_bias) {
     // Get the neuron itself
@@ -308,8 +334,8 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 }
 
 SOMETIMES_UNUSED // Marked unused as only used sometimes
-//! \brief stores neuron parameter back into sdram
-//! \param[out] address: the address in sdram to start the store
+//! \brief Stores neuron parameters back into SDRAM
+//! \param[out] address: the address in SDRAM to start the store
 //! \param[in] next: Offset of next address in store
 //! \param[in] n_neurons: number of neurons
 static void neuron_impl_store_neuron_parameters(
@@ -365,6 +391,8 @@ static void neuron_impl_store_neuron_parameters(
 }
 
 #if LOG_LEVEL >= LOG_DEBUG
+//! \brief Print the inputs to the neurons
+//! \param[in] n_neurons: The number of neurons
 void neuron_impl_print_inputs(uint32_t n_neurons) {
     bool empty = true;
     for (index_t i = 0; i < n_neurons; i++) {
@@ -390,6 +418,8 @@ void neuron_impl_print_inputs(uint32_t n_neurons) {
     }
 }
 
+//! \brief Print the synapse parameters of the neurons
+//! \param[in] n_neurons: The number of neurons
 void neuron_impl_print_synapse_parameters(uint32_t n_neurons) {
     log_debug("-------------------------------------\n");
     for (index_t n = 0; n < n_neurons; n++) {
@@ -398,6 +428,9 @@ void neuron_impl_print_synapse_parameters(uint32_t n_neurons) {
     log_debug("-------------------------------------\n");
 }
 
+//! \brief Get the synapse type character for a synapse type
+//! \param[in] synapse_type: The synapse type
+//! \return The descriptor character (sometimes two characters)
 const char *neuron_impl_get_synapse_type_char(uint32_t synapse_type) {
     return synapse_types_get_type_char(synapse_type);
 }

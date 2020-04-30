@@ -67,7 +67,7 @@ state_t neuron_model_state_update(
     return neuron->V_membrane;
 }
 
-void neuron_model_has_spiked(neuron_t *neuron) {
+void neuron_model_has_spiked(neuron_t *restrict neuron) {
     // reset membrane voltage
     neuron->V_membrane = neuron->V_reset;
 

@@ -86,7 +86,7 @@ input_t synapse_dynamics_get_intrinsic_bias(
         uint32_t time, index_t neuron_index) {
     use(time);
     use(neuron_index);
-    return REAL_CONST(0.0);
+    return ZERO;
 }
 
 void synapse_dynamics_print_plastic_synapses(
