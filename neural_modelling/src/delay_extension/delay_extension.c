@@ -29,16 +29,27 @@
 #include <spin1_api.h>
 
 //! values for the priority for each callback
-typedef enum callback_priorities {
-    MC_PACKET = -1, SDP = 0, USER = 1, TIMER = 3, DMA = 2
-} callback_priorities;
+enum delay_extension_callback_priorities {
+    MC_PACKET = -1, //!< multicast packet reception uses FIQ
+    SDP = 0,        //!< SDP handling is highest ordinary priority
+    USER = 1,       //!< User interrupt is next (clearing packet received queue)
+    DMA = 2,        //!< DMA complete handling is next
+    TIMER = 3,      //!< Regular timer tick handling is lowest priority
+};
 
+//! Structure of the provenance data
 struct delay_extension_provenance {
+    //! Number of input spikes
     uint32_t n_packets_received;
+    //! Number of spikes transferred via queue
     uint32_t n_packets_processed;
+    //! Number of spikes added to delay processing
     uint32_t n_packets_added;
+    //! Number of spikes sent
     uint32_t n_packets_sent;
+    //! Number of circular buffer overflows (spikes internally dropped)
     uint32_t n_buffer_overflows;
+    //! Number of times we had to back off because the comms hardware was busy
     uint32_t n_delays;
 };
 
