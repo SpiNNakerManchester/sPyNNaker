@@ -8,7 +8,7 @@ from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeStatic
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 
 # global objects
-DEFAULT_MAX_ATOMS_PER_CORE = 255
+DEFAULT_MAX_ATOMS_PER_CORE = 64
 
 default_parameters = {
     'tau_m': 20.0,
@@ -152,7 +152,9 @@ class IFCondCombExp2E2I(AbstractPyNNNeuronModelStandard):
             )
 
         threshold_type = ThresholdTypeStatic(v_thresh)
-
+        
+        IFCondCombExp2E2I.set_model_max_atoms_per_core(DEFAULT_MAX_ATOMS_PER_CORE)
+        
         super(IFCondCombExp2E2I, self).__init__(
             model_name="IF_cond_comb_exp_2E2I", binary="IF_cond_comb_exp_2E2I.aplx",
             neuron_model=neuron_model, input_type=input_type,
