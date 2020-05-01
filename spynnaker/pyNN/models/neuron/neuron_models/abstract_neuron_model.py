@@ -76,6 +76,7 @@ class AbstractNeuronModel(
         :return: A list with the same length as self.global_struct.field_types
         :rtype: list(int or float) or ~numpy.ndarray
         """
+        # pylint: disable=unused-argument
         return numpy.zeros(0, dtype="uint32")
 
     @overrides(AbstractStandardNeuronComponent.get_data)
