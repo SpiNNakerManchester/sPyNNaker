@@ -761,7 +761,11 @@ class SynapticManager(object):
                     if weight_min != 0:
                         min_weights[synapse_type] = min(
                             min_weights[synapse_type], weight_min)
-        return [m if m != sys.maxsize else 0 for m in min_weights]
+
+        # Convert values to their closest representable value to ensure
+        # that division works for the minimum value
+        return [DataType.S1615.closest_representable_value(m)
+                if m != sys.maxsize else 0 for m in min_weights]
 
     def _get_min_weights(
             self, application_vertex, application_graph, weight_scale):
