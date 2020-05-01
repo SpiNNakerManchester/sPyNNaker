@@ -379,9 +379,8 @@ class SynapticManager(object):
             spec.write_value(w, data_type=DataType.S1615)
 
         # Return the weight scaling factors
-        return numpy.array([
-            DataType.S1615.closest_representable_value((1 / w) * weight_scale)
-            if w != 0 else 0 for w in min_weights])
+        return numpy.array([(1 / w) * weight_scale if w != 0 else 0
+                            for w in min_weights])
 
     def _write_padding(
             self, spec, synaptic_matrix_region, next_block_start_address):
@@ -733,6 +732,14 @@ class SynapticManager(object):
             block_addr += len(row_data) * BYTES_PER_WORD
         return block_addr, single_addr, index
 
+    def __get_closest_weight(self, value):
+        """ Get the best representation of the weight so that both weight and
+            1 / w work
+        """
+        if abs(value) < 1.0:
+            return DataType.S1615.closest_representable_value(value)
+        return 1 / (DataType.S1615.closest_representable_value(1 / value))
+
     def _calculate_min_weights(
             self, application_vertex, application_graph, weight_scale):
         min_weights = [sys.maxsize for _ in range(self.__n_synapse_types)]
@@ -753,7 +760,7 @@ class SynapticManager(object):
 
         # Convert values to their closest representable value to ensure
         # that division works for the minimum value
-        min_weights = [DataType.S1615.closest_representable_value(m)
+        min_weights = [self.__get_closest_weight(m)
                        if m != sys.maxsize else 0 for m in min_weights]
 
         # The minimum weight shouldn't be 0 unless set above (and then it
