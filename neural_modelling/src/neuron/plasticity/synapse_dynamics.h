@@ -29,7 +29,7 @@
 //! \param[in] address: Where the configuration data is
 //! \param[in] n_neurons: Number of neurons
 //! \param[in] n_synapse_types: Number of synapse types
-//! \param ring_buffer_to_input_buffer_left_shifts:
+//! \param[in] ring_buffer_to_input_buffer_left_shifts:
 //!     How to interpret the values from the ring buffers
 //! \return The address of the first word after our configuration data.
 //!     This is <code>sizeof(synapse_dynamics_config)</code> bytes after the
@@ -39,9 +39,9 @@ address_t synapse_dynamics_initialise(
         uint32_t *ring_buffer_to_input_buffer_left_shifts);
 
 //! \brief Processes the dynamics of the synapses
-//! \param plastic_region_address: Where the plastic data is
-//! \param fixed_region_address: Where the fixed data is
-//! \param ring_buffers: The ring buffers
+//! \param[in,out] plastic_region_address: Where the plastic data is
+//! \param[in] fixed_region_address: Where the fixed data is
+//! \param[in,out] ring_buffers: The ring buffers
 //! \param[in] time: The current simulation time
 //! \return ???
 bool synapse_dynamics_process_plastic_synapses(

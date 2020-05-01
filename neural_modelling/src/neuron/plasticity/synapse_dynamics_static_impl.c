@@ -26,10 +26,15 @@
 #include <debug.h>
 #include <utils.h>
 
+//! ::synapse_index_bits + ::synapse_type_bits
 static uint32_t synapse_type_index_bits;
+//! Number of bits to hold the neuron index
 static uint32_t synapse_index_bits;
+//! Mask to extract the neuron index (has ::synapse_index_bits bits set)
 static uint32_t synapse_index_mask;
+//! Number of bits to hold the synapse type
 static uint32_t synapse_type_bits;
+//! Mask to extract the synapse type (has ::synapse_type_bits bits set)
 static uint32_t synapse_type_mask;
 
 address_t synapse_dynamics_initialise(
@@ -110,8 +115,7 @@ bool synapse_dynamics_find_neuron(
         uint32_t *offset, uint32_t *synapse_type) {
     address_t fixed_region = synapse_row_fixed_region(row);
     int32_t fixed_synapse = synapse_row_num_fixed_synapses(fixed_region);
-    uint32_t *synaptic_words = synapse_row_fixed_weight_controls(
-        fixed_region);
+    uint32_t *synaptic_words = synapse_row_fixed_weight_controls(fixed_region);
 
     // Loop through plastic synapses
     for (; fixed_synapse > 0; fixed_synapse--) {
@@ -164,8 +168,7 @@ bool synapse_dynamics_add_neuron(
         uint32_t delay, uint32_t type) {
     address_t fixed_region = synapse_row_fixed_region(row);
     int32_t fixed_synapse = synapse_row_num_fixed_synapses(fixed_region);
-    uint32_t *synaptic_words = synapse_row_fixed_weight_controls(
-        fixed_region);
+    uint32_t *synaptic_words = synapse_row_fixed_weight_controls(fixed_region);
     uint32_t new_synapse = _fixed_synapse_convert(id, weight, delay, type);
 
     // Add control word at offset
