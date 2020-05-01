@@ -267,6 +267,38 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
             return numpy.mean(weights)
         raise Exception("Unrecognised weight format")
 
+    def _get_weight_minimum(self, weights, n_connections):
+        """ Get the minimum of the weights.
+
+        :param weights:
+        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float
+            or list(int) or list(float)
+        :param int n_connections:
+        :rtype: float
+        """
+        if isinstance(weights, RandomDistribution):
+            mean_weight = utility_calls.get_mean(weights)
+            if mean_weight < 0:
+                max_weight = utility_calls.get_maximum_probable_value(
+                    weights, n_connections)
+                high = utility_calls.high(weights)
+                if high is None:
+                    return abs(max_weight)
+                return abs(max(max_weight, high))
+            else:
+                min_weight = utility_calls.get_minimum_probable_value(
+                    weights, n_connections)
+                low = utility_calls.low(weights)
+                if low is None:
+                    return abs(min_weight)
+                return abs(min(min_weight, low))
+
+        elif numpy.isscalar(weights):
+            return abs(weights)
+        elif hasattr(weights, "__getitem__"):
+            return numpy.amax(numpy.abs(weights))
+        raise Exception("Unrecognised weight format")
+
     def get_weight_minimum(self, weights, sigma):
         """ Get the minimum of the weights.  This default uses the mean and the
             variance to avoid needing to add this to all subclasses, but
