@@ -181,9 +181,7 @@ class AbstractSynapseDynamics(object):
         :param SynapseInformation synapse_info:
         :param float sigma: The number of standard deviations of accuracy
         """
-        weights = synapse_info.weights
-        return (connector.get_weight_mean(weights) -
-                connector.get_weight_variance(weights) * sigma)
+        return connector.get_weight_minimum(synapse_info.weights, sigma)
 
     def convert_per_connection_data_to_rows(
             self, connection_row_indices, n_rows, data):
