@@ -22,7 +22,7 @@
 //---------------------------------------
 // Globals
 //---------------------------------------
-// Global plasticity parameter data
+//! Global plasticity parameter data
 plasticity_weight_region_data_t *plasticity_weight_region_data;
 
 //---------------------------------------

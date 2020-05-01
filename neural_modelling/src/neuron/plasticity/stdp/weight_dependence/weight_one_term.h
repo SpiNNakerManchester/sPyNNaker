@@ -22,9 +22,17 @@
 
 #include "weight.h"
 
+//! \brief Apply the depression rule to the weight state
+//! \param[in] state: The weight state to update
+//! \param[in] depression: The amount of depression to apply
+//! \return the updated weight state
 static weight_state_t weight_one_term_apply_depression(
         weight_state_t state, int32_t depression);
 
+//! \brief Apply the potentiation rule to the weight state
+//! \param[in] state: The weight state to update
+//! \param[in] potentiation: The amount of potentiation to apply
+//! \return the updated weight state
 static weight_state_t weight_one_term_apply_potentiation(
         weight_state_t state, int32_t potentiation);
 
