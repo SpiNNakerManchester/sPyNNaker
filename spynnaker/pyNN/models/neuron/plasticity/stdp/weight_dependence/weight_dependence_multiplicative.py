@@ -114,7 +114,7 @@ class WeightDependenceMultiplicative(
     @overrides(AbstractWeightDependence.weight_change_minimum)
     def weight_change_minimum(self, min_delta):
         pot, dep = min_delta
-        return [pot * self.A_plus, dep * self.A_minus]
+        return min(pot * self.A_plus, dep * self.A_minus)
 
     @overrides(AbstractWeightDependence.get_parameter_names)
     def get_parameter_names(self):
