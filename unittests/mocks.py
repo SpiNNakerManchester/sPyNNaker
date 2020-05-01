@@ -92,7 +92,8 @@ class MockSimulator(object):
             {"spikes_per_second": "30",
              "incoming_spike_buffer_size": "256",
              "ring_buffer_sigma": "5",
-             "one_to_one_connection_dtcm_max_bytes": "0"}
+             "one_to_one_connection_dtcm_max_bytes": "0",
+             "min_weights": "None"}
         self.config["Buffers"] = {"time_between_requests": "10",
                                   "minimum_buffer_sdram": "10",
                                   "use_auto_pause_and_resume": "True",
