@@ -44,6 +44,7 @@ def get_exp_lut_array(time_step, time_constant, shift=0):
     header = numpy.array([len(a), shift], dtype="uint16")
     return numpy.concatenate((header, a.astype("uint16"))).view("uint32")
 
+
 def get_min_lut_value(exp_lut_array):
     """ Get the smallest non-zero value of an exponential lookup array,\
         or zero if no such value
