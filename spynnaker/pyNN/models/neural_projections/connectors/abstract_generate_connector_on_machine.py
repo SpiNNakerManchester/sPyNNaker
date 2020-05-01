@@ -62,8 +62,8 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
     ]
 
     def __init__(self, safe=True, callback=None, verbose=False):
-        AbstractConnector.__init__(
-            self, safe=safe, callback=callback, verbose=verbose)
+        super(AbstractGenerateConnectorOnMachine, self).__init__(
+            safe=safe, callback=callback, verbose=verbose)
         self.__delay_seed = dict()
         self.__weight_seed = dict()
         self.__connector_seed = dict()
