@@ -732,18 +732,6 @@ class SynapticManager(object):
             block_addr += len(row_data) * BYTES_PER_WORD
         return block_addr, single_addr, index
 
-    def _get_ring_buffer_shifts(
-            self, application_vertex, application_graph, machine_timestep,
-            weight_scale):
-        """ Get the ring buffer shifts for this vertex
-        """
-        if self.__ring_buffer_shifts is None:
-            self.__ring_buffer_shifts = \
-                self._get_ring_buffer_to_input_left_shifts(
-                    application_vertex, application_graph, machine_timestep,
-                    weight_scale)
-        return self.__ring_buffer_shifts
-
     def _calculate_min_weights(
             self, application_vertex, application_graph, weight_scale):
         min_weights = [sys.maxsize for _ in range(self.__n_synapse_types)]
