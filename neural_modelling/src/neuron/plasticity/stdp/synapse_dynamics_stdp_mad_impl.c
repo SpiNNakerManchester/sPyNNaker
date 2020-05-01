@@ -179,6 +179,7 @@ static inline pre_event_history_t *plastic_event_history(
 void synapse_dynamics_print_plastic_synapses(
         address_t plastic_region_address, address_t fixed_region_address,
         REAL *min_weights) {
+    use(min_weights);
     use(plastic_region_address);
     use(fixed_region_address);
 
