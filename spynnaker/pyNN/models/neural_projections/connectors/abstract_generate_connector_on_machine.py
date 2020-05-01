@@ -230,6 +230,7 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
 
         :rtype: numpy array of uint32
         """
+        # pylint: disable=unused-argument
         return numpy.zeros(0, dtype="uint32")
 
     @property
