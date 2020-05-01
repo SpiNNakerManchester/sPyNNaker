@@ -293,9 +293,22 @@ void timer_callback(uint timer_count, uint unused) {
         count_rewire_attempts++;
     }
 
+    if (rewiring) {
+    	// Update to record additions / removals
+    	uint32_t neurons_added[n_neurons];
+    	uint32_t neurons_removed[n_neurons];
+    	synapse_dynamics_additions(n_neurons, neurons_added);
+    	synapse_dynamics_removals(n_neurons, neurons_removed);
+    	for (uint32_t i = 0; i < n_neurons; i++) {
+        	io_printf(IO_BUF, "time %u ", time);
+    		neuron_record_structural(i, neurons_added[i], neurons_removed[i]);
+    	}
+    }
+
     // Now do synapse and neuron time step updates
     synapses_do_timestep_update(time);
     neuron_do_timestep_update(time, timer_count, timer_period);
+
 
     profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
 }

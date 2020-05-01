@@ -47,6 +47,16 @@ static stdp_params params;
 uint32_t num_plastic_pre_synaptic_events = 0;
 uint32_t plastic_saturation_count = 0;
 
+typedef struct structural_rec_t {
+    uint32_t n_added;
+    uint32_t n_removed;
+} structural_rec_t;
+
+typedef struct structural_rec_t* structural_rec_pointer_t;
+
+//! Array of things for structural recording
+static structural_rec_pointer_t structural_rec_array;
+
 //---------------------------------------
 // Macros
 //---------------------------------------
@@ -257,6 +267,19 @@ address_t synapse_dynamics_initialise(
         return NULL;
     }
 
+    if (sizeof(structural_rec_t)) {
+        structural_rec_array = spin1_malloc(n_neurons * sizeof(structural_rec_t));
+        if (structural_rec_array == NULL) {
+            log_error("Unable to allocate structural recording array"
+                    "- Out of DTCM");
+            return false;
+        }
+        for (uint32_t i = 0; i < n_neurons; i++) {
+        	structural_rec_array[i].n_added = 0;
+        	structural_rec_array[i].n_removed = 0;
+        }
+    }
+
     uint32_t n_neurons_power_2 = n_neurons;
     uint32_t log_n_neurons = 1;
     if (n_neurons != 1) {
@@ -429,7 +452,7 @@ bool synapse_dynamics_find_neuron(
     return false;
 }
 
-bool synapse_dynamics_remove_neuron(uint32_t offset, address_t row){
+bool synapse_dynamics_remove_neuron(uint32_t pre_id, uint32_t offset, address_t row){
     address_t fixed_region = synapse_row_fixed_region(row);
     plastic_synapse_t *plastic_words =
             plastic_synapses(synapse_row_plastic_region(row));
@@ -446,6 +469,8 @@ bool synapse_dynamics_remove_neuron(uint32_t offset, address_t row){
     // Decrement FP
     fixed_region[1]--;
 
+    structural_rec_array[pre_id].n_removed += 1;
+
     return true;
 }
 
@@ -459,7 +484,7 @@ static inline control_t control_conversion(
     return new_control;
 }
 
-bool synapse_dynamics_add_neuron(uint32_t id, address_t row,
+bool synapse_dynamics_add_neuron(uint32_t pre_id, uint32_t id, address_t row,
         weight_t weight, uint32_t delay, uint32_t type) {
     plastic_synapse_t new_weight = synapse_structure_create_synapse(weight);
     control_t new_control = control_conversion(id, delay, type);
@@ -478,9 +503,32 @@ bool synapse_dynamics_add_neuron(uint32_t id, address_t row,
 
     // Increment FP
     fixed_region[1]++;
+
+    structural_rec_array[pre_id].n_added += 1;
+
     return true;
 }
 
 uint32_t synapse_dynamics_n_connections_in_row(address_t fixed) {
     return synapse_row_num_plastic_controls(fixed);
+}
+
+void synapse_dynamics_additions(uint32_t n_neurons, uint32_t* added) {
+//	uint32_t added[n_neurons];
+	for (uint32_t i=0; i < n_neurons; i++) {
+		added[i] = structural_rec_array[i].n_added;
+		// reset value
+		structural_rec_array[i].n_added = 0;
+	}
+//	return added;
+}
+
+void synapse_dynamics_removals(uint32_t n_neurons, uint32_t* removed) {
+//	uint32_t removed[n_neurons];
+	for (uint32_t i=0; i < n_neurons; i++) {
+		removed[i] = structural_rec_array[i].n_removed;
+		// reset value
+		structural_rec_array[i].n_removed = 0;
+	}
+//	return removed;
 }
