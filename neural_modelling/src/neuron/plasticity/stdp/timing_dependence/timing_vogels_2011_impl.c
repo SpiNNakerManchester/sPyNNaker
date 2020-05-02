@@ -22,10 +22,10 @@
 //---------------------------------------
 // Globals
 //---------------------------------------
-// Exponential lookup-tables
+//! Lookup table for pre-computed _&tau;_
 int16_lut *tau_lookup;
 
-// Global plasticity parameter data
+//! Global plasticity parameter data
 plasticity_trace_region_data_t plasticity_trace_region_data;
 
 //---------------------------------------

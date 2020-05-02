@@ -112,8 +112,8 @@ static inline int32_t maths_mul_16x16(int16_t x, int16_t y) {
 
 //---------------------------------------
 //! \brief multiply two 16-bit fixed point numbers (encoded in int32_t)
-//! \param[in] x: The first multiplicand
-//! \param[in] y: The first multiplicand
+//! \param[in] a: The first multiplicand
+//! \param[in] b: The first multiplicand
 //! \param[in] fixed_point_position: The location of the fixed point
 //! \return The product
 static inline int32_t maths_fixed_mul16(
@@ -127,8 +127,8 @@ static inline int32_t maths_fixed_mul16(
 
 //---------------------------------------
 //! \brief multiply two 32-bit fixed point numbers (encoded in int32_t)
-//! \param[in] x: The first multiplicand
-//! \param[in] y: The first multiplicand
+//! \param[in] a: The first multiplicand
+//! \param[in] b: The first multiplicand
 //! \param[in] fixed_point_position: The location of the fixed point
 //! \return The product
 static inline int32_t maths_fixed_mul32(

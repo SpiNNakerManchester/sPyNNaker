@@ -23,7 +23,9 @@
 // Globals
 //---------------------------------------
 // Exponential lookup-tables
+//! Lookup table for &tau;<sup>+</sup> exponential decay
 int16_lut *tau_plus_lookup;
+//! Lookup table for &tau;<sup>-</sup> exponential decay
 int16_lut *tau_minus_lookup;
 
 //---------------------------------------

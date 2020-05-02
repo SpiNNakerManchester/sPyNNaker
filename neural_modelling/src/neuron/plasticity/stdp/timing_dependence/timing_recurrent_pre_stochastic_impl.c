@@ -16,17 +16,21 @@
  */
 
 //! \file
-//! \brief Initialisation for timing_recurrent_pre_stochastic_impl.h
+//! \brief Initialisation & state for timing_recurrent_pre_stochastic_impl.h
 #include "timing_recurrent_pre_stochastic_impl.h"
 
 //---------------------------------------
 // Globals
 //---------------------------------------
 // Exponential lookup-tables
+//! \brief Lookup table for picking exponentially distributed random value for
+//! pre-traces
 uint16_t pre_exp_dist_lookup[STDP_FIXED_POINT_ONE];
+//! \brief Lookup table for picking exponentially distributed random value for
+//! pre-traces
 uint16_t post_exp_dist_lookup[STDP_FIXED_POINT_ONE];
 
-// Global plasticity parameter data
+//! Global plasticity parameter data
 plasticity_trace_region_data_t plasticity_trace_region_data;
 
 //---------------------------------------

@@ -22,8 +22,11 @@
 //---------------------------------------
 // Globals
 //---------------------------------------
-// Exponential lookup-tables
+//! \brief Lookup table for picking exponentially distributed random value for
+//! pre-traces
 uint16_t pre_exp_dist_lookup[STDP_FIXED_POINT_ONE];
+//! \brief Lookup table for picking exponentially distributed random value for
+//! post-traces
 uint16_t post_exp_dist_lookup[STDP_FIXED_POINT_ONE];
 
 // Global plasticity parameter data

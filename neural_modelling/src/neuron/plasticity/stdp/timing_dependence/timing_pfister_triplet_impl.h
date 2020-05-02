@@ -17,17 +17,26 @@
 
 //! \file
 //! \brief Timing rule using spike triplets
+//! \details
+//! <strong>Citation:</strong><br>
+//! Triplets of Spikes in a Model of Spike Timing-Dependent Plasticity.
+//! **Pfister** JP, **Gerstner** W,
+//! _Journal of Neuroscience_
+//! 20 September 2006, 26 (38) 9673-9682.<br>
+//! DOI: [10.1523/JNEUROSCI.1425-06.2006](https://doi.org/10.1523/JNEUROSCI.1425-06.2006)
 #ifndef _TIMING_PFISTER_TRIPLET_IMPL_H_
 #define _TIMING_PFISTER_TRIPLET_IMPL_H_
 
 //---------------------------------------
 // Structures
 //---------------------------------------
+//! The type of post-spike traces
 typedef struct post_trace_t {
     int16_t o1;
     int16_t o2;
 } post_trace_t;
 
+//! The type of pre-spike traces
 typedef struct pre_trace_t {
     int16_t r1;
     int16_t r2;
@@ -55,11 +64,18 @@ extern int16_lut *tau_y_lookup;
 //---------------------------------------
 // Timing dependence inline functions
 //---------------------------------------
+//! \brief Get an initial post-synaptic timing trace
+//! \return the post trace
 static inline post_trace_t timing_get_initial_post_trace(void) {
     return (post_trace_t) {.o1 = 0, .o2 = 0};
 }
 
 //---------------------------------------
+//! \brief Add a post spike to the post trace
+//! \param[in] time: the time of the spike
+//! \param[in] last_time: the time of the previous spike update
+//! \param[in] last_trace: the post trace to update
+//! \return the updated post trace
 static inline post_trace_t timing_add_post_spike(
         uint32_t time, uint32_t last_time, post_trace_t last_trace) {
     // Get time since last spike
@@ -86,6 +102,11 @@ static inline post_trace_t timing_add_post_spike(
 }
 
 //---------------------------------------
+//! \brief Add a pre spike to the pre trace
+//! \param[in] time: the time of the spike
+//! \param[in] last_time: the time of the previous spike update
+//! \param[in] last_trace: the pre trace to update
+//! \return the updated pre trace
 static inline pre_trace_t timing_add_pre_spike(
         uint32_t time, uint32_t last_time, pre_trace_t last_trace) {
     // Get time since last spike
@@ -112,6 +133,15 @@ static inline pre_trace_t timing_add_pre_spike(
 }
 
 //---------------------------------------
+//! \brief Apply a pre-spike timing rule state update
+//! \param[in] time: the current time
+//! \param[in] trace: the current pre-spike trace
+//! \param[in] last_pre_time: the time of the last pre-spike
+//! \param[in] last_pre_trace: the trace of the last pre-spike
+//! \param[in] last_post_time: the time of the last post-spike
+//! \param[in] last_post_trace: the trace of the last post-spike
+//! \param[in] previous_state: the state to update
+//! \return the updated state
 static inline update_state_t timing_apply_pre_spike(
         uint32_t time, pre_trace_t trace, uint32_t last_pre_time,
         pre_trace_t last_pre_trace, uint32_t last_post_time,
@@ -137,6 +167,15 @@ static inline update_state_t timing_apply_pre_spike(
 }
 
 //---------------------------------------
+//! \brief Apply a post-spike timing rule state update
+//! \param[in] time: the current time
+//! \param[in] trace: the current post-spike trace
+//! \param[in] last_pre_time: the time of the last pre-spike
+//! \param[in] last_pre_trace: the trace of the last pre-spike
+//! \param[in] last_post_time: the time of the last post-spike
+//! \param[in] last_post_trace: the trace of the last post-spike
+//! \param[in] previous_state: the state to update
+//! \return the updated state
 static inline update_state_t timing_apply_post_spike(
         uint32_t time, post_trace_t trace, uint32_t last_pre_time,
         pre_trace_t last_pre_trace, uint32_t last_post_time,
