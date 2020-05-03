@@ -35,7 +35,9 @@ typedef struct formation_params formation_params_t;
 //! \return the read parameters data structure
 formation_params_t *synaptogenesis_formation_init(uint8_t **data);
 
-//! \brief Formation rule for synaptogenesis
+//! \brief Formation rule for synaptogenesis; picks what neuron in the
+//!     _current_ population will have a synapse added, and then performs the
+//!     addition.
 //! \param[in] current_state: Pointer to current state
 //! \param[in] params: Pointer to rewiring data
 //! \param[in] time: Time of formation

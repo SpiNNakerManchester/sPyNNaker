@@ -31,7 +31,7 @@
 //!     parameters (random seed, spread of receptive field etc.)
 //! \param[in] sdram_sp_address: Address of the start of the SDRAM region
 //!     which contains synaptic rewiring params.
-//! \return address_t Address after the final word read from SDRAM.
+//! \return Address after the final word read from SDRAM.
 address_t synaptogenesis_dynamics_initialise(
         address_t sdram_sp_address);
 
@@ -52,7 +52,6 @@ bool synaptogenesis_dynamics_rewire(uint32_t time,
 bool synaptogenesis_row_restructure(uint32_t time, address_t row);
 
 //! \brief retrieve the period of rewiring
-//!
 //! \return Based on synaptogenesis_is_fast(), this can either be how many times
 //!     rewiring happens in a timestep, or how many timesteps have to pass until
 //!     rewiring happens.

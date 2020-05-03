@@ -21,7 +21,9 @@
 
 spike_t* last_spikes_buffer[2];
 uint32_t n_spikes[2];
+//! Size of each sub-array within ::last_spikes_buffer
 uint32_t last_spikes_buffer_size;
+//! The time of the most recently-considered spike
 uint32_t last_time;
 
 void partner_init(uint8_t **data) {
