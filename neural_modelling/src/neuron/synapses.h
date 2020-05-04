@@ -33,10 +33,10 @@
 //! \param[in] synapse_index_bits:
 //! \return Index into the ring buffer
 static inline index_t synapses_get_ring_buffer_index(
-        uint32_t simuation_timestep, uint32_t synapse_type_index,
+        uint32_t simulation_timestep, uint32_t synapse_type_index,
         uint32_t neuron_index, uint32_t synapse_type_index_bits,
         uint32_t synapse_index_bits) {
-    return ((simuation_timestep & SYNAPSE_DELAY_MASK) << synapse_type_index_bits)
+    return ((simulation_timestep & SYNAPSE_DELAY_MASK) << synapse_type_index_bits)
             | (synapse_type_index << synapse_index_bits)
             | neuron_index;
 }

@@ -121,8 +121,8 @@ static inline uint get_payload(enum send_type type, accum value) {
 }
 
 //! \brief Determines if the value given is above the threshold value
-//! \param[in] value The value to determine if it is above the threshold
-//! \param[in] params The parameters to use to determine the result
+//! \param[in] value: The value to determine if it is above the threshold
+//! \param[in] threshold_type: The parameters to use to determine the result
 //! \return True if the neuron should fire
 static bool threshold_type_is_above_threshold(
         state_t value, threshold_type_t *threshold_type) {

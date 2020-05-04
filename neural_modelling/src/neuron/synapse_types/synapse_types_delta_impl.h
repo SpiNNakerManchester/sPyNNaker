@@ -30,10 +30,16 @@
 //---------------------------------------
 // Macros
 //---------------------------------------
+//! \brief Number of bits to encode the synapse type
+//! \details <tt>ceil(log2(#SYNAPSE_TYPE_COUNT))</tt>
 #define SYNAPSE_TYPE_BITS 1
+//! \brief Number of synapse types
+//! \details <tt>#NUM_EXCITATORY_RECEPTORS + #NUM_INHIBITORY_RECEPTORS</tt>
 #define SYNAPSE_TYPE_COUNT 2
 
+//! Number of excitatory receptors
 #define NUM_EXCITATORY_RECEPTORS 1
+//! Number of inhibitory receptors
 #define NUM_INHIBITORY_RECEPTORS 1
 
 #include <debug.h>
@@ -43,33 +49,38 @@
 //---------------------------------------
 // Synapse parameters
 //---------------------------------------
+//! Buffer used for result of synapse_types_get_excitatory_input()
 input_t excitatory_response[NUM_EXCITATORY_RECEPTORS];
+//! Buffer used for result of synapse_types_get_inhibitory_input()
 input_t inhibitory_response[NUM_INHIBITORY_RECEPTORS];
 
 typedef struct delta_params_t {
 	input_t synaptic_input_value;
-}delta_params_t;
+} delta_params_t;
 
 struct synapse_param_t {
 	delta_params_t exc;
 	delta_params_t inh;
 };
 
-typedef enum input_buffer_regions {
-    EXCITATORY, INHIBITORY,
-} input_buffer_regions;
+//! The input buffer types supported by the synapse
+typedef enum {
+    EXCITATORY, //!< Excitatory input
+    INHIBITORY, //!< Inhibitory input
+} synapse_delta_input_buffer_regions;
 
 //---------------------------------------
 // Synapse shaping inline implementation
 //---------------------------------------
 
 //! \brief Decays the stuff thats sitting in the input buffers.
+//! \details
 //!     In this case, a delta shape means returning the value to zero
 //!     immediately.
-//! \param[out] delta_params: the parameter to update
+//! \param[out] delta_param: the parameter to update
 //! \return nothing
-static inline void delta_shaping(delta_params_t* delta_params) {
-	delta_params->synaptic_input_value = 0;
+static inline void delta_shaping(delta_params_t *delta_param) {
+	delta_param->synaptic_input_value = 0;
 }
 
 //! \brief decays the stuff thats sitting in the input buffers as these have not
@@ -89,12 +100,12 @@ static inline void synapse_types_shape_input(
 
 //! \brief helper function to add input for a given timer period to a given
 //!     neuron
-//! \param[in,out] delta_params: the parameter to update
+//! \param[in,out] delta_param: the parameter to update
 //! \param[in] input: the input to add.
 //! \return None
 static inline void add_input_delta(
-        delta_params_t* delta_params, input_t input) {
-	delta_params->synaptic_input_value += input;
+        delta_params_t *delta_param, input_t input) {
+	delta_param->synaptic_input_value += input;
 }
 
 //! \brief adds the inputs for a give timer period to a given neuron that is
@@ -107,10 +118,13 @@ static inline void add_input_delta(
 static inline void synapse_types_add_neuron_input(
         index_t synapse_type_index, synapse_param_t *parameters,
         input_t input) {
-    if (synapse_type_index == EXCITATORY) {
+    switch (synapse_type_index) {
+    case EXCITATORY:
     	add_input_delta(&parameters->exc, input);
-    } else if (synapse_type_index == INHIBITORY) {
+    	break;
+    case INHIBITORY:
     	add_input_delta(&parameters->inh, input);
+    	break;
     }
 }
 
@@ -141,11 +155,12 @@ static inline input_t *synapse_types_get_inhibitory_input(
 //! \return a human readable character representing the synapse type.
 static inline const char *synapse_types_get_type_char(
         index_t synapse_type_index) {
-    if (synapse_type_index == EXCITATORY) {
+    switch (synapse_type_index) {
+    case EXCITATORY:
         return "X";
-    } else if (synapse_type_index == INHIBITORY) {
+    case INHIBITORY:
         return "I";
-    } else {
+    default:
         log_debug("did not recognise synapse type %i", synapse_type_index);
         return "?";
     }

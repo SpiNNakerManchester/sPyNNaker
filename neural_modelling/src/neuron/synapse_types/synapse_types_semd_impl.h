@@ -25,55 +25,75 @@
 #ifndef _SYNAPSE_TYPES_SEMD_IMPL_H_
 #define _SYNAPSE_TYPES_SEMD_IMPL_H_
 
-
 //---------------------------------------
 // Macros
 //---------------------------------------
+//! \brief Number of bits to encode the synapse type
+//! \details <tt>ceil(log2(#SYNAPSE_TYPE_COUNT))</tt>
 #define SYNAPSE_TYPE_BITS 2
+//! \brief Number of synapse types
+//! \details <tt>#NUM_EXCITATORY_RECEPTORS + #NUM_INHIBITORY_RECEPTORS</tt>
 #define SYNAPSE_TYPE_COUNT 3
 
+//! Number of excitatory receptors
 #define NUM_EXCITATORY_RECEPTORS 2
+//! Number of inhibitory receptors
 #define NUM_INHIBITORY_RECEPTORS 1
 
-#define SCALING_FACTOR 100.0k
+//! Used to scale the secondary response
+#define SCALING_FACTOR  REAL_CONST(100.0)
 
 #include <neuron/decay.h>
 #include <debug.h>
 #include "synapse_types.h"
 
-
 //---------------------------------------
 // Synapse parameters
 //---------------------------------------
+//! Buffer used for result of synapse_types_get_excitatory_input()
 input_t excitatory_response[NUM_EXCITATORY_RECEPTORS];
+//! Buffer used for result of synapse_types_get_inhibitory_input()
 input_t inhibitory_response[NUM_INHIBITORY_RECEPTORS];
 
 typedef struct exp_params_t {
-	decay_t decay;
+    //! Decay multiplier per timestep
+    decay_t decay;
+    //! Initial decay factor
     decay_t init;
+    //! The actual synaptic contribution
     input_t synaptic_input_value;
 } exp_params_t;
 
 struct synapse_param_t {
+    //! Excitatory input 1
 	exp_params_t exc;
+    //! Excitatory input 2
 	exp_params_t exc2;
+	//! Inhibitory input
 	exp_params_t inh;
+	//! Output scaling factor derived from first excitatory input
 	input_t multiplicator;
+	//! History storage used to reset synaptic state
 	input_t exc2_old;
 };
 
 //! human readable definition for the positions in the input regions for the
 //! different synapse types.
-typedef enum input_buffer_regions {
-    EXCITATORY_ONE, EXCITATORY_TWO, INHIBITORY,
-} input_buffer_regions;
+typedef enum {
+    //! First excitatory input
+    EXCITATORY_ONE,
+    //! Second excitatory input
+    EXCITATORY_TWO,
+    //! Inhibitory input
+    INHIBITORY,
+} synapse_semd_input_buffer_regions;
 
 //---------------------------------------
 // Synapse shaping inline implementation
 //---------------------------------------
 
 //! \brief Shapes a single parameter
-//! \param[in,out] exp_params: The parameter to shape
+//! \param[in,out] exp_param: The parameter to shape
 static inline void exp_shaping(exp_params_t *exp_param) {
     // decay value according to decay constant
 	exp_param->synaptic_input_value =
@@ -115,12 +135,16 @@ static inline void add_input_exp(exp_params_t *parameter, input_t input) {
 static inline void synapse_types_add_neuron_input(
         index_t synapse_type_index, synapse_param_t *parameter,
         input_t input) {
-    if (synapse_type_index == EXCITATORY_ONE) {
+    switch (synapse_type_index) {
+    case EXCITATORY_ONE:
     	add_input_exp(&parameter->exc, input);
-    } else if (synapse_type_index == EXCITATORY_TWO) {
+    	break;
+    case EXCITATORY_TWO:
     	add_input_exp(&parameter->exc2, input);
-    } else if (synapse_type_index == INHIBITORY) {
+    	break;
+    case INHIBITORY:
     	add_input_exp(&parameter->inh, input);
+    	break;
     }
 }
 
@@ -164,13 +188,14 @@ static inline input_t *synapse_types_get_inhibitory_input(
 //! \return a human readable character representing the synapse type.
 static inline const char *synapse_types_get_type_char(
         index_t synapse_type_index) {
-    if (synapse_type_index == EXCITATORY_ONE) {
+    switch (synapse_type_index) {
+    case EXCITATORY_ONE:
         return "X1";
-    } else if (synapse_type_index == EXCITATORY_TWO) {
+    case EXCITATORY_TWO:
         return "X2";
-    } else if (synapse_type_index == INHIBITORY) {
+    case INHIBITORY:
         return "I";
-    } else {
+    default:
         log_debug("did not recognise synapse type %i", synapse_type_index);
         return "?";
     }

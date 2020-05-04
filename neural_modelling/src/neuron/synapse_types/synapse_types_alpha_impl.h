@@ -27,51 +27,59 @@
 //---------------------------------------
 // Macros
 //---------------------------------------
+//! \brief Number of bits to encode the synapse type
+//! \details <tt>ceil(log2(#SYNAPSE_TYPE_COUNT))</tt>
 #define SYNAPSE_TYPE_BITS 1
+//! \brief Number of synapse types
+//! \details <tt>#NUM_EXCITATORY_RECEPTORS + #NUM_INHIBITORY_RECEPTORS</tt>
 #define SYNAPSE_TYPE_COUNT 2
 
+//! Number of excitatory receptors
 #define NUM_EXCITATORY_RECEPTORS 1
+//! Number of inhibitory receptors
 #define NUM_INHIBITORY_RECEPTORS 1
 
 #include <neuron/decay.h>
 #include <debug.h>
 #include "synapse_types.h"
 
-
 //---------------------------------------
 // Synapse parameters
 //---------------------------------------
+//! Buffer used for result of synapse_types_get_excitatory_input()
 input_t excitatory_response[NUM_EXCITATORY_RECEPTORS];
+//! Buffer used for result of synapse_types_get_inhibitory_input()
 input_t inhibitory_response[NUM_INHIBITORY_RECEPTORS];
 
 typedef struct alpha_params_t {
-    // buffer for linear term
+    //! buffer for linear term
     input_t lin_buff;
 
-    // buffer for exponential term
+    //! buffer for exponential term
     input_t exp_buff;
 
-    // Inverse of tau pre-multiplied by dt
+    //! Inverse of tau pre-multiplied by dt
     input_t dt_divided_by_tau_sqr;
 
-    // Exponential decay multiplier
+    //! Exponential decay multiplier
     decay_t decay;
 
-    // Temporary value of
+    //! Temporary value of input
     input_t q_buff;
 } alpha_params_t;
 
 struct synapse_param_t {
+    //! Excitatory parameters
     alpha_params_t exc;
+    //! Inhibitory parameters
     alpha_params_t inh;
 };
 
-//! human readable definition for the positions in the input regions for the
+//! \brief the positions in the input regions for the
 //! different synapse types.
-typedef enum input_buffer_regions {
+typedef enum {
     EXCITATORY, INHIBITORY,
-} input_buffer_regions;
-
+} synapse_alpha_input_buffer_regions;
 
 //---------------------------------------
 // Synapse shaping inline implementation
@@ -136,10 +144,13 @@ static inline void synapse_types_add_neuron_input(
         index_t synapse_type_index, synapse_param_t *parameters,
         input_t input) {
     if (input > ZERO) {
-        if (synapse_type_index == EXCITATORY) {
+        switch (synapse_type_index) {
+        case EXCITATORY:
             add_input_alpha(&parameters->exc, input);
-        } else if (synapse_type_index == INHIBITORY) {
+            break;
+        case INHIBITORY:
             add_input_alpha(&parameters->inh, input);
+            break;
         }
     }
 }
@@ -175,11 +186,12 @@ static inline input_t* synapse_types_get_inhibitory_input(
 //! \return a human readable character representing the synapse type.
 static inline const char *synapse_types_get_type_char(
         index_t synapse_type_index) {
-    if (synapse_type_index == EXCITATORY) {
+    switch (synapse_type_index) {
+    case EXCITATORY:
         return "X";
-    } else if (synapse_type_index == INHIBITORY) {
+    case INHIBITORY:
         return "I";
-    } else {
+    default:
         log_debug("did not recognise synapse type %i", synapse_type_index);
         return "?";
     }
