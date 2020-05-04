@@ -71,6 +71,10 @@ enum recurrent_state_machine_state_t {
 //---------------------------------------
 // Timing dependence functions
 //---------------------------------------
+
+static inline void _no_op(void) {
+}
+
 //! \brief Get an initial post-synaptic timing trace
 //! \return the post trace
 static inline post_trace_t timing_get_initial_post_trace(void) {
@@ -139,8 +143,9 @@ static inline update_state_t timing_apply_pre_spike(
         previous_state =
                 timing_recurrent_calculate_pre_window(previous_state);
         break;
-    case STATE_PRE_OPEN: ; // <<< empty statement for C syntax reasons
+    case STATE_PRE_OPEN:
         // If we're in pre-open state
+        _no_op(); // <<< empty statement for C syntax reasons
         // Get time of event relative to last pre-synaptic event
         uint32_t time_since_last_pre = time - last_pre_time;
 
@@ -157,8 +162,9 @@ static inline update_state_t timing_apply_pre_spike(
                     timing_recurrent_calculate_pre_window(previous_state);
         }
         break;
-    case STATE_POST_OPEN: ; // <<< empty statement for C syntax reasons
+    case STATE_POST_OPEN:
         // Otherwise, if we're in post-open
+        _no_op(); // <<< empty statement for C syntax reasons
         // Get time of event relative to last post-synaptic event
         uint32_t time_since_last_post = time - last_post_time;
 
@@ -229,8 +235,9 @@ static inline update_state_t timing_apply_post_spike(
         previous_state =
                 timing_recurrent_calculate_post_window(previous_state);
         break;
-    case STATE_POST_OPEN: ; // <<< empty statement for C syntax reasons
+    case STATE_POST_OPEN:
         // If we're in post-open state
+        _no_op(); // <<< empty statement for C syntax reasons
         // Get time of event relative to last post-synaptic event
         uint32_t time_since_last_post = time - last_post_time;
 
@@ -248,8 +255,9 @@ static inline update_state_t timing_apply_post_spike(
                     timing_recurrent_calculate_post_window(previous_state);
         }
         break;
-    case STATE_PRE_OPEN: ; // <<< empty statement for C syntax reasons
+    case STATE_PRE_OPEN:
         // Otherwise, if we're in pre-open
+        _no_op(); // <<< empty statement for C syntax reasons
         // Get time of event relative to last pre-synaptic event
         uint32_t time_since_last_pre = time - last_pre_time;
 
