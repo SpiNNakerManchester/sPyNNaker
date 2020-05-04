@@ -103,12 +103,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Data Structures</h2></td></tr>
 <tr class="memitem:structthreshold__type__t"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="threshold__type__static_8h.html#structthreshold__type__t">threshold_type_t</a></td></tr>
+<tr class="memdesc:structthreshold__type__t"><td class="mdescLeft">&#160;</td><td class="mdescRight">The definition of the threshold.  <a href="threshold__type__static_8h.html#structthreshold__type__t">More...</a><br /></td></tr>
 <tr class="separator:structthreshold__type__t"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a78e80ccc57135aa9f338b0e82001fb89"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a78e80ccc57135aa9f338b0e82001fb89"></a>
-static bool&#160;</td><td class="memItemRight" valign="bottom"><b>threshold_type_is_above_threshold</b> (<a class="el" href="neuron-typedefs_8h.html#ab5816efea940631eca6d71dd4ca99c17">state_t</a> value, <a class="el" href="threshold__type__static_8h.html#structthreshold__type__t">threshold_type_t</a> *threshold_type)</td></tr>
+<tr class="memitem:a78e80ccc57135aa9f338b0e82001fb89"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="threshold__type__static_8h.html#a78e80ccc57135aa9f338b0e82001fb89">threshold_type_is_above_threshold</a> (<a class="el" href="neuron-typedefs_8h.html#ab5816efea940631eca6d71dd4ca99c17">state_t</a> value, <a class="el" href="threshold__type__static_8h.html#structthreshold__type__t">threshold_type_t</a> *threshold_type)</td></tr>
+<tr class="memdesc:a78e80ccc57135aa9f338b0e82001fb89"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determines if the value given is above the threshold value.  <a href="#a78e80ccc57135aa9f338b0e82001fb89">More...</a><br /></td></tr>
 <tr class="separator:a78e80ccc57135aa9f338b0e82001fb89"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -123,7 +124,10 @@ static bool&#160;</td><td class="memItemRight" valign="bottom"><b>threshold_type
         </tr>
       </table>
 </div><div class="memdoc">
-<div class="textblock"></div><table class="fieldtable">
+<div class="textblock"><p>The definition of the threshold. </p>
+<p>Static threshold configuration.</p>
+<p>Stochastic threshold configuration. </p>
+</div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="a22fd617733ea84d268d826b840800e7d"></a>uint32_t</td>
@@ -165,7 +169,7 @@ time_until_next_send</td>
 <td class="fielddoc">
 The time until the next sending of the value (initially 0) </td></tr>
 <tr><td class="fieldtype">
-<a class="anchor" id="a91ff408c17251a6b8001bb4f31d65764"></a>enum send_type</td>
+<a class="anchor" id="a91ff408c17251a6b8001bb4f31d65764"></a>enum <a class="el" href="threshold__type__external__device__control_8h.html#a73f8837bd24ba4a9abf204756c0b9b9e">send_type</a></td>
 <td class="fieldname">
 type</td>
 <td class="fielddoc">
@@ -175,39 +179,86 @@ Send type. </td></tr>
 <td class="fieldname">
 du_th_inv</td>
 <td class="fielddoc">
+<p>sensitivity of soft threshold to membrane voltage [mV<sup>-1</sup>] (inverted in python code) </p>
 </td></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="ae06bd5cdb86afcc206e80fc52f08944f"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
 <td class="fieldname">
 tau_th_inv</td>
 <td class="fielddoc">
+<p>time constant for soft threshold [ms<sup>-1</sup>] (inverted in python code) </p>
 </td></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="ab45ec840ac2e212feee7e2b5782a8ed0"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
 <td class="fieldname">
 v_thresh</td>
 <td class="fielddoc">
-</td></tr>
+soft threshold value [mV] </td></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="ad4d04f4117f32c07cd86ee51cdc9eb74"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
 <td class="fieldname">
 neg_machine_time_step_ms_div_10</td>
 <td class="fielddoc">
-</td></tr>
+time step scaling factor </td></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="a8d25a3b92dbeffe773c096f0289aeb44"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
 <td class="fieldname">
 threshold_value</td>
 <td class="fielddoc">
-</td></tr>
+The value of the static threshold. </td></tr>
 </table>
+
+</div>
+</div>
+<h2 class="groupheader">Function Documentation</h2>
+<a class="anchor" id="a78e80ccc57135aa9f338b0e82001fb89"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static bool threshold_type_is_above_threshold </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="neuron-typedefs_8h.html#ab5816efea940631eca6d71dd4ca99c17">state_t</a>&#160;</td>
+          <td class="paramname"><em>value</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="threshold__type__static_8h.html#structthreshold__type__t">threshold_type_t</a> *&#160;</td>
+          <td class="paramname"><em>threshold_type</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Determines if the value given is above the threshold value. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">value</td><td>The value to determine if it is above the threshold </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">threshold_type</td><td>The parameters to use to determine the result </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>True if the neuron should fire </dd></dl>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Apr 29 2020 10:12:39 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon May 4 2020 11:12:16 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

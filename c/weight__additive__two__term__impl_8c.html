@@ -101,13 +101,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a499ff9e19e3982f41bd7422fafebca2e"><td class="memItemLeft" align="right" valign="top">address_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="weight__additive__two__term__impl_8c.html#a499ff9e19e3982f41bd7422fafebca2e">weight_initialise</a> (address_t address, uint32_t <a class="el" href="synapses_8c.html#adedb27b3ece4d4dece0aee776a136427">n_synapse_types</a>, uint32_t *ring_buffer_to_input_buffer_left_shifts)</td></tr>
-<tr class="memdesc:a499ff9e19e3982f41bd7422fafebca2e"><td class="mdescLeft">&#160;</td><td class="mdescRight">initialised the weight aspect of a STDP rule.  <a href="#a499ff9e19e3982f41bd7422fafebca2e">More...</a><br /></td></tr>
+<tr class="memdesc:a499ff9e19e3982f41bd7422fafebca2e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialises the weight aspect of an STDP rule.  <a href="#a499ff9e19e3982f41bd7422fafebca2e">More...</a><br /></td></tr>
 <tr class="separator:a499ff9e19e3982f41bd7422fafebca2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
 <tr class="memitem:aff9620807595c2091e6bd5887da64f5b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aff9620807595c2091e6bd5887da64f5b"></a>
-<a class="el" href="weight__multiplicative__impl_8h.html#structplasticity__weight__region__data__t">plasticity_weight_region_data_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>plasticity_weight_region_data</b></td></tr>
+<a class="el" href="weight__multiplicative__impl_8h.html#structplasticity__weight__region__data__t">plasticity_weight_region_data_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="weight__additive__two__term__impl_8c.html#aff9620807595c2091e6bd5887da64f5b">plasticity_weight_region_data</a></td></tr>
+<tr class="memdesc:aff9620807595c2091e6bd5887da64f5b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Global plasticity parameter data. <br /></td></tr>
 <tr class="separator:aff9620807595c2091e6bd5887da64f5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -143,7 +144,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>initialised the weight aspect of a STDP rule. </p>
+<p>Initialises the weight aspect of an STDP rule. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">address</td><td>the absolute address in SRAM where the weight parameters are stored. </td></tr>
@@ -152,14 +153,14 @@ Variables</h2></td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>address_t: returns the end of the weight region as an absolute SDRAM memory address. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the end of the weight region as an absolute SDRAM memory address. </dd></dl>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Apr 29 2020 10:12:39 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon May 4 2020 11:12:16 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

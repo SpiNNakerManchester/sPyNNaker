@@ -107,24 +107,23 @@ Functions</h2></td></tr>
 <tr class="memitem:a7d0403fedf08df2d791534cfe72f4fa2"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__impl_8h.html#a7d0403fedf08df2d791534cfe72f4fa2">neuron_impl_add_inputs</a> (index_t synapse_type_index, index_t neuron_index, <a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> weights_this_timestep)</td></tr>
 <tr class="memdesc:a7d0403fedf08df2d791534cfe72f4fa2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add inputs to the neuron.  <a href="#a7d0403fedf08df2d791534cfe72f4fa2">More...</a><br /></td></tr>
 <tr class="separator:a7d0403fedf08df2d791534cfe72f4fa2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a72b0028625c6e3cad1e4176bdba1b44e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a72b0028625c6e3cad1e4176bdba1b44e"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__impl_8h.html#a72b0028625c6e3cad1e4176bdba1b44e">neuron_impl_load_neuron_parameters</a> (address_t address, uint32_t next, uint32_t <a class="el" href="synapses_8c.html#a7368643a28282d8b3429f0fb145aa5db">n_neurons</a>)</td></tr>
-<tr class="memdesc:a72b0028625c6e3cad1e4176bdba1b44e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load in the neuron parameters. <br /></td></tr>
+<tr class="memitem:a72b0028625c6e3cad1e4176bdba1b44e"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__impl_8h.html#a72b0028625c6e3cad1e4176bdba1b44e">neuron_impl_load_neuron_parameters</a> (address_t address, uint32_t next, uint32_t <a class="el" href="synapses_8c.html#a7368643a28282d8b3429f0fb145aa5db">n_neurons</a>)</td></tr>
+<tr class="memdesc:a72b0028625c6e3cad1e4176bdba1b44e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Load in the neuron parameters.  <a href="#a72b0028625c6e3cad1e4176bdba1b44e">More...</a><br /></td></tr>
 <tr class="separator:a72b0028625c6e3cad1e4176bdba1b44e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a21f9a596a5048838a60fee323e466314"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__impl_8h.html#a21f9a596a5048838a60fee323e466314">neuron_impl_do_timestep_update</a> (index_t neuron_index, <a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> external_bias)</td></tr>
 <tr class="memdesc:a21f9a596a5048838a60fee323e466314"><td class="mdescLeft">&#160;</td><td class="mdescRight">Do the timestep update for the particular implementation.  <a href="#a21f9a596a5048838a60fee323e466314">More...</a><br /></td></tr>
 <tr class="separator:a21f9a596a5048838a60fee323e466314"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af2c8c3ce110bf3e9b4d0dc27f22b4860"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__impl_8h.html#af2c8c3ce110bf3e9b4d0dc27f22b4860">neuron_impl_store_neuron_parameters</a> (address_t address, uint32_t next, uint32_t <a class="el" href="synapses_8c.html#a7368643a28282d8b3429f0fb145aa5db">n_neurons</a>)</td></tr>
-<tr class="memdesc:af2c8c3ce110bf3e9b4d0dc27f22b4860"><td class="mdescLeft">&#160;</td><td class="mdescRight">Store the neuron parameters to the given address.  <a href="#af2c8c3ce110bf3e9b4d0dc27f22b4860">More...</a><br /></td></tr>
+<tr class="memdesc:af2c8c3ce110bf3e9b4d0dc27f22b4860"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stores neuron parameters back into SDRAM.  <a href="#af2c8c3ce110bf3e9b4d0dc27f22b4860">More...</a><br /></td></tr>
 <tr class="separator:af2c8c3ce110bf3e9b4d0dc27f22b4860"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa1d6d1186174dd22b3d152b919a4ca0f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa1d6d1186174dd22b3d152b919a4ca0f"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>neuron_impl_print_inputs</b> (uint32_t <a class="el" href="synapses_8c.html#a7368643a28282d8b3429f0fb145aa5db">n_neurons</a>)</td></tr>
+<tr class="memitem:aa1d6d1186174dd22b3d152b919a4ca0f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__impl_8h.html#aa1d6d1186174dd22b3d152b919a4ca0f">neuron_impl_print_inputs</a> (uint32_t <a class="el" href="synapses_8c.html#a7368643a28282d8b3429f0fb145aa5db">n_neurons</a>)</td></tr>
+<tr class="memdesc:aa1d6d1186174dd22b3d152b919a4ca0f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print the inputs to the neurons.  <a href="#aa1d6d1186174dd22b3d152b919a4ca0f">More...</a><br /></td></tr>
 <tr class="separator:aa1d6d1186174dd22b3d152b919a4ca0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a29ad1f4cd958c5acde321fe2f2d41abe"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a29ad1f4cd958c5acde321fe2f2d41abe"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>neuron_impl_print_synapse_parameters</b> (uint32_t <a class="el" href="synapses_8c.html#a7368643a28282d8b3429f0fb145aa5db">n_neurons</a>)</td></tr>
+<tr class="memitem:a29ad1f4cd958c5acde321fe2f2d41abe"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__impl_8h.html#a29ad1f4cd958c5acde321fe2f2d41abe">neuron_impl_print_synapse_parameters</a> (uint32_t <a class="el" href="synapses_8c.html#a7368643a28282d8b3429f0fb145aa5db">n_neurons</a>)</td></tr>
+<tr class="memdesc:a29ad1f4cd958c5acde321fe2f2d41abe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print the synapse parameters of the neurons.  <a href="#a29ad1f4cd958c5acde321fe2f2d41abe">More...</a><br /></td></tr>
 <tr class="separator:a29ad1f4cd958c5acde321fe2f2d41abe"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab28525e166d16dfb00284093d84c6661"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab28525e166d16dfb00284093d84c6661"></a>
-const char *&#160;</td><td class="memItemRight" valign="bottom"><b>neuron_impl_get_synapse_type_char</b> (uint32_t synapse_type)</td></tr>
+<tr class="memitem:ab28525e166d16dfb00284093d84c6661"><td class="memItemLeft" align="right" valign="top">const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__impl_8h.html#ab28525e166d16dfb00284093d84c6661">neuron_impl_get_synapse_type_char</a> (uint32_t synapse_type)</td></tr>
+<tr class="memdesc:ab28525e166d16dfb00284093d84c6661"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the synapse type character for a synapse type.  <a href="#ab28525e166d16dfb00284093d84c6661">More...</a><br /></td></tr>
 <tr class="separator:ab28525e166d16dfb00284093d84c6661"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -213,6 +212,56 @@ const char *&#160;</td><td class="memItemRight" valign="bottom"><b>neuron_impl_g
 
 </div>
 </div>
+<a class="anchor" id="a72b0028625c6e3cad1e4176bdba1b44e"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void neuron_impl_load_neuron_parameters </td>
+          <td>(</td>
+          <td class="paramtype">address_t&#160;</td>
+          <td class="paramname"><em>address</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>next</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>n_neurons</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Load in the neuron parameters. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">address</td><td>SDRAM block to read parameters from </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">next</td><td>Offset of next address in store </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">n_neurons</td><td>The number of neurons </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a class="anchor" id="a21f9a596a5048838a60fee323e466314"></a>
 <div class="memitem">
 <div class="memproto">
@@ -295,22 +344,95 @@ const char *&#160;</td><td class="memItemRight" valign="bottom"><b>neuron_impl_g
 </table>
 </div><div class="memdoc">
 
-<p>Store the neuron parameters to the given address. </p>
+<p>Stores neuron parameters back into SDRAM. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[out]</td><td class="paramname">address</td><td></td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">next</td><td></td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">n_neurons</td><td></td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">address</td><td>the address in SDRAM to start the store </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">next</td><td>Offset of next address in store </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">n_neurons</td><td>The number of neurons </td></tr>
   </table>
   </dd>
 </dl>
 
 </div>
 </div>
+<a class="anchor" id="aa1d6d1186174dd22b3d152b919a4ca0f"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void neuron_impl_print_inputs </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>n_neurons</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Print the inputs to the neurons. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">n_neurons</td><td>The number of neurons </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a29ad1f4cd958c5acde321fe2f2d41abe"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void neuron_impl_print_synapse_parameters </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>n_neurons</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Print the synapse parameters of the neurons. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">n_neurons</td><td>The number of neurons </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="ab28525e166d16dfb00284093d84c6661"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const char* neuron_impl_get_synapse_type_char </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>synapse_type</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the synapse type character for a synapse type. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">synapse_type</td><td>The synapse type </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The descriptor character (sometimes two characters) </dd></dl>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Apr 29 2020 10:12:38 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon May 4 2020 11:12:16 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

@@ -107,53 +107,52 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <code>#include &lt;debug.h&gt;</code><br />
 <code>#include &lt;utils.h&gt;</code><br />
 <code>#include &lt;<a class="el" href="synapse__dynamics_8h_source.html">neuron/plasticity/synapse_dynamics.h</a>&gt;</code><br />
+<code>#include &lt;stddef.h&gt;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Data Structures</h2></td></tr>
 <tr class="memitem:structstdp__params"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#structstdp__params">stdp_params</a></td></tr>
+<tr class="memdesc:structstdp__params"><td class="mdescLeft">&#160;</td><td class="mdescRight">The type of configuration parameters in SDRAM (written by host)  <a href="synapse__dynamics__stdp__mad__impl_8c.html#structstdp__params">More...</a><br /></td></tr>
 <tr class="separator:structstdp__params"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:structpre__event__history__t"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#structpre__event__history__t">pre_event_history_t</a></td></tr>
+<tr class="memdesc:structpre__event__history__t"><td class="mdescLeft">&#160;</td><td class="mdescRight">The type of history data of pre-events.  <a href="synapse__dynamics__stdp__mad__impl_8c.html#structpre__event__history__t">More...</a><br /></td></tr>
 <tr class="separator:structpre__event__history__t"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:structsynapse__row__plastic__data__t"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#structsynapse__row__plastic__data__t">synapse_row_plastic_data_t</a></td></tr>
+<tr class="memdesc:structsynapse__row__plastic__data__t"><td class="mdescLeft">&#160;</td><td class="mdescRight">The format of the plastic data region of a synaptic row.  <a href="synapse__dynamics__stdp__mad__impl_8c.html#structsynapse__row__plastic__data__t">More...</a><br /></td></tr>
+<tr class="separator:structsynapse__row__plastic__data__t"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
-<tr class="memitem:ad56063ded3be48fa1e95ab2237e70bf4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad56063ded3be48fa1e95ab2237e70bf4"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>SYNAPSE_AXONAL_DELAY_BITS</b>&#160;&#160;&#160;3</td></tr>
+<tr class="memitem:ad56063ded3be48fa1e95ab2237e70bf4"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#ad56063ded3be48fa1e95ab2237e70bf4">SYNAPSE_AXONAL_DELAY_BITS</a>&#160;&#160;&#160;3</td></tr>
+<tr class="memdesc:ad56063ded3be48fa1e95ab2237e70bf4"><td class="mdescLeft">&#160;</td><td class="mdescRight">The plastic control words used by Morrison synapses store an axonal delay in the upper 3 bits.  <a href="#ad56063ded3be48fa1e95ab2237e70bf4">More...</a><br /></td></tr>
 <tr class="separator:ad56063ded3be48fa1e95ab2237e70bf4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7ef4633ab4f3f1be7e55dfedc08f8405"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7ef4633ab4f3f1be7e55dfedc08f8405"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>SYNAPSE_AXONAL_DELAY_MASK</b>&#160;&#160;&#160;((1 &lt;&lt; SYNAPSE_AXONAL_DELAY_BITS) - 1)</td></tr>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a7ef4633ab4f3f1be7e55dfedc08f8405">SYNAPSE_AXONAL_DELAY_MASK</a>&#160;&#160;&#160;((1 &lt;&lt; <a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#ad56063ded3be48fa1e95ab2237e70bf4">SYNAPSE_AXONAL_DELAY_BITS</a>) - 1)</td></tr>
+<tr class="memdesc:a7ef4633ab4f3f1be7e55dfedc08f8405"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mask for extracting <a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#ad56063ded3be48fa1e95ab2237e70bf4" title="The plastic control words used by Morrison synapses store an axonal delay in the upper 3 bits...">SYNAPSE_AXONAL_DELAY_BITS</a> bits. <br /></td></tr>
 <tr class="separator:a7ef4633ab4f3f1be7e55dfedc08f8405"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:aa195e42fb2e365fe51384e2ef8a95ec8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa195e42fb2e365fe51384e2ef8a95ec8"></a>
-static <a class="el" href="synapse__structure__weight__state__accumulator__window__impl_8h.html#structplastic__synapse__t">final_state_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#aa195e42fb2e365fe51384e2ef8a95ec8">plasticity_update_synapse</a> (const uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, const uint32_t last_pre_time, const <a class="el" href="timing__recurrent__pre__stochastic__impl_8h.html#structpre__trace__t">pre_trace_t</a> last_pre_trace, const <a class="el" href="timing__recurrent__pre__stochastic__impl_8h.html#structpre__trace__t">pre_trace_t</a> new_pre_trace, const uint32_t delay_dendritic, const uint32_t delay_axonal, <a class="el" href="synapse__structure__weight__state__accumulator__window__impl_8h.html#structupdate__state__t">update_state_t</a> current_state, const <a class="el" href="post__events_8h.html#structpost__event__history__t">post_event_history_t</a> *post_event_history)</td></tr>
-<tr class="memdesc:aa195e42fb2e365fe51384e2ef8a95ec8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Synapse update loop. <br /></td></tr>
+<tr class="memitem:aa195e42fb2e365fe51384e2ef8a95ec8"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="synapse__structure__weight__accumulator__impl_8h.html#a174a20aa9aac3b4c8ecda186d8db0083">final_state_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#aa195e42fb2e365fe51384e2ef8a95ec8">plasticity_update_synapse</a> (const uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, const uint32_t last_pre_time, const <a class="el" href="timing__recurrent__pre__stochastic__impl_8h.html#structpre__trace__t">pre_trace_t</a> last_pre_trace, const <a class="el" href="timing__recurrent__pre__stochastic__impl_8h.html#structpre__trace__t">pre_trace_t</a> new_pre_trace, const uint32_t delay_dendritic, const uint32_t delay_axonal, <a class="el" href="synapse__structure__weight__state__accumulator__window__impl_8h.html#structupdate__state__t">update_state_t</a> current_state, const <a class="el" href="post__events_8h.html#structpost__event__history__t">post_event_history_t</a> *<a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a9738c22cad44349036699b2383355540">post_event_history</a>)</td></tr>
+<tr class="memdesc:aa195e42fb2e365fe51384e2ef8a95ec8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Synapse update loop core.  <a href="#aa195e42fb2e365fe51384e2ef8a95ec8">More...</a><br /></td></tr>
 <tr class="separator:aa195e42fb2e365fe51384e2ef8a95ec8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7546f1c4d29b0de40071f49d305ac803"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7546f1c4d29b0de40071f49d305ac803"></a>
-static <a class="el" href="synapse__structure__weight__state__accumulator__window__impl_8h.html#structplastic__synapse__t">plastic_synapse_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a7546f1c4d29b0de40071f49d305ac803">plastic_synapses</a> (address_t plastic_region_address)</td></tr>
-<tr class="memdesc:a7546f1c4d29b0de40071f49d305ac803"><td class="mdescLeft">&#160;</td><td class="mdescRight">Synaptic row plastic-region implementation. <br /></td></tr>
-<tr class="separator:a7546f1c4d29b0de40071f49d305ac803"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a707b8840a2913b990c8354ca583df95a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a707b8840a2913b990c8354ca583df95a"></a>
-static <a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#structpre__event__history__t">pre_event_history_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>plastic_event_history</b> (address_t plastic_region_address)</td></tr>
-<tr class="separator:a707b8840a2913b990c8354ca583df95a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3b1ce651b5787830bfbd4ddd26e993f4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3b1ce651b5787830bfbd4ddd26e993f4"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>synapse_dynamics_print_plastic_synapses</b> (address_t plastic_region_address, address_t fixed_region_address, uint32_t *ring_buffer_to_input_buffer_left_shifts)</td></tr>
+<tr class="memitem:a3b1ce651b5787830bfbd4ddd26e993f4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a3b1ce651b5787830bfbd4ddd26e993f4">synapse_dynamics_print_plastic_synapses</a> (address_t plastic_region_address, address_t fixed_region_address, uint32_t *ring_buffer_to_input_buffer_left_shifts)</td></tr>
+<tr class="memdesc:a3b1ce651b5787830bfbd4ddd26e993f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print the synapse dynamics.  <a href="#a3b1ce651b5787830bfbd4ddd26e993f4">More...</a><br /></td></tr>
 <tr class="separator:a3b1ce651b5787830bfbd4ddd26e993f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abade6b73a469c1ff0e54366f065343e5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abade6b73a469c1ff0e54366f065343e5"></a>
-static index_t&#160;</td><td class="memItemRight" valign="bottom"><b>sparse_axonal_delay</b> (uint32_t x)</td></tr>
+<tr class="memitem:abade6b73a469c1ff0e54366f065343e5"><td class="memItemLeft" align="right" valign="top">static index_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#abade6b73a469c1ff0e54366f065343e5">sparse_axonal_delay</a> (uint32_t x)</td></tr>
+<tr class="memdesc:abade6b73a469c1ff0e54366f065343e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the axonal delay.  <a href="#abade6b73a469c1ff0e54366f065343e5">More...</a><br /></td></tr>
 <tr class="separator:abade6b73a469c1ff0e54366f065343e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab9ef0316722ad01baf5beed9028e1ff5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab9ef0316722ad01baf5beed9028e1ff5"></a>
-address_t&#160;</td><td class="memItemRight" valign="bottom"><b>synapse_dynamics_initialise</b> (address_t address, uint32_t <a class="el" href="synapses_8c.html#a7368643a28282d8b3429f0fb145aa5db">n_neurons</a>, uint32_t <a class="el" href="synapses_8c.html#adedb27b3ece4d4dece0aee776a136427">n_synapse_types</a>, uint32_t *ring_buffer_to_input_buffer_left_shifts)</td></tr>
+<tr class="memitem:ab9ef0316722ad01baf5beed9028e1ff5"><td class="memItemLeft" align="right" valign="top">address_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#ab9ef0316722ad01baf5beed9028e1ff5">synapse_dynamics_initialise</a> (address_t address, uint32_t <a class="el" href="synapses_8c.html#a7368643a28282d8b3429f0fb145aa5db">n_neurons</a>, uint32_t <a class="el" href="synapses_8c.html#adedb27b3ece4d4dece0aee776a136427">n_synapse_types</a>, uint32_t *ring_buffer_to_input_buffer_left_shifts)</td></tr>
+<tr class="memdesc:ab9ef0316722ad01baf5beed9028e1ff5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise the synapse dynamics.  <a href="#ab9ef0316722ad01baf5beed9028e1ff5">More...</a><br /></td></tr>
 <tr class="separator:ab9ef0316722ad01baf5beed9028e1ff5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab23d9244a75db91ab20874d4da0e5ef8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab23d9244a75db91ab20874d4da0e5ef8"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>synapse_dynamics_process_plastic_synapses</b> (address_t plastic_region_address, address_t fixed_region_address, weight_t *<a class="el" href="synapses_8c.html#a9d013c2e9d5eddd8472bd57e9b21ff99">ring_buffers</a>, uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>)</td></tr>
+<tr class="memitem:ab23d9244a75db91ab20874d4da0e5ef8"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#ab23d9244a75db91ab20874d4da0e5ef8">synapse_dynamics_process_plastic_synapses</a> (address_t plastic_region_address, address_t fixed_region_address, weight_t *<a class="el" href="synapses_8c.html#a9d013c2e9d5eddd8472bd57e9b21ff99">ring_buffers</a>, uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>)</td></tr>
+<tr class="memdesc:ab23d9244a75db91ab20874d4da0e5ef8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Processes the dynamics of the synapses.  <a href="#ab23d9244a75db91ab20874d4da0e5ef8">More...</a><br /></td></tr>
 <tr class="separator:ab23d9244a75db91ab20874d4da0e5ef8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5087bc7e79f5dc3850f73239c5c463a3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5087bc7e79f5dc3850f73239c5c463a3"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>synapse_dynamics_process_post_synaptic_event</b> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, index_t neuron_index)</td></tr>
+<tr class="memitem:a5087bc7e79f5dc3850f73239c5c463a3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a5087bc7e79f5dc3850f73239c5c463a3">synapse_dynamics_process_post_synaptic_event</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, index_t neuron_index)</td></tr>
+<tr class="memdesc:a5087bc7e79f5dc3850f73239c5c463a3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Informs the synapses that the neuron fired.  <a href="#a5087bc7e79f5dc3850f73239c5c463a3">More...</a><br /></td></tr>
 <tr class="separator:a5087bc7e79f5dc3850f73239c5c463a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a06ce5830924c098a9668b25c9f09c7cc"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a06ce5830924c098a9668b25c9f09c7cc"></a>
-<a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a>&#160;</td><td class="memItemRight" valign="bottom"><b>synapse_dynamics_get_intrinsic_bias</b> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, index_t neuron_index)</td></tr>
+<tr class="memitem:a06ce5830924c098a9668b25c9f09c7cc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a06ce5830924c098a9668b25c9f09c7cc">synapse_dynamics_get_intrinsic_bias</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, index_t neuron_index)</td></tr>
+<tr class="memdesc:a06ce5830924c098a9668b25c9f09c7cc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the intrinsic bias of the synapses.  <a href="#a06ce5830924c098a9668b25c9f09c7cc">More...</a><br /></td></tr>
 <tr class="separator:a06ce5830924c098a9668b25c9f09c7cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a24b755e1d96fcab4e950b83796376e75"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a24b755e1d96fcab4e950b83796376e75">synapse_dynamics_get_plastic_pre_synaptic_events</a> (void)</td></tr>
 <tr class="memdesc:a24b755e1d96fcab4e950b83796376e75"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns the counters for plastic pre synaptic events based on (if the model was compiled with SYNAPSE_BENCHMARK parameter) or returns 0  <a href="#a24b755e1d96fcab4e950b83796376e75">More...</a><br /></td></tr>
@@ -168,7 +167,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>synapse_dynamics_proc
 <tr class="memdesc:abc297b864cdfaa0cd6e7115cd064baef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove the entry at the specified offset in the synaptic row.  <a href="#abc297b864cdfaa0cd6e7115cd064baef">More...</a><br /></td></tr>
 <tr class="separator:abc297b864cdfaa0cd6e7115cd064baef"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a06f2e2d805f0d8aa8b3ca7b687f24a24"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a06f2e2d805f0d8aa8b3ca7b687f24a24"></a>
-static control_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a06f2e2d805f0d8aa8b3ca7b687f24a24">control_conversion</a> (uint32_t id, uint32_t delay, uint32_t type)</td></tr>
+static <a class="el" href="synapse__row_8h.html#aeae1e8aa0c0095434ba488866ef21aa2">control_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a06f2e2d805f0d8aa8b3ca7b687f24a24">control_conversion</a> (uint32_t id, uint32_t delay, uint32_t type)</td></tr>
 <tr class="memdesc:a06f2e2d805f0d8aa8b3ca7b687f24a24"><td class="mdescLeft">&#160;</td><td class="mdescRight">packing all of the information into the required plastic control word <br /></td></tr>
 <tr class="separator:a06f2e2d805f0d8aa8b3ca7b687f24a24"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a30b01777aad5fef37adccffc7cbef483"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a30b01777aad5fef37adccffc7cbef483">synapse_dynamics_add_neuron</a> (uint32_t id, address_t row, weight_t weight, uint32_t delay, uint32_t type)</td></tr>
@@ -181,34 +180,44 @@ static control_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
 <tr class="memitem:a4cb72a09cb7c84f5c82c07d17bcb0516"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4cb72a09cb7c84f5c82c07d17bcb0516"></a>
-static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>synapse_type_index_bits</b></td></tr>
+static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a4cb72a09cb7c84f5c82c07d17bcb0516">synapse_type_index_bits</a></td></tr>
+<tr class="memdesc:a4cb72a09cb7c84f5c82c07d17bcb0516"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a840b87d6e981394dff1224fc0b8cd9c3" title="Number of bits to hold the neuron index. ">synapse_index_bits</a> + number of synapse type bits <br /></td></tr>
 <tr class="separator:a4cb72a09cb7c84f5c82c07d17bcb0516"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a840b87d6e981394dff1224fc0b8cd9c3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a840b87d6e981394dff1224fc0b8cd9c3"></a>
-static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>synapse_index_bits</b></td></tr>
+static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a840b87d6e981394dff1224fc0b8cd9c3">synapse_index_bits</a></td></tr>
+<tr class="memdesc:a840b87d6e981394dff1224fc0b8cd9c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of bits to hold the neuron index. <br /></td></tr>
 <tr class="separator:a840b87d6e981394dff1224fc0b8cd9c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a84db6c41c7cf03558016d477d8df4d37"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a84db6c41c7cf03558016d477d8df4d37"></a>
-static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>synapse_index_mask</b></td></tr>
+static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a84db6c41c7cf03558016d477d8df4d37">synapse_index_mask</a></td></tr>
+<tr class="memdesc:a84db6c41c7cf03558016d477d8df4d37"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mask to extract the neuron index (has <a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a840b87d6e981394dff1224fc0b8cd9c3" title="Number of bits to hold the neuron index. ">synapse_index_bits</a> bits set) <br /></td></tr>
 <tr class="separator:a84db6c41c7cf03558016d477d8df4d37"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac3299a10c6a78f6e4f37246ab79a0736"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac3299a10c6a78f6e4f37246ab79a0736"></a>
-static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>synapse_type_index_mask</b></td></tr>
+static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#ac3299a10c6a78f6e4f37246ab79a0736">synapse_type_index_mask</a></td></tr>
+<tr class="memdesc:ac3299a10c6a78f6e4f37246ab79a0736"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mask to extract the type and index (has <a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a4cb72a09cb7c84f5c82c07d17bcb0516" title="synapse_index_bits + number of synapse type bits ">synapse_type_index_bits</a> bits set) <br /></td></tr>
 <tr class="separator:ac3299a10c6a78f6e4f37246ab79a0736"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6ee98912aaae99284ae103901c4a6879"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6ee98912aaae99284ae103901c4a6879"></a>
-static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>synapse_delay_index_type_bits</b></td></tr>
+static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a6ee98912aaae99284ae103901c4a6879">synapse_delay_index_type_bits</a></td></tr>
+<tr class="memdesc:a6ee98912aaae99284ae103901c4a6879"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a6ee98912aaae99284ae103901c4a6879" title="synapse_delay_index_type_bits + number of bits to encode delay ">synapse_delay_index_type_bits</a> + number of bits to encode delay <br /></td></tr>
 <tr class="separator:a6ee98912aaae99284ae103901c4a6879"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af786c2a0c6f40c688029991d5b9711a7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af786c2a0c6f40c688029991d5b9711a7"></a>
-static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>synapse_type_mask</b></td></tr>
+static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#af786c2a0c6f40c688029991d5b9711a7">synapse_type_mask</a></td></tr>
+<tr class="memdesc:af786c2a0c6f40c688029991d5b9711a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Mask to extract the synapse type. <br /></td></tr>
 <tr class="separator:af786c2a0c6f40c688029991d5b9711a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a159669347528cd4f88c368d0d33e4670"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a159669347528cd4f88c368d0d33e4670"></a>
-static <a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#structstdp__params">stdp_params</a>&#160;</td><td class="memItemRight" valign="bottom"><b>params</b></td></tr>
+static <a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#structstdp__params">stdp_params</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a159669347528cd4f88c368d0d33e4670">params</a></td></tr>
+<tr class="memdesc:a159669347528cd4f88c368d0d33e4670"><td class="mdescLeft">&#160;</td><td class="mdescRight">Configuration parameters. <br /></td></tr>
 <tr class="separator:a159669347528cd4f88c368d0d33e4670"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9e7456ba7de4fa401d09c84644229f91"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9e7456ba7de4fa401d09c84644229f91"></a>
-uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>num_plastic_pre_synaptic_events</b> = 0</td></tr>
+uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a9e7456ba7de4fa401d09c84644229f91">num_plastic_pre_synaptic_events</a> = 0</td></tr>
+<tr class="memdesc:a9e7456ba7de4fa401d09c84644229f91"><td class="mdescLeft">&#160;</td><td class="mdescRight">Count of pre-synaptic events relevant to plastic processing. <br /></td></tr>
 <tr class="separator:a9e7456ba7de4fa401d09c84644229f91"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a865d0cf426d384be02e8f07b34b05e31"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a865d0cf426d384be02e8f07b34b05e31"></a>
-uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>plastic_saturation_count</b> = 0</td></tr>
+uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a865d0cf426d384be02e8f07b34b05e31">plastic_saturation_count</a> = 0</td></tr>
+<tr class="memdesc:a865d0cf426d384be02e8f07b34b05e31"><td class="mdescLeft">&#160;</td><td class="mdescRight">Count of times that the plastic math became saturated. <br /></td></tr>
 <tr class="separator:a865d0cf426d384be02e8f07b34b05e31"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9738c22cad44349036699b2383355540"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9738c22cad44349036699b2383355540"></a>
-<a class="el" href="post__events_8h.html#structpost__event__history__t">post_event_history_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>post_event_history</b></td></tr>
+<a class="el" href="post__events_8h.html#structpost__event__history__t">post_event_history_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a9738c22cad44349036699b2383355540">post_event_history</a></td></tr>
+<tr class="memdesc:a9738c22cad44349036699b2383355540"><td class="mdescLeft">&#160;</td><td class="mdescRight">The history data of post-events. <br /></td></tr>
 <tr class="separator:a9738c22cad44349036699b2383355540"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -224,14 +233,15 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>plastic_saturatio
         </tr>
       </table>
 </div><div class="memdoc">
-<div class="textblock"></div><table class="fieldtable">
+<div class="textblock"><p>The type of configuration parameters in SDRAM (written by host) </p>
+</div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="a06c22d077ef52c561ae4d0ea9f64d7ff"></a>uint32_t</td>
 <td class="fieldname">
 backprop_delay</td>
 <td class="fielddoc">
-</td></tr>
+The back-propagation delay, in basic simulation timesteps. </td></tr>
 </table>
 
 </div>
@@ -245,25 +255,418 @@ backprop_delay</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<div class="textblock"></div><table class="fieldtable">
+<div class="textblock"><p>The type of history data of pre-events. </p>
+<p>This data is stored in SDRAM in the plastic part of the synaptic matrix </p>
+</div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="ace155e5e7a0d0b2c67c5e1a802c7608e"></a>uint32_t</td>
 <td class="fieldname">
 prev_time</td>
 <td class="fielddoc">
-</td></tr>
+The event time. </td></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="a36f385470c61c31c5afac9c875674ff2"></a><a class="el" href="timing__recurrent__pre__stochastic__impl_8h.html#structpre__trace__t">pre_trace_t</a></td>
 <td class="fieldname">
 prev_trace</td>
 <td class="fielddoc">
-</td></tr>
+The event trace. </td></tr>
 </table>
 
 </div>
 </div>
+<a name="structsynapse__row__plastic__data__t" id="structsynapse__row__plastic__data__t"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">struct synapse_row_plastic_data_t</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<div class="textblock"><p>The format of the plastic data region of a synaptic row. </p>
+</div><table class="fieldtable">
+<tr><th colspan="3">Data Fields</th></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="af0d2f303f8c9aa1663c98c13b53b7ed5"></a><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#structpre__event__history__t">pre_event_history_t</a></td>
+<td class="fieldname">
+history</td>
+<td class="fielddoc">
+The pre-event history. </td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a8ca99776251ff7551be58b738b7d5380"></a><a class="el" href="synapse__structure__weight__state__accumulator__window__impl_8h.html#structplastic__synapse__t">plastic_synapse_t</a></td>
+<td class="fieldname">
+synapses[]</td>
+<td class="fielddoc">
+The per-synapse information. </td></tr>
+</table>
+
+</div>
+</div>
+<h2 class="groupheader">Macro Definition Documentation</h2>
+<a class="anchor" id="ad56063ded3be48fa1e95ab2237e70bf4"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define SYNAPSE_AXONAL_DELAY_BITS&#160;&#160;&#160;3</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>The plastic control words used by Morrison synapses store an axonal delay in the upper 3 bits. </p>
+<p>Assuming a maximum of 16 delay slots, this is all that is required as:</p>
+<ol type="1">
+<li>Dendritic + Axonal &lt;= 15</li>
+<li>Dendritic &gt;= Axonal</li>
+</ol>
+<p>Therefore:</p>
+<ul>
+<li>Maximum value of dendritic delay is 15 (with axonal delay of 0)<ul>
+<li>It requires 4 bits</li>
+</ul>
+</li>
+<li>Maximum value of axonal delay is 7 (with dendritic delay of 8)<ul>
+<li>It requires 3 bits</li>
+</ul>
+</li>
+</ul>
+<div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;|        Axonal delay       |  Dendritic delay   |       Type        |      Index         |</div><div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;|---------------------------|--------------------|-------------------|--------------------|</div><div class="line"><a name="l00003"></a><span class="lineno">    3</span>&#160;| SYNAPSE_AXONAL_DELAY_BITS | SYNAPSE_DELAY_BITS | SYNAPSE_TYPE_BITS | SYNAPSE_INDEX_BITS |</div><div class="line"><a name="l00004"></a><span class="lineno">    4</span>&#160;|                           |                    |        SYNAPSE_TYPE_INDEX_BITS         |</div><div class="line"><a name="l00005"></a><span class="lineno">    5</span>&#160;|---------------------------|--------------------|----------------------------------------|</div></div><!-- fragment --> 
+</div>
+</div>
 <h2 class="groupheader">Function Documentation</h2>
+<a class="anchor" id="aa195e42fb2e365fe51384e2ef8a95ec8"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="synapse__structure__weight__accumulator__impl_8h.html#a174a20aa9aac3b4c8ecda186d8db0083">final_state_t</a> plasticity_update_synapse </td>
+          <td>(</td>
+          <td class="paramtype">const uint32_t&#160;</td>
+          <td class="paramname"><em>time</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const uint32_t&#160;</td>
+          <td class="paramname"><em>last_pre_time</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="timing__recurrent__pre__stochastic__impl_8h.html#structpre__trace__t">pre_trace_t</a>&#160;</td>
+          <td class="paramname"><em>last_pre_trace</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="timing__recurrent__pre__stochastic__impl_8h.html#structpre__trace__t">pre_trace_t</a>&#160;</td>
+          <td class="paramname"><em>new_pre_trace</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const uint32_t&#160;</td>
+          <td class="paramname"><em>delay_dendritic</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const uint32_t&#160;</td>
+          <td class="paramname"><em>delay_axonal</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="synapse__structure__weight__state__accumulator__window__impl_8h.html#structupdate__state__t">update_state_t</a>&#160;</td>
+          <td class="paramname"><em>current_state</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="post__events_8h.html#structpost__event__history__t">post_event_history_t</a> *&#160;</td>
+          <td class="paramname"><em>post_event_history</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Synapse update loop core. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">time</td><td>The current time </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">last_pre_time</td><td>The time of the last previous pre-event </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">last_pre_trace</td><td>The last previous pre-trace </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">new_pre_trace</td><td>The new pre-trace </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">delay_dendritic</td><td>The dendritic delay for the synapse </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">delay_axonal</td><td>The axonal delay for the synapse </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">current_state</td><td>The current state </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">post_event_history</td><td>The history </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The new basic state of the synapse </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a3b1ce651b5787830bfbd4ddd26e993f4"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void synapse_dynamics_print_plastic_synapses </td>
+          <td>(</td>
+          <td class="paramtype">address_t&#160;</td>
+          <td class="paramname"><em>plastic_region_address</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">address_t&#160;</td>
+          <td class="paramname"><em>fixed_region_address</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t *&#160;</td>
+          <td class="paramname"><em>ring_buffer_to_input_buffer_left_shifts</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Print the synapse dynamics. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">plastic_region_address</td><td>Where the plastic data is </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">fixed_region_address</td><td>Where the fixed data is </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">ring_buffer_to_input_buffer_left_shifts</td><td>How to interpret the values from the ring buffers </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="abade6b73a469c1ff0e54366f065343e5"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static index_t sparse_axonal_delay </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>x</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the axonal delay. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>The packed plastic synapse control word </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the axonal delay </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ab9ef0316722ad01baf5beed9028e1ff5"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">address_t synapse_dynamics_initialise </td>
+          <td>(</td>
+          <td class="paramtype">address_t&#160;</td>
+          <td class="paramname"><em>address</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>n_neurons</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>n_synapse_types</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t *&#160;</td>
+          <td class="paramname"><em>ring_buffer_to_input_buffer_left_shifts</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Initialise the synapse dynamics. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">address</td><td>Where the configuration data is </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">n_neurons</td><td>Number of neurons </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">n_synapse_types</td><td>Number of synapse types </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">ring_buffer_to_input_buffer_left_shifts</td><td>How to interpret the values from the ring buffers </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The address of the first word after our configuration data. This is <code>sizeof(synapse_dynamics_config)</code> bytes after the value passed in as the <code>address</code> argument. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ab23d9244a75db91ab20874d4da0e5ef8"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool synapse_dynamics_process_plastic_synapses </td>
+          <td>(</td>
+          <td class="paramtype">address_t&#160;</td>
+          <td class="paramname"><em>plastic_region_address</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">address_t&#160;</td>
+          <td class="paramname"><em>fixed_region_address</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">weight_t *&#160;</td>
+          <td class="paramname"><em>ring_buffers</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>time</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Processes the dynamics of the synapses. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">plastic_region_address</td><td>Where the plastic data is </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">fixed_region_address</td><td>Where the fixed data is </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">ring_buffers</td><td>The ring buffers </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">time</td><td>The current simulation time </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>??? </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a5087bc7e79f5dc3850f73239c5c463a3"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void synapse_dynamics_process_post_synaptic_event </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>time</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">index_t&#160;</td>
+          <td class="paramname"><em>neuron_index</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Informs the synapses that the neuron fired. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">time</td><td>The current simulation time </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">neuron_index</td><td>Which neuron are we processing </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a06ce5830924c098a9668b25c9f09c7cc"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> synapse_dynamics_get_intrinsic_bias </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>time</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">index_t&#160;</td>
+          <td class="paramname"><em>neuron_index</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the intrinsic bias of the synapses. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">time</td><td>The current simulation time </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">neuron_index</td><td>Which neuron are we processing </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The intrinsic bias </dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="a24b755e1d96fcab4e950b83796376e75"></a>
 <div class="memitem">
 <div class="memproto">
@@ -487,7 +890,7 @@ prev_trace</td>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Apr 29 2020 10:12:39 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon May 4 2020 11:12:16 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

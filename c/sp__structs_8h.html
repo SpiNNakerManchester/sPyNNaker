@@ -126,25 +126,26 @@ Data Structures</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
 <tr class="memitem:a8ee9a5f54a9347b84ef109d9f9fd1fa5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8ee9a5f54a9347b84ef109d9f9fd1fa5"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>IS_CONNECTION_LAT</b>&#160;&#160;&#160;1</td></tr>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sp__structs_8h.html#a8ee9a5f54a9347b84ef109d9f9fd1fa5">IS_CONNECTION_LAT</a>&#160;&#160;&#160;1</td></tr>
+<tr class="memdesc:a8ee9a5f54a9347b84ef109d9f9fd1fa5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Flag: Is connection lateral? <br /></td></tr>
 <tr class="separator:a8ee9a5f54a9347b84ef109d9f9fd1fa5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ae14c8e107626ef7b99580d4ee57aa7d5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae14c8e107626ef7b99580d4ee57aa7d5"></a>
-static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sp__structs_8h.html#ae14c8e107626ef7b99580d4ee57aa7d5">sp_structs_find_by_spike</a> (<a class="el" href="sp__structs_8h.html#structpre__pop__info__table__t">pre_pop_info_table_t</a> *pre_pop_info_table, <a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> spike, uint32_t *neuron_id, uint32_t *population_id, uint32_t *sub_population_id, uint32_t *m_pop_index)</td></tr>
-<tr class="memdesc:ae14c8e107626ef7b99580d4ee57aa7d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">unpack the spike into key and identifying information for the neuron; Identify pop, sub-population and low and high atoms <br /></td></tr>
-<tr class="separator:ae14c8e107626ef7b99580d4ee57aa7d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aca9cfbe9add5978e97d5fe58039b2d3b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aca9cfbe9add5978e97d5fe58039b2d3b"></a>
+static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sp__structs_8h.html#aca9cfbe9add5978e97d5fe58039b2d3b">sp_structs_find_by_spike</a> (const <a class="el" href="sp__structs_8h.html#structpre__pop__info__table__t">pre_pop_info_table_t</a> *pre_pop_info_table, <a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> spike, uint32_t *restrict neuron_id, uint32_t *restrict population_id, uint32_t *restrict sub_population_id, uint32_t *restrict m_pop_index)</td></tr>
+<tr class="memdesc:aca9cfbe9add5978e97d5fe58039b2d3b"><td class="mdescLeft">&#160;</td><td class="mdescRight">unpack the spike into key and identifying information for the neuron; Identify pop, sub-population and low and high atoms <br /></td></tr>
+<tr class="separator:aca9cfbe9add5978e97d5fe58039b2d3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a338a05750100ede86a35a1142687b6bf"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a338a05750100ede86a35a1142687b6bf"></a>
 static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sp__structs_8h.html#a338a05750100ede86a35a1142687b6bf">sp_structs_get_sub_pop_info</a> (const <a class="el" href="sp__structs_8h.html#structpre__pop__info__table__t">pre_pop_info_table_t</a> *pre_pop_table_info, uint32_t population_id, uint32_t pop_neuron_id, uint32_t *restrict sub_population_id, uint32_t *restrict sub_pop_neuron_id, uint32_t *restrict spike)</td></tr>
 <tr class="memdesc:a338a05750100ede86a35a1142687b6bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the sub-population id and sub-population-based neuron id given the population id and the population-based neuron id. <br /></td></tr>
 <tr class="separator:a338a05750100ede86a35a1142687b6bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ada64d9ddeb4da02c7d3b83a3cf7ee5c4"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ada64d9ddeb4da02c7d3b83a3cf7ee5c4"></a>
-static bool&#160;</td><td class="memItemRight" valign="bottom"><b>sp_structs_remove_synapse</b> (<a class="el" href="sp__structs_8h.html#structcurrent__state__t">current_state_t</a> *restrict current_state, address_t row)</td></tr>
-<tr class="separator:ada64d9ddeb4da02c7d3b83a3cf7ee5c4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae34a2ac2772a47ac460ec64425d9a87e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae34a2ac2772a47ac460ec64425d9a87e"></a>
-static bool&#160;</td><td class="memItemRight" valign="bottom"><b>sp_structs_add_synapse</b> (<a class="el" href="sp__structs_8h.html#structcurrent__state__t">current_state_t</a> *restrict current_state, address_t row)</td></tr>
-<tr class="separator:ae34a2ac2772a47ac460ec64425d9a87e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a54852e3c438dc8a51a7a3d72a7448121"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sp__structs_8h.html#a54852e3c438dc8a51a7a3d72a7448121">sp_structs_remove_synapse</a> (<a class="el" href="sp__structs_8h.html#structcurrent__state__t">current_state_t</a> *restrict current_state, address_t restrict row)</td></tr>
+<tr class="memdesc:a54852e3c438dc8a51a7a3d72a7448121"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes a synapse from the relevant structures.  <a href="#a54852e3c438dc8a51a7a3d72a7448121">More...</a><br /></td></tr>
+<tr class="separator:a54852e3c438dc8a51a7a3d72a7448121"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a488618fc45d5bfbe0957600eb6ba3058"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sp__structs_8h.html#a488618fc45d5bfbe0957600eb6ba3058">sp_structs_add_synapse</a> (<a class="el" href="sp__structs_8h.html#structcurrent__state__t">current_state_t</a> *restrict current_state, address_t restrict row)</td></tr>
+<tr class="memdesc:a488618fc45d5bfbe0957600eb6ba3058"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a synapse to the relevant structures.  <a href="#a488618fc45d5bfbe0957600eb6ba3058">More...</a><br /></td></tr>
+<tr class="separator:a488618fc45d5bfbe0957600eb6ba3058"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Miscellaneous structures. </p>
@@ -490,10 +491,99 @@ synapse type </td></tr>
 
 </div>
 </div>
+<h2 class="groupheader">Function Documentation</h2>
+<a class="anchor" id="a54852e3c438dc8a51a7a3d72a7448121"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static bool sp_structs_remove_synapse </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="sp__structs_8h.html#structcurrent__state__t">current_state_t</a> *restrict&#160;</td>
+          <td class="paramname"><em>current_state</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">address_t restrict&#160;</td>
+          <td class="paramname"><em>row</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Removes a synapse from the relevant structures. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">current_state</td><td>Describes what is to be done </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">row</td><td>The row of the synaptic matrix to be updated </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>True if the synapse was removed </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a488618fc45d5bfbe0957600eb6ba3058"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static bool sp_structs_add_synapse </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="sp__structs_8h.html#structcurrent__state__t">current_state_t</a> *restrict&#160;</td>
+          <td class="paramname"><em>current_state</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">address_t restrict&#160;</td>
+          <td class="paramname"><em>row</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Adds a synapse to the relevant structures. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">current_state</td><td>Describes what is to be done </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">row</td><td>The row of the synaptic matrix to be updated </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>True if the synapse was added </dd></dl>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Apr 29 2020 10:12:39 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon May 4 2020 11:12:16 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

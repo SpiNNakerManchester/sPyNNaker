@@ -103,91 +103,67 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <code>#include &lt;data_specification.h&gt;</code><br />
 <code>#include &lt;debug.h&gt;</code><br />
 <code>#include &lt;simulation.h&gt;</code><br />
+<code>#include &lt;stdbool.h&gt;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
 <tr class="memitem:af0514f49bd1003dd50d375abf557b50a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af0514f49bd1003dd50d375abf557b50a"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>N_COUNTERS</b>&#160;&#160;&#160;6</td></tr>
 <tr class="separator:af0514f49bd1003dd50d375abf557b50a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2f71bb14bdfd8470da047334e3ce6150"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2f71bb14bdfd8470da047334e3ce6150"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>MOTION_FORWARD</b>&#160;&#160;&#160;0x01</td></tr>
-<tr class="separator:a2f71bb14bdfd8470da047334e3ce6150"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a03cdc148626fe57efa32ae30bb6cb5e3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a03cdc148626fe57efa32ae30bb6cb5e3"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>MOTION_BACK</b>&#160;&#160;&#160;0x02</td></tr>
-<tr class="separator:a03cdc148626fe57efa32ae30bb6cb5e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a42caf33ed9c8d02ae7d5b1a1b5cec9ea"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a42caf33ed9c8d02ae7d5b1a1b5cec9ea"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>MOTION_RIGHT</b>&#160;&#160;&#160;0x03</td></tr>
-<tr class="separator:a42caf33ed9c8d02ae7d5b1a1b5cec9ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac8fae49ee224b3b41514f3b87f1c2045"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac8fae49ee224b3b41514f3b87f1c2045"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>MOTION_LEFT</b>&#160;&#160;&#160;0x04</td></tr>
-<tr class="separator:ac8fae49ee224b3b41514f3b87f1c2045"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae8759332940e1735803df59c43d1f966"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae8759332940e1735803df59c43d1f966"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>MOTION_CLOCKWISE</b>&#160;&#160;&#160;0x05</td></tr>
-<tr class="separator:ae8759332940e1735803df59c43d1f966"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a170d03795ed78be3d4e059eb3e4949b9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a170d03795ed78be3d4e059eb3e4949b9"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>MOTION_C_CLOCKWISE</b>&#160;&#160;&#160;0x06</td></tr>
-<tr class="separator:a170d03795ed78be3d4e059eb3e4949b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a00cd32915a371b81b181def080b6d66c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a00cd32915a371b81b181def080b6d66c"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><b>NEURON_ID_MASK</b>&#160;&#160;&#160;0x7FF</td></tr>
 <tr class="separator:a00cd32915a371b81b181def080b6d66c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
 Enumerations</h2></td></tr>
-<tr class="memitem:a7f61ffa202f9ba34d1917f6f83d8bf9d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7f61ffa202f9ba34d1917f6f83d8bf9d"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><b>robot_motor_control_regions_e</b> { <b>SYSTEM_REGION</b>, 
-<b>PARAMS_REGION</b>
- }</td></tr>
-<tr class="separator:a7f61ffa202f9ba34d1917f6f83d8bf9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a65b19dabf5283c1ea37df964ca25e964"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a65b19dabf5283c1ea37df964ca25e964"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="robot__motor__control_8c.html#a65b19dabf5283c1ea37df964ca25e964">callback_priorities</a> { <br />
-&#160;&#160;<b>MC_PACKET</b> = -1, 
-<b>SDP</b> = 0, 
-<b>USER</b> = 1, 
-<b>TIMER</b> = 3, 
+<tr class="memitem:ae9ae980041e438eed7a3af43ce4e9f6b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae9ae980041e438eed7a3af43ce4e9f6b"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="robot__motor__control_8c.html#ae9ae980041e438eed7a3af43ce4e9f6b">direction_t</a> { <br />
+&#160;&#160;<b>MOTION_FORWARD</b> = 0x01, 
+<b>MOTION_BACK</b> = 0x02, 
+<b>MOTION_RIGHT</b> = 0x03, 
+<b>MOTION_LEFT</b> = 0x04, 
 <br />
-&#160;&#160;<b>DMA</b> = 2, 
-<b>MC</b> = -1, 
-<b>DMA</b> = 0, 
-<b>USER</b> = 0, 
+&#160;&#160;<b>MOTION_CLOCKWISE</b> = 0x05, 
+<b>MOTION_C_CLOCKWISE</b> = 0x06
 <br />
-&#160;&#160;<b>SDP</b> = 1, 
-<b>TIMER</b> = 2, 
-<b>MC</b> = -1, 
-<b>SDP</b> = 0, 
-<br />
-&#160;&#160;<b>TIMER</b> = 2, 
-<b>DMA</b> = 1, 
-<b>MULTICAST</b> = -1, 
-<b>SDP</b> = 0, 
-<br />
-&#160;&#160;<b>DMA</b> = 1, 
-<b>TIMER</b> = 2
-<br />
- }<tr class="memdesc:a65b19dabf5283c1ea37df964ca25e964"><td class="mdescLeft">&#160;</td><td class="mdescRight">values for the priority for each callback <br /></td></tr>
+ }<tr class="memdesc:ae9ae980041e438eed7a3af43ce4e9f6b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The "directions" that the motors can move in. <br /></td></tr>
 </td></tr>
-<tr class="separator:a65b19dabf5283c1ea37df964ca25e964"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="separator:ae9ae980041e438eed7a3af43ce4e9f6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7f61ffa202f9ba34d1917f6f83d8bf9d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a7f61ffa202f9ba34d1917f6f83d8bf9d"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="robot__motor__control_8c.html#a7f61ffa202f9ba34d1917f6f83d8bf9d">robot_motor_control_regions_e</a> { <b>SYSTEM_REGION</b>, 
+<b>PARAMS_REGION</b>
+ }<tr class="memdesc:a7f61ffa202f9ba34d1917f6f83d8bf9d"><td class="mdescLeft">&#160;</td><td class="mdescRight">DSG regions in use. <br /></td></tr>
+</td></tr>
+<tr class="separator:a7f61ffa202f9ba34d1917f6f83d8bf9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad8ff0294897e11d77bb67c6f1e9a3386"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad8ff0294897e11d77bb67c6f1e9a3386"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="robot__motor__control_8c.html#ad8ff0294897e11d77bb67c6f1e9a3386">robot_motor_control_callback_priorities</a> { <b>MC</b> = -1, 
+<b>SDP</b> = 0, 
+<b>TIMER</b> = 2, 
+<b>DMA</b> = 1
+ }<tr class="memdesc:ad8ff0294897e11d77bb67c6f1e9a3386"><td class="mdescLeft">&#160;</td><td class="mdescRight">values for the priority for each callback <br /></td></tr>
+</td></tr>
+<tr class="separator:ad8ff0294897e11d77bb67c6f1e9a3386"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a48eaa01651c9d941072c086843613dbf"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="robot__motor__control_8c.html#a48eaa01651c9d941072c086843613dbf">send</a> (uint32_t direction, uint32_t speed)</td></tr>
-<tr class="memdesc:a48eaa01651c9d941072c086843613dbf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send a SpiNNaker multicast-with-payload message to the motor hardware.  <a href="#a48eaa01651c9d941072c086843613dbf">More...</a><br /></td></tr>
-<tr class="separator:a48eaa01651c9d941072c086843613dbf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1ecef764f22c02936fc78976bcffc8a3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1ecef764f22c02936fc78976bcffc8a3"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><b>do_motion</b> (uint32_t direction_index, uint32_t opposite_index, const char *direction, const char *opposite)</td></tr>
-<tr class="separator:a1ecef764f22c02936fc78976bcffc8a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4493cd0fd2fc8e3f89107c4983f95af2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4493cd0fd2fc8e3f89107c4983f95af2"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><b>do_update</b> (uint32_t direction_index, uint32_t opposite_index, const char *direction, const char *opposite)</td></tr>
-<tr class="separator:a4493cd0fd2fc8e3f89107c4983f95af2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9d116f770371127474391640debce621"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="robot__motor__control_8c.html#a9d116f770371127474391640debce621">send_to_motor</a> (uint32_t direction, uint32_t the_speed)</td></tr>
+<tr class="memdesc:a9d116f770371127474391640debce621"><td class="mdescLeft">&#160;</td><td class="mdescRight">Send a SpiNNaker multicast-with-payload message to the motor hardware.  <a href="#a9d116f770371127474391640debce621">More...</a><br /></td></tr>
+<tr class="separator:a9d116f770371127474391640debce621"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a96363d8d245d659d10d5512cb46aa0e3"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="robot__motor__control_8c.html#a96363d8d245d659d10d5512cb46aa0e3">do_motion</a> (<a class="el" href="robot__motor__control_8c.html#ae9ae980041e438eed7a3af43ce4e9f6b">direction_t</a> direction_index, <a class="el" href="robot__motor__control_8c.html#ae9ae980041e438eed7a3af43ce4e9f6b">direction_t</a> opposite_index, const char *direction, const char *opposite)</td></tr>
+<tr class="separator:a96363d8d245d659d10d5512cb46aa0e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a559960c23f8a6e90bde4d3e5b8dc7811"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="robot__motor__control_8c.html#a559960c23f8a6e90bde4d3e5b8dc7811">do_update</a> (<a class="el" href="robot__motor__control_8c.html#ae9ae980041e438eed7a3af43ce4e9f6b">direction_t</a> direction_index, <a class="el" href="robot__motor__control_8c.html#ae9ae980041e438eed7a3af43ce4e9f6b">direction_t</a> opposite_index, const char *direction, const char *opposite)</td></tr>
+<tr class="separator:a559960c23f8a6e90bde4d3e5b8dc7811"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac9914f4341d050b71b5e1516eb19a184"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="robot__motor__control_8c.html#ac9914f4341d050b71b5e1516eb19a184">timer_callback</a> (uint unused0, uint unused1)</td></tr>
 <tr class="memdesc:ac9914f4341d050b71b5e1516eb19a184"><td class="mdescLeft">&#160;</td><td class="mdescRight">Regular 1ms callback. Takes spikes from circular buffer and converts to motor activity level.  <a href="#ac9914f4341d050b71b5e1516eb19a184">More...</a><br /></td></tr>
 <tr class="separator:ac9914f4341d050b71b5e1516eb19a184"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aab12b0c06c8347c79d80f7f5bfaa9bc9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aab12b0c06c8347c79d80f7f5bfaa9bc9"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>read_parameters</b> (address_t region_address)</td></tr>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="robot__motor__control_8c.html#aab12b0c06c8347c79d80f7f5bfaa9bc9">read_parameters</a> (address_t region_address)</td></tr>
+<tr class="memdesc:aab12b0c06c8347c79d80f7f5bfaa9bc9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reads the configuration. <br /></td></tr>
 <tr class="separator:aab12b0c06c8347c79d80f7f5bfaa9bc9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6b818e9883e19c8fc320e4aa2f800e47"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6b818e9883e19c8fc320e4aa2f800e47"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="robot__motor__control_8c.html#a6b818e9883e19c8fc320e4aa2f800e47">incoming_spike_callback</a> (uint <a class="el" href="neuron_8c.html#ac8861193246fc34d8f29ac9d57b6791a">key</a>, uint payload)</td></tr>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="robot__motor__control_8c.html#a6b818e9883e19c8fc320e4aa2f800e47">incoming_spike_callback</a> (uint <a class="el" href="robot__motor__control_8c.html#a6d4ec8e4f3148d51041635da9986c3fa">key</a>, uint payload)</td></tr>
 <tr class="memdesc:a6b818e9883e19c8fc320e4aa2f800e47"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add incoming spike message (in FIQ) to circular buffer. <br /></td></tr>
 <tr class="separator:a6b818e9883e19c8fc320e4aa2f800e47"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a37f0b2315f3101f6ff9936c212c5bd84"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a37f0b2315f3101f6ff9936c212c5bd84"></a>
-static bool&#160;</td><td class="memItemRight" valign="bottom"><b>initialize</b> (uint32_t *<a class="el" href="spike__source__poisson_8c.html#ac0c27301e134af3ce80814a553601074">timer_period</a>)</td></tr>
+static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="robot__motor__control_8c.html#a37f0b2315f3101f6ff9936c212c5bd84">initialize</a> (uint32_t *<a class="el" href="spike__source__poisson_8c.html#ac0c27301e134af3ce80814a553601074">timer_period</a>)</td></tr>
+<tr class="memdesc:a37f0b2315f3101f6ff9936c212c5bd84"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read all application configuration. <br /></td></tr>
 <tr class="separator:a37f0b2315f3101f6ff9936c212c5bd84"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa14f4f1d4c84183b7bf7108bf930a23c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa14f4f1d4c84183b7bf7108bf930a23c"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="robot__motor__control_8c.html#aa14f4f1d4c84183b7bf7108bf930a23c">c_main</a> (void)</td></tr>
@@ -197,20 +173,25 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="robo
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
 <tr class="memitem:ae73654f333e4363463ad8c594eca1905"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae73654f333e4363463ad8c594eca1905"></a>
-static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>time</b></td></tr>
+static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="robot__motor__control_8c.html#ae73654f333e4363463ad8c594eca1905">time</a></td></tr>
+<tr class="memdesc:ae73654f333e4363463ad8c594eca1905"><td class="mdescLeft">&#160;</td><td class="mdescRight">The simulation time. <br /></td></tr>
 <tr class="separator:ae73654f333e4363463ad8c594eca1905"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a05926f86cced61e4fafe198f08115789"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a05926f86cced61e4fafe198f08115789"></a>
-static uint32_t *&#160;</td><td class="memItemRight" valign="bottom"><b>counters</b></td></tr>
-<tr class="separator:a05926f86cced61e4fafe198f08115789"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a25e0c985dbc134802d0fb81c98ca0e0f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a25e0c985dbc134802d0fb81c98ca0e0f"></a>
-static uint32_t *&#160;</td><td class="memItemRight" valign="bottom"><b>last_speed</b></td></tr>
-<tr class="separator:a25e0c985dbc134802d0fb81c98ca0e0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3b08ec26bdf4328bdc94c955dfab05b3"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3b08ec26bdf4328bdc94c955dfab05b3"></a>
+static int *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="robot__motor__control_8c.html#a3b08ec26bdf4328bdc94c955dfab05b3">counters</a></td></tr>
+<tr class="memdesc:a3b08ec26bdf4328bdc94c955dfab05b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Accumulators for each motor direction. <br /></td></tr>
+<tr class="separator:a3b08ec26bdf4328bdc94c955dfab05b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ada328500a397b9cc689fd84ba7f92adb"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ada328500a397b9cc689fd84ba7f92adb"></a>
+static int *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="robot__motor__control_8c.html#ada328500a397b9cc689fd84ba7f92adb">last_speed</a></td></tr>
+<tr class="memdesc:ada328500a397b9cc689fd84ba7f92adb"><td class="mdescLeft">&#160;</td><td class="mdescRight">The last speeds for each motor direction. <br /></td></tr>
+<tr class="separator:ada328500a397b9cc689fd84ba7f92adb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6d4ec8e4f3148d51041635da9986c3fa"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6d4ec8e4f3148d51041635da9986c3fa"></a>
-static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>key</b></td></tr>
+static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="robot__motor__control_8c.html#a6d4ec8e4f3148d51041635da9986c3fa">key</a></td></tr>
+<tr class="memdesc:a6d4ec8e4f3148d51041635da9986c3fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">The (base) key to use to send to the motor. <br /></td></tr>
 <tr class="separator:a6d4ec8e4f3148d51041635da9986c3fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a220859a8b5da0232739a11cbe7f79fc5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a220859a8b5da0232739a11cbe7f79fc5"></a>
-static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>speed</b></td></tr>
-<tr class="separator:a220859a8b5da0232739a11cbe7f79fc5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a218b4f7c6cc2681a99c23a3b089d68b1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a218b4f7c6cc2681a99c23a3b089d68b1"></a>
+static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="robot__motor__control_8c.html#a218b4f7c6cc2681a99c23a3b089d68b1">speed</a></td></tr>
+<tr class="memdesc:a218b4f7c6cc2681a99c23a3b089d68b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">The standard motor speed, set by configuration. <br /></td></tr>
+<tr class="separator:a218b4f7c6cc2681a99c23a3b089d68b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab322aee7201d11451cb55e2f551e72cb"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab322aee7201d11451cb55e2f551e72cb"></a>
 static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>sample_time</b></td></tr>
 <tr class="separator:ab322aee7201d11451cb55e2f551e72cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -221,11 +202,13 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>update_tim
 static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>delay_time</b></td></tr>
 <tr class="separator:a293f27a9ee99a155bbebd8f77049f462"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a09517e37541b1afcae42a85569fd6976"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a09517e37541b1afcae42a85569fd6976"></a>
-static int&#160;</td><td class="memItemRight" valign="bottom"><b>delta_threshold</b></td></tr>
+static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="robot__motor__control_8c.html#a09517e37541b1afcae42a85569fd6976">delta_threshold</a></td></tr>
+<tr class="memdesc:a09517e37541b1afcae42a85569fd6976"><td class="mdescLeft">&#160;</td><td class="mdescRight">The size of change required to matter. <br /></td></tr>
 <tr class="separator:a09517e37541b1afcae42a85569fd6976"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abe8c179eaa3326c88822415d14cb2034"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abe8c179eaa3326c88822415d14cb2034"></a>
-static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>continue_if_not_different</b></td></tr>
-<tr class="separator:abe8c179eaa3326c88822415d14cb2034"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6526db077be7f7eaa67bf3bf25800eeb"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6526db077be7f7eaa67bf3bf25800eeb"></a>
+static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="robot__motor__control_8c.html#a6526db077be7f7eaa67bf3bf25800eeb">continue_if_not_different</a></td></tr>
+<tr class="memdesc:a6526db077be7f7eaa67bf3bf25800eeb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Whether we should continue moving if there is no change. <br /></td></tr>
+<tr class="separator:a6526db077be7f7eaa67bf3bf25800eeb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2178bb4764f423b1534a9631b0cc6e5e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2178bb4764f423b1534a9631b0cc6e5e"></a>
 static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>simulation_ticks</b></td></tr>
 <tr class="separator:a2178bb4764f423b1534a9631b0cc6e5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -236,7 +219,7 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>infinite_r
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Implementation of Robot Motor Control model. </p>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a class="anchor" id="a48eaa01651c9d941072c086843613dbf"></a>
+<a class="anchor" id="a9d116f770371127474391640debce621"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -244,7 +227,7 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>infinite_r
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static void send </td>
+          <td class="memname">static void send_to_motor </td>
           <td>(</td>
           <td class="paramtype">uint32_t&#160;</td>
           <td class="paramname"><em>direction</em>, </td>
@@ -253,7 +236,7 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>infinite_r
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>speed</em>&#160;</td>
+          <td class="paramname"><em>the_speed</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -272,7 +255,117 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>infinite_r
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">direction</td><td>Which direction to move in </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">speed</td><td>What speed to move at </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">the_speed</td><td>What speed to move at </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a96363d8d245d659d10d5512cb46aa0e3"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void do_motion </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="robot__motor__control_8c.html#ae9ae980041e438eed7a3af43ce4e9f6b">direction_t</a>&#160;</td>
+          <td class="paramname"><em>direction_index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="robot__motor__control_8c.html#ae9ae980041e438eed7a3af43ce4e9f6b">direction_t</a>&#160;</td>
+          <td class="paramname"><em>opposite_index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>direction</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>opposite</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Commands the robot's motors to start doing a motion </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">direction_index</td><td>The "forward" sense of motion </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">opposite_index</td><td>The "reverse" sense of motion </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">direction</td><td>for debugging </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">opposite</td><td>for debugging </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a559960c23f8a6e90bde4d3e5b8dc7811"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void do_update </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="robot__motor__control_8c.html#ae9ae980041e438eed7a3af43ce4e9f6b">direction_t</a>&#160;</td>
+          <td class="paramname"><em>direction_index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="robot__motor__control_8c.html#ae9ae980041e438eed7a3af43ce4e9f6b">direction_t</a>&#160;</td>
+          <td class="paramname"><em>opposite_index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>direction</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>opposite</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>Commands the robot's motors to continue a motion </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">direction_index</td><td>The "forward" sense of motion </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">opposite_index</td><td>The "reverse" sense of motion </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">direction</td><td>for debugging </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">opposite</td><td>for debugging </td></tr>
   </table>
   </dd>
 </dl>
@@ -317,7 +410,7 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>infinite_r
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Apr 29 2020 10:12:40 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon May 4 2020 11:12:16 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

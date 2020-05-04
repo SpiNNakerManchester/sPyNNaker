@@ -103,21 +103,21 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:a499ff9e19e3982f41bd7422fafebca2e"><td class="memItemLeft" align="right" valign="top">address_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="weight_8h.html#a499ff9e19e3982f41bd7422fafebca2e">weight_initialise</a> (address_t address, uint32_t <a class="el" href="synapses_8c.html#adedb27b3ece4d4dece0aee776a136427">n_synapse_types</a>, uint32_t *ring_buffer_to_input_buffer_left_shifts)</td></tr>
-<tr class="memdesc:a499ff9e19e3982f41bd7422fafebca2e"><td class="mdescLeft">&#160;</td><td class="mdescRight">initialised the weight aspect of a STDP rule.  <a href="#a499ff9e19e3982f41bd7422fafebca2e">More...</a><br /></td></tr>
+<tr class="memdesc:a499ff9e19e3982f41bd7422fafebca2e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialises the weight aspect of an STDP rule.  <a href="#a499ff9e19e3982f41bd7422fafebca2e">More...</a><br /></td></tr>
 <tr class="separator:a499ff9e19e3982f41bd7422fafebca2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a77fd3764c1b7b7c67822db6da73f73f5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a77fd3764c1b7b7c67822db6da73f73f5"></a>
-static <a class="el" href="weight__multiplicative__impl_8h.html#structweight__state__t">weight_state_t</a>&#160;</td><td class="memItemRight" valign="bottom"><b>weight_get_initial</b> (weight_t weight, index_t synapse_type)</td></tr>
+<tr class="memitem:a77fd3764c1b7b7c67822db6da73f73f5"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="weight__multiplicative__impl_8h.html#structweight__state__t">weight_state_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="weight_8h.html#a77fd3764c1b7b7c67822db6da73f73f5">weight_get_initial</a> (weight_t weight, index_t synapse_type)</td></tr>
+<tr class="memdesc:a77fd3764c1b7b7c67822db6da73f73f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the initial weight state.  <a href="#a77fd3764c1b7b7c67822db6da73f73f5">More...</a><br /></td></tr>
 <tr class="separator:a77fd3764c1b7b7c67822db6da73f73f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5321486a75826401b258999334c52640"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5321486a75826401b258999334c52640"></a>
-static weight_t&#160;</td><td class="memItemRight" valign="bottom"><b>weight_get_final</b> (<a class="el" href="weight__multiplicative__impl_8h.html#structweight__state__t">weight_state_t</a> new_state)</td></tr>
+<tr class="memitem:a5321486a75826401b258999334c52640"><td class="memItemLeft" align="right" valign="top">static weight_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="weight_8h.html#a5321486a75826401b258999334c52640">weight_get_final</a> (<a class="el" href="weight__multiplicative__impl_8h.html#structweight__state__t">weight_state_t</a> new_state)</td></tr>
+<tr class="memdesc:a5321486a75826401b258999334c52640"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the final weight.  <a href="#a5321486a75826401b258999334c52640">More...</a><br /></td></tr>
 <tr class="separator:a5321486a75826401b258999334c52640"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>interface for different weight implementations for the weight half of a STDP rule. </p>
 <p>the API interface contains:</p><ul>
-<li>weight_initialise(address, ring_buffer_to_input_buffer_left_shifts): initialised the weight aspect of a STDP rule.</li>
-<li>weight_get_initial(weight, synapse_type):</li>
-<li>weight_get_final(new_state): </li>
+<li><a class="el" href="weight_8h.html#a499ff9e19e3982f41bd7422fafebca2e" title="Initialises the weight aspect of an STDP rule. ">weight_initialise()</a>: Initialises the weight aspect of a STDP rule.</li>
+<li><a class="el" href="weight_8h.html#a77fd3764c1b7b7c67822db6da73f73f5" title="Gets the initial weight state. ">weight_get_initial()</a>: Converts the stored weight into an update-able form.</li>
+<li><a class="el" href="weight_8h.html#a5321486a75826401b258999334c52640" title="Gets the final weight. ">weight_get_final()</a>: Converts the updated weight into store-able form. </li>
 </ul>
 </div><h2 class="groupheader">Function Documentation</h2>
 <a class="anchor" id="a499ff9e19e3982f41bd7422fafebca2e"></a>
@@ -150,7 +150,7 @@ static weight_t&#160;</td><td class="memItemRight" valign="bottom"><b>weight_get
       </table>
 </div><div class="memdoc">
 
-<p>initialised the weight aspect of a STDP rule. </p>
+<p>Initialises the weight aspect of an STDP rule. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">address</td><td>the absolute address in SRAM where the weight parameters are stored. </td></tr>
@@ -159,14 +159,91 @@ static weight_t&#160;</td><td class="memItemRight" valign="bottom"><b>weight_get
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>address_t: returns the end of the weight region as an absolute SDRAM memory address. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the end of the weight region as an absolute SDRAM memory address. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a77fd3764c1b7b7c67822db6da73f73f5"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="weight__multiplicative__impl_8h.html#structweight__state__t">weight_state_t</a> weight_get_initial </td>
+          <td>(</td>
+          <td class="paramtype">weight_t&#160;</td>
+          <td class="paramname"><em>weight</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">index_t&#160;</td>
+          <td class="paramname"><em>synapse_type</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Gets the initial weight state. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">weight</td><td>The weight at the start </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">synapse_type</td><td>The type of synapse involved </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The initial weight state. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a5321486a75826401b258999334c52640"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static weight_t weight_get_final </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="weight__multiplicative__impl_8h.html#structweight__state__t">weight_state_t</a>&#160;</td>
+          <td class="paramname"><em>new_state</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Gets the final weight. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">new_state</td><td>The updated weight state </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The new weight. </dd></dl>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Apr 29 2020 10:12:39 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon May 4 2020 11:12:16 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

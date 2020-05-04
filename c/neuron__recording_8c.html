@@ -130,9 +130,9 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 <tr class="memitem:acf22d4e046f8216c065e3c77a5274f84"><td class="memItemLeft" align="right" valign="top">static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__recording_8c.html#acf22d4e046f8216c065e3c77a5274f84">bitfield_data_size</a> (uint32_t <a class="el" href="synapses_8c.html#a7368643a28282d8b3429f0fb145aa5db">n_neurons</a>)</td></tr>
 <tr class="memdesc:acf22d4e046f8216c065e3c77a5274f84"><td class="mdescLeft">&#160;</td><td class="mdescRight">the number of bytes used in bitfield recording for n_neurons  <a href="#acf22d4e046f8216c065e3c77a5274f84">More...</a><br /></td></tr>
 <tr class="separator:acf22d4e046f8216c065e3c77a5274f84"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1f81c5db2bff198aa3f40993b65b06b1"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__recording_8c.html#a1f81c5db2bff198aa3f40993b65b06b1">neuron_recording_read_in_elements</a> (void *data_address, uint32_t <a class="el" href="synapses_8c.html#a7368643a28282d8b3429f0fb145aa5db">n_neurons</a>)</td></tr>
-<tr class="memdesc:a1f81c5db2bff198aa3f40993b65b06b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">reads recording data from sdram  <a href="#a1f81c5db2bff198aa3f40993b65b06b1">More...</a><br /></td></tr>
-<tr class="separator:a1f81c5db2bff198aa3f40993b65b06b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab1ce319a9907ceeca7fa4a77029bef5c"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__recording_8c.html#ab1ce319a9907ceeca7fa4a77029bef5c">neuron_recording_read_in_elements</a> (void *recording_address, uint32_t <a class="el" href="synapses_8c.html#a7368643a28282d8b3429f0fb145aa5db">n_neurons</a>)</td></tr>
+<tr class="memdesc:ab1ce319a9907ceeca7fa4a77029bef5c"><td class="mdescLeft">&#160;</td><td class="mdescRight">reads recording data from SDRAM  <a href="#ab1ce319a9907ceeca7fa4a77029bef5c">More...</a><br /></td></tr>
+<tr class="separator:ab1ce319a9907ceeca7fa4a77029bef5c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6ec6bcccf5cf769f8ea0c853ab0577e9"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__recording_8c.html#a6ec6bcccf5cf769f8ea0c853ab0577e9">neuron_recording_reset</a> (uint32_t <a class="el" href="synapses_8c.html#a7368643a28282d8b3429f0fb145aa5db">n_neurons</a>)</td></tr>
 <tr class="memdesc:a6ec6bcccf5cf769f8ea0c853ab0577e9"><td class="mdescLeft">&#160;</td><td class="mdescRight">reads recording data from sdram on reset.  <a href="#a6ec6bcccf5cf769f8ea0c853ab0577e9">More...</a><br /></td></tr>
 <tr class="separator:a6ec6bcccf5cf769f8ea0c853ab0577e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -264,7 +264,7 @@ n_bitfield_vars</td>
 
 </div>
 </div>
-<a class="anchor" id="a1f81c5db2bff198aa3f40993b65b06b1"></a>
+<a class="anchor" id="ab1ce319a9907ceeca7fa4a77029bef5c"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -275,7 +275,7 @@ n_bitfield_vars</td>
           <td class="memname">static bool neuron_recording_read_in_elements </td>
           <td>(</td>
           <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>data_address</em>, </td>
+          <td class="paramname"><em>recording_address</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -296,15 +296,15 @@ n_bitfield_vars</td>
 </table>
 </div><div class="memdoc">
 
-<p>reads recording data from sdram </p>
+<p>reads recording data from SDRAM </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">recording_address</td><td>sdram location for the recording data </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">recording_address</td><td>SDRAM location for the recording data </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">n_neurons</td><td>the number of neurons to setup for </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>bool stating if the read was successful or not </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Whether the read was successful </dd></dl>
 
 </div>
 </div>
@@ -443,7 +443,7 @@ n_bitfield_vars</td>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Apr 29 2020 10:12:39 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon May 4 2020 11:12:16 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

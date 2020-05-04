@@ -100,31 +100,89 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:aa0c616a50e494c67ae9c1066a5d8df23"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa0c616a50e494c67ae9c1066a5d8df23"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>partner_init</b> (uint8_t **data)</td></tr>
+<tr class="memitem:aa0c616a50e494c67ae9c1066a5d8df23"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="last__neuron__selection__impl_8c.html#aa0c616a50e494c67ae9c1066a5d8df23">partner_init</a> (uint8_t **data)</td></tr>
+<tr class="memdesc:aa0c616a50e494c67ae9c1066a5d8df23"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise the partner selection rule.  <a href="#aa0c616a50e494c67ae9c1066a5d8df23">More...</a><br /></td></tr>
 <tr class="separator:aa0c616a50e494c67ae9c1066a5d8df23"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:a0c6ea3029fe958000e3697db978f4db7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0c6ea3029fe958000e3697db978f4db7"></a>
-<a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>last_spikes_buffer</b> [2]</td></tr>
+<tr class="memitem:a0c6ea3029fe958000e3697db978f4db7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="last__neuron__selection__impl_8c.html#a0c6ea3029fe958000e3697db978f4db7">last_spikes_buffer</a> [2]</td></tr>
+<tr class="memdesc:a0c6ea3029fe958000e3697db978f4db7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Spike accumulation buffers.  <a href="#a0c6ea3029fe958000e3697db978f4db7">More...</a><br /></td></tr>
 <tr class="separator:a0c6ea3029fe958000e3697db978f4db7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3517ef59d8e5a261be447e890013b160"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3517ef59d8e5a261be447e890013b160"></a>
-uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>n_spikes</b> [2]</td></tr>
+<tr class="memitem:a3517ef59d8e5a261be447e890013b160"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="last__neuron__selection__impl_8c.html#a3517ef59d8e5a261be447e890013b160">n_spikes</a> [2]</td></tr>
+<tr class="memdesc:a3517ef59d8e5a261be447e890013b160"><td class="mdescLeft">&#160;</td><td class="mdescRight">Spike buffer counters.  <a href="#a3517ef59d8e5a261be447e890013b160">More...</a><br /></td></tr>
 <tr class="separator:a3517ef59d8e5a261be447e890013b160"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1426be5faa3cda06aba963af47402da6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1426be5faa3cda06aba963af47402da6"></a>
-uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>last_spikes_buffer_size</b></td></tr>
+uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="last__neuron__selection__impl_8c.html#a1426be5faa3cda06aba963af47402da6">last_spikes_buffer_size</a></td></tr>
+<tr class="memdesc:a1426be5faa3cda06aba963af47402da6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Size of each sub-array within <a class="el" href="last__neuron__selection__impl_8c.html#a0c6ea3029fe958000e3697db978f4db7" title="Spike accumulation buffers. ">last_spikes_buffer</a>. <br /></td></tr>
 <tr class="separator:a1426be5faa3cda06aba963af47402da6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adf31bd4dca7310ba032781bf74fee32c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adf31bd4dca7310ba032781bf74fee32c"></a>
-uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>last_time</b></td></tr>
+uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="last__neuron__selection__impl_8c.html#adf31bd4dca7310ba032781bf74fee32c">last_time</a></td></tr>
+<tr class="memdesc:adf31bd4dca7310ba032781bf74fee32c"><td class="mdescLeft">&#160;</td><td class="mdescRight">The time of the most recently-considered spike. <br /></td></tr>
 <tr class="separator:adf31bd4dca7310ba032781bf74fee32c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Support code for <a class="el" href="last__neuron__selection__impl_8h.html" title="Recently spiked partners selection rule. ">last_neuron_selection_impl.h</a>. </p>
-</div></div><!-- contents -->
+</div><h2 class="groupheader">Function Documentation</h2>
+<a class="anchor" id="aa0c616a50e494c67ae9c1066a5d8df23"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void partner_init </td>
+          <td>(</td>
+          <td class="paramtype">uint8_t **&#160;</td>
+          <td class="paramname"><em>data</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Initialise the partner selection rule. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">data</td><td>A variable holding the location in SDRAM to configure the rule from. Will be updated to point to the first location after the configuration data. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a class="anchor" id="a0c6ea3029fe958000e3697db978f4db7"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a>* last_spikes_buffer[2]</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Spike accumulation buffers. </p>
+<p>Two arrays, one for current timestep, one for previous </p>
+
+</div>
+</div>
+<a class="anchor" id="a3517ef59d8e5a261be447e890013b160"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint32_t n_spikes[2]</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Spike buffer counters. </p>
+<p>Two counters, one for current timestep, one for previous </p>
+
+</div>
+</div>
+</div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Apr 29 2020 10:12:39 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon May 4 2020 11:12:16 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

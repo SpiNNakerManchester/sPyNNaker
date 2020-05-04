@@ -3,7 +3,7 @@ var searchData=
   ['read_5fconnection_5fbuilder_5fregion',['read_connection_builder_region',['../synapse__expander_8c.html#a796837af1a5d205aa367196d5a7001bf',1,'synapse_expander.c']]],
   ['read_5fdelay_5fbuilder_5fregion',['read_delay_builder_region',['../delay__expander_8c.html#ac2a97c4437a50fb351aad2db718cf7bf',1,'delay_expander.c']]],
   ['read_5fglobal_5fparameters',['read_global_parameters',['../spike__source__poisson_8c.html#a571b747b9d964eb5af02496ce866130b',1,'spike_source_poisson.c']]],
-  ['read_5fparameters',['read_parameters',['../delay__extension_8c.html#afeb21131569d4edffb884f6564de89dd',1,'delay_extension.c']]],
+  ['read_5fparameters',['read_parameters',['../delay__extension_8c.html#afeb21131569d4edffb884f6564de89dd',1,'read_parameters(struct delay_parameters *params):&#160;delay_extension.c'],['../robot__motor__control_8c.html#aab12b0c06c8347c79d80f7f5bfaa9bc9',1,'read_parameters(address_t region_address):&#160;robot_motor_control.c']]],
   ['read_5frates',['read_rates',['../spike__source__poisson_8c.html#af4847de2b9a2d080b0e03eabccb7308d',1,'spike_source_poisson.c']]],
   ['record_5fspikes',['record_spikes',['../spike__source__poisson_8c.html#a6383f32ff6d54333f83d681ff919d4d0',1,'spike_source_poisson.c']]],
   ['recording_5fcomplete_5fcallback',['recording_complete_callback',['../spike__source__poisson_8c.html#aef76853af3707b8ab86a141b0742623f',1,'spike_source_poisson.c']]],

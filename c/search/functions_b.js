@@ -2,7 +2,10 @@ var searchData=
 [
   ['mark_5fspike',['mark_spike',['../spike__source__poisson_8c.html#a285c14edf54c74a6fe624e2968964a12',1,'spike_source_poisson.c']]],
   ['mars_5fkiss_5ffixed_5fpoint',['mars_kiss_fixed_point',['../random__util_8h.html#a888c74ee81620d84c956eed32713f074',1,'random_util.h']]],
+  ['maths_5fclamp_5fpot',['maths_clamp_pot',['../maths_8h.html#a260ef4f2441756ae0507deceefda7460',1,'maths.h']]],
   ['maths_5fcopy_5fint16_5flut',['maths_copy_int16_lut',['../maths_8h.html#a510f113b80d885ec2b2e8b80d8cd08b6',1,'maths.h']]],
+  ['maths_5ffixed_5fmul16',['maths_fixed_mul16',['../maths_8h.html#a684f0b41c83b59209f8ee616a57474ec',1,'maths.h']]],
+  ['maths_5ffixed_5fmul32',['maths_fixed_mul32',['../maths_8h.html#a9570356b9b13ddd638685b38b66ed6ff',1,'maths.h']]],
   ['maths_5flut_5fexponential_5fdecay',['maths_lut_exponential_decay',['../maths_8h.html#a7c315224937c5fa8f619c4ed6be5c89d',1,'maths.h']]],
   ['maths_5fmul_5f16x16',['maths_mul_16x16',['../maths_8h.html#a470b9772ae34f0a79199154330378c7f',1,'maths.h']]],
   ['matrix_5fgenerator_5ffree',['matrix_generator_free',['../matrix__generator_8c.html#aafbab40316b9861d41999287c65d1dbe',1,'matrix_generator_free(matrix_generator_t generator):&#160;matrix_generator.c'],['../matrix__generator_8h.html#aafbab40316b9861d41999287c65d1dbe',1,'matrix_generator_free(matrix_generator_t generator):&#160;matrix_generator.c']]],

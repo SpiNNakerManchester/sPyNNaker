@@ -101,21 +101,60 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
 <tr class="memitem:ad2fac83f5bb9b0f79f346200d9f74024"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad2fac83f5bb9b0f79f346200d9f74024"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>STDP_FIXED_POINT</b>&#160;&#160;&#160;11</td></tr>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stdp__typedefs_8h.html#ad2fac83f5bb9b0f79f346200d9f74024">STDP_FIXED_POINT</a>&#160;&#160;&#160;11</td></tr>
+<tr class="memdesc:ad2fac83f5bb9b0f79f346200d9f74024"><td class="mdescLeft">&#160;</td><td class="mdescRight">Position of the point in the fixed point math used by STDP. <br /></td></tr>
 <tr class="separator:ad2fac83f5bb9b0f79f346200d9f74024"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa17e993cea62822ef342b0db7ed156f5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa17e993cea62822ef342b0db7ed156f5"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>STDP_FIXED_POINT_ONE</b>&#160;&#160;&#160;(1 &lt;&lt; STDP_FIXED_POINT)</td></tr>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stdp__typedefs_8h.html#aa17e993cea62822ef342b0db7ed156f5">STDP_FIXED_POINT_ONE</a>&#160;&#160;&#160;(1 &lt;&lt; <a class="el" href="stdp__typedefs_8h.html#ad2fac83f5bb9b0f79f346200d9f74024">STDP_FIXED_POINT</a>)</td></tr>
+<tr class="memdesc:aa17e993cea62822ef342b0db7ed156f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number 1.0 in the fixed point math used by STDP. <br /></td></tr>
 <tr class="separator:aa17e993cea62822ef342b0db7ed156f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aadb4d7a82820e2de3f998e902b7cd87a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aadb4d7a82820e2de3f998e902b7cd87a"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>STDP_FIXED_MUL_16X16</b>(a,  b)&#160;&#160;&#160;maths_fixed_mul16(a, b, STDP_FIXED_POINT)</td></tr>
+<tr class="memitem:aadb4d7a82820e2de3f998e902b7cd87a"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stdp__typedefs_8h.html#aadb4d7a82820e2de3f998e902b7cd87a">STDP_FIXED_MUL_16X16</a>(a,  b)&#160;&#160;&#160;<a class="el" href="maths_8h.html#a684f0b41c83b59209f8ee616a57474ec">maths_fixed_mul16</a>(a, b, <a class="el" href="stdp__typedefs_8h.html#ad2fac83f5bb9b0f79f346200d9f74024">STDP_FIXED_POINT</a>)</td></tr>
+<tr class="memdesc:aadb4d7a82820e2de3f998e902b7cd87a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Multiply two STDP fixed point numbers.  <a href="#aadb4d7a82820e2de3f998e902b7cd87a">More...</a><br /></td></tr>
 <tr class="separator:aadb4d7a82820e2de3f998e902b7cd87a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Basic definitions for STDP. </p>
-</div></div><!-- contents -->
+</div><h2 class="groupheader">Macro Definition Documentation</h2>
+<a class="anchor" id="aadb4d7a82820e2de3f998e902b7cd87a"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define STDP_FIXED_MUL_16X16</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">a, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">b&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td>&#160;&#160;&#160;<a class="el" href="maths_8h.html#a684f0b41c83b59209f8ee616a57474ec">maths_fixed_mul16</a>(a, b, <a class="el" href="stdp__typedefs_8h.html#ad2fac83f5bb9b0f79f346200d9f74024">STDP_FIXED_POINT</a>)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Multiply two STDP fixed point numbers. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">a</td><td>The first multiplicand </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">b</td><td>The second multiplicand </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The product </dd></dl>
+
+</div>
+</div>
+</div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Apr 29 2020 10:12:39 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon May 4 2020 11:12:16 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

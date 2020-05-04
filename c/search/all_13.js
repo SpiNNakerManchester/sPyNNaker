@@ -10,5 +10,6 @@ var searchData=
   ['ureal',['UREAL',['../maths-util_8h.html#a2e4c6b7f842497114d81356c763536c4',1,'maths-util.h']]],
   ['ureal_5fconst',['UREAL_CONST',['../maths-util_8h.html#a9ff1e35d7d395a988bf688a412076a40',1,'maths-util.h']]],
   ['use_5fkey',['use_key',['../neuron_8c.html#ab9132b5a04a7bdb8ac2e4293c1ec96bf',1,'neuron.c']]],
+  ['user',['USER',['../delay__extension_8c.html#a9754029f237bd209c67ffa701d8250c6ae2d30a195cee6b2961cc2c23ea4b520b',1,'delay_extension.c']]],
   ['user_5fevent_5fcallback',['user_event_callback',['../spike__processing_8c.html#a1a403a9ad2200bc3bd7650e18d78fc26',1,'spike_processing.c']]]
 ];

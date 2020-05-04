@@ -4,6 +4,7 @@ var searchData=
   ['spike_5fprocessing_2ec',['spike_processing.c',['../spike__processing_8c.html',1,'']]],
   ['spike_5fprocessing_2eh',['spike_processing.h',['../spike__processing_8h.html',1,'']]],
   ['spike_5fsource_5fpoisson_2ec',['spike_source_poisson.c',['../spike__source__poisson_8c.html',1,'']]],
+  ['spin1_2dwfi_2eh',['spin1-wfi.h',['../spin1-wfi_8h.html',1,'']]],
   ['stdp_5ftypedefs_2eh',['stdp_typedefs.h',['../stdp__typedefs_8h.html',1,'']]],
   ['synapse_5fdynamics_2eh',['synapse_dynamics.h',['../synapse__dynamics_8h.html',1,'']]],
   ['synapse_5fdynamics_5fstatic_5fimpl_2ec',['synapse_dynamics_static_impl.c',['../synapse__dynamics__static__impl_8c.html',1,'']]],

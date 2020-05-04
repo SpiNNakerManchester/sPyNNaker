@@ -111,6 +111,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <code>#include &lt;limits.h&gt;</code><br />
 <code>#include &quot;<a class="el" href="spike__source_2poisson_2profile__tags_8h_source.html">profile_tags.h</a>&quot;</code><br />
 <code>#include &lt;profiler.h&gt;</code><br />
+<code>#include &lt;<a class="el" href="spin1-wfi_8h_source.html">common/spin1-wfi.h</a>&gt;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Data Structures</h2></td></tr>
@@ -154,38 +155,23 @@ Enumerations</h2></td></tr>
 </td></tr>
 <tr class="separator:a1b9edddb3735d131c67e9e824f07c402"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a65b19dabf5283c1ea37df964ca25e964"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a65b19dabf5283c1ea37df964ca25e964"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><b>callback_priorities</b> { <br />
-&#160;&#160;<b>MC_PACKET</b> = -1, 
-<b>SDP</b> = 0, 
-<b>USER</b> = 1, 
-<b>TIMER</b> = 3, 
-<br />
-&#160;&#160;<b>DMA</b> = 2, 
-<b>MC</b> = -1, 
+&#160;&#160;<b>MC</b> = -1, 
 <b>DMA</b> = 0, 
 <b>USER</b> = 0, 
-<br />
-&#160;&#160;<b>SDP</b> = 1, 
-<b>TIMER</b> = 2, 
-<b>MC</b> = -1, 
-<b>SDP</b> = 0, 
+<b>SDP</b> = 1, 
 <br />
 &#160;&#160;<b>TIMER</b> = 2, 
-<b>DMA</b> = 1, 
 <b>MULTICAST</b> = -1, 
 <b>SDP</b> = 0, 
+<b>DMA</b> = 1, 
 <br />
-&#160;&#160;<b>DMA</b> = 1, 
-<b>TIMER</b> = 2
+&#160;&#160;<b>TIMER</b> = 2
 <br />
  }</td></tr>
 <tr class="separator:a65b19dabf5283c1ea37df964ca25e964"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ae35277172e3b42f22218009fe98a2402"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae35277172e3b42f22218009fe98a2402"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#ae35277172e3b42f22218009fe98a2402">spin1_wfi</a> (void)</td></tr>
-<tr class="memdesc:ae35277172e3b42f22218009fe98a2402"><td class="mdescLeft">&#160;</td><td class="mdescRight">Declare spin1_wfi, missing from spin1api header. <br /></td></tr>
-<tr class="separator:ae35277172e3b42f22218009fe98a2402"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a271dd89ae6f3a25d49a7e2d4cb768a37"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a271dd89ae6f3a25d49a7e2d4cb768a37"></a>
 static <a class="el" href="spike__source__poisson_8c.html#structspike__source__t">spike_source_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>get_source_data</b> (uint32_t id)</td></tr>
 <tr class="separator:a271dd89ae6f3a25d49a7e2d4cb768a37"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -233,10 +219,10 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><b>read_next_rate
 <tr class="memitem:a6b8523cb6e82e9b56c93f8f52b47e274"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a6b8523cb6e82e9b56c93f8f52b47e274">send_spike</a> (uint32_t <a class="el" href="neuron-typedefs_8h.html#adca4ceace8e60559a8953bc89a616d70">spike_key</a>, uint32_t timer_count)</td></tr>
 <tr class="memdesc:a6b8523cb6e82e9b56c93f8f52b47e274"><td class="mdescLeft">&#160;</td><td class="mdescRight">handles spreading of Poisson spikes for even packet reception at destination  <a href="#a6b8523cb6e82e9b56c93f8f52b47e274">More...</a><br /></td></tr>
 <tr class="separator:a6b8523cb6e82e9b56c93f8f52b47e274"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a09166600548501c6befb79b410cdc98a"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a09166600548501c6befb79b410cdc98a">expand_spike_recording_buffer</a> (uint32_t n_spikes)</td></tr>
+<tr class="memitem:a09166600548501c6befb79b410cdc98a"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a09166600548501c6befb79b410cdc98a">expand_spike_recording_buffer</a> (uint32_t <a class="el" href="last__neuron__selection__impl_8h.html#a3517ef59d8e5a261be447e890013b160">n_spikes</a>)</td></tr>
 <tr class="memdesc:a09166600548501c6befb79b410cdc98a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Expand the space for recording spikes.  <a href="#a09166600548501c6befb79b410cdc98a">More...</a><br /></td></tr>
 <tr class="separator:a09166600548501c6befb79b410cdc98a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a285c14edf54c74a6fe624e2968964a12"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a285c14edf54c74a6fe624e2968964a12">mark_spike</a> (uint32_t neuron_id, uint32_t n_spikes)</td></tr>
+<tr class="memitem:a285c14edf54c74a6fe624e2968964a12"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a285c14edf54c74a6fe624e2968964a12">mark_spike</a> (uint32_t neuron_id, uint32_t <a class="el" href="last__neuron__selection__impl_8h.html#a3517ef59d8e5a261be447e890013b160">n_spikes</a>)</td></tr>
 <tr class="memdesc:a285c14edf54c74a6fe624e2968964a12"><td class="mdescLeft">&#160;</td><td class="mdescRight">records spikes as needed  <a href="#a285c14edf54c74a6fe624e2968964a12">More...</a><br /></td></tr>
 <tr class="separator:a285c14edf54c74a6fe624e2968964a12"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aef76853af3707b8ab86a141b0742623f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aef76853af3707b8ab86a141b0742623f"></a>
@@ -258,7 +244,7 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 <tr class="memitem:a12c72782cb450237076bc0622fc90125"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a12c72782cb450237076bc0622fc90125">set_spike_source_rate</a> (uint32_t id, <a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a> rate)</td></tr>
 <tr class="memdesc:a12c72782cb450237076bc0622fc90125"><td class="mdescLeft">&#160;</td><td class="mdescRight">set the spike source rate as required  <a href="#a12c72782cb450237076bc0622fc90125">More...</a><br /></td></tr>
 <tr class="separator:a12c72782cb450237076bc0622fc90125"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af5b2c04c7a9d81f1421e15ddfe40b782"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#af5b2c04c7a9d81f1421e15ddfe40b782">multicast_packet_callback</a> (uint <a class="el" href="neuron_8c.html#ac8861193246fc34d8f29ac9d57b6791a">key</a>, uint payload)</td></tr>
+<tr class="memitem:af5b2c04c7a9d81f1421e15ddfe40b782"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#af5b2c04c7a9d81f1421e15ddfe40b782">multicast_packet_callback</a> (uint <a class="el" href="robot__motor__control_8c.html#a6d4ec8e4f3148d51041635da9986c3fa">key</a>, uint payload)</td></tr>
 <tr class="memdesc:af5b2c04c7a9d81f1421e15ddfe40b782"><td class="mdescLeft">&#160;</td><td class="mdescRight">multicast callback used to set rate when injected in a live example  <a href="#af5b2c04c7a9d81f1421e15ddfe40b782">More...</a><br /></td></tr>
 <tr class="separator:af5b2c04c7a9d81f1421e15ddfe40b782"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa14f4f1d4c84183b7bf7108bf930a23c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa14f4f1d4c84183b7bf7108bf930a23c"></a>
@@ -272,10 +258,10 @@ Variables</h2></td></tr>
 uint&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a7fcd6915876e066781399d7b00f1b1f0">ticks</a></td></tr>
 <tr class="memdesc:a7fcd6915876e066781399d7b00f1b1f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Spin1 API ticks, to know when the timer wraps. <br /></td></tr>
 <tr class="separator:a7fcd6915876e066781399d7b00f1b1f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5e731a5b624d474b4a71237b20feb29d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5e731a5b624d474b4a71237b20feb29d"></a>
-static <a class="el" href="spike__source__poisson_8c.html#structglobal__parameters">global_parameters</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a5e731a5b624d474b4a71237b20feb29d">params</a></td></tr>
-<tr class="memdesc:a5e731a5b624d474b4a71237b20feb29d"><td class="mdescLeft">&#160;</td><td class="mdescRight">The <a class="el" href="spike__source__poisson_8c.html#structglobal__parameters" title="Parameters of the SpikeSourcePoisson. ">global_parameters</a> for the sub-population. <br /></td></tr>
-<tr class="separator:a5e731a5b624d474b4a71237b20feb29d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3474215ce02c1bf76bceafe71ef89c7b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3474215ce02c1bf76bceafe71ef89c7b"></a>
+static <a class="el" href="spike__source__poisson_8c.html#structglobal__parameters">global_parameters</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a3474215ce02c1bf76bceafe71ef89c7b">ssp_params</a></td></tr>
+<tr class="memdesc:a3474215ce02c1bf76bceafe71ef89c7b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The <a class="el" href="spike__source__poisson_8c.html#structglobal__parameters" title="Parameters of the SpikeSourcePoisson. ">global_parameters</a> for the sub-population. <br /></td></tr>
+<tr class="separator:a3474215ce02c1bf76bceafe71ef89c7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a47b4faf584a02b7d913efcb91134d196"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a47b4faf584a02b7d913efcb91134d196"></a>
 static <a class="el" href="spike__source__poisson_8c.html#structsource__info">source_info</a> **&#160;</td><td class="memItemRight" valign="bottom"><b>source_data</b></td></tr>
 <tr class="separator:a47b4faf584a02b7d913efcb91134d196"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1275,7 +1261,7 @@ poissons[]</td>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Apr 29 2020 10:12:40 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon May 4 2020 11:12:16 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

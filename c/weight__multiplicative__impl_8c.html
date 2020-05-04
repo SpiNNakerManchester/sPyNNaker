@@ -100,25 +100,71 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a852d81c9a2ae739ac6b3e0151fabbb77"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a852d81c9a2ae739ac6b3e0151fabbb77"></a>
-uint32_t *&#160;</td><td class="memItemRight" valign="bottom"><b>weight_initialise</b> (uint32_t *address, uint32_t <a class="el" href="synapses_8c.html#adedb27b3ece4d4dece0aee776a136427">n_synapse_types</a>, uint32_t *ring_buffer_to_input_buffer_left_shifts)</td></tr>
-<tr class="separator:a852d81c9a2ae739ac6b3e0151fabbb77"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a499ff9e19e3982f41bd7422fafebca2e"><td class="memItemLeft" align="right" valign="top">address_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="weight__multiplicative__impl_8c.html#a499ff9e19e3982f41bd7422fafebca2e">weight_initialise</a> (address_t address, uint32_t <a class="el" href="synapses_8c.html#adedb27b3ece4d4dece0aee776a136427">n_synapse_types</a>, uint32_t *ring_buffer_to_input_buffer_left_shifts)</td></tr>
+<tr class="memdesc:a499ff9e19e3982f41bd7422fafebca2e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialises the weight aspect of an STDP rule.  <a href="#a499ff9e19e3982f41bd7422fafebca2e">More...</a><br /></td></tr>
+<tr class="separator:a499ff9e19e3982f41bd7422fafebca2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
 <tr class="memitem:aff9620807595c2091e6bd5887da64f5b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aff9620807595c2091e6bd5887da64f5b"></a>
-<a class="el" href="weight__multiplicative__impl_8h.html#structplasticity__weight__region__data__t">plasticity_weight_region_data_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>plasticity_weight_region_data</b></td></tr>
+<a class="el" href="weight__multiplicative__impl_8h.html#structplasticity__weight__region__data__t">plasticity_weight_region_data_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="weight__multiplicative__impl_8c.html#aff9620807595c2091e6bd5887da64f5b">plasticity_weight_region_data</a></td></tr>
+<tr class="memdesc:aff9620807595c2091e6bd5887da64f5b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Global plasticity parameter data array, in DTCM. <br /></td></tr>
 <tr class="separator:aff9620807595c2091e6bd5887da64f5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a04481d5906cf9a60cb1b2c2c1e68de54"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a04481d5906cf9a60cb1b2c2c1e68de54"></a>
-uint32_t *&#160;</td><td class="memItemRight" valign="bottom"><b>weight_multiply_right_shift</b></td></tr>
+uint32_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="weight__multiplicative__impl_8c.html#a04481d5906cf9a60cb1b2c2c1e68de54">weight_multiply_right_shift</a></td></tr>
+<tr class="memdesc:a04481d5906cf9a60cb1b2c2c1e68de54"><td class="mdescLeft">&#160;</td><td class="mdescRight">Plasticity multiply shift array, in DTCM. <br /></td></tr>
 <tr class="separator:a04481d5906cf9a60cb1b2c2c1e68de54"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Support code for <a class="el" href="weight__multiplicative__impl_8h.html" title="Multiplicative single-term weight dependence rule. ">weight_multiplicative_impl.h</a>. </p>
-</div></div><!-- contents -->
+</div><h2 class="groupheader">Function Documentation</h2>
+<a class="anchor" id="a499ff9e19e3982f41bd7422fafebca2e"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">address_t weight_initialise </td>
+          <td>(</td>
+          <td class="paramtype">address_t&#160;</td>
+          <td class="paramname"><em>address</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>n_synapse_types</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t *&#160;</td>
+          <td class="paramname"><em>ring_buffer_to_input_buffer_left_shifts</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Initialises the weight aspect of an STDP rule. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">address</td><td>the absolute address in SRAM where the weight parameters are stored. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">n_synapse_types</td><td>The number of synapse types </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">ring_buffer_to_input_buffer_left_shifts</td><td>how much a value needs to be shifted in the left direction to support comprises with fixed point arithmetic </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the end of the weight region as an absolute SDRAM memory address. </dd></dl>
+
+</div>
+</div>
+</div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Apr 29 2020 10:12:39 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon May 4 2020 11:12:16 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

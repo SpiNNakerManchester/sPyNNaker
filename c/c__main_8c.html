@@ -129,28 +129,17 @@ Macros</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
 Enumerations</h2></td></tr>
 <tr class="memitem:a65b19dabf5283c1ea37df964ca25e964"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a65b19dabf5283c1ea37df964ca25e964"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#a65b19dabf5283c1ea37df964ca25e964">callback_priorities</a> { <br />
-&#160;&#160;<b>MC_PACKET</b> = -1, 
-<b>SDP</b> = 0, 
-<b>USER</b> = 1, 
-<b>TIMER</b> = 3, 
-<br />
-&#160;&#160;<b>DMA</b> = 2, 
-<b>MC</b> = -1, 
+&#160;&#160;<b>MC</b> = -1, 
 <b>DMA</b> = 0, 
 <b>USER</b> = 0, 
-<br />
-&#160;&#160;<b>SDP</b> = 1, 
-<b>TIMER</b> = 2, 
-<b>MC</b> = -1, 
-<b>SDP</b> = 0, 
+<b>SDP</b> = 1, 
 <br />
 &#160;&#160;<b>TIMER</b> = 2, 
-<b>DMA</b> = 1, 
 <b>MULTICAST</b> = -1, 
 <b>SDP</b> = 0, 
+<b>DMA</b> = 1, 
 <br />
-&#160;&#160;<b>DMA</b> = 1, 
-<b>TIMER</b> = 2
+&#160;&#160;<b>TIMER</b> = 2
 <br />
  }<tr class="memdesc:a65b19dabf5283c1ea37df964ca25e964"><td class="mdescLeft">&#160;</td><td class="mdescRight">values for the priority for each callback <br /></td></tr>
 </td></tr>
@@ -182,10 +171,12 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 <tr class="memdesc:ae73654f333e4363463ad8c594eca1905"><td class="mdescLeft">&#160;</td><td class="mdescRight">The current timer tick value. <br /></td></tr>
 <tr class="separator:ae73654f333e4363463ad8c594eca1905"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac0c27301e134af3ce80814a553601074"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac0c27301e134af3ce80814a553601074"></a>
-static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>timer_period</b></td></tr>
+static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#ac0c27301e134af3ce80814a553601074">timer_period</a></td></tr>
+<tr class="memdesc:ac0c27301e134af3ce80814a553601074"><td class="mdescLeft">&#160;</td><td class="mdescRight">timer tick period (in microseconds) <br /></td></tr>
 <tr class="separator:ac0c27301e134af3ce80814a553601074"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a73996d13ad0b2acf43a8bae560ac63c0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a73996d13ad0b2acf43a8bae560ac63c0"></a>
-static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>timer_offset</b></td></tr>
+static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#a73996d13ad0b2acf43a8bae560ac63c0">timer_offset</a></td></tr>
+<tr class="memdesc:a73996d13ad0b2acf43a8bae560ac63c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">timer phase offset (in microseconds) <br /></td></tr>
 <tr class="separator:a73996d13ad0b2acf43a8bae560ac63c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2178bb4764f423b1534a9631b0cc6e5e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2178bb4764f423b1534a9631b0cc6e5e"></a>
 static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#a2178bb4764f423b1534a9631b0cc6e5e">simulation_ticks</a> = 0</td></tr>
@@ -331,12 +322,6 @@ The number of rewirings performed. </td></tr>
 </div><div class="memdoc">
 
 <p>Initialises the model by reading in the regions and checking recording data. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">timer_period</td><td>a pointer for the memory address where the timer period should be stored during the function. </td></tr>
-  </table>
-  </dd>
-</dl>
 <dl class="section return"><dt>Returns</dt><dd>True if it successfully initialised, false otherwise </dd></dl>
 
 </div>
@@ -399,7 +384,7 @@ The number of rewirings performed. </td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Apr 29 2020 10:12:38 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon May 4 2020 11:12:16 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

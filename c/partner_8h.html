@@ -112,22 +112,162 @@ Macros</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:aa0c616a50e494c67ae9c1066a5d8df23"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa0c616a50e494c67ae9c1066a5d8df23"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>partner_init</b> (uint8_t **data)</td></tr>
+<tr class="memitem:aa0c616a50e494c67ae9c1066a5d8df23"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="partner_8h.html#aa0c616a50e494c67ae9c1066a5d8df23">partner_init</a> (uint8_t **data)</td></tr>
+<tr class="memdesc:aa0c616a50e494c67ae9c1066a5d8df23"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise the partner selection rule.  <a href="#aa0c616a50e494c67ae9c1066a5d8df23">More...</a><br /></td></tr>
 <tr class="separator:aa0c616a50e494c67ae9c1066a5d8df23"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac996afd22014e8bbc3106e0f84cddc7e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac996afd22014e8bbc3106e0f84cddc7e"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><b>partner_spike_received</b> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, <a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> spike)</td></tr>
+<tr class="memitem:ac996afd22014e8bbc3106e0f84cddc7e"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="partner_8h.html#ac996afd22014e8bbc3106e0f84cddc7e">partner_spike_received</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, <a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> spike)</td></tr>
+<tr class="memdesc:ac996afd22014e8bbc3106e0f84cddc7e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Notifies the rule that a spike has been received.  <a href="#ac996afd22014e8bbc3106e0f84cddc7e">More...</a><br /></td></tr>
 <tr class="separator:ac996afd22014e8bbc3106e0f84cddc7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4869aa919b813c4f93dfca3a23d09159"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4869aa919b813c4f93dfca3a23d09159"></a>
-static bool&#160;</td><td class="memItemRight" valign="bottom"><b>potential_presynaptic_partner</b> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, uint32_t *population_id, uint32_t *sub_population_id, uint32_t *neuron_id, <a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> *spike, uint32_t *m_pop_index)</td></tr>
-<tr class="separator:a4869aa919b813c4f93dfca3a23d09159"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acf4961684ee5730d0017dc34c1a8211d"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="partner_8h.html#acf4961684ee5730d0017dc34c1a8211d">potential_presynaptic_partner</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, uint32_t *restrict population_id, uint32_t *restrict sub_population_id, uint32_t *restrict neuron_id, <a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> *restrict spike, uint32_t *restrict m_pop_index)</td></tr>
+<tr class="memdesc:acf4961684ee5730d0017dc34c1a8211d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Choose the potential (remote) synaptic partner.  <a href="#acf4961684ee5730d0017dc34c1a8211d">More...</a><br /></td></tr>
+<tr class="separator:acf4961684ee5730d0017dc34c1a8211d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Partner selection rule common API. </p>
-</div></div><!-- contents -->
+</div><h2 class="groupheader">Function Documentation</h2>
+<a class="anchor" id="aa0c616a50e494c67ae9c1066a5d8df23"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void partner_init </td>
+          <td>(</td>
+          <td class="paramtype">uint8_t **&#160;</td>
+          <td class="paramname"><em>data</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Initialise the partner selection rule. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">data</td><td>A variable holding the location in SDRAM to configure the rule from. Will be updated to point to the first location after the configuration data. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="ac996afd22014e8bbc3106e0f84cddc7e"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void partner_spike_received </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>time</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a>&#160;</td>
+          <td class="paramname"><em>spike</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Notifies the rule that a spike has been received. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">time</td><td>The time that the spike was received at </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">spike</td><td>The spike that was received (includes the sending neuron ID) </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="acf4961684ee5730d0017dc34c1a8211d"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static bool potential_presynaptic_partner </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>time</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t *restrict&#160;</td>
+          <td class="paramname"><em>population_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t *restrict&#160;</td>
+          <td class="paramname"><em>sub_population_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t *restrict&#160;</td>
+          <td class="paramname"><em>neuron_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> *restrict&#160;</td>
+          <td class="paramname"><em>spike</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t *restrict&#160;</td>
+          <td class="paramname"><em>m_pop_index</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Choose the potential (remote) synaptic partner. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">time</td><td>The current time </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">population_id</td><td>The ID of the other population </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">sub_population_id</td><td>The ID of the subpopulation (corresponds to remote SpiNNaker core handling the population) </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">neuron_id</td><td>The ID of the neuron within the subpopulation </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">spike</td><td>The spike that made this a meaningful choice </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">m_pop_index</td><td>The master population table index </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>True if a choice was made </dd></dl>
+
+</div>
+</div>
+</div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Apr 29 2020 10:12:39 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon May 4 2020 11:12:16 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['kernel',['KERNEL',['../connection__generator_8c.html#a0411cd49bb5b71852cecd93bcbf0ca2da53c6e691e7db9eceefc0fb37cb724cd2',1,'connection_generator.c']]]
+  ['gsyn_5fexc_5frecording_5findex',['GSYN_EXC_RECORDING_INDEX',['../neuron__impl__standard_8h.html#a68f96be069d7309d70ec3343afad2e03a1f4a97c6e4523af2fea20d3ca50dbd0e',1,'neuron_impl_standard.h']]],
+  ['gsyn_5finh_5frecording_5findex',['GSYN_INH_RECORDING_INDEX',['../neuron__impl__standard_8h.html#a68f96be069d7309d70ec3343afad2e03a0e4025cde485021d43ae9284bee78c6e',1,'neuron_impl_standard.h']]]
 ];

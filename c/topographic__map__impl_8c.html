@@ -120,7 +120,7 @@ Functions</h2></td></tr>
 <tr class="memdesc:a1a8123da1bd797e82cb3193a0ce43847"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function called (usually on a timer from <a class="el" href="delay__extension_8c.html#aa14f4f1d4c84183b7bf7108bf930a23c" title="Entry point. ">c_main()</a>) to trigger the process of synaptic rewiring.  <a href="#a1a8123da1bd797e82cb3193a0ce43847">More...</a><br /></td></tr>
 <tr class="separator:a1a8123da1bd797e82cb3193a0ce43847"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac08559ca2e23561471aebd3f4097e348"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="topographic__map__impl_8c.html#ac08559ca2e23561471aebd3f4097e348">synaptogenesis_row_restructure</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, address_t row)</td></tr>
-<tr class="memdesc:ac08559ca2e23561471aebd3f4097e348"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function is a rewiring DMA callback.  <a href="#ac08559ca2e23561471aebd3f4097e348">More...</a><br /></td></tr>
+<tr class="memdesc:ac08559ca2e23561471aebd3f4097e348"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs the actual restructuring of a row.  <a href="#ac08559ca2e23561471aebd3f4097e348">More...</a><br /></td></tr>
 <tr class="separator:ac08559ca2e23561471aebd3f4097e348"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afa57eee149b8ef2c30e2239c22f0957e"><td class="memItemLeft" align="right" valign="top">int32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="topographic__map__impl_8c.html#afa57eee149b8ef2c30e2239c22f0957e">synaptogenesis_rewiring_period</a> (void)</td></tr>
 <tr class="memdesc:afa57eee149b8ef2c30e2239c22f0957e"><td class="mdescLeft">&#160;</td><td class="mdescRight">retrieve the period of rewiring  <a href="#afa57eee149b8ef2c30e2239c22f0957e">More...</a><br /></td></tr>
@@ -134,25 +134,30 @@ Functions</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
 <tr class="memitem:a14052fb746b24752fc5a96accf39d8b8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a14052fb746b24752fc5a96accf39d8b8"></a>
-<a class="el" href="sp__structs_8h.html#structrewiring__data__t">rewiring_data_t</a>&#160;</td><td class="memItemRight" valign="bottom"><b>rewiring_data</b></td></tr>
+<a class="el" href="sp__structs_8h.html#structrewiring__data__t">rewiring_data_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="topographic__map__impl_8c.html#a14052fb746b24752fc5a96accf39d8b8">rewiring_data</a></td></tr>
+<tr class="memdesc:a14052fb746b24752fc5a96accf39d8b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">the instantiation of the rewiring data <br /></td></tr>
 <tr class="separator:a14052fb746b24752fc5a96accf39d8b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab4adc13b137ccdbaff9d8883400182eb"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab4adc13b137ccdbaff9d8883400182eb"></a>
-static <a class="el" href="sp__structs_8h.html#structpost__to__pre__entry">post_to_pre_entry</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>post_to_pre_table</b></td></tr>
+static <a class="el" href="sp__structs_8h.html#structpost__to__pre__entry">post_to_pre_entry</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="topographic__map__impl_8c.html#ab4adc13b137ccdbaff9d8883400182eb">post_to_pre_table</a></td></tr>
+<tr class="memdesc:ab4adc13b137ccdbaff9d8883400182eb"><td class="mdescLeft">&#160;</td><td class="mdescRight">inverse of synaptic matrix <br /></td></tr>
 <tr class="separator:ab4adc13b137ccdbaff9d8883400182eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a25e63ee99aecac3677f299c1cccec889"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a25e63ee99aecac3677f299c1cccec889"></a>
-<a class="el" href="sp__structs_8h.html#structpre__pop__info__table__t">pre_pop_info_table_t</a>&#160;</td><td class="memItemRight" valign="bottom"><b>pre_info</b></td></tr>
+<a class="el" href="sp__structs_8h.html#structpre__pop__info__table__t">pre_pop_info_table_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="topographic__map__impl_8c.html#a25e63ee99aecac3677f299c1cccec889">pre_info</a></td></tr>
+<tr class="memdesc:a25e63ee99aecac3677f299c1cccec889"><td class="mdescLeft">&#160;</td><td class="mdescRight">pre-population information table <br /></td></tr>
 <tr class="separator:a25e63ee99aecac3677f299c1cccec889"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3802481f4afc5130dddf0c912313830e"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3802481f4afc5130dddf0c912313830e"></a>
-static struct <a class="el" href="formation__distance__dependent__impl_8h.html#structformation__params">formation_params</a> **&#160;</td><td class="memItemRight" valign="bottom"><b>formation_params</b></td></tr>
-<tr class="separator:a3802481f4afc5130dddf0c912313830e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a28c298577f3a18f919905a8021e90d6a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a28c298577f3a18f919905a8021e90d6a"></a>
-static struct <a class="el" href="elimination__random__by__weight__impl_8h.html#structelimination__params">elimination_params</a> **&#160;</td><td class="memItemRight" valign="bottom"><b>elimination_params</b></td></tr>
-<tr class="separator:a28c298577f3a18f919905a8021e90d6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a617d5ccf1e27648321a85cfc2498eedf"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a617d5ccf1e27648321a85cfc2498eedf"></a>
-static circular_buffer&#160;</td><td class="memItemRight" valign="bottom"><b>current_state_queue</b></td></tr>
+<tr class="memitem:a9eaecb5e1c8b325fcd3d6f500f15875f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9eaecb5e1c8b325fcd3d6f500f15875f"></a>
+static formation_params_t **&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="topographic__map__impl_8c.html#a9eaecb5e1c8b325fcd3d6f500f15875f">formation_params</a></td></tr>
+<tr class="memdesc:a9eaecb5e1c8b325fcd3d6f500f15875f"><td class="mdescLeft">&#160;</td><td class="mdescRight">The formation parameters per pre-population. <br /></td></tr>
+<tr class="separator:a9eaecb5e1c8b325fcd3d6f500f15875f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa964e9c3a6560d7521d1c40f9825fb8a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa964e9c3a6560d7521d1c40f9825fb8a"></a>
+static elimination_params_t **&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="topographic__map__impl_8c.html#aa964e9c3a6560d7521d1c40f9825fb8a">elimination_params</a></td></tr>
+<tr class="memdesc:aa964e9c3a6560d7521d1c40f9825fb8a"><td class="mdescLeft">&#160;</td><td class="mdescRight">The elimination parameters per pre-population. <br /></td></tr>
+<tr class="separator:aa964e9c3a6560d7521d1c40f9825fb8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a617d5ccf1e27648321a85cfc2498eedf"><td class="memItemLeft" align="right" valign="top">static circular_buffer&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="topographic__map__impl_8c.html#a617d5ccf1e27648321a85cfc2498eedf">current_state_queue</a></td></tr>
+<tr class="memdesc:a617d5ccf1e27648321a85cfc2498eedf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Current states in use.  <a href="#a617d5ccf1e27648321a85cfc2498eedf">More...</a><br /></td></tr>
 <tr class="separator:a617d5ccf1e27648321a85cfc2498eedf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abe30d6dd9444f9a17ed9128f6682fa03"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="abe30d6dd9444f9a17ed9128f6682fa03"></a>
-static circular_buffer&#160;</td><td class="memItemRight" valign="bottom"><b>free_states</b></td></tr>
+<tr class="memitem:abe30d6dd9444f9a17ed9128f6682fa03"><td class="memItemLeft" align="right" valign="top">static circular_buffer&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="topographic__map__impl_8c.html#abe30d6dd9444f9a17ed9128f6682fa03">free_states</a></td></tr>
+<tr class="memdesc:abe30d6dd9444f9a17ed9128f6682fa03"><td class="mdescLeft">&#160;</td><td class="mdescRight">Free current states.  <a href="#abe30d6dd9444f9a17ed9128f6682fa03">More...</a><br /></td></tr>
 <tr class="separator:abe30d6dd9444f9a17ed9128f6682fa03"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -180,7 +185,7 @@ static circular_buffer&#160;</td><td class="memItemRight" valign="bottom"><b>fre
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>address_t Address after the final word read from SDRAM. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Address after the final word read from SDRAM. </dd></dl>
 
 </div>
 </div>
@@ -258,16 +263,15 @@ static circular_buffer&#160;</td><td class="memItemRight" valign="bottom"><b>fre
       </table>
 </div><div class="memdoc">
 
-<p>This function is a rewiring DMA callback. </p>
-<p>Performs the actual restructuring of a row.</p>
+<p>Performs the actual restructuring of a row. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">dma_id</td><td>the ID of the DMA </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">dma_tag</td><td>the DMA tag, i.e. the tag used for reading row for rewiring </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">time</td><td>The time of the restructure </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">row</td><td>The row to restructure </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>nothing </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>True if the row was changed and needs to be written back </dd></dl>
 
 </div>
 </div>
@@ -286,7 +290,7 @@ static circular_buffer&#160;</td><td class="memItemRight" valign="bottom"><b>fre
 </div><div class="memdoc">
 
 <p>retrieve the period of rewiring </p>
-<p>retrieve the period of rewiring based on is_fast(), this can either mean how many times rewiring happens in a timestep, or how many timesteps have to pass until rewiring happens. </p>
+<dl class="section return"><dt>Returns</dt><dd>Based on <a class="el" href="synaptogenesis__dynamics_8h.html#a0d2bd7f05bdc3f4c8ce1ccafc16feb4a" title="controls whether rewiring is attempted multiple times per timestep or after a number of timesteps...">synaptogenesis_is_fast()</a>, this can either be how many times rewiring happens in a timestep, or how many timesteps have to pass until rewiring happens. </dd></dl>
 
 </div>
 </div>
@@ -305,7 +309,7 @@ static circular_buffer&#160;</td><td class="memItemRight" valign="bottom"><b>fre
 </div><div class="memdoc">
 
 <p>controls whether rewiring is attempted multiple times per timestep or after a number of timesteps. </p>
-<p>controls whether rewiring is attempted multiple times per timestep or after a number of timesteps. </p>
+<dl class="section return"><dt>Returns</dt><dd>true if the result of <a class="el" href="synaptogenesis__dynamics_8h.html#afa57eee149b8ef2c30e2239c22f0957e" title="retrieve the period of rewiring ">synaptogenesis_rewiring_period()</a> is the number of attempts to try per timestep. </dd></dl>
 
 </div>
 </div>
@@ -342,10 +346,57 @@ static circular_buffer&#160;</td><td class="memItemRight" valign="bottom"><b>fre
 
 </div>
 </div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a class="anchor" id="a617d5ccf1e27648321a85cfc2498eedf"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">circular_buffer current_state_queue</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Current states in use. </p>
+<p><a class="el" href="topographic__map__impl_8c.html#ac08559ca2e23561471aebd3f4097e348" title="Performs the actual restructuring of a row. ">synaptogenesis_row_restructure()</a> moves states from here to <a class="el" href="topographic__map__impl_8c.html#abe30d6dd9444f9a17ed9128f6682fa03" title="Free current states. ">free_states</a> </p>
+
+</div>
+</div>
+<a class="anchor" id="abe30d6dd9444f9a17ed9128f6682fa03"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">circular_buffer free_states</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Free current states. </p>
+<p><a class="el" href="topographic__map__impl_8c.html#a1a8123da1bd797e82cb3193a0ce43847" title="Function called (usually on a timer from c_main()) to trigger the process of synaptic rewiring...">synaptogenesis_dynamics_rewire()</a> moves states from here to <a class="el" href="topographic__map__impl_8c.html#a617d5ccf1e27648321a85cfc2498eedf" title="Current states in use. ">current_state_queue</a> </p>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Apr 29 2020 10:12:39 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon May 4 2020 11:12:16 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

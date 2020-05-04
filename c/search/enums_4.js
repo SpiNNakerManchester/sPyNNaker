@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['region',['region',['../spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402',1,'spike_source_poisson.c']]],
-  ['region_5fidentifiers',['region_identifiers',['../delay__extension_8h.html#a6e4d67a0bd74db4da98539f8d2e5ab32',1,'delay_extension.h']]],
-  ['regions_5fe',['regions_e',['../regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6',1,'regions.h']]]
+  ['munich_5fprotocol_5fmodes_5fe',['munich_protocol_modes_e',['../munich__protocol_8h.html#a276ea595faa60fd27301105f3613b2ef',1,'munich_protocol.h']]]
 ];

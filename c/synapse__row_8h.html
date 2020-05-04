@@ -116,80 +116,533 @@ Macros</h2></td></tr>
 <tr class="memdesc:a9932d3e682ca42eb572c28a676e4e4b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">the mask for the synapse delay in the row <br /></td></tr>
 <tr class="separator:a9932d3e682ca42eb572c28a676e4e4b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad7cd5d97013df7e40e5a1f2c7d73ee57"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad7cd5d97013df7e40e5a1f2c7d73ee57"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>N_SYNAPSE_ROW_HEADER_WORDS</b>&#160;&#160;&#160;3</td></tr>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__row_8h.html#ad7cd5d97013df7e40e5a1f2c7d73ee57">N_SYNAPSE_ROW_HEADER_WORDS</a>&#160;&#160;&#160;3</td></tr>
+<tr class="memdesc:ad7cd5d97013df7e40e5a1f2c7d73ee57"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of header words per synaptic row. <br /></td></tr>
 <tr class="separator:ad7cd5d97013df7e40e5a1f2c7d73ee57"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="typedef-members"></a>
 Typedefs</h2></td></tr>
 <tr class="memitem:aeae1e8aa0c0095434ba488866ef21aa2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aeae1e8aa0c0095434ba488866ef21aa2"></a>
-typedef uint16_t&#160;</td><td class="memItemRight" valign="bottom"><b>control_t</b></td></tr>
+typedef uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__row_8h.html#aeae1e8aa0c0095434ba488866ef21aa2">control_t</a></td></tr>
+<tr class="memdesc:aeae1e8aa0c0095434ba488866ef21aa2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Define the type of the control data. <br /></td></tr>
 <tr class="separator:aeae1e8aa0c0095434ba488866ef21aa2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a392c5d735cea24b05dc4f09533216683"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a392c5d735cea24b05dc4f09533216683"></a>
-static size_t&#160;</td><td class="memItemRight" valign="bottom"><b>synapse_row_plastic_size</b> (address_t row)</td></tr>
+<tr class="memitem:a392c5d735cea24b05dc4f09533216683"><td class="memItemLeft" align="right" valign="top">static size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__row_8h.html#a392c5d735cea24b05dc4f09533216683">synapse_row_plastic_size</a> (address_t row)</td></tr>
+<tr class="memdesc:a392c5d735cea24b05dc4f09533216683"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size of the plastic region.  <a href="#a392c5d735cea24b05dc4f09533216683">More...</a><br /></td></tr>
 <tr class="separator:a392c5d735cea24b05dc4f09533216683"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adc6c789c206db13f271591b0ccc1e9ed"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="adc6c789c206db13f271591b0ccc1e9ed"></a>
-static address_t&#160;</td><td class="memItemRight" valign="bottom"><b>synapse_row_plastic_region</b> (address_t row)</td></tr>
+<tr class="memitem:adc6c789c206db13f271591b0ccc1e9ed"><td class="memItemLeft" align="right" valign="top">static address_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__row_8h.html#adc6c789c206db13f271591b0ccc1e9ed">synapse_row_plastic_region</a> (address_t row)</td></tr>
+<tr class="memdesc:adc6c789c206db13f271591b0ccc1e9ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the address of the plastic region.  <a href="#adc6c789c206db13f271591b0ccc1e9ed">More...</a><br /></td></tr>
 <tr class="separator:adc6c789c206db13f271591b0ccc1e9ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a551d18ff318c0f5ee3eed7af60ab37ce"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a551d18ff318c0f5ee3eed7af60ab37ce"></a>
-static address_t&#160;</td><td class="memItemRight" valign="bottom"><b>synapse_row_fixed_region</b> (address_t row)</td></tr>
+<tr class="memitem:a551d18ff318c0f5ee3eed7af60ab37ce"><td class="memItemLeft" align="right" valign="top">static address_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__row_8h.html#a551d18ff318c0f5ee3eed7af60ab37ce">synapse_row_fixed_region</a> (address_t row)</td></tr>
+<tr class="memdesc:a551d18ff318c0f5ee3eed7af60ab37ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the address of the non-plastic (or fixed) region.  <a href="#a551d18ff318c0f5ee3eed7af60ab37ce">More...</a><br /></td></tr>
 <tr class="separator:a551d18ff318c0f5ee3eed7af60ab37ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa4e59f9f6e65f2adb38eda17266299e5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa4e59f9f6e65f2adb38eda17266299e5"></a>
-static size_t&#160;</td><td class="memItemRight" valign="bottom"><b>synapse_row_num_fixed_synapses</b> (address_t fixed)</td></tr>
+<tr class="memitem:aa4e59f9f6e65f2adb38eda17266299e5"><td class="memItemLeft" align="right" valign="top">static size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__row_8h.html#aa4e59f9f6e65f2adb38eda17266299e5">synapse_row_num_fixed_synapses</a> (address_t fixed)</td></tr>
+<tr class="memdesc:aa4e59f9f6e65f2adb38eda17266299e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of fixed synapses in the row.  <a href="#aa4e59f9f6e65f2adb38eda17266299e5">More...</a><br /></td></tr>
 <tr class="separator:aa4e59f9f6e65f2adb38eda17266299e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5bb51090afe1fd0a7a8b58aecbd08b7d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5bb51090afe1fd0a7a8b58aecbd08b7d"></a>
-static size_t&#160;</td><td class="memItemRight" valign="bottom"><b>synapse_row_num_plastic_controls</b> (address_t fixed)</td></tr>
+<tr class="memitem:a5bb51090afe1fd0a7a8b58aecbd08b7d"><td class="memItemLeft" align="right" valign="top">static size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__row_8h.html#a5bb51090afe1fd0a7a8b58aecbd08b7d">synapse_row_num_plastic_controls</a> (address_t fixed)</td></tr>
+<tr class="memdesc:a5bb51090afe1fd0a7a8b58aecbd08b7d"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of plastic controls in the row.  <a href="#a5bb51090afe1fd0a7a8b58aecbd08b7d">More...</a><br /></td></tr>
 <tr class="separator:a5bb51090afe1fd0a7a8b58aecbd08b7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5ce445e106984aea0e11d4c423593594"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5ce445e106984aea0e11d4c423593594"></a>
-static control_t *&#160;</td><td class="memItemRight" valign="bottom"><b>synapse_row_plastic_controls</b> (address_t fixed)</td></tr>
+<tr class="memitem:a5ce445e106984aea0e11d4c423593594"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="synapse__row_8h.html#aeae1e8aa0c0095434ba488866ef21aa2">control_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__row_8h.html#a5ce445e106984aea0e11d4c423593594">synapse_row_plastic_controls</a> (address_t fixed)</td></tr>
+<tr class="memdesc:a5ce445e106984aea0e11d4c423593594"><td class="mdescLeft">&#160;</td><td class="mdescRight">The array of plastic controls in the row.  <a href="#a5ce445e106984aea0e11d4c423593594">More...</a><br /></td></tr>
 <tr class="separator:a5ce445e106984aea0e11d4c423593594"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4eda772c550113c270945284e0cf1881"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a4eda772c550113c270945284e0cf1881"></a>
-static uint32_t *&#160;</td><td class="memItemRight" valign="bottom"><b>synapse_row_fixed_weight_controls</b> (address_t fixed)</td></tr>
+<tr class="memitem:a4eda772c550113c270945284e0cf1881"><td class="memItemLeft" align="right" valign="top">static uint32_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__row_8h.html#a4eda772c550113c270945284e0cf1881">synapse_row_fixed_weight_controls</a> (address_t fixed)</td></tr>
+<tr class="memdesc:a4eda772c550113c270945284e0cf1881"><td class="mdescLeft">&#160;</td><td class="mdescRight">The array of fixed weights in the row.  <a href="#a4eda772c550113c270945284e0cf1881">More...</a><br /></td></tr>
 <tr class="separator:a4eda772c550113c270945284e0cf1881"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9bbd252568935c8020f478dcdaff97b5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9bbd252568935c8020f478dcdaff97b5"></a>
-static index_t&#160;</td><td class="memItemRight" valign="bottom"><b>synapse_row_sparse_index</b> (uint32_t x, uint32_t synapse_index_mask)</td></tr>
+<tr class="memitem:a9bbd252568935c8020f478dcdaff97b5"><td class="memItemLeft" align="right" valign="top">static index_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__row_8h.html#a9bbd252568935c8020f478dcdaff97b5">synapse_row_sparse_index</a> (uint32_t x, uint32_t <a class="el" href="synapse__dynamics__static__impl_8c.html#a84db6c41c7cf03558016d477d8df4d37">synapse_index_mask</a>)</td></tr>
+<tr class="memdesc:a9bbd252568935c8020f478dcdaff97b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the index.  <a href="#a9bbd252568935c8020f478dcdaff97b5">More...</a><br /></td></tr>
 <tr class="separator:a9bbd252568935c8020f478dcdaff97b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8ac7fef74256d744079d84a638d2d5c7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8ac7fef74256d744079d84a638d2d5c7"></a>
-static index_t&#160;</td><td class="memItemRight" valign="bottom"><b>synapse_row_sparse_type</b> (uint32_t x, uint32_t synapse_index_bits, uint32_t synapse_type_mask)</td></tr>
+<tr class="memitem:a8ac7fef74256d744079d84a638d2d5c7"><td class="memItemLeft" align="right" valign="top">static index_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__row_8h.html#a8ac7fef74256d744079d84a638d2d5c7">synapse_row_sparse_type</a> (uint32_t x, uint32_t <a class="el" href="synapse__dynamics__static__impl_8c.html#a840b87d6e981394dff1224fc0b8cd9c3">synapse_index_bits</a>, uint32_t <a class="el" href="synapse__dynamics__static__impl_8c.html#af786c2a0c6f40c688029991d5b9711a7">synapse_type_mask</a>)</td></tr>
+<tr class="memdesc:a8ac7fef74256d744079d84a638d2d5c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the type code.  <a href="#a8ac7fef74256d744079d84a638d2d5c7">More...</a><br /></td></tr>
 <tr class="separator:a8ac7fef74256d744079d84a638d2d5c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab47a817128850c7fea9d755816040392"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab47a817128850c7fea9d755816040392"></a>
-static index_t&#160;</td><td class="memItemRight" valign="bottom"><b>synapse_row_sparse_type_index</b> (uint32_t x, uint32_t synapse_type_index_mask)</td></tr>
+<tr class="memitem:ab47a817128850c7fea9d755816040392"><td class="memItemLeft" align="right" valign="top">static index_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__row_8h.html#ab47a817128850c7fea9d755816040392">synapse_row_sparse_type_index</a> (uint32_t x, uint32_t <a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#ac3299a10c6a78f6e4f37246ab79a0736">synapse_type_index_mask</a>)</td></tr>
+<tr class="memdesc:ab47a817128850c7fea9d755816040392"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the type and index.  <a href="#ab47a817128850c7fea9d755816040392">More...</a><br /></td></tr>
 <tr class="separator:ab47a817128850c7fea9d755816040392"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8ac4945585bcd95397c6ab7f57e413f7"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8ac4945585bcd95397c6ab7f57e413f7"></a>
-static index_t&#160;</td><td class="memItemRight" valign="bottom"><b>synapse_row_sparse_delay</b> (uint32_t x, uint32_t synapse_type_index_bits)</td></tr>
+<tr class="memitem:a8ac4945585bcd95397c6ab7f57e413f7"><td class="memItemLeft" align="right" valign="top">static index_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__row_8h.html#a8ac4945585bcd95397c6ab7f57e413f7">synapse_row_sparse_delay</a> (uint32_t x, uint32_t <a class="el" href="synapse__dynamics__static__impl_8c.html#a4cb72a09cb7c84f5c82c07d17bcb0516">synapse_type_index_bits</a>)</td></tr>
+<tr class="memdesc:a8ac4945585bcd95397c6ab7f57e413f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the delay.  <a href="#a8ac4945585bcd95397c6ab7f57e413f7">More...</a><br /></td></tr>
 <tr class="separator:a8ac4945585bcd95397c6ab7f57e413f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af7eb0b5869f5256cf8a1343860d8aa21"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af7eb0b5869f5256cf8a1343860d8aa21"></a>
-static weight_t&#160;</td><td class="memItemRight" valign="bottom"><b>synapse_row_sparse_weight</b> (uint32_t x)</td></tr>
+<tr class="memitem:af7eb0b5869f5256cf8a1343860d8aa21"><td class="memItemLeft" align="right" valign="top">static weight_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__row_8h.html#af7eb0b5869f5256cf8a1343860d8aa21">synapse_row_sparse_weight</a> (uint32_t x)</td></tr>
+<tr class="memdesc:af7eb0b5869f5256cf8a1343860d8aa21"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the weight.  <a href="#af7eb0b5869f5256cf8a1343860d8aa21">More...</a><br /></td></tr>
 <tr class="separator:af7eb0b5869f5256cf8a1343860d8aa21"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>implementation for handling the processing of synapse rows. </p>
-<p>Synapse Row Representation: </p><table class="doxtable">
-<tr>
-<th>Weight </th><th>Delay </th><th>Synapse Type </th><th>Neuron Index  </th></tr>
-<tr>
-<td>SYNAPSE_WEIGHT_BITS</td><td>SYNAPSE_DELAY_BITS</td><td>SYNAPSE_TYPE_BITS</td><td>SYNAPSE_INDEX_BITS </td></tr>
-</table>
-<p>| | | SYNAPSE_TYPE_INDEX_BITS | The API interface supports:</p><ul>
-<li>synapse_row_plastic_size(row)</li>
-<li>synapse_row_plastic_region(row)</li>
-<li>synapse_row_fixed_region(row)</li>
-<li>synapse_row_num_fixed_synapses(fixed)</li>
-<li>synapse_row_num_plastic_controls(fixed)</li>
-<li>synapse_row_plastic_controls(fixed)</li>
-<li>synapse_row_fixed_weight_controls(fixed)</li>
-<li>synapse_row_sparse_index(x)</li>
-<li>synapse_row_sparse_type(x)</li>
-<li>synapse_row_sparse_type_index(x)</li>
-<li>synapse_row_sparse_delay(x)</li>
-<li>synapse_row_sparse_weight(x) </li>
+<h1><a class="anchor" id="row"></a>
+Synapse Row Representation</h1>
+<div class="fragment"><div class="line">|       Weight      |       Delay      |  Synapse Type   |   Neuron Index   |</div><div class="line">|-------------------|------------------|-----------------|------------------|</div><div class="line">|<a class="code" href="synapse__row_8h.html#a6e5ee3925245f54cf5f6c4312338c25c">SYNAPSE_WEIGHT_BITS</a>|<a class="code" href="synapse__row_8h.html#a28b2156b2573ab59559866710ed97628">SYNAPSE_DELAY_BITS</a>|<a class="code" href="synapse__types__alpha__impl_8h.html#a6a9484756434bfd11111a5187ac8f4bb">SYNAPSE_TYPE_BITS</a>|SYNAPSE_INDEX_BITS|</div><div class="line">|                   |                  |       SYNAPSE_TYPE_INDEX_BITS      |</div></div><!-- fragment --><p> The API interface supports:</p>
+<ul>
+<li><a class="el" href="synapse__row_8h.html#a392c5d735cea24b05dc4f09533216683" title="Returns the size of the plastic region. ">synapse_row_plastic_size()</a></li>
+<li><a class="el" href="synapse__row_8h.html#adc6c789c206db13f271591b0ccc1e9ed" title="Returns the address of the plastic region. ">synapse_row_plastic_region()</a></li>
+<li><a class="el" href="synapse__row_8h.html#a551d18ff318c0f5ee3eed7af60ab37ce" title="Returns the address of the non-plastic (or fixed) region. ">synapse_row_fixed_region()</a></li>
+<li><a class="el" href="synapse__row_8h.html#aa4e59f9f6e65f2adb38eda17266299e5" title="The number of fixed synapses in the row. ">synapse_row_num_fixed_synapses()</a></li>
+<li><a class="el" href="synapse__row_8h.html#a5bb51090afe1fd0a7a8b58aecbd08b7d" title="The number of plastic controls in the row. ">synapse_row_num_plastic_controls()</a></li>
+<li><a class="el" href="synapse__row_8h.html#a5ce445e106984aea0e11d4c423593594" title="The array of plastic controls in the row. ">synapse_row_plastic_controls()</a></li>
+<li><a class="el" href="synapse__row_8h.html#a4eda772c550113c270945284e0cf1881" title="The array of fixed weights in the row. ">synapse_row_fixed_weight_controls()</a></li>
+<li><a class="el" href="synapse__row_8h.html#a9bbd252568935c8020f478dcdaff97b5" title="Get the index. ">synapse_row_sparse_index()</a></li>
+<li><a class="el" href="synapse__row_8h.html#a8ac7fef74256d744079d84a638d2d5c7" title="Get the type code. ">synapse_row_sparse_type()</a></li>
+<li><a class="el" href="synapse__row_8h.html#ab47a817128850c7fea9d755816040392" title="Get the type and index. ">synapse_row_sparse_type_index()</a></li>
+<li><a class="el" href="synapse__row_8h.html#a8ac4945585bcd95397c6ab7f57e413f7" title="Get the delay. ">synapse_row_sparse_delay()</a></li>
+<li><a class="el" href="synapse__row_8h.html#af7eb0b5869f5256cf8a1343860d8aa21" title="Get the weight. ">synapse_row_sparse_weight()</a></li>
 </ul>
-</div></div><!-- contents -->
+<h1><a class="anchor" id="matrix"></a>
+Data Structure</h1>
+<p>The data structure layout supported by this API is designed for mixed plastic and fixed synapse rows.</p>
+<p>The data structure is treated as an array of 32-bit words. Special meanings are ascribed to the 0th and 1st elements of the array.</p>
+<p>We are expecting the original source address in SDRAM to be in <code>row[0]</code>. The number of array elements in the plastic region is held in the upper part of <code>row[1]</code>. A tag to indicate the nature of the synaptic row structure is held in the lower part of <code>row[1]</code>. </p><div class="fragment"><div class="line">  0:  [ N = &lt;plastic elements&gt;         | &lt;tag&gt; ]</div><div class="line">  1:  [ First word of plastic <a class="code" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a>           ]</div><div class="line">  ...</div><div class="line">  N:  [ Last word of plastic <a class="code" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a>            ]</div><div class="line">N+1:  [ First word of fixed <a class="code" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a>             ]</div><div class="line">  ...</div><div class="line"> M:   [ Last word of fixed <a class="code" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a>              ]</div></div><!-- fragment --><h1><a class="anchor" id="fixed"></a>
+Fixed and Fixed-Plastic Regions</h1>
+<p>Within the fixed-region extracted using the above API, <code>fixed[0]</code> contains the number of 32-bit fixed synaptic words, <code>fixed[1]</code> contains the number of 16-bit plastic synapse control words. (The weights for the plastic synapses are assumed to be stored in some learning-rule-specific format in the plastic region) </p><div class="fragment"><div class="line">  0:           [ F = Num fixed synapses                                    ]</div><div class="line">  1:           [ P = Size of plastic <a class="code" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a> in <a class="code" href="maths-util_8h.html#a37c4c48ff47f0838f64b5a1fb3c803b2">HALF</a>-WORDS                  ]</div><div class="line">  2:           [ First fixed synaptic word                                 ]</div><div class="line">  ...</div><div class="line">F+1:           [ Last fixed synaptic word                                  ]</div><div class="line">F+2:           [ 1st plastic synapse control word|2nd plastic control word ]</div><div class="line">  ...</div><div class="line">F+1+ceil(P/2): [ Last word of fixed <a class="code" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a>                                 ]</div></div><!-- fragment --><p> Note that <code>P</code> is effectively rounded up to a multiple of two for storage purposes. </p>
+</div><h2 class="groupheader">Function Documentation</h2>
+<a class="anchor" id="a392c5d735cea24b05dc4f09533216683"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static size_t synapse_row_plastic_size </td>
+          <td>(</td>
+          <td class="paramtype">address_t&#160;</td>
+          <td class="paramname"><em>row</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns the size of the plastic region. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">row</td><td>The synaptic row </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The size of the plastic region of the row </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="adc6c789c206db13f271591b0ccc1e9ed"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static address_t synapse_row_plastic_region </td>
+          <td>(</td>
+          <td class="paramtype">address_t&#160;</td>
+          <td class="paramname"><em>row</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns the address of the plastic region. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">row</td><td>The synaptic row </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Address of the plastic region of the row </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a551d18ff318c0f5ee3eed7af60ab37ce"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static address_t synapse_row_fixed_region </td>
+          <td>(</td>
+          <td class="paramtype">address_t&#160;</td>
+          <td class="paramname"><em>row</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns the address of the non-plastic (or fixed) region. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">row</td><td>The synaptic row </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Address of the fixed region of the row </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="aa4e59f9f6e65f2adb38eda17266299e5"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static size_t synapse_row_num_fixed_synapses </td>
+          <td>(</td>
+          <td class="paramtype">address_t&#160;</td>
+          <td class="paramname"><em>fixed</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The number of fixed synapses in the row. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">fixed</td><td>The fixed region of the synaptic row </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Size of the fixed region of the row (in words) </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a5bb51090afe1fd0a7a8b58aecbd08b7d"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static size_t synapse_row_num_plastic_controls </td>
+          <td>(</td>
+          <td class="paramtype">address_t&#160;</td>
+          <td class="paramname"><em>fixed</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The number of plastic controls in the row. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">fixed</td><td>The fixed region of the synaptic row </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Size of the fixed-plastic region of the row (in <em>half</em> words) </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a5ce445e106984aea0e11d4c423593594"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="synapse__row_8h.html#aeae1e8aa0c0095434ba488866ef21aa2">control_t</a>* synapse_row_plastic_controls </td>
+          <td>(</td>
+          <td class="paramtype">address_t&#160;</td>
+          <td class="paramname"><em>fixed</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The array of plastic controls in the row. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">fixed</td><td>The fixed region of the synaptic row </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Address of the fixed-plastic region of the row </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a4eda772c550113c270945284e0cf1881"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static uint32_t* synapse_row_fixed_weight_controls </td>
+          <td>(</td>
+          <td class="paramtype">address_t&#160;</td>
+          <td class="paramname"><em>fixed</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>The array of fixed weights in the row. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">fixed</td><td>The fixed region of the synaptic row </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Address of the fixed-fixed region of the row </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a9bbd252568935c8020f478dcdaff97b5"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static index_t synapse_row_sparse_index </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>synapse_index_mask</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the index. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>The value to decode </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">synapse_index_mask</td><td>Mask for the synapse index (depends on type) </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the index </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a8ac7fef74256d744079d84a638d2d5c7"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static index_t synapse_row_sparse_type </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>synapse_index_bits</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>synapse_type_mask</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the type code. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>The value to decode </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">synapse_index_bits</td><td>Number of bits for the synapse index (depends on type) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">synapse_type_mask</td><td>Mask for the synapse type (depends on type) </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the type code </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ab47a817128850c7fea9d755816040392"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static index_t synapse_row_sparse_type_index </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>synapse_type_index_mask</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the type and index. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>The value to decode </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">synapse_type_index_mask</td><td>Mask for the synapse type and index (depends on type) </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the type and index (packed in the low bits of a word) </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a8ac4945585bcd95397c6ab7f57e413f7"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static index_t synapse_row_sparse_delay </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>synapse_type_index_bits</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the delay. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>The value to decode </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">synapse_type_index_bits</td><td>Number of bits for the synapse type and index (depends on type) </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>the delay </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="af7eb0b5869f5256cf8a1343860d8aa21"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static weight_t synapse_row_sparse_weight </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>x</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the weight. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>The value to decode </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+</div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Apr 29 2020 10:12:39 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon May 4 2020 11:12:16 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

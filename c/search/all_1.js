@@ -1,11 +1,13 @@
 var searchData=
 [
+  ['backprop_5fdelay',['backprop_delay',['../synapse__dynamics__stdp__mad__impl_8c.html#a06c22d077ef52c561ae4d0ea9f64d7ff',1,'stdp_params']]],
   ['bias_5fkey',['BIAS_KEY',['../munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04a86e8b86d0f722dc54808c12fc3d5d4e2',1,'munich_protocol.h']]],
   ['binomial',['binomial',['../connection__generator__fixed__total_8h.html#a1f0a769498290639dfc184f29e18de1c',1,'connection_generator_fixed_total.h']]],
   ['bitfield_5fdata_5fsize',['bitfield_data_size',['../neuron__recording_8c.html#acf22d4e046f8216c065e3c77a5274f84',1,'neuron_recording.c']]],
   ['bitfield_5finfo',['bitfield_info',['../neuron__recording_8c.html#a2960fd20508bd11722265c5a5e2bebec',1,'bitfield_info():&#160;neuron_recording.c'],['../neuron__recording_8h.html#a2960fd20508bd11722265c5a5e2bebec',1,'bitfield_info():&#160;neuron_recording.c']]],
   ['bitfield_5finfo_5ft',['bitfield_info_t',['../neuron__recording_8h.html#structbitfield__info__t',1,'']]],
   ['bitfield_5frecording_5findexes',['bitfield_recording_indexes',['../neuron__recording_8c.html#a2edd162fb9940477e5363386ba417f9e',1,'bitfield_recording_indexes():&#160;neuron_recording.c'],['../neuron__recording_8h.html#a2edd162fb9940477e5363386ba417f9e',1,'bitfield_recording_indexes():&#160;neuron_recording.c']]],
+  ['bitfield_5frecording_5findices',['bitfield_recording_indices',['../neuron__impl__standard_8h.html#a1a1145a27f2273fe3bf900dc1602b4e3',1,'neuron_impl_standard.h']]],
   ['bitfield_5fvalues',['bitfield_values',['../neuron__recording_8c.html#ab63f6c062cd231b9b383cdf19a09dd0d',1,'bitfield_values():&#160;neuron_recording.c'],['../neuron__recording_8h.html#ab63f6c062cd231b9b383cdf19a09dd0d',1,'bitfield_values():&#160;neuron_recording.c']]],
   ['bitfield_5fvalues_5ft',['bitfield_values_t',['../neuron__recording_8h.html#structbitfield__values__t',1,'']]],
   ['bitfields',['bitfields',['../munich__protocol_8h.html#a69c84edcf35be44406679d226d994c32',1,'munich_key_t']]],
