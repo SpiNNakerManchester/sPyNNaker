@@ -20,11 +20,29 @@
 #ifndef _INPUT_TYPE_NONE_H_
 #define _INPUT_TYPE_NONE_H_
 
+#ifndef NUM_EXCITATORY_RECEPTORS
+//! No inputs, so no receptors
+#define NUM_EXCITATORY_RECEPTORS 0
+#endif
+#ifndef NUM_INHIBITORY_RECEPTORS
+//! No inputs, so no receptors
+#define NUM_INHIBITORY_RECEPTORS 0
+#endif
+
 #include "input_type.h"
 
 struct input_type_t {
 };
 
+//! \brief Gets the actual input value. This allows any scaling to take place
+//! \details Actually does nothing; no receptors
+//! \param[in,out] value: The array of the receptor-based values of the input
+//!     before scaling
+//! \param[in] input_type: The input type pointer to the parameters
+//! \param[in] num_receptors: The number of receptors.
+//!     The size of the \p value array.
+//! \return Pointer to array of values of the receptor-based input after
+//!     scaling
 static input_t *input_type_get_input_value(
         input_t *restrict value, const input_type_t *input_type,
         uint16_t num_receptors) {
@@ -34,6 +52,13 @@ static input_t *input_type_get_input_value(
     return 0;
 }
 
+//! \brief Converts an excitatory input into an excitatory current
+//! \details Actually does nothing; no receptors
+//! \param[in,out] exc_input: Pointer to array of excitatory inputs from
+//!     different receptors this timestep. Note that this will already have
+//!     been scaled by input_type_get_input_value()
+//! \param[in] input_type: The input type pointer to the parameters
+//! \param[in] membrane_voltage: The membrane voltage to use for the input
 static void input_type_convert_excitatory_input_to_current(
         input_t *restrict exc_input, const input_type_t *input_type,
         state_t membrane_voltage) {
@@ -42,6 +67,13 @@ static void input_type_convert_excitatory_input_to_current(
     use(membrane_voltage);
 }
 
+//! \brief Converts an inhibitory input into an inhibitory current
+//! \details Actually does nothing; no receptors
+//! \param[in,out] inh_input: Pointer to array of inhibitory inputs from
+//!     different receptors this timestep. Note that this will already have
+//!     been scaled by input_type_get_input_value()
+//! \param[in] input_type: The input type pointer to the parameters
+//! \param[in] membrane_voltage: The membrane voltage to use for the input
 static void input_type_convert_inhibitory_input_to_current(
         input_t *restrict inh_input, const input_type_t *input_type,
         state_t membrane_voltage) {

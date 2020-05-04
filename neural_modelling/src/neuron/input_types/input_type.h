@@ -22,6 +22,24 @@
 #ifndef _INPUT_TYPE_H_
 #define _INPUT_TYPE_H_
 
+#ifndef NUM_EXCITATORY_RECEPTORS
+//! \private
+//! \brief The number of excitatory receptors.
+//! \details It should be defined by a synapse shaping include.
+#define NUM_EXCITATORY_RECEPTORS 1
+#error NUM_EXCITATORY_RECEPTORS was undefined.  It should be defined by a synapse\
+    shaping include
+#endif
+
+#ifndef NUM_INHIBITORY_RECEPTORS
+//! \private
+//! \brief The number of inhibitory receptors.
+//! \details It should be defined by a synapse shaping include.
+#define NUM_INHIBITORY_RECEPTORS 1
+#error NUM_INHIBITORY_RECEPTORS was undefined.  It should be defined by a synapse\
+    shaping include
+#endif
+
 #include <common/neuron-typedefs.h>
 
 // Forward declaration of the input type structure

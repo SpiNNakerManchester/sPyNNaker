@@ -16,7 +16,6 @@
  */
 
 /*! \file
- *
  *  \brief interface for neurons
  *
  *  The API contains:
@@ -42,9 +41,9 @@
 //! \param[in] recording_address: the recording parameters in SDRAM
 //!            (contains which regions are active and how big they are)
 //! \param[out] n_neurons_value: The number of neurons this model is to
-//              simulate
+//!             simulate
 //! \param[out] n_synapse_types_value: The number of synapse types in
-//              the model
+//!             the model
 //! \param[out] incoming_spike_buffer_size: The number of spikes to
 //!             support in the incoming spike circular buffer
 //! \param[out] timer_offset: An offset to use during launching the main
@@ -61,7 +60,6 @@ bool neuron_initialise(
 //! \param[in] time: the timer tick value currently being executed
 //! \param[in] timer_count: used for detecting a wrapping timer
 //! \param[in] timer_period: the intended amount of time per timer tick
-//! \return nothing
 void neuron_do_timestep_update(
         timer_t time, uint timer_count, uint timer_period);
 
@@ -72,9 +70,7 @@ void neuron_do_timestep_update(
 bool neuron_resume(address_t address);
 
 //! \brief Perform steps needed before pausing a simulation.
-//!
-//! Stores neuron parameters back into SDRAM.
-//!
+//! \details Stores neuron parameters back into SDRAM.
 //! \param[in] address: the address where the neuron parameters are stored
 //!                     in SDRAM
 void neuron_pause(address_t address);
@@ -83,25 +79,21 @@ void neuron_pause(address_t address);
 //! \param[in] synapse_type_index the synapse type (e.g. exc. or inh.)
 //! \param[in] neuron_index the index of the neuron
 //! \param[in] weights_this_timestep weight inputs to be added
-//! \return None
 void neuron_add_inputs(
         index_t synapse_type_index, index_t neuron_index,
         input_t weights_this_timestep);
 
 #if LOG_LEVEL >= LOG_DEBUG
 //! \brief Print the inputs to the neurons.
-//!
-//! Only available in debug mode.
+//! \details Only available in debug mode.
 void neuron_print_inputs(void);
 
 //! \brief Print the neurons' synapse parameters.
-//!
-//! Only available in debug mode.
+//! \details Only available in debug mode.
 void neuron_print_synapse_parameters(void);
 
 //! \brief Get the synapse _type_ description character.
-//!
-//! Only available in debug mode.
+//! \details Only available in debug mode.
 //! \param[in] synapse_type: The synapse type.
 //! \return a single character that describes the synapse.
 const char *neuron_get_synapse_type_char(uint32_t synapse_type);

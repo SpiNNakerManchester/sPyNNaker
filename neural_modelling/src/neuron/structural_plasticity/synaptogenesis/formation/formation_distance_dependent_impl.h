@@ -22,6 +22,7 @@
 
 #include "formation.h"
 
+//! Largest value in a `uint16_t`
 #define MAX_SHORT 65535
 
 //! \brief Configuration of synapse formation rule

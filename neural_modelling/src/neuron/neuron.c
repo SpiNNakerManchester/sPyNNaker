@@ -55,6 +55,7 @@ struct neuron_parameters {
     uint32_t incoming_spike_buffer_size;
 };
 
+//! Offset of start of global parameters, in words.
 #define START_OF_GLOBAL_PARAMETERS \
     (sizeof(struct neuron_parameters) / sizeof(uint32_t))
 

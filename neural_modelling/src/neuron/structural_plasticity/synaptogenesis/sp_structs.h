@@ -109,6 +109,13 @@ typedef struct {
 
 //! \brief unpack the spike into key and identifying information for the
 //!     neuron; Identify pop, sub-population and low and high atoms
+//! \param[in] pre_pop_info_table: The prepopulation information table
+//! \param[in] spike: The spike to look up the information from
+//! \param[out] neuron_id: The ID of the neuron within its population
+//! \param[out] population_id: The population ID
+//! \param[out] sub_population_id: The ID of the sub-population
+//! \param[out] m_pop_index: The master population table index
+//! \return True if the information was found.
 static inline bool sp_structs_find_by_spike(
         const pre_pop_info_table_t *pre_pop_info_table, spike_t spike,
         uint32_t *restrict neuron_id, uint32_t *restrict population_id,
@@ -136,12 +143,20 @@ static inline bool sp_structs_find_by_spike(
 
 //! \brief Get the sub-population id and sub-population-based neuron id given
 //!        the population id and the population-based neuron id
+//! \param[in] pre_pop_info_table: The prepopulation information table
+//! \param[in] population_id: The population ID
+//! \param[in] pop_neuron_id: The ID of the neuron within the population
+//! \param[out] sub_population_id: The ID of the sub-population
+//! \param[out] sub_pop_neuron_id:
+//!     The ID of the neuron within the sub-population
+//! \param[out] spike: The spike associated with communication from that neuron
+//! \return True if the information was found.
 static inline bool sp_structs_get_sub_pop_info(
-        const pre_pop_info_table_t *pre_pop_table_info, uint32_t population_id,
+        const pre_pop_info_table_t *pre_pop_info_table, uint32_t population_id,
         uint32_t pop_neuron_id, uint32_t *restrict sub_population_id,
         uint32_t *restrict sub_pop_neuron_id, uint32_t *restrict spike) {
     const pre_info_t *app_pop_info =
-            pre_pop_table_info->prepop_info[population_id];
+            pre_pop_info_table->prepop_info[population_id];
     uint32_t neuron_id = pop_neuron_id;
     for (uint32_t i = 0; i < app_pop_info->no_pre_vertices; i++) {
         uint32_t n_atoms = app_pop_info->key_atom_info[i].n_atoms;

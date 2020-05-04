@@ -30,7 +30,9 @@
 //---------------------------------------
 // Typedefines
 //---------------------------------------
+//! Type of post-traces
 typedef int16_t post_trace_t;
+//! Type of pre-traces
 typedef int16_t pre_trace_t;
 
 #include <neuron/plasticity/stdp/synapse_structure/synapse_structure_weight_impl.h>
@@ -55,7 +57,6 @@ typedef struct {
 // Externals
 //---------------------------------------
 extern int16_lut *tau_lookup;
-extern plasticity_trace_region_data_t plasticity_trace_region_data;
 
 //---------------------------------------
 // Timing dependence inline functions
@@ -123,6 +124,8 @@ static inline update_state_t timing_apply_pre_spike(
         uint32_t time, pre_trace_t trace, uint32_t last_pre_time,
         pre_trace_t last_pre_trace, uint32_t last_post_time,
         post_trace_t last_post_trace, update_state_t previous_state) {
+    extern plasticity_trace_region_data_t plasticity_trace_region_data;
+
     use(&trace);
     use(last_pre_time);
     use(&last_pre_trace);

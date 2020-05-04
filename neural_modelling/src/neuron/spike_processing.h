@@ -24,6 +24,13 @@
 #include <common/in_spikes.h>
 #include <spin1_api.h>
 
+//! \brief Initialise the spike processing system
+//! \param[in] row_max_n_bytes: The maximum size of a synaptic row
+//! \param[in] mc_packet_callback_priority:
+//!     Multicast packet receive interrupt priority
+//! \param[in] user_event_priority: User event interrupt priority
+//! \param[in] incoming_spike_buffer_size: Size of buffer for receiving spikes
+//! \return True if initialisation succeeded
 bool spike_processing_initialise(
         size_t row_max_n_bytes, uint mc_packet_callback_priority,
         uint user_event_priority, uint incoming_spike_buffer_size);
@@ -37,7 +44,8 @@ uint32_t spike_processing_get_buffer_overflows(void);
 uint32_t spike_processing_get_successful_rewires(void);
 
 //! \brief set the number of times spike_processing has to attempt rewiring
-//! \return bool: currently, always true
-bool spike_processing_do_rewiring(int number_of_rew);
+//! \param[in] number_of_rewires: The number of rewirings to perform
+//! \return currently always true
+bool spike_processing_do_rewiring(int number_of_rewires);
 
 #endif // _SPIKE_PROCESSING_H_

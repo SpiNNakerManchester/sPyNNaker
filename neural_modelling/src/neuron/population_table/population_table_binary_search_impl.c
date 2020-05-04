@@ -16,16 +16,21 @@
  */
 
 //! \file
-//! \brief Pop table implementation that uses binary search
+//! \brief Master population table implementation that uses binary search
 #include "population_table.h"
 #include <neuron/synapse_row.h>
 #include <debug.h>
 #include <stdbool.h>
 
+//! An entry in the master population table.
 typedef struct master_population_table_entry {
+    //! The key to match against the incoming message
     uint32_t key;
+    //! The mask to select the relevant bits of \p key for matching
     uint32_t mask;
+    //! The index into ::address_list for this entry
     uint16_t start;
+    //! The number of entries in ::address_list for this entry
     uint16_t count;
 } master_population_table_entry;
 
@@ -36,15 +41,24 @@ typedef struct {
     uint32_t is_single : 1;  //!< whether this is a direct/single address
 } address_and_row_length;
 
+//! The master population table. This is sorted.
 static master_population_table_entry *master_population_table;
+//! The length of ::master_population_table
 static uint32_t master_population_table_length;
+//! The array of information that points into the synaptic matrix
 static address_and_row_length *address_list;
+//! Base address for the synaptic matrix's indirect rows
 static address_t synaptic_rows_base_address;
+//! Base address for the synaptic matrix's direct rows
 static uint32_t direct_rows_base_address;
 
+//! The spike being processed
 static spike_t last_spike = 0;
+//! The neuron ID from the spike
 static uint32_t last_neuron_id = 0;
+//! The next item in the ::address_list
 static uint16_t next_item = 0;
+//! The number of relevant items remaining in the ::address_list
 static uint16_t items_to_go = 0;
 
 //! \brief Get the direct address out of an entry
