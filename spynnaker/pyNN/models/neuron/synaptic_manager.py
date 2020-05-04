@@ -35,6 +35,7 @@ from spynnaker.pyNN.models.neuron.master_pop_table import (
     MasterPopTableAsBinarySearch)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 import sys
+from spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_stdp import SynapseDynamicsSTDP
 
 TIME_STAMP_BYTES = BYTES_PER_WORD
 
@@ -743,20 +744,28 @@ class SynapticManager(object):
     def _calculate_min_weights(
             self, application_vertex, application_graph, weight_scale):
         min_weights = [sys.maxsize for _ in range(self.__n_synapse_types)]
+        stdp_min_deltas = [sys.maxsize for _ in range(self.__n_synapse_types)]
         for app_edge in application_graph.get_edges_ending_at_vertex(
                 application_vertex):
             if isinstance(app_edge, ProjectionApplicationEdge):
                 for synapse_info in app_edge.synapse_information:
                     synapse_type = synapse_info.synapse_type
-                    synapse_dynamics = synapse_info.synapse_dynamics
-                    connector = synapse_info.connector
 
-                    weight_min = (synapse_dynamics.get_weight_minimum(
-                        connector, synapse_info) *
-                        weight_scale)
+                    connector = synapse_info.connector
+                    weight_min = connector.get_weight_minimum(synapse_info)
+                    weight_min *= weight_scale
                     if weight_min != 0:
                         min_weights[synapse_type] = min(
                             min_weights[synapse_type], weight_min)
+
+                    synapse_dynamics = synapse_info.synapse_dynamics
+                    if isinstance(synapse_dynamics, SynapseDynamicsSTDP):
+                        min_delta = synapse_dynamics.get_weight_min_delta()
+                        stdp_min_deltas[synapse_type] = min(
+                            stdp_min_deltas[synapse_type], min_delta)
+
+        # Try to allow STDP weights to get as small as they want to, but try
+        # to keep a reasonable upper range too
 
         # Convert values to their closest representable value to ensure
         # that division works for the minimum value

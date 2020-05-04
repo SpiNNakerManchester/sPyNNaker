@@ -173,15 +173,6 @@ class AbstractSynapseDynamics(object):
         # pylint: disable=too-many-arguments
         return connector.get_weight_variance(weights)
 
-    def get_weight_minimum(self, connector, synapse_info):
-        """ Get the minimum non-zero weight for the synapses, or 0 if all\
-            synapses are zero
-
-        :param AbstractConnector connector: The connector in use
-        :param SynapseInformation synapse_info:
-        """
-        return connector.get_weight_minimum(synapse_info)
-
     def convert_per_connection_data_to_rows(
             self, connection_row_indices, n_rows, data):
         """ Converts per-connection data generated from connections into\

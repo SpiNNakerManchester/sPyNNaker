@@ -464,9 +464,9 @@ class SynapseDynamicsSTDP(
         # has to be given as no variance
         return 0.0
 
-    @overrides(AbstractPlasticSynapseDynamics.get_weight_minimum)
-    def get_weight_minimum(self, connector, synapse_info):
-        # Use the minimum weight change as the minimum non-zero weight
+    def get_weight_min_delta(self):
+        """ Get the minimum non-zero weight change
+        """
         return self.__weight_dependence.weight_change_minimum(
             self.__timing_dependence.minimum_delta)
 
