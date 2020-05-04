@@ -752,7 +752,7 @@ class SynapticManager(object):
                     connector = synapse_info.connector
 
                     weight_min = (synapse_dynamics.get_weight_minimum(
-                        connector, synapse_info, self.__ring_buffer_sigma) *
+                        connector, synapse_info) *
                         weight_scale)
                     if weight_min != 0:
                         min_weights[synapse_type] = min(

@@ -115,6 +115,15 @@ class IndexBasedProbabilityConnector(AbstractConnector):
             numpy.amax(self.__probs))
         return self._get_weight_maximum(synapse_info.weights, n_connections)
 
+    @overrides(AbstractConnector.get_weight_minimum)
+    def get_weight_minimum(self, synapse_info):
+        self._update_probs_from_index_expression(synapse_info)
+        n_connections = utility_calls.get_probable_maximum_selected(
+            synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
+            synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
+            numpy.amax(self.__probs))
+        return self._get_weight_minimum(synapse_info.weights, n_connections)
+
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
             self, pre_slices, pre_slice_index, post_slices,

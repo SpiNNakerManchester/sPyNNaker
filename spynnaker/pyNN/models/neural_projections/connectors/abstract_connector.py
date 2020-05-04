@@ -299,18 +299,14 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
             return numpy.amax(numpy.abs(weights))
         raise Exception("Unrecognised weight format")
 
-    def get_weight_minimum(self, weights, sigma):
-        """ Get the minimum of the weights.  This default uses the mean and the
-            variance to avoid needing to add this to all subclasses, but
-            subclasses can override it if it makes sense to do so.
+    @abstractmethod
+    def get_weight_minimum(self, synapse_info):
+        """ Get the minimum of the weights.
 
         :param weights:
         :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float
             or list(int) or list(float)
-        :param float sigma: The number of standard deviations of accuracy
         """
-        return (self.get_weight_mean(weights) -
-                math.sqrt(self.get_weight_variance(weights)) * sigma)
 
     def _get_weight_maximum(self, weights, n_connections):
         """ Get the maximum of the weights.

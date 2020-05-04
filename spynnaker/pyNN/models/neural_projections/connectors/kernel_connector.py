@@ -287,7 +287,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
         return self._get_weight_maximum(synapse_info.weights, n_conns)
 
     @overrides(AbstractConnector.get_weight_minimum)
-    def get_weight_minimum(self, weights, sigma):
+    def get_weight_minimum(self, synapse_info):
         # I think this is overestimated, but not by much
         n_conns = (
             self._pre_w * self._pre_h * self._kernel_w * self._kernel_h)
@@ -295,7 +295,7 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
         if self._krn_weights is not None:
             return self._get_weight_minimum(self._krn_weights, n_conns)
 
-        return self._get_weight_minimum(weights, n_conns)
+        return self._get_weight_minimum(synapse_info.weights, n_conns)
 
     def __repr__(self):
         return "KernelConnector(shape_kernel[{},{}])".format(

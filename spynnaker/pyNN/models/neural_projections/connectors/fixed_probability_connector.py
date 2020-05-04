@@ -107,6 +107,15 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
             self._p_connect)
         return self._get_weight_maximum(synapse_info.weights, n_connections)
 
+    @overrides(AbstractConnector.get_weight_minimum)
+    def get_weight_minimum(self, synapse_info):
+        # pylint: disable=too-many-arguments
+        n_connections = utility_calls.get_probable_maximum_selected(
+            synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
+            synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
+            self._p_connect)
+        return self._get_weight_minimum(synapse_info.weights, n_connections)
+
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
             self, pre_slices, pre_slice_index, post_slices,

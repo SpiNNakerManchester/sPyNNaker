@@ -83,6 +83,11 @@ class ArrayConnector(AbstractConnector):
         return self._get_weight_maximum(
             synapse_info.weights, self.__n_total_connections)
 
+    @overrides(AbstractConnector.get_weight_minimum)
+    def get_weight_minimum(self, synapse_info):
+        return self._get_weight_minimum(
+            synapse_info.weights, self.__n_total_connections)
+
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
             self, pre_slices, pre_slice_index, post_slices,

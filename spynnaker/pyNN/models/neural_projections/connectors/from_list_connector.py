@@ -212,9 +212,9 @@ class FromListConnector(AbstractConnector):
             return numpy.var(numpy.abs(self.__weights))
 
     @overrides(AbstractConnector.get_weight_minimum)
-    def get_weight_minimum(self, weights, sigma):
+    def get_weight_minimum(self, synapse_info):
         if self.__weights is None:
-            return numpy.amin(weights)
+            return numpy.amin(synapse_info.weights)
         else:
             return numpy.amin(numpy.abs(self.__weights))
 
