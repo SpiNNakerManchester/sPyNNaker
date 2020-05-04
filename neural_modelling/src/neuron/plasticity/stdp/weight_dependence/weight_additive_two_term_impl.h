@@ -59,6 +59,12 @@ typedef struct weight_state_t {
 //---------------------------------------
 // STDP weight dependence functions
 //---------------------------------------
+/*!
+ * \brief Gets the initial weight state.
+ * \param[in] weight: The weight at the start
+ * \param[in] synapse_type: The type of synapse involved
+ * \return The initial weight state.
+ */
 static inline weight_state_t weight_get_initial(
         weight_t weight, index_t synapse_type) {
     extern plasticity_weight_region_data_t *plasticity_weight_region_data;

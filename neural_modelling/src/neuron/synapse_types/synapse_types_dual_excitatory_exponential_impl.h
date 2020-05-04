@@ -72,12 +72,11 @@ typedef enum input_buffer_regions {
 //---------------------------------------
 
 //! \brief Shapes a single parameter
-//! \param[in,out] exp_params: The parameter to shape
-static inline void exp_shaping(exp_params_t *exp_params) {
+//! \param[in,out] exp_param: The parameter to shape
+static inline void exp_shaping(exp_params_t *exp_param) {
     // decay value according to decay constant
-	exp_params->synaptic_input_value =
-			decay_s1615(exp_params->synaptic_input_value,
-					exp_params->decay);
+	exp_param->synaptic_input_value =
+			decay_s1615(exp_param->synaptic_input_value, exp_param->decay);
 }
 
 //! \brief decays the stuff thats sitting in the input buffers as these have not
@@ -97,12 +96,12 @@ static inline void synapse_types_shape_input(synapse_param_t *parameters) {
 
 //! \brief helper function to add input for a given timer period to a given
 //!     neuron
-//! \param[in,out] exp_params: the parameter to be updated
+//! \param[in,out] exp_param: the parameter to be updated
 //! \param[in] input: the input to add.
 //! \return None
-static inline void add_input_exp(exp_params_t *exp_params, input_t input) {
-	exp_params->synaptic_input_value = exp_params->synaptic_input_value +
-			decay_s1615(input, exp_params->init);
+static inline void add_input_exp(exp_params_t *exp_param, input_t input) {
+	exp_param->synaptic_input_value = exp_param->synaptic_input_value +
+			decay_s1615(input, exp_param->init);
 }
 
 //! \brief adds the inputs for a give timer period to a given neuron that is

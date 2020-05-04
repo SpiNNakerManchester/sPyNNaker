@@ -22,11 +22,8 @@
 #ifndef _FORMATION_H_
 #define _FORMATION_H_
 
-// Forward declaration
-struct formation_params;
-typedef struct formation_params formation_params_t;
-
 #include <neuron/structural_plasticity/synaptogenesis/sp_structs.h>
+typedef struct formation_params formation_params_t;
 
 //! \brief Read and return an formation parameter data structure from the
 //!     data stream

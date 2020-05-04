@@ -34,13 +34,15 @@ struct elimination_params {
 };
 
 //! \brief Elimination rule for synaptogenesis
-//! \param[in] current_state Pointer to current state
-//! \param[in] time Time of elimination
-//! \param[in] row The row to eliminate from
+//! \param[in,out] current_state: Pointer to current state
+//! \param[in] params: The elimination rule configuration.
+//! \param[in] time: Time of elimination
+//! \param[in,out] row: The row to eliminate from
 //! \return if row was modified
 static inline bool synaptogenesis_elimination_rule(
-        current_state_t *current_state, struct elimination_params *params,
-        uint32_t time, address_t row) {
+        current_state_t *restrict current_state,
+        const elimination_params_t *params,
+        uint32_t time, address_t restrict row) {
     use(time);
 
     uint32_t random_number = mars_kiss64_seed(*(current_state->local_seed));

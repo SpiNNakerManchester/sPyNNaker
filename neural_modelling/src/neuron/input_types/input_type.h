@@ -30,10 +30,12 @@ typedef struct input_type_t input_type_t;
 //! Declaration of the input type pointer
 typedef input_type_t *input_type_pointer_t;
 
-//! \brief Gets the actual input value - allows any scaling to take place
+//! \brief Gets the actual input value. This allows any scaling to take place
 //! \param[in,out] value: The array of the receptor-based values of the input
 //!     before scaling
 //! \param[in] input_type: The input type pointer to the parameters
+//! \param[in] num_receptors: The number of receptors.
+//!     The size of the \p value array.
 //! \return Pointer to array of values of the receptor-based input after
 //!     scaling
 static input_t *input_type_get_input_value(

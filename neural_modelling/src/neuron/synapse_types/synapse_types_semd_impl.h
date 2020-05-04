@@ -74,11 +74,10 @@ typedef enum input_buffer_regions {
 
 //! \brief Shapes a single parameter
 //! \param[in,out] exp_params: The parameter to shape
-static inline void exp_shaping(exp_params_t *exp_params) {
+static inline void exp_shaping(exp_params_t *exp_param) {
     // decay value according to decay constant
-	exp_params->synaptic_input_value =
-			decay_s1615(exp_params->synaptic_input_value,
-					exp_params->decay);
+	exp_param->synaptic_input_value =
+			decay_s1615(exp_param->synaptic_input_value, exp_param->decay);
 }
 
 //! \brief decays the stuff thats sitting in the input buffers as these have not
@@ -88,12 +87,12 @@ static inline void exp_shaping(exp_params_t *exp_params) {
 //! (spike goes in, synapse opens, then closes slowly)
 //! plus the leaky aspect of a neuron.
 //!
-//! \param[in,out] parameter: the pointer to the parameters to use
+//! \param[in,out] parameters: the pointer to the parameters to use
 //! \return nothing
-static inline void synapse_types_shape_input(synapse_param_t *parameter) {
-	exp_shaping(&parameter->exc);
-	exp_shaping(&parameter->exc2);
-	exp_shaping(&parameter->inh);
+static inline void synapse_types_shape_input(synapse_param_t *parameters) {
+	exp_shaping(&parameters->exc);
+	exp_shaping(&parameters->exc2);
+	exp_shaping(&parameters->inh);
 }
 
 //! \brief helper function to add input for a given timer period to a given
@@ -101,9 +100,9 @@ static inline void synapse_types_shape_input(synapse_param_t *parameter) {
 //! \param[in,out] parameter: the parameter to update
 //! \param[in] input: the input to add.
 //! \return None
-static inline void add_input_exp(exp_params_t *exp_params, input_t input) {
-	exp_params->synaptic_input_value = exp_params->synaptic_input_value +
-			decay_s1615(input, exp_params->init);
+static inline void add_input_exp(exp_params_t *parameter, input_t input) {
+    parameter->synaptic_input_value = parameter->synaptic_input_value +
+			decay_s1615(input, parameter->init);
 }
 
 //! \brief adds the inputs for a give timer period to a given neuron that is
@@ -127,35 +126,34 @@ static inline void synapse_types_add_neuron_input(
 
 //! \brief extracts the excitatory input buffers from the buffers available
 //!     for a given parameter set
-//! \param[in]  parameter: the pointer to the parameters to use
+//! \param[in] parameters: the pointer to the parameters to use
 //! \return the excitatory input buffers for a given neuron ID.
 static inline input_t *synapse_types_get_excitatory_input(
-        synapse_param_t *parameter) {
-
-	if (parameter->exc2.synaptic_input_value >= 0.001
-	        && parameter->multiplicator == 0
-			&& parameter->exc2_old == 0) {
-		parameter->multiplicator = parameter->exc.synaptic_input_value;
-	} else if (parameter->exc2.synaptic_input_value < 0.001) {
-		parameter->multiplicator = 0;
+        synapse_param_t *parameters) {
+	if (parameters->exc2.synaptic_input_value >= 0.001
+	        && parameters->multiplicator == 0
+			&& parameters->exc2_old == 0) {
+		parameters->multiplicator = parameters->exc.synaptic_input_value;
+	} else if (parameters->exc2.synaptic_input_value < 0.001) {
+		parameters->multiplicator = 0;
 	}
 
-	parameter->exc2_old = parameter->exc2.synaptic_input_value;
+	parameters->exc2_old = parameters->exc2.synaptic_input_value;
 
     excitatory_response[0] = 0; // I think?
     excitatory_response[1] =
-    		parameter->exc2.synaptic_input_value * parameter->multiplicator
+    		parameters->exc2.synaptic_input_value * parameters->multiplicator
     		* SCALING_FACTOR;
     return &excitatory_response[0];
 }
 
 //! \brief extracts the inhibitory input buffers from the buffers available
 //!     for a given parameter set
-//! \param[in] parameter: the pointer to the parameters to use
+//! \param[in] parameters: the pointer to the parameters to use
 //! \return the inhibitory input buffers for a given neuron ID.
 static inline input_t *synapse_types_get_inhibitory_input(
-        synapse_param_t *parameter) {
-    inhibitory_response[0] = parameter->inh.synaptic_input_value;
+        synapse_param_t *parameters) {
+    inhibitory_response[0] = parameters->inh.synaptic_input_value;
     return &inhibitory_response[0];
 }
 
@@ -181,34 +179,32 @@ static inline const char *synapse_types_get_type_char(
 //! \brief prints the input for a neuron ID given the available inputs
 //!     currently only executed when the models are in debug mode, as the prints
 //!     are controlled from the synapses.c print_inputs() method.
-//! \param[in] parameter: the parameters to print
+//! \param[in] parameters: the parameters to print
 //! \return Nothing
-static inline void synapse_types_print_input(
-        synapse_param_t *parameter) {
+static inline void synapse_types_print_input(synapse_param_t *parameters) {
     io_printf(IO_BUF, "%12.6k + %12.6k - %12.6k",
-            parameter->exc.synaptic_input_value,
-            parameter->exc2.synaptic_input_value,
-            parameter->inh.synaptic_input_value);
+            parameters->exc.synaptic_input_value,
+            parameters->exc2.synaptic_input_value,
+            parameters->inh.synaptic_input_value);
 }
 
 //! \brief printer call
-//! \param[in] parameter: the pointer to the parameters to print
-static inline void synapse_types_print_parameters(
-        synapse_param_t *parameter) {
-    log_info("exc_decay  = %11.4k\n", parameter->exc.decay);
-    log_info("exc_init   = %11.4k\n", parameter->exc.init);
-    log_info("exc2_decay = %11.4k\n", parameter->exc2.decay);
-    log_info("exc2_init  = %11.4k\n", parameter->exc2.init);
-    log_info("inh_decay  = %11.4k\n", parameter->inh.decay);
-    log_info("inh_init   = %11.4k\n", parameter->inh.init);
+//! \param[in] parameters: the pointer to the parameters to print
+static inline void synapse_types_print_parameters(synapse_param_t *parameters) {
+    log_info("exc_decay  = %11.4k\n", parameters->exc.decay);
+    log_info("exc_init   = %11.4k\n", parameters->exc.init);
+    log_info("exc2_decay = %11.4k\n", parameters->exc2.decay);
+    log_info("exc2_init  = %11.4k\n", parameters->exc2.init);
+    log_info("inh_decay  = %11.4k\n", parameters->inh.decay);
+    log_info("inh_init   = %11.4k\n", parameters->inh.init);
     log_info("gsyn_excitatory_initial_value = %11.4k\n",
-            parameter->exc.synaptic_input_value);
+            parameters->exc.synaptic_input_value);
     log_info("gsyn_excitatory2_initial_value = %11.4k\n",
-            parameter->exc2.synaptic_input_value);
+            parameters->exc2.synaptic_input_value);
     log_info("gsyn_inhibitory_initial_value = %11.4k\n",
-            parameter->inh.synaptic_input_value);
-    log_info("multiplicator = %11.4k\n", parameter->multiplicator);
-    log_info("exc2_old      = %11.4k\n", parameter->exc2_old);
+            parameters->inh.synaptic_input_value);
+    log_info("multiplicator = %11.4k\n", parameters->multiplicator);
+    log_info("exc2_old      = %11.4k\n", parameters->exc2_old);
 }
 
 #endif  // _SYNAPSE_TYPES_SEMD_IMPL_H_

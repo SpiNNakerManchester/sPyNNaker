@@ -107,7 +107,7 @@ static inline u016 decay_u016(u016 x, decay_t decay) {
  */
 //! \brief This is a type-generic decay "function".
 //! \param[in] x: the value to decayed
-//! \param[in] decay: the amount to decay the value by
+//! \param[in] d: the amount to decay the value by
 //! \return the new decayed value
 #define decay(x, d) ({ \
     __typeof__(x) tmp = (x); \

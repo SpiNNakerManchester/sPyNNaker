@@ -61,12 +61,12 @@ struct delay_parameters {
     ((index & 0xFF) | ((stage & 0xFF) << 8))
 
 //! \brief Decode a delay index (encoded with pack_delay_index_stage())
-//! \param[in] packet: the encoded value
+//! \param[in] packed: the encoded value
 //! \return The delay index
 #define unpack_delay_index(packed)      (packed & 0xFF)
 
 //! \brief Decode a delay stage (encoded with pack_delay_index_stage())
-//! \param[in] packet: the encoded value
+//! \param[in] packed: the encoded value
 //! \return The delay stage
 #define unpack_delay_stage(packed)      ((packed >> 8) & 0xFF)
 

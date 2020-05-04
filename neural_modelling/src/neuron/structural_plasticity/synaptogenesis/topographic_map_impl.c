@@ -56,10 +56,10 @@ static post_to_pre_entry *post_to_pre_table;
 pre_pop_info_table_t pre_info;
 
 //! The formation parameters per pre-population
-static struct formation_params **formation_params;
+static formation_params_t **formation_params;
 
 //! The elimination parameters per pre-population
-static struct elimination_params **elimination_params;
+static elimination_params_t **elimination_params;
 
 //! \brief Current states in use.
 //!
@@ -178,7 +178,7 @@ address_t synaptogenesis_dynamics_initialise(address_t sdram_sp_address) {
     partner_init(&data);
 
     formation_params = spin1_malloc(
-        rewiring_data.no_pre_pops * sizeof(struct formation_params *));
+            rewiring_data.no_pre_pops * sizeof(formation_params_t *));
     if (formation_params == NULL) {
         log_error("Could not initialise formation parameters");
         rt_error(RTE_SWERR);
@@ -188,7 +188,7 @@ address_t synaptogenesis_dynamics_initialise(address_t sdram_sp_address) {
     }
 
     elimination_params = spin1_malloc(
-        rewiring_data.no_pre_pops * sizeof(struct elimination_params *));
+            rewiring_data.no_pre_pops * sizeof(elimination_params_t *));
     if (elimination_params == NULL) {
         log_error("Could not initialise elimination parameters");
         rt_error(RTE_SWERR);
@@ -281,8 +281,8 @@ bool synaptogenesis_row_restructure(uint32_t time, address_t row) {
         // find the offset of the neuron in the current row
         if (synapse_dynamics_find_neuron(
                 current_state->post_syn_id, row,
-                &(current_state->weight), &(current_state->delay),
-                &(current_state->offset), &(current_state->synapse_type))) {
+                &current_state->weight, &current_state->delay,
+                &current_state->offset, &current_state->synapse_type)) {
             return_value = synaptogenesis_elimination_rule(current_state,
                     elimination_params[current_state->post_to_pre.pop_index],
                     time, row);

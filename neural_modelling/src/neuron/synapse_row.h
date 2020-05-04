@@ -19,7 +19,7 @@
  * \file
  * \brief implementation for handling the processing of synapse rows.
  *
- * \subsection row Synapse Row Representation
+ * \section row Synapse Row Representation
  * ```
  * |       Weight      |       Delay      |  Synapse Type   |   Neuron Index   |
  * |-------------------|------------------|-----------------|------------------|
@@ -41,7 +41,7 @@
  * - synapse_row_sparse_delay()
  * - synapse_row_sparse_weight()
  *
- * \subsection matrix Data Structure
+ * \section matrix Data Structure
  *
  * The data structure layout supported by this API is designed for
  * mixed plastic and fixed synapse rows.
@@ -65,7 +65,7 @@
  *  M:   [ Last word of fixed region              ]
  * ```
  *
- * \subsection fixed Fixed and Fixed-Plastic Regions
+ * \section fixed Fixed and Fixed-Plastic Regions
  *
  * Within the fixed-region extracted using the above API, <code>fixed[0]</code>
  * contains the number of 32-bit fixed synaptic words, <code>fixed[1]</code>

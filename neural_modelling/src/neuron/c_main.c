@@ -85,7 +85,10 @@ typedef enum callback_priorities {
 // the timer tick callback returning the same value.
 uint32_t time;
 
+//! timer tick period (in microseconds)
 static uint32_t timer_period;
+
+//! timer phase offset (in microseconds)
 static uint32_t timer_offset;
 
 //! The number of timer ticks to run for before being expected to exit
@@ -128,8 +131,6 @@ static void c_main_store_provenance_data(address_t provenance_region) {
 
 //! \brief Initialises the model by reading in the regions and checking
 //!        recording data.
-//! \param[in] timer_period a pointer for the memory address where the timer
-//!            period should be stored during the function.
 //! \return True if it successfully initialised, false otherwise
 static bool initialise(void) {
     log_debug("Initialise: started");

@@ -17,7 +17,7 @@
 
 /*!
  * \file
- * \brief  implementation of synapse_types.h for a delta decay to synapses.
+ * \brief implementation of synapse_types.h for a delta decay to synapses.
  *
  * If we have combined excitatory/inhibitory synapses it will be
  * because both excitatory and inhibitory synaptic time-constants
@@ -118,7 +118,7 @@ static inline void synapse_types_add_neuron_input(
 //!     for a given parameter set
 //! \param[in] parameters: the pointer to the parameters to use
 //! \return the excitatory input buffers for a given neuron ID.
-static inline input_t* synapse_types_get_excitatory_input(
+static inline input_t *synapse_types_get_excitatory_input(
         synapse_param_t *parameters) {
     excitatory_response[0] = parameters->exc.synaptic_input_value;
     return &excitatory_response[0];
@@ -128,7 +128,7 @@ static inline input_t* synapse_types_get_excitatory_input(
 //!     for a given parameter set
 //! \param[in] parameters: the pointer to the parameters to use
 //! \return the inhibitory input buffers for a given neuron ID.
-static inline input_t* synapse_types_get_inhibitory_input(
+static inline input_t *synapse_types_get_inhibitory_input(
         synapse_param_t *parameters) {
     inhibitory_response[0] = parameters->inh.synaptic_input_value;
     return &inhibitory_response[0];

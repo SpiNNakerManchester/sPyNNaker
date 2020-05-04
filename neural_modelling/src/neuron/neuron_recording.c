@@ -101,12 +101,12 @@ static inline uint32_t bitfield_data_size(uint32_t n_neurons) {
     return sizeof(bitfield_values_t) + (get_bit_field_size(n_neurons) * sizeof(uint32_t));
 }
 
-//! \brief reads recording data from sdram
-//! \param[in] recording_address: sdram location for the recording data
+//! \brief reads recording data from SDRAM
+//! \param[in] recording_address: SDRAM location for the recording data
 //! \param[in] n_neurons: the number of neurons to setup for
-//! \return bool stating if the read was successful or not
+//! \return Whether the read was successful
 static bool neuron_recording_read_in_elements(
-        void *data_address, uint32_t n_neurons) {
+        void *recording_address, uint32_t n_neurons) {
 
     // Round up the number of bytes to align at a word boundary i.e. round to
     // the next multiple of 4
@@ -120,7 +120,7 @@ static bool neuron_recording_read_in_elements(
         uint8_t indices[ceil_n_entries];
     } neuron_recording_data_t;
 
-    neuron_recording_data_t *data = data_address;
+    neuron_recording_data_t *data = recording_address;
 
     for (uint32_t i = 0; i < N_RECORDED_VARS; i++) {
         recording_info[i].rate = data[i].rate;

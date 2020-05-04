@@ -113,7 +113,7 @@ static inline void synapse_types_shape_input(
 //! \param[in] a_params: the parameter to update
 //! \param[in] input: the input to add.
 //! \return None
-static inline void add_input_alpha(alpha_params_t* a_params, input_t input) {
+static inline void add_input_alpha(alpha_params_t *a_params, input_t input) {
     a_params->q_buff = input;
 
 	a_params->exp_buff =
