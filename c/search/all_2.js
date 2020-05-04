@@ -52,6 +52,7 @@ var searchData=
   ['continue_5fif_5fnot_5fdifferent',['continue_if_not_different',['../robot__motor__control_8c.html#a6526db077be7f7eaa67bf3bf25800eeb',1,'robot_motor_control.c']]],
   ['control_5fconversion',['control_conversion',['../synapse__dynamics__stdp__mad__impl_8c.html#a06f2e2d805f0d8aa8b3ca7b687f24a24',1,'synapse_dynamics_stdp_mad_impl.c']]],
   ['control_5ft',['control_t',['../synapse__row_8h.html#aeae1e8aa0c0095434ba488866ef21aa2',1,'synapse_row.h']]],
+  ['count',['count',['../population__table__binary__search__impl_8c.html#a87e093d6173e3a92b7780801e9f98806',1,'master_population_table_entry']]],
   ['count_5fminus_5fone',['count_minus_one',['../post__events_8h.html#a55510f69f9fd514e9c470fedb286a3e6',1,'post_event_history_t']]],
   ['count_5frewire_5fattempts',['count_rewire_attempts',['../c__main_8c.html#a113643d98988bc0d1706e0b21d7b4a4e',1,'c_main.c']]],
   ['counters',['counters',['../robot__motor__control_8c.html#a3b08ec26bdf4328bdc94c955dfab05b3',1,'robot_motor_control.c']]],

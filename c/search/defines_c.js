@@ -5,6 +5,7 @@ var searchData=
   ['sqr',['SQR',['../maths-util_8h.html#ad41630f833e920c1ffa34722f45a8e77',1,'maths-util.h']]],
   ['sqrt',['SQRT',['../maths-util_8h.html#ae52c48592a33f8f3db9592f7be0502f3',1,'maths-util.h']]],
   ['start',['START',['../maths-util_8h.html#a3018c7600b7bb9866400596a56a57af7',1,'maths-util.h']]],
+  ['start_5fof_5fglobal_5fparameters',['START_OF_GLOBAL_PARAMETERS',['../neuron_8c.html#a0bc6b385c441f8307f938c6c297d8d2a',1,'neuron.c']]],
   ['static_5ffixed_5ffixed_5foffset',['STATIC_FIXED_FIXED_OFFSET',['../matrix__generator__static_8h.html#af6d1d250fd4924c15ef742601752d066',1,'matrix_generator_static.h']]],
   ['static_5ffixed_5ffixed_5fsize',['STATIC_FIXED_FIXED_SIZE',['../matrix__generator__static_8h.html#aed1da57790c33f7c33e253d438efe578',1,'matrix_generator_static.h']]],
   ['static_5ffixed_5fplastic_5fsize',['STATIC_FIXED_PLASTIC_SIZE',['../matrix__generator__static_8h.html#ac2f71bc80cfc0fc31d9e701a7a3e2ea2',1,'matrix_generator_static.h']]],

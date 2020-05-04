@@ -36,6 +36,7 @@ var searchData=
   ['reset_5fretina_5fkey',['RESET_RETINA_KEY',['../munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04aac54162f9b613c9ea627ae35225021d2',1,'munich_protocol.h']]],
   ['reset_5fspikes',['reset_spikes',['../spike__source__poisson_8c.html#a6965b6994e494500e00730df56c449b5',1,'spike_source_poisson.c']]],
   ['resume_5fcallback',['resume_callback',['../c__main_8c.html#a8967e8eb09363007076f840186a20995',1,'resume_callback(void):&#160;c_main.c'],['../spike__source__poisson_8c.html#afb40f588131f69f1d033283921f1a811',1,'resume_callback(void):&#160;spike_source_poisson.c']]],
+  ['rewires_5fto_5fdo',['rewires_to_do',['../spike__processing_8c.html#a58209497c5fe5ba1a7034e03e6622d6d',1,'spike_processing.c']]],
   ['rewiring',['rewiring',['../c__main_8c.html#a1c0ebb4e72cbc1b6f3da884524a78078',1,'c_main.c']]],
   ['rewiring_5fdata',['rewiring_data',['../topographic__map__impl_8c.html#a14052fb746b24752fc5a96accf39d8b8',1,'topographic_map_impl.c']]],
   ['rewiring_5fdata_5ft',['rewiring_data_t',['../sp__structs_8h.html#structrewiring__data__t',1,'']]],
@@ -56,6 +57,7 @@ var searchData=
   ['robot_5fmotor_5fcontrol_5fcallback_5fpriorities',['robot_motor_control_callback_priorities',['../robot__motor__control_8c.html#ad8ff0294897e11d77bb67c6f1e9a3386',1,'robot_motor_control.c']]],
   ['robot_5fmotor_5fcontrol_5fregions_5fe',['robot_motor_control_regions_e',['../robot__motor__control_8c.html#a7f61ffa202f9ba34d1917f6f83d8bf9d',1,'robot_motor_control.c']]],
   ['round_5fto_5fnext_5fpot',['round_to_next_pot',['../delay__extension_8c.html#ac5c8b24e3b6d606c321ce3cd22ebe8a0',1,'delay_extension.c']]],
+  ['row',['row',['../spike__processing_8c.html#a9861968df19a075eac9fa7f507592fd0',1,'dma_buffer']]],
   ['row_5flength',['row_length',['../population__table__binary__search__impl_8c.html#a1fb46843c73b7998401310d379339f64',1,'address_and_row_length']]],
   ['run_5fdelay_5fexpander',['run_delay_expander',['../delay__expander_8c.html#ab8e8cac1b4ebc8d1fd0d665b9639988e',1,'delay_expander.c']]],
   ['run_5fsynapse_5fexpander',['run_synapse_expander',['../synapse__expander_8c.html#ab2b96fb3f7cddc88c3b12263c25f0fc1',1,'synapse_expander.c']]]

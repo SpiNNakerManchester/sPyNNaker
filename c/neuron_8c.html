@@ -113,7 +113,8 @@ Data Structures</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
 <tr class="memitem:a0bc6b385c441f8307f938c6c297d8d2a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0bc6b385c441f8307f938c6c297d8d2a"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>START_OF_GLOBAL_PARAMETERS</b>&#160;&#160;&#160;(sizeof(struct <a class="el" href="neuron_8c.html#structneuron__parameters">neuron_parameters</a>) / sizeof(uint32_t))</td></tr>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron_8c.html#a0bc6b385c441f8307f938c6c297d8d2a">START_OF_GLOBAL_PARAMETERS</a>&#160;&#160;&#160;(sizeof(struct <a class="el" href="neuron_8c.html#structneuron__parameters">neuron_parameters</a>) / sizeof(uint32_t))</td></tr>
+<tr class="memdesc:a0bc6b385c441f8307f938c6c297d8d2a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Offset of start of global parameters, in words. <br /></td></tr>
 <tr class="separator:a0bc6b385c441f8307f938c6c297d8d2a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
@@ -344,8 +345,8 @@ incoming_spike_buffer_size</td>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">address</td><td>the absolute address in SDRAM for the start of the NEURON_PARAMS data region in SDRAM </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">recording_address</td><td>the recording parameters in SDRAM (contains which regions are active and how big they are) </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">n_neurons_value</td><td>The number of neurons this model is to </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">n_synapse_types_value</td><td>The number of synapse types in </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">n_neurons_value</td><td>The number of neurons this model is to simulate </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">n_synapse_types_value</td><td>The number of synapse types in the model </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">incoming_spike_buffer_size</td><td>The number of spikes to support in the incoming spike circular buffer </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">timer_offset</td><td>An offset to use during launching the main simulation loop so that we don't utterly hammer the SpiNNaker network every timestep. </td></tr>
   </table>
@@ -370,8 +371,7 @@ incoming_spike_buffer_size</td>
 </div><div class="memdoc">
 
 <p>Perform steps needed before pausing a simulation. </p>
-<p>Stores neuron parameters back into SDRAM.</p>
-<dl class="params"><dt>Parameters</dt><dd>
+<p>Stores neuron parameters back into SDRAM. </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">address</td><td>the address where the neuron parameters are stored in SDRAM </td></tr>
   </table>
@@ -419,7 +419,6 @@ incoming_spike_buffer_size</td>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>nothing </dd></dl>
 
 </div>
 </div>
@@ -462,7 +461,6 @@ incoming_spike_buffer_size</td>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>None </dd></dl>
 
 </div>
 </div>
@@ -554,7 +552,7 @@ incoming_spike_buffer_size</td>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon May 4 2020 11:12:16 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon May 4 2020 13:05:48 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

@@ -132,14 +132,12 @@ Macros</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:aca9cfbe9add5978e97d5fe58039b2d3b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aca9cfbe9add5978e97d5fe58039b2d3b"></a>
-static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sp__structs_8h.html#aca9cfbe9add5978e97d5fe58039b2d3b">sp_structs_find_by_spike</a> (const <a class="el" href="sp__structs_8h.html#structpre__pop__info__table__t">pre_pop_info_table_t</a> *pre_pop_info_table, <a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> spike, uint32_t *restrict neuron_id, uint32_t *restrict population_id, uint32_t *restrict sub_population_id, uint32_t *restrict m_pop_index)</td></tr>
-<tr class="memdesc:aca9cfbe9add5978e97d5fe58039b2d3b"><td class="mdescLeft">&#160;</td><td class="mdescRight">unpack the spike into key and identifying information for the neuron; Identify pop, sub-population and low and high atoms <br /></td></tr>
+<tr class="memitem:aca9cfbe9add5978e97d5fe58039b2d3b"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sp__structs_8h.html#aca9cfbe9add5978e97d5fe58039b2d3b">sp_structs_find_by_spike</a> (const <a class="el" href="sp__structs_8h.html#structpre__pop__info__table__t">pre_pop_info_table_t</a> *pre_pop_info_table, <a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> spike, uint32_t *restrict neuron_id, uint32_t *restrict population_id, uint32_t *restrict sub_population_id, uint32_t *restrict m_pop_index)</td></tr>
+<tr class="memdesc:aca9cfbe9add5978e97d5fe58039b2d3b"><td class="mdescLeft">&#160;</td><td class="mdescRight">unpack the spike into key and identifying information for the neuron; Identify pop, sub-population and low and high atoms  <a href="#aca9cfbe9add5978e97d5fe58039b2d3b">More...</a><br /></td></tr>
 <tr class="separator:aca9cfbe9add5978e97d5fe58039b2d3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a338a05750100ede86a35a1142687b6bf"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a338a05750100ede86a35a1142687b6bf"></a>
-static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sp__structs_8h.html#a338a05750100ede86a35a1142687b6bf">sp_structs_get_sub_pop_info</a> (const <a class="el" href="sp__structs_8h.html#structpre__pop__info__table__t">pre_pop_info_table_t</a> *pre_pop_table_info, uint32_t population_id, uint32_t pop_neuron_id, uint32_t *restrict sub_population_id, uint32_t *restrict sub_pop_neuron_id, uint32_t *restrict spike)</td></tr>
-<tr class="memdesc:a338a05750100ede86a35a1142687b6bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the sub-population id and sub-population-based neuron id given the population id and the population-based neuron id. <br /></td></tr>
-<tr class="separator:a338a05750100ede86a35a1142687b6bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad2579659b57fc47437537823688e2315"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sp__structs_8h.html#ad2579659b57fc47437537823688e2315">sp_structs_get_sub_pop_info</a> (const <a class="el" href="sp__structs_8h.html#structpre__pop__info__table__t">pre_pop_info_table_t</a> *pre_pop_info_table, uint32_t population_id, uint32_t pop_neuron_id, uint32_t *restrict sub_population_id, uint32_t *restrict sub_pop_neuron_id, uint32_t *restrict spike)</td></tr>
+<tr class="memdesc:ad2579659b57fc47437537823688e2315"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the sub-population id and sub-population-based neuron id given the population id and the population-based neuron id.  <a href="#ad2579659b57fc47437537823688e2315">More...</a><br /></td></tr>
+<tr class="separator:ad2579659b57fc47437537823688e2315"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a54852e3c438dc8a51a7a3d72a7448121"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sp__structs_8h.html#a54852e3c438dc8a51a7a3d72a7448121">sp_structs_remove_synapse</a> (<a class="el" href="sp__structs_8h.html#structcurrent__state__t">current_state_t</a> *restrict current_state, address_t restrict row)</td></tr>
 <tr class="memdesc:a54852e3c438dc8a51a7a3d72a7448121"><td class="mdescLeft">&#160;</td><td class="mdescRight">Removes a synapse from the relevant structures.  <a href="#a54852e3c438dc8a51a7a3d72a7448121">More...</a><br /></td></tr>
 <tr class="separator:a54852e3c438dc8a51a7a3d72a7448121"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -492,6 +490,150 @@ synapse type </td></tr>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
+<a class="anchor" id="aca9cfbe9add5978e97d5fe58039b2d3b"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static bool sp_structs_find_by_spike </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="sp__structs_8h.html#structpre__pop__info__table__t">pre_pop_info_table_t</a> *&#160;</td>
+          <td class="paramname"><em>pre_pop_info_table</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a>&#160;</td>
+          <td class="paramname"><em>spike</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t *restrict&#160;</td>
+          <td class="paramname"><em>neuron_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t *restrict&#160;</td>
+          <td class="paramname"><em>population_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t *restrict&#160;</td>
+          <td class="paramname"><em>sub_population_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t *restrict&#160;</td>
+          <td class="paramname"><em>m_pop_index</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>unpack the spike into key and identifying information for the neuron; Identify pop, sub-population and low and high atoms </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">pre_pop_info_table</td><td>The prepopulation information table </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">spike</td><td>The spike to look up the information from </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">neuron_id</td><td>The ID of the neuron within its population </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">population_id</td><td>The population ID </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">sub_population_id</td><td>The ID of the sub-population </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">m_pop_index</td><td>The master population table index </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>True if the information was found. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ad2579659b57fc47437537823688e2315"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static bool sp_structs_get_sub_pop_info </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="sp__structs_8h.html#structpre__pop__info__table__t">pre_pop_info_table_t</a> *&#160;</td>
+          <td class="paramname"><em>pre_pop_info_table</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>population_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>pop_neuron_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t *restrict&#160;</td>
+          <td class="paramname"><em>sub_population_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t *restrict&#160;</td>
+          <td class="paramname"><em>sub_pop_neuron_id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t *restrict&#160;</td>
+          <td class="paramname"><em>spike</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the sub-population id and sub-population-based neuron id given the population id and the population-based neuron id. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">pre_pop_info_table</td><td>The prepopulation information table </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">population_id</td><td>The population ID </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">pop_neuron_id</td><td>The ID of the neuron within the population </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">sub_population_id</td><td>The ID of the sub-population </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">sub_pop_neuron_id</td><td>The ID of the neuron within the sub-population </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">spike</td><td>The spike associated with communication from that neuron </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>True if the information was found. </dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="a54852e3c438dc8a51a7a3d72a7448121"></a>
 <div class="memitem">
 <div class="memproto">
@@ -583,7 +725,7 @@ synapse type </td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon May 4 2020 11:12:16 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon May 4 2020 13:05:48 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

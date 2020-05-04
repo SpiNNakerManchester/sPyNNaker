@@ -103,8 +103,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a58f9a7e547ba3ab8866a02e9c338efcc"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a58f9a7e547ba3ab8866a02e9c338efcc"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><b>spike_processing_initialise</b> (size_t row_max_n_bytes, uint mc_packet_callback_priority, uint user_event_priority, uint incoming_spike_buffer_size)</td></tr>
+<tr class="memitem:a58f9a7e547ba3ab8866a02e9c338efcc"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing_8h.html#a58f9a7e547ba3ab8866a02e9c338efcc">spike_processing_initialise</a> (size_t row_max_n_bytes, uint mc_packet_callback_priority, uint user_event_priority, uint incoming_spike_buffer_size)</td></tr>
+<tr class="memdesc:a58f9a7e547ba3ab8866a02e9c338efcc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise the spike processing system.  <a href="#a58f9a7e547ba3ab8866a02e9c338efcc">More...</a><br /></td></tr>
 <tr class="separator:a58f9a7e547ba3ab8866a02e9c338efcc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a31a23129c986ef03985d6c245cffb7ce"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing_8h.html#a31a23129c986ef03985d6c245cffb7ce">spike_processing_get_buffer_overflows</a> (void)</td></tr>
 <tr class="memdesc:a31a23129c986ef03985d6c245cffb7ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns the number of times the input buffer has overflowed  <a href="#a31a23129c986ef03985d6c245cffb7ce">More...</a><br /></td></tr>
@@ -112,13 +112,63 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>spike_processing_init
 <tr class="memitem:abe273f1e2f87e852b3a8fc94b7029c60"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing_8h.html#abe273f1e2f87e852b3a8fc94b7029c60">spike_processing_get_successful_rewires</a> (void)</td></tr>
 <tr class="memdesc:abe273f1e2f87e852b3a8fc94b7029c60"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns the number of successful rewires performed  <a href="#abe273f1e2f87e852b3a8fc94b7029c60">More...</a><br /></td></tr>
 <tr class="separator:abe273f1e2f87e852b3a8fc94b7029c60"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0f2b05b5633c54ce3a4a62aeccc68101"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing_8h.html#a0f2b05b5633c54ce3a4a62aeccc68101">spike_processing_do_rewiring</a> (int number_of_rew)</td></tr>
-<tr class="memdesc:a0f2b05b5633c54ce3a4a62aeccc68101"><td class="mdescLeft">&#160;</td><td class="mdescRight">set the number of times spike_processing has to attempt rewiring  <a href="#a0f2b05b5633c54ce3a4a62aeccc68101">More...</a><br /></td></tr>
-<tr class="separator:a0f2b05b5633c54ce3a4a62aeccc68101"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a392325c1b5bc32c222df0a35d3dcfad3"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing_8h.html#a392325c1b5bc32c222df0a35d3dcfad3">spike_processing_do_rewiring</a> (int number_of_rewires)</td></tr>
+<tr class="memdesc:a392325c1b5bc32c222df0a35d3dcfad3"><td class="mdescLeft">&#160;</td><td class="mdescRight">set the number of times spike_processing has to attempt rewiring  <a href="#a392325c1b5bc32c222df0a35d3dcfad3">More...</a><br /></td></tr>
+<tr class="separator:a392325c1b5bc32c222df0a35d3dcfad3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Spike processing API. </p>
 </div><h2 class="groupheader">Function Documentation</h2>
+<a class="anchor" id="a58f9a7e547ba3ab8866a02e9c338efcc"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool spike_processing_initialise </td>
+          <td>(</td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>row_max_n_bytes</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint&#160;</td>
+          <td class="paramname"><em>mc_packet_callback_priority</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint&#160;</td>
+          <td class="paramname"><em>user_event_priority</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint&#160;</td>
+          <td class="paramname"><em>incoming_spike_buffer_size</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Initialise the spike processing system. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">row_max_n_bytes</td><td>The maximum size of a synaptic row </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">mc_packet_callback_priority</td><td>Multicast packet receive interrupt priority </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">user_event_priority</td><td>User event interrupt priority </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">incoming_spike_buffer_size</td><td>Size of buffer for receiving spikes </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>True if initialisation succeeded </dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="a31a23129c986ef03985d6c245cffb7ce"></a>
 <div class="memitem">
 <div class="memproto">
@@ -134,9 +184,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>spike_processing_init
 </div><div class="memdoc">
 
 <p>returns the number of times the input buffer has overflowed </p>
-<dl class="section return"><dt>Returns</dt><dd>the number of times the input buffer has overflowed</dd>
-<dd>
-the number of times the input buffer has overloaded </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the number of times the input buffer has overflowed </dd></dl>
 
 </div>
 </div>
@@ -159,7 +207,7 @@ the number of times the input buffer has overloaded </dd></dl>
 
 </div>
 </div>
-<a class="anchor" id="a0f2b05b5633c54ce3a4a62aeccc68101"></a>
+<a class="anchor" id="a392325c1b5bc32c222df0a35d3dcfad3"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -174,14 +222,20 @@ the number of times the input buffer has overloaded </dd></dl>
 </div><div class="memdoc">
 
 <p>set the number of times spike_processing has to attempt rewiring </p>
-<dl class="section return"><dt>Returns</dt><dd>bool: currently, always true </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">number_of_rewires</td><td>The number of rewirings to perform </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>currently always true </dd></dl>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon May 4 2020 11:12:16 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon May 4 2020 13:05:48 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

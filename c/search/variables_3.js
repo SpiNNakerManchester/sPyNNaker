@@ -5,6 +5,7 @@ var searchData=
   ['delay_5fblocks',['delay_blocks',['../delay__extension_8h.html#ac96e823ff8133a64c9cdc218b44244aa',1,'delay_parameters']]],
   ['delta_5fthreshold',['delta_threshold',['../robot__motor__control_8c.html#a09517e37541b1afcae42a85569fd6976',1,'robot_motor_control.c']]],
   ['device',['device',['../munich__protocol_8h.html#adbc3297c6b342ffff16c276b3d8f44d7',1,'munich_key_bitfields_t']]],
+  ['direct_5frows_5fbase_5faddress',['direct_rows_base_address',['../population__table__binary__search__impl_8c.html#a53f683b47d1883d1fe9dc988c1b6a101',1,'population_table_binary_search_impl.c']]],
   ['dma_5fbuffers',['dma_buffers',['../spike__processing_8c.html#a6952d0c3ce89e17b53834243600e6745',1,'spike_processing.c']]],
   ['dma_5fbusy',['dma_busy',['../spike__processing_8c.html#a6d745b360c9ad1e3de0fe2ea134209f9',1,'spike_processing.c']]],
   ['dma_5fn_5frewires',['dma_n_rewires',['../spike__processing_8c.html#af760c32944840948570708761ca97038',1,'spike_processing.c']]],

@@ -88,7 +88,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Data Structures</a> &#124;
-<a href="#define-members">Macros</a> &#124;
 <a href="#func-members">Functions</a> &#124;
 <a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
@@ -107,31 +106,23 @@ Data Structures</h2></td></tr>
 <tr class="memitem:structinput__type__t"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="input__type__none_8h.html#structinput__type__t">input_type_t</a></td></tr>
 <tr class="separator:structinput__type__t"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
-Macros</h2></td></tr>
-<tr class="memitem:ad780fbb2c43b8bbf0f73ff0561061174"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad780fbb2c43b8bbf0f73ff0561061174"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>NUM_EXCITATORY_RECEPTORS</b>&#160;&#160;&#160;1</td></tr>
-<tr class="separator:ad780fbb2c43b8bbf0f73ff0561061174"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6dd746ed60f4dc54e7e604f239843aa6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6dd746ed60f4dc54e7e604f239843aa6"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>NUM_INHIBITORY_RECEPTORS</b>&#160;&#160;&#160;1</td></tr>
-<tr class="separator:a6dd746ed60f4dc54e7e604f239843aa6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a76038712099761ac99552d1ae469aec8"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a76038712099761ac99552d1ae469aec8"></a>
-static <a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>input_type_get_input_value</b> (<a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> *restrict value, const <a class="el" href="input__type__none_8h.html#structinput__type__t">input_type_t</a> *input_type, uint16_t num_receptors)</td></tr>
+<tr class="memitem:a76038712099761ac99552d1ae469aec8"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="input__type__delta_8h.html#a76038712099761ac99552d1ae469aec8">input_type_get_input_value</a> (<a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> *restrict value, const <a class="el" href="input__type__none_8h.html#structinput__type__t">input_type_t</a> *input_type, uint16_t num_receptors)</td></tr>
+<tr class="memdesc:a76038712099761ac99552d1ae469aec8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the actual input value. This allows any scaling to take place.  <a href="#a76038712099761ac99552d1ae469aec8">More...</a><br /></td></tr>
 <tr class="separator:a76038712099761ac99552d1ae469aec8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af4e297fdfe7c9c7c2a9dcdca4d7e6c56"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af4e297fdfe7c9c7c2a9dcdca4d7e6c56"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><b>input_type_convert_excitatory_input_to_current</b> (<a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> *restrict exc_input, const <a class="el" href="input__type__none_8h.html#structinput__type__t">input_type_t</a> *input_type, <a class="el" href="neuron-typedefs_8h.html#ab5816efea940631eca6d71dd4ca99c17">state_t</a> membrane_voltage)</td></tr>
+<tr class="memitem:af4e297fdfe7c9c7c2a9dcdca4d7e6c56"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="input__type__delta_8h.html#af4e297fdfe7c9c7c2a9dcdca4d7e6c56">input_type_convert_excitatory_input_to_current</a> (<a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> *restrict exc_input, const <a class="el" href="input__type__none_8h.html#structinput__type__t">input_type_t</a> *input_type, <a class="el" href="neuron-typedefs_8h.html#ab5816efea940631eca6d71dd4ca99c17">state_t</a> membrane_voltage)</td></tr>
+<tr class="memdesc:af4e297fdfe7c9c7c2a9dcdca4d7e6c56"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts an excitatory input into an excitatory current.  <a href="#af4e297fdfe7c9c7c2a9dcdca4d7e6c56">More...</a><br /></td></tr>
 <tr class="separator:af4e297fdfe7c9c7c2a9dcdca4d7e6c56"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a07605d2b04f6d102c116229dd0ccc91c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a07605d2b04f6d102c116229dd0ccc91c"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><b>input_type_convert_inhibitory_input_to_current</b> (<a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> *restrict inh_input, const <a class="el" href="input__type__none_8h.html#structinput__type__t">input_type_t</a> *input_type, <a class="el" href="neuron-typedefs_8h.html#ab5816efea940631eca6d71dd4ca99c17">state_t</a> membrane_voltage)</td></tr>
+<tr class="memitem:a07605d2b04f6d102c116229dd0ccc91c"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="input__type__delta_8h.html#a07605d2b04f6d102c116229dd0ccc91c">input_type_convert_inhibitory_input_to_current</a> (<a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> *restrict inh_input, const <a class="el" href="input__type__none_8h.html#structinput__type__t">input_type_t</a> *input_type, <a class="el" href="neuron-typedefs_8h.html#ab5816efea940631eca6d71dd4ca99c17">state_t</a> membrane_voltage)</td></tr>
+<tr class="memdesc:a07605d2b04f6d102c116229dd0ccc91c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts an inhibitory input into an inhibitory current.  <a href="#a07605d2b04f6d102c116229dd0ccc91c">More...</a><br /></td></tr>
 <tr class="separator:a07605d2b04f6d102c116229dd0ccc91c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
 <tr class="memitem:a80a0eacdb1171eb336d3ff00ee1fa50a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a80a0eacdb1171eb336d3ff00ee1fa50a"></a>
-static const <a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a>&#160;</td><td class="memItemRight" valign="bottom"><b>INPUT_SCALE_FACTOR</b> = <a class="el" href="maths-util_8h.html#a206b6f5362e56b51ca957635350b70b6">ONE</a></td></tr>
+static const <a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="input__type__delta_8h.html#a80a0eacdb1171eb336d3ff00ee1fa50a">INPUT_SCALE_FACTOR</a> = <a class="el" href="maths-util_8h.html#a206b6f5362e56b51ca957635350b70b6">ONE</a></td></tr>
+<tr class="memdesc:a80a0eacdb1171eb336d3ff00ee1fa50a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Scaling factor (trivial!) for input currents. <br /></td></tr>
 <tr class="separator:a80a0eacdb1171eb336d3ff00ee1fa50a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -170,10 +161,162 @@ scale_factor</td>
 
 </div>
 </div>
+<h2 class="groupheader">Function Documentation</h2>
+<a class="anchor" id="a76038712099761ac99552d1ae469aec8"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a>* input_type_get_input_value </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> *restrict&#160;</td>
+          <td class="paramname"><em>value</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="input__type__none_8h.html#structinput__type__t">input_type_t</a> *&#160;</td>
+          <td class="paramname"><em>input_type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint16_t&#160;</td>
+          <td class="paramname"><em>num_receptors</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Gets the actual input value. This allows any scaling to take place. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">value</td><td>The array of the receptor-based values of the input before scaling </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">input_type</td><td>The input type pointer to the parameters </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">num_receptors</td><td>The number of receptors. The size of the <code>value</code> array. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Pointer to array of values of the receptor-based input after scaling </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="af4e297fdfe7c9c7c2a9dcdca4d7e6c56"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void input_type_convert_excitatory_input_to_current </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> *restrict&#160;</td>
+          <td class="paramname"><em>exc_input</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="input__type__none_8h.html#structinput__type__t">input_type_t</a> *&#160;</td>
+          <td class="paramname"><em>input_type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="neuron-typedefs_8h.html#ab5816efea940631eca6d71dd4ca99c17">state_t</a>&#160;</td>
+          <td class="paramname"><em>membrane_voltage</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Converts an excitatory input into an excitatory current. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">exc_input</td><td>Pointer to array of excitatory inputs from different receptors this timestep. Note that this will already have been scaled by <a class="el" href="input__type__delta_8h.html#a76038712099761ac99552d1ae469aec8" title="Gets the actual input value. This allows any scaling to take place. ">input_type_get_input_value()</a> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">input_type</td><td>The input type pointer to the parameters </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">membrane_voltage</td><td>The membrane voltage to use for the input </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a07605d2b04f6d102c116229dd0ccc91c"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void input_type_convert_inhibitory_input_to_current </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> *restrict&#160;</td>
+          <td class="paramname"><em>inh_input</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="input__type__none_8h.html#structinput__type__t">input_type_t</a> *&#160;</td>
+          <td class="paramname"><em>input_type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="neuron-typedefs_8h.html#ab5816efea940631eca6d71dd4ca99c17">state_t</a>&#160;</td>
+          <td class="paramname"><em>membrane_voltage</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Converts an inhibitory input into an inhibitory current. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">inh_input</td><td>Pointer to array of inhibitory inputs from different receptors this timestep. Note that this will already have been scaled by <a class="el" href="input__type__delta_8h.html#a76038712099761ac99552d1ae469aec8" title="Gets the actual input value. This allows any scaling to take place. ">input_type_get_input_value()</a> </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">input_type</td><td>The input type pointer to the parameters </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">membrane_voltage</td><td>The membrane voltage to use for the input </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon May 4 2020 11:12:16 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon May 4 2020 13:05:48 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

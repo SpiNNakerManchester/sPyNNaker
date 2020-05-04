@@ -95,7 +95,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!--header-->
 <div class="contents">
 
-<p>Pop table implementation that uses binary search.  
+<p>Master population table implementation that uses binary search.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &quot;<a class="el" href="population__table_8h_source.html">population_table.h</a>&quot;</code><br />
 <code>#include &lt;<a class="el" href="synapse__row_8h_source.html">neuron/synapse_row.h</a>&gt;</code><br />
@@ -105,6 +105,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Data Structures</h2></td></tr>
 <tr class="memitem:structmaster__population__table__entry"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table__binary__search__impl_8c.html#structmaster__population__table__entry">master_population_table_entry</a></td></tr>
+<tr class="memdesc:structmaster__population__table__entry"><td class="mdescLeft">&#160;</td><td class="mdescRight">An entry in the master population table.  <a href="population__table__binary__search__impl_8c.html#structmaster__population__table__entry">More...</a><br /></td></tr>
 <tr class="separator:structmaster__population__table__entry"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:structaddress__and__row__length"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table__binary__search__impl_8c.html#structaddress__and__row__length">address_and_row_length</a></td></tr>
 <tr class="memdesc:structaddress__and__row__length"><td class="mdescLeft">&#160;</td><td class="mdescRight">A packed address and row length.  <a href="population__table__binary__search__impl_8c.html#structaddress__and__row__length">More...</a><br /></td></tr>
@@ -143,35 +144,44 @@ Functions</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
 <tr class="memitem:a165c9820d20b3f9cce795f65e326708b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a165c9820d20b3f9cce795f65e326708b"></a>
-static <a class="el" href="population__table__binary__search__impl_8c.html#structmaster__population__table__entry">master_population_table_entry</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>master_population_table</b></td></tr>
+static <a class="el" href="population__table__binary__search__impl_8c.html#structmaster__population__table__entry">master_population_table_entry</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table__binary__search__impl_8c.html#a165c9820d20b3f9cce795f65e326708b">master_population_table</a></td></tr>
+<tr class="memdesc:a165c9820d20b3f9cce795f65e326708b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The master population table. This is sorted. <br /></td></tr>
 <tr class="separator:a165c9820d20b3f9cce795f65e326708b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac791e8f016a5422c047f964641706f42"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac791e8f016a5422c047f964641706f42"></a>
-static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>master_population_table_length</b></td></tr>
+static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table__binary__search__impl_8c.html#ac791e8f016a5422c047f964641706f42">master_population_table_length</a></td></tr>
+<tr class="memdesc:ac791e8f016a5422c047f964641706f42"><td class="mdescLeft">&#160;</td><td class="mdescRight">The length of <a class="el" href="population__table__binary__search__impl_8c.html#a165c9820d20b3f9cce795f65e326708b" title="The master population table. This is sorted. ">master_population_table</a>. <br /></td></tr>
 <tr class="separator:ac791e8f016a5422c047f964641706f42"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab790496cf8bf2823f3da09aa7bb6e40f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab790496cf8bf2823f3da09aa7bb6e40f"></a>
-static <a class="el" href="population__table__binary__search__impl_8c.html#structaddress__and__row__length">address_and_row_length</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>address_list</b></td></tr>
+static <a class="el" href="population__table__binary__search__impl_8c.html#structaddress__and__row__length">address_and_row_length</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table__binary__search__impl_8c.html#ab790496cf8bf2823f3da09aa7bb6e40f">address_list</a></td></tr>
+<tr class="memdesc:ab790496cf8bf2823f3da09aa7bb6e40f"><td class="mdescLeft">&#160;</td><td class="mdescRight">The array of information that points into the synaptic matrix. <br /></td></tr>
 <tr class="separator:ab790496cf8bf2823f3da09aa7bb6e40f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad2ce101a5edabbd6b4f3d3e0f61d4592"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad2ce101a5edabbd6b4f3d3e0f61d4592"></a>
-static address_t&#160;</td><td class="memItemRight" valign="bottom"><b>synaptic_rows_base_address</b></td></tr>
+static address_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table__binary__search__impl_8c.html#ad2ce101a5edabbd6b4f3d3e0f61d4592">synaptic_rows_base_address</a></td></tr>
+<tr class="memdesc:ad2ce101a5edabbd6b4f3d3e0f61d4592"><td class="mdescLeft">&#160;</td><td class="mdescRight">Base address for the synaptic matrix's indirect rows. <br /></td></tr>
 <tr class="separator:ad2ce101a5edabbd6b4f3d3e0f61d4592"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a53f683b47d1883d1fe9dc988c1b6a101"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a53f683b47d1883d1fe9dc988c1b6a101"></a>
-static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>direct_rows_base_address</b></td></tr>
+static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table__binary__search__impl_8c.html#a53f683b47d1883d1fe9dc988c1b6a101">direct_rows_base_address</a></td></tr>
+<tr class="memdesc:a53f683b47d1883d1fe9dc988c1b6a101"><td class="mdescLeft">&#160;</td><td class="mdescRight">Base address for the synaptic matrix's direct rows. <br /></td></tr>
 <tr class="separator:a53f683b47d1883d1fe9dc988c1b6a101"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af5f8c1b781901d417e09126b75d60140"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af5f8c1b781901d417e09126b75d60140"></a>
-static <a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a>&#160;</td><td class="memItemRight" valign="bottom"><b>last_spike</b> = 0</td></tr>
+static <a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table__binary__search__impl_8c.html#af5f8c1b781901d417e09126b75d60140">last_spike</a> = 0</td></tr>
+<tr class="memdesc:af5f8c1b781901d417e09126b75d60140"><td class="mdescLeft">&#160;</td><td class="mdescRight">The spike being processed. <br /></td></tr>
 <tr class="separator:af5f8c1b781901d417e09126b75d60140"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac37238a52469aa0b4303c54e119a6dce"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac37238a52469aa0b4303c54e119a6dce"></a>
-static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>last_neuron_id</b> = 0</td></tr>
+static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table__binary__search__impl_8c.html#ac37238a52469aa0b4303c54e119a6dce">last_neuron_id</a> = 0</td></tr>
+<tr class="memdesc:ac37238a52469aa0b4303c54e119a6dce"><td class="mdescLeft">&#160;</td><td class="mdescRight">The neuron ID from the spike. <br /></td></tr>
 <tr class="separator:ac37238a52469aa0b4303c54e119a6dce"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1002add104ecafe843ef47eadf096e0d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1002add104ecafe843ef47eadf096e0d"></a>
-static uint16_t&#160;</td><td class="memItemRight" valign="bottom"><b>next_item</b> = 0</td></tr>
+static uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table__binary__search__impl_8c.html#a1002add104ecafe843ef47eadf096e0d">next_item</a> = 0</td></tr>
+<tr class="memdesc:a1002add104ecafe843ef47eadf096e0d"><td class="mdescLeft">&#160;</td><td class="mdescRight">The next item in the <a class="el" href="population__table__binary__search__impl_8c.html#ab790496cf8bf2823f3da09aa7bb6e40f" title="The array of information that points into the synaptic matrix. ">address_list</a>. <br /></td></tr>
 <tr class="separator:a1002add104ecafe843ef47eadf096e0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aebd5b17aab1bbe44fa564e8786f84d94"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aebd5b17aab1bbe44fa564e8786f84d94"></a>
-static uint16_t&#160;</td><td class="memItemRight" valign="bottom"><b>items_to_go</b> = 0</td></tr>
+static uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table__binary__search__impl_8c.html#aebd5b17aab1bbe44fa564e8786f84d94">items_to_go</a> = 0</td></tr>
+<tr class="memdesc:aebd5b17aab1bbe44fa564e8786f84d94"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of relevant items remaining in the <a class="el" href="population__table__binary__search__impl_8c.html#ab790496cf8bf2823f3da09aa7bb6e40f" title="The array of information that points into the synaptic matrix. ">address_list</a>. <br /></td></tr>
 <tr class="separator:aebd5b17aab1bbe44fa564e8786f84d94"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Pop table implementation that uses binary search. </p>
+<div class="textblock"><p>Master population table implementation that uses binary search. </p>
 </div><hr/><h2 class="groupheader">Data Structure Documentation</h2>
 <a name="structmaster__population__table__entry" id="structmaster__population__table__entry"></a>
 <div class="memitem">
@@ -182,32 +192,33 @@ static uint16_t&#160;</td><td class="memItemRight" valign="bottom"><b>items_to_g
         </tr>
       </table>
 </div><div class="memdoc">
-<div class="textblock"></div><table class="fieldtable">
+<div class="textblock"><p>An entry in the master population table. </p>
+</div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="a0afdbef67c9cba4231a9c8cc63e0c005"></a>uint32_t</td>
 <td class="fieldname">
 key</td>
 <td class="fielddoc">
-</td></tr>
+The key to match against the incoming message. </td></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="a5d5364d69a3eb267eba9b0e47ffd1db7"></a>uint32_t</td>
 <td class="fieldname">
 mask</td>
 <td class="fielddoc">
-</td></tr>
+The mask to select the relevant bits of <code>key</code> for matching. </td></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="acbf633d5b9a24380b536ef418c9e2a8f"></a>uint16_t</td>
 <td class="fieldname">
 start</td>
 <td class="fielddoc">
-</td></tr>
+The index into <a class="el" href="population__table__binary__search__impl_8c.html#ab790496cf8bf2823f3da09aa7bb6e40f" title="The array of information that points into the synaptic matrix. ">address_list</a> for this entry. </td></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="a87e093d6173e3a92b7780801e9f98806"></a>uint16_t</td>
 <td class="fieldname">
 count</td>
 <td class="fielddoc">
-</td></tr>
+The number of entries in <a class="el" href="population__table__binary__search__impl_8c.html#ab790496cf8bf2823f3da09aa7bb6e40f" title="The array of information that points into the synaptic matrix. ">address_list</a> for this entry. </td></tr>
 </table>
 
 </div>
@@ -589,7 +600,7 @@ whether this is a direct/single address </td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon May 4 2020 11:12:16 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon May 4 2020 13:05:48 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

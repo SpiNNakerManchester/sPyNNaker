@@ -1,11 +1,13 @@
 var searchData=
 [
   ['saturation_5fcount',['saturation_count',['../synapses_8c.html#af98038a462abb37d565a0f4e6fbc2b2a',1,'synapses.c']]],
+  ['sdram_5fwriteback_5faddress',['sdram_writeback_address',['../spike__processing_8c.html#a371d1adc84e7ae7e0272af5fc3baabeb',1,'dma_buffer']]],
   ['seconds_5fper_5ftick',['seconds_per_tick',['../spike__source__poisson_8c.html#ae0f9eec779642b68ca81ade1b1d1ce10',1,'global_parameters']]],
   ['set_5frate_5fneuron_5fid_5fmask',['set_rate_neuron_id_mask',['../spike__source__poisson_8c.html#ab4adadbc1d477b4c51e123cf3a454d26',1,'global_parameters']]],
   ['shift',['shift',['../maths_8h.html#a98d5cfbb988f03dac634156f7dcdc2d7',1,'int16_lut']]],
   ['simple_5ftq_5foffset',['SIMPLE_TQ_OFFSET',['../neuron__model__izh__impl_8c.html#a2a9449a2c1269d81389014e6c2df9573',1,'neuron_model_izh_impl.c']]],
   ['simulation_5fticks',['simulation_ticks',['../delay__extension_8c.html#a2178bb4764f423b1534a9631b0cc6e5e',1,'simulation_ticks():&#160;delay_extension.c'],['../c__main_8c.html#a2178bb4764f423b1534a9631b0cc6e5e',1,'simulation_ticks():&#160;c_main.c'],['../spike__source__poisson_8c.html#a2178bb4764f423b1534a9631b0cc6e5e',1,'simulation_ticks():&#160;spike_source_poisson.c']]],
+  ['single_5ffixed_5fsynapse',['single_fixed_synapse',['../spike__processing_8c.html#aa2bb8f7ba57b4b519c2868867d09922b',1,'spike_processing.c']]],
   ['size',['size',['../maths_8h.html#ab6d1fb27d517365483fc4a8fcb16b598',1,'int16_lut']]],
   ['slow_5frate_5fper_5ftick_5fcutoff',['slow_rate_per_tick_cutoff',['../spike__source__poisson_8c.html#a8fc7a576f718c19bb241c4c6301fd416',1,'global_parameters']]],
   ['speed',['speed',['../robot__motor__control_8c.html#a218b4f7c6cc2681a99c23a3b089d68b1',1,'robot_motor_control.c']]],
@@ -14,6 +16,7 @@ var searchData=
   ['spike_5fsource_5fseed',['spike_source_seed',['../spike__source__poisson_8c.html#a1b27dd1091ed50b78407f2c69fb35582',1,'global_parameters']]],
   ['spikes',['spikes',['../spike__source__poisson_8c.html#aa0bfbeceddbbc2213395ff3ffce6f548',1,'spike_source_poisson.c']]],
   ['ssp_5fparams',['ssp_params',['../spike__source__poisson_8c.html#a3474215ce02c1bf76bceafe71ef89c7b',1,'spike_source_poisson.c']]],
+  ['start',['start',['../population__table__binary__search__impl_8c.html#acbf633d5b9a24380b536ef418c9e2a8f',1,'master_population_table_entry']]],
   ['state',['state',['../synapse__structure__weight__state__accumulator__window__impl_8h.html#a3fb84deaa3f0d348fc69ece32370cb2d',1,'plastic_synapse_t::state()'],['../synapse__structure__weight__state__accumulator__window__impl_8h.html#a84871d6882d55c00c9723a167198811c',1,'update_state_t::state()'],['../synapse__structure__weight__state__accumulator__window__impl_8h.html#a8475ff0e503b4b1cc73d9c4291ef949d',1,'plastic_synapse_t::state()']]],
   ['synapse_5fdelay_5findex_5ftype_5fbits',['synapse_delay_index_type_bits',['../synapse__dynamics__stdp__mad__impl_8c.html#a6ee98912aaae99284ae103901c4a6879',1,'synapse_dynamics_stdp_mad_impl.c']]],
   ['synapse_5findex_5fbits',['synapse_index_bits',['../synapse__dynamics__stdp__mad__impl_8c.html#a840b87d6e981394dff1224fc0b8cd9c3',1,'synapse_index_bits():&#160;synapse_dynamics_stdp_mad_impl.c'],['../synapse__dynamics__static__impl_8c.html#a840b87d6e981394dff1224fc0b8cd9c3',1,'synapse_index_bits():&#160;synapse_dynamics_static_impl.c']]],
@@ -24,5 +27,6 @@ var searchData=
   ['synapse_5ftype_5findex_5fmask',['synapse_type_index_mask',['../synapse__dynamics__stdp__mad__impl_8c.html#ac3299a10c6a78f6e4f37246ab79a0736',1,'synapse_dynamics_stdp_mad_impl.c']]],
   ['synapse_5ftype_5fmask',['synapse_type_mask',['../synapse__dynamics__stdp__mad__impl_8c.html#af786c2a0c6f40c688029991d5b9711a7',1,'synapse_type_mask():&#160;synapse_dynamics_stdp_mad_impl.c'],['../synapse__dynamics__static__impl_8c.html#af786c2a0c6f40c688029991d5b9711a7',1,'synapse_type_mask():&#160;synapse_dynamics_static_impl.c']]],
   ['synapses',['synapses',['../synapse__dynamics__stdp__mad__impl_8c.html#a8ca99776251ff7551be58b738b7d5380',1,'synapse_row_plastic_data_t']]],
-  ['synaptic_5finput_5fvalue',['synaptic_input_value',['../synapse__types__semd__impl_8h.html#ac8b591da2d0dfcbcb814dbf8580cbd56',1,'exp_params_t']]]
+  ['synaptic_5finput_5fvalue',['synaptic_input_value',['../synapse__types__semd__impl_8h.html#ac8b591da2d0dfcbcb814dbf8580cbd56',1,'exp_params_t']]],
+  ['synaptic_5frows_5fbase_5faddress',['synaptic_rows_base_address',['../population__table__binary__search__impl_8c.html#ad2ce101a5edabbd6b4f3d3e0f61d4592',1,'population_table_binary_search_impl.c']]]
 ];
