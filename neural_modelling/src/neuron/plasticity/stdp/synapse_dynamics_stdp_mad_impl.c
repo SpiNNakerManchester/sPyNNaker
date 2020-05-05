@@ -48,8 +48,8 @@ uint32_t num_plastic_pre_synaptic_events = 0;
 uint32_t plastic_saturation_count = 0;
 
 typedef struct structural_rec_t {
-    uint32_t n_added;
-    uint32_t n_removed;
+    uint32_t changed;
+    uint32_t recorded_val;
 } structural_rec_t;
 
 typedef struct structural_rec_t* structural_rec_pointer_t;
@@ -275,8 +275,8 @@ address_t synapse_dynamics_initialise(
             return false;
         }
         for (uint32_t i = 0; i < n_neurons; i++) {
-        	structural_rec_array[i].n_added = 0;
-        	structural_rec_array[i].n_removed = 0;
+        	structural_rec_array[i].changed = 0;
+        	structural_rec_array[i].recorded_val = 0;
         }
     }
 
@@ -452,7 +452,8 @@ bool synapse_dynamics_find_neuron(
     return false;
 }
 
-bool synapse_dynamics_remove_neuron(uint32_t pre_id, uint32_t offset, address_t row){
+bool synapse_dynamics_remove_neuron(
+		uint32_t pre_id, uint32_t post_id, uint32_t offset, address_t row){
     address_t fixed_region = synapse_row_fixed_region(row);
     plastic_synapse_t *plastic_words =
             plastic_synapses(synapse_row_plastic_region(row));
@@ -469,7 +470,10 @@ bool synapse_dynamics_remove_neuron(uint32_t pre_id, uint32_t offset, address_t 
     // Decrement FP
     fixed_region[1]--;
 
-    structural_rec_array[pre_id].n_removed += 1;
+    // Create recorded value
+    // (bottom bit: added/removed, next 8: local_id, remainder: other id)
+    structural_rec_array[pre_id].changed = 1;
+	structural_rec_array[pre_id].recorded_val = (0 << 0) | (post_id << 1) | (pre_id << 9);
 
     return true;
 }
@@ -504,7 +508,11 @@ bool synapse_dynamics_add_neuron(uint32_t pre_id, uint32_t id, address_t row,
     // Increment FP
     fixed_region[1]++;
 
-    structural_rec_array[pre_id].n_added += 1;
+    // Create recorded value
+    // (bottom bit: added/removed, next 8: local_id, remainder: other id)
+    structural_rec_array[pre_id].changed = 1;
+    structural_rec_array[pre_id].recorded_val = (1 << 0) | (id << 1) | (pre_id << 9);
+//    structural_rec_array[pre_id].n_added += 1;
 
     return true;
 }
@@ -513,22 +521,41 @@ uint32_t synapse_dynamics_n_connections_in_row(address_t fixed) {
     return synapse_row_num_plastic_controls(fixed);
 }
 
-void synapse_dynamics_additions(uint32_t n_neurons, uint32_t* added) {
-//	uint32_t added[n_neurons];
-	for (uint32_t i=0; i < n_neurons; i++) {
-		added[i] = structural_rec_array[i].n_added;
-		// reset value
-		structural_rec_array[i].n_added = 0;
-	}
-//	return added;
-}
+//void synapse_dynamics_additions(uint32_t n_neurons, uint32_t* added) {
+////	uint32_t added[n_neurons];
+//	for (uint32_t i=0; i < n_neurons; i++) {
+//		added[i] = structural_rec_array[i].n_added;
+//		// reset value
+//		structural_rec_array[i].n_added = 0;
+//	}
+////	return added;
+//}
+//
+//void synapse_dynamics_removals(uint32_t n_neurons, uint32_t* removed) {
+////	uint32_t removed[n_neurons];
+//	for (uint32_t i=0; i < n_neurons; i++) {
+//		removed[i] = structural_rec_array[i].n_removed;
+//		// reset value
+//		structural_rec_array[i].n_removed = 0;
+//	}
+////	return removed;
+//}
 
-void synapse_dynamics_removals(uint32_t n_neurons, uint32_t* removed) {
+void synapse_dynamics_changes(uint32_t n_neurons, uint32_t* changed) {
 //	uint32_t removed[n_neurons];
 	for (uint32_t i=0; i < n_neurons; i++) {
-		removed[i] = structural_rec_array[i].n_removed;
+		changed[i] = structural_rec_array[i].changed;
 		// reset value
-		structural_rec_array[i].n_removed = 0;
+		structural_rec_array[i].changed = 0;
 	}
-//	return removed;
 }
+
+void synapse_dynamics_recording_values(uint32_t n_neurons, uint32_t* rec_values) {
+//	uint32_t removed[n_neurons];
+	for (uint32_t i=0; i < n_neurons; i++) {
+		rec_values[i] = structural_rec_array[i].recorded_val;
+		// reset value
+		structural_rec_array[i].recorded_val = 0;
+	}
+}
+

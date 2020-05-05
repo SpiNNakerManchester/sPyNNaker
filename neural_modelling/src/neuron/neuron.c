@@ -230,8 +230,8 @@ void neuron_add_inputs( // EXPORTED
 }
 
 void neuron_record_structural( // EXPORTED
-		uint32_t neuron_index, uint32_t added, uint32_t removed) {
-	neuron_impl_record_structural(neuron_index, added, removed);
+		uint32_t neuron_index, uint32_t changed, uint32_t rec_value) {
+	neuron_impl_record_structural(neuron_index, changed, rec_value);
 }
 
 #if LOG_LEVEL >= LOG_DEBUG

@@ -156,6 +156,13 @@ static inline void neuron_recording_record_int32(
     data[index] = value;
 }
 
+static inline void neuron_recording_record_uint32(
+        uint32_t var_index, uint32_t neuron_index, uint32_t value) {
+    uint8_t index = neuron_recording_indexes[var_index][neuron_index];
+    uint32_t *data = (uint32_t *) recording_values[var_index];
+    data[index] = value;
+}
+
 
 //! \brief stores a recording of a set bit; this is the only way to set a bit
 //!        in a bitfield; neuron_recording_record_value doesn't work for this!

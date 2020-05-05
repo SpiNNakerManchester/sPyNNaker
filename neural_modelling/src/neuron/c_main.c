@@ -295,13 +295,13 @@ void timer_callback(uint timer_count, uint unused) {
 
     if (rewiring) {
     	// Update to record additions / removals
-    	uint32_t neurons_added[n_neurons];
-    	uint32_t neurons_removed[n_neurons];
-    	synapse_dynamics_additions(n_neurons, neurons_added);
-    	synapse_dynamics_removals(n_neurons, neurons_removed);
+    	uint32_t neurons_changed[n_neurons];
+    	uint32_t rec_values[n_neurons];
+    	synapse_dynamics_changes(n_neurons, neurons_changed);
+    	synapse_dynamics_recording_values(n_neurons, rec_values);
     	for (uint32_t i = 0; i < n_neurons; i++) {
-        	io_printf(IO_BUF, "time %u ", time);
-    		neuron_record_structural(i, neurons_added[i], neurons_removed[i]);
+    		io_printf(IO_BUF, "time %u ", time);
+    		neuron_record_structural(i, neurons_changed[i], rec_values[i]);
     	}
     }
 

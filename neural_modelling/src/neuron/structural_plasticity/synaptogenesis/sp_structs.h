@@ -153,7 +153,8 @@ static inline bool sp_structs_get_sub_pop_info(
 
 static inline bool sp_structs_remove_synapse(
         current_state_t *current_state, address_t row) {
-    if (!synapse_dynamics_remove_neuron(current_state->pre_syn_id, current_state->offset, row)) {
+    if (!synapse_dynamics_remove_neuron(
+    		current_state->pre_syn_id, current_state->post_syn_id, current_state->offset, row)) {
         return false;
     }
     current_state->post_to_pre_table_entry->neuron_index = 0xFFFF;
@@ -171,8 +172,9 @@ static inline bool sp_structs_add_synapse(
         offset + current_state->pre_population_info->delay_lo;
 
     if (!synapse_dynamics_add_neuron(
-            current_state->pre_syn_id, current_state->post_syn_id, row, appr_scaled_weight, actual_delay,
-            current_state->pre_population_info->connection_type)) {
+            current_state->pre_syn_id, current_state->post_syn_id,
+			row, appr_scaled_weight, actual_delay,
+			current_state->pre_population_info->connection_type)) {
         return false;
     }
 

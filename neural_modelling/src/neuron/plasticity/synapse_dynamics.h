@@ -72,7 +72,8 @@ bool synapse_dynamics_find_neuron(
 //! \param[in] offset: the offset in the row at which to remove the entry
 //! \param[in] row: the core-local address of the synaptic row
 //! \return bool: was the removal successful?
-bool synapse_dynamics_remove_neuron(uint32_t pre_id, uint32_t offset, address_t row);
+bool synapse_dynamics_remove_neuron(
+		uint32_t pre_id, uint32_t post_id, uint32_t offset, address_t row);
 
 //! \brief  Add an entry in the synaptic row
 //! \param[in] id: the (core-local) ID of the post-synaptic neuron to be added
@@ -90,7 +91,7 @@ bool synapse_dynamics_add_neuron(
 //! \return uint32_t: The number of connections in the row
 uint32_t synapse_dynamics_n_connections_in_row(address_t fixed);
 
-void synapse_dynamics_additions(uint32_t n_neurons, uint32_t* added);
-void synapse_dynamics_removals(uint32_t n_neurons, uint32_t* removed);
+void synapse_dynamics_changes(uint32_t n_neurons, uint32_t* changed);
+void synapse_dynamics_recording_values(uint32_t n_neurons, uint32_t* rec_values);
 
 #endif // _SYNAPSE_DYNAMICS_H_
