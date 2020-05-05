@@ -23,7 +23,7 @@
 #include "neuron_model.h"
 
 /////////////////////////////////////////////////////////////
-// definition for LIF neuron parameters
+//! definition for LIF neuron parameters
 typedef struct neuron_t {
     //! membrane voltage [mV]
     REAL     V_membrane;
@@ -52,6 +52,7 @@ typedef struct neuron_t {
     int32_t  T_refract;
 } neuron_t;
 
+//! LIF global parameters
 typedef struct global_neuron_params_t {
 } global_neuron_params_t;
 

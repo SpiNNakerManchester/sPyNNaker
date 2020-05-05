@@ -26,33 +26,52 @@
 #include <synapse_expander/common_mem.h>
 #include <synapse_expander/generator_types.h>
 
+//! Convolution kernel parameter generator configuration
 struct param_generator_kernel {
     uint16_t commonWidth;
     uint16_t commonHeight;
 
+    //! Prepopulation grid width
     uint16_t preWidth;
+    //! Prepopulation grid height
     uint16_t preHeight;
+    //! Postpopulation grid width
     uint16_t postWidth;
+    //! Postpopulation grid height
     uint16_t postHeight;
 
+    //! Prepopulation grid X offset
     uint16_t startPreWidth;
+    //! Prepopulation grid Y offset
     uint16_t startPreHeight;
+    //! Postpopulation grid X offset
     uint16_t startPostWidth;
+    //! Postpopulation grid Y offset
     uint16_t startPostHeight;
 
+    //! Prepopulation grid X step
     uint16_t stepPreWidth;
+    //! Prepopulation grid Y step
     uint16_t stepPreHeight;
+    //! Postpopulation grid X step
     uint16_t stepPostWidth;
+    //! Postpopulation grid Y step
     uint16_t stepPostHeight;
 
+    //! Convolution kernel grid width
     uint16_t kernelWidth;
+    //! Convolution kernel grid height
     uint16_t kernelHeight;
 
+    //! Offset into the postpopulation that the current core's slice starts at
     uint32_t post_slice_start;
 };
 
+//! Implementation of the state of the convolution kernel parameter generator
 struct all_kernel_params {
+    //! Configuration descriptor
     struct param_generator_kernel params;
+    //! Array of values in the convolution kernel
     accum *values;
 };
 

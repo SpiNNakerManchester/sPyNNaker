@@ -33,6 +33,7 @@ struct formation_params;
 //! Flag: Is connection lateral?
 #define IS_CONNECTION_LAT 1
 
+//! Entry of map from post-connection to pre-connection neural indices
 typedef struct post_to_pre_entry {
     uint8_t pop_index;
     uint8_t sub_pop_index;

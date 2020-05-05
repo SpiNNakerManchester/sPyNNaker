@@ -22,6 +22,7 @@
 
 #include "input_type.h"
 
+//! Conductance input parameters
 typedef struct input_type_t {
     //! reversal voltage - Excitatory [mV]
     REAL     V_rev_E;

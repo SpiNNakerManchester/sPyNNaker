@@ -221,7 +221,6 @@ static bool initialise(void) {
 }
 
 //! \brief the function to call when resuming a simulation
-//! \return None
 void resume_callback(void) {
     data_specification_metadata_t *ds_regions =
             data_specification_get_data_address();
@@ -243,10 +242,9 @@ void resume_callback(void) {
 }
 
 //! \brief Timer interrupt callback
-//! \param[in] timer_count the number of times this call back has been
+//! \param[in] timer_count: the number of times this call back has been
 //!            executed since start of simulation
-//! \param[in] unused unused parameter kept for API consistency
-//! \return None
+//! \param[in] unused: unused parameter kept for API consistency
 void timer_callback(uint timer_count, uint unused) {
     use(unused);
 

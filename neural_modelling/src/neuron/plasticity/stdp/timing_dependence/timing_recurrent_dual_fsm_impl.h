@@ -23,7 +23,9 @@
 //---------------------------------------
 // Typedefines
 //---------------------------------------
+//! The type of post-traces
 typedef uint16_t post_trace_t;
+//! The type of pre-traces
 typedef uint16_t pre_trace_t;
 
 #include <neuron/plasticity/stdp/synapse_structure/synapse_structure_weight_accumulator_impl.h>

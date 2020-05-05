@@ -24,13 +24,15 @@
 #include "neuron-typedefs.h"
 #include <circular_buffer.h>
 
+//! \brief Buffer for quickly taking spikes received by a fast interrupt and
+//! queueing them for later processing by less critical code.
 static circular_buffer buffer;
 
 //! \brief This function initialises the input spike buffer.
 //!
 //! It configures:
 //! <dl>
-//!    <dt>buffer</dt>
+//!    <dt>::buffer</dt>
 //!    <dd>the buffer to hold the spikes (initialised with size spaces)</dd>
 //!    <dt>input</dt>
 //!    <dd>index for next spike inserted into buffer</dd>
@@ -54,6 +56,7 @@ static inline bool in_spikes_initialize_spike_buffer(uint32_t size) {
 
 //! \brief Adds a spike to the input spike buffer.
 //! \param[in] spike: The spike to add
+//! \return True if the spike was added
 static inline bool in_spikes_add_spike(spike_t spike) {
     return circular_buffer_add(buffer, spike);
 }
@@ -86,8 +89,7 @@ static inline counter_t in_spikes_get_n_buffer_underflows(void) {
 }
 
 //! \brief Print the input spike buffer.
-//!
-//! Expected to be mainly for debugging.
+//! \details Expected to be mainly for debugging.
 static inline void in_spikes_print_buffer(void) {
     circular_buffer_print_buffer(buffer);
 }

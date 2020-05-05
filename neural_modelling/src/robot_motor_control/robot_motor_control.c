@@ -28,17 +28,41 @@
 #include <simulation.h>
 #include <stdbool.h>
 
-// Counters
+// ----------------------------------------------------------------------
+
+//! The structure of our configuration region in SDRAM
+typedef struct {
+    //! The (base) key to use to send to the motor
+    uint32_t key;
+    //! The standard motor speed scaling factor
+    int speed;
+    //! Time interval between samples of the state of incoming messages,
+    //! in ticks
+    uint32_t sample_time;
+    //! Time interval between motor speed updates, in ticks
+    uint32_t update_time;
+    //! Outgoing inter-message delay time, in &mu;s
+    uint32_t delay_time;
+    //! The size of change required to matter
+    int delta_threshold;
+    //! Whether we should continue moving if there is no change
+    uint32_t continue_if_not_different;
+} motor_control_config_t;
+
+//! Number of counters
 #define N_COUNTERS         6
+
 //! The "directions" that the motors can move in
 typedef enum {
-    MOTION_FORWARD = 0x01,
-    MOTION_BACK	= 0x02,
-    MOTION_RIGHT = 0x03,
-    MOTION_LEFT	= 0x04,
-    MOTION_CLOCKWISE = 0x05,
-    MOTION_C_CLOCKWISE = 0x06
+    MOTION_FORWARD = 0x01,    //!< Forwards
+    MOTION_BACK	= 0x02,       //!< Backwards
+    MOTION_RIGHT = 0x03,      //!< To the right
+    MOTION_LEFT	= 0x04,       //!< To the left
+    MOTION_CLOCKWISE = 0x05,  //!< Rotate clockwise on the spot
+    MOTION_C_CLOCKWISE = 0x06 //!< Rotate counterclockwise on the spot
 } direction_t;
+
+//! Mask for selecting the neuron ID from a spike
 #define NEURON_ID_MASK     0x7FF
 
 // Globals
@@ -52,26 +76,36 @@ static int *last_speed;
 static uint32_t key;
 //! The standard motor speed, set by configuration
 static int speed;
+//! Time interval between samples, in ticks
 static uint32_t sample_time;
+//! Time interval between updates, in ticks
 static uint32_t update_time;
+//! Inter-message delay time, in &mu;s
 static uint32_t delay_time;
 //! The size of change required to matter
 static int delta_threshold;
 //! Whether we should continue moving if there is no change
 static bool continue_if_not_different;
+//! Current simulation stop/pause time
 static uint32_t simulation_ticks;
+//! True if the simulation is running continuously
 static uint32_t infinite_run;
 
 //! DSG regions in use
 enum robot_motor_control_regions_e {
-    SYSTEM_REGION,
-    PARAMS_REGION
+    SYSTEM_REGION, //!< General simulation API control area
+    PARAMS_REGION  //!< Configuration region for this application
 };
 
 //! values for the priority for each callback
 enum robot_motor_control_callback_priorities {
-    MC = -1, SDP = 0, TIMER = 2, DMA = 1
+    MC = -1,   //!< Multicast message reception is FIQ
+    SDP = 0,   //!< SDP handling is highest normal priority
+    DMA = 1,   //!< DMA complete handling is medium priority
+    TIMER = 2, //!< Timer interrupt processing is lowest priority
 };
+
+// ----------------------------------------------------------------------
 
 //! \brief Send a SpiNNaker multicast-with-payload message to the motor hardware
 //! \param[in] direction: Which direction to move in
@@ -86,7 +120,7 @@ static inline void send_to_motor(uint32_t direction, uint32_t the_speed) {
     }
 }
 
-//! Commands the robot's motors to start doing a motion
+//! \brief Commands the robot's motors to start doing a motion
 //! \param[in] direction_index: The "forward" sense of motion
 //! \param[in] opposite_index: The "reverse" sense of motion
 //! \param[in] direction: for debugging
@@ -120,7 +154,8 @@ static inline void do_motion(
     }
 }
 
-//! Commands the robot's motors to continue a motion
+//! \brief Commands the robot's motors to continue a motion started by
+//!     do_motion()
 //! \param[in] direction_index: The "forward" sense of motion
 //! \param[in] opposite_index: The "reverse" sense of motion
 //! \param[in] direction: for debugging
@@ -147,9 +182,9 @@ static inline void do_update(
 // Callbacks
 //! \brief Regular 1ms callback. Takes spikes from circular buffer and converts
 //!     to motor activity level.
-//! \param unused0 unused
-//! \param unused1 unused
-void timer_callback(uint unused0, uint unused1) {
+//! \param unused0: unused
+//! \param unused1: unused
+static void timer_callback(uint unused0, uint unused1) {
     use(unused0);
     use(unused1);
     time++;
@@ -196,16 +231,17 @@ void timer_callback(uint unused0, uint unused1) {
     }
 }
 
-//! Reads the configuration
-void read_parameters(address_t region_address) {
-    log_info("Reading parameters from 0x%.8x", region_address);
-    key = region_address[0];
-    speed = (int) region_address[1];
-    sample_time = region_address[2];
-    update_time = region_address[3];
-    delay_time = region_address[4];
-    delta_threshold = (int) region_address[5];
-    continue_if_not_different = (bool) region_address[6];
+//! \brief Reads the configuration
+//! \param[in] config_region: Where to read the configuration from
+static void read_parameters(motor_control_config_t *config_region) {
+    log_info("Reading parameters from 0x%.8x", config_region);
+    key = config_region->key;
+    speed = config_region->speed;
+    sample_time = config_region->sample_time;
+    update_time = config_region->update_time;
+    delay_time = config_region->delay_time;
+    delta_threshold = config_region->delta_threshold;
+    continue_if_not_different = config_region->continue_if_not_different;
 
     // Allocate the space for the schedule
     counters = spin1_malloc(N_COUNTERS * sizeof(int));
@@ -222,8 +258,10 @@ void read_parameters(address_t region_address) {
             continue_if_not_different);
 }
 
-//! Add incoming spike message (in FIQ) to circular buffer
-void incoming_spike_callback(uint key, uint payload) {
+//! \brief Add incoming spike message (in FIQ) to circular buffer
+//! \param[in] key: The received spike
+//! \param payload: ignored
+static void incoming_spike_callback(uint key, uint payload) {
     use(payload);
 
     log_debug("Received spike %x at time %d\n", key, time);
@@ -232,7 +270,9 @@ void incoming_spike_callback(uint key, uint payload) {
     in_spikes_add_spike(key);
 }
 
-//! Read all application configuration
+//! \brief Read all application configuration
+//! \param[out] timer_period: How long to program ticks to be
+//! \return True if initialisation succeeded
 static bool initialize(uint32_t *timer_period) {
     log_info("initialise: started");
 

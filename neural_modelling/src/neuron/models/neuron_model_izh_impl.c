@@ -21,6 +21,7 @@
 
 #include <debug.h>
 
+//! The global parameters of the Izhekevich neuron model
 static const global_neuron_params_t *global_params;
 
 /*! \brief For linear membrane voltages, 1.5 is the correct value. However
@@ -58,12 +59,12 @@ static inline void neuron_ode(
 static const REAL MAGIC_MULTIPLIER = REAL_CONST(0.040008544921875);
 
 /*!
- * \brief Midpoint is best balance between speed and accuracy so far from
- * ODE solve comparison work paper shows that Trapezoid version gives better
- * accuracy at small speed cost
- * \param[in] h
- * \param[in] neuron
- * \param[in] input_this_timestep
+ * \brief Midpoint is best balance between speed and accuracy so far.
+ * \details From ODE solver comparison work, paper shows that Trapezoid version
+ *      gives better accuracy at small speed cost
+ * \param[in] h: threshold
+ * \param[in,out] neuron: The model being updated
+ * \param[in] input_this_timestep: the input
  */
 static inline void rk2_kernel_midpoint(
         REAL h, neuron_t *neuron, REAL input_this_timestep) {

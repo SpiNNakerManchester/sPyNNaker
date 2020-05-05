@@ -32,6 +32,7 @@
 // Further includes
 #include <debug.h>
 
+//! Indices for recording of words
 enum word_recording_indices {
     //! V (somatic potential) recording index
     V_RECORDING_INDEX = 0,
@@ -43,6 +44,7 @@ enum word_recording_indices {
     N_RECORDED_VARS = 3
 };
 
+//! Indices for recording of bitfields
 enum bitfield_recording_indices {
     //! Spike event recording index
     SPIKE_RECORDING_BITFIELD = 0,

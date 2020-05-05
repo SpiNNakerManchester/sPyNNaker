@@ -33,22 +33,36 @@ struct kernel {
     uint16_t commonWidth;
     uint16_t commonHeight;
 
+    //! Prepopulation grid width
     uint16_t preWidth;
+    //! Prepopulation grid height
     uint16_t preHeight;
+    //! Postpopulation grid width
     uint16_t postWidth;
+    //! Postpopulation grid height
     uint16_t postHeight;
 
+    //! Prepopulation grid X offset
     uint16_t startPreWidth;
+    //! Prepopulation grid Y offset
     uint16_t startPreHeight;
+    //! Postpopulation grid X offset
     uint16_t startPostWidth;
+    //! Postpopulation grid Y offset
     uint16_t startPostHeight;
 
+    //! Prepopulation grid X step
     uint16_t stepPreWidth;
+    //! Prepopulation grid Y step
     uint16_t stepPreHeight;
+    //! Postpopulation grid X step
     uint16_t stepPostWidth;
+    //! Postpopulation grid Y step
     uint16_t stepPostHeight;
 
+    //! Convolution kernel grid width
     uint16_t kernelWidth;
+    //! Convolution kernel grid height
     uint16_t kernelHeight;
 
     // any further parameters required would go here

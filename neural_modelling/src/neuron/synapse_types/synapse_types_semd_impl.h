@@ -40,12 +40,12 @@
 //! Number of inhibitory receptors
 #define NUM_INHIBITORY_RECEPTORS 1
 
-//! Used to scale the secondary response
-#define SCALING_FACTOR  REAL_CONST(100.0)
-
 #include <neuron/decay.h>
 #include <debug.h>
 #include "synapse_types.h"
+
+//! Used to scale the secondary response
+static const REAL SCALING_FACTOR = REAL_CONST(100.0);
 
 //---------------------------------------
 // Synapse parameters
@@ -56,36 +56,26 @@ input_t excitatory_response[NUM_EXCITATORY_RECEPTORS];
 input_t inhibitory_response[NUM_INHIBITORY_RECEPTORS];
 
 typedef struct exp_params_t {
-    //! Decay multiplier per timestep
-    decay_t decay;
-    //! Initial decay factor
-    decay_t init;
-    //! The actual synaptic contribution
-    input_t synaptic_input_value;
+    decay_t decay;                  //!< Decay multiplier per timestep
+    decay_t init;                   //!< Initial decay factor
+    input_t synaptic_input_value;   //!< The actual synaptic contribution
 } exp_params_t;
 
 struct synapse_param_t {
-    //! Excitatory input 1
-	exp_params_t exc;
-    //! Excitatory input 2
-	exp_params_t exc2;
-	//! Inhibitory input
-	exp_params_t inh;
-	//! Output scaling factor derived from first excitatory input
-	input_t multiplicator;
-	//! History storage used to reset synaptic state
-	input_t exc2_old;
+    exp_params_t exc;           //!< First excitatory synaptic input
+    exp_params_t exc2;          //!< Second excitatory synaptic input
+    exp_params_t inh;           //!< Inhibitory synaptic input
+    //! Output scaling factor derived from first excitatory input
+    input_t multiplicator;
+    //! History storage used to reset synaptic state
+    input_t exc2_old;
 };
 
-//! human readable definition for the positions in the input regions for the
-//! different synapse types.
+//! The supported synapse type indices
 typedef enum {
-    //! First excitatory input
-    EXCITATORY_ONE,
-    //! Second excitatory input
-    EXCITATORY_TWO,
-    //! Inhibitory input
-    INHIBITORY,
+    EXCITATORY_ONE,             //!< First excitatory synaptic input
+    EXCITATORY_TWO,             //!< Second excitatory synaptic input
+    INHIBITORY,                 //!< Inhibitory synaptic input
 } synapse_semd_input_buffer_regions;
 
 //---------------------------------------

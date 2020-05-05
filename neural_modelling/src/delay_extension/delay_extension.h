@@ -41,6 +41,8 @@ typedef enum region_identifiers {
     EXPANDER_REGION = 3
 } region_identifiers;
 
+//! \brief Delay configuration, as read from SDRAM where it was placed by DSG
+//! or by on-chip generation
 struct delay_parameters {
     uint32_t key;                 //!< Key to use for sending messages
     uint32_t incoming_key;        //!< Key to accept messages with

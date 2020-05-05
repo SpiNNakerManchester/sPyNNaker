@@ -27,6 +27,7 @@
 // Forward declaration of the additional input pointer
 struct additional_input_t;
 typedef struct additional_input_t additional_input_t;
+//! Pointer to additional_input_t
 typedef additional_input_t *additional_input_pointer_t;
 
 //! \brief Gets the value of current provided by the additional input this

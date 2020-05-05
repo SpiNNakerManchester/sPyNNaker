@@ -54,19 +54,22 @@ input_t excitatory_response[NUM_EXCITATORY_RECEPTORS];
 //! Buffer used for result of synapse_types_get_inhibitory_input()
 input_t inhibitory_response[NUM_INHIBITORY_RECEPTORS];
 
+//! A synaptic input shaped as a Dirac delta
 typedef struct delta_params_t {
-	input_t synaptic_input_value;
+    //! The synaptic input value
+    input_t synaptic_input_value;
 } delta_params_t;
 
+//! Delta synapses support just a single excitatory and inhibitory input each
 struct synapse_param_t {
-	delta_params_t exc;
-	delta_params_t inh;
+    delta_params_t exc; //!< Excitatory synaptic input
+    delta_params_t inh; //!< Inhibitory synaptic input
 };
 
-//! The input buffer types supported by the synapse
+//! The supported synapse type indices
 typedef enum {
-    EXCITATORY, //!< Excitatory input
-    INHIBITORY, //!< Inhibitory input
+    EXCITATORY, //!< Excitatory synaptic input
+    INHIBITORY, //!< Inhibitory synaptic input
 } synapse_delta_input_buffer_regions;
 
 //---------------------------------------

@@ -28,6 +28,7 @@
 
 #include "additional_input.h"
 
+//! The additional input is due to calcium ions
 struct additional_input_t {
     //! exp(-(machine time step in ms) / (TauCa))
     REAL    exp_TauCa;
@@ -37,6 +38,12 @@ struct additional_input_t {
     REAL    I_alpha;
 };
 
+//! \brief Gets the value of current provided by the additional input this
+//!     timestep
+//! \param[in] additional_input: The additional input type pointer to the
+//!     parameters
+//! \param[in] membrane_voltage: The membrane voltage of the neuron
+//! \return The value of the input after scaling
 static input_t additional_input_get_input_value_as_current(
         struct additional_input_t *additional_input,
         state_t membrane_voltage) {
@@ -49,6 +56,9 @@ static input_t additional_input_get_input_value_as_current(
     return -additional_input->I_Ca2;
 }
 
+//! \brief Notifies the additional input type that the neuron has spiked
+//! \param[in] additional_input: The additional input type pointer to the
+//!     parameters
 static void additional_input_has_spiked(
         struct additional_input_t *additional_input) {
     // Apply influx of calcium to trace

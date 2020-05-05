@@ -31,12 +31,12 @@ static uint32_t expected_time;
 
 //! What sort of message payload should we send?
 enum send_type {
-    SEND_TYPE_INT = 0,
-    SEND_TYPE_UINT,
-    SEND_TYPE_ACCUM,
-    SEND_TYPE_UACCUM,
-    SEND_TYPE_FRACT,
-    SEND_TYPE_UFRACT,
+    SEND_TYPE_INT = 0, //!< Message payload is an `int32_t`
+    SEND_TYPE_UINT,    //!< Message payload is an `uint32_t`
+    SEND_TYPE_ACCUM,   //!< Message payload is an `accum`
+    SEND_TYPE_UACCUM,  //!< Message payload is an `unsigned accum`
+    SEND_TYPE_FRACT,   //!< Message payload is a `fract`
+    SEND_TYPE_UFRACT,  //!< Message payload is an `unsigned fract`
 };
 
 //! The definition of the threshold

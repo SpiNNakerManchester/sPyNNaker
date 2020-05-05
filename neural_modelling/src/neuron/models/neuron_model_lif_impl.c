@@ -21,7 +21,10 @@
 
 #include <debug.h>
 
-//! simple Leaky I&F ODE
+//! \brief simple Leaky I&F ODE
+//! \param[in,out] neuron: The neuron to update
+//! \param[in] V_prev: previous voltage
+//! \param[in] input_this_timestep: The input to apply
 static inline void lif_neuron_closed_form(
         neuron_t *neuron, REAL V_prev, input_t input_this_timestep) {
     REAL alpha = input_this_timestep * neuron->R_membrane + neuron->V_rest;

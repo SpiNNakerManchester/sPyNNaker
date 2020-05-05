@@ -31,7 +31,7 @@ plasticity_trace_region_data_t plasticity_trace_region_data;
 //---------------------------------------
 // Functions
 //---------------------------------------
-uint32_t *timing_initialise(uint32_t* address) {
+address_t timing_initialise(address_t address) {
     log_info("timing_initialise: starting");
     log_info("\tVogels 2011 timing rule");
 

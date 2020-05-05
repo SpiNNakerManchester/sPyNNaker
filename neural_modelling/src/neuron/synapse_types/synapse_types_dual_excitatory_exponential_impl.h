@@ -55,28 +55,24 @@ input_t excitatory_response[NUM_EXCITATORY_RECEPTORS];
 //! Buffer used for result of synapse_types_get_inhibitory_input()
 input_t inhibitory_response[NUM_INHIBITORY_RECEPTORS];
 
+//! Parameters for an exponential decay
 typedef struct exp_params_t {
-    //! Decay multiplier per timestep
-	decay_t decay;
-	//! Initial decay factor
-    decay_t init;
-    //! The actual synaptic contribution
-    input_t synaptic_input_value;
+    decay_t decay;                  //!< Decay multiplier per timestep
+    decay_t init;                   //!< Initial decay factor
+    input_t synaptic_input_value;   //!< The actual synaptic contribution
 } exp_params_t;
 
 struct synapse_param_t {
-    //! First excitatory parameter
-	exp_params_t exc;
-	//! Second excitatory parameter
-	exp_params_t exc2;
-	//! Inhibitory parameter
-	exp_params_t inh;
+    exp_params_t exc;           //!< First excitatory synaptic input
+    exp_params_t exc2;          //!< Second excitatory synaptic input
+    exp_params_t inh;           //!< Inhibitory synaptic input
 };
 
-//! \brief the positions in the input regions for the
-//! different synapse types.
+//! The supported synapse type indices
 typedef enum {
-    EXCITATORY_ONE, EXCITATORY_TWO, INHIBITORY,
+    EXCITATORY_ONE,             //!< First excitatory synaptic input
+    EXCITATORY_TWO,             //!< Second excitatory synaptic input
+    INHIBITORY,                 //!< Inhibitory synaptic input
 } synapse_dual_input_buffer_regions;
 
 //---------------------------------------

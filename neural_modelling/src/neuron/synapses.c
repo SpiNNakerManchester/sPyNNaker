@@ -52,11 +52,25 @@ static uint32_t *ring_buffer_to_input_left_shifts;
 //! Count of the number of times the ring buffers have saturated
 static uint32_t saturation_count = 0;
 
+//! \brief Number of bits needed for the synapse type and index
+//! \details
+//! ```
+//! synapse_index_bits + synapse_type_bits
+//! ```
 static uint32_t synapse_type_index_bits;
+//! \brief Mask to pick out the synapse type and index.
+//! \details
+//! ```
+//! synapse_index_mask | synapse_type_mask
+//! ```
 static uint32_t synapse_type_index_mask;
+//! Number of bits in the synapse index
 static uint32_t synapse_index_bits;
+//! Mask to pick out the synapse index.
 static uint32_t synapse_index_mask;
+//! Number of bits in the synapse type
 static uint32_t synapse_type_bits;
+//! Mask to pick out the synapse type.
 static uint32_t synapse_type_mask;
 
 

@@ -36,6 +36,7 @@ typedef struct neuron_t* neuron_pointer_t;
 //! Forward declaration of global neuron parameters
 struct global_neuron_params_t;
 typedef struct global_neuron_params_t global_neuron_params_t;
+//! pointer to global neuron parameters
 typedef global_neuron_params_t* global_neuron_params_pointer_t;
 
 //! \brief set the global neuron parameters

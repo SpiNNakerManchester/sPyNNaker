@@ -39,46 +39,68 @@
 
 #include <common/spin1-wfi.h>
 
+// ----------------------------------------------------------------------
+
 //! Spin1 API ticks, to know when the timer wraps
 extern uint ticks;
 
 //! data structure for Poisson sources
 typedef struct spike_source_t {
+    //! When the current control regime starts, in timer ticks
     uint32_t start_ticks;
+    //! When the current control regime ends, in timer ticks
     uint32_t end_ticks;
+    //! When we should load the next control regime, in timer ticks
     uint32_t next_ticks;
+    //! Flag for whether we're in fast or slow mode
     uint32_t is_fast_source;
 
+    //! exp(-&lambda;)
     UFRACT exp_minus_lambda;
+    //! sqrt(&lambda;)
     REAL sqrt_lambda;
+    //! Mean interspike interval, in ticks
     uint32_t mean_isi_ticks;
+    //! Planned time to spike, in ticks
     uint32_t time_to_spike_ticks;
 } spike_source_t;
 
 //! \brief data structure for recording spikes
 typedef struct timed_out_spikes {
+    //! Time of recording
     uint32_t time;
+    //! Number of spike-recording buffers
     uint32_t n_buffers;
+    //! Spike recording buffers; sort of a bit_field_t[]
     uint32_t out_spikes[];
 } timed_out_spikes;
 
 //! spike source array region IDs in human readable form
 typedef enum region {
-    SYSTEM, POISSON_PARAMS, RATES,
-    SPIKE_HISTORY_REGION,
-    PROVENANCE_REGION,
-    PROFILER_REGION
+    SYSTEM,               //!< simulation interface master control
+    POISSON_PARAMS,       //!< application configuration; global_parameters
+    RATES,                //!< rates to apply; source_info
+    SPIKE_HISTORY_REGION, //!< spike history recording region
+    PROVENANCE_REGION,    //!< provenance region
+    PROFILER_REGION       //!< profiling region
 } region;
 
+//! The number of recording regions
 #define NUMBER_OF_REGIONS_TO_RECORD 1
+//! Bytes per word
 #define BYTE_TO_WORD_CONVERTER 4
 //! A scale factor to allow the use of integers for "inter-spike intervals"
 #define ISI_SCALE_FACTOR 1000
 
-typedef enum callback_priorities {
+//! Priorities for interrupt handlers
+typedef enum ssp_callback_priorities {
+    //! Multicast packet reception uses the FIQ
     MULTICAST = -1,
+    //! SDP handling is highest ordinary priority
     SDP = 0,
+    //! DMA complete handling is medium priority
     DMA = 1,
+    //! Regular timer interrupt is lowest priority
     TIMER = 2
 } callback_priorities;
 
@@ -113,14 +135,20 @@ typedef struct global_parameters {
 //! The global_parameters for the sub-population
 static global_parameters ssp_params;
 
+//! Collection of rates to apply over time to a particular spike source
 typedef struct source_info {
+    //! The number of rates
     uint32_t n_rates;
+    //! Where in the array of rate descriptors we are
     uint32_t index;
+    //! Array of rate descriptors
     spike_source_t poissons[];
 } source_info;
 
+//! Array of pointers to sequences of rate data
 static source_info **source_data;
 
+//! The currently applied rate descriptors
 static spike_source_t *source;
 
 //! The expected current clock tick of timer_1
@@ -157,19 +185,23 @@ static bool recording_in_progress = false;
 //! The timer period
 static uint32_t timer_period;
 
+// ----------------------------------------------------------------------
+
+//! \brief Get the source data for a particular spike source
+//! \param[in] id: The spike source ID
+//! \return Its current rate descriptor, in SDRAM
 static inline spike_source_t *get_source_data(uint32_t id) {
     return &source_data[id]->poissons[source_data[id]->index];
 }
 
 //! \brief Set specific spikes for recording
-//! \param[in] n is the spike array index
+//! \param[in] n: the spike array index
 //! \return bit field at the location n
 static inline bit_field_t out_spikes_bitfield(uint32_t n) {
     return &spikes->out_spikes[n * n_spike_buffer_words];
 }
 
 //! \brief Reset the spike buffer by clearing the bit field
-//! \return None
 static inline void reset_spikes(void) {
     spikes->n_buffers = 0;
     for (uint32_t n = n_spike_buffers_allocated; n > 0; n--) {
@@ -179,10 +211,9 @@ static inline void reset_spikes(void) {
 
 //! \brief Determines the time in timer ticks multiplied by ISI_SCALE_FACTOR
 //!        until the next spike is to occur given the mean inter-spike interval
-//! \param[in] mean_inter_spike_interval_in_ticks The mean number of ticks
+//! \param[in] mean_inter_spike_interval_in_ticks: The mean number of ticks
 //!            before a spike is expected to occur in a slow process.
-//! \return a uint32_t which represents "time" in timer ticks * ISI_SCALE_FACTOR
-//!         until the next spike occurs
+//! \return "time" in timer ticks * ISI_SCALE_FACTOR until the next spike occurs
 static inline uint32_t slow_spike_source_get_time_to_spike(
         uint32_t mean_inter_spike_interval_in_ticks) {
     // Round (dist variate * ISI_SCALE_FACTOR), convert to uint32
@@ -197,11 +228,12 @@ static inline uint32_t slow_spike_source_get_time_to_spike(
     return exp_variate;
 }
 
-//! \brief Determines how many spikes to transmit this timer tick, for a fast source
-//! \param[in] exp_minus_lambda exp(-lambda), lambda is amount of spikes expected to be
-//!            produced this timer interval (timer tick in real time)
-//! \return a uint32_t which represents the number of spikes to transmit
-//!         this timer tick
+//! \brief Determines how many spikes to transmit this timer tick, for a fast
+//!     source
+//! \param[in] exp_minus_lambda: exp(-&lambda;), &lambda; is amount of spikes
+//!            expected to be produced this timer interval (timer tick in real
+//!            time)
+//! \return the number of spikes to transmit this timer tick
 static inline uint32_t fast_spike_source_get_num_spikes(
         UFRACT exp_minus_lambda) {
     // If the value of exp_minus_lambda is very small then it's not worth
@@ -213,10 +245,11 @@ static inline uint32_t fast_spike_source_get_num_spikes(
             mars_kiss64_seed, ssp_params.spike_source_seed, exp_minus_lambda);
 }
 
-//! \brief Determines how many spikes to transmit this timer tick, for a faster source
-//!        (where lambda is large enough that a Gaussian can be used instead of a Poisson)
-//! \param[in] sqrt_lambda Square root of the amount of spikes expected to be produced
-//!            this timer interval (timer tick in real time)
+//! \brief Determines how many spikes to transmit this timer tick, for a faster
+//!        source (where &lambda; is large enough that a Gaussian can be used
+//!        instead of a Poisson)
+//! \param[in] sqrt_lambda: Square root of the amount of spikes expected to be
+//!            produced this timer interval (timer tick in real time)
 //! \return a uint32_t which represents the number of spikes to transmit
 //!         this timer tick
 static inline uint32_t faster_spike_source_get_num_spikes(
@@ -230,6 +263,8 @@ static inline uint32_t faster_spike_source_get_num_spikes(
 }
 
 #if LOG_LEVEL >= LOG_DEBUG
+//! \brief Print a spike source
+//! \param[in] s: The spike source ID
 static void print_spike_source(index_t s) {
     spike_source_t *p = &source[s];
     log_info("atom %d", s);
@@ -242,6 +277,7 @@ static void print_spike_source(index_t s) {
     log_info("time_to_spike = %k", p->time_to_spike_ticks);
 }
 
+//! Print all spike sources
 static void print_spike_sources(void) {
     for (index_t s = 0; s < ssp_params.n_spike_sources; s++) {
         print_spike_source(s);
@@ -253,7 +289,7 @@ static void print_spike_sources(void) {
 //!        parameter region
 //! \param[in] sdram_globals: the absolute SDRAM memory address to which the
 //!            Poisson parameter region starts.
-//! \return a boolean which is True if the parameters were read successfully or
+//! \return True if the parameters were read successfully or
 //!         False otherwise
 static bool read_global_parameters(global_parameters *sdram_globals) {
     log_info("read global_parameters: starting");
@@ -281,6 +317,8 @@ static bool read_global_parameters(global_parameters *sdram_globals) {
     return true;
 }
 
+//! \brief Get the next chunk of rates read
+//! \param[in] id: The spike source ID
 static inline void read_next_rates(uint32_t id) {
     if (source_data[id]->index < source_data[id]->n_rates) {
         source_data[id]->index++;
@@ -294,10 +332,9 @@ static inline void read_next_rates(uint32_t id) {
 
 //! \brief method for reading the rates of the Poisson
 //! \param[in] sdram_sources: the configuration in SDRAM
-//! \return a boolean which is True if the rates were read successfully or
+//! \return True if the rates were read successfully or
 //!         False otherwise
 static bool read_rates(source_info *sdram_sources) {
-
     // Allocate DTCM for array of spike sources and copy block of data
     if (ssp_params.n_spike_sources > 0) {
         // the first time around, the array is set to NULL, afterwards,
@@ -341,6 +378,7 @@ static bool read_rates(source_info *sdram_sources) {
 }
 
 //! \brief Initialises the recording parts of the model
+//! \param[in] ds_regions: Data specification master descriptor
 //! \return True if recording initialisation is successful, false otherwise
 static bool initialise_recording(data_specification_metadata_t *ds_regions) {
     // Get the system region
@@ -353,9 +391,9 @@ static bool initialise_recording(data_specification_metadata_t *ds_regions) {
     return success;
 }
 
-//! Initialises the model by reading in the regions and checking recording
-//! data.
-//! \return boolean of True if it successfully read all the regions and set up
+//! \brief Initialises the model by reading in the regions and checking
+//!     recording data.
+//! \return True if it successfully read all the regions and set up
 //!         all its internal data structures. Otherwise returns False
 static bool initialize(void) {
     log_info("Initialise: started");
@@ -453,7 +491,7 @@ static void resume_callback(void) {
 }
 
 //! \brief stores the Poisson parameters back into SDRAM for reading by the
-//! host when needed
+//!     host when needed
 //! \return True if successful
 static bool store_poisson_parameters(void) {
     log_info("store_parameters: starting");
@@ -476,8 +514,9 @@ static bool store_poisson_parameters(void) {
 }
 
 //! \brief handles spreading of Poisson spikes for even packet reception at
-//! destination
+//!     destination
 //! \param[in] spike_key: the key to transmit
+//! \param[in] timer_count: Time to send spike at
 static void send_spike(uint32_t spike_key, uint32_t timer_count) {
     // Wait until the expected time to send
     while ((ticks == timer_count) && (tc[T1_COUNT] > expected_time)) {
@@ -558,9 +597,9 @@ static inline void record_spikes(uint32_t time) {
 }
 
 //! \brief Handle a fast spike source
-//! \param s_id
-//! \param source
-//! \param timer_count
+//! \param s_id: Source ID
+//! \param source: Source descriptor
+//! \param[in] timer_count: Time to send spike at
 static void process_fast_source(
         index_t s_id, spike_source_t *source, uint timer_count) {
     if ((time >= source->start_ticks) && (time < source->end_ticks)) {
@@ -569,14 +608,18 @@ static void process_fast_source(
 
         // If sqrt_lambda has been set then use the Gaussian algorithm for faster sources
         if (REAL_COMPARE(source->sqrt_lambda, >, ZERO)) {
-            profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_PROB_FUNC);
+            profiler_write_entry_disable_irq_fiq(
+                    PROFILER_ENTER | PROFILER_PROB_FUNC);
             num_spikes = faster_spike_source_get_num_spikes(source->sqrt_lambda);
-            profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_PROB_FUNC);
+            profiler_write_entry_disable_irq_fiq(
+                    PROFILER_EXIT | PROFILER_PROB_FUNC);
         } else {
             // Call the fast source Poisson algorithm
-            profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_PROB_FUNC);
+            profiler_write_entry_disable_irq_fiq(
+                    PROFILER_ENTER | PROFILER_PROB_FUNC);
             num_spikes = fast_spike_source_get_num_spikes(source->exp_minus_lambda);
-            profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_PROB_FUNC);
+            profiler_write_entry_disable_irq_fiq(
+                    PROFILER_EXIT | PROFILER_PROB_FUNC);
         }
 
         log_debug("Generating %d spikes", num_spikes);
@@ -599,9 +642,9 @@ static void process_fast_source(
 }
 
 //! \brief Handle a slow spike source
-//! \param s_id
-//! \param source
-//! \param timer_count
+//! \param s_id: Source ID
+//! \param source: Source descriptor
+//! \param[in] timer_count: Time to send spike at
 static void process_slow_source(
         index_t s_id, spike_source_t *source, uint timer_count) {
     if ((time >= source->start_ticks) && (time < source->end_ticks)
@@ -619,10 +662,12 @@ static void process_slow_source(
 
             // Update time to spike (note, this might not get us back above
             // the scale factor, particularly if the mean_isi is smaller)
-            profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_PROB_FUNC);
+            profiler_write_entry_disable_irq_fiq(
+                    PROFILER_ENTER | PROFILER_PROB_FUNC);
             source->time_to_spike_ticks +=
                     slow_spike_source_get_time_to_spike(source->mean_isi_ticks);
-            profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_PROB_FUNC);
+            profiler_write_entry_disable_irq_fiq(
+                    PROFILER_EXIT | PROFILER_PROB_FUNC);
         }
 
         // Now we have finished for this tick, subtract the scale factor
@@ -707,7 +752,7 @@ static void timer_callback(uint timer_count, uint unused) {
 
 //! \brief set the spike source rate as required
 //! \param[in] id: the ID of the source to be updated
-//! \param[in] rate: the REAL-valued rate in Hz, to be multiplied
+//! \param[in] rate: the rate in Hz, to be multiplied
 //!            to get per_tick values
 void set_spike_source_rate(uint32_t id, REAL rate) {
     if ((id < ssp_params.first_source_id) ||
@@ -743,8 +788,8 @@ void set_spike_source_rate(uint32_t id, REAL rate) {
 }
 
 //! \brief multicast callback used to set rate when injected in a live example
-//! \param key
-//! \param payload
+//! \param key: Received multicast key
+//! \param payload: Received multicast payload
 static void multicast_packet_callback(uint key, uint payload) {
     uint32_t id = key & ssp_params.set_rate_neuron_id_mask;
     REAL rate = kbits(payload);

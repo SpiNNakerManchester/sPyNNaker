@@ -34,8 +34,8 @@ typedef struct {
     int32_t accumulator_potentiation_minus_one;
 } plasticity_trace_region_data_t;
 
-#define STRUCTURE_PATH(file) <neuron/plasticity/stdp/synapse_structure/file>
-#include STRUCTURE_PATH(synapse_structure_weight_state_accumulator_window_impl.h)
+#define _STRUCTURE_PATH(file) <neuron/plasticity/stdp/synapse_structure/file>
+#include _STRUCTURE_PATH(synapse_structure_weight_state_accumulator_window_impl.h)
 #include "timing_recurrent_common.h"
 
 //! \brief Check if there was an event in the pre-window

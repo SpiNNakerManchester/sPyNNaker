@@ -23,7 +23,6 @@
 #ifndef _ALPHA_SYNAPSE_H_
 #define _ALPHA_SYNAPSE_H_
 
-
 //---------------------------------------
 // Macros
 //---------------------------------------
@@ -51,34 +50,25 @@ input_t excitatory_response[NUM_EXCITATORY_RECEPTORS];
 //! Buffer used for result of synapse_types_get_inhibitory_input()
 input_t inhibitory_response[NUM_INHIBITORY_RECEPTORS];
 
+//! Internal structure of an alpha-shaped synaptic input
 typedef struct alpha_params_t {
-    //! buffer for linear term
-    input_t lin_buff;
-
-    //! buffer for exponential term
-    input_t exp_buff;
-
-    //! Inverse of tau pre-multiplied by dt
+    input_t lin_buff;           //!< buffer for linear term
+    input_t exp_buff;           //!< buffer for exponential term
+    //! _&tau;_<sup>-1</sup> pre-multiplied by d<i>t</i>
     input_t dt_divided_by_tau_sqr;
-
-    //! Exponential decay multiplier
-    decay_t decay;
-
-    //! Temporary value of input
-    input_t q_buff;
+    decay_t decay;              //!< Exponential decay multiplier
+    input_t q_buff;             //!< Temporary value of input
 } alpha_params_t;
 
 struct synapse_param_t {
-    //! Excitatory parameters
-    alpha_params_t exc;
-    //! Inhibitory parameters
-    alpha_params_t inh;
+    alpha_params_t exc;         //!< Excitatory synaptic input
+    alpha_params_t inh;         //!< Inhibitory synaptic input
 };
 
-//! \brief the positions in the input regions for the
-//! different synapse types.
+//! The supported synapse type indices
 typedef enum {
-    EXCITATORY, INHIBITORY,
+    EXCITATORY,                 //!< Excitatory synaptic input
+    INHIBITORY,                 //!< Inhibitory synaptic input
 } synapse_alpha_input_buffer_regions;
 
 //---------------------------------------
@@ -109,7 +99,7 @@ static inline void synapse_types_shape_input(
     alpha_shaping(&parameters->exc);
     alpha_shaping(&parameters->inh);
 #if 0
-    log_info("lin: %12.6k, exp: %12.6k, comb: %12.6k",
+    log_debug("lin: %12.6k, exp: %12.6k, comb: %12.6k",
             parameters->exc.lin_buff,
             parameters->exc.exp_buff,
             parameters->exc.lin_buff * parameters->exc.exp_buff);
@@ -134,8 +124,8 @@ static inline void add_input_alpha(alpha_params_t *a_params, input_t input) {
 
 //! \brief adds the inputs for a give timer period to a given neuron that is
 //!     being simulated by this model
-//!
-//! Add input from ring buffer. Zero if no spikes, otherwise one or more weights
+//! \details Add input from ring buffer. Zero if no spikes, otherwise one or
+//!     more weights
 //! \param[in] synapse_type_index: the type of input that this input is to be
 //!     considered (aka excitatory or inhibitory etc)
 //! \param[in,out] parameters: the parameters to update
@@ -178,9 +168,8 @@ static inline input_t* synapse_types_get_inhibitory_input(
 }
 
 //! \brief returns a human readable character for the type of synapse.
-//!
-//! Examples would be `X` = excitatory types, `I` = inhibitory types, etc.
-//!
+//! \details Examples would be `X` = excitatory types, `I` = inhibitory types,
+//!     etc.
 //! \param[in] synapse_type_index: the synapse type index
 //!     (there is a specific index interpretation in each synapse type)
 //! \return a human readable character representing the synapse type.

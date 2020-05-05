@@ -28,6 +28,7 @@
 // Forward declaration of the threshold pointer type
 struct threshold_type_t;
 typedef struct threshold_type_t threshold_type_t;
+//! Pointer to a threshold type
 typedef threshold_type_t* threshold_type_pointer_t;
 
 //! \brief Determines if the value given is above the threshold value
