@@ -16,6 +16,7 @@ var searchData=
   ['state_5fidle',['STATE_IDLE',['../timing__recurrent__common_8h.html#aa582d447f01913259d0486c7335a3455aaade5e53e88cf231292cd1142cce2afe',1,'timing_recurrent_common.h']]],
   ['state_5fpost_5fopen',['STATE_POST_OPEN',['../timing__recurrent__common_8h.html#aa582d447f01913259d0486c7335a3455a166a47bbf11a3281b3fd852f670dbb57',1,'timing_recurrent_common.h']]],
   ['state_5fpre_5fopen',['STATE_PRE_OPEN',['../timing__recurrent__common_8h.html#aa582d447f01913259d0486c7335a3455acaed6c3d35a93a30b38bdf72f2d13b7e',1,'timing_recurrent_common.h']]],
+  ['static_5fmatrix_5fgenerator',['STATIC_MATRIX_GENERATOR',['../matrix__generator_8c.html#abed82baf7f470b522273a3e37c24c600af14f18f5ed2665f8cb095c1363fc9848',1,'matrix_generator.c']]],
   ['synapse_5fdynamics_5fregion',['SYNAPSE_DYNAMICS_REGION',['../regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6ab672882ccd8470f490be492ed18d717b',1,'regions.h']]],
   ['synapse_5fparams_5fregion',['SYNAPSE_PARAMS_REGION',['../regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6a3e4b437e3952b8683d2dde3f61a15d80',1,'regions.h']]],
   ['synaptic_5fmatrix_5fregion',['SYNAPTIC_MATRIX_REGION',['../regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6ad5778663b1d738822f9b1b5ce9dd9061',1,'regions.h']]],

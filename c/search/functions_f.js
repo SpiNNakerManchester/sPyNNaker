@@ -9,6 +9,8 @@ var searchData=
   ['record_5fspikes',['record_spikes',['../spike__source__poisson_8c.html#a6383f32ff6d54333f83d681ff919d4d0',1,'spike_source_poisson.c']]],
   ['recording_5fcomplete_5fcallback',['recording_complete_callback',['../spike__source__poisson_8c.html#aef76853af3707b8ab86a141b0742623f',1,'spike_source_poisson.c']]],
   ['recording_5fdone_5fcallback',['recording_done_callback',['../neuron__recording_8h.html#a4bbf0859d5fe0bbd7d4b3f63c0683608',1,'neuron_recording.h']]],
+  ['rescale_5fdelay',['rescale_delay',['../matrix__generator_8c.html#abe727a061d0165e4205bb2764711e760',1,'matrix_generator.c']]],
+  ['rescale_5fweight',['rescale_weight',['../matrix__generator_8c.html#af997d4cb1d1b45d411e1a0f1506faf60',1,'matrix_generator.c']]],
   ['reset_5frecord_5fcounter',['reset_record_counter',['../neuron__recording_8c.html#a48e4d4f21167fadbe5b44ec1707677fe',1,'neuron_recording.c']]],
   ['reset_5fspikes',['reset_spikes',['../spike__source__poisson_8c.html#a6965b6994e494500e00730df56c449b5',1,'spike_source_poisson.c']]],
   ['resume_5fcallback',['resume_callback',['../c__main_8c.html#a8967e8eb09363007076f840186a20995',1,'resume_callback(void):&#160;c_main.c'],['../spike__source__poisson_8c.html#afb40f588131f69f1d033283921f1a811',1,'resume_callback(void):&#160;spike_source_poisson.c']]],

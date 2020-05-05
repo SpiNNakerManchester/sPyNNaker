@@ -24,5 +24,6 @@ var searchData=
   ['expander_5fconfig',['expander_config',['../synapse__expander_8c.html#structexpander__config',1,'']]],
   ['expander_5fregion',['EXPANDER_REGION',['../delay__extension_8h.html#a6e4d67a0bd74db4da98539f8d2e5ab32a719368d00e2ee9a5b0e27a360ea05be4',1,'delay_extension.h']]],
   ['expected_5ftime',['expected_time',['../delay__extension_8c.html#a8a1c8ad4577d74c25e7760e6d653eed5',1,'expected_time():&#160;delay_extension.c'],['../neuron_8c.html#a8a1c8ad4577d74c25e7760e6d653eed5',1,'expected_time():&#160;neuron.c'],['../threshold__type__external__device__control_8h.html#a8a1c8ad4577d74c25e7760e6d653eed5',1,'expected_time():&#160;threshold_type_external_device_control.h'],['../spike__source__poisson_8c.html#a8a1c8ad4577d74c25e7760e6d653eed5',1,'expected_time():&#160;spike_source_poisson.c']]],
+  ['exponential',['EXPONENTIAL',['../param__generator_8c.html#ab04a0655cd1e3bcac5e8f48c18df1a57aa6055a3a8ab1aed0594419b51d9ec15e',1,'param_generator.c']]],
   ['exponential_5fsynapse_5finput_5fbuffer_5fregions',['exponential_synapse_input_buffer_regions',['../synapse__types__exponential__impl_8h.html#aa8f436b9633d82c53bcbeea73f3eb4ab',1,'synapse_types_exponential_impl.h']]]
 ];

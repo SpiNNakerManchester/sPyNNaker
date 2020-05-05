@@ -4,12 +4,17 @@ var searchData=
   ['payload_5fdelta_5ftimestamps',['PAYLOAD_DELTA_TIMESTAMPS',['../munich__protocol_8h.html#adc29c2ff13d900c2f185ee95427fb06ca7e7a925c702fda8735064bd0c71b5de4',1,'munich_protocol.h']]],
   ['payload_5ffour_5fbyte_5ftime_5fstamps',['PAYLOAD_FOUR_BYTE_TIME_STAMPS',['../munich__protocol_8h.html#adc29c2ff13d900c2f185ee95427fb06cafcbea561be57d033de0ec3777485e92e',1,'munich_protocol.h']]],
   ['payload_5fno_5ftimestamps',['PAYLOAD_NO_TIMESTAMPS',['../munich__protocol_8h.html#adc29c2ff13d900c2f185ee95427fb06ca35c35a3d19b4e8bbea2e9c2a345d0cf7',1,'munich_protocol.h']]],
+  ['payload_5foffset_5ffor_5fretina_5fsize',['PAYLOAD_OFFSET_FOR_RETINA_SIZE',['../munich__protocol_8h.html#a99fb83031ce9923c84392b4e92f956b5abc9f9dd3f1a2cac8b0a2d6eda2bcc3e5',1,'munich_protocol.h']]],
+  ['payload_5foffset_5ffor_5fsensor_5ftime',['PAYLOAD_OFFSET_FOR_SENSOR_TIME',['../munich__protocol_8h.html#a99fb83031ce9923c84392b4e92f956b5afe00a4850a038af3dc4ed6d35575a572',1,'munich_protocol.h']]],
+  ['payload_5foffset_5ffor_5ftimestamps',['PAYLOAD_OFFSET_FOR_TIMESTAMPS',['../munich__protocol_8h.html#a99fb83031ce9923c84392b4e92f956b5afc03d8a1fbea6053f8d14e704cca9462',1,'munich_protocol.h']]],
   ['payload_5fretina_5f16_5fdown_5fsampling',['PAYLOAD_RETINA_16_DOWN_SAMPLING',['../munich__protocol_8h.html#a61dadd085c1777f559549e05962b2c9eaff0513e0ecc8dfe19b9c70d891b09534',1,'munich_protocol.h']]],
   ['payload_5fretina_5f32_5fdown_5fsampling',['PAYLOAD_RETINA_32_DOWN_SAMPLING',['../munich__protocol_8h.html#a61dadd085c1777f559549e05962b2c9ea69237ae9abec2c9a96870f267d951fc1',1,'munich_protocol.h']]],
   ['payload_5fretina_5f64_5fdown_5fsampling',['PAYLOAD_RETINA_64_DOWN_SAMPLING',['../munich__protocol_8h.html#a61dadd085c1777f559549e05962b2c9eafc3113b6039407f4ba93ccfede07921b',1,'munich_protocol.h']]],
   ['payload_5fretina_5fno_5fdown_5fsampling',['PAYLOAD_RETINA_NO_DOWN_SAMPLING',['../munich__protocol_8h.html#a61dadd085c1777f559549e05962b2c9ea8de5b4140e590b1afd4610167028e60f',1,'munich_protocol.h']]],
+  ['payload_5fsensor_5fid_5foffset',['PAYLOAD_SENSOR_ID_OFFSET',['../munich__protocol_8h.html#a99fb83031ce9923c84392b4e92f956b5a6ad12602c70c04f6da611cc36d9822fb',1,'munich_protocol.h']]],
   ['payload_5fthree_5fbyte_5ftime_5fstamps',['PAYLOAD_THREE_BYTE_TIME_STAMPS',['../munich__protocol_8h.html#adc29c2ff13d900c2f185ee95427fb06ca5dbc455edb7e576b4b10207499df32d4',1,'munich_protocol.h']]],
   ['payload_5ftwo_5fbyte_5ftime_5fstamps',['PAYLOAD_TWO_BYTE_TIME_STAMPS',['../munich__protocol_8h.html#adc29c2ff13d900c2f185ee95427fb06ca3a5dbca82d4fd637a9b24f952c0a3b1d',1,'munich_protocol.h']]],
+  ['plastic_5fmatrix_5fgenerator',['PLASTIC_MATRIX_GENERATOR',['../matrix__generator_8c.html#abed82baf7f470b522273a3e37c24c600a08b27fbab7a770bae071d9defb278782',1,'matrix_generator.c']]],
   ['poisson_5fparams',['POISSON_PARAMS',['../spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402a727a4355ea4eac05e783bca4d11a76de',1,'spike_source_poisson.c']]],
   ['poll_5fsensors_5fcontinuously_5fkey',['POLL_SENSORS_CONTINUOUSLY_KEY',['../munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04ac78ecb26d0149528ab6d114d5a2a7d2d',1,'munich_protocol.h']]],
   ['poll_5fsensors_5fonce_5fkey',['POLL_SENSORS_ONCE_KEY',['../munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04af411423d32b0d5b899c3ac16f6d616f7',1,'munich_protocol.h']]],
@@ -36,5 +41,6 @@ var searchData=
   ['push_5fbot_5fspeaker_5fconfig_5factive_5ftime',['PUSH_BOT_SPEAKER_CONFIG_ACTIVE_TIME',['../munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04a262224b76c4dcf3cea82ee9465943bda',1,'munich_protocol.h']]],
   ['push_5fbot_5fspeaker_5fconfig_5ftotal_5fperiod',['PUSH_BOT_SPEAKER_CONFIG_TOTAL_PERIOD',['../munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04ae0391bb2f6e1b09e79d782783f7d27ed',1,'munich_protocol.h']]],
   ['push_5fbot_5fspeaker_5ftone_5fbeep',['PUSH_BOT_SPEAKER_TONE_BEEP',['../munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04a265f834c4306024944c8ddddf02a3d0a',1,'munich_protocol.h']]],
-  ['push_5fbot_5fspeaker_5ftone_5fmelody',['PUSH_BOT_SPEAKER_TONE_MELODY',['../munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04a3d4ccd45e6f44e668908c27f589b0fe2',1,'munich_protocol.h']]]
+  ['push_5fbot_5fspeaker_5ftone_5fmelody',['PUSH_BOT_SPEAKER_TONE_MELODY',['../munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04a3d4ccd45e6f44e668908c27f589b0fe2',1,'munich_protocol.h']]],
+  ['push_5fbot_5fuart_5foffset_5fspeaker_5fled_5flaser',['PUSH_BOT_UART_OFFSET_SPEAKER_LED_LASER',['../munich__protocol_8h.html#adf764cbdea00d65edcd07bb9953ad2b7a3194db92087aedb945479152ff1dabe1',1,'munich_protocol.h']]]
 ];

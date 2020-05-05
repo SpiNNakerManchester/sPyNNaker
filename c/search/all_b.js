@@ -33,6 +33,7 @@ var searchData=
   ['matrix_5fgenerator_5fstdp_5ffree',['matrix_generator_stdp_free',['../matrix__generator__stdp_8h.html#aa0ccbf6127b7bd9ba00efc3ba17373e9',1,'matrix_generator_stdp.h']]],
   ['matrix_5fgenerator_5fstdp_5finitialize',['matrix_generator_stdp_initialize',['../matrix__generator__stdp_8h.html#a0ddb143edd7818571ecf6ccb2d22abb9',1,'matrix_generator_stdp.h']]],
   ['matrix_5fgenerator_5fstdp_5fwrite_5frow',['matrix_generator_stdp_write_row',['../matrix__generator__stdp_8h.html#ae75889fca592bbadef4e459c81c04db7',1,'matrix_generator_stdp.h']]],
+  ['matrix_5fgenerator_5fwrite_5frow',['matrix_generator_write_row',['../matrix__generator_8c.html#a577e684ea5256802bc6d68987d38a3ad',1,'matrix_generator.c']]],
   ['matrix_5fgenerators',['matrix_generators',['../matrix__generator_8c.html#a420abd8627e0860d1b5e902686806ea0',1,'matrix_generator.c']]],
   ['max',['MAX',['../maths_8h.html#aff9931d7524c88e07743af6535b20761',1,'maths.h']]],
   ['max_5fdelay',['MAX_DELAY',['../matrix__generator__common_8h.html#a16027d8acc5301e440cefa086eb9db2a',1,'matrix_generator_common.h']]],

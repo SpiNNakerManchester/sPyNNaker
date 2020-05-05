@@ -103,13 +103,11 @@ Functions</h2></td></tr>
 <tr class="memitem:ac7271db2d65d3c345c76024e1becfe99"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="common__kernel_8c.html#ac7271db2d65d3c345c76024e1becfe99">uidiv</a> (uint32_t dividend, uint16_t divider, uint16_t *remainder)</td></tr>
 <tr class="memdesc:ac7271db2d65d3c345c76024e1becfe99"><td class="mdescLeft">&#160;</td><td class="mdescRight">Unsigned integer division.  <a href="#ac7271db2d65d3c345c76024e1becfe99">More...</a><br /></td></tr>
 <tr class="separator:ac7271db2d65d3c345c76024e1becfe99"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae380e1c9722449c4ef92aa2f372bb958"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae380e1c9722449c4ef92aa2f372bb958"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="common__kernel_8c.html#ae380e1c9722449c4ef92aa2f372bb958">post_in_pre_world</a> (uint16_t in_row, uint16_t in_col, uint16_t start_row, uint16_t start_col, uint16_t step_row, uint16_t step_col, uint16_t *out_row, uint16_t *out_col)</td></tr>
-<tr class="memdesc:ae380e1c9722449c4ef92aa2f372bb958"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the post's coordinates in the pre's coordinate system. <br /></td></tr>
+<tr class="memitem:ae380e1c9722449c4ef92aa2f372bb958"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="common__kernel_8c.html#ae380e1c9722449c4ef92aa2f372bb958">post_in_pre_world</a> (uint16_t in_row, uint16_t in_col, uint16_t start_row, uint16_t start_col, uint16_t step_row, uint16_t step_col, uint16_t *out_row, uint16_t *out_col)</td></tr>
+<tr class="memdesc:ae380e1c9722449c4ef92aa2f372bb958"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the post's coordinates in the pre's coordinate system.  <a href="#ae380e1c9722449c4ef92aa2f372bb958">More...</a><br /></td></tr>
 <tr class="separator:ae380e1c9722449c4ef92aa2f372bb958"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a86920262c0a0b97f0cde9a8d05b5e12b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a86920262c0a0b97f0cde9a8d05b5e12b"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="common__kernel_8c.html#a86920262c0a0b97f0cde9a8d05b5e12b">pre_in_post_world</a> (uint16_t in_row, uint16_t in_col, uint16_t start_row, uint16_t start_col, uint16_t step_row, uint16_t step_col, int16_t *out_row, int16_t *out_col)</td></tr>
-<tr class="memdesc:a86920262c0a0b97f0cde9a8d05b5e12b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the pre's coordinates in the post's coordinate system. <br /></td></tr>
+<tr class="memitem:a86920262c0a0b97f0cde9a8d05b5e12b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="common__kernel_8c.html#a86920262c0a0b97f0cde9a8d05b5e12b">pre_in_post_world</a> (uint16_t in_row, uint16_t in_col, uint16_t start_row, uint16_t start_col, uint16_t step_row, uint16_t step_col, int16_t *out_row, int16_t *out_col)</td></tr>
+<tr class="memdesc:a86920262c0a0b97f0cde9a8d05b5e12b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the pre's coordinates in the post's coordinate system.  <a href="#a86920262c0a0b97f0cde9a8d05b5e12b">More...</a><br /></td></tr>
 <tr class="separator:a86920262c0a0b97f0cde9a8d05b5e12b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -158,10 +156,164 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="comm
 
 </div>
 </div>
+<a class="anchor" id="ae380e1c9722449c4ef92aa2f372bb958"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void post_in_pre_world </td>
+          <td>(</td>
+          <td class="paramtype">uint16_t&#160;</td>
+          <td class="paramname"><em>in_row</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint16_t&#160;</td>
+          <td class="paramname"><em>in_col</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint16_t&#160;</td>
+          <td class="paramname"><em>start_row</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint16_t&#160;</td>
+          <td class="paramname"><em>start_col</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint16_t&#160;</td>
+          <td class="paramname"><em>step_row</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint16_t&#160;</td>
+          <td class="paramname"><em>step_col</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint16_t *&#160;</td>
+          <td class="paramname"><em>out_row</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint16_t *&#160;</td>
+          <td class="paramname"><em>out_col</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the post's coordinates in the pre's coordinate system. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">in_row</td><td>post row coordinate </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">in_col</td><td>post column coordinate </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">start_row</td><td>row offset </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">start_col</td><td>column offset </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">step_row</td><td>row step </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">step_col</td><td>column step </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">out_row</td><td>pre row coordinate </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">out_col</td><td>pre column coordinate </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a class="anchor" id="a86920262c0a0b97f0cde9a8d05b5e12b"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void pre_in_post_world </td>
+          <td>(</td>
+          <td class="paramtype">uint16_t&#160;</td>
+          <td class="paramname"><em>in_row</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint16_t&#160;</td>
+          <td class="paramname"><em>in_col</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint16_t&#160;</td>
+          <td class="paramname"><em>start_row</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint16_t&#160;</td>
+          <td class="paramname"><em>start_col</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint16_t&#160;</td>
+          <td class="paramname"><em>step_row</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint16_t&#160;</td>
+          <td class="paramname"><em>step_col</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int16_t *&#160;</td>
+          <td class="paramname"><em>out_row</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int16_t *&#160;</td>
+          <td class="paramname"><em>out_col</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Get the pre's coordinates in the post's coordinate system. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">in_row</td><td>pre row coordinate </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">in_col</td><td>pre column coordinate </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">start_row</td><td>row offset </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">start_col</td><td>column offset </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">step_row</td><td>row step </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">step_col</td><td>column step </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">out_row</td><td>post row coordinate </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">out_col</td><td>post column coordinate </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue May 5 2020 15:25:29 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue May 5 2020 16:16:31 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

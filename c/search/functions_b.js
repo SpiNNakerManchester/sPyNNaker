@@ -17,6 +17,7 @@ var searchData=
   ['matrix_5fgenerator_5fstdp_5ffree',['matrix_generator_stdp_free',['../matrix__generator__stdp_8h.html#aa0ccbf6127b7bd9ba00efc3ba17373e9',1,'matrix_generator_stdp.h']]],
   ['matrix_5fgenerator_5fstdp_5finitialize',['matrix_generator_stdp_initialize',['../matrix__generator__stdp_8h.html#a0ddb143edd7818571ecf6ccb2d22abb9',1,'matrix_generator_stdp.h']]],
   ['matrix_5fgenerator_5fstdp_5fwrite_5frow',['matrix_generator_stdp_write_row',['../matrix__generator__stdp_8h.html#ae75889fca592bbadef4e459c81c04db7',1,'matrix_generator_stdp.h']]],
+  ['matrix_5fgenerator_5fwrite_5frow',['matrix_generator_write_row',['../matrix__generator_8c.html#a577e684ea5256802bc6d68987d38a3ad',1,'matrix_generator.c']]],
   ['multicast_5fpacket_5fcallback',['multicast_packet_callback',['../spike__source__poisson_8c.html#af5b2c04c7a9d81f1421e15ddfe40b782',1,'spike_source_poisson.c']]],
   ['multicast_5fpacket_5freceived_5fcallback',['multicast_packet_received_callback',['../spike__processing_8c.html#a1b6621acb7633134372e8daa1010b072',1,'spike_processing.c']]],
   ['munich_5fprotocol_5fadd_5fpayload_5flogic_5fto_5fcurrent_5foutput',['munich_protocol_add_payload_logic_to_current_output',['../munich__protocol_8h.html#a401923b4aebaf0d3bd0544f2595f6af7',1,'munich_protocol.h']]],

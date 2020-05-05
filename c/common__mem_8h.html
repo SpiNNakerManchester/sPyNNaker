@@ -101,17 +101,67 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ae3a73d8e23f8cea646b20d8ba1e86b9a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae3a73d8e23f8cea646b20d8ba1e86b9a"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="common__mem_8h.html#ae3a73d8e23f8cea646b20d8ba1e86b9a">fast_memcpy</a> (void *restrict to, const void *restrict from, uint32_t num_bytes)</td></tr>
-<tr class="memdesc:ae3a73d8e23f8cea646b20d8ba1e86b9a"><td class="mdescLeft">&#160;</td><td class="mdescRight">A small and fast version of memcpy; pointers must be aligned and a whole number of words must be being copied. <br /></td></tr>
-<tr class="separator:ae3a73d8e23f8cea646b20d8ba1e86b9a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a293d12ada8b9ace4a1b4b19aa49df3fe"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="common__mem_8h.html#a293d12ada8b9ace4a1b4b19aa49df3fe">fast_memcpy</a> (void *restrict to, const void *restrict from, size_t num_bytes)</td></tr>
+<tr class="memdesc:a293d12ada8b9ace4a1b4b19aa49df3fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">A small and fast version of <code>memcpy()</code>.  <a href="#a293d12ada8b9ace4a1b4b19aa49df3fe">More...</a><br /></td></tr>
+<tr class="separator:a293d12ada8b9ace4a1b4b19aa49df3fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Utility functions for working with memory. </p>
-</div></div><!-- contents -->
+</div><h2 class="groupheader">Function Documentation</h2>
+<a class="anchor" id="a293d12ada8b9ace4a1b4b19aa49df3fe"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void fast_memcpy </td>
+          <td>(</td>
+          <td class="paramtype">void *restrict&#160;</td>
+          <td class="paramname"><em>to</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const void *restrict&#160;</td>
+          <td class="paramname"><em>from</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>num_bytes</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>A small and fast version of <code>memcpy()</code>. </p>
+<p>Both pointers must be aligned and a whole number of words must be being copied. The areas of memory must not overlap. </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[out]</td><td class="paramname">to</td><td>Where to copy to. Must be word-aligned. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">from</td><td>Where to copy from. Must be word-aligned. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">num_bytes</td><td>The number of bytes to copy. Must be a multiple of 4. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+</div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue May 5 2020 15:25:29 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue May 5 2020 16:16:31 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

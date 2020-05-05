@@ -118,8 +118,8 @@ Functions</h2></td></tr>
 <tr class="memitem:ae913507c69e31814ff266356875d0c3f"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="connection__generator__fixed__post_8h.html#ae913507c69e31814ff266356875d0c3f">connection_generator_fixed_post_free</a> (void *generator)</td></tr>
 <tr class="memdesc:ae913507c69e31814ff266356875d0c3f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Free the fixed-post connection generator.  <a href="#ae913507c69e31814ff266356875d0c3f">More...</a><br /></td></tr>
 <tr class="separator:ae913507c69e31814ff266356875d0c3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae08cfcb6c50855844e811f8bec2eacbf"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae08cfcb6c50855844e811f8bec2eacbf"></a>
-static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><b>post_random_in_range</b> (struct <a class="el" href="connection__generator__fixed__post_8h.html#structfixed__post">fixed_post</a> *obj, uint32_t range)</td></tr>
+<tr class="memitem:ae08cfcb6c50855844e811f8bec2eacbf"><td class="memItemLeft" align="right" valign="top">static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="connection__generator__fixed__post_8h.html#ae08cfcb6c50855844e811f8bec2eacbf">post_random_in_range</a> (struct <a class="el" href="connection__generator__fixed__post_8h.html#structfixed__post">fixed_post</a> *obj, uint32_t range)</td></tr>
+<tr class="memdesc:ae08cfcb6c50855844e811f8bec2eacbf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates a uniformly-distributed random number.  <a href="#ae08cfcb6c50855844e811f8bec2eacbf">More...</a><br /></td></tr>
 <tr class="separator:ae08cfcb6c50855844e811f8bec2eacbf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab2e91f8df6e9d90fbd9028a6ff1c0964"><td class="memItemLeft" align="right" valign="top">static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="connection__generator__fixed__post_8h.html#ab2e91f8df6e9d90fbd9028a6ff1c0964">connection_generator_fixed_post_generate</a> (void *generator, uint32_t pre_slice_start, uint32_t pre_slice_count, uint32_t pre_neuron_index, uint32_t post_slice_start, uint32_t post_slice_count, uint32_t max_row_length, uint16_t *indices)</td></tr>
 <tr class="memdesc:ab2e91f8df6e9d90fbd9028a6ff1c0964"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate connections with the fixed-post connection generator.  <a href="#ab2e91f8df6e9d90fbd9028a6ff1c0964">More...</a><br /></td></tr>
@@ -288,6 +288,50 @@ Configured random number generator. </td></tr>
 
 </div>
 </div>
+<a class="anchor" id="ae08cfcb6c50855844e811f8bec2eacbf"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static uint32_t post_random_in_range </td>
+          <td>(</td>
+          <td class="paramtype">struct <a class="el" href="connection__generator__fixed__post_8h.html#structfixed__post">fixed_post</a> *&#160;</td>
+          <td class="paramname"><em>obj</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>range</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Generates a uniformly-distributed random number. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">obj</td><td>the generator containing the RNG </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">range</td><td>the (<em>upper, exclusive</em>) limit of the range of random numbers that may be generated. Should be in range 0..65536 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>a random integer in the given input range. </dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="ab2e91f8df6e9d90fbd9028a6ff1c0964"></a>
 <div class="memitem">
 <div class="memproto">
@@ -377,7 +421,7 @@ Configured random number generator. </td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue May 5 2020 15:25:29 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue May 5 2020 16:16:31 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

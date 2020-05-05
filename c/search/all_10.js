@@ -33,6 +33,8 @@ var searchData=
   ['regions_2eh',['regions.h',['../regions_8h.html',1,'']]],
   ['regions_5fe',['regions_e',['../regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6',1,'regions.h']]],
   ['remove_5fpayload_5fto_5fcurrent_5foutput_5fkey',['REMOVE_PAYLOAD_TO_CURRENT_OUTPUT_KEY',['../munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04a1e4713ab52d9efee9beaa14486b59ea4',1,'munich_protocol.h']]],
+  ['rescale_5fdelay',['rescale_delay',['../matrix__generator_8c.html#abe727a061d0165e4205bb2764711e760',1,'matrix_generator.c']]],
+  ['rescale_5fweight',['rescale_weight',['../matrix__generator_8c.html#af997d4cb1d1b45d411e1a0f1506faf60',1,'matrix_generator.c']]],
   ['reset_5faddress',['reset_address',['../neuron__recording_8c.html#ac4b03f54804a47d2b1d7f9086d42292a',1,'neuron_recording.c']]],
   ['reset_5frecord_5fcounter',['reset_record_counter',['../neuron__recording_8c.html#a48e4d4f21167fadbe5b44ec1707677fe',1,'neuron_recording.c']]],
   ['reset_5fretina_5fkey',['RESET_RETINA_KEY',['../munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04aac54162f9b613c9ea627ae35225021d2',1,'munich_protocol.h']]],

@@ -84,6 +84,7 @@ var searchData=
   ['static_5ffixed_5ffixed_5foffset',['STATIC_FIXED_FIXED_OFFSET',['../matrix__generator__static_8h.html#af6d1d250fd4924c15ef742601752d066',1,'matrix_generator_static.h']]],
   ['static_5ffixed_5ffixed_5fsize',['STATIC_FIXED_FIXED_SIZE',['../matrix__generator__static_8h.html#aed1da57790c33f7c33e253d438efe578',1,'matrix_generator_static.h']]],
   ['static_5ffixed_5fplastic_5fsize',['STATIC_FIXED_PLASTIC_SIZE',['../matrix__generator__static_8h.html#ac2f71bc80cfc0fc31d9e701a7a3e2ea2',1,'matrix_generator_static.h']]],
+  ['static_5fmatrix_5fgenerator',['STATIC_MATRIX_GENERATOR',['../matrix__generator_8c.html#abed82baf7f470b522273a3e37c24c600af14f18f5ed2665f8cb095c1363fc9848',1,'matrix_generator.c']]],
   ['static_5fplastic_5fplastic_5fsize',['STATIC_PLASTIC_PLASTIC_SIZE',['../matrix__generator__static_8h.html#aac7abdd039c56a26b832530725b1a809',1,'matrix_generator_static.h']]],
   ['stdp_5ffixed_5ffixed_5fsize',['STDP_FIXED_FIXED_SIZE',['../matrix__generator__stdp_8h.html#ad860c1a067bda44a54781479657cfe85',1,'matrix_generator_stdp.h']]],
   ['stdp_5ffixed_5fmul_5f16x16',['STDP_FIXED_MUL_16X16',['../stdp__typedefs_8h.html#aadb4d7a82820e2de3f998e902b7cd87a',1,'stdp_typedefs.h']]],
