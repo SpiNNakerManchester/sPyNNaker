@@ -29,6 +29,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+// ----------------------------------------------------------------------
+
 //! The format of Munich device protocol keys
 typedef struct {
     uint32_t device : 3;         //!< Device identifier
@@ -270,6 +272,9 @@ static munich_protocol_modes_e mode = MUNICH_PROTOCOL_RESET_TO_DEFAULT;
 //! Note this is pre-shifted into position so can simply be OR'd to apply it
 static uint32_t instance_key = 0;
 
+// ----------------------------------------------------------------------
+// Protocol core control
+
 //! \brief Configures the protocol mode
 //!
 //! See also munich_protocol_get_set_mode_command()
@@ -306,6 +311,9 @@ static inline multicast_packet munich_protocol_get_set_mode_command(void) {
     };
 }
 
+// ----------------------------------------------------------------------
+// Generic retina control
+
 //! \brief Creates a command to set the retina base key.
 //! \param[in] new_key: the new key to use
 //! \param[in] uart_id: the retina UART to program
@@ -332,6 +340,21 @@ static inline multicast_packet munich_protocol_disable_retina_event_streaming(
         .payload_flag = NO_PAYLOAD
     };
 }
+
+//! \brief Creates a command to reset a retina.
+//! \param[in] uart_id: the retina UART to program
+//! \return Description of what multicast packet to send
+static inline multicast_packet munich_protocol_reset_retina(uint32_t uart_id) {
+    return (multicast_packet) {
+        .key = (RESET_RETINA_KEY | (uart_id << OFFSET_FOR_UART_ID) |
+                instance_key),
+        .payload = 0,
+        .payload_flag = NO_PAYLOAD
+    };
+}
+
+// ----------------------------------------------------------------------
+// Protocol master/slave control
 
 //! \brief Creates a command to tell the master/slave to use its internal event
 //!     counter.
@@ -404,17 +427,8 @@ static inline multicast_packet munich_protocol_bias_values(
     };
 }
 
-//! \brief Creates a command to reset a retina.
-//! \param[in] uart_id: the retina UART to program
-//! \return Description of what multicast packet to send
-static inline multicast_packet munich_protocol_reset_retina(uint32_t uart_id) {
-    return (multicast_packet) {
-        .key = (RESET_RETINA_KEY | (uart_id << OFFSET_FOR_UART_ID) |
-                instance_key),
-        .payload = 0,
-        .payload_flag = NO_PAYLOAD
-    };
-}
+// ----------------------------------------------------------------------
+// Generic sensor control
 
 //! \brief Creates a command to stop sensor reporting.
 //! \param[in] sensor_id: the sensor to stop
@@ -454,6 +468,9 @@ munich_protocol_poll_individual_sensor_continuously(
         .payload_flag = WITH_PAYLOAD
     };
 }
+
+// ----------------------------------------------------------------------
+// Generic motor control
 
 //! \brief Creates a command to turn a motor on or off.
 //! \param[in] enable_disable: True to enable the motor
@@ -544,6 +561,11 @@ munich_protocol_generic_motor1_raw_output_leak_to_0(
     };
 }
 
+// ----------------------------------------------------------------------
+// Generic pulse width modulation (PWM) control
+
+//! \brief Creates a command to set the PWM duty cycle period for Timer A.
+//! \param[in] timer_period: The timer period
 //! \param[in] uart_id: Which UART to program
 //! \return Description of what multicast packet to send
 static inline multicast_packet munich_protocol_pwm_pin_output_timer_a_duration(
@@ -556,6 +578,8 @@ static inline multicast_packet munich_protocol_pwm_pin_output_timer_a_duration(
     };
 }
 
+//! \brief Creates a command to set the PWM duty cycle period for Timer B.
+//! \param[in] timer_period: The timer period
 //! \param[in] uart_id: Which UART to program
 //! \return Description of what multicast packet to send
 static inline multicast_packet munich_protocol_pwm_pin_output_timer_b_duration(
@@ -568,6 +592,8 @@ static inline multicast_packet munich_protocol_pwm_pin_output_timer_b_duration(
     };
 }
 
+//! \brief Creates a command to set the PWM duty cycle period for Timer C.
+//! \param[in] timer_period: The timer period
 //! \param[in] uart_id: Which UART to program
 //! \return Description of what multicast packet to send
 static inline multicast_packet munich_protocol_pwm_pin_output_timer_c_duration(
@@ -580,6 +606,8 @@ static inline multicast_packet munich_protocol_pwm_pin_output_timer_c_duration(
     };
 }
 
+//! \brief Creates a command to set the PWM duty cycle ratio for Timer A, Channel 0.
+//! \param[in] timer_period: The timer period
 //! \param[in] uart_id: Which UART to program
 //! \return Description of what multicast packet to send
 static inline multicast_packet
@@ -593,6 +621,8 @@ munich_protocol_pwm_pin_output_timer_a_channel_0_ratio(
     };
 }
 
+//! \brief Creates a command to set the PWM duty cycle ratio for Timer A, Channel 1.
+//! \param[in] timer_period: The timer period
 //! \param[in] uart_id: Which UART to program
 //! \return Description of what multicast packet to send
 static inline multicast_packet
@@ -606,6 +636,8 @@ munich_protocol_pwm_pin_output_timer_a_channel_1_ratio(
     };
 }
 
+//! \brief Creates a command to set the PWM duty cycle ratio for Timer B, Channel 0.
+//! \param[in] timer_period: The timer period
 //! \param[in] uart_id: Which UART to program
 //! \return Description of what multicast packet to send
 static inline multicast_packet
@@ -619,6 +651,8 @@ munich_protocol_pwm_pin_output_timer_b_channel_0_ratio(
     };
 }
 
+//! \brief Creates a command to set the PWM duty cycle ratio for Timer B, Channel 1.
+//! \param[in] timer_period: The timer period
 //! \param[in] uart_id: Which UART to program
 //! \return Description of what multicast packet to send
 static inline multicast_packet
@@ -632,6 +666,8 @@ munich_protocol_pwm_pin_output_timer_b_channel_1_ratio(
     };
 }
 
+//! \brief Creates a command to set the PWM duty cycle ratio for Timer C, Channel 0.
+//! \param[in] timer_period: The timer period
 //! \param[in] uart_id: Which UART to program
 //! \return Description of what multicast packet to send
 static inline multicast_packet
@@ -645,6 +681,8 @@ munich_protocol_pwm_pin_output_timer_c_channel_0_ratio(
     };
 }
 
+//! \brief Creates a command to set the PWM duty cycle ratio for Timer C, Channel 1.
+//! \param[in] timer_period: The timer period
 //! \param[in] uart_id: Which UART to program
 //! \return Description of what multicast packet to send
 static inline multicast_packet
@@ -658,6 +696,10 @@ munich_protocol_pwm_pin_output_timer_c_channel_1_ratio(
     };
 }
 
+// ----------------------------------------------------------------------
+// Generic I/O control
+
+//! \brief Creates a command to ask for the state of the IO lines.
 //! \return Description of what multicast packet to send
 static inline multicast_packet munich_protocol_query_state_of_io_lines(void) {
     return (multicast_packet) {
@@ -667,7 +709,10 @@ static inline multicast_packet munich_protocol_query_state_of_io_lines(void) {
     };
 }
 
+//! \brief Creates a command to set an output pattern for a payload.
+//! \param[in] payload: What to set.
 //! \return Description of what multicast packet to send
+// This is extremely hard to intuit the meaning of!
 static inline multicast_packet munich_protocol_set_output_pattern_for_payload(
         uint32_t payload) {
     return (multicast_packet) {
@@ -677,7 +722,10 @@ static inline multicast_packet munich_protocol_set_output_pattern_for_payload(
     };
 }
 
+//! \brief Creates a command to add to the current output.
+//! \param[in] payload: What to add.
 //! \return Description of what multicast packet to send
+// This is extremely hard to intuit the meaning of!
 static inline multicast_packet
 munich_protocol_add_payload_logic_to_current_output(
         uint32_t payload) {
@@ -688,7 +736,10 @@ munich_protocol_add_payload_logic_to_current_output(
     };
 }
 
+//! \brief Creates a command to remove from the current output.
+//! \param[in] payload: What to remove.
 //! \return Description of what multicast packet to send
+// This is extremely hard to intuit the meaning of!
 static inline multicast_packet
 munich_protocol_remove_payload_logic_to_current_output(
         uint32_t payload) {
@@ -699,7 +750,10 @@ munich_protocol_remove_payload_logic_to_current_output(
     };
 }
 
+//! \brief Creates a command to set the payload pins to high-impedance mode.
+//! \param[in] payload: Which pins to set.
 //! \return Description of what multicast packet to send
+// This is extremely hard to intuit the meaning of!
 static inline multicast_packet
 munich_protocol_set_payload_pins_to_high_impedance(
         uint32_t payload) {
@@ -710,6 +764,11 @@ munich_protocol_set_payload_pins_to_high_impedance(
     };
 }
 
+// ----------------------------------------------------------------------
+// PushBot laser control
+
+//! \brief Creates a command to set the laser total period.
+//! \param[in] total_period: The total period
 //! \param[in] uart_id: Which UART to program
 //! \return Description of what multicast packet to send
 static inline multicast_packet
@@ -728,6 +787,8 @@ munich_protocol_push_bot_laser_config_total_period(
     };
 }
 
+//! \brief Creates a command to set the laser active time.
+//! \param[in] active_time: The active time
 //! \param[in] uart_id: Which UART to program
 //! \return Description of what multicast packet to send
 static inline multicast_packet
@@ -746,6 +807,8 @@ munich_protocol_push_bot_laser_config_active_time(
     };
 }
 
+//! \brief Creates a command to set the laser flash frequency.
+//! \param[in] frequency: The frequency
 //! \param[in] uart_id: Which UART to program
 //! \return Description of what multicast packet to send
 static inline multicast_packet munich_protocol_push_bot_laser_set_frequency(
@@ -762,6 +825,9 @@ static inline multicast_packet munich_protocol_push_bot_laser_set_frequency(
         .payload_flag = WITH_PAYLOAD
     };
 }
+
+// ----------------------------------------------------------------------
+// PushBot speaker control
 
 //! \brief Creates a command to configure the speaker to run in PCM mode.
 //! \param[in] total_period: The width of the overall PCM pulse. Affects
@@ -785,7 +851,7 @@ munich_protocol_push_bot_speaker_config_total_period(
 }
 
 //! \brief Creates a command to adjust how the speaker runs in PCM mode.
-//! \param[in] total_period: The width of the active part of the PCM pulse.
+//! \param[in] active_time: The width of the active part of the PCM pulse.
 //!     Affects quality of tone.
 //! \param[in] uart_id: Which UART to program
 //! \return Description of what multicast packet to send
@@ -845,6 +911,11 @@ static inline multicast_packet munich_protocol_push_bot_speaker_set_melody(
     };
 }
 
+// ----------------------------------------------------------------------
+// PushBot LED control
+
+//! \brief Creates a command to set the total LED period.
+//! \param[in] total_period: The total period
 //! \param[in] uart_id: Which UART to program
 //! \return Description of what multicast packet to send
 static inline multicast_packet munich_protocol_push_bot_led_total_period(
@@ -862,6 +933,8 @@ static inline multicast_packet munich_protocol_push_bot_led_total_period(
     };
 }
 
+//! \brief Creates a command to set the back LED active time.
+//! \param[in] active_time: The active time
 //! \param[in] uart_id: Which UART to program
 //! \return Description of what multicast packet to send
 static inline multicast_packet munich_protocol_push_bot_led_back_active_time(
@@ -879,6 +952,8 @@ static inline multicast_packet munich_protocol_push_bot_led_back_active_time(
     };
 }
 
+//! \brief Creates a command to set the front LED active time.
+//! \param[in] active_time: The active time
 //! \param[in] uart_id: Which UART to program
 //! \return Description of what multicast packet to send
 static inline multicast_packet munich_protocol_push_bot_led_front_active_time(
@@ -896,6 +971,8 @@ static inline multicast_packet munich_protocol_push_bot_led_front_active_time(
     };
 }
 
+//! \brief Creates a command to set the LED flash frequency.
+//! \param[in] frequency: Frequency to set
 //! \param[in] uart_id: Which UART to program
 //! \return Description of what multicast packet to send
 static inline multicast_packet munich_protocol_push_bot_led_set_frequency(
@@ -913,6 +990,11 @@ static inline multicast_packet munich_protocol_push_bot_led_set_frequency(
     };
 }
 
+// ----------------------------------------------------------------------
+// PushBot motor control
+
+//! \brief Creates a command to set motor 0 moving, in constant mode.
+//! \param[in] velocity: Constant velocity
 //! \param[in] uart_id: Which UART to program
 //! \return Description of what multicast packet to send
 static inline multicast_packet munich_protocol_push_bot_motor_0_permanent(
@@ -930,6 +1012,8 @@ static inline multicast_packet munich_protocol_push_bot_motor_0_permanent(
     };
 }
 
+//! \brief Creates a command to set motor 1 moving, in constant mode.
+//! \param[in] velocity: Constant velocity
 //! \param[in] uart_id: Which UART to program
 //! \return Description of what multicast packet to send
 static inline multicast_packet munich_protocol_push_bot_motor_1_permanent(
@@ -947,6 +1031,8 @@ static inline multicast_packet munich_protocol_push_bot_motor_1_permanent(
     };
 }
 
+//! \brief Creates a command to set motor 0 moving, in leak-to-zero mode.
+//! \param[in] velocity: Initial velocity
 //! \param[in] uart_id: Which UART to program
 //! \return Description of what multicast packet to send
 static inline multicast_packet
@@ -965,6 +1051,8 @@ munich_protocol_push_bot_motor_0_leaking_towards_zero(
     };
 }
 
+//! \brief Creates a command to set motor 1 moving, in leak-to-zero mode.
+//! \param[in] velocity: Initial velocity
 //! \param[in] uart_id: Which UART to program
 //! \return Description of what multicast packet to send
 static inline multicast_packet
@@ -982,6 +1070,9 @@ munich_protocol_push_bot_motor_1_leaking_towards_zero(
         .payload_flag = WITH_PAYLOAD
     };
 }
+
+// ----------------------------------------------------------------------
+// PushBot retina control
 
 static inline multicast_packet _key_retina(
         uint32_t retina_pixels, uint32_t time_stamps, uint32_t uart_id) {
