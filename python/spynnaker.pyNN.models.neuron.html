@@ -1054,6 +1054,36 @@ If None the assumption is all neurons are recording</li>
 </tr>
 </tbody>
 </table>
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model_standard.AbstractPyNNNeuronModelStandard.create_vertex">
+<code class="descname">create_vertex</code><span class="sig-paren">(</span><em>n_neurons</em>, <em>label</em>, <em>constraints</em>, <em>spikes_per_second</em>, <em>ring_buffer_sigma</em>, <em>incoming_spike_buffer_size</em>, <em>n_steps_per_timestep</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_pynn_neuron_model_standard.html#AbstractPyNNNeuronModelStandard.create_vertex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model_standard.AbstractPyNNNeuronModelStandard.create_vertex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a vertex for a population of the model</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons in the population</li>
+<li><strong>label</strong> (<em>str</em>) &#8211; The label to give to the vertex</li>
+<li><strong>constraints</strong> (<em>list</em><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v)"><em>AbstractConstraint</em></a><em>) or </em><em>None</em>) &#8211; A list of constraints to give to the vertex, or None</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">An application vertex for the population</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v)">ApplicationVertex</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model_standard.AbstractPyNNNeuronModelStandard.default_population_parameters">
+<code class="descname">default_population_parameters</code><em class="property"> = {'spikes_per_second': None, 'ring_buffer_sigma': None, 'incoming_spike_buffer_size': None, 'n_steps_per_timestep': 1}</em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model_standard.AbstractPyNNNeuronModelStandard.default_population_parameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 </div>
@@ -2997,6 +3027,36 @@ source, target, weight and delay</td>
 </tr>
 </tbody>
 </table>
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModelStandard.create_vertex">
+<code class="descname">create_vertex</code><span class="sig-paren">(</span><em>n_neurons</em>, <em>label</em>, <em>constraints</em>, <em>spikes_per_second</em>, <em>ring_buffer_sigma</em>, <em>incoming_spike_buffer_size</em>, <em>n_steps_per_timestep</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_pynn_neuron_model_standard.html#AbstractPyNNNeuronModelStandard.create_vertex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModelStandard.create_vertex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a vertex for a population of the model</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons in the population</li>
+<li><strong>label</strong> (<em>str</em>) &#8211; The label to give to the vertex</li>
+<li><strong>constraints</strong> (<em>list</em><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v)"><em>AbstractConstraint</em></a><em>) or </em><em>None</em>) &#8211; A list of constraints to give to the vertex, or None</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">An application vertex for the population</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v)">ApplicationVertex</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModelStandard.default_population_parameters">
+<code class="descname">default_population_parameters</code><em class="property"> = {'spikes_per_second': None, 'ring_buffer_sigma': None, 'incoming_spike_buffer_size': None, 'n_steps_per_timestep': 1}</em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModelStandard.default_population_parameters" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 </div>

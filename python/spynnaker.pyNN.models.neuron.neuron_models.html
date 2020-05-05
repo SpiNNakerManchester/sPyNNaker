@@ -126,7 +126,7 @@ that they appear</li>
 </table>
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.neuron_models.abstract_neuron_model.AbstractNeuronModel.get_data">
-<code class="descname">get_data</code><span class="sig-paren">(</span><em>parameters</em>, <em>state_variables</em>, <em>vertex_slice</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/abstract_neuron_model.html#AbstractNeuronModel.get_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.abstract_neuron_model.AbstractNeuronModel.get_data" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_data</code><span class="sig-paren">(</span><em>parameters</em>, <em>state_variables</em>, <em>vertex_slice</em>, <em>ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/abstract_neuron_model.html#AbstractNeuronModel.get_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.abstract_neuron_model.AbstractNeuronModel.get_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the data <em>to be written to the machine</em> for this model.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -164,15 +164,17 @@ that they appear</li>
 
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.neuron_models.abstract_neuron_model.AbstractNeuronModel.get_global_values">
-<code class="descname">get_global_values</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/abstract_neuron_model.html#AbstractNeuronModel.get_global_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.abstract_neuron_model.AbstractNeuronModel.get_global_values" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_global_values</code><span class="sig-paren">(</span><em>ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/abstract_neuron_model.html#AbstractNeuronModel.get_global_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.abstract_neuron_model.AbstractNeuronModel.get_global_values" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the global values to be written to the machine for this model</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A list with the same length as self.global_struct.field_types</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ts</strong> (<em>float</em>) &#8211; The time to advance the model at each call</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list(int or float) or ndarray</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A list with the same length as self.global_struct.field_types</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list(int or float) or ndarray</td>
 </tr>
 </tbody>
 </table>
@@ -294,15 +296,17 @@ that they appear</li>
 
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.neuron_models.neuron_model_izh.NeuronModelIzh.get_global_values">
-<code class="descname">get_global_values</code><span class="sig-paren">(</span><em>machine_time_step</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/neuron_model_izh.html#NeuronModelIzh.get_global_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.neuron_model_izh.NeuronModelIzh.get_global_values" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_global_values</code><span class="sig-paren">(</span><em>ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/neuron_model_izh.html#NeuronModelIzh.get_global_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.neuron_model_izh.NeuronModelIzh.get_global_values" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the global values to be written to the machine for this model</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A list with the same length as self.global_struct.field_types</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ts</strong> (<em>float</em>) &#8211; The time to advance the model at each call</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list(int or float) or ndarray</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A list with the same length as self.global_struct.field_types</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list(int or float) or ndarray</td>
 </tr>
 </tbody>
 </table>
@@ -350,6 +354,7 @@ that they appear</li>
 <li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters</li>
 <li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables</li>
 <li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; The slice of variables being retrieved</li>
+<li><strong>ts</strong> (<em>float</em>) &#8211; The time to be advanced in one call to the update of this component</li>
 </ul>
 </td>
 </tr>
@@ -498,6 +503,7 @@ RangedList)</p>
 <li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters</li>
 <li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables</li>
 <li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; The slice of variables being retrieved</li>
+<li><strong>ts</strong> (<em>float</em>) &#8211; The time to be advanced in one call to the update of this component</li>
 </ul>
 </td>
 </tr>
@@ -603,7 +609,7 @@ that they appear</li>
 </table>
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel.get_data">
-<code class="descname">get_data</code><span class="sig-paren">(</span><em>parameters</em>, <em>state_variables</em>, <em>vertex_slice</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/abstract_neuron_model.html#AbstractNeuronModel.get_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel.get_data" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_data</code><span class="sig-paren">(</span><em>parameters</em>, <em>state_variables</em>, <em>vertex_slice</em>, <em>ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/abstract_neuron_model.html#AbstractNeuronModel.get_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel.get_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the data <em>to be written to the machine</em> for this model.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -641,15 +647,17 @@ that they appear</li>
 
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel.get_global_values">
-<code class="descname">get_global_values</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/abstract_neuron_model.html#AbstractNeuronModel.get_global_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel.get_global_values" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_global_values</code><span class="sig-paren">(</span><em>ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/abstract_neuron_model.html#AbstractNeuronModel.get_global_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel.get_global_values" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the global values to be written to the machine for this model</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A list with the same length as self.global_struct.field_types</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ts</strong> (<em>float</em>) &#8211; The time to advance the model at each call</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list(int or float) or ndarray</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A list with the same length as self.global_struct.field_types</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list(int or float) or ndarray</td>
 </tr>
 </tbody>
 </table>
@@ -768,15 +776,17 @@ that they appear</li>
 
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.get_global_values">
-<code class="descname">get_global_values</code><span class="sig-paren">(</span><em>machine_time_step</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/neuron_model_izh.html#NeuronModelIzh.get_global_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.get_global_values" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_global_values</code><span class="sig-paren">(</span><em>ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/neuron_models/neuron_model_izh.html#NeuronModelIzh.get_global_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.neuron_models.NeuronModelIzh.get_global_values" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the global values to be written to the machine for this model</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A list with the same length as self.global_struct.field_types</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ts</strong> (<em>float</em>) &#8211; The time to advance the model at each call</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">list(int or float) or ndarray</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A list with the same length as self.global_struct.field_types</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list(int or float) or ndarray</td>
 </tr>
 </tbody>
 </table>
@@ -824,6 +834,7 @@ that they appear</li>
 <li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters</li>
 <li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables</li>
 <li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; The slice of variables being retrieved</li>
+<li><strong>ts</strong> (<em>float</em>) &#8211; The time to be advanced in one call to the update of this component</li>
 </ul>
 </td>
 </tr>
@@ -969,6 +980,7 @@ RangedList)</p>
 <li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters</li>
 <li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables</li>
 <li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; The slice of variables being retrieved</li>
+<li><strong>ts</strong> (<em>float</em>) &#8211; The time to be advanced in one call to the update of this component</li>
 </ul>
 </td>
 </tr>

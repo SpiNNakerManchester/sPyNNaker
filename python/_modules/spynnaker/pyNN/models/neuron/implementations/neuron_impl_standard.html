@@ -84,6 +84,14 @@
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.input_types</span> <span class="kn">import</span> <span class="n">InputTypeConductance</span>
 <span class="kn">from</span> <span class="nn">.abstract_neuron_impl</span> <span class="kn">import</span> <span class="n">AbstractNeuronImpl</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities</span> <span class="kn">import</span> <span class="n">globals_variables</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="n">BYTES_PER_WORD</span>
+
+<span class="c1"># The size of the n_steps_per_timestep parameter</span>
+<span class="n">_N_STEPS_PER_TIMESTEP_SIZE</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
+
+<span class="c1"># The default number of steps per timestep</span>
+<span class="n">_DEFAULT_N_STEPS_PER_TIMESTEP</span> <span class="o">=</span> <span class="mi">1</span>
 
 
 <div class="viewcode-block" id="NeuronImplStandard"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard">[docs]</a><span class="k">class</span> <span class="nc">NeuronImplStandard</span><span class="p">(</span><span class="n">AbstractNeuronImpl</span><span class="p">):</span>
@@ -98,7 +106,8 @@
         <span class="s2">&quot;__synapse_type&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__threshold_type&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__additional_input_type&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__components&quot;</span>
+        <span class="s2">&quot;__components&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;__n_steps_per_timestep&quot;</span>
     <span class="p">]</span>
 
     <span class="n">_RECORDABLES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;v&quot;</span><span class="p">,</span> <span class="s2">&quot;gsyn_exc&quot;</span><span class="p">,</span> <span class="s2">&quot;gsyn_inh&quot;</span><span class="p">]</span>
@@ -134,12 +143,21 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_type</span> <span class="o">=</span> <span class="n">synapse_type</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__threshold_type</span> <span class="o">=</span> <span class="n">threshold_type</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__additional_input_type</span> <span class="o">=</span> <span class="n">additional_input_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__n_steps_per_timestep</span> <span class="o">=</span> <span class="n">_DEFAULT_N_STEPS_PER_TIMESTEP</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__components</span> <span class="o">=</span> <span class="p">[</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__input_type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__threshold_type</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_type</span><span class="p">]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__additional_input_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__components</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__additional_input_type</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">n_steps_per_timestep</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_steps_per_timestep</span>
+
+    <span class="nd">@n_steps_per_timestep</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">n_steps_per_timestep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_steps_per_timestep</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__n_steps_per_timestep</span> <span class="o">=</span> <span class="n">n_steps_per_timestep</span>
 
     <span class="nd">@property</span>
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractNeuronImpl</span><span class="o">.</span><span class="n">model_name</span><span class="p">)</span>
@@ -163,7 +181,8 @@
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractNeuronImpl</span><span class="o">.</span><span class="n">get_dtcm_usage_in_bytes</span><span class="p">)</span>
 <div class="viewcode-block" id="NeuronImplStandard.get_dtcm_usage_in_bytes"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard.get_dtcm_usage_in_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">get_dtcm_usage_in_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">):</span>
-        <span class="n">total</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_model</span><span class="o">.</span><span class="n">get_dtcm_usage_in_bytes</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">)</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="n">_N_STEPS_PER_TIMESTEP_SIZE</span>
+        <span class="n">total</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_model</span><span class="o">.</span><span class="n">get_dtcm_usage_in_bytes</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">)</span>
         <span class="n">total</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_type</span><span class="o">.</span><span class="n">get_dtcm_usage_in_bytes</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">)</span>
         <span class="n">total</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__input_type</span><span class="o">.</span><span class="n">get_dtcm_usage_in_bytes</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">)</span>
         <span class="n">total</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__threshold_type</span><span class="o">.</span><span class="n">get_dtcm_usage_in_bytes</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">)</span>
@@ -174,7 +193,8 @@
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractNeuronImpl</span><span class="o">.</span><span class="n">get_sdram_usage_in_bytes</span><span class="p">)</span>
 <div class="viewcode-block" id="NeuronImplStandard.get_sdram_usage_in_bytes"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard.get_sdram_usage_in_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">get_sdram_usage_in_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">):</span>
-        <span class="n">total</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_model</span><span class="o">.</span><span class="n">get_sdram_usage_in_bytes</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">)</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="n">_N_STEPS_PER_TIMESTEP_SIZE</span>
+        <span class="n">total</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__neuron_model</span><span class="o">.</span><span class="n">get_sdram_usage_in_bytes</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">)</span>
         <span class="n">total</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_type</span><span class="o">.</span><span class="n">get_sdram_usage_in_bytes</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">)</span>
         <span class="n">total</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__input_type</span><span class="o">.</span><span class="n">get_sdram_usage_in_bytes</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">)</span>
         <span class="n">total</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__threshold_type</span><span class="o">.</span><span class="n">get_sdram_usage_in_bytes</span><span class="p">(</span><span class="n">n_neurons</span><span class="p">)</span>
@@ -231,14 +251,19 @@
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractNeuronImpl</span><span class="o">.</span><span class="n">get_data</span><span class="p">)</span>
 <div class="viewcode-block" id="NeuronImplStandard.get_data"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard.get_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span>
-            <span class="n">component</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">component</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__components</span>
-        <span class="p">])</span></div>
+        <span class="c1"># Work out the time step per step</span>
+        <span class="n">ts</span> <span class="o">=</span> <span class="n">globals_variables</span><span class="o">.</span><span class="n">get_simulator</span><span class="p">()</span><span class="o">.</span><span class="n">machine_time_step</span>
+        <span class="n">ts</span> <span class="o">/=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_steps_per_timestep</span>
+        <span class="n">items</span> <span class="o">=</span> <span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">__n_steps_per_timestep</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;uint32&quot;</span><span class="p">)]</span>
+        <span class="n">items</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+            <span class="n">component</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span><span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">ts</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">component</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__components</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">items</span><span class="p">)</span></div>
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractNeuronImpl</span><span class="o">.</span><span class="n">read_data</span><span class="p">)</span>
 <div class="viewcode-block" id="NeuronImplStandard.read_data"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard.read_data">[docs]</a>    <span class="k">def</span> <span class="nf">read_data</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">):</span>
+        <span class="n">offset</span> <span class="o">+=</span> <span class="n">_N_STEPS_PER_TIMESTEP_SIZE</span>
         <span class="k">for</span> <span class="n">component</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__components</span><span class="p">:</span>
             <span class="n">offset</span> <span class="o">=</span> <span class="n">component</span><span class="o">.</span><span class="n">read_data</span><span class="p">(</span>
                 <span class="n">data</span><span class="p">,</span> <span class="n">offset</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">state_variables</span><span class="p">)</span>

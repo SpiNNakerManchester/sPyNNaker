@@ -460,7 +460,7 @@ they appear</td>
 
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent.get_data">
-<code class="descname">get_data</code><span class="sig-paren">(</span><em>parameters</em>, <em>state_variables</em>, <em>vertex_slice</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_standard_neuron_component.html#AbstractStandardNeuronComponent.get_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent.get_data" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_data</code><span class="sig-paren">(</span><em>parameters</em>, <em>state_variables</em>, <em>vertex_slice</em>, <em>ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_standard_neuron_component.html#AbstractStandardNeuronComponent.get_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent.get_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the data <em>to be written to the machine</em> for this model.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -544,7 +544,7 @@ they appear</td>
 
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent.get_values">
-<code class="descname">get_values</code><span class="sig-paren">(</span><em>parameters</em>, <em>state_variables</em>, <em>vertex_slice</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_standard_neuron_component.html#AbstractStandardNeuronComponent.get_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent.get_values" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_values</code><span class="sig-paren">(</span><em>parameters</em>, <em>state_variables</em>, <em>vertex_slice</em>, <em>ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_standard_neuron_component.html#AbstractStandardNeuronComponent.get_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent.get_values" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the values to be written to the machine for this model</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -554,6 +554,7 @@ they appear</td>
 <li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters</li>
 <li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables</li>
 <li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; The slice of variables being retrieved</li>
+<li><strong>ts</strong> (<em>float</em>) &#8211; The time to be advanced in one call to the update of this component</li>
 </ul>
 </td>
 </tr>
@@ -950,6 +951,11 @@ RangedList)</p>
 </table>
 </dd></dl>
 
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard.n_steps_per_timestep">
+<code class="descname">n_steps_per_timestep</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard.n_steps_per_timestep" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard.read_data">
 <code class="descname">read_data</code><span class="sig-paren">(</span><em>data</em>, <em>offset</em>, <em>vertex_slice</em>, <em>parameters</em>, <em>state_variables</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.read_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard.read_data" title="Permalink to this definition">¶</a></dt>
@@ -1042,7 +1048,7 @@ they appear</td>
 
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.get_data">
-<code class="descname">get_data</code><span class="sig-paren">(</span><em>parameters</em>, <em>state_variables</em>, <em>vertex_slice</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_standard_neuron_component.html#AbstractStandardNeuronComponent.get_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.get_data" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_data</code><span class="sig-paren">(</span><em>parameters</em>, <em>state_variables</em>, <em>vertex_slice</em>, <em>ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_standard_neuron_component.html#AbstractStandardNeuronComponent.get_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.get_data" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the data <em>to be written to the machine</em> for this model.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1126,7 +1132,7 @@ they appear</td>
 
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.get_values">
-<code class="descname">get_values</code><span class="sig-paren">(</span><em>parameters</em>, <em>state_variables</em>, <em>vertex_slice</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_standard_neuron_component.html#AbstractStandardNeuronComponent.get_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.get_values" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_values</code><span class="sig-paren">(</span><em>parameters</em>, <em>state_variables</em>, <em>vertex_slice</em>, <em>ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_standard_neuron_component.html#AbstractStandardNeuronComponent.get_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.get_values" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the values to be written to the machine for this model</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1136,6 +1142,7 @@ they appear</td>
 <li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters</li>
 <li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables</li>
 <li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; The slice of variables being retrieved</li>
+<li><strong>ts</strong> (<em>float</em>) &#8211; The time to be advanced in one call to the update of this component</li>
 </ul>
 </td>
 </tr>
@@ -1528,6 +1535,11 @@ RangedList)</p>
 </tbody>
 </table>
 </dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.n_steps_per_timestep">
+<code class="descname">n_steps_per_timestep</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.n_steps_per_timestep" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.read_data">

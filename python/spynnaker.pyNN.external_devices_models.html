@@ -519,7 +519,7 @@
 <p>Abstract control module for the PushBot, based on the LIF neuron,        but without spikes, and using the voltage as the output to the various        devices</p>
 <dl class="method">
 <dt id="spynnaker.pyNN.external_devices_models.external_device_lif_control.ExternalDeviceLifControl.create_vertex">
-<code class="descname">create_vertex</code><span class="sig-paren">(</span><em>n_neurons</em>, <em>label</em>, <em>constraints</em>, <em>spikes_per_second</em>, <em>ring_buffer_sigma</em>, <em>incoming_spike_buffer_size</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/external_device_lif_control.html#ExternalDeviceLifControl.create_vertex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.external_device_lif_control.ExternalDeviceLifControl.create_vertex" title="Permalink to this definition">¶</a></dt>
+<code class="descname">create_vertex</code><span class="sig-paren">(</span><em>n_neurons</em>, <em>label</em>, <em>constraints</em>, <em>spikes_per_second</em>, <em>ring_buffer_sigma</em>, <em>incoming_spike_buffer_size</em>, <em>n_steps_per_timestep</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/external_device_lif_control.html#ExternalDeviceLifControl.create_vertex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.external_device_lif_control.ExternalDeviceLifControl.create_vertex" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a vertex for a population of the model</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1258,7 +1258,7 @@ CPUCyclesPerTickResource, DTCMResource and SDRAMResource</td>
 
 <dl class="method">
 <dt id="spynnaker.pyNN.external_devices_models.threshold_type_multicast_device_control.ThresholdTypeMulticastDeviceControl.get_values">
-<code class="descname">get_values</code><span class="sig-paren">(</span><em>parameters</em>, <em>state_variables</em>, <em>vertex_slice</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/threshold_type_multicast_device_control.html#ThresholdTypeMulticastDeviceControl.get_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.threshold_type_multicast_device_control.ThresholdTypeMulticastDeviceControl.get_values" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_values</code><span class="sig-paren">(</span><em>parameters</em>, <em>state_variables</em>, <em>vertex_slice</em>, <em>ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/threshold_type_multicast_device_control.html#ThresholdTypeMulticastDeviceControl.get_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.threshold_type_multicast_device_control.ThresholdTypeMulticastDeviceControl.get_values" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the values to be written to the machine for this model</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -1268,6 +1268,7 @@ CPUCyclesPerTickResource, DTCMResource and SDRAMResource</td>
 <li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters</li>
 <li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables</li>
 <li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; The slice of variables being retrieved</li>
+<li><strong>ts</strong> (<em>float</em>) &#8211; The time to be advanced in one call to the update of this component</li>
 </ul>
 </td>
 </tr>
@@ -1617,7 +1618,7 @@ RangedList)</p>
 <p>Abstract control module for the PushBot, based on the LIF neuron,        but without spikes, and using the voltage as the output to the various        devices</p>
 <dl class="method">
 <dt id="spynnaker.pyNN.external_devices_models.ExternalDeviceLifControl.create_vertex">
-<code class="descname">create_vertex</code><span class="sig-paren">(</span><em>n_neurons</em>, <em>label</em>, <em>constraints</em>, <em>spikes_per_second</em>, <em>ring_buffer_sigma</em>, <em>incoming_spike_buffer_size</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/external_device_lif_control.html#ExternalDeviceLifControl.create_vertex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.ExternalDeviceLifControl.create_vertex" title="Permalink to this definition">¶</a></dt>
+<code class="descname">create_vertex</code><span class="sig-paren">(</span><em>n_neurons</em>, <em>label</em>, <em>constraints</em>, <em>spikes_per_second</em>, <em>ring_buffer_sigma</em>, <em>incoming_spike_buffer_size</em>, <em>n_steps_per_timestep</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/external_device_lif_control.html#ExternalDeviceLifControl.create_vertex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.ExternalDeviceLifControl.create_vertex" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a vertex for a population of the model</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2182,7 +2183,7 @@ CPUCyclesPerTickResource, DTCMResource and SDRAMResource</td>
 
 <dl class="method">
 <dt id="spynnaker.pyNN.external_devices_models.ThresholdTypeMulticastDeviceControl.get_values">
-<code class="descname">get_values</code><span class="sig-paren">(</span><em>parameters</em>, <em>state_variables</em>, <em>vertex_slice</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/threshold_type_multicast_device_control.html#ThresholdTypeMulticastDeviceControl.get_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.ThresholdTypeMulticastDeviceControl.get_values" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_values</code><span class="sig-paren">(</span><em>parameters</em>, <em>state_variables</em>, <em>vertex_slice</em>, <em>ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/external_devices_models/threshold_type_multicast_device_control.html#ThresholdTypeMulticastDeviceControl.get_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.external_devices_models.ThresholdTypeMulticastDeviceControl.get_values" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the values to be written to the machine for this model</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -2192,6 +2193,7 @@ CPUCyclesPerTickResource, DTCMResource and SDRAMResource</td>
 <li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters</li>
 <li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables</li>
 <li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; The slice of variables being retrieved</li>
+<li><strong>ts</strong> (<em>float</em>) &#8211; The time to be advanced in one call to the update of this component</li>
 </ul>
 </td>
 </tr>

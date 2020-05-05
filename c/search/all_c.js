@@ -38,6 +38,7 @@ var searchData=
   ['n_5fspikes',['n_spikes',['../last__neuron__selection__impl_8c.html#a3517ef59d8e5a261be447e890013b160',1,'n_spikes():&#160;last_neuron_selection_impl.c'],['../last__neuron__selection__impl_8h.html#a3517ef59d8e5a261be447e890013b160',1,'n_spikes():&#160;last_neuron_selection_impl.c']]],
   ['n_5fspikes_5fadded',['n_spikes_added',['../delay__extension_8c.html#aad9874f1f923ca947460f8f82fddcb2f',1,'delay_extension.c']]],
   ['n_5fspikes_5fsent',['n_spikes_sent',['../delay__extension_8c.html#a3234bc766f5cbe802ac49b206bf95f45',1,'delay_extension.c']]],
+  ['n_5fsteps_5fper_5ftimestep',['n_steps_per_timestep',['../neuron__impl__standard_8h.html#adc2145aaa2f8435401d2c077d42c7b91',1,'neuron_impl_standard.h']]],
   ['n_5fsuccessful_5frewires',['n_successful_rewires',['../spike__processing_8c.html#a3a9f1e7d67f318a7a966f01ff80b49dd',1,'spike_processing.c']]],
   ['n_5fsynapse_5frow_5fheader_5fwords',['N_SYNAPSE_ROW_HEADER_WORDS',['../synapse__row_8h.html#ad7cd5d97013df7e40e5a1f2c7d73ee57',1,'synapse_row.h']]],
   ['n_5fsynapse_5ftypes',['n_synapse_types',['../synapses_8c.html#adedb27b3ece4d4dece0aee776a136427',1,'synapses.c']]],
