@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['decay_5ft',['decay_t',['../decay_8h.html#a2d8155d52b7e3ac155ddc14cbe1efb25',1,'decay.h']]]
+  ['card',['Card',['../maths-util_8h.html#a63fe77b0ec710597cb0b69eee8d90aaf',1,'maths-util.h']]],
+  ['control_5ft',['control_t',['../synapse__row_8h.html#aeae1e8aa0c0095434ba488866ef21aa2',1,'synapse_row.h']]]
 ];

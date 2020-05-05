@@ -1,7 +1,9 @@
 var searchData=
 [
   ['n_5fatoms',['n_atoms',['../delay__extension_8h.html#a9e45122a1ce77599d6fd04118ddfd33b',1,'delay_parameters']]],
+  ['n_5fbitfield_5fvars',['n_bitfield_vars',['../neuron__recording_8c.html#aceb45219931c687ba2595c66b9561e18',1,'neuron_recording_header_t']]],
   ['n_5fbuffer_5foverflows',['n_buffer_overflows',['../delay__extension_8c.html#a14402f68e6fb5f758c453cd1ef86f954',1,'delay_extension_provenance']]],
+  ['n_5fbuffers',['n_buffers',['../spike__source__poisson_8c.html#a01eac79ac7d1bc6bc5ba8bbe4fcdfa6c',1,'timed_out_spikes']]],
   ['n_5fbytes_5ftransferred',['n_bytes_transferred',['../spike__processing_8c.html#a764511923c4c18e2c1303c4386aaf5e3',1,'dma_buffer']]],
   ['n_5fdelay_5fstages',['n_delay_stages',['../delay__extension_8h.html#ae066739d171e52ac2fa7001f58891b42',1,'delay_parameters']]],
   ['n_5fdelays',['n_delays',['../delay__extension_8c.html#a3ca931b66220774b3aaf1dea3db2b392',1,'delay_extension_provenance::n_delays()'],['../delay__extension_8c.html#a5afaacadf2ba06d040be6c3c3b173feb',1,'n_delays():&#160;delay_extension.c']]],
@@ -21,6 +23,8 @@ var searchData=
   ['n_5fpre_5fneurons_5fdone',['n_pre_neurons_done',['../connection__generator__fixed__pre_8h.html#a39a9876a13a2fe1e6700d4fa144de305',1,'fixed_pre_globals_t']]],
   ['n_5fpre_5fsynaptic_5fevents',['n_pre_synaptic_events',['../c__main_8c.html#aa5cc7c82313ba8fd9b9300b36b5fbbcf',1,'neuron_provenance']]],
   ['n_5fprocessed_5fspikes',['n_processed_spikes',['../delay__extension_8c.html#a6493419a971eb32c75d2295ebc0fa4ed',1,'delay_extension.c']]],
+  ['n_5frates',['n_rates',['../spike__source__poisson_8c.html#a62435794d07ae2d9589f23e7e318cf65',1,'source_info']]],
+  ['n_5frecorded_5fvars',['n_recorded_vars',['../neuron__recording_8c.html#abedd25f4658e60246836b650b8432a7b',1,'neuron_recording_header_t']]],
   ['n_5frecordings_5foutstanding',['n_recordings_outstanding',['../neuron__recording_8c.html#a68f284a99102ae7b420f1650e7d50a88',1,'n_recordings_outstanding():&#160;neuron_recording.c'],['../neuron__recording_8h.html#a68f284a99102ae7b420f1650e7d50a88',1,'n_recordings_outstanding():&#160;neuron_recording.c']]],
   ['n_5frewires',['n_rewires',['../c__main_8c.html#ac525fc32eb7e2f1ef173901fb8dac16d',1,'neuron_provenance']]],
   ['n_5fspike_5fbuffer_5fwords',['n_spike_buffer_words',['../spike__source__poisson_8c.html#ab75c33a373a49cc4235f559fc559b0f9',1,'spike_source_poisson.c']]],
@@ -40,6 +44,7 @@ var searchData=
   ['neuron_5fsynapse_5fshaping_5fparams',['neuron_synapse_shaping_params',['../neuron__impl__standard_8h.html#ae0383b1a8ff4169668ce6e5130cfbeaf',1,'neuron_impl_standard.h']]],
   ['next_5fbuffer_5fto_5ffill',['next_buffer_to_fill',['../spike__processing_8c.html#a44ad7661afc7fed0e0bc90a36caae5db',1,'spike_processing.c']]],
   ['next_5fitem',['next_item',['../population__table__binary__search__impl_8c.html#a1002add104ecafe843ef47eadf096e0d',1,'population_table_binary_search_impl.c']]],
+  ['next_5fticks',['next_ticks',['../spike__source__poisson_8c.html#aa9931cbd5389b3c46b8c0a4de4d0aa77',1,'spike_source_t']]],
   ['next_5ftime',['next_time',['../post__events_8h.html#a9e1d7d36e09369711dca6fd87e8bf756',1,'post_event_window_t']]],
   ['next_5ftrace',['next_trace',['../post__events_8h.html#ac8965ef8cab18d79f9f329602b05c26c',1,'post_event_window_t']]],
   ['num_5fdelay_5fslots_5fmask',['num_delay_slots_mask',['../delay__extension_8c.html#a72085e13d5dfdbd948a0773dd1e13096',1,'delay_extension.c']]],

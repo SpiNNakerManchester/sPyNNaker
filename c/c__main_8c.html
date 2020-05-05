@@ -128,20 +128,20 @@ Macros</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
 Enumerations</h2></td></tr>
-<tr class="memitem:a65b19dabf5283c1ea37df964ca25e964"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a65b19dabf5283c1ea37df964ca25e964"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#a65b19dabf5283c1ea37df964ca25e964">callback_priorities</a> { <br />
+<tr class="memitem:a65b19dabf5283c1ea37df964ca25e964"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#a65b19dabf5283c1ea37df964ca25e964">callback_priorities</a> { <br />
 &#160;&#160;<b>MC</b> = -1, 
 <b>DMA</b> = 0, 
 <b>USER</b> = 0, 
 <b>SDP</b> = 1, 
 <br />
 &#160;&#160;<b>TIMER</b> = 2, 
-<b>MULTICAST</b> = -1, 
-<b>SDP</b> = 0, 
-<b>DMA</b> = 1, 
+<a class="el" href="spike__source__poisson_8c.html#a65b19dabf5283c1ea37df964ca25e964a607d700b2c0a01c54bdadde074a7cb12">MULTICAST</a> = -1, 
+<a class="el" href="spike__source__poisson_8c.html#a65b19dabf5283c1ea37df964ca25e964ad645defae8408de2415f3dc417f69773">SDP</a> = 0, 
+<a class="el" href="spike__source__poisson_8c.html#a65b19dabf5283c1ea37df964ca25e964a6537a62f6f155792bb9a320ee2ec4d68">DMA</a> = 1, 
 <br />
-&#160;&#160;<b>TIMER</b> = 2
+&#160;&#160;<a class="el" href="spike__source__poisson_8c.html#a65b19dabf5283c1ea37df964ca25e964a17ba9bae1b8d7e8d6c12d46ec58e0769">TIMER</a> = 2
 <br />
- }<tr class="memdesc:a65b19dabf5283c1ea37df964ca25e964"><td class="mdescLeft">&#160;</td><td class="mdescRight">values for the priority for each callback <br /></td></tr>
+ }<tr class="memdesc:a65b19dabf5283c1ea37df964ca25e964"><td class="mdescLeft">&#160;</td><td class="mdescRight">values for the priority for each callback  <a href="c__main_8c.html#a65b19dabf5283c1ea37df964ca25e964">More...</a><br /></td></tr>
 </td></tr>
 <tr class="separator:a65b19dabf5283c1ea37df964ca25e964"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -153,8 +153,9 @@ Functions</h2></td></tr>
 <tr class="memitem:abc8ec4992e18193766cc267a4968f1d7"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#abc8ec4992e18193766cc267a4968f1d7">initialise</a> (void)</td></tr>
 <tr class="memdesc:abc8ec4992e18193766cc267a4968f1d7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialises the model by reading in the regions and checking recording data.  <a href="#abc8ec4992e18193766cc267a4968f1d7">More...</a><br /></td></tr>
 <tr class="separator:abc8ec4992e18193766cc267a4968f1d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8967e8eb09363007076f840186a20995"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#a8967e8eb09363007076f840186a20995">resume_callback</a> (void)</td></tr>
-<tr class="memdesc:a8967e8eb09363007076f840186a20995"><td class="mdescLeft">&#160;</td><td class="mdescRight">the function to call when resuming a simulation  <a href="#a8967e8eb09363007076f840186a20995">More...</a><br /></td></tr>
+<tr class="memitem:a8967e8eb09363007076f840186a20995"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8967e8eb09363007076f840186a20995"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#a8967e8eb09363007076f840186a20995">resume_callback</a> (void)</td></tr>
+<tr class="memdesc:a8967e8eb09363007076f840186a20995"><td class="mdescLeft">&#160;</td><td class="mdescRight">the function to call when resuming a simulation <br /></td></tr>
 <tr class="separator:a8967e8eb09363007076f840186a20995"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a217aea663c8dd444052831cbde49bd62"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c__main_8c.html#a217aea663c8dd444052831cbde49bd62">timer_callback</a> (uint timer_count, uint unused)</td></tr>
 <tr class="memdesc:a217aea663c8dd444052831cbde49bd62"><td class="mdescLeft">&#160;</td><td class="mdescRight">Timer interrupt callback.  <a href="#a217aea663c8dd444052831cbde49bd62">More...</a><br /></td></tr>
@@ -266,6 +267,35 @@ The number of rewirings performed. </td></tr>
 
 </div>
 </div>
+<h2 class="groupheader">Enumeration Type Documentation</h2>
+<a class="anchor" id="a65b19dabf5283c1ea37df964ca25e964"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="c__main_8c.html#a65b19dabf5283c1ea37df964ca25e964">callback_priorities</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>values for the priority for each callback </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a class="anchor" id="a65b19dabf5283c1ea37df964ca25e964a607d700b2c0a01c54bdadde074a7cb12"></a>MULTICAST&#160;</td><td class="fielddoc">
+<p>Multicast packet reception uses the FIQ. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="a65b19dabf5283c1ea37df964ca25e964ad645defae8408de2415f3dc417f69773"></a>SDP&#160;</td><td class="fielddoc">
+<p>SDP handling is highest ordinary priority. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="a65b19dabf5283c1ea37df964ca25e964a6537a62f6f155792bb9a320ee2ec4d68"></a>DMA&#160;</td><td class="fielddoc">
+<p>DMA complete handling is medium priority. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="a65b19dabf5283c1ea37df964ca25e964a17ba9bae1b8d7e8d6c12d46ec58e0769"></a>TIMER&#160;</td><td class="fielddoc">
+<p>Regular timer interrupt is lowest priority. </p>
+</td></tr>
+</table>
+
+</div>
+</div>
 <h2 class="groupheader">Function Documentation</h2>
 <a class="anchor" id="a1dc4d17392d4c0a6dac7ab12267da487"></a>
 <div class="memitem">
@@ -326,25 +356,6 @@ The number of rewirings performed. </td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a8967e8eb09363007076f840186a20995"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void resume_callback </td>
-          <td>(</td>
-          <td class="paramtype">void&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>the function to call when resuming a simulation </p>
-<dl class="section return"><dt>Returns</dt><dd>None </dd></dl>
-
-</div>
-</div>
 <a class="anchor" id="a217aea663c8dd444052831cbde49bd62"></a>
 <div class="memitem">
 <div class="memproto">
@@ -377,14 +388,13 @@ The number of rewirings performed. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>None </dd></dl>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon May 4 2020 13:05:48 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue May 5 2020 15:25:29 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

@@ -108,8 +108,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Data Structures</h2></td></tr>
 <tr class="memitem:structexp__params__t"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__types__semd__impl_8h.html#structexp__params__t">exp_params_t</a></td></tr>
+<tr class="memdesc:structexp__params__t"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parameters for an exponential decay.  <a href="synapse__types__semd__impl_8h.html#structexp__params__t">More...</a><br /></td></tr>
 <tr class="separator:structexp__params__t"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:structsynapse__param__t"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__types__semd__impl_8h.html#structsynapse__param__t">synapse_param_t</a></td></tr>
+<tr class="memdesc:structsynapse__param__t"><td class="mdescLeft">&#160;</td><td class="mdescRight">Delta synapses support just a single excitatory and inhibitory input each.  <a href="synapse__types__semd__impl_8h.html#structsynapse__param__t">More...</a><br /></td></tr>
 <tr class="separator:structsynapse__param__t"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
@@ -192,7 +194,8 @@ Variables</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<div class="textblock"></div><table class="fieldtable">
+<div class="textblock"><p>Parameters for an exponential decay. </p>
+</div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="aacee2e1a8db0f17984b2f3e4c42e7ee6"></a><a class="el" href="decay_8h.html#a2d8155d52b7e3ac155ddc14cbe1efb25">decay_t</a></td>
@@ -225,57 +228,54 @@ The actual synaptic contribution. </td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<div class="textblock"></div><table class="fieldtable">
+<div class="textblock"><p>Delta synapses support just a single excitatory and inhibitory input each. </p>
+</div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="a54c6d9b5e32ee070e6f3fc350bd3dc27"></a><a class="el" href="synapse__types__alpha__impl_8h.html#structalpha__params__t">alpha_params_t</a></td>
 <td class="fieldname">
 exc</td>
 <td class="fielddoc">
-Excitatory parameters. <p>Excitatory input 1.</p>
-<p>Excitatory parameter. </p>
+Excitatory synaptic input. <p>First excitatory synaptic input. </p>
 </td></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="a603098082c6122c49eaaee5220b91c36"></a><a class="el" href="synapse__types__alpha__impl_8h.html#structalpha__params__t">alpha_params_t</a></td>
 <td class="fieldname">
 inh</td>
 <td class="fielddoc">
-Inhibitory parameters. <p>Inhibitory input.</p>
-<p>Inhibitory parameter. </p>
+Inhibitory synaptic input. <p>Inhibitory synaptic input </p>
 </td></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="a8f91b2c0aa9a88c2b44e086fc94e6e24"></a><a class="el" href="synapse__types__delta__impl_8h.html#structdelta__params__t">delta_params_t</a></td>
 <td class="fieldname">
 exc</td>
 <td class="fielddoc">
-</td></tr>
+Excitatory synaptic input. </td></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="a39087de65c4c33969bbfa69fee75697d"></a><a class="el" href="synapse__types__delta__impl_8h.html#structdelta__params__t">delta_params_t</a></td>
 <td class="fieldname">
 inh</td>
 <td class="fielddoc">
-</td></tr>
+Inhibitory synaptic input. </td></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="a54c6d9b5e32ee070e6f3fc350bd3dc27"></a><a class="el" href="synapse__types__semd__impl_8h.html#structexp__params__t">exp_params_t</a></td>
 <td class="fieldname">
 exc</td>
 <td class="fielddoc">
-First excitatory parameter. <p>Excitatory input 1.</p>
-<p>Excitatory parameter. </p>
+First excitatory synaptic input. <p>Excitatory synaptic input. </p>
 </td></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="ac7188feb692fb36784afed3e29e1db7b"></a><a class="el" href="synapse__types__semd__impl_8h.html#structexp__params__t">exp_params_t</a></td>
 <td class="fieldname">
 exc2</td>
 <td class="fielddoc">
-Second excitatory parameter. <p>Excitatory input 2. </p>
-</td></tr>
+Second excitatory synaptic input. </td></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="a603098082c6122c49eaaee5220b91c36"></a><a class="el" href="synapse__types__semd__impl_8h.html#structexp__params__t">exp_params_t</a></td>
 <td class="fieldname">
 inh</td>
 <td class="fielddoc">
-Inhibitory parameter. <p>Inhibitory input. </p>
+Inhibitory synaptic input. <p>Inhibitory synaptic input </p>
 </td></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="ae5a2dbf2b4410eb054592c7dd981354a"></a><a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a></td>
@@ -338,10 +338,10 @@ History storage used to reset synaptic state. </td></tr>
 <p>The supported synapse type indices. </p>
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a class="anchor" id="aa8f436b9633d82c53bcbeea73f3eb4aba5e0e3eedcc62dc4db0c7e2af83703129"></a>EXCITATORY&#160;</td><td class="fielddoc">
-<p>Excitatory parameter. </p>
+<p>Excitatory synaptic input. </p>
 </td></tr>
 <tr><td class="fieldname"><a class="anchor" id="aa8f436b9633d82c53bcbeea73f3eb4aba175c96e554c8359207394ef1e677b70d"></a>INHIBITORY&#160;</td><td class="fielddoc">
-<p>Inhibitory parameter. </p>
+<p>Inhibitory synaptic input. </p>
 </td></tr>
 </table>
 
@@ -676,7 +676,7 @@ History storage used to reset synaptic state. </td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon May 4 2020 13:05:48 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue May 5 2020 15:25:29 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

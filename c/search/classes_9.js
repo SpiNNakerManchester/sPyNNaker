@@ -4,6 +4,7 @@ var searchData=
   ['matrix_5fgenerator',['matrix_generator',['../matrix__generator_8c.html#structmatrix__generator',1,'']]],
   ['matrix_5fgenerator_5finfo',['matrix_generator_info',['../matrix__generator_8c.html#structmatrix__generator__info',1,'']]],
   ['matrix_5fgenerator_5fstdp',['matrix_generator_stdp',['../matrix__generator__stdp_8h.html#structmatrix__generator__stdp',1,'']]],
+  ['motor_5fcontrol_5fconfig_5ft',['motor_control_config_t',['../robot__motor__control_8c.html#structmotor__control__config__t',1,'']]],
   ['multicast_5fpacket',['multicast_packet',['../munich__protocol_8h.html#structmulticast__packet',1,'']]],
   ['munich_5fkey_5fbitfields_5ft',['munich_key_bitfields_t',['../munich__protocol_8h.html#structmunich__key__bitfields__t',1,'']]],
   ['munich_5fkey_5ft',['munich_key_t',['../munich__protocol_8h.html#unionmunich__key__t',1,'']]]

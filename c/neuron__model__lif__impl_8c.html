@@ -100,9 +100,8 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:acdc543d115e02324c243ebbfdd303214"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="acdc543d115e02324c243ebbfdd303214"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__model__lif__impl_8c.html#acdc543d115e02324c243ebbfdd303214">lif_neuron_closed_form</a> (<a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_t</a> *neuron, <a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a> V_prev, <a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> input_this_timestep)</td></tr>
-<tr class="memdesc:acdc543d115e02324c243ebbfdd303214"><td class="mdescLeft">&#160;</td><td class="mdescRight">simple Leaky I&amp;F ODE <br /></td></tr>
+<tr class="memitem:acdc543d115e02324c243ebbfdd303214"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__model__lif__impl_8c.html#acdc543d115e02324c243ebbfdd303214">lif_neuron_closed_form</a> (<a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_t</a> *neuron, <a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a> V_prev, <a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> input_this_timestep)</td></tr>
+<tr class="memdesc:acdc543d115e02324c243ebbfdd303214"><td class="mdescLeft">&#160;</td><td class="mdescRight">simple Leaky I&amp;F ODE  <a href="#acdc543d115e02324c243ebbfdd303214">More...</a><br /></td></tr>
 <tr class="separator:acdc543d115e02324c243ebbfdd303214"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2c709e18b3833cf07131b394b0a9b929"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__model__lif__impl_8c.html#a2c709e18b3833cf07131b394b0a9b929">neuron_model_set_global_neuron_params</a> (const <a class="el" href="neuron__model__lif__impl_8h.html#structglobal__neuron__params__t">global_neuron_params_t</a> *<a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a159669347528cd4f88c368d0d33e4670">params</a>)</td></tr>
 <tr class="memdesc:a2c709e18b3833cf07131b394b0a9b929"><td class="mdescLeft">&#160;</td><td class="mdescRight">set the global neuron parameters  <a href="#a2c709e18b3833cf07131b394b0a9b929">More...</a><br /></td></tr>
@@ -126,6 +125,56 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Leaky Integrate and Fire neuron implementation. </p>
 </div><h2 class="groupheader">Function Documentation</h2>
+<a class="anchor" id="acdc543d115e02324c243ebbfdd303214"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void lif_neuron_closed_form </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_t</a> *&#160;</td>
+          <td class="paramname"><em>neuron</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a>&#160;</td>
+          <td class="paramname"><em>V_prev</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a>&#160;</td>
+          <td class="paramname"><em>input_this_timestep</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>simple Leaky I&amp;F ODE </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">neuron</td><td>The neuron to update </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">V_prev</td><td>previous voltage </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">input_this_timestep</td><td>The input to apply </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a class="anchor" id="a2c709e18b3833cf07131b394b0a9b929"></a>
 <div class="memitem">
 <div class="memproto">
@@ -314,7 +363,7 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon May 4 2020 13:05:48 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue May 5 2020 15:25:29 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

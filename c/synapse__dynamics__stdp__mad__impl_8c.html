@@ -166,9 +166,8 @@ Functions</h2></td></tr>
 <tr class="memitem:abc297b864cdfaa0cd6e7115cd064baef"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#abc297b864cdfaa0cd6e7115cd064baef">synapse_dynamics_remove_neuron</a> (uint32_t offset, address_t row)</td></tr>
 <tr class="memdesc:abc297b864cdfaa0cd6e7115cd064baef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove the entry at the specified offset in the synaptic row.  <a href="#abc297b864cdfaa0cd6e7115cd064baef">More...</a><br /></td></tr>
 <tr class="separator:abc297b864cdfaa0cd6e7115cd064baef"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a06f2e2d805f0d8aa8b3ca7b687f24a24"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a06f2e2d805f0d8aa8b3ca7b687f24a24"></a>
-static <a class="el" href="synapse__row_8h.html#aeae1e8aa0c0095434ba488866ef21aa2">control_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a06f2e2d805f0d8aa8b3ca7b687f24a24">control_conversion</a> (uint32_t id, uint32_t delay, uint32_t type)</td></tr>
-<tr class="memdesc:a06f2e2d805f0d8aa8b3ca7b687f24a24"><td class="mdescLeft">&#160;</td><td class="mdescRight">packing all of the information into the required plastic control word <br /></td></tr>
+<tr class="memitem:a06f2e2d805f0d8aa8b3ca7b687f24a24"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="synapse__row_8h.html#aeae1e8aa0c0095434ba488866ef21aa2">control_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a06f2e2d805f0d8aa8b3ca7b687f24a24">control_conversion</a> (uint32_t id, uint32_t delay, uint32_t type)</td></tr>
+<tr class="memdesc:a06f2e2d805f0d8aa8b3ca7b687f24a24"><td class="mdescLeft">&#160;</td><td class="mdescRight">packing all of the information into the required plastic control word  <a href="#a06f2e2d805f0d8aa8b3ca7b687f24a24">More...</a><br /></td></tr>
 <tr class="separator:a06f2e2d805f0d8aa8b3ca7b687f24a24"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a30b01777aad5fef37adccffc7cbef483"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a30b01777aad5fef37adccffc7cbef483">synapse_dynamics_add_neuron</a> (uint32_t id, address_t row, weight_t weight, uint32_t delay, uint32_t type)</td></tr>
 <tr class="memdesc:a30b01777aad5fef37adccffc7cbef483"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add an entry in the synaptic row.  <a href="#a30b01777aad5fef37adccffc7cbef483">More...</a><br /></td></tr>
@@ -805,6 +804,57 @@ The per-synapse information. </td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a06f2e2d805f0d8aa8b3ca7b687f24a24"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="synapse__row_8h.html#aeae1e8aa0c0095434ba488866ef21aa2">control_t</a> control_conversion </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>id</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>delay</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>type</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>packing all of the information into the required plastic control word </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">id</td><td>The spike ID </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">delay</td><td>The delay </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">type</td><td>The synapse type </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The encoded word </dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="a30b01777aad5fef37adccffc7cbef483"></a>
 <div class="memitem">
 <div class="memproto">
@@ -890,7 +940,7 @@ The per-synapse information. </td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon May 4 2020 13:05:48 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue May 5 2020 15:25:29 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

@@ -42,6 +42,8 @@ var searchData=
   ['print_5finputs',['print_inputs',['../synapses_8c.html#a445b2a82a1dd66ace9f61be6d2fc0bdb',1,'synapses.c']]],
   ['print_5fmaster_5fpopulation_5ftable',['print_master_population_table',['../population__table__binary__search__impl_8c.html#a3c2c10dcc54c9ec95a730e4c1324a2c5',1,'population_table_binary_search_impl.c']]],
   ['print_5fring_5fbuffers',['print_ring_buffers',['../synapses_8c.html#abc3c16c46a33ff2d2b041797a591963f',1,'synapses.c']]],
+  ['print_5fspike_5fsource',['print_spike_source',['../spike__source__poisson_8c.html#a01cb7fc152ba6cfcdef074e29129fd50',1,'spike_source_poisson.c']]],
+  ['print_5fspike_5fsources',['print_spike_sources',['../spike__source__poisson_8c.html#a67624c118e9bb7a0b4d9da6aa5afd523',1,'spike_source_poisson.c']]],
   ['print_5fsynapse_5fparameters',['print_synapse_parameters',['../synapses_8c.html#a74c97ada7fedd1b5e90ed09797072c29',1,'synapses.c']]],
   ['print_5fsynaptic_5frow',['print_synaptic_row',['../synapses_8c.html#a6ce61ebd9de50e3e1d657fd651038879',1,'synapses.c']]],
   ['process_5ffast_5fsource',['process_fast_source',['../spike__source__poisson_8c.html#a8c0f1543e08e9c0d5ea8ac638f65fdac',1,'spike_source_poisson.c']]],

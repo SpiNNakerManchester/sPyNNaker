@@ -125,15 +125,18 @@ Data Structures</h2></td></tr>
 <tr class="memdesc:structglobal__parameters"><td class="mdescLeft">&#160;</td><td class="mdescRight">Parameters of the SpikeSourcePoisson.  <a href="spike__source__poisson_8c.html#structglobal__parameters">More...</a><br /></td></tr>
 <tr class="separator:structglobal__parameters"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:structsource__info"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#structsource__info">source_info</a></td></tr>
+<tr class="memdesc:structsource__info"><td class="mdescLeft">&#160;</td><td class="mdescRight">Collection of rates to apply over time to a particular spike source.  <a href="spike__source__poisson_8c.html#structsource__info">More...</a><br /></td></tr>
 <tr class="separator:structsource__info"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
 Macros</h2></td></tr>
 <tr class="memitem:a9460522d5774f317649cd352ea6112b0"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9460522d5774f317649cd352ea6112b0"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>NUMBER_OF_REGIONS_TO_RECORD</b>&#160;&#160;&#160;1</td></tr>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a9460522d5774f317649cd352ea6112b0">NUMBER_OF_REGIONS_TO_RECORD</a>&#160;&#160;&#160;1</td></tr>
+<tr class="memdesc:a9460522d5774f317649cd352ea6112b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of recording regions. <br /></td></tr>
 <tr class="separator:a9460522d5774f317649cd352ea6112b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a60ccdb9b7cf99da446d1b7a8a27a55a2"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a60ccdb9b7cf99da446d1b7a8a27a55a2"></a>
-#define&#160;</td><td class="memItemRight" valign="bottom"><b>BYTE_TO_WORD_CONVERTER</b>&#160;&#160;&#160;4</td></tr>
+#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a60ccdb9b7cf99da446d1b7a8a27a55a2">BYTE_TO_WORD_CONVERTER</a>&#160;&#160;&#160;4</td></tr>
+<tr class="memdesc:a60ccdb9b7cf99da446d1b7a8a27a55a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bytes per word. <br /></td></tr>
 <tr class="separator:a60ccdb9b7cf99da446d1b7a8a27a55a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af9fc996bed279eea4da4fd5166df447c"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af9fc996bed279eea4da4fd5166df447c"></a>
 #define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#af9fc996bed279eea4da4fd5166df447c">ISI_SCALE_FACTOR</a>&#160;&#160;&#160;1000</td></tr>
@@ -142,44 +145,46 @@ Macros</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
 Enumerations</h2></td></tr>
-<tr class="memitem:a1b9edddb3735d131c67e9e824f07c402"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1b9edddb3735d131c67e9e824f07c402"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a> { <br />
-&#160;&#160;<b>SYSTEM</b>, 
-<b>POISSON_PARAMS</b>, 
-<b>RATES</b>, 
-<b>SPIKE_HISTORY_REGION</b>, 
+<tr class="memitem:a1b9edddb3735d131c67e9e824f07c402"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a> { <br />
+&#160;&#160;<a class="el" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402a57cc238145ec1361c72c327674c0d754">SYSTEM</a>, 
+<a class="el" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402a727a4355ea4eac05e783bca4d11a76de">POISSON_PARAMS</a>, 
+<a class="el" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402a7f669c928768a61926bf55f39d53528a">RATES</a>, 
+<a class="el" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402a162ff910476c1b005ba3214e83f68b27">SPIKE_HISTORY_REGION</a>, 
 <br />
-&#160;&#160;<b>PROVENANCE_REGION</b>, 
-<b>PROFILER_REGION</b>
+&#160;&#160;<a class="el" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402a43f0d58cfc0317ea06139b20c9242d1e">PROVENANCE_REGION</a>, 
+<a class="el" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402a161a63f4ef09daf69f48a49cc4a8ef5b">PROFILER_REGION</a>
 <br />
- }<tr class="memdesc:a1b9edddb3735d131c67e9e824f07c402"><td class="mdescLeft">&#160;</td><td class="mdescRight">spike source array region IDs in human readable form <br /></td></tr>
+ }<tr class="memdesc:a1b9edddb3735d131c67e9e824f07c402"><td class="mdescLeft">&#160;</td><td class="mdescRight">spike source array region IDs in human readable form  <a href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">More...</a><br /></td></tr>
 </td></tr>
 <tr class="separator:a1b9edddb3735d131c67e9e824f07c402"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a65b19dabf5283c1ea37df964ca25e964"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a65b19dabf5283c1ea37df964ca25e964"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><b>callback_priorities</b> { <br />
+<tr class="memitem:a65b19dabf5283c1ea37df964ca25e964"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a65b19dabf5283c1ea37df964ca25e964">callback_priorities</a> { <br />
 &#160;&#160;<b>MC</b> = -1, 
 <b>DMA</b> = 0, 
 <b>USER</b> = 0, 
 <b>SDP</b> = 1, 
 <br />
 &#160;&#160;<b>TIMER</b> = 2, 
-<b>MULTICAST</b> = -1, 
-<b>SDP</b> = 0, 
-<b>DMA</b> = 1, 
+<a class="el" href="spike__source__poisson_8c.html#a65b19dabf5283c1ea37df964ca25e964a607d700b2c0a01c54bdadde074a7cb12">MULTICAST</a> = -1, 
+<a class="el" href="spike__source__poisson_8c.html#a65b19dabf5283c1ea37df964ca25e964ad645defae8408de2415f3dc417f69773">SDP</a> = 0, 
+<a class="el" href="spike__source__poisson_8c.html#a65b19dabf5283c1ea37df964ca25e964a6537a62f6f155792bb9a320ee2ec4d68">DMA</a> = 1, 
 <br />
-&#160;&#160;<b>TIMER</b> = 2
+&#160;&#160;<a class="el" href="spike__source__poisson_8c.html#a65b19dabf5283c1ea37df964ca25e964a17ba9bae1b8d7e8d6c12d46ec58e0769">TIMER</a> = 2
 <br />
- }</td></tr>
+ }<tr class="memdesc:a65b19dabf5283c1ea37df964ca25e964"><td class="mdescLeft">&#160;</td><td class="mdescRight">Priorities for interrupt handlers.  <a href="spike__source__poisson_8c.html#a65b19dabf5283c1ea37df964ca25e964">More...</a><br /></td></tr>
+</td></tr>
 <tr class="separator:a65b19dabf5283c1ea37df964ca25e964"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a271dd89ae6f3a25d49a7e2d4cb768a37"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a271dd89ae6f3a25d49a7e2d4cb768a37"></a>
-static <a class="el" href="spike__source__poisson_8c.html#structspike__source__t">spike_source_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>get_source_data</b> (uint32_t id)</td></tr>
+<tr class="memitem:a271dd89ae6f3a25d49a7e2d4cb768a37"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="spike__source__poisson_8c.html#structspike__source__t">spike_source_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a271dd89ae6f3a25d49a7e2d4cb768a37">get_source_data</a> (uint32_t id)</td></tr>
+<tr class="memdesc:a271dd89ae6f3a25d49a7e2d4cb768a37"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the source data for a particular spike source.  <a href="#a271dd89ae6f3a25d49a7e2d4cb768a37">More...</a><br /></td></tr>
 <tr class="separator:a271dd89ae6f3a25d49a7e2d4cb768a37"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af538c1942ccd68490d03067fae37805b"><td class="memItemLeft" align="right" valign="top">static bit_field_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#af538c1942ccd68490d03067fae37805b">out_spikes_bitfield</a> (uint32_t n)</td></tr>
 <tr class="memdesc:af538c1942ccd68490d03067fae37805b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set specific spikes for recording.  <a href="#af538c1942ccd68490d03067fae37805b">More...</a><br /></td></tr>
 <tr class="separator:af538c1942ccd68490d03067fae37805b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6965b6994e494500e00730df56c449b5"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a6965b6994e494500e00730df56c449b5">reset_spikes</a> (void)</td></tr>
-<tr class="memdesc:a6965b6994e494500e00730df56c449b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the spike buffer by clearing the bit field.  <a href="#a6965b6994e494500e00730df56c449b5">More...</a><br /></td></tr>
+<tr class="memitem:a6965b6994e494500e00730df56c449b5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a6965b6994e494500e00730df56c449b5"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a6965b6994e494500e00730df56c449b5">reset_spikes</a> (void)</td></tr>
+<tr class="memdesc:a6965b6994e494500e00730df56c449b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reset the spike buffer by clearing the bit field. <br /></td></tr>
 <tr class="separator:a6965b6994e494500e00730df56c449b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa2602e67f1b5a03f8e9440743171ef81"><td class="memItemLeft" align="right" valign="top">static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#aa2602e67f1b5a03f8e9440743171ef81">slow_spike_source_get_time_to_spike</a> (uint32_t mean_inter_spike_interval_in_ticks)</td></tr>
 <tr class="memdesc:aa2602e67f1b5a03f8e9440743171ef81"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determines the time in timer ticks multiplied by ISI_SCALE_FACTOR until the next spike is to occur given the mean inter-spike interval.  <a href="#aa2602e67f1b5a03f8e9440743171ef81">More...</a><br /></td></tr>
@@ -188,19 +193,20 @@ static <a class="el" href="spike__source__poisson_8c.html#structspike__source__t
 <tr class="memdesc:a6fc68d58ed86cf64bddcb8c1a16c101d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determines how many spikes to transmit this timer tick, for a fast source.  <a href="#a6fc68d58ed86cf64bddcb8c1a16c101d">More...</a><br /></td></tr>
 <tr class="separator:a6fc68d58ed86cf64bddcb8c1a16c101d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a44e2906c713931da0ee4f911361afc5f"><td class="memItemLeft" align="right" valign="top">static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a44e2906c713931da0ee4f911361afc5f">faster_spike_source_get_num_spikes</a> (<a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a> sqrt_lambda)</td></tr>
-<tr class="memdesc:a44e2906c713931da0ee4f911361afc5f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determines how many spikes to transmit this timer tick, for a faster source (where lambda is large enough that a Gaussian can be used instead of a Poisson)  <a href="#a44e2906c713931da0ee4f911361afc5f">More...</a><br /></td></tr>
+<tr class="memdesc:a44e2906c713931da0ee4f911361afc5f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determines how many spikes to transmit this timer tick, for a faster source (where &lambda; is large enough that a Gaussian can be used instead of a Poisson)  <a href="#a44e2906c713931da0ee4f911361afc5f">More...</a><br /></td></tr>
 <tr class="separator:a44e2906c713931da0ee4f911361afc5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a01cb7fc152ba6cfcdef074e29129fd50"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a01cb7fc152ba6cfcdef074e29129fd50"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><b>print_spike_source</b> (index_t s)</td></tr>
+<tr class="memitem:a01cb7fc152ba6cfcdef074e29129fd50"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a01cb7fc152ba6cfcdef074e29129fd50">print_spike_source</a> (index_t s)</td></tr>
+<tr class="memdesc:a01cb7fc152ba6cfcdef074e29129fd50"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print a spike source.  <a href="#a01cb7fc152ba6cfcdef074e29129fd50">More...</a><br /></td></tr>
 <tr class="separator:a01cb7fc152ba6cfcdef074e29129fd50"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a67624c118e9bb7a0b4d9da6aa5afd523"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a67624c118e9bb7a0b4d9da6aa5afd523"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><b>print_spike_sources</b> (void)</td></tr>
+static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a67624c118e9bb7a0b4d9da6aa5afd523">print_spike_sources</a> (void)</td></tr>
+<tr class="memdesc:a67624c118e9bb7a0b4d9da6aa5afd523"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print all spike sources. <br /></td></tr>
 <tr class="separator:a67624c118e9bb7a0b4d9da6aa5afd523"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a571b747b9d964eb5af02496ce866130b"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a571b747b9d964eb5af02496ce866130b">read_global_parameters</a> (<a class="el" href="spike__source__poisson_8c.html#structglobal__parameters">global_parameters</a> *sdram_globals)</td></tr>
 <tr class="memdesc:a571b747b9d964eb5af02496ce866130b"><td class="mdescLeft">&#160;</td><td class="mdescRight">entry method for reading the global parameters stored in Poisson parameter region  <a href="#a571b747b9d964eb5af02496ce866130b">More...</a><br /></td></tr>
 <tr class="separator:a571b747b9d964eb5af02496ce866130b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5d93135c80cbb663f602737e639626ce"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5d93135c80cbb663f602737e639626ce"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><b>read_next_rates</b> (uint32_t id)</td></tr>
+<tr class="memitem:a5d93135c80cbb663f602737e639626ce"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a5d93135c80cbb663f602737e639626ce">read_next_rates</a> (uint32_t id)</td></tr>
+<tr class="memdesc:a5d93135c80cbb663f602737e639626ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the next chunk of rates read.  <a href="#a5d93135c80cbb663f602737e639626ce">More...</a><br /></td></tr>
 <tr class="separator:a5d93135c80cbb663f602737e639626ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af4847de2b9a2d080b0e03eabccb7308d"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#af4847de2b9a2d080b0e03eabccb7308d">read_rates</a> (<a class="el" href="spike__source__poisson_8c.html#structsource__info">source_info</a> *sdram_sources)</td></tr>
 <tr class="memdesc:af4847de2b9a2d080b0e03eabccb7308d"><td class="mdescLeft">&#160;</td><td class="mdescRight">method for reading the rates of the Poisson  <a href="#af4847de2b9a2d080b0e03eabccb7308d">More...</a><br /></td></tr>
@@ -209,6 +215,7 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><b>read_next_rate
 <tr class="memdesc:a25d26d2a2c3ec75e4013c7a5e42bc5a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialises the recording parts of the model.  <a href="#a25d26d2a2c3ec75e4013c7a5e42bc5a7">More...</a><br /></td></tr>
 <tr class="separator:a25d26d2a2c3ec75e4013c7a5e42bc5a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a03a8e4045b51680cc94b4359837fa796"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a03a8e4045b51680cc94b4359837fa796">initialize</a> (void)</td></tr>
+<tr class="memdesc:a03a8e4045b51680cc94b4359837fa796"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialises the model by reading in the regions and checking recording data.  <a href="#a03a8e4045b51680cc94b4359837fa796">More...</a><br /></td></tr>
 <tr class="separator:a03a8e4045b51680cc94b4359837fa796"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afb40f588131f69f1d033283921f1a811"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#afb40f588131f69f1d033283921f1a811">resume_callback</a> (void)</td></tr>
 <tr class="memdesc:afb40f588131f69f1d033283921f1a811"><td class="mdescLeft">&#160;</td><td class="mdescRight">runs any functions needed at resume time.  <a href="#afb40f588131f69f1d033283921f1a811">More...</a><br /></td></tr>
@@ -232,10 +239,10 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 <tr class="memitem:a6383f32ff6d54333f83d681ff919d4d0"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a6383f32ff6d54333f83d681ff919d4d0">record_spikes</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>)</td></tr>
 <tr class="memdesc:a6383f32ff6d54333f83d681ff919d4d0"><td class="mdescLeft">&#160;</td><td class="mdescRight">writing spikes to SDRAM  <a href="#a6383f32ff6d54333f83d681ff919d4d0">More...</a><br /></td></tr>
 <tr class="separator:a6383f32ff6d54333f83d681ff919d4d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8c0f1543e08e9c0d5ea8ac638f65fdac"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a8c0f1543e08e9c0d5ea8ac638f65fdac">process_fast_source</a> (index_t s_id, <a class="el" href="spike__source__poisson_8c.html#structspike__source__t">spike_source_t</a> *source, uint timer_count)</td></tr>
+<tr class="memitem:a8c0f1543e08e9c0d5ea8ac638f65fdac"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a8c0f1543e08e9c0d5ea8ac638f65fdac">process_fast_source</a> (index_t s_id, <a class="el" href="spike__source__poisson_8c.html#structspike__source__t">spike_source_t</a> *<a class="el" href="spike__source__poisson_8c.html#a8fc9649bde3c5a1307c82861ad881004">source</a>, uint timer_count)</td></tr>
 <tr class="memdesc:a8c0f1543e08e9c0d5ea8ac638f65fdac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Handle a fast spike source.  <a href="#a8c0f1543e08e9c0d5ea8ac638f65fdac">More...</a><br /></td></tr>
 <tr class="separator:a8c0f1543e08e9c0d5ea8ac638f65fdac"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae6b1e1c0aee533b40075573aca35b72f"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#ae6b1e1c0aee533b40075573aca35b72f">process_slow_source</a> (index_t s_id, <a class="el" href="spike__source__poisson_8c.html#structspike__source__t">spike_source_t</a> *source, uint timer_count)</td></tr>
+<tr class="memitem:ae6b1e1c0aee533b40075573aca35b72f"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#ae6b1e1c0aee533b40075573aca35b72f">process_slow_source</a> (index_t s_id, <a class="el" href="spike__source__poisson_8c.html#structspike__source__t">spike_source_t</a> *<a class="el" href="spike__source__poisson_8c.html#a8fc9649bde3c5a1307c82861ad881004">source</a>, uint timer_count)</td></tr>
 <tr class="memdesc:ae6b1e1c0aee533b40075573aca35b72f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Handle a slow spike source.  <a href="#ae6b1e1c0aee533b40075573aca35b72f">More...</a><br /></td></tr>
 <tr class="separator:ae6b1e1c0aee533b40075573aca35b72f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab3ba3db2e11b1db9fd9d1986558eee30"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#ab3ba3db2e11b1db9fd9d1986558eee30">timer_callback</a> (uint timer_count, uint unused)</td></tr>
@@ -263,10 +270,12 @@ static <a class="el" href="spike__source__poisson_8c.html#structglobal__paramete
 <tr class="memdesc:a3474215ce02c1bf76bceafe71ef89c7b"><td class="mdescLeft">&#160;</td><td class="mdescRight">The <a class="el" href="spike__source__poisson_8c.html#structglobal__parameters" title="Parameters of the SpikeSourcePoisson. ">global_parameters</a> for the sub-population. <br /></td></tr>
 <tr class="separator:a3474215ce02c1bf76bceafe71ef89c7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a47b4faf584a02b7d913efcb91134d196"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a47b4faf584a02b7d913efcb91134d196"></a>
-static <a class="el" href="spike__source__poisson_8c.html#structsource__info">source_info</a> **&#160;</td><td class="memItemRight" valign="bottom"><b>source_data</b></td></tr>
+static <a class="el" href="spike__source__poisson_8c.html#structsource__info">source_info</a> **&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a47b4faf584a02b7d913efcb91134d196">source_data</a></td></tr>
+<tr class="memdesc:a47b4faf584a02b7d913efcb91134d196"><td class="mdescLeft">&#160;</td><td class="mdescRight">Array of pointers to sequences of rate data. <br /></td></tr>
 <tr class="separator:a47b4faf584a02b7d913efcb91134d196"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8fc9649bde3c5a1307c82861ad881004"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8fc9649bde3c5a1307c82861ad881004"></a>
-static <a class="el" href="spike__source__poisson_8c.html#structspike__source__t">spike_source_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>source</b></td></tr>
+static <a class="el" href="spike__source__poisson_8c.html#structspike__source__t">spike_source_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a8fc9649bde3c5a1307c82861ad881004">source</a></td></tr>
+<tr class="memdesc:a8fc9649bde3c5a1307c82861ad881004"><td class="mdescLeft">&#160;</td><td class="mdescRight">The currently applied rate descriptors. <br /></td></tr>
 <tr class="separator:a8fc9649bde3c5a1307c82861ad881004"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8a1c8ad4577d74c25e7760e6d653eed5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8a1c8ad4577d74c25e7760e6d653eed5"></a>
 static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a8a1c8ad4577d74c25e7760e6d653eed5">expected_time</a></td></tr>
@@ -331,49 +340,49 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
 <td class="fieldname">
 start_ticks</td>
 <td class="fielddoc">
-</td></tr>
+When the current control regime starts, in timer ticks. </td></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="a64607ac2fa64b0549d111b2b84cbb51e"></a>uint32_t</td>
 <td class="fieldname">
 end_ticks</td>
 <td class="fielddoc">
-</td></tr>
+When the current control regime ends, in timer ticks. </td></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="aa9931cbd5389b3c46b8c0a4de4d0aa77"></a>uint32_t</td>
 <td class="fieldname">
 next_ticks</td>
 <td class="fielddoc">
-</td></tr>
+When we should load the next control regime, in timer ticks. </td></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="a891758695b252c5b4c43c98b8f3232d4"></a>uint32_t</td>
 <td class="fieldname">
 is_fast_source</td>
 <td class="fielddoc">
-</td></tr>
+Flag for whether we're in fast or slow mode. </td></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="ad312952bbda1eb46855036a9ec72c738"></a><a class="el" href="maths-util_8h.html#a8cf409d4308be505fbdb5683525213ba">UFRACT</a></td>
 <td class="fieldname">
 exp_minus_lambda</td>
 <td class="fielddoc">
-</td></tr>
+exp(-&lambda;) </td></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="a0f76e635e260b47d8e260740166324cd"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
 <td class="fieldname">
 sqrt_lambda</td>
 <td class="fielddoc">
-</td></tr>
+sqrt(&lambda;) </td></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="aab41a5a325aec875f6f6b5dc7253aa74"></a>uint32_t</td>
 <td class="fieldname">
 mean_isi_ticks</td>
 <td class="fielddoc">
-</td></tr>
+Mean interspike interval, in ticks. </td></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="a939c2987f014e9004e52db891d73a845"></a>uint32_t</td>
 <td class="fieldname">
 time_to_spike_ticks</td>
 <td class="fielddoc">
-</td></tr>
+Planned time to spike, in ticks. </td></tr>
 </table>
 
 </div>
@@ -395,19 +404,19 @@ time_to_spike_ticks</td>
 <td class="fieldname">
 time</td>
 <td class="fielddoc">
-</td></tr>
+Time of recording. </td></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="a01eac79ac7d1bc6bc5ba8bbe4fcdfa6c"></a>uint32_t</td>
 <td class="fieldname">
 n_buffers</td>
 <td class="fielddoc">
-</td></tr>
+Number of spike-recording buffers. </td></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="a5e1cb4999f85fa84e66c575788e3bef6"></a>uint32_t</td>
 <td class="fieldname">
 out_spikes[]</td>
 <td class="fielddoc">
-</td></tr>
+Spike recording buffers; sort of a bit_field_t[]. </td></tr>
 </table>
 
 </div>
@@ -509,31 +518,128 @@ The seed for the Poisson generation process. </td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<div class="textblock"></div><table class="fieldtable">
+<div class="textblock"><p>Collection of rates to apply over time to a particular spike source. </p>
+</div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="a62435794d07ae2d9589f23e7e318cf65"></a>uint32_t</td>
 <td class="fieldname">
 n_rates</td>
 <td class="fielddoc">
-</td></tr>
+The number of rates. </td></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="a5d2b3e7270a501214853d5105f536faf"></a>uint32_t</td>
 <td class="fieldname">
 index</td>
 <td class="fielddoc">
-</td></tr>
+Where in the array of rate descriptors we are. </td></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="a489d13f6c68c512fda05e069a5383947"></a><a class="el" href="spike__source__poisson_8c.html#structspike__source__t">spike_source_t</a></td>
 <td class="fieldname">
 poissons[]</td>
 <td class="fielddoc">
+Array of rate descriptors. </td></tr>
+</table>
+
+</div>
+</div>
+<h2 class="groupheader">Enumeration Type Documentation</h2>
+<a class="anchor" id="a1b9edddb3735d131c67e9e824f07c402"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>spike source array region IDs in human readable form </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a class="anchor" id="a1b9edddb3735d131c67e9e824f07c402a57cc238145ec1361c72c327674c0d754"></a>SYSTEM&#160;</td><td class="fielddoc">
+<p>simulation interface master control </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="a1b9edddb3735d131c67e9e824f07c402a727a4355ea4eac05e783bca4d11a76de"></a>POISSON_PARAMS&#160;</td><td class="fielddoc">
+<p>application configuration; <a class="el" href="spike__source__poisson_8c.html#structglobal__parameters" title="Parameters of the SpikeSourcePoisson. ">global_parameters</a> </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="a1b9edddb3735d131c67e9e824f07c402a7f669c928768a61926bf55f39d53528a"></a>RATES&#160;</td><td class="fielddoc">
+<p>rates to apply; <a class="el" href="spike__source__poisson_8c.html#structsource__info" title="Collection of rates to apply over time to a particular spike source. ">source_info</a> </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="a1b9edddb3735d131c67e9e824f07c402a162ff910476c1b005ba3214e83f68b27"></a>SPIKE_HISTORY_REGION&#160;</td><td class="fielddoc">
+<p>spike history recording region </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="a1b9edddb3735d131c67e9e824f07c402a43f0d58cfc0317ea06139b20c9242d1e"></a>PROVENANCE_REGION&#160;</td><td class="fielddoc">
+<p>provenance region </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="a1b9edddb3735d131c67e9e824f07c402a161a63f4ef09daf69f48a49cc4a8ef5b"></a>PROFILER_REGION&#160;</td><td class="fielddoc">
+<p>profiling region </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<a class="anchor" id="a65b19dabf5283c1ea37df964ca25e964"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="c__main_8c.html#a65b19dabf5283c1ea37df964ca25e964">callback_priorities</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Priorities for interrupt handlers. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a class="anchor" id="a65b19dabf5283c1ea37df964ca25e964a607d700b2c0a01c54bdadde074a7cb12"></a>MULTICAST&#160;</td><td class="fielddoc">
+<p>Multicast packet reception uses the FIQ. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="a65b19dabf5283c1ea37df964ca25e964ad645defae8408de2415f3dc417f69773"></a>SDP&#160;</td><td class="fielddoc">
+<p>SDP handling is highest ordinary priority. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="a65b19dabf5283c1ea37df964ca25e964a6537a62f6f155792bb9a320ee2ec4d68"></a>DMA&#160;</td><td class="fielddoc">
+<p>DMA complete handling is medium priority. </p>
+</td></tr>
+<tr><td class="fieldname"><a class="anchor" id="a65b19dabf5283c1ea37df964ca25e964a17ba9bae1b8d7e8d6c12d46ec58e0769"></a>TIMER&#160;</td><td class="fielddoc">
+<p>Regular timer interrupt is lowest priority. </p>
 </td></tr>
 </table>
 
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
+<a class="anchor" id="a271dd89ae6f3a25d49a7e2d4cb768a37"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="spike__source__poisson_8c.html#structspike__source__t">spike_source_t</a>* get_source_data </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>id</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the source data for a particular spike source. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">id</td><td>The spike source ID </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>Its current rate descriptor, in SDRAM </dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="af538c1942ccd68490d03067fae37805b"></a>
 <div class="memitem">
 <div class="memproto">
@@ -559,38 +665,11 @@ poissons[]</td>
 <p>Set specific spikes for recording. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">n</td><td>is the spike array index </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">n</td><td>the spike array index </td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>bit field at the location n </dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="a6965b6994e494500e00730df56c449b5"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static void reset_spikes </td>
-          <td>(</td>
-          <td class="paramtype">void&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Reset the spike buffer by clearing the bit field. </p>
-<dl class="section return"><dt>Returns</dt><dd>None </dd></dl>
 
 </div>
 </div>
@@ -623,7 +702,7 @@ poissons[]</td>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>a uint32_t which represents "time" in timer ticks * ISI_SCALE_FACTOR until the next spike occurs </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>"time" in timer ticks * ISI_SCALE_FACTOR until the next spike occurs </dd></dl>
 
 </div>
 </div>
@@ -652,11 +731,11 @@ poissons[]</td>
 <p>Determines how many spikes to transmit this timer tick, for a fast source. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">exp_minus_lambda</td><td>exp(-lambda), lambda is amount of spikes expected to be produced this timer interval (timer tick in real time) </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">exp_minus_lambda</td><td>exp(-&lambda;), &lambda; is amount of spikes expected to be produced this timer interval (timer tick in real time) </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>a uint32_t which represents the number of spikes to transmit this timer tick </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>the number of spikes to transmit this timer tick </dd></dl>
 
 </div>
 </div>
@@ -682,7 +761,7 @@ poissons[]</td>
 </table>
 </div><div class="memdoc">
 
-<p>Determines how many spikes to transmit this timer tick, for a faster source (where lambda is large enough that a Gaussian can be used instead of a Poisson) </p>
+<p>Determines how many spikes to transmit this timer tick, for a faster source (where &lambda; is large enough that a Gaussian can be used instead of a Poisson) </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">sqrt_lambda</td><td>Square root of the amount of spikes expected to be produced this timer interval (timer tick in real time) </td></tr>
@@ -690,6 +769,38 @@ poissons[]</td>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a uint32_t which represents the number of spikes to transmit this timer tick </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a01cb7fc152ba6cfcdef074e29129fd50"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void print_spike_source </td>
+          <td>(</td>
+          <td class="paramtype">index_t&#160;</td>
+          <td class="paramname"><em>s</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Print a spike source. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">s</td><td>The spike source ID </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -722,7 +833,39 @@ poissons[]</td>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>a boolean which is True if the parameters were read successfully or False otherwise </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>True if the parameters were read successfully or False otherwise </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a5d93135c80cbb663f602737e639626ce"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void read_next_rates </td>
+          <td>(</td>
+          <td class="paramtype">uint32_t&#160;</td>
+          <td class="paramname"><em>id</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Get the next chunk of rates read. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">id</td><td>The spike source ID </td></tr>
+  </table>
+  </dd>
+</dl>
 
 </div>
 </div>
@@ -755,7 +898,7 @@ poissons[]</td>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>a boolean which is True if the rates were read successfully or False otherwise </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>True if the rates were read successfully or False otherwise </dd></dl>
 
 </div>
 </div>
@@ -782,6 +925,12 @@ poissons[]</td>
 </div><div class="memdoc">
 
 <p>Initialises the recording parts of the model. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">ds_regions</td><td>Data specification master descriptor </td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="section return"><dt>Returns</dt><dd>True if recording initialisation is successful, false otherwise </dd></dl>
 
 </div>
@@ -807,7 +956,9 @@ poissons[]</td>
   </tr>
 </table>
 </div><div class="memdoc">
-<p>Initialises the model by reading in the regions and checking recording data. </p><dl class="section return"><dt>Returns</dt><dd>boolean of True if it successfully read all the regions and set up all its internal data structures. Otherwise returns False </dd></dl>
+
+<p>Initialises the model by reading in the regions and checking recording data. </p>
+<dl class="section return"><dt>Returns</dt><dd>True if it successfully read all the regions and set up all its internal data structures. Otherwise returns False </dd></dl>
 
 </div>
 </div>
@@ -901,6 +1052,7 @@ poissons[]</td>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">spike_key</td><td>the key to transmit </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">timer_count</td><td>Time to send spike at </td></tr>
   </table>
   </dd>
 </dl>
@@ -1055,9 +1207,9 @@ poissons[]</td>
 <p>Handle a fast spike source. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">s_id</td><td></td></tr>
-    <tr><td class="paramname">source</td><td></td></tr>
-    <tr><td class="paramname">timer_count</td><td></td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">s_id</td><td>Source ID </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">source</td><td>Source descriptor </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">timer_count</td><td>Time to send spike at </td></tr>
   </table>
   </dd>
 </dl>
@@ -1105,9 +1257,9 @@ poissons[]</td>
 <p>Handle a slow spike source. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">s_id</td><td></td></tr>
-    <tr><td class="paramname">source</td><td></td></tr>
-    <tr><td class="paramname">timer_count</td><td></td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">s_id</td><td>Source ID </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">source</td><td>Source descriptor </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">timer_count</td><td>Time to send spike at </td></tr>
   </table>
   </dd>
 </dl>
@@ -1186,7 +1338,7 @@ poissons[]</td>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">id</td><td>the ID of the source to be updated </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">rate</td><td>the REAL-valued rate in Hz, to be multiplied to get per_tick values </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">rate</td><td>the rate in Hz, to be multiplied to get per_tick values </td></tr>
   </table>
   </dd>
 </dl>
@@ -1228,8 +1380,8 @@ poissons[]</td>
 <p>multicast callback used to set rate when injected in a live example </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">key</td><td></td></tr>
-    <tr><td class="paramname">payload</td><td></td></tr>
+    <tr><td class="paramname">key</td><td>Received multicast key </td></tr>
+    <tr><td class="paramname">payload</td><td>Received multicast payload </td></tr>
   </table>
   </dd>
 </dl>
@@ -1261,7 +1413,7 @@ poissons[]</td>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon May 4 2020 13:05:48 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue May 5 2020 15:25:29 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

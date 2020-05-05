@@ -1,7 +1,5 @@
 var searchData=
 [
-  ['real_5fcompare',['REAL_COMPARE',['../maths-util_8h.html#a312d47ef9413a82783b9a70de764d9a2',1,'maths-util.h']]],
-  ['real_5fconst',['REAL_CONST',['../maths-util_8h.html#a0ac3b00bb3dbd6b05a21cb12708b8f8d',1,'maths-util.h']]],
-  ['real_5fhalf',['REAL_HALF',['../maths-util_8h.html#acb3ba35e71e4ec24a52b48d53308d3c2',1,'maths-util.h']]],
-  ['real_5ftwice',['REAL_TWICE',['../maths-util_8h.html#ac5b558ffc8e6ef1ff9e8703ad39abfb4',1,'maths-util.h']]]
+  ['pack_5fdelay_5findex_5fstage',['pack_delay_index_stage',['../delay__extension_8h.html#a62c01d7388112097a930509cf05f6168',1,'delay_extension.h']]],
+  ['prob_5fsaturation',['PROB_SATURATION',['../threshold__type__maass__stochastic_8h.html#a83a285b76d1d37dc508e758e1f0c9726',1,'threshold_type_maass_stochastic.h']]]
 ];

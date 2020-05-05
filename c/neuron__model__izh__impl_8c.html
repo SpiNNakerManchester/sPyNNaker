@@ -102,7 +102,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:ae9b257f5e4059af3a5fa30730512f2b6"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__model__izh__impl_8c.html#ae9b257f5e4059af3a5fa30730512f2b6">rk2_kernel_midpoint</a> (<a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a> h, <a class="el" href="neuron__model__lif__impl_8h.html#structneuron__t">neuron_t</a> *neuron, <a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a> input_this_timestep)</td></tr>
-<tr class="memdesc:ae9b257f5e4059af3a5fa30730512f2b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Midpoint is best balance between speed and accuracy so far from ODE solve comparison work paper shows that Trapezoid version gives better accuracy at small speed cost.  <a href="#ae9b257f5e4059af3a5fa30730512f2b6">More...</a><br /></td></tr>
+<tr class="memdesc:ae9b257f5e4059af3a5fa30730512f2b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Midpoint is best balance between speed and accuracy so far.  <a href="#ae9b257f5e4059af3a5fa30730512f2b6">More...</a><br /></td></tr>
 <tr class="separator:ae9b257f5e4059af3a5fa30730512f2b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2c709e18b3833cf07131b394b0a9b929"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__model__izh__impl_8c.html#a2c709e18b3833cf07131b394b0a9b929">neuron_model_set_global_neuron_params</a> (const <a class="el" href="neuron__model__lif__impl_8h.html#structglobal__neuron__params__t">global_neuron_params_t</a> *<a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a159669347528cd4f88c368d0d33e4670">params</a>)</td></tr>
 <tr class="memdesc:a2c709e18b3833cf07131b394b0a9b929"><td class="mdescLeft">&#160;</td><td class="mdescRight">set the global neuron parameters  <a href="#a2c709e18b3833cf07131b394b0a9b929">More...</a><br /></td></tr>
@@ -126,7 +126,8 @@ Functions</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
 <tr class="memitem:a60d02bd3fd0eb5694bf3d08679d4565d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a60d02bd3fd0eb5694bf3d08679d4565d"></a>
-static const <a class="el" href="neuron__model__lif__impl_8h.html#structglobal__neuron__params__t">global_neuron_params_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><b>global_params</b></td></tr>
+static const <a class="el" href="neuron__model__lif__impl_8h.html#structglobal__neuron__params__t">global_neuron_params_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__model__izh__impl_8c.html#a60d02bd3fd0eb5694bf3d08679d4565d">global_params</a></td></tr>
+<tr class="memdesc:a60d02bd3fd0eb5694bf3d08679d4565d"><td class="mdescLeft">&#160;</td><td class="mdescRight">The global parameters of the Izhekevich neuron model. <br /></td></tr>
 <tr class="separator:a60d02bd3fd0eb5694bf3d08679d4565d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2a9449a2c1269d81389014e6c2df9573"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a2a9449a2c1269d81389014e6c2df9573"></a>
 static const <a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__model__izh__impl_8c.html#a2a9449a2c1269d81389014e6c2df9573">SIMPLE_TQ_OFFSET</a> = <a class="el" href="maths-util_8h.html#a0ac3b00bb3dbd6b05a21cb12708b8f8d">REAL_CONST</a>(1.85)</td></tr>
@@ -177,12 +178,12 @@ static const <a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7d
 </table>
 </div><div class="memdoc">
 
-<p>Midpoint is best balance between speed and accuracy so far from ODE solve comparison work paper shows that Trapezoid version gives better accuracy at small speed cost. </p>
-<dl class="params"><dt>Parameters</dt><dd>
+<p>Midpoint is best balance between speed and accuracy so far. </p>
+<p>From ODE solver comparison work, paper shows that Trapezoid version gives better accuracy at small speed cost </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">h</td><td></td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">neuron</td><td></td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">input_this_timestep</td><td></td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">h</td><td>threshold </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">neuron</td><td>The model being updated </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">input_this_timestep</td><td>the input </td></tr>
   </table>
   </dd>
 </dl>
@@ -401,7 +402,7 @@ static const <a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7d
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon May 4 2020 13:05:48 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue May 5 2020 15:25:29 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['decay',['decay',['../decay_8h.html#a251df1ff8ee78f551bedbd55c451a859',1,'decay.h']]],
-  ['delay_5fstage_5flength',['DELAY_STAGE_LENGTH',['../delay__extension_8h.html#a48634ce49aad40ac1c5cb1b8be213499',1,'delay_extension.h']]]
+  ['ceil_5fto_5f4',['CEIL_TO_4',['../neuron__recording_8c.html#a116ca5cd8794f7ac7266ed798720a3d6',1,'neuron_recording.c']]],
+  ['cube',['CUBE',['../maths-util_8h.html#a3e97109573f7a38ddc9e9c1a9dbb6758',1,'maths-util.h']]]
 ];

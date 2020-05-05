@@ -103,15 +103,16 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Data Structures</h2></td></tr>
 <tr class="memitem:structadditional__input__t"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="additional__input__none__impl_8h.html#structadditional__input__t">additional_input_t</a></td></tr>
+<tr class="memdesc:structadditional__input__t"><td class="mdescLeft">&#160;</td><td class="mdescRight">The additional input is due to calcium ions.  <a href="additional__input__none__impl_8h.html#structadditional__input__t">More...</a><br /></td></tr>
 <tr class="separator:structadditional__input__t"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a136eddebea2acf483d5e28be84070452"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a136eddebea2acf483d5e28be84070452"></a>
-static <a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a>&#160;</td><td class="memItemRight" valign="bottom"><b>additional_input_get_input_value_as_current</b> (struct <a class="el" href="additional__input__none__impl_8h.html#structadditional__input__t">additional_input_t</a> *additional_input, <a class="el" href="neuron-typedefs_8h.html#ab5816efea940631eca6d71dd4ca99c17">state_t</a> membrane_voltage)</td></tr>
+<tr class="memitem:a136eddebea2acf483d5e28be84070452"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="additional__input__none__impl_8h.html#a136eddebea2acf483d5e28be84070452">additional_input_get_input_value_as_current</a> (struct <a class="el" href="additional__input__none__impl_8h.html#structadditional__input__t">additional_input_t</a> *additional_input, <a class="el" href="neuron-typedefs_8h.html#ab5816efea940631eca6d71dd4ca99c17">state_t</a> membrane_voltage)</td></tr>
+<tr class="memdesc:a136eddebea2acf483d5e28be84070452"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the value of current provided by the additional input this timestep.  <a href="#a136eddebea2acf483d5e28be84070452">More...</a><br /></td></tr>
 <tr class="separator:a136eddebea2acf483d5e28be84070452"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac6a9ad3289ee8e787955dfbd7b2a726d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac6a9ad3289ee8e787955dfbd7b2a726d"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><b>additional_input_has_spiked</b> (struct <a class="el" href="additional__input__none__impl_8h.html#structadditional__input__t">additional_input_t</a> *additional_input)</td></tr>
+<tr class="memitem:ac6a9ad3289ee8e787955dfbd7b2a726d"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="additional__input__none__impl_8h.html#ac6a9ad3289ee8e787955dfbd7b2a726d">additional_input_has_spiked</a> (struct <a class="el" href="additional__input__none__impl_8h.html#structadditional__input__t">additional_input_t</a> *additional_input)</td></tr>
+<tr class="memdesc:ac6a9ad3289ee8e787955dfbd7b2a726d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Notifies the additional input type that the neuron has spiked.  <a href="#ac6a9ad3289ee8e787955dfbd7b2a726d">More...</a><br /></td></tr>
 <tr class="separator:ac6a9ad3289ee8e787955dfbd7b2a726d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -126,7 +127,9 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><b>additional_inp
         </tr>
       </table>
 </div><div class="memdoc">
-<div class="textblock"></div><table class="fieldtable">
+<div class="textblock"><p>The additional input is due to calcium ions. </p>
+<p>An empty additional input that makes no contribution. </p>
+</div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="a0c1f083f2abaa9a200f9bc6e26ccbb92"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
@@ -150,10 +153,87 @@ Influx of CA2 caused by each spike. </td></tr>
 
 </div>
 </div>
+<h2 class="groupheader">Function Documentation</h2>
+<a class="anchor" id="a136eddebea2acf483d5e28be84070452"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> additional_input_get_input_value_as_current </td>
+          <td>(</td>
+          <td class="paramtype">struct <a class="el" href="additional__input__none__impl_8h.html#structadditional__input__t">additional_input_t</a> *&#160;</td>
+          <td class="paramname"><em>additional_input</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="neuron-typedefs_8h.html#ab5816efea940631eca6d71dd4ca99c17">state_t</a>&#160;</td>
+          <td class="paramname"><em>membrane_voltage</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Gets the value of current provided by the additional input this timestep. </p>
+<p>Does nothing </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">additional_input</td><td>The additional input type pointer to the parameters </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">membrane_voltage</td><td>The membrane voltage of the neuron </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The value of the input after scaling </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ac6a9ad3289ee8e787955dfbd7b2a726d"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void additional_input_has_spiked </td>
+          <td>(</td>
+          <td class="paramtype">struct <a class="el" href="additional__input__none__impl_8h.html#structadditional__input__t">additional_input_t</a> *&#160;</td>
+          <td class="paramname"><em>additional_input</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Notifies the additional input type that the neuron has spiked. </p>
+<p>Does nothing </p><dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">additional_input</td><td>The additional input type pointer to the parameters </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon May 4 2020 13:05:48 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue May 5 2020 15:25:29 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

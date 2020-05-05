@@ -7,5 +7,6 @@ var searchData=
   ['get_5fneuron_5fid',['get_neuron_id',['../population__table__binary__search__impl_8c.html#ab08d6807fc8fd46ed5f70a8bd14a5a93',1,'population_table_binary_search_impl.c']]],
   ['get_5fpayload',['get_payload',['../threshold__type__external__device__control_8h.html#a62ce705c4f3f3b079557f236935e1dd3',1,'threshold_type_external_device_control.h']]],
   ['get_5frow_5flength',['get_row_length',['../population__table__binary__search__impl_8c.html#a90850a3d006b876ba62076c80a401be1',1,'population_table_binary_search_impl.c']]],
+  ['get_5fsource_5fdata',['get_source_data',['../spike__source__poisson_8c.html#a271dd89ae6f3a25d49a7e2d4cb768a37',1,'spike_source_poisson.c']]],
   ['get_5ftype_5fchar',['get_type_char',['../synapses_8c.html#a5af3d86ffc14ed6815aeeec7dbe9412a',1,'synapses.c']]]
 ];

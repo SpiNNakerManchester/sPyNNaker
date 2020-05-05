@@ -7,6 +7,7 @@ var searchData=
   ['unpack_5fdelay_5findex',['unpack_delay_index',['../delay__extension_8h.html#a64494ca55a7d8abb2d9c45c1928da31d',1,'delay_extension.h']]],
   ['unpack_5fdelay_5fstage',['unpack_delay_stage',['../delay__extension_8h.html#a4f6b0f0080036b3baadaebe99a5c4b95',1,'delay_extension.h']]],
   ['update_5fstate_5ft',['update_state_t',['../synapse__structure__weight__state__accumulator__window__impl_8h.html#structupdate__state__t',1,'update_state_t'],['../synapse__structure__weight__impl_8h.html#ac4fd00ce43d4ad3f6181dde377224723',1,'update_state_t():&#160;synapse_structure_weight_impl.h']]],
+  ['update_5ftime',['update_time',['../robot__motor__control_8c.html#af91db5a416282fefdb525fadbc6f5f8f',1,'motor_control_config_t::update_time()'],['../robot__motor__control_8c.html#a86e18fc3ab6be6646e80307e68187e63',1,'update_time():&#160;robot_motor_control.c']]],
   ['ureal',['UREAL',['../maths-util_8h.html#a2e4c6b7f842497114d81356c763536c4',1,'maths-util.h']]],
   ['ureal_5fconst',['UREAL_CONST',['../maths-util_8h.html#a9ff1e35d7d395a988bf688a412076a40',1,'maths-util.h']]],
   ['use_5fkey',['use_key',['../neuron_8c.html#ab9132b5a04a7bdb8ac2e4293c1ec96bf',1,'neuron.c']]],

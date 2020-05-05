@@ -100,9 +100,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a66bcbf25869d17ef22b1af0fa390fd27"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a66bcbf25869d17ef22b1af0fa390fd27"></a>
-uint32_t *&#160;</td><td class="memItemRight" valign="bottom"><b>timing_initialise</b> (uint32_t *address)</td></tr>
-<tr class="separator:a66bcbf25869d17ef22b1af0fa390fd27"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adcf80560bde3d552d7ef273645c530fa"><td class="memItemLeft" align="right" valign="top">address_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="timing__vogels__2011__impl_8c.html#adcf80560bde3d552d7ef273645c530fa">timing_initialise</a> (address_t address)</td></tr>
+<tr class="memdesc:adcf80560bde3d552d7ef273645c530fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise the timing dependence state (global) from SDRAM.  <a href="#adcf80560bde3d552d7ef273645c530fa">More...</a><br /></td></tr>
+<tr class="separator:adcf80560bde3d552d7ef273645c530fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
@@ -117,10 +117,36 @@ Variables</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Initialisation for <a class="el" href="timing__vogels__2011__impl_8h.html" title="Timing rule from Vogels 2011. ">timing_vogels_2011_impl.h</a>. </p>
-</div></div><!-- contents -->
+</div><h2 class="groupheader">Function Documentation</h2>
+<a class="anchor" id="adcf80560bde3d552d7ef273645c530fa"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">address_t timing_initialise </td>
+          <td>(</td>
+          <td class="paramtype">address_t&#160;</td>
+          <td class="paramname"><em>address</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Initialise the timing dependence state (global) from SDRAM. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">address</td><td>Location in SDRAM of timing data </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>address of first word after the timing data </dd></dl>
+
+</div>
+</div>
+</div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon May 4 2020 13:05:48 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue May 5 2020 15:25:29 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

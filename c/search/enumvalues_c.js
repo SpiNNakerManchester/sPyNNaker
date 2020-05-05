@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['params_5fregion',['PARAMS_REGION',['../robot__motor__control_8c.html#a7f61ffa202f9ba34d1917f6f83d8bf9da91faf3838b3b1ca64895b4f7bc331410',1,'robot_motor_control.c']]],
   ['payload_5fdelta_5ftimestamps',['PAYLOAD_DELTA_TIMESTAMPS',['../munich__protocol_8h.html#adc29c2ff13d900c2f185ee95427fb06ca7e7a925c702fda8735064bd0c71b5de4',1,'munich_protocol.h']]],
   ['payload_5ffour_5fbyte_5ftime_5fstamps',['PAYLOAD_FOUR_BYTE_TIME_STAMPS',['../munich__protocol_8h.html#adc29c2ff13d900c2f185ee95427fb06cafcbea561be57d033de0ec3777485e92e',1,'munich_protocol.h']]],
   ['payload_5fno_5ftimestamps',['PAYLOAD_NO_TIMESTAMPS',['../munich__protocol_8h.html#adc29c2ff13d900c2f185ee95427fb06ca35c35a3d19b4e8bbea2e9c2a345d0cf7',1,'munich_protocol.h']]],
@@ -9,6 +10,7 @@ var searchData=
   ['payload_5fretina_5fno_5fdown_5fsampling',['PAYLOAD_RETINA_NO_DOWN_SAMPLING',['../munich__protocol_8h.html#a61dadd085c1777f559549e05962b2c9ea8de5b4140e590b1afd4610167028e60f',1,'munich_protocol.h']]],
   ['payload_5fthree_5fbyte_5ftime_5fstamps',['PAYLOAD_THREE_BYTE_TIME_STAMPS',['../munich__protocol_8h.html#adc29c2ff13d900c2f185ee95427fb06ca5dbc455edb7e576b4b10207499df32d4',1,'munich_protocol.h']]],
   ['payload_5ftwo_5fbyte_5ftime_5fstamps',['PAYLOAD_TWO_BYTE_TIME_STAMPS',['../munich__protocol_8h.html#adc29c2ff13d900c2f185ee95427fb06ca3a5dbca82d4fd637a9b24f952c0a3b1d',1,'munich_protocol.h']]],
+  ['poisson_5fparams',['POISSON_PARAMS',['../spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402a727a4355ea4eac05e783bca4d11a76de',1,'spike_source_poisson.c']]],
   ['poll_5fsensors_5fcontinuously_5fkey',['POLL_SENSORS_CONTINUOUSLY_KEY',['../munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04ac78ecb26d0149528ab6d114d5a2a7d2d',1,'munich_protocol.h']]],
   ['poll_5fsensors_5fonce_5fkey',['POLL_SENSORS_ONCE_KEY',['../munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04af411423d32b0d5b899c3ac16f6d616f7',1,'munich_protocol.h']]],
   ['population_5ftable_5fregion',['POPULATION_TABLE_REGION',['../regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6aa5d73e2f95ea7659b63a96ada14f5389',1,'regions.h']]],
@@ -16,10 +18,10 @@ var searchData=
   ['profiler_5fincoming_5fspike',['PROFILER_INCOMING_SPIKE',['../neuron_2profile__tags_8h.html#a0d952ae768d975f73145cdb93a775973a06f29c1c8c010cad288570a2e846bef9',1,'profile_tags.h']]],
   ['profiler_5fprocess_5ffixed_5fsynapses',['PROFILER_PROCESS_FIXED_SYNAPSES',['../neuron_2profile__tags_8h.html#a0d952ae768d975f73145cdb93a775973a6325244b78e2b4c5f39ec14a58b9679d',1,'profile_tags.h']]],
   ['profiler_5fprocess_5fplastic_5fsynapses',['PROFILER_PROCESS_PLASTIC_SYNAPSES',['../neuron_2profile__tags_8h.html#a0d952ae768d975f73145cdb93a775973a070e57e10719c6c91dfe162487a31018',1,'profile_tags.h']]],
-  ['profiler_5fregion',['PROFILER_REGION',['../regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6a161a63f4ef09daf69f48a49cc4a8ef5b',1,'regions.h']]],
+  ['profiler_5fregion',['PROFILER_REGION',['../regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6a161a63f4ef09daf69f48a49cc4a8ef5b',1,'PROFILER_REGION():&#160;regions.h'],['../spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402a161a63f4ef09daf69f48a49cc4a8ef5b',1,'PROFILER_REGION():&#160;spike_source_poisson.c']]],
   ['profiler_5ftimer',['PROFILER_TIMER',['../neuron_2profile__tags_8h.html#a0d952ae768d975f73145cdb93a775973a54cf15346177f758a5cf2bddf4584f47',1,'profile_tags.h']]],
   ['provenance_5fdata_5fregion',['PROVENANCE_DATA_REGION',['../regions_8h.html#a94cb8426c71368d0a24cf95fcc70a3d6a9dcdca344c3940f5dabd669af51fede2',1,'regions.h']]],
-  ['provenance_5fregion',['PROVENANCE_REGION',['../delay__extension_8h.html#a6e4d67a0bd74db4da98539f8d2e5ab32a43f0d58cfc0317ea06139b20c9242d1e',1,'delay_extension.h']]],
+  ['provenance_5fregion',['PROVENANCE_REGION',['../delay__extension_8h.html#a6e4d67a0bd74db4da98539f8d2e5ab32a43f0d58cfc0317ea06139b20c9242d1e',1,'PROVENANCE_REGION():&#160;delay_extension.h'],['../spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402a43f0d58cfc0317ea06139b20c9242d1e',1,'PROVENANCE_REGION():&#160;spike_source_poisson.c']]],
   ['push_5fbot_5flaser_5fconfig_5factive_5ftime',['PUSH_BOT_LASER_CONFIG_ACTIVE_TIME',['../munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04aaf64f130ca2b0371a27d61e97ee5dfca',1,'munich_protocol.h']]],
   ['push_5fbot_5flaser_5fconfig_5ftotal_5fperiod',['PUSH_BOT_LASER_CONFIG_TOTAL_PERIOD',['../munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04a92aa458811e2d91fa2a2ddc7c6300c08',1,'munich_protocol.h']]],
   ['push_5fbot_5flaser_5ffrequency',['PUSH_BOT_LASER_FREQUENCY',['../munich__protocol_8h.html#abc6126af1d45847bc59afa0aa3216b04a667772b48cfbd160decaa2e2d59070db',1,'munich_protocol.h']]],

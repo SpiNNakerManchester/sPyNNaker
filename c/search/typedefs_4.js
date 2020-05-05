@@ -1,6 +1,8 @@
 var searchData=
 [
-  ['initialize_5ffunc',['initialize_func',['../generator__types_8h.html#aee3c3f67a2dbc86e776c251bdc87f8ad',1,'generator_types.h']]],
-  ['input_5ft',['input_t',['../neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591',1,'neuron-typedefs.h']]],
-  ['input_5ftype_5fpointer_5ft',['input_type_pointer_t',['../input__type_8h.html#af2eac2241adec660b95b59ab8cc519ff',1,'input_type.h']]]
+  ['generate_5fconnection_5ffunc',['generate_connection_func',['../generator__types_8h.html#aeecea374609ce4f319912de8bb3373aa',1,'generator_types.h']]],
+  ['generate_5fparam_5ffunc',['generate_param_func',['../generator__types_8h.html#a4bd003486ef73fb965123237b0559f38',1,'generator_types.h']]],
+  ['generate_5frow_5ffunc',['generate_row_func',['../generator__types_8h.html#a93d89ec17e8dd61e706a81874b5241d3',1,'generator_types.h']]],
+  ['generator_5fhash_5ft',['generator_hash_t',['../generator__types_8h.html#a55f8d20fc9350939e3fa6a85d8aed90c',1,'generator_types.h']]],
+  ['global_5fneuron_5fparams_5fpointer_5ft',['global_neuron_params_pointer_t',['../neuron__model_8h.html#af6a73a4c591000fae3ac1f7e879b9a36',1,'neuron_model.h']]]
 ];

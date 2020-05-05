@@ -105,6 +105,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Data Structures</h2></td></tr>
 <tr class="memitem:structneuron__recording__header__t"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__recording_8c.html#structneuron__recording__header__t">neuron_recording_header_t</a></td></tr>
+<tr class="memdesc:structneuron__recording__header__t"><td class="mdescLeft">&#160;</td><td class="mdescRight">The heading of the neuron recording region.  <a href="neuron__recording_8c.html#structneuron__recording__header__t">More...</a><br /></td></tr>
 <tr class="separator:structneuron__recording__header__t"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="define-members"></a>
@@ -136,11 +137,11 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 <tr class="memitem:a6ec6bcccf5cf769f8ea0c853ab0577e9"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__recording_8c.html#a6ec6bcccf5cf769f8ea0c853ab0577e9">neuron_recording_reset</a> (uint32_t <a class="el" href="synapses_8c.html#a7368643a28282d8b3429f0fb145aa5db">n_neurons</a>)</td></tr>
 <tr class="memdesc:a6ec6bcccf5cf769f8ea0c853ab0577e9"><td class="mdescLeft">&#160;</td><td class="mdescRight">reads recording data from sdram on reset.  <a href="#a6ec6bcccf5cf769f8ea0c853ab0577e9">More...</a><br /></td></tr>
 <tr class="separator:a6ec6bcccf5cf769f8ea0c853ab0577e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a70d6022a564a21077615ffd8ef160b42"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__recording_8c.html#a70d6022a564a21077615ffd8ef160b42">allocate_dtcm</a> (uint32_t <a class="el" href="synapses_8c.html#a7368643a28282d8b3429f0fb145aa5db">n_neurons</a>)</td></tr>
-<tr class="memdesc:a70d6022a564a21077615ffd8ef160b42"><td class="mdescLeft">&#160;</td><td class="mdescRight">handles all the dtcm allocations  <a href="#a70d6022a564a21077615ffd8ef160b42">More...</a><br /></td></tr>
-<tr class="separator:a70d6022a564a21077615ffd8ef160b42"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8b7a478d22db76495934d689b0a32482"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__recording_8c.html#a8b7a478d22db76495934d689b0a32482">allocate_word_dtcm</a> (uint32_t <a class="el" href="synapses_8c.html#a7368643a28282d8b3429f0fb145aa5db">n_neurons</a>)</td></tr>
+<tr class="memdesc:a8b7a478d22db76495934d689b0a32482"><td class="mdescLeft">&#160;</td><td class="mdescRight">handles all the DTCM allocations for recording words  <a href="#a8b7a478d22db76495934d689b0a32482">More...</a><br /></td></tr>
+<tr class="separator:a8b7a478d22db76495934d689b0a32482"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af48d91cdeaac5c1b26bf495746757f81"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__recording_8c.html#af48d91cdeaac5c1b26bf495746757f81">allocate_bitfield_dtcm</a> (uint32_t <a class="el" href="synapses_8c.html#a7368643a28282d8b3429f0fb145aa5db">n_neurons</a>)</td></tr>
-<tr class="memdesc:af48d91cdeaac5c1b26bf495746757f81"><td class="mdescLeft">&#160;</td><td class="mdescRight">handles all the dtcm allocations  <a href="#af48d91cdeaac5c1b26bf495746757f81">More...</a><br /></td></tr>
+<tr class="memdesc:af48d91cdeaac5c1b26bf495746757f81"><td class="mdescLeft">&#160;</td><td class="mdescRight">handles all the DTCM allocations for recording bitfields  <a href="#af48d91cdeaac5c1b26bf495746757f81">More...</a><br /></td></tr>
 <tr class="separator:af48d91cdeaac5c1b26bf495746757f81"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab0523578673e54e4761dde07d4818c6a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__recording_8c.html#ab0523578673e54e4761dde07d4818c6a">neuron_recording_initialise</a> (void *recording_address, uint32_t *<a class="el" href="spike__source__poisson_8c.html#a9a97f21dc7fccaac8071bcd29894bccb">recording_flags</a>, uint32_t <a class="el" href="synapses_8c.html#a7368643a28282d8b3429f0fb145aa5db">n_neurons</a>)</td></tr>
 <tr class="memdesc:ab0523578673e54e4761dde07d4818c6a"><td class="mdescLeft">&#160;</td><td class="mdescRight">sets up the recording stuff  <a href="#ab0523578673e54e4761dde07d4818c6a">More...</a><br /></td></tr>
@@ -193,20 +194,21 @@ static void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" h
         </tr>
       </table>
 </div><div class="memdoc">
-<div class="textblock"></div><table class="fieldtable">
+<div class="textblock"><p>The heading of the neuron recording region. </p>
+</div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="abedd25f4658e60246836b650b8432a7b"></a>uint32_t</td>
 <td class="fieldname">
 n_recorded_vars</td>
 <td class="fielddoc">
-</td></tr>
+The number of word-sized variables to record. </td></tr>
 <tr><td class="fieldtype">
 <a class="anchor" id="aceb45219931c687ba2595c66b9561e18"></a>uint32_t</td>
 <td class="fieldname">
 n_bitfield_vars</td>
 <td class="fielddoc">
-</td></tr>
+The number of bitfield variables to record. </td></tr>
 </table>
 
 </div>
@@ -333,7 +335,7 @@ n_bitfield_vars</td>
 
 </div>
 </div>
-<a class="anchor" id="a70d6022a564a21077615ffd8ef160b42"></a>
+<a class="anchor" id="a8b7a478d22db76495934d689b0a32482"></a>
 <div class="memitem">
 <div class="memproto">
 <table class="mlabels">
@@ -341,7 +343,7 @@ n_bitfield_vars</td>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static bool allocate_dtcm </td>
+          <td class="memname">static bool allocate_word_dtcm </td>
           <td>(</td>
           <td class="paramtype">uint32_t&#160;</td>
           <td class="paramname"><em>n_neurons</em></td><td>)</td>
@@ -355,13 +357,14 @@ n_bitfield_vars</td>
 </table>
 </div><div class="memdoc">
 
-<p>handles all the dtcm allocations </p>
+<p>handles all the DTCM allocations for recording words </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">n_neurons</td><td>how many neurons to set dtcm for </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">n_neurons</td><td>how many neurons to set DTCM for </td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>True on success </dd></dl>
 
 </div>
 </div>
@@ -387,13 +390,14 @@ n_bitfield_vars</td>
 </table>
 </div><div class="memdoc">
 
-<p>handles all the dtcm allocations </p>
+<p>handles all the DTCM allocations for recording bitfields </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">n_neurons</td><td>how many neurons to set dtcm for </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">n_neurons</td><td>how many neurons to set DTCM for </td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>True on success </dd></dl>
 
 </div>
 </div>
@@ -443,7 +447,7 @@ n_bitfield_vars</td>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon May 4 2020 13:05:48 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue May 5 2020 15:25:29 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>
