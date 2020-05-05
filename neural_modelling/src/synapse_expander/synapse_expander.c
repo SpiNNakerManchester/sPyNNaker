@@ -75,6 +75,7 @@ struct expander_config {
  * \param[in] n_synapse_index_bits: The number of bits for the neuron index id
  * \param[in] weight_scales: An array of weight scales, one for each synapse
  *                           type
+ * \return true on success, false on failure
  */
 static bool read_connection_builder_region(address_t *in_region,
         address_t synaptic_matrix_region, uint32_t post_slice_start,

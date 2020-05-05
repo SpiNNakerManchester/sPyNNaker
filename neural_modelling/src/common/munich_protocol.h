@@ -42,6 +42,7 @@ typedef union {
     uint32_t value;                   //!< Overall key value
 } munich_key_t;
 
+//! Offsets within a munich_key_t
 enum {
     OFFSET_TO_I = 4, //!< Offset to I (instruction) field in command word
     OFFSET_TO_F = 3, //!< Offset to F (format) field in command word
@@ -50,7 +51,9 @@ enum {
 
 //! Specific fields in the key
 enum {
+    //! UART identifier offset
     OFFSET_FOR_UART_ID = 29,
+    //! Device UART offset for the pushbot
     PUSH_BOT_UART_OFFSET_SPEAKER_LED_LASER = 1
 };
 
@@ -82,14 +85,19 @@ enum {
 //! \return The instance key as an unsigned 32 bit integer
 #define MUNICH_KEY_I(I)         MUNICH_KEY(I, 0, 0)
 
-//! Payload fields
+//! Payload bit offsets for various fields
 enum {
+    //! Offset for timestamps
     PAYLOAD_OFFSET_FOR_TIMESTAMPS = 29,
+    //! Offset for retina size
     PAYLOAD_OFFSET_FOR_RETINA_SIZE = 26,
+    //! Offset for sensor ID
     PAYLOAD_SENSOR_ID_OFFSET = 27,
+    //! Offset for sensor timestamp
     PAYLOAD_OFFSET_FOR_SENSOR_TIME = 31
 };
 
+//! Command keys (as offsets from the base key)
 enum {
     //! command key for setting up the master key of the board
     CONFIGURE_MASTER_KEY = MUNICH_KEY_I(127),

@@ -32,13 +32,21 @@
 #include "param_generators/param_generator_exponential.h"
 #include "param_generators/param_generator_kernel.h"
 
+//! The "hashes" for parameter generators
 enum {
+    //! A parameter that is a constant
     CONSTANT,
+    //! A parameter that is a uniformly-distributed random variable
     UNIFORM,
+    //! A parameter that is a normally-distributed random variable
     NORMAL,
+    //! A parameter that is a clipped-normally-distributed random variable
     NORMAL_CLIPPED,
+    //! A parameter that is a clamped-normally-distributed random variable
     NORMAL_CLIPPED_BOUNDARY,
+    //! A parameter that is an exponentially-distributed random variable
     EXPONENTIAL,
+    //! A parameter that is used with a convolution kernel connector
     KERNEL,
     //! The number of known generators
     N_PARAM_GENERATORS = 7

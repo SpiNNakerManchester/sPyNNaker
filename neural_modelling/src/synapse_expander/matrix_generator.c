@@ -28,8 +28,11 @@
 #include "matrix_generators/matrix_generator_stdp.h"
 #include <delay_extension/delay_extension.h>
 
+//! The "hashes" for synaptic matrix generators
 enum {
+    //! Generate a pure static synaptic matrix
     STATIC_MATRIX_GENERATOR,
+    //! Generate a synaptic matrix with STDP
     PLASTIC_MATRIX_GENERATOR,
     /**
      * \brief The number of known generators
@@ -112,6 +115,26 @@ void matrix_generator_free(matrix_generator_t generator) {
     sark_free(generator);
 }
 
+/**
+ * \brief Generate a row of a synaptic matrix
+ * \param[in] generator: The matrix generator
+ * \param[out] synaptic_matrix: The address of the synaptic matrix to write to
+ * \param[out] delayed_synaptic_matrix: The address of the synaptic matrix to
+ *                                      write delayed connections to
+ * \param[in] n_pre_neurons: The number of pre neurons to generate for
+ * \param[in] pre_neuron_index: The index of the first pre neuron
+ * \param[in] max_row_n_words: The maximum number of words in a normal row
+ * \param[in] max_delayed_row_n_words: The maximum number of words in a
+ *                                     delayed row
+ * \param[in] n_synapse_type_bits: The number of bits used for the synapse type
+ * \param[in] n_synapse_index_bits: The number of bits used for the neuron id
+ * \param[in] synapse_type: The synapse type of each connection
+ * \param[in] n_synapses: The number of synapses
+ * \param[in] indices: Pointer to table of indices
+ * \param[in] delays: Pointer to table of delays
+ * \param[in] weights: Pointer to table of weights
+ * \param[in] max_stage: The maximum delay stage to support
+ */
 static void matrix_generator_write_row(
         matrix_generator_t generator,
         address_t synaptic_matrix, address_t delayed_synaptic_matrix,
@@ -131,6 +154,10 @@ static void matrix_generator_write_row(
 
 // ---------------------------------------------------------------------
 
+//! \brief Rescales a delay to account for timesteps and type-converts it
+//! \param[in] delay: the delay to rescale
+//! \param[in] timestep_per_delay: The timestep unit
+//! \return the rescaled delay
 static inline uint16_t rescale_delay(accum delay, accum timestep_per_delay) {
     delay = delay * timestep_per_delay;
     if (delay < 0) {
@@ -143,6 +170,11 @@ static inline uint16_t rescale_delay(accum delay, accum timestep_per_delay) {
     return delay_int;
 }
 
+//! \brief Rescales a weight to account for weight granularity and
+//!     type-converts it
+//! \param[in] weight: the weight to rescale
+//! \param[in] weight_scale: The weight scaling factor
+//! \return the rescaled weight
 static inline uint16_t rescale_weight(accum weight, accum weight_scale) {
     if (weight < 0) {
         weight = -weight;
@@ -150,7 +182,8 @@ static inline uint16_t rescale_weight(accum weight, accum weight_scale) {
     weight = weight * weight_scale;
     uint16_t weight_int = (uint16_t) weight;
     if (weight != weight_int) {
-        log_debug("Rounded weight %k to %u (scale is %k)", weight, weight_int, weight_scale);
+        log_debug("Rounded weight %k to %u (scale is %k)",
+                weight, weight_int, weight_scale);
     }
     return weight_int;
 }

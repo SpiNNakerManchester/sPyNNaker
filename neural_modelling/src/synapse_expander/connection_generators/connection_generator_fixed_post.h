@@ -95,6 +95,13 @@ static void connection_generator_fixed_post_free(void *generator) {
     sark_free(generator);
 }
 
+/**
+ * \brief Generates a uniformly-distributed random number
+ * \param[in,out] obj: the generator containing the RNG
+ * \param[in] range: the (_upper, exclusive_) limit of the range of random
+ *      numbers that may be generated. Should be in range 0..65536
+ * \return a random integer in the given input range.
+ */
 static uint32_t post_random_in_range(struct fixed_post *obj, uint32_t range) {
     uint32_t u01 = rng_generator(obj->rng) & 0x00007fff;
     return (u01 * range) >> 15;
