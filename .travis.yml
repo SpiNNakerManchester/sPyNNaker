@@ -111,6 +111,7 @@ after_success:
     ( cd $TRAVIS_BUILD_DIR && exec coveralls )
 
 before_deploy:
+  # Merge the doc trees
   - >
     [ -d $ROOT_DOC_DIR ] && cp -vaT $ROOT_DOC_DIR $DEPLOY_DIR
   - >
@@ -120,23 +121,16 @@ before_deploy:
 after_deploy:
   - rm -rf $DEPLOY_DIR
 deploy:
-  - provider: pages
-    skip_cleanup: true
-    keep_history: true
-    # Inject magic environment variable from Travis Job Configuration page
-    token: $GITHUB_TOKEN
-    local_dir: $DEPLOY_DIR
-    on:
-      branch: master
-      python: 3.6
-      # Only enable deployment on master if we actually have supplied a token
-      condition: -n "$GITHUB_TOKEN"
-  # TODO: Remove this auxilary deployment before finalizing
-  - provider: pages
-    skip_cleanup: true
-    keep_history: true
-    token: $GITHUB_TOKEN
-    local_dir: $DEPLOY_DIR
-    on:
-      branch: doxygen
-      python: 3.6
+  provider: pages
+  skip_cleanup: true
+  keep_history: true
+  # Inject magic environment variable from Travis Job Configuration page
+  token: $GITHUB_TOKEN
+  local_dir: $DEPLOY_DIR
+  on:
+    branch:
+      - master
+      - doxygen
+    python: 3.6
+    # Only enable deployment if we actually have supplied a token
+    condition: -n "$GITHUB_TOKEN"
