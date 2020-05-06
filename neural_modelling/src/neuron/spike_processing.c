@@ -84,6 +84,9 @@ static uint32_t dma_complete_count = 0;
 // the number of spikes that were processed (used in provenance generation)
 static uint32_t spike_processing_count = 0;
 
+// The number of successful rewires
+static uint32_t n_successful_rewires = 0;
+
 /* PRIVATE FUNCTIONS - static for inlining */
 
 static inline void do_dma_read(
@@ -284,6 +287,7 @@ static void dma_complete_callback(uint unused, uint tag) {
         if (synaptogenesis_row_restructure(time, current_buffer->row)) {
             write_back = true;
             plastic_only = false;
+            n_successful_rewires++;
         }
     }
 
@@ -410,6 +414,12 @@ uint32_t spike_processing_get_spike_processing_count(){
 //! \return address of circular buffer
 circular_buffer get_circular_buffer(void) { // EXPORTED
     return buffer;
+}
+
+//! \brief returns the number of successful rewires performed
+//! \return the number of successful rewires
+uint32_t spike_processing_get_successful_rewires(void) { // EXPORTED
+    return n_successful_rewires;
 }
 
 //! \brief set the number of times spike_processing has to attempt rewiring

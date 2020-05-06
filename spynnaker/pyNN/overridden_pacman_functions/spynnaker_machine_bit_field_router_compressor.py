@@ -15,6 +15,7 @@
 
 import logging
 
+from pacman.model.placements import Placement
 from spinn_front_end_common.abstract_models.\
     abstract_supports_bit_field_generation import \
     AbstractSupportsBitFieldGeneration
@@ -22,6 +23,7 @@ from spinn_front_end_common.interface.interface_functions.\
     machine_bit_field_router_compressor import \
     MachineBitFieldRouterCompressor
 from spinn_front_end_common.utilities import system_control_logic
+from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState
 from spynnaker.pyNN.models.utility_models.synapse_expander. \
@@ -129,12 +131,14 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
                         if app_vertex.gen_on_machine(
                                 graph_mapper.get_slice(vertex)):
                             new_cores.add_processor(
-                                expander_executable_path, core_subset.x,
-                                core_subset.y, processor_id)
+                                expander_executable_path,
+                                core_subset.x, core_subset.y, processor_id,
+                                executable_type=ExecutableType.SYSTEM)
         return new_cores
 
+    @staticmethod
     def _rerun_synaptic_cores(
-            self, synaptic_expander_rerun_cores, transceiver,
+            synaptic_expander_rerun_cores, transceiver,
             provenance_file_path, executable_finder, needs_sync_barrier,
             no_sync_changes):
         """ reruns the synaptic expander

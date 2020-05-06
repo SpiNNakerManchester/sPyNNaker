@@ -60,6 +60,7 @@ class PopulationMachineVertex(
         SPIKE_PROGRESSING_COUNT = 8
         INVALID_MASTER_POP_HITS = 9
         BIT_FIELD_FILTERED_COUNT = 10
+        N_REWIRES = 11
 
     PROFILE_TAG_LABELS = {
         0: "TIMER",
@@ -195,6 +196,8 @@ class PopulationMachineVertex(
             self.EXTRA_PROVENANCE_DATA_ENTRIES.INVALID_MASTER_POP_HITS.value]
         n_packets_filtered_by_bit_field_filter = provenance_data[
             self.EXTRA_PROVENANCE_DATA_ENTRIES.BIT_FIELD_FILTERED_COUNT.value]
+        n_rewires = provenance_data[
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.N_REWIRES.value]
 
         label, x, y, p, names = self._get_placement_details(placement)
 
@@ -283,7 +286,9 @@ class PopulationMachineVertex(
                 "packets are filtered in the router to improve "
                 "performance.".format(
                     n_packets_filtered_by_bit_field_filter, x, y, p)))))
-
+        provenance_items.append(ProvenanceDataItem(
+            self._add_name(names, "Number_of_rewires"),
+            n_rewires))
         return provenance_items
 
     @overrides(AbstractReceiveBuffersToHost.get_recorded_region_ids)

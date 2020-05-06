@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from spinn_utilities.overrides import overrides
-from pacman.executor.injection_decorator import inject_items
 from data_specification.enums import DataType
 from .abstract_input_type import AbstractInputType
 
@@ -40,8 +39,7 @@ class InputTypeDelta(AbstractInputType):
     def add_state_variables(self, state_variables):
         pass
 
-    @inject_items({"ts": "MachineTimeStep"})
-    @overrides(AbstractInputType.get_values, additional_arguments={'ts'})
+    @overrides(AbstractInputType.get_values)
     def get_values(self, parameters, state_variables, vertex_slice, ts):
         # pylint: disable=arguments-differ
         scale_factor = 1000.0 / float(ts)
