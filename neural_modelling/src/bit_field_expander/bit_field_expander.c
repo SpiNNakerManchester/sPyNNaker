@@ -85,7 +85,7 @@ uint32_t * row_data;
 //! \brief bool holder saying if we should run
 bool can_run = true;
 
-/*****************************stuff needed for strcutral stuff to work*/
+/*****************************stuff needed for structural stuff to work*/
 
 // the instantiation of the previous struct
 rewiring_data_t rewiring_data;
@@ -450,7 +450,7 @@ bool generate_bit_field(void) {
             spike_t new_key = (spike_t) (key + neuron_id);
             log_debug("new key for neurons %d is %0x", neuron_id, new_key);
 
-            // check if this is goverened by the structural stuff. if so,
+            // check if this is governed by the structural stuff. if so,
             // avoid filtering as it could change over time
             bool bit_found = false;
             if (structural_matrix_region_base_address != NULL) {

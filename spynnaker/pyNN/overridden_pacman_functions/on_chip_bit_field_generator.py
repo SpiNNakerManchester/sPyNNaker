@@ -23,6 +23,7 @@ from spinn_front_end_common.abstract_models import \
     AbstractSupportsBitFieldGeneration
 from spinn_front_end_common.utilities import system_control_logic
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spinn_front_end_common.utilities.utility_objs import ExecutableType
 
 from spinn_utilities.progress_bar import ProgressBar
 
@@ -374,7 +375,7 @@ class OnChipBitFieldGenerator(object):
                     # check if the chip being considered already.
                     expander_cores.add_processor(
                         bit_field_expander_path, placement.x, placement.y,
-                        placement.p)
+                        placement.p, executable_type=ExecutableType.SYSTEM)
 
                     bit_field_builder_region = \
                         machine_vertex.bit_field_builder_region(
