@@ -300,7 +300,7 @@ void timer_callback(uint timer_count, uint unused) {
     	synapse_dynamics_changes(n_neurons, neurons_changed);
     	synapse_dynamics_recording_values(n_neurons, rec_values);
     	for (uint32_t i = 0; i < n_neurons; i++) {
-    		io_printf(IO_BUF, "time %u ", time);
+//    		io_printf(IO_BUF, "time %u ", time);
     		neuron_record_structural(i, neurons_changed[i], rec_values[i]);
     	}
     }

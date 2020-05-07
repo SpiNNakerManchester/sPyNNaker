@@ -51,7 +51,7 @@ class NeuronImplStandard(AbstractNeuronImpl):
         "v": DataType.S1615,
         "gsyn_exc": DataType.S1615,
         "gsyn_inh": DataType.S1615,
-        "struct_pl": DataType.UINT32
+        "struct_pl": DataType.INT32
     }
 
     _RECORDABLE_UNITS = {

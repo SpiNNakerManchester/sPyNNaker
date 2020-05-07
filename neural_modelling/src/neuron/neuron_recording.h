@@ -185,6 +185,12 @@ static inline void neuron_recording_record(uint32_t time) {
         if (rec_info->count == rec_info->rate) {
             // Reset the count
             rec_info->count = 1;
+
+//            if (i == STRUCT_PL_RECORDING_INDEX) {
+//            	// don't record if no change happened
+//
+//            }
+
             // Note we are recording
             n_recordings_outstanding += 1;
             // Set the time and record the data
