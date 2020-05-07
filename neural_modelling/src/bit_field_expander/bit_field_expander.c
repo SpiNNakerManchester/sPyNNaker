@@ -113,6 +113,8 @@ void fail_shut_down(void){
     vcpu_t *sark_virtual_processor_info = (vcpu_t *) SV_VCPU;
     uint core = spin1_get_core_id();
     sark_virtual_processor_info[core].user2 = 1;
+    bit_field_base_address->n_merged_filters = 0;
+    bit_field_base_address->n_redundancy_filters = 0;
     bit_field_base_address->n_filters = 0;
 }
 
@@ -146,6 +148,10 @@ void read_in_addresses(void){
     bit_field_base_address = (filter_region_t*)
         data_specification_get_region(
             builder_data.bit_field_region_id, core_address);
+    // fill in size zero in case population table never read in
+    bit_field_base_address->n_merged_filters = 0;
+    bit_field_base_address->n_redundancy_filters = 0;
+    bit_field_base_address->n_filters = 0;
     direct_matrix_region_base_address = data_specification_get_region(
         builder_data.direct_matrix_region_id, core_address);
 
@@ -344,19 +350,12 @@ bool _do_sdram_read_and_test(
 
 void _sort_by_redunancy() {
     // Semantic sugar
-    int n_filters = bit_field_base_address->n_filters;
     filter_info_t* filters = bit_field_base_address->filters;
 
     // no filters merged of course
     bit_field_base_address->n_merged_filters = 0;
 
-    // Avoid indexing if len is 0
-    if (n_filters == 0) {
-        bit_field_base_address->n_redundancy_filters = 0;
-        return;
-    }
-
-    int n_redundancy_filters = n_filters - 1;
+    int n_redundancy_filters = bit_field_base_address->n_filters;
     int i = 0;
     int i_atoms;
     int i_words;
@@ -368,20 +367,16 @@ void _sort_by_redunancy() {
             // Found redunancy so leave at top
             i++;
         } else {
+            // reduce the number of redundant so it point at last to check
+            n_redundancy_filters--;
+            // swap
+            // Ok to do a self swap if i was the last to check
             filter_info_t bit_field_temp = filters[i];
             filters[i] = filters[n_redundancy_filters];
             filters[n_redundancy_filters] = bit_field_temp;
-            n_redundancy_filters--;
         }
     }
-    // check if filter at index n_redundancy_filters is redundnant too
-    i_atoms = filters[n_redundancy_filters].n_atoms;
-    i_words = get_bit_field_size(i_atoms);
-    if (i_atoms > count_bit_field(filters[n_redundancy_filters].data, i_words)) {
-        bit_field_base_address->n_redundancy_filters = n_redundancy_filters;
-    } else {
-        bit_field_base_address->n_redundancy_filters = n_redundancy_filters - 1;
-    }
+    bit_field_base_address->n_redundancy_filters = n_redundancy_filters;
 
     // bubble sort just the packets with redundancy
     for (int i = 0; i < n_redundancy_filters -1; i++){
