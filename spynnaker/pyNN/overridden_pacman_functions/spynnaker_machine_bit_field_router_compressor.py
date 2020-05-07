@@ -157,4 +157,4 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
                 synaptic_expander_rerun_cores, expander_app_id, transceiver,
                 provenance_file_path, executable_finder, True, None, None,
                 [CPUState.FINISHED], needs_sync_barrier, no_sync_changes,
-                "rerun_of_synaptic_expander_on_{}_{}_{}")
+                "rerun_of_synaptic_expander_on_{}_{}_{}.txt")
