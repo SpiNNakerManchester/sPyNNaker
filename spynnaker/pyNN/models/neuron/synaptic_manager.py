@@ -34,8 +34,8 @@ from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from spynnaker.pyNN.models.neuron.master_pop_table import (
     MasterPopTableAsBinarySearch)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
+from spynnaker.pyNN.models.neuron.synapse_dynamics import SynapseDynamicsSTDP
 import sys
-from spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_stdp import SynapseDynamicsSTDP
 
 TIME_STAMP_BYTES = BYTES_PER_WORD
 
