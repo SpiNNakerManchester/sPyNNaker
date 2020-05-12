@@ -267,7 +267,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
             return numpy.mean(weights)
         raise Exception("Unrecognised weight format")
 
-    def _get_weight_minimum(self, weights, n_connections):
+    def _get_weight_minimum(self, weights, n_connections, min_weight_sigma):
         """ Get the minimum of the weights.
 
         :param weights:
@@ -278,16 +278,14 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         """
         if isinstance(weights, RandomDistribution):
             mean_weight = utility_calls.get_mean(weights)
+            weight_var = utility_calls.get_variance(weights)
+            min_weight = mean_weight - weight_var
             if mean_weight < 0:
-                max_weight = utility_calls.get_maximum_probable_value(
-                    weights, n_connections)
                 high = utility_calls.high(weights)
                 if high is None:
-                    return abs(max_weight)
-                return abs(max(max_weight, high))
+                    return abs(min_weight)
+                return abs(max(min_weight, high))
             else:
-                min_weight = utility_calls.get_minimum_probable_value(
-                    weights, n_connections)
                 low = utility_calls.low(weights)
                 if low is None:
                     return abs(min_weight)
@@ -300,7 +298,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         raise Exception("Unrecognised weight format")
 
     @abstractmethod
-    def get_weight_minimum(self, synapse_info):
+    def get_weight_minimum(self, synapse_info, weight_random_sigma):
         """ Get the minimum of the weights.
 
         :param weights:
