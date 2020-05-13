@@ -221,7 +221,8 @@ bool synapses_initialise(
         address_t synapse_params_address, address_t direct_matrix_address,
         uint32_t n_neurons_value, uint32_t n_synapse_types_value,
         uint32_t **ring_buffer_to_input_buffer_left_shifts,
-        address_t *direct_synapses_address) {
+        address_t *direct_synapses_address,
+        bool* clear_input_buffers_of_late_packets_init) {
     log_debug("synapses_initialise: starting");
     n_neurons = n_neurons_value;
     n_synapse_types = n_synapse_types_value;
@@ -233,6 +234,14 @@ bool synapses_initialise(
         log_error("Not enough memory to allocate ring buffer");
         return false;
     }
+
+    // read bool flag about dropping packets that arrive too late
+    *clear_input_buffers_of_late_packets_init = synapse_params_address[0];
+
+    // shift read by 1 word.
+    synapse_params_address += 1;
+
+    // read in ring buffer to input left shifts
     spin1_memcpy(
             ring_buffer_to_input_left_shifts, synapse_params_address,
             n_synapse_types * sizeof(uint32_t));

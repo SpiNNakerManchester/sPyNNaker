@@ -49,7 +49,7 @@ TIME_STAMP_BYTES = BYTES_PER_WORD
 
 # TODO: Make sure these values are correct (particularly CPU cycles)
 _SYNAPSES_BASE_DTCM_USAGE_IN_BYTES = 7 * BYTES_PER_WORD
-_SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES = 0
+_SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES = 4
 _SYNAPSES_BASE_N_CPU_CYCLES_PER_NEURON = 10
 _SYNAPSES_BASE_N_CPU_CYCLES = 8
 
@@ -85,13 +85,17 @@ class SynapticManager(object):
         "__ring_buffer_shifts",
         "__gen_on_machine",
         "__max_row_info",
-        "__synapse_indices"]
+        "__synapse_indices",
+        "__drop_late_packets_from_ring_buffer"]
 
     def __init__(self, n_synapse_types, ring_buffer_sigma, spikes_per_second,
-                 config, population_table_type=None, synapse_io=None):
+                 config, drop_late_packets_from_ring_buffer,
+                 population_table_type=None, synapse_io=None):
         self.__n_synapse_types = n_synapse_types
         self.__ring_buffer_sigma = ring_buffer_sigma
         self.__spikes_per_second = spikes_per_second
+        self.__drop_late_packets_from_ring_buffer = (
+            drop_late_packets_from_ring_buffer)
 
         # Get the type of population table
         self.__poptable_type = population_table_type
@@ -110,6 +114,10 @@ class SynapticManager(object):
         if self.__spikes_per_second is None:
             self.__spikes_per_second = config.getfloat(
                 "Simulation", "spikes_per_second")
+
+        if self.__drop_late_packets_from_ring_buffer is None:
+            self.__drop_late_packets_from_ring_buffer = config.getboolean(
+                "Simulation", "throw_away_late_packets")
 
         # Prepare for dealing with STDP - there can only be one (non-static)
         # synapse dynamics per vertex at present
@@ -142,6 +150,10 @@ class SynapticManager(object):
     @property
     def synapse_dynamics(self):
         return self.__synapse_dynamics
+
+    @property
+    def drop_late_packets_from_ring_buffer(self):
+        return self.__drop_late_packets_from_ring_buffer
 
     def __combine_structural_stdp_dynamics(self, structural, stdp):
         return SynapseDynamicsStructuralSTDP(
@@ -208,8 +220,8 @@ class SynapticManager(object):
         return (_SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES +
                 (BYTES_PER_WORD * self.__n_synapse_types))
 
-    def _get_static_synaptic_matrix_sdram_requirements(self):
-
+    @staticmethod
+    def _get_static_synaptic_matrix_sdram_requirements():
         # 4 for address of direct addresses, and
         # 4 for the size of the direct addresses matrix in bytes
         return 2 * BYTES_PER_WORD
@@ -550,8 +562,13 @@ class SynapticManager(object):
             self, spec, ring_buffer_shifts, weight_scale):
         """Get the ring buffer shifts and scaling factors."""
 
-        # Write the ring buffer shifts
+        # switch to synapse params
         spec.switch_write_focus(POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value)
+
+        # write the bool for deleting packets that were too late for a timer
+        spec.write_value(int(self.__drop_late_packets_from_ring_buffer))
+
+        # Write the ring buffer shifts
         spec.write_array(ring_buffer_shifts)
 
         # Return the weight scaling factors

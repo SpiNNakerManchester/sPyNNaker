@@ -65,7 +65,7 @@ _C_MAIN_BASE_SDRAM_USAGE_IN_BYTES = 18 * BYTES_PER_WORD
 _C_MAIN_BASE_N_CPU_CYCLES = 0
 
 # The microseconds per timestep will be divided by this to get the max offset
-_MAX_OFFSET_DENOMINATOR = 10
+_MAX_OFFSET_DENOMINATOR = 50
 
 
 class AbstractPopulationVertex(
@@ -117,7 +117,7 @@ class AbstractPopulationVertex(
     def __init__(
             self, n_neurons, label, constraints, max_atoms_per_core,
             spikes_per_second, ring_buffer_sigma, incoming_spike_buffer_size,
-            neuron_impl, pynn_model):
+            neuron_impl, pynn_model, drop_late_packets_from_ring_buffer):
         # pylint: disable=too-many-arguments, too-many-locals
         super(AbstractPopulationVertex, self).__init__(
             label, constraints, max_atoms_per_core)
@@ -157,7 +157,7 @@ class AbstractPopulationVertex(
         # Set up synapse handling
         self.__synapse_manager = SynapticManager(
             self.__neuron_impl.get_n_synapse_types(), ring_buffer_sigma,
-            spikes_per_second, config)
+            spikes_per_second, config, drop_late_packets_from_ring_buffer)
 
         # bool for if state has changed.
         self.__change_requires_mapping = True
@@ -365,7 +365,8 @@ class AbstractPopulationVertex(
 
         # Write the number of microseconds between sending spikes
         time_between_spikes = (
-            (machine_time_step * time_scale_factor) / (n_atoms * 2.0))
+            (machine_time_step * time_scale_factor) /
+            (n_atoms * _MAX_OFFSET_DENOMINATOR))
         spec.write_value(data=int(time_between_spikes))
 
         # Write whether the key is to be used, and then the key, or 0 if it

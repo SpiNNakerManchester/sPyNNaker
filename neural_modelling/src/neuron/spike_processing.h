@@ -24,7 +24,8 @@
 
 bool spike_processing_initialise(
         size_t row_max_n_bytes, uint mc_packet_callback_priority,
-        uint user_event_priority, uint incoming_spike_buffer_size);
+        uint user_event_priority, uint incoming_spike_buffer_size,
+        bool clear_input_buffers_of_late_packets_init);
 
 //! \brief returns the number of times the input buffer has overflowed
 //! \return the number of times the input buffer has overflowed
@@ -37,5 +38,13 @@ uint32_t spike_processing_get_successful_rewires(void);
 //! \brief set the number of times spike_processing has to attempt rewiring
 //! \return bool: currently, always true
 bool spike_processing_do_rewiring(int number_of_rew);
+
+//! \brief return the number of packets dropped by the input buffer as they
+//! arrived too late to be processed
+//! \return the number of packets dropped.
+uint32_t spike_processing_get_n_packets_dropped_from_lateness(void);
+
+//! \brief clears the input buffer of packets and records them
+void spike_processing_clear_input_buffer(void);
 
 #endif // _SPIKE_PROCESSING_H_

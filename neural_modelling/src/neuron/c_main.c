@@ -62,6 +62,7 @@ struct neuron_provenance {
     uint32_t current_timer_tick;
     uint32_t n_plastic_synaptic_weight_saturations;
     uint32_t n_rewires;
+    uint32_t n_packets_dropped_from_lateness;
 };
 
 //! values for the priority for each callback
@@ -115,6 +116,8 @@ void c_main_store_provenance_data(address_t provenance_region) {
     prov->n_plastic_synaptic_weight_saturations =
             synapse_dynamics_get_plastic_saturation_count();
     prov->n_rewires = spike_processing_get_successful_rewires();
+    prov->n_packets_dropped_from_lateness =
+        spike_processing_get_n_packets_dropped_from_lateness();
     log_debug("finished other provenance data");
 }
 
@@ -159,6 +162,7 @@ static bool initialise(void) {
 
     // Set up the synapses
     uint32_t *ring_buffer_to_input_buffer_left_shifts;
+    bool clear_input_buffers_of_late_packets_init;
     address_t indirect_synapses_address =
             data_specification_get_region(SYNAPTIC_MATRIX_REGION, ds_regions);
     address_t direct_synapses_address;
@@ -167,7 +171,8 @@ static bool initialise(void) {
             data_specification_get_region(DIRECT_MATRIX_REGION, ds_regions),
             n_neurons, n_synapse_types,
             &ring_buffer_to_input_buffer_left_shifts,
-            &direct_synapses_address)) {
+            &direct_synapses_address,
+            &clear_input_buffers_of_late_packets_init)) {
         return false;
     }
 
@@ -200,7 +205,8 @@ static bool initialise(void) {
     rewiring = rewiring_period != -1;
 
     if (!spike_processing_initialise(
-            row_max_n_words, MC, USER, incoming_spike_buffer_size)) {
+            row_max_n_words, MC, USER, incoming_spike_buffer_size,
+            clear_input_buffers_of_late_packets_init)) {
         return false;
     }
 
@@ -240,6 +246,10 @@ void resume_callback(void) {
 //! \return None
 void timer_callback(uint timer_count, uint unused) {
     use(unused);
+
+    uint32_t state = spin1_irq_disable();
+    spike_processing_clear_input_buffer();
+    spin1_mode_restore(state);
 
     profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
 
@@ -296,7 +306,6 @@ void timer_callback(uint timer_count, uint unused) {
     // Now do synapse and neuron time step updates
     synapses_do_timestep_update(time);
     neuron_do_timestep_update(time, timer_count, timer_period);
-
     profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
 }
 

@@ -78,6 +78,14 @@ static inline uint32_t in_spikes_real_size(void) {
     return circular_buffer_real_size(buffer);
 }
 
+static inline uint32_t in_spikes_size(void) {
+    return circular_buffer_size(buffer);
+}
+
+static inline void in_spikes_clear(void) {
+    circular_buffer_clear(buffer);
+}
+
 static inline uint32_t in_spikes_value_at_index(uint32_t index) {
     return circular_buffer_value_at_index(buffer, index);
 }

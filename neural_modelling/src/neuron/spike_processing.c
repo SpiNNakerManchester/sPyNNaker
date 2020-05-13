@@ -22,6 +22,7 @@
 #include "structural_plasticity/synaptogenesis_dynamics.h"
 #include <simulation.h>
 #include <debug.h>
+#include <common/in_spikes.h>
 
 //! DMA buffer structure combines the row read from SDRAM with information
 //! about the read.
@@ -81,6 +82,14 @@ static uint32_t dma_n_spikes;
 
 // The number of successful rewires
 static uint32_t n_successful_rewires = 0;
+
+//! count how many packets were lost from the input buffer because of late
+//! arrival
+uint32_t count_input_buffer_packets_lost = 0;
+
+//! bool that governs if we should clear packets from the input buffer at the
+//! end of a timer tick.
+static bool clear_input_buffers_of_late_packets = false;
 
 
 /* PRIVATE FUNCTIONS - static for inlining */
@@ -342,9 +351,22 @@ void user_event_callback(uint unused0, uint unused1) {
 
 /* INTERFACE FUNCTIONS - cannot be static */
 
+//! \brief clears the input buffer of packets and records them
+void spike_processing_clear_input_buffer(void) {
+    log_debug("clearing buffer");
+    if(clear_input_buffers_of_late_packets) {
+        count_input_buffer_packets_lost += in_spikes_size();
+        in_spikes_clear();
+        log_debug(
+            "current lost packets = %d",
+            count_input_buffer_packets_lost);
+    }
+}
+
 bool spike_processing_initialise( // EXPORTED
         size_t row_max_n_words, uint mc_packet_callback_priority,
-        uint user_event_priority, uint incoming_spike_buffer_size) {
+        uint user_event_priority, uint incoming_spike_buffer_size,
+        bool clear_input_buffers_of_late_packets_init) {
     // Allocate the DMA buffers
     for (uint32_t i = 0; i < N_DMA_BUFFERS; i++) {
         dma_buffers[i].row = spin1_malloc(row_max_n_words * sizeof(uint32_t));
@@ -356,6 +378,8 @@ bool spike_processing_initialise( // EXPORTED
                 i, dma_buffers[i].row);
     }
     dma_busy = false;
+    clear_input_buffers_of_late_packets =
+        clear_input_buffers_of_late_packets_init;
     next_buffer_to_fill = 0;
     buffer_being_read = N_DMA_BUFFERS;
     max_n_words = row_max_n_words;
@@ -398,6 +422,13 @@ circular_buffer get_circular_buffer(void) { // EXPORTED
 //! \return the number of successful rewires
 uint32_t spike_processing_get_successful_rewires(void) { // EXPORTED
     return n_successful_rewires;
+}
+
+//! \brief return the number of packets dropped by the input buffer as they
+//! arrived too late to be processed
+//! \return the number of packets dropped.
+uint32_t spike_processing_get_n_packets_dropped_from_lateness(void) { // EXPORTED
+    return count_input_buffer_packets_lost;
 }
 
 //! \brief set the number of times spike_processing has to attempt rewiring

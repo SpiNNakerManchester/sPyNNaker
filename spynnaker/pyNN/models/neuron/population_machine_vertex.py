@@ -34,6 +34,7 @@ class PopulationMachineVertex(
         MachineVertex, AbstractReceiveBuffersToHost,
         ProvidesProvenanceDataFromMachineImpl, AbstractRecordable,
         AbstractHasProfileData):
+
     __slots__ = [
         "__recorded_region_ids",
         "__resources"]
@@ -47,6 +48,46 @@ class PopulationMachineVertex(
         CURRENT_TIMER_TIC = 3
         PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT = 4
         N_REWIRES = 5
+        # the number of packets that were dropped as they arrived too late
+        # to be processed
+        N_PACKETS_DROPPED_TO_LATENESS = 6
+
+    SATURATION_COUNT_NAME = "Times_synaptic_weights_have_saturated"
+    SATURATION_COUNT_MESSAGE = (
+        "The weights from the synapses for {} on {}, {}, {} saturated "
+        "{} times. If this causes issues you can increase the "
+        "spikes_per_second and / or ring_buffer_sigma "
+        "values located within the .spynnaker.cfg file.")
+
+    INPUT_BUFFER_FULL_NAME = "Times_the_input_buffer_lost_packets"
+    INPUT_BUFFER_FULL_MESSAGE = (
+        "The input buffer for {} on {}, {}, {} lost packets on {} "
+        "occasions. This is often a sign that the system is running "
+        "too quickly for the number of neurons per core.  Please "
+        "increase the timer_tic or time_scale_factor or decrease the "
+        "number of neurons per core.")
+
+    TOTAL_PRE_SYNAPTIC_EVENT_NAME = "Total_pre_synaptic_events"
+    LAST_TIMER_TICK_NAME = "Last_timer_tic_the_core_ran_to"
+    N_RE_WIRES_NAME = "Number_of_rewires"
+
+    SATURATED_PLASTIC_WEIGHTS_NAME = (
+        "Times_plastic_synaptic_weights_have_saturated")
+    SATURATED_PLASTIC_WEIGHTS_MESSAGE = (
+        "The weights from the plastic synapses for {} on {}, {}, {} "
+        "saturated {} times. If this causes issue increase the "
+        "spikes_per_second and / or ring_buffer_sigma values located "
+        "within the .spynnaker.cfg file.")
+
+    _N_PACKETS_DROPPED_TO_LATENESS_NAME = \
+        "Number_of_packets_dropped_during_the_run_as_they_arrived_late"
+    _N_PACKETS_DROPPED_TO_LATENESS_MESSAGE = (
+        "The number of packets that were dropped from the input buffer, "
+        "because they arrived too late to be processed in a given time step "
+        "for {} on {}, {} was {} packets. This is caused because the other "
+        "models packets took longer to be sent that expected, and can be "
+        "solved by increasing the time_scale_factor located within the "
+        ".spynnaker.cfg file or by being set by the pynn.setup() method.")
 
     PROFILE_TAG_LABELS = {
         0: "TIMER",
@@ -112,51 +153,46 @@ class PopulationMachineVertex(
             PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT.value]
         n_rewires = provenance_data[
             self.EXTRA_PROVENANCE_DATA_ENTRIES.N_REWIRES.value]
+        number_of_dropped_packets_to_lateness = provenance_data[
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.
+            N_PACKETS_DROPPED_TO_LATENESS.value]
 
         label, x, y, p, names = self._get_placement_details(placement)
 
         # translate into provenance data items
         provenance_items.append(ProvenanceDataItem(
-            self._add_name(names, "Times_synaptic_weights_have_saturated"),
+            self._add_name(names, self.SATURATION_COUNT_NAME),
             n_saturations,
             report=n_saturations > 0,
-            message=(
-                "The weights from the synapses for {} on {}, {}, {} saturated "
-                "{} times. If this causes issues you can increase the "
-                "spikes_per_second and / or ring_buffer_sigma "
-                "values located within the .spynnaker.cfg file.".format(
-                    label, x, y, p, n_saturations))))
+            message=self.SATURATION_COUNT_MESSAGE.format(
+                label, x, y, p, n_saturations)))
         provenance_items.append(ProvenanceDataItem(
-            self._add_name(names, "Times_the_input_buffer_lost_packets"),
+            self._add_name(names, self.INPUT_BUFFER_FULL_NAME),
             n_buffer_overflows,
             report=n_buffer_overflows > 0,
-            message=(
-                "The input buffer for {} on {}, {}, {} lost packets on {} "
-                "occasions. This is often a sign that the system is running "
-                "too quickly for the number of neurons per core.  Please "
-                "increase the timer_tic or time_scale_factor or decrease the "
-                "number of neurons per core.".format(
-                    label, x, y, p, n_buffer_overflows))))
+            message=self.INPUT_BUFFER_FULL_MESSAGE.format(
+                label, x, y, p, n_buffer_overflows)))
         provenance_items.append(ProvenanceDataItem(
-            self._add_name(names, "Total_pre_synaptic_events"),
+            self._add_name(names, self.TOTAL_PRE_SYNAPTIC_EVENT_NAME),
             n_pre_synaptic_events))
         provenance_items.append(ProvenanceDataItem(
-            self._add_name(names, "Last_timer_tic_the_core_ran_to"),
+            self._add_name(names, self.LAST_TIMER_TICK_NAME),
             last_timer_tick))
         provenance_items.append(ProvenanceDataItem(
-            self._add_name(names,
-                           "Times_plastic_synaptic_weights_have_saturated"),
+            self._add_name(names, self.SATURATED_PLASTIC_WEIGHTS_NAME),
             n_plastic_saturations,
             report=n_plastic_saturations > 0,
-            message=(
-                "The weights from the plastic synapses for {} on {}, {}, {} "
-                "saturated {} times. If this causes issue increase the "
-                "spikes_per_second and / or ring_buffer_sigma values located "
-                "within the .spynnaker.cfg file.".format(
-                    label, x, y, p, n_plastic_saturations))))
+            message=self.SATURATED_PLASTIC_WEIGHTS_MESSAGE.format(
+                label, x, y, p, n_plastic_saturations)))
         provenance_items.append(ProvenanceDataItem(
-            self._add_name(names, "Number_of_rewires"),
-            n_rewires))
+            self._add_name(names, self.N_RE_WIRES_NAME), n_rewires))
+
+        provenance_items.append(ProvenanceDataItem(
+            self._add_name(names, self._N_PACKETS_DROPPED_TO_LATENESS_NAME),
+            number_of_dropped_packets_to_lateness,
+            report=number_of_dropped_packets_to_lateness > 0,
+            message=self._N_PACKETS_DROPPED_TO_LATENESS_MESSAGE.format(
+                label, x, y, p, number_of_dropped_packets_to_lateness)))
 
         return provenance_items
 
