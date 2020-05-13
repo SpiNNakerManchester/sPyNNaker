@@ -312,6 +312,9 @@ void synapses_do_timestep_update(timer_t time) {
     // Disable interrupts to stop DMAs interfering with the ring buffers
     uint32_t state = spin1_irq_disable();
 
+    // Clear any outstanding spikes if enabled (or just count them if not)
+    spike_processing_clear_input_buffer();
+
     // Transfer the input from the ring buffers into the input buffers
     for (uint32_t neuron_index = 0; neuron_index < n_neurons;
             neuron_index++) {
@@ -396,7 +399,7 @@ uint32_t synapses_get_pre_synaptic_events(void) {
 }
 
 void synapses_flush_ring_buffers(void) {
-	for (uint32_t i = 0; i < ring_buffer_size; i++) {
+    for (uint32_t i = 0; i < ring_buffer_size; i++) {
         ring_buffers[i] = 0;
     }
 }

@@ -353,13 +353,13 @@ void user_event_callback(uint unused0, uint unused1) {
 
 //! \brief clears the input buffer of packets and records them
 void spike_processing_clear_input_buffer(void) {
-    log_debug("clearing buffer");
+    // Record the count whether clearing or not for provenance
+    count_input_buffer_packets_lost += in_spikes_size();
+    log_debug("current lost packets = %d", count_input_buffer_packets_lost);
+
     if(clear_input_buffers_of_late_packets) {
-        count_input_buffer_packets_lost += in_spikes_size();
+        log_debug("clearing buffer");
         in_spikes_clear();
-        log_debug(
-            "current lost packets = %d",
-            count_input_buffer_packets_lost);
     }
 }
 

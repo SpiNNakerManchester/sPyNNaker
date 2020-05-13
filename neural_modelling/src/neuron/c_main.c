@@ -234,7 +234,7 @@ void resume_callback(void) {
     // flushed in case there is a delayed spike left over from a previous run
     // NOTE: at reset, time is set to UINT_MAX ahead of timer_callback(...)
     if ((time+1) == 0) {
-    	synapses_flush_ring_buffers();
+        synapses_flush_ring_buffers();
     }
 
 }
@@ -246,10 +246,6 @@ void resume_callback(void) {
 //! \return None
 void timer_callback(uint timer_count, uint unused) {
     use(unused);
-
-    uint32_t state = spin1_irq_disable();
-    spike_processing_clear_input_buffer();
-    spin1_mode_restore(state);
 
     profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
 
@@ -289,7 +285,10 @@ void timer_callback(uint timer_count, uint unused) {
         return;
     }
 
-    // Do rewiring
+    // First do synapses timestep update, as this is time-critical
+    synapses_do_timestep_update(time);
+
+    // Then do rewiring
     if (rewiring &&
             ((last_rewiring_time >= rewiring_period && !synaptogenesis_is_fast())
                 || synaptogenesis_is_fast())) {
@@ -303,8 +302,7 @@ void timer_callback(uint timer_count, uint unused) {
         count_rewire_attempts++;
     }
 
-    // Now do synapse and neuron time step updates
-    synapses_do_timestep_update(time);
+    // Now do neuron time step update
     neuron_do_timestep_update(time, timer_count, timer_period);
     profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
 }
