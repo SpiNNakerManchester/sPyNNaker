@@ -65,7 +65,7 @@ _C_MAIN_BASE_SDRAM_USAGE_IN_BYTES = 18 * BYTES_PER_WORD
 _C_MAIN_BASE_N_CPU_CYCLES = 0
 
 # The microseconds per timestep will be divided by this to get the max offset
-_MAX_OFFSET_DENOMINATOR = 50
+_MAX_OFFSET_DENOMINATOR = 10
 
 
 class AbstractPopulationVertex(
@@ -117,7 +117,7 @@ class AbstractPopulationVertex(
     def __init__(
             self, n_neurons, label, constraints, max_atoms_per_core,
             spikes_per_second, ring_buffer_sigma, incoming_spike_buffer_size,
-            neuron_impl, pynn_model, drop_late_packets_from_ring_buffer):
+            neuron_impl, pynn_model, drop_late_spikes):
         # pylint: disable=too-many-arguments, too-many-locals
         super(AbstractPopulationVertex, self).__init__(
             label, constraints, max_atoms_per_core)
@@ -157,7 +157,7 @@ class AbstractPopulationVertex(
         # Set up synapse handling
         self.__synapse_manager = SynapticManager(
             self.__neuron_impl.get_n_synapse_types(), ring_buffer_sigma,
-            spikes_per_second, config, drop_late_packets_from_ring_buffer)
+            spikes_per_second, config, drop_late_spikes)
 
         # bool for if state has changed.
         self.__change_requires_mapping = True
@@ -233,7 +233,7 @@ class AbstractPopulationVertex(
             vertex_slice)
         return PopulationMachineVertex(
             resources_required, recorded_region_ids,
-            label, constraints)
+            label, constraints, self.__synapse_manager.drop_late_spikes)
 
     def get_cpu_usage_for_atoms(self, vertex_slice):
         return (

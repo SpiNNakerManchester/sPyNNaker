@@ -86,16 +86,15 @@ class SynapticManager(object):
         "__gen_on_machine",
         "__max_row_info",
         "__synapse_indices",
-        "__drop_late_packets_from_ring_buffer"]
+        "__drop_late_spikes"]
 
     def __init__(self, n_synapse_types, ring_buffer_sigma, spikes_per_second,
-                 config, drop_late_packets_from_ring_buffer,
-                 population_table_type=None, synapse_io=None):
+                 config, drop_late_spikes, population_table_type=None,
+                 synapse_io=None):
         self.__n_synapse_types = n_synapse_types
         self.__ring_buffer_sigma = ring_buffer_sigma
         self.__spikes_per_second = spikes_per_second
-        self.__drop_late_packets_from_ring_buffer = (
-            drop_late_packets_from_ring_buffer)
+        self.__drop_late_spikes = drop_late_spikes
 
         # Get the type of population table
         self.__poptable_type = population_table_type
@@ -115,9 +114,9 @@ class SynapticManager(object):
             self.__spikes_per_second = config.getfloat(
                 "Simulation", "spikes_per_second")
 
-        if self.__drop_late_packets_from_ring_buffer is None:
-            self.__drop_late_packets_from_ring_buffer = config.getboolean(
-                "Simulation", "throw_away_late_packets")
+        if self.__drop_late_spikes is None:
+            self.__drop_late_spikes = config.getboolean(
+                "Simulation", "drop_late_spikes")
 
         # Prepare for dealing with STDP - there can only be one (non-static)
         # synapse dynamics per vertex at present
@@ -152,8 +151,8 @@ class SynapticManager(object):
         return self.__synapse_dynamics
 
     @property
-    def drop_late_packets_from_ring_buffer(self):
-        return self.__drop_late_packets_from_ring_buffer
+    def drop_late_spikes(self):
+        return self.__drop_late_spikes
 
     def __combine_structural_stdp_dynamics(self, structural, stdp):
         return SynapseDynamicsStructuralSTDP(
@@ -566,7 +565,7 @@ class SynapticManager(object):
         spec.switch_write_focus(POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value)
 
         # write the bool for deleting packets that were too late for a timer
-        spec.write_value(int(self.__drop_late_packets_from_ring_buffer))
+        spec.write_value(int(self.__drop_late_spikes))
 
         # Write the ring buffer shifts
         spec.write_array(ring_buffer_shifts)
