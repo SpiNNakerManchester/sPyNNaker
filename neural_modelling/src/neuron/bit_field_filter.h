@@ -29,7 +29,6 @@ uint32_t failed_bit_field_reads = 0;
 static bool bit_field_filter_initialise(address_t bitfield_region_address){
 
     filter_region_t* filter_region = (filter_region_t*) bitfield_region_address;
-    uint32_t n_bit_fields = filter_region->n_filters;
 
     log_info("Found %d bitfields of which %d have redundancy "
             "of which %d merged in", filter_region->n_filters,
@@ -53,7 +52,7 @@ static bool bit_field_filter_initialise(address_t bitfield_region_address){
     }
 
     // try allocating dtcm for each bit field
-    for (uint32_t cur_bit_field = filter_region->n_merged_filters;
+    for (int cur_bit_field = filter_region->n_merged_filters;
             cur_bit_field < filter_region->n_redundancy_filters;
             cur_bit_field++){
         // get the key associated with this bitfield
