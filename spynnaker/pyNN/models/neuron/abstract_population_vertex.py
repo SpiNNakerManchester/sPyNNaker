@@ -15,7 +15,6 @@
 
 import logging
 import os
-import math
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
@@ -55,7 +54,6 @@ logger = logging.getLogger(__name__)
 
 # TODO: Make sure these values are correct (particularly CPU cycles)
 _NEURON_BASE_DTCM_USAGE_IN_BYTES = 9 * BYTES_PER_WORD
-_NEURON_BASE_SDRAM_USAGE_IN_BYTES = 3 * BYTES_PER_WORD
 _NEURON_BASE_N_CPU_CYCLES_PER_NEURON = 22
 _NEURON_BASE_N_CPU_CYCLES = 10
 
@@ -108,7 +106,7 @@ class AbstractPopulationVertex(
     RUNTIME_SDP_PORT_SIZE = BYTES_PER_WORD
 
     # 7 elements before the start of global parameters
-    # 1. random back off, 2. micro secs before spike, 3. has key, 4. key,
+    # 1. core_index, 2. micro secs before spike, 3. has key, 4. key,
     # 5. n atoms, 6. n synapse types, 7. incoming spike buffer size.
     BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 7 * BYTES_PER_WORD
 
@@ -326,8 +324,8 @@ class AbstractPopulationVertex(
         return target
 
     def _write_neuron_parameters(
-            self, spec, key, vertex_slice, machine_time_step,
-            time_scale_factor):
+            self, spec, routing_info, graph_mapper, machine_vertex,
+            machine_time_step, time_scale_factor):
 
         # If resetting, reset any state variables that need to be reset
         if (self.__has_reset_last and
@@ -346,6 +344,12 @@ class AbstractPopulationVertex(
         self.__has_reset_last = False
         self.__updated_state_variables.clear()
 
+        # Get some information
+        key = routing_info.get_first_key_from_pre_vertex(
+            machine_vertex, constants.SPIKE_PARTITION_ID)
+        vertex_slice = graph_mapper.get_slice(machine_vertex)
+        vertex_index = graph_mapper.get_machine_vertex_index(machine_vertex)
+
         # pylint: disable=too-many-arguments
         n_atoms = vertex_slice.n_atoms
         spec.comment("\nWriting Neuron Parameters for {} Neurons:\n".format(
@@ -355,15 +359,10 @@ class AbstractPopulationVertex(
         spec.switch_write_focus(
             region=constants.POPULATION_BASED_REGIONS.NEURON_PARAMS.value)
 
-        # Write the random back off value
-        max_offset = (
-            machine_time_step * time_scale_factor) // _MAX_OFFSET_DENOMINATOR
-        spec.write_value(
-            int(math.ceil(max_offset / self.__n_subvertices)) *
-            self.__n_data_specs)
-        self.__n_data_specs += 1
+        # Write the index of this core
+        spec.write_value(vertex_index)
 
-        # Write the number of microseconds between sending spikes
+        # Write the number of microseconds between sending spikes on average
         time_between_spikes = (
             (machine_time_step * time_scale_factor) /
             (n_atoms * _MAX_OFFSET_DENOMINATOR))
@@ -406,7 +405,6 @@ class AbstractPopulationVertex(
             self, spec, placement, machine_time_step, time_scale_factor,
             graph_mapper, routing_info):
         # pylint: disable=too-many-arguments, arguments-differ
-        vertex_slice = graph_mapper.get_slice(placement.vertex)
 
         # reserve the neuron parameters data region
         self._reserve_neuron_params_data_region(
@@ -414,11 +412,8 @@ class AbstractPopulationVertex(
 
         # write the neuron params into the new DSG region
         self._write_neuron_parameters(
-            key=routing_info.get_first_key_from_pre_vertex(
-                placement.vertex, constants.SPIKE_PARTITION_ID),
-            machine_time_step=machine_time_step, spec=spec,
-            time_scale_factor=time_scale_factor,
-            vertex_slice=vertex_slice)
+            spec, routing_info, graph_mapper, placement.vertex,
+            machine_time_step, time_scale_factor)
 
         # close spec
         spec.end_specification()
@@ -466,10 +461,6 @@ class AbstractPopulationVertex(
         # TODO add random distribution stuff
         # self.write_random_distribution_declarations(spec)
 
-        # Get the key
-        key = routing_info.get_first_key_from_pre_vertex(
-            vertex, constants.SPIKE_PARTITION_ID)
-
         # Write the setup region
         spec.switch_write_focus(
             constants.POPULATION_BASED_REGIONS.SYSTEM.value)
@@ -484,7 +475,8 @@ class AbstractPopulationVertex(
 
         # Write the neuron parameters
         self._write_neuron_parameters(
-            spec, key, vertex_slice, machine_time_step, time_scale_factor)
+            spec, routing_info, graph_mapper, placement.vertex,
+            machine_time_step, time_scale_factor)
 
         # write profile data
         profile_utils.write_profile_region_data(
