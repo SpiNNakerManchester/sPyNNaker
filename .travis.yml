@@ -88,7 +88,7 @@ before_script:
 script:
   # Python
   - py.test --cov-report= unittests --cov spynnaker
-  - flake8 examples spynnaker pyNN-spiNNaker-src
+  - flake8 spynnaker
   - flake8 unittests
   - >
     ( pylint --output-format=colorized --disable=R,C spynnaker; exit $(($? & 35)) )

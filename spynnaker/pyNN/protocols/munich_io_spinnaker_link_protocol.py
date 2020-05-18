@@ -43,16 +43,16 @@ PUSH_BOT_MOTOR_WITHOUT_UART_MASK = 0x7C0
 PUSH_BOT_MOTOR_UART_SHIFT = 0 + _OFFSET_TO_I
 
 
-def munich_key(I, F, D):
-    return (I << _OFFSET_TO_I) | (F << _OFFSET_TO_F) | (D << _OFFSET_TO_D)
+def munich_key(Instr, F, D):
+    return (Instr << _OFFSET_TO_I) | (F << _OFFSET_TO_F) | (D << _OFFSET_TO_D)
 
 
-def munich_key_i_d(I, D):
-    return munich_key(I, 0, D)
+def munich_key_i_d(Instr, D):
+    return munich_key(Instr, 0, D)
 
 
-def munich_key_i(I):
-    return munich_key(I, 0, 0)
+def munich_key_i(Instr):
+    return munich_key(Instr, 0, 0)
 
 
 def get_munich_i(key):
