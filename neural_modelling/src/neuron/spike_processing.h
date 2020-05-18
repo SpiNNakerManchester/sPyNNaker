@@ -30,6 +30,10 @@ bool spike_processing_initialise(
 //! \return the number of times the input buffer has overflowed
 uint32_t spike_processing_get_buffer_overflows(void);
 
+//! \brief returns the number of successful rewires performed
+//! \return the number of successful rewires
+uint32_t spike_processing_get_successful_rewires(void);
+
 //! \brief set the number of times spike_processing has to attempt rewiring
 //! \return bool: currently, always true
 bool spike_processing_do_rewiring(int number_of_rew);

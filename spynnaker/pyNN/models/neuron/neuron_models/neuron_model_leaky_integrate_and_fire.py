@@ -16,7 +16,6 @@
 import numpy
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
-from pacman.executor.injection_decorator import inject_items
 from .abstract_neuron_model import AbstractNeuronModel
 from spynnaker.pyNN.models.neuron.implementations import (
     AbstractStandardNeuronComponent)
@@ -111,9 +110,7 @@ class NeuronModelLeakyIntegrateAndFire(AbstractNeuronModel):
     def has_variable(self, variable):
         return variable in UNITS
 
-    @inject_items({"ts": "MachineTimeStep"})
-    @overrides(AbstractStandardNeuronComponent.get_values,
-               additional_arguments={'ts'})
+    @overrides(AbstractStandardNeuronComponent.get_values)
     def get_values(self, parameters, state_variables, vertex_slice, ts):
         """
         :param int ts: machine time step

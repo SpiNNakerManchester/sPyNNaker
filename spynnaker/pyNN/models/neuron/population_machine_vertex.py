@@ -53,6 +53,7 @@ class PopulationMachineVertex(
         #: The number of times the plastic synapses saturated during weight
         #: calculation
         PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT = 4
+        N_REWIRES = 5
 
     _PROFILE_TAG_LABELS = {
         0: "TIMER",
@@ -119,6 +120,8 @@ class PopulationMachineVertex(
         n_plastic_saturations = provenance_data[
             self.EXTRA_PROVENANCE_DATA_ENTRIES.
             PLASTIC_SYNAPTIC_WEIGHT_SATURATION_COUNT.value]
+        n_rewires = provenance_data[
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.N_REWIRES.value]
 
         label, x, y, p, names = self._get_placement_details(placement)
 
@@ -161,6 +164,9 @@ class PopulationMachineVertex(
                 "spikes_per_second and / or ring_buffer_sigma values located "
                 "within the .spynnaker.cfg file.".format(
                     label, x, y, p, n_plastic_saturations))))
+        provenance_items.append(ProvenanceDataItem(
+            self._add_name(names, "Number_of_rewires"),
+            n_rewires))
 
         return provenance_items
 
