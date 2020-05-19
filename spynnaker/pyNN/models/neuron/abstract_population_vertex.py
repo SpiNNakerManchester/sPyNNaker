@@ -864,4 +864,4 @@ class AbstractPopulationVertex(
     @overrides(AbstractProvidesLocalProvenanceData.get_local_provenance_data)
     def get_local_provenance_data(self):
         return self.__synapse_manager.get_weight_provenance(
-            list(self.__neuron_impl.get_synapse_targets()))
+            self._label, list(self.__neuron_impl.get_synapse_targets()))

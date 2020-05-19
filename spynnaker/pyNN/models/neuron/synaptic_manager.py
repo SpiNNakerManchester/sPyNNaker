@@ -1134,22 +1134,29 @@ class SynapticManager(object):
             return False
         return self.__synapse_dynamics.changes_during_run
 
-    def get_weight_provenance(self, synapse_names):
+    def get_weight_provenance(self, label, synapse_names):
+        """ Get provenance data for weights
+
+        :param str label: The label of the vertex
+        :param list synapse_names: List of the names of the synapses
+        :return: A list of provenance items
+        """
         prov_items = list()
         # Record the min weight used for each synapse type
         for i, weight in enumerate(self.__min_weights):
             prov_items.append(ProvenanceDataItem(
-                [self._label, "min_weight_{}".format(synapse_names[i])],
+                [label, "min_weight_{}".format(synapse_names[i])],
                 weight))
 
         # Report any known weights that couldn't be represented
         for (weight, r_weight) in self.__weight_provenance:
-            (app_edge, s_info) = self.__weight_provenance[weight, r_weight]
-            prov_items.append(ProvenanceDataItem(
-                [self._label, app_edge.label,
-                 s_info.connector.__class__.__name__,
-                 "weight_representation"], r_weight,
-                report=True,
-                message="Weight of {} could not be represented precisely;"
-                        " a weight of {} was used instead".format(
-                            weight, r_weight)))
+            edge_info = self.__weight_provenance[weight, r_weight]
+            for i, (app_edge, s_info) in enumerate(edge_info):
+                prov_items.append(ProvenanceDataItem(
+                    [label, app_edge.label,
+                     s_info.connector.__class__.__name__,
+                     "weight_representation"], r_weight,
+                    report=(i == 0),
+                    message="Weight of {} could not be represented precisely;"
+                            " a weight of {} was used instead".format(
+                                weight, r_weight)))
