@@ -29,12 +29,10 @@ class IFExpRateTwoComp(AbstractPyNNNeuronModelStandard):
 
     @default_initial_values({"u", "isyn_exc_soma", "isyn_inh_soma",
                              "isyn_exc_dendrite", "isyn_inh_dendrite",
-                             "v", "v_star",
-                             "mean_isi_ticks", "time_to_spike_ticks",
-                             "starting_rate"})
+                             "v", "starting_rate"})
     def __init__(
-            self, tau_m=0.5, cm=1.0, u_rest=0, v_reset=-50.0,
-            v_thresh=10.0, tau_refrac=0.1, i_offset=0.0, u=0.0,
+            self, cm=1.0, u_rest=0, v_reset=-50.0,
+            v_thresh=10.0, i_offset=0.0, u=0.0,
 
             e_rev_E=4.667, e_rev_I=0.333,
 
@@ -44,18 +42,16 @@ class IFExpRateTwoComp(AbstractPyNNNeuronModelStandard):
             tau_syn_E_dendrite=5.0, tau_syn_I_dendrite=5.0,
             isyn_exc_dendrite=0.0, isyn_inh_dendrite=0.0,
 
-            g_D=2, g_L=0.1, tau_L=10, v=0.0, v_star=0.0,
+            g_D=2, g_L=0.1, tau_L=10, v=0.0,
 
-            mean_isi_ticks=65000, time_to_spike_ticks=65000, rate_update_threshold=0.25,
+            rate_update_threshold=2,
 
-            starting_rate = 0,
+            starting_rate=0,
             ):
         # pylint: disable=too-many-arguments, too-many-locals
         neuron_model = NeuronModelLeakyIntegrateAndFireTwoCompRate(
-            u, u_rest, tau_m, cm, i_offset, v_reset, tau_refrac,
-            g_D, g_L, tau_L, v, v_star,
-            mean_isi_ticks, time_to_spike_ticks, rate_update_threshold,
-            starting_rate)
+            u, u_rest, cm, i_offset, v_reset, g_D, g_L,
+            tau_L, v, rate_update_threshold, starting_rate)
         synapse_type = SynapseTypeExponentialTwoComp(
             tau_syn_E_soma, tau_syn_E_dendrite, tau_syn_I_soma, tau_syn_I_dendrite,
             isyn_exc_soma, isyn_exc_dendrite, isyn_inh_soma, isyn_inh_dendrite)

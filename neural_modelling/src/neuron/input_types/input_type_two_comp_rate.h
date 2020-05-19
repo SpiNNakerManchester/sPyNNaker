@@ -67,7 +67,7 @@ static inline void input_type_convert_excitatory_input_to_current(
 //    }
 
 	// Convert conductance based (teacher) input
-	        exc_input[0] = exc_input[0] * input_type->Teach_rev_E;
+	exc_input[0] = exc_input[0] * input_type->Teach_rev_E;
 
 
 }
@@ -83,7 +83,7 @@ static inline void input_type_convert_inhibitory_input_to_current(
 
 
 	// Convert conductance based (teacher) input
-	        inh_input[0] = -inh_input[0] * input_type->Teach_rev_I;
+	inh_input[0] = -inh_input[0] * input_type->Teach_rev_I;
 
 }
 

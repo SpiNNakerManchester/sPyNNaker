@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 MODELS = IF_exp_two_comp_rate \
+		 IF_exp_two_comp_rate_stdp_mad_Bern_plasticity \
 #         IF_curr_exp \
 #         IF_cond_exp \
 #         IZK_curr_exp \

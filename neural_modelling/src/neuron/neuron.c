@@ -184,7 +184,7 @@ bool neuron_reload_neuron_parameters(address_t address) { // EXPORTED
 //! \return True is the initialisation was successful, otherwise False
 bool neuron_initialise(address_t address, uint32_t *n_neurons_value, // EXPORTED
         uint32_t *n_synapse_types_value, uint32_t *incoming_spike_buffer_size,
-        uint32_t *timer_offset, uint32_t *starting_rate) {
+        uint32_t *timer_offset, REAL *starting_rate) {
     log_debug("neuron_initialise: starting");
     struct neuron_parameters *params = (void *) address;
 
@@ -355,7 +355,8 @@ void neuron_do_timestep_update( // EXPORTED
             out_spikes_set_spike(spike_recording_indexes[neuron_index]);
 
             // Do any required synapse processing
-            synapse_dynamics_process_post_synaptic_event(time, neuron_index);
+            synapse_dynamics_process_post_synaptic_event(neuron_index,
+               neuron_impl_post_syn_urate(neuron_index), neuron_impl_post_syn_vrate(neuron_index));
 
 //            if (use_key) {
 //                // Wait until the expected time to send
@@ -423,10 +424,6 @@ void neuron_add_inputs( // EXPORTED
         index_t synapse_type_index, index_t neuron_index,
         input_t weights_this_timestep) {
 
-    io_printf(IO_BUF, "Adding %k\n", weights_this_timestep);
-    if(weights_this_timestep > 0) {
-        io_printf(IO_BUF, "positive\n");
-    }
     neuron_impl_add_inputs(
             synapse_type_index, neuron_index, weights_this_timestep);
 }

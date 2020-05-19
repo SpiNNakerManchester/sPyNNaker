@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "neuron_model_lif_two_comp_impl.h"
+#include "neuron_model_lif_two_comp_rate_impl.h"
 
 #include <debug.h>
 
@@ -33,38 +33,27 @@ state_t neuron_model_state_update(
 	log_debug("Exc 1: %12.6k, Exc 2: %12.6k", exc_input[0], exc_input[1]);
 	log_debug("Inh 1: %12.6k, Inh 2: %12.6k", inh_input[0], inh_input[1]);
 
-    // If outside of the refractory period
-    if (neuron->refract_timer <= 0) {
+    // Get the dendrite input in nA
+    input_t dendrite_input_this_timestep =
+        exc_input[1] - inh_input[1] + external_bias + neuron->I_offset;
+    //input_t dendrite_input_this_timestep =
+    //  exc_input[1] - inh_input[1];
 
-        // Get the dendrite input in nA
-        input_t dendrite_input_this_timestep =
-                exc_input[1] - inh_input[1] + external_bias + neuron->I_offset;
-        //input_t dendrite_input_this_timestep =
-        //        exc_input[1] - inh_input[1];
+    // update dendrite
+    neuron->V = dendrite_input_this_timestep * neuron->tau_L;
 
-        //THESE GUYS HAVE TO BE PASSED BY PYTHON!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        // Leaky conductance
-        REAL g_L = 0.1k;
-        REAL tau_L = 10;
-        // Coupling conductance
-        REAL g_D = 2k;
-        // 1/(g_L + g_D)
-        REAL R_tot = 0.476k;
+    // Get the soma input in nA
+    //Isyn (exc_input[0] contains g_E * E_E, while exc_input[2] is g_E)
+    input_t soma_input_this_timestep =
+        exc_input[0] - inh_input[0] + neuron->I_offset;
 
-        // update dendrite
-        neuron->V = dendrite_input_this_timestep * tau_L;
+    io_printf(IO_BUF, "dend input %k, soma input %k\n", dendrite_input_this_timestep, soma_input_this_timestep);
 
-        // Get the soma input in nA
-        //Isyn
-        input_t soma_input_this_timestep =
-                exc_input[0] - inh_input[0] + neuron->I_offset;
+    neuron->U_membrane = (neuron->g_D * neuron->V + soma_input_this_timestep) /
+                            (neuron->g_L + neuron->g_D + exc_input[2] + exc_input[2]);
 
-        neuron->U_membrane = (g_D * neuron->V + soma_input_this_timestep) / (g_L + g_D + exc_input[2] + exc_input[2]);
+    io_printf(IO_BUF, "U %k, V %k\n", neuron->U_membrane, neuron->V);
 
-    } else {
-        // countdown refractory timer
-        neuron->refract_timer--;
-    }
     return neuron->U_membrane;
 }
 
@@ -91,7 +80,4 @@ void neuron_model_print_parameters(restrict neuron_pointer_t neuron) {
     log_debug("I offset      = %11.4k nA", neuron->I_offset);
     log_debug("R membrane    = %11.4k Mohm", neuron->R_membrane);
 
-    log_debug("exp(-ms/(RC)) = %11.4k [.]", neuron->exp_TC);
-
-    log_debug("T refract     = %u timesteps", neuron->T_refract);
 }

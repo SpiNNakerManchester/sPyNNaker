@@ -164,8 +164,8 @@ static bool initialise(void) {
     uint32_t n_neurons;
     uint32_t n_synapse_types;
     uint32_t incoming_spike_buffer_size;
-    // SHOULD THIS BE CHANGED IN 32 BIT AT SOME POINT?????
-    uint32_t starting_rate;
+
+    REAL starting_rate;
     if (!neuron_initialise(
             data_specification_get_region(NEURON_PARAMS_REGION, ds_regions),
             &n_neurons, &n_synapse_types, &incoming_spike_buffer_size,
@@ -328,6 +328,8 @@ void timer_callback(uint timer_count, uint unused) {
         count_rewires++;
     }
     // otherwise do synapse and neuron time step updates
+
+    io_printf(IO_BUF, "\n\n\ntimestep %d\n", time);
     synapses_do_timestep_update(time);
     neuron_do_timestep_update(time, timer_count, timer_period);
 

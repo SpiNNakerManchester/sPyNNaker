@@ -68,10 +68,10 @@ static global_neuron_params_pointer_t global_parameters;
 static synapse_param_t *neuron_synapse_shaping_params;
 
 //! Coefficients for the rate function (magic numbers from polynomial interpolation)
-static REAL cubic_term = -24.088958;
-static REAL square_term = 48.012303;
-static REAL linear_term = 73.084895;
-static REAL constant_term = 1.994506;
+static REAL cubic_term = -24.088958k;
+static REAL square_term = 48.012303k;
+static REAL linear_term = 73.084895k;
+static REAL constant_term = 1.994506k;
 
 static bool neuron_impl_initialise(uint32_t n_neurons) {
     // allocate DTCM for the global parameter details
@@ -217,8 +217,7 @@ static void neuron_impl_load_neuron_parameters(
 
 // Rate Update Function
 
-static inline bool set_spike_source_rate(neuron_pointer_t neuron, REAL somatic_voltage,
-		threshold_type_pointer_t threshold_type) {
+static inline REAL set_spike_source_rate(neuron_pointer_t neuron, REAL somatic_voltage) {
 
 	REAL rate;
 
@@ -231,31 +230,18 @@ static inline bool set_spike_source_rate(neuron_pointer_t neuron, REAL somatic_v
 	else {
 
         // Compute the square and cube for the rate function (the values are shifted to stay on 32 bits)
-	    REAL voltage_sq = ((somatic_voltage * somatic_voltage) >> 15);
-	    REAL voltage_cube = ((voltage_sq * somatic_voltage) >> 15);
+	    REAL voltage_sq = ((somatic_voltage * somatic_voltage));
+	    REAL voltage_cube = ((voltage_sq * somatic_voltage));
 
-	    rate = ((cubic_term * voltage_cube) >> 15) +
-	           ((square_term * voltage_sq) >> 15) +
-	           ((linear_term * somatic_voltage) >> 15) +
+	    io_printf(IO_BUF, "sq %k, cub %k\n", voltage_sq, voltage_cube);
+
+	    rate = ((cubic_term * voltage_cube)) +
+	           ((square_term * voltage_sq)) +
+	           ((linear_term * somatic_voltage)) +
 	           constant_term;
 	}
 
-	REAL rate_diff = neuron->rate_at_last_setting - rate;
-
-	io_printf(IO_BUF, "curr rate %k, rate diff %k\n", rate, rate_diff);
-
-	neuron->rate_diff = rate_diff;
-
-	// Has rate changed by more than a predefined threshold since it was last
-	// used to update the mean isi ticks?
-	if ((rate_diff) > neuron->rate_update_threshold || (rate_diff) < -neuron->rate_update_threshold){
-		// then update the rate
-		neuron->rate_at_last_setting = rate;
-
-		return true;
-	}
-
-	return false;
+	return rate;
 }
 // &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
@@ -263,7 +249,7 @@ static inline bool set_spike_source_rate(neuron_pointer_t neuron, REAL somatic_v
 static bool neuron_impl_do_timestep_update(index_t neuron_index,
         input_t external_bias, state_t *recorded_variable_values) {
 
-    io_printf(IO_BUF, "neuron index %d\n\n\n", neuron_index);
+    io_printf(IO_BUF, "neuron index %d\n", neuron_index);
     // Get the neuron itself
     neuron_pointer_t neuron = &neuron_array[neuron_index];
 
@@ -313,7 +299,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     external_bias += additional_input_get_input_value_as_current(
             additional_input, voltage);
 
-    io_printf(IO_BUF, "pre rate %k diff %k\n", neuron->rate_at_last_setting, neuron->rate_diff);
+    io_printf(IO_BUF, "pre rate %k pre diff %k\n", neuron->rate_at_last_setting, neuron->rate_diff);
 
     // update neuron parameters
     state_t result = neuron_model_state_update(
@@ -326,8 +312,25 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     // bool spike = threshold_type_is_above_threshold(result, threshold_type);
     REAL soma_voltage = result;
 
-    // Compute rate and return True if rate change is bigger than the threshold
-    bool rate_updated = set_spike_source_rate(neuron, soma_voltage, threshold_type);
+    // Compute rate diff
+    REAL rate = set_spike_source_rate(neuron, soma_voltage);
+
+    REAL rate_diff = rate - neuron->rate_at_last_setting;
+
+    io_printf(IO_BUF, "curr rate %k, rate diff %k\n", rate, rate_diff);
+
+    neuron->rate_diff = rate_diff;
+
+    bool rate_updated = false;
+
+	// Has rate changed by more than a predefined threshold since it was last
+	// used to update the mean isi ticks?
+	if ((rate_diff) > neuron->rate_update_threshold || (rate_diff) < -neuron->rate_update_threshold){
+		// then update the rate
+		neuron->rate_at_last_setting = rate;
+
+		rate_updated = true;
+	}
     // ************************************************************************
 
     // Call functions to get the input values to be recorded
@@ -335,7 +338,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->V;
     recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->rate_at_last_setting;
 
-    io_printf(IO_BUF, "post rate %k\n", neuron->rate_at_last_setting);
+    io_printf(IO_BUF, "final rate %k\n", neuron->rate_at_last_setting);
 
 #if LOG_LEVEL >= LOG_DEBUG
     neuron_model_print_state_variables(neuron);
@@ -401,7 +404,7 @@ static void neuron_impl_store_neuron_parameters(
 
 //! \brief Returns the difference between the last updated value of rate and the previous one
 //! \param[in] neuron_index: the index of the neuron
-uint neuron_impl_get_rate_diff(index_t neuron_index) {
+uint inline neuron_impl_get_rate_diff(index_t neuron_index) {
 
     union {
         REAL input;
@@ -419,16 +422,32 @@ uint neuron_impl_get_rate_diff(index_t neuron_index) {
 //! \param[in] neuron_index: the index of the neuron
 uint32_t neuron_impl_get_starting_rate() {
 
-    union {
-        REAL input;
-        uint output;
-    } converter;
+    io_printf(IO_BUF, "returning %k\n", neuron_array[0].rate_at_last_setting);
 
-    converter.input = neuron_array[0].rate_at_last_setting;
+    return neuron_array[0].rate_at_last_setting;;
+}
 
-    io_printf(IO_BUF, "returning %k %k\n", neuron_array[0].rate_at_last_setting, converter.output);
+static inline REAL neuron_impl_post_syn_vrate(index_t neuron_index) {
 
-    return converter.output;
+    neuron_pointer_t neuron = &neuron_array[neuron_index];
+
+    REAL a =  set_spike_source_rate(neuron, neuron->V);
+
+    io_printf(IO_BUF, "Rate(V) %k\n", a);
+
+    return a;
+
+}
+
+static inline REAL neuron_impl_post_syn_urate(index_t neuron_index) {
+
+    neuron_pointer_t neuron = &neuron_array[neuron_index];
+
+    REAL a = set_spike_source_rate(neuron, neuron->U_membrane * neuron->plasticity_rate_multiplier);
+
+    io_printf(IO_BUF, "Rate(vtgt) %k\n", a);
+
+    return a;
 }
 
 #if LOG_LEVEL >= LOG_DEBUG
@@ -468,6 +487,7 @@ void neuron_impl_print_synapse_parameters(uint32_t n_neurons) {
 const char *neuron_impl_get_synapse_type_char(uint32_t synapse_type) {
 	return synapse_types_get_type_char(synapse_type);
 }
+
 #endif // LOG_LEVEL >= LOG_DEBUG
 
 #endif // _NEURON_IMPL_STANDARD_H_

@@ -52,7 +52,7 @@
 bool neuron_initialise(
         address_t address, uint32_t *n_neurons_value,
         uint32_t *n_synapse_types_value, uint32_t *incoming_spike_buffer_size,
-        uint32_t *timer_offset, uint32_t *starting_rate);
+        uint32_t *timer_offset, REAL *starting_rate);
 
 //! \brief executes all the updates to neural parameters when a given timer
 //!        period has occurred.

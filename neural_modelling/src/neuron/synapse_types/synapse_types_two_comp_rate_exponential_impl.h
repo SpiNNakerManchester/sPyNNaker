@@ -66,7 +66,7 @@ typedef struct synapse_param_t {
 //! human readable definition for the positions in the input regions for the
 //! different synapse types.
 typedef enum input_buffer_regions {
-    EXCITATORY_ONE, EXCITATORY_TWO, INHIBITORY, INHIBITORY_TWO
+    EXCITATORY_ONE, EXCITATORY_TWO, INHIBITORY_ONE, INHIBITORY_TWO
 } input_buffer_regions;
 
 //---------------------------------------
@@ -121,7 +121,7 @@ static inline void synapse_types_add_neuron_input(
     	add_input_exp(&parameter->exc, input);
     } else if (synapse_type_index == EXCITATORY_TWO) {
     	add_input_exp(&parameter->exc2, input);
-    } else if (synapse_type_index == INHIBITORY) {
+    } else if (synapse_type_index == INHIBITORY_ONE) {
     	add_input_exp(&parameter->inh, input);
     } else if (synapse_type_index == INHIBITORY_TWO) {
     	add_input_exp(&parameter->inh2, input);
@@ -137,7 +137,7 @@ static inline input_t* synapse_types_get_excitatory_input(
     excitatory_response[0] = parameter->exc.synaptic_input_value;
     excitatory_response[1] = parameter->exc2.synaptic_input_value;
 
-    // For the cunductance to he state update
+    // For the conductance to the state update (this will be just g_E to calculate g_tot)
     excitatory_response[2] = parameter->exc.synaptic_input_value;
     return &excitatory_response[0];
 }
@@ -167,7 +167,7 @@ static inline const char *synapse_types_get_type_char(
         return "X1";
     } else if (synapse_type_index == EXCITATORY_TWO) {
         return "X2";
-    } else if (synapse_type_index == INHIBITORY) {
+    } else if (synapse_type_index == INHIBITORY_ONE) {
         return "I";
     } else if (synapse_type_index == INHIBITORY_TWO) {
         return "I2";

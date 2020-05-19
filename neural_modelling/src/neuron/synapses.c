@@ -39,7 +39,7 @@ static uint32_t n_neurons;
 static uint32_t n_synapse_types;
 
 // Ring buffers to handle delays between synapses and neurons
-static uint32_t *ring_buffers;
+static REAL *ring_buffers;
 
 // Amount to left shift the ring buffer by to make it an input
 static uint32_t *ring_buffer_to_input_left_shifts;
@@ -158,6 +158,18 @@ static inline void print_inputs(void) {
 #endif // LOG_LEVEL >= LOG_DEBUG
 }
 
+// Converts a rate to an input
+static inline input_t convert_rate_to_input(uint32_t rate) {
+    union {
+        uint32_t input_type;
+        s1615 output_type;
+    } converter;
+
+    converter.input_type = (rate);
+
+    return converter.output_type;
+}
+
 
 // This is the "inner loop" of the neural simulation.
 // Every spike event could cause up to 256 different weights to
@@ -181,26 +193,29 @@ static inline void process_fixed_synapses(
 //                synapse_row_sparse_delay(synaptic_word, synapse_type_index_bits);
         uint32_t combined_synapse_neuron_index = synapse_row_sparse_type_index(
                 synaptic_word, synapse_type_index_mask);
-        uint32_t weight = synapse_row_sparse_weight(synaptic_word);
 
-        // Convert into ring buffer offset
+        // Convert into ring buffer offset. The time & 1 mask is used to write in the safe ring buffer
         uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
                 0, combined_synapse_neuron_index,
                 synapse_type_index_bits);
 
-        // Add weight to current ring buffer value
-        uint64_t accumulation = ring_buffers[ring_buffer_index] + (((uint64_t) rate_diff * (uint64_t) weight) >> 10);
+        REAL weight = synapses_convert_weight_to_input(
+                            synapse_row_sparse_weight(synaptic_word),
+                            ring_buffer_to_input_left_shifts[combined_synapse_neuron_index >> synapse_index_bits]);
 
-        // Saturation check, Probably useless now!
-        uint64_t sat_test = accumulation & 0x100000000;
-        if (sat_test) {
-            accumulation = sat_test - 1;
-            saturation_count++;
-        }
+        // Add weight to current ring buffer value
+        REAL accumulation = ring_buffers[ring_buffer_index] + (convert_rate_to_input(rate_diff) * weight);
+
+        // Saturation check, MAYBE WE SHOULD CAP THE MAX INCOMING VALUES?
+//        s3231 sat_test = accumulation & 0x100000000;
+//        if (sat_test) {
+//            accumulation = sat_test - 1;
+//            saturation_count++;
+//        }
 
         ring_buffers[ring_buffer_index] = accumulation;
 
-        io_printf(IO_BUF, "added to %u %k * %k = %k sh %k index %d\n", ring_buffer_index, weight, rate_diff, ring_buffers[ring_buffer_index], (rate_diff * weight) >> 12, combined_synapse_neuron_index >> synapse_index_bits);
+        io_printf(IO_BUF, "added %k * %k = %k sh %k\n", weight, rate_diff, ring_buffers[ring_buffer_index], (rate_diff * weight));
     }
 }
 
@@ -219,7 +234,7 @@ bool synapses_initialise(
         address_t synapse_params_address, address_t direct_matrix_address,
         uint32_t n_neurons_value, uint32_t n_synapse_types_value,
         uint32_t **ring_buffer_to_input_buffer_left_shifts,
-        address_t *direct_synapses_address, uint32_t starting_rate) {
+        address_t *direct_synapses_address, REAL starting_rate) {
     log_debug("synapses_initialise: starting");
     n_neurons = n_neurons_value;
     n_synapse_types = n_synapse_types_value;
@@ -280,17 +295,16 @@ bool synapses_initialise(
 
     uint32_t n_ring_buffer_bits =
             log_n_neurons + log_n_synapse_types;
+    // +1 to have the double ring buffer to write in the safe one
     uint32_t ring_buffer_size = 1 << (n_ring_buffer_bits);
 
-    ring_buffers = spin1_malloc(ring_buffer_size * sizeof(uint32_t));
+    ring_buffers = spin1_malloc(ring_buffer_size * sizeof(accum));
 
     if (ring_buffers == NULL) {
 
         log_error("Could not allocate %u entries for ring buffers",
                 ring_buffer_size);
     }
-
-    starting_rate = starting_rate >> 8;
 
     for (uint32_t i = 0; i < ring_buffer_size; i++) {
         ring_buffers[i] = starting_rate;
@@ -305,20 +319,6 @@ bool synapses_initialise(
     synapse_type_bits = log_n_synapse_types;
     synapse_type_mask = (1 << log_n_synapse_types) - 1;
     return true;
-}
-
-// Converts a rate to an input (TMP, need to be different from the one in synapse.h because of the shift amount,
-// direction and the size of the data). This allows to do only one shift instead of two.
-static inline input_t convert_rate_to_input(
-        uint32_t rate, uint32_t left_shift) {
-    union {
-        uint32_t input_type;
-        s1615 output_type;
-    } converter;
-
-    converter.input_type = (rate);
-
-    return converter.output_type;
 }
 
 void synapses_do_timestep_update(timer_t time) {
@@ -341,11 +341,9 @@ void synapses_do_timestep_update(timer_t time) {
 
             // Convert ring-buffer entry to input and add on to correct
             // input for this synapse type and neuron
+
             neuron_add_inputs(
-                    synapse_type_index, neuron_index,
-                    convert_rate_to_input(
-                            ring_buffers[ring_buffer_index],
-                            ring_buffer_to_input_left_shifts[synapse_type_index]));
+                    synapse_type_index, neuron_index, ring_buffers[ring_buffer_index]);
         }
     }
 
@@ -373,7 +371,7 @@ bool synapses_process_synaptic_row(
         profiler_write_entry_disable_fiq(
                 PROFILER_ENTER | PROFILER_PROCESS_PLASTIC_SYNAPSES);
         if (!synapse_dynamics_process_plastic_synapses(plastic_region_address,
-                fixed_region_address, ring_buffers, time)) {
+                fixed_region_address, ring_buffers, time, rate_diff)) {
             return false;
         }
         profiler_write_entry_disable_fiq(

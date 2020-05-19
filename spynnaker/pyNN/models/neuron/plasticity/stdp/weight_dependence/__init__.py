@@ -18,7 +18,8 @@ from .abstract_weight_dependence import AbstractWeightDependence
 from .weight_dependence_additive import WeightDependenceAdditive
 from .weight_dependence_multiplicative import WeightDependenceMultiplicative
 from .weight_dependence_additive_triplet import WeightDependenceAdditiveTriplet
+from .weight_dependence_multiplicative_multicomp_Bern import WeightDependenceMultiplicativeMulticompBern
 
 __all__ = ["AbstractHasAPlusAMinus", "AbstractWeightDependence",
            "WeightDependenceAdditive", "WeightDependenceMultiplicative",
-           "WeightDependenceAdditiveTriplet"]
+           "WeightDependenceAdditiveTriplet", "WeightDependenceMultiplicativeMulticompBern"]

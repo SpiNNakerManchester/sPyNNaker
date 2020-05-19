@@ -38,14 +38,12 @@ TAU_L = "tau_L"
 G_D = "g_D"
 G_L = "g_L"
 
-MEAN_ISI_TICKS = "mean_isi_ticks"
-TIME_TO_SPIKE_TICKS = "time_to_spike_ticks"
+
 SEED1 = "seed1"
 SEED2 = "seed2"
 SEED3 = "seed3"
 SEED4 = "seed4"
 TICKS_PER_SECOND = "ticks_per_second"
-TIME_SINCE_LAST_SPIKE = "time_since_last_spike"
 RATE_AT_LAST_SETTING = "rate_at_last_setting"
 RATE_UPDATE_THRESHOLD = "rate_update_threshold"
 RATE_DIFF = "rate_diff"
@@ -69,7 +67,6 @@ class NeuronModelLeakyIntegrateAndFireTwoCompRate(AbstractNeuronModel):
         "__cm",
         "__i_offset",
         "__v_reset",
-        "__tau_refrac",
 
         "__g_L",
         "__g_D",
@@ -77,9 +74,6 @@ class NeuronModelLeakyIntegrateAndFireTwoCompRate(AbstractNeuronModel):
         "__v",
         "__v_star",
 
-        "__mean_isi_ticks",
-        "__time_to_spike_ticks",
-        "__time_since_last_spike",
         "__rate_at_last_setting",
         "__rate_update_threshold",
         "__rate_diff",
@@ -87,9 +81,8 @@ class NeuronModelLeakyIntegrateAndFireTwoCompRate(AbstractNeuronModel):
         ]
 
     def __init__(
-            self, u_init, u_rest, tau_m, cm, i_offset, v_reset, tau_refrac,
-            g_D, g_L, tau_L, v_init, v_star,
-            mean_isi_ticks, time_to_spike_ticks, rate_update_threshold, starting_rate):
+            self, u_init, u_rest, cm, i_offset, v_reset,
+            g_D, g_L, tau_L, v_init, rate_update_threshold, starting_rate):
 
         global_data_types=[
                     DataType.UINT32,  # MARS KISS seed
@@ -100,24 +93,20 @@ class NeuronModelLeakyIntegrateAndFireTwoCompRate(AbstractNeuronModel):
                     ]
 
         super(NeuronModelLeakyIntegrateAndFireTwoCompRate, self).__init__(
-            data_types = [DataType.S1615,   # v
-                DataType.S1615,   # v_rest
+            data_types = [DataType.S1615,   # U
+                DataType.S1615,   # u_rest
                 DataType.S1615,   # r_membrane (= tau_m / cm)
-                DataType.S1615,   # exp_tc (= e^(-ts / tau_m))
                 DataType.S1615,   # i_offset
-                DataType.INT32,   # count_refrac
-                DataType.S1615,   # v_reset
-                DataType.INT32,   # tau_refrac
+                DataType.S1615,   # u_reset
 
                 DataType.S1615,   # V
                 DataType.S1615,   # V*
-                DataType.S1615,   # g_D/(g_D +g_L)
-                DataType.S1615,   # exp_tc_dend (= e^(-ts / tau_m))
+                DataType.S1615,   # (g_D + g_L) / g_D, plasticity rate multiplier
 
-                #### Poisson Compartment Params ####
-                DataType.S1615,   #  REAL mean_isi_ticks
-                DataType.S1615,   #  REAL time_to_spike_ticks
-                DataType.INT32,    #  int32_t time_since_last_spike s
+                DataType.S1615,   # g_L
+                DataType.S1615,   # tau_L
+                DataType.S1615,   # g_D
+
                 DataType.S1615,   #  REAL rate_at_last_setting; s
                 DataType.S1615,   #  REAL rate_update_threshold; p
                 DataType.S1615    #  REAL rate difference
@@ -125,25 +114,21 @@ class NeuronModelLeakyIntegrateAndFireTwoCompRate(AbstractNeuronModel):
             global_data_types=global_data_types)
 
         if u_init is None:
-            u_init = v_rest
+            u_init = u_rest
         self.__u_init = u_init
         self.__u_rest = u_rest
         self.__tau_m = (1/(g_L + g_D))
         self.__cm = cm
         self.__i_offset = i_offset
         self.__v_reset = v_reset
-        self.__tau_refrac = tau_refrac
 
         self.__g_L = g_L
         self.__g_D = g_D
         self.__tau_L = tau_L
 
-        self.__mean_isi_ticks = mean_isi_ticks
-        self.__time_to_spike_ticks = time_to_spike_ticks
-        self.__time_since_last_spike = 0 # this should be initialised to zero - we know nothing about before the simulation
         self.__rate_at_last_setting = starting_rate
-        self.__rate_update_threshold = 2
-        self.__rate_diff = 0 # same as sime_since last spike
+        self.__rate_update_threshold = rate_update_threshold
+        self.__rate_diff = 0
 
     @overrides(AbstractNeuronModel.get_n_cpu_cycles)
     def get_n_cpu_cycles(self, n_neurons):
@@ -157,7 +142,6 @@ class NeuronModelLeakyIntegrateAndFireTwoCompRate(AbstractNeuronModel):
         parameters[CM] = self.__cm
         parameters[I_OFFSET] = self.__i_offset
         parameters[V_RESET] = self.__v_reset
-        parameters[TAU_REFRAC] = self.__tau_refrac
 
         parameters[TAU_L] = self.__tau_L
         parameters[G_D] = self.__g_D
@@ -169,15 +153,10 @@ class NeuronModelLeakyIntegrateAndFireTwoCompRate(AbstractNeuronModel):
     @overrides(AbstractNeuronModel.add_state_variables)
     def add_state_variables(self, state_variables):
         state_variables[U] = self.__u_init
-        state_variables[COUNT_REFRAC] = 0
 
         state_variables[V] = self.__u_init # initialise to soma potential
         state_variables[V_STAR] = self.__u_init # initialise to soma potential
 
-
-        state_variables[MEAN_ISI_TICKS] = self.__mean_isi_ticks
-        state_variables[TIME_TO_SPIKE_TICKS] = self.__time_to_spike_ticks # could eventually be set from membrane potential
-        state_variables[TIME_SINCE_LAST_SPIKE] = self.__time_since_last_spike
         state_variables[RATE_AT_LAST_SETTING] = self.__rate_at_last_setting
         state_variables[RATE_DIFF] = self.__rate_diff
 
@@ -197,24 +176,18 @@ class NeuronModelLeakyIntegrateAndFireTwoCompRate(AbstractNeuronModel):
         return [state_variables[U],
                 parameters[U_REST],
                 parameters[TAU_M] / parameters[CM],
-                parameters[TAU_M].apply_operation(
-                    operation=lambda x: numpy.exp(float(-ts) / (1000.0 * x))),
-                parameters[I_OFFSET], state_variables[COUNT_REFRAC],
+                parameters[I_OFFSET],
                 parameters[V_RESET],
-                parameters[TAU_REFRAC].apply_operation(
-                    operation=lambda x: int(numpy.ceil(x / (ts / 1000.0)))),
 
 
                 state_variables[V],
                 state_variables[V_STAR],
-                parameters[CM]/(parameters[G_D] + parameters[G_L]),
-                parameters[TAU_L].apply_operation(
-                    operation=lambda x: numpy.exp(float(-ts) / (1000.0 * x))),
+                (parameters[G_D] + parameters[G_L]) / parameters[G_D],
 
+                parameters[G_L],
+                parameters[TAU_L],
+                parameters[G_D],
 
-                state_variables[MEAN_ISI_TICKS],
-                state_variables[TIME_TO_SPIKE_TICKS],
-                state_variables[TIME_SINCE_LAST_SPIKE],
                 state_variables[RATE_AT_LAST_SETTING],
                 parameters[RATE_UPDATE_THRESHOLD],
                 state_variables[RATE_DIFF]
@@ -224,24 +197,18 @@ class NeuronModelLeakyIntegrateAndFireTwoCompRate(AbstractNeuronModel):
     def update_values(self, values, parameters, state_variables):
 
         # Read the data
-        (u, _u_rest, _r_membrane, _exp_tc, _i_offset, count_refrac,
-         _v_reset, _tau_refrac,
-         v, v_star, _v_star_cond, _exp_tc_den,
-         mean_isi_ticks, time_to_spike_ticks,
-         time_since_last_spike, rate_at_last_setting, _rate_update_threshold,
+        (u, _u_rest, _r_membrane, _i_offset,
+         _v_reset, v, v_star, _v_star_cond,
+         rate_at_last_setting, _rate_update_threshold,
          rate_diff
          ) = values
 
         # Copy the changed data only
         state_variables[U] = u
-        state_variables[COUNT_REFRAC] = count_refrac
 
         state_variables[V] = v
-        state_variables[V_INIT] = v_star
+        # state_variables[V_INIT] = v_star
 
-        state_variables[MEAN_ISI_TICKS] = mean_isi_ticks
-        state_variables[TIME_TO_SPIKE_TICKS] = time_to_spike_ticks
-        state_variables[TIME_SINCE_LAST_SPIKE] = time_since_last_spike
         state_variables[RATE_AT_LAST_SETTING] = rate_at_last_setting
         state_variables[RATE_DIFF] = rate_diff
 
@@ -250,10 +217,10 @@ class NeuronModelLeakyIntegrateAndFireTwoCompRate(AbstractNeuronModel):
                additional_arguments={'machine_time_step'})
     def get_global_values(self, machine_time_step):
         vals = [
-                1, # seed 1
-                2, # seed 2
-                3, # seed 3
-                4, # seed 4
+                1,  # seed 1
+                2,  # seed 2
+                3,  # seed 3
+                4,  # seed 4
                 MICROSECONDS_PER_SECOND / float(machine_time_step) # ticks_per_second
                 ]
 
@@ -308,26 +275,3 @@ class NeuronModelLeakyIntegrateAndFireTwoCompRate(AbstractNeuronModel):
     def v_reset(self, v_reset):
         self.__v_reset = v_reset
 
-    @property
-    def tau_refrac(self):
-        return self.__tau_refrac
-
-    @tau_refrac.setter
-    def tau_refrac(self, tau_refrac):
-        self.__tau_refrac = tau_refrac
-
-    @property
-    def mean_isi_ticks(self):
-        return self.__mean_isi_ticks
-
-    @mean_isi_ticks.setter
-    def mean_isi_ticks(self, new_mean_isi_ticks):
-        self.__mean_isi_ticks = new_mean_isi_ticks
-
-    @property
-    def time_to_spike_ticks(self):
-        return self.__time_to_spike_ticks
-
-    @mean_isi_ticks.setter
-    def time_to_spike_ticks(self, new_time_to_spike_ticks):
-        self.__time_to_spike_ticks = new_time_to_spike_ticks
