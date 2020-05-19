@@ -1160,3 +1160,5 @@ class SynapticManager(object):
                     message="Weight of {} could not be represented precisely;"
                             " a weight of {} was used instead".format(
                                 weight, r_weight)))
+
+        return prov_items
