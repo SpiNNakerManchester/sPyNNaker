@@ -99,7 +99,8 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
     @overrides(AbstractPyNNNeuronModelStandard.create_vertex)
     def create_vertex(
             self, n_neurons, label, constraints, spikes_per_second,
-            ring_buffer_sigma, min_weights, incoming_spike_buffer_size,
+            ring_buffer_sigma, min_weights, weight_random_sigma,
+            max_stdp_spike_delta, incoming_spike_buffer_size,
             n_steps_per_timestep):
         if n_neurons != len(self._devices):
             raise ConfigurationException(
@@ -110,4 +111,5 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
         return ExternalDeviceLifControlVertex(
             self._devices, self._create_edges, max_atoms, self._model, self,
             self._translator, spikes_per_second, label, ring_buffer_sigma,
-            min_weights, incoming_spike_buffer_size, constraints)
+            min_weights, weight_random_sigma, max_stdp_spike_delta,
+            incoming_spike_buffer_size, constraints)

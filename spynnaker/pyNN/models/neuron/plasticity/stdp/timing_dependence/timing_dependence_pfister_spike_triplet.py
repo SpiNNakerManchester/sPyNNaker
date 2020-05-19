@@ -118,18 +118,19 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
     def get_parameter_names(self):
         return ['tau_plus', 'tau_minus', 'tau_x', 'tau_y']
 
-    @property
     @overrides(AbstractTimingDependence.minimum_delta)
-    def minimum_delta(self):
+    def minimum_delta(self, max_stdp_spike_delta):
+        ts = get_simulator().machine_time_step / 1000.0
+
         # The minimums for potentiation
         min_decayed_r1 = get_min_lut_value(self.__tau_plus_data)
         min_decayed_r1_o2 = min_decayed_r1 * get_min_lut_value(
-            self.__tau_y_data)
+            self.__tau_y_data, ts, max_stdp_spike_delta)
 
         # The minimums for depression
         min_decayed_o1 = get_min_lut_value(self.__tau_minus_data)
         min_decayed_o1_r2 = min_decayed_o1 * get_min_lut_value(
-            self.__tau_x_data)
+            self.__tau_x_data, ts, max_stdp_spike_delta)
 
         return [[min_decayed_r1, min_decayed_r1_o2],
                 [min_decayed_o1, min_decayed_o1_r2]]

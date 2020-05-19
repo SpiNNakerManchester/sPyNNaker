@@ -287,15 +287,14 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
         return self._get_weight_maximum(synapse_info.weights, n_conns)
 
     @overrides(AbstractConnector.get_weight_minimum)
-    def get_weight_minimum(self, synapse_info):
-        # I think this is overestimated, but not by much
-        n_conns = (
-            self._pre_w * self._pre_h * self._kernel_w * self._kernel_h)
-        # Use the kernel delays if user has supplied them
+    def get_weight_minimum(self, weights, weight_random_sigma):
+        # Use the kernel weights if user has supplied them
         if self._krn_weights is not None:
-            return self._get_weight_minimum(self._krn_weights, n_conns)
+            return self.get_weight_minimum(
+                self._krn_weights, weight_random_sigma)
 
-        return self._get_weight_minimum(synapse_info.weights, n_conns)
+        return super(KernelConnector, self).get_weight_minimum(
+            weights, weight_random_sigma)
 
     def __repr__(self):
         return "KernelConnector(shape_kernel[{},{}])".format(

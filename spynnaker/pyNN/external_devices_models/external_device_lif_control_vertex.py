@@ -51,8 +51,9 @@ class ExternalDeviceLifControlVertex(
     def __init__(
             self, devices, create_edges, max_atoms_per_core, neuron_impl,
             pynn_model, translator=None, spikes_per_second=None, label=None,
-            ring_buffer_sigma=None, min_weights=None,
-            incoming_spike_buffer_size=None, constraints=None):
+            ring_buffer_sigma=None, min_weights=None, weight_random_sigma=None,
+            max_stdp_spike_delta=None, incoming_spike_buffer_size=None,
+            constraints=None):
         """
         :param list(AbstractMulticastControllableDevice) devices:
             The AbstractMulticastControllableDevice instances to be controlled
@@ -70,6 +71,9 @@ class ExternalDeviceLifControlVertex(
         :param float spikes_per_second:
         :param str label:
         :param float ring_buffer_sigma:
+        :param list min_weights:
+        :param float weight_random_sigma:
+        :param float max_stdp_spike_delta:
         :param int incoming_spike_buffer_size:
         :param list(~pacman.model.constraints.AbstractConstraint) constraints:
         """

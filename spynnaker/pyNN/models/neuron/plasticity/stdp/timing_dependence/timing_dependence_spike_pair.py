@@ -96,8 +96,9 @@ class TimingDependenceSpikePair(AbstractTimingDependence):
     def get_parameter_names(self):
         return ['tau_plus', 'tau_minus']
 
-    @property
     @overrides(AbstractTimingDependence.minimum_delta)
-    def minimum_delta(self):
-        return [get_min_lut_value(self.__tau_plus_data),
-                get_min_lut_value(self.__tau_minus_data)]
+    def minimum_delta(self, max_stdp_spike_delta):
+        ts = get_simulator().machine_time_step / 1000.0
+        return [
+            get_min_lut_value(self.__tau_plus_data, ts, max_stdp_spike_delta),
+            get_min_lut_value(self.__tau_minus_data, ts, max_stdp_spike_delta)]

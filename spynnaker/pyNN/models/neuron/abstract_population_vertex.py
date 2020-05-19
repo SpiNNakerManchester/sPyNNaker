@@ -38,6 +38,8 @@ from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
 from spinn_front_end_common.interface.profiling import profile_utils
+from spinn_front_end_common.interface.provenance import (
+    AbstractProvidesLocalProvenanceData)
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, AbstractNeuronRecordable, NeuronRecorder)
 from spynnaker.pyNN.utilities import constants
@@ -78,7 +80,7 @@ class AbstractPopulationVertex(
         AbstractChangableAfterRun,
         AbstractRewritesDataSpecification, AbstractReadParametersBeforeSet,
         AbstractAcceptsIncomingSynapses, ProvidesKeyToAtomMappingImpl,
-        AbstractCanReset):
+        AbstractCanReset, AbstractProvidesLocalProvenanceData):
     """ Underlying vertex model for Neural Populations.
     """
     __slots__ = [
@@ -117,6 +119,7 @@ class AbstractPopulationVertex(
     def __init__(
             self, n_neurons, label, constraints, max_atoms_per_core,
             spikes_per_second, ring_buffer_sigma, min_weights,
+            weight_random_sigma, max_stdp_spike_delta,
             incoming_spike_buffer_size, neuron_impl, pynn_model):
         # pylint: disable=too-many-arguments, too-many-locals
         super(AbstractPopulationVertex, self).__init__(
@@ -157,7 +160,8 @@ class AbstractPopulationVertex(
         # Set up synapse handling
         self.__synapse_manager = SynapticManager(
             self.__neuron_impl.get_n_synapse_types(), ring_buffer_sigma,
-            spikes_per_second, min_weights, config)
+            spikes_per_second, min_weights, weight_random_sigma,
+            max_stdp_spike_delta, config)
 
         # bool for if state has changed.
         self.__change_requires_mapping = True
@@ -856,3 +860,8 @@ class AbstractPopulationVertex(
         if self.__synapse_manager.changes_during_run:
             self.__change_requires_data_generation = True
             self.__change_requires_neuron_parameters_reload = False
+
+    @overrides(AbstractProvidesLocalProvenanceData.get_local_provenance_data)
+    def get_local_provenance_data(self):
+        return self.__synapse_manager.get_weight_provenance(
+            list(self.__neuron_impl.get_synapse_targets()))

@@ -101,8 +101,8 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
     def get_parameter_names(self):
         return ['alpha', 'tau']
 
-    @property
     @overrides(AbstractTimingDependence.minimum_delta)
-    def minimum_delta(self):
-        min_tau = get_min_lut_value(self.__tau_data)
+    def minimum_delta(self, max_stdp_spike_delta):
+        ts = get_simulator().machine_time_step / 1000.0
+        min_tau = get_min_lut_value(self.__tau_data, ts, max_stdp_spike_delta)
         return [min_tau - self.__alpha, min_tau]

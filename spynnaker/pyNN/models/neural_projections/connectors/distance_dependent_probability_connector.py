@@ -156,16 +156,6 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
                 synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
                 numpy.amax(self.__probs)))
 
-    @overrides(AbstractConnector.get_weight_minimum)
-    def get_weight_minimum(self, synapse_info):
-        # pylint: disable=too-many-arguments
-        return self._get_weight_minimum(
-            synapse_info.weights,
-            utility_calls.get_probable_maximum_selected(
-                synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
-                synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
-                numpy.amax(self.__probs)))
-
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
             self, pre_slices, pre_slice_index, post_slices, post_slice_index,

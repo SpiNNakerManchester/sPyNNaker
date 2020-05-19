@@ -16,6 +16,7 @@ from collections import defaultdict
 import math
 import struct
 import numpy
+import sys
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement, read_config)
@@ -35,7 +36,7 @@ from spynnaker.pyNN.models.neuron.master_pop_table import (
     MasterPopTableAsBinarySearch)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.neuron.synapse_dynamics import SynapseDynamicsSTDP
-import sys
+from spinn_front_end_common.utilities.utility_objs.provenance_data_item import ProvenanceDataItem
 
 TIME_STAMP_BYTES = BYTES_PER_WORD
 
@@ -76,17 +77,23 @@ class SynapticManager(object):
         "__synapse_dynamics",
         "__synapse_io",
         "__weight_scales",
+        "__weight_random_sigma",
+        "__max_stdp_spike_delta",
         "__gen_on_machine",
         "__max_row_info",
-        "__synapse_indices"]
+        "__synapse_indices",
+        "__weight_provenance"]
 
     def __init__(
             self, n_synapse_types, ring_buffer_sigma, spikes_per_second,
-            min_weights, config, population_table_type=None, synapse_io=None):
+            min_weights, weight_random_sigma, max_stdp_spike_delta, config,
+            population_table_type=None, synapse_io=None):
         self.__n_synapse_types = n_synapse_types
         self.__ring_buffer_sigma = ring_buffer_sigma
         self.__spikes_per_second = spikes_per_second
         self.__min_weights = min_weights
+        self.__weight_random_sigma = weight_random_sigma
+        self.__max_stdp_spike_delta = max_stdp_spike_delta
 
         # Get the type of population table
         self.__poptable_type = population_table_type
@@ -123,6 +130,14 @@ class SynapticManager(object):
                     " match the number of synapses ({})".format(
                         self.__min_weights, self.__n_synapse_types))
 
+        # Read the other minimum weight configuration parameters
+        if self.__weight_random_sigma is None:
+            self.__weight_random_sigma = config.getfloat(
+                "Simulation", "weight_random_sigma")
+        if self.__max_stdp_spike_delta is None:
+            self.__max_stdp_spike_delta = config.getfloat(
+                "Simulation", "max_stdp_spike_delta")
+
         # Prepare for dealing with STDP - there can only be one (non-static)
         # synapse dynamics per vertex at present
         self.__synapse_dynamics = None
@@ -149,6 +164,10 @@ class SynapticManager(object):
 
         # A map of synapse information for each machine pre vertex to index
         self.__synapse_indices = dict()
+
+        # Store weight provenance information mapping from
+        # (real weight, represented weight) -> list of edges
+        self.__weight_provenance = defaultdict(list)
 
     @property
     def synapse_dynamics(self):
@@ -744,7 +763,6 @@ class SynapticManager(object):
     def _calculate_min_weights(
             self, application_vertex, application_graph, weight_scale):
         min_weights = [sys.maxsize for _ in range(self.__n_synapse_types)]
-        stdp_min_deltas = [sys.maxsize for _ in range(self.__n_synapse_types)]
         for app_edge in application_graph.get_edges_ending_at_vertex(
                 application_vertex):
             if isinstance(app_edge, ProjectionApplicationEdge):
@@ -752,7 +770,8 @@ class SynapticManager(object):
                     synapse_type = synapse_info.synapse_type
 
                     connector = synapse_info.connector
-                    weight_min = connector.get_weight_minimum(synapse_info)
+                    weight_min = connector.get_weight_minimum(
+                        synapse_info.weights, self.__weight_random_sigma)
                     weight_min *= weight_scale
                     if weight_min != 0:
                         min_weights[synapse_type] = min(
@@ -760,12 +779,12 @@ class SynapticManager(object):
 
                     synapse_dynamics = synapse_info.synapse_dynamics
                     if isinstance(synapse_dynamics, SynapseDynamicsSTDP):
-                        min_delta = synapse_dynamics.get_weight_min_delta()
-                        stdp_min_deltas[synapse_type] = min(
-                            stdp_min_deltas[synapse_type], min_delta)
-
-        # Try to allow STDP weights to get as small as they want to, but try
-        # to keep a reasonable upper range too
+                        min_delta = synapse_dynamics.get_weight_min_delta(
+                            self.__max_stdp_spike_delta)
+                        min_delta *= weight_scale
+                        if min_delta is not None and min_delta != 0:
+                            min_weights[synapse_type] = min(
+                                min_weights[synapse_type], min_delta)
 
         # Convert values to their closest representable value to ensure
         # that division works for the minimum value
@@ -775,8 +794,29 @@ class SynapticManager(object):
         # The minimum weight shouldn't be 0 unless set above (and then it
         # doesn't matter that we use the min as there are no weights); so
         # set the weight to the smallest representable value if 0
-        return [m if m > 0 else DataType.S1615.decode_from_int(1)
-                for m in min_weights]
+        min_weights = [m if m > 0 else DataType.S1615.decode_from_int(1)
+                       for m in min_weights]
+
+        self.__check_weights(
+            min_weights, application_graph, application_vertex)
+        return min_weights
+
+    def __check_weights(self, min_weights, app_graph, app_vertex):
+        """ Warn the user about weights that can't be represented properly
+            where possible
+        """
+        for app_edge in app_graph.get_edges_ending_at_vertex(app_vertex):
+            if isinstance(app_edge, ProjectionApplicationEdge):
+                for synapse_info in app_edge.synapse_information:
+                    weight = synapse_info.weights
+                    if numpy.isscalar(weight):
+                        synapse_type = synapse_info.synapse_type
+                        r_weight = weight / min_weights[synapse_type]
+                        r_weight = DataType.UINT16.closest_representable_value(
+                            r_weight) * min_weights[synapse_type]
+                        if weight != r_weight:
+                            self.__weight_provenance[weight, r_weight].append(
+                                (app_edge, synapse_info))
 
     def _get_min_weights(
             self, application_vertex, application_graph, weight_scale):
@@ -1093,3 +1133,23 @@ class SynapticManager(object):
         if self.__synapse_dynamics is None:
             return False
         return self.__synapse_dynamics.changes_during_run
+
+    def get_weight_provenance(self, synapse_names):
+        prov_items = list()
+        # Record the min weight used for each synapse type
+        for i, weight in enumerate(self.__min_weights):
+            prov_items.append(ProvenanceDataItem(
+                [self._label, "min_weight_{}".format(synapse_names[i])],
+                weight))
+
+        # Report any known weights that couldn't be represented
+        for (weight, r_weight) in self.__weight_provenance:
+            (app_edge, s_info) = self.__weight_provenance[weight, r_weight]
+            prov_items.append(ProvenanceDataItem(
+                [self._label, app_edge.label,
+                 s_info.connector.__class__.__name__,
+                 "weight_representation"], r_weight,
+                report=True,
+                message="Weight of {} could not be represented precisely;"
+                        " a weight of {} was used instead".format(
+                            weight, r_weight)))

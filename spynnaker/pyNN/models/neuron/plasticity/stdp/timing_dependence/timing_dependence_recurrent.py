@@ -137,8 +137,7 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
         return ['accumulator_depression', 'accumulator_potentiation',
                 'mean_pre_window', 'mean_post_window', 'dual_fsm']
 
-    @property
     @overrides(AbstractTimingDependence.minimum_delta)
-    def minimum_delta(self):
+    def minimum_delta(self, max_stdp_spike_delta):
         # This rule always has a delta of 1
         return [1.0, 1.0]

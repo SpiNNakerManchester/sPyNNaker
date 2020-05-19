@@ -84,10 +84,13 @@ class AbstractTimingDependence(object):
         :rtype: iterable(str)
         """
 
-    @abstractproperty
-    def minimum_delta(self):
+    @abstractmethod
+    def minimum_delta(self, max_stdp_spike_delta):
         """ The smallest non-zero changes that will be passed to the weight\
             rule
+
+        :param float max_stdp_spike_delta: The maximum expected time difference
+            between two spikes in milliseconds
 
         :return: An array of minimum change values, one for potentiation,\
             one for depression.  If this requires a 2-parameter weight rule,

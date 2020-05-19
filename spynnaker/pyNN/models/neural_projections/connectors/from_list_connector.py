@@ -212,11 +212,11 @@ class FromListConnector(AbstractConnector):
             return numpy.var(numpy.abs(self.__weights))
 
     @overrides(AbstractConnector.get_weight_minimum)
-    def get_weight_minimum(self, synapse_info):
+    def get_weight_minimum(self, weights, weight_random_sigma):
         if self.__weights is None:
-            return numpy.amin(synapse_info.weights)
-        else:
-            return numpy.amin(numpy.abs(self.__weights))
+            return super(FromListConnector, self).get_weight_minimum(
+                weights, weight_random_sigma)
+        return numpy.amin(numpy.abs(self.__weights))
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(

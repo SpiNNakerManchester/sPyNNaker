@@ -267,19 +267,19 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
             return numpy.mean(weights)
         raise Exception("Unrecognised weight format")
 
-    def _get_weight_minimum(self, weights, n_connections, min_weight_sigma):
+    def get_weight_minimum(self, weights, weight_random_sigma):
         """ Get the minimum of the weights.
 
-        :param weights:
         :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float
             or list(int) or list(float)
-        :param int n_connections:
+        :param int weight_random_sigma: The number of standard deviations from
+            the mean to allow for when using a random distribution
         :rtype: float
         """
         if isinstance(weights, RandomDistribution):
             mean_weight = utility_calls.get_mean(weights)
-            weight_var = utility_calls.get_variance(weights)
-            min_weight = mean_weight - weight_var
+            weight_sd = math.sqrt(utility_calls.get_variance(weights))
+            min_weight = mean_weight - (weight_sd * weight_random_sigma)
             if mean_weight < 0:
                 high = utility_calls.high(weights)
                 if high is None:
@@ -296,15 +296,6 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         elif hasattr(weights, "__getitem__"):
             return numpy.amax(numpy.abs(weights))
         raise Exception("Unrecognised weight format")
-
-    @abstractmethod
-    def get_weight_minimum(self, synapse_info, weight_random_sigma):
-        """ Get the minimum of the weights.
-
-        :param weights:
-        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or float
-            or list(int) or list(float)
-        """
 
     def _get_weight_maximum(self, weights, n_connections):
         """ Get the maximum of the weights.
