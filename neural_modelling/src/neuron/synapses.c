@@ -19,6 +19,8 @@
 #include "spike_processing.h"
 #include "neuron.h"
 #include "plasticity/synapse_dynamics.h"
+#include "spike_profiling.h"
+
 #include <profiler.h>
 #include <debug.h>
 #include <spin1_api.h>
@@ -53,6 +55,10 @@ static uint32_t synapse_index_bits;
 static uint32_t synapse_index_mask;
 static uint32_t synapse_type_bits;
 static uint32_t synapse_type_mask;
+
+// Custom profiling variables
+extern struct spike_holder_t spike_counter;
+extern struct spike_holder_t spike_counter_inh;
 
 
 /* PRIVATE FUNCTIONS */
@@ -167,6 +173,24 @@ static inline void process_fixed_synapses(
             synapse_row_num_fixed_synapses(fixed_region_address);
 
     num_fixed_pre_synaptic_events += fixed_synapse;
+
+
+    // Used for custom recording
+    if (fixed_synapse > 0) {
+    		uint32_t synaptic_word = *synaptic_words;
+    		uint32_t type = synapse_row_sparse_type(synaptic_word,
+    				synapse_index_bits, synapse_type_mask);
+
+    		if (type == 0) { // excitatory
+    			spike_profiling_add_count(fixed_synapse, &spike_counter);
+
+    		} else if (type == 1) { // add to inhibitory counter
+    			spike_profiling_add_count(fixed_synapse, &spike_counter_inh);
+
+    		}
+    	} else { // row is zero length, add to excitatory counter
+    		spike_profiling_add_count(fixed_synapse, &spike_counter);
+    	}
 
     for (; fixed_synapse > 0; fixed_synapse--) {
         // Get the next 32 bit word from the synaptic_row

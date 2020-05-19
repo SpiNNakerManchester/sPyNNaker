@@ -25,6 +25,7 @@
 #include "implementations/neuron_impl.h"
 #include "plasticity/synapse_dynamics.h"
 #include <common/out_spikes.h>
+#include "spike_profiling.h"
 #include <debug.h>
 
 // declare spin1_wfi
@@ -103,6 +104,16 @@ struct neuron_parameters {
     uint32_t incoming_spike_buffer_size;
     uint32_t n_recorded_variables;
 };
+
+// Custom recording
+extern uint32_t last_spikes;
+extern uint32_t last_restarts;
+extern uint32_t temp_timer_callback_completed;
+
+extern struct spike_holder_t spike_cache;
+extern struct spike_holder_t spike_cache_inh;
+// End of custom recording
+
 #define START_OF_GLOBAL_PARAMETERS \
     (sizeof(struct neuron_parameters) / sizeof(uint32_t))
 
@@ -337,6 +348,13 @@ void neuron_do_timestep_update( // EXPORTED
         // call the implementation function (boolean for spike)
         bool spike = neuron_impl_do_timestep_update(
                 neuron_index, external_bias, recorded_variable_values);
+
+        // Custom recording
+        recorded_variable_values[0] = spike_profiling_get_spike_holder_as_accum(
+                        spike_cache);
+        recorded_variable_values[1] = last_spikes;
+        recorded_variable_values[2] = spike_profiling_get_spike_holder_as_accum(
+                spike_cache_inh);
 
         // Write the recorded variable values
         for (uint32_t i = 0; i < n_recorded_vars; i++) {
