@@ -93,14 +93,14 @@ state_t neuron_model_state_update(
 			(1.0k - psi_temp2) : 0.0k;
 
 //  This parameter is OK to update, as the actual size of the array is set in the header file, which matches the Python code. This should make it possible to do a pause and resume cycle and have reliable unloading of data.
-    uint32_t total_input_synapses_per_neuron = 200; //todo should this be fixed
-    uint32_t total_recurrent_synapses_per_neuron = 0; //todo should this be fixed
+    uint32_t total_input_synapses_per_neuron = 100; //todo should this be fixed
+    uint32_t total_recurrent_synapses_per_neuron = 100; //todo should this be fixed
     uint32_t recurrent_offset = 100;
 
 
 //    neuron->psi = neuron->psi << 10;
 
-    REAL rho = 0.998;
+    REAL rho = expk(-1.k / 1000.k); // adpt
 
 
     neuron->L = learning_signal * neuron->w_fb;
@@ -270,4 +270,8 @@ void neuron_model_print_parameters(restrict neuron_pointer_t neuron) {
     io_printf(IO_BUF, "learning      = %k n/a\n", neuron->L);
 
     io_printf(IO_BUF, "feedback w    = %k n/a\n\n", neuron->w_fb);
+
+    io_printf(IO_BUF, "e_to_dt_on_tau_a    = %k n/a\n\n", neuron->e_to_dt_on_tau_a);
+
+    io_printf(IO_BUF, "adpt          = %k n/a\n\n", neuron->adpt);
 }

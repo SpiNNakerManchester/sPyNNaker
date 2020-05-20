@@ -303,20 +303,31 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
 
     // Record B
-    if (neuron_index == 0){
-        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = global_parameters->core_pop_rate / neurons_in_pop; // divide by neurons on core to get average per neuron contribution to core pop rate
+//    if (neuron_index == 0){
+//        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = global_parameters->core_pop_rate / neurons_in_pop; // divide by neurons on core to get average per neuron contribution to core pop rate
+////        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[neuron_index].el_a; // divide by neurons on core to get average per neuron contribution to core pop rate
+//    }
+//    else{
+//
+//        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
+//        		B_t; // neuron->B;
+////                neuron->L;
+//    //    		neuron->syn_state[0].z_bar;
+//    //    		global_parameters->core_target_rate;
+//    //    	neuron->syn_state[0].e_bar;
+//    //    	neuron->syn_state[neuron_index].el_a;
+//    //    		exc_input_values[0]; // record input input (signed)
+//    //    		learning_signal * neuron->w_fb;
+//    }
+    if(neuron_index > 3){
+        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[15].el_a;
+        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[15].delta_w;
     }
     else{
-        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
-        		B_t; // neuron->B;
-//                neuron->L;
-    //    		neuron->syn_state[0].z_bar;
-    //    		global_parameters->core_target_rate;
-    //    	neuron->syn_state[0].e_bar;
-    //    	neuron->syn_state[neuron_index].el_a;
-    //    		exc_input_values[0]; // record input input (signed)
-    //    		learning_signal * neuron->w_fb;
+        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[0].el_a;
+        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[0].delta_w;
     }
+//    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[neuron_index].el_a;
     // update neuron parameters
     state_t result = neuron_model_state_update(
             NUM_EXCITATORY_RECEPTORS, exc_input_values,
@@ -343,13 +354,13 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     recorded_variable_values[V_RECORDING_INDEX] = voltage; // result;
 
 
-    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] =
-    		neuron->syn_state[0].delta_w;
+//    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] =
+//    		neuron->syn_state[0].delta_w;
 //    		neuron->syn_state[0].z_bar;
 //    		exc_input_values[0]; // record input input (signed)
 //    		z_t;
 //    		global_parameters->core_pop_rate;
-//    		neuron->psi;
+//    		neuron->B;
 //    		neuron->syn_state[0].z_bar;
 
 //    // Record B

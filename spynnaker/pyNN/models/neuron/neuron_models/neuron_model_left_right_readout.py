@@ -21,6 +21,10 @@ I_OFFSET = "i_offset"
 V_RESET = "v_reset"
 TAU_REFRAC = "tau_refrac"
 COUNT_REFRAC = "count_refrac"
+# Learning signal
+L = "learning_signal"
+W_FB = "feedback_weight"
+
 MEAN_ISI_TICKS = "mean_isi_ticks"
 TIME_TO_SPIKE_TICKS = "time_to_spike_ticks"
 SEED1 = "seed1"
@@ -64,6 +68,7 @@ class NeuronModelLeftRightReadout(AbstractNeuronModel):
         # "_prob_command",
         "_rate_off",
         "_rate_on",
+        "_l",
         "_w_fb",
         "_eta",
         "_mean_l",
@@ -79,7 +84,7 @@ class NeuronModelLeftRightReadout(AbstractNeuronModel):
             # mean_isi_ticks, time_to_spike_ticks,
             # rate_update_threshold,
             # prob_command,
-            rate_on, rate_off, poisson_pop_size, w_fb, eta):
+            rate_on, rate_off, poisson_pop_size, l, w_fb, eta):
 
         global_data_types = [
                     DataType.UINT32,  # MARS KISS seed
@@ -157,6 +162,7 @@ class NeuronModelLeftRightReadout(AbstractNeuronModel):
         self._cross_entropy = 0.0
         self._poisson_key = None
         self._poisson_pop_size = poisson_pop_size
+        self._l = l
         self._w_fb = w_fb
         self._eta = eta
 
@@ -178,6 +184,8 @@ class NeuronModelLeftRightReadout(AbstractNeuronModel):
         parameters[I_OFFSET] = self._i_offset
         parameters[V_RESET] = self._v_reset
         parameters[TAU_REFRAC] = self._tau_refrac
+        parameters[L] = self._l
+        parameters[W_FB] = self._w_fb
         parameters[SEED1] = 10065
         parameters[SEED2] = 232
         parameters[SEED3] = 3634
@@ -196,6 +204,9 @@ class NeuronModelLeftRightReadout(AbstractNeuronModel):
     def add_state_variables(self, state_variables):
         state_variables[V] = self._v_init
         state_variables[COUNT_REFRAC] = 0
+
+        #learning params
+        state_variables[L] = self._l
         # state_variables[MEAN_ISI_TICKS] = self._mean_isi_ticks
         # state_variables[TIME_TO_SPIKE_TICKS] = self._time_to_spike_ticks # could eventually be set from membrane potential
         # state_variables[TIME_SINCE_LAST_SPIKE] = self._time_since_last_spike
@@ -215,7 +226,7 @@ class NeuronModelLeftRightReadout(AbstractNeuronModel):
     def get_values(self, parameters, state_variables, vertex_slice, ts):
 
         # Add the rest of the data
-        return [state_variables[V],
+        values = [state_variables[V],
                 parameters[V_REST],
                 parameters[TAU_M] / parameters[CM],
                 parameters[TAU_M].apply_operation(
@@ -224,31 +235,35 @@ class NeuronModelLeftRightReadout(AbstractNeuronModel):
                 parameters[V_RESET],
                 parameters[TAU_REFRAC].apply_operation(
                     operation=lambda x: int(numpy.ceil(x / (ts / 1000.0)))),
-                # state_variables[MEAN_ISI_TICKS],
-                # state_variables[TIME_TO_SPIKE_TICKS],
-                # state_variables[TIME_SINCE_LAST_SPIKE],
-                # state_variables[RATE_AT_LAST_SETTING],
-                # parameters[RATE_UPDATE_THRESHOLD]
+
+                state_variables[L],
+                parameters[W_FB]
                 ]
+
+        # create synaptic state - init all state to zero
+        eprop_syn_init = [0,    # delta w
+                          0,    # z_bar_inp
+                          0]#,    # z_bar
+                          # 0,    # el_a
+                          # 0]    # e_bar
+        # extend to appropriate fan-in
+        values.extend(eprop_syn_init * SYNAPSES_PER_NEURON)
+
+        return values
 
     @overrides(AbstractNeuronModel.update_values)
     def update_values(self, values, parameters, state_variables):
 
         # Read the data
-        (v, _v_rest, _r_membrane, _exp_tc, _i_offset, count_refrac,
-         _v_reset, _tau_refrac,
-         mean_isi_ticks, time_to_spike_ticks, time_since_last_spike,
-         rate_at_last_setting, #_rate_update_threshold
-#          _seed1, _seed2, _seed3, _seed4, _ticks_per_second
-         ) = values
+        (_v, _v_rest, _r_membrane, _exp_tc, _i_offset, _count_refrac,
+        _v_reset, _tau_refrac,
+        _l, _w_fb) = values  # Not sure this will work with the new array of synapse!!!
+        # todo check alignment on this
 
         # Copy the changed data only
-        state_variables[V] = v
-        state_variables[COUNT_REFRAC] = count_refrac
-        state_variables[MEAN_ISI_TICKS] = mean_isi_ticks
-        state_variables[TIME_TO_SPIKE_TICKS] = time_to_spike_ticks
-        state_variables[TIME_SINCE_LAST_SPIKE] = time_since_last_spike
-        state_variables[RATE_AT_LAST_SETTING] = rate_at_last_setting
+        state_variables[V] = _v
+
+        state_variables[L] = _l
 
     # Global params
     @inject_items({"machine_time_step": "MachineTimeStep"})

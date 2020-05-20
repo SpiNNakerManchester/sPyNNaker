@@ -69,14 +69,18 @@ typedef enum
 current_state_t current_state = 0;
 uint32_t current_time = 0;
 uint32_t cue_number = 0;
-uint32_t total_cues = 7;
+uint32_t total_cues = 1;
 uint32_t current_cue_direction = 2; // 0 = left, 1 = right
 uint32_t accumulative_direction = 0; // if > total_cues / 2 = right
 uint32_t wait_between_cues = 50; // ms
 uint32_t duration_of_cue = 100; // ms
 uint32_t wait_before_result = 1000; // ms but should be a range between 500-1500
 uint32_t prompt_duration = 150; //ms
-uint32_t ticks_for_mean = 0;
+//uint32_t ticks_for_mean = 0;
+bool start_prompt = false;
+accum softmax_0 = 0k;
+accum softmax_1 = 0k;
+//REAL payload;
 bool completed_broadcast = true;
 
 
@@ -299,37 +303,60 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     external_bias += additional_input_get_input_value_as_current(
     		additional_input, voltage);
 
-    recorded_variable_values[V_RECORDING_INDEX] = voltage;
-    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = global_parameters->cross_entropy;
-    if (neuron_index == 2){
-        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = accumulative_direction;
+    if (neuron_index == 0){
+        // update neuron parameters
+        state_t result = neuron_model_state_update(
+                NUM_EXCITATORY_RECEPTORS, exc_input_values,
+                NUM_INHIBITORY_RECEPTORS, inh_input_values,
+                external_bias, neuron, -50k);
+        // Finally, set global membrane potential to updated value
+        global_parameters->readout_V_0 = result;
+
+    } else if (neuron_index == 1){
+        // update neuron parameters
+        learning_signal *= -1.k;
+        state_t result = neuron_model_state_update(
+                NUM_EXCITATORY_RECEPTORS, exc_input_values,
+                NUM_INHIBITORY_RECEPTORS, inh_input_values,
+                external_bias, neuron, -50k);
+        learning_signal *= -1.k;
+        // Finally, set global membrane potential to updated value
+        global_parameters->readout_V_1 = result;
     }
-    else {
-        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = 3.5;
-    }
+//    if (neuron_index == 0){
+//        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = global_parameters->readout_V_0;
+//    }
+//    else if (neuron_index == 1){
+//        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = global_parameters->readout_V_1;
+//    }
 //    io_printf(IO_BUF, "state = %u - %u\n", current_state, time);
     if (cue_number == 0 && completed_broadcast){ // reset start of new test
-        io_printf(IO_BUF, "Resetting\n");
+//        io_printf(IO_BUF, "Resetting\n");
         completed_broadcast = false;
         current_time = time;
         current_state = STATE_CUE;
         accumulative_direction = 0;
         // error params
-        ticks_for_mean = 0;
         global_parameters->cross_entropy = 0.k;
-        global_parameters->mean_0 == 0.k;
-        global_parameters->mean_1 == 0.k;
+        global_parameters->mean_0 = 0.k;
+        global_parameters->mean_1 = 0.k;
+        softmax_0 = 0k;
+        softmax_1 = 0k;
+        while (!spin1_send_mc_packet(
+                key | neuron_index,  bitsk(global_parameters->cross_entropy), 1 )) {
+            spin1_delay_us(1);
+        }
     }
 //    io_printf(IO_BUF, "current_state = %u, cue_number = %u, direction = %u, time = %u\n", current_state, cue_number, current_cue_direction, time);
     // In this state the environment is giving the left/right cues to the agent
     if (current_state == STATE_CUE){
         if (neuron_index == 0){
             // if it's current in the waiting time between cues do nothing
-            if ((time - current_time) % (wait_between_cues + duration_of_cue) < wait_between_cues){
-                // do nothing?
-            }
+//            if ((time - current_time) % (wait_between_cues + duration_of_cue) < wait_between_cues){
+//                 do nothing?
+//            }
             // begin sending left/right cue
-            else{
+            if ((time - current_time) % (wait_between_cues + duration_of_cue) >= wait_between_cues){
                 // pick broadcast if just entered
                 if ((time - current_time) % (wait_between_cues + duration_of_cue) == wait_between_cues){
                     // pick new value and broadcast
@@ -374,11 +401,12 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
         }
         if ((time - current_time) >= wait_before_result){
             current_state = (current_state + 1) % 3;
+            start_prompt = true;
         }
     }
     else if (current_state == STATE_PROMPT){
 //        io_printf(IO_BUF, "ticks_for_mean = %u, n_idx = %u\n", ticks_for_mean, neuron_index);
-        if (!ticks_for_mean && neuron_index == 1){
+        if (start_prompt && neuron_index == 1){
             current_time = time;
             // send packets to the variable poissons with the updated states
             for (int i = 0; i < 4; i++){
@@ -391,56 +419,59 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
                 }
             }
         }
-        if (neuron_index == 0){
-            // update neuron parameters
-            state_t result = neuron_model_state_update(
-                    NUM_EXCITATORY_RECEPTORS, exc_input_values,
-                    NUM_INHIBITORY_RECEPTORS, inh_input_values,
-                    external_bias, neuron, -50k);
-            // Finally, set global membrane potential to updated value
-            global_parameters->readout_V_0 = result;
-
-        } else if (neuron_index == 1){
-            // update neuron parameters
-            state_t result = neuron_model_state_update(
-                    NUM_EXCITATORY_RECEPTORS, exc_input_values,
-                    NUM_INHIBITORY_RECEPTORS, inh_input_values,
-                    external_bias, neuron, -50k);
-
-            // Finally, set global membrane potential to updated value
-            global_parameters->readout_V_1 = result;
-
-        } else if (neuron_index == 2){ // this is the error source
+        if (neuron_index == 2){ // this is the error source
             // Switched to always broadcasting error but with packet
-            ticks_for_mean += 1; //todo is it a running error like this over prompt?
-            io_printf(IO_BUF, "maybe here - %k - %k\n", global_parameters->mean_0, global_parameters->mean_1);
-            io_printf(IO_BUF, "ticks %u - accum %k - ", ticks_for_mean, (accum)ticks_for_mean);
+//            ticks_for_mean += 1; //todo is it a running error like this over prompt?
+            start_prompt = false;
+//            io_printf(IO_BUF, "maybe here - %k - %k\n", global_parameters->mean_0, global_parameters->mean_1);
+//            io_printf(IO_BUF, "ticks %u - accum %k - ", ticks_for_mean, (accum)ticks_for_mean);
             // Softmax of the exc and inh inputs representing 1 and 0 respectively
             // may need to scale to stop huge numbers going in the exp
-            io_printf(IO_BUF, "v0 %k - v1 %k\n", global_parameters->readout_V_0, global_parameters->readout_V_1);
-            global_parameters->mean_0 += global_parameters->readout_V_0;
-            global_parameters->mean_1 += global_parameters->readout_V_1;
+//            io_printf(IO_BUF, "v0 %k - v1 %k\n", global_parameters->readout_V_0, global_parameters->readout_V_1);
+//            global_parameters->mean_0 += global_parameters->readout_V_0;
+//            global_parameters->mean_1 += global_parameters->readout_V_1;
             // divide -> * 1/x
-            io_printf(IO_BUF, " umm ");
-            accum exp_0 = expk(global_parameters->mean_0 / (accum)ticks_for_mean);
-            accum exp_1 = expk(global_parameters->mean_1 / (accum)ticks_for_mean);
-            io_printf(IO_BUF, "or here - ");
-            accum softmax_0 = exp_0 / (exp_1 + exp_0);
-            accum softmax_1 = exp_1 / (exp_1 + exp_0);
-            io_printf(IO_BUF, "soft0 %k - soft1 %k - v0 %k - v1 %k\n", softmax_0, softmax_1, global_parameters->readout_V_0, global_parameters->readout_V_1);
+//            io_printf(IO_BUF, " umm ");
+//            accum exp_0 = expk(global_parameters->mean_0 / (accum)ticks_for_mean);
+//            accum exp_1 = expk(global_parameters->mean_1 / (accum)ticks_for_mean);
+            accum exp_0 = expk(global_parameters->readout_V_0 * 0.1k);
+            accum exp_1 = expk(global_parameters->readout_V_1 * 0.1k);
+//            io_printf(IO_BUF, "or here - ");
+            if (exp_0 == 0k && exp_1 == 0k){
+                if (global_parameters->readout_V_0 > global_parameters->readout_V_1){
+                    softmax_0 = 10k;
+                    softmax_1 = 0k;
+                }
+                else{
+                    softmax_0 = 0k;
+                    softmax_1 = 10k;
+                }
+            }
+            else{
+//                accum denominator = 1.k  / (exp_1 + exp_0);
+                softmax_0 = exp_0 / (exp_1 + exp_0);
+                softmax_1 = exp_1 / (exp_1 + exp_0);
+            }
+//            io_printf(IO_BUF, "soft0 %k - soft1 %k - v0 %k - v1 %k\n", softmax_0, softmax_1, global_parameters->readout_V_0, global_parameters->readout_V_1);
             // What to do if log(0)?
             if (accumulative_direction > total_cues >> 1){
                 global_parameters->cross_entropy = -logk(softmax_1);
+                learning_signal = softmax_0;
             }
             else{
                 global_parameters->cross_entropy = -logk(softmax_0);
+                learning_signal = softmax_0 - 1.k;
             }
-//            recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] =
-//            io_printf(IO_BUF, "broadcasting error\n");
             while (!spin1_send_mc_packet(
-                    key | neuron_index,  bitsk(global_parameters->cross_entropy), 1 )) {
+                    key | neuron_index,  bitsk(learning_signal), 1 )) {
                 spin1_delay_us(1);
             }
+//            if(learning_signal){
+//                io_printf(IO_BUF, "learning signal before cast = %k\n", learning_signal);
+//            }
+//            learning_signal = global_parameters->cross_entropy;
+//            recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] =
+//            io_printf(IO_BUF, "broadcasting error\n");
         }
         if ((time - current_time) >= prompt_duration && neuron_index == 0){
 //            io_printf(IO_BUF, "poisson setting 4, turning off prompt\n");
@@ -456,48 +487,33 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
             }
         }
     }
-//    recorded_variable_values[V_RECORDING_INDEX] = voltage;
-//    if (neuron_index == 0){
-//            // update neuron parameters
-//        state_t result = neuron_model_state_update(
-//                    NUM_EXCITATORY_RECEPTORS, exc_input_values,
-//                    NUM_INHIBITORY_RECEPTORS, inh_input_values,
-//                    external_bias, neuron, 0.0k);
-//
-//        // Calculate error
-//        REAL error = result - global_parameters->target_V[target_ind];
-//        learning_signal = error;
-//        // Record Error
-//        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
-//                error;
-////                neuron->syn_state[3].delta_w;
-////                neuron->syn_state[0].z_bar;
-//
-//        // Record readout
-//        recorded_variable_values[V_RECORDING_INDEX] =
-//                        result;
-//    //                    neuron->syn_state[0].z_bar;
-//
-//        // Send error (learning signal) as packet with payload
-////        while (!spin1_send_mc_packet(
-////                key | neuron_index,  bitsk(error), 1 )) {
-////            spin1_delay_us(1);
-////        }
-//    }
-//    else{
-//        // Record 'Error'
-//        recorded_variable_values[V_RECORDING_INDEX] =
-//                neuron->syn_state[0].z_bar;
-////                global_parameters->target_V[target_ind];
-//        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
-//                - global_parameters->target_V[target_ind];
-//    }
-//    // Record target
-//    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] =
-////        			global_parameters->target_V[target_ind];
-//        			neuron->syn_state[neuron_index].delta_w;
-////        			exc_input_values[0];
 
+//    learning_signal = global_parameters->cross_entropy;
+
+    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = global_parameters->cross_entropy;
+    recorded_variable_values[V_RECORDING_INDEX] = voltage;
+//    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = ;
+//    if (neuron_index == 2){
+//        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = accumulative_direction;
+//    }
+//    else {
+//        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = 3.5;
+//    }
+    if (neuron_index == 2){
+//        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[90].z_bar;
+//        recorded_variable_values[V_RECORDING_INDEX] = neuron->syn_state[90].z_bar;
+        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[90].delta_w;
+    }
+    else if (neuron_index == 1){
+//        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[55].z_bar;
+//        recorded_variable_values[V_RECORDING_INDEX] = neuron->syn_state[55].z_bar;
+        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[55].delta_w;
+    }
+    else{
+//        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[1].z_bar;
+//        recorded_variable_values[V_RECORDING_INDEX] = neuron->syn_state[1].z_bar;
+        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[1].delta_w;
+    }
 
     // If spike occurs, communicate to relevant parts of model
     if (spike) {

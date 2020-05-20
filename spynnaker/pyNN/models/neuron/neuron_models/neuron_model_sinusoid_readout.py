@@ -46,6 +46,7 @@ UNITS = {
 
 class NeuronModelLeakyIntegrateAndFireSinusoidReadout(AbstractNeuronModel):
     __slots__ = [
+        "_v",
         "_v_init",
         "_v_rest",
         "_tau_m",
@@ -56,9 +57,9 @@ class NeuronModelLeakyIntegrateAndFireSinusoidReadout(AbstractNeuronModel):
         "_target_data",
 
         # learning signal
-        "__l",
-        "__w_fb",
-        "__eta"
+        "_l",
+        "_w_fb",
+        "_eta"
         ]
 
     def __init__(
@@ -118,10 +119,10 @@ class NeuronModelLeakyIntegrateAndFireSinusoidReadout(AbstractNeuronModel):
         self._target_data = target_data
 
         # learning signal
-        self.__l = l
-        self.__w_fb = w_fb
+        self._l = l
+        self._w_fb = w_fb
 
-        self.__eta = eta
+        self._eta = eta
 
     @overrides(AbstractNeuronModel.get_n_cpu_cycles)
     def get_n_cpu_cycles(self, n_neurons):
@@ -139,7 +140,7 @@ class NeuronModelLeakyIntegrateAndFireSinusoidReadout(AbstractNeuronModel):
         parameters[TARGET_DATA] = 0.0
 
         #learning params
-        parameters[W_FB] = self.__w_fb
+        parameters[W_FB] = self._w_fb
         
 
     @overrides(AbstractNeuronModel.add_state_variables)
@@ -148,7 +149,7 @@ class NeuronModelLeakyIntegrateAndFireSinusoidReadout(AbstractNeuronModel):
         state_variables[COUNT_REFRAC] = 0
 
         #learning params
-        state_variables[L] = self.__l
+        state_variables[L] = self._l
 
 
     @overrides(AbstractNeuronModel.get_units)
@@ -193,15 +194,15 @@ class NeuronModelLeakyIntegrateAndFireSinusoidReadout(AbstractNeuronModel):
     def update_values(self, values, parameters, state_variables):
 
         # Read the data
-        (v, _v_rest, _r_membrane, _exp_tc, _i_offset, count_refrac,
+        (_v, _v_rest, _r_membrane, _exp_tc, _i_offset, _count_refrac,
         _v_reset, _tau_refrac,
-        l, __w_fb) = values  # Not sure this will work with the new array of synapse!!!
+        _l, _w_fb) = values  # Not sure this will work with the new array of synapse!!!
         # todo check alignment on this
 
         # Copy the changed data only
-        state_variables[V] = v
+        state_variables[V] = _v
 
-        state_variables[L] = l
+        state_variables[L] = _l
 
 
     # Global params
@@ -212,7 +213,7 @@ class NeuronModelLeakyIntegrateAndFireSinusoidReadout(AbstractNeuronModel):
         vals = []
 
         vals.extend(self._target_data)
-        vals.extend([self.__eta])
+        vals.extend([self._eta])
         return vals
 
     @property
@@ -281,9 +282,9 @@ class NeuronModelLeakyIntegrateAndFireSinusoidReadout(AbstractNeuronModel):
 
     @property
     def w_fb(self):
-        return self.__w_fb
+        return self._w_fb
 
     @w_fb.setter
     def w_fb(self, new_value):
-        self.__w_fb = new_value
+        self._w_fb = new_value
 

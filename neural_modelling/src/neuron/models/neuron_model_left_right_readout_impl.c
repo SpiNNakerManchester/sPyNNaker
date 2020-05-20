@@ -75,8 +75,12 @@ state_t neuron_model_state_update(
 
     uint32_t total_synapses_per_neuron = 100; //todo should this be fixed?
 
-    neuron->L = learning_signal * neuron->w_fb;
+//    if(learning_signal){
+//        io_printf(IO_BUF, "learning signal = %k\n", learning_signal);
+//    }
 
+    neuron->L = learning_signal * neuron->w_fb; //* ((accum)syn_ind * -1.k);
+//    REAL tau_decay = expk(-1.k / 1500.k);
     // All operations now need doing once per eprop synapse
     for (uint32_t syn_ind=0; syn_ind < total_synapses_per_neuron; syn_ind++){
 		// ******************************************************************
@@ -84,7 +88,7 @@ state_t neuron_model_state_update(
 		// ******************************************************************
     	neuron->syn_state[syn_ind].z_bar =
     			neuron->syn_state[syn_ind].z_bar * neuron->exp_TC
-    			+ (1 - neuron->exp_TC) * neuron->syn_state[syn_ind].z_bar_inp; // updating z_bar is problematic, if spike could come and interrupt neuron update
+    			+ (1.k - neuron->exp_TC) * neuron->syn_state[syn_ind].z_bar_inp; // updating z_bar is problematic, if spike could come and interrupt neuron update
 
 
 		// ******************************************************************
@@ -109,6 +113,7 @@ state_t neuron_model_state_update(
 		// ******************************************************************
 		// Update cached total weight change
 		// ******************************************************************
+
     	REAL this_dt_weight_change =
 //    			-local_eta * neuron->L * neuron->syn_state[syn_ind].e_bar;
     			-local_eta * neuron->L * neuron->syn_state[syn_ind].z_bar;
