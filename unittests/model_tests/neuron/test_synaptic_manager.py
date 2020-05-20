@@ -119,7 +119,8 @@ class TestSynapticManager(unittest.TestCase):
 
         synaptic_manager = SynapticManager(
             n_synapse_types=2, ring_buffer_sigma=5.0, spikes_per_second=100.0,
-            min_weights=None, config=config,
+            min_weights=None, weight_random_sigma=None,
+            max_stdp_spike_delta=None, config=config,
             population_table_type=MockMasterPopulationTable(
                 {key: [(1, 0, False)]}),
             synapse_io=MockSynapseIO())
@@ -173,7 +174,8 @@ class TestSynapticManager(unittest.TestCase):
 
         synaptic_manager = SynapticManager(
             n_synapse_types=2, ring_buffer_sigma=5.0, spikes_per_second=100.0,
-            min_weights=None, config=config,
+            min_weights=None, weight_random_sigma=None,
+            max_stdp_spike_delta=None, config=config,
             population_table_type=MockMasterPopulationTable(
                 {key: [(1, 0, True), (1, n_rows * 4, True)]}),
             synapse_io=MockSynapseIO())
@@ -288,8 +290,9 @@ class TestSynapticManager(unittest.TestCase):
         spec.reserve_memory_region(synapse_region, all_syn_block_sz)
 
         synaptic_manager = SynapticManager(
-            n_synapse_types=2, ring_buffer_sigma=5.0,
-            spikes_per_second=100.0, min_weights=None, config=config)
+            n_synapse_types=2, ring_buffer_sigma=5.0, spikes_per_second=100.0,
+            min_weights=None, weight_random_sigma=None,
+            max_stdp_spike_delta=None, config=config)
         synaptic_manager._write_synaptic_matrix_and_master_population_table(
             spec, [post_vertex_slice], post_slice_index, post_vertex,
             post_vertex_slice, all_syn_block_sz, weight_scales,
@@ -402,8 +405,9 @@ class TestSynapticManager(unittest.TestCase):
         config = conf_loader.load_config(
             AbstractSpiNNakerCommon.CONFIG_FILE_NAME, default_config_paths)
         synaptic_manager = SynapticManager(
-            n_synapse_types=2, ring_buffer_sigma=5.0,
-            spikes_per_second=100.0, min_weights=None, config=config)
+            n_synapse_types=2, ring_buffer_sigma=5.0, spikes_per_second=100.0,
+            min_weights=None, weight_random_sigma=None,
+            max_stdp_spike_delta=None, config=config)
 
         static = SynapseDynamicsStatic()
         stdp = SynapseDynamicsSTDP(
@@ -494,8 +498,9 @@ class TestSynapticManager(unittest.TestCase):
 
         # Try starting again to get a couple more combinations
         synaptic_manager = SynapticManager(
-            n_synapse_types=2, ring_buffer_sigma=5.0,
-            spikes_per_second=100.0, min_weights=None, config=config)
+            n_synapse_types=2, ring_buffer_sigma=5.0, spikes_per_second=100.0,
+            min_weights=None, weight_random_sigma=None,
+            max_stdp_spike_delta=None, config=config)
 
         # STDP followed by structural STDP should result in Structural STDP
         synaptic_manager.synapse_dynamics = stdp
@@ -515,8 +520,9 @@ class TestSynapticManager(unittest.TestCase):
 
         # One more time!
         synaptic_manager = SynapticManager(
-            n_synapse_types=2, ring_buffer_sigma=5.0,
-            spikes_per_second=100.0, min_weights=None, config=config)
+            n_synapse_types=2, ring_buffer_sigma=5.0, spikes_per_second=100.0,
+            min_weights=None, weight_random_sigma=None,
+            max_stdp_spike_delta=None, config=config)
 
         # Static followed by static structural should result in static
         # structural
@@ -551,8 +557,9 @@ class TestSynapticManager(unittest.TestCase):
 
         # OK, just one more, honest
         synaptic_manager = SynapticManager(
-            n_synapse_types=2, ring_buffer_sigma=5.0,
-            spikes_per_second=100.0, min_weights=None, config=config)
+            n_synapse_types=2, ring_buffer_sigma=5.0, spikes_per_second=100.0,
+            min_weights=None, weight_random_sigma=None,
+            max_stdp_spike_delta=None, config=config)
         synaptic_manager.synapse_dynamics = static_struct
         synaptic_manager.synapse_dynamics = stdp_struct
 
