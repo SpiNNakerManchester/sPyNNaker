@@ -44,6 +44,9 @@ class SynapseDynamicsStructuralCommon(object):
         "__initial_delay",
         # Maximum fan-in per target layer neuron
         "__s_max",
+        # with_replacement, i.e. whether a new synapse can be formed in the
+        # same place as an existing connection
+        "__with_replacement",
         # The seed
         "__seed",
         # Holds initial connectivity as defined via connector
@@ -68,11 +71,11 @@ class SynapseDynamicsStructuralCommon(object):
         "__elimination"
     ]
 
-    # 7 32-bit numbers (fast; p_rew; s_max; app_no_atoms; machine_no_atoms;
-    # low_atom; high_atom) + 2 4-word RNG seeds (shared_seed; local_seed)
-    # + 1 32-bit number (no_pre_pops)
+    # 8 32-bit numbers (fast; p_rew; s_max; app_no_atoms; machine_no_atoms;
+    # low_atom; high_atom; with_replacement) + 2 4-word RNG seeds (shared_seed;
+    # local_seed) + 1 32-bit number (no_pre_pops)
     REWIRING_DATA_SIZE = (
-        (7 * BYTES_PER_WORD) + (2 * 4 * BYTES_PER_WORD) + BYTES_PER_WORD)
+        (8 * BYTES_PER_WORD) + (2 * 4 * BYTES_PER_WORD) + BYTES_PER_WORD)
 
     # Size excluding key_atom_info (as variable length)
     # 4 16-bit numbers (no_pre_vertices; sp_control; delay_lo; delay_hi)
@@ -93,7 +96,7 @@ class SynapseDynamicsStructuralCommon(object):
 
     def __init__(
             self, partner_selection, formation, elimination, f_rew,
-            initial_weight, initial_delay, s_max, seed):
+            initial_weight, initial_delay, s_max, seed, with_replacement):
         """
 
         :param partner_selection: The partner selection rule
@@ -110,6 +113,11 @@ class SynapseDynamicsStructuralCommon(object):
         :type s_max: int
         :param seed: seed the random number generators
         :type seed: int
+        :param with_replacement:\
+            If set to True, a new synapse can be formed in a location where
+            a connection already exists; if False, then it must form where no
+            connection already exists
+        :type with_replacement: bool
         """
         self.__partner_selection = partner_selection
         self.__formation = formation
@@ -120,6 +128,7 @@ class SynapseDynamicsStructuralCommon(object):
         self.__initial_delay = initial_delay
         self.__s_max = s_max
         self.__seed = seed
+        self.__with_replacement = with_replacement
         self.__connections = dict()
 
         self.__actual_row_max_length = self.__s_max
@@ -264,6 +273,8 @@ class SynapseDynamicsStructuralCommon(object):
         spec.write_value(data=post_slice.n_atoms)
         spec.write_value(data=post_slice.lo_atom)
         spec.write_value(data=post_slice.hi_atom)
+        # write with_replacement
+        spec.write_value(data=self.__with_replacement)
 
         # Generate a seed for the RNG on chip that is the same for all
         # of the cores that have perform structural updates.

@@ -47,6 +47,11 @@ class SynapseDynamicsStructuralStatic(
     :type initial_delay: float or (float, float)
     :param s_max: Maximum fan-in per target layer neuron
     :type s_max: int
+    :param with_replacement:\
+        If set to True, a new synapse can be formed in a location where
+        a connection already exists; if False, then it must form where no
+        connection already exists
+    :type with_replacement: bool
     :param seed: seed the random number generators
     :type seed: int
     :param weight: The weight of connections formed by the connector
@@ -59,7 +64,7 @@ class SynapseDynamicsStructuralStatic(
             f_rew=CommonSP.DEFAULT_F_REW,
             initial_weight=CommonSP.DEFAULT_INITIAL_WEIGHT,
             initial_delay=CommonSP.DEFAULT_INITIAL_DELAY,
-            s_max=CommonSP.DEFAULT_S_MAX, seed=None,
+            s_max=CommonSP.DEFAULT_S_MAX, with_replacement=True, seed=None,
             weight=0.0, delay=1.0):
 
         super(SynapseDynamicsStructuralStatic, self).__init__(
@@ -67,7 +72,7 @@ class SynapseDynamicsStructuralStatic(
 
         self.__common_sp = CommonSP(
             partner_selection, formation, elimination, f_rew, initial_weight,
-            initial_delay, s_max, seed)
+            initial_delay, s_max, seed, with_replacement)
 
     @overrides(SynapseDynamicsStatic.merge)
     def merge(self, synapse_dynamics):
