@@ -329,7 +329,8 @@ void timer_callback(uint timer_count, uint unused) {
     }
     // otherwise do synapse and neuron time step updates
 
-    io_printf(IO_BUF, "\n\n\ntimestep %d\n", time);
+    io_printf(IO_BUF, "\n\ntimestep %d\n", time);
+
     synapses_do_timestep_update(time);
     neuron_do_timestep_update(time, timer_count, timer_period);
 
