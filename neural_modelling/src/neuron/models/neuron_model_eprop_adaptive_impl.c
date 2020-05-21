@@ -100,7 +100,9 @@ state_t neuron_model_state_update(
 
 //    neuron->psi = neuron->psi << 10;
 
-    REAL rho = expk(-1.k / 1000.k); // adpt
+    REAL rho = neuron->rho;//expk(-1.k / 1500.k); // adpt
+//    REAL rho_2 = (accum)decay_s1615(1000.k, neuron->adpt);
+//    io_printf(IO_BUF, "1:%k, 2:%k, 3:%k\n", rho, rho_2, neuron->rho);
 
 
     neuron->L = learning_signal * neuron->w_fb;
