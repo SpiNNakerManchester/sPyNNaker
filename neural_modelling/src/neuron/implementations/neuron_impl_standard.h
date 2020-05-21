@@ -324,36 +324,8 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
 __attribute__((unused)) // Marked unused as only used sometimes
 static void neuron_impl_record_structural(
-		uint32_t neuron_index, uint32_t changed, uint32_t rec_value) {
-//	use(changed);
-	// We actually want to record 3 values here:
-	// a) the pre-neuron id; b) the post-neuron id; c) whether added or removed
-	// (c) can be a single bit; (b) has a max of 255 on core (at present), so max 7 bits
-	// which leaves (a), which I guess should be 24 bits to make it up to 32
-//	uint32_t record_this = 0;
-//	if (added > 0) {
-//		uint32_t pre_id = 8000000;
-//		uint32_t post_id = 250;
-//		uint32_t add = 1;
-//		record_this = (add << 0) | (post_id << 1) | (pre_id << 9);
-//	} else if (removed > 0) {
-//		uint32_t pre_id = 8000;
-//		uint32_t post_id = 25;
-//		uint32_t add = 0;
-//		record_this = (add << 0) | (post_id << 1) | (pre_id << 9);
-//	} else {
-//		uint32_t pre_id = 8;
-//		uint32_t post_id = 50;
-//		uint32_t add = 0;
-//		record_this = (add << 0) | (post_id << 1) | (pre_id << 9);
-//	}
-//	io_printf(IO_BUF, "record_structural: index %u added %u removed %u record_this %u \n",
-//			neuron_index, added, removed, record_this);
-	if (changed == 1) {
-		neuron_recording_record_int32(STRUCT_PL_RECORDING_INDEX, neuron_index, rec_value);
-	} else {
-		neuron_recording_record_int32(STRUCT_PL_RECORDING_INDEX, neuron_index, -1);
-	}
+		uint32_t neuron_index, int32_t rec_value) {
+	neuron_recording_record_int32(STRUCT_PL_RECORDING_INDEX, neuron_index, rec_value);
 }
 
 //! \brief stores neuron parameter back into sdram

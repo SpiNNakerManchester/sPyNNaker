@@ -36,8 +36,8 @@ static uint32_t synapse_type_bits;
 static uint32_t synapse_type_mask;
 
 typedef struct structural_rec_t {
-    uint32_t recorded_val;
-    uint32_t changed;
+    int32_t recorded_val;
+//    uint32_t changed;
 } structural_rec_t;
 
 typedef struct structural_rec_t* structural_rec_pointer_t;
@@ -59,8 +59,10 @@ address_t synapse_dynamics_initialise(
             return false;
         }
         for (uint32_t i = 0; i < n_neurons; i++) {
-        	structural_rec_array[i].changed = 0;
-        	structural_rec_array[i].recorded_val = 0;
+//        	structural_rec_array[i].changed = 0;
+        	structural_rec_array[i].recorded_val = -1;
+        	log_info("structural_rec_array[%u].recorded_val = %d",
+        			i, structural_rec_array[i].recorded_val);
         }
     }
 
@@ -173,7 +175,9 @@ bool synapse_dynamics_remove_neuron(
     // Decrement FF
     fixed_region[0] = fixed_region[0] - 1;
 
-    structural_rec_array[pre_id].changed = 1;
+    // Create recorded value
+    // (bottom bit: added/removed, next 8: local_id, remainder: other id)
+//    structural_rec_array[pre_id].changed = 1;
 	structural_rec_array[pre_id].recorded_val = (0 << 0) | (post_id << 1) | (pre_id << 9);
 
     return true;
@@ -208,7 +212,7 @@ bool synapse_dynamics_add_neuron(
 
     // Create recorded value
     // (bottom bit: added/removed, next 8: local_id, remainder: other id)
-    structural_rec_array[pre_id].changed = 1;
+//    structural_rec_array[pre_id].changed = 1;
     structural_rec_array[pre_id].recorded_val = (1 << 0) | (id << 1) | (pre_id << 9);
 
     return true;
@@ -236,20 +240,20 @@ uint32_t synapse_dynamics_n_connections_in_row(address_t fixed) {
 //	}
 //}
 
-void synapse_dynamics_changes(uint32_t n_neurons, uint32_t* changed) {
-//	uint32_t removed[n_neurons];
-	for (uint32_t i=0; i < n_neurons; i++) {
-		changed[i] = structural_rec_array[i].changed;
-		// reset value
-		structural_rec_array[i].changed = 0;
-	}
-}
+//void synapse_dynamics_changes(uint32_t n_neurons, uint32_t* changed) {
+////	uint32_t removed[n_neurons];
+//	for (uint32_t i=0; i < n_neurons; i++) {
+//		changed[i] = structural_rec_array[i].changed;
+//		// reset value
+//		structural_rec_array[i].changed = 0;
+//	}
+//}
 
-void synapse_dynamics_recording_values(uint32_t n_neurons, uint32_t* rec_values) {
+void synapse_dynamics_recording_values(uint32_t n_neurons, int32_t* rec_values) {
 //	uint32_t removed[n_neurons];
 	for (uint32_t i=0; i < n_neurons; i++) {
 		rec_values[i] = structural_rec_array[i].recorded_val;
 		// reset value
-		structural_rec_array[i].recorded_val = 0;
+		structural_rec_array[i].recorded_val = -1;
 	}
 }

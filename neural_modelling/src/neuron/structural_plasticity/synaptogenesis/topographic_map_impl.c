@@ -280,8 +280,18 @@ bool synaptogenesis_row_restructure(uint32_t time, address_t row) {
             log_debug("row is full");
             return_value = false;
         } else {
-            return_value = synaptogenesis_formation_rule(current_state,
-                formation_params[current_state->post_to_pre.pop_index], time, row);
+        	// Check that the post-neuron isn't already in the row
+        	if (!synapse_dynamics_find_neuron(
+        			current_state->post_syn_id, row,
+        	        &(current_state->weight), &(current_state->delay),
+        	        &(current_state->offset), &(current_state->synapse_type))) {
+        		return_value = synaptogenesis_formation_rule(current_state,
+        				formation_params[current_state->post_to_pre.pop_index], time, row);
+        	} else {
+        		log_info("Post neuron %u already in row, synapse can't be formed again",
+        				current_state->post_syn_id);
+        		return_value = false;
+        	}
         }
     }
 

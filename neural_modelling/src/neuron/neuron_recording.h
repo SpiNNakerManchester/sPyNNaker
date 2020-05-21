@@ -156,12 +156,12 @@ static inline void neuron_recording_record_int32(
     data[index] = value;
 }
 
-static inline void neuron_recording_record_uint32(
-        uint32_t var_index, uint32_t neuron_index, uint32_t value) {
-    uint8_t index = neuron_recording_indexes[var_index][neuron_index];
-    uint32_t *data = (uint32_t *) recording_values[var_index];
-    data[index] = value;
-}
+//static inline void neuron_recording_record_uint32(
+//        uint32_t var_index, uint32_t neuron_index, uint32_t value) {
+//    uint8_t index = neuron_recording_indexes[var_index][neuron_index];
+//    uint32_t *data = (uint32_t *) recording_values[var_index];
+//    data[index] = value;
+//}
 
 
 //! \brief stores a recording of a set bit; this is the only way to set a bit
@@ -173,6 +173,8 @@ static inline void neuron_recording_record_bit(
     // Record the bit
     uint32_t index = bitfield_recording_indexes[var_index][neuron_index];
     bit_field_set(bitfield_values[var_index], index);
+    log_info("neuron_recording_record_bit, var index %u neuron_index %u index %u bitfield_value %u",
+    		var_index, neuron_index, index, bitfield_values[var_index][index >> 5]); // see bit_field_set in bit_field.h)
 }
 
 //! \brief does the recording process of handing over to basic recording
@@ -186,10 +188,19 @@ static inline void neuron_recording_record(uint32_t time) {
             // Reset the count
             rec_info->count = 1;
 
-//            if (i == STRUCT_PL_RECORDING_INDEX) {
-//            	// don't record if no change happened
-//
-//            }
+            if ((i - 1) == 3) { // STRUCT_PL_RECORDING_INDEX...
+            	//
+                log_info("element_size %u, rate %u, count %u, increment %u, size %u, test %u",
+                		rec_info->element_size, rec_info->rate, rec_info-> count,
+						rec_info->increment, rec_info->size, (uint32_t) -1);
+            	// don't record if no change happened ?
+//            	for (uint32_t n = 0; n < rec_info->size; n++) {
+//            		accum value = (accum) rec_info->values[n];
+            	log_info("rec_info->values->time = %u rec_info->values->data[0] = %u rec_info->values->data[1] = %u",
+            			rec_info->values->time, rec_info->values->data[0], rec_info->values->data[1]);
+//            	}
+            	log_info("END...");
+            }
 
             // Note we are recording
             n_recordings_outstanding += 1;

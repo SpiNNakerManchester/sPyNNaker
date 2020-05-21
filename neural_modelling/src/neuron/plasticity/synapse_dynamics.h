@@ -91,7 +91,7 @@ bool synapse_dynamics_add_neuron(
 //! \return uint32_t: The number of connections in the row
 uint32_t synapse_dynamics_n_connections_in_row(address_t fixed);
 
-void synapse_dynamics_changes(uint32_t n_neurons, uint32_t* changed);
-void synapse_dynamics_recording_values(uint32_t n_neurons, uint32_t* rec_values);
+//void synapse_dynamics_changes(uint32_t n_neurons, uint32_t* changed);
+void synapse_dynamics_recording_values(uint32_t n_neurons, int32_t* rec_values);
 
 #endif // _SYNAPSE_DYNAMICS_H_

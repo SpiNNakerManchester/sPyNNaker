@@ -80,8 +80,7 @@ void neuron_add_inputs(
         index_t synapse_type_index, index_t neuron_index,
         input_t weights_this_timestep);
 
-void neuron_record_structural(
-		uint32_t neuron_index, uint32_t changed, uint32_t rec_value);
+void neuron_record_structural(uint32_t neuron_index, int32_t rec_value);
 
 #if LOG_LEVEL >= LOG_DEBUG
 void neuron_print_inputs(void);
