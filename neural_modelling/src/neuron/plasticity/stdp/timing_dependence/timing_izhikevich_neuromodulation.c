@@ -31,8 +31,7 @@ int16_lut *tau_d_lookup;
 //---------------------------------------
 address_t timing_initialise(address_t address) {
 
-    log_info("timing_initialise: starting");
-    log_info("\tSTDP neuromodulated Izhikevich rule");
+    log_debug("\tSTDP neuromodulated Izhikevich rule");
 
     // Copy LUTs from following memory
     address_t lut_address = address;
