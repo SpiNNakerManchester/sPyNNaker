@@ -156,10 +156,8 @@ static inline const char *synapse_types_get_type_char(
 //! \return Nothing
 static inline void synapse_types_print_input(
         synapse_param_pointer_t parameter) {
-    io_printf(
-        IO_BUF, "%12.6k - %12.6k",
-        parameter->input_buffer_excitatory_value,
-        parameter->input_buffer_inhibitory_value);
+    log_debug("%12.6k - %12.6k", parameter->input_buffer_excitatory_value,
+    		parameter->input_buffer_inhibitory_value);
 }
 
 static inline void synapse_types_print_parameters(synapse_param_t *parameters) {

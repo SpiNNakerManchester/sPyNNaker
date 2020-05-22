@@ -268,7 +268,7 @@ bool synaptogenesis_row_restructure(uint32_t time, address_t row) {
                 elimination_params[current_state->post_to_pre.pop_index],
                 time, row);
         } else {
-            log_info("Post neuron %u not in row", current_state->post_syn_id);
+            log_debug("Post neuron %u not in row", current_state->post_syn_id);
             return_value = false;
         }
     } else {
