@@ -162,7 +162,7 @@ static void neuron_impl_load_neuron_parameters(
 
     // Read the number of steps per timestep
     n_steps_per_timestep = address[next];
-    log_info("Looping over %u steps each timestep", n_steps_per_timestep);
+    log_debug("Looping over %u steps each timestep", n_steps_per_timestep);
     next += 1;
 
     if (sizeof(global_neuron_params_t)) {

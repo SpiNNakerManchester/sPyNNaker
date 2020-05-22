@@ -54,7 +54,5 @@ address_t timing_initialise(address_t address) {
 			tau_c_lookup->values[0], tau_c_lookup->values[1],
 			tau_d_lookup->values[0], tau_d_lookup->values[1]);
 
-    log_info("timing_initialise: completed successfully");
-
     return lut_address;
 }
