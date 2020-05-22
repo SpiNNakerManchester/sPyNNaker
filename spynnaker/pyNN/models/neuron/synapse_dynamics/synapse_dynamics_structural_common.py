@@ -114,9 +114,9 @@ class SynapseDynamicsStructuralCommon(object):
         :param seed: seed the random number generators
         :type seed: int
         :param with_replacement:\
-            If set to True, a new synapse can be formed in a location where
-            a connection already exists; if False, then it must form where no
-            connection already exists
+            If set to True (default), a new synapse can be formed in a\
+            location where a connection already exists; if False, then it\
+            must form where no connection already exists
         :type with_replacement: bool
         """
         self.__partner_selection = partner_selection
