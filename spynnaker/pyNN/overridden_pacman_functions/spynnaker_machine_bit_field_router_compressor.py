@@ -15,7 +15,6 @@
 
 import logging
 
-from pacman.model.placements import Placement
 from spinn_front_end_common.abstract_models.\
     abstract_supports_bit_field_generation import \
     AbstractSupportsBitFieldGeneration
