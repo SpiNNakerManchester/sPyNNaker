@@ -63,6 +63,7 @@ struct neuron_provenance {
     uint32_t n_plastic_synaptic_weight_saturations;
     uint32_t n_rewires;
     uint32_t n_packets_dropped_from_lateness;
+    uint32_t spike_processing_get_max_filled_input_buffer_size;
 };
 
 //! values for the priority for each callback
@@ -117,6 +118,8 @@ void c_main_store_provenance_data(address_t provenance_region) {
     prov->n_rewires = spike_processing_get_successful_rewires();
     prov->n_packets_dropped_from_lateness =
         spike_processing_get_n_packets_dropped_from_lateness();
+    prov->spike_processing_get_max_filled_input_buffer_size =
+        spike_processing_get_max_filled_input_buffer_size();
     log_debug("finished other provenance data");
 }
 

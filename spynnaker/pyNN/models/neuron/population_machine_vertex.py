@@ -52,6 +52,8 @@ class PopulationMachineVertex(
         # the number of packets that were dropped as they arrived too late
         # to be processed
         N_LATE_SPIKES = 6
+        # the max filled size of the input buffer
+        INPUT_BUFFER_FILLED_SIZE = 7
 
     SATURATION_COUNT_NAME = "Times_synaptic_weights_have_saturated"
     SATURATION_COUNT_MESSAGE = (
@@ -91,6 +93,8 @@ class PopulationMachineVertex(
         " a given time step. "
         "Try increasing the time_scale_factor located within the "
         ".spynnaker.cfg file or in the pynn.setup() method.")
+
+    _MAX_FILLED_SIZE_OF_INPUT_BUFFER_NAME = "Max_filled_size_input_buffer"
 
     PROFILE_TAG_LABELS = {
         0: "TIMER",
@@ -160,6 +164,8 @@ class PopulationMachineVertex(
             self.EXTRA_PROVENANCE_DATA_ENTRIES.N_REWIRES.value]
         n_late_packets = provenance_data[
             self.EXTRA_PROVENANCE_DATA_ENTRIES.N_LATE_SPIKES.value]
+        input_buffer_max_filled_size = provenance_data[
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.INPUT_BUFFER_FILLED_SIZE.value]
 
         label, x, y, p, names = self._get_placement_details(placement)
 
@@ -195,6 +201,10 @@ class PopulationMachineVertex(
             self._add_name(names, self._N_LATE_SPIKES_NAME),
             n_late_packets, report=n_late_packets > 0,
             message=late_message.format(n_late_packets, label, x, y, p)))
+
+        provenance_items.append(ProvenanceDataItem(
+            self._add_name(names, self._MAX_FILLED_SIZE_OF_INPUT_BUFFER_NAME),
+            input_buffer_max_filled_size, report=False))
 
         return provenance_items
 

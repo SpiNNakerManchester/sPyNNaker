@@ -59,6 +59,7 @@ static uint32_t recording_flags = 0;
 //! parameters that reside in the neuron_parameter_data_region
 struct neuron_parameters {
     uint32_t core_index;
+    uint32_t neuron_mask;
     uint32_t time_between_spikes;
     uint32_t has_key;
     uint32_t transmission_key;
@@ -69,6 +70,10 @@ struct neuron_parameters {
 
 #define START_OF_GLOBAL_PARAMETERS \
     (sizeof(struct neuron_parameters) / sizeof(uint32_t))
+
+// 80000 = 40 * n cores (200) * n neurons per core (10) (1 packet per reception per pop)
+// 160000 = 40 * n cores (200) * n neurons per core (10) * n pops receiving from (2) (1 packet per reception)
+#define CPU_CYCLES_PER_INTERRUPT_TO_CALLBACK 2500
 
 //! \brief does the memory copy for the neuron parameters
 //! \param[in] address: the address where the neuron parameters are stored
@@ -120,11 +125,7 @@ bool neuron_initialise(address_t address, address_t recording_address, // EXPORT
     n_neurons = params->n_neurons_to_simulate;
     *n_neurons_value = n_neurons;
     *n_synapse_types_value = params->n_synapse_types;
-    if (is_power_of_2(n_neurons + 1)) {
-        n_neurons_mask = n_neurons;
-    } else {
-        n_neurons_mask = next_power_of_2(n_neurons + 1) - 1;
-    }
+    n_neurons_mask = params->neuron_mask;
 
     // Read the size of the incoming spike buffer to use
     *incoming_spike_buffer_size = params->incoming_spike_buffer_size;
@@ -143,7 +144,8 @@ bool neuron_initialise(address_t address, address_t recording_address, // EXPORT
     }
 
     // setup recording region
-    if (!neuron_recording_initialise(recording_address, &recording_flags, n_neurons)) {
+    if (!neuron_recording_initialise(
+            recording_address, &recording_flags, n_neurons)) {
         return false;
     }
 
@@ -172,7 +174,7 @@ void neuron_pause(address_t address) { // EXPORTED
 void neuron_do_timestep_update( // EXPORTED
         timer_t time, uint timer_count, uint timer_period) {
     // Set the next expected time to wait for between spike sending
-    expected_time = (sv->cpu_clk * timer_period) - next_delta * sv->cpu_clk;
+    expected_time = (sv->cpu_clk * timer_period) - ((next_delta * sv->cpu_clk));
     next_delta = (next_delta + 1) & n_neurons_mask;
 
 
@@ -203,7 +205,8 @@ void neuron_do_timestep_update( // EXPORTED
                         (tc[T1_COUNT] > expected_time)) {
                     // Do Nothing
                 }
-                expected_time -= (time_between_spikes + (next_delta * sv->cpu_clk));
+                expected_time -= (
+                    time_between_spikes + (next_delta * sv->cpu_clk));
                 next_delta = (next_delta + 1) & n_neurons_mask;
 
                 // Send the spike

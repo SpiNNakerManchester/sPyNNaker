@@ -87,6 +87,9 @@ static uint32_t n_successful_rewires = 0;
 //! arrival
 uint32_t count_input_buffer_packets_lost = 0;
 
+//! tracker of how full the input buffer got.
+uint32_t biggest_fill_size_of_input_buffer = 0;
+
 //! bool that governs if we should clear packets from the input buffer at the
 //! end of a timer tick.
 static bool clear_input_buffers_of_late_packets = false;
@@ -149,6 +152,13 @@ static inline bool is_something_to_do(
         return true;
     }
     cpsr = spin1_int_disable();
+
+    // track for provenance
+    uint32_t input_buffer_filled_size = in_spikes_real_size();
+    if (biggest_fill_size_of_input_buffer < input_buffer_filled_size) {
+        biggest_fill_size_of_input_buffer = input_buffer_filled_size;
+    }
+
     // Are there any more spikes to process?
     while (in_spikes_get_next_spike(spike)) {
         // Enable interrupts while looking up in the master pop table,
@@ -429,6 +439,13 @@ uint32_t spike_processing_get_successful_rewires(void) { // EXPORTED
 //! \return the number of packets dropped.
 uint32_t spike_processing_get_n_packets_dropped_from_lateness(void) { // EXPORTED
     return count_input_buffer_packets_lost;
+}
+
+//! \brief returns how many packets were at max inside the input buffer at
+//! any given point.
+//! \return the max size the input buffer reached
+uint32_t spike_processing_get_max_filled_input_buffer_size(void) {
+    return biggest_fill_size_of_input_buffer;
 }
 
 //! \brief set the number of times spike_processing has to attempt rewiring

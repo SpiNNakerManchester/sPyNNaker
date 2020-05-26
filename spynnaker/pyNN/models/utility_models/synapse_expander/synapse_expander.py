@@ -84,10 +84,12 @@ def synapse_expander(
             [CPUState.FINISHED])
         progress.update()
         finished = True
+        progress.end()
+
         _fill_in_connection_data(
             gen_on_machine_vertices, graph_mapper, placements, transceiver)
         _extract_iobuf(expander_cores, transceiver, provenance_file_path)
-        progress.end()
+
     except Exception:  # pylint: disable=broad-except
         logger.exception("Synapse expander has failed")
         _handle_failure(
@@ -155,7 +157,11 @@ def _fill_in_connection_data(
     ctl = globals_variables.get_simulator()
     use_extra_monitors = False
 
-    for vertex in gen_on_machine_vertices:
+    progress_bar = ProgressBar(
+        len(gen_on_machine_vertices),
+        "reading back synaptic data required for connection holders")
+
+    for vertex in progress_bar.over(gen_on_machine_vertices):
         conn_holders = vertex.get_connection_holders()
         for (app_edge, synapse_info), conn_holder_list in iteritems(
                 conn_holders):
@@ -180,3 +186,5 @@ def _fill_in_connection_data(
                         use_extra_monitors)
                     for conn_holder in conn_holder_list:
                         conn_holder.add_connections(conns)
+                for conn_holder in conn_holder_list:
+                    conn_holder.finish()

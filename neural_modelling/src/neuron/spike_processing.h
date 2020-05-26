@@ -47,4 +47,9 @@ uint32_t spike_processing_get_n_packets_dropped_from_lateness(void);
 //! \brief clears the input buffer of packets and records them
 void spike_processing_clear_input_buffer(void);
 
+//! \brief returns how many packets were at max inside the input buffer at
+//! any given point.
+//! \return the max size the input buffer reached
+uint32_t spike_processing_get_max_filled_input_buffer_size(void);
+
 #endif // _SPIKE_PROCESSING_H_

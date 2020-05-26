@@ -15,6 +15,7 @@
 
 import logging
 import os
+import math
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
@@ -63,7 +64,7 @@ _C_MAIN_BASE_SDRAM_USAGE_IN_BYTES = 18 * BYTES_PER_WORD
 _C_MAIN_BASE_N_CPU_CYCLES = 0
 
 # The microseconds per timestep will be divided by this to get the max offset
-_MAX_OFFSET_DENOMINATOR = 10
+_MAX_OFFSET_DENOMINATOR = 0.5
 
 
 class AbstractPopulationVertex(
@@ -98,7 +99,8 @@ class AbstractPopulationVertex(
         "__n_data_specs",
         "__initial_state_variables",
         "__has_reset_last",
-        "__updated_state_variables"]
+        "__updated_state_variables",
+        "__pop_level_spike_control"]
 
     BASIC_MALLOC_USAGE = 2
 
@@ -106,9 +108,9 @@ class AbstractPopulationVertex(
     RUNTIME_SDP_PORT_SIZE = BYTES_PER_WORD
 
     # 7 elements before the start of global parameters
-    # 1. core_index, 2. micro secs before spike, 3. has key, 4. key,
-    # 5. n atoms, 6. n synapse types, 7. incoming spike buffer size.
-    BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 7 * BYTES_PER_WORD
+    # 1. core_index, 2. cycle mask 3. micro secs before spike, 4. has key,
+    # 5. key, 6. n atoms, 7. n synapse types, 8. incoming spike buffer size.
+    BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 8 * BYTES_PER_WORD
 
     _n_vertices = 0
 
@@ -116,6 +118,7 @@ class AbstractPopulationVertex(
             self, n_neurons, label, constraints, max_atoms_per_core,
             spikes_per_second, ring_buffer_sigma, incoming_spike_buffer_size,
             neuron_impl, pynn_model, drop_late_spikes):
+
         # pylint: disable=too-many-arguments, too-many-locals
         super(AbstractPopulationVertex, self).__init__(
             label, constraints, max_atoms_per_core)
@@ -166,6 +169,9 @@ class AbstractPopulationVertex(
         # Set up for profiling
         self.__n_profile_samples = helpful_functions.read_config_int(
             config, "Reports", "n_profile_samples")
+
+        self.__pop_level_spike_control = helpful_functions.read_config_int(
+            config, "Simulation", "pop_spike_quantity")
 
     @property
     @overrides(ApplicationVertex.n_atoms)
@@ -362,10 +368,31 @@ class AbstractPopulationVertex(
         # Write the index of this core
         spec.write_value(vertex_index)
 
+        # mask to ensure only so many fire at the same time over entire pop.
+        if self.__pop_level_spike_control is None:
+            # if power of two already, can be used as mask
+            if math.log2(n_atoms + 1).is_integer():
+                spec.write_value(n_atoms)
+            else:  # not power of 2, so scale to next one and use that as mask
+                next_power_of_two = int(math.pow(2, math.ceil(
+                    math.log(n_atoms) / math.log(2))) - 1)
+                spec.write_value(next_power_of_two)
+            cut_off_point = self._MAX_OFFSET_DENOMINATOR
+        else:
+            # find the cut off point where a mask usage would ensure only
+            # a given number of cores fire at the same time
+            cut_off_point = (
+                int(self.__n_atoms / self.__pop_level_spike_control))
+            if math.log2(cut_off_point + 1).is_integer():
+                spec.write_value(cut_off_point)
+            else:
+                spec.write_value(int(math.pow(
+                    2, math.ceil(math.log(cut_off_point) / math.log(2))) - 1))
+
         # Write the number of microseconds between sending spikes on average
         time_between_spikes = (
             (machine_time_step * time_scale_factor) /
-            (n_atoms * _MAX_OFFSET_DENOMINATOR))
+            (self.n_atoms * min(cut_off_point, _MAX_OFFSET_DENOMINATOR)))
         spec.write_value(data=int(time_between_spikes))
 
         # Write whether the key is to be used, and then the key, or 0 if it

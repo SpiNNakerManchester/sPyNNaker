@@ -183,7 +183,7 @@ void synapse_dynamics_print_plastic_synapses(
     use(fixed_region_address);
     use(ring_buffer_to_input_buffer_left_shifts);
 
-#if LOG_LEVEL >= LOG_DEBUG
+
     // Extract separate arrays of weights (from plastic region),
     // Control words (from fixed region) and number of plastic synapses
     plastic_synapse_t *plastic_words = plastic_synapses(plastic_region_address);
@@ -208,7 +208,7 @@ void synapse_dynamics_print_plastic_synapses(
                 update_state);
         weight_t weight = synapse_structure_get_final_weight(final_state);
 
-        log_debug("%08x [%3d: (w: %5u (=", control_word, i, weight);
+        log_info("%08x [%3d: (w: %5u (=", control_word, i, weight);
         synapses_print_weight(
                 weight, ring_buffer_to_input_buffer_left_shifts[synapse_type]);
         log_debug("nA) d: %2u, %s, n = %3u)] - {%08x %08x}\n",
@@ -217,7 +217,7 @@ void synapse_dynamics_print_plastic_synapses(
             synapse_row_sparse_index(control_word, synapse_index_mask),
             SYNAPSE_DELAY_MASK, synapse_type_index_bits);
     }
-#endif // LOG_LEVEL >= LOG_DEBUG
+
 }
 
 //---------------------------------------
@@ -236,6 +236,10 @@ address_t synapse_dynamics_initialise(
 
     stdp_params *sdram_params = (stdp_params *) address;
     spin1_memcpy(&params, sdram_params, sizeof(stdp_params));
+
+    log_info("synapse dynamics stdp mad impl initialise");
+    log_info("backprop_delay = %d", sdram_params->backprop_delay);
+
     address = (address_t) &sdram_params[1];
 
     // Load timing dependence data
@@ -282,6 +286,16 @@ address_t synapse_dynamics_initialise(
     synapse_delay_index_type_bits =
             SYNAPSE_DELAY_BITS + synapse_type_index_bits;
     synapse_type_mask = (1 << log_n_synapse_types) - 1;
+
+    log_info("n_synapse_types_power_2 = %d", n_synapse_types_power_2);
+    log_info("log_n_synapse_types = %d", log_n_synapse_types);
+    log_info("synapse_type_index_bits = %d", synapse_type_index_bits);
+    log_info("synapse_type_index_mask = %d", synapse_type_index_mask);
+    log_info("synapse_index_bits = %d", synapse_index_bits);
+    log_info("synapse_index_mask = %d", synapse_index_mask);
+    log_info(
+        "synapse_delay_index_type_bits = %d", synapse_delay_index_type_bits);
+    log_info("synapse_type_mask = %d", synapse_type_mask);
 
     return weight_result;
 }
@@ -357,6 +371,10 @@ bool synapse_dynamics_process_plastic_synapses(
 
         uint32_t accumulation = ring_buffers[ring_buffer_index] +
                 synapse_structure_get_final_weight(final_state);
+
+        log_info(
+            "final weight = %d",
+            synapse_structure_get_final_weight(final_state));
 
         uint32_t sat_test = accumulation & 0x10000;
         if (sat_test) {
