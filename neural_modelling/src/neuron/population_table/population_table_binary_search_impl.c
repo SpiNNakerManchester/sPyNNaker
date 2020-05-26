@@ -265,7 +265,7 @@ bool population_table_get_first_address(
 //! \brief get the position in the master pop table
 //! \param[in] spike: The spike received
 //! \return the position in the master pop table
-int population_table_position_in_the_master_pop_array(spike_t spike){
+int population_table_position_in_the_master_pop_array(spike_t spike) {
     uint32_t imin = 0;
     uint32_t imax = master_population_table_length;
 
@@ -336,13 +336,13 @@ bool population_table_get_next_address(
 
 //! \brief generates how many dma's were pointless
 //! \return uint of how many were done
-uint32_t population_table_get_ghost_pop_table_searches(){
+uint32_t population_table_get_ghost_pop_table_searches(void) {
     return ghost_pop_table_searches;
 }
 
 //! \brief get the number of master pop table key misses
 //! \return the number of master pop table key misses
-uint32_t population_table_get_invalid_master_pop_hits(){
+uint32_t population_table_get_invalid_master_pop_hits(void) {
     return invalid_master_pop_hits;
 }
 
@@ -355,7 +355,7 @@ void population_table_set_connectivity_bit_field(
 
 //! \brief clears the dtcm allocated by the population table.
 //! \return bool that says if the clearing was successful or not.
-bool population_table_shut_down(){
+bool population_table_shut_down(void) {
     sark_free(address_list);
     sark_free(master_population_table);
     ghost_pop_table_searches = 0;
@@ -370,26 +370,26 @@ bool population_table_shut_down(){
 
 //! \brief length of master pop table
 //! \return length of the master pop table
-uint32_t population_table_length(){
+uint32_t population_table_length(void) {
     return master_population_table_length;
 }
 
 //! \brief gets the spike associated at a specific index
 //! \param[in] index: the index in the master pop table
 //! \return the spike
-spike_t population_table_get_spike_for_index(uint32_t index){
+spike_t population_table_get_spike_for_index(uint32_t index) {
     return master_population_table[index].key;
 }
 
 //! \brief get the mask for the entry at a specific index
 //! \param[in] index: the index in the master pop table
 //! \return the mask associated with this entry
-uint32_t population_table_get_mask_for_entry(uint32_t index){
+uint32_t population_table_get_mask_for_entry(uint32_t index) {
     return master_population_table[index].mask;
 }
 
 //! \brief get the number of packets that were filtered from the bitfield filter
 //! \return the number of packets filtered by the bitfield filter
-uint32_t population_table_get_filtered_packet_count(){
+uint32_t population_table_get_filtered_packet_count(void) {
     return bit_field_filtered_packets;
 }

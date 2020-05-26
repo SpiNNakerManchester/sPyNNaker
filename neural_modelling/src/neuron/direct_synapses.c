@@ -24,7 +24,7 @@
 static uint32_t single_fixed_synapse[SIZE_OF_SINGLE_FIXED_SYNAPSE];
 
 bool direct_synapses_initialise(
-        address_t direct_matrix_address, address_t *direct_synapses_address){
+        address_t direct_matrix_address, address_t *direct_synapses_address) {
 
     // Work out the positions of the direct and indirect synaptic matrices
     // and copy the direct matrix to DTCM
@@ -54,7 +54,7 @@ bool direct_synapses_initialise(
     return true;
 }
 
-synaptic_row_t direct_synapses_get_direct_synapse(address_t row_address){
+synaptic_row_t direct_synapses_get_direct_synapse(address_t row_address) {
     single_fixed_synapse[3] = (uint32_t) row_address[0];
     return (synaptic_row_t) single_fixed_synapse;
 }

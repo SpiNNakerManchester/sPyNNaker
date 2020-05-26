@@ -71,11 +71,11 @@ uint32_t population_table_get_invalid_master_pop_hits();
 
 //! \brief clears the dtcm allocated by the population table.
 //! \return bool that says if the clearing was successful or not.
-bool population_table_shut_down();
+bool population_table_shut_down(void);
 
 //! \brief length of master pop table
 //! \return length of the master pop table
-uint32_t population_table_length();
+uint32_t population_table_length(void);
 
 //! \brief gets the spike associated at a specific index
 //! \param[in] index: the index in the master pop table
@@ -89,6 +89,6 @@ uint32_t population_table_get_mask_for_entry(uint32_t index);
 
 //! \brief get the number of packets that were filtered from the bitfield filter
 //! \return the number of packets filtered by the bitfield filter
-uint32_t population_table_get_filtered_packet_count();
+uint32_t population_table_get_filtered_packet_count(void);
 
 #endif // _POPULATION_TABLE_H_

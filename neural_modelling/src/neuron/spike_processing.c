@@ -387,25 +387,25 @@ uint32_t spike_processing_get_buffer_overflows(void) { // EXPORTED
 
 //! \brief returns the number of ghost searches occurred
 //! \return the number of times a ghost search occurred.
-uint32_t spike_processing_get_ghost_pop_table_searches(){
+uint32_t spike_processing_get_ghost_pop_table_searches(void) {
 	return population_table_get_ghost_pop_table_searches();
 }
 
 //! \brief returns the number of master pop table failed hits
 //! \return the number of times a spike did not have a master pop table entry
-uint32_t spike_processing_get_invalid_master_pop_table_hits(){
+uint32_t spike_processing_get_invalid_master_pop_table_hits(void) {
     return population_table_get_invalid_master_pop_hits();
 }
 
 //! \brief returns the number of DMA's that were completed
 //! \return the number of DMA's that were completed.
-uint32_t spike_processing_get_dma_complete_count(){
+uint32_t spike_processing_get_dma_complete_count(void) {
     return dma_complete_count;
 }
 
 //! \brief returns the number of spikes that were processed
 //! \return the number of spikes that were processed
-uint32_t spike_processing_get_spike_processing_count(){
+uint32_t spike_processing_get_spike_processing_count(void) {
     return spike_processing_count;
 }
 

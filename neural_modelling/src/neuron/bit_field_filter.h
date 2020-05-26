@@ -26,7 +26,7 @@ bit_field_t *connectivity_bit_field;
 //! limits
 uint32_t failed_bit_field_reads = 0;
 
-static bool bit_field_filter_initialise(address_t bitfield_region_address){
+static bool bit_field_filter_initialise(address_t bitfield_region_address) {
 
     filter_region_t* filter_region = (filter_region_t*) bitfield_region_address;
 
@@ -35,10 +35,10 @@ static bool bit_field_filter_initialise(address_t bitfield_region_address){
             filter_region->n_redundancy_filters,
             filter_region->n_merged_filters);
 
-    // try allocating dtcm for starting array for bitfields
+    // try allocating DTCM for starting array for bitfields
     connectivity_bit_field =
         spin1_malloc(sizeof(bit_field_t) * population_table_length());
-    if (connectivity_bit_field == NULL){
+    if (connectivity_bit_field == NULL) {
         log_warning(
             "couldn't  initialise basic bit field holder. Will end up doing "
             "possibly more DMA's during the execution than required");
@@ -47,19 +47,24 @@ static bool bit_field_filter_initialise(address_t bitfield_region_address){
 
     // set all to NULL for when they not filled in.
     for (uint32_t cur_bit_field = 0; cur_bit_field < population_table_length();
-            cur_bit_field++){
+            cur_bit_field++) {
          connectivity_bit_field[cur_bit_field] = NULL;
     }
 
-    // try allocating dtcm for each bit field
+    // try allocating dtcm for each bit field which has some redundancy.
+    // NOTE: bitfields with no redundancy are better suited to not being read
+    // in as the master pop table will not bother checking for speed boosts.
     for (int cur_bit_field = filter_region->n_merged_filters;
             cur_bit_field < filter_region->n_redundancy_filters;
-            cur_bit_field++){
+            cur_bit_field++) {
+
         // get the key associated with this bitfield
         uint32_t key = filter_region->filters[cur_bit_field].key;
 
+        // get n words needed for this bitfield
         uint32_t n_words = get_bit_field_size(
             filter_region->filters[cur_bit_field].n_atoms);
+
         // locate the position in the array to match the master pop element.
         int position_in_array =
             population_table_position_in_the_master_pop_array(key);
@@ -69,7 +74,7 @@ static bool bit_field_filter_initialise(address_t bitfield_region_address){
         // alloc sdram into right region
         connectivity_bit_field[position_in_array] = spin1_malloc(
             sizeof(bit_field_t) * n_words);
-        if (connectivity_bit_field[position_in_array] == NULL){
+        if (connectivity_bit_field[position_in_array] == NULL) {
             log_debug(
                 "could not initialise bit field for key %d, packets with"
                 " that key will use a DMA to check if the packet targets "

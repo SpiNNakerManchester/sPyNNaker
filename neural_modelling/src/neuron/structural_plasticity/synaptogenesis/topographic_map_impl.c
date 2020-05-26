@@ -74,7 +74,7 @@ void print_post_to_pre_entry(void) {
     uint32_t n_elements =
         rewiring_data.s_max * rewiring_data.machine_no_atoms;
 
-    for (uint32_t i=0; i < n_elements; i++){
+    for (uint32_t i=0; i < n_elements; i++) {
         log_debug(
             "index %d, pop index %d, sub pop index %d, neuron_index %d",
             i, post_to_pre_table[i].pop_index,
@@ -93,7 +93,7 @@ void print_post_to_pre_entry(void) {
 //! which contains synaptic rewiring params.
 //! \return true when successful
 bool synaptogenesis_dynamics_initialise(address_t sdram_sp_address) {
-    log_info("SR init.");
+    log_debug("SR init.");
 
     uint8_t *data = sp_structs_read_in_common(
         sdram_sp_address, &rewiring_data, &pre_info, &post_to_pre_table);
@@ -103,8 +103,9 @@ bool synaptogenesis_dynamics_initialise(address_t sdram_sp_address) {
     if (rewiring_data.fast) {
         n_states = rewiring_data.p_rew;
     }
-    log_info("Rewiring period %u, fast=%u, n_states=%u",
-            rewiring_data.p_rew, rewiring_data.fast, n_states);
+    log_debug(
+        "Rewiring period %u, fast=%u, n_states=%u",
+        rewiring_data.p_rew, rewiring_data.fast, n_states);
     // Add one to number of states as buffer wastes an entry
     current_state_queue = circular_buffer_initialize(n_states + 1);
     if (current_state_queue == NULL) {
@@ -255,7 +256,7 @@ bool synaptogenesis_row_restructure(uint32_t time, address_t row) {
                 elimination_params[current_state->post_to_pre.pop_index],
                 time, row);
         } else {
-            log_info("Post neuron %d not in row\n", current_state->post_syn_id);
+            log_debug("Post neuron %d not in row\n", current_state->post_syn_id);
             return_value = false;
         }
     } else {

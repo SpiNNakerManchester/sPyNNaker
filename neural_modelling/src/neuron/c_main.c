@@ -189,7 +189,7 @@ static bool initialise(void) {
     address_t direct_synapses_address;
     if (!direct_synapses_initialise(
             data_specification_get_region(DIRECT_MATRIX_REGION, ds_regions),
-            &direct_synapses_address)){
+            &direct_synapses_address)) {
         return false;
     }
 
@@ -233,7 +233,7 @@ static bool initialise(void) {
     print_post_to_pre_entry();
     if (!bit_field_filter_initialise(
             data_specification_get_region(
-                BIT_FIELD_FILTER_REGION, ds_regions))){
+                BIT_FIELD_FILTER_REGION, ds_regions))) {
         return false;
     }
 

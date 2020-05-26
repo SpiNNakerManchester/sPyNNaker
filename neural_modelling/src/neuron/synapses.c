@@ -375,7 +375,7 @@ void synapses_flush_ring_buffers(void) {
 
 //! \brief allows clearing of dtcm used by synapses
 //! \return bool true if successful false otherwise
-bool synapses_shut_down(){
+bool synapses_shut_down(void) {
     sark_free(ring_buffer_to_input_left_shifts);
     sark_free(ring_buffers);
     num_fixed_pre_synaptic_events = 0;

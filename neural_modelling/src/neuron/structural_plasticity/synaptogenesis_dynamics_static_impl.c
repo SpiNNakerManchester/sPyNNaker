@@ -60,6 +60,6 @@ void synaptogenesis_spike_received(uint32_t time, spike_t spike) {
 }
 
 
-void print_post_to_pre_entry(void){
+void print_post_to_pre_entry(void) {
     return;
 }

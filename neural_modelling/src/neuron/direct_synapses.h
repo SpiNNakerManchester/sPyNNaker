@@ -21,7 +21,7 @@
 //! \brief setup for the direct synapses
 //! \param[in] direct_matrix_address: the sdram base address for the direct
 //                                    matrix
-//! \param[out]: direct_synapses_address: the dtcm address for the direct matrix
+//! \param[out]: direct_synapses_address: the DTCM address for the direct matrix
 //! \return: bool, that states true if successful, false otherwise.
 bool direct_synapses_initialise(
     address_t direct_matrix_address, address_t *direct_synapses_address);
