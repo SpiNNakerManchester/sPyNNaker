@@ -290,7 +290,7 @@ static inline final_state_t eprop_plasticity_update(update_state_t current_state
 
 	// Convert delta_w to int16_t (same as weight) - take only integer bits from REAL?
 //	int16_t delta_w_int = bitsk(delta_w); // THIS NEEDS UPDATING TO APPROPRIATE SCALING
-	int32_t delta_w_int = (int32_t)roundk(delta_w, 15); // THIS NEEDS UPDATING TO APPROPRIATE SCALING
+	int32_t delta_w_int = (int32_t) roundk(delta_w, 15); // THIS NEEDS UPDATING TO APPROPRIATE SCALING
 //	int16_t delta_w_int = (int) delta_w; // >> 15;
 
 
@@ -322,6 +322,7 @@ static inline final_state_t eprop_plasticity_update(update_state_t current_state
 	// Calculate regularisation error
 	REAL reg_error = (global_parameters->core_target_rate - global_parameters->core_pop_rate) / syn_dynamics_neurons_in_partition; // this needs swapping for an inverse multiply - too expensive to do divide on every spike
 //    io_printf(IO_BUF, "core_pop_rate = %k, target = %k, error = %k\n", global_parameters->core_pop_rate, global_parameters->core_target_rate, reg_error);
+
 
 
     // Return final synaptic word and weight
@@ -399,13 +400,37 @@ bool synapse_dynamics_process_plastic_synapses(
 				neuron->syn_state[syn_ind_from_delay].delta_w, time);
     	}
 
-        // Perform weight update:
-        // Go through typical weight update process to clip to limits
-        final_state_t final_state = eprop_plasticity_update(current_state,
+
+        // Perform weight update: only if batch time has elapsed
+    	final_state_t final_state;
+    	if (neuron->syn_state[syn_ind_from_delay].update_ready == 0){
+    		// enough time has elapsed - perform weight update
+    		if (PRINT_PLASTICITY){
+    			io_printf(IO_BUF, "update_ready=0\n");
+    		}
+
+            // Go through typical weight update process to clip to limits
+    		final_state = eprop_plasticity_update(current_state,
         		neuron->syn_state[syn_ind_from_delay].delta_w);
 
-        // reset delta_w as weight change has now been applied
-        neuron->syn_state[syn_ind_from_delay].delta_w = 0.0k;
+    		// reset delta_w as weight change has now been applied
+    		neuron->syn_state[syn_ind_from_delay].delta_w = 0.0k;
+
+    		// reset update_ready counter based on pattern cycle time
+    		neuron->syn_state[syn_ind_from_delay].update_ready += 10240;
+
+    	} else {
+    		if (PRINT_PLASTICITY){
+    			io_printf(IO_BUF, "update_ready: %u - no update performed\n",
+    					neuron->syn_state[syn_ind_from_delay].update_ready);
+    		}
+    		// don't update weight - get update state based on state cached in SDRAM
+    		// assume reg rate is zero to avoid
+
+    		final_state = synapse_structure_get_final_state(current_state, 0);
+    		// Don't reset delta_w -> keep this accumulating and apply weight change in future
+    	}
+
 
         // Add contribution to synaptic input
         // Convert into ring buffer offset

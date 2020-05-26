@@ -119,6 +119,12 @@ state_t neuron_model_state_update(
     	// reset input (can't have more than one spike per timestep
         neuron->syn_state[syn_ind].z_bar_inp = 0;
 
+
+    	// decrease timestep counter preventing rapid updates
+    	if (neuron->syn_state[syn_ind].update_ready > 0){
+    		neuron->syn_state[syn_ind].update_ready -= 1;
+    	}
+
     }
 
     return neuron->V_membrane;

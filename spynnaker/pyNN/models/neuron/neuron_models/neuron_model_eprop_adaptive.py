@@ -52,6 +52,7 @@ Z_BAR_OLD = "z_bar_old"
 Z_BAR = "z_bar"
 EP_A = "ep_a"
 E_BAR = "e_bar"
+UPDATE_READY = "update_ready"
 
 UNITS = {
     V: 'mV',
@@ -165,6 +166,7 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
                 DataType.S1615, # z_bar
                 DataType.S1615, # ep_a
                 DataType.S1615, # e_bar
+                DataType.UINT32 # update_ready
             ]
         # Extend to include fan-in for each neuron
         datatype_list.extend(eprop_syn_state * SYNAPSES_PER_NEURON)
@@ -249,6 +251,7 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
             state_variables[Z_BAR+str(n)] = 0
             state_variables[EP_A+str(n)] = 0
             state_variables[E_BAR+str(n)] = 0
+            state_variables[UPDATE_READY+str(n)] = 1024
 
     @overrides(AbstractNeuronModel.get_units)
     def get_units(self, variable):
@@ -301,7 +304,9 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
                               state_variables[Z_BAR_OLD+str(n)],
                               state_variables[Z_BAR+str(n)],
                               state_variables[EP_A+str(n)],
-                              state_variables[E_BAR+str(n)]]
+                              state_variables[E_BAR+str(n)],
+                              state_variables[UPDATE_READY+str(n)]
+                              ]
             # extend to appropriate fan-in
             values.extend(eprop_syn_init)  # * SYNAPSES_PER_NEURON)
 
@@ -333,11 +338,12 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
         z_bar = [0] * SYNAPSES_PER_NEURON
         ep_a = [0] * SYNAPSES_PER_NEURON
         e_bar = [0] * SYNAPSES_PER_NEURON
+        update_ready = [0] * SYNAPSES_PER_NEURON
         # Read the data
         (v, _v_rest, _r_membrane, _exp_tc, _i_offset, count_refrac,
          _v_reset, _tau_refrac, psi,
          big_b, small_b, _small_b_0, _e_to_dt_on_tau_a, _beta, adpt, scalar,
-         l, __w_fb, delta_w, z_bar_old, z_bar, ep_a, e_bar) = values
+         l, __w_fb, delta_w, z_bar_old, z_bar, ep_a, e_bar, update_ready) = values
 
         # Not sure this will work with the new array of synapse!!!
         # (Note that this function is only called if you do e.g. run(), set(),
@@ -361,6 +367,7 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
             state_variables[Z_BAR+str(n)] = z_bar[n]
             state_variables[EP_A+str(n)] = ep_a[n]
             state_variables[E_BAR+str(n)] = e_bar[n]
+            state_variables[UPDATE_READY] = update_ready[n]
 
 
     @property

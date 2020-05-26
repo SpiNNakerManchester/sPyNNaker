@@ -30,6 +30,7 @@ typedef struct eprop_syn_state_t {
 	REAL z_bar; // low-pass filtered spike train
 	REAL el_a; // adaptive component of eligibility vector
 	REAL e_bar; // low-pass filtered eligibility trace
+	uint32_t update_ready; // counter to enable batch update (i.e. don't perform on every spike).
 }eprop_syn_state_t;
 
 /////////////////////////////////////////////////////////////

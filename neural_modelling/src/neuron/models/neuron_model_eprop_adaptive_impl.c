@@ -111,7 +111,9 @@ state_t neuron_model_state_update(
 		// ******************************************************************
     	neuron->syn_state[syn_ind].z_bar =
     			neuron->syn_state[syn_ind].z_bar * neuron->exp_TC
-    			+ (1 - neuron->exp_TC) * neuron->syn_state[syn_ind].z_bar_inp; // updating z_bar is problematic, if spike could come and interrupt neuron update
+    			+
+//				(1 - neuron->exp_TC) *
+				neuron->syn_state[syn_ind].z_bar_inp; // updating z_bar is problematic, if spike could come and interrupt neuron update
 
 
 		// ******************************************************************
@@ -157,6 +159,12 @@ state_t neuron_model_state_update(
 //        }
     	// reset input (can't have more than one spike per timestep
     	neuron->syn_state[syn_ind].z_bar_inp = 0;
+
+
+    	// decrease timestep counter preventing rapid updates
+    	if (neuron->syn_state[syn_ind].update_ready > 0){
+    		neuron->syn_state[syn_ind].update_ready -= 1;
+    	}
 
 //        io_printf(IO_BUF, "eta: %k, l: %k, ebar: %k, delta_w: %k, this dt: %k\n",
 //            local_eta, neuron->L, neuron->syn_state[syn_ind].e_bar, neuron->syn_state[syn_ind].delta_w, this_dt_weight_change);
