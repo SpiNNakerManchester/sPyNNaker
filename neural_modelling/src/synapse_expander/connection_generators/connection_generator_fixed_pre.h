@@ -63,7 +63,7 @@ static void *connection_generator_fixed_pre_initialise(address_t *region) {
 
     // Initialise the RNG
     obj->rng = rng_init(region);
-    log_debug("Fixed Total Number Connector,  pre_lo = %u, pre_hi = %u, "
+    log_debug("Fixed Number Pre Connector,  pre_lo = %u, pre_hi = %u, "
     		"post_lo = %u, post_hi = %u, allow self connections = %u, "
             "with replacement = %u, n_pre = %u, n pre neurons = %u",
 			obj->params.pre_lo, obj->params.pre_hi, obj->params.post_lo, obj->params.post_hi,
@@ -113,12 +113,7 @@ uint32_t connection_generator_fixed_pre_generate(
     // If we haven't done so then do the calculations by looping over
     // the post-slices available here
     if (pre_neuron_index == 0) {
-        // Ensure the array was freed
-        if (full_indices != NULL) {
-            log_error("Created out of order!");
-            rt_error(RTE_SWERR);
-        }
-
+    
         n_pre_neurons_done = 0;
         // Allocate array for each column (i.e. post-slice on this slice)
         uint16_t (*array)[n_columns][n_conns] =
