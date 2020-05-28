@@ -30,6 +30,7 @@ typedef struct eprop_syn_state_t {
 	REAL z_bar; // low-pass filtered spike train
 	REAL el_a; // adaptive component of eligibility vector
 	REAL e_bar; // low-pass filtered eligibility trace
+	uint32_t update_ready; // counter to enable batch update (i.e. don't perform on every spike).
 }eprop_syn_state_t;
 
 /////////////////////////////////////////////////////////////
@@ -82,7 +83,6 @@ typedef struct neuron_t {
 
     REAL    L; // learning signal
     REAL w_fb; // feedback weight
-    REAL rho;
 
     // array of synaptic states - peak fan-in of 250 for this case
     eprop_syn_state_t syn_state[SYNAPSES_PER_NEURON];

@@ -46,13 +46,13 @@ SCALAR = "scalar"
 # Learning signal
 L = "learning_signal"
 W_FB = "feedback_weight"
-RHO = 'rho'
 
 DELTA_W = "delta_w"
 Z_BAR_OLD = "z_bar_old"
 Z_BAR = "z_bar"
 EP_A = "ep_a"
 E_BAR = "e_bar"
+UPDATE_READY = "update_ready"
 
 UNITS = {
     V: 'mV',
@@ -104,7 +104,6 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
         # learning signal
         "__l",
         "__w_fb",
-        "__rho",
         "__eta"
         ]
 
@@ -158,7 +157,6 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
             # Learning signal
             DataType.S1615,   #  L
             DataType.S1615,   #  w_fb
-            DataType.S1615    #  rho
             ]
 
         # Synapse states - always initialise to zero
@@ -168,6 +166,7 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
                 DataType.S1615, # z_bar
                 DataType.S1615, # ep_a
                 DataType.S1615, # e_bar
+                DataType.UINT32 # update_ready
             ]
         # Extend to include fan-in for each neuron
         datatype_list.extend(eprop_syn_state * SYNAPSES_PER_NEURON)
@@ -208,7 +207,6 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
         # learning signal
         self.__l = l
         self.__w_fb = w_fb
-        self.__rho = numpy.exp(-1. / tau_a)
 
         self.__eta = eta
 
@@ -232,7 +230,6 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
         parameters[BETA] = self.__beta
         parameters[SCALAR] = self.__scalar
         parameters[W_FB] = self.__w_fb
-        parameters[RHO] = self.__rho
 
 
     @overrides(AbstractNeuronModel.add_state_variables)
@@ -254,6 +251,7 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
             state_variables[Z_BAR+str(n)] = 0
             state_variables[EP_A+str(n)] = 0
             state_variables[E_BAR+str(n)] = 0
+            state_variables[UPDATE_READY+str(n)] = 13000
 
     @overrides(AbstractNeuronModel.get_units)
     def get_units(self, variable):
@@ -297,8 +295,7 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
                 parameters[SCALAR],
 
                 state_variables[L],
-                parameters[W_FB],
-                parameters[RHO]
+                parameters[W_FB]
                 ]
 
         # create synaptic state - init all state to zero
@@ -307,7 +304,9 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
                               state_variables[Z_BAR_OLD+str(n)],
                               state_variables[Z_BAR+str(n)],
                               state_variables[EP_A+str(n)],
-                              state_variables[E_BAR+str(n)]]
+                              state_variables[E_BAR+str(n)],
+                              state_variables[UPDATE_READY+str(n)]
+                              ]
             # extend to appropriate fan-in
             values.extend(eprop_syn_init)  # * SYNAPSES_PER_NEURON)
 
@@ -339,11 +338,12 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
         z_bar = [0] * SYNAPSES_PER_NEURON
         ep_a = [0] * SYNAPSES_PER_NEURON
         e_bar = [0] * SYNAPSES_PER_NEURON
+        update_ready = [0] * SYNAPSES_PER_NEURON
         # Read the data
         (v, _v_rest, _r_membrane, _exp_tc, _i_offset, count_refrac,
          _v_reset, _tau_refrac, psi,
          big_b, small_b, _small_b_0, _e_to_dt_on_tau_a, _beta, adpt, scalar,
-         l, __w_fb, rho, delta_w, z_bar_old, z_bar, ep_a, e_bar) = values
+         l, __w_fb, delta_w, z_bar_old, z_bar, ep_a, e_bar, update_ready) = values
 
         # Not sure this will work with the new array of synapse!!!
         # (Note that this function is only called if you do e.g. run(), set(),
@@ -367,6 +367,7 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
             state_variables[Z_BAR+str(n)] = z_bar[n]
             state_variables[EP_A+str(n)] = ep_a[n]
             state_variables[E_BAR+str(n)] = e_bar[n]
+            state_variables[UPDATE_READY] = update_ready[n]
 
 
     @property
@@ -472,11 +473,3 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
     @w_fb.setter
     def w_fb(self, new_value):
         self.__w_fb = new_value
-
-    @property
-    def rho(self):
-        return self.__w_fb
-
-    @rho.setter
-    def rho(self, new_value):
-        self.__rho = new_value

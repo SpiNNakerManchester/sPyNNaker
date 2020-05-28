@@ -4,12 +4,7 @@ from data_specification.enums import DataType
 from pacman.executor.injection_decorator import inject_items
 from .abstract_neuron_model import AbstractNeuronModel
 
-# from pacman.model.graphs.application.application_vertex import ApplicationVertex
-# from spinn_front_end_common.abstract_models.abstract_provides_n_keys_for_partition import AbstractProvidesNKeysForPartition
-# from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
-# from spynnaker.pyNN.models.neuron.implementations import NeuronImplStandard
-
-
+# constants
 SYNAPSES_PER_NEURON = 250   # around 415 with only 3 in syn_state
 MICROSECONDS_PER_SECOND = 1000000.0
 MICROSECONDS_PER_MILLISECOND = 1000.0
@@ -39,6 +34,13 @@ RATE_AT_LAST_SETTING = "rate_at_last_setting"
 RATE_ON = "rate_on"
 RATE_OFF = "rate_off"
 POISSON_POP_SIZE = 'poisson_pop_size'
+
+DELTA_W = "delta_w"
+Z_BAR_OLD = "z_bar_old"
+Z_BAR = "z_bar"
+# EP_A = "ep_a"
+# E_BAR = "e_bar"
+UPDATE_READY = "update_ready"
 
 UNITS = {
     V: 'mV',
@@ -112,13 +114,8 @@ class NeuronModelLeftRightReadout(AbstractNeuronModel):
             DataType.INT32,  # count_refrac
             DataType.S1615,  # v_reset
             DataType.INT32,  # tau_refrac
-            #### Poisson Compartment Params ####
-            # DataType.S1615,   #  REAL mean_isi_ticks
-            # DataType.S1615,   #  REAL time_to_spike_ticks
-            # DataType.INT32,    #  int32_t time_since_last_spike s
-            # DataType.S1615,   #  REAL rate_at_last_setting; s
-            # DataType.S1615   #  REAL rate_update_threshold; p
-            DataType.S1615,  # learning signal
+            # Learning signal
+            DataType.S1615,  # L
             DataType.S1615  # w_fb
         ]
 
@@ -129,6 +126,7 @@ class NeuronModelLeftRightReadout(AbstractNeuronModel):
                 DataType.S1615, # z_bar
                 # DataType.S1615, # ep_a
                 # DataType.S1615, # e_bar
+                DataType.UINT32   # update_ready
             ]
         # Extend to include fan-in for each neuron
         data_types.extend(eprop_syn_state * SYNAPSES_PER_NEURON)
@@ -212,6 +210,14 @@ class NeuronModelLeftRightReadout(AbstractNeuronModel):
         # state_variables[TIME_SINCE_LAST_SPIKE] = self._time_since_last_spike
         # state_variables[RATE_AT_LAST_SETTING] = self._rate_at_last_setting
 
+        for n in range(SYNAPSES_PER_NEURON):
+            state_variables[DELTA_W+str(n)] = 0
+            state_variables[Z_BAR_OLD+str(n)] = 0
+            state_variables[Z_BAR+str(n)] = 0
+            # state_variables[EP_A+str(n)] = 0
+            # state_variables[E_BAR+str(n)] = 0
+            state_variables[UPDATE_READY+str(n)] = 13000
+
 
     @overrides(AbstractNeuronModel.get_units)
     def get_units(self, variable):
@@ -243,9 +249,11 @@ class NeuronModelLeftRightReadout(AbstractNeuronModel):
         # create synaptic state - init all state to zero
         eprop_syn_init = [0,    # delta w
                           0,    # z_bar_inp
-                          0]#,    # z_bar
+                          0,#,    # z_bar
                           # 0,    # el_a
                           # 0]    # e_bar
+                          13000, #int(numpy.random.rand()*1024)      # update_ready
+                          ]
         # extend to appropriate fan-in
         values.extend(eprop_syn_init * SYNAPSES_PER_NEURON)
 
@@ -257,13 +265,21 @@ class NeuronModelLeftRightReadout(AbstractNeuronModel):
         # Read the data
         (_v, _v_rest, _r_membrane, _exp_tc, _i_offset, _count_refrac,
         _v_reset, _tau_refrac,
-        _l, _w_fb) = values  # Not sure this will work with the new array of synapse!!!
+        _l, _w_fb, delta_w, z_bar_old, z_bar, update_ready) = values  # Not sure this will work with the new array of synapse!!!
         # todo check alignment on this
 
         # Copy the changed data only
         state_variables[V] = _v
 
         state_variables[L] = _l
+
+        for n in range(SYNAPSES_PER_NEURON):
+            state_variables[DELTA_W+str(n)] = delta_w[n]
+            state_variables[Z_BAR_OLD+str(n)] = z_bar_old[n]
+            state_variables[Z_BAR+str(n)] = z_bar[n]
+            # state_variables[EP_A+str(n)] = ep_a[n]
+            # state_variables[E_BAR+str(n)] = e_bar[n]
+            state_variables[UPDATE_READY] = update_ready[n]
 
     # Global params
     @inject_items({"machine_time_step": "MachineTimeStep"})

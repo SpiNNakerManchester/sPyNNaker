@@ -58,6 +58,10 @@ extern key_t key;
 extern REAL learning_signal;
 static uint32_t target_ind = 0;
 
+// recording prams
+uint32_t is_it_right = 0;
+//uint32_t choice = 0;
+
 // Left right parameters
 typedef enum
 {
@@ -338,6 +342,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
         accumulative_direction = 0;
         // error params
         global_parameters->cross_entropy = 0.k;
+        learning_signal = 0.k;
         global_parameters->mean_0 = 0.k;
         global_parameters->mean_1 = 0.k;
         softmax_0 = 0k;
@@ -457,11 +462,19 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
             if (accumulative_direction > total_cues >> 1){
                 global_parameters->cross_entropy = -logk(softmax_1);
                 learning_signal = softmax_0;
+                is_it_right = 1;
             }
             else{
                 global_parameters->cross_entropy = -logk(softmax_0);
                 learning_signal = softmax_0 - 1.k;
+                is_it_right = 0;
             }
+//            if (softmax_0 > 0.5){
+//                choice = 0;
+//            }
+//            else{
+//                choice = 1;
+//            }
             while (!spin1_send_mc_packet(
                     key | neuron_index,  bitsk(learning_signal), 1 )) {
                 spin1_delay_us(1);
@@ -490,7 +503,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
 //    learning_signal = global_parameters->cross_entropy;
 
-    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = global_parameters->cross_entropy;
+    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = learning_signal;
     recorded_variable_values[V_RECORDING_INDEX] = voltage;
 //    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = ;
 //    if (neuron_index == 2){
@@ -503,16 +516,19 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 //        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[90].z_bar;
 //        recorded_variable_values[V_RECORDING_INDEX] = neuron->syn_state[90].z_bar;
         recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[90].delta_w;
+//        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = is_it_right;
     }
     else if (neuron_index == 1){
 //        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[55].z_bar;
 //        recorded_variable_values[V_RECORDING_INDEX] = neuron->syn_state[55].z_bar;
         recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[55].delta_w;
+//        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = softmax_0;
     }
     else{
 //        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[1].z_bar;
 //        recorded_variable_values[V_RECORDING_INDEX] = neuron->syn_state[1].z_bar;
-        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[1].delta_w;
+        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[neuron_index].delta_w;
+//        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = softmax_0;
     }
 
     // If spike occurs, communicate to relevant parts of model

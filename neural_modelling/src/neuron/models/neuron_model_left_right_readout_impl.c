@@ -137,6 +137,15 @@ state_t neuron_model_state_update(
     	// reset input (can't have more than one spike per timestep
         neuron->syn_state[syn_ind].z_bar_inp = 0;
 
+    	// decrease timestep counter preventing rapid updates
+    	if (neuron->syn_state[syn_ind].update_ready > 0){
+//    	    io_printf(IO_BUF, "lr reducing %u -- update:%u\n", syn_ind, neuron->syn_state[syn_ind].update_ready - 1);
+    		neuron->syn_state[syn_ind].update_ready -= 1;
+    	}
+//    	else{
+//    	    io_printf(IO_BUF, "lr not reducing %u\n", syn_ind);
+//    	}
+
     }
 
     return neuron->V_membrane;
