@@ -83,7 +83,8 @@ static inline void input_type_convert_inhibitory_input_to_current(
 
 
 	// Convert conductance based (teacher) input
-	inh_input[0] = -inh_input[0] * input_type->Teach_rev_I;
+	// (this is positive because it vill be subtracted to exc when computing U)
+	inh_input[0] = inh_input[0] * input_type->Teach_rev_I;
 
 }
 

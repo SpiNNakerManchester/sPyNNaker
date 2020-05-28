@@ -151,7 +151,7 @@ static inline input_t* synapse_types_get_inhibitory_input(
     inhibitory_response[0] = parameter->inh.synaptic_input_value;
     inhibitory_response[1] = parameter->inh2.synaptic_input_value;
 
-    // For the cunductance to he state update
+    // For the conductance to the state update (just g_I to calculate g_tot)
     inhibitory_response[2] = parameter->inh.synaptic_input_value;
     return &inhibitory_response[0];
 }
