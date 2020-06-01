@@ -627,9 +627,9 @@ class AbstractPopulationVertex(
                 " parameter {}".format(variable))
 
         parameter = self._get_parameter(variable)
-
         ranged_list = self._state_variables[parameter]
         ranged_list.set_value_by_selector(selector, value)
+        self.__change_requires_neuron_parameters_reload = True
 
     @property
     def conductance_based(self):
