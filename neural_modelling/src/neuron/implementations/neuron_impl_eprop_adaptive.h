@@ -320,13 +320,13 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 //    //    		learning_signal * neuron->w_fb;
 //    }
     if(neuron_index > 3){
-//        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[15].el_a;
+        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[15].el_a;
         recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[15].delta_w;
     }
 //    else if (neuron_index == 0){
 //    }
     else{
-//        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[0].el_a;
+        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[0].el_a;
         recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[0].delta_w;
     }
 //    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[neuron_index].el_a;
@@ -340,13 +340,13 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     if (!accum_time){
         accum_time += 1.k;
     }
-    REAL reg_learning_signal = (global_parameters->core_pop_rate
-//                                    / ((accum)(time%1300)
-//                                    / (1.225k
-                                    / (accum_time
-                                    * (accum)syn_dynamics_neurons_in_partition))
-                                    - global_parameters->core_target_rate;
-    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = reg_learning_signal;//global_parameters->core_pop_rate;
+//    REAL reg_learning_signal = (global_parameters->core_pop_rate
+////                                    / ((accum)(time%1300)
+////                                    / (1.225k
+//                                    / (accum_time
+//                                    * (accum)syn_dynamics_neurons_in_partition))
+//                                    - global_parameters->core_target_rate;
+//    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = reg_learning_signal;//global_parameters->core_pop_rate;
 
 
 

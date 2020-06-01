@@ -19,6 +19,7 @@
 
 #include <debug.h>
 
+bool printed_value = false;
 REAL new_learning_signal;
 extern REAL learning_signal;
 REAL local_eta;
@@ -125,22 +126,33 @@ state_t neuron_model_state_update(
                                     * (accum)syn_dynamics_neurons_in_partition))
                                     - global_parameters->core_target_rate;
 //    io_printf(IO_BUF, "rls: %k\n", reg_learning_signal);
-    if (time % 13000 == 12999 && global_parameters->core_pop_rate){ //hardcoded time of reset
-        new_learning_signal = 0.k;
+    if (time % 13000 == 12999 & !printed_value){ //hardcoded time of reset
         io_printf(IO_BUF, "1 %u, rate err:%k, spikes:%k, target:%k\n", time, reg_learning_signal, global_parameters->core_pop_rate, global_parameters->core_target_rate);
-        global_parameters->core_pop_rate = 0.k;
+//        global_parameters->core_pop_rate = 0.k;
 //        REAL reg_learning_signal = ((global_parameters->core_pop_rate / 1.225k)//(accum)(time%1300))
 //                                / (accum)syn_dynamics_neurons_in_partition) - global_parameters->core_target_rate;
 //        io_printf(IO_BUF, "2 %u, rate at reset:%k, L:%k, rate:%k\n", time, reg_learning_signal, learning_signal, global_parameters->core_pop_rate);
+        printed_value = true;
+    }
+    if (time % 13000 == 0){
+        new_learning_signal = 0.k;
+        global_parameters->core_pop_rate = 0.k;
+        printed_value = false;
     }
 //    neuron->L = learning_signal * neuron->w_fb;
 //    if (learning_signal != 0.k && new_learning_signal != learning_signal){
-    if (new_learning_signal != learning_signal){// && time%1300 > 1100){
+    if (new_learning_signal != learning_signal && abs(reg_learning_signal) > 0.5){// && time%1300 > 1100){
 //        io_printf(IO_BUF, "L:%k, rL:%k, cL:%k, nL:%k\n", learning_signal, reg_learning_signal, learning_signal + reg_learning_signal, new_learning_signal);
-        learning_signal += reg_learning_signal;// * 0.1;
+        learning_signal += reg_learning_signal * 0.1;
         new_learning_signal = learning_signal;
     }
-    neuron->L = learning_signal;
+//    neuron->L = learning_signal;
+    if (time % 13000 > 1300){
+        neuron->L = new_learning_signal;
+    }
+    else{
+        neuron->L = 0.k;
+    }
 
     // All operations now need doing once per eprop synapse
     for (uint32_t syn_ind=0; syn_ind < total_input_synapses_per_neuron; syn_ind++){
