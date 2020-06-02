@@ -287,7 +287,7 @@ static inline final_state_t eprop_plasticity_update(update_state_t current_state
 	// Test weight change
     // delta_w = -0.1k;
 
-	int32_t delta_w_int = (int32_t)roundk(delta_w, 15); // THIS NEEDS UPDATING TO APPROPRIATE SCALING
+	int32_t delta_w_int = (int32_t) roundk(delta_w, 15); // THIS NEEDS UPDATING TO APPROPRIATE SCALING
 
     if (delta_w){
         if (PRINT_PLASTICITY){

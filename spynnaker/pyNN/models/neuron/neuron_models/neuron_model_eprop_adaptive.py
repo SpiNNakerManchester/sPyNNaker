@@ -156,7 +156,7 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
             DataType.S1615,
             # Learning signal
             DataType.S1615,   #  L
-            DataType.S1615,   #  w_fb
+            DataType.S1615    #  w_fb
             ]
 
         # Synapse states - always initialise to zero

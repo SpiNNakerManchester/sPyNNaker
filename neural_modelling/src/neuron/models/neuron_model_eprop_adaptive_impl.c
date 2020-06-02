@@ -97,11 +97,14 @@ state_t neuron_model_state_update(
 //			0.3k *
 			(1.0k - psi_temp2) : 0.0k;
 
-//  This parameter is OK to update, as the actual size of the array is set in the header file, which matches the Python code. This should make it possible to do a pause and resume cycle and have reliable unloading of data.
+    // This parameter is OK to update, as the actual size of the array is set in the
+    // header file, which matches the Python code and aligns memory alocations.
+    // The value here can be reduced to limit the number of synapse state updates
+    // required by the neuron
+    uint32_t total_synapses_per_neuron = 100;
     uint32_t total_input_synapses_per_neuron = 100; //todo should this be fixed
     uint32_t total_recurrent_synapses_per_neuron = 100; //todo should this be fixed
     uint32_t recurrent_offset = 100;
-
 
 //    neuron->psi = neuron->psi << 10;
 
@@ -125,6 +128,7 @@ state_t neuron_model_state_update(
                                     / (accum_time
                                     * (accum)syn_dynamics_neurons_in_partition))
                                     - global_parameters->core_target_rate;
+    
 //    io_printf(IO_BUF, "rls: %k\n", reg_learning_signal);
     if (time % 13000 == 12999 & !printed_value){ //hardcoded time of reset
         io_printf(IO_BUF, "1 %u, rate err:%k, spikes:%k, target:%k\n", time, reg_learning_signal, global_parameters->core_pop_rate, global_parameters->core_target_rate);
@@ -161,8 +165,8 @@ state_t neuron_model_state_update(
 		// ******************************************************************
     	neuron->syn_state[syn_ind].z_bar =
     			neuron->syn_state[syn_ind].z_bar * neuron->exp_TC
-//    			+ (1 - neuron->exp_TC) *
-    			+
+    			+ 
+    			(1 - neuron->exp_TC) *
     			neuron->syn_state[syn_ind].z_bar_inp; // updating z_bar is problematic, if spike could come and interrupt neuron update
 
 
@@ -189,8 +193,8 @@ state_t neuron_model_state_update(
 		// Update cached total weight change
 		// ******************************************************************
     	REAL this_dt_weight_change =
-    			-local_eta * neuron->L * neuron->syn_state[syn_ind].e_bar;
-    	neuron->syn_state[syn_ind].delta_w += this_dt_weight_change;
+    			local_eta * neuron->L * neuron->syn_state[syn_ind].e_bar;
+    	neuron->syn_state[syn_ind].delta_w -= this_dt_weight_change; // -= here to enable compiler to handle previous line (can crash when -ve is at beginning of previous line)
 
 //    	if (!syn_ind || neuron->syn_state[syn_ind].z_bar){// || neuron->syn_state[syn_ind].z_bar_inp){
 //            io_printf(IO_BUF, "total synapses = %u \t syn_ind = %u \t "
