@@ -110,7 +110,7 @@ state_t neuron_model_state_update(
 //    REAL rho_3 = (accum)decay_s1615(1000.k, neuron->e_to_dt_on_tau_a);
 //    io_printf(IO_BUF, "1:%k, 2:%k, 3:%k, 4:%k\n", rho, rho_2, rho_3, neuron->rho);
 
-    REAL accum_time = (accum)(time%13000) * 0.001;
+    REAL accum_time = (accum)(time%13000) * 0.001k;
     if (!accum_time){
         accum_time += 1.k;
     }
@@ -141,9 +141,9 @@ state_t neuron_model_state_update(
     }
 //    neuron->L = learning_signal * neuron->w_fb;
 //    if (learning_signal != 0.k && new_learning_signal != learning_signal){
-    if (new_learning_signal != learning_signal && abs(reg_learning_signal) > 0.5){// && time%1300 > 1100){
+    if (new_learning_signal != learning_signal && (reg_learning_signal > 0.5k || reg_learning_signal < -0.5k){// && time%1300 > 1100){
 //        io_printf(IO_BUF, "L:%k, rL:%k, cL:%k, nL:%k\n", learning_signal, reg_learning_signal, learning_signal + reg_learning_signal, new_learning_signal);
-        learning_signal += reg_learning_signal * 0.1;
+        learning_signal += reg_learning_signal * 0.1k;
         new_learning_signal = learning_signal;
     }
 //    neuron->L = learning_signal;
