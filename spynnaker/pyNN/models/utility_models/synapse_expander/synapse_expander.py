@@ -106,27 +106,19 @@ def _extract_iobuf(expander_cores, transceiver, provenance_file_path,
     """ Extract IOBuf from the cores
     """
     io_buffers = transceiver.get_iobuf(expander_cores.all_core_subsets)
-    core_to_replacer = dict()
-    for binary in expander_cores.binaries:
-        replacer = Replacer()
-        for core_subset in expander_cores.get_cores_for_binary(binary):
-            x = core_subset.x
-            y = core_subset.y
-            for p in core_subset.processor_ids:
-                core_to_replacer[x, y, p] = replacer
 
-    for io_buf in io_buffers:
-        file_path = os.path.join(
-            provenance_file_path, "expander_{}_{}_{}.txt".format(
-                io_buf.x, io_buf.y, io_buf.p))
-        replacer = core_to_replacer[io_buf.x, io_buf.y, io_buf.p]
-        text = ""
-        for line in io_buf.iobuf.split("\n"):
-            text += replacer.replace(line) + "\n"
-        with open(file_path, "w") as writer:
-            writer.write(text)
-        if display:
-            print("{}:{}:{} {}".format(io_buf.x, io_buf.y, io_buf.p, text))
+    with Replacer() as replacer:
+        for io_buf in io_buffers:
+            file_path = os.path.join(
+                provenance_file_path, "expander_{}_{}_{}.txt".format(
+                    io_buf.x, io_buf.y, io_buf.p))
+            text = ""
+            for line in io_buf.iobuf.split("\n"):
+                text += replacer.replace(line) + "\n"
+            with open(file_path, "w") as writer:
+                writer.write(text)
+            if display:
+                print("{}:{}:{} {}".format(io_buf.x, io_buf.y, io_buf.p, text))
 
 
 def _handle_failure(expander_cores, transceiver, provenance_file_path):
