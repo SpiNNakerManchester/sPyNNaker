@@ -26,6 +26,7 @@ REAL local_eta;
 extern uint32_t time;
 extern global_neuron_params_pointer_t global_parameters;
 extern uint32_t syn_dynamics_neurons_in_partition;
+uint32_t window_size = 13000;
 
 // simple Leaky I&F ODE
 static inline void lif_neuron_closed_form(
@@ -110,7 +111,7 @@ state_t neuron_model_state_update(
 //    REAL rho_3 = (accum)decay_s1615(1000.k, neuron->e_to_dt_on_tau_a);
 //    io_printf(IO_BUF, "1:%k, 2:%k, 3:%k, 4:%k\n", rho, rho_2, rho_3, neuron->rho);
 
-    REAL accum_time = (accum)(time%13000) * 0.001k;
+    REAL accum_time = (accum)(time%window_size) * 0.001k;
     if (!accum_time){
         accum_time += 1.k;
     }
@@ -126,7 +127,7 @@ state_t neuron_model_state_update(
                                     * (accum)syn_dynamics_neurons_in_partition))
                                     - global_parameters->core_target_rate;
 //    io_printf(IO_BUF, "rls: %k\n", reg_learning_signal);
-    if (time % 13000 == 12999 & !printed_value){ //hardcoded time of reset
+    if (time % window_size == window_size - 1 & !printed_value){ //hardcoded time of reset
         io_printf(IO_BUF, "1 %u, rate err:%k, spikes:%k, target:%k\n", time, reg_learning_signal, global_parameters->core_pop_rate, global_parameters->core_target_rate);
 //        global_parameters->core_pop_rate = 0.k;
 //        REAL reg_learning_signal = ((global_parameters->core_pop_rate / 1.225k)//(accum)(time%1300))
@@ -134,7 +135,7 @@ state_t neuron_model_state_update(
 //        io_printf(IO_BUF, "2 %u, rate at reset:%k, L:%k, rate:%k\n", time, reg_learning_signal, learning_signal, global_parameters->core_pop_rate);
         printed_value = true;
     }
-    if (time % 13000 == 0){
+    if (time % window_size == 0){
         new_learning_signal = 0.k;
         global_parameters->core_pop_rate = 0.k;
         printed_value = false;
@@ -147,15 +148,21 @@ state_t neuron_model_state_update(
         new_learning_signal = learning_signal;
     }
 //    neuron->L = learning_signal;
-    if (time % 13000 > 1300){
+    if (time % window_size > 1300){
         neuron->L = new_learning_signal;
     }
     else{
-        neuron->L = 0.k;
+        neuron->L = learning_signal;//0.k;
     }
 
     // All operations now need doing once per eprop synapse
     for (uint32_t syn_ind=0; syn_ind < total_input_synapses_per_neuron; syn_ind++){
+        if (time % 1300 == 0){
+            neuron->syn_state[syn_ind].z_bar_inp = 0.k;
+            neuron->syn_state[syn_ind].z_bar = 0.k;
+            neuron->syn_state[syn_ind].el_a = 0.k;
+            neuron->syn_state[syn_ind].e_bar = 0.k;
+        }
 		// ******************************************************************
 		// Low-pass filter incoming spike train
 		// ******************************************************************

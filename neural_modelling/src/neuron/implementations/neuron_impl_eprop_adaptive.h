@@ -320,14 +320,14 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 //    //    		learning_signal * neuron->w_fb;
 //    }
     if(neuron_index > 3){
-        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[15].el_a;
-        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[15].delta_w;
+        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[15+neuron_index].el_a;
+        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[15+neuron_index].delta_w;
     }
 //    else if (neuron_index == 0){
 //    }
     else{
-        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[0].el_a;
-        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[0].delta_w;
+        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[0+neuron_index].el_a;
+        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[0+neuron_index].delta_w;
     }
 //    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[neuron_index].el_a;
     // update neuron parameters
