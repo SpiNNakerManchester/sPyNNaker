@@ -1,4 +1,4 @@
-#include "neuron_model_sinusoid_readout_impl.h"
+#include "neuron_model_left_right_readout_impl.h"
 
 #include <debug.h>
 
@@ -21,7 +21,20 @@ void neuron_model_set_global_neuron_params(
     use(params);
 
     local_eta = params->eta;
+
     io_printf(IO_BUF, "local eta = %k\n", local_eta);
+    io_printf(IO_BUF, "readout_V_0 = %k\n", params->readout_V_0);
+    io_printf(IO_BUF, "readout_V_1 = %k\n", params->readout_V_1);
+    io_printf(IO_BUF, "rate_on = %k\n", params->rate_on);
+    io_printf(IO_BUF, "rate_off = %k\n", params->rate_off);
+    io_printf(IO_BUF, "mean_0 = %k\n", params->mean_0);
+    io_printf(IO_BUF, "mean_1 = %k\n", params->mean_1);
+    io_printf(IO_BUF, "cross_entropy = %k\n", params->cross_entropy);
+    io_printf(IO_BUF, "p_key = %u\n", params->p_key);
+    io_printf(IO_BUF, "p_pop_size = %u\n", params->p_pop_size);
+    io_printf(IO_BUF, "readout_V_1 = %k\n", params->readout_V_1);
+    io_printf(IO_BUF, "readout_V_1 = %k\n", params->readout_V_1);
+//    io_printf(IO_BUF, "local eta = %k\n", params->);
 
     // Does Nothing - no params
 }
@@ -60,10 +73,14 @@ state_t neuron_model_state_update(
         neuron->refract_timer -= 1;
     }
 
-    uint32_t total_synapses_per_neuron = 200; //todo should this be fixed?
+    uint32_t total_synapses_per_neuron = 100; //todo should this be fixed?
 
-    neuron->L = learning_signal * neuron->w_fb;
+//    if(learning_signal){
+//        io_printf(IO_BUF, "learning signal = %k\n", learning_signal);
+//    }
 
+    neuron->L = learning_signal * neuron->w_fb; //* ((accum)syn_ind * -1.k);
+//    REAL tau_decay = expk(-1.k / 1500.k);
     // All operations now need doing once per eprop synapse
     for (uint32_t syn_ind=0; syn_ind < total_synapses_per_neuron; syn_ind++){
 		// ******************************************************************
@@ -71,9 +88,7 @@ state_t neuron_model_state_update(
 		// ******************************************************************
     	neuron->syn_state[syn_ind].z_bar =
     			neuron->syn_state[syn_ind].z_bar * neuron->exp_TC
-    			+ (1 - neuron->exp_TC) *
-//    			+
-    			neuron->syn_state[syn_ind].z_bar_inp; // updating z_bar is problematic, if spike could come and interrupt neuron update
+    			+ (1.k - neuron->exp_TC) * neuron->syn_state[syn_ind].z_bar_inp; // updating z_bar is problematic, if spike could come and interrupt neuron update
 
 
 		// ******************************************************************
@@ -98,6 +113,7 @@ state_t neuron_model_state_update(
 		// ******************************************************************
 		// Update cached total weight change
 		// ******************************************************************
+
     	REAL this_dt_weight_change =
 //    			-local_eta * neuron->L * neuron->syn_state[syn_ind].e_bar;
     			-local_eta * neuron->L * neuron->syn_state[syn_ind].z_bar;
@@ -121,11 +137,14 @@ state_t neuron_model_state_update(
     	// reset input (can't have more than one spike per timestep
         neuron->syn_state[syn_ind].z_bar_inp = 0;
 
-
     	// decrease timestep counter preventing rapid updates
     	if (neuron->syn_state[syn_ind].update_ready > 0){
+//    	    io_printf(IO_BUF, "lr reducing %u -- update:%u\n", syn_ind, neuron->syn_state[syn_ind].update_ready - 1);
     		neuron->syn_state[syn_ind].update_ready -= 1;
     	}
+//    	else{
+//    	    io_printf(IO_BUF, "lr not reducing %u\n", syn_ind);
+//    	}
 
     }
 
@@ -162,7 +181,7 @@ void neuron_model_print_parameters(restrict neuron_pointer_t neuron) {
 
     io_printf(IO_BUF, "learning      = %k n/a\n", neuron->L);
 
-    io_printf(IO_BUF, "feedback w    = %k n/a\n\n", neuron->w_fb);
+    io_printf(IO_BUF, "feedback w    = %k n/a\n", neuron->w_fb);
 
 //    io_printf(IO_BUF, "T refract     = %u timesteps\n", neuron->T_refract);
 //    io_printf(IO_BUF, "mean_isi_ticks  = %k\n", neuron->mean_isi_ticks);

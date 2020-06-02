@@ -251,7 +251,7 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
             state_variables[Z_BAR+str(n)] = 0
             state_variables[EP_A+str(n)] = 0
             state_variables[E_BAR+str(n)] = 0
-            state_variables[UPDATE_READY+str(n)] = 1024
+            state_variables[UPDATE_READY+str(n)] = 13000
 
     @overrides(AbstractNeuronModel.get_units)
     def get_units(self, variable):

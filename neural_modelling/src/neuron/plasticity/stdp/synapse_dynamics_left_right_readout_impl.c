@@ -33,10 +33,11 @@
 
 
 #include <neuron/models/neuron_model.h>
-#include <neuron/models/neuron_model_eprop_adaptive_impl.h>
+//#include <neuron/models/neuron_model_eprop_adaptive_impl.h>
+#include <neuron/models/neuron_model_left_right_readout_impl.h>
 
 extern neuron_pointer_t neuron_array;
-extern global_neuron_params_pointer_t global_parameters;
+//extern global_neuron_params_pointer_t global_parameters;
 
 static uint32_t synapse_type_index_bits;
 static uint32_t synapse_index_bits;
@@ -47,8 +48,6 @@ static uint32_t synapse_type_mask;
 
 uint32_t num_plastic_pre_synaptic_events = 0;
 uint32_t plastic_saturation_count = 0;
-
-uint32_t syn_dynamics_neurons_in_partition;
 
 //---------------------------------------
 // Macros
@@ -239,8 +238,6 @@ address_t synapse_dynamics_initialise(
         return NULL;
     }
 
-    syn_dynamics_neurons_in_partition = n_neurons;
-
     // Load weight dependence data
     address_t weight_result = weight_initialise(
             weight_region_address, n_synapse_types,
@@ -287,7 +284,12 @@ static inline final_state_t eprop_plasticity_update(update_state_t current_state
 	// Test weight change
     // delta_w = -0.1k;
 
-	int32_t delta_w_int = (int32_t) roundk(delta_w, 15); // THIS NEEDS UPDATING TO APPROPRIATE SCALING
+
+	// Convert delta_w to int16_t (same as weight) - take only integer bits from REAL?
+//	int32_t delta_w_int = bitsk(delta_w); // THIS NEEDS UPDATING TO APPROPRIATE SCALING
+	int32_t delta_w_int = (int32_t)roundk(delta_w, 15); // THIS NEEDS UPDATING TO APPROPRIATE SCALING
+//	int32_t delta_w_int_shift = (int32_t)roundk(delta_w << 3, 15); // THIS NEEDS UPDATING TO APPROPRIATE SCALING
+//	int16_t delta_w_int = (int) delta_w; // >> 15;
 
     if (delta_w){
         if (PRINT_PLASTICITY){
@@ -315,9 +317,7 @@ static inline final_state_t eprop_plasticity_update(update_state_t current_state
 	}
 
 	// Calculate regularisation error
-	REAL reg_error = 0.k;//(global_parameters->core_target_rate - global_parameters->core_pop_rate) / syn_dynamics_neurons_in_partition; // this needs swapping for an inverse multiply - too expensive to do divide on every spike
-//	REAL reg_error = ((global_parameters->core_target_rate + ((neuron_array->w_fb - 0.5) * 20)) - global_parameters->core_pop_rate) / syn_dynamics_neurons_in_partition; // this needs swapping for an inverse multiply - too expensive to do divide on every spike
-//    io_printf(IO_BUF, "core_pop_rate = %k, target = %k, error = %k\n", global_parameters->core_pop_rate, global_parameters->core_target_rate, reg_error);
+	REAL reg_error = 0.0; //global_parameters->core_target_rate - global_parameters->core_pop_rate;
 
 
     // Return final synaptic word and weight
@@ -342,6 +342,8 @@ bool synapse_dynamics_process_plastic_synapses(
     num_plastic_pre_synaptic_events += plastic_synapse;
 
     // Could maybe have a single z_bar for the entire synaptic row and update it once here for all synaptic words?
+
+
 
     // Loop through plastic synapses
     for (; plastic_synapse > 0; plastic_synapse--) {
@@ -395,10 +397,11 @@ bool synapse_dynamics_process_plastic_synapses(
 				neuron->syn_state[syn_ind_from_delay].delta_w, time);
     	}
 
-
         // Perform weight update: only if batch time has elapsed
     	final_state_t final_state;
+
     	if (neuron->syn_state[syn_ind_from_delay].update_ready == 0){
+
     		// enough time has elapsed - perform weight update
     		if (PRINT_PLASTICITY){
     			io_printf(IO_BUF, "update_ready=0\n");
@@ -416,8 +419,8 @@ bool synapse_dynamics_process_plastic_synapses(
 
     	} else {
     		if (PRINT_PLASTICITY){
-    			io_printf(IO_BUF, "update_ready: %u/%u - no update performed\n",
-    					neuron->syn_state[syn_ind_from_delay].update_ready, syn_ind_from_delay);
+    			io_printf(IO_BUF, "update_ready: %u - no update performed\n",
+    					neuron->syn_state[syn_ind_from_delay].update_ready);
     		}
     		// don't update weight - get update state based on state cached in SDRAM
     		// assume reg rate is zero to avoid
@@ -425,7 +428,6 @@ bool synapse_dynamics_process_plastic_synapses(
     		final_state = synapse_structure_get_final_state(current_state, 0);
     		// Don't reset delta_w -> keep this accumulating and apply weight change in future
     	}
-
 
         // Add contribution to synaptic input
         // Convert into ring buffer offset

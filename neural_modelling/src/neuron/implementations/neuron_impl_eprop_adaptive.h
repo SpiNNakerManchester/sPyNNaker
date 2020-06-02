@@ -49,10 +49,10 @@
 	shaping include
 #endif
 
-
+extern uint32_t time;
 extern REAL learning_signal;
-uint32_t neurons_in_pop;
-
+//uint32_t neurons_in_pop;
+uint32_t syn_dynamics_neurons_in_partition;
 
 //! Array of neuron states
 neuron_pointer_t neuron_array;
@@ -158,7 +158,7 @@ static void neuron_impl_load_neuron_parameters(
     log_debug("reading parameters, next is %u, n_neurons is %u ",
             next, n_neurons);
 
-    neurons_in_pop = n_neurons; // get number of neurons running on this core for use during execution
+    syn_dynamics_neurons_in_partition = n_neurons; // get number of neurons running on this core for use during execution
 
     if (sizeof(global_neuron_params_t)) {
         log_debug("writing neuron global parameters");
@@ -208,10 +208,10 @@ static void neuron_impl_load_neuron_parameters(
     // ******** for eprop regularisation ************
     // **********************************************
     if (initial_regularise) {
-    	global_parameters->core_target_rate = global_parameters->core_target_rate
-    			* n_neurons; // scales target rate depending on number of neurons
-    	global_parameters->core_pop_rate = global_parameters->core_pop_rate
-    			* n_neurons; // scale initial value, too
+    	global_parameters->core_target_rate = global_parameters->core_target_rate;
+//    			* n_neurons; // scales target rate depending on number of neurons
+    	global_parameters->core_pop_rate = 0.k;//global_parameters->core_pop_rate;
+//    			* n_neurons; // scale initial value, too
 
     	initial_regularise = false;
     }
@@ -235,11 +235,11 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
         input_t external_bias, state_t *recorded_variable_values) {
 
 
-	if (neuron_index == 0) {
-		// Decay global rate trace (only done once per core per timestep)
-		global_parameters->core_pop_rate = global_parameters->core_pop_rate
-				* global_parameters->rate_exp_TC;
-	}
+//	if (neuron_index == 0) {
+//		// Decay global rate trace (only done once per core per timestep)
+//		global_parameters->core_pop_rate = global_parameters->core_pop_rate
+//				* global_parameters->rate_exp_TC;
+//	}
 
 
     // Get the neuron itself
@@ -303,25 +303,50 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
 
     // Record B
-    if (neuron_index == 1){
-        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = global_parameters->core_pop_rate / neurons_in_pop; // divide by neurons on core to get average per neuron contribution to core pop rate
+//    if (neuron_index == 0){
+//        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = global_parameters->core_pop_rate / neurons_in_pop; // divide by neurons on core to get average per neuron contribution to core pop rate
+////        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[neuron_index].el_a; // divide by neurons on core to get average per neuron contribution to core pop rate
+//    }
+//    else{
+//
+//        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
+//        		B_t; // neuron->B;
+////                neuron->L;
+//    //    		neuron->syn_state[0].z_bar;
+//    //    		global_parameters->core_target_rate;
+//    //    	neuron->syn_state[0].e_bar;
+//    //    	neuron->syn_state[neuron_index].el_a;
+//    //    		exc_input_values[0]; // record input input (signed)
+//    //    		learning_signal * neuron->w_fb;
+//    }
+    if(neuron_index > 3){
+        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[15].el_a;
+        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[15].delta_w;
     }
+//    else if (neuron_index == 0){
+//    }
     else{
-        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
-    //    		B_t; // neuron->B;
-                neuron->L;
-    //    		neuron->syn_state[0].z_bar;
-    //    		global_parameters->core_target_rate;
-    //    	neuron->syn_state[0].e_bar;
-    //    	neuron->syn_state[neuron_index].el_a;
-    //    		exc_input_values[0]; // record input input (signed)
-    //    		learning_signal * neuron->w_fb;
+        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[0].el_a;
+        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[0].delta_w;
     }
+//    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->syn_state[neuron_index].el_a;
     // update neuron parameters
     state_t result = neuron_model_state_update(
             NUM_EXCITATORY_RECEPTORS, exc_input_values,
             NUM_INHIBITORY_RECEPTORS, inh_input_values,
             external_bias, neuron, B_t);
+
+    REAL accum_time = (accum)(time%13000) * 0.001;
+    if (!accum_time){
+        accum_time += 1.k;
+    }
+//    REAL reg_learning_signal = (global_parameters->core_pop_rate
+////                                    / ((accum)(time%1300)
+////                                    / (1.225k
+//                                    / (accum_time
+//                                    * (accum)syn_dynamics_neurons_in_partition))
+//                                    - global_parameters->core_target_rate;
+//    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = reg_learning_signal;//global_parameters->core_pop_rate;
 
 
 
@@ -343,13 +368,13 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     recorded_variable_values[V_RECORDING_INDEX] = voltage; // result;
 
 
-    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] =
-    		neuron->syn_state[0].delta_w;
+//    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] =
+//    		neuron->syn_state[0].delta_w;
 //    		neuron->syn_state[0].z_bar;
 //    		exc_input_values[0]; // record input input (signed)
 //    		z_t;
 //    		global_parameters->core_pop_rate;
-//    		neuron->psi;
+//    		neuron->B;
 //    		neuron->syn_state[0].z_bar;
 
 //    // Record B
@@ -364,9 +389,11 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
     // If spike occurs, communicate to relevant parts of model
     if (spike) {
+//        io_printf(IO_BUF, "neuron %u spiked with beta = %k, B_t = %k\n", neuron_index, neuron->beta, neuron->B);
         // Call relevant model-based functions
         // Tell the neuron model
         neuron_model_has_spiked(neuron);
+//        io_printf(IO_BUF, "neuron %u thresholded beta = %k, B_t = %k\n", neuron_index, neuron->beta, neuron->B);
 
         // Tell the additional input
         additional_input_has_spiked(additional_input);

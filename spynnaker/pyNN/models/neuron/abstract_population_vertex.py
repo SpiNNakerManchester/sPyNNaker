@@ -50,6 +50,8 @@ from spynnaker.pyNN.utilities.ranged import (
 from .synaptic_manager import SynapticManager
 from .population_machine_vertex import PopulationMachineVertex
 
+from spynnaker.pyNN.models.neuron.neuron_models import (NeuronModelLeftRightReadout)
+
 logger = logging.getLogger(__name__)
 
 # TODO: Make sure these values are correct (particularly CPU cycles)
@@ -498,6 +500,10 @@ class AbstractPopulationVertex(
         # Get the key
         key = routing_info.get_first_key_from_pre_vertex(
             vertex, constants.SPIKE_PARTITION_ID)
+
+        if isinstance(self.__pynn_model._model.neuron_model, NeuronModelLeftRightReadout):
+            poisson_key = routing_info.get_first_key_from_pre_vertex(placement.vertex, "CONTROL")
+            self.__pynn_model._model.neuron_model.set_poisson_key(poisson_key)
 
         # Get the poisson key
         p_key = routing_info.get_first_key_from_pre_vertex(

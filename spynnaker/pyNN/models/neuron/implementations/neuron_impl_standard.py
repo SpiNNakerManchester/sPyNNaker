@@ -60,6 +60,11 @@ class NeuronImplStandard(AbstractNeuronImpl):
             self.__components.append(self.__additional_input_type)
 
     @property
+    # @overrides(AbstractNeuronImpl.neuron_model)
+    def neuron_model(self):
+        return self.__neuron_model
+
+    @property
     @overrides(AbstractNeuronImpl.model_name)
     def model_name(self):
         return self.__model_name

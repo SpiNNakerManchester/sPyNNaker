@@ -19,8 +19,13 @@
 
 #include <debug.h>
 
+bool printed_value = false;
+REAL new_learning_signal;
 extern REAL learning_signal;
 REAL local_eta;
+extern uint32_t time;
+extern global_neuron_params_pointer_t global_parameters;
+extern uint32_t syn_dynamics_neurons_in_partition;
 
 // simple Leaky I&F ODE
 static inline void lif_neuron_closed_form(
@@ -40,6 +45,9 @@ void neuron_model_set_global_neuron_params(
 
     local_eta = params->eta;
     io_printf(IO_BUF, "local eta = %k\n", local_eta);
+    io_printf(IO_BUF, "core_pop_rate = %k\n", params->core_pop_rate);
+    io_printf(IO_BUF, "core_target_rate = %k\n", params->core_target_rate);
+    io_printf(IO_BUF, "rate_exp_TC = %k\n\n", params->rate_exp_TC);
     // Does Nothing - no params
 }
 
@@ -94,26 +102,72 @@ state_t neuron_model_state_update(
     // The value here can be reduced to limit the number of synapse state updates
     // required by the neuron
     uint32_t total_synapses_per_neuron = 100;
-
+    uint32_t total_input_synapses_per_neuron = 100; //todo should this be fixed
+    uint32_t total_recurrent_synapses_per_neuron = 100; //todo should this be fixed
+    uint32_t recurrent_offset = 100;
 
 //    neuron->psi = neuron->psi << 10;
 
-    REAL rho = 0.998;
+//    REAL rho = neuron->rho;//expk(-1.k / 1500.k); // adpt
+    REAL rho = (accum)decay_s1615(1.k, neuron->e_to_dt_on_tau_a);
+//    REAL rho_3 = (accum)decay_s1615(1000.k, neuron->e_to_dt_on_tau_a);
+//    io_printf(IO_BUF, "1:%k, 2:%k, 3:%k, 4:%k\n", rho, rho_2, rho_3, neuron->rho);
 
+    REAL accum_time = (accum)(time%13000) * 0.001;
+    if (!accum_time){
+        accum_time += 1.k;
+    }
+//    io_printf(IO_BUF, "time = %u, mod = %u, accum = %k, /s:%k, rate:%k, accum t:%k\n", time, time%1300, (accum)(time%1300),
+//                (accum)(time%1300) * 0.001k, (accum)(time%1300) * 0.001k * (accum)syn_dynamics_neurons_in_partition,
+//                accum_time);
 
-    neuron->L = learning_signal * neuron->w_fb;
-
+//	REAL reg_error = (global_parameters->core_target_rate - global_parameters->core_pop_rate) / syn_dynamics_neurons_in_partition;
+    REAL reg_learning_signal = (global_parameters->core_pop_rate // make it work for different ts
+//                                    / ((accum)(time%1300)
+//                                    / (1.225k // 00000!!!!!
+                                    / (accum_time
+                                    * (accum)syn_dynamics_neurons_in_partition))
+                                    - global_parameters->core_target_rate;
+    
+//    io_printf(IO_BUF, "rls: %k\n", reg_learning_signal);
+    if (time % 13000 == 12999 & !printed_value){ //hardcoded time of reset
+        io_printf(IO_BUF, "1 %u, rate err:%k, spikes:%k, target:%k\n", time, reg_learning_signal, global_parameters->core_pop_rate, global_parameters->core_target_rate);
+//        global_parameters->core_pop_rate = 0.k;
+//        REAL reg_learning_signal = ((global_parameters->core_pop_rate / 1.225k)//(accum)(time%1300))
+//                                / (accum)syn_dynamics_neurons_in_partition) - global_parameters->core_target_rate;
+//        io_printf(IO_BUF, "2 %u, rate at reset:%k, L:%k, rate:%k\n", time, reg_learning_signal, learning_signal, global_parameters->core_pop_rate);
+        printed_value = true;
+    }
+    if (time % 13000 == 0){
+        new_learning_signal = 0.k;
+        global_parameters->core_pop_rate = 0.k;
+        printed_value = false;
+    }
+//    neuron->L = learning_signal * neuron->w_fb;
+//    if (learning_signal != 0.k && new_learning_signal != learning_signal){
+    if (new_learning_signal != learning_signal && abs(reg_learning_signal) > 0.5){// && time%1300 > 1100){
+//        io_printf(IO_BUF, "L:%k, rL:%k, cL:%k, nL:%k\n", learning_signal, reg_learning_signal, learning_signal + reg_learning_signal, new_learning_signal);
+        learning_signal += reg_learning_signal * 0.1;
+        new_learning_signal = learning_signal;
+    }
+//    neuron->L = learning_signal;
+    if (time % 13000 > 1300){
+        neuron->L = new_learning_signal;
+    }
+    else{
+        neuron->L = 0.k;
+    }
 
     // All operations now need doing once per eprop synapse
-    for (uint32_t syn_ind=0; syn_ind < total_synapses_per_neuron; syn_ind++){
+    for (uint32_t syn_ind=0; syn_ind < total_input_synapses_per_neuron; syn_ind++){
 		// ******************************************************************
 		// Low-pass filter incoming spike train
 		// ******************************************************************
     	neuron->syn_state[syn_ind].z_bar =
     			neuron->syn_state[syn_ind].z_bar * neuron->exp_TC
-    			+
-//				(1 - neuron->exp_TC) *
-				neuron->syn_state[syn_ind].z_bar_inp; // updating z_bar is problematic, if spike could come and interrupt neuron update
+    			+ 
+    			(1 - neuron->exp_TC) *
+    			neuron->syn_state[syn_ind].z_bar_inp; // updating z_bar is problematic, if spike could come and interrupt neuron update
 
 
 		// ******************************************************************
@@ -160,11 +214,83 @@ state_t neuron_model_state_update(
     	// reset input (can't have more than one spike per timestep
     	neuron->syn_state[syn_ind].z_bar_inp = 0;
 
+    	// decrease timestep counter preventing rapid updates
+    	if (neuron->syn_state[syn_ind].update_ready > 0){
+//    	    io_printf(IO_BUF, "ff reducing %u -- update:%u\n", syn_ind, neuron->syn_state[syn_ind].update_ready - 1);
+    		neuron->syn_state[syn_ind].update_ready -= 1;
+    	}
+//    	else{
+//    	    io_printf(IO_BUF, "ff not reducing %u\n", syn_ind);
+//    	}
+
+//        io_printf(IO_BUF, "eta: %k, l: %k, ebar: %k, delta_w: %k, this dt: %k\n",
+//            local_eta, neuron->L, neuron->syn_state[syn_ind].e_bar, neuron->syn_state[syn_ind].delta_w, this_dt_weight_change);
+
+    }
+
+
+    // All operations now need doing once per recurrent eprop synapse
+    for (uint32_t syn_ind=recurrent_offset; syn_ind < total_recurrent_synapses_per_neuron+recurrent_offset; syn_ind++){
+		// ******************************************************************
+		// Low-pass filter incoming spike train
+		// ******************************************************************
+    	neuron->syn_state[syn_ind].z_bar =
+    			neuron->syn_state[syn_ind].z_bar * neuron->exp_TC
+    			+ (1 - neuron->exp_TC) * neuron->syn_state[syn_ind].z_bar_inp; // updating z_bar is problematic, if spike could come and interrupt neuron update
+
+
+		// ******************************************************************
+		// Update eligibility vector
+		// ******************************************************************
+    	neuron->syn_state[syn_ind].el_a =
+    			(neuron->psi * neuron->syn_state[syn_ind].z_bar) +
+    		(rho - neuron->psi * neuron->beta) *
+			neuron->syn_state[syn_ind].el_a;
+
+
+    	// ******************************************************************
+		// Update eligibility trace
+		// ******************************************************************
+    	REAL temp_elig_trace = neuron->psi * (neuron->syn_state[syn_ind].z_bar -
+    		neuron->beta * neuron->syn_state[syn_ind].el_a);
+
+    	neuron->syn_state[syn_ind].e_bar =
+    			neuron->exp_TC * neuron->syn_state[syn_ind].e_bar
+				+ (1 - neuron->exp_TC) * temp_elig_trace;
+
+		// ******************************************************************
+		// Update cached total weight change
+		// ******************************************************************
+    	REAL this_dt_weight_change =
+    			local_eta * neuron->L * neuron->syn_state[syn_ind].e_bar;
+    	neuron->syn_state[syn_ind].delta_w -= this_dt_weight_change; // -= here to enable compiler to handle previous line (can crash when -ve is at beginning of previous line)
+
+//    	if (!syn_ind || neuron->syn_state[syn_ind].z_bar){// || neuron->syn_state[syn_ind].z_bar_inp){
+//            io_printf(IO_BUF, "total synapses = %u \t syn_ind = %u \t "
+//                              "z_bar_inp = %k \t z_bar = %k \t time:%u\n"
+//                              "L = %k = %k * %k = l * w_fb\n"
+//                              "this dw = %k \t tot dw %k\n"
+//                              ,
+//                total_synapses_per_neuron,
+//                syn_ind,
+//                neuron->syn_state[syn_ind].z_bar_inp,
+//                neuron->syn_state[syn_ind].z_bar,
+//                time,
+//                neuron->L, learning_signal, neuron -> w_fb,
+//                this_dt_weight_change, neuron->syn_state[syn_ind].delta_w
+//                );
+//        }
+    	// reset input (can't have more than one spike per timestep
+    	neuron->syn_state[syn_ind].z_bar_inp = 0;
 
     	// decrease timestep counter preventing rapid updates
     	if (neuron->syn_state[syn_ind].update_ready > 0){
+//    	    io_printf(IO_BUF, "recducing %u -- update:%u\n", syn_ind, neuron->syn_state[syn_ind].update_ready - 1);
     		neuron->syn_state[syn_ind].update_ready -= 1;
     	}
+//    	else{
+//    	    io_printf(IO_BUF, "not recducing %u\n", syn_ind);
+//    	}
 
 //        io_printf(IO_BUF, "eta: %k, l: %k, ebar: %k, delta_w: %k, this dt: %k\n",
 //            local_eta, neuron->L, neuron->syn_state[syn_ind].e_bar, neuron->syn_state[syn_ind].delta_w, this_dt_weight_change);
@@ -213,5 +339,9 @@ void neuron_model_print_parameters(restrict neuron_pointer_t neuron) {
 
     io_printf(IO_BUF, "learning      = %k n/a\n", neuron->L);
 
-    io_printf(IO_BUF, "feedback w    = %k n/a\n", neuron->w_fb);
+    io_printf(IO_BUF, "feedback w    = %k n/a\n\n", neuron->w_fb);
+
+    io_printf(IO_BUF, "e_to_dt_on_tau_a    = %k n/a\n\n", neuron->e_to_dt_on_tau_a);
+
+    io_printf(IO_BUF, "adpt          = %k n/a\n\n", neuron->adpt);
 }

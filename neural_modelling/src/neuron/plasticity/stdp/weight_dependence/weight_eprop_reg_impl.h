@@ -102,18 +102,22 @@ static inline weight_t weight_get_final(weight_state_t new_state,
             new_state.initial_weight + new_state.a2_plus + new_state.a2_minus;
     int32_t reg_weight = new_weight;
     int32_t reg_change = 0;
+    REAL reg_boundary = 1k;
 
     // Calculate regularisation
-    if (new_state.weight_region->reg_rate > 0.0k && (reg_error > 0.2k || reg_error < -0.2k)){ // if reg rate is zero or error small, regularisation is turned off
-        reg_change = new_weight * new_state.weight_region->reg_rate * reg_error;
-    	if (new_weight > 0){
-    		reg_weight = new_weight + reg_change;
-    	} else if (new_weight < 0){
-    		reg_weight = new_weight - reg_change;
-    	}
+    if (new_state.weight_region->reg_rate > 0.0k && (reg_error > reg_boundary || reg_error < -reg_boundary)){ // if reg rate is zero or error small, regularisation is turned off
+//        reg_change = new_weight * new_state.weight_region->reg_rate * reg_error;
+//    	if (reg_error > 0){
+//    		reg_error -= reg_boundary;
+//    	} else if (reg_error < 0){
+//    		reg_error += reg_boundary;
+//    	}
+        reg_change = new_state.weight_region->max_weight * new_state.weight_region->reg_rate * reg_error;
+        reg_weight = new_weight + reg_change;
+//        io_printf(IO_BUF, "\tw:%d + reg_shift:%d = reg_w:%d -- err:%k\n", new_weight, reg_change, reg_weight, reg_error);
     }
 	if (PRINT_PLASTICITY){
-        io_printf(IO_BUF, "\tbefore minmax reg_w:%d, reg_shift:%d, /8:%d", reg_weight, reg_change, reg_change/8);
+        io_printf(IO_BUF, "\tbefore minmax reg_w:%d, reg_shift:%d, max:%d", reg_weight, reg_change, new_state.weight_region->max_weight);
     }
     // Clamp new weight to bounds
     reg_weight = MIN(new_state.weight_region->max_weight,
