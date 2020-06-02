@@ -17,6 +17,9 @@ from six import with_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from .struct import Struct
 from .ranged_dict_vertex_slice import RangedDictVertexSlice
+from spynnaker.pyNN.models.neural_properties import AbstractIsRateBased
+from spynnaker.pyNN.utilities.utility_calls import convert_to
+from data_specification.enums import DataType
 
 
 class AbstractStandardNeuronComponent(with_metaclass(AbstractBase, object)):
@@ -171,3 +174,27 @@ class AbstractStandardNeuronComponent(with_metaclass(AbstractBase, object)):
         :param variable: The name of the variable
         :type variable: str
         """
+
+
+    def generate_rate_lut(self):
+        """ Generate the lut containing the output rates. For rate based models only
+
+        :rtype: list
+        """
+        if not isinstance(self, AbstractIsRateBased):
+            raise Exception("Error: trying to generate output rate LUT for a non rate-based model.")
+
+        float_lut = self.get_rate_lut()
+
+        return [convert_to(val, DataType.S1615) for val in float_lut]
+
+    def get_sdram_usage_for_rate_lut(self):
+        """ Return the size of the LUT containing the output rates. For rate based models only
+
+        :rtype: list
+        """
+        if not isinstance(self, AbstractIsRateBased):
+            raise Exception("Error: trying to generate output rate LUT for a non rate-based model.")
+
+        return self.get_rate_lut_size() * 4
+

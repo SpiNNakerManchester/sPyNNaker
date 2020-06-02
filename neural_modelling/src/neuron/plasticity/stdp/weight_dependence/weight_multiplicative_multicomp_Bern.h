@@ -73,13 +73,15 @@ static inline weight_t weight_get_final(weight_state_t new_state) {
     return (weight_t) new_state.weight;
 }
 
-static inline input_t convert_real_to_int(REAL value) {
+static inline int32_t convert_real_to_int(REAL value) {
     union {
-        s1615 input_type;
+        REAL input_type;
         int32_t output_type;
     } converter;
 
     converter.input_type = (value);
+
+    io_printf(IO_BUF, "weight conv %k returning %k\n", value, converter.output_type);
 
     return converter.output_type;
 }
@@ -92,7 +94,7 @@ static inline weight_state_t weight_one_term_apply_update(weight_state_t state, 
     io_printf(IO_BUF, "learning rate * rate %k, shift %d\n", state.weight_region->learning_rate * total_rate, state.weight_shift);
 
     //DOUBLE CHECK YOU DON'T LOSE THE SIGN FOR NEGATIVE MULTS!!!
-    state.weight = state.weight + (convert_real_to_int(state.weight_region->learning_rate * total_rate) >> state.weight_shift);
+    state.weight = state.weight + ((convert_real_to_int(state.weight_region->learning_rate * total_rate)) >> state.weight_shift);
 
     io_printf(IO_BUF, "weight updated %k\n", state.weight);
 

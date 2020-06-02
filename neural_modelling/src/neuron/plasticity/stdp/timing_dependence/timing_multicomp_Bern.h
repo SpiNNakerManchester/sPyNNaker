@@ -26,7 +26,6 @@ typedef int16_t pre_trace_t;
 
 #include <neuron/plasticity/stdp/synapse_structure/synapse_structure_weight_impl.h>
 #include "timing.h"
-#include <neuron/plasticity/stdp/weight_dependence/weight_one_term.h>
 
 // Include debug header for log_info etc
 #include <debug.h>
@@ -46,12 +45,6 @@ typedef int16_t pre_trace_t;
 #define TAU_MINUS_SIZE 256
 
 //---------------------------------------
-// Externals
-//---------------------------------------
-extern int16_t tau_plus_lookup[TAU_PLUS_SIZE];
-extern int16_t tau_minus_lookup[TAU_MINUS_SIZE];
-
-//---------------------------------------
 // Timing dependence inline functions
 //---------------------------------------
 static inline post_trace_t timing_get_initial_post_trace(void) {
@@ -66,7 +59,7 @@ static inline update_state_t timing_apply_rate(update_state_t current_state, REA
 
     post_rate *= pre_rate;
 
-    io_printf(IO_BUF, "rate product plast %k\n", post_rate);
+    io_printf(IO_BUF, " pre_rate %k rate product plast %k\n", pre_rate, post_rate);
 
     return weight_one_term_apply_update(current_state, post_rate);
 }

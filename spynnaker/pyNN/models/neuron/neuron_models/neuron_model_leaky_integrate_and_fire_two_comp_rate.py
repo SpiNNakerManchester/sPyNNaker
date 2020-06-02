@@ -19,9 +19,12 @@ from data_specification.enums import DataType
 from pacman.executor.injection_decorator import inject_items
 from .abstract_neuron_model import AbstractNeuronModel
 from setuptools.dist import assert_string_list
+from spynnaker.pyNN.models.neural_properties import AbstractIsRateBased
+import math
 
 MICROSECONDS_PER_SECOND = 1000000.0
 MICROSECONDS_PER_MILLISECOND = 1000.0
+LUT_SIZE = 64
 
 U = "u"
 U_REST = "u_rest"
@@ -59,7 +62,7 @@ UNITS = {
 }
 
 
-class NeuronModelLeakyIntegrateAndFireTwoCompRate(AbstractNeuronModel):
+class NeuronModelLeakyIntegrateAndFireTwoCompRate(AbstractNeuronModel, AbstractIsRateBased):
     __slots__ = [
         "__u_init",
         "__u_rest",
@@ -80,7 +83,8 @@ class NeuronModelLeakyIntegrateAndFireTwoCompRate(AbstractNeuronModel):
         "__target_data"
         ]
 
-    def __init__(
+    def \
+            __init__(
             self, u_init, u_rest, cm, i_offset, v_reset,
             g_D, g_L, tau_L, v_init, rate_update_threshold, starting_rate):
 
@@ -107,9 +111,9 @@ class NeuronModelLeakyIntegrateAndFireTwoCompRate(AbstractNeuronModel):
                 DataType.S1615,   # tau_L
                 DataType.S1615,   # g_D
 
-                DataType.S1615,   #  REAL rate_at_last_setting; s
-                DataType.S1615,   #  REAL rate_update_threshold; p
-                DataType.S1615    #  REAL rate difference
+                DataType.S1615,   # REAL rate_at_last_setting; s
+                DataType.S1615,   # REAL rate_update_threshold; p
+                DataType.S1615    # REAL rate difference
                 ],
             global_data_types=global_data_types)
 
@@ -226,6 +230,20 @@ class NeuronModelLeakyIntegrateAndFireTwoCompRate(AbstractNeuronModel):
 
         return vals
 
+    def get_rate_lut(self):
+
+        max_rate = 150
+        k = 0.5
+        beta = 5
+        delta = 1
+
+        x_vals = [0.0625 * i for i in range(LUT_SIZE)]
+        y_vals = [float(max_rate)/(1 + k * math.exp(beta * (delta - x))) for x in x_vals]
+
+        return y_vals
+
+    def get_rate_lut_size(self):
+        return LUT_SIZE
 
     @property
     def u_init(self):

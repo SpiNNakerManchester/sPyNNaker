@@ -23,9 +23,10 @@ from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeStatic
 
 
 class IFExpRateTwoComp(AbstractPyNNNeuronModelStandard):
-    """ Leaky integrate and fire neuron with an exponentially decaying \
-        current input to soma and dendrite
+    """ Multicompartment model from Urbanczik and Senn
     """
+
+    __slots__ = ["_rate_based"]
 
     @default_initial_values({"u", "isyn_exc_soma", "isyn_inh_soma",
                              "isyn_exc_dendrite", "isyn_inh_dendrite",
@@ -57,6 +58,8 @@ class IFExpRateTwoComp(AbstractPyNNNeuronModelStandard):
             isyn_exc_soma, isyn_exc_dendrite, isyn_inh_soma, isyn_inh_dendrite)
         input_type = InputTypeTwoComp(e_rev_E, e_rev_I)
         threshold_type = ThresholdTypeStatic(v_thresh)
+
+        self._rate_based = True
 
         super(IFExpRateTwoComp, self).__init__(
             model_name="IF_exp_rate_two_comp", binary="IF_exp_two_comp_rate.aplx",

@@ -67,11 +67,9 @@ static global_neuron_params_pointer_t global_parameters;
 //! The synapse shaping parameters
 static synapse_param_t *neuron_synapse_shaping_params;
 
-//! Coefficients for the rate function (magic numbers from polynomial interpolation)
-static REAL cubic_term = -24.088958k;
-static REAL square_term = 48.012303k;
-static REAL linear_term = 73.084895k;
-static REAL constant_term = 1.994506k;
+//! Data structure for the output rate LUT
+static REAL *rate_lut;
+static uint32_t rate_lut_size;
 
 static bool neuron_impl_initialise(uint32_t n_neurons) {
     // allocate DTCM for the global parameter details
@@ -170,7 +168,7 @@ static void neuron_impl_load_neuron_parameters(
         next += n_words_needed(n_neurons * sizeof(neuron_t));
     }
 
-    io_printf(IO_BUF, "copied neuron paramsn\n");
+    io_printf(IO_BUF, "copied neuron params\n");
 
     if (sizeof(input_type_t)) {
         log_debug("reading input type parameters");
@@ -202,6 +200,22 @@ static void neuron_impl_load_neuron_parameters(
 
     neuron_model_set_global_neuron_params(global_parameters);
 
+    rate_lut_size = address[next++];
+
+    rate_lut = spin1_malloc(rate_lut_size * sizeof(REAL));
+    if(rate_lut == NULL) {
+        log_error("Cannot allocate space for output rate LUT");
+    }
+
+    spin1_memcpy(rate_lut, &address[next], rate_lut_size * sizeof(REAL));
+    next += n_words_needed(rate_lut_size * sizeof(REAL));
+
+
+    io_printf(IO_BUF, "LUT vals:\n");
+    for(uint i = 0; i < 17; i++)
+        io_printf(IO_BUF, "%k\n", rate_lut[i]);
+
+
 #if LOG_LEVEL >= LOG_DEBUG
     log_debug("-------------------------------------\n");
     for (index_t n = 0; n < n_neurons; n++) {
@@ -230,15 +244,16 @@ static inline REAL set_spike_source_rate(neuron_pointer_t neuron, REAL somatic_v
 	else {
 
         // Compute the square and cube for the rate function (the values are shifted to stay on 32 bits)
-	    REAL voltage_sq = ((somatic_voltage * somatic_voltage));
-	    REAL voltage_cube = ((voltage_sq * somatic_voltage));
+	    //REAL voltage_sq = ((somatic_voltage * somatic_voltage));
+	    //REAL voltage_cube = ((voltage_sq * somatic_voltage));
 
-	    io_printf(IO_BUF, "sq %k, cub %k\n", voltage_sq, voltage_cube);
+	    //io_printf(IO_BUF, "sq %k, cub %k\n", voltage_sq, voltage_cube);
 
-	    rate = ((cubic_term * voltage_cube)) +
-	           ((square_term * voltage_sq)) +
-	           ((linear_term * somatic_voltage)) +
-	           constant_term;
+	    //rate = ((cubic_term * voltage_cube)) +
+	    //       ((square_term * voltage_sq)) +
+	    //       ((linear_term * somatic_voltage)) +
+	    //       constant_term;
+	    rate = rate_lut[(uint32_t) (somatic_voltage << 4)];
 	}
 
 	return rate;

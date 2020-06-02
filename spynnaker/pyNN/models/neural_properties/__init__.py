@@ -14,5 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from .neural_parameter import NeuronParameter
+from .Abstract_is_rate_based import AbstractIsRateBased
 
-__all__ = ["NeuronParameter"]
+__all__ = ["NeuronParameter", "AbstractIsRateBased"]

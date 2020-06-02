@@ -263,7 +263,7 @@ bool synapse_dynamics_process_plastic_synapses(
 
     // Update pre-synaptic trace
     log_debug("Adding pre-synaptic event to trace at time:%u", time);
-    event_history->prev_time = real_rate;
+    event_history->prev_time += real_rate;
     //event_history->prev_trace =
     //        timing_add_pre_spike(time, last_pre_time, last_pre_trace);
 

@@ -173,6 +173,12 @@ class NeuronImplStandard(AbstractNeuronImpl):
     def is_conductance_based(self):
         return isinstance(self.__input_type, InputTypeConductance)
 
+    def generate_rate_lut(self):
+        return self.__neuron_model.generate_rate_lut()
+
+    def get_sdram_usage_for_rate_lut(self):
+        return self.__neuron_model.get_sdram_usage_for_rate_lut()
+
     def __getitem__(self, key):
         # Find the property in the components...
         for component in self.__components:

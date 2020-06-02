@@ -47,6 +47,8 @@ from spynnaker.pyNN.models.abstract_models import (
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.utilities.ranged import (
     SpynnakerRangeDictionary, SpynnakerRangedList)
+from spynnaker.pyNN.models.neural_properties import AbstractIsRateBased
+from data_specification.enums import DataType
 from .synaptic_manager import SynapticManager
 from .population_machine_vertex import PopulationMachineVertex
 
@@ -272,10 +274,17 @@ class AbstractPopulationVertex(
         :param vertex_slice: the slice of atoms.
         :return: The SDRAM required for the neuron region
         """
+
+        base = 0
+
+        if hasattr(self.__pynn_model, "_rate_based"):
+            base = self.__neuron_impl.get_sdram_usage_for_rate_lut() + 1
+
         return (
             self.BYTES_TILL_START_OF_GLOBAL_PARAMETERS +
             self.__neuron_recorder.get_sdram_usage_in_bytes(vertex_slice) +
-            self.__neuron_impl.get_sdram_usage_in_bytes(vertex_slice.n_atoms))
+            self.__neuron_impl.get_sdram_usage_in_bytes(vertex_slice.n_atoms) +
+            base)
 
     def _get_sdram_usage_for_atoms(
             self, vertex_slice, graph, machine_time_step):
@@ -420,6 +429,11 @@ class AbstractPopulationVertex(
         neuron_data = self.__neuron_impl.get_data(
             self._parameters, self._state_variables, vertex_slice)
         spec.write_array(neuron_data)
+
+        if hasattr(self.__pynn_model, "_rate_based"):
+            rate_lut = self.__neuron_impl.generate_rate_lut()
+            spec.write_value(data=len(rate_lut))
+            spec.write_array(rate_lut)
 
     @inject_items({
         "machine_time_step": "MachineTimeStep",
