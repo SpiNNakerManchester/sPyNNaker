@@ -20,13 +20,13 @@
 #include <debug.h>
 #include <bit_field.h>
 
-// bits in a word
+//! bits in a word
 #define BITS_PER_WORD 32
 
-// the highest bit within the word
+//! the highest bit within the word
 #define TOP_BIT_IN_WORD 31
 
-// the flag for when a spike isnt in the master pop table (so shouldnt happen)
+//! the flag for when a spike isnt in the master pop table (so shouldnt happen)
 #define NOT_IN_MASTER_POP_TABLE_FLAG -1
 
 
@@ -103,21 +103,20 @@ static inline void print_master_population_table(void) {
         master_population_table_entry entry = master_population_table[i];
         for (uint16_t j = entry.start; j < (entry.start + entry.count); j++) {
             if (!is_single(address_list[j])) {
-                log_info(
-                    "index (%d, %d), key: 0x%.8x, mask: 0x%.8x,"
-                    " offset: 0x%.8x, address: 0x%.8x, row_length: %u",
-                    i, j, entry.key, entry.mask,
-                    get_address(address_list[j]),
-                    get_address(address_list[j]) +
-                        (uint32_t) synaptic_rows_base_address,
-                    get_row_length(address_list[j]));
+                log_info("index (%d, %d), key: 0x%.8x, mask: 0x%.8x, "
+                        "offset: 0x%.8x, address: 0x%.8x, row_length: %u",
+                        i, j, entry.key, entry.mask,
+                        get_address(address_list[j]),
+                        get_address(address_list[j]) +
+                                (uint32_t) synaptic_rows_base_address,
+                        get_row_length(address_list[j]));
             } else {
-                log_info(
-                    "index (%d, %d), key: 0x%.8x, mask: 0x%.8x,"
-                    " offset: 0x%.8x, address: 0x%.8x, single",
-                    i, j, entry.key, entry.mask,
-                    get_direct_address(address_list[j]),
-                    get_direct_address(address_list[j]) + direct_rows_base_address);
+                log_info("index (%d, %d), key: 0x%.8x, mask: 0x%.8x, "
+                        "offset: 0x%.8x, address: 0x%.8x, single",
+                        i, j, entry.key, entry.mask,
+                        get_direct_address(address_list[j]),
+                        get_direct_address(address_list[j]) +
+                                direct_rows_base_address);
             }
         }
     }
@@ -187,79 +186,71 @@ bool population_table_initialise(
 
 bool population_table_get_first_address(
         spike_t spike, address_t* row_address, size_t* n_bytes_to_transfer) {
-
     // locate the position in the binary search / array
     log_debug("searching for key %d", spike);
     int position = population_table_position_in_the_master_pop_array(spike);
     log_debug("position = %d", position);
 
     // check we don't have a complete miss
-    if (position != NOT_IN_MASTER_POP_TABLE_FLAG){
-        master_population_table_entry entry = master_population_table[position];
-        if (entry.count == 0) {
-            log_debug(
-                "spike %u (= %x): population found in master population"
+    if (position == NOT_IN_MASTER_POP_TABLE_FLAG) {
+        invalid_master_pop_hits++;
+        log_debug("Ghost searches: %u\n", ghost_pop_table_searches);
+        log_debug("spike %u (= %x): "
+                "population not found in master population table",
+                spike, spike);
+        return false;
+    }
+
+    master_population_table_entry entry = master_population_table[position];
+    if (entry.count == 0) {
+        log_debug("spike %u (= %x): population found in master population"
                 "table but count is 0", spike, spike);
+    }
+
+    log_debug("about to try to find neuron id");
+    last_neuron_id = get_neuron_id(entry, spike);
+
+    // check we have a entry in the bit field for this (possible not to due to
+    // DTCM limitations or router table compression). If not, go to DMA check.
+    log_debug("checking bit field");
+    if (connectivity_bit_field[position] != NULL) {
+        log_debug("can be checked, bitfield is allocated");
+        // check that the bit flagged for this neuron id does hit a
+        // neuron here. If not return false and avoid the DMA check.
+        if (!bit_field_test(
+                connectivity_bit_field[position], last_neuron_id)) {
+            log_debug("tested and was not set");
+            bit_field_filtered_packets += 1;
+            return false;
         }
+        log_debug("was set, carrying on");
+    } else {
+        log_debug("bit_field was not set up. "
+                "either its due to a lack of dtcm, or because the "
+                "bitfield was merged into the routing table");
+    }
 
-        log_debug("about to try to find neuron id");
-        last_neuron_id = get_neuron_id(entry, spike);
+    // going to do a DMA to read the matrix and see if there's a hit.
+    log_debug("about to set items");
+    next_item = entry.start;
+    items_to_go = entry.count;
+    last_spike = spike;
 
-        // check we have a entry in the bit field for this (possible not to due
-        // to dtcm limitations or router table compression). If not, go to
-        // DMA check.
-        log_debug("checking bit field");
-        if (connectivity_bit_field[position] != NULL){
-            log_debug("can be checked, bitfield is allocated");
-            // check that the bit flagged for this neuron id does hit a
-            // neuron here. If not return false and avoid the DMA check.
-            if (!bit_field_test(
-                    connectivity_bit_field[position],  last_neuron_id)){
-                log_debug("tested and was not set");
-                bit_field_filtered_packets += 1;
-                return false;
-            }
-            log_debug("was set, carrying on");
-        }
-        else{
-            log_debug(
-                "bit_field was not set up. either its due to a lack of dtcm, "
-                "or because the bitfield was merged into the routing table");
-        }
-
-        // going to do a DMA to read the matrix and see if there's a hit.
-        log_debug("about to set items");
-        next_item = entry.start;
-        items_to_go = entry.count;
-        last_spike = spike;
-
-        log_debug(
-            "spike = %08x, entry_index = %u, start = %u, count = %u",
+    log_debug("spike = %08x, entry_index = %u, start = %u, count = %u",
             spike, position, next_item, items_to_go);
 
-        // A local address is used here as the interface requires something
-        // to be passed in but using the address of an argument is odd!
-        uint32_t local_spike_id;
-        bool get_next = population_table_get_next_address(
+    // A local address is used here as the interface requires something
+    // to be passed in but using the address of an argument is odd!
+    uint32_t local_spike_id;
+    bool get_next = population_table_get_next_address(
             &local_spike_id, row_address, n_bytes_to_transfer);
 
-        // tracks surplus dmas
-        if (!get_next){
-            log_debug(
-                "found a entry which has a ghost entry for key %d", spike);
-            ghost_pop_table_searches ++;
-        }
-        return get_next;
+    // tracks surplus dmas
+    if (!get_next) {
+        log_debug("found a entry which has a ghost entry for key %d", spike);
+        ghost_pop_table_searches++;
     }
-    else{
-        invalid_master_pop_hits ++;
-    }
-
-    log_debug("Ghost searches: %u\n", ghost_pop_table_searches);
-    log_debug(
-        "spike %u (= %x): population not found in master population table",
-        spike, spike);
-    return false;
+    return get_next;
 }
 
 //! \brief get the position in the master pop table
@@ -309,8 +300,8 @@ bool population_table_get_next_address(
         } else {
             uint32_t row_length = get_row_length(item);
             if (row_length > 0) {
-                uint32_t block_address =
-                        get_address(item) + (uint32_t) synaptic_rows_base_address;
+                uint32_t block_address = get_address(item) +
+                        (uint32_t) synaptic_rows_base_address;
                 uint32_t stride = (row_length + N_SYNAPSE_ROW_HEADER_WORDS);
                 uint32_t neuron_offset =
                         last_neuron_id * stride * sizeof(uint32_t);

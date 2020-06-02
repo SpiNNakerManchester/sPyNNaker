@@ -191,9 +191,10 @@ static void setup_synaptic_dma_read(dma_buffer *current_buffer,
         } else if (n_bytes_to_transfer == 0) {
             // If the row is in DTCM, process the row now
             synaptic_row_t single_fixed_synapse =
-                direct_synapses_get_direct_synapse(row_address);
+                    direct_synapses_get_direct_synapse(row_address);
             bool write_back;
-            synapses_process_synaptic_row(time, single_fixed_synapse, &write_back);
+            synapses_process_synaptic_row(
+                    time, single_fixed_synapse, &write_back);
             dma_n_rewires = 0;
             dma_n_spikes = 0;
         } else {
@@ -202,7 +203,7 @@ static void setup_synaptic_dma_read(dma_buffer *current_buffer,
             setup_done = true;
         }
     }
-    spike_processing_count ++;
+    spike_processing_count++;
 }
 
 static inline void setup_synaptic_dma_write(
@@ -410,7 +411,7 @@ uint32_t spike_processing_get_spike_processing_count(void) {
 }
 
 //! \brief get the address of the circular buffer used for buffering received
-//! spikes before processing them
+//!     spikes before processing them
 //! \return address of circular buffer
 circular_buffer get_circular_buffer(void) { // EXPORTED
     return buffer;
@@ -423,7 +424,7 @@ uint32_t spike_processing_get_successful_rewires(void) { // EXPORTED
 }
 
 //! \brief set the number of times spike_processing has to attempt rewiring
-//! \return bool: currently, always true
+//! \return currently, always true
 bool spike_processing_do_rewiring(int number_of_rewires) {
 
     // disable interrupts

@@ -202,19 +202,16 @@ static bool initialise(void) {
         return false;
     }
     // Set up the synapse dynamics
-    address_t synapse_dynamics_region_address =
-            data_specification_get_region(SYNAPSE_DYNAMICS_REGION, ds_regions);
     if (!synapse_dynamics_initialise(
-            synapse_dynamics_region_address, n_neurons, n_synapse_types,
+            data_specification_get_region(SYNAPSE_DYNAMICS_REGION, ds_regions),
+            n_neurons, n_synapse_types,
             ring_buffer_to_input_buffer_left_shifts)) {
         return false;
     }
 
     // Set up structural plasticity dynamics
-    address_t structural_plastic_region_address =
-        data_specification_get_region(STRUCTURAL_DYNAMICS_REGION, ds_regions);
-    if (!synaptogenesis_dynamics_initialise(
-            structural_plastic_region_address)) {
+    if (!synaptogenesis_dynamics_initialise(data_specification_get_region(
+            STRUCTURAL_DYNAMICS_REGION, ds_regions))) {
         return false;
     }
 
@@ -231,9 +228,8 @@ static bool initialise(void) {
 
     log_info("initialising the bit field region");
     print_post_to_pre_entry();
-    if (!bit_field_filter_initialise(
-            data_specification_get_region(
-                BIT_FIELD_FILTER_REGION, ds_regions))) {
+    if (!bit_field_filter_initialise(data_specification_get_region(
+            BIT_FIELD_FILTER_REGION, ds_regions))) {
         return false;
     }
 

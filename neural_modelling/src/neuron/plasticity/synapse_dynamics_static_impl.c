@@ -113,8 +113,7 @@ bool synapse_dynamics_find_neuron(
         uint32_t *offset, uint32_t *synapse_type) {
     address_t fixed_region = synapse_row_fixed_region(row);
     int32_t fixed_synapse = synapse_row_num_fixed_synapses(fixed_region);
-    uint32_t *synaptic_words = synapse_row_fixed_weight_controls(
-        fixed_region);
+    uint32_t *synaptic_words = synapse_row_fixed_weight_controls(fixed_region);
 
     // Loop through plastic synapses
     for (; fixed_synapse > 0; fixed_synapse--) {
@@ -126,9 +125,10 @@ bool synapse_dynamics_find_neuron(
             *offset = synapse_row_num_fixed_synapses(fixed_region) -
                     fixed_synapse;
             *weight = synapse_row_sparse_weight(synaptic_word);
-            *delay = synapse_row_sparse_delay(synaptic_word, synapse_type_index_bits);
+            *delay = synapse_row_sparse_delay(synaptic_word,
+                    synapse_type_index_bits);
             *synapse_type = synapse_row_sparse_type(
-                synaptic_word, synapse_index_bits, synapse_type_mask);
+                    synaptic_word, synapse_index_bits, synapse_type_mask);
             return true;
         }
     }
@@ -139,8 +139,7 @@ bool synapse_dynamics_find_neuron(
 bool synapse_dynamics_remove_neuron(uint32_t offset, address_t row) {
     address_t fixed_region = synapse_row_fixed_region(row);
     int32_t fixed_synapse = synapse_row_num_fixed_synapses(fixed_region);
-    uint32_t *synaptic_words = synapse_row_fixed_weight_controls(
-        fixed_region);
+    uint32_t *synaptic_words = synapse_row_fixed_weight_controls(fixed_region);
 
    // Delete control word at offset (contains weight)
     synaptic_words[offset] = synaptic_words[fixed_synapse-1];
@@ -167,8 +166,7 @@ bool synapse_dynamics_add_neuron(
         uint32_t delay, uint32_t type) {
     address_t fixed_region = synapse_row_fixed_region(row);
     int32_t fixed_synapse = synapse_row_num_fixed_synapses(fixed_region);
-    uint32_t *synaptic_words = synapse_row_fixed_weight_controls(
-        fixed_region);
+    uint32_t *synaptic_words = synapse_row_fixed_weight_controls(fixed_region);
     uint32_t new_synapse = _fixed_synapse_convert(id, weight, delay, type);
 
     // Add control word at offset

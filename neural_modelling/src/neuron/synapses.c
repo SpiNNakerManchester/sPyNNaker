@@ -373,8 +373,8 @@ void synapses_flush_ring_buffers(void) {
     }
 }
 
-//! \brief allows clearing of dtcm used by synapses
-//! \return bool true if successful false otherwise
+//! \brief allows clearing of DTCM used by synapses
+//! \return true if successful
 bool synapses_shut_down(void) {
     sark_free(ring_buffer_to_input_left_shifts);
     sark_free(ring_buffers);

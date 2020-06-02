@@ -68,28 +68,27 @@ static inline void synapses_print_weight(
 
 //! \brief inits the synapse processing
 //! \param[in] synapse_params_address: base address for the synapse params in
-//!  SDRAM
+//!     SDRAM
 //! \param[in] n_neurons: the number of neurons to simulate
 //! \param[in] n_synapse_types: how many synapse types there are
 //! \param[out] ring_buffer_to_input_buffer_left_shifts:
-//! \return bool states true if successfully initialised. False otherwise.
+//! \return True if successfully initialised. False otherwise.
 bool synapses_initialise(
-    address_t synapse_params_address,
-    uint32_t n_neurons, uint32_t n_synapse_types,
-    uint32_t **ring_buffer_to_input_buffer_left_shifts);
+        address_t synapse_params_address,
+        uint32_t n_neurons, uint32_t n_synapse_types,
+        uint32_t **ring_buffer_to_input_buffer_left_shifts);
 
 //! \brief updates synapses for a time step
-//! \param[in] time. the timer
-//! \return None
+//! \param[in] time: the timer
 void synapses_do_timestep_update(timer_t time);
 
 //! \brief process a synaptic row
 //! \param[in] time: the simulated time
 //! \param[in] row: the synaptic row in question
-//! \param[out] write_back: bool saying if to write back to SDRAM
-//! \return bool if successful or not
+//! \param[out] write_back: whether to write back to SDRAM
+//! \return True if successful
 bool synapses_process_synaptic_row(
-    uint32_t time, synaptic_row_t row, bool *write_back);
+        uint32_t time, synaptic_row_t row, bool *write_back);
 
 //! \brief returns the number of times the synapses have saturated their
 //!        weights.
@@ -106,7 +105,7 @@ uint32_t synapses_get_pre_synaptic_events(void);
 void synapses_flush_ring_buffers(void);
 
 //! \brief allows clearing of DTCM used by synapses
-//! \return bool true if successful false otherwise
+//! \return true if successful, false otherwise
 bool synapses_shut_down(void);
 
 #endif // _SYNAPSES_H_

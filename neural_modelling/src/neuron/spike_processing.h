@@ -51,7 +51,7 @@ uint32_t spike_processing_get_invalid_master_pop_table_hits(void);
 uint32_t spike_processing_get_successful_rewires(void);
 
 //! \brief set the number of times spike_processing has to attempt rewiring
-//! \return bool: currently, always true
+//! \return currently, always true
 bool spike_processing_do_rewiring(int number_of_rew);
 
 #endif // _SPIKE_PROCESSING_H_
