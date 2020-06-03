@@ -32,8 +32,8 @@
 //! parameters (random seed, spread of receptive field etc.)
 //! \param[in] sdram_sp_address Address of the start of the SDRAM region
 //! which contains synaptic rewiring params.
-//! \return address_t Address after the final word read from SDRAM.
-address_t synaptogenesis_dynamics_initialise(
+//! \return Whether we were successful.
+bool synaptogenesis_dynamics_initialise(
         address_t sdram_sp_address);
 
 //! \brief Function called (usually on a timer from c_main) to
@@ -63,5 +63,8 @@ bool synaptogenesis_is_fast(void);
 
 //! Indicates that a spike has been received
 void synaptogenesis_spike_received(uint32_t time, spike_t spike);
+
+//! Prints a certain data object
+void print_post_to_pre_entry(void);
 
 #endif // _SYNAPTOGENESIS_DYNAMICS_H_
