@@ -21,7 +21,7 @@
 #include <common/neuron-typedefs.h>
 #include <neuron/synapse_row.h>
 
-address_t synapse_dynamics_initialise(
+bool synapse_dynamics_initialise(
         address_t address, uint32_t n_neurons, uint32_t n_synapse_types,
         uint32_t *ring_buffer_to_input_buffer_left_shifts);
 

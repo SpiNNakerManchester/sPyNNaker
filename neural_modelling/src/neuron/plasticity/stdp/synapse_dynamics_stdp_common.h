@@ -153,11 +153,11 @@ void synapse_dynamics_print_plastic_synapses(
 #endif // LOG_LEVEL >= LOG_DEBUG
 }
 
-address_t synapse_dynamics_stdp_initialise(
+bool synapse_dynamics_stdp_initialise(
         address_t address, uint32_t n_neurons, uint32_t n_synapse_types,
         uint32_t *ring_buffer_to_input_buffer_left_shifts);
 
-address_t synapse_dynamics_initialise(
+bool synapse_dynamics_initialise(
         address_t address, uint32_t n_neurons, uint32_t n_synapse_types,
         uint32_t *ring_buffer_to_input_buffer_left_shifts) {
 
@@ -166,11 +166,11 @@ address_t synapse_dynamics_initialise(
     address = (address_t) &sdram_params[1];
 
     // Call the stdp initialise function
-    address_t weight_result = synapse_dynamics_stdp_initialise(
+    bool weight_result = synapse_dynamics_stdp_initialise(
     		address, n_neurons, n_synapse_types,
 			ring_buffer_to_input_buffer_left_shifts);
     if (weight_result == NULL) {
-        return NULL;
+        return false;
     }
 
     uint32_t n_neurons_power_2 = n_neurons;
@@ -199,7 +199,7 @@ address_t synapse_dynamics_initialise(
             SYNAPSE_DELAY_BITS + synapse_type_index_bits;
     synapse_type_mask = (1 << log_n_synapse_types) - 1;
 
-    return weight_result;
+    return true;
 }
 
 void synapse_dynamics_stdp_process_plastic_synapse(

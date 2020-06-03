@@ -19,6 +19,7 @@
 #include "population_table/population_table.h"
 #include "synapse_row.h"
 #include "synapses.h"
+#include "direct_synapses.h"
 #include "structural_plasticity/synaptogenesis_dynamics.h"
 #include <simulation.h>
 #include <debug.h>
@@ -67,8 +68,6 @@ static uint32_t buffer_being_read;
 
 static uint32_t max_n_words;
 
-static uint32_t single_fixed_synapse[4];
-
 static volatile uint32_t rewires_to_do = 0;
 
 // The number of rewires to do when the DMA completes.  When a DMA is first set
@@ -79,9 +78,14 @@ static uint32_t dma_n_rewires;
 // up, only this or dma_n_rewires can be 1 with the other being 0.
 static uint32_t dma_n_spikes;
 
+// the number of dma completes (used in provenance generation)
+static uint32_t dma_complete_count = 0;
+
+// the number of spikes that were processed (used in provenance generation)
+static uint32_t spike_processing_count = 0;
+
 // The number of successful rewires
 static uint32_t n_successful_rewires = 0;
-
 
 /* PRIVATE FUNCTIONS - static for inlining */
 
@@ -103,14 +107,6 @@ static inline void do_dma_read(
         // Do Nothing
     }
     next_buffer_to_fill = (next_buffer_to_fill + 1) % N_DMA_BUFFERS;
-}
-
-
-static inline void do_direct_row(address_t row_address) {
-    single_fixed_synapse[3] = (uint32_t) row_address[0];
-    // Write back should be False by definition as single rows don't have STDP
-    bool write_back;
-    synapses_process_synaptic_row(time, single_fixed_synapse, &write_back);
 }
 
 // Check if there is anything to do - if not, DMA is not busy
@@ -194,7 +190,11 @@ static void setup_synaptic_dma_read(dma_buffer *current_buffer,
             dma_n_spikes = 0;
         } else if (n_bytes_to_transfer == 0) {
             // If the row is in DTCM, process the row now
-            do_direct_row(row_address);
+            synaptic_row_t single_fixed_synapse =
+                    direct_synapses_get_direct_synapse(row_address);
+            bool write_back;
+            synapses_process_synaptic_row(
+                    time, single_fixed_synapse, &write_back);
             dma_n_rewires = 0;
             dma_n_spikes = 0;
         } else {
@@ -203,6 +203,7 @@ static void setup_synaptic_dma_read(dma_buffer *current_buffer,
             setup_done = true;
         }
     }
+    spike_processing_count++;
 }
 
 static inline void setup_synaptic_dma_write(
@@ -258,6 +259,9 @@ static void multicast_packet_received_callback(uint key, uint payload) {
 // Called when a DMA completes
 static void dma_complete_callback(uint unused, uint tag) {
     use(unused);
+
+    // increment the dma complete count for provenance generation
+    dma_complete_count++;
 
     log_debug("DMA transfer complete at time %u with tag %u", time, tag);
 
@@ -365,11 +369,6 @@ bool spike_processing_initialise( // EXPORTED
         return false;
     }
 
-    // Set up for single fixed synapses (data that is consistent per direct row)
-    single_fixed_synapse[0] = 0;
-    single_fixed_synapse[1] = 1;
-    single_fixed_synapse[2] = 0;
-
     // Set up the callbacks
     spin1_callback_on(MC_PACKET_RECEIVED,
             multicast_packet_received_callback, mc_packet_callback_priority);
@@ -387,8 +386,32 @@ uint32_t spike_processing_get_buffer_overflows(void) { // EXPORTED
     return in_spikes_get_n_buffer_overflows();
 }
 
+//! \brief returns the number of ghost searches occurred
+//! \return the number of times a ghost search occurred.
+uint32_t spike_processing_get_ghost_pop_table_searches(void) {
+	return population_table_get_ghost_pop_table_searches();
+}
+
+//! \brief returns the number of master pop table failed hits
+//! \return the number of times a spike did not have a master pop table entry
+uint32_t spike_processing_get_invalid_master_pop_table_hits(void) {
+    return population_table_get_invalid_master_pop_hits();
+}
+
+//! \brief returns the number of DMA's that were completed
+//! \return the number of DMA's that were completed.
+uint32_t spike_processing_get_dma_complete_count(void) {
+    return dma_complete_count;
+}
+
+//! \brief returns the number of spikes that were processed
+//! \return the number of spikes that were processed
+uint32_t spike_processing_get_spike_processing_count(void) {
+    return spike_processing_count;
+}
+
 //! \brief get the address of the circular buffer used for buffering received
-//! spikes before processing them
+//!     spikes before processing them
 //! \return address of circular buffer
 circular_buffer get_circular_buffer(void) { // EXPORTED
     return buffer;
@@ -401,7 +424,7 @@ uint32_t spike_processing_get_successful_rewires(void) { // EXPORTED
 }
 
 //! \brief set the number of times spike_processing has to attempt rewiring
-//! \return bool: currently, always true
+//! \return currently, always true
 bool spike_processing_do_rewiring(int number_of_rewires) {
 
     // disable interrupts

@@ -87,14 +87,14 @@ static inline final_state_t mad_plasticity_update_synapse(
     return synapse_structure_get_final_state(current_state);
 }
 
-address_t synapse_dynamics_stdp_initialise(
+bool synapse_dynamics_stdp_initialise(
         address_t address, uint32_t n_neurons, uint32_t n_synapse_types,
         uint32_t *ring_buffer_to_input_buffer_left_shifts) {
 
     // Load timing dependence data
     address_t weight_region_address = timing_initialise(address);
     if (address == NULL) {
-        return NULL;
+        return false;
     }
 
     // Load weight dependence data
@@ -102,15 +102,15 @@ address_t synapse_dynamics_stdp_initialise(
             weight_region_address, n_synapse_types,
             ring_buffer_to_input_buffer_left_shifts);
     if (weight_result == NULL) {
-        return NULL;
+        return false;
     }
 
     post_event_history = post_events_init_buffers(n_neurons);
     if (post_event_history == NULL) {
-        return NULL;
+        return false;
     }
 
-    return weight_result;
+    return true;
 }
 
 //---------------------------------------
