@@ -226,7 +226,7 @@ static bool initialise(void) {
     // Setup profiler
     profiler_init(data_specification_get_region(PROFILER_REGION, ds_regions));
 
-    log_info("initialising the bit field region");
+    log_debug("initialising the bit field region");
     print_post_to_pre_entry();
     if (!bit_field_filter_initialise(data_specification_get_region(
             BIT_FIELD_FILTER_REGION, ds_regions))) {

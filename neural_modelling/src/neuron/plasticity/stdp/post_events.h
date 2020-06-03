@@ -54,9 +54,9 @@ typedef struct {
 //---------------------------------------
 
 static inline void print_event_history(const post_event_history_t *events) {
-    log_info("      ##  printing entire post event history  ##");
+    log_debug("      ##  printing entire post event history  ##");
     for (uint32_t i = 0; i <= events->count_minus_one; i++) {
-        log_info("post event: %u, time: %u, trace: %u",
+        log_debug("post event: %u, time: %u, trace: %u",
                 i, events->times[i], events->traces[i]);
     }
 }

@@ -98,12 +98,12 @@ static inline uint32_t get_neuron_id(
 }
 
 static inline void print_master_population_table(void) {
-    log_info("master_population\n");
+    log_debug("master_population\n");
     for (uint32_t i = 0; i < master_population_table_length; i++) {
         master_population_table_entry entry = master_population_table[i];
         for (uint16_t j = entry.start; j < (entry.start + entry.count); j++) {
             if (!is_single(address_list[j])) {
-                log_info("index (%d, %d), key: 0x%.8x, mask: 0x%.8x, "
+                log_debug("index (%d, %d), key: 0x%.8x, mask: 0x%.8x, "
                         "offset: 0x%.8x, address: 0x%.8x, row_length: %u",
                         i, j, entry.key, entry.mask,
                         get_address(address_list[j]),
@@ -111,7 +111,7 @@ static inline void print_master_population_table(void) {
                                 (uint32_t) synaptic_rows_base_address,
                         get_row_length(address_list[j]));
             } else {
-                log_info("index (%d, %d), key: 0x%.8x, mask: 0x%.8x, "
+                log_debug("index (%d, %d), key: 0x%.8x, mask: 0x%.8x, "
                         "offset: 0x%.8x, address: 0x%.8x, single",
                         i, j, entry.key, entry.mask,
                         get_direct_address(address_list[j]),
@@ -120,7 +120,7 @@ static inline void print_master_population_table(void) {
             }
         }
     }
-    log_info("Population table has %u entries", master_population_table_length);
+    log_debug("Population table has %u entries", master_population_table_length);
 }
 
 bool population_table_initialise(
