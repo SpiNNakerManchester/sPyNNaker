@@ -351,10 +351,11 @@ void neuron_do_timestep_update( // EXPORTED
 
         // Custom recording
         recorded_variable_values[0] = spike_profiling_get_spike_holder_as_accum(
-                        spike_cache);
-        recorded_variable_values[1] = last_spikes;
-        recorded_variable_values[2] = spike_profiling_get_spike_holder_as_accum(
-                spike_cache_inh);
+                        spike_cache, 0);
+        recorded_variable_values[1] = spike_profiling_get_spike_holder_as_accum(
+                                                              spike_cache, 1);
+//        recorded_variable_values[2] = spike_profiling_get_spike_holder_as_accum(
+//                spike_cache_inh);
 
         // Write the recorded variable values
         for (uint32_t i = 0; i < n_recorded_vars; i++) {

@@ -290,6 +290,7 @@ void timer_callback(uint timer_count, uint unused) {
     deactivation_time = spike_processing_get_pipeline_deactivation_time();
 
     // cache and flush spike counters
+    // CUSTOM PROFILING
 	spike_profiling_cache_and_flush_spike_holder(&spike_counter,
 			&spike_cache);
 	spike_profiling_cache_and_flush_spike_holder(&spike_counter_inh,

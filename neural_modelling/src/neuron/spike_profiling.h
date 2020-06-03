@@ -1,10 +1,12 @@
 #include <stdfix-full-iso.h>
 
+
+// This struct can be used to record arbitrary variables
 typedef struct spike_holder_t {
-	uint8_t spikes_a;
-	uint8_t spikes_b;
-	uint8_t spikes_c;
-	uint8_t spikes_d;
+	uint16_t spikes_a;
+	uint16_t spikes_b;
+	uint16_t spikes_c;
+	uint16_t spikes_d;
 } spike_holder_t;
 
 static inline void spike_profiling_cache_and_flush_spike_holder(
@@ -42,27 +44,27 @@ static inline void spike_profiling_add_count(uint32_t row_length,
 }
 
 static inline int32_t spike_profiling_get_spike_holder_as_int(
-        struct spike_holder_t spikes) {
+        struct spike_holder_t spikes, int i) {
 
 	union {
-		int32_t inty;
+		int32_t inty[2];
 		struct spike_holder_t sh;
 	} x;
 
 	x.sh = spikes;
 
-	return x.inty;
+	return x.inty[i];
 }
 
 static inline accum spike_profiling_get_spike_holder_as_accum(
-        struct spike_holder_t spikes) {
+        struct spike_holder_t spikes, int i) {
 	union {
-		accum acc;
+		accum acc[2];
 		struct spike_holder_t sh;
 	} x;
 	x.sh = spikes;
 
-	return x.acc;
+	return x.acc[i];
 }
 
 static inline void spike_profiling_print_spikes_from_spike_holder(
