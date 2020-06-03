@@ -70,6 +70,18 @@ static circular_buffer current_state_queue;
 // Free current states
 static circular_buffer free_states;
 
+void print_post_to_pre_entry(void) {
+    uint32_t n_elements =
+            rewiring_data.s_max * rewiring_data.machine_no_atoms;
+
+    for (uint32_t i=0; i < n_elements; i++) {
+        log_debug("index %d, pop index %d, sub pop index %d, neuron_index %d",
+                i, post_to_pre_table[i].pop_index,
+                post_to_pre_table[i].sub_pop_index,
+                post_to_pre_table[i].neuron_index);
+    }
+}
+
 //-----------------------------------------------------------------------------
 // Initialisation                                                             |
 //-----------------------------------------------------------------------------
@@ -78,45 +90,19 @@ static circular_buffer free_states;
 //! parameters (random seed, spread of receptive field etc.)
 //! \param[in] sdram_sp_address Address of the start of the SDRAM region
 //! which contains synaptic rewiring params.
-//! \return address_t Address after the final word read from SDRAM.
-address_t synaptogenesis_dynamics_initialise(address_t sdram_sp_address) {
-    log_info("SR init.");
+//! \return true when successful
+bool synaptogenesis_dynamics_initialise(address_t sdram_sp_address) {
+    log_debug("SR init.");
 
-    uint8_t *data = (uint8_t *) sdram_sp_address;
-    spin1_memcpy(&rewiring_data, data, sizeof(rewiring_data));
-    data += sizeof(rewiring_data);
-    log_info("Topographic Map Impl, s_max=%u", rewiring_data.s_max);
-
-    pre_info.no_pre_pops = rewiring_data.no_pre_pops;
-    pre_info.prepop_info = spin1_malloc(
-            rewiring_data.no_pre_pops * sizeof(pre_info_t *));
-    if (pre_info.prepop_info == NULL) {
-        log_error("Could not initialise pre population info");
-        rt_error(RTE_SWERR);
-    }
-    for (uint32_t i = 0; i < rewiring_data.no_pre_pops; i++) {
-        pre_info.prepop_info[i] = (pre_info_t *) data;
-        uint32_t pre_size = (pre_info.prepop_info[i]->no_pre_vertices
-                * sizeof(key_atom_info_t)) + sizeof(pre_info_t);
-        pre_info.prepop_info[i] = spin1_malloc(pre_size);
-        if (pre_info.prepop_info[i] == NULL) {
-            log_error("Could not initialise pre population info %d", i);
-            rt_error(RTE_SWERR);
-        }
-        spin1_memcpy(pre_info.prepop_info[i], data, pre_size);
-        data += pre_size;
-    }
-
-    post_to_pre_table = (post_to_pre_entry *) data;
-    uint32_t n_elements = rewiring_data.s_max * rewiring_data.machine_no_atoms;
-    data = (uint8_t *) &post_to_pre_table[n_elements];
+    uint8_t *data = sp_structs_read_in_common(
+            sdram_sp_address, &rewiring_data, &pre_info, &post_to_pre_table);
 
     // Allocate current states
     uint32_t n_states = 1;
     if (rewiring_data.fast) {
         n_states = rewiring_data.p_rew;
     }
-    log_info("Rewiring period %u, fast=%u, n_states=%u",
+    log_debug("Rewiring period %u, fast=%u, n_states=%u",
             rewiring_data.p_rew, rewiring_data.fast, n_states);
     // Add one to number of states as buffer wastes an entry
     current_state_queue = circular_buffer_initialize(n_states + 1);
@@ -144,7 +130,7 @@ address_t synaptogenesis_dynamics_initialise(address_t sdram_sp_address) {
     partner_init(&data);
 
     formation_params = spin1_malloc(
-        rewiring_data.no_pre_pops * sizeof(struct formation_params *));
+            rewiring_data.no_pre_pops * sizeof(struct formation_params *));
     if (formation_params == NULL) {
         log_error("Could not initialise formation parameters");
         rt_error(RTE_SWERR);
@@ -154,7 +140,7 @@ address_t synaptogenesis_dynamics_initialise(address_t sdram_sp_address) {
     }
 
     elimination_params = spin1_malloc(
-        rewiring_data.no_pre_pops * sizeof(struct elimination_params *));
+            rewiring_data.no_pre_pops * sizeof(struct elimination_params *));
     if (elimination_params == NULL) {
         log_error("Could not initialise elimination parameters");
         rt_error(RTE_SWERR);
@@ -163,7 +149,7 @@ address_t synaptogenesis_dynamics_initialise(address_t sdram_sp_address) {
         elimination_params[i] = synaptogenesis_elimination_init(&data);
     }
 
-    return (address_t) data;
+    return true;
 }
 
 bool synaptogenesis_dynamics_rewire(
@@ -183,7 +169,8 @@ bool synaptogenesis_dynamics_rewire(
 
     // Select an arbitrary synaptic element for the neurons
     uint32_t row_offset = post_id * rewiring_data.s_max;
-    uint32_t column_offset = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) *
+    uint32_t column_offset =
+            ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) *
             rewiring_data.s_max;
     uint32_t total_offset = row_offset + column_offset;
     post_to_pre_entry entry = post_to_pre_table[total_offset];
@@ -215,7 +202,7 @@ bool synaptogenesis_dynamics_rewire(
         if (!population_table_get_next_address(
                 spike, synaptic_row_address, n_bytes)) {
             log_error("FAIL@key %d, index %d (failed at %d)",
-                *spike, m_pop_index, index);
+                    *spike, m_pop_index, index);
             rt_error(RTE_SWERR);
         }
         index++;
@@ -248,9 +235,9 @@ bool synaptogenesis_dynamics_rewire(
 //!                     rewiring
 //! \return nothing
 bool synaptogenesis_row_restructure(uint32_t time, address_t row) {
-
     current_state_t *current_state;
-    if (!circular_buffer_get_next(current_state_queue, (uint32_t *) &current_state)) {
+    if (!circular_buffer_get_next(current_state_queue,
+            (uint32_t *) &current_state)) {
         log_error("Could not read a state!");
         rt_error(RTE_SWERR);
     }
@@ -265,10 +252,11 @@ bool synaptogenesis_row_restructure(uint32_t time, address_t row) {
                 &(current_state->weight), &(current_state->delay),
                 &(current_state->offset), &(current_state->synapse_type))) {
             return_value = synaptogenesis_elimination_rule(current_state,
-                elimination_params[current_state->post_to_pre.pop_index],
-                time, row);
+                    elimination_params[current_state->post_to_pre.pop_index],
+                    time, row);
         } else {
-            log_info("Post neuron %u not in row", current_state->post_syn_id);
+            log_debug("Post neuron %d not in row",
+                    current_state->post_syn_id);
             return_value = false;
         }
     } else {
@@ -281,7 +269,8 @@ bool synaptogenesis_row_restructure(uint32_t time, address_t row) {
             return_value = false;
         } else {
             return_value = synaptogenesis_formation_rule(current_state,
-                formation_params[current_state->post_to_pre.pop_index], time, row);
+                formation_params[current_state->post_to_pre.pop_index],
+                time, row);
         }
     }
 
