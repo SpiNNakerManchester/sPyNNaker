@@ -228,7 +228,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
     // Get the voltage
     state_t voltage = neuron_model_get_membrane_voltage(neuron);
-    recorded_variable_values[V_RECORDING_INDEX] = voltage;
+//    recorded_variable_values[V_RECORDING_INDEX] = voltage;
 
     // Store whether the neuron has spiked
     bool spike = false;
@@ -246,6 +246,14 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
         input_t* inh_input_values = input_type_get_input_value(
                 inh_value, input_type, NUM_INHIBITORY_RECEPTORS);
 
+        // record synaptic conductance
+        if (neuron_index == 0){
+        	recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = exc_input_values[0];
+        } else if (neuron_index == 1) {
+        	recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = inh_input_values[0];
+        }
+
+
         // Sum g_syn contributions from all receptors for recording
         REAL total_exc = 0;
         REAL total_inh = 0;
@@ -257,19 +265,27 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
             total_inh += inh_input_values[i];
         }
 
-        // Call functions to get the input values to be recorded
-        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = total_exc;
-        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = total_inh;
 
         // Call functions to convert exc_input and inh_input to current
         voltage = neuron_model_get_membrane_voltage(neuron);
+
         input_type_convert_excitatory_input_to_current(
                 exc_input_values, input_type, voltage);
         input_type_convert_inhibitory_input_to_current(
                 inh_input_values, input_type, voltage);
 
-        external_bias += additional_input_get_input_value_as_current(
-                additional_input, voltage);
+//        external_bias += additional_input_get_input_value_as_current(
+//                additional_input, voltage);
+
+        // Call functions to get the input values to be recorded
+        // record synaptic current
+        if (neuron_index == 0){
+        	recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = exc_input_values[0];
+        } else if (neuron_index == 1) {
+        	recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = inh_input_values[0];
+        }
+
+
 
         // update neuron parameters
         state_t result = neuron_model_state_update(
@@ -292,9 +308,15 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
             additional_input_has_spiked(additional_input);
         }
 
+
+
+
+
         // Shape the existing input according to the included rule
         synapse_types_shape_input(synapse_type);
     }
+
+    recorded_variable_values[V_RECORDING_INDEX] = voltage;
 
 #if LOG_LEVEL >= LOG_DEBUG
     neuron_model_print_state_variables(neuron);
