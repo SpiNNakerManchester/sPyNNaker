@@ -198,7 +198,7 @@ static inline index_t synapse_row_sparse_type_index(
     return x & synapse_type_index_mask;
 }
 
-//! \brief Get the delay
+//! \brief Get the delay from an encoded synapse descriptor
 //! \param[in] x: The value to decode
 //! \param[in] synapse_type_index_bits:
 //!     Number of bits for the synapse type and index (depends on type)
@@ -208,8 +208,9 @@ static inline index_t synapse_row_sparse_delay(
     return (x >> synapse_type_index_bits) & SYNAPSE_DELAY_MASK;
 }
 
-//! \brief Get the weight
+//! \brief Get the weight from an encoded synapse descriptor
 //! \param[in] x: The value to decode
+//! \return the weight
 static inline weight_t synapse_row_sparse_weight(uint32_t x) {
     return x >> (32 - SYNAPSE_WEIGHT_BITS);
 }

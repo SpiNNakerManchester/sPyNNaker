@@ -30,7 +30,7 @@
 #define TOP_BIT_IN_WORD 31
 
 //! \brief The flag for when a spike isn't in the master pop table (so
-//! shouldn't happen)
+//!     shouldn't happen)
 #define NOT_IN_MASTER_POP_TABLE_FLAG -1
 
 //! \brief An entry in the master population table.
@@ -86,11 +86,14 @@ static uint16_t next_item = 0;
 static uint16_t items_to_go = 0;
 
 //! \brief The number of packets dropped because the bitfield filter says
-//! they don't hit anything
+//!     they don't hit anything
 static uint32_t bit_field_filtered_packets = 0;
 
 //! The bitfield map
 bit_field_t *connectivity_bit_field;
+
+//! \name Support functions
+//! \{
 
 //! \brief Get the direct address out of an entry
 //! \param[in] entry: the table entry
@@ -102,8 +105,8 @@ static inline uint32_t get_direct_address(address_and_row_length entry) {
 
 //! \brief Get the standard address out of an entry
 //!
-//! The address is in words and is the top 23-bits but 1, so this down
-//! shifts by 8 and then multiplies by 16 (= up shifts by 4)
+//! The address is in units of four words, so this multiplies by 16 (= up
+//! shifts by 4)
 //! \param[in] entry: the table entry
 //! \return a row address
 static inline uint32_t get_address(address_and_row_length entry) {
@@ -162,6 +165,10 @@ static inline void print_master_population_table(void) {
     }
     log_info("Population table has %u entries", master_population_table_length);
 }
+//! \}
+
+//! \name API functions
+//! \{
 
 bool population_table_initialise(
         address_t table_address, address_t synapse_rows_address,
@@ -293,9 +300,6 @@ bool population_table_get_first_address(
     return get_next;
 }
 
-//! \brief get the position in the master pop table
-//! \param[in] spike: The spike received
-//! \return the position in the master pop table
 int population_table_position_in_the_master_pop_array(spike_t spike) {
     uint32_t imin = 0;
     uint32_t imax = master_population_table_length;
@@ -365,27 +369,19 @@ bool population_table_get_next_address(
     return is_valid;
 }
 
-//! \brief generates how many dma's were pointless
-//! \return uint of how many were done
 uint32_t population_table_get_ghost_pop_table_searches(void) {
     return ghost_pop_table_searches;
 }
 
-//! \brief get the number of master pop table key misses
-//! \return the number of master pop table key misses
 uint32_t population_table_get_invalid_master_pop_hits(void) {
     return invalid_master_pop_hits;
 }
 
-//! \brief sets the connectivity lookup element
-//! \param[in] connectivity_lookup: the connectivity lookup
 void population_table_set_connectivity_bit_field(
         bit_field_t* connectivity_bit_fields){
     connectivity_bit_field = connectivity_bit_fields;
 }
 
-//! \brief clears the dtcm allocated by the population table.
-//! \return bool that says if the clearing was successful or not.
 bool population_table_shut_down(void) {
     sark_free(address_list);
     sark_free(master_population_table);
@@ -399,28 +395,19 @@ bool population_table_shut_down(void) {
     return true;
 }
 
-//! \brief length of master pop table
-//! \return length of the master pop table
 uint32_t population_table_length(void) {
     return master_population_table_length;
 }
 
-//! \brief gets the spike associated at a specific index
-//! \param[in] index: the index in the master pop table
-//! \return the spike
 spike_t population_table_get_spike_for_index(uint32_t index) {
     return master_population_table[index].key;
 }
 
-//! \brief get the mask for the entry at a specific index
-//! \param[in] index: the index in the master pop table
-//! \return the mask associated with this entry
 uint32_t population_table_get_mask_for_entry(uint32_t index) {
     return master_population_table[index].mask;
 }
 
-//! \brief get the number of packets that were filtered from the bitfield filter
-//! \return the number of packets filtered by the bitfield filter
 uint32_t population_table_get_filtered_packet_count(void) {
     return bit_field_filtered_packets;
 }
+//! \}

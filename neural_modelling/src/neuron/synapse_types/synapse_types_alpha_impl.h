@@ -93,7 +93,6 @@ static inline void alpha_shaping(alpha_params_t* a_params) {
 //! plus the leaky aspect of a neuron.
 //!
 //! \param[in,out] parameters: the parameters to update
-//! \return nothing
 static inline void synapse_types_shape_input(
 		synapse_param_t *parameters) {
     alpha_shaping(&parameters->exc);
@@ -110,7 +109,6 @@ static inline void synapse_types_shape_input(
 //!     neuron
 //! \param[in] a_params: the parameter to update
 //! \param[in] input: the input to add.
-//! \return None
 static inline void add_input_alpha(alpha_params_t *a_params, input_t input) {
     a_params->q_buff = input;
 

@@ -29,7 +29,7 @@
 
 //! \brief Initialisation of synaptic rewiring (synaptogenesis)
 //!     parameters (random seed, spread of receptive field etc.)
-//! \param[in] sdram_sp_address Address of the start of the SDRAM region
+//! \param[in] sdram_sp_address: Address of the start of the SDRAM region
 //!     which contains synaptic rewiring params.
 //! \return Whether we were successful.
 bool synaptogenesis_dynamics_initialise(

@@ -95,7 +95,6 @@ static inline void exp_shaping(exp_params_t *exp_param) {
 //! neuron.
 //!
 //! \param[in,out] parameters: the parameters to update
-//! \return nothing
 static inline void synapse_types_shape_input(synapse_param_t *parameters) {
 	exp_shaping(&parameters->exc);
 	exp_shaping(&parameters->exc2);
@@ -106,7 +105,6 @@ static inline void synapse_types_shape_input(synapse_param_t *parameters) {
 //!     neuron
 //! \param[in,out] exp_param: the parameter to be updated
 //! \param[in] input: the input to add.
-//! \return None
 static inline void add_input_exp(exp_params_t *exp_param, input_t input) {
 	exp_param->synaptic_input_value = exp_param->synaptic_input_value +
 			decay_s1615(input, exp_param->init);
@@ -118,7 +116,6 @@ static inline void add_input_exp(exp_params_t *exp_param, input_t input) {
 //!     considered (aka excitatory or inhibitory etc)
 //! \param[in,out] parameters: the pointer to the parameters to use
 //! \param[in] input: the inputs for that given synapse_type.
-//! \return None
 static inline void synapse_types_add_neuron_input(
         index_t synapse_type_index, synapse_param_t *parameters,
         input_t input) {
@@ -180,7 +177,6 @@ static inline const char *synapse_types_get_type_char(
 //!     currently only executed when the models are in debug mode, as the prints
 //!     are controlled from the synapses.c print_inputs() method.
 //! \param[in] parameters: the pointer to the parameters to use
-//! \return Nothing
 static inline void synapse_types_print_input(
         synapse_param_t *parameters) {
     io_printf(IO_BUF, "%12.6k + %12.6k - %12.6k",

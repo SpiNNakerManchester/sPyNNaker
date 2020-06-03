@@ -128,11 +128,6 @@ static inline current_state_t *_alloc_state(void) {
 // Initialisation                                                             |
 //-----------------------------------------------------------------------------
 
-//! \brief Initialisation of synaptic rewiring (synaptogenesis)
-//! parameters (random seed, spread of receptive field etc.)
-//! \param[in] sdram_sp_address Address of the start of the SDRAM region
-//! which contains synaptic rewiring params.
-//! \return true when successful
 bool synaptogenesis_dynamics_initialise(address_t sdram_sp_address) {
     log_debug("SR init.");
 

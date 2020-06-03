@@ -81,7 +81,6 @@ typedef enum {
 //!     In this case, a delta shape means returning the value to zero
 //!     immediately.
 //! \param[out] delta_param: the parameter to update
-//! \return nothing
 static inline void delta_shaping(delta_params_t *delta_param) {
 	delta_param->synaptic_input_value = 0;
 }
@@ -94,7 +93,6 @@ static inline void delta_shaping(delta_params_t *delta_param) {
 //! plus the leaky aspect of a neuron.
 //!
 //! \param[in,out] parameters: the pointer to the parameters to use
-//! \return nothing
 static inline void synapse_types_shape_input(
         synapse_param_t *parameters) {
 	delta_shaping(&parameters->exc);
@@ -105,7 +103,6 @@ static inline void synapse_types_shape_input(
 //!     neuron
 //! \param[in,out] delta_param: the parameter to update
 //! \param[in] input: the input to add.
-//! \return None
 static inline void add_input_delta(
         delta_params_t *delta_param, input_t input) {
 	delta_param->synaptic_input_value += input;
@@ -117,7 +114,6 @@ static inline void add_input_delta(
 //!     considered (aka excitatory or inhibitory etc)
 //! \param[in,out] parameters: the pointer to the parameters to use
 //! \param[in] input the inputs for that given synapse_type.
-//! \return None
 static inline void synapse_types_add_neuron_input(
         index_t synapse_type_index, synapse_param_t *parameters,
         input_t input) {
@@ -173,7 +169,6 @@ static inline const char *synapse_types_get_type_char(
 //!     currently only executed when the models are in debug mode, as the prints
 //!     are controlled from the synapses.c print_inputs() method.
 //! \param[in] parameters: the pointer to the parameters to use
-//! \return Nothing
 static inline void synapse_types_print_input(
         synapse_param_t *parameters) {
     io_printf(IO_BUF, "%12.6k - %12.6k",

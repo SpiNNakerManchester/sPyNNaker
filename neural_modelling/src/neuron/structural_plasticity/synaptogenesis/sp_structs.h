@@ -209,6 +209,17 @@ static inline bool sp_structs_add_synapse(
     return true;
 }
 
+//! \brief Common code for structural plasticity initialisation.
+//! \param[in] sdram_sp_address: Address of the configuration region.
+//! \param[in,out] rewiring_data:
+//!     Address of the rewiring information structure to fill out.
+//! \param[in,out] pre_info:
+//!     The pre-population information structure to fill out.
+//! \param[out] post_to_pre_table: Variable to receive the address of the
+//!     post-population-to-pre-population mapping table that this function
+//!     discovers in the configuration region.
+//! \return pointer to the next piece of memory after the common section of the
+//!     configuration region.
 static inline uint8_t *sp_structs_read_in_common(
         address_t sdram_sp_address, rewiring_data_t *rewiring_data,
         pre_pop_info_table_t *pre_info,
