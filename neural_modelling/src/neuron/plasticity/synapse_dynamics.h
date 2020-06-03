@@ -31,10 +31,8 @@
 //! \param[in] n_synapse_types: Number of synapse types
 //! \param[in] ring_buffer_to_input_buffer_left_shifts:
 //!     How to interpret the values from the ring buffers
-//! \return The address of the first word after our configuration data.
-//!     This is <code>sizeof(synapse_dynamics_config)</code> bytes after the
-//!     value passed in as the \p address argument.
-address_t synapse_dynamics_initialise(
+//! \return Whether the initialisation succeeded.
+bool synapse_dynamics_initialise(
         address_t address, uint32_t n_neurons, uint32_t n_synapse_types,
         uint32_t *ring_buffer_to_input_buffer_left_shifts);
 

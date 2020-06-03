@@ -24,15 +24,19 @@
 
 //! DSG region identifiers
 typedef enum neuron_regions_e {
-    SYSTEM_REGION,            //!< simulation system; 0
-    NEURON_PARAMS_REGION,     //!< neuron parameters; 1
-    SYNAPSE_PARAMS_REGION,    //!< synapse parameters; 2
-    POPULATION_TABLE_REGION,  //!< master population table; 3
-    SYNAPTIC_MATRIX_REGION,   //!< synaptic matrix; 4
-    SYNAPSE_DYNAMICS_REGION,  //!< synapse dynamics; 5
-    NEURON_RECORDING_REGION,  //!< recording; 6
-    PROVENANCE_DATA_REGION,   //!< provenance; 7
-    PROFILER_REGION,          //!< profiling; 8
-    CONNECTOR_BUILDER_REGION, //!< connection building; 9
-    DIRECT_MATRIX_REGION      //!< direct synaptic matrix; 10
+    SYSTEM_REGION,              //!< simulation system; 0
+    NEURON_PARAMS_REGION,       //!< neuron parameters; 1
+    SYNAPSE_PARAMS_REGION,      //!< synapse parameters; 2
+    POPULATION_TABLE_REGION,    //!< master population table; 3
+    SYNAPTIC_MATRIX_REGION,     //!< synaptic matrix; 4
+    SYNAPSE_DYNAMICS_REGION,    //!< synapse dynamics; 5
+    STRUCTURAL_DYNAMICS_REGION, //!< structural dynamics; 6
+    NEURON_RECORDING_REGION,    //!< recording; 7
+    PROVENANCE_DATA_REGION,     //!< provenance; 8
+    PROFILER_REGION,            //!< profiling; 9
+    CONNECTOR_BUILDER_REGION,   //!< connection building; 10
+    DIRECT_MATRIX_REGION,       //!< direct synaptic matrix; 11
+    BIT_FIELD_FILTER_REGION,    //!< bitfield filter; 12
+    BIT_FIELD_BUILDER,          //!< bitfield builder parameters; 13
+    BIT_FIELD_KEY_MAP           //!< bitfield key map; 14
 } regions_e;

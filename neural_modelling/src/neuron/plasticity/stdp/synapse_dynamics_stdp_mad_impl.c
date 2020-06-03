@@ -260,7 +260,7 @@ static inline index_t sparse_axonal_delay(uint32_t x) {
 #endif
 }
 
-address_t synapse_dynamics_initialise(
+bool synapse_dynamics_initialise(
         address_t address, uint32_t n_neurons, uint32_t n_synapse_types,
         uint32_t *ring_buffer_to_input_buffer_left_shifts) {
 
@@ -271,7 +271,7 @@ address_t synapse_dynamics_initialise(
     // Load timing dependence data
     address_t weight_region_address = timing_initialise(address);
     if (address == NULL) {
-        return NULL;
+        return false;
     }
 
     // Load weight dependence data
@@ -279,12 +279,12 @@ address_t synapse_dynamics_initialise(
             weight_region_address, n_synapse_types,
             ring_buffer_to_input_buffer_left_shifts);
     if (weight_result == NULL) {
-        return NULL;
+        return false;
     }
 
     post_event_history = post_events_init_buffers(n_neurons);
     if (post_event_history == NULL) {
-        return NULL;
+        return false;
     }
 
     uint32_t n_neurons_power_2 = n_neurons;
@@ -312,8 +312,7 @@ address_t synapse_dynamics_initialise(
     synapse_delay_index_type_bits =
             SYNAPSE_DELAY_BITS + synapse_type_index_bits;
     synapse_type_mask = (1 << log_n_synapse_types) - 1;
-
-    return weight_result;
+    return true;
 }
 
 bool synapse_dynamics_process_plastic_synapses(

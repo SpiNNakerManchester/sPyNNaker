@@ -84,33 +84,30 @@ static inline void synapses_print_weight(
     }
 }
 
-//! \brief Initialise the synapses
-//! \param[in] synapse_params_address: Synapse configuration
-//! \param[in] direct_matrix_address: Direct synapse matrix configuration
-//! \param[in] n_neurons: Number of neurons
+//! \brief Initialise the synapse processing
+//! \param[in] synapse_params_address: Synapse configuration in SDRAM
+//! \param[in] n_neurons: Number of neurons to simulate
 //! \param[in] n_synapse_types: Number of synapse types
 //! \param[out] ring_buffer_to_input_buffer_left_shifts:
 //!     Array of shifts to use when converting from ring buffer values to input
 //!     buffer values
-//! \param[out] direct_synapses_address: Direct synapse information
-//! \return True on success, false on failure
+//! \return True if successfully initialised. False otherwise.
 bool synapses_initialise(
-        address_t synapse_params_address, address_t direct_matrix_address,
+        address_t synapse_params_address,
         uint32_t n_neurons, uint32_t n_synapse_types,
-        uint32_t **ring_buffer_to_input_buffer_left_shifts,
-        address_t *direct_synapses_address);
+        uint32_t **ring_buffer_to_input_buffer_left_shifts);
 
-//! \brief Do all the synapse processing.
-//! \param[in] time: the simulated time
+//! \brief Do all the synapse processing for a timestep.
+//! \param[in] time: the current simulation time
 void synapses_do_timestep_update(timer_t time);
 
 //! \brief process a synaptic row
 //! \param[in] time: the simulated time
 //! \param[in] row: the synaptic row in question
-//! \param[out] write_back: bool saying if to write back to SDRAM
-//! \return bool if successful or not
+//! \param[out] write_back: whether to write back to SDRAM
+//! \return True if successful
 bool synapses_process_synaptic_row(
-    uint32_t time, synaptic_row_t row, bool *write_back);
+        uint32_t time, synaptic_row_t row, bool *write_back);
 
 //! \brief returns the number of times the synapses have saturated their
 //!        weights.
@@ -125,5 +122,9 @@ uint32_t synapses_get_pre_synaptic_events(void);
 
 //! \brief flush the ring buffers
 void synapses_flush_ring_buffers(void);
+
+//! \brief allows clearing of DTCM used by synapses
+//! \return true if successful, false otherwise
+bool synapses_shut_down(void);
 
 #endif // _SYNAPSES_H_

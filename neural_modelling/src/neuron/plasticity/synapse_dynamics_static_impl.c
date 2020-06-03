@@ -37,7 +37,7 @@ static uint32_t synapse_type_bits;
 //! Mask to extract the synapse type (has ::synapse_type_bits bits set)
 static uint32_t synapse_type_mask;
 
-address_t synapse_dynamics_initialise(
+bool synapse_dynamics_initialise(
         address_t address, uint32_t n_neurons, uint32_t n_synapse_types,
         uint32_t *ring_buffer_to_input_buffer_left_shifts) {
     use(address);
@@ -63,7 +63,7 @@ address_t synapse_dynamics_initialise(
     synapse_index_bits = log_n_neurons;
     synapse_index_mask = (1 << synapse_index_bits) - 1;
     synapse_type_mask = (1 << synapse_type_bits) - 1;
-    return address;
+    return true;
 }
 
 //---------------------------------------
@@ -127,7 +127,8 @@ bool synapse_dynamics_find_neuron(
             *offset = synapse_row_num_fixed_synapses(fixed_region) -
                     fixed_synapse;
             *weight = synapse_row_sparse_weight(synaptic_word);
-            *delay = synapse_row_sparse_delay(synaptic_word, synapse_type_index_bits);
+            *delay = synapse_row_sparse_delay(synaptic_word,
+                    synapse_type_index_bits);
             *synapse_type = synapse_row_sparse_type(
                     synaptic_word, synapse_index_bits, synapse_type_mask);
             return true;
@@ -140,8 +141,7 @@ bool synapse_dynamics_find_neuron(
 bool synapse_dynamics_remove_neuron(uint32_t offset, address_t row) {
     address_t fixed_region = synapse_row_fixed_region(row);
     int32_t fixed_synapse = synapse_row_num_fixed_synapses(fixed_region);
-    uint32_t *synaptic_words = synapse_row_fixed_weight_controls(
-        fixed_region);
+    uint32_t *synaptic_words = synapse_row_fixed_weight_controls(fixed_region);
 
    // Delete control word at offset (contains weight)
     synaptic_words[offset] = synaptic_words[fixed_synapse-1];

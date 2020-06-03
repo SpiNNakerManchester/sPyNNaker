@@ -207,7 +207,61 @@ static inline bool sp_structs_add_synapse(
 
     *(current_state->post_to_pre_table_entry) = current_state->post_to_pre;
     return true;
+}
 
+static inline uint8_t *sp_structs_read_in_common(
+        address_t sdram_sp_address, rewiring_data_t *rewiring_data,
+        pre_pop_info_table_t *pre_info,
+        post_to_pre_entry **post_to_pre_table) {
+    uint8_t *data = (uint8_t *) sdram_sp_address;
+    spin1_memcpy(rewiring_data, data, sizeof(rewiring_data_t));
+    data += sizeof(rewiring_data_t);
+    log_debug("Topographic Map Impl, s_max=%u", rewiring_data->s_max);
+
+    pre_info->no_pre_pops = rewiring_data->no_pre_pops;
+    log_debug(" no pre pops = %d", pre_info->no_pre_pops);
+    pre_info->prepop_info = spin1_malloc(
+            rewiring_data->no_pre_pops * sizeof(pre_info_t *));
+    if (pre_info->prepop_info == NULL) {
+        log_error("Could not initialise pre population info");
+        rt_error(RTE_SWERR);
+    }
+    for (uint32_t i = 0; i < rewiring_data->no_pre_pops; i++) {
+        pre_info->prepop_info[i] = (pre_info_t *) data;
+        uint32_t pre_size = (pre_info->prepop_info[i]->no_pre_vertices
+                * sizeof(key_atom_info_t)) + sizeof(pre_info_t);
+        pre_info->prepop_info[i] = spin1_malloc(pre_size);
+        if (pre_info->prepop_info[i] == NULL) {
+            log_error("Could not initialise pre population info %d", i);
+            rt_error(RTE_SWERR);
+        }
+        spin1_memcpy(pre_info->prepop_info[i], data, pre_size);
+
+        log_debug("no_pre = %u, sp_control %u, "
+                "delay lo %u, delay hi %u, weight %d",
+                pre_info->prepop_info[i]->no_pre_vertices,
+                pre_info->prepop_info[i]->sp_control,
+                pre_info->prepop_info[i]->delay_lo,
+                pre_info->prepop_info[i]->delay_hi,
+                pre_info->prepop_info[i]->weight);
+        log_debug("connection_type = %d, total_no_atoms=%d",
+                pre_info->prepop_info[i]->connection_type,
+                pre_info->prepop_info[i]->total_no_atoms);
+        data += pre_size;
+    }
+
+    *post_to_pre_table = (post_to_pre_entry *) data;
+    uint32_t n_elements =
+            rewiring_data->s_max * rewiring_data->machine_no_atoms;
+
+    for (uint32_t i=0; i < n_elements; i++){
+        log_debug("index %d, pop index %d, sub pop index %d, neuron_index %d",
+                i, post_to_pre_table[i]->pop_index,
+                post_to_pre_table[i]->sub_pop_index,
+                post_to_pre_table[i]->neuron_index);
+    }
+    data += n_elements * sizeof(post_to_pre_entry);
+    return (uint8_t *) data;
 }
 
 #endif // _SP_STRUCTS_H_
