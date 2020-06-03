@@ -150,7 +150,9 @@
         <span class="s2">&quot;__ring_buffer_shifts&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__gen_on_machine&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__max_row_info&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__synapse_indices&quot;</span><span class="p">]</span>
+        <span class="s2">&quot;__synapse_indices&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;_host_generated_block_addr&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;_on_chip_generated_block_addr&quot;</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">ring_buffer_sigma</span><span class="p">,</span> <span class="n">spikes_per_second</span><span class="p">,</span>
                  <span class="n">config</span><span class="p">,</span> <span class="n">population_table_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">synapse_io</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -203,6 +205,19 @@
 
         <span class="c1"># A map of synapse information for each machine pre vertex to index</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_indices</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+
+        <span class="c1"># Track writes inside the synaptic matrix region (to meet sizes):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_host_generated_block_addr</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_on_chip_generated_block_addr</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">host_written_matrix_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_host_generated_block_addr</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">on_chip_written_matrix_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_on_chip_generated_block_addr</span> <span class="o">-</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_host_generated_block_addr</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">synapse_dynamics</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -417,12 +432,33 @@
                 <span class="n">region</span><span class="o">=</span><span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">SYNAPTIC_MATRIX</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
                 <span class="n">size</span><span class="o">=</span><span class="n">all_syn_block_sz</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;SynBlocks&#39;</span><span class="p">)</span>
 
-        <span class="n">synapse_dynamics_sz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_synapse_dynamics_parameter_size</span><span class="p">(</span>
-            <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">application_graph</span><span class="p">,</span> <span class="n">application_vertex</span><span class="p">)</span>
+        <span class="c1"># return if not got a synapse dynamics</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_dynamics</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="n">synapse_dynamics_sz</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_dynamics</span><span class="o">.</span><span class="n">get_parameters_sdram_usage_in_bytes</span><span class="p">(</span>
+                <span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_synapse_types</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">synapse_dynamics_sz</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">spec</span><span class="o">.</span><span class="n">reserve_memory_region</span><span class="p">(</span>
                 <span class="n">region</span><span class="o">=</span><span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">SYNAPSE_DYNAMICS</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
                 <span class="n">size</span><span class="o">=</span><span class="n">synapse_dynamics_sz</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;synapseDynamicsParams&#39;</span><span class="p">)</span>
+
+        <span class="c1"># if structural, create structural region</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_dynamics</span><span class="p">,</span> <span class="n">AbstractSynapseDynamicsStructural</span><span class="p">):</span>
+
+            <span class="n">synapse_structural_dynamics_sz</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_dynamics</span><span class="o">.</span>
+                <span class="n">get_structural_parameters_sdram_usage_in_bytes</span><span class="p">(</span>
+                    <span class="n">application_graph</span><span class="p">,</span> <span class="n">application_vertex</span><span class="p">,</span>
+                    <span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_synapse_types</span><span class="p">))</span>
+
+            <span class="k">if</span> <span class="n">synapse_structural_dynamics_sz</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">spec</span><span class="o">.</span><span class="n">reserve_memory_region</span><span class="p">(</span>
+                    <span class="n">region</span><span class="o">=</span><span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">STRUCTURAL_DYNAMICS</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                    <span class="n">size</span><span class="o">=</span><span class="n">synapse_structural_dynamics_sz</span><span class="p">,</span>
+                    <span class="n">label</span><span class="o">=</span><span class="s1">&#39;synapseDynamicsStructuralParams&#39;</span><span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_ring_buffer_expected_upper_bound</span><span class="p">(</span>
@@ -725,6 +761,9 @@
         <span class="c1"># Skip blocks that will be written on the machine, but add them</span>
         <span class="c1"># to the master population table</span>
         <span class="n">generator_data</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_host_generated_block_addr</span> <span class="o">=</span> <span class="n">block_addr</span>
+        <span class="c1"># numpy.random.shuffle(order)</span>
         <span class="k">for</span> <span class="n">gen_data</span> <span class="ow">in</span> <span class="n">generate_on_machine</span><span class="p">:</span>
             <span class="p">(</span><span class="n">synapse_info</span><span class="p">,</span> <span class="n">pre_slices</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">pre_slice_index</span><span class="p">,</span>
                 <span class="n">app_edge</span><span class="p">,</span> <span class="n">rinfo</span><span class="p">)</span> <span class="o">=</span> <span class="n">gen_data</span>
@@ -736,6 +775,7 @@
             <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">synapse_info</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">,</span>
                    <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_indices</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">index</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_on_chip_generated_block_addr</span> <span class="o">=</span> <span class="n">block_addr</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__poptable_type</span><span class="o">.</span><span class="n">finish_master_pop_table</span><span class="p">(</span>
             <span class="n">spec</span><span class="p">,</span> <span class="n">master_pop_table_region</span><span class="p">)</span>
@@ -990,6 +1030,11 @@
             <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">application_vertex</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">machine_vertex</span><span class="p">,</span>
             <span class="n">placement</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">,</span> <span class="n">application_graph</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span>
             <span class="n">graph_mapper</span><span class="p">,</span> <span class="n">weight_scale</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">):</span>
+
+        <span class="c1"># reset for this machine vertex</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_host_generated_block_addr</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_on_chip_generated_block_addr</span> <span class="o">=</span> <span class="mi">0</span>
+
         <span class="c1"># Create an index of delay keys into this vertex</span>
         <span class="k">for</span> <span class="n">m_edge</span> <span class="ow">in</span> <span class="n">machine_graph</span><span class="o">.</span><span class="n">get_edges_ending_at_vertex</span><span class="p">(</span><span class="n">machine_vertex</span><span class="p">):</span>
             <span class="n">app_edge</span> <span class="o">=</span> <span class="n">graph_mapper</span><span class="o">.</span><span class="n">get_application_edge</span><span class="p">(</span><span class="n">m_edge</span><span class="p">)</span>
@@ -1029,18 +1074,17 @@
             <span class="n">routing_info</span><span class="p">,</span> <span class="n">graph_mapper</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_dynamics</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_dynamics</span><span class="o">.</span><span class="n">write_parameters</span><span class="p">(</span>
+                <span class="n">spec</span><span class="p">,</span> <span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">SYNAPSE_DYNAMICS</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">)</span>
+
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__synapse_dynamics</span><span class="p">,</span>
                           <span class="n">AbstractSynapseDynamicsStructural</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_dynamics</span><span class="o">.</span><span class="n">write_structural_parameters</span><span class="p">(</span>
-                    <span class="n">spec</span><span class="p">,</span> <span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">SYNAPSE_DYNAMICS</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                    <span class="n">spec</span><span class="p">,</span> <span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">STRUCTURAL_DYNAMICS</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
                     <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span> <span class="n">application_graph</span><span class="p">,</span>
                     <span class="n">application_vertex</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">graph_mapper</span><span class="p">,</span>
                     <span class="n">routing_info</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_indices</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_dynamics</span><span class="o">.</span><span class="n">write_parameters</span><span class="p">(</span>
-                    <span class="n">spec</span><span class="p">,</span>
-                    <span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">SYNAPSE_DYNAMICS</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
-                    <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__weight_scales</span><span class="p">[</span><span class="n">placement</span><span class="p">]</span> <span class="o">=</span> <span class="n">weight_scales</span>
 
@@ -1207,8 +1251,9 @@
         <span class="k">return</span> <span class="n">transceiver</span><span class="o">.</span><span class="n">read_memory</span><span class="p">(</span>
             <span class="n">placement</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span> <span class="n">synaptic_block_size</span><span class="p">)</span>
 
+    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">__read_single_synaptic_block</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">data_receiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">n_rows</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span>
+            <span class="n">transceiver</span><span class="p">,</span> <span class="n">data_receiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">n_rows</span><span class="p">,</span> <span class="n">address</span><span class="p">,</span>
             <span class="n">using_monitors</span><span class="p">,</span> <span class="n">extra_monitor</span><span class="p">,</span> <span class="n">fixed_routes</span><span class="p">,</span> <span class="n">placements</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Read in a single synaptic block.</span>
 <span class="sd">        &quot;&quot;&quot;</span>

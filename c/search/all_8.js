@@ -47,6 +47,7 @@ var searchData=
   ['instance_5fkey',['instance_key',['../munich__protocol_8h.html#af7733652e8cf2dc7a581b66b432ab4c9',1,'munich_key_bitfields_t::instance_key()'],['../munich__protocol_8h.html#a21aacafb9f4a3adc7afc7b0e4681e0bc',1,'instance_key():&#160;munich_protocol.h']]],
   ['instruction',['instruction',['../munich__protocol_8h.html#af88a58a15f4007a2629456b02fa89685',1,'munich_key_bitfields_t']]],
   ['int16_5flut',['int16_lut',['../maths_8h.html#structint16__lut',1,'']]],
+  ['invalid_5fmaster_5fpop_5fhits',['invalid_master_pop_hits',['../population__table__binary__search__impl_8c.html#a40086bc81cde7081da9ed9b52b6bfaff',1,'population_table_binary_search_impl.c']]],
   ['invalid_5fselection',['INVALID_SELECTION',['../partner_8h.html#a2a7bcb70c4ad5d6f163e74c8fa035f91',1,'partner.h']]],
   ['is_5fconnection_5flat',['IS_CONNECTION_LAT',['../sp__structs_8h.html#a8ee9a5f54a9347b84ef109d9f9fd1fa5',1,'sp_structs.h']]],
   ['is_5ffast_5fsource',['is_fast_source',['../spike__source__poisson_8c.html#a891758695b252c5b4c43c98b8f3232d4',1,'spike_source_t']]],

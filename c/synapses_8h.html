@@ -115,11 +115,11 @@ Functions</h2></td></tr>
 <tr class="memitem:aa1ad92bb519344d001dba972cdd0be5f"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#aa1ad92bb519344d001dba972cdd0be5f">synapses_print_weight</a> (weight_t weight, uint32_t left_shift)</td></tr>
 <tr class="memdesc:aa1ad92bb519344d001dba972cdd0be5f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print the weight of a synapse.  <a href="#aa1ad92bb519344d001dba972cdd0be5f">More...</a><br /></td></tr>
 <tr class="separator:aa1ad92bb519344d001dba972cdd0be5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aac9fab0982e745ee2ca05f47e4ad5f30"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#aac9fab0982e745ee2ca05f47e4ad5f30">synapses_initialise</a> (address_t synapse_params_address, address_t direct_matrix_address, uint32_t <a class="el" href="synapses_8c.html#a7368643a28282d8b3429f0fb145aa5db">n_neurons</a>, uint32_t <a class="el" href="synapses_8c.html#adedb27b3ece4d4dece0aee776a136427">n_synapse_types</a>, uint32_t **ring_buffer_to_input_buffer_left_shifts, address_t *direct_synapses_address)</td></tr>
-<tr class="memdesc:aac9fab0982e745ee2ca05f47e4ad5f30"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise the synapses.  <a href="#aac9fab0982e745ee2ca05f47e4ad5f30">More...</a><br /></td></tr>
-<tr class="separator:aac9fab0982e745ee2ca05f47e4ad5f30"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af18f202350f50a1bc5444062a9e1ee43"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#af18f202350f50a1bc5444062a9e1ee43">synapses_initialise</a> (address_t synapse_params_address, uint32_t <a class="el" href="synapses_8c.html#a7368643a28282d8b3429f0fb145aa5db">n_neurons</a>, uint32_t <a class="el" href="synapses_8c.html#adedb27b3ece4d4dece0aee776a136427">n_synapse_types</a>, uint32_t **ring_buffer_to_input_buffer_left_shifts)</td></tr>
+<tr class="memdesc:af18f202350f50a1bc5444062a9e1ee43"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise the synapse processing.  <a href="#af18f202350f50a1bc5444062a9e1ee43">More...</a><br /></td></tr>
+<tr class="separator:af18f202350f50a1bc5444062a9e1ee43"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad88a7e6b3773f1e0f334b7410f182987"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#ad88a7e6b3773f1e0f334b7410f182987">synapses_do_timestep_update</a> (timer_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>)</td></tr>
-<tr class="memdesc:ad88a7e6b3773f1e0f334b7410f182987"><td class="mdescLeft">&#160;</td><td class="mdescRight">Do all the synapse processing.  <a href="#ad88a7e6b3773f1e0f334b7410f182987">More...</a><br /></td></tr>
+<tr class="memdesc:ad88a7e6b3773f1e0f334b7410f182987"><td class="mdescLeft">&#160;</td><td class="mdescRight">Do all the synapse processing for a timestep.  <a href="#ad88a7e6b3773f1e0f334b7410f182987">More...</a><br /></td></tr>
 <tr class="separator:ad88a7e6b3773f1e0f334b7410f182987"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa1ceab23dea834d6189f496b5133d983"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#aa1ceab23dea834d6189f496b5133d983">synapses_process_synaptic_row</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, <a class="el" href="neuron-typedefs_8h.html#a883af5b0c4fbeeb762d784a8e162da64">synaptic_row_t</a> row, bool *write_back)</td></tr>
 <tr class="memdesc:aa1ceab23dea834d6189f496b5133d983"><td class="mdescLeft">&#160;</td><td class="mdescRight">process a synaptic row  <a href="#aa1ceab23dea834d6189f496b5133d983">More...</a><br /></td></tr>
@@ -134,6 +134,9 @@ Functions</h2></td></tr>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#a71374045de8f83cde4a8a44bbd421ffd">synapses_flush_ring_buffers</a> (void)</td></tr>
 <tr class="memdesc:a71374045de8f83cde4a8a44bbd421ffd"><td class="mdescLeft">&#160;</td><td class="mdescRight">flush the ring buffers <br /></td></tr>
 <tr class="separator:a71374045de8f83cde4a8a44bbd421ffd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac237268af6684b631aef510cc52fa607"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#ac237268af6684b631aef510cc52fa607">synapses_shut_down</a> (void)</td></tr>
+<tr class="memdesc:ac237268af6684b631aef510cc52fa607"><td class="mdescLeft">&#160;</td><td class="mdescRight">allows clearing of DTCM used by synapses  <a href="#ac237268af6684b631aef510cc52fa607">More...</a><br /></td></tr>
+<tr class="separator:ac237268af6684b631aef510cc52fa607"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Operations on synapses. </p>
@@ -341,7 +344,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="syna
 
 </div>
 </div>
-<a class="anchor" id="aac9fab0982e745ee2ca05f47e4ad5f30"></a>
+<a class="anchor" id="af18f202350f50a1bc5444062a9e1ee43"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -350,12 +353,6 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="syna
           <td>(</td>
           <td class="paramtype">address_t&#160;</td>
           <td class="paramname"><em>synapse_params_address</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">address_t&#160;</td>
-          <td class="paramname"><em>direct_matrix_address</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -373,13 +370,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="syna
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">uint32_t **&#160;</td>
-          <td class="paramname"><em>ring_buffer_to_input_buffer_left_shifts</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">address_t *&#160;</td>
-          <td class="paramname"><em>direct_synapses_address</em>&#160;</td>
+          <td class="paramname"><em>ring_buffer_to_input_buffer_left_shifts</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -389,19 +380,17 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="syna
       </table>
 </div><div class="memdoc">
 
-<p>Initialise the synapses. </p>
+<p>Initialise the synapse processing. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">synapse_params_address</td><td>Synapse configuration </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">direct_matrix_address</td><td>Direct synapse matrix configuration </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">n_neurons</td><td>Number of neurons </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">synapse_params_address</td><td>Synapse configuration in SDRAM </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">n_neurons</td><td>Number of neurons to simulate </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">n_synapse_types</td><td>Number of synapse types </td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">ring_buffer_to_input_buffer_left_shifts</td><td>Array of shifts to use when converting from ring buffer values to input buffer values </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">direct_synapses_address</td><td>Direct synapse information </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>True on success, false on failure </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>True if successfully initialised. False otherwise. </dd></dl>
 
 </div>
 </div>
@@ -419,10 +408,10 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="syna
       </table>
 </div><div class="memdoc">
 
-<p>Do all the synapse processing. </p>
+<p>Do all the synapse processing for a timestep. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">time</td><td>the simulated time </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">time</td><td>the current simulation time </td></tr>
   </table>
   </dd>
 </dl>
@@ -464,11 +453,11 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="syna
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">time</td><td>the simulated time </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">row</td><td>the synaptic row in question </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">write_back</td><td>bool saying if to write back to SDRAM </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">write_back</td><td>whether to write back to SDRAM </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>bool if successful or not </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>True if successful </dd></dl>
 
 </div>
 </div>
@@ -510,10 +499,31 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="syna
 
 </div>
 </div>
+<a class="anchor" id="ac237268af6684b631aef510cc52fa607"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool synapses_shut_down </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>allows clearing of DTCM used by synapses </p>
+<dl class="section return"><dt>Returns</dt><dd>true if successful, false otherwise</dd>
+<dd>
+true if successful </dd></dl>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon May 18 2020 14:34:26 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Jun 3 2020 10:20:29 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

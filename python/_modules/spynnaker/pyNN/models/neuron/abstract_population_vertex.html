@@ -81,6 +81,7 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">math</span>
+
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">pacman.model.constraints.key_allocator_constraints</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">ContiguousKeyRangeContraint</span><span class="p">)</span>
@@ -101,11 +102,11 @@
     <span class="n">BYTES_PER_WORD</span><span class="p">,</span> <span class="n">SYSTEM_BYTES_REQUIREMENT</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.utility_objs</span> <span class="kn">import</span> <span class="n">ExecutableType</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.simulation</span> <span class="kn">import</span> <span class="n">simulation_utilities</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.constants</span> <span class="kn">import</span> <span class="n">POPULATION_BASED_REGIONS</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.profiling</span> <span class="kn">import</span> <span class="n">profile_utils</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.constants</span> <span class="kn">import</span> <span class="n">POPULATION_BASED_REGIONS</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.common</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractSpikeRecordable</span><span class="p">,</span> <span class="n">AbstractNeuronRecordable</span><span class="p">,</span> <span class="n">NeuronRecorder</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities</span> <span class="kn">import</span> <span class="n">constants</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities</span> <span class="kn">import</span> <span class="n">constants</span><span class="p">,</span> <span class="n">bit_field_utilities</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractPopulationInitializable</span><span class="p">,</span> <span class="n">AbstractAcceptsIncomingSynapses</span><span class="p">,</span>
     <span class="n">AbstractPopulationSettable</span><span class="p">,</span> <span class="n">AbstractReadParametersBeforeSet</span><span class="p">,</span>
@@ -113,6 +114,7 @@
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">InvalidParameterType</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.ranged</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">SpynnakerRangeDictionary</span><span class="p">,</span> <span class="n">SpynnakerRangedList</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.synapse_dynamics</span> <span class="kn">import</span> <span class="n">AbstractSynapseDynamicsStructural</span>
 <span class="kn">from</span> <span class="nn">.synaptic_manager</span> <span class="kn">import</span> <span class="n">SynapticManager</span>
 <span class="kn">from</span> <span class="nn">.population_machine_vertex</span> <span class="kn">import</span> <span class="n">PopulationMachineVertex</span>
 
@@ -140,12 +142,12 @@
         <span class="n">AbstractProvidesOutgoingPartitionConstraints</span><span class="p">,</span>
         <span class="n">AbstractProvidesIncomingPartitionConstraints</span><span class="p">,</span>
         <span class="n">AbstractPopulationInitializable</span><span class="p">,</span> <span class="n">AbstractPopulationSettable</span><span class="p">,</span>
-        <span class="n">AbstractChangableAfterRun</span><span class="p">,</span>
-        <span class="n">AbstractRewritesDataSpecification</span><span class="p">,</span> <span class="n">AbstractReadParametersBeforeSet</span><span class="p">,</span>
-        <span class="n">AbstractAcceptsIncomingSynapses</span><span class="p">,</span> <span class="n">ProvidesKeyToAtomMappingImpl</span><span class="p">,</span>
-        <span class="n">AbstractCanReset</span><span class="p">):</span>
+        <span class="n">AbstractChangableAfterRun</span><span class="p">,</span> <span class="n">AbstractRewritesDataSpecification</span><span class="p">,</span>
+        <span class="n">AbstractReadParametersBeforeSet</span><span class="p">,</span> <span class="n">AbstractAcceptsIncomingSynapses</span><span class="p">,</span>
+        <span class="n">ProvidesKeyToAtomMappingImpl</span><span class="p">,</span> <span class="n">AbstractCanReset</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Underlying vertex model for Neural Populations.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s2">&quot;__change_requires_mapping&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__change_requires_neuron_parameters_reload&quot;</span><span class="p">,</span>
@@ -184,8 +186,8 @@
             <span class="n">spikes_per_second</span><span class="p">,</span> <span class="n">ring_buffer_sigma</span><span class="p">,</span> <span class="n">incoming_spike_buffer_size</span><span class="p">,</span>
             <span class="n">neuron_impl</span><span class="p">,</span> <span class="n">pynn_model</span><span class="p">):</span>
         <span class="c1"># pylint: disable=too-many-arguments, too-many-locals</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">AbstractPopulationVertex</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">max_atoms_per_core</span><span class="p">)</span>
+        <span class="n">ApplicationVertex</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">max_atoms_per_core</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">__n_atoms</span> <span class="o">=</span> <span class="n">n_neurons</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__n_subvertices</span> <span class="o">=</span> <span class="mi">0</span>
@@ -335,11 +337,26 @@
                 <span class="n">PopulationMachineVertex</span><span class="o">.</span><span class="n">N_ADDITIONAL_PROVENANCE_DATA_ITEMS</span><span class="p">)</span> <span class="o">+</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_manager</span><span class="o">.</span><span class="n">get_sdram_usage_in_bytes</span><span class="p">(</span>
                 <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">graph</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span> <span class="o">+</span>
-            <span class="n">profile_utils</span><span class="o">.</span><span class="n">get_profile_region_size</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__n_profile_samples</span><span class="p">))</span>
-
+            <span class="n">profile_utils</span><span class="o">.</span><span class="n">get_profile_region_size</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__n_profile_samples</span><span class="p">)</span> <span class="o">+</span>
+            <span class="n">bit_field_utilities</span><span class="o">.</span><span class="n">get_estimated_sdram_for_bit_field_region</span><span class="p">(</span>
+                <span class="n">graph</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span> <span class="o">+</span>
+            <span class="n">bit_field_utilities</span><span class="o">.</span><span class="n">get_estimated_sdram_for_key_region</span><span class="p">(</span>
+                <span class="n">graph</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span> <span class="o">+</span>
+            <span class="n">bit_field_utilities</span><span class="o">.</span><span class="n">exact_sdram_for_bit_field_builder_region</span><span class="p">())</span>
         <span class="k">return</span> <span class="n">sdram_requirement</span>
 
-    <span class="k">def</span> <span class="nf">_reserve_memory_regions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">vertex</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_reserve_memory_regions</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">vertex</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">,</span> <span class="n">n_key_map</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; reserves the dsg memory regions</span>
+
+<span class="sd">        :param spec: the data spec object</span>
+<span class="sd">        :param vertex_slice: this vertex atom slice</span>
+<span class="sd">        :param vertex: this vertex</span>
+<span class="sd">        :param machine_graph: machine graph</span>
+<span class="sd">        :param n_key_map: nkey map</span>
+<span class="sd">        :rtype: None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">spec</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Reserving memory space for data regions:</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
@@ -359,6 +376,13 @@
         <span class="n">profile_utils</span><span class="o">.</span><span class="n">reserve_profile_region</span><span class="p">(</span>
             <span class="n">spec</span><span class="p">,</span> <span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">PROFILING</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__n_profile_samples</span><span class="p">)</span>
+
+        <span class="c1"># reserve bit field region</span>
+        <span class="n">bit_field_utilities</span><span class="o">.</span><span class="n">reserve_bit_field_regions</span><span class="p">(</span>
+            <span class="n">spec</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">,</span> <span class="n">n_key_map</span><span class="p">,</span> <span class="n">vertex</span><span class="p">,</span>
+            <span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">BIT_FIELD_BUILDER</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">BIT_FIELD_FILTER</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">BIT_FIELD_KEY_MAP</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
 
         <span class="n">vertex</span><span class="o">.</span><span class="n">reserve_provenance_data_region</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
 
@@ -503,19 +527,20 @@
         <span class="s2">&quot;application_graph&quot;</span><span class="p">:</span> <span class="s2">&quot;MemoryApplicationGraph&quot;</span><span class="p">,</span>
         <span class="s2">&quot;machine_graph&quot;</span><span class="p">:</span> <span class="s2">&quot;MemoryMachineGraph&quot;</span><span class="p">,</span>
         <span class="s2">&quot;routing_info&quot;</span><span class="p">:</span> <span class="s2">&quot;MemoryRoutingInfos&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;data_n_time_steps&quot;</span><span class="p">:</span> <span class="s2">&quot;DataNTimeSteps&quot;</span>
+        <span class="s2">&quot;data_n_time_steps&quot;</span><span class="p">:</span> <span class="s2">&quot;DataNTimeSteps&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;n_key_map&quot;</span><span class="p">:</span> <span class="s2">&quot;MemoryMachinePartitionNKeysMap&quot;</span>
     <span class="p">})</span>
     <span class="nd">@overrides</span><span class="p">(</span>
         <span class="n">AbstractGeneratesDataSpecification</span><span class="o">.</span><span class="n">generate_data_specification</span><span class="p">,</span>
         <span class="n">additional_arguments</span><span class="o">=</span><span class="p">{</span>
             <span class="s2">&quot;machine_time_step&quot;</span><span class="p">,</span> <span class="s2">&quot;time_scale_factor&quot;</span><span class="p">,</span> <span class="s2">&quot;graph_mapper&quot;</span><span class="p">,</span>
             <span class="s2">&quot;application_graph&quot;</span><span class="p">,</span> <span class="s2">&quot;machine_graph&quot;</span><span class="p">,</span> <span class="s2">&quot;routing_info&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;data_n_time_steps&quot;</span>
+            <span class="s2">&quot;data_n_time_steps&quot;</span><span class="p">,</span> <span class="s2">&quot;n_key_map&quot;</span>
         <span class="p">})</span>
 <div class="viewcode-block" id="AbstractPopulationVertex.generate_data_specification"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.abstract_population_vertex.AbstractPopulationVertex.generate_data_specification">[docs]</a>    <span class="k">def</span> <span class="nf">generate_data_specification</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">time_scale_factor</span><span class="p">,</span>
             <span class="n">graph_mapper</span><span class="p">,</span> <span class="n">application_graph</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span>
-            <span class="n">data_n_time_steps</span><span class="p">):</span>
+            <span class="n">data_n_time_steps</span><span class="p">,</span> <span class="n">n_key_map</span><span class="p">):</span>
         <span class="c1"># pylint: disable=too-many-arguments, arguments-differ</span>
         <span class="n">vertex</span> <span class="o">=</span> <span class="n">placement</span><span class="o">.</span><span class="n">vertex</span>
 
@@ -524,7 +549,8 @@
         <span class="n">vertex_slice</span> <span class="o">=</span> <span class="n">graph_mapper</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span>
 
         <span class="c1"># Reserve memory regions</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_reserve_memory_regions</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">vertex</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_reserve_memory_regions</span><span class="p">(</span>
+            <span class="n">spec</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">vertex</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">,</span> <span class="n">n_key_map</span><span class="p">)</span>
 
         <span class="c1"># Declare random number generators and distributions:</span>
         <span class="c1"># TODO add random distribution stuff</span>
@@ -535,8 +561,7 @@
             <span class="n">vertex</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span>
 
         <span class="c1"># Write the setup region</span>
-        <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span>
-            <span class="n">constants</span><span class="o">.</span><span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">SYSTEM</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span><span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">SYSTEM</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">simulation_utilities</span><span class="o">.</span><span class="n">get_simulation_header_array</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">get_binary_file_name</span><span class="p">(),</span> <span class="n">machine_time_step</span><span class="p">,</span>
             <span class="n">time_scale_factor</span><span class="p">))</span>
@@ -552,7 +577,7 @@
 
         <span class="c1"># write profile data</span>
         <span class="n">profile_utils</span><span class="o">.</span><span class="n">write_profile_region_data</span><span class="p">(</span>
-            <span class="n">spec</span><span class="p">,</span> <span class="n">constants</span><span class="o">.</span><span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">PROFILING</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">spec</span><span class="p">,</span> <span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">PROFILING</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__n_profile_samples</span><span class="p">)</span>
 
         <span class="c1"># Get the weight_scale value from the appropriate location</span>
@@ -563,6 +588,23 @@
             <span class="n">spec</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">vertex</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">,</span>
             <span class="n">application_graph</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span> <span class="n">graph_mapper</span><span class="p">,</span>
             <span class="n">weight_scale</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">)</span>
+        <span class="n">vertex</span><span class="o">.</span><span class="n">set_on_chip_generatable_area</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_manager</span><span class="o">.</span><span class="n">host_written_matrix_size</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_manager</span><span class="o">.</span><span class="n">on_chip_written_matrix_size</span><span class="p">)</span>
+
+        <span class="c1"># write up the bitfield builder data</span>
+        <span class="n">bit_field_utilities</span><span class="o">.</span><span class="n">write_bitfield_init_data</span><span class="p">(</span>
+            <span class="n">spec</span><span class="p">,</span> <span class="n">vertex</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span>
+            <span class="n">n_key_map</span><span class="p">,</span> <span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">BIT_FIELD_BUILDER</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">POPULATION_TABLE</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">SYNAPTIC_MATRIX</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">DIRECT_MATRIX</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">BIT_FIELD_FILTER</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">BIT_FIELD_KEY_MAP</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span><span class="n">STRUCTURAL_DYNAMICS</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+            <span class="nb">isinstance</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_manager</span><span class="o">.</span><span class="n">synapse_dynamics</span><span class="p">,</span>
+                <span class="n">AbstractSynapseDynamicsStructural</span><span class="p">))</span>
 
         <span class="c1"># End the writing of this specification:</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">end_specification</span><span class="p">()</span></div>
@@ -692,9 +734,9 @@
                 <span class="s2">&quot; parameter </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">variable</span><span class="p">))</span>
 
         <span class="n">parameter</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_parameter</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
-
         <span class="n">ranged_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_state_variables</span><span class="p">[</span><span class="n">parameter</span><span class="p">]</span>
-        <span class="n">ranged_list</span><span class="o">.</span><span class="n">set_value_by_selector</span><span class="p">(</span><span class="n">selector</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
+        <span class="n">ranged_list</span><span class="o">.</span><span class="n">set_value_by_selector</span><span class="p">(</span><span class="n">selector</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__change_requires_neuron_parameters_reload</span> <span class="o">=</span> <span class="kc">True</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">conductance_based</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

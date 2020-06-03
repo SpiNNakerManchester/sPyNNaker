@@ -113,9 +113,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:aa082f2e8f468172ac021d89b7e89b2cc"><td class="memItemLeft" align="right" valign="top">address_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="topographic__map__impl_8c.html#aa082f2e8f468172ac021d89b7e89b2cc">synaptogenesis_dynamics_initialise</a> (address_t sdram_sp_address)</td></tr>
-<tr class="memdesc:aa082f2e8f468172ac021d89b7e89b2cc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialisation of synaptic rewiring (synaptogenesis) parameters (random seed, spread of receptive field etc.)  <a href="#aa082f2e8f468172ac021d89b7e89b2cc">More...</a><br /></td></tr>
-<tr class="separator:aa082f2e8f468172ac021d89b7e89b2cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa905464bd5cc1eb8fa5b1b16b0d9b263"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa905464bd5cc1eb8fa5b1b16b0d9b263"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="topographic__map__impl_8c.html#aa905464bd5cc1eb8fa5b1b16b0d9b263">print_post_to_pre_entry</a> (void)</td></tr>
+<tr class="memdesc:aa905464bd5cc1eb8fa5b1b16b0d9b263"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prints a certain data object. <br /></td></tr>
+<tr class="separator:aa905464bd5cc1eb8fa5b1b16b0d9b263"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adba45d439e3c65751b2508e6ae744e15"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="topographic__map__impl_8c.html#adba45d439e3c65751b2508e6ae744e15">synaptogenesis_dynamics_initialise</a> (address_t sdram_sp_address)</td></tr>
+<tr class="memdesc:adba45d439e3c65751b2508e6ae744e15"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialisation of synaptic rewiring (synaptogenesis) parameters (random seed, spread of receptive field etc.)  <a href="#adba45d439e3c65751b2508e6ae744e15">More...</a><br /></td></tr>
+<tr class="separator:adba45d439e3c65751b2508e6ae744e15"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1a8123da1bd797e82cb3193a0ce43847"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="topographic__map__impl_8c.html#a1a8123da1bd797e82cb3193a0ce43847">synaptogenesis_dynamics_rewire</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, <a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> *spike, address_t *synaptic_row_address, uint32_t *n_bytes)</td></tr>
 <tr class="memdesc:a1a8123da1bd797e82cb3193a0ce43847"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function called (usually on a timer from <a class="el" href="delay__extension_8c.html#aa14f4f1d4c84183b7bf7108bf930a23c" title="Entry point. ">c_main()</a>) to trigger the process of synaptic rewiring.  <a href="#a1a8123da1bd797e82cb3193a0ce43847">More...</a><br /></td></tr>
 <tr class="separator:a1a8123da1bd797e82cb3193a0ce43847"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -164,12 +168,12 @@ static elimination_params_t **&#160;</td><td class="memItemRight" valign="bottom
 <div class="textblock"><p>This file contains the main functions for probabilistic synaptogenesis. </p>
 <dl class="section author"><dt>Author</dt><dd>Petrut Bogdan </dd></dl>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a class="anchor" id="aa082f2e8f468172ac021d89b7e89b2cc"></a>
+<a class="anchor" id="adba45d439e3c65751b2508e6ae744e15"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">address_t synaptogenesis_dynamics_initialise </td>
+          <td class="memname">bool synaptogenesis_dynamics_initialise </td>
           <td>(</td>
           <td class="paramtype">address_t&#160;</td>
           <td class="paramname"><em>sdram_sp_address</em></td><td>)</td>
@@ -185,7 +189,7 @@ static elimination_params_t **&#160;</td><td class="memItemRight" valign="bottom
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>Address after the final word read from SDRAM. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>true when successful </dd></dl>
 
 </div>
 </div>
@@ -396,7 +400,7 @@ static elimination_params_t **&#160;</td><td class="memItemRight" valign="bottom
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon May 18 2020 14:34:26 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Jun 3 2020 10:20:29 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

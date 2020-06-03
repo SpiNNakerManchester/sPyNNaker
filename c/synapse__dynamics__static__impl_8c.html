@@ -102,9 +102,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ab9ef0316722ad01baf5beed9028e1ff5"><td class="memItemLeft" align="right" valign="top">address_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__static__impl_8c.html#ab9ef0316722ad01baf5beed9028e1ff5">synapse_dynamics_initialise</a> (address_t address, uint32_t <a class="el" href="synapses_8c.html#a7368643a28282d8b3429f0fb145aa5db">n_neurons</a>, uint32_t <a class="el" href="synapses_8c.html#adedb27b3ece4d4dece0aee776a136427">n_synapse_types</a>, uint32_t *ring_buffer_to_input_buffer_left_shifts)</td></tr>
-<tr class="memdesc:ab9ef0316722ad01baf5beed9028e1ff5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise the synapse dynamics.  <a href="#ab9ef0316722ad01baf5beed9028e1ff5">More...</a><br /></td></tr>
-<tr class="separator:ab9ef0316722ad01baf5beed9028e1ff5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4a1c98d660ba6a17d4678ae9ef2a5526"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__static__impl_8c.html#a4a1c98d660ba6a17d4678ae9ef2a5526">synapse_dynamics_initialise</a> (address_t address, uint32_t <a class="el" href="synapses_8c.html#a7368643a28282d8b3429f0fb145aa5db">n_neurons</a>, uint32_t <a class="el" href="synapses_8c.html#adedb27b3ece4d4dece0aee776a136427">n_synapse_types</a>, uint32_t *ring_buffer_to_input_buffer_left_shifts)</td></tr>
+<tr class="memdesc:a4a1c98d660ba6a17d4678ae9ef2a5526"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise the synapse dynamics.  <a href="#a4a1c98d660ba6a17d4678ae9ef2a5526">More...</a><br /></td></tr>
+<tr class="separator:a4a1c98d660ba6a17d4678ae9ef2a5526"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5087bc7e79f5dc3850f73239c5c463a3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__static__impl_8c.html#a5087bc7e79f5dc3850f73239c5c463a3">synapse_dynamics_process_post_synaptic_event</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, index_t neuron_index)</td></tr>
 <tr class="memdesc:a5087bc7e79f5dc3850f73239c5c463a3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Informs the synapses that the neuron fired.  <a href="#a5087bc7e79f5dc3850f73239c5c463a3">More...</a><br /></td></tr>
 <tr class="separator:a5087bc7e79f5dc3850f73239c5c463a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -163,12 +163,12 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
 <div class="textblock"><p>This file contains the main interface for structural plasticity and some shared code. For the main implementation, see <a class="el" href="topographic__map__impl_8c.html" title="This file contains the main functions for probabilistic synaptogenesis. ">topographic_map_impl.c</a>. </p>
 <dl class="section author"><dt>Author</dt><dd>Petrut Bogdan </dd></dl>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a class="anchor" id="ab9ef0316722ad01baf5beed9028e1ff5"></a>
+<a class="anchor" id="a4a1c98d660ba6a17d4678ae9ef2a5526"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">address_t synapse_dynamics_initialise </td>
+          <td class="memname">bool synapse_dynamics_initialise </td>
           <td>(</td>
           <td class="paramtype">address_t&#160;</td>
           <td class="paramname"><em>address</em>, </td>
@@ -209,7 +209,7 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The address of the first word after our configuration data. This is <code>sizeof(synapse_dynamics_config)</code> bytes after the value passed in as the <code>address</code> argument. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Whether the initialisation succeeded. </dd></dl>
 
 </div>
 </div>
@@ -599,7 +599,7 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon May 18 2020 14:34:26 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Jun 3 2020 10:20:29 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

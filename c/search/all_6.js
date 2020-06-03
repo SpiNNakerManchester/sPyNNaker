@@ -15,6 +15,7 @@ var searchData=
   ['get_5frow_5flength',['get_row_length',['../population__table__binary__search__impl_8c.html#a90850a3d006b876ba62076c80a401be1',1,'population_table_binary_search_impl.c']]],
   ['get_5fsource_5fdata',['get_source_data',['../spike__source__poisson_8c.html#a271dd89ae6f3a25d49a7e2d4cb768a37',1,'spike_source_poisson.c']]],
   ['get_5ftype_5fchar',['get_type_char',['../synapses_8c.html#a5af3d86ffc14ed6815aeeec7dbe9412a',1,'synapses.c']]],
+  ['ghost_5fpop_5ftable_5fsearches',['ghost_pop_table_searches',['../population__table__binary__search__impl_8c.html#ac69edc9d8d10785e6775d3805c8e7037',1,'population_table_binary_search_impl.c']]],
   ['global_5fneuron_5fparams_5fpointer_5ft',['global_neuron_params_pointer_t',['../neuron__model_8h.html#af6a73a4c591000fae3ac1f7e879b9a36',1,'neuron_model.h']]],
   ['global_5fneuron_5fparams_5ft',['global_neuron_params_t',['../neuron__model__lif__impl_8h.html#structglobal__neuron__params__t',1,'']]],
   ['global_5fparameters',['global_parameters',['../spike__source__poisson_8c.html#structglobal__parameters',1,'global_parameters'],['../neuron__impl__standard_8h.html#a3080a592212f89a8d8dde67f13a58949',1,'global_parameters():&#160;neuron_impl_standard.h']]],

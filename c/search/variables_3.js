@@ -9,6 +9,7 @@ var searchData=
   ['direct_5frows_5fbase_5faddress',['direct_rows_base_address',['../population__table__binary__search__impl_8c.html#a53f683b47d1883d1fe9dc988c1b6a101',1,'population_table_binary_search_impl.c']]],
   ['dma_5fbuffers',['dma_buffers',['../spike__processing_8c.html#a6952d0c3ce89e17b53834243600e6745',1,'spike_processing.c']]],
   ['dma_5fbusy',['dma_busy',['../spike__processing_8c.html#a6d745b360c9ad1e3de0fe2ea134209f9',1,'spike_processing.c']]],
+  ['dma_5fcomplete_5fcount',['dma_complete_count',['../spike__processing_8c.html#ae5dfef7b91f7f0999e4c50dbda402c17',1,'spike_processing.c']]],
   ['dma_5fn_5frewires',['dma_n_rewires',['../spike__processing_8c.html#af760c32944840948570708761ca97038',1,'spike_processing.c']]],
   ['dma_5fn_5fspikes',['dma_n_spikes',['../spike__processing_8c.html#a2b782d1e539bf132657dd7c00abd91f5',1,'spike_processing.c']]],
   ['dt_5fdivided_5fby_5ftau_5fsqr',['dt_divided_by_tau_sqr',['../synapse__types__alpha__impl_8h.html#a302d76f88428da70bcddb6d6eae4d078',1,'alpha_params_t']]],

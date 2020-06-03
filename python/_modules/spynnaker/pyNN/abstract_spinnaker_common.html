@@ -93,6 +93,7 @@
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utility_models</span> <span class="kn">import</span> <span class="n">CommandSender</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.utility_objs</span> <span class="kn">import</span> <span class="n">ExecutableFinder</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities</span> <span class="kn">import</span> <span class="n">globals_variables</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.helpful_functions</span> <span class="kn">import</span> <span class="n">read_config</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.utility_models</span> <span class="kn">import</span> <span class="n">synapse_expander</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN</span> <span class="kn">import</span> <span class="n">overridden_pacman_functions</span><span class="p">,</span> <span class="n">model_binaries</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities</span> <span class="kn">import</span> <span class="n">constants</span>
@@ -183,9 +184,43 @@
             <span class="n">front_end_versions</span><span class="o">=</span><span class="n">versions</span><span class="p">)</span>
 
         <span class="n">extra_mapping_inputs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="n">extra_mapping_inputs</span><span class="p">[</span><span class="s1">&#39;RouterBitfieldCompressionReport&#39;</span><span class="p">]</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getboolean</span><span class="p">(</span>
+                <span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;generate_router_compression_with_bitfield_report&quot;</span><span class="p">)</span>
+
+        <span class="n">extra_mapping_inputs</span><span class="p">[</span><span class="s1">&#39;RouterCompressorBitFieldUseCutOff&#39;</span><span class="p">]</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getboolean</span><span class="p">(</span>
+                <span class="s2">&quot;Mapping&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;router_table_compression_with_bit_field_use_time_cutoff&quot;</span><span class="p">)</span>
+
+        <span class="n">time</span> <span class="o">=</span> <span class="n">read_config</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="s2">&quot;Mapping&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;router_table_compression_with_bit_field_iteration_time&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">time</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
+        <span class="n">extra_mapping_inputs</span><span class="p">[</span><span class="s1">&#39;RouterCompressorBitFieldTimePerAttempt&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">time</span>
+
+        <span class="n">extra_mapping_inputs</span><span class="p">[</span><span class="s2">&quot;RouterCompressorBitFieldPreAllocSize&quot;</span><span class="p">]</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getint</span><span class="p">(</span>
+                <span class="s2">&quot;Mapping&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;router_table_compression_with_bit_field_pre_alloced_sdram&quot;</span><span class="p">)</span>
+        <span class="n">extra_mapping_inputs</span><span class="p">[</span><span class="s2">&quot;RouterCompressorBitFieldPercentageThreshold&quot;</span><span class="p">]</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getint</span><span class="p">(</span>
+                <span class="s2">&quot;Mapping&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;router_table_compression_with_bit_field_acceptance_threshold&quot;</span><span class="p">)</span>
         <span class="n">extra_mapping_inputs</span><span class="p">[</span><span class="s1">&#39;CreateAtomToEventIdMapping&#39;</span><span class="p">]</span> <span class="o">=</span> \
             <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getboolean</span><span class="p">(</span>
                 <span class="s2">&quot;Database&quot;</span><span class="p">,</span> <span class="s2">&quot;create_routing_info_to_neuron_id_mapping&quot;</span><span class="p">)</span>
+        <span class="n">extra_mapping_inputs</span><span class="p">[</span><span class="s2">&quot;ReadBitFieldGeneratorIOBUF&quot;</span><span class="p">]</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getboolean</span><span class="p">(</span><span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;read_bif_field_iobuf&quot;</span><span class="p">)</span>
+        <span class="n">extra_mapping_inputs</span><span class="p">[</span><span class="s2">&quot;GenerateBitFieldReport&quot;</span><span class="p">]</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getboolean</span><span class="p">(</span><span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;generate_bit_field_report&quot;</span><span class="p">)</span>
+        <span class="n">extra_mapping_inputs</span><span class="p">[</span><span class="s2">&quot;GenerateBitFieldSummaryReport&quot;</span><span class="p">]</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getboolean</span><span class="p">(</span>
+                <span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;generate_bit_field_summary_report&quot;</span><span class="p">)</span>
+        <span class="n">extra_mapping_inputs</span><span class="p">[</span><span class="s2">&quot;RouterCompressorWithBitFieldReadIOBuf&quot;</span><span class="p">]</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getboolean</span><span class="p">(</span>
+                <span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;write_router_compressor_with_bitfield_iobuf&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">user_extra_mapping_inputs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">extra_mapping_inputs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">user_extra_mapping_inputs</span><span class="p">)</span>
 
@@ -196,11 +231,14 @@
         <span class="k">if</span> <span class="n">extra_post_run_algorithms</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">extra_post_run_algorithms</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">extra_load_algorithms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;SynapseExpander&quot;</span><span class="p">)</span>
+        <span class="n">extra_load_algorithms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;OnChipBitFieldGenerator&quot;</span><span class="p">)</span>
         <span class="n">extra_algorithms_pre_run</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getboolean</span><span class="p">(</span><span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;draw_network_graph&quot;</span><span class="p">):</span>
             <span class="n">extra_mapping_algorithms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="s2">&quot;SpYNNakerConnectionHolderGenerator&quot;</span><span class="p">)</span>
+            <span class="n">extra_mapping_algorithms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="s2">&quot;PreAllocateForBitFieldRouterCompressor&quot;</span><span class="p">)</span>
             <span class="n">extra_load_algorithms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="s2">&quot;SpYNNakerNeuronGraphNetworkSpecificationReport&quot;</span><span class="p">)</span>
 
@@ -395,7 +433,7 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">AbstractSpiNNakerCommon</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">stop</span><span class="p">(</span>
             <span class="n">turn_off_machine</span><span class="p">,</span> <span class="n">clear_routing_tables</span><span class="p">,</span> <span class="n">clear_tags</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reset_number_of_neurons_per_core</span><span class="p">()</span>
-        <span class="n">globals_variables</span><span class="o">.</span><span class="n">unset_simulator</span><span class="p">()</span></div>
+        <span class="n">globals_variables</span><span class="o">.</span><span class="n">unset_simulator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AbstractSpiNNakerCommon.run"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_time</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Run the model created.</span>
@@ -408,6 +446,16 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_dsg_algorithm</span> <span class="o">=</span> <span class="s2">&quot;SpynnakerDataSpecificationWriter&quot;</span>
         <span class="k">for</span> <span class="n">projection</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_projections</span><span class="p">:</span>
             <span class="n">projection</span><span class="o">.</span><span class="n">_clear_cache</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getboolean</span><span class="p">(</span><span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;reports_enabled&quot;</span><span class="p">)</span> <span class="ow">and</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getboolean</span><span class="p">(</span>
+                    <span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;write_redundant_packet_count_report&quot;</span><span class="p">)</span> <span class="ow">and</span>
+                <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_use_virtual_board</span> <span class="ow">and</span> <span class="n">run_time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span>
+                <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_has_ran</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_config</span><span class="o">.</span><span class="n">getboolean</span><span class="p">(</span>
+                    <span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;writeProvenanceData&quot;</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">extend_extra_post_run_algorithms</span><span class="p">(</span>
+                <span class="p">[</span><span class="s2">&quot;RedundantPacketCountReport&quot;</span><span class="p">])</span>
+
         <span class="nb">super</span><span class="p">(</span><span class="n">AbstractSpiNNakerCommon</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">run_time</span><span class="p">)</span></div>
 
     <span class="nd">@staticmethod</span>

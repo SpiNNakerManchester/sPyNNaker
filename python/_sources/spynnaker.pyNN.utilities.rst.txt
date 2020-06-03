@@ -12,6 +12,14 @@ Subpackages
 Submodules
 ----------
 
+spynnaker.pyNN.utilities.bit_field_utilities module
+---------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.utilities.bit_field_utilities
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 spynnaker.pyNN.utilities.constants module
 -----------------------------------------
 
@@ -36,10 +44,10 @@ spynnaker.pyNN.utilities.fake_HBP_Portal_machine_provider module
     :undoc-members:
     :show-inheritance:
 
-spynnaker.pyNN.utilities.reports module
----------------------------------------
+spynnaker.pyNN.utilities.redundant_packet_count_report module
+-------------------------------------------------------------
 
-.. automodule:: spynnaker.pyNN.utilities.reports
+.. automodule:: spynnaker.pyNN.utilities.redundant_packet_count_report
     :members:
     :undoc-members:
     :show-inheritance:

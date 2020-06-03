@@ -18,6 +18,7 @@ var searchData=
   ['input_5ftype_5farray',['input_type_array',['../neuron__impl__standard_8h.html#a31058212f43265088fe71863d4ea0907',1,'neuron_impl_standard.h']]],
   ['instance_5fkey',['instance_key',['../munich__protocol_8h.html#af7733652e8cf2dc7a581b66b432ab4c9',1,'munich_key_bitfields_t::instance_key()'],['../munich__protocol_8h.html#a21aacafb9f4a3adc7afc7b0e4681e0bc',1,'instance_key():&#160;munich_protocol.h']]],
   ['instruction',['instruction',['../munich__protocol_8h.html#af88a58a15f4007a2629456b02fa89685',1,'munich_key_bitfields_t']]],
+  ['invalid_5fmaster_5fpop_5fhits',['invalid_master_pop_hits',['../population__table__binary__search__impl_8c.html#a40086bc81cde7081da9ed9b52b6bfaff',1,'population_table_binary_search_impl.c']]],
   ['is_5ffast_5fsource',['is_fast_source',['../spike__source__poisson_8c.html#a891758695b252c5b4c43c98b8f3232d4',1,'spike_source_t']]],
   ['is_5fsingle',['is_single',['../population__table__binary__search__impl_8c.html#abf7a35a5644b46e2db354540b8190f33',1,'address_and_row_length']]],
   ['items_5fto_5fgo',['items_to_go',['../population__table__binary__search__impl_8c.html#aebd5b17aab1bbe44fa564e8786f84d94',1,'population_table_binary_search_impl.c']]]

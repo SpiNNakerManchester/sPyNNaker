@@ -108,10 +108,14 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <code>#include &quot;<a class="el" href="synapse__dynamics_8h_source.html">plasticity/synapse_dynamics.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="synaptogenesis__dynamics_8h_source.html">structural_plasticity/synaptogenesis_dynamics.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="neuron_2profile__tags_8h_source.html">profile_tags.h</a>&quot;</code><br />
+<code>#include &quot;direct_synapses.h&quot;</code><br />
+<code>#include &quot;bit_field_filter.h&quot;</code><br />
 <code>#include &lt;data_specification.h&gt;</code><br />
 <code>#include &lt;simulation.h&gt;</code><br />
 <code>#include &lt;profiler.h&gt;</code><br />
 <code>#include &lt;debug.h&gt;</code><br />
+<code>#include &lt;bit_field.h&gt;</code><br />
+<code>#include &lt;filter_info.h&gt;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Data Structures</h2></td></tr>
@@ -258,6 +262,42 @@ n_plastic_synaptic_weight_saturations</td>
 <td class="fielddoc">
 The number of STDP weight saturations. </td></tr>
 <tr><td class="fieldtype">
+<a class="anchor" id="a1f1f613f49d3e1572c5c815021db4126"></a>uint32_t</td>
+<td class="fieldname">
+n_ghost_pop_table_searches</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a700d357cf16a2f95a5303e8d6598f182"></a>uint32_t</td>
+<td class="fieldname">
+n_failed_bitfield_reads</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a9e407b8da096a0cdbb7c4fd818ff539c"></a>uint32_t</td>
+<td class="fieldname">
+n_dmas_complete</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a64a1ca226ee320bd5b8a0ad98f82773a"></a>uint32_t</td>
+<td class="fieldname">
+n_spikes_processed</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a40a9268bbfbb52fbcbb529fbbd25efad"></a>uint32_t</td>
+<td class="fieldname">
+n_invalid_master_pop_table_hits</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
+<a class="anchor" id="a1d20029c56a5b105191f627f592455a4"></a>uint32_t</td>
+<td class="fieldname">
+n_filtered_by_bitfield</td>
+<td class="fielddoc">
+</td></tr>
+<tr><td class="fieldtype">
 <a class="anchor" id="ac525fc32eb7e2f1ef173901fb8dac16d"></a>uint32_t</td>
 <td class="fieldname">
 n_rewires</td>
@@ -394,7 +434,7 @@ The number of rewirings performed. </td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon May 18 2020 14:34:26 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Jun 3 2020 10:20:29 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

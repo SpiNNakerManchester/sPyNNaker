@@ -1,7 +1,4 @@
 var searchData=
 [
-  ['ufract_5fconst',['UFRACT_CONST',['../maths-util_8h.html#a6c28d1472e31da898fa9a584c9e82d01',1,'maths-util.h']]],
-  ['unpack_5fdelay_5findex',['unpack_delay_index',['../delay__extension_8h.html#a64494ca55a7d8abb2d9c45c1928da31d',1,'delay_extension.h']]],
-  ['unpack_5fdelay_5fstage',['unpack_delay_stage',['../delay__extension_8h.html#a4f6b0f0080036b3baadaebe99a5c4b95',1,'delay_extension.h']]],
-  ['ureal_5fconst',['UREAL_CONST',['../maths-util_8h.html#a9ff1e35d7d395a988bf688a412076a40',1,'maths-util.h']]]
+  ['top_5fbit_5fin_5fword',['TOP_BIT_IN_WORD',['../population__table__binary__search__impl_8c.html#a76abab9c83287abfbdde2324b659b836',1,'population_table_binary_search_impl.c']]]
 ];

@@ -1,0 +1,194 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>spynnaker.pyNN.utilities.redundant_packet_count_report &#8212; sPyNNaker  documentation</title>
+    
+    <link rel="stylesheet" href="../../../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">sPyNNaker  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for spynnaker.pyNN.utilities.redundant_packet_count_report</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) 2019-2020 The University of Manchester</span>
+<span class="c1">#</span>
+<span class="c1"># This program is free software: you can redistribute it and/or modify</span>
+<span class="c1"># it under the terms of the GNU General Public License as published by</span>
+<span class="c1"># the Free Software Foundation, either version 3 of the License, or</span>
+<span class="c1"># (at your option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># This program is distributed in the hope that it will be useful,</span>
+<span class="c1"># but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="c1"># MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="c1"># GNU General Public License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+
+<span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron</span> <span class="kn">import</span> <span class="n">PopulationMachineVertex</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
+
+
+<div class="viewcode-block" id="RedundantPacketCountReport"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.redundant_packet_count_report.RedundantPacketCountReport">[docs]</a><span class="k">class</span> <span class="nc">RedundantPacketCountReport</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="n">_FILE_NAME</span> <span class="o">=</span> <span class="s2">&quot;redundant_packet_count.rpt&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">provenance_items</span><span class="p">,</span> <span class="n">report_default_directory</span><span class="p">):</span>
+        <span class="n">file_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">report_default_directory</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_FILE_NAME</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_write_report</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">provenance_items</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Generate_placement_reports: Can&#39;t open file&quot;</span>
+                             <span class="s2">&quot; </span><span class="si">{}</span><span class="s2"> for writing.&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_FILE_NAME</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_write_report</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">provenance_items</span><span class="p">):</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">dict</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">provenance_item</span> <span class="ow">in</span> <span class="n">provenance_items</span><span class="p">:</span>
+            <span class="n">last_name</span> <span class="o">=</span> <span class="n">provenance_item</span><span class="o">.</span><span class="n">names</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="n">provenance_item</span><span class="o">.</span><span class="n">names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="p">((</span><span class="n">last_name</span> <span class="o">==</span> <span class="n">PopulationMachineVertex</span><span class="o">.</span><span class="n">GHOST_SEARCHES</span><span class="p">)</span> <span class="ow">or</span>
+                    <span class="p">(</span><span class="n">last_name</span> <span class="o">==</span>
+                        <span class="n">PopulationMachineVertex</span><span class="o">.</span><span class="n">BIT_FIELD_FILTERED_PACKETS</span><span class="p">)</span> <span class="ow">or</span>
+                    <span class="p">(</span><span class="n">last_name</span> <span class="o">==</span>
+                        <span class="n">PopulationMachineVertex</span><span class="o">.</span><span class="n">INVALID_MASTER_POP_HITS</span><span class="p">)</span> <span class="ow">or</span>
+                    <span class="p">(</span><span class="n">last_name</span> <span class="o">==</span> <span class="n">PopulationMachineVertex</span><span class="o">.</span><span class="n">SPIKES_PROCESSED</span><span class="p">)):</span>
+
+                <span class="c1"># add to store</span>
+                <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">last_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">provenance_item</span><span class="o">.</span><span class="n">value</span>
+
+                <span class="c1"># accum enough data on a core to do summary</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+
+                    <span class="c1"># total packets received</span>
+                    <span class="n">total</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">PopulationMachineVertex</span><span class="o">.</span><span class="n">GHOST_SEARCHES</span><span class="p">]</span> <span class="o">+</span>
+                        <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">][</span>
+                            <span class="n">PopulationMachineVertex</span><span class="o">.</span>
+                            <span class="n">BIT_FIELD_FILTERED_PACKETS</span><span class="p">]</span> <span class="o">+</span>
+                        <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">][</span>
+                            <span class="n">PopulationMachineVertex</span><span class="o">.</span><span class="n">INVALID_MASTER_POP_HITS</span><span class="p">]</span> <span class="o">+</span>
+                        <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">PopulationMachineVertex</span><span class="o">.</span><span class="n">SPIKES_PROCESSED</span><span class="p">])</span>
+
+                    <span class="c1"># total redundant packets</span>
+                    <span class="n">redundant</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">PopulationMachineVertex</span><span class="o">.</span><span class="n">GHOST_SEARCHES</span><span class="p">]</span> <span class="o">+</span>
+                        <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">][</span>
+                            <span class="n">PopulationMachineVertex</span><span class="o">.</span>
+                            <span class="n">BIT_FIELD_FILTERED_PACKETS</span><span class="p">]</span> <span class="o">+</span>
+                        <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">][</span>
+                            <span class="n">PopulationMachineVertex</span><span class="o">.</span><span class="n">INVALID_MASTER_POP_HITS</span><span class="p">])</span>
+
+                    <span class="n">percentage</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="k">if</span> <span class="n">total</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">percentage</span> <span class="o">=</span> <span class="p">(</span><span class="mf">100.0</span> <span class="o">/</span> <span class="n">total</span><span class="p">)</span> <span class="o">*</span> <span class="n">redundant</span>
+
+                    <span class="n">output</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+                        <span class="s2">&quot;core </span><span class="si">{}</span><span class="s2"> </span><span class="se">\n\n</span><span class="s2">&quot;</span>
+                        <span class="s2">&quot;    </span><span class="si">{}</span><span class="s2"> packets received.</span><span class="se">\n</span><span class="s2">&quot;</span>
+                        <span class="s2">&quot;    </span><span class="si">{}</span><span class="s2"> were detected as redundant packets by the &quot;</span>
+                        <span class="s2">&quot;bitfield filter.</span><span class="se">\n</span><span class="s2">&quot;</span>
+                        <span class="s2">&quot;    </span><span class="si">{}</span><span class="s2"> were detected as having no &quot;</span>
+                        <span class="s2">&quot;targets after the DMA stage.</span><span class="se">\n</span><span class="s2">&quot;</span>
+                        <span class="s2">&quot;    </span><span class="si">{}</span><span class="s2"> were detected as &quot;</span>
+                        <span class="s2">&quot;packets which we should not have received in the &quot;</span>
+                        <span class="s2">&quot;first place. </span><span class="se">\n</span><span class="s2">&quot;</span>
+                        <span class="s2">&quot;    Overall this makes a redundant &quot;</span>
+                        <span class="s2">&quot;percentage of </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="n">key</span><span class="p">,</span> <span class="n">total</span><span class="p">,</span>
+                            <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">][</span>
+                                <span class="n">PopulationMachineVertex</span><span class="o">.</span>
+                                <span class="n">BIT_FIELD_FILTERED_PACKETS</span><span class="p">],</span>
+                            <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">PopulationMachineVertex</span><span class="o">.</span><span class="n">GHOST_SEARCHES</span><span class="p">],</span>
+                            <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">][</span>
+                                <span class="n">PopulationMachineVertex</span><span class="o">.</span>
+                                <span class="n">INVALID_MASTER_POP_HITS</span><span class="p">],</span>
+                            <span class="n">percentage</span><span class="p">))</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../../index.html">sPyNNaker  documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2014-2017.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.3.
+    </div>
+  </body>
+</html>

@@ -58,10 +58,11 @@
 <li><a class="reference internal" href="#">spynnaker.pyNN.utilities package</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.bit_field_utilities">spynnaker.pyNN.utilities.bit_field_utilities module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.constants">spynnaker.pyNN.utilities.constants module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.extracted_data">spynnaker.pyNN.utilities.extracted_data module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.fake_HBP_Portal_machine_provider">spynnaker.pyNN.utilities.fake_HBP_Portal_machine_provider module</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.reports">spynnaker.pyNN.utilities.reports module</a></li>
+<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.redundant_packet_count_report">spynnaker.pyNN.utilities.redundant_packet_count_report module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.running_stats">spynnaker.pyNN.utilities.running_stats module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.spynnaker_connection_holder_generations">spynnaker.pyNN.utilities.spynnaker_connection_holder_generations module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.spynnaker_failed_state">spynnaker.pyNN.utilities.spynnaker_failed_state module</a></li>
@@ -141,6 +142,104 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
+<div class="section" id="module-spynnaker.pyNN.utilities.bit_field_utilities">
+<span id="spynnaker-pynn-utilities-bit-field-utilities-module"></span><h2>spynnaker.pyNN.utilities.bit_field_utilities module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.bit_field_utilities" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="spynnaker.pyNN.utilities.bit_field_utilities.exact_sdram_for_bit_field_builder_region">
+<code class="descclassname">spynnaker.pyNN.utilities.bit_field_utilities.</code><code class="descname">exact_sdram_for_bit_field_builder_region</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/bit_field_utilities.html#exact_sdram_for_bit_field_builder_region"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.bit_field_utilities.exact_sdram_for_bit_field_builder_region" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns the sdram requirement for the builder region
+:return: returns the sdram requirement for the builder region</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="spynnaker.pyNN.utilities.bit_field_utilities.get_estimated_sdram_for_bit_field_region">
+<code class="descclassname">spynnaker.pyNN.utilities.bit_field_utilities.</code><code class="descname">get_estimated_sdram_for_bit_field_region</code><span class="sig-paren">(</span><em>app_graph</em>, <em>vertex</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/bit_field_utilities.html#get_estimated_sdram_for_bit_field_region"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.bit_field_utilities.get_estimated_sdram_for_bit_field_region" title="Permalink to this definition">¶</a></dt>
+<dd><p>estimates the sdram for the bit field region
+:param app_graph: the app graph
+:param vertex: machine vertex
+:return: the estimated number of bytes used by the bit field region</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="spynnaker.pyNN.utilities.bit_field_utilities.get_estimated_sdram_for_key_region">
+<code class="descclassname">spynnaker.pyNN.utilities.bit_field_utilities.</code><code class="descname">get_estimated_sdram_for_key_region</code><span class="sig-paren">(</span><em>app_graph</em>, <em>vertex</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/bit_field_utilities.html#get_estimated_sdram_for_key_region"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.bit_field_utilities.get_estimated_sdram_for_key_region" title="Permalink to this definition">¶</a></dt>
+<dd><p>gets an estimate of the bitfield builder region</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>app_graph</strong> &#8211; the app graph</li>
+<li><strong>vertex</strong> &#8211; machine vertex</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">sdram needed</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="spynnaker.pyNN.utilities.bit_field_utilities.reserve_bit_field_regions">
+<code class="descclassname">spynnaker.pyNN.utilities.bit_field_utilities.</code><code class="descname">reserve_bit_field_regions</code><span class="sig-paren">(</span><em>spec</em>, <em>machine_graph</em>, <em>n_key_map</em>, <em>vertex</em>, <em>bit_field_builder_region</em>, <em>bit_filter_region</em>, <em>bit_field_key_region</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/bit_field_utilities.html#reserve_bit_field_regions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.bit_field_utilities.reserve_bit_field_regions" title="Permalink to this definition">¶</a></dt>
+<dd><p>reserves the regions for the bitfields</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>spec</strong> &#8211; dsg file</li>
+<li><strong>machine_graph</strong> &#8211; machine graph</li>
+<li><strong>n_key_map</strong> &#8211; map between partitions and n keys</li>
+<li><strong>vertex</strong> &#8211; machine vertex</li>
+<li><strong>bit_field_builder_region</strong> &#8211; region id for the builder region</li>
+<li><strong>bit_filter_region</strong> &#8211; region id for the bitfield region</li>
+<li><strong>bit_field_key_region</strong> &#8211; region id for the key map</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="spynnaker.pyNN.utilities.bit_field_utilities.write_bitfield_init_data">
+<code class="descclassname">spynnaker.pyNN.utilities.bit_field_utilities.</code><code class="descname">write_bitfield_init_data</code><span class="sig-paren">(</span><em>spec</em>, <em>machine_vertex</em>, <em>machine_graph</em>, <em>routing_info</em>, <em>n_key_map</em>, <em>bit_field_builder_region</em>, <em>master_pop_region_id</em>, <em>synaptic_matrix_region_id</em>, <em>direct_matrix_region_id</em>, <em>bit_field_region_id</em>, <em>bit_field_key_map_region_id</em>, <em>structural_dynamics_region_id</em>, <em>has_structural_dynamics_region</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/bit_field_utilities.html#write_bitfield_init_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.bit_field_utilities.write_bitfield_init_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>writes the init data needed for the bitfield generator</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>spec</strong> &#8211; data spec writer</li>
+<li><strong>machine_vertex</strong> &#8211; machine vertex</li>
+<li><strong>machine_graph</strong> &#8211; machine graph</li>
+<li><strong>routing_info</strong> &#8211; keys</li>
+<li><strong>n_key_map</strong> &#8211; map for edge to n keys</li>
+<li><strong>bit_field_builder_region</strong> &#8211; the region id for the bitfield builder</li>
+<li><strong>master_pop_region_id</strong> &#8211; the region id for the master pop table</li>
+<li><strong>synaptic_matrix_region_id</strong> &#8211; the region id for the synaptic matrix</li>
+<li><strong>direct_matrix_region_id</strong> &#8211; the region id for the direct matrix</li>
+<li><strong>bit_field_region_id</strong> &#8211; the region id for the bit-fields</li>
+<li><strong>bit_field_key_map_region_id</strong> &#8211; the region id for the key map</li>
+<li><strong>structural_dynamics_region_id</strong> &#8211; the region id for the structural</li>
+<li><strong>has_structural_dynamics_region</strong> &#8211; bool saying if the core has a has_structural_dynamics_region or not</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
 <div class="section" id="module-spynnaker.pyNN.utilities.constants">
 <span id="spynnaker-pynn-utilities-constants-module"></span><h2>spynnaker.pyNN.utilities.constants module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.constants" title="Permalink to this headline">¶</a></h2>
 <dl class="data">
@@ -173,13 +272,28 @@
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">enum.Enum</span></code></p>
 <p>Regions for populations.</p>
 <dl class="attribute">
+<dt id="spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.BIT_FIELD_BUILDER">
+<code class="descname">BIT_FIELD_BUILDER</code><em class="property"> = 13</em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.BIT_FIELD_BUILDER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.BIT_FIELD_FILTER">
+<code class="descname">BIT_FIELD_FILTER</code><em class="property"> = 12</em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.BIT_FIELD_FILTER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.BIT_FIELD_KEY_MAP">
+<code class="descname">BIT_FIELD_KEY_MAP</code><em class="property"> = 14</em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.BIT_FIELD_KEY_MAP" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
 <dt id="spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.CONNECTOR_BUILDER">
-<code class="descname">CONNECTOR_BUILDER</code><em class="property"> = 9</em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.CONNECTOR_BUILDER" title="Permalink to this definition">¶</a></dt>
+<code class="descname">CONNECTOR_BUILDER</code><em class="property"> = 10</em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.CONNECTOR_BUILDER" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.DIRECT_MATRIX">
-<code class="descname">DIRECT_MATRIX</code><em class="property"> = 10</em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.DIRECT_MATRIX" title="Permalink to this definition">¶</a></dt>
+<code class="descname">DIRECT_MATRIX</code><em class="property"> = 11</em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.DIRECT_MATRIX" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -189,7 +303,7 @@
 
 <dl class="attribute">
 <dt id="spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.NEURON_RECORDING">
-<code class="descname">NEURON_RECORDING</code><em class="property"> = 6</em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.NEURON_RECORDING" title="Permalink to this definition">¶</a></dt>
+<code class="descname">NEURON_RECORDING</code><em class="property"> = 7</em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.NEURON_RECORDING" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -199,12 +313,17 @@
 
 <dl class="attribute">
 <dt id="spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.PROFILING">
-<code class="descname">PROFILING</code><em class="property"> = 8</em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.PROFILING" title="Permalink to this definition">¶</a></dt>
+<code class="descname">PROFILING</code><em class="property"> = 9</em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.PROFILING" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.PROVENANCE_DATA">
-<code class="descname">PROVENANCE_DATA</code><em class="property"> = 7</em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.PROVENANCE_DATA" title="Permalink to this definition">¶</a></dt>
+<code class="descname">PROVENANCE_DATA</code><em class="property"> = 8</em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.PROVENANCE_DATA" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.STRUCTURAL_DYNAMICS">
+<code class="descname">STRUCTURAL_DYNAMICS</code><em class="property"> = 6</em><a class="headerlink" href="#spynnaker.pyNN.utilities.constants.POPULATION_BASED_REGIONS.STRUCTURAL_DYNAMICS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -333,8 +452,14 @@
 </dd></dl>
 
 </div>
-<div class="section" id="module-spynnaker.pyNN.utilities.reports">
-<span id="spynnaker-pynn-utilities-reports-module"></span><h2>spynnaker.pyNN.utilities.reports module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.reports" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-spynnaker.pyNN.utilities.redundant_packet_count_report">
+<span id="spynnaker-pynn-utilities-redundant-packet-count-report-module"></span><h2>spynnaker.pyNN.utilities.redundant_packet_count_report module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.redundant_packet_count_report" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="spynnaker.pyNN.utilities.redundant_packet_count_report.RedundantPacketCountReport">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.utilities.redundant_packet_count_report.</code><code class="descname">RedundantPacketCountReport</code><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/redundant_packet_count_report.html#RedundantPacketCountReport"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.redundant_packet_count_report.RedundantPacketCountReport" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+</dd></dl>
+
 </div>
 <div class="section" id="module-spynnaker.pyNN.utilities.running_stats">
 <span id="spynnaker-pynn-utilities-running-stats-module"></span><h2>spynnaker.pyNN.utilities.running_stats module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.running_stats" title="Permalink to this headline">¶</a></h2>

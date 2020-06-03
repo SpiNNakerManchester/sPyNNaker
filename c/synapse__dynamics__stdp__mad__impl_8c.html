@@ -142,9 +142,9 @@ Functions</h2></td></tr>
 <tr class="memitem:abade6b73a469c1ff0e54366f065343e5"><td class="memItemLeft" align="right" valign="top">static index_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#abade6b73a469c1ff0e54366f065343e5">sparse_axonal_delay</a> (uint32_t x)</td></tr>
 <tr class="memdesc:abade6b73a469c1ff0e54366f065343e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the axonal delay.  <a href="#abade6b73a469c1ff0e54366f065343e5">More...</a><br /></td></tr>
 <tr class="separator:abade6b73a469c1ff0e54366f065343e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab9ef0316722ad01baf5beed9028e1ff5"><td class="memItemLeft" align="right" valign="top">address_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#ab9ef0316722ad01baf5beed9028e1ff5">synapse_dynamics_initialise</a> (address_t address, uint32_t <a class="el" href="synapses_8c.html#a7368643a28282d8b3429f0fb145aa5db">n_neurons</a>, uint32_t <a class="el" href="synapses_8c.html#adedb27b3ece4d4dece0aee776a136427">n_synapse_types</a>, uint32_t *ring_buffer_to_input_buffer_left_shifts)</td></tr>
-<tr class="memdesc:ab9ef0316722ad01baf5beed9028e1ff5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise the synapse dynamics.  <a href="#ab9ef0316722ad01baf5beed9028e1ff5">More...</a><br /></td></tr>
-<tr class="separator:ab9ef0316722ad01baf5beed9028e1ff5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4a1c98d660ba6a17d4678ae9ef2a5526"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a4a1c98d660ba6a17d4678ae9ef2a5526">synapse_dynamics_initialise</a> (address_t address, uint32_t <a class="el" href="synapses_8c.html#a7368643a28282d8b3429f0fb145aa5db">n_neurons</a>, uint32_t <a class="el" href="synapses_8c.html#adedb27b3ece4d4dece0aee776a136427">n_synapse_types</a>, uint32_t *ring_buffer_to_input_buffer_left_shifts)</td></tr>
+<tr class="memdesc:a4a1c98d660ba6a17d4678ae9ef2a5526"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise the synapse dynamics.  <a href="#a4a1c98d660ba6a17d4678ae9ef2a5526">More...</a><br /></td></tr>
+<tr class="separator:a4a1c98d660ba6a17d4678ae9ef2a5526"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab23d9244a75db91ab20874d4da0e5ef8"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#ab23d9244a75db91ab20874d4da0e5ef8">synapse_dynamics_process_plastic_synapses</a> (address_t plastic_region_address, address_t fixed_region_address, weight_t *<a class="el" href="synapses_8c.html#a9d013c2e9d5eddd8472bd57e9b21ff99">ring_buffers</a>, uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>)</td></tr>
 <tr class="memdesc:ab23d9244a75db91ab20874d4da0e5ef8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Processes the dynamics of the synapses.  <a href="#ab23d9244a75db91ab20874d4da0e5ef8">More...</a><br /></td></tr>
 <tr class="separator:ab23d9244a75db91ab20874d4da0e5ef8"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -495,12 +495,12 @@ The per-synapse information. </td></tr>
 
 </div>
 </div>
-<a class="anchor" id="ab9ef0316722ad01baf5beed9028e1ff5"></a>
+<a class="anchor" id="a4a1c98d660ba6a17d4678ae9ef2a5526"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">address_t synapse_dynamics_initialise </td>
+          <td class="memname">bool synapse_dynamics_initialise </td>
           <td>(</td>
           <td class="paramtype">address_t&#160;</td>
           <td class="paramname"><em>address</em>, </td>
@@ -541,7 +541,7 @@ The per-synapse information. </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>The address of the first word after our configuration data. This is <code>sizeof(synapse_dynamics_config)</code> bytes after the value passed in as the <code>address</code> argument. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Whether the initialisation succeeded. </dd></dl>
 
 </div>
 </div>
@@ -940,7 +940,7 @@ The per-synapse information. </td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon May 18 2020 14:34:26 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Jun 3 2020 10:20:29 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

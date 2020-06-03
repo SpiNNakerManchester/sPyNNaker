@@ -88,7 +88,6 @@
 <span class="kn">from</span> <span class="nn">.abstract_synapse_dynamics_structural</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractSynapseDynamicsStructural</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">SynapticConfigurationException</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities</span> <span class="kn">import</span> <span class="n">constants</span>
 <span class="kn">import</span> <span class="nn">math</span>
 
 
@@ -238,9 +237,7 @@
         <span class="sd">&quot;&quot;&quot; Write the synapse parameters to the spec.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span><span class="s2">&quot;Writing structural plasticity parameters&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">spec</span><span class="o">.</span><span class="n">current_region</span> <span class="o">!=</span> <span class="n">constants</span><span class="o">.</span><span class="n">POPULATION_BASED_REGIONS</span><span class="o">.</span> \
-                <span class="n">SYNAPSE_DYNAMICS</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
-            <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span><span class="n">region</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span><span class="n">region</span><span class="p">)</span>
 
         <span class="c1"># Get relevant edges</span>
         <span class="n">structural_edges</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_structural_edges</span><span class="p">(</span>

@@ -103,6 +103,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <code>#include &quot;<a class="el" href="population__table_8h_source.html">population_table/population_table.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="synapse__row_8h_source.html">synapse_row.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="synapses_8h_source.html">synapses.h</a>&quot;</code><br />
+<code>#include &quot;direct_synapses.h&quot;</code><br />
 <code>#include &quot;<a class="el" href="synaptogenesis__dynamics_8h_source.html">structural_plasticity/synaptogenesis_dynamics.h</a>&quot;</code><br />
 <code>#include &lt;simulation.h&gt;</code><br />
 <code>#include &lt;debug.h&gt;</code><br />
@@ -132,9 +133,6 @@ Functions</h2></td></tr>
 <tr class="memitem:acdf5b12f204b0f7f4656078d61d48761"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing_8c.html#acdf5b12f204b0f7f4656078d61d48761">do_dma_read</a> (address_t row_address, size_t n_bytes_to_transfer, <a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> spike)</td></tr>
 <tr class="memdesc:acdf5b12f204b0f7f4656078d61d48761"><td class="mdescLeft">&#160;</td><td class="mdescRight">Perform a DMA read of a synaptic row.  <a href="#acdf5b12f204b0f7f4656078d61d48761">More...</a><br /></td></tr>
 <tr class="separator:acdf5b12f204b0f7f4656078d61d48761"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8bec5f88a51f7d5a985f3e0455e0ae5e"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing_8c.html#a8bec5f88a51f7d5a985f3e0455e0ae5e">do_direct_row</a> (address_t row_address)</td></tr>
-<tr class="memdesc:a8bec5f88a51f7d5a985f3e0455e0ae5e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Handle a direct, single fixed row.  <a href="#a8bec5f88a51f7d5a985f3e0455e0ae5e">More...</a><br /></td></tr>
-<tr class="separator:a8bec5f88a51f7d5a985f3e0455e0ae5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a106193de929b229745d8ba1ff61c0868"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing_8c.html#a106193de929b229745d8ba1ff61c0868">is_something_to_do</a> (address_t *row_address, size_t *n_bytes_to_transfer, <a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> *spike, uint32_t *n_rewire, uint32_t *n_process_spike)</td></tr>
 <tr class="memdesc:a106193de929b229745d8ba1ff61c0868"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if there is anything to do. If not, DMA is not busy.  <a href="#a106193de929b229745d8ba1ff61c0868">More...</a><br /></td></tr>
 <tr class="separator:a106193de929b229745d8ba1ff61c0868"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -159,6 +157,18 @@ Functions</h2></td></tr>
 <tr class="memitem:a31a23129c986ef03985d6c245cffb7ce"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing_8c.html#a31a23129c986ef03985d6c245cffb7ce">spike_processing_get_buffer_overflows</a> (void)</td></tr>
 <tr class="memdesc:a31a23129c986ef03985d6c245cffb7ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns the number of times the input buffer has overflowed  <a href="#a31a23129c986ef03985d6c245cffb7ce">More...</a><br /></td></tr>
 <tr class="separator:a31a23129c986ef03985d6c245cffb7ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac269ceb770c41478bd019449cb2543b1"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing_8c.html#ac269ceb770c41478bd019449cb2543b1">spike_processing_get_ghost_pop_table_searches</a> (void)</td></tr>
+<tr class="memdesc:ac269ceb770c41478bd019449cb2543b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns the number of ghost searches occurred  <a href="#ac269ceb770c41478bd019449cb2543b1">More...</a><br /></td></tr>
+<tr class="separator:ac269ceb770c41478bd019449cb2543b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a880beb84401c17c4f8e65f5502e080f2"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing_8c.html#a880beb84401c17c4f8e65f5502e080f2">spike_processing_get_invalid_master_pop_table_hits</a> (void)</td></tr>
+<tr class="memdesc:a880beb84401c17c4f8e65f5502e080f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns the number of master pop table failed hits  <a href="#a880beb84401c17c4f8e65f5502e080f2">More...</a><br /></td></tr>
+<tr class="separator:a880beb84401c17c4f8e65f5502e080f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab28afe0154629d9ab4edf637ea0c2d7c"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing_8c.html#ab28afe0154629d9ab4edf637ea0c2d7c">spike_processing_get_dma_complete_count</a> (void)</td></tr>
+<tr class="memdesc:ab28afe0154629d9ab4edf637ea0c2d7c"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns the number of DMA's that were completed  <a href="#ab28afe0154629d9ab4edf637ea0c2d7c">More...</a><br /></td></tr>
+<tr class="separator:ab28afe0154629d9ab4edf637ea0c2d7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7bb0724cd581cb5a97d52fe55957fcc7"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing_8c.html#a7bb0724cd581cb5a97d52fe55957fcc7">spike_processing_get_spike_processing_count</a> (void)</td></tr>
+<tr class="memdesc:a7bb0724cd581cb5a97d52fe55957fcc7"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns the number of spikes that were processed  <a href="#a7bb0724cd581cb5a97d52fe55957fcc7">More...</a><br /></td></tr>
+<tr class="separator:a7bb0724cd581cb5a97d52fe55957fcc7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8968e90552f7093d74a377ea01cf64a0"><td class="memItemLeft" align="right" valign="top">circular_buffer&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing_8c.html#a8968e90552f7093d74a377ea01cf64a0">get_circular_buffer</a> (void)</td></tr>
 <tr class="memdesc:a8968e90552f7093d74a377ea01cf64a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">get the address of the circular buffer used for buffering received spikes before processing them  <a href="#a8968e90552f7093d74a377ea01cf64a0">More...</a><br /></td></tr>
 <tr class="separator:a8968e90552f7093d74a377ea01cf64a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -191,10 +201,6 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
 static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing_8c.html#a4f91d051c76c3a6e81e61a7707c277b4">buffer_being_read</a></td></tr>
 <tr class="memdesc:a4f91d051c76c3a6e81e61a7707c277b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">The index of the buffer currently being filled by a DMA read. <br /></td></tr>
 <tr class="separator:a4f91d051c76c3a6e81e61a7707c277b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa2bb8f7ba57b4b519c2868867d09922b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa2bb8f7ba57b4b519c2868867d09922b"></a>
-static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing_8c.html#aa2bb8f7ba57b4b519c2868867d09922b">single_fixed_synapse</a> [4]</td></tr>
-<tr class="memdesc:aa2bb8f7ba57b4b519c2868867d09922b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Buffer for handling a single Fixed Synapse. <br /></td></tr>
-<tr class="separator:aa2bb8f7ba57b4b519c2868867d09922b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a58209497c5fe5ba1a7034e03e6622d6d"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a58209497c5fe5ba1a7034e03e6622d6d"></a>
 static volatile uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing_8c.html#a58209497c5fe5ba1a7034e03e6622d6d">rewires_to_do</a> = 0</td></tr>
 <tr class="memdesc:a58209497c5fe5ba1a7034e03e6622d6d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Number of outstanding synaptogenic rewirings. <br /></td></tr>
@@ -203,6 +209,14 @@ static volatile uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a c
 <tr class="separator:af760c32944840948570708761ca97038"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2b782d1e539bf132657dd7c00abd91f5"><td class="memItemLeft" align="right" valign="top">static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing_8c.html#a2b782d1e539bf132657dd7c00abd91f5">dma_n_spikes</a></td></tr>
 <tr class="separator:a2b782d1e539bf132657dd7c00abd91f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae5dfef7b91f7f0999e4c50dbda402c17"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae5dfef7b91f7f0999e4c50dbda402c17"></a>
+static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing_8c.html#ae5dfef7b91f7f0999e4c50dbda402c17">dma_complete_count</a> = 0</td></tr>
+<tr class="memdesc:ae5dfef7b91f7f0999e4c50dbda402c17"><td class="mdescLeft">&#160;</td><td class="mdescRight">the number of dma completes (used in provenance generation) <br /></td></tr>
+<tr class="separator:ae5dfef7b91f7f0999e4c50dbda402c17"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1c63cfe14fca20ae057b01cf442f7abc"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1c63cfe14fca20ae057b01cf442f7abc"></a>
+static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing_8c.html#a1c63cfe14fca20ae057b01cf442f7abc">spike_processing_count</a> = 0</td></tr>
+<tr class="memdesc:a1c63cfe14fca20ae057b01cf442f7abc"><td class="mdescLeft">&#160;</td><td class="mdescRight">the number of spikes that were processed (used in provenance generation) <br /></td></tr>
+<tr class="separator:a1c63cfe14fca20ae057b01cf442f7abc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3a9f1e7d67f318a7a966f01ff80b49dd"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a3a9f1e7d67f318a7a966f01ff80b49dd"></a>
 static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__processing_8c.html#a3a9f1e7d67f318a7a966f01ff80b49dd">n_successful_rewires</a> = 0</td></tr>
 <tr class="memdesc:a3a9f1e7d67f318a7a966f01ff80b49dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of successful rewires. <br /></td></tr>
@@ -326,38 +340,6 @@ Row data. </td></tr>
 
 </div>
 </div>
-<a class="anchor" id="a8bec5f88a51f7d5a985f3e0455e0ae5e"></a>
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static void do_direct_row </td>
-          <td>(</td>
-          <td class="paramtype">address_t&#160;</td>
-          <td class="paramname"><em>row_address</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Handle a direct, single fixed row. </p>
-<p>Note that this does not include STDP by definition. </p><dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">row_address</td><td>Where the row is in SDRAM </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
 <a class="anchor" id="a106193de929b229745d8ba1ff61c0868"></a>
 <div class="memitem">
 <div class="memproto">
@@ -463,7 +445,7 @@ Row data. </td></tr>
 
 <p>Set up a new synaptic DMA read. </p>
 <p>If a current_buffer is passed in, any spike found that matches the originating spike of the buffer will increment a count, and the DMA of that row will be skipped. The number of times a row should be rewired and the number of times synaptic processing should be done on a row is returned.</p>
-<p>Calls <a class="el" href="spike__processing_8c.html#a106193de929b229745d8ba1ff61c0868" title="Check if there is anything to do. If not, DMA is not busy. ">is_something_to_do()</a>, <a class="el" href="spike__processing_8c.html#a8bec5f88a51f7d5a985f3e0455e0ae5e" title="Handle a direct, single fixed row. ">do_direct_row()</a> and <a class="el" href="spike__processing_8c.html#acdf5b12f204b0f7f4656078d61d48761" title="Perform a DMA read of a synaptic row. ">do_dma_read()</a> </p><dl class="params"><dt>Parameters</dt><dd>
+<p>Calls <a class="el" href="spike__processing_8c.html#a106193de929b229745d8ba1ff61c0868" title="Check if there is anything to do. If not, DMA is not busy. ">is_something_to_do()</a>, do_direct_row() and <a class="el" href="spike__processing_8c.html#acdf5b12f204b0f7f4656078d61d48761" title="Perform a DMA read of a synaptic row. ">do_dma_read()</a> </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">current_buffer</td><td>The current buffer, if any. </td></tr>
     <tr><td class="paramdir">[in,out]</td><td class="paramname">n_rewires</td><td>Accumulator of number of rewirings </td></tr>
@@ -707,6 +689,82 @@ Row data. </td></tr>
 
 </div>
 </div>
+<a class="anchor" id="ac269ceb770c41478bd019449cb2543b1"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint32_t spike_processing_get_ghost_pop_table_searches </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>returns the number of ghost searches occurred </p>
+<dl class="section return"><dt>Returns</dt><dd>the number of times a ghost search occurred. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a880beb84401c17c4f8e65f5502e080f2"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint32_t spike_processing_get_invalid_master_pop_table_hits </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>returns the number of master pop table failed hits </p>
+<dl class="section return"><dt>Returns</dt><dd>the number of times a spike did not have a master pop table entry </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ab28afe0154629d9ab4edf637ea0c2d7c"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint32_t spike_processing_get_dma_complete_count </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>returns the number of DMA's that were completed </p>
+<dl class="section return"><dt>Returns</dt><dd>the number of DMA's that were completed. </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="a7bb0724cd581cb5a97d52fe55957fcc7"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint32_t spike_processing_get_spike_processing_count </td>
+          <td>(</td>
+          <td class="paramtype">void&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>returns the number of spikes that were processed </p>
+<dl class="section return"><dt>Returns</dt><dd>the number of spikes that were processed </dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="a8968e90552f7093d74a377ea01cf64a0"></a>
 <div class="memitem">
 <div class="memproto">
@@ -760,13 +818,7 @@ Row data. </td></tr>
 </div><div class="memdoc">
 
 <p>set the number of times spike_processing has to attempt rewiring </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">number_of_rewires</td><td>The number of rewirings to perform </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>currently always true </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>currently, always true </dd></dl>
 
 </div>
 </div>
@@ -816,7 +868,7 @@ Row data. </td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon May 18 2020 14:34:26 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Jun 3 2020 10:20:29 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>
