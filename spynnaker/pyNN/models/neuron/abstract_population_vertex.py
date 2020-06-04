@@ -36,11 +36,11 @@ from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, SYSTEM_BYTES_REQUIREMENT)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.interface.simulation import simulation_utilities
-from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
 from spinn_front_end_common.interface.profiling import profile_utils
+from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, AbstractNeuronRecordable, NeuronRecorder)
-from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.utilities import constants, bit_field_utilities
 from spynnaker.pyNN.models.abstract_models import (
     AbstractPopulationInitializable, AbstractAcceptsIncomingSynapses,
     AbstractPopulationSettable, AbstractReadParametersBeforeSet,
@@ -48,6 +48,7 @@ from spynnaker.pyNN.models.abstract_models import (
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.utilities.ranged import (
     SpynnakerRangeDictionary, SpynnakerRangedList)
+from .synapse_dynamics import AbstractSynapseDynamicsStructural
 from .synaptic_manager import SynapticManager
 from .population_machine_vertex import PopulationMachineVertex
 
@@ -75,13 +76,13 @@ class AbstractPopulationVertex(
         AbstractProvidesOutgoingPartitionConstraints,
         AbstractProvidesIncomingPartitionConstraints,
         AbstractPopulationInitializable, AbstractPopulationSettable,
-        AbstractChangableAfterRun,
-        AbstractRewritesDataSpecification, AbstractReadParametersBeforeSet,
-        AbstractAcceptsIncomingSynapses, ProvidesKeyToAtomMappingImpl,
-        AbstractCanReset):
+        AbstractChangableAfterRun, AbstractRewritesDataSpecification,
+        AbstractReadParametersBeforeSet, AbstractAcceptsIncomingSynapses,
+        ProvidesKeyToAtomMappingImpl, AbstractCanReset):
     """ Underlying vertex model for Neural Populations.
         Not actually abstract.
     """
+
     __slots__ = [
         "__change_requires_mapping",
         "__change_requires_neuron_parameters_reload",
@@ -146,8 +147,8 @@ class AbstractPopulationVertex(
         """
 
         # pylint: disable=too-many-arguments, too-many-locals
-        super(AbstractPopulationVertex, self).__init__(
-            label, constraints, max_atoms_per_core)
+        ApplicationVertex.__init__(
+            self, label, constraints, max_atoms_per_core)
 
         self.__n_atoms = n_neurons
         self.__n_subvertices = 0
@@ -302,18 +303,26 @@ class AbstractPopulationVertex(
                 len(PopulationMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES)) +
             self.__synapse_manager.get_sdram_usage_in_bytes(
                 vertex_slice, machine_time_step, graph, self) +
-            profile_utils.get_profile_region_size(self.__n_profile_samples))
-
+            profile_utils.get_profile_region_size(
+                self.__n_profile_samples) +
+            bit_field_utilities.get_estimated_sdram_for_bit_field_region(
+                graph, self) +
+            bit_field_utilities.get_estimated_sdram_for_key_region(
+                graph, self) +
+            bit_field_utilities.exact_sdram_for_bit_field_builder_region())
         return sdram_requirement
 
-    def _reserve_memory_regions(self, spec, vertex_slice, vertex):
-        """ Reserve the neuron parameter data region.
+    def _reserve_memory_regions(
+            self, spec, vertex_slice, vertex, machine_graph, n_key_map):
+        """ Reserve the DSG data regions.
 
-        :param ~data_specification.DataSpecificationGenerator spec:
+        :param ~.DataSpecificationGenerator spec:
             the spec to write the DSG region to
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             the slice of atoms from the application vertex
-        :param vertex:
+        :param ~.MachineVertex vertex: this vertex
+        :param ~.MachineGraph machine_graph: machine graph
+        :param n_key_map: nkey map
         :return: None
         """
         spec.comment("\nReserving memory space for data regions:\n\n")
@@ -334,6 +343,13 @@ class AbstractPopulationVertex(
         profile_utils.reserve_profile_region(
             spec, POPULATION_BASED_REGIONS.PROFILING.value,
             self.__n_profile_samples)
+
+        # reserve bit field region
+        bit_field_utilities.reserve_bit_field_regions(
+            spec, machine_graph, n_key_map, vertex,
+            POPULATION_BASED_REGIONS.BIT_FIELD_BUILDER.value,
+            POPULATION_BASED_REGIONS.BIT_FIELD_FILTER.value,
+            POPULATION_BASED_REGIONS.BIT_FIELD_KEY_MAP.value)
 
         vertex.reserve_provenance_data_region(spec)
 
@@ -477,18 +493,20 @@ class AbstractPopulationVertex(
         "application_graph": "MemoryApplicationGraph",
         "machine_graph": "MemoryMachineGraph",
         "routing_info": "MemoryRoutingInfos",
-        "data_n_time_steps": "DataNTimeSteps"
+        "data_n_time_steps": "DataNTimeSteps",
+        "n_key_map": "MemoryMachinePartitionNKeysMap"
     })
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
         additional_arguments={
             "machine_time_step", "time_scale_factor",
             "application_graph", "machine_graph", "routing_info",
-            "data_n_time_steps"
+            "data_n_time_steps", "n_key_map"
         })
     def generate_data_specification(
             self, spec, placement, machine_time_step, time_scale_factor,
-            application_graph, machine_graph, routing_info, data_n_time_steps):
+            application_graph, machine_graph, routing_info, data_n_time_steps,
+            n_key_map):
         """
         :param machine_time_step: (injected)
         :param time_scale_factor: (injected)
@@ -496,6 +514,7 @@ class AbstractPopulationVertex(
         :param machine_graph: (injected)
         :param routing_info: (injected)
         :param data_n_time_steps: (injected)
+        :param n_key_map: (injected)
         """
         # pylint: disable=too-many-arguments, arguments-differ
         vertex = placement.vertex
@@ -505,7 +524,8 @@ class AbstractPopulationVertex(
         vertex_slice = vertex.vertex_slice
 
         # Reserve memory regions
-        self._reserve_memory_regions(spec, vertex_slice, vertex)
+        self._reserve_memory_regions(
+            spec, vertex_slice, vertex, machine_graph, n_key_map)
 
         # Declare random number generators and distributions:
         # TODO add random distribution stuff
@@ -516,8 +536,7 @@ class AbstractPopulationVertex(
             vertex, constants.SPIKE_PARTITION_ID)
 
         # Write the setup region
-        spec.switch_write_focus(
-            constants.POPULATION_BASED_REGIONS.SYSTEM.value)
+        spec.switch_write_focus(POPULATION_BASED_REGIONS.SYSTEM.value)
         spec.write_array(simulation_utilities.get_simulation_header_array(
             self.get_binary_file_name(), machine_time_step,
             time_scale_factor))
@@ -533,7 +552,7 @@ class AbstractPopulationVertex(
 
         # write profile data
         profile_utils.write_profile_region_data(
-            spec, constants.POPULATION_BASED_REGIONS.PROFILING.value,
+            spec, POPULATION_BASED_REGIONS.PROFILING.value,
             self.__n_profile_samples)
 
         # Get the weight_scale value from the appropriate location
@@ -544,6 +563,23 @@ class AbstractPopulationVertex(
             spec, self, vertex_slice, vertex, placement, machine_graph,
             application_graph, routing_info,
             weight_scale, machine_time_step)
+        vertex.set_on_chip_generatable_area(
+            self.__synapse_manager.host_written_matrix_size,
+            self.__synapse_manager.on_chip_written_matrix_size)
+
+        # write up the bitfield builder data
+        bit_field_utilities.write_bitfield_init_data(
+            spec, vertex, machine_graph, routing_info,
+            n_key_map, POPULATION_BASED_REGIONS.BIT_FIELD_BUILDER.value,
+            POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
+            POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
+            POPULATION_BASED_REGIONS.DIRECT_MATRIX.value,
+            POPULATION_BASED_REGIONS.BIT_FIELD_FILTER.value,
+            POPULATION_BASED_REGIONS.BIT_FIELD_KEY_MAP.value,
+            POPULATION_BASED_REGIONS.STRUCTURAL_DYNAMICS.value,
+            isinstance(
+                self.__synapse_manager.synapse_dynamics,
+                AbstractSynapseDynamicsStructural))
 
         # End the writing of this specification:
         spec.end_specification()
@@ -676,9 +712,9 @@ class AbstractPopulationVertex(
                 " parameter {}".format(variable))
 
         parameter = self._get_parameter(variable)
-
         ranged_list = self._state_variables[parameter]
         ranged_list.set_value_by_selector(selector, value)
+        self.__change_requires_neuron_parameters_reload = True
 
     @property
     def conductance_based(self):

@@ -101,8 +101,6 @@ class SynapseDynamicsStructuralSTDP(
             self, spec, region, machine_time_step, weight_scales,
             application_graph, app_vertex, post_slice,
             routing_info, synapse_indices):
-        super(SynapseDynamicsStructuralSTDP, self).write_parameters(
-            spec, region, machine_time_step, weight_scales)
         self.__common_sp.write_parameters(
             spec, region, machine_time_step, weight_scales, application_graph,
             app_vertex, post_slice, routing_info, synapse_indices)
@@ -133,11 +131,8 @@ class SynapseDynamicsStructuralSTDP(
                .get_structural_parameters_sdram_usage_in_bytes)
     def get_structural_parameters_sdram_usage_in_bytes(
             self, application_graph, app_vertex, n_neurons, n_synapse_types):
-        size = super(SynapseDynamicsStructuralSTDP, self).\
-            get_parameters_sdram_usage_in_bytes(n_neurons, n_synapse_types)
-        size += self.__common_sp.get_parameters_sdram_usage_in_bytes(
+        return self.__common_sp.get_parameters_sdram_usage_in_bytes(
             application_graph, app_vertex, n_neurons)
-        return size
 
     @overrides(SynapseDynamicsSTDP.get_n_words_for_plastic_connections)
     def get_n_words_for_plastic_connections(self, n_connections):

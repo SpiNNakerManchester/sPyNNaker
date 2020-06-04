@@ -12,8 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from spinn_front_end_common.utilities.constants import \
-    MICRO_TO_SECOND_CONVERSION
 
 from collections import defaultdict, namedtuple
 import math
@@ -25,7 +23,8 @@ from pyNN.random import RandomDistribution
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
-from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spinn_front_end_common.utilities.constants import (
+    BYTES_PER_WORD, MICRO_TO_SECOND_CONVERSION)
 from spynnaker.pyNN.models.neuron.generator_data import GeneratorData
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractGenerateConnectorOnMachine)
@@ -90,7 +89,9 @@ class SynapticManager(object):
         "__ring_buffer_shifts",
         "__gen_on_machine",
         "__max_row_info",
-        "__synapse_indices"]
+        "__synapse_indices",
+        "_host_generated_block_addr",
+        "_on_chip_generated_block_addr"]
 
     def __init__(self, n_synapse_types, ring_buffer_sigma, spikes_per_second,
                  config, population_table_type=None, synapse_io=None):
@@ -161,6 +162,19 @@ class SynapticManager(object):
 
         # A map of synapse information for each machine pre vertex to index
         self.__synapse_indices = dict()
+
+        # Track writes inside the synaptic matrix region (to meet sizes):
+        self._host_generated_block_addr = 0
+        self._on_chip_generated_block_addr = 0
+
+    @property
+    def host_written_matrix_size(self):
+        return self._host_generated_block_addr
+
+    @property
+    def on_chip_written_matrix_size(self):
+        return (self._on_chip_generated_block_addr -
+                self._host_generated_block_addr)
 
     @property
     def synapse_dynamics(self):
@@ -454,12 +468,33 @@ class SynapticManager(object):
                 region=POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
                 size=all_syn_block_sz, label='SynBlocks')
 
-        synapse_dynamics_sz = self._get_synapse_dynamics_parameter_size(
-            vertex_slice, application_graph, application_vertex)
+        # return if not got a synapse dynamics
+        if self.__synapse_dynamics is None:
+            return
+
+        synapse_dynamics_sz = \
+            self.__synapse_dynamics.get_parameters_sdram_usage_in_bytes(
+                vertex_slice.n_atoms, self.__n_synapse_types)
         if synapse_dynamics_sz != 0:
             spec.reserve_memory_region(
                 region=POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value,
                 size=synapse_dynamics_sz, label='synapseDynamicsParams')
+
+        # if structural, create structural region
+        if isinstance(
+                self.__synapse_dynamics, AbstractSynapseDynamicsStructural):
+
+            synapse_structural_dynamics_sz = (
+                self.__synapse_dynamics.
+                get_structural_parameters_sdram_usage_in_bytes(
+                    application_graph, application_vertex,
+                    vertex_slice.n_atoms, self.__n_synapse_types))
+
+            if synapse_structural_dynamics_sz != 0:
+                spec.reserve_memory_region(
+                    region=POPULATION_BASED_REGIONS.STRUCTURAL_DYNAMICS.value,
+                    size=synapse_structural_dynamics_sz,
+                    label='synapseDynamicsStructuralParams')
 
     @staticmethod
     def _ring_buffer_expected_upper_bound(
@@ -796,13 +831,18 @@ class SynapticManager(object):
         # Skip blocks that will be written on the machine, but add them
         # to the master population table
         generator_data = list()
+
+        self._host_generated_block_addr = block_addr
+        # numpy.random.shuffle(order)
         for gen in generate_on_machine:
             block_addr, index = self.__generate_on_chip_data(
                 gen, post_slices, post_slice_index, post_vertex_slice,
                 all_syn_block_sz, block_addr, machine_time_step,
                 generator_data)
-            self.__synapse_indices[
-                gen.synapse_info, gen.pre_slice.lo_atom] = index
+            key = (gen.synapse_info, gen.pre_vertex_slice.lo_atom,
+                   post_vertex_slice.lo_atom)
+            self.__synapse_indices[key] = index
+        self._on_chip_generated_block_addr = block_addr
 
         self.__poptable_type.finish_master_pop_table(
             spec, master_pop_table_region)
@@ -1131,6 +1171,10 @@ class SynapticManager(object):
         :param float weight_scale: How to scale the weights of the synapses
         :param int machine_time_step:
         """
+        # reset for this machine vertex
+        self._host_generated_block_addr = 0
+        self._on_chip_generated_block_addr = 0
+
         # Create an index of delay keys into this vertex
         for m_edge in machine_graph.get_edges_ending_at_vertex(machine_vertex):
             app_edge = m_edge.app_edge
@@ -1166,17 +1210,17 @@ class SynapticManager(object):
             routing_info, machine_graph, machine_time_step)
 
         if self.__synapse_dynamics is not None:
+            self.__synapse_dynamics.write_parameters(
+                spec, POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value,
+                machine_time_step, weight_scales)
+
             if isinstance(self.__synapse_dynamics,
                           AbstractSynapseDynamicsStructural):
                 self.__synapse_dynamics.write_structural_parameters(
-                    spec, POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value,
+                    spec, POPULATION_BASED_REGIONS.STRUCTURAL_DYNAMICS.value,
                     machine_time_step, weight_scales, application_graph,
-                    application_vertex, post_vertex_slice, routing_info,
-                    self.__synapse_indices)
-            else:
-                self.__synapse_dynamics.write_parameters(
-                    spec, POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value,
-                    machine_time_step, weight_scales)
+                    application_vertex, post_vertex_slice,
+                    routing_info, self.__synapse_indices)
 
         self.__weight_scales[placement] = weight_scales
 
@@ -1440,8 +1484,9 @@ class SynapticManager(object):
         return transceiver.read_memory(
             placement.x, placement.y, address, synaptic_block_size)
 
+    @staticmethod
     def __read_single_synaptic_block(
-            self, transceiver, data_receiver, placement, n_rows, address,
+            transceiver, data_receiver, placement, n_rows, address,
             using_monitors, extra_monitor, fixed_routes, placements):
         """ Read in a single synaptic block.
 

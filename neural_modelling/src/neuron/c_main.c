@@ -41,11 +41,15 @@
 #include "plasticity/synapse_dynamics.h"
 #include "structural_plasticity/synaptogenesis_dynamics.h"
 #include "profile_tags.h"
+#include "direct_synapses.h"
+#include "bit_field_filter.h"
 
 #include <data_specification.h>
 #include <simulation.h>
 #include <profiler.h>
 #include <debug.h>
+#include <bit_field.h>
+#include <filter_info.h>
 
 /* validates that the model being compiled does indeed contain a application
  * magic number*/
@@ -61,6 +65,12 @@ struct neuron_provenance {
     uint32_t n_input_buffer_overflows;
     uint32_t current_timer_tick;
     uint32_t n_plastic_synaptic_weight_saturations;
+    uint32_t n_ghost_pop_table_searches;
+    uint32_t n_failed_bitfield_reads;
+    uint32_t n_dmas_complete;
+    uint32_t n_spikes_processed;
+    uint32_t n_invalid_master_pop_table_hits;
+    uint32_t n_filtered_by_bitfield;
     uint32_t n_rewires;
 };
 
@@ -113,8 +123,17 @@ void c_main_store_provenance_data(address_t provenance_region) {
     prov->n_input_buffer_overflows = spike_processing_get_buffer_overflows();
     prov->current_timer_tick = time;
     prov->n_plastic_synaptic_weight_saturations =
-            synapse_dynamics_get_plastic_saturation_count();
+        synapse_dynamics_get_plastic_saturation_count();
+    prov->n_ghost_pop_table_searches =
+        spike_processing_get_ghost_pop_table_searches();
+    prov->n_failed_bitfield_reads = failed_bit_field_reads;
+    prov->n_dmas_complete = spike_processing_get_dma_complete_count();
+    prov->n_spikes_processed = spike_processing_get_spike_processing_count();
+    prov->n_invalid_master_pop_table_hits =
+        spike_processing_get_invalid_master_pop_table_hits();
+    prov->n_filtered_by_bitfield = population_table_get_filtered_packet_count();
     prov->n_rewires = spike_processing_get_successful_rewires();
+
     log_debug("finished other provenance data");
 }
 
@@ -159,14 +178,17 @@ static bool initialise(void) {
 
     // Set up the synapses
     uint32_t *ring_buffer_to_input_buffer_left_shifts;
-    address_t indirect_synapses_address =
-            data_specification_get_region(SYNAPTIC_MATRIX_REGION, ds_regions);
-    address_t direct_synapses_address;
     if (!synapses_initialise(
             data_specification_get_region(SYNAPSE_PARAMS_REGION, ds_regions),
-            data_specification_get_region(DIRECT_MATRIX_REGION, ds_regions),
             n_neurons, n_synapse_types,
-            &ring_buffer_to_input_buffer_left_shifts,
+            &ring_buffer_to_input_buffer_left_shifts)) {
+        return false;
+    }
+
+    // set up direct synapses
+    address_t direct_synapses_address;
+    if (!direct_synapses_initialise(
+            data_specification_get_region(DIRECT_MATRIX_REGION, ds_regions),
             &direct_synapses_address)) {
         return false;
     }
@@ -175,24 +197,21 @@ static bool initialise(void) {
     uint32_t row_max_n_words;
     if (!population_table_initialise(
             data_specification_get_region(POPULATION_TABLE_REGION, ds_regions),
-            indirect_synapses_address, direct_synapses_address,
-            &row_max_n_words)) {
+            data_specification_get_region(SYNAPTIC_MATRIX_REGION, ds_regions),
+            direct_synapses_address, &row_max_n_words)) {
         return false;
     }
     // Set up the synapse dynamics
-    address_t synapse_dynamics_region_address =
-            data_specification_get_region(SYNAPSE_DYNAMICS_REGION, ds_regions);
-    address_t syn_dyn_end_address = synapse_dynamics_initialise(
-            synapse_dynamics_region_address, n_neurons, n_synapse_types,
-            ring_buffer_to_input_buffer_left_shifts);
-
-    if (synapse_dynamics_region_address && !syn_dyn_end_address) {
+    if (!synapse_dynamics_initialise(
+            data_specification_get_region(SYNAPSE_DYNAMICS_REGION, ds_regions),
+            n_neurons, n_synapse_types,
+            ring_buffer_to_input_buffer_left_shifts)) {
         return false;
     }
 
     // Set up structural plasticity dynamics
-    if (synapse_dynamics_region_address &&
-            !synaptogenesis_dynamics_initialise(syn_dyn_end_address)) {
+    if (!synaptogenesis_dynamics_initialise(data_specification_get_region(
+            STRUCTURAL_DYNAMICS_REGION, ds_regions))) {
         return false;
     }
 
@@ -206,6 +225,13 @@ static bool initialise(void) {
 
     // Setup profiler
     profiler_init(data_specification_get_region(PROFILER_REGION, ds_regions));
+
+    log_info("initialising the bit field region");
+    print_post_to_pre_entry();
+    if (!bit_field_filter_initialise(data_specification_get_region(
+            BIT_FIELD_FILTER_REGION, ds_regions))) {
+        return false;
+    }
 
     log_debug("Initialise: finished");
     return true;
