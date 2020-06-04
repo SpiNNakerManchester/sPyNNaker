@@ -22,8 +22,14 @@ BUILDS = synapse_expander \
 
 DIRS = $(BUILDS:%=makefiles/%)
 
+APP_OUTPUT_DIR =  $(abspath $(dir $(MAKEFILE_PATH))../spynnaker/pyNN/model_binaries)/
+
 all: $(DIRS)
 	for d in $(DIRS); do $(MAKE) -C $$d || exit $$?; done
 
 clean: $(DIRS)
 	for d in $(DIRS); do $(MAKE) -C $$d clean || exit $$?; done
+
+install-clean:
+	$(info Deleted all old files in "$(APP_OUTPUT_DIR)")
+	$(RM) $(APP_OUTPUT_DIR)*.dict $(APP_OUTPUT_DIR)logs.sqlite3  $(APP_OUTPUT_DIR)*.aplx
