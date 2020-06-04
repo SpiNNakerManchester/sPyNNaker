@@ -25,10 +25,9 @@
 #include "synaptogenesis_dynamics.h"
 #include <debug.h>
 
-address_t synaptogenesis_dynamics_initialise(
-    address_t sdram_sp_address) {
+bool synaptogenesis_dynamics_initialise(address_t sdram_sp_address) {
     use(sdram_sp_address);
-    return sdram_sp_address;
+    return true;
 }
 
 bool synaptogenesis_dynamics_rewire(uint32_t time,
@@ -57,4 +56,8 @@ bool synaptogenesis_is_fast(void) {
 void synaptogenesis_spike_received(uint32_t time, spike_t spike) {
     use(time);
     use(spike);
+}
+
+void print_post_to_pre_entry(void) {
+    return;
 }

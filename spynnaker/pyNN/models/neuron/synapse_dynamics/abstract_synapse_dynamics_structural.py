@@ -29,9 +29,9 @@ class AbstractSynapseDynamicsStructural(object):
 
     @abstractmethod
     def write_structural_parameters(
-            self, spec, region, machine_time_step, weight_scales,
-            application_graph, app_vertex, post_slice, graph_mapper,
-            routing_info, synapse_indices):
+            self, spec, region, machine_time_step,
+            weight_scales, application_graph, app_vertex, post_slice,
+            graph_mapper, routing_info, synapse_indices):
         """ Write structural plasticity parameters
         """
 
