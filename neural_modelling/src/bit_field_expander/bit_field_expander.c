@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Expands bitfields on SpiNNaker to reduce data transfer times
 #include <bit_field.h>
 #include <utils.h>
 #include <spin1_api.h>
@@ -30,70 +32,71 @@
 #include <filter_info.h>
 #include <key_atom_map.h>
 
-//! byte to word conversion
+//! Byte to word conversion
 #define BYTE_TO_WORD_CONVERSION 4
 
 //! The minimum neurons to sort out DTCM and get though the synapse init.
-#define N_NEURONS 1
+#define N_NEURONS       1
 
 //! The minimum synapse types to sort out DTCM and get though the synapse init
 #define N_SYNAPSE_TYPES 1
 
-//! magic flag for if the region id is not setup
+//! Magic flag for if the region id is not setup
 int FAILED_REGION_ID = 0xFFFFFFFF;
 
-//! master pop address
+//! Master population table base address
 address_t master_pop_base_address;
 
-//! synaptic matrix base address
+//! Synaptic matrix base address
 address_t synaptic_matrix_base_address;
 
-//! bitfield base address
+//! Bitfield base address
 filter_region_t* bit_field_base_address;
 
-//! direct matrix base address
+//! Direct matrix base address
 address_t direct_matrix_region_base_address;
 
-//! structural matrix region base address
+//! Structural matrix region base address
 address_t structural_matrix_region_base_address = NULL;
 
-//! \brief Used to store the DMA based master pop entries.
+//! \brief Stores the DMA based master pop entries.
 //! \details Used during pop table init, and reading back synaptic rows.
 address_t direct_synapses_address;
 
-//! \brief used to store the max row size for DMA reads (used when extracting a
-//! synapse row from sdram.
+//! \brief Stores the max row size for DMA reads (used when extracting a
+//!     synapse row from sdram.
 uint32_t row_max_n_words;
 
-//! storage location for the list of key to max atom maps
+//! The list of key to max atom maps
 key_atom_data_t* keys_to_max_atoms;
 
-//! tracker for length of the key to max atoms map
+//! Tracker for length of the key to max atoms map
 uint32_t n_keys_to_max_atom_map = 0;
 
-//! the number of vertex regions to process
+//! The number of vertex regions to process
 uint32_t n_vertex_regions = 0;
 
-//! a fake bitfield holder. used to circumvent the need for a bitfield in the
-//! master pop table, which we are trying to generate with the use of the
-//! master pop table. chicken vs egg.
+//! \brief Fake bitfield holder.
+//! \details This is used to circumvent the need for a bitfield in the
+//!     master pop table, which we are trying to generate with the use of the
+//!     master pop table. chicken vs egg.
 bit_field_t* fake_bit_fields;
 
-//! \brief used to hold sdram read row
+//! Holds SDRAM read row
 uint32_t * row_data;
 
-//! \brief bool holder saying if we should run
+//! Says if we should run
 bool can_run = true;
 
 /*****************************stuff needed for structural stuff to work*/
 
-//! the instantiation of the rewiring data
+//! The instantiation of the rewiring data
 rewiring_data_t rewiring_data;
 
-//! inverse of synaptic matrix
+//! Inverse of synaptic matrix
 static post_to_pre_entry *post_to_pre_table;
 
-//! pre-population information table
+//! Pre-population information table
 pre_pop_info_table_t pre_info;
 
 /***************************************************************/
@@ -121,11 +124,11 @@ typedef struct builder_region_struct {
 static inline vcpu_t *vcpu(void) {
     vcpu_t *sark_virtual_processor_info = (vcpu_t *) SV_VCPU;
     uint core = spin1_get_core_id();
-    return *sark_virtual_processor_info[core];
+    return &sark_virtual_processor_info[core];
 }
 
 //! \brief Mark this process as failed.
-void fail_shut_down(void) {
+static inline void fail_shut_down(void) {
     vcpu()->user2 = 1;
     bit_field_base_address->n_merged_filters = 0;
     bit_field_base_address->n_redundancy_filters = 0;
@@ -133,11 +136,11 @@ void fail_shut_down(void) {
 }
 
 //! \brief Mark this process as succeeded.
-void success_shut_down(void) {
+static inline void success_shut_down(void) {
     vcpu()->user2 = 0;
 }
 
-//! \brief reads in the vertex region addresses
+//! \brief Read in the vertex region addresses
 void read_in_addresses(void) {
     // get the data (linked to sdram tag 2 and assume the app ids match)
     data_specification_metadata_t *dsg_metadata =
@@ -199,7 +202,7 @@ static void print_key_to_max_atom_map(void) {
 #endif
 
 //! \brief Deduce the number of neurons from the key.
-//! \param[in] mask: the key to convert to n_neurons
+//! \param[in] key: the key to convert to n_neurons
 //! \return the number of neurons from the key map based off this key
 static uint32_t n_neurons_from_key(uint32_t key) {
     int key_index = 0;
@@ -244,7 +247,7 @@ static bool create_fake_bit_field(void) {
 }
 
 //! \brief Set up the master pop table and synaptic matrix for the bit field
-//!        processing
+//!        processing.
 //! \return whether the init was successful.
 bool initialise(void) {
     // init the synapses to get direct synapse address
@@ -334,7 +337,7 @@ bool process_synaptic_row(synaptic_row_t row) {
     }
 }
 
-//! \brief Do a SDRAM read to get synaptic row.
+//! \brief Do an SDRAM read to get synaptic row.
 //! \param[in] row_address: the SDRAM address to read
 //! \param[in] n_bytes_to_transfer:
 //!     how many bytes to read to get the synaptic row
@@ -346,7 +349,7 @@ static bool do_sdram_read_and_test(
     return process_synaptic_row(row_data);
 }
 
-//! Sort the bitfield filters to remove redundancy
+//! Sort the bitfield filters to remove redundancy.
 static void sort_by_redunancy(void) {
     // Semantic sugar to keep the code a little shorter
     filter_info_t *filters = bit_field_base_address->filters;
@@ -396,8 +399,7 @@ static void sort_by_redunancy(void) {
 }
 
 //! \brief Create the bitfield for this master pop table and synaptic matrix.
-//! \param[in] vertex_id: the index in the regions.
-//! \return whether it was successful at generating the bitfield
+//! \return Whether it was successful at generating the bitfield
 bool generate_bit_field(void) {
     // write how many entries (thus bitfields) are to be generated into sdram
     log_debug("update by pop length");
