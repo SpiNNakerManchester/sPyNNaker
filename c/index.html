@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.11"/>
-<title>sPyNNaker neural_modelling: Main Page</title>
+<title>sPyNNaker neural_modelling: sPyNNaker: A PyNN Implementation for SpiNNaker</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -77,13 +77,48 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 
 <div class="header">
   <div class="headertitle">
-<div class="title">sPyNNaker neural_modelling Documentation</div>  </div>
+<div class="title">sPyNNaker: A PyNN Implementation for SpiNNaker </div>  </div>
 </div><!--header-->
 <div class="contents">
-</div><!-- contents -->
+<div class="textblock"><h1><a class="anchor" id="intro"></a>
+Introduction</h1>
+<p>sPyNNaker is an implementation of the <a href="https://neuralensemble.org/PyNN/">PyNN</a> language for SpiNNaker that lets you build spiking neural networks and simulate them in real-time or close to real-time, depending on network complexity and system configuration.</p>
+<p>This is the documentation of the part of sPyNNaker, implemented in C, that is actually deployed onto SpiNNaker to execute. The <a href="http://spinnakermanchester.github.io/sPyNNaker/python/">Python parts</a> of the sPyNNaker package are responsible for the user interface, data preparation, execution planning, and runtime control.</p>
+<p>Note that this code depends on <a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/">SpiNNFrontEndCommon</a> for many support functions.</p>
+<h1><a class="anchor" id="neuron"></a>
+Neuron Simulation Implementation</h1>
+<p>The major part of this code is the implementation of the neuron simulator itself, which is comprised of several pieces.</p>
+<ul>
+<li>A main entry point, <a class="el" href="c__main_8c.html" title="This file contains the main function of the application framework, which the application programmer u...">c_main.c</a></li>
+<li>The core neuron implementation, <a class="el" href="neuron_8c.html" title="implementation of the neuron.h interface. ">neuron.c</a></li>
+<li>The core synapse implementation, <a class="el" href="synapses_8c.html" title="Implementation of non-inlined API in synapses.h. ">synapses.c</a></li>
+<li>The main spike processing system, <a class="el" href="spike__processing_8c.html" title="Implementation of non-inlined API in spike_processing.h. ">spike_processing.c</a></li>
+<li>The master population table, used to decode a spike and identify which neurons it is to be delivered to, <a class="el" href="population__table_8h.html" title="Master pop(ulation) table API. ">population_table.h</a></li>
+<li>The neuron models, <a class="el" href="neuron__model_8h.html" title="The API for neuron models themselves. ">neuron_model.h</a>, and subclasses</li>
+<li>The synaptic input types, <a class="el" href="input__type_8h.html" title="API for synaptic inputs (see also src/neuron/synapse_types) ">input_type.h</a>, and subclasses</li>
+<li>The synaptic shaping, <a class="el" href="synapse__types_8h.html" title="API for synaptic behaviour types (see also src/neuron/input_types) ">synapse_types.h</a>, and subclasses</li>
+<li>The neural threshold model, <a class="el" href="threshold__type_8h.html" title="API for threshold types. ">threshold_type.h</a>, and subclasses</li>
+<li>The plasticity models, both for STDP (<a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html" title="STDP core implementation. ">synapse_dynamics_stdp_mad_impl.c</a>) and structural plasticity (<a class="el" href="topographic__map__impl_8c.html" title="This file contains the main functions for probabilistic synaptogenesis. ">topographic_map_impl.c</a>)</li>
+<li>The additional model inputs, such as calcium ion modulation (<a class="el" href="additional__input__ca2__adaptive__impl_8h.html" title="Implementation of adaptive calcium ion additional input. ">additional_input_ca2_adaptive_impl.h</a>)</li>
+</ul>
+<h1><a class="anchor" id="support"></a>
+Support Binaries</h1>
+<p>These enable the neuron simulation to work, or to work more efficiently.</p>
+<ul>
+<li>Bitfield Expander, which builds inter-core message masks on the machine. See <a class="el" href="bit__field__expander_8c.html" title="Expands bitfields on SpiNNaker to reduce data transfer times. ">bit_field_expander.c</a></li>
+<li>Delay Extension, which handles messages that need to be delayed a long time before delivery. See <a class="el" href="delay__extension_8c.html" title="Implementation of delay extensions. ">delay_extension.c</a></li>
+<li>Robot Motor Control, which translates spiking rates of SpiNNaker messages into activation levels for an motor device (part of integrating with external peripherals). See <a class="el" href="robot__motor__control_8c.html" title="Implementation of Robot Motor Control model. ">robot_motor_control.c</a></li>
+<li>Poisson Spike Source, which injects random spikes (using a Poisson distribution) into the system. See <a class="el" href="spike__source__poisson_8c.html" title="This file contains the main functions for a Poisson spike generator. ">spike_source_poisson.c</a></li>
+<li>Synapse Expander, which efficiently constructs synaptic connectivity data on machine from statistical descriptions. (Note that literal descriptions of connectivity data need to be uploaded directly, which can be a slow process by comparison to generating the data in parallel on SpiNNaker.) See <a class="el" href="synapse__expander_8c.html" title="The synapse expander for neuron cores. ">synapse_expander.c</a></li>
+<li>Delay Expander, which efficiently constructs synaptic delay data on machine. This is a reduced versino of the synapse expander that is designed to support delay extensions. See <a class="el" href="delay__expander_8c.html" title="Generate data for delay extensions. ">delay_expander.c</a></li>
+</ul>
+<h1><a class="anchor" id="cite"></a>
+Preferred Citation</h1>
+<p>Rhodes, O., Bogdan, P., Brenninkmeijer, C., Davidson, S., Fellows, D., Gait, A., Lester, D., Mikaitis, M., Plana, L., Rowley, A., Stokes, A., Furber, S. <b>sPyNNaker: A Software Package for Running PyNN Simulations on SpiNNaker.</b> <em>Frontiers in Neuroscience,</em> vol 12, pp 816, 2018. DOI: <a href="https://doi.org/10.3389/fnins.2018.00816">10.3389/fnins.2018.00816</a> </p>
+</div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Fri Jun 5 2020 14:11:54 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Jun 5 2020 15:06:43 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['spynnaker_3a_20a_20pynn_20implementation_20for_20spinnaker',['sPyNNaker: A PyNN Implementation for SpiNNaker',['../index.html',1,'']]],
   ['sample_5ftime',['sample_time',['../robot__motor__control_8c.html#aba1b565c6070a825b676abb5e5b7b77c',1,'motor_control_config_t::sample_time()'],['../robot__motor__control_8c.html#ab322aee7201d11451cb55e2f551e72cb',1,'sample_time():&#160;robot_motor_control.c']]],
   ['saturation_5fcount',['saturation_count',['../synapses_8c.html#af98038a462abb37d565a0f4e6fbc2b2a',1,'synapses.c']]],
   ['scaling_5ffactor',['SCALING_FACTOR',['../synapse__types__semd__impl_8h.html#a85262ffe0e577594752d69035b2249c2',1,'synapse_types_semd_impl.h']]],
