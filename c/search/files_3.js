@@ -1,6 +1,9 @@
 var searchData=
 [
-  ['elimination_2eh',['elimination.h',['../elimination_8h.html',1,'']]],
-  ['elimination_5frandom_5fby_5fweight_5fimpl_2ec',['elimination_random_by_weight_impl.c',['../elimination__random__by__weight__impl_8c.html',1,'']]],
-  ['elimination_5frandom_5fby_5fweight_5fimpl_2eh',['elimination_random_by_weight_impl.h',['../elimination__random__by__weight__impl_8h.html',1,'']]]
+  ['decay_2eh',['decay.h',['../decay_8h.html',1,'']]],
+  ['delay_5fexpander_2ec',['delay_expander.c',['../delay__expander_8c.html',1,'']]],
+  ['delay_5fextension_2ec',['delay_extension.c',['../delay__extension_8c.html',1,'']]],
+  ['delay_5fextension_2eh',['delay_extension.h',['../delay__extension_8h.html',1,'']]],
+  ['direct_5fsynapses_2ec',['direct_synapses.c',['../direct__synapses_8c.html',1,'']]],
+  ['direct_5fsynapses_2eh',['direct_synapses.h',['../direct__synapses_8h.html',1,'']]]
 ];

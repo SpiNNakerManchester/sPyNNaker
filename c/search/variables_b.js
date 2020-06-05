@@ -2,6 +2,8 @@ var searchData=
 [
   ['magic_5fmultiplier',['MAGIC_MULTIPLIER',['../neuron__model__izh__impl_8c.html#adf9a0e8d9c7ec24f407eee48d6064666',1,'neuron_model_izh_impl.c']]],
   ['mask',['mask',['../population__table__binary__search__impl_8c.html#a5d5364d69a3eb267eba9b0e47ffd1db7',1,'master_population_table_entry']]],
+  ['master_5fpop_5fbase_5faddress',['master_pop_base_address',['../bit__field__expander_8c.html#ae5b6bc86a4a4b0a6873f106ef9082005',1,'bit_field_expander.c']]],
+  ['master_5fpop_5fregion_5fid',['master_pop_region_id',['../bit__field__expander_8c.html#a6cc1f10fa0516c89cf9fe5c6f681f9a6',1,'builder_region_struct']]],
   ['master_5fpopulation_5ftable',['master_population_table',['../population__table__binary__search__impl_8c.html#a165c9820d20b3f9cce795f65e326708b',1,'population_table_binary_search_impl.c']]],
   ['master_5fpopulation_5ftable_5flength',['master_population_table_length',['../population__table__binary__search__impl_8c.html#ac791e8f016a5422c047f964641706f42',1,'population_table_binary_search_impl.c']]],
   ['matrix_5fgenerators',['matrix_generators',['../matrix__generator_8c.html#a420abd8627e0860d1b5e902686806ea0',1,'matrix_generator.c']]],

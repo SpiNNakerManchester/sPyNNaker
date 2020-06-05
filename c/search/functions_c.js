@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['n_5fneurons_5ffrom_5fkey',['n_neurons_from_key',['../bit__field__expander_8c.html#a0d718b635c4c5ed82e91c088a8621770',1,'bit_field_expander.c']]],
   ['n_5fwords_5fneeded',['n_words_needed',['../neuron__impl__standard_8h.html#a712ac031031f4c6e8e7979936f32a783',1,'neuron_impl_standard.h']]],
   ['neuron_5fadd_5finputs',['neuron_add_inputs',['../neuron_8c.html#abad40a95ed27eb262884dfd9f59b78d6',1,'neuron_add_inputs(index_t synapse_type_index, index_t neuron_index, input_t weights_this_timestep):&#160;neuron.c'],['../neuron_8h.html#abad40a95ed27eb262884dfd9f59b78d6',1,'neuron_add_inputs(index_t synapse_type_index, index_t neuron_index, input_t weights_this_timestep):&#160;neuron.c']]],
   ['neuron_5fdo_5ftimestep_5fupdate',['neuron_do_timestep_update',['../neuron_8c.html#abf4cb8bac51f53a1628954d84b0db09d',1,'neuron_do_timestep_update(timer_t time, uint timer_count, uint timer_period):&#160;neuron.c'],['../neuron_8h.html#abf4cb8bac51f53a1628954d84b0db09d',1,'neuron_do_timestep_update(timer_t time, uint timer_count, uint timer_period):&#160;neuron.c']]],

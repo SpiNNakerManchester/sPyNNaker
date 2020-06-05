@@ -9,6 +9,7 @@ var searchData=
   ['read_5fconnection_5fbuilder_5fregion',['read_connection_builder_region',['../synapse__expander_8c.html#a796837af1a5d205aa367196d5a7001bf',1,'synapse_expander.c']]],
   ['read_5fdelay_5fbuilder_5fregion',['read_delay_builder_region',['../delay__expander_8c.html#ac2a97c4437a50fb351aad2db718cf7bf',1,'delay_expander.c']]],
   ['read_5fglobal_5fparameters',['read_global_parameters',['../spike__source__poisson_8c.html#a571b747b9d964eb5af02496ce866130b',1,'spike_source_poisson.c']]],
+  ['read_5fin_5faddresses',['read_in_addresses',['../bit__field__expander_8c.html#a4a87539383a9998fa1063e982f63e0a3',1,'bit_field_expander.c']]],
   ['read_5fnext_5frates',['read_next_rates',['../spike__source__poisson_8c.html#a5d93135c80cbb663f602737e639626ce',1,'spike_source_poisson.c']]],
   ['read_5fparameters',['read_parameters',['../delay__extension_8c.html#afeb21131569d4edffb884f6564de89dd',1,'read_parameters(struct delay_parameters *params):&#160;delay_extension.c'],['../robot__motor__control_8c.html#aa23e1c102ba93d20434d86c3fda24fce',1,'read_parameters(motor_control_config_t *config_region):&#160;robot_motor_control.c']]],
   ['read_5frates',['read_rates',['../spike__source__poisson_8c.html#af4847de2b9a2d080b0e03eabccb7308d',1,'spike_source_poisson.c']]],
@@ -42,7 +43,7 @@ var searchData=
   ['resume_5fcallback',['resume_callback',['../c__main_8c.html#a8967e8eb09363007076f840186a20995',1,'resume_callback(void):&#160;c_main.c'],['../spike__source__poisson_8c.html#afb40f588131f69f1d033283921f1a811',1,'resume_callback(void):&#160;spike_source_poisson.c']]],
   ['rewires_5fto_5fdo',['rewires_to_do',['../spike__processing_8c.html#a58209497c5fe5ba1a7034e03e6622d6d',1,'spike_processing.c']]],
   ['rewiring',['rewiring',['../c__main_8c.html#a1c0ebb4e72cbc1b6f3da884524a78078',1,'c_main.c']]],
-  ['rewiring_5fdata',['rewiring_data',['../topographic__map__impl_8c.html#a14052fb746b24752fc5a96accf39d8b8',1,'topographic_map_impl.c']]],
+  ['rewiring_5fdata',['rewiring_data',['../bit__field__expander_8c.html#a14052fb746b24752fc5a96accf39d8b8',1,'rewiring_data():&#160;bit_field_expander.c'],['../topographic__map__impl_8c.html#a14052fb746b24752fc5a96accf39d8b8',1,'rewiring_data():&#160;topographic_map_impl.c']]],
   ['rewiring_5fdata_5ft',['rewiring_data_t',['../sp__structs_8h.html#structrewiring__data__t',1,'']]],
   ['rewiring_5fperiod',['rewiring_period',['../c__main_8c.html#aa08e7ff835bc68c5a91214035f412894',1,'c_main.c']]],
   ['ring_5fbuffer_5fsize',['ring_buffer_size',['../synapses_8c.html#a9c43ae0578a77accabf5614e5788020b',1,'synapses.c']]],
@@ -62,7 +63,9 @@ var searchData=
   ['robot_5fmotor_5fcontrol_5fregions_5fe',['robot_motor_control_regions_e',['../robot__motor__control_8c.html#a7f61ffa202f9ba34d1917f6f83d8bf9d',1,'robot_motor_control.c']]],
   ['round_5fto_5fnext_5fpot',['round_to_next_pot',['../delay__extension_8c.html#ac5c8b24e3b6d606c321ce3cd22ebe8a0',1,'delay_extension.c']]],
   ['row',['row',['../spike__processing_8c.html#a9861968df19a075eac9fa7f507592fd0',1,'dma_buffer']]],
+  ['row_5fdata',['row_data',['../bit__field__expander_8c.html#aaf22062ead0b27184e006d45487af894',1,'bit_field_expander.c']]],
   ['row_5flength',['row_length',['../population__table__binary__search__impl_8c.html#a1fb46843c73b7998401310d379339f64',1,'address_and_row_length']]],
+  ['row_5fmax_5fn_5fwords',['row_max_n_words',['../bit__field__expander_8c.html#af9b6824a750777e79471f086307d51b9',1,'bit_field_expander.c']]],
   ['run_5fdelay_5fexpander',['run_delay_expander',['../delay__expander_8c.html#ab8e8cac1b4ebc8d1fd0d665b9639988e',1,'delay_expander.c']]],
   ['run_5fsynapse_5fexpander',['run_synapse_expander',['../synapse__expander_8c.html#ab2b96fb3f7cddc88c3b12263c25f0fc1',1,'synapse_expander.c']]]
 ];

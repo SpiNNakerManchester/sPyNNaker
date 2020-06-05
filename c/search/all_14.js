@@ -9,5 +9,6 @@ var searchData=
   ['v_5fthresh',['v_thresh',['../threshold__type__static_8h.html#ab45ec840ac2e212feee7e2b5782a8ed0',1,'threshold_type_t']]],
   ['value',['value',['../munich__protocol_8h.html#ae25a937e1086e1ccf5579cdbe4764743',1,'munich_key_t']]],
   ['value_5fas_5fpayload',['value_as_payload',['../threshold__type__static_8h.html#ad2d30a17b1fabe86ed294e5aa2732e8f',1,'threshold_type_t']]],
-  ['values',['values',['../maths_8h.html#a17b6c0ddd56ccaec45d3191da3f1c209',1,'int16_lut::values()'],['../param__generator__kernel_8h.html#aa55383a91c659f798dc4faf98cfd18ea',1,'all_kernel_params::values()']]]
+  ['values',['values',['../maths_8h.html#a17b6c0ddd56ccaec45d3191da3f1c209',1,'int16_lut::values()'],['../param__generator__kernel_8h.html#aa55383a91c659f798dc4faf98cfd18ea',1,'all_kernel_params::values()']]],
+  ['vcpu',['vcpu',['../bit__field__expander_8c.html#a3f6a8a68b4b17ff5dfc9625fcbca0ba5',1,'bit_field_expander.c']]]
 ];

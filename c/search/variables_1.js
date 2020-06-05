@@ -1,7 +1,10 @@
 var searchData=
 [
   ['backprop_5fdelay',['backprop_delay',['../synapse__dynamics__stdp__mad__impl_8c.html#a06c22d077ef52c561ae4d0ea9f64d7ff',1,'stdp_params']]],
+  ['bit_5ffield_5fbase_5faddress',['bit_field_base_address',['../bit__field__expander_8c.html#a445fa555a051ef68edc27fc90a89ec65',1,'bit_field_expander.c']]],
   ['bit_5ffield_5ffiltered_5fpackets',['bit_field_filtered_packets',['../population__table__binary__search__impl_8c.html#a442bf46f572f3fc97a52421b7e1a0f87',1,'population_table_binary_search_impl.c']]],
+  ['bit_5ffield_5fkey_5fmap_5fregion_5fid',['bit_field_key_map_region_id',['../bit__field__expander_8c.html#a80165df779a65726efc433467d5bc955',1,'builder_region_struct']]],
+  ['bit_5ffield_5fregion_5fid',['bit_field_region_id',['../bit__field__expander_8c.html#a9f1f0eb2d9f6b0f31c7c71359e5d42a2',1,'builder_region_struct']]],
   ['bitfield_5finfo',['bitfield_info',['../neuron__recording_8c.html#a2960fd20508bd11722265c5a5e2bebec',1,'bitfield_info():&#160;neuron_recording.c'],['../neuron__recording_8h.html#a2960fd20508bd11722265c5a5e2bebec',1,'bitfield_info():&#160;neuron_recording.c']]],
   ['bitfield_5frecording_5findexes',['bitfield_recording_indexes',['../neuron__recording_8c.html#a2edd162fb9940477e5363386ba417f9e',1,'bitfield_recording_indexes():&#160;neuron_recording.c'],['../neuron__recording_8h.html#a2edd162fb9940477e5363386ba417f9e',1,'bitfield_recording_indexes():&#160;neuron_recording.c']]],
   ['bitfield_5fvalues',['bitfield_values',['../neuron__recording_8c.html#ab63f6c062cd231b9b383cdf19a09dd0d',1,'bitfield_values():&#160;neuron_recording.c'],['../neuron__recording_8h.html#ab63f6c062cd231b9b383cdf19a09dd0d',1,'bitfield_values():&#160;neuron_recording.c']]],

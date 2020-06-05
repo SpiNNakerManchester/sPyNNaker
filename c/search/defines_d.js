@@ -1,6 +1,7 @@
 var searchData=
 [
   ['sign',['SIGN',['../maths-util_8h.html#a1088484ff7d8b0a6809c495f99580f50',1,'maths-util.h']]],
+  ['size_5fof_5fsingle_5ffixed_5fsynapse',['SIZE_OF_SINGLE_FIXED_SYNAPSE',['../direct__synapses_8c.html#a0216bcfc656605aad717cf24eba2158e',1,'direct_synapses.c']]],
   ['sqr',['SQR',['../maths-util_8h.html#ad41630f833e920c1ffa34722f45a8e77',1,'maths-util.h']]],
   ['sqrt',['SQRT',['../maths-util_8h.html#ae52c48592a33f8f3db9592f7be0502f3',1,'maths-util.h']]],
   ['start',['START',['../maths-util_8h.html#a3018c7600b7bb9866400596a56a57af7',1,'maths-util.h']]],

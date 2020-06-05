@@ -160,10 +160,10 @@ Functions</h2></td></tr>
 <tr class="memdesc:ab47a817128850c7fea9d755816040392"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the type and index.  <a href="#ab47a817128850c7fea9d755816040392">More...</a><br /></td></tr>
 <tr class="separator:ab47a817128850c7fea9d755816040392"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8ac4945585bcd95397c6ab7f57e413f7"><td class="memItemLeft" align="right" valign="top">static index_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__row_8h.html#a8ac4945585bcd95397c6ab7f57e413f7">synapse_row_sparse_delay</a> (uint32_t x, uint32_t <a class="el" href="synapses_8c.html#a4cb72a09cb7c84f5c82c07d17bcb0516">synapse_type_index_bits</a>)</td></tr>
-<tr class="memdesc:a8ac4945585bcd95397c6ab7f57e413f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the delay.  <a href="#a8ac4945585bcd95397c6ab7f57e413f7">More...</a><br /></td></tr>
+<tr class="memdesc:a8ac4945585bcd95397c6ab7f57e413f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the delay from an encoded synapse descriptor.  <a href="#a8ac4945585bcd95397c6ab7f57e413f7">More...</a><br /></td></tr>
 <tr class="separator:a8ac4945585bcd95397c6ab7f57e413f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af7eb0b5869f5256cf8a1343860d8aa21"><td class="memItemLeft" align="right" valign="top">static weight_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__row_8h.html#af7eb0b5869f5256cf8a1343860d8aa21">synapse_row_sparse_weight</a> (uint32_t x)</td></tr>
-<tr class="memdesc:af7eb0b5869f5256cf8a1343860d8aa21"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the weight.  <a href="#af7eb0b5869f5256cf8a1343860d8aa21">More...</a><br /></td></tr>
+<tr class="memdesc:af7eb0b5869f5256cf8a1343860d8aa21"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the weight from an encoded synapse descriptor.  <a href="#af7eb0b5869f5256cf8a1343860d8aa21">More...</a><br /></td></tr>
 <tr class="separator:af7eb0b5869f5256cf8a1343860d8aa21"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -182,8 +182,8 @@ Synapse Row Representation</h1>
 <li><a class="el" href="synapse__row_8h.html#a9bbd252568935c8020f478dcdaff97b5" title="Get the index. ">synapse_row_sparse_index()</a></li>
 <li><a class="el" href="synapse__row_8h.html#a8ac7fef74256d744079d84a638d2d5c7" title="Get the type code. ">synapse_row_sparse_type()</a></li>
 <li><a class="el" href="synapse__row_8h.html#ab47a817128850c7fea9d755816040392" title="Get the type and index. ">synapse_row_sparse_type_index()</a></li>
-<li><a class="el" href="synapse__row_8h.html#a8ac4945585bcd95397c6ab7f57e413f7" title="Get the delay. ">synapse_row_sparse_delay()</a></li>
-<li><a class="el" href="synapse__row_8h.html#af7eb0b5869f5256cf8a1343860d8aa21" title="Get the weight. ">synapse_row_sparse_weight()</a></li>
+<li><a class="el" href="synapse__row_8h.html#a8ac4945585bcd95397c6ab7f57e413f7" title="Get the delay from an encoded synapse descriptor. ">synapse_row_sparse_delay()</a></li>
+<li><a class="el" href="synapse__row_8h.html#af7eb0b5869f5256cf8a1343860d8aa21" title="Get the weight from an encoded synapse descriptor. ">synapse_row_sparse_weight()</a></li>
 </ul>
 <h1><a class="anchor" id="matrix"></a>
 Data Structure</h1>
@@ -595,7 +595,7 @@ Fixed and Fixed-Plastic Regions</h1>
 </table>
 </div><div class="memdoc">
 
-<p>Get the delay. </p>
+<p>Get the delay from an encoded synapse descriptor. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>The value to decode </td></tr>
@@ -629,20 +629,21 @@ Fixed and Fixed-Plastic Regions</h1>
 </table>
 </div><div class="memdoc">
 
-<p>Get the weight. </p>
+<p>Get the weight from an encoded synapse descriptor. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>The value to decode </td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section return"><dt>Returns</dt><dd>the weight </dd></dl>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jun 3 2020 10:20:29 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Jun 5 2020 14:11:54 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

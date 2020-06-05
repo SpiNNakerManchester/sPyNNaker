@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['generate_5fbit_5ffield',['generate_bit_field',['../bit__field__expander_8c.html#a05cd52c8292c3bab8005816a1b7d5645',1,'bit_field_expander.c']]],
   ['get_5faddress',['get_address',['../population__table__binary__search__impl_8c.html#aa48b23a2a333284836c0054f7113ca95',1,'population_table_binary_search_impl.c']]],
   ['get_5fcircular_5fbuffer',['get_circular_buffer',['../spike__processing_8c.html#a8968e90552f7093d74a377ea01cf64a0',1,'spike_processing.c']]],
   ['get_5fdelay',['get_delay',['../matrix__generator__common_8h.html#aaffaf8d20874f964c224271c048c1375',1,'matrix_generator_common.h']]],

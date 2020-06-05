@@ -145,8 +145,8 @@ Functions</h2></td></tr>
 <tr class="memitem:a488618fc45d5bfbe0957600eb6ba3058"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sp__structs_8h.html#a488618fc45d5bfbe0957600eb6ba3058">sp_structs_add_synapse</a> (<a class="el" href="sp__structs_8h.html#structcurrent__state__t">current_state_t</a> *restrict current_state, address_t restrict row)</td></tr>
 <tr class="memdesc:a488618fc45d5bfbe0957600eb6ba3058"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a synapse to the relevant structures.  <a href="#a488618fc45d5bfbe0957600eb6ba3058">More...</a><br /></td></tr>
 <tr class="separator:a488618fc45d5bfbe0957600eb6ba3058"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af0f53340995f427043f318c118d3d974"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af0f53340995f427043f318c118d3d974"></a>
-static uint8_t *&#160;</td><td class="memItemRight" valign="bottom"><b>sp_structs_read_in_common</b> (address_t sdram_sp_address, <a class="el" href="sp__structs_8h.html#structrewiring__data__t">rewiring_data_t</a> *<a class="el" href="topographic__map__impl_8c.html#a14052fb746b24752fc5a96accf39d8b8">rewiring_data</a>, <a class="el" href="sp__structs_8h.html#structpre__pop__info__table__t">pre_pop_info_table_t</a> *<a class="el" href="topographic__map__impl_8c.html#a25e63ee99aecac3677f299c1cccec889">pre_info</a>, <a class="el" href="sp__structs_8h.html#structpost__to__pre__entry">post_to_pre_entry</a> **<a class="el" href="topographic__map__impl_8c.html#ab4adc13b137ccdbaff9d8883400182eb">post_to_pre_table</a>)</td></tr>
+<tr class="memitem:af0f53340995f427043f318c118d3d974"><td class="memItemLeft" align="right" valign="top">static uint8_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="sp__structs_8h.html#af0f53340995f427043f318c118d3d974">sp_structs_read_in_common</a> (address_t sdram_sp_address, <a class="el" href="sp__structs_8h.html#structrewiring__data__t">rewiring_data_t</a> *<a class="el" href="topographic__map__impl_8c.html#a14052fb746b24752fc5a96accf39d8b8">rewiring_data</a>, <a class="el" href="sp__structs_8h.html#structpre__pop__info__table__t">pre_pop_info_table_t</a> *<a class="el" href="topographic__map__impl_8c.html#a25e63ee99aecac3677f299c1cccec889">pre_info</a>, <a class="el" href="sp__structs_8h.html#structpost__to__pre__entry">post_to_pre_entry</a> **<a class="el" href="topographic__map__impl_8c.html#ab4adc13b137ccdbaff9d8883400182eb">post_to_pre_table</a>)</td></tr>
+<tr class="memdesc:af0f53340995f427043f318c118d3d974"><td class="mdescLeft">&#160;</td><td class="mdescRight">Common code for structural plasticity initialisation.  <a href="#af0f53340995f427043f318c118d3d974">More...</a><br /></td></tr>
 <tr class="separator:af0f53340995f427043f318c118d3d974"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
@@ -727,10 +727,68 @@ synapse type </td></tr>
 
 </div>
 </div>
+<a class="anchor" id="af0f53340995f427043f318c118d3d974"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static uint8_t* sp_structs_read_in_common </td>
+          <td>(</td>
+          <td class="paramtype">address_t&#160;</td>
+          <td class="paramname"><em>sdram_sp_address</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="sp__structs_8h.html#structrewiring__data__t">rewiring_data_t</a> *&#160;</td>
+          <td class="paramname"><em>rewiring_data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="sp__structs_8h.html#structpre__pop__info__table__t">pre_pop_info_table_t</a> *&#160;</td>
+          <td class="paramname"><em>pre_info</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="sp__structs_8h.html#structpost__to__pre__entry">post_to_pre_entry</a> **&#160;</td>
+          <td class="paramname"><em>post_to_pre_table</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Common code for structural plasticity initialisation. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">sdram_sp_address</td><td>Address of the configuration region. </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">rewiring_data</td><td>Address of the rewiring information structure to fill out. </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">pre_info</td><td>The pre-population information structure to fill out. </td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">post_to_pre_table</td><td>Variable to receive the address of the post-population-to-pre-population mapping table that this function discovers in the configuration region. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>pointer to the next piece of memory after the common section of the configuration region. </dd></dl>
+
+</div>
+</div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jun 3 2020 10:20:29 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Jun 5 2020 14:11:54 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

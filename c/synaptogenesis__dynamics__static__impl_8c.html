@@ -104,7 +104,7 @@ Functions</h2></td></tr>
 <tr class="memdesc:adba45d439e3c65751b2508e6ae744e15"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialisation of synaptic rewiring (synaptogenesis) parameters (random seed, spread of receptive field etc.)  <a href="#adba45d439e3c65751b2508e6ae744e15">More...</a><br /></td></tr>
 <tr class="separator:adba45d439e3c65751b2508e6ae744e15"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1a8123da1bd797e82cb3193a0ce43847"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synaptogenesis__dynamics__static__impl_8c.html#a1a8123da1bd797e82cb3193a0ce43847">synaptogenesis_dynamics_rewire</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, <a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> *spike, address_t *synaptic_row_address, uint32_t *n_bytes)</td></tr>
-<tr class="memdesc:a1a8123da1bd797e82cb3193a0ce43847"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function called (usually on a timer from <a class="el" href="delay__extension_8c.html#aa14f4f1d4c84183b7bf7108bf930a23c" title="Entry point. ">c_main()</a>) to trigger the process of synaptic rewiring.  <a href="#a1a8123da1bd797e82cb3193a0ce43847">More...</a><br /></td></tr>
+<tr class="memdesc:a1a8123da1bd797e82cb3193a0ce43847"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function called (usually on a timer from <a class="el" href="bit__field__expander_8c.html#aa14f4f1d4c84183b7bf7108bf930a23c" title="Entry point. ">c_main()</a>) to trigger the process of synaptic rewiring.  <a href="#a1a8123da1bd797e82cb3193a0ce43847">More...</a><br /></td></tr>
 <tr class="separator:a1a8123da1bd797e82cb3193a0ce43847"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac08559ca2e23561471aebd3f4097e348"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synaptogenesis__dynamics__static__impl_8c.html#ac08559ca2e23561471aebd3f4097e348">synaptogenesis_row_restructure</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, address_t row)</td></tr>
 <tr class="memdesc:ac08559ca2e23561471aebd3f4097e348"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs the actual restructuring of a row.  <a href="#ac08559ca2e23561471aebd3f4097e348">More...</a><br /></td></tr>
@@ -147,14 +147,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="syna
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>Whether we were successful.</dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">sdram_sp_address</td><td>Address of the start of the SDRAM region which contains synaptic rewiring params. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>true when successful </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>Whether we were successful. </dd></dl>
 
 </div>
 </div>
@@ -194,7 +187,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="syna
       </table>
 </div><div class="memdoc">
 
-<p>Function called (usually on a timer from <a class="el" href="delay__extension_8c.html#aa14f4f1d4c84183b7bf7108bf930a23c" title="Entry point. ">c_main()</a>) to trigger the process of synaptic rewiring. </p>
+<p>Function called (usually on a timer from <a class="el" href="bit__field__expander_8c.html#aa14f4f1d4c84183b7bf7108bf930a23c" title="Entry point. ">c_main()</a>) to trigger the process of synaptic rewiring. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">time</td><td>the current timestep </td></tr>
@@ -318,7 +311,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="syna
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jun 3 2020 10:20:29 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Jun 5 2020 14:11:54 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

@@ -89,7 +89,6 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   <div class="summary">
 <a href="#nested-classes">Data Structures</a> &#124;
 <a href="#define-members">Macros</a> &#124;
-<a href="#func-members">Functions</a> &#124;
 <a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
 <div class="title">population_table_binary_search_impl.c File Reference</div>  </div>
@@ -130,6 +129,7 @@ Macros</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr><td colspan="2"><div class="groupHeader">Support functions</div></td></tr>
 <tr class="memitem:a0f6729803ce65a621db8be58bfa1d972"><td class="memItemLeft" align="right" valign="top">static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table__binary__search__impl_8c.html#a0f6729803ce65a621db8be58bfa1d972">get_direct_address</a> (<a class="el" href="population__table__binary__search__impl_8c.html#structaddress__and__row__length">address_and_row_length</a> entry)</td></tr>
 <tr class="memdesc:a0f6729803ce65a621db8be58bfa1d972"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the direct address out of an entry.  <a href="#a0f6729803ce65a621db8be58bfa1d972">More...</a><br /></td></tr>
 <tr class="separator:a0f6729803ce65a621db8be58bfa1d972"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -148,41 +148,42 @@ Functions</h2></td></tr>
 <tr class="memitem:a3c2c10dcc54c9ec95a730e4c1324a2c5"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table__binary__search__impl_8c.html#a3c2c10dcc54c9ec95a730e4c1324a2c5">print_master_population_table</a> (void)</td></tr>
 <tr class="memdesc:a3c2c10dcc54c9ec95a730e4c1324a2c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prints the master pop table.  <a href="#a3c2c10dcc54c9ec95a730e4c1324a2c5">More...</a><br /></td></tr>
 <tr class="separator:a3c2c10dcc54c9ec95a730e4c1324a2c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5f92af4dd47e65504cbbbcb265083196"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table__binary__search__impl_8c.html#a5f92af4dd47e65504cbbbcb265083196">population_table_initialise</a> (address_t table_address, address_t synapse_rows_address, address_t direct_rows_address, uint32_t *row_max_n_words)</td></tr>
+<tr><td colspan="2"><div class="groupHeader">API functions</div></td></tr>
+<tr class="memitem:a5f92af4dd47e65504cbbbcb265083196"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table__binary__search__impl_8c.html#a5f92af4dd47e65504cbbbcb265083196">population_table_initialise</a> (address_t table_address, address_t synapse_rows_address, address_t direct_rows_address, uint32_t *<a class="el" href="bit__field__expander_8c.html#af9b6824a750777e79471f086307d51b9">row_max_n_words</a>)</td></tr>
 <tr class="memdesc:a5f92af4dd47e65504cbbbcb265083196"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets up the table.  <a href="#a5f92af4dd47e65504cbbbcb265083196">More...</a><br /></td></tr>
 <tr class="separator:a5f92af4dd47e65504cbbbcb265083196"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8bda7c27a3c9d52a2f95c4b6edd58944"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table__binary__search__impl_8c.html#a8bda7c27a3c9d52a2f95c4b6edd58944">population_table_get_first_address</a> (<a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> spike, address_t *row_address, size_t *n_bytes_to_transfer)</td></tr>
 <tr class="memdesc:a8bda7c27a3c9d52a2f95c4b6edd58944"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the first row data for the given input spike.  <a href="#a8bda7c27a3c9d52a2f95c4b6edd58944">More...</a><br /></td></tr>
 <tr class="separator:a8bda7c27a3c9d52a2f95c4b6edd58944"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1d265f6b135058a82e5b5806b35c6539"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table__binary__search__impl_8c.html#a1d265f6b135058a82e5b5806b35c6539">population_table_position_in_the_master_pop_array</a> (<a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> spike)</td></tr>
-<tr class="memdesc:a1d265f6b135058a82e5b5806b35c6539"><td class="mdescLeft">&#160;</td><td class="mdescRight">get the position in the master pop table  <a href="#a1d265f6b135058a82e5b5806b35c6539">More...</a><br /></td></tr>
+<tr class="memdesc:a1d265f6b135058a82e5b5806b35c6539"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the position in the master population table.  <a href="#a1d265f6b135058a82e5b5806b35c6539">More...</a><br /></td></tr>
 <tr class="separator:a1d265f6b135058a82e5b5806b35c6539"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6ab19e2b1b4c0ed25d126d7cd7763ccf"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table__binary__search__impl_8c.html#a6ab19e2b1b4c0ed25d126d7cd7763ccf">population_table_get_next_address</a> (<a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> *spike, address_t *row_address, size_t *n_bytes_to_transfer)</td></tr>
 <tr class="memdesc:a6ab19e2b1b4c0ed25d126d7cd7763ccf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the next row data for a previously given spike. If no spike has been given, return False.  <a href="#a6ab19e2b1b4c0ed25d126d7cd7763ccf">More...</a><br /></td></tr>
 <tr class="separator:a6ab19e2b1b4c0ed25d126d7cd7763ccf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3d02d2b908f0d3115192eb6010038b54"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table__binary__search__impl_8c.html#a3d02d2b908f0d3115192eb6010038b54">population_table_get_ghost_pop_table_searches</a> (void)</td></tr>
-<tr class="memdesc:a3d02d2b908f0d3115192eb6010038b54"><td class="mdescLeft">&#160;</td><td class="mdescRight">generates how many dma's were pointless  <a href="#a3d02d2b908f0d3115192eb6010038b54">More...</a><br /></td></tr>
+<tr class="memdesc:a3d02d2b908f0d3115192eb6010038b54"><td class="mdescLeft">&#160;</td><td class="mdescRight">Reports how many DMAs were pointless.  <a href="#a3d02d2b908f0d3115192eb6010038b54">More...</a><br /></td></tr>
 <tr class="separator:a3d02d2b908f0d3115192eb6010038b54"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7bbffa9367a5934939379717554169b9"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table__binary__search__impl_8c.html#a7bbffa9367a5934939379717554169b9">population_table_get_invalid_master_pop_hits</a> (void)</td></tr>
-<tr class="memdesc:a7bbffa9367a5934939379717554169b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">get the number of master pop table key misses  <a href="#a7bbffa9367a5934939379717554169b9">More...</a><br /></td></tr>
+<tr class="memdesc:a7bbffa9367a5934939379717554169b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the number of master pop table key misses.  <a href="#a7bbffa9367a5934939379717554169b9">More...</a><br /></td></tr>
 <tr class="separator:a7bbffa9367a5934939379717554169b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac70a245279c010501448e8bf7d985bd6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table__binary__search__impl_8c.html#ac70a245279c010501448e8bf7d985bd6">population_table_set_connectivity_bit_field</a> (bit_field_t *connectivity_bit_fields)</td></tr>
-<tr class="memdesc:ac70a245279c010501448e8bf7d985bd6"><td class="mdescLeft">&#160;</td><td class="mdescRight">sets the connectivity lookup element  <a href="#ac70a245279c010501448e8bf7d985bd6">More...</a><br /></td></tr>
+<tr class="memdesc:ac70a245279c010501448e8bf7d985bd6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the connectivity lookup map.  <a href="#ac70a245279c010501448e8bf7d985bd6">More...</a><br /></td></tr>
 <tr class="separator:ac70a245279c010501448e8bf7d985bd6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afcbeec022a055055de66ed0e4d9dfb54"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table__binary__search__impl_8c.html#afcbeec022a055055de66ed0e4d9dfb54">population_table_shut_down</a> (void)</td></tr>
-<tr class="memdesc:afcbeec022a055055de66ed0e4d9dfb54"><td class="mdescLeft">&#160;</td><td class="mdescRight">clears the dtcm allocated by the population table.  <a href="#afcbeec022a055055de66ed0e4d9dfb54">More...</a><br /></td></tr>
+<tr class="memdesc:afcbeec022a055055de66ed0e4d9dfb54"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clears the DTCM allocated by the population table.  <a href="#afcbeec022a055055de66ed0e4d9dfb54">More...</a><br /></td></tr>
 <tr class="separator:afcbeec022a055055de66ed0e4d9dfb54"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1fbc6889b4753930ba5be91449308c35"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table__binary__search__impl_8c.html#a1fbc6889b4753930ba5be91449308c35">population_table_length</a> (void)</td></tr>
-<tr class="memdesc:a1fbc6889b4753930ba5be91449308c35"><td class="mdescLeft">&#160;</td><td class="mdescRight">length of master pop table  <a href="#a1fbc6889b4753930ba5be91449308c35">More...</a><br /></td></tr>
+<tr class="memdesc:a1fbc6889b4753930ba5be91449308c35"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the length of master population table.  <a href="#a1fbc6889b4753930ba5be91449308c35">More...</a><br /></td></tr>
 <tr class="separator:a1fbc6889b4753930ba5be91449308c35"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af6cde3f3fba19558d03381d2b9bc2456"><td class="memItemLeft" align="right" valign="top"><a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table__binary__search__impl_8c.html#af6cde3f3fba19558d03381d2b9bc2456">population_table_get_spike_for_index</a> (uint32_t index)</td></tr>
-<tr class="memdesc:af6cde3f3fba19558d03381d2b9bc2456"><td class="mdescLeft">&#160;</td><td class="mdescRight">gets the spike associated at a specific index  <a href="#af6cde3f3fba19558d03381d2b9bc2456">More...</a><br /></td></tr>
+<tr class="memdesc:af6cde3f3fba19558d03381d2b9bc2456"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the spike associated at a specific index.  <a href="#af6cde3f3fba19558d03381d2b9bc2456">More...</a><br /></td></tr>
 <tr class="separator:af6cde3f3fba19558d03381d2b9bc2456"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2f82195b320a1d9ce7e00129ac59af7e"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table__binary__search__impl_8c.html#a2f82195b320a1d9ce7e00129ac59af7e">population_table_get_mask_for_entry</a> (uint32_t index)</td></tr>
-<tr class="memdesc:a2f82195b320a1d9ce7e00129ac59af7e"><td class="mdescLeft">&#160;</td><td class="mdescRight">get the mask for the entry at a specific index  <a href="#a2f82195b320a1d9ce7e00129ac59af7e">More...</a><br /></td></tr>
+<tr class="memdesc:a2f82195b320a1d9ce7e00129ac59af7e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the mask for the entry at a specific index.  <a href="#a2f82195b320a1d9ce7e00129ac59af7e">More...</a><br /></td></tr>
 <tr class="separator:a2f82195b320a1d9ce7e00129ac59af7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac569b455d9ea27c712612bb97c72c7bd"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table__binary__search__impl_8c.html#ac569b455d9ea27c712612bb97c72c7bd">population_table_get_filtered_packet_count</a> (void)</td></tr>
-<tr class="memdesc:ac569b455d9ea27c712612bb97c72c7bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">get the number of packets that were filtered from the bitfield filter  <a href="#ac569b455d9ea27c712612bb97c72c7bd">More...</a><br /></td></tr>
+<tr class="memdesc:ac569b455d9ea27c712612bb97c72c7bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the number of packets that were filtered from the bitfield filter.  <a href="#ac569b455d9ea27c712612bb97c72c7bd">More...</a><br /></td></tr>
 <tr class="separator:ac569b455d9ea27c712612bb97c72c7bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
@@ -374,7 +375,7 @@ whether this is a direct/single address </td></tr>
 </div><div class="memdoc">
 
 <p>Get the standard address out of an entry. </p>
-<p>The address is in words and is the top 23-bits but 1, so this down shifts by 8 and then multiplies by 16 (= up shifts by 4) </p><dl class="params"><dt>Parameters</dt><dd>
+<p>The address is in units of four words, so this multiplies by 16 (= up shifts by 4) </p><dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">entry</td><td>the table entry </td></tr>
   </table>
@@ -628,14 +629,14 @@ whether this is a direct/single address </td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>get the position in the master pop table </p>
+<p>Get the position in the master population table. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">spike</td><td>The spike received </td></tr>
   </table>
   </dd>
 </dl>
-<dl class="section return"><dt>Returns</dt><dd>the position in the master pop table </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The position in the master pop table </dd></dl>
 
 </div>
 </div>
@@ -696,8 +697,8 @@ whether this is a direct/single address </td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>generates how many dma's were pointless </p>
-<dl class="section return"><dt>Returns</dt><dd>uint of how many were done </dd></dl>
+<p>Reports how many DMAs were pointless. </p>
+<dl class="section return"><dt>Returns</dt><dd>How many were done that were not required </dd></dl>
 
 </div>
 </div>
@@ -715,7 +716,7 @@ whether this is a direct/single address </td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>get the number of master pop table key misses </p>
+<p>Get the number of master pop table key misses. </p>
 <dl class="section return"><dt>Returns</dt><dd>the number of master pop table key misses </dd></dl>
 
 </div>
@@ -734,10 +735,10 @@ whether this is a direct/single address </td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>sets the connectivity lookup element </p>
+<p>Sets the connectivity lookup map. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">connectivity_lookup</td><td>the connectivity lookup </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">connectivity_bit_fields</td><td>the connectivity lookup bitfield </td></tr>
   </table>
   </dd>
 </dl>
@@ -758,8 +759,8 @@ whether this is a direct/single address </td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>clears the dtcm allocated by the population table. </p>
-<dl class="section return"><dt>Returns</dt><dd>bool that says if the clearing was successful or not. </dd></dl>
+<p>Clears the DTCM allocated by the population table. </p>
+<dl class="section return"><dt>Returns</dt><dd>If the clearing was successful or not. </dd></dl>
 
 </div>
 </div>
@@ -777,8 +778,8 @@ whether this is a direct/single address </td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>length of master pop table </p>
-<dl class="section return"><dt>Returns</dt><dd>length of the master pop table </dd></dl>
+<p>Get the length of master population table. </p>
+<dl class="section return"><dt>Returns</dt><dd>Length of the master pop table </dd></dl>
 
 </div>
 </div>
@@ -796,7 +797,7 @@ whether this is a direct/single address </td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>gets the spike associated at a specific index </p>
+<p>Get the spike associated at a specific index. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">index</td><td>the index in the master pop table </td></tr>
@@ -821,7 +822,7 @@ whether this is a direct/single address </td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>get the mask for the entry at a specific index </p>
+<p>Get the mask for the entry at a specific index. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">index</td><td>the index in the master pop table </td></tr>
@@ -846,7 +847,7 @@ whether this is a direct/single address </td></tr>
       </table>
 </div><div class="memdoc">
 
-<p>get the number of packets that were filtered from the bitfield filter </p>
+<p>Get the number of packets that were filtered from the bitfield filter. </p>
 <dl class="section return"><dt>Returns</dt><dd>the number of packets filtered by the bitfield filter </dd></dl>
 
 </div>
@@ -854,7 +855,7 @@ whether this is a direct/single address </td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jun 3 2020 10:20:29 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Jun 5 2020 14:11:54 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.11
 </small></address>

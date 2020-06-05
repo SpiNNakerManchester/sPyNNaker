@@ -10,12 +10,14 @@ var searchData=
   ['reset_5faddress',['reset_address',['../neuron__recording_8c.html#ac4b03f54804a47d2b1d7f9086d42292a',1,'neuron_recording.c']]],
   ['rewires_5fto_5fdo',['rewires_to_do',['../spike__processing_8c.html#a58209497c5fe5ba1a7034e03e6622d6d',1,'spike_processing.c']]],
   ['rewiring',['rewiring',['../c__main_8c.html#a1c0ebb4e72cbc1b6f3da884524a78078',1,'c_main.c']]],
-  ['rewiring_5fdata',['rewiring_data',['../topographic__map__impl_8c.html#a14052fb746b24752fc5a96accf39d8b8',1,'topographic_map_impl.c']]],
+  ['rewiring_5fdata',['rewiring_data',['../bit__field__expander_8c.html#a14052fb746b24752fc5a96accf39d8b8',1,'rewiring_data():&#160;bit_field_expander.c'],['../topographic__map__impl_8c.html#a14052fb746b24752fc5a96accf39d8b8',1,'rewiring_data():&#160;topographic_map_impl.c']]],
   ['rewiring_5fperiod',['rewiring_period',['../c__main_8c.html#aa08e7ff835bc68c5a91214035f412894',1,'c_main.c']]],
   ['ring_5fbuffer_5fsize',['ring_buffer_size',['../synapses_8c.html#a9c43ae0578a77accabf5614e5788020b',1,'synapses.c']]],
   ['ring_5fbuffer_5fto_5finput_5fleft_5fshifts',['ring_buffer_to_input_left_shifts',['../synapses_8c.html#ade696d20461dc712b7daafcbcad6ba4b',1,'synapses.c']]],
   ['ring_5fbuffers',['ring_buffers',['../synapses_8c.html#a9d013c2e9d5eddd8472bd57e9b21ff99',1,'synapses.c']]],
   ['rng',['rng',['../connection__generator__fixed__post_8h.html#a1555dd530c7395bb4373b6bb5b699297',1,'fixed_post']]],
   ['row',['row',['../spike__processing_8c.html#a9861968df19a075eac9fa7f507592fd0',1,'dma_buffer']]],
-  ['row_5flength',['row_length',['../population__table__binary__search__impl_8c.html#a1fb46843c73b7998401310d379339f64',1,'address_and_row_length']]]
+  ['row_5fdata',['row_data',['../bit__field__expander_8c.html#aaf22062ead0b27184e006d45487af894',1,'bit_field_expander.c']]],
+  ['row_5flength',['row_length',['../population__table__binary__search__impl_8c.html#a1fb46843c73b7998401310d379339f64',1,'address_and_row_length']]],
+  ['row_5fmax_5fn_5fwords',['row_max_n_words',['../bit__field__expander_8c.html#af9b6824a750777e79471f086307d51b9',1,'bit_field_expander.c']]]
 ];

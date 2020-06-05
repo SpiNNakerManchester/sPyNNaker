@@ -1,5 +1,8 @@
 var searchData=
 [
+  ['failed_5fbit_5ffield_5freads',['failed_bit_field_reads',['../bit__field__filter_8h.html#a3fe8cdf904112ab379545b0d8f7a5d20',1,'bit_field_filter.h']]],
+  ['failed_5fregion_5fid',['FAILED_REGION_ID',['../bit__field__expander_8c.html#a9132a44b6d09c3f7ffd226f8e16f11a9',1,'bit_field_expander.c']]],
+  ['fake_5fbit_5ffields',['fake_bit_fields',['../bit__field__expander_8c.html#abab455406701d8b67a962835f9175899',1,'bit_field_expander.c']]],
   ['fast_5frate_5fper_5ftick_5fcutoff',['fast_rate_per_tick_cutoff',['../spike__source__poisson_8c.html#afd5bbf1b89c098c3f2bf38a4689f42ba',1,'global_parameters']]],
   ['ff_5fprob_5fsize',['ff_prob_size',['../formation__distance__dependent__impl_8h.html#abf338e53b58fbf637112ba228bd58108',1,'formation_params']]],
   ['first_5fsource_5fid',['first_source_id',['../spike__source__poisson_8c.html#a4459890055b76bb63c4bd4b9ac2a14e5',1,'global_parameters']]],

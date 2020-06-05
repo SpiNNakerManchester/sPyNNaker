@@ -1,5 +1,9 @@
 var searchData=
 [
+  ['fail_5fshut_5fdown',['fail_shut_down',['../bit__field__expander_8c.html#acbb8b3b888337366c49aa83e72172383',1,'bit_field_expander.c']]],
+  ['failed_5fbit_5ffield_5freads',['failed_bit_field_reads',['../bit__field__filter_8h.html#a3fe8cdf904112ab379545b0d8f7a5d20',1,'bit_field_filter.h']]],
+  ['failed_5fregion_5fid',['FAILED_REGION_ID',['../bit__field__expander_8c.html#a9132a44b6d09c3f7ffd226f8e16f11a9',1,'bit_field_expander.c']]],
+  ['fake_5fbit_5ffields',['fake_bit_fields',['../bit__field__expander_8c.html#abab455406701d8b67a962835f9175899',1,'bit_field_expander.c']]],
   ['fast_5fmemcpy',['fast_memcpy',['../common__mem_8h.html#a293d12ada8b9ace4a1b4b19aa49df3fe',1,'common_mem.h']]],
   ['fast_5frate_5fper_5ftick_5fcutoff',['fast_rate_per_tick_cutoff',['../spike__source__poisson_8c.html#afd5bbf1b89c098c3f2bf38a4689f42ba',1,'global_parameters']]],
   ['fast_5fspike_5fsource_5fget_5fnum_5fspikes',['fast_spike_source_get_num_spikes',['../spike__source__poisson_8c.html#a6fc68d58ed86cf64bddcb8c1a16c101d',1,'spike_source_poisson.c']]],
