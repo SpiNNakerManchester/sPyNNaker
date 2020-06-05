@@ -228,10 +228,11 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
     // Get the voltage
     state_t voltage = neuron_model_get_membrane_voltage(neuron);
-//    recorded_variable_values[V_RECORDING_INDEX] = voltage;
+    recorded_variable_values[V_RECORDING_INDEX] = voltage;
 
     // Store whether the neuron has spiked
     bool spike = false;
+    state_t result;
 
     // Loop however many times requested
     for (uint32_t i = n_steps_per_timestep; i > 0; i--) {
@@ -247,12 +248,15 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
                 inh_value, input_type, NUM_INHIBITORY_RECEPTORS);
 
         // record synaptic conductance
-        if (neuron_index == 0){
-        	recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = exc_input_values[0];
-        } else if (neuron_index == 1) {
-        	recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = inh_input_values[0];
-        }
-
+		if (i == n_steps_per_timestep) {
+			if (neuron_index == 0) {
+				recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] =
+						exc_input_values[0];
+			} else if (neuron_index == 1) {
+				recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] =
+						inh_input_values[0];
+			}
+		}
 
         // Sum g_syn contributions from all receptors for recording
         REAL total_exc = 0;
@@ -279,44 +283,43 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
         // Call functions to get the input values to be recorded
         // record synaptic current
-        if (neuron_index == 0){
-        	recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = exc_input_values[0];
-        } else if (neuron_index == 1) {
-        	recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = inh_input_values[0];
-        }
-
-
+		if (i == n_steps_per_timestep) {
+			if (neuron_index == 0) {
+				recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
+						exc_input_values[0];
+			} else if (neuron_index == 1) {
+				recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] =
+						inh_input_values[0];
+			}
+		}
 
         // update neuron parameters
-        state_t result = neuron_model_state_update(
+        result = neuron_model_state_update(
                 NUM_EXCITATORY_RECEPTORS, exc_input_values,
                 NUM_INHIBITORY_RECEPTORS, inh_input_values,
                 external_bias, neuron);
-
-        // determine if a spike should occur
-        bool spike_now = threshold_type_is_above_threshold(result, threshold_type);
-
-        // If spike occurs, communicate to relevant parts of model
-        if (spike_now) {
-            spike = true;
-
-            // Call relevant model-based functions
-            // Tell the neuron model
-            neuron_model_has_spiked(neuron);
-
-            // Tell the additional input
-            additional_input_has_spiked(additional_input);
-        }
-
-
-
-
 
         // Shape the existing input according to the included rule
         synapse_types_shape_input(synapse_type);
     }
 
-    recorded_variable_values[V_RECORDING_INDEX] = voltage;
+
+    // determine if a spike should occur
+    bool spike_now = threshold_type_is_above_threshold(result, threshold_type);
+
+    // If spike occurs, communicate to relevant parts of model
+    if (spike_now) {
+        spike = true;
+
+        // Call relevant model-based functions
+        // Tell the neuron model
+        neuron_model_has_spiked(neuron);
+
+        // Tell the additional input
+        additional_input_has_spiked(additional_input);
+    }
+
+
 
 #if LOG_LEVEL >= LOG_DEBUG
     neuron_model_print_state_variables(neuron);
