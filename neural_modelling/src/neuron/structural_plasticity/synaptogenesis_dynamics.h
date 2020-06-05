@@ -15,13 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*! \file
- *
- * SUMMARY
- *  \brief This file contains the main interface for structural plasticity
- *
- *
- * Author: Petrut Bogdan
+/*!
+ * \dir
+ * \brief Structural plasticity interface and algorithms
+ * \file
+ * \brief This file contains the main interface for structural plasticity
+ * \author Petrut Bogdan
  */
 #ifndef _SYNAPTOGENESIS_DYNAMICS_H_
 #define _SYNAPTOGENESIS_DYNAMICS_H_
@@ -29,15 +28,15 @@
 #include <common/neuron-typedefs.h>
 
 //! \brief Initialisation of synaptic rewiring (synaptogenesis)
-//! parameters (random seed, spread of receptive field etc.)
-//! \param[in] sdram_sp_address Address of the start of the SDRAM region
-//! which contains synaptic rewiring params.
-//! \return address_t Address after the final word read from SDRAM.
-address_t synaptogenesis_dynamics_initialise(
+//!     parameters (random seed, spread of receptive field etc.)
+//! \param[in] sdram_sp_address: Address of the start of the SDRAM region
+//!     which contains synaptic rewiring params.
+//! \return Whether we were successful.
+bool synaptogenesis_dynamics_initialise(
         address_t sdram_sp_address);
 
-//! \brief Function called (usually on a timer from c_main) to
-//! trigger the process of synaptic rewiring
+//! \brief Function called (usually on a timer from c_main()) to
+//!     trigger the process of synaptic rewiring
 //! \param[in] time: the current timestep
 //! \param[out] spike: variable to hold the spike
 //! \param[out] synaptic_row_address: variable to hold the address of the row
@@ -52,16 +51,24 @@ bool synaptogenesis_dynamics_rewire(uint32_t time,
 //! \return True if the row was changed and needs to be written back
 bool synaptogenesis_row_restructure(uint32_t time, address_t row);
 
-//! retrieve the period of rewiring
-//! based on is_fast(), this can either mean how many times rewiring happens
-//! in a timestep, or how many timesteps have to pass until rewiring happens.
+//! \brief retrieve the period of rewiring
+//! \return Based on synaptogenesis_is_fast(), this can either be how many times
+//!     rewiring happens in a timestep, or how many timesteps have to pass until
+//!     rewiring happens.
 int32_t synaptogenesis_rewiring_period(void);
 
-//! controls whether rewiring is attempted multiple times per timestep
-//! or after a number of timesteps.
+//! \brief controls whether rewiring is attempted multiple times per timestep
+//!     or after a number of timesteps.
+//! \return true if the result of synaptogenesis_rewiring_period() is the number
+//!     of attempts to try per timestep.
 bool synaptogenesis_is_fast(void);
 
 //! Indicates that a spike has been received
+//! \param[in] time: The time that the spike was received at
+//! \param[in] spike: The received spike
 void synaptogenesis_spike_received(uint32_t time, spike_t spike);
+
+//! Prints a certain data object
+void print_post_to_pre_entry(void);
 
 #endif // _SYNAPTOGENESIS_DYNAMICS_H_

@@ -30,6 +30,7 @@ from spynnaker.pyNN.utilities.random_stats import (
     RandomStatsPoissonImpl, RandomStatsRandIntImpl, RandomStatsUniformImpl,
     RandomStatsVonmisesImpl, RandomStatsBinomialImpl)
 
+
 MAX_RATE = 2 ** 32 - 1  # To allow a unit32_t to be used to store the rate
 
 STATS_BY_NAME = {
