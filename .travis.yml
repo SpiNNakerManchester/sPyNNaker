@@ -20,6 +20,9 @@ jobs:
       python: 3.6
       env:
         - DEPLOY_DIR=$PWD/deploy
+        - ROOT_DOC_DIR=$PWD/doc/global
+        - C_DOC_DIR=$PWD/neural_modelling/html
+        - PY_DOC_DIR=$PWD/doc/source/_build/html
     - name: Py3.7
       python: 3.7
     - name: Py2.7 (legacy)
@@ -63,9 +66,6 @@ before_install:
   - support/gitclone.sh https://github.com/SpiNNakerManchester/SpiNNFrontEndCommon.git
   - export SPINN_DIRS=$PWD/spinnaker_tools
   - export NEURAL_MODELLING_DIRS=$PWD/neural_modelling
-  - ROOT_DOC_DIR=$PWD/doc/global
-  - C_DOC_DIR=$PWD/neural_modelling/html
-  - PY_DOC_DIR=$PWD/doc/source/_build/html
 
 install:
   - pip install -r requirements-test.txt
@@ -130,7 +130,6 @@ deploy:
   on:
     branch:
       - master
-      - doxygen
     python: 3.6
     # Only enable deployment if we actually have supplied a token
     condition: -n "$GITHUB_TOKEN"
