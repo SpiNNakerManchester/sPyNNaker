@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Implementation of non-inlined API in spike_processing.h
 #include "spike_processing.h"
 #include "population_table/population_table.h"
 #include "synapse_row.h"
@@ -27,68 +29,72 @@
 //! DMA buffer structure combines the row read from SDRAM with information
 //! about the read.
 typedef struct dma_buffer {
-
-    // Address in SDRAM to write back plastic region to
+    //! Address in SDRAM to write back plastic region to
     address_t sdram_writeback_address;
 
-    // Key of originating spike
-    // (used to allow row data to be re-used for multiple spikes)
+    //! \brief Key of originating spike
+    //! \details used to allow row data to be re-used for multiple spikes
     spike_t originating_spike;
 
-    // Number of bytes transferred in the read
+    //! Number of bytes transferred in the read
     uint32_t n_bytes_transferred;
 
-    // Row data
+    //! Row data
     address_t row;
-
 } dma_buffer;
 
-// The number of DMA Buffers to use
+//! The number of DMA Buffers to use
 #define N_DMA_BUFFERS 2
 
-// DMA tags
+//! DMA tags
 enum spike_processing_dma_tags {
+    //! Tag of a DMA read of a full synaptic row
     DMA_TAG_READ_SYNAPTIC_ROW,
+    //! Tag of a DMA write of the plastic region of a synaptic row
     DMA_TAG_WRITE_PLASTIC_REGION
 };
 
+//! The current timer tick value
 extern uint32_t time;
 
-// True if the DMA "loop" is currently running
+//! True if the DMA "loop" is currently running
 static volatile bool dma_busy;
 
-// The DTCM buffers for the synapse rows
+//! The DTCM buffers for the synapse rows
 static dma_buffer dma_buffers[N_DMA_BUFFERS];
 
-// The index of the next buffer to be filled by a DMA
+//! The index of the next buffer to be filled by a DMA
 static uint32_t next_buffer_to_fill;
 
-// The index of the buffer currently being filled by a DMA read
+//! The index of the buffer currently being filled by a DMA read
 static uint32_t buffer_being_read;
 
-static uint32_t max_n_words;
-
+//! Number of outstanding synaptogenic rewirings
 static volatile uint32_t rewires_to_do = 0;
 
-// The number of rewires to do when the DMA completes.  When a DMA is first set
-// up, only this or dma_n_spikes can be 1 with the other being 0.
+//! The number of rewires to do when the DMA completes.  When a DMA is first set
+//! up, only this or dma_n_spikes can be 1 with the other being 0.
 static uint32_t dma_n_rewires;
 
-// The number of spikes to do when the DMA completes.  When a DMA is first set
-// up, only this or dma_n_rewires can be 1 with the other being 0.
+//! The number of spikes to do when the DMA completes.  When a DMA is first set
+//! up, only this or dma_n_rewires can be 1 with the other being 0.
 static uint32_t dma_n_spikes;
 
-// the number of dma completes (used in provenance generation)
+//! the number of dma completes (used in provenance generation)
 static uint32_t dma_complete_count = 0;
 
-// the number of spikes that were processed (used in provenance generation)
+//! the number of spikes that were processed (used in provenance generation)
 static uint32_t spike_processing_count = 0;
 
-// The number of successful rewires
+//! The number of successful rewires
 static uint32_t n_successful_rewires = 0;
 
 /* PRIVATE FUNCTIONS - static for inlining */
 
+//! \brief Perform a DMA read of a synaptic row
+//! \param[in] row_address: Where in SDRAM to read the row from
+//! \param[in] n_bytes_to_transfer: The size of the synaptic row
+//! \param[in] spike: The spike that triggered this read
 static inline void do_dma_read(
         address_t row_address, size_t n_bytes_to_transfer, spike_t spike) {
     // Write the SDRAM address of the plastic region and the
@@ -109,7 +115,14 @@ static inline void do_dma_read(
     next_buffer_to_fill = (next_buffer_to_fill + 1) % N_DMA_BUFFERS;
 }
 
-// Check if there is anything to do - if not, DMA is not busy
+//! \brief Check if there is anything to do. If not, DMA is not busy
+//! \param[out] row_address:
+//!     The address of the synaptic row that has been processed
+//! \param[out] n_bytes_to_transfer: The size of the processed synaptic row
+//! \param[out] spike: The spike being processed
+//! \param[in,out] n_rewire: Accumulator of number of rewirings
+//! \param[in,out] n_process_spike: Accumulator of number of processed spikes
+//! \return True if there's something to do
 static inline bool is_something_to_do(
         address_t *row_address, size_t *n_bytes_to_transfer,
         spike_t *spike, uint32_t *n_rewire, uint32_t *n_process_spike) {
@@ -160,14 +173,20 @@ static inline bool is_something_to_do(
     return false;
 }
 
-// Set up a new synaptic DMA read.  If a current_buffer is passed in, any spike
-// found that matches the originating spike of the buffer will increment a
-// count, and the DMA of that row will be skipped.  The number of times a row
-// should be rewired and the number of times synaptic processing should be
-// done on a row is returned.
+//! \brief Set up a new synaptic DMA read.
+//! \details
+//! If a current_buffer is passed in, any spike found that matches the
+//! originating spike of the buffer will increment a count, and the DMA of that
+//! row will be skipped.  The number of times a row should be rewired and the
+//! number of times synaptic processing should be done on a row is returned.
+//!
+//! Calls is_something_to_do(), do_direct_row() and do_dma_read()
+//! \param[in] current_buffer: The current buffer, if any.
+//! \param[in,out] n_rewires: Accumulator of number of rewirings
+//! \param[in,out] n_synapse_processes:
+//!     Accumulator of number of synapses processed
 static void setup_synaptic_dma_read(dma_buffer *current_buffer,
         uint32_t *n_rewires, uint32_t *n_synapse_processes) {
-
     // Set up to store the DMA location and size to read
     address_t row_address;
     size_t n_bytes_to_transfer;
@@ -206,9 +225,12 @@ static void setup_synaptic_dma_read(dma_buffer *current_buffer,
     spike_processing_count++;
 }
 
+//! \brief Set up a DMA write of synaptic data.
+//! \param[in] dma_buffer_index: Index of DMA buffer to use
+//! \param[in] plastic_only: If false, write the whole synaptic row.
+//!     If true, only write the plastic data region of the synaptic row.
 static inline void setup_synaptic_dma_write(
         uint32_t dma_buffer_index, bool plastic_only) {
-
     // Get pointer to current buffer
     dma_buffer *buffer = &dma_buffers[dma_buffer_index];
 
@@ -233,7 +255,9 @@ static inline void setup_synaptic_dma_write(
     }
 }
 
-// Called when a multicast packet is received
+//! \brief Called when a multicast packet is received
+//! \param[in] key: The key of the packet. The spike.
+//! \param payload: Ignored
 static void multicast_packet_received_callback(uint key, uint payload) {
     use(payload);
     log_debug("Received spike %x at %d, DMA Busy = %d", key, time, dma_busy);
@@ -256,7 +280,9 @@ static void multicast_packet_received_callback(uint key, uint payload) {
     }
 }
 
-// Called when a DMA completes
+//! \brief Called when a DMA completes
+//! \param unused: unused
+//! \param[in] tag: What sort of DMA has finished?
 static void dma_complete_callback(uint unused, uint tag) {
     use(unused);
 
@@ -324,7 +350,9 @@ static void dma_complete_callback(uint unused, uint tag) {
     }
 }
 
-// Called when a user event is received
+//! \brief Called when a user event is received
+//! \param unused0: unused
+//! \param unused1: unused
 void user_event_callback(uint unused0, uint unused1) {
     use(unused0);
     use(unused1);
@@ -362,7 +390,6 @@ bool spike_processing_initialise( // EXPORTED
     dma_busy = false;
     next_buffer_to_fill = 0;
     buffer_being_read = N_DMA_BUFFERS;
-    max_n_words = row_max_n_words;
 
     // Allocate incoming spike buffer
     if (!in_spikes_initialize_spike_buffer(incoming_spike_buffer_size)) {
@@ -379,33 +406,23 @@ bool spike_processing_initialise( // EXPORTED
     return true;
 }
 
-//! \brief returns the number of times the input buffer has overflowed
-//! \return the number of times the input buffer has overloaded
 uint32_t spike_processing_get_buffer_overflows(void) { // EXPORTED
     // Check for buffer overflow
     return in_spikes_get_n_buffer_overflows();
 }
 
-//! \brief returns the number of ghost searches occurred
-//! \return the number of times a ghost search occurred.
 uint32_t spike_processing_get_ghost_pop_table_searches(void) {
 	return population_table_get_ghost_pop_table_searches();
 }
 
-//! \brief returns the number of master pop table failed hits
-//! \return the number of times a spike did not have a master pop table entry
 uint32_t spike_processing_get_invalid_master_pop_table_hits(void) {
     return population_table_get_invalid_master_pop_hits();
 }
 
-//! \brief returns the number of DMA's that were completed
-//! \return the number of DMA's that were completed.
 uint32_t spike_processing_get_dma_complete_count(void) {
     return dma_complete_count;
 }
 
-//! \brief returns the number of spikes that were processed
-//! \return the number of spikes that were processed
 uint32_t spike_processing_get_spike_processing_count(void) {
     return spike_processing_count;
 }
@@ -417,16 +434,11 @@ circular_buffer get_circular_buffer(void) { // EXPORTED
     return buffer;
 }
 
-//! \brief returns the number of successful rewires performed
-//! \return the number of successful rewires
 uint32_t spike_processing_get_successful_rewires(void) { // EXPORTED
     return n_successful_rewires;
 }
 
-//! \brief set the number of times spike_processing has to attempt rewiring
-//! \return currently, always true
 bool spike_processing_do_rewiring(int number_of_rewires) {
-
     // disable interrupts
     uint cpsr = spin1_int_disable();
     rewires_to_do += number_of_rewires;

@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Additive dual-term weight dependence rule
 #ifndef _WEIGHT_ADDITIVE_TWO_TERM_IMPL_H_
 #define _WEIGHT_ADDITIVE_TWO_TERM_IMPL_H_
 
@@ -28,50 +30,61 @@
 //---------------------------------------
 // Structures
 //---------------------------------------
+//! The configuration of the rule
 typedef struct {
-    int32_t min_weight;
-    int32_t max_weight;
+    int32_t min_weight;     //!< Minimum weight
+    int32_t max_weight;     //!< Maximum weight
 
-    int32_t a2_plus;
-    int32_t a2_minus;
-    int32_t a3_plus;
-    int32_t a3_minus;
+    int32_t a2_plus;        //!< Scaling factor for weight delta on potentiation
+    int32_t a2_minus;       //!< Scaling factor for weight delta on depression
+    int32_t a3_plus;        //!< Scaling factor for weight delta on potentiation
+    int32_t a3_minus;       //!< Scaling factor for weight delta on depression
 } plasticity_weight_region_data_t;
 
+//! The current state data for the rule
 typedef struct weight_state_t {
-    int32_t initial_weight;
+    int32_t initial_weight; //!< The starting weight
 
-    int32_t a2_plus;
-    int32_t a2_minus;
-    int32_t a3_plus;
-    int32_t a3_minus;
+    int32_t a2_plus;        //!< Cumulative potentiation delta (term 1)
+    int32_t a2_minus;       //!< Cumulative depression delta (term 1)
+    int32_t a3_plus;        //!< Cumulative potentiation delta (term 2)
+    int32_t a3_minus;       //!< Cumulative depression delta (term 2)
 
+    //! Reference to the configuration data
     const plasticity_weight_region_data_t *weight_region;
 } weight_state_t;
 
 #include "weight_two_term.h"
 
 //---------------------------------------
-// Externals
+// STDP weight dependence functions
 //---------------------------------------
-extern plasticity_weight_region_data_t *plasticity_weight_region_data;
-
-//---------------------------------------
-// STDP weight dependance functions
-//---------------------------------------
+/*!
+ * \brief Gets the initial weight state.
+ * \param[in] weight: The weight at the start
+ * \param[in] synapse_type: The type of synapse involved
+ * \return The initial weight state.
+ */
 static inline weight_state_t weight_get_initial(
         weight_t weight, index_t synapse_type) {
+    extern plasticity_weight_region_data_t *plasticity_weight_region_data;
+
     return (weight_state_t) {
         .initial_weight = (int32_t) weight,
         .a2_plus = 0,
         .a2_minus = 0,
         .a3_plus = 0,
         .a3_minus = 0,
-        .weight_region =&plasticity_weight_region_data[synapse_type]
+        .weight_region = &plasticity_weight_region_data[synapse_type]
     };
 }
 
 //---------------------------------------
+//! \brief Apply the depression rule to the weight state
+//! \param[in] state: The weight state to update
+//! \param[in] a2_minus: The amount of depression to apply to term 1
+//! \param[in] a3_minus: The amount of depression to apply to term 2
+//! \return the updated weight state
 static inline weight_state_t weight_two_term_apply_depression(
         weight_state_t state, int32_t a2_minus, int32_t a3_minus) {
     state.a2_minus += a2_minus;
@@ -80,6 +93,11 @@ static inline weight_state_t weight_two_term_apply_depression(
 }
 
 //---------------------------------------
+//! \brief Apply the potentiation rule to the weight state
+//! \param[in] state: The weight state to update
+//! \param[in] a2_plus: The amount of potentiation to apply to term 1
+//! \param[in] a3_plus: The amount of potentiation to apply to term 2
+//! \return the updated weight state
 static inline weight_state_t weight_two_term_apply_potentiation(
         weight_state_t state, int32_t a2_plus, int32_t a3_plus) {
     state.a2_plus += a2_plus;
@@ -88,6 +106,11 @@ static inline weight_state_t weight_two_term_apply_potentiation(
 }
 
 //---------------------------------------
+/*!
+ * \brief Gets the final weight.
+ * \param[in] new_state: The updated weight state
+ * \return The new weight.
+ */
 static inline weight_t weight_get_final(weight_state_t new_state) {
     // Scale potentiation and depression
     // **NOTE** A2+, A2-, A3+ and A3- are pre-scaled into weight format

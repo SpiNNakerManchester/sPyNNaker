@@ -15,6 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \dir
+//! \brief Structural plasticity through formation and elimination of synapses
+//! \file
+//! \brief Miscellaneous structures
 #ifndef _SP_STRUCTS_H_
 #define _SP_STRUCTS_H_
 
@@ -26,8 +30,10 @@
 struct elimination_params;
 struct formation_params;
 
+//! Flag: Is connection lateral?
 #define IS_CONNECTION_LAT 1
 
+//! Entry of map from post-connection to pre-connection neural indices
 typedef struct post_to_pre_entry {
     uint8_t pop_index;
     uint8_t sub_pop_index;
@@ -78,45 +84,52 @@ typedef struct {
 
 //! struct representing the current state of rewiring
 typedef struct {
-    // Seed referenced from rewiring data
+    //! Seed referenced from rewiring data
     mars_kiss64_seed_t *local_seed;
-    // Low atom copied from rewiring data
+    //! Low atom copied from rewiring data
     uint32_t post_low_atom;
     // what are the currently selecting pre- and post-synaptic neurons
     uint32_t pre_syn_id;
     uint32_t post_syn_id;
-    // does the connection already exist
+    //! does the connection already exist
     uint32_t element_exists;
     // information extracted from the post to pre table
     post_to_pre_entry *post_to_pre_table_entry;
     pre_info_t *pre_population_info;
     key_atom_info_t *key_atom_info;
     post_to_pre_entry post_to_pre;
-    // offset in synaptic row (if exists)
+    //! offset in synaptic row (if exists)
     uint32_t offset;
-    // current delay (if exists)
+    //! current delay (if exists)
     uint16_t delay;
-    // current weight (if exists)
+    //! current weight (if exists)
     uint16_t weight;
-    // synapse type
+    //! synapse type
     uint32_t synapse_type;
 } current_state_t;
 
-// \!brief unpack the spike into key and identifying information for the neuron;
-//         Identify pop, sub-population and low and high atoms
+//! \brief unpack the spike into key and identifying information for the
+//!     neuron; Identify pop, sub-population and low and high atoms
+//! \param[in] pre_pop_info_table: The prepopulation information table
+//! \param[in] spike: The spike to look up the information from
+//! \param[out] neuron_id: The ID of the neuron within its population
+//! \param[out] population_id: The population ID
+//! \param[out] sub_population_id: The ID of the sub-population
+//! \param[out] m_pop_index: The master population table index
+//! \return True if the information was found.
 static inline bool sp_structs_find_by_spike(
-        pre_pop_info_table_t *pre_pop_info_table, spike_t spike,
-        uint32_t *neuron_id, uint32_t *population_id,
-        uint32_t *sub_population_id, uint32_t *m_pop_index) {
+        const pre_pop_info_table_t *pre_pop_info_table, spike_t spike,
+        uint32_t *restrict neuron_id, uint32_t *restrict population_id,
+        uint32_t *restrict sub_population_id, uint32_t *restrict m_pop_index) {
     // Amazing linear search inc.
     // Loop over all populations
     for (uint32_t i = 0; i < pre_pop_info_table->no_pre_pops; i++) {
-        pre_info_t *pre_pop_info = pre_pop_info_table->prepop_info[i];
+        const pre_info_t *pre_pop_info = pre_pop_info_table->prepop_info[i];
 
         // Loop over all sub-populations and check if the KEY matches
         // (with neuron ID masked out)
         for (int j = 0; j < pre_pop_info->no_pre_vertices; j++) {
-            key_atom_info_t *kai = &pre_pop_info->key_atom_info[j];
+            const key_atom_info_t *kai = &pre_pop_info->key_atom_info[j];
             if ((spike & kai->mask) == kai->key) {
                 *population_id = i;
                 *sub_population_id = j;
@@ -129,14 +142,22 @@ static inline bool sp_structs_find_by_spike(
     return false;
 }
 
-// \brief Get the sub-population id and sub-population-based neuron id given
-//        the population id and the population-based neuron id
+//! \brief Get the sub-population id and sub-population-based neuron id given
+//!        the population id and the population-based neuron id
+//! \param[in] pre_pop_info_table: The prepopulation information table
+//! \param[in] population_id: The population ID
+//! \param[in] pop_neuron_id: The ID of the neuron within the population
+//! \param[out] sub_population_id: The ID of the sub-population
+//! \param[out] sub_pop_neuron_id:
+//!     The ID of the neuron within the sub-population
+//! \param[out] spike: The spike associated with communication from that neuron
+//! \return True if the information was found.
 static inline bool sp_structs_get_sub_pop_info(
-        pre_pop_info_table_t *pre_pop_table_info, uint32_t population_id,
-        uint32_t pop_neuron_id, uint32_t *sub_population_id,
-        uint32_t *sub_pop_neuron_id, uint32_t *spike) {
-    pre_info_t *app_pop_info =
-            pre_pop_table_info->prepop_info[population_id];
+        const pre_pop_info_table_t *pre_pop_info_table, uint32_t population_id,
+        uint32_t pop_neuron_id, uint32_t *restrict sub_population_id,
+        uint32_t *restrict sub_pop_neuron_id, uint32_t *restrict spike) {
+    const pre_info_t *app_pop_info =
+            pre_pop_info_table->prepop_info[population_id];
     uint32_t neuron_id = pop_neuron_id;
     for (uint32_t i = 0; i < app_pop_info->no_pre_vertices; i++) {
         uint32_t n_atoms = app_pop_info->key_atom_info[i].n_atoms;
@@ -151,8 +172,12 @@ static inline bool sp_structs_get_sub_pop_info(
     return false;
 }
 
+//! \brief Removes a synapse from the relevant structures
+//! \param[in,out] current_state: Describes what is to be done
+//! \param[in,out] row: The row of the synaptic matrix to be updated
+//! \return True if the synapse was removed
 static inline bool sp_structs_remove_synapse(
-        current_state_t *current_state, address_t row) {
+        current_state_t *restrict current_state, address_t restrict row) {
     if (!synapse_dynamics_remove_neuron(current_state->offset, row)) {
         return false;
     }
@@ -160,8 +185,12 @@ static inline bool sp_structs_remove_synapse(
     return true;
 }
 
+//! \brief Adds a synapse to the relevant structures
+//! \param[in,out] current_state: Describes what is to be done
+//! \param[in,out] row: The row of the synaptic matrix to be updated
+//! \return True if the synapse was added
 static inline bool sp_structs_add_synapse(
-        current_state_t *current_state, address_t row) {
+        current_state_t *restrict current_state, address_t restrict row) {
     uint32_t appr_scaled_weight = current_state->pre_population_info->weight;
 
     uint32_t actual_delay;
@@ -180,6 +209,17 @@ static inline bool sp_structs_add_synapse(
     return true;
 }
 
+//! \brief Common code for structural plasticity initialisation.
+//! \param[in] sdram_sp_address: Address of the configuration region.
+//! \param[in,out] rewiring_data:
+//!     Address of the rewiring information structure to fill out.
+//! \param[in,out] pre_info:
+//!     The pre-population information structure to fill out.
+//! \param[out] post_to_pre_table: Variable to receive the address of the
+//!     post-population-to-pre-population mapping table that this function
+//!     discovers in the configuration region.
+//! \return pointer to the next piece of memory after the common section of the
+//!     configuration region.
 static inline uint8_t *sp_structs_read_in_common(
         address_t sdram_sp_address, rewiring_data_t *rewiring_data,
         pre_pop_info_table_t *pre_info,
