@@ -15,34 +15,56 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Master population table implementation that uses binary search
 #include "population_table.h"
 #include <neuron/synapse_row.h>
 #include <debug.h>
+#include <stdbool.h>
 #include <bit_field.h>
 
 //! bits in a word
 #define BITS_PER_WORD 32
 
-//! the highest bit within the word
+//! \brief The highest bit within the word
 #define TOP_BIT_IN_WORD 31
 
-//! the flag for when a spike isnt in the master pop table (so shouldnt happen)
+//! \brief The flag for when a spike isn't in the master pop table (so
+//!     shouldn't happen)
 #define NOT_IN_MASTER_POP_TABLE_FLAG -1
 
-
+//! \brief An entry in the master population table.
 typedef struct master_population_table_entry {
+    //! The key to match against the incoming message
     uint32_t key;
+    //! The mask to select the relevant bits of \p key for matching
     uint32_t mask;
+    //! The index into ::address_list for this entry
     uint16_t start;
+    //! The number of entries in ::address_list for this entry
     uint16_t count;
 } master_population_table_entry;
 
-typedef uint32_t address_and_row_length;
+//! \brief A packed address and row length
+typedef struct {
+    uint32_t row_length : 8; //!< the length of the row
+    uint32_t address : 23;   //!< the address
+    uint32_t is_single : 1;  //!< whether this is a direct/single address
+} address_and_row_length;
 
+//! The master population table. This is sorted.
 static master_population_table_entry *master_population_table;
+
+//! The length of ::master_population_table
 static uint32_t master_population_table_length;
+
+//! The array of information that points into the synaptic matrix
 static address_and_row_length *address_list;
+
+//! Base address for the synaptic matrix's indirect rows
 static address_t synaptic_rows_base_address;
+
+//! Base address for the synaptic matrix's direct rows
 static uint32_t direct_rows_base_address;
 
 //! \brief the number of times a DMA resulted in 0 entries
@@ -54,49 +76,70 @@ static uint32_t invalid_master_pop_hits = 0;
 //! \brief The last spike received
 static spike_t last_spike = 0;
 
-//! \brief the last neuron id for the key
+//! \brief The last neuron id for the key
 static uint32_t last_neuron_id = 0;
 
-//! the index for the next time
+//! the index for the next item in the ::address_list
 static uint16_t next_item = 0;
 
-//! \brief how many items are left to go
+//! The number of relevant items remaining in the ::address_list
 static uint16_t items_to_go = 0;
 
-//! \brief how many packets were dropped because the bitfield filter says
-//!        they don't hit anything
+//! \brief The number of packets dropped because the bitfield filter says
+//!     they don't hit anything
 static uint32_t bit_field_filtered_packets = 0;
 
-//! \brief pointer for the bitfield map
-bit_field_t* connectivity_bit_field;
+//! The bitfield map
+bit_field_t *connectivity_bit_field;
 
+//! \name Support functions
+//! \{
+
+//! \brief Get the direct address out of an entry
+//! \param[in] entry: the table entry
+//! \return a direct row address
 static inline uint32_t get_direct_address(address_and_row_length entry) {
     // Direct row address is just the direct address bit
-    return (entry & 0x7FFFFF00) >> 8;
+    return entry.address;
 }
 
+//! \brief Get the standard address out of an entry
+//!
+//! The address is in units of four words, so this multiplies by 16 (= up
+//! shifts by 4)
+//! \param[in] entry: the table entry
+//! \return a row address
 static inline uint32_t get_address(address_and_row_length entry) {
-    // The address is in words and is the top 23-bits but 1, so this down
-    // shifts by 8 and then multiplies by 16 (= up shifts by 4) = down shift
-    // by 4 with the given mask 0x7FFFFF00 to fully remove the row length
-    // NOTE: The mask can be removed given the machine spec says it
-    // hard-codes the bottom 2 bits to zero anyhow. BUT BAD CODE PRACTICE
-    return (entry & 0x7FFFFF00) >> 4;
+    return entry.address << 4;
 }
 
+//! \brief Get the length of the row from the entry
+//! \param[in] entry: the table entry
+//! \return the row length
 static inline uint32_t get_row_length(address_and_row_length entry) {
-    return entry & 0xFF;
+    return entry.row_length;
 }
 
-static inline uint32_t is_single(address_and_row_length entry) {
-    return entry & 0x80000000;
+//! \brief Get whether this is a single-valued row (i.e. if it uses direct
+//!     addressing) from the entry
+//! \param[in] entry: the table entry
+//! \return true if this is a single-valued row
+static inline bool is_single(address_and_row_length entry) {
+    return entry.is_single;
 }
 
+//! \brief Get the neuron ID for a spike given its table entry
+//! \param[in] entry: the table entry
+//! \param[in] spike: the spike
+//! \return the neuron ID
 static inline uint32_t get_neuron_id(
         master_population_table_entry entry, spike_t spike) {
     return spike & ~entry.mask;
 }
 
+//! \brief Prints the master pop table.
+//!
+//! For debugging
 static inline void print_master_population_table(void) {
     log_info("master_population\n");
     for (uint32_t i = 0; i < master_population_table_length; i++) {
@@ -122,6 +165,10 @@ static inline void print_master_population_table(void) {
     }
     log_info("Population table has %u entries", master_population_table_length);
 }
+//! \}
+
+//! \name API functions
+//! \{
 
 bool population_table_initialise(
         address_t table_address, address_t synapse_rows_address,
@@ -253,9 +300,6 @@ bool population_table_get_first_address(
     return get_next;
 }
 
-//! \brief get the position in the master pop table
-//! \param[in] spike: The spike received
-//! \return the position in the master pop table
 int population_table_position_in_the_master_pop_array(spike_t spike) {
     uint32_t imin = 0;
     uint32_t imax = master_population_table_length;
@@ -325,27 +369,19 @@ bool population_table_get_next_address(
     return is_valid;
 }
 
-//! \brief generates how many dma's were pointless
-//! \return uint of how many were done
 uint32_t population_table_get_ghost_pop_table_searches(void) {
     return ghost_pop_table_searches;
 }
 
-//! \brief get the number of master pop table key misses
-//! \return the number of master pop table key misses
 uint32_t population_table_get_invalid_master_pop_hits(void) {
     return invalid_master_pop_hits;
 }
 
-//! \brief sets the connectivity lookup element
-//! \param[in] connectivity_lookup: the connectivity lookup
 void population_table_set_connectivity_bit_field(
         bit_field_t* connectivity_bit_fields){
     connectivity_bit_field = connectivity_bit_fields;
 }
 
-//! \brief clears the dtcm allocated by the population table.
-//! \return bool that says if the clearing was successful or not.
 bool population_table_shut_down(void) {
     sark_free(address_list);
     sark_free(master_population_table);
@@ -359,28 +395,19 @@ bool population_table_shut_down(void) {
     return true;
 }
 
-//! \brief length of master pop table
-//! \return length of the master pop table
 uint32_t population_table_length(void) {
     return master_population_table_length;
 }
 
-//! \brief gets the spike associated at a specific index
-//! \param[in] index: the index in the master pop table
-//! \return the spike
 spike_t population_table_get_spike_for_index(uint32_t index) {
     return master_population_table[index].key;
 }
 
-//! \brief get the mask for the entry at a specific index
-//! \param[in] index: the index in the master pop table
-//! \return the mask associated with this entry
 uint32_t population_table_get_mask_for_entry(uint32_t index) {
     return master_population_table[index].mask;
 }
 
-//! \brief get the number of packets that were filtered from the bitfield filter
-//! \return the number of packets filtered by the bitfield filter
 uint32_t population_table_get_filtered_packet_count(void) {
     return bit_field_filtered_packets;
 }
+//! \}

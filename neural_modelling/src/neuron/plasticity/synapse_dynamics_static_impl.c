@@ -15,24 +15,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*! \file
+/*!
+ * \file
+ * \brief This file contains the main interface for structural plasticity
+ * and some shared code. For the main implementation, see topographic_map_impl.c
  *
- * SUMMARY
- *  \brief This file contains the main interface for structural plasticity
- * but no actual code. For that, look at topographic_map_impl.c
- *
- *
- * Author: Petrut Bogdan
- *
+ * \author Petrut Bogdan
  */
 #include "synapse_dynamics.h"
 #include <debug.h>
 #include <utils.h>
 
+//! ::synapse_index_bits + ::synapse_type_bits
 static uint32_t synapse_type_index_bits;
+//! Number of bits to hold the neuron index
 static uint32_t synapse_index_bits;
+//! Mask to extract the neuron index (has ::synapse_index_bits bits set)
 static uint32_t synapse_index_mask;
+//! Number of bits to hold the synapse type
 static uint32_t synapse_type_bits;
+//! Mask to extract the synapse type (has ::synapse_type_bits bits set)
 static uint32_t synapse_type_mask;
 
 bool synapse_dynamics_initialise(
@@ -89,7 +91,7 @@ input_t synapse_dynamics_get_intrinsic_bias(
         uint32_t time, index_t neuron_index) {
     use(time);
     use(neuron_index);
-    return REAL_CONST(0.0);
+    return ZERO;
 }
 
 void synapse_dynamics_print_plastic_synapses(

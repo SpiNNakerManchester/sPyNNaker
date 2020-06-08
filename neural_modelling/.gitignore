@@ -19,3 +19,5 @@
 /.settings/
 *modified_src/
 *builds/
+/html/
+/latex/
