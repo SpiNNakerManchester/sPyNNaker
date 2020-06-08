@@ -16,7 +16,7 @@
 from six import with_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-from .struct import Struct
+from spynnaker.pyNN.utilities.struct import Struct
 from .ranged_dict_vertex_slice import RangedDictVertexSlice
 
 
@@ -86,7 +86,7 @@ class AbstractStandardNeuronComponent(with_metaclass(AbstractBase, object)):
         """
 
     @abstractmethod
-    def get_values(self, parameters, state_variables, vertex_slice):
+    def get_values(self, parameters, state_variables, vertex_slice, ts):
         """ Get the values to be written to the machine for this model
 
         :param ~spinn_utilities.ranged.RangeDictionary parameters:
@@ -95,12 +95,14 @@ class AbstractStandardNeuronComponent(with_metaclass(AbstractBase, object)):
             The holder of the state variables
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of variables being retrieved
+        :param float ts:
+            The time to be advanced in one call to the update of this component
         :return: A list with the same length as self.struct.field_types
         :rtype: list(int or float or list(int) or list(float) or
             ~spinn_utilities.ranged.RangedList)
         """
 
-    def get_data(self, parameters, state_variables, vertex_slice):
+    def get_data(self, parameters, state_variables, vertex_slice, ts):
         """ Get the data *to be written to the machine* for this model.
 
         :param ~spinn_utilities.ranged.RangeDictionary parameters:
@@ -111,7 +113,7 @@ class AbstractStandardNeuronComponent(with_metaclass(AbstractBase, object)):
             The slice of the vertex to generate parameters for
         :rtype: ~numpy.ndarray(~numpy.uint32)
         """
-        values = self.get_values(parameters, state_variables, vertex_slice)
+        values = self.get_values(parameters, state_variables, vertex_slice, ts)
         return self.struct.get_data(
             values, vertex_slice.lo_atom, vertex_slice.n_atoms)
 

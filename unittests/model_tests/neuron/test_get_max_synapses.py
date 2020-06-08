@@ -13,15 +13,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
-from spinn_front_end_common.utility_models import LivePacketGather
+import pytest
+from spynnaker.pyNN.models.neuron.synapse_dynamics import SynapseDynamicsSTDP
+from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
+    TimingDependenceSpikePair)
+from spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence import (
+    WeightDependenceAdditive)
+from unittests.mocks import MockSimulator
 
 
-class TestLiveSpikeRecorder(unittest.TestCase):
-
-    def test_new_live_spike_recorder(self):
-        LivePacketGather(1000, 1, 1, 1, "")
-
-
-if __name__ == '__main__':
-    unittest.main()
+@pytest.mark.timeout(1)
+def test_get_max_synapses():
+    MockSimulator.setup()
+    d = SynapseDynamicsSTDP(timing_dependence=TimingDependenceSpikePair(),
+                            weight_dependence=WeightDependenceAdditive(),
+                            pad_to_length=258)
+    assert d.get_max_synapses(256) <= 256

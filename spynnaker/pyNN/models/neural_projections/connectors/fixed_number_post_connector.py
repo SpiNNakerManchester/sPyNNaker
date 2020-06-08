@@ -22,13 +22,18 @@ from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
+from .abstract_connector_supports_views_on_machine import (
+    AbstractConnectorSupportsViewsOnMachine)
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.exceptions import SpynnakerException
+
+N_GEN_PARAMS = 8
 
 logger = logging.getLogger(__file__)
 
 
-class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine):
+class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
+                               AbstractConnectorSupportsViewsOnMachine):
     """ Connects a fixed number of post-synaptic neurons selected at random,\
         to all pre-synaptic neurons.
     """
@@ -162,13 +167,12 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine):
             self, post_vertex_slice, synapse_info, min_delay=None,
             max_delay=None):
         # pylint: disable=too-many-arguments
-        prob_in_slice = (
+        prob_in_slice = min(
             post_vertex_slice.n_atoms / float(
-                synapse_info.n_post_neurons))
+                synapse_info.n_post_neurons), 1.0)
         n_connections = utility_calls.get_probable_maximum_selected(
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
-            self.__n_post * synapse_info.n_pre_neurons, prob_in_slice,
-            chance=1.0/100000.0)
+            self.__n_post, prob_in_slice, chance=1.0/100000.0)
 
         if min_delay is None or max_delay is None:
             return int(math.ceil(n_connections))
@@ -184,7 +188,7 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine):
         selection_prob = 1.0 / float(synapse_info.n_post_neurons)
         n_connections = utility_calls.get_probable_maximum_selected(
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
-            self.__n_post * synapse_info.n_pre_neurons, selection_prob,
+            synapse_info.n_pre_neurons, selection_prob,
             chance=1.0/100000.0)
         return int(math.ceil(n_connections))
 
@@ -258,6 +262,8 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine):
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type, synapse_info):
+        params = self._basic_connector_params(synapse_info)
+
         # The same seed needs to be sent to each of the slices
         key = (id(pre_vertex_slice), id(post_slices))
         if key not in self.__post_connector_seed:
@@ -269,11 +275,11 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine):
         if ((not self.__allow_self_connections) and (
                 synapse_info.pre_population is synapse_info.post_population)):
             self_connections = False
-        params = [
+        params.extend([
             self_connections,
             self.__with_replacement,
             self.__n_post,
-            synapse_info.n_post_neurons]
+            synapse_info.n_post_neurons])
         params.extend(self.__post_connector_seed[key])
         return numpy.array(params, dtype="uint32")
 
@@ -281,4 +287,4 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine):
     @overrides(AbstractGenerateConnectorOnMachine.
                gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
-        return (4 + 4) * BYTES_PER_WORD
+        return self._view_params_bytes + (N_GEN_PARAMS * BYTES_PER_WORD)
