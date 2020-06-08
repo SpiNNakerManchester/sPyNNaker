@@ -205,7 +205,12 @@ static inline bool sp_structs_add_synapse(
         return false;
     }
 
-    *(current_state->post_to_pre_table_entry) = current_state->post_to_pre;
+    // Critical: tell the compiler that this pointer is aligned so it doesn't
+    // internally convert the assignment to a memcpy(), which is a saving of
+    // hundreds of bytes...
+    post_to_pre_entry *ppentry = __builtin_assume_aligned(
+            current_state->post_to_pre_table_entry, 4);
+    *ppentry = current_state->post_to_pre;
     return true;
 }
 
