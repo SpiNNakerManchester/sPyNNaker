@@ -16,8 +16,8 @@
  */
 
 /**
- *! \file
- *! \brief Generate data for delay extensions
+ * \file
+ * \brief Generate data for delay extensions
  */
 #include "connection_generator.h"
 #include "param_generator.h"
@@ -30,6 +30,7 @@
 #include <delay_extension/delay_extension.h>
 #include <bit_field.h>
 
+//! The configuration of the delay builder
 struct delay_builder_config {
     // the parameters
     uint32_t max_row_n_synapses;
@@ -44,18 +45,18 @@ struct delay_builder_config {
 };
 
 /**
- *! \brief Generate the data for a single connector
- *! \param[in/out] in_region The address to read the parameters from.  Should be
- *!                          updated to the position just after the parameters
- *!                          after calling.
- *! \param[in/out] neuron_delay_stage_config Bit fields into which to write the
- *!                                          delay information
- *! \param[in] post_slice_start The start of the slice of the delay extension to
- *!                             generate for
- *! \param[in] post_slice_count The number of neurons of the delay extension to
- *!                             generate for
- *! \return True if the region was correctly generated, False if there was an
- *!         error
+ * \brief Generate the data for a single connector
+ * \param[in,out] in_region: The address to read the parameters from.  Should be
+ *                           updated to the position just after the parameters
+ *                           after calling.
+ * \param[in,out] neuron_delay_stage_config: Bit fields into which to write the
+ *                                           delay information
+ * \param[in] post_slice_start: The start of the slice of the delay extension to
+ *                              generate for
+ * \param[in] post_slice_count: The number of neurons of the delay extension to
+ *                              generate for
+ * \return True if the region was correctly generated, False if there was an
+ *         error
  */
 static bool read_delay_builder_region(address_t *in_region,
         bit_field_t *neuron_delay_stage_config, uint32_t post_slice_start,
@@ -131,12 +132,12 @@ static bool read_delay_builder_region(address_t *in_region,
 }
 
 /**
- *! \brief Read the data for the generator
- *! \param[in] delay_params_address The address of the delay extension
- *!                                 parameters
- *! \param[in] params_address The address of the expander parameters
- *! \return True if the expander finished correctly, False if there was an
- *!         error
+ * \brief Read the data for the generator
+ * \param[in] delay_params_address: The address of the delay extension
+ *                                  parameters
+ * \param[in] params_address: The address of the expander parameters
+ * \return True if the expander finished correctly, False if there was an
+ *         error
  */
 static bool run_delay_expander(
         void *delay_params_address, address_t params_address) {
@@ -175,6 +176,7 @@ static bool run_delay_expander(
     return true;
 }
 
+//! Entry point
 void c_main(void) {
     sark_cpu_state(CPU_STATE_RUN);
 
@@ -197,5 +199,5 @@ void c_main(void) {
         rt_error(RTE_ABORT);
     }
 
-    log_info("Finished On Machine Delays!");
+    log_info("Finished On-Machine Delays!");
 }

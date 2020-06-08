@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/SpiNNakerManchester/sPyNNaker.svg?branch=master)](https://travis-ci.org/SpiNNakerManchester/sPyNNaker)
+[![Build Status](https://travis-ci.com/SpiNNakerManchester/sPyNNaker.svg?branch=master)](https://travis-ci.com/SpiNNakerManchester/sPyNNaker)
 [![Documentation Status](https://readthedocs.org/projects/spynnaker/badge/?version=master)](https://spynnaker.readthedocs.io/en/master/?badge=master)
 [![Coverage Status](https://coveralls.io/repos/github/SpiNNakerManchester/sPyNNaker/badge.svg?branch=master)](https://coveralls.io/github/SpiNNakerManchester/sPyNNaker?branch=master)
 
@@ -24,6 +24,10 @@ depend upon for a complete editable install.
 
 Documentation
 -------------
-[sPyNNaker python documentation](http://spynnaker.readthedocs.io)
+[sPyNNaker Python documentation](http://spinnakermanchester.github.io/sPyNNaker/python/)
+<br>
+[sPyNNaker C documentation](http://spinnakermanchester.github.io/sPyNNaker/c/)
+
 [Combined PyNN7 python documentation](http://spinnaker7manchester.readthedocs.io)
+<br>
 [Combined PyNN8 python documentation](http://spinnaker8manchester.readthedocs.io)

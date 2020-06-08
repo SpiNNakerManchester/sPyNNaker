@@ -15,12 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*! \file
- *
- * SUMMARY
- *  \brief This file contains the static impl of synaptogenesis.
- *  No functionality is gained with this class
- *
+/*!
+ * \file
+ * \brief This file contains the static (non-)implementation of synaptogenesis.
+ * \details No functionality is gained with this class.
  */
 #include "synaptogenesis_dynamics.h"
 #include <debug.h>

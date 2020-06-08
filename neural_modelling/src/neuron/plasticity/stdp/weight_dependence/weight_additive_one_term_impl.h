@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Additive single-term weight dependence rule
 #ifndef _WEIGHT_ADDITIVE_ONE_TERM_IMPL_H_
 #define _WEIGHT_ADDITIVE_ONE_TERM_IMPL_H_
 
@@ -28,35 +30,41 @@
 //---------------------------------------
 // Structures
 //---------------------------------------
+//! The configuration of the rule
 typedef struct {
-    int32_t min_weight;
-    int32_t max_weight;
+    int32_t min_weight;     //!< Minimum weight
+    int32_t max_weight;     //!< Maximum weight
 
-    int32_t a2_plus;
-    int32_t a2_minus;
+    int32_t a2_plus;        //!< Scaling factor for weight delta on potentiation
+    int32_t a2_minus;       //!< Scaling factor for weight delta on depression
 } plasticity_weight_region_data_t;
 
+//! The current state data for the rule
 typedef struct {
-    int32_t initial_weight;
+    int32_t initial_weight; //!< The starting weight
 
-    int32_t a2_plus;
-    int32_t a2_minus;
+    int32_t a2_plus;        //!< Cumulative potentiation delta
+    int32_t a2_minus;       //!< Cumulative depression delta
 
+    //! Reference to the configuration data
     const plasticity_weight_region_data_t *weight_region;
 } weight_state_t;
 
 #include "weight_one_term.h"
 
 //---------------------------------------
-// Externals
+// STDP weight dependence functions
 //---------------------------------------
-extern plasticity_weight_region_data_t *plasticity_weight_region_data;
-
-//---------------------------------------
-// STDP weight dependance functions
-//---------------------------------------
+/*!
+ * \brief Gets the initial weight state.
+ * \param[in] weight: The weight at the start
+ * \param[in] synapse_type: The type of synapse involved
+ * \return The initial weight state.
+ */
 static inline weight_state_t weight_get_initial(
         weight_t weight, index_t synapse_type) {
+    extern plasticity_weight_region_data_t *plasticity_weight_region_data;
+
     return (weight_state_t) {
         .initial_weight = (int32_t) weight,
         .a2_plus = 0,
@@ -66,6 +74,10 @@ static inline weight_state_t weight_get_initial(
 }
 
 //---------------------------------------
+//! \brief Apply the depression rule to the weight state
+//! \param[in] state: The weight state to update
+//! \param[in] a2_minus: The amount of depression to apply
+//! \return the updated weight state
 static inline weight_state_t weight_one_term_apply_depression(
         weight_state_t state, int32_t a2_minus) {
     state.a2_minus += a2_minus;
@@ -73,6 +85,10 @@ static inline weight_state_t weight_one_term_apply_depression(
 }
 
 //---------------------------------------
+//! \brief Apply the potentiation rule to the weight state
+//! \param[in] state: The weight state to update
+//! \param[in] a2_plus: The amount of potentiation to apply
+//! \return the updated weight state
 static inline weight_state_t weight_one_term_apply_potentiation(
         weight_state_t state, int32_t a2_plus) {
     state.a2_plus += a2_plus;
@@ -80,6 +96,11 @@ static inline weight_state_t weight_one_term_apply_potentiation(
 }
 
 //---------------------------------------
+/*!
+ * \brief Gets the final weight.
+ * \param[in] new_state: The updated weight state
+ * \return The new weight.
+ */
 static inline weight_t weight_get_final(weight_state_t new_state) {
     // Scale potentiation and depression
     // **NOTE** A2+ and A2- are pre-scaled into weight format
