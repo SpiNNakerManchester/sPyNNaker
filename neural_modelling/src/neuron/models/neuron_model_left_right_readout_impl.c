@@ -5,6 +5,7 @@
 extern uint32_t time;
 extern REAL learning_signal;
 REAL local_eta;
+REAL v_mem_error;
 
 // simple Leaky I&F ODE
 static inline void _lif_neuron_closed_form(
@@ -78,6 +79,18 @@ state_t neuron_model_state_update(
 //    if(learning_signal){
 //        io_printf(IO_BUF, "learning signal = %k\n", learning_signal);
 //    }
+//    if (neuron->V_membrane > 10.k){
+//        v_mem_error = neuron->V_membrane - 10.k;
+////        io_printf(IO_BUF, "> %k = %k - %k\n", v_mem_error, neuron->V_membrane, neuron->B);
+//    }
+//    else if (neuron->V_membrane < -10.k){
+//        v_mem_error = neuron->V_membrane + 10.k;
+////        io_printf(IO_BUF, "< %k = %k - %k\n", v_mem_error, -neuron->V_membrane, neuron->B);
+//    }
+//    else{
+//        v_mem_error = 0.k;
+//    }
+//    learning_signal += v_mem_error * 0.1;
 
     neuron->L = learning_signal * neuron->w_fb; //* ((accum)syn_ind * -1.k);
 //    REAL tau_decay = expk(-1.k / 1500.k);

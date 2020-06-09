@@ -335,6 +335,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 //    }
 //    io_printf(IO_BUF, "state = %u - %u\n", current_state, time);
     if (cue_number == 0 && completed_broadcast){ // reset start of new test
+        io_printf(IO_BUF, "time entering reset %u\n", time);
 //        io_printf(IO_BUF, "Resetting\n");
         completed_broadcast = false;
         current_time = time;
@@ -355,6 +356,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 //    io_printf(IO_BUF, "current_state = %u, cue_number = %u, direction = %u, time = %u\n", current_state, cue_number, current_cue_direction, time);
     // In this state the environment is giving the left/right cues to the agent
     if (current_state == STATE_CUE){
+//        io_printf(IO_BUF, "time entering cue %u\n", time);
         if (neuron_index == 0){
             // if it's current in the waiting time between cues do nothing
 //            if ((time - current_time) % (wait_between_cues + duration_of_cue) < wait_between_cues){
@@ -382,24 +384,25 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
                         spin1_send_mc_packet(global_parameters->p_key | j, bitsk(payload), WITH_PAYLOAD);
                     }
                 }
-                // turn off and reset if finished
-                else if ((time - current_time) % (wait_between_cues + duration_of_cue) == (wait_between_cues + duration_of_cue) - 1){
-                    cue_number += 1;
-                    REAL payload;
-                    payload = global_parameters->rate_off;
+            }
+            // turn off and reset if finished
+            else if ((time - current_time) % (wait_between_cues + duration_of_cue) == 0 && (time - current_time) > 0){//(wait_between_cues + duration_of_cue) - 1){
+                cue_number += 1;
+                REAL payload;
+                payload = global_parameters->rate_off;
 //                    io_printf(IO_BUF, "poisson setting 2, direction = %u\n", current_cue_direction);
-                    for (int j = current_cue_direction*global_parameters->p_pop_size;
-                            j < current_cue_direction*global_parameters->p_pop_size + global_parameters->p_pop_size; j++){
-                        spin1_send_mc_packet(global_parameters->p_key | j, bitsk(payload), WITH_PAYLOAD);
-                    }
-                    if (cue_number >= total_cues){
-                        current_state = (current_state + 1) % 3;
-                    }
+                for (int j = current_cue_direction*global_parameters->p_pop_size;
+                        j < current_cue_direction*global_parameters->p_pop_size + global_parameters->p_pop_size; j++){
+                    spin1_send_mc_packet(global_parameters->p_key | j, bitsk(payload), WITH_PAYLOAD);
+                }
+                if (cue_number >= total_cues){
+                    current_state = (current_state + 1) % 3;
                 }
             }
         }
     }
     else if (current_state == STATE_WAITING){
+//        io_printf(IO_BUF, "time entering wait %u\n", time);
         // waiting for prompt, all things ok
         if (cue_number >= total_cues){
             current_time = time;
@@ -411,7 +414,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
         }
     }
     else if (current_state == STATE_PROMPT){
-//        io_printf(IO_BUF, "ticks_for_mean = %u, n_idx = %u\n", ticks_for_mean, neuron_index);
+//        io_printf(IO_BUF, "time entering prompt %u\n", time);
         if (start_prompt && neuron_index == 1){
             current_time = time;
             // send packets to the variable poissons with the updated states
@@ -488,6 +491,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 //            io_printf(IO_BUF, "broadcasting error\n");
         }
         if ((time - current_time) >= prompt_duration && neuron_index == 0){
+//            io_printf(IO_BUF, "time entering end of test %u\n", time);
 //            io_printf(IO_BUF, "poisson setting 4, turning off prompt\n");
             current_state = 0;
             completed_broadcast = true;
@@ -522,13 +526,13 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     else if (neuron_index == 1){
 //        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[55].z_bar;
 //        recorded_variable_values[V_RECORDING_INDEX] = neuron->syn_state[55].z_bar;
-        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[55].delta_w;
+        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[40].delta_w;
 //        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = softmax_0;
     }
     else{
 //        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[1].z_bar;
 //        recorded_variable_values[V_RECORDING_INDEX] = neuron->syn_state[1].z_bar;
-        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[neuron_index].delta_w;
+        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[0].delta_w;
 //        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = softmax_0;
     }
 

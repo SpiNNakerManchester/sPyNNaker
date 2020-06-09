@@ -20,6 +20,7 @@
 #include <debug.h>
 
 bool printed_value = false;
+REAL v_mem_error;
 REAL new_learning_signal;
 extern REAL learning_signal;
 REAL local_eta;
@@ -119,6 +120,19 @@ state_t neuron_model_state_update(
 //                (accum)(time%1300) * 0.001k, (accum)(time%1300) * 0.001k * (accum)syn_dynamics_neurons_in_partition,
 //                accum_time);
 
+    if (neuron->V_membrane > neuron->B){
+        v_mem_error = neuron->V_membrane - neuron->B;
+//        io_printf(IO_BUF, "> %k = %k - %k\n", v_mem_error, neuron->V_membrane, neuron->B);
+    }
+    else if (neuron->V_membrane < -neuron->B){
+        v_mem_error = neuron->V_membrane + neuron->B;
+//        io_printf(IO_BUF, "< %k = %k - %k\n", v_mem_error, -neuron->V_membrane, neuron->B);
+    }
+    else{
+        v_mem_error = 0.k;
+    }
+    learning_signal += v_mem_error;
+
 //	REAL reg_error = (global_parameters->core_target_rate - global_parameters->core_pop_rate) / syn_dynamics_neurons_in_partition;
     REAL reg_learning_signal = (global_parameters->core_pop_rate // make it work for different ts
 //                                    / ((accum)(time%1300)
@@ -128,7 +142,9 @@ state_t neuron_model_state_update(
                                     - global_parameters->core_target_rate;
 //    io_printf(IO_BUF, "rls: %k\n", reg_learning_signal);
     if (time % window_size == window_size - 1 & !printed_value){ //hardcoded time of reset
-        io_printf(IO_BUF, "1 %u, rate err:%k, spikes:%k, target:%k\n", time, reg_learning_signal, global_parameters->core_pop_rate, global_parameters->core_target_rate);
+        io_printf(IO_BUF, "1 %u, rate err:%k, spikes:%k, target:%k\tL:%k, v_mem:%k\n",
+        time, reg_learning_signal, global_parameters->core_pop_rate, global_parameters->core_target_rate,
+        learning_signal-v_mem_error, v_mem_error);
 //        global_parameters->core_pop_rate = 0.k;
 //        REAL reg_learning_signal = ((global_parameters->core_pop_rate / 1.225k)//(accum)(time%1300))
 //                                / (accum)syn_dynamics_neurons_in_partition) - global_parameters->core_target_rate;
@@ -136,25 +152,37 @@ state_t neuron_model_state_update(
         printed_value = true;
     }
     if (time % window_size == 0){
-        new_learning_signal = 0.k;
+//        new_learning_signal = 0.k;
         global_parameters->core_pop_rate = 0.k;
         printed_value = false;
     }
 //    neuron->L = learning_signal * neuron->w_fb;
+    learning_signal *= neuron->w_fb;
 //    if (learning_signal != 0.k && new_learning_signal != learning_signal){
-    if (new_learning_signal != learning_signal && (reg_learning_signal > 0.5k || reg_learning_signal < -0.5k)){// && time%1300 > 1100){
+//    if (new_learning_signal != learning_signal){// && time%1300 > 1100){
 //        io_printf(IO_BUF, "L:%k, rL:%k, cL:%k, nL:%k\n", learning_signal, reg_learning_signal, learning_signal + reg_learning_signal, new_learning_signal);
-        learning_signal += reg_learning_signal * 0.1k;
-        new_learning_signal = learning_signal;
-    }
+//    if (reg_learning_signal > 0.5k || reg_learning_signal < -0.5k){
+    new_learning_signal = learning_signal + (reg_learning_signal * 0.1k);
+//    }
+//        new_learning_signal = learning_signal;
+//    }
 //    neuron->L = learning_signal;
     if (time % window_size > 1300){
         neuron->L = new_learning_signal;
     }
     else{
-        neuron->L = learning_signal;//0.k;
+        neuron->L = learning_signal;
     }
 
+//    if (time % 99 == 0){
+//        io_printf(IO_BUF, "during B = %k, b = %k, time = %u\n", neuron->B, neuron->b, time);
+//    }
+    if (time % 1300 == 0){
+//        io_printf(IO_BUF, "before B = %k, b = %k\n", neuron->B, neuron->b);
+        neuron->B = 10.k;
+        neuron->b = 0.k;
+//        io_printf(IO_BUF, "reset B = %k, b = %k\n", neuron->B, neuron->b);
+    }
     // All operations now need doing once per eprop synapse
     for (uint32_t syn_ind=0; syn_ind < total_input_synapses_per_neuron; syn_ind++){
         if (time % 1300 == 0){
@@ -196,8 +224,8 @@ state_t neuron_model_state_update(
 		// Update cached total weight change
 		// ******************************************************************
     	REAL this_dt_weight_change =
-    			-local_eta * neuron->L * neuron->syn_state[syn_ind].e_bar;
-    	neuron->syn_state[syn_ind].delta_w += this_dt_weight_change;
+    			local_eta * neuron->L * neuron->syn_state[syn_ind].e_bar;
+    	neuron->syn_state[syn_ind].delta_w -= this_dt_weight_change; // -= here to enable compiler to handle previous line (can crash when -ve is at beginning of previous line)
 
 //    	if (!syn_ind || neuron->syn_state[syn_ind].z_bar){// || neuron->syn_state[syn_ind].z_bar_inp){
 //            io_printf(IO_BUF, "total synapses = %u \t syn_ind = %u \t "
@@ -234,6 +262,12 @@ state_t neuron_model_state_update(
 
     // All operations now need doing once per recurrent eprop synapse
     for (uint32_t syn_ind=recurrent_offset; syn_ind < total_recurrent_synapses_per_neuron+recurrent_offset; syn_ind++){
+        if (time % 1300 == 0){
+            neuron->syn_state[syn_ind].z_bar_inp = 0.k;
+            neuron->syn_state[syn_ind].z_bar = 0.k;
+            neuron->syn_state[syn_ind].el_a = 0.k;
+            neuron->syn_state[syn_ind].e_bar = 0.k;
+        }
 		// ******************************************************************
 		// Low-pass filter incoming spike train
 		// ******************************************************************
