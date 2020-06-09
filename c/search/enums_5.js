@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['profiler_5ftags_5fe',['profiler_tags_e',['../neuron_2profile__tags_8h.html#a0d952ae768d975f73145cdb93a775973',1,'profile_tags.h']]]
+  ['neuron_5fregions_5fe_2193',['neuron_regions_e',['../regions_8h.html#ae999d786209aa275138bef0bf9012295',1,'regions.h']]]
 ];
