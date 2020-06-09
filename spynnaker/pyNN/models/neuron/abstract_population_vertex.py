@@ -65,8 +65,11 @@ _C_MAIN_BASE_DTCM_USAGE_IN_BYTES = 3 * BYTES_PER_WORD
 _C_MAIN_BASE_SDRAM_USAGE_IN_BYTES = 18 * BYTES_PER_WORD
 _C_MAIN_BASE_N_CPU_CYCLES = 0
 
-# The microseconds per timestep will be divided by this to get the max offset
+# The percentage of the time step where spikes can occur
 _MAX_OFFSET_DENOMINATOR = 0.5
+
+# default number of cores to fire at same time from this population
+_DEFAULT_N_CORES_AT_SAME_TIME = 7
 
 
 class AbstractPopulationVertex(
@@ -110,9 +113,10 @@ class AbstractPopulationVertex(
     RUNTIME_SDP_PORT_SIZE = BYTES_PER_WORD
 
     # 7 elements before the start of global parameters
-    # 1. core_index, 2. cycle mask 3. micro secs before spike, 4. has key,
-    # 5. key, 6. n atoms, 7. n synapse types, 8. incoming spike buffer size.
-    BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 8 * BYTES_PER_WORD
+    # 1. core_index, 2. cycle mask 3. micro secs before spike,
+    # 4. time between cores 5. has key, 6. key, 7. n atoms,
+    # 8. n synapse types, 9. incoming spike buffer size.
+    BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 9 * BYTES_PER_WORD
 
     _n_vertices = 0
 
@@ -174,6 +178,8 @@ class AbstractPopulationVertex(
 
         self.__pop_level_spike_control = helpful_functions.read_config_int(
             config, "Simulation", "pop_spike_quantity")
+        self.__time_between_cores = helpful_functions.read_config_int(
+            config, "Simulation", "time_between_cores")
 
     @property
     @overrides(ApplicationVertex.n_atoms)
@@ -353,6 +359,14 @@ class AbstractPopulationVertex(
             target[key] = copy_list
         return target
 
+    @staticmethod
+    def _find_max_atoms_on_core(graph_mapper, app_vertex):
+        max_atoms = 0
+        for mac_vertex in graph_mapper.get_machine_vertices(app_vertex):
+            if graph_mapper.get_slice(mac_vertex).n_atoms > max_atoms:
+                max_atoms = graph_mapper.get_slice(mac_vertex).n_atoms
+        return max_atoms
+
     def _write_neuron_parameters(
             self, spec, routing_info, graph_mapper, machine_vertex,
             machine_time_step, time_scale_factor):
@@ -394,30 +408,54 @@ class AbstractPopulationVertex(
 
         # mask to ensure only so many fire at the same time over entire pop.
         if self.__pop_level_spike_control is None:
-            # if power of two already, can be used as mask
-            if math.log2(n_atoms + 1).is_integer():
-                spec.write_value(n_atoms)
-            else:  # not power of 2, so scale to next one and use that as mask
-                next_power_of_two = int(math.pow(2, math.ceil(
-                    math.log(n_atoms) / math.log(2))) - 1)
-                spec.write_value(next_power_of_two)
-            cut_off_point = self._MAX_OFFSET_DENOMINATOR
+            self.__pop_level_spike_control = self._DEFAULT_N_CORES_AT_SAME_TIME
+
+        # find the cut off point where a mask usage would ensure only
+        # a given number of cores fire at the same time
+        cut_off_point = int(self.__n_atoms / self.__pop_level_spike_control)
+        if math.log2(cut_off_point + 1).is_integer():
+            spec.write_value(cut_off_point)
         else:
-            # find the cut off point where a mask usage would ensure only
-            # a given number of cores fire at the same time
-            cut_off_point = (
-                int(self.__n_atoms / self.__pop_level_spike_control))
-            if math.log2(cut_off_point + 1).is_integer():
-                spec.write_value(cut_off_point)
-            else:
-                spec.write_value(int(math.pow(
+            spec.write_value(
+                int(math.pow(
                     2, math.ceil(math.log(cut_off_point) / math.log(2))) - 1))
 
+        # Figure bits needed to figure out time between spikes.
+        # cores 0-4 have 2 atoms, core 5 has 1 atom
+        #############################################
+        #        0     1       2      3       4      5
+        # T2-[   X                    X
+        #    |         X                      X
+        #    |                 X                     X
+        #    [  X                     X
+        #       |------| T
+        #              X                      X
+        #                      X
+        # T = time_between_cores T2 = time_between_spikes
+        # cutoff = 2. n_phases = 3 max_atoms = 2
+
+        n_cores = len(graph_mapper.get_machine_vertices(self))
+        max_atoms = self._find_max_atoms_on_core(graph_mapper, self)
+        n_phases = int(math.ceil(n_cores / cut_off_point))
+
+        # figure T2
+        time_between_spikes = self.__time_between_cores * n_phases
+
+        # figure how much time this TDMA needs
+        total_time_needed = (
+            (max_atoms * time_between_spikes) +
+            (n_phases * self.__time_between_cores))
+
+        total_time_available = (
+            (machine_time_step * time_scale_factor) *
+            self._MAX_OFFSET_DENOMINATOR)
+
+        if total_time_needed > total_time_available:
+            logger.warning("")
+
         # Write the number of microseconds between sending spikes on average
-        time_between_spikes = (
-            (machine_time_step * time_scale_factor) /
-            (self.n_atoms * min(cut_off_point, _MAX_OFFSET_DENOMINATOR)))
-        spec.write_value(data=int(time_between_spikes))
+        spec.write_value(data=time_between_spikes)
+        spec.write_value(data=self.__time_between_cores)
 
         # Write whether the key is to be used, and then the key, or 0 if it
         # isn't to be used

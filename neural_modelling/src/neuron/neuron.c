@@ -191,11 +191,13 @@ void neuron_do_timestep_update( // EXPORTED
             synapse_dynamics_process_post_synaptic_event(time, neuron_index);
 
             if (use_key) {
+
                 // Wait until the expected time to send
                 while ((ticks == timer_count) &&
                         (tc[T1_COUNT] > expected_time)) {
                     // Do Nothing
                 }
+
                 expected_time -= (
                     time_between_spikes + (next_delta * sv->cpu_clk));
                 next_delta = (next_delta + 1) & n_neurons_mask;
