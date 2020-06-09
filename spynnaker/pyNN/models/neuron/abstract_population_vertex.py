@@ -30,17 +30,19 @@ from spinn_front_end_common.abstract_models import (
     AbstractCanReset)
 from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl)
-from spinn_front_end_common.utilities import (
-    constants as common_constants, helpful_functions, globals_variables)
 from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, SYSTEM_BYTES_REQUIREMENT)
+    BYTES_PER_WORD, SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES)
+from spinn_front_end_common.utilities.helpful_functions import (
+    read_config_int, locate_memory_region_for_placement)
+from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.interface.profiling import profile_utils
-from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
+from spynnaker.pyNN.utilities.constants import (
+    POPULATION_BASED_REGIONS, SPIKE_PARTITION_ID)
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, AbstractNeuronRecordable, NeuronRecorder)
-from spynnaker.pyNN.utilities import constants, bit_field_utilities
+from spynnaker.pyNN.utilities import bit_field_utilities
 from spynnaker.pyNN.models.abstract_models import (
     AbstractPopulationInitializable, AbstractAcceptsIncomingSynapses,
     AbstractPopulationSettable, AbstractReadParametersBeforeSet,
@@ -158,7 +160,7 @@ class AbstractPopulationVertex(
         self.__incoming_spike_buffer_size = incoming_spike_buffer_size
 
         # get config from simulator
-        config = globals_variables.get_simulator().config
+        config = get_simulator().config
 
         if incoming_spike_buffer_size is None:
             self.__incoming_spike_buffer_size = config.getint(
@@ -194,7 +196,7 @@ class AbstractPopulationVertex(
         self.__has_reset_last = True
 
         # Set up for profiling
-        self.__n_profile_samples = helpful_functions.read_config_int(
+        self.__n_profile_samples = read_config_int(
             config, "Reports", "n_profile_samples")
 
     @property
@@ -330,7 +332,7 @@ class AbstractPopulationVertex(
         # Reserve memory:
         spec.reserve_memory_region(
             region=POPULATION_BASED_REGIONS.SYSTEM.value,
-            size=common_constants.SIMULATION_N_BYTES,
+            size=SIMULATION_N_BYTES,
             label='System')
 
         self._reserve_neuron_params_data_region(spec, vertex_slice)
@@ -411,7 +413,7 @@ class AbstractPopulationVertex(
 
         # Set the focus to the memory region 2 (neuron parameters):
         spec.switch_write_focus(
-            region=constants.POPULATION_BASED_REGIONS.NEURON_PARAMS.value)
+            region=POPULATION_BASED_REGIONS.NEURON_PARAMS.value)
 
         # Write the random back off value
         max_offset = (
@@ -470,7 +472,7 @@ class AbstractPopulationVertex(
         # write the neuron params into the new DSG region
         self._write_neuron_parameters(
             key=routing_info.get_first_key_from_pre_vertex(
-                placement.vertex, constants.SPIKE_PARTITION_ID),
+                placement.vertex, SPIKE_PARTITION_ID),
             machine_time_step=machine_time_step, spec=spec,
             time_scale_factor=time_scale_factor,
             vertex_slice=vertex_slice)
@@ -533,7 +535,7 @@ class AbstractPopulationVertex(
 
         # Get the key
         key = routing_info.get_first_key_from_pre_vertex(
-            vertex, constants.SPIKE_PARTITION_ID)
+            vertex, SPIKE_PARTITION_ID)
 
         # Write the setup region
         spec.switch_write_focus(POPULATION_BASED_REGIONS.SYSTEM.value)
@@ -749,8 +751,7 @@ class AbstractPopulationVertex(
             self, transceiver, placement, vertex_slice):
 
         # locate SDRAM address to where the neuron parameters are stored
-        neuron_region_sdram_address = \
-            helpful_functions.locate_memory_region_for_placement(
+        neuron_region_sdram_address = locate_memory_region_for_placement(
                 placement, POPULATION_BASED_REGIONS.NEURON_PARAMS.value,
                 transceiver)
 

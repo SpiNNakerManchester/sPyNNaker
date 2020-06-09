@@ -17,7 +17,8 @@ from spinn_utilities.overrides import overrides
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
 from .synapse_dynamics_structural_common import (
-    SynapseDynamicsStructuralCommon as CommonSP)
+    SynapseDynamicsStructuralCommon as
+        CommonSP)
 from .synapse_dynamics_static import SynapseDynamicsStatic
 from .synapse_dynamics_stdp import SynapseDynamicsSTDP
 from .synapse_dynamics_structural_stdp import SynapseDynamicsStructuralSTDP

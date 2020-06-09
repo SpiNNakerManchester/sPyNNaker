@@ -17,13 +17,13 @@ import logging
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, MICRO_TO_MILLISECOND_CONVERSION)
+from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
     get_exp_lut_array)
-from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence\
-    import AbstractTimingDependence
-from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure\
-    import SynapseStructureWeightOnly
-from spinn_front_end_common.utilities.globals_variables import get_simulator
+from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
+    AbstractTimingDependence)
+from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
+    SynapseStructureWeightOnly)
 
 logger = logging.getLogger(__name__)
 

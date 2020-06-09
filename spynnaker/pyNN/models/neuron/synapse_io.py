@@ -16,9 +16,8 @@
 import math
 import numpy
 from six import raise_from
-
-from spinn_front_end_common.utilities.constants import \
-    MICRO_TO_MILLISECOND_CONVERSION, BYTES_PER_WORD
+from spinn_front_end_common.utilities.constants import (
+    MICRO_TO_MILLISECOND_CONVERSION, BYTES_PER_WORD)
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector)
 from spynnaker.pyNN.utilities.constants import MAX_SUPPORTED_DELAY_TICS

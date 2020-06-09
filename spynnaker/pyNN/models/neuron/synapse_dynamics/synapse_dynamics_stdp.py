@@ -21,12 +21,12 @@ from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BYTES_PER_SHORT)
 from spynnaker.pyNN.models.abstract_models import AbstractSettable
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
-from .abstract_synapse_dynamics_structural \
-    import AbstractSynapseDynamicsStructural
+from .abstract_synapse_dynamics_structural import (
+    AbstractSynapseDynamicsStructural)
 from .abstract_generate_on_machine import (
     AbstractGenerateOnMachine, MatrixGeneratorID)
-from spynnaker.pyNN.exceptions import InvalidParameterType,\
-    SynapticConfigurationException
+from spynnaker.pyNN.exceptions import (
+    InvalidParameterType, SynapticConfigurationException)
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 
 # How large are the time-stamps stored with each event

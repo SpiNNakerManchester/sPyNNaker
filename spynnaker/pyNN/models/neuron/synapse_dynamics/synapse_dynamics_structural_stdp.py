@@ -19,7 +19,7 @@ from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
 from .synapse_dynamics_structural_common import (
     SynapseDynamicsStructuralCommon as
-    CommonSP)
+        CommonSP)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 
 

@@ -31,14 +31,15 @@ from spynnaker.pyNN.models.neural_projections import (
     DelayedApplicationEdge, SynapseInformation,
     ProjectionApplicationEdge, DelayAfferentApplicationEdge)
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
-from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.utilities.constants import (
+    MAX_DELAY_BLOCKS, MAX_TIMER_TICS_SUPPORTED_PER_BLOCK, SPIKE_PARTITION_ID)
 from spynnaker.pyNN.models.neuron import ConnectionHolder
 
 # pylint: disable=protected-access
 
 logger = logging.getLogger(__name__)
 _delay_extension_max_supported_delay = (
-    constants.MAX_DELAY_BLOCKS * constants.MAX_TIMER_TICS_SUPPORTED_PER_BLOCK)
+    MAX_DELAY_BLOCKS * MAX_TIMER_TICS_SUPPORTED_PER_BLOCK)
 # The maximum delay supported by the Delay extension, in ticks.
 
 
@@ -181,7 +182,7 @@ class PyNNProjectionCommon(object):
 
             # add edge to the graph
             spinnaker_control.add_application_edge(
-                self.__projection_edge, constants.SPIKE_PARTITION_ID)
+                self.__projection_edge, SPIKE_PARTITION_ID)
 
         # If the delay exceeds the post vertex delay, add a delay extension
         if max_delay > post_vertex_max_supported_delay_ms:
@@ -297,7 +298,7 @@ class PyNNProjectionCommon(object):
                 pre_vertex, delay_vertex, label="{}_to_DelayExtension".format(
                     pre_vertex.label))
             self.__spinnaker_control.add_application_edge(
-                delay_afferent_edge, constants.SPIKE_PARTITION_ID)
+                delay_afferent_edge, SPIKE_PARTITION_ID)
 
         # Ensure that the delay extension knows how many states it will
         # support
@@ -315,7 +316,7 @@ class PyNNProjectionCommon(object):
                 label="{}_delayed_to_{}".format(
                     pre_vertex.label, post_vertex.label))
             self.__spinnaker_control.add_application_edge(
-                delay_edge, constants.SPIKE_PARTITION_ID)
+                delay_edge, SPIKE_PARTITION_ID)
         else:
             delay_edge.add_synapse_information(self.__synapse_information)
         return delay_edge

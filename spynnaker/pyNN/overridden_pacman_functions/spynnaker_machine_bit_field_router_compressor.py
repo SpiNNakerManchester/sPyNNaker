@@ -14,19 +14,18 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-
-from spinn_front_end_common.abstract_models.\
-    abstract_supports_bit_field_generation import \
-    AbstractSupportsBitFieldGeneration
-from spinn_front_end_common.interface.interface_functions.\
-    machine_bit_field_router_compressor import \
-    MachineBitFieldRouterCompressor
-from spinn_front_end_common.utilities import system_control_logic
-from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState
-from spynnaker.pyNN.models.utility_models.synapse_expander. \
-    synapse_expander import SYNAPSE_EXPANDER
+from spinn_front_end_common.abstract_models import (
+    AbstractSupportsBitFieldGeneration)
+from spinn_front_end_common.interface.interface_functions.\
+    machine_bit_field_router_compressor import (
+        MachineBitFieldRouterCompressor)
+from spinn_front_end_common.utilities import system_control_logic
+from spinn_front_end_common.utilities.utility_objs import ExecutableType
+from spynnaker.pyNN.models.utility_models.synapse_expander.synapse_expander \
+    import (
+        SYNAPSE_EXPANDER)
 
 logger = logging.getLogger(__name__)
 

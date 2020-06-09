@@ -19,13 +19,12 @@ import re
 import numpy
 from pyNN.random import NumpyRNG, RandomDistribution
 from six import string_types, with_metaclass
-
-from spinn_front_end_common.utilities.constants import \
-    MICRO_TO_MILLISECOND_CONVERSION
 from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.safe_eval import SafeEval
-from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spinn_front_end_common.utilities.constants import (
+    MICRO_TO_MILLISECOND_CONVERSION)
+from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 from spynnaker.pyNN.utilities import utility_calls
 
 # global objects

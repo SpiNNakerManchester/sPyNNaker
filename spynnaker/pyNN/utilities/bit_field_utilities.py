@@ -14,11 +14,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import math
-
 from pacman.utilities.constants import FULL_MASK
+from pacman.utilities.algorithm_utilities.partition_algorithm_utilities \
+    import (
+        determine_max_atoms_for_vertex)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-from pacman.utilities.algorithm_utilities. \
-    partition_algorithm_utilities import determine_max_atoms_for_vertex
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 
@@ -44,7 +44,8 @@ BIT_IN_A_WORD = 32.0
 
 
 def get_estimated_sdram_for_bit_field_region(app_graph, vertex):
-    """ estimates the sdram for the bit field region
+    """ Estimates the SDRAM for the bit field region
+
     :param app_graph: the app graph
     :param vertex: machine vertex
     :return: the estimated number of bytes used by the bit field region
@@ -100,10 +101,9 @@ def get_estimated_sdram_for_key_region(app_graph, vertex):
     return sdram
 
 
-def _exact_sdram_for_bit_field_region(
-        machine_graph, vertex, n_key_map):
-    """ calculates the correct sdram for the bitfield region based off \
-        the machine graph and graph mapper
+def _exact_sdram_for_bit_field_region(machine_graph, vertex, n_key_map):
+    """ Gets the correct SDRAM for the bitfield region based off \
+        the machine graph
 
     :param machine_graph: machine graph
     :param vertex: the machine vertex
@@ -123,14 +123,15 @@ def _exact_sdram_for_bit_field_region(
 
 
 def exact_sdram_for_bit_field_builder_region():
-    """ returns the sdram requirement for the builder region
-    :return: returns the sdram requirement for the builder region
+    """ Gets the SDRAM requirement for the builder region
+
+    :return: returns the SDRAM requirement for the builder region
     """
     return N_REGIONS_ADDRESSES * BYTES_PER_WORD
 
 
 def _exact_sdram_for_bit_field_key_region(machine_graph, vertex):
-    """ calcs the exact sdram for the bitfield key region
+    """ Calculates the exact SDRAM for the bitfield key region
 
     :param machine_graph: machine graph
     :param vertex: machine vertex

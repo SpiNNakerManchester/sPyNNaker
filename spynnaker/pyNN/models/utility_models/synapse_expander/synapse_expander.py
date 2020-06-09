@@ -20,7 +20,7 @@ from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.make_tools.replacer import Replacer
 from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState
-from spinn_front_end_common.utilities import globals_variables
+from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
@@ -170,7 +170,7 @@ def _fill_in_connection_data(expanded_pop_vertices, placements, transceiver):
 
     :rtype: None
     """
-    ctl = globals_variables.get_simulator()
+    ctl = get_simulator()
     use_extra_monitors = False
 
     for vertex in expanded_pop_vertices:

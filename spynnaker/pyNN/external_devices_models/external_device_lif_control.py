@@ -17,8 +17,8 @@ import logging
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModelStandard
-from spynnaker.pyNN.models.defaults import default_initial_values,\
-    default_parameters
+from spynnaker.pyNN.models.defaults import (
+    default_initial_values, default_parameters)
 from spynnaker.pyNN.models.neuron.input_types import InputTypeCurrent
 from spynnaker.pyNN.models.neuron.neuron_models import (
     NeuronModelLeakyIntegrateAndFire)

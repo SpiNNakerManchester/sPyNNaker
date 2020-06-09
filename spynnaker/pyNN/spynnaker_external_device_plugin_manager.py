@@ -16,7 +16,8 @@
 from spinn_utilities.socket_address import SocketAddress
 from pacman.model.graphs.application import ApplicationEdge
 from spinnman.messages.eieio import EIEIOType
-from spinn_front_end_common.utilities import helpful_functions
+from spinn_front_end_common.utilities.helpful_functions import (
+    read_config, read_config_int)
 from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spinn_front_end_common.utility_models import (
     ReverseIpTagMultiCastSource)
@@ -50,15 +51,15 @@ class SpynnakerExternalDevicePluginManager(object):
         """
         config = get_simulator().config
         if database_notify_port_num is None:
-            database_notify_port_num = helpful_functions.read_config_int(
+            database_notify_port_num = read_config_int(
                 config, "Database", "notify_port")
         if database_notify_host is None:
-            database_notify_host = helpful_functions.read_config(
+            database_notify_host = read_config(
                 config, "Database", "notify_hostname")
         elif database_notify_host == "0.0.0.0":
             database_notify_host = "localhost"
         if database_ack_port_num is None:
-            database_ack_port_num = helpful_functions.read_config_int(
+            database_ack_port_num = read_config_int(
                 config, "Database", "listen_port")
 
         # build the database socket address used by the notification interface
@@ -298,9 +299,8 @@ class SpynnakerExternalDevicePluginManager(object):
             ~pacman.model.graphs.application.ApplicationVertex
         :param str partition_id: the partition identifier for making nets
         """
-        _spinnaker = get_simulator()
         edge = ApplicationEdge(vertex, device_vertex)
-        _spinnaker.add_application_edge(edge, partition_id)
+        get_simulator().add_application_edge(edge, partition_id)
 
     @staticmethod
     def add_application_vertex(vertex):

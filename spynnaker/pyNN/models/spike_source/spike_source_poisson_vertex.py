@@ -18,7 +18,6 @@ import math
 import numpy
 import scipy.stats
 import struct
-
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from pacman.executor.injection_decorator import inject_items
@@ -36,26 +35,26 @@ from spinn_front_end_common.abstract_models.impl import (
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.interface.buffer_management import (
     recording_utilities)
-from spinn_front_end_common.utilities import (
-    helpful_functions, globals_variables)
 from spinn_front_end_common.utilities.constants import (
     SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES, BYTES_PER_WORD)
+from spinn_front_end_common.utilities.globals_variables import get_simulator
+from spinn_front_end_common.utilities.helpful_functions import (
+    locate_memory_region_for_placement, read_config_int)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.interface.profiling import profile_utils
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, MultiSpikeRecorder, SimplePopulationSettable)
-from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.utilities.constants import (
+    LIVE_POISSON_CONTROL_PARTITION_ID, SPIKE_PARTITION_ID)
 from spynnaker.pyNN.models.abstract_models import (
     AbstractReadParametersBeforeSet)
 from .spike_source_poisson_machine_vertex import (
     SpikeSourcePoissonMachineVertex)
 from spynnaker.pyNN.utilities.utility_calls import validate_mars_kiss_64_seed
 from spynnaker.pyNN.utilities.struct import Struct
-from spynnaker.pyNN.utilities.ranged.spynnaker_ranged_dict \
-    import SpynnakerRangeDictionary
-from spynnaker.pyNN.utilities.ranged.spynnaker_ranged_list \
-    import SpynnakerRangedList
+from spynnaker.pyNN.utilities.ranged import (
+    SpynnakerRangeDictionary, SpynnakerRangedList)
 
 logger = logging.getLogger(__name__)
 
@@ -302,8 +301,8 @@ class SpikeSourcePoissonVertex(
         self.__machine_time_step = None
 
         # get config from simulator
-        config = globals_variables.get_simulator().config
-        self.__n_profile_samples = helpful_functions.read_config_int(
+        config = get_simulator().config
+        self.__n_profile_samples = read_config_int(
             config, "Reports", "n_profile_samples")
 
         # Prepare for recording, and to get spikes
@@ -616,13 +615,13 @@ class SpikeSourcePoissonVertex(
 
         # Write Key info for this core:
         key = routing_info.get_first_key_from_pre_vertex(
-            placement.vertex, constants.SPIKE_PARTITION_ID)
+            placement.vertex, SPIKE_PARTITION_ID)
         spec.write_value(data=1 if key is not None else 0)
         spec.write_value(data=key if key is not None else 0)
 
         # Write the incoming mask if there is one
         in_edges = graph.get_edges_ending_at_vertex_with_partition_name(
-            placement.vertex, constants.LIVE_POISSON_CONTROL_PARTITION_ID)
+            placement.vertex, LIVE_POISSON_CONTROL_PARTITION_ID)
         if len(in_edges) > 1:
             raise ConfigurationException(
                 "Only one control edge can end at a Poisson vertex")
@@ -837,7 +836,7 @@ class SpikeSourcePoissonVertex(
 
     @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
     def get_spikes_sampling_interval(self):
-        return globals_variables.get_simulator().machine_time_step
+        return get_simulator().machine_time_step
 
     @staticmethod
     def get_dtcm_usage_for_atoms():
@@ -907,8 +906,7 @@ class SpikeSourcePoissonVertex(
             self, transceiver, placement, vertex_slice):
 
         # locate SDRAM address where parameters are stored
-        poisson_params = \
-            helpful_functions.locate_memory_region_for_placement(
+        poisson_params = locate_memory_region_for_placement(
                 placement, _REGIONS.POISSON_PARAMS_REGION.value, transceiver)
         seed_array = transceiver.read_memory(
             placement.x, placement.y, poisson_params + SEED_OFFSET_BYTES,
@@ -916,8 +914,7 @@ class SpikeSourcePoissonVertex(
         self.__kiss_seed[vertex_slice] = struct.unpack_from("<4I", seed_array)
 
         # locate SDRAM address where the rates are stored
-        poisson_rate_region_sdram_address = \
-            helpful_functions.locate_memory_region_for_placement(
+        poisson_rate_region_sdram_address = locate_memory_region_for_placement(
                 placement, _REGIONS.RATES_REGION.value, transceiver)
 
         # get size of poisson params

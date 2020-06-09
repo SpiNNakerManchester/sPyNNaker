@@ -15,7 +15,8 @@
 
 import configparser
 import numpy
-from spinn_front_end_common.utilities import globals_variables
+from spinn_front_end_common.utilities.globals_variables import (
+    set_failed_state, set_simulator)
 from spynnaker.pyNN.utilities.spynnaker_failed_state import (
     SpynnakerFailedState)
 from builtins import property
@@ -132,8 +133,8 @@ class MockSimulator(object):
     @classmethod
     def setup(cls):
         simulator = MockSimulator()
-        globals_variables.set_failed_state(SpynnakerFailedState())
-        globals_variables.set_simulator(simulator)
+        set_failed_state(SpynnakerFailedState())
+        set_simulator(simulator)
         return simulator
 
     @property

@@ -17,21 +17,22 @@ import logging
 import math
 import os
 from six import with_metaclass
-
-from spinn_front_end_common.utilities.constants import \
-    MICRO_TO_MILLISECOND_CONVERSION
 from spinn_utilities.abstract_base import AbstractBase
 from spinn_utilities.log import FormatAdapter
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
     AbstractSpinnakerBase)
+from spinn_front_end_common.utilities.constants import (
+    MICRO_TO_MILLISECOND_CONVERSION)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utility_models import CommandSender
 from spinn_front_end_common.utilities.utility_objs import ExecutableFinder
-from spinn_front_end_common.utilities import globals_variables
+from spinn_front_end_common.utilities.globals_variables import unset_simulator
 from spinn_front_end_common.utilities.helpful_functions import read_config
 from spynnaker.pyNN.models.utility_models import synapse_expander
 from spynnaker.pyNN import overridden_pacman_functions, model_binaries
-from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.utilities.constants import (
+    MAX_DELAY_BLOCKS, MAX_SUPPORTED_DELAY_TICS,
+    MAX_TIMER_TICS_SUPPORTED_PER_BLOCK, MIN_SUPPORTED_DELAY)
 from spynnaker.pyNN.spynnaker_simulator_interface import (
     SpynnakerSimulatorInterface)
 from spynnaker.pyNN.utilities.extracted_data import ExtractedData
@@ -250,7 +251,7 @@ class AbstractSpiNNakerCommon(with_metaclass(
             raise ConfigurationException(
                 "Pacman does not support min delays below {} ms with the "
                 "current machine time step".format(
-                    constants.MIN_SUPPORTED_DELAY * self.machine_time_step))
+                    MIN_SUPPORTED_DELAY * self.machine_time_step))
         if min_delay is not None:
             self.__min_delay = min_delay
         else:
@@ -258,11 +259,9 @@ class AbstractSpiNNakerCommon(with_metaclass(
                 self.machine_time_step / MICRO_TO_MILLISECOND_CONVERSION)
 
         # Sort out the maximum delay
-        natively_supported_delay_for_models = \
-            constants.MAX_SUPPORTED_DELAY_TICS
+        natively_supported_delay_for_models = MAX_SUPPORTED_DELAY_TICS
         delay_extension_max_supported_delay = (
-            constants.MAX_DELAY_BLOCKS *
-            constants.MAX_TIMER_TICS_SUPPORTED_PER_BLOCK)
+            MAX_DELAY_BLOCKS * MAX_TIMER_TICS_SUPPORTED_PER_BLOCK)
         max_delay_tics_supported = \
             natively_supported_delay_for_models + \
             delay_extension_max_supported_delay
@@ -398,7 +397,7 @@ class AbstractSpiNNakerCommon(with_metaclass(
         super(AbstractSpiNNakerCommon, self).stop(
             turn_off_machine, clear_routing_tables, clear_tags)
         self.reset_number_of_neurons_per_core()
-        globals_variables.unset_simulator(self)
+        unset_simulator(self)
 
     def run(self, run_time):
         """ Run the model created.

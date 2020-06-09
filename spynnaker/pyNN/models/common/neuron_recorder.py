@@ -26,7 +26,7 @@ from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.resources.variable_sdram import VariableSDRAM
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from spinn_front_end_common.utilities import globals_variables
+from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, MICRO_TO_MILLISECOND_CONVERSION, BITS_PER_WORD)
 from spinn_front_end_common.interface.buffer_management.recording_utilities \
@@ -142,7 +142,7 @@ class NeuronRecorder(object):
         :return: Sampling interval in microseconds
         :rtype: float
         """
-        step = (globals_variables.get_simulator().machine_time_step /
+        step = (get_simulator().machine_time_step /
                 MICRO_TO_MILLISECOND_CONVERSION)
         return self.__sampling_rates[variable] * step
 
@@ -479,7 +479,7 @@ class NeuronRecorder(object):
             return 1
 
         step = (
-            globals_variables.get_simulator().machine_time_step /
+            get_simulator().machine_time_step /
             MICRO_TO_MILLISECOND_CONVERSION)
         rate = int(sampling_interval / step)
         if sampling_interval != rate * step:

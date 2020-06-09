@@ -13,9 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from spinn_utilities.overrides import overrides
 from .abstract_pynn_neuron_model import AbstractPyNNNeuronModel
 from spynnaker.pyNN.models.neuron.implementations import NeuronImplStandard
-from spinn_utilities.overrides import overrides
 
 _population_parameters = dict(
     AbstractPyNNNeuronModel.default_population_parameters)
