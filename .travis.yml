@@ -27,7 +27,7 @@ jobs:
       python: 3.7
     - name: Py2.7 (legacy)
       python: 2.7
-dist: xenial
+dist: focal
 cache: pip
 addons:
   apt:
