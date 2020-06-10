@@ -76,7 +76,7 @@ class InputTypeConductance(AbstractInputType):
 
     @overrides(AbstractInputType.get_global_weight_scale)
     def get_global_weight_scale(self):
-        return float(2**0)
+        return float(2**5)
 
     @property
     def e_rev_E(self):

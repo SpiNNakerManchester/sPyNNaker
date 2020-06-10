@@ -96,8 +96,7 @@ static inline void synapse_types_shape_input(
 //! \return None
 static inline void add_input_exp(exp_params_t* exp_params, input_t input) {
 	exp_params->synaptic_input_value = exp_params->synaptic_input_value +
-			input;
-//			decay_s1615(input, exp_params->init);
+			decay_s1615(input, exp_params->init);
 }
 
 //! \brief adds the inputs for a give timer period to a given neuron that is
