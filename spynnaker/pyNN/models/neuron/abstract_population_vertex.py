@@ -37,7 +37,7 @@ from spinn_front_end_common.abstract_models.impl import (
 from spinn_front_end_common.utilities import (
     constants as common_constants, helpful_functions, globals_variables)
 from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, SARK_PER_MALLOC_SDRAM_USAGE, SIMULATION_N_BYTES)
+    BYTES_PER_WORD, SIMULATION_N_BYTES)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.interface.profiling import profile_utils
@@ -198,10 +198,12 @@ class AbstractPopulationVertex(
         # pylint: disable=arguments-differ
 
         sdram_costs = MultiRegionSDRAM()
-        sdram_costs.nest("DS", self.__neuron_recorder.get_recording_sdram_usage(
-            vertex_slice))
-        sdram_costs.nest("Recording", self._get_sdram_usage_for_atoms(
-                    vertex_slice, graph, machine_time_step))
+        sdram_costs.nest(
+            "DS", self.__neuron_recorder.get_recording_sdram_usage(
+                vertex_slice))
+        sdram_costs.nest(
+            "Recording", self._get_sdram_usage_for_atoms(
+                vertex_slice, graph, machine_time_step))
 
         # set resources required from this object
         container = ResourceContainer(
