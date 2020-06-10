@@ -209,7 +209,8 @@ void synapse_dynamics_print_plastic_synapses(
 
     // Extract separate arrays of weights (from plastic region),
     // Control words (from fixed region) and number of plastic synapses
-    synapse_row_plastic_data_t *data_ptr = plastic_region_address;
+    synapse_row_plastic_data_t *data_ptr =
+        (synapse_row_plastic_data_t*) plastic_region_address;
     const plastic_synapse_t *plastic_words = data_ptr->synapses;
     const control_t *control_words =
             synapse_row_plastic_controls(fixed_region_address);

@@ -46,7 +46,7 @@ from spynnaker.pyNN.models.abstract_models import (
     AbstractPopulationInitializable, AbstractAcceptsIncomingSynapses,
     AbstractPopulationSettable, AbstractReadParametersBeforeSet,
     AbstractContainsUnits)
-from spynnaker.pyNN.exceptions import InvalidParameterType
+from spynnaker.pyNN.exceptions import InvalidParameterType, SpynnakerException
 from spynnaker.pyNN.utilities.ranged import (
     SpynnakerRangeDictionary, SpynnakerRangedList)
 from .synapse_dynamics import AbstractSynapseDynamicsStructural
@@ -65,12 +65,11 @@ _C_MAIN_BASE_DTCM_USAGE_IN_BYTES = 3 * BYTES_PER_WORD
 _C_MAIN_BASE_SDRAM_USAGE_IN_BYTES = 18 * BYTES_PER_WORD
 _C_MAIN_BASE_N_CPU_CYCLES = 0
 
-# The percentage of the time step where spikes can occur
-_MAX_OFFSET_DENOMINATOR = 0.5
-
-# default number of cores to fire at same time from this population
-_DEFAULT_N_CORES_AT_SAME_TIME = 7
-
+# error message for when the vertex TDMA isnt feasible.
+_VERTEX_TDMA_FAILURE_MSG = (
+    "population {} does not have enough time to execute the "
+    "TDMA in the given time. The population would need a time "
+    "scale factor of {} to correctly execute this TDMA.")
 
 class AbstractPopulationVertex(
         ApplicationVertex, AbstractGeneratesDataSpecification,
@@ -113,10 +112,19 @@ class AbstractPopulationVertex(
     RUNTIME_SDP_PORT_SIZE = BYTES_PER_WORD
 
     # 7 elements before the start of global parameters
-    # 1. core_index, 2. cycle mask 3. micro secs before spike,
-    # 4. time between cores 5. has key, 6. key, 7. n atoms,
-    # 8. n synapse types, 9. incoming spike buffer size.
-    BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 9 * BYTES_PER_WORD
+    # 1. core slot, 2. micro secs before spike,
+    # 3. time between cores 4. has key, 5. key, 6. n atoms,
+    # 7. n synapse types, 8. incoming spike buffer size.
+    BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 8 * BYTES_PER_WORD
+
+    # fraction of the real time we will use for spike transmissions
+    FRACTION_OF_TIME_FOR_SPIKE_SENDING = 0.5
+
+    # default number of cores to fire at same time from this population
+    _DEFAULT_N_CORES_AT_SAME_TIME = 7
+
+    # default number of microseconds between cores firing
+    _DEFAULT_TIME_BETWEEN_CORES = 50
 
     _n_vertices = 0
 
@@ -176,10 +184,19 @@ class AbstractPopulationVertex(
         self.__n_profile_samples = helpful_functions.read_config_int(
             config, "Reports", "n_profile_samples")
 
+        # set the number of cores expected to fire at any given time
         self.__pop_level_spike_control = helpful_functions.read_config_int(
             config, "Simulation", "pop_spike_quantity")
+        if self.__pop_level_spike_control is None:
+            self.__pop_level_spike_control = self._DEFAULT_N_CORES_AT_SAME_TIME
+
+        # set the time between cores to fire
         self.__time_between_cores = helpful_functions.read_config_int(
             config, "Simulation", "time_between_cores")
+        if self.__time_between_cores is None:
+            self.__time_between_cores = self._DEFAULT_TIME_BETWEEN_CORES
+
+
 
     @property
     @overrides(ApplicationVertex.n_atoms)
@@ -392,7 +409,6 @@ class AbstractPopulationVertex(
         key = routing_info.get_first_key_from_pre_vertex(
             machine_vertex, constants.SPIKE_PARTITION_ID)
         vertex_slice = graph_mapper.get_slice(machine_vertex)
-        vertex_index = graph_mapper.get_machine_vertex_index(machine_vertex)
 
         # pylint: disable=too-many-arguments
         n_atoms = vertex_slice.n_atoms
@@ -402,23 +418,6 @@ class AbstractPopulationVertex(
         # Set the focus to the memory region 2 (neuron parameters):
         spec.switch_write_focus(
             region=constants.POPULATION_BASED_REGIONS.NEURON_PARAMS.value)
-
-        # Write the index of this core
-        spec.write_value(vertex_index)
-
-        # mask to ensure only so many fire at the same time over entire pop.
-        if self.__pop_level_spike_control is None:
-            self.__pop_level_spike_control = self._DEFAULT_N_CORES_AT_SAME_TIME
-
-        # find the cut off point where a mask usage would ensure only
-        # a given number of cores fire at the same time
-        cut_off_point = int(self.__n_atoms / self.__pop_level_spike_control)
-        if math.log2(cut_off_point + 1).is_integer():
-            spec.write_value(cut_off_point)
-        else:
-            spec.write_value(
-                int(math.pow(
-                    2, math.ceil(math.log(cut_off_point) / math.log(2))) - 1))
 
         # Figure bits needed to figure out time between spikes.
         # cores 0-4 have 2 atoms, core 5 has 1 atom
@@ -430,30 +429,42 @@ class AbstractPopulationVertex(
         #    [  X                     X
         #       |------| T
         #              X                      X
-        #                      X
+        #                      X <- T3
         # T = time_between_cores T2 = time_between_spikes
+        # T3 = end of TDMA (equiv of ((n_phases + 1) * T2))
         # cutoff = 2. n_phases = 3 max_atoms = 2
 
+        # constants etc just to get into head
+        # clock cycles = 200 Mhz = 200 = sv->cpu_clk
+        # 1ms = 200000 for timer 1. = clock cycles
+        # 200 per microsecond
+        # machine time step = microseconds already.
+        # __time_between_cores = microseconds.
+
+        vertex_index = graph_mapper.get_machine_vertex_index(machine_vertex)
         n_cores = len(graph_mapper.get_machine_vertices(self))
-        max_atoms = self._find_max_atoms_on_core(graph_mapper, self)
-        n_phases = int(math.ceil(n_cores / cut_off_point))
+        n_phases = self._find_max_atoms_on_core(graph_mapper, self)
+        n_slots = int(math.ceil(n_cores / self.__pop_level_spike_control))
 
         # figure T2
-        time_between_spikes = self.__time_between_cores * n_phases
+        time_between_spikes = self.__time_between_cores * n_slots
 
         # figure how much time this TDMA needs
-        total_time_needed = (
-            (max_atoms * time_between_spikes) +
-            (n_phases * self.__time_between_cores))
+        total_time_needed = (n_phases + 1) * time_between_spikes
 
-        total_time_available = (
+        total_time_available = int(math.ceil(
             (machine_time_step * time_scale_factor) *
-            self._MAX_OFFSET_DENOMINATOR)
-
+            self.FRACTION_OF_TIME_FOR_SPIKE_SENDING))
         if total_time_needed > total_time_available:
-            logger.warning("")
+            time_scale_factor_needed = (
+                math.ceil(total_time_needed / machine_time_step))
+            msg = _VERTEX_TDMA_FAILURE_MSG.format(
+                 self.label, time_scale_factor_needed)
+            logger.error(msg)
+            raise SpynnakerException(msg)
 
         # Write the number of microseconds between sending spikes on average
+        spec.write_value(vertex_index & n_slots)
         spec.write_value(data=time_between_spikes)
         spec.write_value(data=self.__time_between_cores)
 
