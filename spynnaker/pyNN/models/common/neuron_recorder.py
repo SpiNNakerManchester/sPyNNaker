@@ -22,7 +22,7 @@ from six import raise_from, iteritems
 from six.moves import range, xrange
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
-from pacman.model.resources import MultiRegionSDRAM
+from pacman.model.resources import RecordingSDRAM
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities import globals_variables
@@ -682,7 +682,7 @@ class NeuronRecorder(object):
         :return: SDRAM cost
         rtype: MultiRegionSDRAM
         """
-        costs = MultiRegionSDRAM()
+        costs = RecordingSDRAM()
         for variable in self.__sampling_rates:
             rate = self.__sampling_rates[variable]
             if rate > 0:
@@ -702,7 +702,6 @@ class NeuronRecorder(object):
                         # Add the rest once to fixed for worst case
                         (per_record - average_per_timestep),
                         average_per_timestep)
-                costs.add_cost("recording malloc", self.SARK_BLOCK_SIZE)
         return costs
 
     def get_dtcm_usage_in_bytes(self, vertex_slice):

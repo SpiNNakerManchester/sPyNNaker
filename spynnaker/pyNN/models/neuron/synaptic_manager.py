@@ -23,7 +23,7 @@ import scipy.stats  # @UnresolvedImport
 from scipy import special  # @UnresolvedImport
 from pyNN.random import RandomDistribution
 from data_specification.enums import DataType
-from pacman.model.resources import MultiRegionSDRAM
+from pacman.model.resources import DsSDRAM
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
@@ -339,7 +339,7 @@ class SynapticManager(object):
     def get_sdram_usage_in_bytes(
             self, vertex_slice, machine_time_step, application_graph,
             app_vertex):
-        costs = MultiRegionSDRAM()
+        costs = DsSDRAM()
         in_edges = application_graph.get_edges_ending_at_vertex(app_vertex)
         # These values can be cross checked with the data_spec_text_files
         costs.add_cost(POPULATION_BASED_REGIONS.SYNAPSE_PARAMS,

@@ -25,7 +25,7 @@ from pacman.model.constraints.key_allocator_constraints import (
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.resources import (
-    CPUCyclesPerTickResource, DTCMResource, MultiRegionSDRAM,
+    CPUCyclesPerTickResource, DTCMResource, DsSDRAM, MultiRegionSDRAM,
     ResourceContainer)
 from spinn_front_end_common.abstract_models import (
     AbstractChangableAfterRun, AbstractProvidesIncomingPartitionConstraints,
@@ -197,9 +197,10 @@ class AbstractPopulationVertex(
             self, vertex_slice, graph, machine_time_step):
         # pylint: disable=arguments-differ
 
-        sdram_costs = self.__neuron_recorder.get_recording_sdram_usage(
-            vertex_slice)
-        sdram_costs.merge(self._get_sdram_usage_for_atoms(
+        sdram_costs = MultiRegionSDRAM()
+        sdram_costs.nest("DS", self.__neuron_recorder.get_recording_sdram_usage(
+            vertex_slice))
+        sdram_costs.nest("Recording", self._get_sdram_usage_for_atoms(
                     vertex_slice, graph, machine_time_step))
 
         # set resources required from this object
@@ -266,8 +267,7 @@ class AbstractPopulationVertex(
 
     def _get_sdram_usage_for_atoms(
             self, vertex_slice, graph, machine_time_step):
-        costs = MultiRegionSDRAM()
-        region_costs = MultiRegionSDRAM()
+        region_costs = DsSDRAM()
         # These values can be cross checked with the data_spec_text_files
         region_costs.add_cost(
             POPULATION_BASED_REGIONS.SYSTEM, SIMULATION_N_BYTES)
@@ -289,9 +289,8 @@ class AbstractPopulationVertex(
         region_costs.add_cost(
             "dsg overhead",
             APP_PTR_TABLE_HEADER_BYTE_SIZE + MAX_MEM_REGIONS * 4)
-
         region_costs.add_cost(
-            POPULATION_BASED_REGIONS.BIT_FIELD_REGION,
+            POPULATION_BASED_REGIONS.BIT_FIELD_FILTER,
             bit_field_utilities.get_estimated_sdram_for_bit_field_region(
                 graph, self))
         region_costs.add_cost(
@@ -302,9 +301,7 @@ class AbstractPopulationVertex(
             POPULATION_BASED_REGIONS.BIT_FIELD_BUILDER,
             bit_field_utilities.exact_sdram_for_bit_field_builder_region())
 
-        costs.nest("Data_Spec_size", region_costs)
-        costs.add_cost("DSG_malloc", SARK_PER_MALLOC_SDRAM_USAGE)
-        return costs
+        return region_costs
 
     def _reserve_memory_regions(
             self, spec, vertex_slice, vertex, machine_graph, n_key_map):
