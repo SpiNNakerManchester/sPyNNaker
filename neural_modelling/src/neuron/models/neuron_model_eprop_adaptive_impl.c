@@ -27,7 +27,7 @@ REAL local_eta;
 extern uint32_t time;
 extern global_neuron_params_pointer_t global_parameters;
 extern uint32_t syn_dynamics_neurons_in_partition;
-uint32_t window_size = 13000;
+//uint32_t window_size = 13000;
 
 // simple Leaky I&F ODE
 static inline void lif_neuron_closed_form(
@@ -112,7 +112,7 @@ state_t neuron_model_state_update(
 //    REAL rho_3 = (accum)decay_s1615(1000.k, neuron->e_to_dt_on_tau_a);
 //    io_printf(IO_BUF, "1:%k, 2:%k, 3:%k, 4:%k\n", rho, rho_2, rho_3, neuron->rho);
 
-    REAL accum_time = (accum)(time%window_size) * 0.001k;
+    REAL accum_time = (accum)(time%neuron->window_size) * 0.001k;
     if (!accum_time){
         accum_time += 1.k;
     }
@@ -141,7 +141,7 @@ state_t neuron_model_state_update(
                                     * (accum)syn_dynamics_neurons_in_partition))
                                     - global_parameters->core_target_rate;
 //    io_printf(IO_BUF, "rls: %k\n", reg_learning_signal);
-    if (time % window_size == window_size - 1 & !printed_value){ //hardcoded time of reset
+    if (time % neuron->window_size == neuron->window_size - 1 & !printed_value){ //hardcoded time of reset
         io_printf(IO_BUF, "1 %u, rate err:%k, spikes:%k, target:%k\tL:%k, v_mem:%k\n",
         time, reg_learning_signal, global_parameters->core_pop_rate, global_parameters->core_target_rate,
         learning_signal-v_mem_error, v_mem_error);
@@ -151,7 +151,7 @@ state_t neuron_model_state_update(
 //        io_printf(IO_BUF, "2 %u, rate at reset:%k, L:%k, rate:%k\n", time, reg_learning_signal, learning_signal, global_parameters->core_pop_rate);
         printed_value = true;
     }
-    if (time % window_size == 0){
+    if (time % neuron->window_size == 0){
 //        new_learning_signal = 0.k;
         global_parameters->core_pop_rate = 0.k;
         printed_value = false;
@@ -162,12 +162,12 @@ state_t neuron_model_state_update(
 //    if (new_learning_signal != learning_signal){// && time%1300 > 1100){
 //        io_printf(IO_BUF, "L:%k, rL:%k, cL:%k, nL:%k\n", learning_signal, reg_learning_signal, learning_signal + reg_learning_signal, new_learning_signal);
 //    if (reg_learning_signal > 0.5k || reg_learning_signal < -0.5k){
-    new_learning_signal = learning_signal + (reg_learning_signal * 0.1k);
+    new_learning_signal = learning_signal + (reg_learning_signal);// * 0.1k);
 //    }
 //        new_learning_signal = learning_signal;
 //    }
 //    neuron->L = learning_signal;
-    if (time % window_size > 1300){
+    if (time % neuron->window_size > 1300 * 2){
         neuron->L = new_learning_signal;
     }
     else{
@@ -181,6 +181,8 @@ state_t neuron_model_state_update(
 //        io_printf(IO_BUF, "before B = %k, b = %k\n", neuron->B, neuron->b);
         neuron->B = 10.k;
         neuron->b = 0.k;
+        neuron->V_membrane = neuron->V_rest;
+        neuron->refract_timer = 0;
 //        io_printf(IO_BUF, "reset B = %k, b = %k\n", neuron->B, neuron->b);
     }
     // All operations now need doing once per eprop synapse
@@ -377,6 +379,8 @@ void neuron_model_print_parameters(restrict neuron_pointer_t neuron) {
     io_printf(IO_BUF, "learning      = %k n/a\n", neuron->L);
 
     io_printf(IO_BUF, "feedback w    = %k n/a\n\n", neuron->w_fb);
+
+    io_printf(IO_BUF, "window size   = %u ts\n\n", neuron->window_size);
 
     io_printf(IO_BUF, "e_to_dt_on_tau_a    = %k n/a\n\n", neuron->e_to_dt_on_tau_a);
 

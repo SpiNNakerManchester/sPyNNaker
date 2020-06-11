@@ -46,6 +46,7 @@ SCALAR = "scalar"
 # Learning signal
 L = "learning_signal"
 W_FB = "feedback_weight"
+WINDOW_SIZE = "window_size"
 
 DELTA_W = "delta_w"
 Z_BAR_OLD = "z_bar_old"
@@ -104,7 +105,8 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
         # learning signal
         "__l",
         "__w_fb",
-        "__eta"
+        "__eta",
+        "__window_size"
         ]
 
     def __init__(
@@ -130,7 +132,8 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
             tau_err,
             l,
             w_fb,
-            eta
+            eta,
+            window_size
             ):
 
         datatype_list = [
@@ -157,6 +160,7 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
             # Learning signal
             DataType.S1615,   #  L
             DataType.S1615,   #  w_fb
+            DataType.UINT32   #  window_size
             ]
 
         # Synapse states - always initialise to zero
@@ -207,8 +211,8 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
         # learning signal
         self.__l = l
         self.__w_fb = w_fb
-
         self.__eta = eta
+        self.__window_size = window_size
 
 
     @overrides(AbstractNeuronModel.get_n_cpu_cycles)
@@ -230,6 +234,7 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
         parameters[BETA] = self.__beta
         parameters[SCALAR] = self.__scalar
         parameters[W_FB] = self.__w_fb
+        parameters[WINDOW_SIZE] = self.__window_size
 
 
     @overrides(AbstractNeuronModel.add_state_variables)
@@ -295,7 +300,8 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
                 parameters[SCALAR],
 
                 state_variables[L],
-                parameters[W_FB]
+                parameters[W_FB],
+                parameters[WINDOW_SIZE]
                 ]
 
         # create synaptic state - init all state to zero
@@ -343,7 +349,7 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
         (v, _v_rest, _r_membrane, _exp_tc, _i_offset, count_refrac,
          _v_reset, _tau_refrac, psi,
          big_b, small_b, _small_b_0, _e_to_dt_on_tau_a, _beta, adpt, scalar,
-         l, __w_fb, delta_w, z_bar_old, z_bar, ep_a, e_bar, update_ready) = values
+         l, __w_fb, window_size, delta_w, z_bar_old, z_bar, ep_a, e_bar, update_ready) = values
 
         # Not sure this will work with the new array of synapse!!!
         # (Note that this function is only called if you do e.g. run(), set(),
@@ -473,3 +479,11 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
     @w_fb.setter
     def w_fb(self, new_value):
         self.__w_fb = new_value
+
+    @property
+    def window_size(self):
+        return self.__window_size
+
+    @window_size.setter
+    def window_size(self, new_value):
+        self.__window_size = new_value

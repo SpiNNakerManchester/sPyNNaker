@@ -398,7 +398,7 @@ bool synapse_dynamics_process_plastic_synapses(
 
         // Perform weight update: only if batch time has elapsed
     	final_state_t final_state;
-    	if (neuron->syn_state[syn_ind_from_delay].update_ready == 0){
+    	if (neuron->syn_state[syn_ind_from_delay].update_ready <= 0){
     		// enough time has elapsed - perform weight update
     		if (PRINT_PLASTICITY){
     			io_printf(IO_BUF, "update_ready=0\n");
@@ -412,7 +412,7 @@ bool synapse_dynamics_process_plastic_synapses(
     		neuron->syn_state[syn_ind_from_delay].delta_w = 0.0k;
 
     		// reset update_ready counter based on pattern cycle time
-    		neuron->syn_state[syn_ind_from_delay].update_ready += 13000;
+    		neuron->syn_state[syn_ind_from_delay].update_ready += neuron->window_size;
 
     	} else {
     		if (PRINT_PLASTICITY){

@@ -196,6 +196,8 @@ void neuron_model_print_parameters(restrict neuron_pointer_t neuron) {
 
     io_printf(IO_BUF, "feedback w    = %k n/a\n", neuron->w_fb);
 
+    io_printf(IO_BUF, "feedback w    = %k n/a\n", neuron->window_size);
+
 //    io_printf(IO_BUF, "T refract     = %u timesteps\n", neuron->T_refract);
 //    io_printf(IO_BUF, "mean_isi_ticks  = %k\n", neuron->mean_isi_ticks);
 //    io_printf(IO_BUF, "time_to_spike_ticks  = %k \n",
