@@ -22,7 +22,8 @@ from spinn_front_end_common.utilities.constants import \
     MICRO_TO_MILLISECOND_CONVERSION
 from spinn_utilities.abstract_base import AbstractBase
 from spinn_utilities.log import FormatAdapter
-from spinn_utilities.make_tools.log_sqllite_database import set_alternative_log_path
+from spinn_utilities.make_tools.log_sqllite_database import (
+    set_alternative_log_path)
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
     AbstractSpinnakerBase)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
