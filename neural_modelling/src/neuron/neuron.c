@@ -16,9 +16,7 @@
  */
 
 /*! \file
- *
  * \brief implementation of the neuron.h interface.
- *
  */
 
 #include "neuron.h"
@@ -26,9 +24,6 @@
 #include "implementations/neuron_impl.h"
 #include "plasticity/synapse_dynamics.h"
 #include <debug.h>
-
-// Spin1 API ticks - to know when the timer wraps
-extern uint ticks;
 
 //! The key to be used for this core (will be ORed with neuron ID)
 static key_t key;
@@ -60,12 +55,13 @@ struct neuron_parameters {
     uint32_t incoming_spike_buffer_size;
 };
 
+//! Offset of start of global parameters, in words.
 #define START_OF_GLOBAL_PARAMETERS \
     (sizeof(struct neuron_parameters) / sizeof(uint32_t))
 
 //! \brief does the memory copy for the neuron parameters
 //! \param[in] address: the address where the neuron parameters are stored
-//! in SDRAM
+//!     in SDRAM
 //! \return bool which is true if the mem copy's worked, false otherwise
 static bool neuron_load_neuron_parameters(address_t address) {
     log_debug("loading parameters");
@@ -76,7 +72,6 @@ static bool neuron_load_neuron_parameters(address_t address) {
 }
 
 bool neuron_resume(address_t address) { // EXPORTED
-
     if (!neuron_recording_reset(n_neurons)){
         log_error("failed to reload the neuron recording parameters");
         return false;
@@ -86,13 +81,6 @@ bool neuron_resume(address_t address) { // EXPORTED
     return neuron_load_neuron_parameters(address);
 }
 
-//! \brief Set up the neuron models
-//! \param[in] address the absolute address in SDRAM for the start of the
-//!            NEURON_PARAMS data region in SDRAM
-//! \param[in] recording_flags_param the recordings parameters
-//!            (contains which regions are active and how big they are)
-//! \param[out] n_neurons_value The number of neurons this model is to emulate
-//! \return True is the initialisation was successful, otherwise False
 bool neuron_initialise(address_t address, address_t recording_address, // EXPORTED
         uint32_t *n_neurons_value, uint32_t *n_synapse_types_value,
         uint32_t *incoming_spike_buffer_size, uint32_t *timer_offset) {
@@ -139,17 +127,15 @@ bool neuron_initialise(address_t address, address_t recording_address, // EXPORT
     }
 
     // setup recording region
-    if (!neuron_recording_initialise(recording_address, &recording_flags, n_neurons)) {
+    if (!neuron_recording_initialise(
+            recording_address, &recording_flags, n_neurons)) {
         return false;
     }
 
     return true;
 }
 
-//! \brief stores neuron parameter back into SDRAM
-//! \param[in] address: the address in SDRAM to start the store
 void neuron_pause(address_t address) { // EXPORTED
-
     /* Finalise any recordings that are in progress, writing back the final
      * amounts of samples recorded to SDRAM */
     if (recording_flags > 0) {
@@ -159,14 +145,14 @@ void neuron_pause(address_t address) { // EXPORTED
 
     // call neuron implementation function to do the work
     neuron_impl_store_neuron_parameters(
-        address, START_OF_GLOBAL_PARAMETERS, n_neurons);
+            address, START_OF_GLOBAL_PARAMETERS, n_neurons);
 }
 
-//! \executes all the updates to neural parameters when a given timer period
-//! has occurred.
-//! \param[in] time the timer tick  value currently being executed
 void neuron_do_timestep_update( // EXPORTED
         timer_t time, uint timer_count, uint timer_period) {
+    // Spin1 API ticks - to know when the timer wraps
+    extern uint ticks;
+
     // Set the next expected time to wait for between spike sending
     expected_time = sv->cpu_clk * timer_period;
 
@@ -191,7 +177,6 @@ void neuron_do_timestep_update( // EXPORTED
             synapse_dynamics_process_post_synaptic_event(time, neuron_index);
 
             if (use_key) {
-
                 // Wait until the expected time to send
                 while ((ticks == timer_count) &&
                         (tc[T1_COUNT] > expected_time)) {
@@ -212,8 +197,7 @@ void neuron_do_timestep_update( // EXPORTED
     }
 
     // Disable interrupts to avoid possible concurrent access
-    uint cpsr = 0;
-    cpsr = spin1_int_disable();
+    uint cpsr = spin1_int_disable();
 
     // Record the recorded variables
     neuron_recording_record(time);

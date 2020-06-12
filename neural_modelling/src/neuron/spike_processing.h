@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Spike processing API
 #ifndef _SPIKE_PROCESSING_H_
 #define _SPIKE_PROCESSING_H_
 
@@ -22,36 +24,46 @@
 #include <common/in_spikes.h>
 #include <spin1_api.h>
 
+//! \brief Initialise the spike processing system
+//! \param[in] row_max_n_bytes: The maximum size of a synaptic row
+//! \param[in] mc_packet_callback_priority:
+//!     Multicast packet receive interrupt priority
+//! \param[in] user_event_priority: User event interrupt priority
+//! \param[in] incoming_spike_buffer_size: Size of buffer for receiving spikes
+//! \return True if initialisation succeeded
 bool spike_processing_initialise(
         size_t row_max_n_bytes, uint mc_packet_callback_priority,
         uint user_event_priority, uint incoming_spike_buffer_size);
 
-//! \brief returns the number of times the input buffer has overflowed
+//! \brief Gets the number of times the input buffer has overflowed
 //! \return the number of times the input buffer has overflowed
 uint32_t spike_processing_get_buffer_overflows(void);
 
-//! \brief returns the number of ghost searches occurred
+//! \brief Gets the number of ghost searches of the master population table
+//!     that occurred
 //! \return the number of times a ghost search occurred.
 uint32_t spike_processing_get_ghost_pop_table_searches(void);
 
-//! \brief returns the number of DMA's that were completed
+//! \brief Gets the number of DMA's that were completed
 //! \return the number of DMA's that were completed.
 uint32_t spike_processing_get_dma_complete_count(void);
 
-//! \brief returns the number of spikes that were processed
+//! \brief Gets the number of spikes that were processed
 //! \return the number of spikes that were processed
 uint32_t spike_processing_get_spike_processing_count(void);
 
-//! \brief returns the number of master pop table failed hits
+//! \brief Gets the number of master population table searches that failed to
+//!     find a hit.
 //! \return the number of times a spike did not have a master pop table entry
 uint32_t spike_processing_get_invalid_master_pop_table_hits(void);
 
-//! \brief returns the number of successful rewires performed
+//! \brief Gets the number of successful rewires performed
 //! \return the number of successful rewires
 uint32_t spike_processing_get_successful_rewires(void);
 
-//! \brief set the number of times spike_processing has to attempt rewiring
-//! \return currently, always true
-bool spike_processing_do_rewiring(int number_of_rew);
+//! \brief Set the number of times spike_processing has to attempt rewiring.
+//! \param[in] number_of_rewires: The number of rewirings to perform
+//! \return currently always true
+bool spike_processing_do_rewiring(int number_of_rewires);
 
 #endif // _SPIKE_PROCESSING_H_

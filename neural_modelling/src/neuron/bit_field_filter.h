@@ -15,15 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Bit field filtering functions.
 #include <bit_field.h>
 #include <filter_info.h>
 #include <debug.h>
 #include "population_table/population_table.h"
 
+//! \brief Holds the bitfields describing the connectivity for atoms handled by
+//!     this core.
 bit_field_t *connectivity_bit_field;
 
-//! \brief the number of bit fields which were not able to be read in due to
-//!     DTCM limits
+//! \brief The number of bit fields which were not able to be read in due to
+//!     DTCM limits.
 uint32_t failed_bit_field_reads = 0;
 
 //! \brief Initialise the bitfield filtering system.

@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Operations on synapses
 #ifndef _SYNAPSES_H_
 #define _SYNAPSES_H_
 
@@ -22,19 +24,29 @@
 #include "synapse_row.h"
 #include "neuron.h"
 
-// Get the index of the ring buffer for a given timestep, synapse type and
-// neuron index
+//! \brief Get the index of the ring buffer for a given timestep, synapse type
+//!     and neuron index
+//! \param[in] simulation_timestep:
+//! \param[in] synapse_type_index:
+//! \param[in] neuron_index:
+//! \param[in] synapse_type_index_bits:
+//! \param[in] synapse_index_bits:
+//! \return Index into the ring buffer
 static inline index_t synapses_get_ring_buffer_index(
-        uint32_t simuation_timestep, uint32_t synapse_type_index,
+        uint32_t simulation_timestep, uint32_t synapse_type_index,
         uint32_t neuron_index, uint32_t synapse_type_index_bits,
         uint32_t synapse_index_bits) {
-    return ((simuation_timestep & SYNAPSE_DELAY_MASK) << synapse_type_index_bits)
+    return ((simulation_timestep & SYNAPSE_DELAY_MASK) << synapse_type_index_bits)
             | (synapse_type_index << synapse_index_bits)
             | neuron_index;
 }
 
-// Get the index of the ring buffer for a given timestep and combined
-// synapse type and neuron index (as stored in a synapse row)
+//! \brief Get the index of the ring buffer for a given timestep and combined
+//!     synapse type and neuron index (as stored in a synapse row)
+//! \param[in] simulation_timestep:
+//! \param[in] combined_synapse_neuron_index:
+//! \param[in] synapse_type_index_bits:
+//! \return Index into the ring buffer
 static inline index_t synapses_get_ring_buffer_index_combined(
         uint32_t simulation_timestep,
         uint32_t combined_synapse_neuron_index,
@@ -43,7 +55,10 @@ static inline index_t synapses_get_ring_buffer_index_combined(
             | combined_synapse_neuron_index;
 }
 
-// Converts a weight stored in a synapse row to an input
+//! \brief Converts a weight stored in a synapse row to an input
+//! \param[in] weight: the weight to convert in synapse-row form
+//! \param[in] left_shift: the shift to use when decoding
+//! \return the actual input weight for the model
 static inline input_t synapses_convert_weight_to_input(
         weight_t weight, uint32_t left_shift) {
     union {
@@ -56,6 +71,9 @@ static inline input_t synapses_convert_weight_to_input(
     return converter.output_type;
 }
 
+//! \brief Print the weight of a synapse
+//! \param[in] weight: the weight to print in synapse-row form
+//! \param[in] left_shift: the shift to use when decoding
 static inline void synapses_print_weight(
         weight_t weight, uint32_t left_shift) {
     if (weight != 0) {
@@ -66,20 +84,21 @@ static inline void synapses_print_weight(
     }
 }
 
-//! \brief inits the synapse processing
-//! \param[in] synapse_params_address: base address for the synapse params in
-//!     SDRAM
-//! \param[in] n_neurons: the number of neurons to simulate
-//! \param[in] n_synapse_types: how many synapse types there are
+//! \brief Initialise the synapse processing
+//! \param[in] synapse_params_address: Synapse configuration in SDRAM
+//! \param[in] n_neurons: Number of neurons to simulate
+//! \param[in] n_synapse_types: Number of synapse types
 //! \param[out] ring_buffer_to_input_buffer_left_shifts:
+//!     Array of shifts to use when converting from ring buffer values to input
+//!     buffer values
 //! \return True if successfully initialised. False otherwise.
 bool synapses_initialise(
         address_t synapse_params_address,
         uint32_t n_neurons, uint32_t n_synapse_types,
         uint32_t **ring_buffer_to_input_buffer_left_shifts);
 
-//! \brief updates synapses for a time step
-//! \param[in] time: the timer
+//! \brief Do all the synapse processing for a timestep.
+//! \param[in] time: the current simulation time
 void synapses_do_timestep_update(timer_t time);
 
 //! \brief process a synaptic row

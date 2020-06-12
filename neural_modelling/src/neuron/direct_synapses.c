@@ -15,12 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Implementation of direct_synapses.h
 #include <debug.h>
 #include <spin1_api.h>
 #include <common/neuron-typedefs.h>
 
+//! The size of the fixed synapse buffer, in words
 #define SIZE_OF_SINGLE_FIXED_SYNAPSE 4
 
+//! Working buffer for direct synapse access
 static uint32_t single_fixed_synapse[SIZE_OF_SINGLE_FIXED_SYNAPSE];
 
 bool direct_synapses_initialise(
@@ -31,16 +35,14 @@ bool direct_synapses_initialise(
     log_info("Direct matrix malloc size is %d", direct_matrix_size);
 
     if (direct_matrix_size != 0) {
-        *direct_synapses_address = (address_t)
-                spin1_malloc(direct_matrix_size);
-
+        *direct_synapses_address = spin1_malloc(direct_matrix_size);
         if (*direct_synapses_address == NULL) {
             log_error("Not enough memory to allocate direct matrix");
             return false;
         }
         log_debug("Copying %u bytes of direct synapses to 0x%08x",
                 direct_matrix_size, *direct_synapses_address);
-        spin1_memcpy(*direct_synapses_address, &(direct_matrix_address[1]),
+        spin1_memcpy(*direct_synapses_address, &direct_matrix_address[1],
                 direct_matrix_size);
     }
 
