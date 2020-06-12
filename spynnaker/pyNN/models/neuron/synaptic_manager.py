@@ -839,7 +839,7 @@ class SynapticManager(object):
                 gen, post_slices, post_slice_index, post_vertex_slice,
                 all_syn_block_sz, block_addr, machine_time_step,
                 generator_data)
-            key = (gen.synapse_info, gen.pre_vertex_slice.lo_atom,
+            key = (gen.synapse_info, gen.pre_slice.lo_atom,
                    post_vertex_slice.lo_atom)
             self.__synapse_indices[key] = index
         self._on_chip_generated_block_addr = block_addr
