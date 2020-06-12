@@ -23,7 +23,6 @@ from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
-from spynnaker.pyNN.utilities import constants
 import math
 
 
@@ -182,9 +181,7 @@ class SynapseDynamicsStructuralCommon(object):
         """ Write the synapse parameters to the spec.
         """
         spec.comment("Writing structural plasticity parameters")
-        if spec.current_region != constants.POPULATION_BASED_REGIONS. \
-                SYNAPSE_DYNAMICS.value:
-            spec.switch_write_focus(region)
+        spec.switch_write_focus(region)
 
         # Get relevant edges
         structural_edges = self.__get_structural_edges(
