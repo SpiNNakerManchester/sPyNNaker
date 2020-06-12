@@ -91,7 +91,15 @@ class SynapticManager(object):
         "__max_row_info",
         "__synapse_indices",
         "_host_generated_block_addr",
-        "_on_chip_generated_block_addr"]
+        "_on_chip_generated_block_addr",
+        # Overridable (for testing only) region IDs
+        "_synapse_params_region",
+        "_pop_table_region",
+        "_synaptic_matrix_region",
+        "_synapse_dynamics_region",
+        "_struct_dynamics_region",
+        "_connector_builder_region",
+        "_direct_matrix_region"]
 
     def __init__(self, n_synapse_types, ring_buffer_sigma, spikes_per_second,
                  config, population_table_type=None, synapse_io=None):
@@ -116,6 +124,20 @@ class SynapticManager(object):
         self.__n_synapse_types = n_synapse_types
         self.__ring_buffer_sigma = ring_buffer_sigma
         self.__spikes_per_second = spikes_per_second
+        self._synapse_params_region = \
+            POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value
+        self._pop_table_region = \
+            POPULATION_BASED_REGIONS.POPULATION_TABLE.value
+        self._synaptic_matrix_region = \
+            POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value
+        self._synapse_dynamics_region = \
+            POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value
+        self._struct_dynamics_region = \
+            POPULATION_BASED_REGIONS.STRUCTURAL_DYNAMICS.value
+        self._connector_builder_region = \
+            POPULATION_BASED_REGIONS.CONNECTOR_BUILDER.value
+        self._direct_matrix_region = \
+            POPULATION_BASED_REGIONS.DIRECT_MATRIX.value
 
         # Get the type of population table
         self.__poptable_type = population_table_type
@@ -452,7 +474,7 @@ class SynapticManager(object):
         :param ~.ApplicationVertex application_vertex:
         """
         spec.reserve_memory_region(
-            region=POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value,
+            region=self._synapse_params_region,
             size=self._get_synapse_params_size(),
             label='SynapseParams')
 
@@ -461,11 +483,11 @@ class SynapticManager(object):
                 machine_vertex, machine_graph)
         if master_pop_table_sz > 0:
             spec.reserve_memory_region(
-                region=POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
+                region=self._pop_table_region,
                 size=master_pop_table_sz, label='PopTable')
         if all_syn_block_sz > 0:
             spec.reserve_memory_region(
-                region=POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
+                region=self._synaptic_matrix_region,
                 size=all_syn_block_sz, label='SynBlocks')
 
         # return if not got a synapse dynamics
@@ -477,7 +499,7 @@ class SynapticManager(object):
                 vertex_slice.n_atoms, self.__n_synapse_types)
         if synapse_dynamics_sz != 0:
             spec.reserve_memory_region(
-                region=POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value,
+                region=self._synapse_dynamics_region,
                 size=synapse_dynamics_sz, label='synapseDynamicsParams')
 
         # if structural, create structural region
@@ -492,7 +514,7 @@ class SynapticManager(object):
 
             if synapse_structural_dynamics_sz != 0:
                 spec.reserve_memory_region(
-                    region=POPULATION_BASED_REGIONS.STRUCTURAL_DYNAMICS.value,
+                    region=self._struct_dynamics_region,
                     size=synapse_structural_dynamics_sz,
                     label='synapseDynamicsStructuralParams')
 
@@ -682,7 +704,7 @@ class SynapticManager(object):
         return list(max_weight_powers)
 
     @staticmethod
-    def _get_weight_scale(ring_buffer_to_input_left_shift):
+    def __get_weight_scale(ring_buffer_to_input_left_shift):
         """ Return the amount to scale the weights by to convert them from \
             floating point values to 16-bit fixed point numbers which can be \
             shifted left by ring_buffer_to_input_left_shift to produce an\
@@ -703,19 +725,17 @@ class SynapticManager(object):
         :rtype: ~numpy.ndarray
         """
         # Write the ring buffer shifts
-        spec.switch_write_focus(POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value)
+        spec.switch_write_focus(self._synapse_params_region)
         spec.write_array(ring_buffer_shifts)
 
         # Return the weight scaling factors
         return numpy.array([
-            self._get_weight_scale(r) * weight_scale
+            self.__get_weight_scale(r) * weight_scale
             for r in ring_buffer_shifts])
 
-    def _write_padding(
-            self, spec, synaptic_matrix_region, next_block_start_address):
+    def _write_padding(self, spec, next_block_start_address):
         """
         :param ~.DataSpecificationGenerator spec:
-        :param int synaptic_matrix_region:
         :param int next_block_start_address:
         :rtype: int
         """
@@ -725,7 +745,7 @@ class SynapticManager(object):
 
             # Pad out data file with the added alignment bytes:
             spec.comment("\nWriting population table required padding\n")
-            spec.switch_write_focus(synaptic_matrix_region)
+            spec.switch_write_focus(self._synaptic_matrix_region)
             spec.set_register_value(
                 register_id=15,
                 data=next_block_allowed_address - next_block_start_address)
@@ -738,9 +758,7 @@ class SynapticManager(object):
     def _write_synaptic_matrix_and_master_population_table(
             self, spec, post_slices, post_slice_index, machine_vertex,
             post_vertex_slice, all_syn_block_sz, weight_scales,
-            master_pop_table_region, synaptic_matrix_region,
-            direct_matrix_region, routing_info, machine_graph,
-            machine_time_step):
+            routing_info, machine_graph, machine_time_step):
         """ Simultaneously generates both the master population table and
             the synaptic matrix.
 
@@ -751,9 +769,6 @@ class SynapticManager(object):
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
         :param all_syn_block_sz:
         :param weight_scales:
-        :param int master_pop_table_region:
-        :param int synaptic_matrix_region:
-        :param int direct_matrix_region:
         :param .RoutingInfo routing_info:
         :param .MachineGraph machine_graph:
         :param int machine_time_step:
@@ -774,7 +789,7 @@ class SynapticManager(object):
         # Set up for single synapses - write the offset of the single synapses
         # initially 0
         single_synapses = list()
-        spec.switch_write_focus(synaptic_matrix_region)
+        spec.switch_write_focus(self._synaptic_matrix_region)
         single_addr = 0
 
         # Store a list of synapse info to be generated on the machine
@@ -817,9 +832,8 @@ class SynapticManager(object):
                             pre_slice_index, app_edge, rinfo))
                     else:
                         block_addr, single_addr, index = self.__write_block(
-                            spec, synaptic_matrix_region, synapse_info,
-                            pre_slices, pre_slice_index, post_slices,
-                            post_slice_index, pre_vertex_slice,
+                            spec, synapse_info, pre_slices, pre_slice_index,
+                            post_slices, post_slice_index, pre_vertex_slice,
                             post_vertex_slice, app_edge,
                             self.__n_synapse_types, single_synapses,
                             weight_scales, machine_time_step, rinfo,
@@ -845,23 +859,23 @@ class SynapticManager(object):
         self._on_chip_generated_block_addr = block_addr
 
         self.__poptable_type.finish_master_pop_table(
-            spec, master_pop_table_region)
+            spec, self._pop_table_region)
 
         # Write the size and data of single synapses to the direct region
         if single_synapses:
             single_data = numpy.concatenate(single_synapses)
             spec.reserve_memory_region(
-                region=direct_matrix_region,
+                region=self._direct_matrix_region,
                 size=(len(single_data) + 1) * BYTES_PER_WORD,
                 label='DirectMatrix')
-            spec.switch_write_focus(direct_matrix_region)
+            spec.switch_write_focus(self._direct_matrix_region)
             spec.write_value(len(single_data) * BYTES_PER_WORD)
             spec.write_array(single_data)
         else:
             spec.reserve_memory_region(
-                region=direct_matrix_region, size=BYTES_PER_WORD,
+                region=self._direct_matrix_region, size=BYTES_PER_WORD,
                 label="DirectMatrix")
-            spec.switch_write_focus(direct_matrix_region)
+            spec.switch_write_focus(self._direct_matrix_region)
             spec.write_value(0)
 
         return generator_data
@@ -973,14 +987,13 @@ class SynapticManager(object):
         return block_addr, index
 
     def __write_block(
-            self, spec, synaptic_matrix_region, synapse_info, pre_slices,
+            self, spec, synapse_info, pre_slices,
             pre_slice_index, post_slices, post_slice_index, pre_vertex_slice,
             post_vertex_slice, app_edge, n_synapse_types, single_synapses,
             weight_scales, machine_time_step, rinfo, all_syn_block_sz,
             block_addr, single_addr, machine_edge):
         """
         :param ~.DataSpecificationGenerator spec:
-        :param int synaptic_matrix_region:
         :param SynapseInformation synapse_info:
         :param list(.Slice) pre_slices:
         :param int pre_slice_index:
@@ -1031,8 +1044,8 @@ class SynapticManager(object):
             block_addr, single_addr, index = self.__write_row_data(
                 spec, synapse_info.connector, pre_vertex_slice,
                 post_vertex_slice, row_length, row_data, rinfo,
-                single_synapses, synaptic_matrix_region, block_addr,
-                single_addr, app_edge, synapse_info)
+                single_synapses, block_addr, single_addr, app_edge,
+                synapse_info)
         elif rinfo is not None:
             index = self.__poptable_type.update_master_population_table(
                 0, 0, rinfo.first_key_and_mask)
@@ -1050,8 +1063,8 @@ class SynapticManager(object):
             block_addr, single_addr, d_index = self.__write_row_data(
                 spec, synapse_info.connector, pre_vertex_slice,
                 post_vertex_slice, delayed_row_length, delayed_row_data,
-                delay_rinfo, single_synapses, synaptic_matrix_region,
-                block_addr, single_addr, app_edge, synapse_info)
+                delay_rinfo, single_synapses,  block_addr, single_addr,
+                app_edge, synapse_info)
         elif delay_rinfo is not None:
             d_index = self.__poptable_type.update_master_population_table(
                 0, 0, delay_rinfo.first_key_and_mask)
@@ -1092,9 +1105,7 @@ class SynapticManager(object):
     def __write_row_data(
             self, spec, connector, pre_vertex_slice, post_vertex_slice,
             row_length, row_data, rinfo, single_synapses,
-
-            synaptic_matrix_region, block_addr, single_addr, app_edge,
-            synapse_info):
+            block_addr, single_addr, app_edge, synapse_info):
         """
         :param ~.DataSpecificationGenerator spec:
         :param AbstractConnector connector:
@@ -1104,7 +1115,6 @@ class SynapticManager(object):
         :param ~numpy.ndarray row_data:
         :param .PartitionRoutingInfo rinfo:
         :param list(~numpy.ndarray) single_synapses:
-        :param int synaptic_matrix_region:
         :param int block_addr:
         :param int single_addr:
         :param ProjectionApplicationEdge app_edge:
@@ -1120,9 +1130,8 @@ class SynapticManager(object):
                 single_addr, 1, rinfo.first_key_and_mask, is_single=True)
             single_addr += len(single_rows) * BYTES_PER_WORD
         else:
-            block_addr = self._write_padding(
-                spec, synaptic_matrix_region, block_addr)
-            spec.switch_write_focus(synaptic_matrix_region)
+            block_addr = self._write_padding(spec, block_addr)
+            spec.switch_write_focus(self._synaptic_matrix_region)
             spec.write_array(row_data)
             index = self.__poptable_type.update_master_population_table(
                 block_addr, row_length, rinfo.first_key_and_mask)
@@ -1204,23 +1213,19 @@ class SynapticManager(object):
         gen_data = self._write_synaptic_matrix_and_master_population_table(
             spec, post_slices, post_slice_idx, machine_vertex,
             post_vertex_slice, all_syn_block_sz, weight_scales,
-            POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
-            POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
-            POPULATION_BASED_REGIONS.DIRECT_MATRIX.value,
             routing_info, machine_graph, machine_time_step)
 
         if self.__synapse_dynamics is not None:
             self.__synapse_dynamics.write_parameters(
-                spec, POPULATION_BASED_REGIONS.SYNAPSE_DYNAMICS.value,
+                spec, self._synapse_dynamics_region,
                 machine_time_step, weight_scales)
 
             if isinstance(self.__synapse_dynamics,
                           AbstractSynapseDynamicsStructural):
                 self.__synapse_dynamics.write_structural_parameters(
-                    spec, POPULATION_BASED_REGIONS.STRUCTURAL_DYNAMICS.value,
-                    machine_time_step, weight_scales, application_graph,
-                    application_vertex, post_vertex_slice,
-                    routing_info, self.__synapse_indices)
+                    spec, self._struct_dynamics_region, machine_time_step,
+                    weight_scales, application_graph, application_vertex,
+                    post_vertex_slice, routing_info, self.__synapse_indices)
 
         self.__weight_scales[placement] = weight_scales
 
@@ -1335,14 +1340,11 @@ class SynapticManager(object):
         :rtype: tuple(int, int, int)
         """
         master_pop_table = locate_memory_region_for_placement(
-            placement, POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
-            transceiver)
+            placement, self._pop_table_region, transceiver)
         synaptic_matrix = locate_memory_region_for_placement(
-            placement, POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value,
-            transceiver)
-        direct_synapses = locate_memory_region_for_placement(
-            placement, POPULATION_BASED_REGIONS.DIRECT_MATRIX.value,
-            transceiver) + BYTES_PER_WORD
+            placement, self._synaptic_matrix_region, transceiver)
+        direct_synapses = BYTES_PER_WORD + locate_memory_region_for_placement(
+            placement, self._direct_matrix_region, transceiver)
         return master_pop_table, direct_synapses, synaptic_matrix
 
     def _extract_synaptic_matrix_data_location(
@@ -1553,10 +1555,9 @@ class SynapticManager(object):
             n_bytes += data.size
 
         spec.reserve_memory_region(
-            region=POPULATION_BASED_REGIONS.CONNECTOR_BUILDER.value,
+            region=self._connector_builder_region,
             size=n_bytes, label="ConnectorBuilderRegion")
-        spec.switch_write_focus(
-            region=POPULATION_BASED_REGIONS.CONNECTOR_BUILDER.value)
+        spec.switch_write_focus(self._connector_builder_region)
 
         spec.write_value(len(generator_data))
         spec.write_value(post_vertex_slice.lo_atom)
@@ -1570,10 +1571,7 @@ class SynapticManager(object):
             # enough, then weight_scales < 1 will result in a zero scale
             # if converted to an int, so this needs to be an S1615
             dtype = DataType.S1615
-            if w > dtype.max:
-                spec.write_value(data=dtype.max, data_type=dtype)
-            else:
-                spec.write_value(data=w, data_type=dtype)
+            spec.write_value(data=min(w, dtype.max), data_type=dtype)
 
         for data in generator_data:
             spec.write_array(data.gen_data)

@@ -279,8 +279,8 @@ class TestSynapticManager(unittest.TestCase):
         spec_writer = FileDataWriter(temp_spec)
         spec = DataSpecificationGenerator(spec_writer, None)
         master_pop_sz = 1000
-        master_pop_region = 0
         all_syn_block_sz = 2000
+        master_pop_region = 0
         synapse_region = 1
         direct_region = 2
         spec.reserve_memory_region(master_pop_region, master_pop_sz)
@@ -289,11 +289,15 @@ class TestSynapticManager(unittest.TestCase):
         synaptic_manager = SynapticManager(
             n_synapse_types=2, ring_buffer_sigma=5.0,
             spikes_per_second=100.0, config=config)
+        # Poke in our testing region IDs
+        synaptic_manager._pop_table_region = master_pop_region
+        synaptic_manager._synaptic_matrix_region = synapse_region
+        synaptic_manager._direct_matrix_region = direct_region
+
         synaptic_manager._write_synaptic_matrix_and_master_population_table(
             spec, [post_vertex_slice], post_slice_index, post_vertex,
             post_vertex_slice, all_syn_block_sz, weight_scales,
-            master_pop_region, synapse_region, direct_region, routing_info,
-            graph, machine_time_step)
+            routing_info, graph, machine_time_step)
         spec.end_specification()
         spec_writer.close()
 
