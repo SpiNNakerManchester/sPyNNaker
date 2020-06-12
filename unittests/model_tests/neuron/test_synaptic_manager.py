@@ -347,7 +347,7 @@ class TestSynapticManager(unittest.TestCase):
             using_monitors=False)
         connections_1 = synaptic_manager._read_synapses(
             direct_synapse_information_1, pre_vertex_slice, post_vertex_slice,
-            row_len_1, 0, 2, weight_scales, data_1, None, machine_time_step)
+            row_len_1, 0, weight_scales, data_1, None, machine_time_step)
 
         # The first matrix is a 1-1 matrix, so row length is 1
         assert row_len_1 == 1
@@ -366,7 +366,7 @@ class TestSynapticManager(unittest.TestCase):
             using_monitors=False)
         connections_2 = synaptic_manager._read_synapses(
             direct_synapse_information_2, pre_vertex_slice, post_vertex_slice,
-            row_len_2, 0, 2, weight_scales, data_2, None, machine_time_step)
+            row_len_2, 0, weight_scales, data_2, None, machine_time_step)
 
         # The second matrix is a 1-1 matrix, so row length is 1
         assert row_len_2 == 1
@@ -385,7 +385,7 @@ class TestSynapticManager(unittest.TestCase):
             using_monitors=False)
         connections_3 = synaptic_manager._read_synapses(
             all_to_all_synapse_information, pre_vertex_slice,
-            post_vertex_slice, row_len_3, 0, 2, weight_scales, data_3, None,
+            post_vertex_slice, row_len_3, 0, weight_scales, data_3, None,
             machine_time_step)
 
         # The third matrix is an all-to-all matrix, so length is n_atoms
