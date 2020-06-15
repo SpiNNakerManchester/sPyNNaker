@@ -470,10 +470,9 @@ class SynapseDynamicsStructuralCommon(object):
         if not isinstance(synapse_info.synapse_dynamics,
                           AbstractSynapseDynamicsStructural):
             return
-        key = (app_edge.post_vertex, post_vertex_slice.lo_atom)
-        if key not in self.__connections.keys():
-            self.__connections[key] = []
-        self.__connections[key].append(
+        collector = self.__connections.get(
+            (app_edge.post_vertex, post_vertex_slice.lo_atom), [])
+        collector.append(
             (connections, app_edge, machine_edge, synapse_info))
 
     def n_words_for_plastic_connections(self, value):

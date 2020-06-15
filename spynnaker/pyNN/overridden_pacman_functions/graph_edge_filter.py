@@ -33,7 +33,9 @@ class GraphEdgeFilter(object):
         :param machine_graph: the machine_graph whose edges are to be filtered
         :return: a new, filtered machine graph
         """
-        new_machine_graph = MachineGraph(label=machine_graph.label)
+        app_graph = machine_graph.application_graph
+        new_machine_graph = MachineGraph(
+            label=machine_graph.label, application_graph=app_graph)
 
         # create progress bar
         progress = ProgressBar(
@@ -46,7 +48,7 @@ class GraphEdgeFilter(object):
             new_machine_graph.add_vertex(vertex)
 
         # purge the app graph of the old edges
-        machine_graph.application_graph.forget_machine_edges()
+        app_graph.forget_machine_edges()
 
         # start checking edges to decide which ones need pruning....
         prune_count = 0
@@ -65,11 +67,16 @@ class GraphEdgeFilter(object):
         # the application graph maps to now
         logger.debug("prune_count:{} no_prune_count:{}",
                      prune_count, no_prune_count)
-        machine_graph.application_graph.machine_graph = new_machine_graph
+        app_graph.machine_graph = new_machine_graph
         return new_machine_graph
 
     @staticmethod
     def _add_edge_to_new_graph(edge, partition, new_graph):
+        """
+        :param .MachineEdge edge:
+        :param .OutgoingEdgePartition partition:
+        :param .MachineGraph new_graph:
+        """
         new_graph.add_edge(edge, partition.identifier)
         edge.app_edge.remember_associated_machine_edge(edge)
 
@@ -82,6 +89,10 @@ class GraphEdgeFilter(object):
 
     @staticmethod
     def _is_filterable(edge):
+        """
+        :param .MachineEdge edge:
+        :rtype: bool
+        """
         if isinstance(edge, AbstractFilterableEdge):
             return edge.filter_edge()
         elif isinstance(edge.app_edge, ApplicationEdge):
