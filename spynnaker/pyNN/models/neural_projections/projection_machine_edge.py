@@ -65,7 +65,8 @@ class ProjectionMachineEdge(
                 pre = self.pre_vertex.vertex_slice
                 post = self.post_vertex.vertex_slice
                 # Filter edge if both are views and outside limits
-                if synapse_info.prepop_is_view and synapse_info.postpop_is_view:
+                if (synapse_info.prepop_is_view and
+                        synapse_info.postpop_is_view):
                     pre_lo = synapse_info.pre_population._indexes[0]
                     pre_hi = synapse_info.pre_population._indexes[-1]
                     post_lo = synapse_info.post_population._indexes[0]
