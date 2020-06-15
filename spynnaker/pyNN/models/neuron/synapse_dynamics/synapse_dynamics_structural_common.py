@@ -374,8 +374,7 @@ class SynapseDynamicsStructuralCommon(object):
         :param ~pacman.model.graphs.common.Slice post_slice:
         """
         # Get connections for this post slice
-        key = (app_vertex, post_slice.lo_atom)
-        slice_conns = self.__connections[key]
+        slice_conns = self.__connections[app_vertex, post_slice.lo_atom]
         # Make a single large array of connections
         connections = numpy.concatenate(
             [conn for (conn, _, _, _) in slice_conns])
@@ -470,7 +469,7 @@ class SynapseDynamicsStructuralCommon(object):
         if not isinstance(synapse_info.synapse_dynamics,
                           AbstractSynapseDynamicsStructural):
             return
-        collector = self.__connections.get(
+        collector = self.__connections.setdefault(
             (app_edge.post_vertex, post_vertex_slice.lo_atom), [])
         collector.append(
             (connections, app_edge, machine_edge, synapse_info))
