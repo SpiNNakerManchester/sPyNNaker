@@ -13,11 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import math
-import struct
+from collections import defaultdict
 import logging
 import os
-from collections import defaultdict
+import struct
 from spinn_utilities.progress_bar import ProgressBar
 from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState
@@ -46,9 +45,6 @@ class OnChipBitFieldGenerator(object):
     # flag which states that the binary finished cleanly.
     _SUCCESS = 0
 
-    # the number of bytes needed to read the user2 register
-    _USER_BYTES = 4
-
     # n key to n neurons maps size in words
     _N_KEYS_DATA_SET_IN_WORDS = 1
 
@@ -64,9 +60,8 @@ class OnChipBitFieldGenerator(object):
     # n elements in each key to n atoms map
     _N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP = 2
 
-    _BYTES_PER_FILTER = 12
-
-    _ONE_WORDS = struct.Struct("<I")
+    _ONE_WORD = struct.Struct("<I")
+    _THREE_WORDS = struct.Struct("<III")
 
     # bit field report file name
     _BIT_FIELD_REPORT_FILENAME = "generated_bit_fields.rpt"
@@ -196,8 +191,7 @@ class OnChipBitFieldGenerator(object):
         address = vertex.bit_field_base_address(txrx, placement)
 
         # read how many bitfields there are
-        n_bit_field_entries, = struct.unpack(
-            "<I", txrx.read_memory(
+        n_bit_field_entries, = self._ONE_WORD.unpack(txrx.read_memory(
                 placement.x, placement.y, address,
                 BYTES_PER_WORD))
         address += BYTES_PER_WORD
@@ -206,10 +200,10 @@ class OnChipBitFieldGenerator(object):
         for _bit_field_index in range(0, n_bit_field_entries):
             # master pop key, n words and read pointer
             _master_pop_key, n_words_to_read, bitfield_pointer = \
-                struct.unpack("<III", txrx.read_memory(
+                self._THREE_WORDS.unpack(txrx.read_memory(
                     placement.x, placement.y, address,
-                    self._BYTES_PER_FILTER))
-            address += self._BYTES_PER_FILTER
+                    self._THREE_WORDS.size))
+            address += self._THREE_WORDS.size
 
             # get bitfield words
             bit_field = struct.unpack(
@@ -270,7 +264,7 @@ class OnChipBitFieldGenerator(object):
             transceiver, placement)
 
         # read how many bitfields there are
-        n_bit_field_entries, = struct.unpack("<I", transceiver.read_memory(
+        n_bit_field_entries, = self._ONE_WORD.unpack(transceiver.read_memory(
             placement.x, placement.y, bit_field_address, BYTES_PER_WORD))
         reading_address = bit_field_address + BYTES_PER_WORD
 
@@ -278,11 +272,11 @@ class OnChipBitFieldGenerator(object):
         for _bit_field_index in range(0, n_bit_field_entries):
 
             # master pop key, n words and read pointer
-            master_pop_key, n_words_to_read, read_pointer = struct.unpack(
-                "<III", transceiver.read_memory(
+            master_pop_key, n_words_to_read, read_pointer = \
+                self._THREE_WORDS.unpack(transceiver.read_memory(
                     placement.x, placement.y, reading_address,
-                    self._BYTES_PER_FILTER))
-            reading_address += self._BYTES_PER_FILTER
+                    self._THREE_WORDS.size))
+            reading_address += self._THREE_WORDS.size
 
             # get bitfield words
             bit_field = struct.unpack(
@@ -304,10 +298,8 @@ class OnChipBitFieldGenerator(object):
         :param neuron_id: the neuron id to find the bit in the bitfield
         :return: the bit
         """
-        word_id = int(math.floor(neuron_id // self._BITS_IN_A_WORD))
-        bit_in_word = neuron_id % self._BITS_IN_A_WORD
-        flag = (bit_field[word_id] >> bit_in_word) & self._BIT_MASK
-        return flag
+        word_id, bit_in_word = divmod(neuron_id, self._BITS_IN_A_WORD)
+        return (bit_field[word_id] >> bit_in_word) & self._BIT_MASK
 
     def _calculate_core_data(
             self, app_graph, placements, progress,
@@ -356,8 +348,8 @@ class OnChipBitFieldGenerator(object):
         address = txrx.get_user_1_register_address_from_core(placement.p)
         txrx.write_memory(
             placement.x, placement.y, address,
-            self._ONE_WORDS.pack(bit_field_builder_region),
-            self._USER_BYTES)
+            self._ONE_WORD.pack(bit_field_builder_region),
+            self._ONE_WORD.size)
 
     def _check_for_success(self, executable_targets, transceiver):
         """ Goes through the cores checking for cores that have failed to\
@@ -382,6 +374,6 @@ class OnChipBitFieldGenerator(object):
         x = core_subset.x
         y = core_subset.y
         user_2_address = transceiver.get_user_2_register_address_from_core(p)
-        result, = struct.unpack("<I", transceiver.read_memory(
-            x, y, user_2_address, self._USER_BYTES))
+        result, = self._ONE_WORD.unpack(transceiver.read_memory(
+            x, y, user_2_address, self._ONE_WORD.size))
         return result

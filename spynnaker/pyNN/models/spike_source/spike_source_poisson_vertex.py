@@ -42,7 +42,8 @@ from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement, read_config_int)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from spinn_front_end_common.interface.profiling import profile_utils
+from spinn_front_end_common.interface.profiling.profile_utils import (
+    get_profile_region_size, reserve_profile_region, write_profile_region_data)
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, MultiSpikeRecorder, SimplePopulationSettable)
 from spynnaker.pyNN.utilities.constants import (
@@ -489,7 +490,7 @@ class SpikeSourcePoissonVertex(
             poisson_params_sz +
             recording_utilities.get_recording_header_size(1) +
             recording_utilities.get_recording_data_constant_size(1) +
-            profile_utils.get_profile_region_size(self.__n_profile_samples))
+            get_profile_region_size(self.__n_profile_samples))
 
         recording = self.get_recording_sdram_usage(
             vertex_slice, machine_time_step)
@@ -567,7 +568,7 @@ class SpikeSourcePoissonVertex(
             size=recording_utilities.get_recording_header_size(1),
             label="Recording")
 
-        profile_utils.reserve_profile_region(
+        reserve_profile_region(
             spec, _REGIONS.PROFILER_REGION.value, self.__n_profile_samples)
 
         placement.vertex.reserve_provenance_data_region(spec)
@@ -907,7 +908,7 @@ class SpikeSourcePoissonVertex(
 
         # locate SDRAM address where parameters are stored
         poisson_params = locate_memory_region_for_placement(
-                placement, _REGIONS.POISSON_PARAMS_REGION.value, transceiver)
+            placement, _REGIONS.POISSON_PARAMS_REGION.value, transceiver)
         seed_array = transceiver.read_memory(
             placement.x, placement.y, poisson_params + SEED_OFFSET_BYTES,
             SEED_SIZE_BYTES)
@@ -915,7 +916,7 @@ class SpikeSourcePoissonVertex(
 
         # locate SDRAM address where the rates are stored
         poisson_rate_region_sdram_address = locate_memory_region_for_placement(
-                placement, _REGIONS.RATES_REGION.value, transceiver)
+            placement, _REGIONS.RATES_REGION.value, transceiver)
 
         # get size of poisson params
         size_of_region = self.get_rates_bytes(vertex_slice)
@@ -1021,9 +1022,8 @@ class SpikeSourcePoissonVertex(
                                   first_machine_time_step)
 
         # write profile data
-        profile_utils.write_profile_region_data(
-            spec, _REGIONS.PROFILER_REGION.value,
-            self.__n_profile_samples)
+        write_profile_region_data(
+            spec, _REGIONS.PROFILER_REGION.value, self.__n_profile_samples)
 
         # End-of-Spec:
         spec.end_specification()

@@ -19,6 +19,8 @@ import os
 from six import with_metaclass
 from spinn_utilities.abstract_base import AbstractBase
 from spinn_utilities.log import FormatAdapter
+from spinn_front_end_common.utilities.constants import (
+    MICRO_TO_MILLISECOND_CONVERSION)
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
     AbstractSpinnakerBase)
 from spinn_front_end_common.utilities.constants import (

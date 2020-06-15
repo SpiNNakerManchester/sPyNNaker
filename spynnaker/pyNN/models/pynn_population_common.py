@@ -166,8 +166,7 @@ class PyNNPopulationCommon(object):
 
         # things for pynn demands
         self._all_ids = numpy.arange(
-            get_simulator().id_counter,
-            get_simulator().id_counter + size)
+            get_simulator().id_counter, get_simulator().id_counter + size)
         self.__first_id = self._all_ids[0]
         self.__last_id = self._all_ids[-1]
 

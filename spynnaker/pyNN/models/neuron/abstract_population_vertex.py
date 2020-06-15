@@ -31,18 +31,24 @@ from spinn_front_end_common.abstract_models import (
 from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl)
 from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES)
+    BYTES_PER_WORD, SIMULATION_N_BYTES, SYSTEM_BYTES_REQUIREMENT)
 from spinn_front_end_common.utilities.helpful_functions import (
     read_config_int, locate_memory_region_for_placement)
 from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
-from spinn_front_end_common.interface.simulation import simulation_utilities
-from spinn_front_end_common.interface.profiling import profile_utils
+from spinn_front_end_common.interface.simulation.simulation_utilities import (
+    get_simulation_header_array)
+from spinn_front_end_common.interface.profiling.profile_utils import (
+    get_profile_region_size, reserve_profile_region, write_profile_region_data)
 from spynnaker.pyNN.utilities.constants import (
     POPULATION_BASED_REGIONS, SPIKE_PARTITION_ID)
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, AbstractNeuronRecordable, NeuronRecorder)
-from spynnaker.pyNN.utilities import bit_field_utilities
+from spynnaker.pyNN.utilities.bit_field_utilities import (
+    exact_sdram_for_bit_field_builder_region,
+    get_estimated_sdram_for_bit_field_region,
+    get_estimated_sdram_for_key_region,
+    reserve_bit_field_regions, write_bitfield_init_data)
 from spynnaker.pyNN.models.abstract_models import (
     AbstractPopulationInitializable, AbstractAcceptsIncomingSynapses,
     AbstractPopulationSettable, AbstractReadParametersBeforeSet,
@@ -305,13 +311,10 @@ class AbstractPopulationVertex(
                 len(PopulationMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES)) +
             self.__synapse_manager.get_sdram_usage_in_bytes(
                 vertex_slice, machine_time_step, graph, self) +
-            profile_utils.get_profile_region_size(
-                self.__n_profile_samples) +
-            bit_field_utilities.get_estimated_sdram_for_bit_field_region(
-                graph, self) +
-            bit_field_utilities.get_estimated_sdram_for_key_region(
-                graph, self) +
-            bit_field_utilities.exact_sdram_for_bit_field_builder_region())
+            get_profile_region_size(self.__n_profile_samples) +
+            get_estimated_sdram_for_bit_field_region(graph, self) +
+            get_estimated_sdram_for_key_region(graph, self) +
+            exact_sdram_for_bit_field_builder_region())
         return sdram_requirement
 
     def _reserve_memory_regions(
@@ -342,12 +345,12 @@ class AbstractPopulationVertex(
             size=self._neuron_recorder.get_static_sdram_usage(vertex_slice),
             label="neuron recording")
 
-        profile_utils.reserve_profile_region(
+        reserve_profile_region(
             spec, POPULATION_BASED_REGIONS.PROFILING.value,
             self.__n_profile_samples)
 
         # reserve bit field region
-        bit_field_utilities.reserve_bit_field_regions(
+        reserve_bit_field_regions(
             spec, machine_graph, n_key_map, vertex,
             POPULATION_BASED_REGIONS.BIT_FIELD_BUILDER.value,
             POPULATION_BASED_REGIONS.BIT_FIELD_FILTER.value,
@@ -412,8 +415,7 @@ class AbstractPopulationVertex(
             n_atoms))
 
         # Set the focus to the memory region 2 (neuron parameters):
-        spec.switch_write_focus(
-            region=POPULATION_BASED_REGIONS.NEURON_PARAMS.value)
+        spec.switch_write_focus(POPULATION_BASED_REGIONS.NEURON_PARAMS.value)
 
         # Write the random back off value
         max_offset = (
@@ -539,7 +541,7 @@ class AbstractPopulationVertex(
 
         # Write the setup region
         spec.switch_write_focus(POPULATION_BASED_REGIONS.SYSTEM.value)
-        spec.write_array(simulation_utilities.get_simulation_header_array(
+        spec.write_array(get_simulation_header_array(
             self.get_binary_file_name(), machine_time_step,
             time_scale_factor))
 
@@ -553,7 +555,7 @@ class AbstractPopulationVertex(
             spec, key, vertex_slice, machine_time_step, time_scale_factor)
 
         # write profile data
-        profile_utils.write_profile_region_data(
+        write_profile_region_data(
             spec, POPULATION_BASED_REGIONS.PROFILING.value,
             self.__n_profile_samples)
 
@@ -570,7 +572,7 @@ class AbstractPopulationVertex(
             self.__synapse_manager.on_chip_written_matrix_size)
 
         # write up the bitfield builder data
-        bit_field_utilities.write_bitfield_init_data(
+        write_bitfield_init_data(
             spec, vertex, machine_graph, routing_info,
             n_key_map, POPULATION_BASED_REGIONS.BIT_FIELD_BUILDER.value,
             POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
@@ -752,8 +754,8 @@ class AbstractPopulationVertex(
 
         # locate SDRAM address to where the neuron parameters are stored
         neuron_region_sdram_address = locate_memory_region_for_placement(
-                placement, POPULATION_BASED_REGIONS.NEURON_PARAMS.value,
-                transceiver)
+            placement, POPULATION_BASED_REGIONS.NEURON_PARAMS.value,
+            transceiver)
 
         # shift past the extra stuff before neuron parameters that we don't
         # need to read

@@ -187,8 +187,7 @@ class NeuronImplStandard(AbstractNeuronImpl):
     @overrides(AbstractNeuronImpl.get_data)
     def get_data(self, parameters, state_variables, vertex_slice):
         # Work out the time step per step
-        ts = get_simulator().machine_time_step
-        ts /= self.__n_steps_per_timestep
+        ts = get_simulator().machine_time_step / self.__n_steps_per_timestep
         items = [numpy.array([self.__n_steps_per_timestep], dtype="uint32")]
         items.extend(
             component.get_data(parameters, state_variables, vertex_slice, ts)
