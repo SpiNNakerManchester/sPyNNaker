@@ -47,10 +47,6 @@ class GraphEdgeFilter(object):
         for vertex in progress.over(machine_graph.vertices, False):
             new_machine_graph.add_vertex(vertex)
 
-        # purge the app graph of the old edges
-        if app_graph:
-            app_graph.forget_machine_edges()
-
         # start checking edges to decide which ones need pruning....
         prune_count = 0
         no_prune_count = 0
@@ -68,8 +64,6 @@ class GraphEdgeFilter(object):
         # the application graph maps to now
         logger.debug("prune_count:{} no_prune_count:{}",
                      prune_count, no_prune_count)
-        if app_graph:
-            app_graph.machine_graph = new_machine_graph
         return new_machine_graph
 
     @staticmethod
