@@ -95,6 +95,10 @@ class GraphEdgeFilter(object):
         :param .MachineEdge edge:
         :rtype: bool
         """
+        # If our associated application edge wants to say don't filter...
+        if (isinstance(edge.app_edge, AbstractFilterableEdge)
+                and not edge.app_edge.filter_edge()):
+            return False
         if isinstance(edge, AbstractFilterableEdge):
             return edge.filter_edge()
         elif isinstance(edge.app_edge, ApplicationEdge):
