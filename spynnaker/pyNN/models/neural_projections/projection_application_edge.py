@@ -96,13 +96,11 @@ class ProjectionApplicationEdge(ApplicationEdge, AbstractFilterableEdge):
             return 0
         return self.__delay_edge.pre_vertex.n_delay_stages
 
-    @overrides(ApplicationEdge.create_machine_edge)
-    def create_machine_edge(
+    @overrides(ApplicationEdge._create_machine_edge)
+    def _create_machine_edge(
             self, pre_vertex, post_vertex, label):
-        edge = ProjectionMachineEdge(
+        return ProjectionMachineEdge(
             self.__synapse_information, pre_vertex, post_vertex, self, label)
-        self.remember_associated_machine_edge(edge)
-        return edge
 
     @overrides(AbstractFilterableEdge.filter_edge)
     def filter_edge(self):
