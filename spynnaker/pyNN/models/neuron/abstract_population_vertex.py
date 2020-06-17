@@ -113,9 +113,9 @@ class AbstractPopulationVertex(
 
     # 7 elements before the start of global parameters
     # 1. core slot, 2. micro secs before spike,
-    # 3. time between cores 4. has key, 5. key, 6. n atoms,
-    # 7. n synapse types, 8. incoming spike buffer size.
-    BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 8 * BYTES_PER_WORD
+    # 3. time between cores 4. initial offset. 5. has key, 6. key, 7. n atoms,
+    # 8. n synapse types, 9. incoming spike buffer size.
+    BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 9 * BYTES_PER_WORD
 
     # fraction of the real time we will use for spike transmissions
     FRACTION_OF_TIME_FOR_SPIKE_SENDING = 0.5
@@ -125,8 +125,6 @@ class AbstractPopulationVertex(
 
     # default number of microseconds between cores firing
     _DEFAULT_TIME_BETWEEN_CORES = 50
-
-    _n_vertices = 0
 
     def __init__(
             self, n_neurons, label, constraints, max_atoms_per_core,
@@ -386,7 +384,7 @@ class AbstractPopulationVertex(
 
     def _write_neuron_parameters(
             self, spec, routing_info, graph_mapper, machine_vertex,
-            machine_time_step, time_scale_factor):
+            machine_time_step, time_scale_factor, app_graph):
 
         # If resetting, reset any state variables that need to be reset
         if (self.__has_reset_last and
@@ -467,6 +465,9 @@ class AbstractPopulationVertex(
         spec.write_value(vertex_index & n_slots)
         spec.write_value(data=time_between_spikes)
         spec.write_value(data=self.__time_between_cores)
+        spec.write_value(
+            data=app_graph.vertices.index(self) * int(math.ceil(
+                len(app_graph.vertices) / self.__time_between_cores)))
 
         # Write whether the key is to be used, and then the key, or 0 if it
         # isn't to be used
@@ -535,19 +536,20 @@ class AbstractPopulationVertex(
         "machine_graph": "MemoryMachineGraph",
         "routing_info": "MemoryRoutingInfos",
         "data_n_time_steps": "DataNTimeSteps",
-        "n_key_map": "MemoryMachinePartitionNKeysMap"
+        "n_key_map": "MemoryMachinePartitionNKeysMap",
+        "app_graph": "MemoryApplicationGraph"
     })
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
         additional_arguments={
             "machine_time_step", "time_scale_factor", "graph_mapper",
             "application_graph", "machine_graph", "routing_info",
-            "data_n_time_steps", "n_key_map"
+            "data_n_time_steps", "n_key_map", "app_graph"
         })
     def generate_data_specification(
             self, spec, placement, machine_time_step, time_scale_factor,
             graph_mapper, application_graph, machine_graph, routing_info,
-            data_n_time_steps, n_key_map):
+            data_n_time_steps, n_key_map, app_graph):
         # pylint: disable=too-many-arguments, arguments-differ
         vertex = placement.vertex
 
@@ -577,7 +579,7 @@ class AbstractPopulationVertex(
         # Write the neuron parameters
         self._write_neuron_parameters(
             spec, routing_info, graph_mapper, placement.vertex,
-            machine_time_step, time_scale_factor)
+            machine_time_step, time_scale_factor, app_graph)
 
         # write profile data
         profile_utils.write_profile_region_data(

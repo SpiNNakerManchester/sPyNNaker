@@ -48,6 +48,9 @@ static uint32_t core_slot;
 //! The expected current clock tick of timer_1 when the next spike can be sent
 static uint32_t expected_time;
 
+//! the initial offset
+static uint32_t initial_offset;
+
 //! The recording flags
 static uint32_t recording_flags = 0;
 
@@ -56,6 +59,7 @@ struct neuron_parameters {
     uint32_t core_slot;
     uint32_t time_between_spikes;
     uint32_t time_between_cores;
+    uint32_t initial_offset;
     uint32_t has_key;
     uint32_t transmission_key;
     uint32_t n_neurons_to_simulate;
@@ -101,7 +105,8 @@ bool neuron_initialise(address_t address, address_t recording_address, // EXPORT
 
     time_between_spikes = params->time_between_spikes * sv->cpu_clk;
     time_between_cores = params->time_between_cores * sv->cpu_clk;
-    core_slot = params->core_slot;
+    core_slot = params->core_slot * sv->cpu_clk;
+    initial_offset = params->initial_offset * sv->cpu_clk;
     log_info("\t time between spikes %u", time_between_spikes);
     log_info("\t time between core index's %u", time_between_cores);
     log_info("\t core slot %u", core_slot);
@@ -174,7 +179,8 @@ static inline void neuron_tdma_spike_processing(
     // Set the next expected time to wait for between spike sending
     expected_time = (
         (sv->cpu_clk * timer_period) -
-        ((phase * time_between_spikes) + (time_between_cores * core_slot)));
+        ((phase * time_between_spikes) + (time_between_cores * core_slot) +
+         initial_offset));
 
     // Wait until the expected time to send
     while ((ticks == timer_count) && (tc[T1_COUNT] > expected_time)) {
