@@ -131,7 +131,7 @@ state_t neuron_model_state_update(
     else{
         v_mem_error = 0.k;
     }
-    learning_signal += v_mem_error;
+//    learning_signal += v_mem_error;
 
 //	REAL reg_error = (global_parameters->core_target_rate - global_parameters->core_pop_rate) / syn_dynamics_neurons_in_partition;
     REAL reg_learning_signal = (global_parameters->core_pop_rate // make it work for different ts
@@ -162,7 +162,7 @@ state_t neuron_model_state_update(
 //    if (new_learning_signal != learning_signal){// && time%1300 > 1100){
 //        io_printf(IO_BUF, "L:%k, rL:%k, cL:%k, nL:%k\n", learning_signal, reg_learning_signal, learning_signal + reg_learning_signal, new_learning_signal);
 //    if (reg_learning_signal > 0.5k || reg_learning_signal < -0.5k){
-    new_learning_signal = learning_signal + (reg_learning_signal);// * 0.1k);
+    new_learning_signal = learning_signal;// + (reg_learning_signal);// * 0.1k);
 //    }
 //        new_learning_signal = learning_signal;
 //    }
@@ -185,6 +185,7 @@ state_t neuron_model_state_update(
         neuron->refract_timer = 0;
 //        io_printf(IO_BUF, "reset B = %k, b = %k\n", neuron->B, neuron->b);
     }
+//    io_printf(IO_BUF, "check B = %k, b = %k, time = %u\n", neuron->B, neuron->b, time);
     // All operations now need doing once per eprop synapse
     for (uint32_t syn_ind=0; syn_ind < total_input_synapses_per_neuron; syn_ind++){
         if (time % 1300 == 0){
@@ -248,10 +249,10 @@ state_t neuron_model_state_update(
     	neuron->syn_state[syn_ind].z_bar_inp = 0;
 
     	// decrease timestep counter preventing rapid updates
-    	if (neuron->syn_state[syn_ind].update_ready > 0){
+//    	if (neuron->syn_state[syn_ind].update_ready > 0){
 //    	    io_printf(IO_BUF, "ff reducing %u -- update:%u\n", syn_ind, neuron->syn_state[syn_ind].update_ready - 1);
-    		neuron->syn_state[syn_ind].update_ready -= 1;
-    	}
+        neuron->syn_state[syn_ind].update_ready -= 1;
+//    	}
 //    	else{
 //    	    io_printf(IO_BUF, "ff not reducing %u\n", syn_ind);
 //    	}
@@ -323,10 +324,10 @@ state_t neuron_model_state_update(
     	neuron->syn_state[syn_ind].z_bar_inp = 0;
 
     	// decrease timestep counter preventing rapid updates
-    	if (neuron->syn_state[syn_ind].update_ready > 0){
+//    	if (neuron->syn_state[syn_ind].update_ready > 0){
 //    	    io_printf(IO_BUF, "recducing %u -- update:%u\n", syn_ind, neuron->syn_state[syn_ind].update_ready - 1);
-    		neuron->syn_state[syn_ind].update_ready -= 1;
-    	}
+        neuron->syn_state[syn_ind].update_ready -= 1;
+//    	}
 //    	else{
 //    	    io_printf(IO_BUF, "not recducing %u\n", syn_ind);
 //    	}
@@ -366,7 +367,7 @@ void neuron_model_print_state_variables(restrict neuron_pointer_t neuron) {
 }
 
 void neuron_model_print_parameters(restrict neuron_pointer_t neuron) {
-    io_printf(IO_BUF, "V reset       = %11.4k mv\n", neuron->V_reset);
+    io_printf(IO_BUF, "V reset       = %11.4k mv\n\n", neuron->V_reset);
     io_printf(IO_BUF, "V rest        = %11.4k mv\n", neuron->V_rest);
 
     io_printf(IO_BUF, "I offset      = %11.4k nA\n", neuron->I_offset);
@@ -380,9 +381,9 @@ void neuron_model_print_parameters(restrict neuron_pointer_t neuron) {
 
     io_printf(IO_BUF, "feedback w    = %k n/a\n\n", neuron->w_fb);
 
-    io_printf(IO_BUF, "window size   = %u ts\n\n", neuron->window_size);
+    io_printf(IO_BUF, "window size   = %u ts\n", neuron->window_size);
 
-    io_printf(IO_BUF, "e_to_dt_on_tau_a    = %k n/a\n\n", neuron->e_to_dt_on_tau_a);
+    io_printf(IO_BUF, "beta    = %k n/a\n", neuron->beta);
 
-    io_printf(IO_BUF, "adpt          = %k n/a\n\n", neuron->adpt);
+    io_printf(IO_BUF, "adpt          = %k n/a\n", neuron->adpt);
 }

@@ -308,6 +308,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     		additional_input, voltage);
 
     if (neuron_index == 0){
+//        io_printf(IO_BUF, "n0 - ");
         // update neuron parameters
         state_t result = neuron_model_state_update(
                 NUM_EXCITATORY_RECEPTORS, exc_input_values,
@@ -317,13 +318,14 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
         global_parameters->readout_V_0 = result;
 
     } else if (neuron_index == 1){
+//        io_printf(IO_BUF, "n1 - ");
         // update neuron parameters
-        learning_signal *= -1.k;
+//        learning_signal *= -1.k;
         state_t result = neuron_model_state_update(
                 NUM_EXCITATORY_RECEPTORS, exc_input_values,
                 NUM_INHIBITORY_RECEPTORS, inh_input_values,
                 external_bias, neuron, -50k);
-        learning_signal *= -1.k;
+//        learning_signal *= -1.k;
         // Finally, set global membrane potential to updated value
         global_parameters->readout_V_1 = result;
     }
@@ -335,7 +337,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 //    }
 //    io_printf(IO_BUF, "state = %u - %u\n", current_state, time);
     if (cue_number == 0 && completed_broadcast){ // reset start of new test
-        io_printf(IO_BUF, "time entering reset %u\n", time);
+//        io_printf(IO_BUF, "time entering reset %u\n", time);
 //        io_printf(IO_BUF, "Resetting\n");
         completed_broadcast = false;
         current_time = time;
@@ -508,7 +510,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
 //    learning_signal = global_parameters->cross_entropy;
 
-    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = learning_signal;
+    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = learning_signal;//exc_input_values[0];//neuron->syn_state[1].update_ready;//
     recorded_variable_values[V_RECORDING_INDEX] = voltage;
 //    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = ;
 //    if (neuron_index == 2){

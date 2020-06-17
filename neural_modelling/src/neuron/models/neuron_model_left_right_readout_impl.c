@@ -47,6 +47,8 @@ state_t neuron_model_state_update(
 
 	log_debug("Exc 1: %12.6k, Exc 2: %12.6k", exc_input[0], exc_input[1]);
 	log_debug("Inh 1: %12.6k, Inh 2: %12.6k", inh_input[0], inh_input[1]);
+//	io_printf(IO_BUF, "Exc 1: %12.6k, Exc 2: %12.6k - ", exc_input[0], exc_input[1]);
+//	io_printf(IO_BUF, "Inh 1: %12.6k, Inh 2: %12.6k - %u\n", inh_input[0], inh_input[1], time);
 	use(dummy);
 
     // If outside of the refractory period
@@ -151,10 +153,10 @@ state_t neuron_model_state_update(
         neuron->syn_state[syn_ind].z_bar_inp = 0;
 
     	// decrease timestep counter preventing rapid updates
-    	if (neuron->syn_state[syn_ind].update_ready > 0){
+//    	if (neuron->syn_state[syn_ind].update_ready > 0){
 //    	    io_printf(IO_BUF, "lr reducing %u -- update:%u\n", syn_ind, neuron->syn_state[syn_ind].update_ready - 1);
-    		neuron->syn_state[syn_ind].update_ready -= 1;
-    	}
+        neuron->syn_state[syn_ind].update_ready -= 1;
+//    	}
 //    	else{
 //    	    io_printf(IO_BUF, "lr not reducing %u\n", syn_ind);
 //    	}
@@ -196,7 +198,7 @@ void neuron_model_print_parameters(restrict neuron_pointer_t neuron) {
 
     io_printf(IO_BUF, "feedback w    = %k n/a\n", neuron->w_fb);
 
-    io_printf(IO_BUF, "feedback w    = %k n/a\n", neuron->window_size);
+    io_printf(IO_BUF, "window size   = %u n/a\n", neuron->window_size);
 
 //    io_printf(IO_BUF, "T refract     = %u timesteps\n", neuron->T_refract);
 //    io_printf(IO_BUF, "mean_isi_ticks  = %k\n", neuron->mean_isi_ticks);

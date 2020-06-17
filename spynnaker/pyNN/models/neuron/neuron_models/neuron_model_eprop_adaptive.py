@@ -170,7 +170,7 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
                 DataType.S1615, # z_bar
                 DataType.S1615, # ep_a
                 DataType.S1615, # e_bar
-                DataType.UINT32 # update_ready
+                DataType.INT32 # update_ready
             ]
         # Extend to include fan-in for each neuron
         datatype_list.extend(eprop_syn_state * SYNAPSES_PER_NEURON)
@@ -256,7 +256,7 @@ class NeuronModelEPropAdaptive(AbstractNeuronModel):
             state_variables[Z_BAR+str(n)] = 0
             state_variables[EP_A+str(n)] = 0
             state_variables[E_BAR+str(n)] = 0
-            state_variables[UPDATE_READY+str(n)] = 13000
+            state_variables[UPDATE_READY+str(n)] = self.__window_size
 
     @overrides(AbstractNeuronModel.get_units)
     def get_units(self, variable):
