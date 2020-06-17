@@ -16,8 +16,10 @@
  */
 
 /**
- *! \file
- *! \brief Common functions for matrix generation
+ * \dir
+ * \brief Synaptic matrix generators
+ * \file
+ * \brief Common functions for matrix generation
  */
 
 #ifndef __MATRIX_GENERATOR_COMMON_H__
@@ -26,12 +28,12 @@
 #include <debug.h>
 
 /**
- *! \brief The maximum delay value that can be represented on core
+ * \brief The maximum delay value that can be represented on core
  */
 #define MAX_DELAY 16
 
 /**
- *! \brief A converted final delay value and delay stage
+ * \brief A converted final delay value and delay stage
  */
 struct delay_value {
     uint16_t delay;
@@ -39,9 +41,10 @@ struct delay_value {
 };
 
 /**
- *! \brief Get a converted delay value and stage
- *! \param[in] The value to convert
- *! \param[in] The maximum delay stage allowed
+ * \brief Get a converted delay value and stage
+ * \param[in] delay_value: The value to convert
+ * \param[in] max_stage: The maximum delay stage allowed
+ * \return The converted delay value
  */
 static struct delay_value get_delay(uint16_t delay_value, uint32_t max_stage) {
     uint16_t delay = delay_value;

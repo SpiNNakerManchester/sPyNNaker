@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Support code for random_selection_impl.h
 #include "random_selection_impl.h"
 
 void partner_init(uint8_t **data) {
