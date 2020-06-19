@@ -46,6 +46,7 @@ class GraphEdgeFilter(object):
         # add the vertices directly, as they won't be pruned.
         for vertex in progress.over(machine_graph.vertices, False):
             new_machine_graph.add_vertex(vertex)
+            vertex.associate_application_vertex()
 
         # start checking edges to decide which ones need pruning....
         prune_count = 0
@@ -74,7 +75,7 @@ class GraphEdgeFilter(object):
         :param .MachineGraph new_graph:
         """
         new_graph.add_edge(edge, partition.identifier)
-        edge.app_edge.remember_associated_machine_edge(edge)
+        edge. associate_application_edge()
 
         # add partition constraints from the original graph to the new graph
         # add constraints from the application partition
