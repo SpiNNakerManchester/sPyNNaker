@@ -75,7 +75,7 @@ class GraphEdgeFilter(object):
         :param .MachineGraph new_graph:
         """
         new_graph.add_edge(edge, partition.identifier)
-        edge. associate_application_edge()
+        edge.associate_application_edge()
 
         # add partition constraints from the original graph to the new graph
         # add constraints from the application partition
