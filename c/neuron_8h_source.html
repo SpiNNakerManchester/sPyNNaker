@@ -92,32 +92,33 @@ $(function() {
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;<span class="preprocessor">#define _NEURON_H_</span></div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160; </div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;<span class="preprocessor">#include &lt;<a class="code" href="neuron-typedefs_8h.html">common/neuron-typedefs.h</a>&gt;</span></div>
-<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160; </div>
-<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;<span class="keywordtype">bool</span> <a class="code" href="neuron_8h.html#a883e3b3d586543070a684060e74d1a16">neuron_initialise</a>(</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;        address_t address, address_t recording_address, uint32_t *n_neurons_value,</div>
-<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;        uint32_t *n_synapse_types_value, uint32_t *incoming_spike_buffer_size,</div>
-<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;        uint32_t *<a class="code" href="delay__extension_8c.html#a73996d13ad0b2acf43a8bae560ac63c0">timer_offset</a>);</div>
-<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160; </div>
-<div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;<span class="keywordtype">void</span> <a class="code" href="neuron_8h.html#abf4cb8bac51f53a1628954d84b0db09d">neuron_do_timestep_update</a>(</div>
-<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;        timer_t <a class="code" href="delay__extension_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, uint timer_count, uint <a class="code" href="delay__extension_8c.html#ac0c27301e134af3ce80814a553601074">timer_period</a>);</div>
-<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160; </div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;<span class="keywordtype">bool</span> <a class="code" href="neuron_8h.html#a2511f7541e414899ee44c6260214c6c8">neuron_resume</a>(address_t address);</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160; </div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;<span class="keywordtype">void</span> <a class="code" href="neuron_8h.html#a4ac44865a6edf62cd9e8c3349023b792">neuron_pause</a>(address_t address);</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160; </div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="keywordtype">void</span> <a class="code" href="neuron_8h.html#abad40a95ed27eb262884dfd9f59b78d6">neuron_add_inputs</a>(</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;        index_t synapse_type_index, index_t neuron_index,</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;        <a class="code" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> weights_this_timestep);</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160; </div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;<span class="preprocessor">#if LOG_LEVEL &gt;= LOG_DEBUG</span></div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="keywordtype">void</span> <a class="code" href="neuron_8h.html#a4bd09a278d3fc33a8f186f405d650c4a">neuron_print_inputs</a>(<span class="keywordtype">void</span>);</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160; </div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;<span class="keywordtype">void</span> <a class="code" href="neuron_8h.html#a243d592c67c1db595bd3e4bf73454d33">neuron_print_synapse_parameters</a>(<span class="keywordtype">void</span>);</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160; </div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;<span class="keyword">const</span> <span class="keywordtype">char</span> *<a class="code" href="neuron_8h.html#a7a4c98f25d6221625769999846e97204">neuron_get_synapse_type_char</a>(uint32_t synapse_type);</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;<span class="preprocessor">#endif</span></div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160; </div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;<span class="preprocessor">#endif // _NEURON_H_</span></div>
+<div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="preprocessor">#include &lt;spin1_api.h&gt;</span></div>
+<div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160; </div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;<span class="keywordtype">bool</span> <a class="code" href="neuron_8h.html#a883e3b3d586543070a684060e74d1a16">neuron_initialise</a>(</div>
+<div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;        address_t address, address_t recording_address, uint32_t *n_neurons_value,</div>
+<div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;        uint32_t *n_synapse_types_value, uint32_t *incoming_spike_buffer_size,</div>
+<div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160;        uint32_t *<a class="code" href="delay__extension_8c.html#a73996d13ad0b2acf43a8bae560ac63c0">timer_offset</a>);</div>
+<div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160; </div>
+<div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;<span class="keywordtype">void</span> <a class="code" href="neuron_8h.html#abf4cb8bac51f53a1628954d84b0db09d">neuron_do_timestep_update</a>(</div>
+<div class="line"><a name="l00065"></a><span class="lineno">   65</span>&#160;        timer_t <a class="code" href="delay__extension_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, uint timer_count, uint <a class="code" href="delay__extension_8c.html#ac0c27301e134af3ce80814a553601074">timer_period</a>);</div>
+<div class="line"><a name="l00066"></a><span class="lineno">   66</span>&#160; </div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;<span class="keywordtype">bool</span> <a class="code" href="neuron_8h.html#a2511f7541e414899ee44c6260214c6c8">neuron_resume</a>(address_t address);</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160; </div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;<span class="keywordtype">void</span> <a class="code" href="neuron_8h.html#a4ac44865a6edf62cd9e8c3349023b792">neuron_pause</a>(address_t address);</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160; </div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;<span class="keywordtype">void</span> <a class="code" href="neuron_8h.html#abad40a95ed27eb262884dfd9f59b78d6">neuron_add_inputs</a>(</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;        index_t synapse_type_index, index_t neuron_index,</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;        <a class="code" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a> weights_this_timestep);</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160; </div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;<span class="preprocessor">#if LOG_LEVEL &gt;= LOG_DEBUG</span></div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;<span class="keywordtype">void</span> <a class="code" href="neuron_8h.html#a4bd09a278d3fc33a8f186f405d650c4a">neuron_print_inputs</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160; </div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;<span class="keywordtype">void</span> <a class="code" href="neuron_8h.html#a243d592c67c1db595bd3e4bf73454d33">neuron_print_synapse_parameters</a>(<span class="keywordtype">void</span>);</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160; </div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;<span class="keyword">const</span> <span class="keywordtype">char</span> *<a class="code" href="neuron_8h.html#a7a4c98f25d6221625769999846e97204">neuron_get_synapse_type_char</a>(uint32_t synapse_type);</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;<span class="preprocessor">#endif</span></div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160; </div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;<span class="preprocessor">#endif // _NEURON_H_</span></div>
 </div><!-- fragment --></div><!-- contents -->
 <div class="ttc" id="aneuron_8c_html_ab9132b5a04a7bdb8ac2e4293c1ec96bf"><div class="ttname"><a href="neuron_8c.html#ab9132b5a04a7bdb8ac2e4293c1ec96bf">use_key</a></div><div class="ttdeci">static bool use_key</div><div class="ttdef"><b>Definition:</b> neuron.c:33</div></div>
 <div class="ttc" id="aneuron_8h_html_a7a4c98f25d6221625769999846e97204"><div class="ttname"><a href="neuron_8h.html#a7a4c98f25d6221625769999846e97204">neuron_get_synapse_type_char</a></div><div class="ttdeci">const char * neuron_get_synapse_type_char(uint32_t synapse_type)</div><div class="ttdoc">Get the synapse type description character.</div><div class="ttdef"><b>Definition:</b> neuron.c:225</div></div>
@@ -173,7 +174,7 @@ $(function() {
 <div class="ttc" id="aneuron__impl_8h_html_a21f9a596a5048838a60fee323e466314"><div class="ttname"><a href="neuron__impl_8h.html#a21f9a596a5048838a60fee323e466314">neuron_impl_do_timestep_update</a></div><div class="ttdeci">static bool neuron_impl_do_timestep_update(index_t neuron_index, input_t external_bias)</div><div class="ttdoc">Do the timestep update for the particular implementation.</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Jun 17 2020 22:54:45 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Jun 23 2020 15:33:23 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.17
 </small></address>
