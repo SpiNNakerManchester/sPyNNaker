@@ -28,12 +28,15 @@ class GraphEdgeFilter(object):
     """ Removes graph edges that aren't required
     """
 
-    def __call__(self, machine_graph):
+    def __call__(self, app_graph, machine_graph):
         """
-        :param machine_graph: the machine_graph whose edges are to be filtered
+        :param application_graph: The application graph
+        :type application_graph:
+            ~pacman.model.graphs.application.ApplicationGraph or None
+        :param .MachineGraph new_graph:
+             The machine_graph whose edges are to be filtered
         :return: a new, filtered machine graph
         """
-        app_graph = machine_graph.application_graph
         new_machine_graph = MachineGraph(
             label=machine_graph.label, application_graph=app_graph)
 
