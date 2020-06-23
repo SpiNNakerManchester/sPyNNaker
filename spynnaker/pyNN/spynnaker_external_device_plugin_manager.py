@@ -292,9 +292,9 @@ class SpynnakerExternalDevicePluginManager(object):
 
         :param ~pacman.model.graphs.application.ApplicationVertex vertex:
             the pre-vertex to connect the edge from
-        :param ~pacman.model.graphs.application.ApplicationVertex \
-                device_vertex:
-            the post vertex to connect the edge to
+        :param device_vertex: the post vertex to connect the edge to
+        :type device_vertex:
+            ~pacman.model.graphs.application.ApplicationVertex 
         :param str partition_id: the partition identifier for making nets
         """
         _spinnaker = get_simulator()
