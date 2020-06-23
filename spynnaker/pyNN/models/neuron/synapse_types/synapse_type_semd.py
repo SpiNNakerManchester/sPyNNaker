@@ -17,6 +17,8 @@ import numpy
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from .abstract_synapse_type import AbstractSynapseType
+from spinn_front_end_common.utilities.constants import (
+    MICRO_TO_MILLISECOND_CONVERSION)
 
 TAU_SYN_E = 'tau_syn_E'
 TAU_SYN_E2 = 'tau_syn_E2'
@@ -116,7 +118,7 @@ class SynapseTypeSEMD(AbstractSynapseType):
         :param int ts: machine time step
         """
         # pylint: disable=arguments-differ
-        tsfloat = float(ts) / 1000.0
+        tsfloat = float(ts) / MICRO_TO_MILLISECOND_CONVERSION
 
         def decay(x):
             return numpy.exp(-tsfloat / x)

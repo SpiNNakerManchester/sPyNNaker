@@ -17,7 +17,7 @@ import logging
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, BYTES_PER_SHORT)
+    BYTES_PER_WORD, BYTES_PER_SHORT, MICRO_TO_MILLISECOND_CONVERSION)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
     AbstractTimingDependence)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
@@ -50,7 +50,8 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
 
         self.__synapse_structure = SynapseStructureWeightOnly()
 
-        ts = get_simulator().machine_time_step / 1000.0
+        ts = get_simulator().machine_time_step
+        ts = ts / MICRO_TO_MILLISECOND_CONVERSION
         self.__tau_data = get_exp_lut_array(ts, self.__tau)
 
     @property
