@@ -596,6 +596,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
             key=self.pwm_pin_output_timer_c_channel_0_ratio_key,
             payload=timer_period, time=time)
 
+    @property
     def pwm_pin_output_timer_c_channel_1_ratio_key(self):
         return self._get_key(
             MOTOR_TIMER_C_CHANNEL_1_ACTIVE_PERIOD_KEY, RETINA_UART_SHIFT)
