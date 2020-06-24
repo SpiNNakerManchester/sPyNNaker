@@ -81,6 +81,11 @@ void neuron_model_has_spiked(neuron_pointer_t neuron) {
     neuron->refract_timer  = neuron->T_refract;
 }
 
+
+void neuron_model_set_v_hist(neuron_pointer_t neuron){
+	neuron->V_mem_hist = 1000.0k;
+}
+
 state_t neuron_model_get_membrane_voltage(neuron_pointer_t neuron) {
     return neuron->V_membrane;
 }

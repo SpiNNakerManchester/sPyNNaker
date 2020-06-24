@@ -1,7 +1,7 @@
 #ifndef _TIMING_RECURRENT_CYCLIC_IMPL_H_
 #define _TIMING_RECURRENT_CYCLIC_IMPL_H_
 
-#define print_plasticity false
+#define print_plasticity true
 
 //---------------------------------------
 // Typedefines
@@ -175,7 +175,25 @@ static inline update_state_t timing_apply_pre_spike(
 
 
        uint32_t random;
-       accum voltage_difference = post_synaptic_threshold->threshold_value - post_synaptic_mem_V;
+
+
+       // How far was the neuron from threshold just before the teaching signal arrived?
+       // Also extract flag indicating whether neuron was fired by presynaptic input (not Teacher!)
+       accum voltage_difference;
+
+       if (post_synaptic_mem_V == 1000.0k) {
+    	   // neuron was fired by presynaptic input
+    	   voltage_difference = 1000.0k;
+       } else {
+    	   // neuron was fired by Teacher
+    	   voltage_difference = post_synaptic_threshold->threshold_value - post_synaptic_mem_V;
+       }
+
+       // Voltage difference will be rectified (so no negative values allowed - can this ever happen?):
+       if (voltage_difference < (accum)0.0) {
+          voltage_difference = (accum)0.0;
+       }
+
 
        if (!random_enabled) {
     	   random = (STDP_FIXED_POINT_ONE>>3)-1; //5;
@@ -267,29 +285,41 @@ static inline update_state_t timing_apply_pre_spike(
         		if (previous_state.lock == 0){
                         	// SD New. don't depress if we're in the right firing zone:
                         	// How far was the neuron from threshold just before the teaching signal arrived?
-                        	if (voltage_difference < v_diff_pot_threshold) {
-                                        // Weight is to be used, but we don't want or need a full weight decrement.
-                                        // Lock so this weight does not get used again until it decays:
-                                        //previous_state.weight_state.weight = previous_state.weight_state.weight * 1.05k;
-                                        // SD 13/5/20: Let's depress by slightly more, to gently push spike time back:
-                                        previous_state.weight_state.weight = previous_state.weight_state.weight - 1;
-                                        //previous_state.weight_state.weight = previous_state.weight_state.weight * 0.88k;
-                                        previous_state.lock = 1;
-        			        previous_state.dep_accumulator = 0;
-                                }
-                                else {
-        			    // Otherwise, reset accumulator and apply depression
-        			    // Note: at present this is not gated on membrane potential
-        			    previous_state.dep_accumulator = 0;
+					if (voltage_difference < v_diff_pot_threshold) { // WARNING!!! THIS CONDITION IS OK, BUT voltage_difference CAN NOW TAKE VALUE 1000.0k
 
-        			    // Depress synapse using A2_minus rate
-        		            previous_state.weight_state = weight_one_term_apply_depression_sd(
-        		    	    previous_state.weight_state, syn_type, STDP_FIXED_POINT_ONE);
+						if (print_plasticity) {
+							io_printf(IO_BUF, "            Voltage diff: %k, lock in current state", voltage_difference);
+						}
+
+						// Weight is to be used, but we don't want or need a full weight decrement.
+						// Lock so this weight does not get used again until it decays:
+						//previous_state.weight_state.weight = previous_state.weight_state.weight * 1.05k;
+						// SD 13/5/20: Let's depress by slightly more, to gently push spike time back:
+						previous_state.weight_state.weight =
+								previous_state.weight_state.weight - 1;
+						//previous_state.weight_state.weight = previous_state.weight_state.weight * 0.88k;
+						previous_state.lock = 1;
+						previous_state.dep_accumulator = 0;
+					} else {
+
+						if (print_plasticity) {
+							io_printf(IO_BUF, "            Applying full depression", voltage_difference);
+						}
+						// Otherwise, reset accumulator and apply depression
+						// Note: at present this is not gated on membrane potential
+						previous_state.dep_accumulator = 0;
 
 
-        			    // Lock synapse in depressed state
-           			    previous_state.lock = 1;
-                                }
+
+						// Depress synapse using A2_minus rate
+						previous_state.weight_state =
+								weight_one_term_apply_depression_sd(
+										previous_state.weight_state, syn_type,
+										STDP_FIXED_POINT_ONE);
+
+						// Lock synapse in depressed state
+						previous_state.lock = 1;
+					}
 
         		} else {
         			if (print_plasticity){
@@ -341,7 +371,16 @@ static inline update_state_t timing_apply_post_spike(
    //use(&post_synaptic_mem_V);
 
    // How far was the neuron from threshold just before the teaching signal arrived?
-   accum voltage_difference = post_synaptic_threshold->threshold_value - post_synaptic_mem_V;
+   // Also extract flag indicating whether neuron was fired by presynaptic input (not Teacher!)
+   accum voltage_difference;
+
+   if (post_synaptic_mem_V == 1000.0k) {
+	   // neuron was fired by presynaptic input
+	   voltage_difference = 1000.0k;
+   } else {
+	   // neuron was fired by Teacher
+	   voltage_difference = post_synaptic_threshold->threshold_value - post_synaptic_mem_V;
+   }
 
    // Voltage difference will be rectified (so no negative values allowed):
    if (voltage_difference < (accum) 0.0) {
@@ -403,7 +442,7 @@ static inline update_state_t timing_apply_post_spike(
 
                     //SD Mar31.2020 io_printf(IO_BUF, "+diff: %k, margin: %k\n", voltage_difference, v_diff_pot_threshold);
                     // Gate on voltage
-                    if (voltage_difference > v_diff_pot_threshold) {
+                    if (voltage_difference > v_diff_pot_threshold && voltage_difference != 1000.0k) {
                     	if (print_plasticity){
                     	    io_printf(IO_BUF, "Voltage  diff: %k, so potentiate\n", voltage_difference);
                             io_printf(IO_BUF, "Old weight: %u, ", previous_state.weight_state);
@@ -420,11 +459,19 @@ static inline update_state_t timing_apply_post_spike(
                         	io_printf(IO_BUF, "New Weight: %u \n", previous_state.weight_state);
                         }
 
+                    } else if (voltage_difference == 1000.0k) {
+                    	if (print_plasticity){
+                    		io_printf(IO_BUF, "Neuron fired by pattern input (not teacher): locking at current weight");
+                    	}
+
+                    	previous_state.weight_state.weight = previous_state.weight_state.weight + 2;
+                    	previous_state.lock = 1;
+
                     } else {
                         // Weight is to be used, but we don't want or need a full weight increment.
                         // Lock so this weight does not get used again until it decays:
                     	if (print_plasticity){
-                    		io_printf(IO_BUF, "Voltage  diff: %k, so lock at current weight\n", voltage_difference);
+                    		io_printf(IO_BUF, "Voltage diff: %k, so lock at current weight\n", voltage_difference);
                     	}
                         // SD 13/5/20: Let's make change bigger, so that it gently pushes spike time back.
                     	//previous_state.weight_state.weight = previous_state.weight_state.weight * 0.92k;

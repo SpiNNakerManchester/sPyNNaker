@@ -63,4 +63,7 @@ void neuron_model_print_state_variables(restrict neuron_pointer_t neuron);
 //! \return None, this method does not return anything
 void neuron_model_print_parameters(restrict neuron_pointer_t neuron);
 
+
+void neuron_model_set_v_hist(neuron_pointer_t neuron);
+
 #endif // _NEURON_MODEL_H_

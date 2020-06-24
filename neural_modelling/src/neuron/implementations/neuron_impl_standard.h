@@ -246,6 +246,12 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
         // Tell the additional input
         additional_input_has_spiked(additional_input);
+
+
+        if (exc_input_values[1] == 0){
+        	// Teacher didn't fire neuron - input spikes did
+        	 neuron_model_set_v_hist(neuron);
+        }
     }
 
     // Shape the existing input according to the included rule
