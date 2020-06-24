@@ -267,12 +267,13 @@ static inline update_state_t timing_apply_pre_spike(
         		if (previous_state.lock == 0){
                         	// SD New. don't depress if we're in the right firing zone:
                         	// How far was the neuron from threshold just before the teaching signal arrived?
-        			io_printf(IO_BUF, "thres: %k, mem_pot %k\n", post_synaptic_threshold->threshold_value, post_synaptic_mem_V);
                         	if (voltage_difference < v_diff_pot_threshold) {
                                         // Weight is to be used, but we don't want or need a full weight decrement.
                                         // Lock so this weight does not get used again until it decays:
                                         //previous_state.weight_state.weight = previous_state.weight_state.weight * 1.05k;
-                                        previous_state.weight_state.weight = previous_state.weight_state.weight + 1;
+                                        // SD 13/5/20: Let's depress by slightly more, to gently push spike time back:
+                                        previous_state.weight_state.weight = previous_state.weight_state.weight - 1;
+                                        //previous_state.weight_state.weight = previous_state.weight_state.weight * 0.88k;
                                         previous_state.lock = 1;
         			        previous_state.dep_accumulator = 0;
                                 }
@@ -355,12 +356,17 @@ static inline update_state_t timing_apply_post_spike(
    // Get time of event relative to last pre-synaptic event
    uint32_t time_since_last_pre = time - last_pre_time;
 
+   pre_trace_t my_last_pre_trace; // SD 16/6/20: Added this to create unique window per synapse
+   uint32_t random;
+   random = mars_kiss64_seed(recurrentSeed) & ((STDP_FIXED_POINT_ONE>>2) - 1);
+   my_last_pre_trace = post_exp_dist_lookup_excit[random];
+
    // If spikes don't coincide:
    if (previous_state.pre_waiting_post == true && time_since_last_pre > 0) {
       previous_state.pre_waiting_post = false;
 
       // Now check if this post spike occurred in the open window created by the previous pre-spike:
-      if (time_since_last_pre <= last_pre_trace) {
+      if (time_since_last_pre <= my_last_pre_trace) {  // SD 16/6/20: Generate window length for each connection instead of sharing
          if (previous_state.pot_accumulator <
              recurrent_plasticity_params.accum_pot_minus_one[syn_type]<<ACCUM_SCALING){
              // If accumulator's not going to hit potentiation limit, increment it:
@@ -420,10 +426,9 @@ static inline update_state_t timing_apply_post_spike(
                     	if (print_plasticity){
                     		io_printf(IO_BUF, "Voltage  diff: %k, so lock at current weight\n", voltage_difference);
                     	}
-                    	//previous_state.weight_state.weight = previous_state.weight_state.weight * 1.05k;
-                        // SD 22/8/2019. Let's depress these locked synapses slightly, to prevent creeping potentiation:
-                    	//previous_state.weight_state.weight = previous_state.weight_state.weight * 0.95k;
-                    	previous_state.weight_state.weight = previous_state.weight_state.weight -1;
+                        // SD 13/5/20: Let's make change bigger, so that it gently pushes spike time back.
+                    	//previous_state.weight_state.weight = previous_state.weight_state.weight * 0.92k;
+                    	previous_state.weight_state.weight = previous_state.weight_state.weight + 1;
                         previous_state.lock = 1;
                     }
 
