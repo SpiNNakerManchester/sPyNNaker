@@ -59,11 +59,22 @@ static inline void exp_shaping(exp_params_t* exp_params){
 					exp_params->decay);
 }
 
+static inline void set_to_zero(exp_params_t* exp_params){
+
+
+    // this should only be called on exc2 -> to reset teacher input
+	exp_params->synaptic_input_value = 0;
+
+}
+
 static inline void synapse_types_shape_input(
         synapse_param_pointer_t parameter) {
 
 	exp_shaping(&parameter->exc);
-	exp_shaping(&parameter->exc2);
+
+//	exp_shaping(&parameter->exc2);
+	set_to_zero(&parameter->exc2);
+
 	exp_shaping(&parameter->inh);
 	exp_shaping(&parameter->inh2);
 }
