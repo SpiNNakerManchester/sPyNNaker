@@ -49,28 +49,29 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
             self, n, allow_self_connections=True, with_replacement=False,
             safe=True, callback=None, verbose=False, rng=None):
         """
-        :param n: \
+        :param int n:
             number of random pre-synaptic neurons connected to output
-        :type n: int
-        :param allow_self_connections: \
-            if the connector is used to connect a\
-            Population to itself, this flag determines whether a neuron is\
-            allowed to connect to itself, or only to other neurons in the\
-            Population.
-        :type allow_self_connections: bool
-        :param with_replacement:
-            this flag determines how the random selection of pre-synaptic\
-            neurons is performed; if true, then every pre-synaptic neuron\
-            can be chosen on each occasion, and so multiple connections\
-            between neuron pairs are possible; if false, then once a\
-            pre-synaptic neuron has been connected to a post-neuron, it\
+        :param bool allow_self_connections:
+            if the connector is used to connect a Population to itself,
+            this flag determines whether a neuron is allowed to connect to
+            itself, or only to other neurons in the Population.
+        :param bool with_replacement:
+            this flag determines how the random selection of pre-synaptic
+            neurons is performed; if true, then every pre-synaptic neuron
+            can be chosen on each occasion, and so multiple connections
+            between neuron pairs are possible; if false, then once a
+            pre-synaptic neuron has been connected to a post-neuron, it
             can't be connected again.
-        :type with_replacement: bool
+        :param bool safe:
+        :param callable callback: Ignored
+        :param bool verbose:
+        :param rng:
+            Seeded random number generator, or None to make one when needed
+        :type rng: ~pyNN.random.NumpyRNG or None
         """
-        # :param space:
-        # a Space object, needed if you wish to specify distance-dependent\
+        # :param ~pyNN.space.Space space:
+        # a Space object, needed if you wish to specify distance-dependent
         # weights or delays - not implemented
-        # :type space: pyNN.Space
         super(FixedNumberPreConnector, self).__init__(safe, callback, verbose)
         self.__n_pre = n
         self.__allow_self_connections = allow_self_connections
@@ -103,6 +104,10 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
             synapse_info.delays, self.__n_pre * synapse_info.n_post_neurons)
 
     def _get_pre_neurons(self, synapse_info):
+        """
+        :param SynapseInformation synapse_info:
+        :rtype: list(~numpy.ndarray)
+        """
         # If we haven't set the array up yet, do it now
         if not self.__pre_neurons_set:
             self.__pre_neurons = [None] * synapse_info.n_post_neurons
@@ -157,6 +162,12 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
         return self.__pre_neurons
 
     def _pre_neurons_in_slice(self, pre_vertex_slice, n, synapse_info):
+        """
+        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
+        :param int n:
+        :param SynapseInformation synapse_info:
+        :rtype: ~numpy.ndarray
+        """
         pre_neurons = self._get_pre_neurons(synapse_info)
 
         # Take the nth array and get the bits from it we need

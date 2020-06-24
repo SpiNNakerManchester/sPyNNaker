@@ -26,22 +26,26 @@ class AbstractConnectorSupportsViewsOnMachine(object):
     def get_view_lo_hi(self, indexes):
         """ Get the low and high index values of the PopulationView
 
-        :param indexes: the indexes array of a PopulationView
+        :param list(int) indexes: the indexes array of a PopulationView
         :return: The low and high index values of the PopulationView
-        :rtype: uint, uint
+        :rtype: tuple(int, int)
         """
         view_lo = indexes[0]
         view_hi = indexes[-1]
         return view_lo, view_hi
 
     def _basic_connector_params(self, synapse_info):
+        """
+        :param SynapseInformation synapse_info:
+        :rtype: list(int)
+        """
         params = []
+
         pre_view_lo = 0
         pre_view_hi = synapse_info.n_pre_neurons - 1
         if synapse_info.prepop_is_view:
             pre_view_lo, pre_view_hi = self.get_view_lo_hi(
                 synapse_info.pre_population._indexes)
-
         params.extend([pre_view_lo, pre_view_hi])
 
         post_view_lo = 0
@@ -49,7 +53,6 @@ class AbstractConnectorSupportsViewsOnMachine(object):
         if synapse_info.postpop_is_view:
             post_view_lo, post_view_hi = self.get_view_lo_hi(
                 synapse_info.post_population._indexes)
-
         params.extend([post_view_lo, post_view_hi])
 
         return params

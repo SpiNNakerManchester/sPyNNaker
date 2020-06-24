@@ -32,9 +32,13 @@ class ArrayConnector(AbstractConnector):
     def __init__(self, array, safe=True, callback=None, verbose=False):
         """
         :param array:
-            An explicit boolean matrix that specifies the connections\
-            between the pre- and post-populations\
-            (see PyNN documentation)
+            An explicit boolean matrix that specifies the connections
+            between the pre- and post-populations
+            (see PyNN documentation). Must be 2D in practice.
+        :type array: ~numpy.ndarray(2, ~numpy.uint8)
+        :param bool safe:
+        :param callable callback: Ignored
+        :param bool verbose:
         """
         super(ArrayConnector, self).__init__(safe, callback, verbose)
         self.__array = array
@@ -117,5 +121,4 @@ class ArrayConnector(AbstractConnector):
         return block
 
     def __repr__(self):
-        return "ArrayConnector({})".format(
-            self.__array)
+        return "ArrayConnector({})".format(self.__array)

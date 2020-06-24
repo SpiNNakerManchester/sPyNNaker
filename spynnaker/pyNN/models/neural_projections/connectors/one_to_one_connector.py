@@ -36,6 +36,10 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
     def __init__(self, random_number_class,
                  safe=True, callback=None, verbose=False):
         """
+        :param type random_number_class:
+        :param bool safe:
+        :param callable callback: Ignored
+        :param bool verbose:
         """
         self.__random_number_class = random_number_class
         super(OneToOneConnector, self).__init__(safe, callback, verbose)
@@ -114,6 +118,13 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
 
     def _get_pre_post_limits(
             self, pre_vertex_slice, post_vertex_slice, synapse_info):
+        """
+        :param ~pacman.model.graphs.common.Slice pre_slice:
+        :param ~pacman.model.graphs.common.Slice post_slice:
+        :param SynapseInformation synapse_info:
+        :return: (pre_lo, post_lo, pre_hi, post_hi)
+        :rtype: tuple(int,int,int,int)
+        """
         if synapse_info.prepop_is_view:
             # work out which atoms are on this pre-slice
             view_lo, view_hi = self.get_view_lo_hi(

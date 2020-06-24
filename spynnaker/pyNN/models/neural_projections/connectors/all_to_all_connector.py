@@ -40,12 +40,13 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
     def __init__(self, allow_self_connections=True, safe=True, callback=None,
                  verbose=None):
         """
-        :param allow_self_connections:
-            if the connector is used to connect a\
-            Population to itself, this flag determines whether a neuron is\
-            allowed to connect to itself, or only to other neurons in the\
-            Population.
-        :type allow_self_connections: bool
+        :param bool allow_self_connections:
+            if the connector is used to connect a Population to itself, this
+            flag determines whether a neuron is allowed to connect to itself,
+            or only to other neurons in the Population.
+        :param bool safe:
+        :param callable callback: Ignored
+        :param bool verbose:
         """
         super(AllToAllConnector, self).__init__(safe, callback, verbose)
         self.__allow_self_connections = allow_self_connections
@@ -53,6 +54,11 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
     def _connection_slices(self, pre_vertex_slice, post_vertex_slice,
                            synapse_info):
         """ Get a slice of the overall set of connections.
+
+        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param SynapseInformation synapse_info:
+        :rtype: list(slice)
         """
         n_post_neurons = synapse_info.n_post_neurons
         stop_atom = post_vertex_slice.hi_atom + 1
@@ -143,6 +149,9 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
 
     @property
     def allow_self_connections(self):
+        """
+        :rtype: bool
+        """
         return self.__allow_self_connections
 
     @allow_self_connections.setter

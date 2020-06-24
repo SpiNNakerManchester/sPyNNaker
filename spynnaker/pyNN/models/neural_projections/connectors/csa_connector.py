@@ -39,8 +39,15 @@ class CSAConnector(AbstractConnector):
 
     def __init__(self, cset, safe=True, callback=None, verbose=False):
         """
-        :param '?' cset:
+        :param csa.connset.CSet cset:
             A description of the connection set between populations
+        :param bool safe:
+        :param callable callback: Ignored
+        :param bool verbose:
+        :raises ImportError:
+            if the `csa` library isn't present; it's tricky to install in
+            some environments so we don't force it to be present unless you
+            want to actually use this class.
         """
         super(CSAConnector, self).__init__(safe, callback, verbose)
         found, ex = _csa_found
@@ -60,6 +67,12 @@ class CSAConnector(AbstractConnector):
 
     def _get_n_connections(self, pre_vertex_slice, post_vertex_slice,
                            synapse_info):
+        """
+        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param SynapseInformation synapse_info:
+        :rtype: tuple(int, cset.connset.CSet)
+        """
         # do the work from self._cset in here
         # get the values for this slice
         pre_lo = pre_vertex_slice.lo_atom
@@ -81,10 +94,8 @@ class CSAConnector(AbstractConnector):
         if self.verbose:
             print('full cset: ', self.__full_cset)
             print('this vertex pair_list: ', pair_list)
-            print('this vertex pre_neurons: ',
-                  [x[0] for x in pair_list])
-            print('this vertex post_neurons: ',
-                  [x[1] for x in pair_list])
+            print('this vertex pre_neurons: ', [x[0] for x in pair_list])
+            print('this vertex post_neurons: ', [x[1] for x in pair_list])
 
         n_connections = len(pair_list)  # size of the array created
         return n_connections, pair_list
@@ -142,6 +153,10 @@ class CSAConnector(AbstractConnector):
         return block
 
     def show_connection_set(self, n_pre_neurons, n_post_neurons):
+        """
+        :param int n_pre_neurons:
+        :param int n_post_neurons:
+        """
         # Yuck; this was supposed to be available to the user from scripts...
         csa.show(self.__full_connection_set, n_pre_neurons, n_post_neurons)
 

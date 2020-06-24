@@ -50,6 +50,8 @@ class _ReadOnlyDict(dict):
 
 
 class NeuronRecorder(object):
+    """ Core object for handling recording values and spikes from a neuron.
+    """
     __slots__ = [
         "__indexes",
         "__n_neurons",
@@ -57,36 +59,37 @@ class NeuronRecorder(object):
         "__data_types",
         "__bitfield_variables"]
 
+    #: size of timestamps
     N_BYTES_FOR_TIMESTAMP = DataType.UINT32.size
 
-    # how many time steps to wait between recordings
+    #: size of how many time steps to wait between recordings
     N_BYTES_PER_RATE = DataType.UINT32.size
 
-    # the enum type for the state struct
+    #: size of the enum type for the state struct
     N_BYTES_PER_ENUM = DataType.UINT32.size
 
-    # size of a index in terms of position into recording array
+    #: size of a index in terms of position into recording array
     N_BYTES_PER_INDEX = DataType.UINT8.size  # currently uint8
 
-    # size of the counter for spike recording
+    #: size of the counter for spike recording
     N_BYTES_PER_COUNT = DataType.UINT32.size
 
-    # size of the increment for spike recording
+    #: size of the increment for spike recording
     N_BYTES_PER_INCREMENT = DataType.UINT32.size
 
-    # sampling temporal value size (how many ticks between recordings)
+    #: size of the sampling temporal value (how many ticks between recordings)
     N_BYTES_PER_SIZE = DataType.UINT32.size
     N_CPU_CYCLES_PER_NEURON = 8
     N_BYTES_PER_POINTER = DataType.UINT32.size
     SARK_BLOCK_SIZE = 2 * BYTES_PER_WORD  # Seen in sark.c
 
-    # size of the counter for outstanding recording
+    #: size of the counter for outstanding recording
     N_BYTES_PER_OUTSTANDING_RECORDING = DataType.UINT32.size
 
-    # number of items types (currently non-bitfield and bitfield)
+    #: number of items types (currently non-bitfield and bitfield)
     N_ITEM_TYPES = 2
 
-    # flag for spikes
+    #: flag for spikes
     SPIKES = "spikes"
 
     MAX_RATE = 2 ** 32 - 1  # To allow a unit32_t to be used to store the rate
@@ -94,6 +97,12 @@ class NeuronRecorder(object):
     def __init__(
             self, allowed_variables, data_types, bitfield_variables,
             n_neurons):
+        """
+        :param list(str) allowed_variables:
+        :param list(str) data_types:
+        :param list(str) bitfield_variables:
+        :param int n_neurons:
+        """
         self.__sampling_rates = OrderedDict()
         self.__indexes = dict()
         self.__data_types = data_types
@@ -104,6 +113,11 @@ class NeuronRecorder(object):
             self.__indexes[variable] = None
 
     def _count_recording_per_slice(self, variable, vertex_slice):
+        """
+        :param str variable:
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :rtype: int
+        """
         if self.__sampling_rates[variable] == 0:
             return 0
         if self.__indexes[variable] is None:
@@ -112,6 +126,11 @@ class NeuronRecorder(object):
                    for index in self.__indexes[variable])
 
     def _neurons_recording(self, variable, vertex_slice):
+        """
+        :param str variable:
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :rtype: iterable(int)
+        """
         if self.__sampling_rates[variable] == 0:
             return []
         if self.__indexes[variable] is None:
@@ -124,8 +143,9 @@ class NeuronRecorder(object):
     def get_neuron_sampling_interval(self, variable):
         """ Return the current sampling interval for this variable
 
-        :param variable: PyNN name of the variable
-        :return: Sampling interval in micro seconds
+        :param str variable: PyNN name of the variable
+        :return: Sampling interval in microseconds
+        :rtype: float
         """
         step = (globals_variables.get_simulator().machine_time_step /
                 MICRO_TO_MILLISECOND_CONVERSION)
@@ -133,6 +153,14 @@ class NeuronRecorder(object):
 
     def _convert_placement_matrix_data(
             self, row_data, n_rows, data_row_length, variable, n_neurons):
+        """
+        :param ~numpy.ndarray row_data:
+        :param int n_rows:
+        :param int data_row_length:
+        :param str variable:
+        :param int n_neurons:
+        :rtype: ~numpy.ndarray
+        """
 
         surplus_bytes = self.N_BYTES_FOR_TIMESTAMP
         var_data = (row_data[:, surplus_bytes:].reshape(
@@ -146,6 +174,17 @@ class NeuronRecorder(object):
     def _process_missing_data(
             missing_str, placement, expected_rows, n_neurons, times,
             sampling_rate, label, placement_data):
+        """
+        :param str missing_str:
+        :param ~.Placement placement:
+        :param list(int) expected_rows:
+        :param int n_neurons:
+        :param ~numpy.ndarray times:
+        :param int sampling_rate:
+        :param str label:
+        :param ~numpy.ndarray placement_data:
+        :rtype: ~numpy.ndarray
+        """
         missing_str += "({}, {}, {}); ".format(
             placement.x, placement.y, placement.p)
         # Start the fragment for this slice empty
@@ -172,21 +211,23 @@ class NeuronRecorder(object):
             buffer_manager, expected_rows, missing_str, sampling_rate, label):
         """ processes a placement for matrix data
 
-        :param variable: the variable to read
-        :param placements: the placements object
-        :param vertex: the vertex to read from
-        :param sampling_interval: the interval of sampling
-        :param indexes: the indexes of neurons to be added to
-        :param region: the recording region id
+        :param str variable: the variable to read
+        :param ~pacman.model.placements.Placements placements:
+            the placements object
+        :param ~pacman.model.graphs.machine.MachineVertex vertex:
+            the vertex to read from
+        :param list(int) indexes: the indexes of neurons to be added to
+        :param int region: the recording region id
         :param graph_mapper: the graph mapper
-        :param buffer_manager: the buffer manager
-        :param expected_rows: how many rows the tools think should be recorded
-        :param missing_str: string for reporting missing stuff
-        :param sampling_rate: the rate of sampling
-        :param label: the vertex label.
-        :return: placement data and sampling interval.
+        :param ~.BufferManager buffer_manager: the buffer manager
+        :param int expected_rows:
+            how many rows the tools think should be recorded
+        :param str missing_str: string for reporting missing stuff
+        :param int sampling_rate: the rate of sampling
+        :param str label: the vertex label.
+        :return: placement data
+        :rtype: ~numpy.ndarray
         """
-
         placement = placements.get_placement_of_vertex(vertex)
         vertex_slice = graph_mapper.get_slice(vertex)
         neurons = self._neurons_recording(variable, vertex_slice)
@@ -233,9 +274,10 @@ class NeuronRecorder(object):
     def expected_rows_for_a_run_time(n_machine_time_steps, sampling_rate):
         """ determines how many rows to see based off how long its ran for
 
-        :param n_machine_time_steps: map of vertex to time steps
-        :param sampling_rate: the sampling rate for a given variable
+        :param int n_machine_time_steps: map of vertex to time steps
+        :param float sampling_rate: the sampling rate for a given variable
         :return: how many rows there should be.
+        :rtype: int
         """
         return int(math.ceil(n_machine_time_steps / sampling_rate))
 
@@ -245,17 +287,22 @@ class NeuronRecorder(object):
         """ Read a uint32 mapped to time and neuron IDs from the SpiNNaker\
             machine and converts to required data types with scaling if needed.
 
-        :param label: vertex label
+        :param str label: vertex label
         :param buffer_manager: the manager for buffered data
-        :param region: the DSG region ID used for this data
-        :param placements: the placements object
-        :param graph_mapper: \
+        :type buffer_manager:
+            ~spinn_front_end_common.interface.buffer_management.BufferManager
+        :param int region: the DSG region ID used for this data
+        :param ~pacman.model.placements.Placements placements:
+            the placements object
+        :param graph_mapper:
             the mapping between application and machine vertices
         :param application_vertex:
-        :param variable: PyNN name for the variable (V, gsy_inh etc.)
-        :type variable: str
-        :param n_machine_time_steps:
-        :return:
+        :type application_vertex:
+            ~pacman.model.graphs.application.ApplicationVertex
+        :param str variable: PyNN name for the variable (`V`, `gsy_inh`, etc.)
+        :param int n_machine_time_steps:
+        :return: (data, recording_indices, sampling_interval)
+        :rtype: tuple(~numpy.ndarray, list(int), float)
         """
         if variable in self.__bitfield_variables:
             msg = "Variable {} is not supported, use get_spikes".format(
@@ -300,6 +347,25 @@ class NeuronRecorder(object):
     def get_spikes(
             self, label, buffer_manager, region, placements, graph_mapper,
             application_vertex, variable, machine_time_step):
+        """ Read a uint32 mapped to time and neuron IDs from the SpiNNaker\
+            machine.
+
+        :param str label: vertex label
+        :param buffer_manager: the manager for buffered data
+        :type buffer_manager:
+            ~spinn_front_end_common.interface.buffer_management.BufferManager
+        :param int region: the DSG region ID used for this data
+        :param ~pacman.model.placements.Placements placements:
+            the placements object
+        :param graph_mapper:
+        :param application_vertex:
+        :type application_vertex:
+            ~pacman.model.graphs.application.ApplicationVertex
+        :param str variable:
+        :param int machine_time_step: microseconds
+        :return:
+        :rtype: ~numpy.ndarray(tuple(int,int))
+        """
         if variable not in self.__bitfield_variables:
             msg = "Variable {} is not supported, use get_matrix_data".format(
                 variable)

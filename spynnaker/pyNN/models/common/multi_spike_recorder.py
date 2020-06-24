@@ -37,6 +37,9 @@ class MultiSpikeRecorder(object):
 
     @property
     def record(self):
+        """
+        :rtype: bool
+        """
         return self.__record
 
     @record.setter
@@ -44,6 +47,11 @@ class MultiSpikeRecorder(object):
         self.__record = record
 
     def get_sdram_usage_in_bytes(self, n_neurons, spikes_per_timestep):
+        """
+        :param int n_neurons:
+        :param int spikes_per_timestep:
+        :rtype: ~pacman.model.resources.AbstractSDRAM
+        """
         if not self.__record:
             return ConstantSDRAM(0)
 
@@ -52,11 +60,18 @@ class MultiSpikeRecorder(object):
             out_spike_bytes * spikes_per_timestep))
 
     def get_dtcm_usage_in_bytes(self):
+        """
+        :rtype: int
+        """
         if not self.__record:
             return 0
         return BYTES_PER_WORD
 
     def get_n_cpu_cycles(self, n_neurons):
+        """
+        :param int n_neurons:
+        :rtype: int
+        """
         if not self.__record:
             return 0
         return n_neurons * 4
@@ -64,6 +79,21 @@ class MultiSpikeRecorder(object):
     def get_spikes(
             self, label, buffer_manager, region,
             placements, graph_mapper, application_vertex, machine_time_step):
+        """
+        :param str label:
+        :param buffer_manager: the buffer manager object
+        :type buffer_manager:
+            ~spinn_front_end_common.interface.buffer_management.BufferManager
+        :param int region:
+        :param ~pacman.model.placements.Placements placements:
+        :param application_vertex:
+        :type application_vertex:
+            ~pacman.model.graphs.application.ApplicationVertex
+        :param int machine_time_step: microseconds
+        :return: A numpy array of 2-element arrays of (neuron_id, time)\
+            ordered by time, one element per event
+        :rtype: ~numpy.ndarray(tuple(int,int))
+        """
         # pylint: disable=too-many-arguments
         spike_times = list()
         spike_ids = list()
@@ -105,6 +135,14 @@ class MultiSpikeRecorder(object):
     def _process_spike_data(
             vertex_slice, ms_per_tick, n_words, raw_data, spike_ids,
             spike_times):
+        """
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :param int ms_per_tick:
+        :param int n_words:
+        :param bytearray raw_data:
+        :param list(~numpy.ndarray) spike_ids:
+        :param list(~numpy.ndarray) spike_times:
+        """
         # pylint: disable=too-many-arguments
         n_bytes_per_block = n_words * BYTES_PER_WORD
         offset = 0

@@ -30,6 +30,19 @@ class SmallWorldConnector(AbstractConnector):
             self, degree, rewiring, allow_self_connections=True,
             n_connections=None, rng=None, safe=True, callback=None,
             verbose=False):
+        """
+        :param float degree:
+        :param float rewiring:
+        :param bool allow_self_connections:
+        :param n_connections:
+        :type n_connections: int or None
+        :param rng:
+            Seeded random number generator, or None to make one when needed
+        :type rng: ~pyNN.random.NumpyRNG or None
+        :param bool safe:
+        :param callable callback: Ignored
+        :param bool verbose:
+        """
         # pylint: disable=too-many-arguments
         super(SmallWorldConnector, self).__init__(safe, callback, verbose, rng)
         self.__rewiring = rewiring
@@ -48,6 +61,9 @@ class SmallWorldConnector(AbstractConnector):
         self._set_n_connections(synapse_info)
 
     def _set_n_connections(self, synapse_info):
+        """
+        :param SynapseInformation synapse_info:
+        """
         # Get the probabilities up-front for now
         # TODO: Work out how this can be done statistically
         # space.distances(...) expects N,3 array in PyNN0.7, but 3,N in PyNN0.8

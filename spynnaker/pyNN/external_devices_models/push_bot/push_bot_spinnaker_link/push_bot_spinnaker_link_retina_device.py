@@ -38,7 +38,13 @@ class PushBotSpiNNakerLinkRetinaDevice(
             self, spinnaker_link_id, protocol, resolution,
             board_address=default_parameters['board_address'],
             label=default_parameters['label']):
-
+        """
+        :param int spinnaker_link_id:
+        :param MunichIoSpiNNakerLinkProtocol protocol:
+        :param PushBotRetinaResolution resolution:
+        :param str board_address:
+        :param str label:
+        """
         AbstractPushBotRetinaDevice.__init__(self, protocol, resolution)
         ApplicationSpiNNakerLinkVertex.__init__(
             self, spinnaker_link_id=spinnaker_link_id,
