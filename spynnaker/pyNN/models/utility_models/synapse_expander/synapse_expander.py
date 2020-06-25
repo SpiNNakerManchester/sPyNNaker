@@ -151,8 +151,8 @@ def _extract_iobuf(expander_cores, transceiver, provenance_file_path,
 def _handle_failure(expander_cores, transceiver, provenance_file_path):
     """ Handle failure of the expander
 
-    :param executable_targets:
-    :param txrx:
+    :param expander_cores:
+    :param transceiver:
     :param provenance_file_path:
     :rtype: None
     """
