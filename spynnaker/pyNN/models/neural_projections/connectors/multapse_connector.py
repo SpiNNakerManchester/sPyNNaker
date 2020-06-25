@@ -234,26 +234,23 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
     def gen_connector_id(self):
         return ConnectorIDs.FIXED_TOTAL_NUMBER_CONNECTOR.value
 
-    def _get_connection_param(
-            self, indexes, is_view, vertex_slice, view_lo, view_hi):
-        size = vertex_slice.n_atoms
-        if is_view:
-            view_lo, view_hi = self.get_view_lo_hi(indexes)
-            # work out the number of atoms required on this slice
-            lo_atom = vertex_slice.lo_atom
-            hi_atom = vertex_slice.hi_atom
-            if lo_atom <= view_lo <= hi_atom:
-                if view_hi <= hi_atom:
-                    size = view_hi - view_lo + 1
-                else:
-                    size = hi_atom - view_lo + 1
-            elif view_lo < lo_atom <= view_hi:
-                if view_hi <= hi_atom:
-                    size = view_hi - lo_atom + 1
-                else:
-                    size = hi_atom - lo_atom + 1
+    def _get_connection_param(self, indexes, vertex_slice):
+        view_lo, view_hi = self.get_view_lo_hi(indexes)
+        # work out the number of atoms required on this slice
+        lo_atom = vertex_slice.lo_atom
+        hi_atom = vertex_slice.hi_atom
+        if lo_atom <= view_lo <= hi_atom:
+            if view_hi <= hi_atom:
+                size = view_hi - view_lo + 1
             else:
-                size = 0
+                size = hi_atom - view_lo + 1
+        elif view_lo < lo_atom <= view_hi:
+            if view_hi <= hi_atom:
+                size = view_hi - lo_atom + 1
+            else:
+                size = hi_atom - lo_atom + 1
+        else:
+            size = 0
         return size, view_lo, view_hi
 
     @staticmethod
@@ -286,16 +283,23 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
             pre_vertex_slice, post_vertex_slice, synapse_type, synapse_info):
         params = []
 
-        pre_size, pre_view_lo, pre_view_hi = self._get_connection_param(
-            synapse_info.pre_population._indexes, synapse_info.prepop_is_view,
-            pre_vertex_slice, 0, synapse_info.n_pre_neurons - 1)
+        if synapse_info.prepop_is_view:
+            pre_size, pre_view_lo, pre_view_hi = self._get_connection_param(
+                synapse_info.pre_population._indexes, pre_vertex_slice)
+        else:
+            pre_size = pre_vertex_slice.n_atoms
+            pre_view_lo = 0
+            pre_view_hi = synapse_info.n_pre_neurons - 1
 
         params.extend([pre_view_lo, pre_view_hi])
 
-        post_size, post_view_lo, post_view_hi = self._get_connection_param(
-            synapse_info.post_population._indexes,
-            synapse_info.postpop_is_view,
-            post_vertex_slice, 0, synapse_info.n_post_neurons - 1)
+        if synapse_info.postpop_is_view:
+            post_size, post_view_lo, post_view_hi = self._get_connection_param(
+                synapse_info.post_population._indexes, post_vertex_slice)
+        else:
+            post_size = post_vertex_slice.n_atoms
+            post_view_lo = 0
+            post_view_hi = synapse_info.n_post_neurons - 1
 
         params.extend([post_view_lo, post_view_hi])
 
