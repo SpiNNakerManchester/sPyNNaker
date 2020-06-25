@@ -20,7 +20,8 @@ from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.log import FormatAdapter
 from spinnman.messages.eieio.data_messages import EIEIODataHeader
 from spynnaker.pyNN.models.common import recording_utils
-from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spinn_front_end_common.utilities.constants import (
+    BYTES_PER_WORD, MICRO_TO_MILLISECOND_CONVERSION)
 
 logger = FormatAdapter(logging.getLogger(__name__))
 _ONE_WORD = struct.Struct("<I")
@@ -51,6 +52,7 @@ class EIEIOSpikeRecorder(object):
     def set_recording(self, new_state, sampling_interval=None):
         """
         :param new_state: bool
+        :param sampling_interval: not supported functionality
         """
         if sampling_interval is not None:
             logger.warning("Sampling interval currently not supported for "
@@ -99,7 +101,7 @@ class EIEIOSpikeRecorder(object):
         # pylint: disable=too-many-arguments
         results = list()
         missing = []
-        ms_per_tick = machine_time_step / 1000.0
+        ms_per_tick = machine_time_step / MICRO_TO_MILLISECOND_CONVERSION
         vertices = application_vertex.machine_vertices
         progress = ProgressBar(vertices,
                                "Getting spikes for {}".format(label))
@@ -117,7 +119,7 @@ class EIEIOSpikeRecorder(object):
                         # assuming this must be a single integer
                         n_buffer_times += 1
 
-            if (n_buffer_times > 0):
+            if n_buffer_times > 0:
                 raw_spike_data, data_missing = \
                     buffer_manager.get_data_by_placement(placement, region)
                 if data_missing:
