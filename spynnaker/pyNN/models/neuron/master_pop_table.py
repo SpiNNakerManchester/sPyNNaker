@@ -17,7 +17,8 @@ import logging
 import math
 import struct
 import numpy
-from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD, \
+    SARK_PER_MALLOC_SDRAM_USAGE
 from spynnaker.pyNN.models.neural_projections import (
     ProjectionApplicationEdge, ProjectionMachineEdge)
 from spynnaker.pyNN.exceptions import (
@@ -102,12 +103,18 @@ class MasterPopTableAsBinarySearch(object):
     __slots__ = [
         "__entries",
         "__n_addresses",
-        "__n_single_entries"]
+        "__n_single_entries",
+        "__edge_constraints"]
+
+    MAX_ROW_LENGTH = 255
+    UPPER_BOUND_FUDGE = 2
+    TOP_MEMORY_POINT = 0x7FFFFF
 
     def __init__(self):
         self.__entries = None
         self.__n_addresses = 0
         self.__n_single_entries = None
+        self.__edge_constraints = list()
 
     def get_master_population_table_size(self, in_edges):
         """ Get the size of the master population table in SDRAM
@@ -142,8 +149,10 @@ class MasterPopTableAsBinarySearch(object):
 
         # Multiply by 2 to get an upper bound
         return (
-            (n_vertices * 2 * _MASTER_POP_ENTRY_SIZE_BYTES) +
-            (n_entries * 2 * _ADDRESS_LIST_ENTRY_SIZE_BYTES) + 8)
+            (n_vertices * self.UPPER_BOUND_FUDGE *
+             _MASTER_POP_ENTRY_SIZE_BYTES) +
+            (n_entries * self.UPPER_BOUND_FUDGE *
+             _ADDRESS_LIST_ENTRY_SIZE_BYTES) + SARK_PER_MALLOC_SDRAM_USAGE)
 
     def get_exact_master_population_table_size(self, vertex, machine_graph):
         """
@@ -162,8 +171,10 @@ class MasterPopTableAsBinarySearch(object):
 
         # Multiply by 2 to get an upper bound
         return (
-            (n_vertices * 2 * _MASTER_POP_ENTRY_SIZE_BYTES) +
-            (n_entries * 2 * _ADDRESS_LIST_ENTRY_SIZE_BYTES) + 8)
+            (n_vertices * self.UPPER_BOUND_FUDGE *
+             _MASTER_POP_ENTRY_SIZE_BYTES) +
+            (n_entries * self.UPPER_BOUND_FUDGE *
+             _ADDRESS_LIST_ENTRY_SIZE_BYTES) + SARK_PER_MALLOC_SDRAM_USAGE)
 
     def get_allowed_row_length(self, row_length):
         """
@@ -172,9 +183,10 @@ class MasterPopTableAsBinarySearch(object):
         :rtype: int
         :raises SynapseRowTooBigException: If the row won't fit
         """
-        if row_length > 255:
+        if row_length > self.MAX_ROW_LENGTH:
             raise SynapseRowTooBigException(
-                255, "Only rows of up to 255 entries are allowed")
+                self.MAX_ROW_LENGTH,
+                "Only rows of up to 255 entries are allowed")
         return row_length
 
     def get_next_allowed_address(self, next_address):
@@ -188,7 +200,7 @@ class MasterPopTableAsBinarySearch(object):
         over = next_address % _ADDRESS_SCALE
         if over:
             next_address += _ADDRESS_SCALE - over
-        if next_address // _ADDRESS_SCALE > 0x7FFFFF:
+        if next_address // _ADDRESS_SCALE > self.TOP_MEMORY_POINT:
             raise SynapticConfigurationException(
                 "Address {} is out of range for this population table!".format(
                     hex(next_address)))
@@ -245,7 +257,7 @@ class MasterPopTableAsBinarySearch(object):
         # sort entries by key
         entries = sorted(
             self.__entries.values(),
-            key=lambda entry: entry.routing_key)
+            key=lambda a_entry: a_entry.routing_key)
 
         # write no master pop entries and the address list size
         n_entries = len(entries)
@@ -378,4 +390,4 @@ class MasterPopTableAsBinarySearch(object):
         :return: a list of constraints
         :rtype: list(~pacman.model.constraints.AbstractConstraint)
         """
-        return list()
+        return self.__edge_constraints
