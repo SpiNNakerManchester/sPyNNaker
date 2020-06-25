@@ -234,101 +234,77 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
     def gen_connector_id(self):
         return ConnectorIDs.FIXED_TOTAL_NUMBER_CONNECTOR.value
 
+    def _get_connection_param(
+            self, indexes, is_view, vertex_slice, view_lo, view_hi):
+        size = vertex_slice.n_atoms
+        if is_view:
+            view_lo, view_hi = self.get_view_lo_hi(indexes)
+            # work out the number of atoms required on this slice
+            lo_atom = vertex_slice.lo_atom
+            hi_atom = vertex_slice.hi_atom
+            if lo_atom <= view_lo <= hi_atom:
+                if view_hi <= hi_atom:
+                    size = view_hi - view_lo + 1
+                else:
+                    size = hi_atom - view_lo + 1
+            elif view_lo < lo_atom <= view_hi:
+                if view_hi <= hi_atom:
+                    size = view_hi - lo_atom + 1
+                else:
+                    size = hi_atom - lo_atom + 1
+            else:
+                size = 0
+        return size, view_lo, view_hi
+
+    @staticmethod
+    def _get_view_slices(vertex_slices, view_lo, view_hi):
+        view_slices = []
+        for vertex_slice in vertex_slices:
+            new_post_lo = 0
+            new_post_hi = 0
+            if vertex_slice.lo_atom <= view_lo <= vertex_slice.hi_atom:
+                new_post_lo = view_lo
+                if view_hi <= vertex_slice.hi_atom:
+                    new_post_hi = view_hi
+                else:
+                    new_post_hi = vertex_slice.hi_atom
+            elif view_lo < vertex_slice.lo_atom <= view_hi:
+                new_post_lo = vertex_slice.lo_atom
+                if view_hi <= vertex_slice.hi_atom:
+                    new_post_hi = view_hi
+                else:
+                    new_post_hi = vertex_slice.hi_atom
+            if new_post_lo == 0 and new_post_hi == 0:
+                view_slices.append([])
+            else:
+                view_slices.append(Slice(new_post_lo, new_post_hi))
+        return view_slices
+
     @overrides(AbstractGenerateConnectorOnMachine.gen_connector_params)
     def gen_connector_params(
             self, pre_slices, pre_slice_index, post_slices, post_slice_index,
             pre_vertex_slice, post_vertex_slice, synapse_type, synapse_info):
         params = []
-        pre_view_lo = 0
-        pre_view_hi = synapse_info.n_pre_neurons - 1
-        pre_size = pre_vertex_slice.n_atoms
-        if synapse_info.prepop_is_view:
-            pre_view_lo, pre_view_hi = self.get_view_lo_hi(
-                synapse_info.pre_population._indexes)
-            # work out the number of atoms required on this slice
-            pre_lo_atom = pre_vertex_slice.lo_atom
-            pre_hi_atom = pre_vertex_slice.hi_atom
-            if pre_lo_atom <= pre_view_lo <= pre_hi_atom:
-                if pre_view_hi <= pre_hi_atom:
-                    pre_size = pre_view_hi - pre_view_lo + 1
-                else:
-                    pre_size = pre_hi_atom - pre_view_lo + 1
-            elif pre_view_lo < pre_lo_atom <= pre_view_hi:
-                if pre_view_hi <= pre_hi_atom:
-                    pre_size = pre_view_hi - pre_lo_atom + 1
-                else:
-                    pre_size = pre_hi_atom - pre_lo_atom + 1
-            else:
-                pre_size = 0
+
+        pre_size, pre_view_lo, pre_view_hi = self._get_connection_param(
+            synapse_info.pre_population._indexes, synapse_info.prepop_is_view,
+            pre_vertex_slice, 0, synapse_info.n_pre_neurons - 1)
 
         params.extend([pre_view_lo, pre_view_hi])
 
-        post_view_lo = 0
-        post_view_hi = synapse_info.n_post_neurons - 1
-        post_size = post_vertex_slice.n_atoms
-        if synapse_info.postpop_is_view:
-            post_view_lo, post_view_hi = self.get_view_lo_hi(
-                synapse_info.post_population._indexes)
-            # work out the number of atoms required on this slice
-            post_lo_atom = post_vertex_slice.lo_atom
-            post_hi_atom = post_vertex_slice.hi_atom
-            if post_lo_atom <= post_view_lo <= post_hi_atom:
-                if post_view_hi <= post_hi_atom:
-                    post_size = post_view_hi - post_view_lo + 1
-                else:
-                    post_size = post_hi_atom - post_view_lo + 1
-            elif post_view_lo < post_lo_atom <= post_view_hi:
-                if post_view_hi <= post_hi_atom:
-                    post_size = post_view_hi - post_lo_atom + 1
-                else:
-                    post_size = post_hi_atom - post_lo_atom + 1
-            else:
-                post_size = 0
+        post_size, post_view_lo, post_view_hi = self._get_connection_param(
+            synapse_info.post_population._indexes,
+            synapse_info.postpop_is_view,
+            post_vertex_slice, 0, synapse_info.n_post_neurons - 1)
 
         params.extend([post_view_lo, post_view_hi])
 
         # only select the relevant pre- and post-slices
-        view_pre_slices = []
-        for pre in pre_slices:
-            new_pre_lo = 0
-            new_pre_hi = 0
-            if pre.lo_atom <= pre_view_lo <= pre.hi_atom:
-                new_pre_lo = pre_view_lo
-                if pre_view_hi <= pre.hi_atom:
-                    new_pre_hi = pre_view_hi
-                else:
-                    new_pre_hi = pre.hi_atom
-            elif pre_view_lo < pre.lo_atom <= pre_view_hi:
-                new_pre_lo = pre.lo_atom
-                if pre_view_hi <= pre.hi_atom:
-                    new_pre_hi = pre_view_hi
-                else:
-                    new_pre_hi = pre.hi_atom
-            if new_pre_lo == 0 and new_pre_hi == 0:
-                view_pre_slices.append([])
-            else:
-                view_pre_slices.append(Slice(new_pre_lo, new_pre_hi))
+        view_pre_slices = self._get_view_slices(
+            pre_slices, pre_view_lo, pre_view_hi)
 
-        view_post_slices = []
-        for post in post_slices:
-            new_post_lo = 0
-            new_post_hi = 0
-            if post.lo_atom <= post_view_lo <= post.hi_atom:
-                new_post_lo = post_view_lo
-                if post_view_hi <= post.hi_atom:
-                    new_post_hi = post_view_hi
-                else:
-                    new_post_hi = post.hi_atom
-            elif post_view_lo < post.lo_atom <= post_view_hi:
-                new_post_lo = post.lo_atom
-                if post_view_hi <= post.hi_atom:
-                    new_post_hi = post_view_hi
-                else:
-                    new_post_hi = post.hi_atom
-            if new_post_lo == 0 and new_post_hi == 0:
-                view_post_slices.append([])
-            else:
-                view_post_slices.append(Slice(new_post_lo, new_post_hi))
+        view_post_slices = self._get_view_slices(
+            post_slices, post_view_lo, post_view_hi)
 
         self._update_synapses_per_post_vertex(
             view_pre_slices, view_post_slices)
