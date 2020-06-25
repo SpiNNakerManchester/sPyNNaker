@@ -280,8 +280,8 @@ class TestSynapticManager(unittest.TestCase):
         spec_writer = FileDataWriter(temp_spec)
         spec = DataSpecificationGenerator(spec_writer, None)
         master_pop_sz = 1000
-        master_pop_region = 0
         all_syn_block_sz = 2000
+        master_pop_region = 0
         synapse_region = 1
         direct_region = 2
         spec.reserve_memory_region(master_pop_region, master_pop_sz)
@@ -290,11 +290,15 @@ class TestSynapticManager(unittest.TestCase):
         synaptic_manager = SynapticManager(
             n_synapse_types=2, ring_buffer_sigma=5.0,
             spikes_per_second=100.0, config=config)
+        # Special values for testing
+        synaptic_manager._pop_table_region = master_pop_region
+        synaptic_manager._synapse_params_region = synapse_region
+        synaptic_manager._direct_matrix_region = direct_region
+
         synaptic_manager._write_synaptic_matrix_and_master_population_table(
             spec, [post_vertex_slice], post_slice_index, post_vertex,
             post_vertex_slice, all_syn_block_sz, weight_scales,
-            master_pop_region, synapse_region, direct_region, routing_info,
-            graph_mapper, graph, machine_time_step)
+            routing_info, graph_mapper, graph, machine_time_step)
         spec.end_specification()
         spec_writer.close()
 
@@ -344,7 +348,7 @@ class TestSynapticManager(unittest.TestCase):
             using_monitors=False)
         connections_1 = synaptic_manager._read_synapses(
             direct_synapse_information_1, pre_vertex_slice, post_vertex_slice,
-            row_len_1, 0, 2, weight_scales, data_1, None, machine_time_step)
+            row_len_1, 0, weight_scales, data_1, None, machine_time_step)
 
         # The first matrix is a 1-1 matrix, so row length is 1
         assert row_len_1 == 1
@@ -363,7 +367,7 @@ class TestSynapticManager(unittest.TestCase):
             using_monitors=False)
         connections_2 = synaptic_manager._read_synapses(
             direct_synapse_information_2, pre_vertex_slice, post_vertex_slice,
-            row_len_2, 0, 2, weight_scales, data_2, None, machine_time_step)
+            row_len_2, 0, weight_scales, data_2, None, machine_time_step)
 
         # The second matrix is a 1-1 matrix, so row length is 1
         assert row_len_2 == 1
@@ -382,7 +386,7 @@ class TestSynapticManager(unittest.TestCase):
             using_monitors=False)
         connections_3 = synaptic_manager._read_synapses(
             all_to_all_synapse_information, pre_vertex_slice,
-            post_vertex_slice, row_len_3, 0, 2, weight_scales, data_3, None,
+            post_vertex_slice, row_len_3, 0, weight_scales, data_3, None,
             machine_time_step)
 
         # The third matrix is an all-to-all matrix, so length is n_atoms

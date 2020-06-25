@@ -31,6 +31,12 @@ class ProjectionApplicationEdge(ApplicationEdge):
 
     def __init__(
             self, pre_vertex, post_vertex, synapse_information, label=None):
+        """
+        :param AbstractPopulationVertex pre_vertex:
+        :param AbstractPopulationVertex post_vertex:
+        :param SynapseInformation synapse_information:
+        :param str label:
+        """
         super(ProjectionApplicationEdge, self).__init__(
             pre_vertex, post_vertex, label=label)
 
@@ -45,14 +51,24 @@ class ProjectionApplicationEdge(ApplicationEdge):
         self.__stored_synaptic_data_from_machine = None
 
     def add_synapse_information(self, synapse_information):
+        """
+        :param SynapseInformation synapse_information:
+        """
         self.__synapse_information.append(synapse_information)
 
     @property
     def synapse_information(self):
+        """
+        :rtype: list(SynapseInformation)
+        """
         return self.__synapse_information
 
     @property
     def delay_edge(self):
+        """ Settable.
+
+        :rtype: DelayedApplicationEdge or None
+        """
         return self.__delay_edge
 
     @delay_edge.setter
@@ -61,6 +77,9 @@ class ProjectionApplicationEdge(ApplicationEdge):
 
     @property
     def n_delay_stages(self):
+        """
+        :rtype: int
+        """
         if self.__delay_edge is None:
             return 0
         return self.__delay_edge.pre_vertex.n_delay_stages

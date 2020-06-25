@@ -32,6 +32,8 @@ logger = logging.getLogger(__name__)
 
 
 class TimingDependenceVogels2011(AbstractTimingDependence):
+    """ A timing dependence STDP rule due to Vogels (2011).
+    """
     __slots__ = [
         "__alpha",
         "__synapse_structure",
@@ -41,6 +43,10 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
     default_parameters = {'tau': 20.0}
 
     def __init__(self, alpha, tau=default_parameters['tau']):
+        r"""
+        :param float alpha: :math:`\alpha`
+        :param float tau: :math:`\tau`
+        """
         self.__alpha = alpha
         self.__tau = tau
 
@@ -51,10 +57,18 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
 
     @property
     def alpha(self):
+        r""" :math:`\alpha`
+
+        :rtype: float
+        """
         return self.__alpha
 
     @property
     def tau(self):
+        r""" :math:`\tau`
+
+        :rtype: float
+        """
         return self.__tau
 
     @overrides(AbstractTimingDependence.is_same_as)
@@ -67,10 +81,12 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
                 self.__alpha == timing_dependence.alpha)
 
     @property
+    @overrides(AbstractTimingDependence.vertex_executable_suffix)
     def vertex_executable_suffix(self):
         return "vogels_2011"
 
     @property
+    @overrides(AbstractTimingDependence.pre_trace_n_bytes)
     def pre_trace_n_bytes(self):
         # Trace entries consist of a single 16-bit number
         return BYTES_PER_SHORT
@@ -80,6 +96,7 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
         return BYTES_PER_WORD + BYTES_PER_WORD * len(self.__tau_data)
 
     @property
+    @overrides(AbstractTimingDependence.n_weight_terms)
     def n_weight_terms(self):
         return 1
 
@@ -94,6 +111,7 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
         spec.write_array(self.__tau_data)
 
     @property
+    @overrides(AbstractTimingDependence.synaptic_structure)
     def synaptic_structure(self):
         return self.__synapse_structure
 

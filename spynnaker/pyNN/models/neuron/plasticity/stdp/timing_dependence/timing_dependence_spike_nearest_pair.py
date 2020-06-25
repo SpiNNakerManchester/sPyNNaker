@@ -27,6 +27,8 @@ logger = logging.getLogger(__name__)
 
 
 class TimingDependenceSpikeNearestPair(AbstractTimingDependence):
+    """ A timing dependence STDP rule based on nearest pairs.
+    """
     __slots__ = [
         "__synapse_structure",
         "__tau_minus",
@@ -38,6 +40,10 @@ class TimingDependenceSpikeNearestPair(AbstractTimingDependence):
 
     def __init__(self, tau_plus=default_parameters['tau_plus'],
                  tau_minus=default_parameters['tau_minus']):
+        r"""
+        :param float tau_plus: :math:`\tau_+`
+        :param float tau_minus: :math:`\tau_-`
+        """
         self.__tau_plus = tau_plus
         self.__tau_minus = tau_minus
 
@@ -49,10 +55,18 @@ class TimingDependenceSpikeNearestPair(AbstractTimingDependence):
 
     @property
     def tau_plus(self):
+        r""" :math:`\tau_+`
+
+        :rtype: float
+        """
         return self.__tau_plus
 
     @property
     def tau_minus(self):
+        r""" :math:`\tau_-`
+
+        :rtype: float
+        """
         return self.__tau_minus
 
     @overrides(AbstractTimingDependence.is_same_as)
@@ -64,10 +78,12 @@ class TimingDependenceSpikeNearestPair(AbstractTimingDependence):
                 self.__tau_minus == timing_dependence.tau_minus)
 
     @property
+    @overrides(AbstractTimingDependence.vertex_executable_suffix)
     def vertex_executable_suffix(self):
         return "nearest_pair"
 
     @property
+    @overrides(AbstractTimingDependence.pre_trace_n_bytes)
     def pre_trace_n_bytes(self):
 
         # Pair rule requires no pre-synaptic trace when only the nearest
@@ -80,6 +96,7 @@ class TimingDependenceSpikeNearestPair(AbstractTimingDependence):
                                  len(self.__tau_minus_data))
 
     @property
+    @overrides(AbstractTimingDependence.n_weight_terms)
     def n_weight_terms(self):
         return 1
 
@@ -91,6 +108,7 @@ class TimingDependenceSpikeNearestPair(AbstractTimingDependence):
         spec.write_array(self.__tau_minus_data)
 
     @property
+    @overrides(AbstractTimingDependence.synaptic_structure)
     def synaptic_structure(self):
         return self.__synapse_structure
 

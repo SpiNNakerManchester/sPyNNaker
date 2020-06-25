@@ -17,27 +17,29 @@ import logging
 import math
 import numpy
 from pyNN.random import RandomDistribution
-from spinn_front_end_common.utilities.constants import \
-    MICRO_TO_MILLISECOND_CONVERSION
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.constraints.partitioner_constraints import (
     SameAtomsAsVertexConstraint)
-from spinn_front_end_common.utilities import helpful_functions
+from spinn_front_end_common.utilities.constants import (
+    MICRO_TO_MILLISECOND_CONVERSION)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
+from spinn_front_end_common.utilities.helpful_functions import (
+    locate_extra_monitor_mc_receiver)
 from spynnaker.pyNN.models.abstract_models import (
     AbstractAcceptsIncomingSynapses)
 from spynnaker.pyNN.models.neural_projections import (
     DelayedApplicationEdge, SynapseInformation,
     ProjectionApplicationEdge, DelayAfferentApplicationEdge)
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
-from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.utilities.constants import (
+    MAX_DELAY_BLOCKS, MAX_TIMER_TICS_SUPPORTED_PER_BLOCK, SPIKE_PARTITION_ID)
 from spynnaker.pyNN.models.neuron import ConnectionHolder
 
 # pylint: disable=protected-access
 
 logger = logging.getLogger(__name__)
 _delay_extension_max_supported_delay = (
-    constants.MAX_DELAY_BLOCKS * constants.MAX_TIMER_TICS_SUPPORTED_PER_BLOCK)
+    MAX_DELAY_BLOCKS * MAX_TIMER_TICS_SUPPORTED_PER_BLOCK)
 # The maximum delay supported by the Delay extension, in ticks.
 
 
@@ -65,6 +67,27 @@ class PyNNProjectionCommon(object):
             target, pre_synaptic_population, post_synaptic_population,
             prepop_is_view, postpop_is_view,
             rng, machine_time_step, user_max_delay, label, time_scale_factor):
+        """
+        :param spinnaker_control: The simulator engine core.
+        :type spinnaker_control:
+            ~spinn_front_end_common.interface.abstract_spinnaker_base.AbstractSpinnakerBase
+        :param AbstractConnector connector:
+            What is the connector for this projection.
+        :param AbstractSynapseDynamics synapse_dynamics_stdp:
+            How synapses behave
+        :param str target: What is the target on the post-synaptic population?
+        :param AbstractPopulationVertex pre_synaptic_population:
+            Where do we connect from?
+        :param AbstractPopulationVertex post_synaptic_population:
+            Where do we connect to?
+        :param rng:
+        :type rng: ~pyNN.random.NumpyRNG or None
+        :param int machine_time_step:
+        :param float user_max_delay: User-provided max delay
+        :param label: Label for the projection, or None to generate one
+        :type label: str or None
+        :param int time_scale_factor:
+        """
         # pylint: disable=too-many-arguments, too-many-locals
         self.__spinnaker_control = spinnaker_control
         self.__projection_edge = None
@@ -162,7 +185,7 @@ class PyNNProjectionCommon(object):
 
             # add edge to the graph
             spinnaker_control.add_application_edge(
-                self.__projection_edge, constants.SPIKE_PARTITION_ID)
+                self.__projection_edge, SPIKE_PARTITION_ID)
 
         # If the delay exceeds the post vertex delay, add a delay extension
         if max_delay > post_vertex_max_supported_delay_ms:
@@ -195,18 +218,29 @@ class PyNNProjectionCommon(object):
 
     @property
     def requires_mapping(self):
+        """ Whether this projection requires mapping.
+
+        :rtype: bool
+        """
         return self.__requires_mapping
 
     def mark_no_changes(self):
-        # Does Nothing currently
+        """ Mark this projection as not having changes to be mapped.
+        """
         self.__requires_mapping = False
 
     @property
     def _synapse_information(self):
+        """
+        :rtype: SynapseInformation
+        """
         return self.__synapse_information
 
     @property
     def _projection_edge(self):
+        """
+        :rtype: ProjectionApplicationEdge
+        """
         return self.__projection_edge
 
     def _find_existing_edge(self, pre_synaptic_vertex, post_synaptic_vertex):
@@ -214,12 +248,13 @@ class PyNNProjectionCommon(object):
             edge which has the same post and pre vertex
 
         :param pre_synaptic_vertex: the source vertex of the multapse
-        :type pre_synaptic_vertex: \
-            pacman.model.graph.application.ApplicationVertex
+        :type pre_synaptic_vertex:
+            ~pacman.model.graphs.application.ApplicationVertex
         :param post_synaptic_vertex: The destination vertex of the multapse
-        :type post_synaptic_vertex: \
-            pacman.model.graph.application.ApplicationVertex
+        :type post_synaptic_vertex:
+            ~pacman.model.graphs.application.ApplicationVertex
         :return: None or the edge going to these vertices.
+        :rtype: ~.ApplicationEdge
         """
 
         # Find edges ending at the postsynaptic vertex
@@ -237,6 +272,14 @@ class PyNNProjectionCommon(object):
             max_delay_for_projection, max_delay_per_neuron, machine_time_step,
             time_scale_factor):
         """ Instantiate delay extension component
+
+        :param PyNNPopulationCommon pre_synaptic_population:
+        :param PyNNPopulationCommon post_synaptic_population:
+        :param int max_delay_for_projection:
+        :param int max_delay_per_neuron:
+        :param int machine_time_step:
+        :param int time_scale_factor:
+        :rtype: DelayedApplicationEdge
         """
         # pylint: disable=too-many-arguments
 
@@ -258,7 +301,7 @@ class PyNNProjectionCommon(object):
                 pre_vertex, delay_vertex, label="{}_to_DelayExtension".format(
                     pre_vertex.label))
             self.__spinnaker_control.add_application_edge(
-                delay_afferent_edge, constants.SPIKE_PARTITION_ID)
+                delay_afferent_edge, SPIKE_PARTITION_ID)
 
         # Ensure that the delay extension knows how many states it will
         # support
@@ -277,7 +320,7 @@ class PyNNProjectionCommon(object):
                 label="{}_delayed_to_{}".format(
                     pre_vertex.label, post_vertex.label))
             self.__spinnaker_control.add_application_edge(
-                delay_edge, constants.SPIKE_PARTITION_ID)
+                delay_edge, SPIKE_PARTITION_ID)
         else:
             delay_edge.add_synapse_information(self.__synapse_information)
         return delay_edge
@@ -285,6 +328,14 @@ class PyNNProjectionCommon(object):
     def _get_synaptic_data(
             self, as_list, data_to_get, fixed_values=None, notify=None,
             handle_time_out_configuration=True):
+        """
+        :param bool as_list:
+        :param list(int) data_to_get:
+        :param list(tuple(str,int)) fixed_values:
+        :param callable(ConnectionHolder,None) notify:
+        :param bool handle_time_out_configuration:
+        :rtype: ConnectionHolder
+        """
         # pylint: disable=too-many-arguments
         post_vertex = self.__projection_edge.post_vertex
         pre_vertex = self.__projection_edge.pre_vertex
@@ -324,6 +375,13 @@ class PyNNProjectionCommon(object):
     def __get_projection_data(
             self, data_to_get, pre_vertex, post_vertex, connection_holder,
             handle_time_out_configuration):
+        """
+        :param str data_to_get:
+        :param .ApplicationVertex pre_vertex:
+        :param .AbstractPopulationVertex post_vertex:
+        :param ConnectionHolder connection_holder:
+        :param bool handle_time_out_configuration:
+        """
         # pylint: disable=too-many-arguments, too-many-locals
         ctl = self.__spinnaker_control
 
@@ -350,7 +408,7 @@ class PyNNProjectionCommon(object):
 
             # if using extra monitor data extractor find local receiver
             if extra_monitors is not None:
-                receiver = helpful_functions.locate_extra_monitor_mc_receiver(
+                receiver = locate_extra_monitor_mc_receiver(
                     placement_x=placement.x, placement_y=placement.y,
                     machine=ctl.machine,
                     packet_gather_cores_to_ethernet_connection_map=receivers)
@@ -382,7 +440,8 @@ class PyNNProjectionCommon(object):
     def size(self, gather=True):
         """ Return the total number of connections.
 
-        :param gather: If False, only get the number of connections locally.\
+        :param bool gather:
+            If False, only get the number of connections locally.
             Which means nothing on SpiNNaker...
         """
         # TODO

@@ -28,6 +28,12 @@ logger = logging.getLogger(__name__)
 
 
 class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
+    """ A timing dependence STDP rule based on spike triplets.
+
+    Jean-Pascal Pfister, Wulfram Gerstner. Triplets of Spikes in a Model of
+    Spike Timing-Dependent Plasticity. *Journal of Neuroscience*,
+    20 September 2006, 26 (38) 9673-9682; DOI: 10.1523/JNEUROSCI.1425-06.2006
+    """
     __slots__ = [
         "__synapse_structure",
         "__tau_minus",
@@ -41,6 +47,12 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
 
     # noinspection PyPep8Naming
     def __init__(self, tau_plus, tau_minus, tau_x, tau_y):
+        r"""
+        :param float tau_plus: :math:`\tau_+`
+        :param float tau_minus: :math:`\tau_-`
+        :param float tau_x: :math:`\tau_x`
+        :param float tau_y: :math:`\tau_y`
+        """
         self.__tau_plus = tau_plus
         self.__tau_minus = tau_minus
         self.__tau_x = tau_x
@@ -56,18 +68,34 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
 
     @property
     def tau_plus(self):
+        r""" :math:`\tau_+`
+
+        :rtype: float
+        """
         return self.__tau_plus
 
     @property
     def tau_minus(self):
+        r""" :math:`\tau_-`
+
+        :rtype: float
+        """
         return self.__tau_minus
 
     @property
     def tau_x(self):
+        r""" :math:`\tau_x`
+
+        :rtype: float
+        """
         return self.__tau_x
 
     @property
     def tau_y(self):
+        r""" :math:`\tau_y`
+
+        :rtype: float
+        """
         return self.__tau_y
 
     @overrides(AbstractTimingDependence.is_same_as)
@@ -82,10 +110,12 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
             (self.__tau_y == timing_dependence.tau_y))
 
     @property
+    @overrides(AbstractTimingDependence.vertex_executable_suffix)
     def vertex_executable_suffix(self):
         return "pfister_triplet"
 
     @property
+    @overrides(AbstractTimingDependence.pre_trace_n_bytes)
     def pre_trace_n_bytes(self):
         # Triplet rule trace entries consists of two 16-bit traces - R1 and R2
         return BYTES_PER_WORD
@@ -98,6 +128,7 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
         return lut_array_words * BYTES_PER_WORD
 
     @property
+    @overrides(AbstractTimingDependence.n_weight_terms)
     def n_weight_terms(self):
         return 2
 
@@ -111,6 +142,7 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
         spec.write_array(self.__tau_y_data)
 
     @property
+    @overrides(AbstractTimingDependence.synaptic_structure)
     def synaptic_structure(self):
         return self.__synapse_structure
 

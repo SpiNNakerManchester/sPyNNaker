@@ -25,6 +25,14 @@ class AbstractSynapseDynamicsStructural(object):
     def get_structural_parameters_sdram_usage_in_bytes(
             self, application_graph, app_vertex, n_neurons, n_synapse_types):
         """ Get the size of the structural parameters
+
+        :param ~pacman.model.graphs.application.ApplicationGraph \
+                application_graph:
+        :param AbstractPopulationVertex app_vertex:
+        :param int n_neurons:
+        :param int n_synapse_types:
+        :return: the size of the parameters, in bytes
+        :rtype: int
         """
 
     @abstractmethod
@@ -33,6 +41,18 @@ class AbstractSynapseDynamicsStructural(object):
             weight_scales, application_graph, app_vertex, post_slice,
             graph_mapper, routing_info, synapse_indices):
         """ Write structural plasticity parameters
+
+        :param ~data_specification.DataSpecificationGenerator spec:
+        :param int region: region ID
+        :param int machine_time_step:
+        :param weight_scales:
+        :type weight_scales: ~numpy.ndarray or list(float)
+        :param ~pacman.model.graphs.application.ApplicationGraph\
+                application_graph:
+        :param AbstractPopulationVertex app_vertex:
+        :param ~pacman.model.graphs.common.Slice post_slice:
+        :param ~pacman.model.routing_info.RoutingInfo routing_info:
+        :param dict(tuple(SynapseInformation,int),int) synapse_indices:
         """
 
     @abstractmethod
@@ -40,44 +60,66 @@ class AbstractSynapseDynamicsStructural(object):
             self, connections, post_vertex_slice, app_edge, synapse_info,
             machine_edge):
         """ Set connections for structural plasticity
+
+        :param ~numpy.ndarray connections:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param ProjectionApplicationEdge app_edge:
+        :param SynapseInformation synapse_info:
+        :param ProjectionMachineEdge machine_edge:
         """
 
     @abstractproperty
     def f_rew(self):
         """ The frequency of rewiring
+
+        :rtype: float
         """
 
     @abstractproperty
     def s_max(self):
         """ The maximum number of synapses
+
+        :rtype: int
         """
 
     @abstractproperty
     def seed(self):
         """ The seed to control the randomness
+
+        :rtype: int
         """
 
     @abstractproperty
     def initial_weight(self):
         """ The weight of a formed connection
+
+        :rtype: float
         """
 
     @abstractproperty
     def initial_delay(self):
         """ The delay of a formed connection
+
+        :rtype: float
         """
 
     @abstractproperty
     def partner_selection(self):
         """ The partner selection rule
+
+        :rtype: AbstractPartnerSelection
         """
 
     @abstractproperty
     def formation(self):
         """ The formation rule
+
+        :rtype: AbstractFormation
         """
 
     @abstractproperty
     def elimination(self):
         """ The elimination rule
+
+        :rtype: AbstractElimination
         """

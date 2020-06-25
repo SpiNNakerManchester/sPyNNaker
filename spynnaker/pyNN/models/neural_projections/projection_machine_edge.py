@@ -34,6 +34,13 @@ class ProjectionMachineEdge(
     def __init__(
             self, synapse_information, pre_vertex, post_vertex,
             label=None, traffic_weight=1):
+        """
+        :param list(SynapseInformation) synapse_information:
+        :param PopulationMachineVertex pre_vertex:
+        :param PopulationMachineVertex post_vertex:
+        :param str label:
+        :param int traffic_weight:
+        """
         # pylint: disable=too-many-arguments
         super(ProjectionMachineEdge, self).__init__(
             pre_vertex, post_vertex, label=label,
@@ -43,6 +50,9 @@ class ProjectionMachineEdge(
 
     @property
     def synapse_information(self):
+        """
+        :rtype: list(SynapseInformation)
+        """
         return self.__synapse_information
 
     @overrides(AbstractFilterableEdge.filter_edge)

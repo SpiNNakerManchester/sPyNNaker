@@ -31,19 +31,33 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
     default_population_parameters = _population_parameters
 
     def __init__(self, model):
+        """
+        :param AbstractNeuronImpl model: The model implementation
+        """
         self.__model = model
 
     @property
     def _model(self):
+        """
+        :rtype: AbstractNeuronImpl
+        """
         return self.__model
 
     @classmethod
     def set_model_max_atoms_per_core(cls, n_atoms=DEFAULT_MAX_ATOMS_PER_CORE):
+        """ Set the maximum number of atoms per core for this model
+
+        :param int n_atoms: The new maximum
+        """
         super(AbstractPyNNNeuronModel, cls).set_model_max_atoms_per_core(
             n_atoms)
 
     @classmethod
     def get_max_atoms_per_core(cls):
+        """ Get the maximum number of atoms per core for this model
+
+        :rtype: int
+        """
         if cls not in super(AbstractPyNNNeuronModel, cls)._max_atoms_per_core:
             return DEFAULT_MAX_ATOMS_PER_CORE
         return super(AbstractPyNNNeuronModel, cls).get_max_atoms_per_core()
@@ -53,6 +67,11 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
     def create_vertex(
             self, n_neurons, label, constraints, spikes_per_second,
             ring_buffer_sigma, incoming_spike_buffer_size):
+        """
+        :param float spikes_per_second:
+        :param float ring_buffer_sigma:
+        :param int incoming_spike_buffer_size:
+        """
         # pylint: disable=arguments-differ
         max_atoms = self.get_max_atoms_per_core()
         return AbstractPopulationVertex(

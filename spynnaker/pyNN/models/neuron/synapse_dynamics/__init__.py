@@ -26,12 +26,16 @@ from .synapse_dynamics_structural_common import SynapseDynamicsStructuralCommon
 from .synapse_dynamics_structural_static import SynapseDynamicsStructuralStatic
 from .synapse_dynamics_structural_stdp import SynapseDynamicsStructuralSTDP
 
-__all__ = ["AbstractSynapseDynamics", "AbstractGenerateOnMachine",
-           "AbstractStaticSynapseDynamics",
-           "AbstractPlasticSynapseDynamics", "PyNNSynapseDynamics",
-           "SynapseDynamicsStatic", "SynapseDynamicsSTDP",
-           "AbstractSynapseDynamicsStructural",
-           # Structural plasticity
-           "SynapseDynamicsStructuralCommon",
-           "SynapseDynamicsStructuralStatic",
-           "SynapseDynamicsStructuralSTDP"]
+__all__ = [
+    "AbstractGenerateOnMachine",
+    "AbstractPlasticSynapseDynamics",
+    "AbstractStaticSynapseDynamics",
+    "AbstractSynapseDynamics",
+    "AbstractSynapseDynamicsStructural",
+    "PyNNSynapseDynamics",
+    "SynapseDynamicsStatic",
+    "SynapseDynamicsSTDP",
+    # Structural plasticity
+    "SynapseDynamicsStructuralCommon",
+    "SynapseDynamicsStructuralStatic",
+    "SynapseDynamicsStructuralSTDP"]

@@ -37,9 +37,8 @@ class RecordingCommon(object):
 
     def __init__(self, population):
         """
-        :param population: the population to record for
+        :param PyNNPopulationCommon population: the population to record for
         """
-
         self.__population = population
 
         # file flags, allows separate files for the recorded variables
@@ -51,10 +50,16 @@ class RecordingCommon(object):
 
     @property
     def _population(self):
+        """
+        :rtype: PyNNPopulationCommon
+        """
         return self.__population
 
     @property
     def _write_to_files_indicators(self):
+        """
+        :rtype: dict(str,~neo.io or ~neo.rawio or str or None)
+        """
         return self.__write_to_files_indicators
 
     def _record(self, variable, sampling_interval=None, to_file=None,
@@ -64,10 +69,12 @@ class RecordingCommon(object):
         :param variable: the variable to record, valued variables to record\
             are: 'gsyn_exc', 'gsyn_inh', 'v', 'spikes'
         :param sampling_interval: the interval to record them
+        :type sampling_interval: int or None
+        :param to_file:
+        :type to_file: ~neo.io or ~neo.rawio or str or None
         :param indexes: List of indexes to record or None for all
-        :return: None
+        :type indexes: list(int) or None
         """
-
         get_simulator().verify_not_running()
         # tell vertex its recording
         if variable == "spikes":
@@ -104,9 +111,8 @@ class RecordingCommon(object):
                     "input. You will receive current measurements instead.")
 
     def _get_recorded_pynn7(self, variable):
-        if variable == "spikes":
-            data = self._get_spikes()
-
+        """ Get recorded data in PyNN 0.7 format. Must not be spikes.
+        """
         (data, ids, sampling_interval) = self._get_recorded_matrix(variable)
         n_machine_time_steps = len(data)
         n_neurons = len(ids)
@@ -122,8 +128,9 @@ class RecordingCommon(object):
         """ Perform safety checks and get the recorded data from the vertex\
             in matrix format.
 
-        :param variable: the variable name to read. supported variable names
-            are :'gsyn_exc', 'gsyn_inh', 'v'
+        :param str variable:
+            the variable name to read. supported variable names are:
+            'gsyn_exc', 'gsyn_inh', 'v'
         :return: data, indexes, sampling_interval
         :rtype: tuple(~numpy.ndarray, list(int), float)
         """
@@ -175,8 +182,8 @@ class RecordingCommon(object):
         """ How to get spikes from a vertex.
 
         :return: the spikes from a vertex
+        :rtype: ~numpy.ndarray
         """
-
         # check we're in a state where we can get spikes
         if not isinstance(self.__population._vertex, AbstractSpikeRecordable):
             raise ConfigurationException(
@@ -206,10 +213,7 @@ class RecordingCommon(object):
 
     def _turn_off_all_recording(self, indexes=None):
         """ Turns off recording, is used by a pop saying `.record()`
-
-        :rtype: None
         """
-
         # check for standard record which includes spikes
         if isinstance(self.__population._vertex, AbstractNeuronRecordable):
             variables = self.__population._vertex.get_recordable_variables()
