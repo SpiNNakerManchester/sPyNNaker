@@ -12,6 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+import math
 
 import numpy
 from spinn_utilities.overrides import overrides
@@ -84,7 +85,7 @@ class SmallWorldConnector(AbstractConnector):
 
         self.__mask = (d < self.__degree).astype(float)
 
-        self.__n_connections = int(numpy.sum(self.__mask))
+        self.__n_connections = int(math.ceil(numpy.sum(self.__mask)))
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
