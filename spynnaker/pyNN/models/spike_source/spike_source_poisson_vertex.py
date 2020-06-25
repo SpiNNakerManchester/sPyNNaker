@@ -156,12 +156,12 @@ class SpikeSourcePoissonVertex(
         :param int n_neurons:
         :param constraints:
         :param str label:
-        :param float sed:
+        :param float seed:
         :param int max_atoms_per_core:
         :param model:
-        :param float rate:
-        :param int start:
-        :param int duration:
+        :param iterable of float rate:
+        :param iterable of int start:
+        :param iterable of int duration:
         """
         # pylint: disable=too-many-arguments
         super(SpikeSourcePoissonVertex, self).__init__(
