@@ -101,6 +101,9 @@ class SynapticManager(object):
         "_connector_builder_region",
         "_direct_matrix_region"]
 
+    # TODO make this right
+    FUDGE = 0
+
     def __init__(self, n_synapse_types, ring_buffer_sigma, spikes_per_second,
                  config, population_table_type=None, synapse_io=None):
         """
@@ -206,7 +209,8 @@ class SynapticManager(object):
         """
         return self.__synapse_dynamics
 
-    def __combine_structural_stdp_dynamics(self, structural, stdp):
+    @staticmethod
+    def __combine_structural_stdp_dynamics(structural, stdp):
         """
         :param AbstractSynapseDynamicsStructural structural:
         :param SynapseDynamicsSTDP stdp:
@@ -293,14 +297,14 @@ class SynapticManager(object):
         :rtype: int
         """
         # TODO: Calculate this correctly
-        return 0
+        return self.FUDGE
 
     def get_dtcm_usage_in_bytes(self):
         """
         :rtype: int
         """
         # TODO: Calculate this correctly
-        return 0
+        return self.FUDGE
 
     def _get_synapse_params_size(self):
         """
@@ -1361,7 +1365,7 @@ class SynapticManager(object):
         :param int master_pop_table_address:
         :param ~spinnman.transceiver.Transceiver txrx:
         :param ~.Placement placement:
-        :rtype: int
+        :rtype: list(tuple(int, int, bool))
         """
         return self.__poptable_type.extract_synaptic_matrix_data_location(
             key, master_pop_table_address, txrx, placement.x, placement.y)
@@ -1380,7 +1384,7 @@ class SynapticManager(object):
         :type data: bytes or bytearray or memoryview
         :param delayed_data:
         :type delayed_data: bytes or bytearray or memoryview
-        :param int machine_time_step:
+        :param int timestep:
         :return: array with ``weight`` and ``delay`` columns
         :rtype: ~numpy.ndarray
         """
