@@ -43,9 +43,9 @@ PUSH_BOT_MOTOR_WITHOUT_UART_MASK = 0x7C0
 PUSH_BOT_MOTOR_UART_SHIFT = 0 + _OFFSET_TO_I
 
 
-def _munich_key(Instr, Format=0, Device=0):
-    return ((Instr << _OFFSET_TO_I) | (Format << _OFFSET_TO_F) |
-            (Device << _OFFSET_TO_D))
+def _munich_key(instr, format_bit=0, device=0):
+    return ((instr << _OFFSET_TO_I) | (format_bit << _OFFSET_TO_F) |
+            (device << _OFFSET_TO_D))
 
 
 def get_munich_i(key):
