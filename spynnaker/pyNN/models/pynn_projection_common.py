@@ -141,10 +141,12 @@ class PyNNProjectionCommon(object):
 
         # check if all delays requested can fit into the natively supported
         # delays in the models
-        post_vertex_max_supported_delay_ms = \
-            post_vertex.get_maximum_delay_supported_in_ms(machine_time_step)
-        max_supported_delay_ms = post_vertex_max_supported_delay_ms + \
-            _delay_extension_max_supported_delay * (machine_time_step / 1000.0)
+        post_vertex_max_supported_delay_ms = (
+            post_vertex.get_maximum_delay_supported_in_ms(machine_time_step))
+        max_supported_delay_ms = (
+            post_vertex_max_supported_delay_ms +
+            _delay_extension_max_supported_delay *
+            (machine_time_step / MICRO_TO_MILLISECOND_CONVERSION))
         if max_delay > max_supported_delay_ms:
             raise ConfigurationException(
                 "The maximum delay {} for projection is not supported "
