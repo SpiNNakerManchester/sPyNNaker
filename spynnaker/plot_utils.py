@@ -20,6 +20,7 @@ try:
     import matplotlib.pyplot as plt
     matplotlib_missing = False
 except ImportError:
+    plt = None
     matplotlib_missing = True
 # pylint: disable=consider-using-enumerate
 
@@ -122,14 +123,14 @@ def _get_colour():
 
 def _grid(length):
     if length == 1:
-        return (1, 1)
+        return 1, 1
     if length == 2:
-        return (1, 2)
+        return 1, 2
     if length == 3:
-        return (1, 3)
+        return 1, 3
     if length == 4:
-        return (2, 2)
-    return (length // 3 + 1, length % 3 + 1)
+        return 2, 2
+    return length // 3 + 1, length % 3 + 1
 
 
 def plot_spikes(spikes, title="spikes"):
@@ -147,10 +148,10 @@ def plot_spikes(spikes, title="spikes"):
 
     colours = _get_colour()
 
-    minTime = sys.maxsize
-    maxTime = 0
-    minSpike = sys.maxsize
-    maxSpike = 0
+    min_time = sys.maxsize
+    max_time = 0
+    min_spike = sys.maxsize
+    max_spike = 0
 
     print("Plotting {} set of spikes".format(len(spikes)))
     (numrows, numcols) = _grid(len(spikes))
@@ -159,21 +160,21 @@ def plot_spikes(spikes, title="spikes"):
         single_spikes = spikes[index]
         spike_time = [i[1] for i in single_spikes]
         spike_id = [i[0] for i in single_spikes]
-        minTime = min(minTime, min(spike_time))
-        maxTime = max(maxTime, max(spike_time))
-        minSpike = min(minSpike, min(spike_id))
-        maxSpike = max(maxSpike, max(spike_id))
+        min_time = min(min_time, min(spike_time))
+        max_time = max(max_time, max(spike_time))
+        min_spike = min(min_spike, min(spike_id))
+        max_spike = max(max_spike, max(spike_id))
         plt.plot(spike_time, spike_id, next(colours), )
     plt.xlabel("Time (ms)")
     plt.ylabel("Neuron ID")
     plt.title(title)
-    timeDiff = (maxTime - minTime) * 0.05
-    minTime = minTime - timeDiff
-    maxTime = maxTime + timeDiff
-    spikeDiff = (maxSpike - minSpike) * 0.05
-    minSpike = minSpike - spikeDiff
-    maxSpike = maxSpike + spikeDiff
-    plt.axis([minTime, maxTime, minSpike, maxSpike])
+    time_diff = (max_time - min_time) * 0.05
+    min_time = min_time - time_diff
+    max_time = max_time + time_diff
+    spike_diff = (max_spike - min_spike) * 0.05
+    min_spike = min_spike - spike_diff
+    max_spike = max_spike + spike_diff
+    plt.axis([min_time, max_time, min_spike, max_spike])
     plt.show()
 
 
