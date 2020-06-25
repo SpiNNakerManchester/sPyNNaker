@@ -30,10 +30,10 @@ class GraphEdgeFilter(object):
 
     def __call__(self, app_graph, machine_graph):
         """
-        :param application_graph: The application graph
-        :type application_graph:
+        :param app_graph: The application graph
+        :type app_graph:
             ~pacman.model.graphs.application.ApplicationGraph or None
-        :param .MachineGraph new_graph:
+        :param .MachineGraph machine_graph:
              The machine_graph whose edges are to be filtered
         :return: a new, filtered machine graph
         """
