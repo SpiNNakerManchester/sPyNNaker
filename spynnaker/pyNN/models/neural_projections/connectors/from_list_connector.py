@@ -109,8 +109,8 @@ class FromListConnector(AbstractConnector):
                 self.__split_post_slices == post_slices):
             return False
 
-        self.__split_pre_slices = pre_slices
-        self.__split_post_slices = post_slices
+        self.__split_pre_slices = list(pre_slices)
+        self.__split_post_slices = list(post_slices)
 
         # Create bins into which connections are to be grouped
         pre_bins = numpy.concatenate((
