@@ -46,9 +46,10 @@ def synapse_expander(
     :param ~spinnman.transceiver.Transceiver transceiver:
         How to talk to the machine.
     :param str provenance_file_path: Where provenance data should be written.
-    :param ~spinn_utilities.executable_finder.ExecutableFinder \
-            executable_finder:
+    :param executable_finder:
         How to find the synapse expander binaries.
+    :type executable_finder:
+        ~spinn_utilities.executable_finder.ExecutableFinder
     """
 
     synapse_bin = executable_finder.get_executable_path(SYNAPSE_EXPANDER)
