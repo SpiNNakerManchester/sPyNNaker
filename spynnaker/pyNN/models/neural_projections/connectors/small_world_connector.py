@@ -76,7 +76,7 @@ class SmallWorldConnector(AbstractConnector):
         # PyNN 0.8 returns a flattened (C-style) array from space.distances,
         # so the easiest thing to do here is to reshape back to the "expected"
         # PyNN 0.7 shape; otherwise later code gets confusing and difficult
-        if (len(distances.shape) == 1):
+        if len(distances.shape) == 1:
             d = numpy.reshape(distances, (pre_positions.shape[0],
                                           post_positions.shape[0]))
         else:
@@ -84,7 +84,7 @@ class SmallWorldConnector(AbstractConnector):
 
         self.__mask = (d < self.__degree).astype(float)
 
-        self.__n_connections = numpy.sum(self.__mask)
+        self.__n_connections = int(numpy.sum(self.__mask))
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
