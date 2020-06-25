@@ -74,6 +74,8 @@ class DelayExtensionVertex(
         "__n_subvertices",
         "__n_data_specs"]
 
+    ESTIMATED_CPU_CYCLES = 128
+
     def __init__(self, n_neurons, delay_per_stage, source_vertex,
                  machine_time_step, time_scale_factor, constraints=None,
                  label="DelayExtension"):
@@ -365,7 +367,7 @@ class DelayExtensionVertex(
         :param ~pacman.model.graphs.common.Slice vertex_slice:
         :rtype: int
         """
-        return 128 * vertex_slice.n_atoms
+        return self.ESTIMATED_CPU_CYCLES * vertex_slice.n_atoms
 
     def get_sdram_usage_for_atoms(self, out_edges):
         """
