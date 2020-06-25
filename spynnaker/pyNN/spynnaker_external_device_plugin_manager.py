@@ -267,6 +267,7 @@ class SpynnakerExternalDevicePluginManager(object):
             database and are ready for it to start execution
         :param int database_notify_port_num: The port number to which an
             external device will receive the database is ready command
+        :param bool notify: adds to the notification protocol if set.
         :param bool reserve_reverse_ip_tag: True if a reverse IP tag is to be
             used, False if SDP is to be used (default)
         """
