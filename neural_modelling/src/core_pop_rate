@@ -1,0 +1,113 @@
+neuron/implementations/neuron_impl_left_right_readout.h:152:    validate_mars_kiss64_seed(global_parameters->kiss_seed);
+neuron/implementations/neuron_impl_left_right_readout.h:208:    io_printf(IO_BUF, "seed 1: %u \n", global_parameters->kiss_seed[0]);
+neuron/implementations/neuron_impl_left_right_readout.h:209:    io_printf(IO_BUF, "seed 2: %u \n", global_parameters->kiss_seed[1]);
+neuron/implementations/neuron_impl_left_right_readout.h:210:    io_printf(IO_BUF, "seed 3: %u \n", global_parameters->kiss_seed[2]);
+neuron/implementations/neuron_impl_left_right_readout.h:211:    io_printf(IO_BUF, "seed 4: %u \n", global_parameters->kiss_seed[3]);
+neuron/implementations/neuron_impl_left_right_readout.h:212:    io_printf(IO_BUF, "ticks_per_second: %k \n\n", global_parameters->ticks_per_second);
+neuron/implementations/neuron_impl_left_right_readout.h:213://    io_printf(IO_BUF, "prob_command: %k \n\n", global_parameters->prob_command);
+neuron/implementations/neuron_impl_left_right_readout.h:214:    io_printf(IO_BUF, "rate on: %k \n\n", global_parameters->rate_on);
+neuron/implementations/neuron_impl_left_right_readout.h:215:    io_printf(IO_BUF, "rate off: %k \n\n", global_parameters->rate_off);
+neuron/implementations/neuron_impl_left_right_readout.h:216:    io_printf(IO_BUF, "mean 0: %k \n\n", global_parameters->mean_0);
+neuron/implementations/neuron_impl_left_right_readout.h:217:    io_printf(IO_BUF, "mean 1: %k \n\n", global_parameters->mean_1);
+neuron/implementations/neuron_impl_left_right_readout.h:218:    io_printf(IO_BUF, "poisson key: %u \n\n", global_parameters->p_key);
+neuron/implementations/neuron_impl_left_right_readout.h:219:    io_printf(IO_BUF, "poisson pop size: %u \n\n", global_parameters->p_pop_size);
+neuron/implementations/neuron_impl_left_right_readout.h:255://    		global_parameters->target_V[target_ind]);
+neuron/implementations/neuron_impl_left_right_readout.h:313:        global_parameters->readout_V_0 = result;
+neuron/implementations/neuron_impl_left_right_readout.h:324:        global_parameters->readout_V_1 = result;
+neuron/implementations/neuron_impl_left_right_readout.h:327://        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = global_parameters->readout_V_0;
+neuron/implementations/neuron_impl_left_right_readout.h:330://        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = global_parameters->readout_V_1;
+neuron/implementations/neuron_impl_left_right_readout.h:340:        global_parameters->cross_entropy = 0.k;
+neuron/implementations/neuron_impl_left_right_readout.h:341:        global_parameters->mean_0 = 0.k;
+neuron/implementations/neuron_impl_left_right_readout.h:342:        global_parameters->mean_1 = 0.k;
+neuron/implementations/neuron_impl_left_right_readout.h:346:                key | neuron_index,  bitsk(global_parameters->cross_entropy), 1 )) {
+neuron/implementations/neuron_impl_left_right_readout.h:363:                    REAL random_value = (REAL)(mars_kiss64_seed(global_parameters->kiss_seed) / (REAL)0xffffffff); // 0-1
+neuron/implementations/neuron_impl_left_right_readout.h:372:                    payload = global_parameters->rate_on;
+neuron/implementations/neuron_impl_left_right_readout.h:374:                    for (int j = current_cue_direction*global_parameters->p_pop_size;
+neuron/implementations/neuron_impl_left_right_readout.h:375:                            j < current_cue_direction*global_parameters->p_pop_size + global_parameters->p_pop_size; j++){
+neuron/implementations/neuron_impl_left_right_readout.h:376:                        spin1_send_mc_packet(global_parameters->p_key | j, bitsk(payload), WITH_PAYLOAD);
+neuron/implementations/neuron_impl_left_right_readout.h:383:                    payload = global_parameters->rate_off;
+neuron/implementations/neuron_impl_left_right_readout.h:385:                    for (int j = current_cue_direction*global_parameters->p_pop_size;
+neuron/implementations/neuron_impl_left_right_readout.h:386:                            j < current_cue_direction*global_parameters->p_pop_size + global_parameters->p_pop_size; j++){
+neuron/implementations/neuron_impl_left_right_readout.h:387:                        spin1_send_mc_packet(global_parameters->p_key | j, bitsk(payload), WITH_PAYLOAD);
+neuron/implementations/neuron_impl_left_right_readout.h:414:                payload = global_parameters->rate_on;
+neuron/implementations/neuron_impl_left_right_readout.h:416:                for (int j = 2*global_parameters->p_pop_size;
+neuron/implementations/neuron_impl_left_right_readout.h:417:                        j < 2*global_parameters->p_pop_size + global_parameters->p_pop_size; j++){
+neuron/implementations/neuron_impl_left_right_readout.h:418:                    spin1_send_mc_packet(global_parameters->p_key | j, bitsk(payload), WITH_PAYLOAD);
+neuron/implementations/neuron_impl_left_right_readout.h:426://            io_printf(IO_BUF, "maybe here - %k - %k\n", global_parameters->mean_0, global_parameters->mean_1);
+neuron/implementations/neuron_impl_left_right_readout.h:430://            io_printf(IO_BUF, "v0 %k - v1 %k\n", global_parameters->readout_V_0, global_parameters->readout_V_1);
+neuron/implementations/neuron_impl_left_right_readout.h:431://            global_parameters->mean_0 += global_parameters->readout_V_0;
+neuron/implementations/neuron_impl_left_right_readout.h:432://            global_parameters->mean_1 += global_parameters->readout_V_1;
+neuron/implementations/neuron_impl_left_right_readout.h:435://            accum exp_0 = expk(global_parameters->mean_0 / (accum)ticks_for_mean);
+neuron/implementations/neuron_impl_left_right_readout.h:436://            accum exp_1 = expk(global_parameters->mean_1 / (accum)ticks_for_mean);
+neuron/implementations/neuron_impl_left_right_readout.h:437:            accum exp_0 = expk(global_parameters->readout_V_0 * 0.1k);
+neuron/implementations/neuron_impl_left_right_readout.h:438:            accum exp_1 = expk(global_parameters->readout_V_1 * 0.1k);
+neuron/implementations/neuron_impl_left_right_readout.h:441:                if (global_parameters->readout_V_0 > global_parameters->readout_V_1){
+neuron/implementations/neuron_impl_left_right_readout.h:455://            io_printf(IO_BUF, "soft0 %k - soft1 %k - v0 %k - v1 %k\n", softmax_0, softmax_1, global_parameters->readout_V_0, global_parameters->readout_V_1);
+neuron/implementations/neuron_impl_left_right_readout.h:458:                global_parameters->cross_entropy = -logk(softmax_1);
+neuron/implementations/neuron_impl_left_right_readout.h:462:                global_parameters->cross_entropy = -logk(softmax_0);
+neuron/implementations/neuron_impl_left_right_readout.h:472://            learning_signal = global_parameters->cross_entropy;
+neuron/implementations/neuron_impl_left_right_readout.h:482:                payload = global_parameters->rate_off;
+neuron/implementations/neuron_impl_left_right_readout.h:483:                for (int j = 2*global_parameters->p_pop_size;
+neuron/implementations/neuron_impl_left_right_readout.h:484:                        j < 2*global_parameters->p_pop_size + global_parameters->p_pop_size; j++){
+neuron/implementations/neuron_impl_left_right_readout.h:485:                    spin1_send_mc_packet(global_parameters->p_key | j, payload, WITH_PAYLOAD);
+neuron/implementations/neuron_impl_left_right_readout.h:491://    learning_signal = global_parameters->cross_entropy;
+neuron/implementations/neuron_impl_left_right_readout.h:493:    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = global_parameters->cross_entropy;
+neuron/implementations/neuron_impl_store_recall_readout.h:139:    validate_mars_kiss64_seed(global_parameters->kiss_seed);
+neuron/implementations/neuron_impl_store_recall_readout.h:195:    io_printf(IO_BUF, "seed 1: %u \n", global_parameters->kiss_seed[0]);
+neuron/implementations/neuron_impl_store_recall_readout.h:196:    io_printf(IO_BUF, "seed 2: %u \n", global_parameters->kiss_seed[1]);
+neuron/implementations/neuron_impl_store_recall_readout.h:197:    io_printf(IO_BUF, "seed 3: %u \n", global_parameters->kiss_seed[2]);
+neuron/implementations/neuron_impl_store_recall_readout.h:198:    io_printf(IO_BUF, "seed 4: %u \n", global_parameters->kiss_seed[3]);
+neuron/implementations/neuron_impl_store_recall_readout.h:199:    io_printf(IO_BUF, "ticks_per_second: %k \n\n", global_parameters->ticks_per_second);
+neuron/implementations/neuron_impl_store_recall_readout.h:200:    io_printf(IO_BUF, "prob_command: %k \n\n", global_parameters->prob_command);
+neuron/implementations/neuron_impl_store_recall_readout.h:201:    io_printf(IO_BUF, "rate on: %k \n\n", global_parameters->rate_on);
+neuron/implementations/neuron_impl_store_recall_readout.h:202:    io_printf(IO_BUF, "rate off: %k \n\n", global_parameters->rate_off);
+neuron/implementations/neuron_impl_store_recall_readout.h:203:    io_printf(IO_BUF, "mean 0: %k \n\n", global_parameters->mean_0);
+neuron/implementations/neuron_impl_store_recall_readout.h:204:    io_printf(IO_BUF, "mean 1: %k \n\n", global_parameters->mean_1);
+neuron/implementations/neuron_impl_store_recall_readout.h:205:    io_printf(IO_BUF, "poisson key: %k \n\n", global_parameters->p_key);
+neuron/implementations/neuron_impl_store_recall_readout.h:206:    io_printf(IO_BUF, "poisson pop size: %k \n\n", global_parameters->p_pop_size);
+neuron/implementations/neuron_impl_store_recall_readout.h:241:            REAL random_number = (REAL)(mars_kiss64_seed(global_parameters->kiss_seed) / (REAL)0xffffffff);
+neuron/implementations/neuron_impl_store_recall_readout.h:242:            if (random_number < global_parameters->prob_command){
+neuron/implementations/neuron_impl_store_recall_readout.h:246:        REAL switch_value = (REAL)(mars_kiss64_seed(global_parameters->kiss_seed) / (REAL)0xffffffff);
+neuron/implementations/neuron_impl_store_recall_readout.h:259:                payload = global_parameters->rate_on;
+neuron/implementations/neuron_impl_store_recall_readout.h:262:                payload = global_parameters->rate_off;
+neuron/implementations/neuron_impl_store_recall_readout.h:264:            for (int j = i*global_parameters->p_pop_size;
+neuron/implementations/neuron_impl_store_recall_readout.h:265:                    j < i*global_parameters->p_pop_size + global_parameters->p_pop_size; j++){
+neuron/implementations/neuron_impl_store_recall_readout.h:266:                spin1_send_mc_packet(global_parameters->p_key | j, payload, WITH_PAYLOAD);
+neuron/implementations/neuron_impl_store_recall_readout.h:323:        global_parameters->mean_0 == 0;
+neuron/implementations/neuron_impl_store_recall_readout.h:324:        global_parameters->mean_1 == 0;
+neuron/implementations/neuron_impl_store_recall_readout.h:336:    	global_parameters->readout_V_0 = result;
+neuron/implementations/neuron_impl_store_recall_readout.h:347:    	global_parameters->readout_V_1 = result;
+neuron/implementations/neuron_impl_store_recall_readout.h:359:            global_parameters->mean_0 += global_parameters->readout_V_0;
+neuron/implementations/neuron_impl_store_recall_readout.h:360:            global_parameters->mean_1 += global_parameters->readout_V_1;
+neuron/implementations/neuron_impl_store_recall_readout.h:361:            accum exp_0 = expk(global_parameters->mean_0 / ticks_for_mean);
+neuron/implementations/neuron_impl_store_recall_readout.h:362:            accum exp_1 = expk(global_parameters->mean_1 / ticks_for_mean);
+neuron/implementations/neuron_impl_store_recall_readout.h:367:                global_parameters->cross_entropy = -logk(softmax_1);
+neuron/implementations/neuron_impl_store_recall_readout.h:370:                global_parameters->cross_entropy = -logk(softmax_0);
+neuron/implementations/neuron_impl_store_recall_readout.h:382://    	if (global_parameters->cross_entropy < -0.7){
+neuron/implementations/neuron_impl_eprop_adaptive.h:211:    	global_parameters->core_target_rate = global_parameters->core_target_rate
+neuron/implementations/neuron_impl_eprop_adaptive.h:213:    	global_parameters->core_pop_rate = global_parameters->core_pop_rate
+neuron/implementations/neuron_impl_eprop_adaptive.h:240:		global_parameters->core_pop_rate = global_parameters->core_pop_rate
+neuron/implementations/neuron_impl_eprop_adaptive.h:241:				* global_parameters->rate_exp_TC;
+neuron/implementations/neuron_impl_eprop_adaptive.h:290://    		global_parameters->core_pop_rate;
+neuron/implementations/neuron_impl_eprop_adaptive.h:307://        recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = global_parameters->core_pop_rate / neurons_in_pop; // divide by neurons on core to get average per neuron contribution to core pop rate
+neuron/implementations/neuron_impl_eprop_adaptive.h:316://    //    		global_parameters->core_target_rate;
+neuron/implementations/neuron_impl_eprop_adaptive.h:362://    		global_parameters->core_pop_rate;
+neuron/implementations/neuron_impl_eprop_adaptive.h:369:////    		global_parameters->core_target_rate;
+neuron/implementations/neuron_impl_eprop_adaptive.h:388:        global_parameters->core_pop_rate += 1.0k;
+neuron/implementations/neuron_impl_eprop_adaptive.h:464:    		global_parameters->core_target_rate, global_parameters->core_pop_rate);
+neuron/implementations/neuron_impl_sinusoid_readout.h:182://    io_printf(IO_BUF, "seed 1: %u \n", global_parameters->spike_source_seed[0]);
+neuron/implementations/neuron_impl_sinusoid_readout.h:183://    io_printf(IO_BUF, "seed 2: %u \n", global_parameters->spike_source_seed[1]);
+neuron/implementations/neuron_impl_sinusoid_readout.h:184://    io_printf(IO_BUF, "seed 3: %u \n", global_parameters->spike_source_seed[2]);
+neuron/implementations/neuron_impl_sinusoid_readout.h:185://    io_printf(IO_BUF, "seed 4: %u \n", global_parameters->spike_source_seed[3]);
+neuron/implementations/neuron_impl_sinusoid_readout.h:186:    io_printf(IO_BUF, "eta: %k \n\n", global_parameters->eta);
+neuron/implementations/neuron_impl_sinusoid_readout.h:222://    		global_parameters->target_V[target_ind]);
+neuron/implementations/neuron_impl_sinusoid_readout.h:282:        REAL error = result - global_parameters->target_V[target_ind];
+neuron/implementations/neuron_impl_sinusoid_readout.h:306:                global_parameters->target_V[target_ind];
+neuron/implementations/neuron_impl_sinusoid_readout.h:308:                - global_parameters->target_V[target_ind];
+neuron/implementations/neuron_impl_sinusoid_readout.h:312://        			global_parameters->target_V[target_ind];
+neuron/plasticity/stdp/synapse_dynamics_sinusoid_readout_impl.c:320:	REAL reg_error = 0.0; //global_parameters->core_target_rate - global_parameters->core_pop_rate;
+neuron/plasticity/stdp/synapse_dynamics_eprop_adaptive_impl.c:318:	REAL reg_error = (global_parameters->core_target_rate - global_parameters->core_pop_rate) / syn_dynamics_neurons_in_partition; // this needs swapping for an inverse multiply - too expensive to do divide on every spike
+neuron/plasticity/stdp/synapse_dynamics_eprop_adaptive_impl.c:319://	REAL reg_error = ((global_parameters->core_target_rate + ((neuron_array->w_fb - 0.5) * 20)) - global_parameters->core_pop_rate) / syn_dynamics_neurons_in_partition; // this needs swapping for an inverse multiply - too expensive to do divide on every spike
+neuron/plasticity/stdp/synapse_dynamics_eprop_adaptive_impl.c:320://    io_printf(IO_BUF, "core_pop_rate = %k, target = %k, error = %k\n", global_parameters->core_pop_rate, global_parameters->core_target_rate, reg_error);
+neuron/plasticity/stdp/synapse_dynamics_left_right_readout_impl.c:320:	REAL reg_error = 0.0; //global_parameters->core_target_rate - global_parameters->core_pop_rate;
+neuron/models/neuron_model_eprop_adaptive_impl.c:109:	REAL reg_error = (global_parameters->core_target_rate - global_parameters->core_pop_rate) / syn_dynamics_neurons_in_partition;

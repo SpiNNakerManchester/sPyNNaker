@@ -157,22 +157,23 @@ state_t neuron_model_state_update(
         printed_value = false;
     }
 //    neuron->L = learning_signal * neuron->w_fb;
-    learning_signal *= neuron->w_fb;
+//    learning_signal *= neuron->w_fb;
 //    if (learning_signal != 0.k && new_learning_signal != learning_signal){
 //    if (new_learning_signal != learning_signal){// && time%1300 > 1100){
 //        io_printf(IO_BUF, "L:%k, rL:%k, cL:%k, nL:%k\n", learning_signal, reg_learning_signal, learning_signal + reg_learning_signal, new_learning_signal);
 //    if (reg_learning_signal > 0.5k || reg_learning_signal < -0.5k){
-    new_learning_signal = learning_signal;// + (reg_learning_signal);// * 0.1k);
+    new_learning_signal = (learning_signal * neuron->w_fb) + v_mem_error;
 //    }
 //        new_learning_signal = learning_signal;
 //    }
 //    neuron->L = learning_signal;
     if (time % neuron->window_size > 1300 * 2){
-        neuron->L = new_learning_signal;
+        neuron->L = new_learning_signal + (reg_learning_signal);// * 0.1k);
     }
     else{
-        neuron->L = learning_signal;
+        neuron->L = new_learning_signal;
     }
+//    neuron->L = learning_signal * neuron->w_fb; // turns of all reg
 
 //    if (time % 99 == 0){
 //        io_printf(IO_BUF, "during B = %k, b = %k, time = %u\n", neuron->B, neuron->b, time);
