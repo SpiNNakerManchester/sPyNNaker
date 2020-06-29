@@ -14,8 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from six import add_metaclass
-from spinn_utilities.abstract_base import (
-    AbstractBase, abstractproperty, abstractmethod)
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 
 
 @add_metaclass(AbstractBase)
@@ -24,7 +23,7 @@ class AbstractAcceptsIncomingSynapses(object):
     """
     __slots__ = ()
 
-    @abstractproperty
+    @abstractmethod
     def get_synapse_id_by_target(self, target):
         """ Get the ID of a synapse given the name.
 
@@ -54,9 +53,9 @@ class AbstractAcceptsIncomingSynapses(object):
     def get_connections_from_machine(
             self, transceiver, placement, edge, graph_mapper, routing_infos,
             synapse_information, machine_time_step, using_extra_monitor_cores,
-            placements=None, monitor_api=None, monitor_placement=None,
-            monitor_cores=None, handle_time_out_configuration=True,
-            fixed_routes=None):
+            placements=None, monitor_api=None, monitor_cores=None,
+            handle_time_out_configuration=True, fixed_routes=None,
+            extra_monitor=None):
         # pylint: disable=too-many-arguments
         """ Get the connections from the machine post-run.
         """

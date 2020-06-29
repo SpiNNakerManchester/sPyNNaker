@@ -17,6 +17,9 @@ import logging
 import math
 import os
 from six import with_metaclass
+
+from spinn_front_end_common.utilities.constants import \
+    MICRO_TO_MILLISECOND_CONVERSION
 from spinn_utilities.abstract_base import AbstractBase
 from spinn_utilities.log import FormatAdapter
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
@@ -25,6 +28,7 @@ from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utility_models import CommandSender
 from spinn_front_end_common.utilities.utility_objs import ExecutableFinder
 from spinn_front_end_common.utilities import globals_variables
+from spinn_front_end_common.utilities.helpful_functions import read_config
 from spynnaker.pyNN.models.utility_models import synapse_expander
 from spynnaker.pyNN import overridden_pacman_functions, model_binaries
 from spynnaker.pyNN.utilities import constants
@@ -115,9 +119,43 @@ class AbstractSpiNNakerCommon(with_metaclass(
             front_end_versions=versions)
 
         extra_mapping_inputs = dict()
+        extra_mapping_inputs['RouterBitfieldCompressionReport'] = \
+            self.config.getboolean(
+                "Reports", "generate_router_compression_with_bitfield_report")
+
+        extra_mapping_inputs['RouterCompressorBitFieldUseCutOff'] = \
+            self.config.getboolean(
+                "Mapping",
+                "router_table_compression_with_bit_field_use_time_cutoff")
+
+        time = read_config(
+            self.config, "Mapping",
+            "router_table_compression_with_bit_field_iteration_time")
+        if time is not None:
+            time = int(time)
+        extra_mapping_inputs['RouterCompressorBitFieldTimePerAttempt'] = time
+
+        extra_mapping_inputs["RouterCompressorBitFieldPreAllocSize"] = \
+            self.config.getint(
+                "Mapping",
+                "router_table_compression_with_bit_field_pre_alloced_sdram")
+        extra_mapping_inputs["RouterCompressorBitFieldPercentageThreshold"] = \
+            self.config.getint(
+                "Mapping",
+                "router_table_compression_with_bit_field_acceptance_threshold")
         extra_mapping_inputs['CreateAtomToEventIdMapping'] = \
             self.config.getboolean(
                 "Database", "create_routing_info_to_neuron_id_mapping")
+        extra_mapping_inputs["ReadBitFieldGeneratorIOBUF"] = \
+            self.config.getboolean("Reports", "read_bif_field_iobuf")
+        extra_mapping_inputs["GenerateBitFieldReport"] = \
+            self.config.getboolean("Reports", "generate_bit_field_report")
+        extra_mapping_inputs["GenerateBitFieldSummaryReport"] = \
+            self.config.getboolean(
+                "Reports", "generate_bit_field_summary_report")
+        extra_mapping_inputs["RouterCompressorWithBitFieldReadIOBuf"] = \
+            self.config.getboolean(
+                "Reports", "write_router_compressor_with_bitfield_iobuf")
         if user_extra_mapping_inputs is not None:
             extra_mapping_inputs.update(user_extra_mapping_inputs)
 
@@ -125,12 +163,17 @@ class AbstractSpiNNakerCommon(with_metaclass(
             extra_mapping_algorithms = []
         if extra_load_algorithms is None:
             extra_load_algorithms = []
+        if extra_post_run_algorithms is None:
+            extra_post_run_algorithms = []
         extra_load_algorithms.append("SynapseExpander")
+        extra_load_algorithms.append("OnChipBitFieldGenerator")
         extra_algorithms_pre_run = []
 
         if self.config.getboolean("Reports", "draw_network_graph"):
             extra_mapping_algorithms.append(
                 "SpYNNakerConnectionHolderGenerator")
+            extra_mapping_algorithms.append(
+                "PreAllocateForBitFieldRouterCompressor")
             extra_load_algorithms.append(
                 "SpYNNakerNeuronGraphNetworkSpecificationReport")
 
@@ -152,33 +195,37 @@ class AbstractSpiNNakerCommon(with_metaclass(
         self.set_up_machine_specifics(hostname)
 
         logger.info("Setting time scale factor to {}.",
-                    self._time_scale_factor)
+                    self.time_scale_factor)
 
         # get the machine time step
         logger.info("Setting machine time step to {} micro-seconds.",
-                    self._machine_time_step)
+                    self.machine_time_step)
 
     def _set_up_timings(
             self, timestep, min_delay, max_delay, config, time_scale_factor):
         # pylint: disable=too-many-arguments
 
         # Get the standard values
-        machine_time_step = None
-        if timestep is not None:
-            machine_time_step = math.ceil(timestep * 1000.0)
-        self.set_up_timings(machine_time_step, time_scale_factor)
+        if timestep is None:
+            self.set_up_timings(timestep, time_scale_factor)
+        else:
+            self.set_up_timings(
+                math.ceil(timestep * MICRO_TO_MILLISECOND_CONVERSION),
+                time_scale_factor)
 
         # Sort out the minimum delay
         if (min_delay is not None and
-                min_delay * 1000.0 < self._machine_time_step):
+                (min_delay * MICRO_TO_MILLISECOND_CONVERSION) <
+                self.machine_time_step):
             raise ConfigurationException(
                 "Pacman does not support min delays below {} ms with the "
                 "current machine time step".format(
-                    constants.MIN_SUPPORTED_DELAY * self._machine_time_step))
+                    constants.MIN_SUPPORTED_DELAY * self.machine_time_step))
         if min_delay is not None:
             self.__min_delay = min_delay
         else:
-            self.__min_delay = self._machine_time_step / 1000.0
+            self.__min_delay = (
+                self.machine_time_step / MICRO_TO_MILLISECOND_CONVERSION)
 
         # Sort out the maximum delay
         natively_supported_delay_for_models = \
@@ -189,33 +236,38 @@ class AbstractSpiNNakerCommon(with_metaclass(
         max_delay_tics_supported = \
             natively_supported_delay_for_models + \
             delay_extension_max_supported_delay
-        if (max_delay is not None and max_delay * 1000.0 >
-                max_delay_tics_supported * self._machine_time_step):
+        if (max_delay is not None and
+                max_delay * MICRO_TO_MILLISECOND_CONVERSION >
+                max_delay_tics_supported * self.machine_time_step):
             raise ConfigurationException(
                 "Pacman does not support max delays above {} ms with the "
                 "current machine time step".format(
-                    0.144 * self._machine_time_step))
+                    0.144 * self.machine_time_step))
         if max_delay is not None:
             self.__max_delay = max_delay
         else:
             self.__max_delay = (
-                max_delay_tics_supported * (self._machine_time_step / 1000.0))
+                max_delay_tics_supported * (
+                    self.machine_time_step /
+                    MICRO_TO_MILLISECOND_CONVERSION))
 
         # Sort out the time scale factor if not user specified
         # (including config)
-        if self._time_scale_factor is None:
-            self._time_scale_factor = max(
-                1.0, math.ceil(1000.0 / self._machine_time_step))
-            if self._time_scale_factor > 1:
+        if self.time_scale_factor is None:
+            self.time_scale_factor = max(
+                1.0, math.ceil(
+                    MICRO_TO_MILLISECOND_CONVERSION / self.machine_time_step))
+            if self.time_scale_factor > 1:
                 logger.warning(
                     "A timestep was entered that has forced sPyNNaker to "
                     "automatically slow the simulation down from real time "
                     "by a factor of {}. To remove this automatic behaviour, "
                     "please enter a timescaleFactor value in your .{}",
-                    self._time_scale_factor, self.CONFIG_FILE_NAME)
+                    self.time_scale_factor, self.CONFIG_FILE_NAME)
 
         # Check the combination of machine time step and time scale factor
-        if self._machine_time_step * self._time_scale_factor < 1000:
+        if (self.machine_time_step * self.time_scale_factor <
+                MICRO_TO_MILLISECOND_CONVERSION):
             if not config.getboolean(
                     "Mode", "violate_1ms_wall_clock_restriction"):
                 raise ConfigurationException(
@@ -273,11 +325,11 @@ class AbstractSpiNNakerCommon(with_metaclass(
         """
         return self.__max_delay
 
-    def add_application_vertex(self, vertex, prefix=None):
+    def add_application_vertex(self, vertex):
         if isinstance(vertex, CommandSender):
             self._command_sender = vertex
 
-        AbstractSpinnakerBase.add_application_vertex(self, vertex, prefix)
+        AbstractSpinnakerBase.add_application_vertex(self, vertex)
 
     @staticmethod
     def _count_unique_keys(commands):
@@ -316,7 +368,7 @@ class AbstractSpiNNakerCommon(with_metaclass(
         super(AbstractSpiNNakerCommon, self).stop(
             turn_off_machine, clear_routing_tables, clear_tags)
         self.reset_number_of_neurons_per_core()
-        globals_variables.unset_simulator()
+        globals_variables.unset_simulator(self)
 
     def run(self, run_time):
         """ Run the model created.
@@ -329,16 +381,17 @@ class AbstractSpiNNakerCommon(with_metaclass(
         self._dsg_algorithm = "SpynnakerDataSpecificationWriter"
         for projection in self._projections:
             projection._clear_cache()
+
+        if (self.config.getboolean("Reports", "reports_enabled") and
+                self.config.getboolean(
+                    "Reports", "write_redundant_packet_count_report") and
+                not self._use_virtual_board and run_time is not None and
+                not self._has_ran and self._config.getboolean(
+                    "Reports", "writeProvenanceData")):
+            self.extend_extra_post_run_algorithms(
+                ["RedundantPacketCountReport"])
+
         super(AbstractSpiNNakerCommon, self).run(run_time)
-
-    @property
-    def time_scale_factor(self):
-        """ The multiplicative scaling from application time to real\
-            execution time.
-
-        :return: the time scale factor
-        """
-        return self._time_scale_factor
 
     @staticmethod
     def register_binary_search_path(search_path):
@@ -399,6 +452,10 @@ class AbstractSpiNNakerCommon(with_metaclass(
 
         # set up the router timeouts to stop packet loss
         for data_receiver, extra_monitor_cores in receivers:
+            data_receiver.load_system_routing_tables(
+                self._txrx,
+                self.get_generated_output("MemoryExtraMonitorVertices"),
+                self._placements)
             data_receiver.set_cores_for_data_streaming(
                 self._txrx, list(extra_monitor_cores), self._placements)
 
@@ -415,6 +472,10 @@ class AbstractSpiNNakerCommon(with_metaclass(
         for data_receiver, extra_monitor_cores in receivers:
             data_receiver.unset_cores_for_data_streaming(
                 self._txrx, list(extra_monitor_cores), self._placements)
+            data_receiver.load_application_routing_tables(
+                self._txrx,
+                self.get_generated_output("MemoryExtraMonitorVertices"),
+                self._placements)
 
         # return data items
         return mother_lode

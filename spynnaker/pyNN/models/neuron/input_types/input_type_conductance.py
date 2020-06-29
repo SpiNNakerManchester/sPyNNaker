@@ -34,6 +34,12 @@ class InputTypeConductance(AbstractInputType):
         "__e_rev_I"]
 
     def __init__(self, e_rev_E, e_rev_I):
+        """
+        :param float e_rev_E: Reversal potential for excitatory input;
+            :math:`E^{rev}_e`
+        :param float e_rev_I: Reversal potential for inhibitory input;
+            :math:`E^{rev}_i`
+        """
         super(InputTypeConductance, self).__init__([
             DataType.S1615,   # e_rev_E
             DataType.S1615])  # e_rev_I
@@ -63,7 +69,7 @@ class InputTypeConductance(AbstractInputType):
         return variable in UNITS
 
     @overrides(AbstractInputType.get_values)
-    def get_values(self, parameters, state_variables, vertex_slice):
+    def get_values(self, parameters, state_variables, vertex_slice, ts):
 
         # Add the rest of the data
         return [parameters[E_REV_E], parameters[E_REV_I]]
@@ -80,6 +86,9 @@ class InputTypeConductance(AbstractInputType):
 
     @property
     def e_rev_E(self):
+        """
+        :math:`E_{{rev}_e}`
+        """
         return self.__e_rev_E
 
     @e_rev_E.setter
@@ -88,6 +97,9 @@ class InputTypeConductance(AbstractInputType):
 
     @property
     def e_rev_I(self):
+        """
+        :math:`E_{{rev}_i}`
+        """
         return self.__e_rev_I
 
     @e_rev_I.setter

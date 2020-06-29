@@ -15,14 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Initialisation for timing_nearest_pair_impl.h
 #include "timing_nearest_pair_impl.h"
 
 //---------------------------------------
 // Globals
 //---------------------------------------
 // Exponential lookup-tables
-int16_t tau_plus_lookup[TAU_PLUS_SIZE];
-int16_t tau_minus_lookup[TAU_MINUS_SIZE];
+//! Lookup table for &tau;<sup>+</sup> exponential decay
+int16_lut *tau_plus_lookup;
+//! Lookup table for &tau;<sup>-</sup> exponential decay
+int16_lut *tau_minus_lookup;
 
 //---------------------------------------
 // Functions
@@ -30,13 +34,11 @@ int16_t tau_minus_lookup[TAU_MINUS_SIZE];
 address_t timing_initialise(address_t address) {
     log_info("timing_initialise: starting");
     log_info("\tSTDP nearest-pair rule");
-    // **TODO** assert number of neurons is less than max
 
     // Copy LUTs from following memory
-    address_t lut_address = maths_copy_int16_lut(
-            &address[0], TAU_PLUS_SIZE, &tau_plus_lookup[0]);
-    lut_address = maths_copy_int16_lut(
-            lut_address, TAU_MINUS_SIZE, &tau_minus_lookup[0]);
+    address_t lut_address = address;
+    tau_plus_lookup = maths_copy_int16_lut(&lut_address);
+    tau_minus_lookup = maths_copy_int16_lut(&lut_address);
 
     log_info("timing_initialise: completed successfully");
     return lut_address;

@@ -64,7 +64,7 @@ class ThresholdTypeMulticastDeviceControl(AbstractThresholdType):
         return variable in UNITS
 
     @overrides(AbstractThresholdType.get_values)
-    def get_values(self, parameters, state_variables, vertex_slice):
+    def get_values(self, parameters, state_variables, vertex_slice, ts):
 
         # Add the rest of the data
         return [parameters[DEVICE].apply_operation(

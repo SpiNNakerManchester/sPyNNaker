@@ -21,40 +21,60 @@ from .abstract_static_synapse_dynamics import AbstractStaticSynapseDynamics
 from .abstract_generate_on_machine import (
     AbstractGenerateOnMachine, MatrixGeneratorID)
 from spynnaker.pyNN.exceptions import InvalidParameterType
-from .abstract_synapse_dynamics import AbstractSynapseDynamics
 from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 
 
 class SynapseDynamicsStatic(
         AbstractStaticSynapseDynamics, AbstractSettable,
         AbstractChangableAfterRun, AbstractGenerateOnMachine):
+    """ The dynamics of a synapse that does not change over time.
+    """
+
     __slots__ = [
-        # ??????????
+        # Indicates if a change that has been made requires mapping
         "__change_requires_mapping",
         # padding to add to a synaptic row for synaptic rewiring
-        "__pad_to_length"]
+        "__pad_to_length",
+        # weight of connections
+        "__weight",
+        # delay of connections
+        "__delay"]
 
-    def __init__(self, pad_to_length=None):
+    def __init__(self, weight=0.0, delay=1.0, pad_to_length=None):
+        """
+        :param float weight:
+        :param float delay:
+        :param int pad_to_length:
+        """
         self.__change_requires_mapping = True
+        self.__weight = weight
+        self.__delay = delay
         self.__pad_to_length = pad_to_length
 
-    @overrides(AbstractSynapseDynamics.is_same_as)
+    @overrides(AbstractStaticSynapseDynamics.merge)
+    def merge(self, synapse_dynamics):
+        # We can always override a static synapse dynamics with a more
+        # complex model
+        return synapse_dynamics
+
+    @overrides(AbstractStaticSynapseDynamics.is_same_as)
     def is_same_as(self, synapse_dynamics):
         return isinstance(synapse_dynamics, SynapseDynamicsStatic)
 
-    @overrides(AbstractSynapseDynamics.are_weights_signed)
+    @overrides(AbstractStaticSynapseDynamics.are_weights_signed)
     def are_weights_signed(self):
         return False
 
-    @overrides(AbstractSynapseDynamics.get_vertex_executable_suffix)
+    @overrides(AbstractStaticSynapseDynamics.get_vertex_executable_suffix)
     def get_vertex_executable_suffix(self):
         return ""
 
-    @overrides(AbstractSynapseDynamics.get_parameters_sdram_usage_in_bytes)
+    @overrides(AbstractStaticSynapseDynamics.
+               get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(self, n_neurons, n_synapse_types):
         return 0
 
-    @overrides(AbstractSynapseDynamics.write_parameters)
+    @overrides(AbstractStaticSynapseDynamics.write_parameters)
     def write_parameters(self, spec, region, machine_time_step, weight_scales):
         # Nothing to do here
         pass
@@ -97,6 +117,11 @@ class SynapseDynamicsStatic(
         return ff_data, ff_size
 
     def _pad_row(self, rows, no_bytes_per_connection):
+        """
+        :param list(~numpy.ndarray) rows:
+        :param int no_bytes_per_connection:
+        :rtype: list(~numpy.ndarray)
+        """
         padded_rows = []
         for row in rows:  # Row elements are (individual) bytes
             padded_rows.append(
@@ -141,7 +166,8 @@ class SynapseDynamicsStatic(
 
         return connections
 
-    @overrides(AbstractChangableAfterRun.requires_mapping)
+    @property
+    @overrides(AbstractChangableAfterRun.requires_mapping, extend_doc=False)
     def requires_mapping(self):
         """ True if changes that have been made require that mapping be\
             performed.  Note that this should return True the first time it\
@@ -150,7 +176,7 @@ class SynapseDynamicsStatic(
         """
         return self.__change_requires_mapping
 
-    @overrides(AbstractChangableAfterRun.mark_no_changes)
+    @overrides(AbstractChangableAfterRun.mark_no_changes, extend_doc=False)
     def mark_no_changes(self):
         """ Marks the point after which changes are reported.  Immediately\
             after calling this method, requires_mapping should return False.
@@ -159,8 +185,6 @@ class SynapseDynamicsStatic(
 
     @overrides(AbstractSettable.get_value)
     def get_value(self, key):
-        """ Get a property
-        """
         if hasattr(self, key):
             return getattr(self, key)
         raise InvalidParameterType(
@@ -168,11 +192,6 @@ class SynapseDynamicsStatic(
 
     @overrides(AbstractSettable.set_value)
     def set_value(self, key, value):
-        """ Set a property
-
-        :param key: the name of the parameter to change
-        :param value: the new value of the parameter to assign
-        """
         if hasattr(self, key):
             setattr(self, key, value)
             self.__change_requires_mapping = True
@@ -193,6 +212,20 @@ class SynapseDynamicsStatic(
         return MatrixGeneratorID.STATIC_MATRIX.value
 
     @property
-    @overrides(AbstractSynapseDynamics.changes_during_run)
+    @overrides(AbstractStaticSynapseDynamics.changes_during_run)
     def changes_during_run(self):
         return False
+
+    @property
+    @overrides(AbstractStaticSynapseDynamics.weight)
+    def weight(self):
+        return self.__weight
+
+    @property
+    @overrides(AbstractStaticSynapseDynamics.delay)
+    def delay(self):
+        return self.__delay
+
+    @overrides(AbstractStaticSynapseDynamics.set_delay)
+    def set_delay(self, delay):
+        self.__delay = delay

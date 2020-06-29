@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from pyNN.random import RandomDistribution
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.utilities import utility_calls
 from pacman.model.graphs.machine import MachineEdge
@@ -84,10 +85,53 @@ class ProjectionMachineEdge(
                 post_hi = graph_mapper.get_slice(self.post_vertex).hi_atom
                 post_slices = graph_mapper.get_slices(post_app_vertex)
 
-            # handle the different connectors
             if isinstance(synapse_info.connector, OneToOneConnector):
-                if pre_hi < post_lo or pre_lo > post_hi:
-                    n_filtered += 1
+                # Filter edge if both are views and outside limits
+                if (synapse_info.prepop_is_view and
+                        synapse_info.postpop_is_view):
+                    prepop_lo = synapse_info.pre_population._indexes[0]
+                    prepop_hi = synapse_info.pre_population._indexes[-1]
+                    postpop_lo = synapse_info.post_population._indexes[0]
+                    postpop_hi = synapse_info.post_population._indexes[-1]
+                    # Get test values
+                    pre_lo_test = pre_lo - prepop_lo
+                    pre_hi_test = pre_hi - prepop_lo
+                    post_lo_test = post_lo - postpop_lo
+                    post_hi_test = post_hi - postpop_lo
+                    if ((pre_hi_test < post_lo_test) or
+                        (pre_lo_test > post_hi_test) or
+                        (pre_hi < prepop_lo) or (pre_lo > prepop_hi) or
+                        (post_hi < postpop_lo) or (post_lo > postpop_hi)):
+                        n_filtered += 1
+                # Filter edge if pre-pop is outside limit and post_lo is bigger
+                # than n_pre_neurons
+                elif synapse_info.prepop_is_view:
+                    prepop_lo = synapse_info.pre_population._indexes[0]
+                    prepop_hi = synapse_info.pre_population._indexes[-1]
+                    # Get test values
+                    pre_lo_test = pre_lo - prepop_lo
+                    pre_hi_test = pre_hi - prepop_lo
+                    if ((pre_hi_test < post_lo) or
+                        (pre_lo_test > post_hi) or
+                        (pre_hi < prepop_lo) or (pre_lo > prepop_hi)):
+                        n_filtered += 1
+                # Filter edge if post-pop is outside limit and pre_lo is bigger
+                # than n_post_neurons
+                elif synapse_info.postpop_is_view:
+                    postpop_lo = synapse_info.post_population._indexes[0]
+                    postpop_hi = synapse_info.post_population._indexes[-1]
+                    # Get test values
+                    post_lo_test = post_lo - postpop_lo
+                    post_hi_test = post_hi - postpop_lo
+                    if ((pre_hi < post_lo_test) or
+                        (pre_lo > post_hi_test) or
+                        (post_hi < postpop_lo) or (post_lo > postpop_hi)):
+                        n_filtered += 1
+                # Filter edge in the usual scenario with normal populations
+                else:
+                    if pre_hi < post_lo or pre_lo > post_hi:
+                        n_filtered += 1
+            # Filter edge in the usual scenario with normal populations
             elif isinstance(synapse_info.connector, FromListConnector):
                 pre_app_vertex = graph_mapper.get_application_vertex(
                     self.pre_vertex)
@@ -112,13 +156,13 @@ class ProjectionMachineEdge(
         weight = 0
         for synapse_info in self.__synapse_information:
             new_weight = synapse_info.connector.\
-                get_n_connections_to_post_vertex_maximum()
+                get_n_connections_to_post_vertex_maximum(synapse_info)
             new_weight *= pre_vertex_slice.n_atoms
             if hasattr(pre_vertex, "rate"):
                 rate = pre_vertex.rate
                 if hasattr(rate, "__getitem__"):
                     rate = max(rate)
-                elif globals_variables.get_simulator().is_a_pynn_random(rate):
+                elif isinstance(rate, RandomDistribution):
                     rate = utility_calls.get_maximum_probable_value(
                         rate, pre_vertex_slice.n_atoms)
                 new_weight *= rate
@@ -133,7 +177,7 @@ class ProjectionMachineEdge(
         prov_items = list()
         for synapse_info in self.__synapse_information:
             prov_items.extend(
-                synapse_info.connector.get_provenance_data())
+                synapse_info.connector.get_provenance_data(synapse_info))
             prov_items.extend(
                 synapse_info.synapse_dynamics.get_provenance_data(
                     self.pre_vertex.label, self.post_vertex.label))

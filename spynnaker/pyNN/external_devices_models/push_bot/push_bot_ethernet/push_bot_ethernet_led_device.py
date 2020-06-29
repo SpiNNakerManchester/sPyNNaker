@@ -37,16 +37,17 @@ class PushBotEthernetLEDDevice(
             start_total_period=None, start_frequency=None,
             timesteps_between_send=None):
         """
-
         :param led: The PushBotLED parameter to control
+        :type led: PushBotLED
         :param protocol: The protocol instance to get commands from
-        :param start_active_time_front:\
+        :type protocol: MunichIoEthernetProtocol
+        :param start_active_time_front:
             The "active time" to set for the front LED at the start
-        :param start_active_time_back:\
+        :param start_active_time_back:
             The "active time" to set for the back LED at the start
         :param start_total_period: The "total period" to set at the start
         :param start_frequency: The "frequency" to set at the start
-        :param timesteps_between_send:\
+        :param timesteps_between_send:
             The number of timesteps between sending commands to the device,\
             or None to use the default
         """
@@ -65,6 +66,7 @@ class PushBotEthernetLEDDevice(
         self.__start_total_period = start_total_period
         self.__start_frequency = start_frequency
 
+    @overrides(PushBotEthernetDevice.set_command_protocol)
     def set_command_protocol(self, command_protocol):
         self.__command_protocol = command_protocol
 

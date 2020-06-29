@@ -43,16 +43,16 @@ PUSH_BOT_MOTOR_WITHOUT_UART_MASK = 0x7C0
 PUSH_BOT_MOTOR_UART_SHIFT = 0 + _OFFSET_TO_I
 
 
-def munich_key(I, F, D):
-    return (I << _OFFSET_TO_I) | (F << _OFFSET_TO_F) | (D << _OFFSET_TO_D)
+def munich_key(Instr, F, D):
+    return (Instr << _OFFSET_TO_I) | (F << _OFFSET_TO_F) | (D << _OFFSET_TO_D)
 
 
-def munich_key_i_d(I, D):
-    return munich_key(I, 0, D)
+def munich_key_i_d(Instr, D):
+    return munich_key(Instr, 0, D)
 
 
-def munich_key_i(I):
-    return munich_key(I, 0, 0)
+def munich_key_i(Instr):
+    return munich_key(Instr, 0, 0)
 
 
 def get_munich_i(key):
@@ -262,15 +262,14 @@ class MunichIoSpiNNakerLinkProtocol(object):
     """
     __slots__ = ["__instance_key", "__mode", "__uart_id"]
 
-    # types of modes supported by this protocol
-    MODES = Enum(
-        value="MODES",
-        names=[('RESET_TO_DEFAULT', 0),
-               ('PUSH_BOT', 1),
-               ('SPOMNIBOT', 2),
-               ('BALL_BALANCER', 3),
-               ('MY_ORO_BOTICS', 4),
-               ('FREE', 5)])
+    class MODES(Enum):
+        """types of modes supported by this protocol"""
+        RESET_TO_DEFAULT = 0
+        PUSH_BOT = 1
+        SPOMNIBOT = 2
+        BALL_BALANCER = 3
+        MY_ORO_BOTICS = 4
+        FREE = 5
 
     # The instance of the protocol in use, to ensure that each vertex that is
     # to send commands to the PushBot uses a different outgoing key; the top
@@ -453,8 +452,7 @@ class MunichIoSpiNNakerLinkProtocol(object):
     def generic_motor_total_period_key(self):
         return self._get_key(MOTOR_RUN_FOR_PERIOD_KEY, RETINA_UART_SHIFT)
 
-    def generic_motor_total_period(
-            self, time_in_ms, uart_id=0, time=None):
+    def generic_motor_total_period(self, time_in_ms, time=None):
         return MultiCastCommand(
             key=self.generic_motor_total_period_key,
             payload=time_in_ms, time=time)

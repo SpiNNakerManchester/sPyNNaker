@@ -16,24 +16,27 @@
  */
 
 /**
- *! \file
- *! \brief Common functions for kernel generation
+ * \file
+ * \brief Common functions for kernel generation
  */
 #include "common_kernel.h"
+#include <stdlib.h>
 
-uint16_t uidiv(uint16_t dividend, uint16_t divider, uint16_t *remainder) {
+//! \brief Unsigned integer division.
+//! \param[in] dividend: The value being divided
+//! \param[in] divider: The value doing the dividing
+//! \param[out] remainder: The remainder
+//! \return The quotient
+uint16_t uidiv(uint32_t dividend, uint16_t divider, uint16_t *remainder) {
     if (dividend == 0 || dividend < divider) {
-        *remainder = dividend;
+    	*remainder = (uint16_t) dividend;
         return 0;
     }
 
-    uint16_t d = 0;
-    *remainder = dividend;
-    while (*remainder >= divider) {
-        d++;
-        *remainder -= divider;
-    }
-    return d;
+    // Assumes that the dividend is less than 1<<31
+    div_t results = div((int) dividend, (int) (uint32_t) divider);
+    *remainder = (uint16_t) results.rem;
+    return (uint16_t) results.quot;
 }
 
 void post_in_pre_world(uint16_t in_row, uint16_t in_col,

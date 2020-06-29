@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
+from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
 from pacman.model.graphs.application import ApplicationEdge
 from pacman.model.graphs.machine import MachineGraph
@@ -24,7 +25,7 @@ from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractSynapseDynamicsStructural)
 
-logger = logging.getLogger(__name__)
+logger = FormatAdapter(logging.getLogger(__name__))
 
 
 class GraphEdgeFilter(object):
@@ -57,18 +58,18 @@ class GraphEdgeFilter(object):
         for partition in progress.over(machine_graph.outgoing_edge_partitions):
             for edge in partition.edges:
                 if self._is_filterable(edge, graph_mapper):
-                    logger.debug("this edge was pruned %s", edge)
+                    logger.debug("this edge was pruned {}", edge)
                     prune_count += 1
                     continue
-                logger.debug("this edge was not pruned %s", edge)
+                logger.debug("this edge was not pruned {}", edge)
                 no_prune_count += 1
                 self._add_edge_to_new_graph(
                     edge, partition, graph_mapper, new_machine_graph,
                     new_graph_mapper)
 
         # returned the pruned graph and graph_mapper
-        logger.debug("prune_count:{} no_prune_count:{}".format(
-            prune_count, no_prune_count))
+        logger.debug("prune_count:{} no_prune_count:{}",
+                     prune_count, no_prune_count)
         return new_machine_graph, new_graph_mapper
 
     @staticmethod

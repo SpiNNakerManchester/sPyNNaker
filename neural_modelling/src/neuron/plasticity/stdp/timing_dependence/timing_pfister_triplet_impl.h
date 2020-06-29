@@ -15,17 +15,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Timing rule using spike triplets
+//! \details
+//! <strong>Citation:</strong><br>
+//! Triplets of Spikes in a Model of Spike Timing-Dependent Plasticity.
+//! **Pfister** JP, **Gerstner** W,
+//! _Journal of Neuroscience_
+//! 20 September 2006, 26 (38) 9673-9682.<br>
+//! DOI: [10.1523/JNEUROSCI.1425-06.2006](https://doi.org/10.1523/JNEUROSCI.1425-06.2006)
 #ifndef _TIMING_PFISTER_TRIPLET_IMPL_H_
 #define _TIMING_PFISTER_TRIPLET_IMPL_H_
 
 //---------------------------------------
 // Structures
 //---------------------------------------
+//! The type of post-spike traces
 typedef struct post_trace_t {
     int16_t o1;
     int16_t o2;
 } post_trace_t;
 
+//! The type of pre-spike traces
 typedef struct pre_trace_t {
     int16_t r1;
     int16_t r2;
@@ -43,52 +54,28 @@ typedef struct pre_trace_t {
 #include <neuron/plasticity/stdp/stdp_typedefs.h>
 
 //---------------------------------------
-// Macros
-//---------------------------------------
-// Exponential decay lookup parameters
-#define TAU_PLUS_TIME_SHIFT 0
-#define TAU_PLUS_SIZE 256
-
-#define TAU_MINUS_TIME_SHIFT 0
-#define TAU_MINUS_SIZE 256
-
-#define TAU_X_TIME_SHIFT 2
-#define TAU_X_SIZE 256
-
-#define TAU_Y_TIME_SHIFT 2
-#define TAU_Y_SIZE 256
-
-// Helper macros for looking up decays
-#define DECAY_LOOKUP_TAU_PLUS(time) \
-    maths_lut_exponential_decay( \
-	        time, TAU_PLUS_TIME_SHIFT, TAU_PLUS_SIZE, tau_plus_lookup)
-#define DECAY_LOOKUP_TAU_MINUS(time) \
-    maths_lut_exponential_decay( \
-            time, TAU_MINUS_TIME_SHIFT, TAU_MINUS_SIZE, tau_minus_lookup)
-
-#define DECAY_LOOKUP_TAU_X(time) \
-    maths_lut_exponential_decay( \
-            time, TAU_X_TIME_SHIFT, TAU_X_SIZE, tau_x_lookup)
-#define DECAY_LOOKUP_TAU_Y(time) \
-    maths_lut_exponential_decay( \
-            time, TAU_Y_TIME_SHIFT, TAU_Y_SIZE, tau_y_lookup)
-
-//---------------------------------------
 // Externals
 //---------------------------------------
-extern int16_t tau_plus_lookup[TAU_PLUS_SIZE];
-extern int16_t tau_minus_lookup[TAU_MINUS_SIZE];
-extern int16_t tau_x_lookup[TAU_X_SIZE];
-extern int16_t tau_y_lookup[TAU_Y_SIZE];
+extern int16_lut *tau_plus_lookup;
+extern int16_lut *tau_minus_lookup;
+extern int16_lut *tau_x_lookup;
+extern int16_lut *tau_y_lookup;
 
 //---------------------------------------
 // Timing dependence inline functions
 //---------------------------------------
+//! \brief Get an initial post-synaptic timing trace
+//! \return the post trace
 static inline post_trace_t timing_get_initial_post_trace(void) {
     return (post_trace_t) {.o1 = 0, .o2 = 0};
 }
 
 //---------------------------------------
+//! \brief Add a post spike to the post trace
+//! \param[in] time: the time of the spike
+//! \param[in] last_time: the time of the previous spike update
+//! \param[in] last_trace: the post trace to update
+//! \return the updated post trace
 static inline post_trace_t timing_add_post_spike(
         uint32_t time, uint32_t last_time, post_trace_t last_trace) {
     // Get time since last spike
@@ -96,16 +83,16 @@ static inline post_trace_t timing_add_post_spike(
 
     // Decay previous o1 trace and add energy caused by new spike
     int32_t decayed_o1 = STDP_FIXED_MUL_16X16(last_trace.o1,
-            DECAY_LOOKUP_TAU_MINUS(delta_time));
+        maths_lut_exponential_decay(delta_time, tau_minus_lookup));
     int32_t new_o1 = decayed_o1 + STDP_FIXED_POINT_ONE;
 
     // If this is the 1st post-synaptic event, o2 trace is zero
     // (as it's sampled BEFORE the spike),
     // otherwise, add on energy caused by last spike and decay that
     int32_t new_o2 = (last_time == 0) ? 0 :
-            STDP_FIXED_MUL_16X16(
-                    last_trace.o2 + STDP_FIXED_POINT_ONE,
-                    DECAY_LOOKUP_TAU_Y(delta_time));
+        STDP_FIXED_MUL_16X16(
+            last_trace.o2 + STDP_FIXED_POINT_ONE,
+            maths_lut_exponential_decay(delta_time, tau_y_lookup));
 
     log_debug("\tdelta_time=%d, o1=%d, o2=%d\n", delta_time, new_o1, new_o2);
 
@@ -115,6 +102,11 @@ static inline post_trace_t timing_add_post_spike(
 }
 
 //---------------------------------------
+//! \brief Add a pre spike to the pre trace
+//! \param[in] time: the time of the spike
+//! \param[in] last_time: the time of the previous spike update
+//! \param[in] last_trace: the pre trace to update
+//! \return the updated pre trace
 static inline pre_trace_t timing_add_pre_spike(
         uint32_t time, uint32_t last_time, pre_trace_t last_trace) {
     // Get time since last spike
@@ -122,16 +114,16 @@ static inline pre_trace_t timing_add_pre_spike(
 
     // Decay previous r1 trace and add energy caused by new spike
     int32_t decayed_r1 = STDP_FIXED_MUL_16X16(last_trace.r1,
-            DECAY_LOOKUP_TAU_PLUS(delta_time));
+        maths_lut_exponential_decay(delta_time, tau_plus_lookup));
     int32_t new_r1 = decayed_r1 + STDP_FIXED_POINT_ONE;
 
     // If this is the 1st pre-synaptic event, r2 trace is zero
     // (as it's sampled BEFORE the spike),
     // otherwise, add on energy caused by last spike  and decay that
     int32_t new_r2 = (last_time == 0) ? 0 :
-            STDP_FIXED_MUL_16X16(
-                    last_trace.r2 + STDP_FIXED_POINT_ONE,
-                    DECAY_LOOKUP_TAU_X(delta_time));
+        STDP_FIXED_MUL_16X16(
+            last_trace.r2 + STDP_FIXED_POINT_ONE,
+            maths_lut_exponential_decay(delta_time, tau_x_lookup));
 
     log_debug("\tdelta_time=%u, r1=%d, r2=%d\n", delta_time, new_r1, new_r2);
 
@@ -141,6 +133,15 @@ static inline pre_trace_t timing_add_pre_spike(
 }
 
 //---------------------------------------
+//! \brief Apply a pre-spike timing rule state update
+//! \param[in] time: the current time
+//! \param[in] trace: the current pre-spike trace
+//! \param[in] last_pre_time: the time of the last pre-spike
+//! \param[in] last_pre_trace: the trace of the last pre-spike
+//! \param[in] last_post_time: the time of the last post-spike
+//! \param[in] last_post_trace: the trace of the last post-spike
+//! \param[in] previous_state: the state to update
+//! \return the updated state
 static inline update_state_t timing_apply_pre_spike(
         uint32_t time, pre_trace_t trace, uint32_t last_pre_time,
         pre_trace_t last_pre_trace, uint32_t last_post_time,
@@ -150,26 +151,31 @@ static inline update_state_t timing_apply_pre_spike(
 
     // Get time of event relative to last post-synaptic event
     uint32_t time_since_last_post = time - last_post_time;
-    if (time_since_last_post > 0) {
-        int32_t decayed_o1 = STDP_FIXED_MUL_16X16(last_post_trace.o1,
-                DECAY_LOOKUP_TAU_MINUS(time_since_last_post));
+    int32_t decayed_o1 = STDP_FIXED_MUL_16X16(last_post_trace.o1,
+        maths_lut_exponential_decay(time_since_last_post, tau_minus_lookup));
 
-        // Calculate triplet term
-        int32_t decayed_o1_r2 = STDP_FIXED_MUL_16X16(decayed_o1, trace.r2);
+    // Calculate triplet term
+    int32_t decayed_o1_r2 = STDP_FIXED_MUL_16X16(decayed_o1, trace.r2);
 
-        log_debug("\t\t\ttime_since_last_post_event=%u, decayed_o1=%d, r2=%d,"
-                "decayed_o1_r2=%d\n",
-                time_since_last_post, decayed_o1, trace.r2, decayed_o1_r2);
+    log_debug("\t\t\ttime_since_last_post_event=%u, decayed_o1=%d, r2=%d,"
+            "decayed_o1_r2=%d\n",
+            time_since_last_post, decayed_o1, trace.r2, decayed_o1_r2);
 
-        // Apply depression to state (which is a weight_state)
-        return weight_two_term_apply_depression(
-                previous_state, decayed_o1, decayed_o1_r2);
-    } else {
-        return previous_state;
-    }
+    // Apply depression to state (which is a weight_state)
+    return weight_two_term_apply_depression(
+            previous_state, decayed_o1, decayed_o1_r2);
 }
 
 //---------------------------------------
+//! \brief Apply a post-spike timing rule state update
+//! \param[in] time: the current time
+//! \param[in] trace: the current post-spike trace
+//! \param[in] last_pre_time: the time of the last pre-spike
+//! \param[in] last_pre_trace: the trace of the last pre-spike
+//! \param[in] last_post_time: the time of the last post-spike
+//! \param[in] last_post_trace: the trace of the last post-spike
+//! \param[in] previous_state: the state to update
+//! \return the updated state
 static inline update_state_t timing_apply_post_spike(
         uint32_t time, post_trace_t trace, uint32_t last_pre_time,
         pre_trace_t last_pre_trace, uint32_t last_post_time,
@@ -181,7 +187,7 @@ static inline update_state_t timing_apply_post_spike(
     uint32_t time_since_last_pre = time - last_pre_time;
     if (time_since_last_pre > 0) {
         int32_t decayed_r1 = STDP_FIXED_MUL_16X16(last_pre_trace.r1,
-                DECAY_LOOKUP_TAU_PLUS(time_since_last_pre));
+            maths_lut_exponential_decay(time_since_last_pre, tau_plus_lookup));
 
         // Calculate triplet term
         int32_t decayed_r1_o2 = STDP_FIXED_MUL_16X16(decayed_r1, trace.o2);

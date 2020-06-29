@@ -13,9 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import decimal
 import numpy
 from data_specification.enums.data_type import DataType
+from spinn_front_end_common.utilities.constants import (
+    MICRO_TO_MILLISECOND_CONVERSION, BYTES_PER_WORD)
 
 
 class DelayGeneratorData(object):
@@ -34,13 +35,26 @@ class DelayGeneratorData(object):
         "__pre_vertex_slice",
         "__synapse_information")
 
-    BASE_SIZE = 8 * 4
+    BASE_SIZE = 8 * BYTES_PER_WORD
 
     def __init__(
             self, max_row_n_synapses, max_delayed_row_n_synapses,
             pre_slices, pre_slice_index, post_slices, post_slice_index,
             pre_vertex_slice, post_vertex_slice, synapse_information,
             max_stage, machine_time_step):
+        """
+        :param int max_row_n_synapses:
+        :param int max_delayed_row_n_synapses:
+        :param list(~pacman.model.graphs.common.Slice) pre_slices:
+        :param int pre_slice_index:
+        :param list(~pacman.model.graphs.common.Slice) post_slices:
+        :param int post_slice_index:
+        :param ~pacman.model.graphs.common.Slicepre_vertex_slice:
+        :param ~pacman.model.graphs.common.Slicepost_vertex_slice:
+        :param SynapseInformation synapse_information:
+        :param int max_stage:
+        :param int machine_time_step:
+        """
         self.__max_row_n_synapses = max_row_n_synapses
         self.__max_delayed_row_n_synapses = max_delayed_row_n_synapses
         self.__pre_slices = pre_slices
@@ -61,35 +75,36 @@ class DelayGeneratorData(object):
         """
         connector = self.__synapse_information.connector
 
-        return sum((self.BASE_SIZE,
-                    connector.gen_connector_params_size_in_bytes,
-                    connector.gen_delay_params_size_in_bytes(
-                        self.__synapse_information.delay)))
+        return (
+            self.BASE_SIZE + connector.gen_connector_params_size_in_bytes +
+            connector.gen_delay_params_size_in_bytes(
+                self.__synapse_information.delays))
 
     @property
     def gen_data(self):
         """ Get the data to be written for this connection
 
-        :rtype: numpy array of uint32
+        :rtype: ~numpy.ndarray(~numpy.uint32)
         """
         connector = self.__synapse_information.connector
         items = list()
         items.append(numpy.array([
             self.__max_row_n_synapses,
             self.__max_delayed_row_n_synapses,
-            self.__post_vertex_slice.lo_atom,
-            self.__post_vertex_slice.n_atoms,
+            self.__pre_vertex_slice.lo_atom,
+            self.__pre_vertex_slice.n_atoms,
             self.__max_stage,
-            (decimal.Decimal(str(1000.0 / float(self.__machine_time_step))) *
-             DataType.S1615.scale),
+            DataType.S1615.encode_as_int(
+                MICRO_TO_MILLISECOND_CONVERSION / self.__machine_time_step),
             connector.gen_connector_id,
-            connector.gen_delays_id(self.__synapse_information.delay)],
+            connector.gen_delays_id(self.__synapse_information.delays)],
             dtype="uint32"))
         items.append(connector.gen_connector_params(
             self.__pre_slices, self.__pre_slice_index, self.__post_slices,
             self.__post_slice_index, self.__pre_vertex_slice,
-            self.__post_vertex_slice, self.__synapse_information.synapse_type))
+            self.__post_vertex_slice, self.__synapse_information.synapse_type,
+            self.__synapse_information))
         items.append(connector.gen_delay_params(
-            self.__synapse_information.delay, self.__pre_vertex_slice,
+            self.__synapse_information.delays, self.__pre_vertex_slice,
             self.__post_vertex_slice))
         return numpy.concatenate(items)

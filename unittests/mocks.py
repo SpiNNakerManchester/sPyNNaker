@@ -18,6 +18,7 @@ import numpy
 from spinn_front_end_common.utilities import globals_variables
 from spynnaker.pyNN.utilities.spynnaker_failed_state import (
     SpynnakerFailedState)
+from builtins import property
 
 
 class MockPopulation(object):
@@ -44,6 +45,39 @@ class MockPopulation(object):
         return "Population {}".format(self._label)
 
 
+class MockSynapseInfo(object):
+
+    def __init__(self, pre_population, post_population, weights, delays):
+        self._pre_population = pre_population
+        self._post_population = post_population
+        self._weights = weights
+        self._delays = delays
+
+    @property
+    def pre_population(self):
+        return self._pre_population
+
+    @property
+    def post_population(self):
+        return self._post_population
+
+    @property
+    def n_pre_neurons(self):
+        return self._pre_population.size
+
+    @property
+    def n_post_neurons(self):
+        return self._post_population.size
+
+    @property
+    def weights(self):
+        return self._weights
+
+    @property
+    def delays(self):
+        return self._delays
+
+
 class MockRNG(object):
 
     def __init__(self):
@@ -54,17 +88,6 @@ class MockRNG(object):
 
     def __getattr__(self, name):
         return getattr(self._rng, name)
-
-
-class MockRandomDistribution(object):
-
-    def __init__(self, name, rng, **kwargs):
-        self._name = name
-        self._kwargs = kwargs
-        self._rng = rng
-
-    def next(self, n=1):
-        return self._rng.next(n)
 
 
 class MockSimulator(object):
@@ -85,19 +108,10 @@ class MockSimulator(object):
         self.config["MasterPopTable"] = {"generator": "BinarySearch"}
         self.config["Reports"] = {"n_profile_samples": 0}
 
-    def is_a_pynn_random(self, values):
-        return isinstance(values, MockRNG)
-
-    def get_pynn_NumpyRNG(self):
-        return MockRNG
-
-    def get_random_distribution(self):
-        return MockRandomDistribution
-
     def add_population(self, pop):
         pass
 
-    def add_application_vertex(self, vertex, prefix=None):
+    def add_application_vertex(self, vertex):
         pass
 
     def verify_not_running(self):

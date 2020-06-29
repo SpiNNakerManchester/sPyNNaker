@@ -21,15 +21,15 @@
  *
  *    The API includes:
  *
- *     - decay_s1615 (x, decay)
+ *     - decay_s1615()
  *         decays a s1615 value x by a given decay amount
- *     - decay_u1616(x, decay)
+ *     - decay_u1616()
  *         decays a u1616 value x by a given decay amount
- *     - decay_s015(x, decay)
+ *     - decay_s015()
  *         decays a s015 value x by a given decay amount
- *     - decay_u016(x, decay)
+ *     - decay_u016()
  *     	   decays a u016 value x by a given decay amount
- *     - decay(x, d)
+ *     - decay()
  *         is suppose to deduce the x value's type and call one of the above
  *         methods to decay it by a given decay amount.
  */
@@ -105,6 +105,10 @@ static inline u016 decay_u016(u016 x, decay_t decay) {
  * the abort statement and therefore kills scripts dead on SpiNNaker.
  * ---------------------------------
  */
+//! \brief This is a type-generic decay "function".
+//! \param[in] x: the value to decayed
+//! \param[in] d: the amount to decay the value by
+//! \return the new decayed value
 #define decay(x, d) ({ \
     __typeof__(x) tmp = (x); \
     if (__builtin_types_compatible_p(__typeof__(x), s1615)) {\

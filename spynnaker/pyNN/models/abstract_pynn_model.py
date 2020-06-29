@@ -13,10 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-try:
-    from collections.abc import defaultdict
-except ImportError:
-    from collections import defaultdict
+from collections import defaultdict
 import sys
 from six import add_metaclass
 from spinn_utilities.classproperty import classproperty
@@ -51,8 +48,8 @@ class AbstractPyNNModel(object):
         return AbstractPyNNModel._max_atoms_per_core[cls]
 
     @staticmethod
-    def _get_init_params_and_svars(cls):
-        init = getattr(cls, "__init__")
+    def __get_init_params_and_svars(the_cls):
+        init = getattr(the_cls, "__init__")
         while hasattr(init, "_method"):
             init = getattr(init, "_method")
         params = None
@@ -64,21 +61,21 @@ class AbstractPyNNModel(object):
         return init, params, svars
 
     @classproperty
-    def default_parameters(cls):
+    def default_parameters(cls):  # pylint: disable=no-self-argument
         """ Get the default values for the parameters of the model.
 
-        :rtype: dict(str, object)
+        :rtype: dict(str, Any)
         """
-        init, params, svars = cls._get_init_params_and_svars(cls)
+        init, params, svars = cls.__get_init_params_and_svars(cls)
         return get_dict_from_init(init, skip=svars, include=params)
 
     @classproperty
-    def default_initial_values(cls):
+    def default_initial_values(cls):  # pylint: disable=no-self-argument
         """ Get the default initial values for the state variables of the model
 
-        :rtype: dict(str, object)
+        :rtype: dict(str, Any)
         """
-        init, params, svars = cls._get_init_params_and_svars(cls)
+        init, params, svars = cls.__get_init_params_and_svars(cls)
         if params is None and svars is None:
             return {}
         return get_dict_from_init(init, skip=params, include=svars)
@@ -89,14 +86,13 @@ class AbstractPyNNModel(object):
 
         :rtype: list(str)
         """
-        return cls.default_parameters.keys()
+        return cls.default_parameters.keys()  # pylint: disable=no-member
 
     @classmethod
     def has_parameter(cls, name):
         """ Determine if the model has a parameter with the given name
 
-        :param name: The name of the parameter to check for
-        :type name: str
+        :param str name: The name of the parameter to check for
         :rtype: bool
         """
         return name in cls.default_parameters
@@ -107,20 +103,19 @@ class AbstractPyNNModel(object):
             These are parameters that can be passed in to the Population\
             constructor in addition to the standard PyNN options
 
-        :rtype: dict(str, object)
+        :rtype: dict(str, Any)
         """
 
     @abstractmethod
     def create_vertex(self, n_neurons, label, constraints):
         """ Create a vertex for a population of the model
 
-        :param n_neurons: The number of neurons in the population
-        :type n_neurons: int
-        :param label: The label to give to the vertex
-        :type label: str
-        :param constraints:\
+        :param int n_neurons: The number of neurons in the population
+        :param str label: The label to give to the vertex
+        :param constraints:
             A list of constraints to give to the vertex, or None
-        :type constraints: list or None
+        :type constraints:
+            list(~pacman.model.constraints.AbstractConstraint) or None
         :return: An application vertex for the population
-        :rtype: :py:class:`pacman.model.graphs.application.ApplicationVertex`
+        :rtype: ~pacman.model.graphs.application.ApplicationVertex
         """

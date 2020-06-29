@@ -17,13 +17,14 @@ import logging
 from threading import RLock
 import numpy
 from spinnman.connections import ConnectionListener
+from spinn_front_end_common.utilities.constants import BYTES_PER_SHORT
 from spynnaker.pyNN.connections import SpynnakerLiveSpikesConnection
 from spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters \
     import (
         PushBotRetinaResolution)
 
 logger = logging.getLogger(__name__)
-_RETINA_PACKET_SIZE = 2
+_RETINA_PACKET_SIZE = BYTES_PER_SHORT
 
 
 class PushBotRetinaConnection(SpynnakerLiveSpikesConnection):
@@ -45,6 +46,18 @@ class PushBotRetinaConnection(SpynnakerLiveSpikesConnection):
             self, retina_injector_label, pushbot_wifi_connection,
             resolution=PushBotRetinaResolution.NATIVE_128_X_128,
             local_host=None, local_port=None):
+        """
+        :param retina_injector_label:
+        :type retina_injector_label: str
+        :param pushbot_wifi_connection:
+        :type pushbot_wifi_connection: PushBotWIFIConnection
+        :param resolution:
+        :type resolution: PushBotRetinaResolution
+        :param local_host:
+        :type local_host: str or None
+        :param local_port:
+        :type local_port: int or None
+        """
         # pylint: disable=too-many-arguments
         super(PushBotRetinaConnection, self).__init__(
             send_labels=[retina_injector_label], local_host=local_host,
