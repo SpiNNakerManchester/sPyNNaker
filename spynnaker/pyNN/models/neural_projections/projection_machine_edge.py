@@ -23,7 +23,6 @@ from pacman.model.partitioner_interfaces.\
 from pacman.model.partitioner_interfaces.\
     abstract_controls_source_of_edges import \
     AbstractControlsSourceOfEdges
-from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.interface.provenance import (
     AbstractProvidesLocalProvenanceData)
 from spynnaker.pyNN.models.neural_projections.connectors import (
@@ -99,9 +98,9 @@ class ProjectionMachineEdge(
                     post_lo_test = post_lo - postpop_lo
                     post_hi_test = post_hi - postpop_lo
                     if ((pre_hi_test < post_lo_test) or
-                        (pre_lo_test > post_hi_test) or
-                        (pre_hi < prepop_lo) or (pre_lo > prepop_hi) or
-                        (post_hi < postpop_lo) or (post_lo > postpop_hi)):
+                            (pre_lo_test > post_hi_test) or
+                            (pre_hi < prepop_lo) or (pre_lo > prepop_hi) or
+                            (post_hi < postpop_lo) or (post_lo > postpop_hi)):
                         n_filtered += 1
                 # Filter edge if pre-pop is outside limit and post_lo is bigger
                 # than n_pre_neurons
@@ -112,8 +111,8 @@ class ProjectionMachineEdge(
                     pre_lo_test = pre_lo - prepop_lo
                     pre_hi_test = pre_hi - prepop_lo
                     if ((pre_hi_test < post_lo) or
-                        (pre_lo_test > post_hi) or
-                        (pre_hi < prepop_lo) or (pre_lo > prepop_hi)):
+                            (pre_lo_test > post_hi) or
+                            (pre_hi < prepop_lo) or (pre_lo > prepop_hi)):
                         n_filtered += 1
                 # Filter edge if post-pop is outside limit and pre_lo is bigger
                 # than n_post_neurons
@@ -124,13 +123,14 @@ class ProjectionMachineEdge(
                     post_lo_test = post_lo - postpop_lo
                     post_hi_test = post_hi - postpop_lo
                     if ((pre_hi < post_lo_test) or
-                        (pre_lo > post_hi_test) or
-                        (post_hi < postpop_lo) or (post_lo > postpop_hi)):
+                            (pre_lo > post_hi_test) or
+                            (post_hi < postpop_lo) or (post_lo > postpop_hi)):
                         n_filtered += 1
                 # Filter edge in the usual scenario with normal populations
                 else:
                     if pre_hi < post_lo or pre_lo > post_hi:
                         n_filtered += 1
+
             # Filter edge in the usual scenario with normal populations
             elif isinstance(synapse_info.connector, FromListConnector):
                 pre_app_vertex = graph_mapper.get_application_vertex(

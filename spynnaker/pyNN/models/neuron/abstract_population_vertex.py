@@ -38,8 +38,6 @@ from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, SYSTEM_BYTES_REQUIREMENT)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.interface.simulation import simulation_utilities
-from spinn_front_end_common.interface.buffer_management import (
-    recording_utilities)
 from spynnaker.pyNN.models.abstract_models.\
     abstract_sends_outgoing_synapses import AbstractSendsOutgoingSynapses
 from spinn_front_end_common.interface.profiling import profile_utils

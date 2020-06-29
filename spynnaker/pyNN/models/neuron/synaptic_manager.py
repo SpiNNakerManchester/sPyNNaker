@@ -21,7 +21,6 @@ import struct
 import numpy
 import scipy.stats  # @UnresolvedImport
 from scipy import special  # @UnresolvedImport
-from spinn_utilities.helpful_functions import get_valid_components
 from pacman.model.partitioner_interfaces.\
     abstract_controls_destination_of_edges import \
     AbstractControlsDestinationOfEdges
