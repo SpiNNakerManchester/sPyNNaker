@@ -15,6 +15,8 @@
 
 from pyNN.random import NumpyRNG
 
+from spynnaker.pyNN.models.pynn_population_common import PyNNPopulationCommon
+
 
 class SynapseInformation(object):
     """ Contains the synapse information including the connector, synapse type\
@@ -61,11 +63,17 @@ class SynapseInformation(object):
 
     @property
     def n_pre_neurons(self):
-        return self.__pre_population.outgoing_neurons()
+        if isinstance(self.__pre_population, PyNNPopulationCommon):
+            return self.__pre_population.outgoing_neurons()
+        else:
+            return self.__pre_population.size
 
     @property
     def n_post_neurons(self):
-        return self.__post_population.incoming_neurons()
+        if isinstance(self.__pre_population, PyNNPopulationCommon):
+            return self.__post_population.incoming_neurons()
+        else:
+            return self.__post_population.size
 
     @property
     def prepop_is_view(self):
