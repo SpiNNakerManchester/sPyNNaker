@@ -1569,18 +1569,21 @@ source, target, weight and delay</td>
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.population_machine_vertex.PopulationMachineVertex.bit_field_base_address">
 <code class="descclassname">PopulationMachineVertex.</code><code class="descname">bit_field_base_address</code><span class="sig-paren">(</span><em>transceiver</em>, <em>placement</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/population_machine_vertex.html#PopulationMachineVertex.bit_field_base_address"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.population_machine_vertex.PopulationMachineVertex.bit_field_base_address" title="Permalink to this definition">¶</a></dt>
-<dd><p>returns the sdram address for the bit field table data</p>
+<dd><p>Returns the SDRAM address for the bit field table data.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>transceiver</strong> &#8211; txrx</li>
-<li><strong>placement</strong> &#8211; placement</li>
+<li><strong>transceiver</strong> (<a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman/#spinnman.transceiver.Transceiver" title="(in SpiNNMan v)"><em>Transceiver</em></a>) &#8211; </li>
+<li><strong>placement</strong> (<em>Placement</em>) &#8211; </li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">the sdram address for the bitfield address</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the SDRAM address for the bitfield address</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">int</p>
 </td>
 </tr>
 </tbody>
@@ -1590,18 +1593,21 @@ source, target, weight and delay</td>
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.population_machine_vertex.PopulationMachineVertex.bit_field_builder_region">
 <code class="descclassname">PopulationMachineVertex.</code><code class="descname">bit_field_builder_region</code><span class="sig-paren">(</span><em>transceiver</em>, <em>placement</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/population_machine_vertex.html#PopulationMachineVertex.bit_field_builder_region"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.population_machine_vertex.PopulationMachineVertex.bit_field_builder_region" title="Permalink to this definition">¶</a></dt>
-<dd><p>returns the sdram address for the bit field builder data</p>
+<dd><p>returns the SDRAM address for the bit field builder data</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>transceiver</strong> &#8211; txrx</li>
-<li><strong>placement</strong> &#8211; placement</li>
+<li><strong>transceiver</strong> (<a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman/#spinnman.transceiver.Transceiver" title="(in SpiNNMan v)"><em>Transceiver</em></a>) &#8211; </li>
+<li><strong>placement</strong> (<em>Placement</em>) &#8211; </li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">the sdram address for the bitfield builder data</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the SDRAM address for the bitfield builder data</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">int</p>
 </td>
 </tr>
 </tbody>
@@ -1707,18 +1713,21 @@ source, target, weight and delay</td>
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.population_machine_vertex.PopulationMachineVertex.key_to_atom_map_region_base_address">
 <code class="descclassname">PopulationMachineVertex.</code><code class="descname">key_to_atom_map_region_base_address</code><span class="sig-paren">(</span><em>transceiver</em>, <em>placement</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/population_machine_vertex.html#PopulationMachineVertex.key_to_atom_map_region_base_address"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.population_machine_vertex.PopulationMachineVertex.key_to_atom_map_region_base_address" title="Permalink to this definition">¶</a></dt>
-<dd><p>returns the sdram address for the region that contains key to         atom data</p>
+<dd><p>Returns the SDRAM address for the region that contains             key-to-atom data.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>transceiver</strong> &#8211; txrx</li>
-<li><strong>placement</strong> &#8211; placement</li>
+<li><strong>transceiver</strong> (<a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman/#spinnman.transceiver.Transceiver" title="(in SpiNNMan v)"><em>Transceiver</em></a>) &#8211; </li>
+<li><strong>placement</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placement" title="(in PACMAN v)"><em>Placement</em></a>) &#8211; </li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">the sdram address for the  key to atom data</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the SDRAM address for the key-to-atom data</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">int</p>
 </td>
 </tr>
 </tbody>
@@ -1728,18 +1737,24 @@ source, target, weight and delay</td>
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.population_machine_vertex.PopulationMachineVertex.regeneratable_sdram_blocks_and_sizes">
 <code class="descclassname">PopulationMachineVertex.</code><code class="descname">regeneratable_sdram_blocks_and_sizes</code><span class="sig-paren">(</span><em>transceiver</em>, <em>placement</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/population_machine_vertex.html#PopulationMachineVertex.regeneratable_sdram_blocks_and_sizes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.population_machine_vertex.PopulationMachineVertex.regeneratable_sdram_blocks_and_sizes" title="Permalink to this definition">¶</a></dt>
-<dd><p>returns the sdram address&#8217;s for the core&#8217;s sdram that can be used         to generate bitfield tables loaded</p>
+<dd><p>Returns the SDRAM addresses and sizes for the cores&#8217; SDRAM that             are available (borrowed) for generating bitfield tables.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>transceiver</strong> &#8211; txrx</li>
-<li><strong>placement</strong> &#8211; placement</li>
+<li><strong>transceiver</strong> (<a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman/#spinnman.transceiver.Transceiver" title="(in SpiNNMan v)"><em>Transceiver</em></a>) &#8211; </li>
+<li><strong>placement</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placement" title="(in PACMAN v)"><em>Placement</em></a>) &#8211; </li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list of tuple containing (the sdram address for the cores         sdram address&#8217;s for the core&#8217;s sdram that can be used         to generate bitfield tables loaded</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">list of tuples containing (the SDRAM address for the cores
+SDRAM address&#8217;s for the core&#8217;s SDRAM that can be used to generate
+bitfield tables loaded, and the size of memory chunks located
+there)</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list(tuple(int,int))</p>
 </td>
 </tr>
 </tbody>
@@ -3139,18 +3154,21 @@ source, target, weight and delay</td>
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.PopulationMachineVertex.bit_field_base_address">
 <code class="descclassname">PopulationMachineVertex.</code><code class="descname">bit_field_base_address</code><span class="sig-paren">(</span><em>transceiver</em>, <em>placement</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/population_machine_vertex.html#PopulationMachineVertex.bit_field_base_address"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.bit_field_base_address" title="Permalink to this definition">¶</a></dt>
-<dd><p>returns the sdram address for the bit field table data</p>
+<dd><p>Returns the SDRAM address for the bit field table data.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>transceiver</strong> &#8211; txrx</li>
-<li><strong>placement</strong> &#8211; placement</li>
+<li><strong>transceiver</strong> (<a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman/#spinnman.transceiver.Transceiver" title="(in SpiNNMan v)"><em>Transceiver</em></a>) &#8211; </li>
+<li><strong>placement</strong> (<em>Placement</em>) &#8211; </li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">the sdram address for the bitfield address</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the SDRAM address for the bitfield address</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">int</p>
 </td>
 </tr>
 </tbody>
@@ -3160,18 +3178,21 @@ source, target, weight and delay</td>
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.PopulationMachineVertex.bit_field_builder_region">
 <code class="descclassname">PopulationMachineVertex.</code><code class="descname">bit_field_builder_region</code><span class="sig-paren">(</span><em>transceiver</em>, <em>placement</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/population_machine_vertex.html#PopulationMachineVertex.bit_field_builder_region"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.bit_field_builder_region" title="Permalink to this definition">¶</a></dt>
-<dd><p>returns the sdram address for the bit field builder data</p>
+<dd><p>returns the SDRAM address for the bit field builder data</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>transceiver</strong> &#8211; txrx</li>
-<li><strong>placement</strong> &#8211; placement</li>
+<li><strong>transceiver</strong> (<a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman/#spinnman.transceiver.Transceiver" title="(in SpiNNMan v)"><em>Transceiver</em></a>) &#8211; </li>
+<li><strong>placement</strong> (<em>Placement</em>) &#8211; </li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">the sdram address for the bitfield builder data</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the SDRAM address for the bitfield builder data</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">int</p>
 </td>
 </tr>
 </tbody>
@@ -3277,18 +3298,21 @@ source, target, weight and delay</td>
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.PopulationMachineVertex.key_to_atom_map_region_base_address">
 <code class="descclassname">PopulationMachineVertex.</code><code class="descname">key_to_atom_map_region_base_address</code><span class="sig-paren">(</span><em>transceiver</em>, <em>placement</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/population_machine_vertex.html#PopulationMachineVertex.key_to_atom_map_region_base_address"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.key_to_atom_map_region_base_address" title="Permalink to this definition">¶</a></dt>
-<dd><p>returns the sdram address for the region that contains key to         atom data</p>
+<dd><p>Returns the SDRAM address for the region that contains             key-to-atom data.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>transceiver</strong> &#8211; txrx</li>
-<li><strong>placement</strong> &#8211; placement</li>
+<li><strong>transceiver</strong> (<a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman/#spinnman.transceiver.Transceiver" title="(in SpiNNMan v)"><em>Transceiver</em></a>) &#8211; </li>
+<li><strong>placement</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placement" title="(in PACMAN v)"><em>Placement</em></a>) &#8211; </li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">the sdram address for the  key to atom data</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the SDRAM address for the key-to-atom data</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">int</p>
 </td>
 </tr>
 </tbody>
@@ -3298,18 +3322,24 @@ source, target, weight and delay</td>
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.PopulationMachineVertex.regeneratable_sdram_blocks_and_sizes">
 <code class="descclassname">PopulationMachineVertex.</code><code class="descname">regeneratable_sdram_blocks_and_sizes</code><span class="sig-paren">(</span><em>transceiver</em>, <em>placement</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/population_machine_vertex.html#PopulationMachineVertex.regeneratable_sdram_blocks_and_sizes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.regeneratable_sdram_blocks_and_sizes" title="Permalink to this definition">¶</a></dt>
-<dd><p>returns the sdram address&#8217;s for the core&#8217;s sdram that can be used         to generate bitfield tables loaded</p>
+<dd><p>Returns the SDRAM addresses and sizes for the cores&#8217; SDRAM that             are available (borrowed) for generating bitfield tables.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>transceiver</strong> &#8211; txrx</li>
-<li><strong>placement</strong> &#8211; placement</li>
+<li><strong>transceiver</strong> (<a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman/#spinnman.transceiver.Transceiver" title="(in SpiNNMan v)"><em>Transceiver</em></a>) &#8211; </li>
+<li><strong>placement</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placement" title="(in PACMAN v)"><em>Placement</em></a>) &#8211; </li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list of tuple containing (the sdram address for the cores         sdram address&#8217;s for the core&#8217;s sdram that can be used         to generate bitfield tables loaded</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">list of tuples containing (the SDRAM address for the cores
+SDRAM address&#8217;s for the core&#8217;s SDRAM that can be used to generate
+bitfield tables loaded, and the size of memory chunks located
+there)</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list(tuple(int,int))</p>
 </td>
 </tr>
 </tbody>
