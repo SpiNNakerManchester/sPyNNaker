@@ -34,7 +34,7 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
 
     def __call__(
             self, routing_tables, transceiver, machine, app_id,
-            provenance_file_path, machine_graph, graph_mapper,
+            provenance_file_path, machine_graph,
             placements, executable_finder, read_algorithm_iobuf,
             produce_report, default_report_folder, target_length,
             routing_infos, time_to_try_for_each_iteration, use_timer_cut_off,
@@ -50,7 +50,6 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
         :param int app_id: app id of the application
         :param str provenance_file_path: file path for prov data
         :param ~.MachineGraph machine_graph: machine graph
-        :param graph_mapper: mapping between graphs
         :param ~.Placements placements: placements on machine
         :param int threshold_percentage:
             the percentage of bitfields to do on chip before its considered
@@ -71,7 +70,7 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
                 routing_tables=routing_tables, transceiver=transceiver,
                 machine=machine, app_id=app_id,
                 provenance_file_path=provenance_file_path,
-                machine_graph=machine_graph, graph_mapper=graph_mapper,
+                machine_graph=machine_graph,
                 placements=placements, executable_finder=executable_finder,
                 read_algorithm_iobuf=read_algorithm_iobuf,
                 produce_report=produce_report,
@@ -90,7 +89,7 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
         # adjust cores to exclude the ones which did not give sdram.
         expander_chip_cores = self._locate_synaptic_expander_cores(
             compressor_executable_targets, executable_finder,
-            placements, graph_mapper, machine)
+            placements, machine)
 
         # just rerun the synaptic expander for safety purposes
         self._rerun_synaptic_cores(
@@ -101,14 +100,14 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
 
     @staticmethod
     def _locate_synaptic_expander_cores(
-            cores, executable_finder, placements, graph_mapper, machine):
+            cores, executable_finder, placements, machine):
         """ removes host based cores for synaptic matrix regeneration
 
         :param ~.ExecutableTargets cores: the cores for everything
         :param ~.ExecutableFinder executable_finder: way to get binary path
-        :param graph_mapper: mapping between graphs
-        :param ~.Machinemachine: spiNNMachine instance.
+        :param ~.Machine machine: spiNNMachine instance.
         :return: new targets for synaptic expander
+        :rtype: ~.ExecutableTargets
         """
         new_cores = ExecutableTargets()
 
@@ -125,10 +124,9 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
                         core_subset.x, core_subset.y, processor_id):
                     vertex = placements.get_vertex_on_processor(
                         core_subset.x, core_subset.y, processor_id)
-                    app_vertex = graph_mapper.get_application_vertex(vertex)
+                    app_vertex = vertex.app_vertex
                     if isinstance(vertex, AbstractSupportsBitFieldGeneration):
-                        if app_vertex.gen_on_machine(
-                                graph_mapper.get_slice(vertex)):
+                        if app_vertex.gen_on_machine(vertex.vertex_slice):
                             new_cores.add_processor(
                                 expander_executable_path,
                                 core_subset.x, core_subset.y, processor_id,

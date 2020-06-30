@@ -49,7 +49,7 @@ class AbstractSpikeRecordable(object):
         """
 
     @abstractmethod
-    def clear_spike_recording(self, buffer_manager, placements, graph_mapper):
+    def clear_spike_recording(self, buffer_manager, placements):
         """ Clear the recorded data from the object
 
         :param buffer_manager: the buffer manager object
@@ -57,17 +57,14 @@ class AbstractSpikeRecordable(object):
             ~spinn_front_end_common.interface.buffer_management.BufferManager
         :param ~pacman.model.placements.Placements placements:
             the placements object
-        :param graph_mapper: the graph mapper object
         """
 
     @abstractmethod
-    def get_spikes(
-            self, placements, graph_mapper, buffer_manager, machine_time_step):
+    def get_spikes(self, placements, buffer_manager, machine_time_step):
         """ Get the recorded spikes from the object
 
         :param ~pacman.model.placements.Placements placements:
             the placements object
-        :param graph_mapper: the graph mapper object
         :param buffer_manager: the buffer manager object
         :type buffer_manager:
             ~spinn_front_end_common.interface.buffer_management.BufferManager

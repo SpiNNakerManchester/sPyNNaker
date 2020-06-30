@@ -66,13 +66,12 @@ class RecordingCommon(object):
                 indexes=None):
         """ Tell the vertex to record data.
 
-        :param variable: the variable to record, valued variables to record\
-            are: 'gsyn_exc', 'gsyn_inh', 'v', 'spikes'
-        :param sampling_interval: the interval to record them
-        :type sampling_interval: int or None
+        :param str variable: the variable to record, valued variables to
+            record are: 'gsyn_exc', 'gsyn_inh', 'v', 'spikes'
+        :param int sampling_interval: the interval to record them
         :param to_file:
         :type to_file: ~neo.io or ~neo.rawio or str or None
-        :param indexes: List of indexes to record or None for all
+        :param indexes: List of indexes to record or `None` for all
         :type indexes: list(int) or None
         """
         get_simulator().verify_not_running()
@@ -173,7 +172,7 @@ class RecordingCommon(object):
             # data
             results = self.__population._vertex.get_data(
                 variable, sim.no_machine_time_steps, sim.placements,
-                sim.graph_mapper, sim.buffer_manager, sim.machine_time_step)
+                sim.buffer_manager, sim.machine_time_step)
             (data, indexes, sampling_interval) = results
 
         return (data, indexes, sampling_interval)
@@ -208,8 +207,7 @@ class RecordingCommon(object):
         # assuming we got here, everything is OK, so we should go get the
         # spikes
         return self.__population._vertex.get_spikes(
-            sim.placements, sim.graph_mapper, sim.buffer_manager,
-            sim.machine_time_step)
+            sim.placements, sim.buffer_manager, sim.machine_time_step)
 
     def _turn_off_all_recording(self, indexes=None):
         """ Turns off recording, is used by a pop saying `.record()`
@@ -222,6 +220,6 @@ class RecordingCommon(object):
                     variable, new_state=False, indexes=indexes)
 
         # check for spikes
-        elif isinstance(self.__population._vertex, AbstractSpikeRecordable):
+        if isinstance(self.__population._vertex, AbstractSpikeRecordable):
             self.__population._vertex.set_recording_spikes(
                 new_state=False, indexes=indexes)

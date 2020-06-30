@@ -94,7 +94,6 @@ class Struct(object):
             else:
                 for start, end, value in values.iter_ranges_by_slice(
                         offset, offset + array_size):
-
                     # Get the values and get them into the correct data type
                     if isinstance(value, RandomDistribution):
                         values = value.next(end - start)
@@ -134,19 +133,18 @@ class Struct(object):
         # as numpy.frombuffer does not like an empty type
         if len(self.numpy_dtype) == 0:
             return items_to_return
-        else:
-            # Read in the data values
-            numpy_data = numpy.frombuffer(
-                data, offset=offset, dtype=self.numpy_dtype, count=array_size)
 
-            # Go through the things to be set
-            items_to_return = list()
-            for i, data_type in enumerate(self.field_types):
+        # Read in the data values
+        numpy_data = numpy.frombuffer(
+            data, offset=offset, dtype=self.numpy_dtype, count=array_size)
 
-                # Get the data to set for this item
-                values = numpy_data["f" + str(i)]
+        # Go through the things to be set
+        items_to_return = list()
+        for i, data_type in enumerate(self.field_types):
+            # Get the data to set for this item
+            values = numpy_data["f" + str(i)]
+            # TODO: types that are integers should become integers
+            items_to_return.append(values / float(data_type.scale))
 
-                items_to_return.append(values / float(data_type.scale))
-
-            # Return values read
-            return items_to_return
+        # Return values read
+        return items_to_return

@@ -110,9 +110,8 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type, synapse_info):
+            self, pre_slices, pre_slice_index, post_slices, post_slice_index,
+            pre_vertex_slice, post_vertex_slice, synapse_type, synapse_info):
         # pylint: disable=too-many-arguments
         n_items = pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms
         items = self._rng.next(n_items)
@@ -148,28 +147,25 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
     def gen_connector_id(self):
         return ConnectorIDs.FIXED_PROBABILITY_CONNECTOR.value
 
-    @overrides(AbstractGenerateConnectorOnMachine.
-               gen_connector_params)
+    @overrides(AbstractGenerateConnectorOnMachine.gen_connector_params)
     def gen_connector_params(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type, synapse_info):
+            self, pre_slices, pre_slice_index, post_slices, post_slice_index,
+            pre_vertex_slice, post_vertex_slice, synapse_type, synapse_info):
         params = self._basic_connector_params(synapse_info)
-
-        params.extend([self.__allow_self_connections])
+        params.append(self.__allow_self_connections)
 
         # If prob=1.0 has been specified, take care when scaling value to
         # ensure that it doesn't wrap round to zero as an unsigned long fract
-        params.extend([DataType.U032.encode_as_int(
-            DataType.U032.max if self._p_connect == 1.0 else self._p_connect)])
+        params.append(DataType.U032.encode_as_int(
+            DataType.U032.max if self._p_connect == 1.0 else self._p_connect))
 
         params.extend(self._get_connector_seed(
             pre_vertex_slice, post_vertex_slice, self._rng))
         return numpy.array(params, dtype="uint32")
 
     @property
-    @overrides(AbstractGenerateConnectorOnMachine.
-               gen_connector_params_size_in_bytes)
+    @overrides(
+        AbstractGenerateConnectorOnMachine.gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
         # view + params + seeds
         return self._view_params_bytes + (N_GEN_PARAMS * BYTES_PER_WORD)

@@ -75,7 +75,7 @@ class OnChipBitFieldGenerator(object):
 
     def __call__(
             self, placements, app_graph, executable_finder,
-            provenance_file_path, transceiver, graph_mapper,
+            provenance_file_path, transceiver,
             read_bit_field_generator_iobuf, generating_bitfield_report,
             default_report_folder, machine_graph, routing_infos,
             generating_bit_field_summary_report):
@@ -87,7 +87,6 @@ class OnChipBitFieldGenerator(object):
         :param str provenance_file_path:
             the path to where provenance data items is written
         :param ~.Transceiver transceiver: the SpiNNMan instance
-        :param graph_mapper: mapper between application an machine graphs.
         :param bool read_bit_field_generator_iobuf: flag for report
         :param bool generating_bitfield_report: flag for report
         :param str default_report_folder: the file path for reports
@@ -106,7 +105,7 @@ class OnChipBitFieldGenerator(object):
 
         # get data
         expander_cores = self._calculate_core_data(
-            app_graph, graph_mapper, progress, executable_finder)
+            app_graph, progress, executable_finder)
 
         # load data
         bit_field_app_id = transceiver.app_id_tracker.get_new_id()
@@ -124,23 +123,21 @@ class OnChipBitFieldGenerator(object):
 
         # read in bit fields for debugging purposes
         if generating_bitfield_report:
-            self._full_report_bit_fields(
-                app_graph, graph_mapper, default_report_folder,
+            self._read_back_bit_fields(
+                app_graph, default_report_folder,
                 self._BIT_FIELD_REPORT_FILENAME)
         if generating_bit_field_summary_report:
-            self._summarise_bit_fields(
-                app_graph, graph_mapper, default_report_folder,
+            self._read_back_and_summarise_bit_fields(
+                app_graph, default_report_folder,
                 self._BIT_FIELD_SUMMARY_REPORT_FILENAME)
 
-    def _summarise_bit_fields(
-            self, app_graph, graph_mapper,
-            default_report_folder, bit_field_summary_report_name):
+    def _read_back_and_summarise_bit_fields(
+            self, app_graph, report_folder, report_name):
         """ summary report of the bitfields that were generated
 
         :param ~.ApplicationGraph app_graph: app graph
-        :param graph_mapper: the graph mapper
-        :param str default_report_folder: the file path for where reports are
-        :param str bit_field_summary_report_name: the name of the summary file
+        :param str report_folder: the file path for where reports are
+        :param str report_name: the name of the summary file
         """
         progress = ProgressBar(
             app_graph.n_vertices,
@@ -149,43 +146,41 @@ class OnChipBitFieldGenerator(object):
         chip_packet_count = defaultdict(int)
         chip_redundant_count = defaultdict(int)
 
-        file_path = os.path.join(
-            default_report_folder, bit_field_summary_report_name)
-        output = open(file_path, "w")
+        file_path = os.path.join(report_folder, report_name)
+        with open(file_path, "w") as output:
+            # read in for each app vertex that would have a bitfield
+            for app_vertex in progress.over(app_graph.vertices):
+                for vertex in app_vertex.machine_vertices:
+                    if isinstance(vertex, AbstractSupportsBitFieldGeneration):
+                        self.__summarise_vertex_bitfields(
+                            vertex, chip_packet_count, chip_redundant_count,
+                            output)
 
-        # read in for each app vertex that would have a bitfield
-        for app_vertex in progress.over(app_graph.vertices):
-            for vertex in graph_mapper.get_machine_vertices(app_vertex):
-                if isinstance(vertex, AbstractSupportsBitFieldGeneration):
-                    self.__summarise_vertex_bitfields(
-                        vertex, chip_packet_count, chip_redundant_count,
-                        output)
+            output.write("\n\n\n")
 
-        output.write("\n\n\n")
+            # overall summary
+            total_packets = 0
+            total_redundant_packets = 0
+            for xy in chip_packet_count:
+                x, y = xy
+                output.write(
+                    "chip {}:{} has a total incoming packet count of {} and "
+                    "a redundant packet count of {} given a redundant "
+                    "percentage of {} \n".format(
+                        x, y, chip_packet_count[xy], chip_redundant_count[xy],
+                        _percent(chip_redundant_count[xy],
+                                 chip_packet_count[xy])))
 
-        # overall summary
-        total_packets = 0
-        total_redundant_packets = 0
-        for xy in chip_packet_count:
-            x, y = xy
+                total_packets += chip_packet_count[xy]
+                total_redundant_packets += chip_redundant_count[xy]
+
+            percentage = _percent(total_redundant_packets, total_packets)
+
             output.write(
-                "chip {}:{} has a total incoming packet count of {} and a "
-                "redundant packet count of {} given a redundant "
-                "percentage of {} \n".format(
-                    x, y, chip_packet_count[xy], chip_redundant_count[xy],
-                    _percent(chip_redundant_count[xy], chip_packet_count[xy])))
-
-            total_packets += chip_packet_count[xy]
-            total_redundant_packets += chip_redundant_count[xy]
-
-        percentage = _percent(total_redundant_packets, total_packets)
-
-        output.write(
-            "overall the application has estimated {} packets flying around "
-            "of which {} are redundant at reception. this is a {} percentage "
-            "of the packets".format(
-                total_packets, total_redundant_packets, percentage))
-        output.close()
+                "overall the application has estimated {} packets flying "
+                "around of which {} are redundant at reception. this is "
+                "{}% of the packets".format(
+                    total_packets, total_redundant_packets, percentage))
 
     def __summarise_vertex_bitfields(
             self, vertex, chip_count, redundant_count, f):
@@ -217,26 +212,23 @@ class OnChipBitFieldGenerator(object):
                 placement.x, placement.y, placement.p,
                 local_total, local_redundant, redundant_packet_percentage))
 
-    def _full_report_bit_fields(
-            self, app_graph, graph_mapper,
-            default_report_folder, bit_field_report_name):
+    def _read_back_bit_fields(self, app_graph, report_folder, report_name):
         """ report of the bitfields that were generated
 
         :param ~.ApplicationGraph app_graph: app graph
-        :param graph_mapper: the graph mapper
-        :param str default_report_folder: the file path for where reports are.
-        :param str bit_field_report_name: the name of the file
+        :param str report_folder: the file path for where reports are.
+        :param str report_name: the name of the file
         """
 
         # generate file
         progress = ProgressBar(
             app_graph.n_vertices, "reading back bitfields from chip")
 
-        file_path = os.path.join(default_report_folder, bit_field_report_name)
+        file_path = os.path.join(report_folder, report_name)
         with open(file_path, "w") as output:
             # read in for each app vertex that would have a bitfield
             for app_vertex in progress.over(app_graph.vertices):
-                for vertex in graph_mapper.get_machine_vertices(app_vertex):
+                for vertex in app_vertex.machine_vertices:
                     if isinstance(vertex, AbstractSupportsBitFieldGeneration):
                         self.__report_vertex_bitfields(vertex, output)
 
@@ -299,12 +291,10 @@ class OnChipBitFieldGenerator(object):
         flag = (bitfield_data[word_id] >> bit_in_word) & self._BIT_MASK
         return flag
 
-    def _calculate_core_data(
-            self, app_graph, graph_mapper, progress, executable_finder):
+    def _calculate_core_data(self, app_graph, progress, executable_finder):
         """ gets the data needed for the bit field expander for the machine
 
         :param ~.ApplicationGraph app_graph: app graph
-        :param graph_mapper: graph mapper between app graph and machine graph
         :param ~.ProgressBar progress: progress bar
         :param ~.ExecutableFinder executable_finder:
             where to find the executable
@@ -321,8 +311,7 @@ class OnChipBitFieldGenerator(object):
 
         # locate verts which can have a synaptic matrix to begin with
         for app_vertex in progress.over(app_graph.vertices, False):
-            machine_verts = graph_mapper.get_machine_vertices(app_vertex)
-            for vertex in machine_verts:
+            for vertex in app_vertex.machine_vertices:
                 if isinstance(vertex, AbstractSupportsBitFieldGeneration):
                     self.__set_bitfield_builder_region(
                         vertex, expander_cores, binary_path)

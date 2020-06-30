@@ -28,7 +28,8 @@ class AbstractSynapseDynamicsStructural(object):
 
         :param ~pacman.model.graphs.application.ApplicationGraph \
                 application_graph:
-        :param AbstractPopulationVertex app_vertex:
+        :param ~spynnaker.pyNN.models.neuron.AbstractPopulationVertex \
+                app_vertex:
         :param int n_neurons:
         :param int n_synapse_types:
         :return: the size of the parameters, in bytes
@@ -37,9 +38,9 @@ class AbstractSynapseDynamicsStructural(object):
 
     @abstractmethod
     def write_structural_parameters(
-            self, spec, region, machine_time_step,
-            weight_scales, application_graph, app_vertex, post_slice,
-            graph_mapper, routing_info, synapse_indices):
+            self, spec, region, machine_time_step, weight_scales,
+            application_graph, app_vertex, post_slice,
+            routing_info, synapse_indices):
         """ Write structural plasticity parameters
 
         :param ~data_specification.DataSpecificationGenerator spec:

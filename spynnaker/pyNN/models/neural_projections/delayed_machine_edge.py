@@ -25,7 +25,7 @@ class DelayedMachineEdge(MachineEdge, AbstractFilterableEdge):
         "__synapse_information"]
 
     def __init__(
-            self, synapse_information, pre_vertex, post_vertex,
+            self, synapse_information, pre_vertex, post_vertex, app_edge,
             label=None, weight=1):
         """
         :param list(SynapseInformation) synapse_information:
@@ -36,19 +36,20 @@ class DelayedMachineEdge(MachineEdge, AbstractFilterableEdge):
         """
         # pylint: disable=too-many-arguments
         super(DelayedMachineEdge, self).__init__(
-            pre_vertex, post_vertex, label=label, traffic_weight=weight)
+            pre_vertex, post_vertex, label=label, traffic_weight=weight,
+            app_edge=app_edge)
         self.__synapse_information = synapse_information
 
     @overrides(AbstractFilterableEdge.filter_edge)
-    def filter_edge(self, graph_mapper):
-
+    def filter_edge(self):
         # Filter one-to-one connections that are out of range
-        for synapse_info in self.__synapse_information:
-            if isinstance(synapse_info.connector, OneToOneConnector):
-                pre_lo = graph_mapper.get_slice(self.pre_vertex).lo_atom
-                pre_hi = graph_mapper.get_slice(self.pre_vertex).hi_atom
-                post_lo = graph_mapper.get_slice(self.post_vertex).lo_atom
-                post_hi = graph_mapper.get_slice(self.post_vertex).hi_atom
-                if pre_hi < post_lo or pre_lo > post_hi:
-                    return True
-        return False
+        return any(
+            isinstance(synapse_info.connector, OneToOneConnector)
+            for synapse_info in self.__synapse_information) \
+            and self.__no_overlap(self.pre_vertex, self.post_vertex)
+
+    @staticmethod
+    def __no_overlap(pre_vertex, post_vertex):
+        pre = pre_vertex.vertex_slice
+        post = post_vertex.vertex_slice
+        return pre.hi_atom < post.lo_atom or pre.lo_atom > post.hi_atom

@@ -24,11 +24,10 @@ class GraphEdgeWeightUpdater(object):
     """ Updates the weights of all edges.
     """
 
-    def __call__(self, machine_graph, graph_mapper):
+    def __call__(self, machine_graph):
         """
         :param ~.MachineGraph machine_graph:
             the machine_graph whose edges are to be updated
-        :param graph_mapper: the graph mapper between graphs
         """
         # create progress bar
         progress = ProgressBar(
@@ -39,7 +38,7 @@ class GraphEdgeWeightUpdater(object):
         for partition in progress.over(machine_graph.outgoing_edge_partitions):
             for edge in partition.edges:
                 if isinstance(edge, AbstractWeightUpdatable):
-                    edge.update_weight(graph_mapper)
+                    edge.update_weight()
 
         # return nothing
         return machine_graph

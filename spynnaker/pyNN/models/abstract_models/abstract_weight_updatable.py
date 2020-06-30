@@ -25,6 +25,6 @@ class AbstractWeightUpdatable(object):
     __slots__ = ()
 
     @abstractmethod
-    def update_weight(self, graph_mapper):
-        """ Update the weight
+    def update_weight(self):
+        """ Update the weight.
         """

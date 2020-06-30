@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import math
 import logging
 import struct
 import numpy
@@ -21,7 +20,8 @@ from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.log import FormatAdapter
 from pacman.model.resources.constant_sdram import ConstantSDRAM
 from pacman.model.resources.variable_sdram import VariableSDRAM
-from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spinn_front_end_common.utilities.constants import (
+    BYTES_PER_WORD, BITS_PER_WORD, MICRO_TO_MILLISECOND_CONVERSION)
 from spynnaker.pyNN.utilities.utility_calls import ceildiv
 from spynnaker.pyNN.models.common import recording_utils
 
@@ -56,7 +56,7 @@ class MultiSpikeRecorder(object):
         if not self.__record:
             return ConstantSDRAM(0)
 
-        out_spike_bytes = ceildiv(n_neurons, 32) * BYTES_PER_WORD
+        out_spike_bytes = ceildiv(n_neurons, BITS_PER_WORD) * BYTES_PER_WORD
         return VariableSDRAM(0, (2 * BYTES_PER_WORD) + (
             out_spike_bytes * spikes_per_timestep))
 
@@ -79,7 +79,7 @@ class MultiSpikeRecorder(object):
 
     def get_spikes(
             self, label, buffer_manager, region,
-            placements, graph_mapper, application_vertex, machine_time_step):
+            placements, application_vertex, machine_time_step):
         """
         :param str label:
         :param buffer_manager: the buffer manager object
@@ -98,15 +98,15 @@ class MultiSpikeRecorder(object):
         # pylint: disable=too-many-arguments
         spike_times = list()
         spike_ids = list()
-        ms_per_tick = machine_time_step / 1000.0
+        ms_per_tick = machine_time_step / MICRO_TO_MILLISECOND_CONVERSION
 
-        vertices = graph_mapper.get_machine_vertices(application_vertex)
+        vertices = application_vertex.machine_vertices
         missing = []
         progress = ProgressBar(
             vertices, "Getting spikes for {}".format(label))
         for vertex in progress.over(vertices):
             placement = placements.get_placement_of_vertex(vertex)
-            vertex_slice = graph_mapper.get_slice(vertex)
+            vertex_slice = vertex.vertex_slice
 
             # Read the spikes from the buffer manager
             neuron_param_data, data_missing = \
@@ -115,13 +115,13 @@ class MultiSpikeRecorder(object):
                 missing.append(placement)
             self._process_spike_data(
                 vertex_slice, ms_per_tick,
-                ceildiv(vertex_slice.n_atoms, 32),
+                ceildiv(vertex_slice.n_atoms, BITS_PER_WORD),
                 neuron_param_data, spike_ids, spike_times)
 
         if missing:
             logger.warning(
-                "Population {} is missing spike data in region {} from the"
-                " following cores: {}", label, region,
+                "Population {} is missing spike data in region {} from the "
+                "following cores: {}", label, region,
                 recording_utils.make_missing_string(missing))
 
         if not spike_ids:

@@ -91,7 +91,7 @@ class PyNNPopulationCommon(object):
         :type additional_parameters: dict(str, Any) or None
         """
         # pylint: disable=too-many-arguments
-        size = self._roundsize(size, label)
+        size = self.__roundsize(size, label)
 
         # Use a provided model to create a vertex
         if isinstance(model, AbstractPyNNModel):
@@ -496,14 +496,9 @@ class PyNNPopulationCommon(object):
                 and self._vertex_read_parameters_before_set \
                 and not self.__has_read_neuron_parameters_this_run \
                 and not globals_variables.get_simulator().use_virtual_board:
-            # locate machine vertices from the application vertices
-            machine_vertices = globals_variables.get_simulator().graph_mapper\
-                .get_machine_vertices(self.__vertex)
-
             # go through each machine vertex and read the neuron parameters
             # it contains
-            for machine_vertex in machine_vertices:
-
+            for machine_vertex in self.__vertex.machine_vertices:
                 # tell the core to rewrite neuron params back to the
                 # SDRAM space.
                 placement = globals_variables.get_simulator().placements.\
@@ -511,8 +506,7 @@ class PyNNPopulationCommon(object):
 
                 self.__vertex.read_parameters_from_machine(
                     globals_variables.get_simulator().transceiver, placement,
-                    globals_variables.get_simulator().graph_mapper.get_slice(
-                        machine_vertex))
+                    machine_vertex.vertex_slice)
 
             self.__has_read_neuron_parameters_this_run = True
 
@@ -657,7 +651,7 @@ class PyNNPopulationCommon(object):
             "This population does not support describing its units")
 
     @staticmethod
-    def _roundsize(size, label):
+    def __roundsize(size, label):
         # External device population can have a size of None so accept for now
         if size is None or isinstance(size, int):
             return size

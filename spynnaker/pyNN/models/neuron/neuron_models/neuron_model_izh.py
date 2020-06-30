@@ -107,6 +107,9 @@ class NeuronModelIzh(AbstractNeuronModel):
 
     @overrides(AbstractStandardNeuronComponent.get_values)
     def get_values(self, parameters, state_variables, vertex_slice, ts):
+        """
+        :param ts: machine time step
+        """
         # pylint: disable=arguments-differ
 
         # Add the rest of the data

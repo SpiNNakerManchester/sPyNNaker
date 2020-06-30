@@ -33,7 +33,7 @@ class DistanceDependentFormation(AbstractFormation):
     ]
 
     def __init__(
-            self, grid=numpy.array([16, 16]), p_form_forward=0.16,
+            self, grid=(16, 16), p_form_forward=0.16,
             sigma_form_forward=2.5, p_form_lateral=1.0,
             sigma_form_lateral=1.0):
         """

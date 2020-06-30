@@ -14,6 +14,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from pyNN.random import NumpyRNG
+from spynnaker.pyNN.models.neural_projections.connectors import (
+    AbstractGenerateConnectorOnMachine)
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    AbstractGenerateOnMachine)
 
 
 class SynapseInformation(object):
@@ -43,8 +47,8 @@ class SynapseInformation(object):
             The population sending spikes to the synapse
         :param PyNNPopulationCommon post_population:
             The population hosting the synapse
-        :param bool prepop_is_view: Whether the pre_population is a view
-        :param bool postpop_is_view: Whether the post_population is a view
+        :param bool prepop_is_view: Whether the `pre_population` is a view
+        :param bool postpop_is_view: Whether the `post_population` is a view
         :param rng: Seeded random number generator
         :type rng: ~pyNN.random.NumpyRNG or None
         :param AbstractSynapseDynamics synapse_dynamics:
@@ -161,3 +165,21 @@ class SynapseInformation(object):
         :rtype: float or list(float) or ~numpy.ndarray(float) or None
         """
         return self.__delays
+
+    def may_generate_on_machine(self):
+        """ Do we describe a collection of synapses whose synaptic matrix may
+            be generated on SpiNNaker instead of needing to be calculated in
+            this process and uploaded? This depends on the connector, the
+            definitions of the weights and delays, and the dynamics of the
+            synapses.
+
+        :return: True if the synaptic matrix may be generated on machine (or
+            may have already been so done)
+        :rtype: bool
+        """
+        connector_gen = (
+            isinstance(self.connector, AbstractGenerateConnectorOnMachine) and
+            self.connector.generate_on_machine(self.weights, self.delays))
+        synapse_gen = isinstance(
+            self.synapse_dynamics, AbstractGenerateOnMachine)
+        return connector_gen and synapse_gen

@@ -65,8 +65,8 @@ class CSAConnector(AbstractConnector):
         # we can probably look at the array and do better than this?
         return self._get_delay_maximum(synapse_info.delays, n_conns_max)
 
-    def _get_n_connections(self, pre_vertex_slice, post_vertex_slice,
-                           synapse_info):
+    def _get_n_connections(
+            self, pre_vertex_slice, post_vertex_slice, synapse_info):
         """
         :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
@@ -74,11 +74,6 @@ class CSAConnector(AbstractConnector):
         :rtype: tuple(int, cset.connset.CSet)
         """
         # do the work from self._cset in here
-        # get the values for this slice
-        pre_lo = pre_vertex_slice.lo_atom
-        pre_hi = pre_vertex_slice.hi_atom
-        post_lo = post_vertex_slice.lo_atom
-        post_hi = post_vertex_slice.hi_atom
 
         # this is where the magic needs to happen somehow
         if self.__full_cset is None:
@@ -88,8 +83,9 @@ class CSAConnector(AbstractConnector):
 
         # use CSA to cross the range of this vertex's neurons with the cset
         pair_list = csa.cross(
-            range(pre_lo, pre_hi+1),
-            range(post_lo, post_hi+1)) * self.__full_cset
+            range(pre_vertex_slice.lo_atom, pre_vertex_slice.hi_atom+1),
+            range(post_vertex_slice.lo_atom, post_vertex_slice.hi_atom+1)) \
+            * self.__full_cset
 
         if self.verbose:
             print('full cset: ', self.__full_cset)
@@ -123,9 +119,8 @@ class CSAConnector(AbstractConnector):
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type, synapse_info):
+            self, pre_slices, pre_slice_index, post_slices, post_slice_index,
+            pre_vertex_slice, post_vertex_slice, synapse_type, synapse_info):
         n_connections, pair_list = self._get_n_connections(
             pre_vertex_slice, post_vertex_slice, synapse_info)
 

@@ -67,7 +67,7 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         :param callable callback: Ignored
         :param bool verbose:
         """
-        AbstractConnector.__init__(
+        AbstractConnector.__init__(  # pylint: disable=non-parent-init-called
             self, safe=safe, callback=callback, verbose=verbose)
         self.__delay_seed = dict()
         self.__weight_seed = dict()
@@ -202,7 +202,6 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
             float or list(int) or list(float)
         :rtype: bool
         """
-
         return (self._generate_lists_on_machine(weights) and
                 self._generate_lists_on_machine(delays))
 
@@ -299,6 +298,7 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         :param SynapseInformation synapse_info:
         :rtype: ~numpy.ndarray(uint32)
         """
+        # pylint: disable=unused-argument
         return numpy.zeros(0, dtype="uint32")
 
     @property
@@ -308,3 +308,16 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         :rtype: int
         """
         return 0
+
+    @staticmethod
+    def _get_view_lo_hi(view):
+        """ Get the range of neuron IDs covered by a view.
+
+        :param spynnaker8.models.populations.PopulationView view:
+        :rtype: tuple(int,int)
+        """
+        # Evil forward reference to subpackage implementation of type!
+        indexes = view._indexes
+        view_lo = indexes[0]
+        view_hi = indexes[-1]
+        return view_lo, view_hi

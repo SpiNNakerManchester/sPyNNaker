@@ -18,7 +18,7 @@ import logging
 import numpy
 
 logger = logging.getLogger(__name__)
-#: Default value of fixed-point one for STDP
+# Default value of fixed-point one for STDP
 STDP_FIXED_POINT_ONE = (1 << 11)
 
 

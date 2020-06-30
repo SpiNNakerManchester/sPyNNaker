@@ -17,11 +17,23 @@ import logging
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationEdge
 from .projection_machine_edge import ProjectionMachineEdge
+from spynnaker.pyNN.models.abstract_models import AbstractFilterableEdge
 
 logger = logging.getLogger(__name__)
+_DynamicsStructural = None
 
 
-class ProjectionApplicationEdge(ApplicationEdge):
+def _are_dynamics_structural(synapse_dynamics):
+    global _DynamicsStructural
+    if _DynamicsStructural is None:
+        # Avoid import loop by postponing this import
+        from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+            AbstractSynapseDynamicsStructural)
+        _DynamicsStructural = AbstractSynapseDynamicsStructural
+    return isinstance(synapse_dynamics, _DynamicsStructural)
+
+
+class ProjectionApplicationEdge(ApplicationEdge, AbstractFilterableEdge):
     """ An edge which terminates on an :py:class:`AbstractPopulationVertex`.
     """
     __slots__ = [
@@ -84,8 +96,14 @@ class ProjectionApplicationEdge(ApplicationEdge):
             return 0
         return self.__delay_edge.pre_vertex.n_delay_stages
 
-    @overrides(ApplicationEdge.create_machine_edge)
-    def create_machine_edge(
+    @overrides(ApplicationEdge._create_machine_edge)
+    def _create_machine_edge(
             self, pre_vertex, post_vertex, label):
         return ProjectionMachineEdge(
-            self.__synapse_information, pre_vertex, post_vertex, label)
+            self.__synapse_information, pre_vertex, post_vertex, self, label)
+
+    @overrides(AbstractFilterableEdge.filter_edge)
+    def filter_edge(self):
+        return all(
+            not _are_dynamics_structural(syn_info.synapse_dynamics)
+            for syn_info in self.__synapse_information)

@@ -72,16 +72,13 @@ class FromListConnector(AbstractConnector):
         """
         super(FromListConnector, self).__init__(safe, callback, verbose)
 
-        # Need to set column names first, as setter uses this
         self.__column_names = column_names
-
-        # Call the conn_list setter, as this sets the internal values
-        self.conn_list = conn_list
-
-        # The connection list split by pre/post vertex slices
         self.__split_conn_list = None
         self.__split_pre_slices = None
         self.__split_post_slices = None
+
+        # Call the conn_list setter, as this sets the internal values
+        self.conn_list = conn_list
 
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
@@ -112,8 +109,8 @@ class FromListConnector(AbstractConnector):
                 self.__split_post_slices == post_slices):
             return False
 
-        self.__split_pre_slices = pre_slices
-        self.__split_post_slices = post_slices
+        self.__split_pre_slices = list(pre_slices)
+        self.__split_post_slices = list(post_slices)
 
         # Create bins into which connections are to be grouped
         pre_bins = numpy.concatenate((
@@ -225,15 +222,14 @@ class FromListConnector(AbstractConnector):
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type, synapse_info):
+            self, pre_slices, pre_slice_index, post_slices, post_slice_index,
+            pre_vertex_slice, post_vertex_slice, synapse_type, synapse_info):
         # pylint: disable=too-many-arguments
         if not len(self.__sources):
             return numpy.zeros(0, dtype=self.NUMPY_SYNAPSES_DTYPE)
         self._split_connections(pre_slices, post_slices)
         indices = self.__split_conn_list[
-            (pre_vertex_slice.hi_atom, post_vertex_slice.hi_atom)]
+            pre_vertex_slice.hi_atom, post_vertex_slice.hi_atom]
         block = numpy.zeros(len(indices), dtype=self.NUMPY_SYNAPSES_DTYPE)
         block["source"] = self.__sources[indices]
         block["target"] = self.__targets[indices]
@@ -281,7 +277,9 @@ class FromListConnector(AbstractConnector):
         :rtype: int
         """
         self._split_connections(pre_slices, post_slices)
-        return len(self.__split_conn_list[(pre_hi, post_hi)])
+        if not self.__split_conn_list:
+            return 0
+        return len(self.__split_conn_list[pre_hi, post_hi])
 
     @conn_list.setter
     def conn_list(self, conn_list):

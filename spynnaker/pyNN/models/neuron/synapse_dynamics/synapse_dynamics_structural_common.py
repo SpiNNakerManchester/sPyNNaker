@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import collections
+import math
 import numpy
 from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.constants import (
@@ -70,20 +71,20 @@ class SynapseDynamicsStructuralCommon(object):
     # 7 32-bit numbers (fast; p_rew; s_max; app_no_atoms; machine_no_atoms;
     # low_atom; high_atom) + 2 4-word RNG seeds (shared_seed; local_seed)
     # + 1 32-bit number (no_pre_pops)
-    REWIRING_DATA_SIZE = (
+    _REWIRING_DATA_SIZE = (
         (7 * BYTES_PER_WORD) + (2 * 4 * BYTES_PER_WORD) + BYTES_PER_WORD)
 
     # Size excluding key_atom_info (as variable length)
     # 4 16-bit numbers (no_pre_vertices; sp_control; delay_lo; delay_hi)
     # + 3 32-bit numbers (weight; connection_type; total_no_atoms)
-    PRE_POP_INFO_BASE_SIZE = (4 * BYTES_PER_SHORT) + (3 * BYTES_PER_WORD)
+    _PRE_POP_INFO_BASE_SIZE = (4 * BYTES_PER_SHORT) + (3 * BYTES_PER_WORD)
 
     # 5 32-bit numbers (key; mask; n_atoms; lo_atom; m_pop_index)
-    KEY_ATOM_INFO_SIZE = (5 * BYTES_PER_WORD)
+    _KEY_ATOM_INFO_SIZE = (5 * BYTES_PER_WORD)
 
     # 1 16-bit number (neuron_index)
     # + 2 8-bit numbers (sub_pop_index; pop_index)
-    POST_TO_PRE_ENTRY_SIZE = BYTES_PER_SHORT + (2 * 1)
+    _POST_TO_PRE_ENTRY_SIZE = BYTES_PER_SHORT + (2 * 1)
 
     #: Default value for frequency of rewiring
     DEFAULT_F_REW = 10**4
@@ -134,8 +135,8 @@ class SynapseDynamicsStructuralCommon(object):
         :param str param:
         :param value:
         """
-        for item in [self.__partner_selection, self.__formation,
-                     self.__elimination]:
+        for item in (self.__partner_selection, self.__formation,
+                     self.__elimination):
             if hasattr(item, param):
                 setattr(item, param, value)
                 break
@@ -172,8 +173,8 @@ class SynapseDynamicsStructuralCommon(object):
 
     def write_parameters(
             self, spec, region, machine_time_step, weight_scales,
-            application_graph, app_vertex, post_slice, graph_mapper,
-            routing_info, synapse_indices):
+            application_graph, app_vertex, post_slice, routing_info,
+            synapse_indices):
         """ Write the synapse parameters to the spec.
 
         :param ~data_specification.DataSpecificationGenerator spec:
@@ -207,12 +208,11 @@ class SynapseDynamicsStructuralCommon(object):
 
         # Write the pre-population info
         pop_index = self.__write_prepopulation_info(
-            spec, app_vertex, structural_edges, graph_mapper, routing_info,
-            weight_scales, post_slice, synapse_indices, machine_time_step)
+            spec, app_vertex, structural_edges, routing_info, weight_scales,
+            post_slice, synapse_indices, machine_time_step)
 
         # Write the post-to-pre table
-        self.__write_post_to_pre_table(
-            spec, pop_index, app_vertex, post_slice, graph_mapper)
+        self.__write_post_to_pre_table(spec, pop_index, app_vertex, post_slice)
 
         # Write the component parameters
         self.__partner_selection.write_parameters(spec)
@@ -241,11 +241,10 @@ class SynapseDynamicsStructuralCommon(object):
                                   AbstractSynapseDynamicsStructural):
                         if found:
                             raise SynapticConfigurationException(
-                                "Only one Projection between each pair of"
-                                " Populations can use structural plasticity ")
+                                "Only one Projection between each pair of "
+                                "Populations can use structural plasticity")
                         found = True
                         structural_edges.append((app_edge, synapse_info))
-
         return structural_edges
 
     def __write_common_rewiring_data(
@@ -302,7 +301,7 @@ class SynapseDynamicsStructuralCommon(object):
         spec.write_value(data=n_pre_pops)
 
     def __write_prepopulation_info(
-            self, spec, app_vertex, structural_edges, graph_mapper,
+            self, spec, app_vertex, structural_edges,
             routing_info, weight_scales, post_slice, synapse_indices,
             machine_time_step):
         """
@@ -323,8 +322,8 @@ class SynapseDynamicsStructuralCommon(object):
             pop_index[app_edge.pre_vertex, synapse_info] = index
             index += 1
             machine_edges = [
-                e for e in graph_mapper.get_machine_edges(app_edge)
-                if graph_mapper.get_slice(e.post_vertex) == post_slice]
+                e for e in app_edge.machine_edges
+                if e.post_vertex.vertex_slice == post_slice]
             dynamics = synapse_info.synapse_dynamics
 
             # Number of machine edges
@@ -354,17 +353,17 @@ class SynapseDynamicsStructuralCommon(object):
             # Machine edge information
             for machine_edge in machine_edges:
                 r_info = routing_info.get_routing_info_for_edge(machine_edge)
-                vertex_slice = graph_mapper.get_slice(machine_edge.pre_vertex)
-                skey = (synapse_info, vertex_slice.lo_atom, post_slice.lo_atom)
+                vertex_slice = machine_edge.pre_vertex.vertex_slice
                 spec.write_value(r_info.first_key)
                 spec.write_value(r_info.first_mask)
                 spec.write_value(vertex_slice.n_atoms)
                 spec.write_value(vertex_slice.lo_atom)
-                spec.write_value(synapse_indices[skey])
+                spec.write_value(
+                    synapse_indices[synapse_info, vertex_slice.lo_atom])
         return pop_index
 
     def __write_post_to_pre_table(
-            self, spec, pop_index, app_vertex, post_slice, graph_mapper):
+            self, spec, pop_index, app_vertex, post_slice):
         """ Post to pre table is basically the transpose of the synaptic\
             matrix.
 
@@ -375,8 +374,7 @@ class SynapseDynamicsStructuralCommon(object):
         :param ~pacman.model.graphs.common.Slice post_slice:
         """
         # Get connections for this post slice
-        key = (app_vertex, post_slice.lo_atom)
-        slice_conns = self.__connections[key]
+        slice_conns = self.__connections[app_vertex, post_slice.lo_atom]
         # Make a single large array of connections
         connections = numpy.concatenate(
             [conn for (conn, _, _, _) in slice_conns])
@@ -390,11 +388,11 @@ class SynapseDynamicsStructuralCommon(object):
              for (_, a_edge, _, s_info) in slice_conns], conn_lens)
         # Make a single large array of sub-population index
         subpop_indices = numpy.repeat(
-            [graph_mapper.get_machine_vertex_index(m_edge.pre_vertex)
+            [m_edge.pre_vertex.index
              for (_, _, m_edge, _) in slice_conns], conn_lens)
         # Get the low atom for each source and subtract
         lo_atoms = numpy.repeat(
-            [graph_mapper.get_slice(m_edge.pre_vertex).lo_atom
+            [m_edge.pre_vertex.vertex_slice.lo_atom
              for (_, _, m_edge, _) in slice_conns], conn_lens)
         connections["source"] = connections["source"] - lo_atoms
         connections["target"] = connections["target"] - post_slice.lo_atom
@@ -450,10 +448,10 @@ class SynapseDynamicsStructuralCommon(object):
             param_sizes += dynamics.elimination\
                 .get_parameters_sdram_usage_in_bytes()
 
-        return int((self.REWIRING_DATA_SIZE +
-                   (self.PRE_POP_INFO_BASE_SIZE * len(structural_edges)) +
-                   (self.KEY_ATOM_INFO_SIZE * n_sub_edges) +
-                   (self.POST_TO_PRE_ENTRY_SIZE * n_neurons * self.__s_max) +
+        return int((self._REWIRING_DATA_SIZE +
+                   (self._PRE_POP_INFO_BASE_SIZE * len(structural_edges)) +
+                   (self._KEY_ATOM_INFO_SIZE * n_sub_edges) +
+                   (self._POST_TO_PRE_ENTRY_SIZE * n_neurons * self.__s_max) +
                    param_sizes))
 
     def synaptic_data_update(
@@ -470,10 +468,9 @@ class SynapseDynamicsStructuralCommon(object):
         if not isinstance(synapse_info.synapse_dynamics,
                           AbstractSynapseDynamicsStructural):
             return
-        key = (app_edge.post_vertex, post_vertex_slice.lo_atom)
-        if key not in self.__connections.keys():
-            self.__connections[key] = []
-        self.__connections[key].append(
+        collector = self.__connections.setdefault(
+            (app_edge.post_vertex, post_vertex_slice.lo_atom), [])
+        collector.append(
             (connections, app_edge, machine_edge, synapse_info))
 
     def n_words_for_plastic_connections(self, value):

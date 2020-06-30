@@ -21,9 +21,9 @@ from pacman.model.constraints.partitioner_constraints import (
     SameAtomsAsVertexConstraint)
 from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION)
-from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_extra_monitor_mc_receiver)
+from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.models.abstract_models import (
     AbstractAcceptsIncomingSynapses)
 from spynnaker.pyNN.utilities.utility_calls import ceildiv
@@ -95,16 +95,16 @@ class PyNNProjectionCommon(object):
         self.__has_retrieved_synaptic_list_from_machine = False
         self.__requires_mapping = True
         self.__label = None
+        pre_vertex = pre_synaptic_population._get_vertex
+        post_vertex = post_synaptic_population._get_vertex
 
-        if not isinstance(post_synaptic_population._get_vertex,
-                          AbstractAcceptsIncomingSynapses):
+        if not isinstance(post_vertex, AbstractAcceptsIncomingSynapses):
             raise ConfigurationException(
                 "postsynaptic population is not designed to receive"
                 " synaptic projections")
 
         # sort out synapse type
-        synapse_type = post_synaptic_population._get_vertex\
-            .get_synapse_id_by_target(target)
+        synapse_type = post_vertex.get_synapse_id_by_target(target)
         if synapse_type is None:
             raise ConfigurationException(
                 "Synapse target {} not found in {}".format(
@@ -121,8 +121,7 @@ class PyNNProjectionCommon(object):
 
         # set the plasticity dynamics for the post pop (allows plastic stuff
         #  when needed)
-        post_synaptic_population._get_vertex.set_synapse_dynamics(
-            synapse_dynamics_stdp)
+        post_vertex.set_synapse_dynamics(synapse_dynamics_stdp)
 
         # Set and store synapse information for future processing
         self.__synapse_information = SynapseInformation(
@@ -143,11 +142,12 @@ class PyNNProjectionCommon(object):
 
         # check if all delays requested can fit into the natively supported
         # delays in the models
-        post_vertex_max_supported_delay_ms = \
-            post_synaptic_population._get_vertex \
-            .get_maximum_delay_supported_in_ms(machine_time_step)
-        max_supported_delay_ms = post_vertex_max_supported_delay_ms + \
-            _delay_extension_max_supported_delay * (machine_time_step / 1000.0)
+        post_vertex_max_supported_delay_ms = (
+            post_vertex.get_maximum_delay_supported_in_ms(machine_time_step))
+        max_supported_delay_ms = (
+            post_vertex_max_supported_delay_ms +
+            _delay_extension_max_supported_delay *
+            (machine_time_step / MICRO_TO_MILLISECOND_CONVERSION))
         if max_delay > max_supported_delay_ms:
             raise ConfigurationException(
                 "The maximum delay {} for projection is not supported "
@@ -167,9 +167,7 @@ class PyNNProjectionCommon(object):
             spinnaker_control.increment_none_labelled_edge_count()
 
         # Find out if there is an existing edge between the populations
-        edge_to_merge = self._find_existing_edge(
-            pre_synaptic_population._get_vertex,
-            post_synaptic_population._get_vertex)
+        edge_to_merge = self._find_existing_edge(pre_vertex, post_vertex)
         if edge_to_merge is not None:
 
             # If there is an existing edge, add the connector
@@ -179,9 +177,8 @@ class PyNNProjectionCommon(object):
 
             # If there isn't an existing edge, create a new one
             self.__projection_edge = ProjectionApplicationEdge(
-                pre_synaptic_population._get_vertex,
-                post_synaptic_population._get_vertex,
-                self.__synapse_information, label=label)
+                pre_vertex, post_vertex, self.__synapse_information,
+                label=label)
 
             # add edge to the graph
             spinnaker_control.add_application_edge(
@@ -207,7 +204,6 @@ class PyNNProjectionCommon(object):
         self.__virtual_connection_list = None
         if spinnaker_control.use_virtual_board:
             self.__virtual_connection_list = list()
-            pre_vertex = pre_synaptic_population._get_vertex
             connection_holder = ConnectionHolder(
                 None, False, pre_vertex.n_atoms, post_vertex.n_atoms,
                 self.__virtual_connection_list)
@@ -282,10 +278,11 @@ class PyNNProjectionCommon(object):
         :rtype: DelayedApplicationEdge
         """
         # pylint: disable=too-many-arguments
-
-        # Create a delay extension vertex to do the extra delays
         delay_vertex = pre_synaptic_population._internal_delay_vertex
         pre_vertex = pre_synaptic_population._get_vertex
+        post_vertex = post_synaptic_population._get_vertex
+
+        # Create a delay extension vertex to do the extra delays
         if delay_vertex is None:
             delay_name = "{}_delayed".format(pre_vertex.label)
             delay_vertex = DelayExtensionVertex(
@@ -312,7 +309,6 @@ class PyNNProjectionCommon(object):
             delay_vertex.n_delay_stages = n_stages
 
         # Create the delay edge if there isn't one already
-        post_vertex = post_synaptic_population._get_vertex
         delay_edge = self._find_existing_edge(delay_vertex, post_vertex)
         if delay_edge is None:
             delay_edge = DelayedApplicationEdge(
@@ -398,7 +394,7 @@ class PyNNProjectionCommon(object):
             receivers = None
             extra_monitor_placements = None
 
-        edges = ctl.graph_mapper.get_machine_edges(self.__projection_edge)
+        edges = self.__projection_edge.machine_edges
         progress = ProgressBar(
             edges, "Getting {}s for projection between {} and {}".format(
                 data_to_get, pre_vertex.label, post_vertex.label))
@@ -419,7 +415,7 @@ class PyNNProjectionCommon(object):
                 sender_extra_monitor_core = None
 
             connections = post_vertex.get_connections_from_machine(
-                ctl.transceiver, placement, edge, ctl.graph_mapper,
+                ctl.transceiver, placement, edge,
                 ctl.routing_infos, self.__synapse_information,
                 ctl.machine_time_step, extra_monitors is not None,
                 ctl.placements, receiver, extra_monitors,

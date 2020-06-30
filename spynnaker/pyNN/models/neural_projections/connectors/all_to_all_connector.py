@@ -51,8 +51,8 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
         super(AllToAllConnector, self).__init__(safe, callback, verbose)
         self.__allow_self_connections = allow_self_connections
 
-    def _connection_slices(self, pre_vertex_slice, post_vertex_slice,
-                           synapse_info):
+    def _connection_slices(
+            self, pre_vertex_slice, post_vertex_slice, synapse_info):
         """ Get a slice of the overall set of connections.
 
         :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
@@ -105,9 +105,8 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type, synapse_info):
+            self, pre_slices, pre_slice_index, post_slices, post_slice_index,
+            pre_vertex_slice, post_vertex_slice, synapse_type, synapse_info):
         # pylint: disable=too-many-arguments
         n_connections = pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms
         if (not self.__allow_self_connections and
@@ -163,19 +162,17 @@ class AllToAllConnector(AbstractGenerateConnectorOnMachine,
     def gen_connector_id(self):
         return ConnectorIDs.ALL_TO_ALL_CONNECTOR.value
 
-    @overrides(AbstractGenerateConnectorOnMachine.
-               gen_connector_params)
+    @overrides(AbstractGenerateConnectorOnMachine.gen_connector_params)
     def gen_connector_params(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type, synapse_info):
+            self, pre_slices, pre_slice_index, post_slices, post_slice_index,
+            pre_vertex_slice, post_vertex_slice, synapse_type, synapse_info):
         params = self._basic_connector_params(synapse_info)
-        params.extend([self.allow_self_connections])
+        params.append(self.__allow_self_connections)
         return numpy.array(params, dtype="uint32")
 
     @property
-    @overrides(AbstractGenerateConnectorOnMachine.
-               gen_connector_params_size_in_bytes)
+    @overrides(
+        AbstractGenerateConnectorOnMachine.gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
         # view parameters + allow_self_connections
         return self._view_params_bytes + (N_GEN_PARAMS * BYTES_PER_WORD)

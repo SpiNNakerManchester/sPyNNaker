@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from spinn_utilities.socket_address import SocketAddress
 from pacman.model.graphs.application import ApplicationEdge
 from spinnman.messages.eieio import EIEIOType
 from spinn_front_end_common.utilities.helpful_functions import (
@@ -20,7 +21,6 @@ from spinn_front_end_common.utilities.helpful_functions import (
 from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spinn_front_end_common.utility_models import (
     ReverseIpTagMultiCastSource)
-from spinn_utilities.socket_address import SocketAddress
 from spinn_front_end_common.utilities.utility_objs import (
     LivePacketGatherParameters)
 from spynnaker.pyNN.utilities.constants import (
@@ -268,6 +268,7 @@ class SpynnakerExternalDevicePluginManager(object):
             database and are ready for it to start execution
         :param int database_notify_port_num: The port number to which an
             external device will receive the database is ready command
+        :param bool notify: adds to the notification protocol if set.
         :param bool reserve_reverse_ip_tag: True if a reverse IP tag is to be
             used, False if SDP is to be used (default)
         """

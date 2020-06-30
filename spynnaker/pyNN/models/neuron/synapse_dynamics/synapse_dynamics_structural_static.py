@@ -17,7 +17,8 @@ from spinn_utilities.overrides import overrides
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
 from .synapse_dynamics_structural_common import (
-    SynapseDynamicsStructuralCommon as CommonSP)
+    SynapseDynamicsStructuralCommon as
+    CommonSP)
 from .synapse_dynamics_static import SynapseDynamicsStatic
 from .synapse_dynamics_stdp import SynapseDynamicsSTDP
 from .synapse_dynamics_structural_stdp import SynapseDynamicsStructuralSTDP
@@ -98,13 +99,12 @@ class SynapseDynamicsStructuralStatic(
 
     @overrides(AbstractSynapseDynamicsStructural.write_structural_parameters)
     def write_structural_parameters(
-            self, spec, region, machine_time_step,
-            weight_scales, application_graph, app_vertex, post_slice,
-            graph_mapper, routing_info, synapse_indices):
+            self, spec, region, machine_time_step, weight_scales,
+            application_graph, app_vertex, post_slice,
+            routing_info, synapse_indices):
         self.__common_sp.write_parameters(
-            spec, region, machine_time_step, weight_scales,
-            application_graph, app_vertex, post_slice, graph_mapper,
-            routing_info, synapse_indices)
+            spec, region, machine_time_step, weight_scales, application_graph,
+            app_vertex, post_slice, routing_info, synapse_indices)
 
     def set_projection_parameter(self, param, value):
         """

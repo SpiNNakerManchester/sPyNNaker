@@ -70,7 +70,7 @@ class PopulationMachineVertex(
         #: Number of structural plasticity rewirings
         N_REWIRES = 11
 
-    PROFILE_TAG_LABELS = {
+    _PROFILE_TAG_LABELS = {
         0: "TIMER",
         1: "DMA_READ",
         2: "INCOMING_SPIKE",
@@ -97,15 +97,20 @@ class PopulationMachineVertex(
     N_ADDITIONAL_PROVENANCE_DATA_ITEMS = len(EXTRA_PROVENANCE_DATA_ENTRIES)
 
     def __init__(
-            self, resources_required, recorded_region_ids, label, constraints):
+            self, resources_required, recorded_region_ids, label, constraints,
+            app_vertex, vertex_slice):
         """
         :param ~pacman.model.resources.ResourceContainer resources_required:
         :param iterable(int) recorded_region_ids:
         :param str label:
         :param list(~pacman.model.constraints.AbstractConstraint) constraints:
+        :param AbstractPopulationVertex app_vertex:
+            The associated application vertex
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            The slice of the population that this implements
         """
-        MachineVertex.__init__(self, label, constraints)
-        AbstractSupportsBitFieldGeneration.__init__(self)
+        MachineVertex.__init__(
+            self, label, constraints, app_vertex, vertex_slice)
         AbstractRecordable.__init__(self)
         self.__recorded_region_ids = recorded_region_ids
         self.__resources = resources_required
@@ -137,8 +142,7 @@ class PopulationMachineVertex(
 
     @overrides(AbstractSupportsBitFieldRoutingCompression.
                regeneratable_sdram_blocks_and_sizes)
-    def regeneratable_sdram_blocks_and_sizes(
-            self, transceiver, placement):
+    def regeneratable_sdram_blocks_and_sizes(self, transceiver, placement):
         synaptic_matrix_base_address = locate_memory_region_for_placement(
             placement=placement, transceiver=transceiver,
             region=POPULATION_BASED_REGIONS.SYNAPTIC_MATRIX.value)
@@ -159,7 +163,7 @@ class PopulationMachineVertex(
     @property
     @overrides(ProvidesProvenanceDataFromMachineImpl._n_additional_data_items)
     def _n_additional_data_items(self):
-        return self.N_ADDITIONAL_PROVENANCE_DATA_ITEMS
+        return len(PopulationMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES)
 
     @overrides(AbstractRecordable.is_recording)
     def is_recording(self):
@@ -310,4 +314,4 @@ class PopulationMachineVertex(
     def get_profile_data(self, transceiver, placement):
         return get_profiling_data(
             POPULATION_BASED_REGIONS.PROFILING.value,
-            self.PROFILE_TAG_LABELS, transceiver, placement)
+            self._PROFILE_TAG_LABELS, transceiver, placement)

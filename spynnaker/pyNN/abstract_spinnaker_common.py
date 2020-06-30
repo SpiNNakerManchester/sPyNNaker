@@ -451,7 +451,7 @@ class AbstractSpiNNakerCommon(with_metaclass(
             neuron_type.set_model_max_atoms_per_core()
 
     def get_projections_data(self, projection_to_attribute_map):
-        """ Common data extractor for projection data. Allows fully \
+        """ Common data extractor for projection data. Allows fully
             exploitation of the ????
 
         :param projection_to_attribute_map:
@@ -524,12 +524,8 @@ class AbstractSpiNNakerCommon(with_metaclass(
 
         # iterate though projections
         for projection in projections:
-
             # iteration though the projections machine edges to locate chips
-            edges = self._graph_mapper.get_machine_edges(
-                projection._projection_edge)
-
-            for edge in edges:
+            for edge in projection._projection_edge.machine_edges:
                 placement = self._placements.get_placement_of_vertex(
                     edge.post_vertex)
                 chip = self._machine.get_chip_at(placement.x, placement.y)
