@@ -18,8 +18,9 @@ from six import with_metaclass
 from spinn_utilities.abstract_base import AbstractBase
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.neuron.implementations import (
-    AbstractStandardNeuronComponent, Struct)
+    AbstractStandardNeuronComponent)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spynnaker.pyNN.utilities.struct import Struct
 
 
 # with_metaclass due to https://github.com/benjaminp/six/issues/219
@@ -71,7 +72,7 @@ class AbstractNeuronModel(
     def get_global_values(self, timestamp_in_us):
         """ Get the global values to be written to the machine for this model
 
-        :param timestamp_in_us: the timestep for this vertex in us
+        :param int timestamp_in_us: the timestep for this vertex in us
         :type timestamp_in_us: int
         :return: A list with the same length as self.global_struct.field_types
         :rtype: list(int or float) or ~numpy.ndarray

@@ -19,11 +19,14 @@ from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
+from .abstract_connector_supports_views_on_machine import (
+    AbstractConnectorSupportsViewsOnMachine)
 
 logger = logging.getLogger(__name__)
 
 
-class OneToOneConnector(AbstractGenerateConnectorOnMachine):
+class OneToOneConnector(AbstractGenerateConnectorOnMachine,
+                        AbstractConnectorSupportsViewsOnMachine):
     """ Where the pre- and postsynaptic populations have the same size,\
         connect cell i in the presynaptic pynn_population.py to cell i in the\
         postsynaptic pynn_population.py for all i.
@@ -113,7 +116,7 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
             self, pre_vertex_slice, post_vertex_slice, synapse_info):
         if synapse_info.prepop_is_view:
             # work out which atoms are on this pre-slice
-            view_lo, view_hi = self._get_view_lo_hi(
+            view_lo, view_hi = self.get_view_lo_hi(
                 synapse_info.pre_population._indexes)
             if ((view_lo > pre_vertex_slice.lo_atom) and
                     (view_lo < pre_vertex_slice.hi_atom)):
@@ -131,7 +134,7 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
 
         if synapse_info.postpop_is_view:
             # work out which atoms are on this post-slice
-            view_lo, view_hi = self._get_view_lo_hi(
+            view_lo, view_hi = self.get_view_lo_hi(
                 synapse_info.post_population._indexes)
             if ((view_lo > post_vertex_slice.lo_atom) and
                     (view_lo < post_vertex_slice.hi_atom)):
@@ -148,11 +151,6 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
             post_hi = post_vertex_slice.hi_atom
 
         return pre_lo, post_lo, pre_hi, post_hi
-
-    def _get_view_lo_hi(self, indexes):
-        view_lo = indexes[0]
-        view_hi = indexes[-1]
-        return view_lo, view_hi
 
     @overrides(AbstractConnector.use_direct_matrix)
     def use_direct_matrix(self, synapse_info):
@@ -171,26 +169,11 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine):
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type, synapse_info):
-        params = []
-        pre_view_lo = 0
-        pre_view_hi = synapse_info.n_pre_neurons - 1
-        if synapse_info.prepop_is_view:
-            pre_view_lo, pre_view_hi = self._get_view_lo_hi(
-                synapse_info.pre_population._indexes)
-
-        params.extend([pre_view_lo, pre_view_hi])
-
-        post_view_lo = 0
-        post_view_hi = synapse_info.n_post_neurons - 1
-        if synapse_info.postpop_is_view:
-            post_view_lo, post_view_hi = self._get_view_lo_hi(
-                synapse_info.post_population._indexes)
-
-        params.extend([post_view_lo, post_view_hi])
+        params = self._basic_connector_params(synapse_info)
         return numpy.array(params, dtype="uint32")
 
     @property
     @overrides(AbstractGenerateConnectorOnMachine.
                gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
-        return 16
+        return self._view_params_bytes

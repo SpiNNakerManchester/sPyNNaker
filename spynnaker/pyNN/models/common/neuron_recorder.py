@@ -31,7 +31,6 @@ from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BITS_PER_WORD)
 from spinn_front_end_common.interface.buffer_management import \
     recording_utilities
-from spynnaker.pyNN.models.neural_properties import NeuronParameter
 import itertools
 
 logger = FormatAdapter(logging.getLogger(__name__))
@@ -825,17 +824,6 @@ class NeuronRecorder(object):
             self.__add_indices(data, variable, rate, n_recording, vertex_slice)
 
         return numpy.concatenate(data)
-
-    def get_global_parameters(self, vertex_slice):
-        params = []
-        for variable in self.__sampling_rates:
-            params.append(NeuronParameter(
-                self.__sampling_rates[variable], DataType.UINT32))
-        for variable in self.__sampling_rates:
-            n_recording = self._count_recording_per_slice(
-                variable, vertex_slice)
-            params.append(NeuronParameter(n_recording, DataType.UINT8))
-        return params
 
     @property
     def _indexes(self):  # for testing only

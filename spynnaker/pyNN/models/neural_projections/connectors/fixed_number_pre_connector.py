@@ -23,11 +23,16 @@ from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
 from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.exceptions import SpynnakerException
+from .abstract_connector_supports_views_on_machine import (
+    AbstractConnectorSupportsViewsOnMachine)
+
+N_GEN_PARAMS = 8
 
 logger = logging.getLogger(__file__)
 
 
-class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine):
+class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
+                              AbstractConnectorSupportsViewsOnMachine):
     """ Connects a fixed number of pre-synaptic neurons selected at random,\
         to all post-synaptic neurons.
     """
@@ -171,9 +176,9 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine):
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             self.__n_pre * synapse_info.n_post_neurons, prob_selection,
             chance=1.0/10000.0)
-        prob_in_slice = (
+        prob_in_slice = min(
             float(post_vertex_slice.n_atoms) / float(
-                synapse_info.n_post_neurons))
+                synapse_info.n_post_neurons), 1.0)
         n_connections = utility_calls.get_probable_maximum_selected(
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             n_connections_total, prob_in_slice, chance=1.0/100000.0)
@@ -263,6 +268,8 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine):
             self, pre_slices, pre_slice_index, post_slices,
             post_slice_index, pre_vertex_slice, post_vertex_slice,
             synapse_type, synapse_info):
+        params = self._basic_connector_params(synapse_info)
+
         # The same seed needs to be sent to each of the slices
         key = (id(pre_slices), id(post_vertex_slice))
         if key not in self.__pre_connector_seed:
@@ -275,11 +282,11 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine):
                 synapse_info.pre_population is synapse_info.post_population)):
             self_connections = False
 
-        params = [
+        params.extend([
             self_connections,
             self.__with_replacement,
             self.__n_pre,
-            synapse_info.n_pre_neurons]
+            synapse_info.n_pre_neurons])
         params.extend(self.__pre_connector_seed[key])
         return numpy.array(params, dtype="uint32")
 
@@ -287,4 +294,4 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine):
     @overrides(AbstractGenerateConnectorOnMachine.
                gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
-        return (4 + 4) * BYTES_PER_WORD
+        return self._view_params_bytes + (N_GEN_PARAMS * BYTES_PER_WORD)

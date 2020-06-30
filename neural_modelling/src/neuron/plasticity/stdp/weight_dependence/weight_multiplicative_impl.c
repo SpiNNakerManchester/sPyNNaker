@@ -15,20 +15,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Support code for weight_multiplicative_impl.h
 #include "weight_multiplicative_impl.h"
 
 //---------------------------------------
 // Globals
 //---------------------------------------
-// Global plasticity parameter data
+//! Global plasticity parameter data array, in DTCM
 plasticity_weight_region_data_t *plasticity_weight_region_data;
+//! Plasticity multiply shift array, in DTCM
 uint32_t *weight_multiply_right_shift;
 
 //---------------------------------------
 // Functions
 //---------------------------------------
-uint32_t *weight_initialise(
-        uint32_t *address, uint32_t n_synapse_types,
+address_t weight_initialise(
+        address_t address, uint32_t n_synapse_types,
         uint32_t *ring_buffer_to_input_buffer_left_shifts) {
     log_debug("weight_initialise: starting");
     log_debug("\tSTDP multiplicative weight dependence");
