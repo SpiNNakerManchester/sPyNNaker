@@ -17,30 +17,28 @@ import numpy
 from pyNN.random import RandomDistribution
 from spinn_utilities.helpful_functions import is_singleton
 from spinn_utilities.ranged.ranged_list import RangedList
-from spynnaker.pyNN.utilities.utility_calls import convert_to
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spynnaker.pyNN.utilities.utility_calls import convert_to
 
 
 class Struct(object):
-    """ Represents a C code structure
+    """ Represents a C code structure.
     """
 
     __slots__ = ["__field_types"]
 
     def __init__(self, field_types):
         """
-        :param field_types:\
-            The types of the fields, ordered as they appear in the struct
-        :type field_types:\
-            list of :py:class:`data_specification.enums.data_type.DataType`
+        :param list(~data_specification.enums.DataType) field_types:
+            The types of the fields, ordered as they appear in the struct.
         """
         self.__field_types = field_types
 
     @property
     def field_types(self):
-        """ The types of the fields, ordered as they appear in the struct
+        """ The types of the fields, ordered as they appear in the struct.
 
-        :rtype: list of :py:class:`data_specification.enums.data_type.DataType`
+        :rtype: list(~data_specification.enums.DataType)
         """
         return self.__field_types
 
@@ -48,7 +46,7 @@ class Struct(object):
     def numpy_dtype(self):
         """ The numpy data type of the struct
 
-        :rtype: :py:class:`numpy.dtype`
+        :rtype: ~numpy.dtype
         """
         return numpy.dtype(
             [("f" + str(i), numpy.dtype(data_type.struct_encoding))
@@ -59,7 +57,7 @@ class Struct(object):
         """ Get the size of the struct in whole words in an array of given\
             size (default 1 item)
 
-        :param array_size: The number of elements in an array of structs
+        :param int array_size: The number of elements in an array of structs
         :rtype: int
         """
         datatype = self.numpy_dtype
@@ -67,16 +65,18 @@ class Struct(object):
         return (size_in_bytes + (BYTES_PER_WORD - 1)) // BYTES_PER_WORD
 
     def get_data(self, values, offset=0, array_size=1):
-        """ Get a numpy array of uint32 of data for the given values
+        """ Get a numpy array of uint32 of data for the given values. \
+            The array will be suitable for being written to SpiNNaker.
 
-        :param values:\
-            A list of values with length the same size as the number of fields\
+        :param values:
+            A list of values with length the same size as the number of fields
             returned by field_types
-        :type values:\
-            list of (single value or list of values or RangedList of values)
-        :param offset: The offset into each of the values where to start
-        :param array_size: The number of structs to generate
-        :rtype: numpy.array(dtype="uint32")
+        :type values:
+            list(int or float or list(int) or list(float) or
+            ~spinn_utilities.ranged.RangedList)
+        :param int offset: The offset into each of the values where to start
+        :param int array_size: The number of structs to generate
+        :rtype: ~numpy.ndarray(dtype="uint32")
         """
         # Create an array to store values in
         data = numpy.zeros(array_size, dtype=self.numpy_dtype)
@@ -116,10 +116,12 @@ class Struct(object):
         """ Read a bytearray of data and convert to struct values
 
         :param data: The data to be read
-        :param offset: Index of the byte at the start of the valid data
-        :param array_size: The number of struct elements to read
-        :return:\
+        :type data: bytes or bytearray
+        :param int offset: Index of the byte at the start of the valid data
+        :param int array_size: The number of struct elements to read
+        :return:
             a list of lists of data values, one list for each struct element
+        :rtype: list(float)
         """
         if self.numpy_dtype.itemsize == 0:
             return numpy.zeros(0, dtype=self.numpy_dtype)

@@ -20,13 +20,16 @@ import numpy
 from pyNN.random import NumpyRNG, RandomDistribution
 from six import string_types, with_metaclass
 
-from spinn_front_end_common.utilities.constants import \
-    MICRO_TO_MILLISECOND_CONVERSION
 from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.safe_eval import SafeEval
+from spinn_front_end_common.utilities.constants import (
+    MICRO_TO_MILLISECOND_CONVERSION)
 from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
-from spynnaker.pyNN.utilities import utility_calls
+from spynnaker.pyNN.utilities.utility_calls import (
+    get_maximum_probable_value, get_minimum_probable_value, get_mean,
+    get_probability_within_range, get_probable_maximum_selected,
+    get_variance, high, low)
 
 # global objects
 logger = logging.getLogger(__name__)
@@ -142,14 +145,14 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         :param int n_connections:
         """
         if isinstance(delays, RandomDistribution):
-            max_estimated_delay = utility_calls.get_maximum_probable_value(
+            max_estimated_delay = get_maximum_probable_value(
                 delays, n_connections)
-            high = utility_calls.high(delays)
-            if high is None:
+            hi = high(delays)
+            if hi is None:
                 return max_estimated_delay
 
             # The maximum is the minimum of the possible maximums
-            return min(max_estimated_delay, high)
+            return min(max_estimated_delay, hi)
         elif numpy.isscalar(delays):
             return delays
         elif hasattr(delays, "__getitem__"):
@@ -175,7 +178,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         :rtype: float
         """
         if isinstance(delays, RandomDistribution):
-            return utility_calls.get_variance(delays)
+            return get_variance(delays)
         elif numpy.isscalar(delays):
             return 0.0
         elif hasattr(delays, "__getitem__"):
@@ -200,9 +203,9 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         """
         # pylint: disable=too-many-arguments
         if isinstance(delays, RandomDistribution):
-            prob_in_range = utility_calls.get_probability_within_range(
+            prob_in_range = get_probability_within_range(
                 delays, min_delay, max_delay)
-            return int(math.ceil(utility_calls.get_probable_maximum_selected(
+            return int(math.ceil(get_probable_maximum_selected(
                 n_total_connections, n_connections, prob_in_range)))
         elif numpy.isscalar(delays):
             if min_delay <= delays <= max_delay:
@@ -216,7 +219,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
                 return 0
             n_total = len(delays)
             prob_delayed = float(n_delayed) / float(n_total)
-            return int(math.ceil(utility_calls.get_probable_maximum_selected(
+            return int(math.ceil(get_probable_maximum_selected(
                 n_total_connections, n_connections, prob_delayed)))
         raise Exception("Unrecognised delay format")
 
@@ -260,7 +263,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         :rtype: float
         """
         if isinstance(weights, RandomDistribution):
-            return abs(utility_calls.get_mean(weights))
+            return abs(get_mean(weights))
         elif numpy.isscalar(weights):
             return abs(weights)
         elif hasattr(weights, "__getitem__"):
@@ -277,21 +280,19 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         :rtype: float
         """
         if isinstance(weights, RandomDistribution):
-            mean_weight = utility_calls.get_mean(weights)
+            mean_weight = get_mean(weights)
             if mean_weight < 0:
-                min_weight = utility_calls.get_minimum_probable_value(
-                    weights, n_connections)
-                low = utility_calls.low(weights)
-                if low is None:
+                min_weight = get_minimum_probable_value(weights, n_connections)
+                lo = low(weights)
+                if lo is None:
                     return abs(min_weight)
-                return abs(max(min_weight, low))
+                return abs(max(min_weight, lo))
             else:
-                max_weight = utility_calls.get_maximum_probable_value(
-                    weights, n_connections)
-                high = utility_calls.high(weights)
-                if high is None:
+                max_weight = get_maximum_probable_value(weights, n_connections)
+                hi = high(weights)
+                if hi is None:
                     return abs(max_weight)
-                return abs(min(max_weight, high))
+                return abs(min(max_weight, hi))
 
         elif numpy.isscalar(weights):
             return abs(weights)
@@ -317,7 +318,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         :rtype: float
         """
         if isinstance(weights, RandomDistribution):
-            return utility_calls.get_variance(weights)
+            return get_variance(weights)
         elif numpy.isscalar(weights):
             return 0.0
         elif hasattr(weights, "__getitem__"):

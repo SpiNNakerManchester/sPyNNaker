@@ -14,13 +14,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import collections
-import math
 import numpy
 from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION, MICRO_TO_SECOND_CONVERSION,
     BYTES_PER_WORD, BYTES_PER_SHORT)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
+from spynnaker.pyNN.utilities.utility_calls import ceildiv
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
@@ -443,8 +443,7 @@ class SynapseDynamicsStructuralCommon(object):
             max_atoms = in_edge.pre_vertex.get_max_atoms_per_core()
             if in_edge.pre_vertex.n_atoms < max_atoms:
                 max_atoms = in_edge.pre_vertex.n_atoms
-            n_sub_edges += int(math.ceil(
-                float(in_edge.pre_vertex.n_atoms) / float(max_atoms)))
+            n_sub_edges += ceildiv(in_edge.pre_vertex.n_atoms, max_atoms)
             dynamics = synapse_info.synapse_dynamics
             param_sizes += dynamics.formation\
                 .get_parameters_sdram_usage_in_bytes()

@@ -38,7 +38,7 @@ from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 from spynnaker.pyNN.utilities.constants import (
     POPULATION_BASED_REGIONS, POSSION_SIGMA_SUMMATION_LIMIT)
 from spynnaker.pyNN.utilities.utility_calls import (
-    get_maximum_probable_value, get_n_bits)
+    ceildiv, get_maximum_probable_value, get_n_bits)
 from spynnaker.pyNN.utilities.running_stats import RunningStats
 from spynnaker.pyNN.models.neuron.master_pop_table import (
     MasterPopTableAsBinarySearch)
@@ -389,8 +389,8 @@ class SynapticManager(object):
                     max_atoms = in_edge.pre_vertex.get_max_atoms_per_core()
                     if in_edge.pre_vertex.n_atoms < max_atoms:
                         max_atoms = in_edge.pre_vertex.n_atoms
-                    n_edge_vertices = int(math.ceil(
-                        float(in_edge.pre_vertex.n_atoms) / float(max_atoms)))
+                    n_edge_vertices = ceildiv(
+                        in_edge.pre_vertex.n_atoms, max_atoms)
 
                     # Get the size
                     connector = synapse_info.connector
@@ -689,7 +689,7 @@ class SynapticManager(object):
 
         # Convert these to powers
         max_weight_powers = (
-            0 if w <= 0 else int(math.ceil(max(0, math.log(w, 2))))
+            0 if w <= 0 else (w - 1).bit_length()
             for w in max_weights)
 
         # If 2^max_weight_power equals the max weight, we have to add another
@@ -715,7 +715,7 @@ class SynapticManager(object):
         :param int ring_buffer_to_input_left_shift:
         :rtype: float
         """
-        return float(math.pow(2, 16 - (ring_buffer_to_input_left_shift + 1)))
+        return 2.0 ** (16 - (ring_buffer_to_input_left_shift + 1))
 
     def _write_synapse_parameters(
             self, spec, ring_buffer_shifts, weight_scale):

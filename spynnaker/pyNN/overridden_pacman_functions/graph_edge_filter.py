@@ -34,9 +34,10 @@ class GraphEdgeFilter(object):
 
     def __call__(self, machine_graph, graph_mapper):
         """
-        :param machine_graph: the machine_graph whose edges are to be filtered
+        :param .MachineGraph new_graph:
+             The machine_graph whose edges are to be filtered
         :param graph_mapper: the graph mapper between graphs
-        :return: a new graph mapper and machine graph
+        :return: a new machine graph and graph mapper
         """
         new_machine_graph = MachineGraph(label=machine_graph.label)
         new_graph_mapper = GraphMapper()
@@ -96,6 +97,10 @@ class GraphEdgeFilter(object):
 
     @staticmethod
     def _is_filterable(edge, graph_mapper):
+        """
+        :param ~.MachineEdge edge:
+        :rtype: bool
+        """
         app_edge = graph_mapper.get_application_edge(edge)
 
         # Don't filter edges which have structural synapse dynamics

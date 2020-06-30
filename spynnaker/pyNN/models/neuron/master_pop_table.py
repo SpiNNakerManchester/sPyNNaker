@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-import math
 import struct
 import numpy
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
@@ -22,6 +21,7 @@ from spynnaker.pyNN.models.neural_projections import (
     ProjectionApplicationEdge, ProjectionMachineEdge)
 from spynnaker.pyNN.exceptions import (
     SynapseRowTooBigException, SynapticConfigurationException)
+from spynnaker.pyNN.utilities.utility_calls import ceildiv
 
 logger = logging.getLogger(__name__)
 _TWO_WORDS = struct.Struct("<II")
@@ -138,8 +138,8 @@ class MasterPopTableAsBinarySearch(object):
                     max_atoms = in_edge.pre_vertex.n_atoms
 
                 # Get the number of likely vertices
-                n_edge_vertices = int(math.ceil(
-                    float(in_edge.pre_vertex.n_atoms) / float(max_atoms)))
+                n_edge_vertices = ceildiv(
+                    in_edge.pre_vertex.n_atoms, max_atoms)
                 n_vertices += n_edge_vertices
                 n_entries += (
                     n_edge_vertices * len(in_edge.synapse_information))

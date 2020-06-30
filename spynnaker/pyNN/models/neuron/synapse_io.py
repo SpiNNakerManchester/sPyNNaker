@@ -13,15 +13,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import math
 import numpy
 from six import raise_from
-
-from spinn_front_end_common.utilities.constants import \
-    MICRO_TO_MILLISECOND_CONVERSION, BYTES_PER_WORD
+from spinn_front_end_common.utilities.constants import (
+    MICRO_TO_MILLISECOND_CONVERSION, BYTES_PER_WORD)
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector)
 from spynnaker.pyNN.utilities.constants import MAX_SUPPORTED_DELAY_TICS
+from spynnaker.pyNN.utilities.utility_calls import ceildiv
 from spynnaker.pyNN.exceptions import SynapseRowTooBigException
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractStaticSynapseDynamics, AbstractSynapseDynamicsStructural,
@@ -133,7 +132,7 @@ class SynapseIORowBased(object):
         :param int n_bytes:
         :rtype: int
         """
-        return math.ceil(float(n_bytes) / BYTES_PER_WORD)
+        return ceildiv(n_bytes, BYTES_PER_WORD)
 
     @staticmethod
     def _get_max_row_length(

@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import math
 import numpy
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
@@ -21,13 +20,13 @@ from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BYTES_PER_SHORT)
 from spynnaker.pyNN.models.abstract_models import AbstractSettable
 from .abstract_plastic_synapse_dynamics import AbstractPlasticSynapseDynamics
-from .abstract_synapse_dynamics_structural \
-    import AbstractSynapseDynamicsStructural
+from .abstract_synapse_dynamics_structural import (
+    AbstractSynapseDynamicsStructural)
 from .abstract_generate_on_machine import (
     AbstractGenerateOnMachine, MatrixGeneratorID)
 from spynnaker.pyNN.exceptions import InvalidParameterType,\
     SynapticConfigurationException
-from spynnaker.pyNN.utilities.utility_calls import get_n_bits
+from spynnaker.pyNN.utilities.utility_calls import ceildiv, get_n_bits
 
 # How large are the time-stamps stored with each event
 TIME_STAMP_BYTES = BYTES_PER_WORD
@@ -281,14 +280,13 @@ class SynapseDynamicsSTDP(
 
         # The actual number of bytes is in a word-aligned struct, so work out
         # the number of bytes as a number of words
-        return int(math.ceil(float(n_bytes) / BYTES_PER_WORD)) * BYTES_PER_WORD
+        return ceildiv(n_bytes, BYTES_PER_WORD) * BYTES_PER_WORD
 
     def __get_n_connections(self, n_connections, check_length_padded=True):
         """
         :param int n_connections:
-        :rtype: int
         :param bool check_length_padded:
-        :rtype: bool
+        :rtype: int
         """
         synapse_structure = self.__timing_dependence.synaptic_structure
         if self.__pad_to_length is not None and check_length_padded:
@@ -303,7 +301,7 @@ class SynapseDynamicsSTDP(
             self._n_header_bytes +
             (synapse_structure.get_n_half_words_per_connection() *
              BYTES_PER_SHORT * n_connections))
-        pp_size_words = int(math.ceil(float(pp_size_bytes) / BYTES_PER_WORD))
+        pp_size_words = ceildiv(pp_size_bytes, BYTES_PER_WORD)
 
         return fp_size_words + pp_size_words
 

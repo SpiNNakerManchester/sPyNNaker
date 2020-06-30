@@ -16,7 +16,7 @@
 from __future__ import division
 from collections import OrderedDict
 import logging
-import math
+import itertools
 import numpy
 from six import raise_from, iteritems
 from six.moves import range, xrange
@@ -28,9 +28,9 @@ from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities import globals_variables
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, MICRO_TO_MILLISECOND_CONVERSION, BITS_PER_WORD)
-from spinn_front_end_common.interface.buffer_management import \
-    recording_utilities
-import itertools
+from spinn_front_end_common.interface.buffer_management import (
+    recording_utilities)
+from spynnaker.pyNN.utilities.utility_calls import ceildiv
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -279,7 +279,7 @@ class NeuronRecorder(object):
         :return: how many rows there should be.
         :rtype: int
         """
-        return int(math.ceil(n_machine_time_steps / sampling_rate))
+        return ceildiv(n_machine_time_steps, sampling_rate)
 
     def get_matrix_data(
             self, label, buffer_manager, region, placements, graph_mapper,
@@ -388,7 +388,7 @@ class NeuronRecorder(object):
                 continue
 
             # Read the spikes
-            n_words = int(math.ceil(neurons_recording / BITS_PER_WORD))
+            n_words = ceildiv(neurons_recording, BITS_PER_WORD)
             n_bytes = n_words * BYTES_PER_WORD
             n_words_with_timestamp = n_words + 1
 
@@ -654,7 +654,7 @@ class NeuronRecorder(object):
             return 0
         if variable in self.__bitfield_variables:
             # Overflow can be ignored as it is not save if in an extra word
-            out_spike_words = int(math.ceil(n_neurons / BITS_PER_WORD))
+            out_spike_words = ceildiv(n_neurons, BITS_PER_WORD)
             out_spike_bytes = out_spike_words * BYTES_PER_WORD
             return self.N_BYTES_FOR_TIMESTAMP + out_spike_bytes
         else:
@@ -705,8 +705,7 @@ class NeuronRecorder(object):
         return data_size * records
 
     def get_sdram_usage_in_bytes(self, vertex_slice):
-        n_words_for_n_neurons = int(
-            math.ceil(vertex_slice.n_atoms // BYTES_PER_WORD))
+        n_words_for_n_neurons = ceildiv(vertex_slice.n_atoms, BYTES_PER_WORD)
         n_bytes_for_n_neurons = n_words_for_n_neurons * BYTES_PER_WORD
         var_bytes = (
             (self.N_BYTES_PER_RATE + self.N_BYTES_PER_SIZE +
@@ -772,8 +771,7 @@ class NeuronRecorder(object):
         # out_spikes, *_values
         for variable in self.__sampling_rates:
             if variable in self.__bitfield_variables:
-                out_spike_words = int(
-                    math.ceil(vertex_slice.n_atoms / BITS_PER_WORD))
+                out_spike_words = ceildiv(vertex_slice.n_atoms, BITS_PER_WORD)
                 out_spike_bytes = out_spike_words * BYTES_PER_WORD
                 usage += self.N_BYTES_FOR_TIMESTAMP + out_spike_bytes
             else:
@@ -792,8 +790,7 @@ class NeuronRecorder(object):
                 len(self.recording_variables)
 
     def __add_indices(self, data, variable, rate, n_recording, vertex_slice):
-        n_words_for_n_neurons = int(
-            math.ceil(vertex_slice.n_atoms / BYTES_PER_WORD))
+        n_words_for_n_neurons = ceildiv(vertex_slice.n_atoms, BYTES_PER_WORD)
         n_bytes_for_n_neurons = n_words_for_n_neurons * BYTES_PER_WORD
         if rate == 0:
             data.append(numpy.zeros(n_words_for_n_neurons, dtype="uint32"))

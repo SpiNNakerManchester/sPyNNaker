@@ -14,11 +14,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-utility class containing simple helper methods
+utility class containing simple helper functions
 """
 import os
 import logging
-import math
 import numpy
 from pyNN.random import RandomDistribution
 from scipy.stats import binom
@@ -47,6 +46,20 @@ STATS_BY_NAME = {
     'vonmises': RandomStatsVonmisesImpl()}
 
 logger = logging.getLogger(__name__)
+
+
+def ceildiv(dividend, divisor):
+    """ How to divide two possibly-integer numbers and round up.
+
+    :param dividend:
+    :type dividend: float or int
+    :param divisor:
+    :type divisor: float or int
+    :rtype: int
+    """
+    assert divisor > 0
+    q, r = divmod(dividend, divisor)
+    return int(q) + (r != 0)
 
 
 def check_directory_exists_and_create_if_not(filename):
@@ -298,4 +311,4 @@ def get_n_bits(n_values):
         return 0
     if n_values == 1:
         return 1
-    return int(math.ceil(math.log(n_values, 2)))
+    return (w - 1).bit_length()

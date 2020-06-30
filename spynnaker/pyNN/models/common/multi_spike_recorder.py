@@ -17,12 +17,13 @@ import math
 import logging
 import struct
 import numpy
-from pacman.model.resources.constant_sdram import ConstantSDRAM
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.log import FormatAdapter
-from spynnaker.pyNN.models.common import recording_utils
+from pacman.model.resources.constant_sdram import ConstantSDRAM
 from pacman.model.resources.variable_sdram import VariableSDRAM
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spynnaker.pyNN.utilities.utility_calls import ceildiv
+from spynnaker.pyNN.models.common import recording_utils
 
 logger = FormatAdapter(logging.getLogger(__name__))
 _TWO_WORDS = struct.Struct("<II")
@@ -55,7 +56,7 @@ class MultiSpikeRecorder(object):
         if not self.__record:
             return ConstantSDRAM(0)
 
-        out_spike_bytes = int(math.ceil(n_neurons / 32.0)) * BYTES_PER_WORD
+        out_spike_bytes = ceildiv(n_neurons, 32) * BYTES_PER_WORD
         return VariableSDRAM(0, (2 * BYTES_PER_WORD) + (
             out_spike_bytes * spikes_per_timestep))
 
@@ -114,7 +115,7 @@ class MultiSpikeRecorder(object):
                 missing.append(placement)
             self._process_spike_data(
                 vertex_slice, ms_per_tick,
-                int(math.ceil(vertex_slice.n_atoms / 32.0)),
+                ceildiv(vertex_slice.n_atoms, 32),
                 neuron_param_data, spike_ids, spike_times)
 
         if missing:

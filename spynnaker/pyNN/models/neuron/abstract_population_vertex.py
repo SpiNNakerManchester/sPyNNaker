@@ -15,7 +15,6 @@
 
 import logging
 import os
-import math
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
@@ -30,17 +29,26 @@ from spinn_front_end_common.abstract_models import (
     AbstractCanReset)
 from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl)
-from spinn_front_end_common.utilities import (
-    constants as common_constants, helpful_functions, globals_variables)
+from spinn_front_end_common.utilities.globals_variables import get_simulator
+from spinn_front_end_common.utilities.helpful_functions import (
+    locate_memory_region_for_placement, read_config_int)
 from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, SYSTEM_BYTES_REQUIREMENT)
+    BYTES_PER_WORD, SIMULATION_N_BYTES, SYSTEM_BYTES_REQUIREMENT)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
-from spinn_front_end_common.interface.simulation import simulation_utilities
-from spinn_front_end_common.interface.profiling import profile_utils
-from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
+from spinn_front_end_common.interface.simulation.simulation_utilities import (
+    get_simulation_header_array)
+from spinn_front_end_common.interface.profiling.profile_utils import (
+    get_profile_region_size, reserve_profile_region, write_profile_region_data)
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, AbstractNeuronRecordable, NeuronRecorder)
-from spynnaker.pyNN.utilities import constants, bit_field_utilities
+from spynnaker.pyNN.utilities.utility_calls import ceildiv
+from spynnaker.pyNN.utilities.constants import (
+    POPULATION_BASED_REGIONS, SPIKE_PARTITION_ID)
+from spynnaker.pyNN.utilities.bit_field_utilities import (
+    exact_sdram_for_bit_field_builder_region,
+    get_estimated_sdram_for_bit_field_region,
+    get_estimated_sdram_for_key_region,
+    reserve_bit_field_regions, write_bitfield_init_data)
 from spynnaker.pyNN.models.abstract_models import (
     AbstractPopulationInitializable, AbstractAcceptsIncomingSynapses,
     AbstractPopulationSettable, AbstractReadParametersBeforeSet,
@@ -153,7 +161,7 @@ class AbstractPopulationVertex(
         self.__incoming_spike_buffer_size = incoming_spike_buffer_size
 
         # get config from simulator
-        config = globals_variables.get_simulator().config
+        config = get_simulator().config
 
         if incoming_spike_buffer_size is None:
             self.__incoming_spike_buffer_size = config.getint(
@@ -189,7 +197,7 @@ class AbstractPopulationVertex(
         self.__has_reset_last = True
 
         # Set up for profiling
-        self.__n_profile_samples = helpful_functions.read_config_int(
+        self.__n_profile_samples = read_config_int(
             config, "Reports", "n_profile_samples")
 
     @property
@@ -306,13 +314,10 @@ class AbstractPopulationVertex(
                 PopulationMachineVertex.N_ADDITIONAL_PROVENANCE_DATA_ITEMS) +
             self.__synapse_manager.get_sdram_usage_in_bytes(
                 vertex_slice, machine_time_step, graph, self) +
-            profile_utils.get_profile_region_size(
-                self.__n_profile_samples) +
-            bit_field_utilities.get_estimated_sdram_for_bit_field_region(
-                graph, self) +
-            bit_field_utilities.get_estimated_sdram_for_key_region(
-                graph, self) +
-            bit_field_utilities.exact_sdram_for_bit_field_builder_region())
+            get_profile_region_size(self.__n_profile_samples) +
+            get_estimated_sdram_for_bit_field_region(graph, self) +
+            get_estimated_sdram_for_key_region(graph, self) +
+            exact_sdram_for_bit_field_builder_region())
         return sdram_requirement
 
     def _reserve_memory_regions(
@@ -332,7 +337,7 @@ class AbstractPopulationVertex(
         # Reserve memory:
         spec.reserve_memory_region(
             region=POPULATION_BASED_REGIONS.SYSTEM.value,
-            size=common_constants.SIMULATION_N_BYTES,
+            size=SIMULATION_N_BYTES,
             label='System')
 
         self._reserve_neuron_params_data_region(spec, vertex_slice)
@@ -342,12 +347,12 @@ class AbstractPopulationVertex(
             size=self._neuron_recorder.get_static_sdram_usage(vertex_slice),
             label="neuron recording")
 
-        profile_utils.reserve_profile_region(
+        reserve_profile_region(
             spec, POPULATION_BASED_REGIONS.PROFILING.value,
             self.__n_profile_samples)
 
         # reserve bit field region
-        bit_field_utilities.reserve_bit_field_regions(
+        reserve_bit_field_regions(
             spec, machine_graph, n_key_map, vertex,
             POPULATION_BASED_REGIONS.BIT_FIELD_BUILDER.value,
             POPULATION_BASED_REGIONS.BIT_FIELD_FILTER.value,
@@ -424,14 +429,13 @@ class AbstractPopulationVertex(
 
         # Set the focus to the memory region 2 (neuron parameters):
         spec.switch_write_focus(
-            region=constants.POPULATION_BASED_REGIONS.NEURON_PARAMS.value)
+            region=POPULATION_BASED_REGIONS.NEURON_PARAMS.value)
 
         # Write the random back off value
         max_offset = (
             machine_time_step * time_scale_factor) // _MAX_OFFSET_DENOMINATOR
         spec.write_value(
-            int(math.ceil(max_offset / self.__n_subvertices)) *
-            self.__n_data_specs)
+            ceildiv(max_offset, self.__n_subvertices) * self.__n_data_specs)
         self.__n_data_specs += 1
 
         # Write the number of microseconds between sending spikes
@@ -490,7 +494,7 @@ class AbstractPopulationVertex(
         # write the neuron params into the new DSG region
         self._write_neuron_parameters(
             key=routing_info.get_first_key_from_pre_vertex(
-                placement.vertex, constants.SPIKE_PARTITION_ID),
+                placement.vertex, SPIKE_PARTITION_ID),
             machine_time_step=machine_time_step, spec=spec,
             time_scale_factor=time_scale_factor,
             vertex_slice=vertex_slice)
@@ -559,11 +563,11 @@ class AbstractPopulationVertex(
 
         # Get the key
         key = routing_info.get_first_key_from_pre_vertex(
-            vertex, constants.SPIKE_PARTITION_ID)
+            vertex, SPIKE_PARTITION_ID)
 
         # Write the setup region
         spec.switch_write_focus(POPULATION_BASED_REGIONS.SYSTEM.value)
-        spec.write_array(simulation_utilities.get_simulation_header_array(
+        spec.write_array(get_simulation_header_array(
             self.get_binary_file_name(), machine_time_step,
             time_scale_factor))
 
@@ -577,7 +581,7 @@ class AbstractPopulationVertex(
             spec, key, vertex_slice, machine_time_step, time_scale_factor)
 
         # write profile data
-        profile_utils.write_profile_region_data(
+        write_profile_region_data(
             spec, POPULATION_BASED_REGIONS.PROFILING.value,
             self.__n_profile_samples)
 
@@ -594,7 +598,7 @@ class AbstractPopulationVertex(
             self.__synapse_manager.on_chip_written_matrix_size)
 
         # write up the bitfield builder data
-        bit_field_utilities.write_bitfield_init_data(
+        write_bitfield_init_data(
             spec, vertex, machine_graph, routing_info,
             n_key_map, POPULATION_BASED_REGIONS.BIT_FIELD_BUILDER.value,
             POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
@@ -603,7 +607,7 @@ class AbstractPopulationVertex(
             POPULATION_BASED_REGIONS.BIT_FIELD_FILTER.value,
             POPULATION_BASED_REGIONS.BIT_FIELD_KEY_MAP.value,
             POPULATION_BASED_REGIONS.STRUCTURAL_DYNAMICS.value,
-            isinstance(
+            has_structural_dynamics_region=isinstance(
                 self.__synapse_manager.synapse_dynamics,
                 AbstractSynapseDynamicsStructural))
 
@@ -777,10 +781,9 @@ class AbstractPopulationVertex(
             self, transceiver, placement, vertex_slice):
 
         # locate SDRAM address to where the neuron parameters are stored
-        neuron_region_sdram_address = \
-            helpful_functions.locate_memory_region_for_placement(
-                placement, POPULATION_BASED_REGIONS.NEURON_PARAMS.value,
-                transceiver)
+        neuron_region_sdram_address = locate_memory_region_for_placement(
+            placement, POPULATION_BASED_REGIONS.NEURON_PARAMS.value,
+            transceiver)
 
         # shift past the extra stuff before neuron parameters that we don't
         # need to read

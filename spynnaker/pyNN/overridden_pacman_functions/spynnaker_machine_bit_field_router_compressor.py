@@ -14,19 +14,18 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-
-from spinn_front_end_common.abstract_models.\
-    abstract_supports_bit_field_generation import \
-    AbstractSupportsBitFieldGeneration
-from spinn_front_end_common.interface.interface_functions.\
-    machine_bit_field_router_compressor import \
-    MachineBitFieldRouterCompressor
-from spinn_front_end_common.utilities import system_control_logic
-from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState
+from spinn_front_end_common.abstract_models import (
+    AbstractSupportsBitFieldGeneration)
+from spinn_front_end_common.interface.interface_functions.\
+    machine_bit_field_router_compressor import (
+        MachineBitFieldRouterCompressor)
+from spinn_front_end_common.utilities import system_control_logic
+from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spynnaker.pyNN.models.utility_models.synapse_expander. \
-    synapse_expander import SYNAPSE_EXPANDER
+    synapse_expander import (
+        SYNAPSE_EXPANDER)
 
 logger = logging.getLogger(__name__)
 
@@ -42,26 +41,27 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
             machine_time_step, time_scale_factor,
             no_sync_changes, threshold_percentage,
             executable_targets, compress_only_when_needed=True,
-            compress_as_much_as_possible=False,  provenance_data_objects=None):
+            compress_as_much_as_possible=False, provenance_data_objects=None):
         """ entrance for routing table compression with bit field
 
-        :param routing_tables: routing tables
-        :param transceiver: spinnman instance
-        :param machine: spinnMachine instance
-        :param app_id: app id of the application
-        :param provenance_file_path: file path for prov data
-        :param machine_graph: machine graph
+        :param ~.MulticastRoutingTables routing_tables: routing tables
+        :param ~.Transceiver transceiver: spinnman instance
+        :param ~.Machine machine: spinnMachine instance
+        :param int app_id: app id of the application
+        :param str provenance_file_path: file path for prov data
+        :param ~.MachineGraph machine_graph: machine graph
         :param graph_mapper: mapping between graphs
-        :param placements: placements on machine
-        :param threshold_percentage: the percentage of bitfields to do on chip\
-         before its considered a success
-        :param executable_finder: where are binaries are located
-        :param read_algorithm_iobuf: bool flag saying if read iobuf
-        :param compress_only_when_needed: bool flag asking if compress only \
-        when needed
-        :param compress_as_much_as_possible: bool flag asking if should \
-        compress as much as possible
-        :rtype: None
+        :param ~.Placements placements: placements on machine
+        :param int threshold_percentage:
+            the percentage of bitfields to do on chip before its considered
+            a success
+        :param ~.ExecutableFinder executable_finder:
+            where are binaries are located
+        :param bool read_algorithm_iobuf: whether to read iobuf
+        :param bool compress_only_when_needed:
+            whether to compress only when needed
+        :param bool compress_as_much_as_possible:
+            whether to compress as much as possible
         """
 
         # build machine compressor
@@ -104,10 +104,10 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
             cores, executable_finder, placements, graph_mapper, machine):
         """ removes host based cores for synaptic matrix regeneration
 
-        :param cores: the cores for everything
-        :param executable_finder: way to get binary path
+        :param ~.ExecutableTargets cores: the cores for everything
+        :param ~.ExecutableFinder executable_finder: way to get binary path
         :param graph_mapper: mapping between graphs
-        :param machine: spiNNMachine instance.
+        :param ~.Machinemachine: spiNNMachine instance.
         :return: new targets for synaptic expander
         """
         new_cores = ExecutableTargets()
@@ -142,12 +142,12 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
             no_sync_changes):
         """ reruns the synaptic expander
 
-        :param synaptic_expander_rerun_cores: the cores to rerun the synaptic /
-        matrix generator for
-        :param transceiver: spinnman instance
-        :param provenance_file_path: prov file path
-        :param executable_finder: finder of binary file paths
-        :rtype: None
+        :param ~.ExecutableTargets synaptic_expander_rerun_cores:
+            the cores to rerun the synaptic matrix generator for
+        :param ~.Transceiver transceiver: spinnman instance
+        :param str provenance_file_path: prov file path
+        :param ~.ExecutableFinder executable_finder:
+            finder of binary file paths
         """
         if synaptic_expander_rerun_cores.total_processors != 0:
             logger.info("rerunning synaptic expander")

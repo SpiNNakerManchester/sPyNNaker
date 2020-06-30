@@ -23,6 +23,8 @@ from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
 
 class DelayExtensionMachineVertex(
         MachineVertex, ProvidesProvenanceDataFromMachineImpl):
+    """ Implements long delays of spikes.
+    """
     __slots__ = [
         "__resources"]
 
@@ -43,6 +45,13 @@ class DelayExtensionMachineVertex(
     N_EXTRA_PROVENANCE_DATA_ENTRIES = len(EXTRA_PROVENANCE_DATA_ENTRIES)
 
     def __init__(self, resources_required, label, constraints=None):
+        """
+        :param ~pacman.model.resources.ResourceContainer resources_required:
+            The resources required by the vertex
+        :param str label: The optional name of the vertex
+        :param iterable(AbstractConstraint) constraints:
+            The optional initial constraints of the vertex
+        """
         super(DelayExtensionMachineVertex, self).__init__(
             label, constraints=constraints)
         self.__resources = resources_required

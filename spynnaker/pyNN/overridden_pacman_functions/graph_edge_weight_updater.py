@@ -21,15 +21,15 @@ logger = logging.getLogger(__name__)
 
 
 class GraphEdgeWeightUpdater(object):
-    """ Removes graph edges that aren't required
+    """ Updates the weights of all edges.
     """
 
     def __call__(self, machine_graph, graph_mapper):
         """
-        :param machine_graph: the machine_graph whose edges are to be updated
+        :param ~.MachineGraph machine_graph:
+            the machine_graph whose edges are to be updated
         :param graph_mapper: the graph mapper between graphs
         """
-
         # create progress bar
         progress = ProgressBar(
             machine_graph.n_outgoing_edge_partitions,

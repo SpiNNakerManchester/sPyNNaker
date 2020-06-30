@@ -15,6 +15,7 @@
 
 import logging
 import os
+from six import iteritems
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.make_tools.replacer import Replacer
 from spinnman.model import ExecutableTargets
@@ -27,7 +28,6 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractGenerateConnectorOnMachine)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractGenerateOnMachine)
-from six import iteritems
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +38,21 @@ DELAY_EXPANDER = "delay_expander.aplx"
 def synapse_expander(
         app_graph, graph_mapper, placements, transceiver,
         provenance_file_path, executable_finder):
-    """ Run the synapse expander - needs to be done after data has been loaded
+    """ Run the synapse expander.
+
+    .. note::
+        Needs to be done after data has been loaded.
+
+    :param ~pacman.model.graphs.application.ApplicationGraph app_graph:
+        The graph containing the vertices that might need expanding.
+    :param ~pacman.model.placements.Placements placements:
+        Where all vertices are on the machine.
+    :param ~spinnman.transceiver.Transceiver transceiver:
+        How to talk to the machine.
+    :param str provenance_file_path: Where provenance data should be written.
+    :param ~spinn_utilities.executable_finder.ExecutableFinder \
+            executable_finder:
+        How to find the synapse expander binaries.
     """
 
     synapse_bin = executable_finder.get_executable_path(SYNAPSE_EXPANDER)
@@ -104,6 +118,11 @@ def synapse_expander(
 def _extract_iobuf(expander_cores, transceiver, provenance_file_path,
                    display=False):
     """ Extract IOBuf from the cores
+
+    :param ~.ExecutableTargets expander_cores:
+    :param ~.Transceiver transceiver:
+    :param str provenance_file_path:
+    :param bool display:
     """
     io_buffers = transceiver.get_iobuf(expander_cores.all_core_subsets)
     core_to_replacer = dict()
@@ -132,10 +151,9 @@ def _extract_iobuf(expander_cores, transceiver, provenance_file_path,
 def _handle_failure(expander_cores, transceiver, provenance_file_path):
     """ Handle failure of the expander
 
-    :param executable_targets:
-    :param txrx:
-    :param provenance_file_path:
-    :rtype: None
+    :param ~.ExecutableTargets expander_cores:
+    :param ~.Transceiver txrx:
+    :param str provenance_file_path:
     """
     core_subsets = expander_cores.all_core_subsets
     error_cores = transceiver.get_cores_not_in_state(
@@ -148,9 +166,10 @@ def _handle_failure(expander_cores, transceiver, provenance_file_path):
 def _fill_in_connection_data(
         gen_on_machine_vertices, graph_mapper, placements, transceiver):
     """ Once expander has run, fill in the connection data
-    :param app_graph
-    :param graph_mapper
-    :rtype: None
+
+    :param list(AbstractPopulationVertex) gen_on_machine_vertices:
+    :param ~.Placements placements:
+    :param ~.Transceiver transceiver:
     """
     ctl = globals_variables.get_simulator()
     use_extra_monitors = False
