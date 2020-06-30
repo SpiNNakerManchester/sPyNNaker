@@ -15,7 +15,6 @@
 
 import logging
 import os
-import math
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)

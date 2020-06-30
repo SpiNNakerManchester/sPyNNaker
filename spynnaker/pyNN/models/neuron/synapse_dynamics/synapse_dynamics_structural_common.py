@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import collections
-import math
 import numpy
 from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.constants import (
