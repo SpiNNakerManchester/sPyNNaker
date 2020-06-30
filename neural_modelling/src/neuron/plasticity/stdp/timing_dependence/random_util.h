@@ -15,7 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// Utility function
+//! \file
+//! \brief Utility function for random number generation
+
+//! \brief **YUCK** copy and pasted RNG to allow inlining and also to avoid
+//!     horrific executable bloat.
+//!
+//! Algorithm is the KISS algorithm due to Marsaglia and Zaman. (Fortunately, we
+//! don't do cryptography on SpiNNaker.)
+//!
+//! \return random number, uniformly distributed over range 0 ..
+//!     2<sup>::STDP_FIXED_POINT_ONE</sup>
 static inline int32_t mars_kiss_fixed_point(void) {
     // **YUCK** copy and pasted rng to allow inlining and also to avoid
     // horrific executable bloat
