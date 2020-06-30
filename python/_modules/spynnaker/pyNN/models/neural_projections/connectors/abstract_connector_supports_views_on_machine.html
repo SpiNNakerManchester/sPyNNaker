@@ -80,7 +80,7 @@
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="n">BYTES_PER_WORD</span>
 
 
-<div class="viewcode-block" id="AbstractConnectorSupportsViewsOnMachine"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.abstract_connector_supports_views_on_machine.AbstractConnectorSupportsViewsOnMachine">[docs]</a><span class="k">class</span> <span class="nc">AbstractConnectorSupportsViewsOnMachine</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractConnectorSupportsViewsOnMachine"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractConnectorSupportsViewsOnMachine">[docs]</a><span class="k">class</span> <span class="nc">AbstractConnectorSupportsViewsOnMachine</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Connector that generates on machine and supports using PopulationViews</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -88,10 +88,10 @@
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
 
-<div class="viewcode-block" id="AbstractConnectorSupportsViewsOnMachine.get_view_lo_hi"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.abstract_connector_supports_views_on_machine.AbstractConnectorSupportsViewsOnMachine.get_view_lo_hi">[docs]</a>    <span class="k">def</span> <span class="nf">get_view_lo_hi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indexes</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractConnectorSupportsViewsOnMachine.get_view_lo_hi"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractConnectorSupportsViewsOnMachine.get_view_lo_hi">[docs]</a>    <span class="k">def</span> <span class="nf">get_view_lo_hi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indexes</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the low and high index values of the PopulationView</span>
 
-<span class="sd">        :param indexes: the indexes array of a PopulationView</span>
+<span class="sd">        :param list(int) indexes: the indexes array of a PopulationView</span>
 <span class="sd">        :return: The low and high index values of the PopulationView</span>
 <span class="sd">        :rtype: uint, uint</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -100,13 +100,17 @@
         <span class="k">return</span> <span class="n">view_lo</span><span class="p">,</span> <span class="n">view_hi</span></div>
 
     <span class="k">def</span> <span class="nf">_basic_connector_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param SynapseInformation synapse_info:</span>
+<span class="sd">        :rtype: list(int)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">params</span> <span class="o">=</span> <span class="p">[]</span>
+
         <span class="n">pre_view_lo</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">pre_view_hi</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_pre_neurons</span> <span class="o">-</span> <span class="mi">1</span>
         <span class="k">if</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">prepop_is_view</span><span class="p">:</span>
             <span class="n">pre_view_lo</span><span class="p">,</span> <span class="n">pre_view_hi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_view_lo_hi</span><span class="p">(</span>
                 <span class="n">synapse_info</span><span class="o">.</span><span class="n">pre_population</span><span class="o">.</span><span class="n">_indexes</span><span class="p">)</span>
-
         <span class="n">params</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">pre_view_lo</span><span class="p">,</span> <span class="n">pre_view_hi</span><span class="p">])</span>
 
         <span class="n">post_view_lo</span> <span class="o">=</span> <span class="mi">0</span>
@@ -114,7 +118,6 @@
         <span class="k">if</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">postpop_is_view</span><span class="p">:</span>
             <span class="n">post_view_lo</span><span class="p">,</span> <span class="n">post_view_hi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_view_lo_hi</span><span class="p">(</span>
                 <span class="n">synapse_info</span><span class="o">.</span><span class="n">post_population</span><span class="o">.</span><span class="n">_indexes</span><span class="p">)</span>
-
         <span class="n">params</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">post_view_lo</span><span class="p">,</span> <span class="n">post_view_hi</span><span class="p">])</span>
 
         <span class="k">return</span> <span class="n">params</span>

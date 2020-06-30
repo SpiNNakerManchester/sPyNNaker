@@ -86,7 +86,7 @@
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.utility_objs</span> <span class="kn">import</span> <span class="n">ProvenanceDataItem</span>
 
 
-<div class="viewcode-block" id="DelayExtensionMachineVertex"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.delay_extension_machine_vertex.DelayExtensionMachineVertex">[docs]</a><span class="k">class</span> <span class="nc">DelayExtensionMachineVertex</span><span class="p">(</span>
+<div class="viewcode-block" id="DelayExtensionMachineVertex"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex">[docs]</a><span class="k">class</span> <span class="nc">DelayExtensionMachineVertex</span><span class="p">(</span>
         <span class="n">MachineVertex</span><span class="p">,</span> <span class="n">ProvidesProvenanceDataFromMachineImpl</span><span class="p">):</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s2">&quot;__resources&quot;</span><span class="p">]</span>
@@ -97,7 +97,7 @@
         <span class="n">PROVENANCE_REGION</span> <span class="o">=</span> <span class="mi">2</span>
         <span class="n">EXPANDER_REGION</span> <span class="o">=</span> <span class="mi">3</span>
 
-<div class="viewcode-block" id="DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.delay_extension_machine_vertex.DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES">[docs]</a>    <span class="k">class</span> <span class="nc">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<div class="viewcode-block" id="DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES">[docs]</a>    <span class="k">class</span> <span class="nc">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
         <span class="n">N_PACKETS_RECEIVED</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">N_PACKETS_PROCESSED</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="n">N_PACKETS_ADDED</span> <span class="o">=</span> <span class="mi">2</span>
@@ -107,9 +107,24 @@
 
     <span class="n">N_EXTRA_PROVENANCE_DATA_ENTRIES</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">EXTRA_PROVENANCE_DATA_ENTRIES</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_required</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resources_required</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">app_vertex</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param ~pacman.model.resources.ResourceContainer resources_required:</span>
+<span class="sd">            The resources required by the vertex</span>
+<span class="sd">        :param str label: The optional name of the vertex</span>
+<span class="sd">        :param iterable(AbstractConstraint) constraints:</span>
+<span class="sd">            The optional initial constraints of the vertex</span>
+<span class="sd">        :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:</span>
+<span class="sd">            The application vertex that caused this machine vertex to be</span>
+<span class="sd">            created. If None, there is no such application vertex.</span>
+<span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
+<span class="sd">            The slice of the application vertex that this machine vertex</span>
+<span class="sd">            implements.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">DelayExtensionMachineVertex</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="n">constraints</span><span class="p">)</span>
+            <span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="n">constraints</span><span class="p">,</span> <span class="n">app_vertex</span><span class="o">=</span><span class="n">app_vertex</span><span class="p">,</span>
+            <span class="n">vertex_slice</span><span class="o">=</span><span class="n">vertex_slice</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__resources</span> <span class="o">=</span> <span class="n">resources_required</span>
 
     <span class="nd">@property</span>
@@ -130,7 +145,7 @@
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">ProvidesProvenanceDataFromMachineImpl</span><span class="o">.</span>
                <span class="n">get_provenance_data_from_machine</span><span class="p">)</span>
-<div class="viewcode-block" id="DelayExtensionMachineVertex.get_provenance_data_from_machine"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.delay_extension_machine_vertex.DelayExtensionMachineVertex.get_provenance_data_from_machine">[docs]</a>    <span class="k">def</span> <span class="nf">get_provenance_data_from_machine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
+<div class="viewcode-block" id="DelayExtensionMachineVertex.get_provenance_data_from_machine"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.get_provenance_data_from_machine">[docs]</a>    <span class="k">def</span> <span class="nf">get_provenance_data_from_machine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">):</span>
         <span class="c1"># pylint: disable=too-many-locals</span>
         <span class="n">provenance_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_provenance_data</span><span class="p">(</span><span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">)</span>
         <span class="n">provenance_items</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_basic_provenance_items</span><span class="p">(</span>

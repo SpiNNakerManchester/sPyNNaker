@@ -1,42 +1,6 @@
 spynnaker.pyNN.models.neuron.implementations package
 ====================================================
 
-Submodules
-----------
-
-spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl module
-------------------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component module
---------------------------------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard module
-------------------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.models.neuron.implementations.ranged_dict_vertex_slice module
-----------------------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.models.neuron.implementations.ranged_dict_vertex_slice
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-
 Module contents
 ---------------
 

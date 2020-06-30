@@ -78,11 +78,11 @@
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
-<span class="kn">from</span> <span class="nn">.abstract_elimination</span> <span class="kn">import</span> <span class="n">AbstractElimination</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
+<span class="kn">from</span> <span class="nn">.abstract_elimination</span> <span class="kn">import</span> <span class="n">AbstractElimination</span>
 
 
-<div class="viewcode-block" id="RandomByWeightElimination"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.html#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.random_by_weight_elimination.RandomByWeightElimination">[docs]</a><span class="k">class</span> <span class="nc">RandomByWeightElimination</span><span class="p">(</span><span class="n">AbstractElimination</span><span class="p">):</span>
+<div class="viewcode-block" id="RandomByWeightElimination"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.html#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.RandomByWeightElimination">[docs]</a><span class="k">class</span> <span class="nc">RandomByWeightElimination</span><span class="p">(</span><span class="n">AbstractElimination</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Elimination Rule that depends on the weight of a synapse</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -96,16 +96,15 @@
             <span class="bp">self</span><span class="p">,</span> <span class="n">threshold</span><span class="p">,</span> <span class="n">prob_elim_depressed</span><span class="o">=</span><span class="mf">0.0245</span><span class="p">,</span>
             <span class="n">prob_elim_potentiated</span><span class="o">=</span><span class="mf">1.36</span> <span class="o">*</span> <span class="mi">10</span> <span class="o">**</span> <span class="o">-</span><span class="mi">4</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-
-<span class="sd">        :param threshold:\</span>
-<span class="sd">            Below this weight is considered depression, above or equal to this\</span>
-<span class="sd">            weight is considered potentiation (or the static weight of the\</span>
+<span class="sd">        :param float threshold:</span>
+<span class="sd">            Below this weight is considered depression, above or equal to this</span>
+<span class="sd">            weight is considered potentiation (or the static weight of the</span>
 <span class="sd">            connection on static weight connections)</span>
-<span class="sd">        :param prob_elim_depressed:\</span>
-<span class="sd">            The probability of elimination if the weight has been depressed\</span>
+<span class="sd">        :param float prob_elim_depressed:</span>
+<span class="sd">            The probability of elimination if the weight has been depressed</span>
 <span class="sd">            (ignored on static weight connections)</span>
-<span class="sd">        :param prob_elim_potentiated:\</span>
-<span class="sd">            The probability of elimination of the weight has been potentiated\</span>
+<span class="sd">        :param float prob_elim_potentiated:</span>
+<span class="sd">            The probability of elimination of the weight has been potentiated</span>
 <span class="sd">            or has not changed (and also used on static weight connections)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__prob_elim_depressed</span> <span class="o">=</span> <span class="n">prob_elim_depressed</span>
@@ -118,17 +117,17 @@
         <span class="k">return</span> <span class="s2">&quot;_weight&quot;</span>
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractElimination</span><span class="o">.</span><span class="n">get_parameters_sdram_usage_in_bytes</span><span class="p">)</span>
-<div class="viewcode-block" id="RandomByWeightElimination.get_parameters_sdram_usage_in_bytes"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.html#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.random_by_weight_elimination.RandomByWeightElimination.get_parameters_sdram_usage_in_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">get_parameters_sdram_usage_in_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="RandomByWeightElimination.get_parameters_sdram_usage_in_bytes"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.html#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.RandomByWeightElimination.get_parameters_sdram_usage_in_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">get_parameters_sdram_usage_in_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="mi">3</span> <span class="o">*</span> <span class="mi">4</span></div>
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractElimination</span><span class="o">.</span><span class="n">write_parameters</span><span class="p">)</span>
-<div class="viewcode-block" id="RandomByWeightElimination.write_parameters"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.html#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.random_by_weight_elimination.RandomByWeightElimination.write_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">write_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">weight_scale</span><span class="p">):</span>
+<div class="viewcode-block" id="RandomByWeightElimination.write_parameters"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.html#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.RandomByWeightElimination.write_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">write_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">weight_scale</span><span class="p">):</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__prob_elim_depressed</span> <span class="o">*</span> <span class="mh">0xFFFFFFFF</span><span class="p">))</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__prob_elim_potentiated</span> <span class="o">*</span> <span class="mh">0xFFFFFFFF</span><span class="p">))</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__threshold</span> <span class="o">*</span> <span class="n">weight_scale</span><span class="p">)</span></div>
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractElimination</span><span class="o">.</span><span class="n">get_parameter_names</span><span class="p">)</span>
-<div class="viewcode-block" id="RandomByWeightElimination.get_parameter_names"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.html#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.random_by_weight_elimination.RandomByWeightElimination.get_parameter_names">[docs]</a>    <span class="k">def</span> <span class="nf">get_parameter_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="RandomByWeightElimination.get_parameter_names"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.html#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.RandomByWeightElimination.get_parameter_names">[docs]</a>    <span class="k">def</span> <span class="nf">get_parameter_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">[</span><span class="s2">&quot;prob_elim_depressed&quot;</span><span class="p">,</span> <span class="s2">&quot;prob_elim_potentiated&quot;</span><span class="p">,</span> <span class="s2">&quot;threshold&quot;</span><span class="p">]</span></div></div>
 </pre></div>
 

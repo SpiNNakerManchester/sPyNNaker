@@ -94,19 +94,19 @@
 <span class="c1"># robot with 7 7 1</span>
 
 
-<div class="viewcode-block" id="get_x_from_robot_retina"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.munich_spinnaker_link_retina_device.get_x_from_robot_retina">[docs]</a><span class="k">def</span> <span class="nf">get_x_from_robot_retina</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">key</span> <span class="o">&gt;&gt;</span> <span class="mi">7</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0x7f</span></div>
+<span class="k">def</span> <span class="nf">get_x_from_robot_retina</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">key</span> <span class="o">&gt;&gt;</span> <span class="mi">7</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0x7f</span>
 
 
-<div class="viewcode-block" id="get_y_from_robot_retina"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.munich_spinnaker_link_retina_device.get_y_from_robot_retina">[docs]</a><span class="k">def</span> <span class="nf">get_y_from_robot_retina</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">key</span> <span class="o">&amp;</span> <span class="mh">0x7f</span></div>
+<span class="k">def</span> <span class="nf">get_y_from_robot_retina</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">key</span> <span class="o">&amp;</span> <span class="mh">0x7f</span>
 
 
-<div class="viewcode-block" id="get_spike_value_from_robot_retina"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.munich_spinnaker_link_retina_device.get_spike_value_from_robot_retina">[docs]</a><span class="k">def</span> <span class="nf">get_spike_value_from_robot_retina</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">key</span> <span class="o">&gt;&gt;</span> <span class="mi">14</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0x1</span></div>
+<span class="k">def</span> <span class="nf">get_spike_value_from_robot_retina</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">key</span> <span class="o">&gt;&gt;</span> <span class="mi">14</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0x1</span>
 
 
-<div class="viewcode-block" id="MunichRetinaDevice"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.munich_spinnaker_link_retina_device.MunichRetinaDevice">[docs]</a><span class="k">class</span> <span class="nc">MunichRetinaDevice</span><span class="p">(</span>
+<div class="viewcode-block" id="MunichRetinaDevice"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.MunichRetinaDevice">[docs]</a><span class="k">class</span> <span class="nc">MunichRetinaDevice</span><span class="p">(</span>
         <span class="n">ApplicationSpiNNakerLinkVertex</span><span class="p">,</span> <span class="n">AbstractSendMeMulticastCommandsVertex</span><span class="p">,</span>
         <span class="n">AbstractProvidesOutgoingPartitionConstraints</span><span class="p">,</span>
         <span class="n">ProvidesKeyToAtomMappingImpl</span><span class="p">):</span>
@@ -186,7 +186,7 @@
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractProvidesOutgoingPartitionConstraints</span><span class="o">.</span>
                <span class="n">get_outgoing_partition_constraints</span><span class="p">)</span>
-<div class="viewcode-block" id="MunichRetinaDevice.get_outgoing_partition_constraints"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.munich_spinnaker_link_retina_device.MunichRetinaDevice.get_outgoing_partition_constraints">[docs]</a>    <span class="k">def</span> <span class="nf">get_outgoing_partition_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">partition</span><span class="p">):</span>
+<div class="viewcode-block" id="MunichRetinaDevice.get_outgoing_partition_constraints"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.MunichRetinaDevice.get_outgoing_partition_constraints">[docs]</a>    <span class="k">def</span> <span class="nf">get_outgoing_partition_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">partition</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">FixedKeyAndMaskConstraint</span><span class="p">([</span>
             <span class="n">BaseKeyAndMask</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__fixed_key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__fixed_mask</span><span class="p">)])]</span></div>
 

@@ -47,9 +47,10 @@
           <a href="spynnaker.pyNN.models.neuron.threshold_types.html" title="spynnaker.pyNN.models.neuron.threshold_types package"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
-          <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.models.html" accesskey="U">spynnaker.pyNN.models package</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="modules.html" >spynnaker</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="spynnaker.pyNN.models.html" accesskey="U">spynnaker.pyNN.models package</a> &#187;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -58,12 +59,8 @@
   <ul>
 <li><a class="reference internal" href="#">spynnaker.pyNN.models.spike_source package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.models.spike_source.spike_source_array">spynnaker.pyNN.models.spike_source.spike_source_array module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.models.spike_source.spike_source_array_vertex">spynnaker.pyNN.models.spike_source.spike_source_array_vertex module</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.models.spike_source.spike_source_from_file">spynnaker.pyNN.models.spike_source.spike_source_from_file module</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.models.spike_source.spike_source_poisson">spynnaker.pyNN.models.spike_source.spike_source_poisson module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex">spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex module</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.models.spike_source.spike_source_poisson_variable">spynnaker.pyNN.models.spike_source.spike_source_poisson_variable module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex">spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.models.spike_source">Module contents</a></li>
 </ul>
@@ -106,51 +103,12 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-spynnaker.pyNN.models.spike_source.spike_source_array">
-<span id="spynnaker-pynn-models-spike-source-spike-source-array-module"></span><h2>spynnaker.pyNN.models.spike_source.spike_source_array module<a class="headerlink" href="#module-spynnaker.pyNN.models.spike_source.spike_source_array" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="spynnaker.pyNN.models.spike_source.spike_source_array.SpikeSourceArray">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.spike_source.spike_source_array.</code><code class="descname">SpikeSourceArray</code><span class="sig-paren">(</span><em>spike_times=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_array.html#SpikeSourceArray"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_array.SpikeSourceArray" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel" title="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel</span></code></a></p>
-<dl class="method">
-<dt id="spynnaker.pyNN.models.spike_source.spike_source_array.SpikeSourceArray.create_vertex">
-<code class="descname">create_vertex</code><span class="sig-paren">(</span><em>n_neurons</em>, <em>label</em>, <em>constraints</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_array.html#SpikeSourceArray.create_vertex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_array.SpikeSourceArray.create_vertex" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a vertex for a population of the model</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons in the population</li>
-<li><strong>label</strong> (<em>str</em>) &#8211; The label to give to the vertex</li>
-<li><strong>constraints</strong> (<em>list</em><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v)"><em>AbstractConstraint</em></a><em>) or </em><em>None</em>) &#8211; A list of constraints to give to the vertex, or None</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">An application vertex for the population</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v)">ApplicationVertex</a></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.spike_source.spike_source_array.SpikeSourceArray.default_population_parameters">
-<code class="descname">default_population_parameters</code><em class="property"> = {}</em><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_array.SpikeSourceArray.default_population_parameters" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-</div>
 <div class="section" id="module-spynnaker.pyNN.models.spike_source.spike_source_array_vertex">
 <span id="spynnaker-pynn-models-spike-source-spike-source-array-vertex-module"></span><h2>spynnaker.pyNN.models.spike_source.spike_source_array_vertex module<a class="headerlink" href="#module-spynnaker.pyNN.models.spike_source.spike_source_array_vertex" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="spynnaker.pyNN.models.spike_source.spike_source_array_vertex.SpikeSourceArrayVertex">
 <em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.spike_source.spike_source_array_vertex.</code><code class="descname">SpikeSourceArrayVertex</code><span class="sig-paren">(</span><em>n_neurons</em>, <em>spike_times</em>, <em>constraints</em>, <em>label</em>, <em>max_atoms_per_core</em>, <em>model</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_array_vertex.html#SpikeSourceArrayVertex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_array_vertex.SpikeSourceArrayVertex" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.utility_models.reverse_ip_tag_multi_cast_source.ReverseIpTagMultiCastSource</span></code>, <a class="reference internal" href="spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.abstract_spike_recordable.AbstractSpikeRecordable" title="spynnaker.pyNN.models.common.abstract_spike_recordable.AbstractSpikeRecordable"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.common.abstract_spike_recordable.AbstractSpikeRecordable</span></code></a>, <a class="reference internal" href="spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.simple_population_settable.SimplePopulationSettable" title="spynnaker.pyNN.models.common.simple_population_settable.SimplePopulationSettable"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.common.simple_population_settable.SimplePopulationSettable</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_changable_after_run.AbstractChangableAfterRun</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.impl.provides_key_to_atom_mapping_impl.ProvidesKeyToAtomMappingImpl</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.utility_models.reverse_ip_tag_multi_cast_source.ReverseIpTagMultiCastSource</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.common.abstract_spike_recordable.AbstractSpikeRecordable</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.common.simple_population_settable.SimplePopulationSettable</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_changable_after_run.AbstractChangableAfterRun</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.impl.provides_key_to_atom_mapping_impl.ProvidesKeyToAtomMappingImpl</span></code></p>
 <p>Model for play back of spikes</p>
 <dl class="attribute">
 <dt id="spynnaker.pyNN.models.spike_source.spike_source_array_vertex.SpikeSourceArrayVertex.SPIKE_RECORDING_REGION_ID">
@@ -159,20 +117,19 @@
 
 <dl class="method">
 <dt id="spynnaker.pyNN.models.spike_source.spike_source_array_vertex.SpikeSourceArrayVertex.clear_spike_recording">
-<code class="descname">clear_spike_recording</code><span class="sig-paren">(</span><em>buffer_manager</em>, <em>placements</em>, <em>graph_mapper</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_array_vertex.html#SpikeSourceArrayVertex.clear_spike_recording"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_array_vertex.SpikeSourceArrayVertex.clear_spike_recording" title="Permalink to this definition">¶</a></dt>
+<code class="descname">clear_spike_recording</code><span class="sig-paren">(</span><em>buffer_manager</em>, <em>placements</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_array_vertex.html#SpikeSourceArrayVertex.clear_spike_recording"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_array_vertex.SpikeSourceArrayVertex.clear_spike_recording" title="Permalink to this definition">¶</a></dt>
 <dd><p>Clear the recorded data from the object</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>buffer_manager</strong> &#8211; the buffer manager object</li>
-<li><strong>placements</strong> &#8211; the placements object</li>
-<li><strong>graph_mapper</strong> &#8211; the graph mapper object</li>
+<li><strong>buffer_manager</strong> (<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.interface.buffer_management.html#spinn_front_end_common.interface.buffer_management.BufferManager" title="(in SpiNNFrontEndCommon v)"><em>BufferManager</em></a>) &#8211; the buffer manager object</li>
+<li><strong>placements</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placements" title="(in PACMAN v)"><em>Placements</em></a>) &#8211; the placements object</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">None</p>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></p>
 </td>
 </tr>
 </tbody>
@@ -183,27 +140,29 @@
 <dt id="spynnaker.pyNN.models.spike_source.spike_source_array_vertex.SpikeSourceArrayVertex.describe">
 <code class="descname">describe</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_array_vertex.html#SpikeSourceArrayVertex.describe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_array_vertex.SpikeSourceArrayVertex.describe" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns a human-readable description of the cell or synapse type.</p>
-<p>The output may be customised by specifying a different template        together with an associated template engine        (see <code class="docutils literal"><span class="pre">pyNN.descriptions</span></code>).</p>
+<p>The output may be customised by specifying a different template        together with an associated template engine        (see <code class="xref py py-mod docutils literal"><span class="pre">pyNN.descriptions</span></code>).</p>
 <p>If template is None, then a dictionary containing the template        context will be returned.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="spynnaker.pyNN.models.spike_source.spike_source_array_vertex.SpikeSourceArrayVertex.get_spikes">
-<code class="descname">get_spikes</code><span class="sig-paren">(</span><em>placements</em>, <em>graph_mapper</em>, <em>buffer_manager</em>, <em>machine_time_step</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_array_vertex.html#SpikeSourceArrayVertex.get_spikes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_array_vertex.SpikeSourceArrayVertex.get_spikes" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_spikes</code><span class="sig-paren">(</span><em>placements</em>, <em>buffer_manager</em>, <em>machine_time_step</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_array_vertex.html#SpikeSourceArrayVertex.get_spikes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_array_vertex.SpikeSourceArrayVertex.get_spikes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the recorded spikes from the object</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>placements</strong> &#8211; the placements object</li>
-<li><strong>graph_mapper</strong> &#8211; the graph mapper object</li>
-<li><strong>buffer_manager</strong> &#8211; the buffer manager object</li>
-<li><strong>machine_time_step</strong> &#8211; the time step of the simulation</li>
+<li><strong>placements</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placements" title="(in PACMAN v)"><em>Placements</em></a>) &#8211; the placements object</li>
+<li><strong>buffer_manager</strong> (<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.interface.buffer_management.html#spinn_front_end_common.interface.buffer_management.BufferManager" title="(in SpiNNFrontEndCommon v)"><em>BufferManager</em></a>) &#8211; the buffer manager object</li>
+<li><strong>machine_time_step</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; the time step of the simulation, in microseconds</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A numpy array of 2-element arrays of (neuron_id, time)            ordered by time</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A numpy array of 2-element arrays of (neuron_id, time)            ordered by time, one element per event</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">ndarray</a>(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a>,<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a>))</p>
 </td>
 </tr>
 </tbody>
@@ -218,7 +177,9 @@
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Sampling interval in micro seconds</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Sampling interval in microseconds</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a></td>
 </tr>
 </tbody>
 </table>
@@ -234,7 +195,7 @@
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if spikes are being recorded, False otherwise</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></td>
 </tr>
 </tbody>
 </table>
@@ -254,7 +215,7 @@
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></td>
 </tr>
 </tbody>
 </table>
@@ -263,16 +224,17 @@
 <dl class="method">
 <dt id="spynnaker.pyNN.models.spike_source.spike_source_array_vertex.SpikeSourceArrayVertex.set_recording_spikes">
 <code class="descname">set_recording_spikes</code><span class="sig-paren">(</span><em>new_state=True</em>, <em>sampling_interval=None</em>, <em>indexes=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_array_vertex.html#SpikeSourceArrayVertex.set_recording_spikes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_array_vertex.SpikeSourceArrayVertex.set_recording_spikes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set spikes to being recorded.             If new_state is false all other parameters are ignored.</p>
+<dd><p>Set spikes to being recorded.             If <cite>new_state</cite> is false all other parameters are ignored.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>new_state</strong> (<em>bool</em>) &#8211; Set if the spikes are recording or not</li>
-<li><strong>sampling_interval</strong> &#8211; The interval at which spikes are recorded.            Must be a whole multiple of the timestep
-None will be taken as the timestep</li>
-<li><strong>indexes</strong> &#8211; The indexes of the neurons that will record spikes.
+<li><strong>new_state</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) &#8211; Set if the spikes are recording or not</li>
+<li><strong>sampling_interval</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) &#8211; The interval at which spikes are recorded.
+Must be a whole multiple of the timestep.
+None will be taken as the timestep.</li>
+<li><strong>indexes</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) &#8211; The indexes of the neurons that will record spikes.
 If None the assumption is all neurons are recording</li>
 </ul>
 </td>
@@ -290,80 +252,16 @@ If None the assumption is all neurons are recording</li>
 </dd></dl>
 
 </div>
-<div class="section" id="module-spynnaker.pyNN.models.spike_source.spike_source_from_file">
-<span id="spynnaker-pynn-models-spike-source-spike-source-from-file-module"></span><h2>spynnaker.pyNN.models.spike_source.spike_source_from_file module<a class="headerlink" href="#module-spynnaker.pyNN.models.spike_source.spike_source_from_file" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="spynnaker.pyNN.models.spike_source.spike_source_from_file.SpikeSourceFromFile">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.spike_source.spike_source_from_file.</code><code class="descname">SpikeSourceFromFile</code><span class="sig-paren">(</span><em>spike_time_file</em>, <em>min_atom=None</em>, <em>max_atom=None</em>, <em>min_time=None</em>, <em>max_time=None</em>, <em>split_value='t'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_from_file.html#SpikeSourceFromFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_from_file.SpikeSourceFromFile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.spike_source.spike_source_array.SpikeSourceArray" title="spynnaker.pyNN.models.spike_source.spike_source_array.SpikeSourceArray"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.spike_source.spike_source_array.SpikeSourceArray</span></code></a></p>
-<p>SpikeSourceArray that works from a file</p>
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.spike_source.spike_source_from_file.SpikeSourceFromFile.spike_times">
-<code class="descname">spike_times</code><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_from_file.SpikeSourceFromFile.spike_times" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="section" id="module-spynnaker.pyNN.models.spike_source.spike_source_poisson">
-<span id="spynnaker-pynn-models-spike-source-spike-source-poisson-module"></span><h2>spynnaker.pyNN.models.spike_source.spike_source_poisson module<a class="headerlink" href="#module-spynnaker.pyNN.models.spike_source.spike_source_poisson" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="spynnaker.pyNN.models.spike_source.spike_source_poisson.SpikeSourcePoisson">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.spike_source.spike_source_poisson.</code><code class="descname">SpikeSourcePoisson</code><span class="sig-paren">(</span><em>rate=1.0</em>, <em>start=0</em>, <em>duration=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_poisson.html#SpikeSourcePoisson"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_poisson.SpikeSourcePoisson" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel" title="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel</span></code></a></p>
-<dl class="method">
-<dt id="spynnaker.pyNN.models.spike_source.spike_source_poisson.SpikeSourcePoisson.create_vertex">
-<code class="descname">create_vertex</code><span class="sig-paren">(</span><em>n_neurons</em>, <em>label</em>, <em>constraints</em>, <em>seed</em>, <em>max_rate</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_poisson.html#SpikeSourcePoisson.create_vertex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_poisson.SpikeSourcePoisson.create_vertex" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a vertex for a population of the model</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons in the population</li>
-<li><strong>label</strong> (<em>str</em>) &#8211; The label to give to the vertex</li>
-<li><strong>constraints</strong> (<em>list</em><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v)"><em>AbstractConstraint</em></a><em>) or </em><em>None</em>) &#8211; A list of constraints to give to the vertex, or None</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">An application vertex for the population</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v)">ApplicationVertex</a></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.spike_source.spike_source_poisson.SpikeSourcePoisson.default_population_parameters">
-<code class="descname">default_population_parameters</code><em class="property"> = {'seed': None, 'max_rate': None}</em><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_poisson.SpikeSourcePoisson.default_population_parameters" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="classmethod">
-<dt id="spynnaker.pyNN.models.spike_source.spike_source_poisson.SpikeSourcePoisson.get_max_atoms_per_core">
-<em class="property">classmethod </em><code class="descname">get_max_atoms_per_core</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_poisson.html#SpikeSourcePoisson.get_max_atoms_per_core"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_poisson.SpikeSourcePoisson.get_max_atoms_per_core" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="classmethod">
-<dt id="spynnaker.pyNN.models.spike_source.spike_source_poisson.SpikeSourcePoisson.set_model_max_atoms_per_core">
-<em class="property">classmethod </em><code class="descname">set_model_max_atoms_per_core</code><span class="sig-paren">(</span><em>n_atoms=500</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_poisson.html#SpikeSourcePoisson.set_model_max_atoms_per_core"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_poisson.SpikeSourcePoisson.set_model_max_atoms_per_core" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-</div>
 <div class="section" id="module-spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex">
 <span id="spynnaker-pynn-models-spike-source-spike-source-poisson-machine-vertex-module"></span><h2>spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex module<a class="headerlink" href="#module-spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex.SpikeSourcePoissonMachineVertex">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex.</code><code class="descname">SpikeSourcePoissonMachineVertex</code><span class="sig-paren">(</span><em>resources_required</em>, <em>is_recording</em>, <em>constraints=None</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_poisson_machine_vertex.html#SpikeSourcePoissonMachineVertex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex.SpikeSourcePoissonMachineVertex" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex.</code><code class="descname">SpikeSourcePoissonMachineVertex</code><span class="sig-paren">(</span><em>resources_required</em>, <em>is_recording</em>, <em>constraints=None</em>, <em>label=None</em>, <em>app_vertex=None</em>, <em>vertex_slice=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_poisson_machine_vertex.html#SpikeSourcePoissonMachineVertex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex.SpikeSourcePoissonMachineVertex" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">pacman.model.graphs.machine.machine_vertex.MachineVertex</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.interface.buffer_management.buffer_models.abstract_receive_buffers_to_host.AbstractReceiveBuffersToHost</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.interface.provenance.provides_provenance_data_from_machine_impl.ProvidesProvenanceDataFromMachineImpl</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_recordable.AbstractRecordable</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_supports_database_injection.AbstractSupportsDatabaseInjection</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.interface.profiling.abstract_has_profile_data.AbstractHasProfileData</span></code></p>
 <dl class="class">
 <dt id="spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex.SpikeSourcePoissonMachineVertex.POISSON_SPIKE_SOURCE_REGIONS">
 <em class="property">class </em><code class="descname">POISSON_SPIKE_SOURCE_REGIONS</code><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_poisson_machine_vertex.html#SpikeSourcePoissonMachineVertex.POISSON_SPIKE_SOURCE_REGIONS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex.SpikeSourcePoissonMachineVertex.POISSON_SPIKE_SOURCE_REGIONS" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">enum.Enum</span></code></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/enum.html#enum.Enum" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">enum.Enum</span></code></a></p>
 <p>An enumeration.</p>
 <dl class="attribute">
 <dt id="spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex.SpikeSourcePoissonMachineVertex.POISSON_SPIKE_SOURCE_REGIONS.POISSON_PARAMS_REGION">
@@ -433,7 +331,7 @@ If None the assumption is all neurons are recording</li>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The region numbers that have active recording</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">iterable(int)</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">iterable(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a>)</td>
 </tr>
 </tbody>
 </table>
@@ -456,7 +354,7 @@ If None the assumption is all neurons are recording</li>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the base address of the recording region</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">int</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></p>
 </td>
 </tr>
 </tbody>
@@ -471,7 +369,7 @@ If None the assumption is all neurons are recording</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></td>
 </tr>
 </tbody>
 </table>
@@ -485,7 +383,7 @@ If None the assumption is all neurons are recording</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></td>
 </tr>
 </tbody>
 </table>
@@ -508,42 +406,32 @@ If None the assumption is all neurons are recording</li>
 </dd></dl>
 
 </div>
-<div class="section" id="module-spynnaker.pyNN.models.spike_source.spike_source_poisson_variable">
-<span id="spynnaker-pynn-models-spike-source-spike-source-poisson-variable-module"></span><h2>spynnaker.pyNN.models.spike_source.spike_source_poisson_variable module<a class="headerlink" href="#module-spynnaker.pyNN.models.spike_source.spike_source_poisson_variable" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="spynnaker.pyNN.models.spike_source.spike_source_poisson_variable.SpikeSourcePoissonVariable">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.spike_source.spike_source_poisson_variable.</code><code class="descname">SpikeSourcePoissonVariable</code><span class="sig-paren">(</span><em>rates</em>, <em>starts</em>, <em>durations=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_poisson_variable.html#SpikeSourcePoissonVariable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_poisson_variable.SpikeSourcePoissonVariable" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel" title="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel</span></code></a></p>
-<dl class="method">
-<dt id="spynnaker.pyNN.models.spike_source.spike_source_poisson_variable.SpikeSourcePoissonVariable.create_vertex">
-<code class="descname">create_vertex</code><span class="sig-paren">(</span><em>n_neurons</em>, <em>label</em>, <em>constraints</em>, <em>seed</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_poisson_variable.html#SpikeSourcePoissonVariable.create_vertex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_poisson_variable.SpikeSourcePoissonVariable.create_vertex" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.spike_source.spike_source_poisson_variable.SpikeSourcePoissonVariable.default_population_parameters">
-<code class="descname">default_population_parameters</code><em class="property"> = {'seed': None}</em><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_poisson_variable.SpikeSourcePoissonVariable.default_population_parameters" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="classmethod">
-<dt id="spynnaker.pyNN.models.spike_source.spike_source_poisson_variable.SpikeSourcePoissonVariable.get_max_atoms_per_core">
-<em class="property">classmethod </em><code class="descname">get_max_atoms_per_core</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_poisson_variable.html#SpikeSourcePoissonVariable.get_max_atoms_per_core"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_poisson_variable.SpikeSourcePoissonVariable.get_max_atoms_per_core" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="classmethod">
-<dt id="spynnaker.pyNN.models.spike_source.spike_source_poisson_variable.SpikeSourcePoissonVariable.set_model_max_atoms_per_core">
-<em class="property">classmethod </em><code class="descname">set_model_max_atoms_per_core</code><span class="sig-paren">(</span><em>n_atoms=500</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_poisson_variable.html#SpikeSourcePoissonVariable.set_model_max_atoms_per_core"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_poisson_variable.SpikeSourcePoissonVariable.set_model_max_atoms_per_core" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-</div>
 <div class="section" id="module-spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex">
 <span id="spynnaker-pynn-models-spike-source-spike-source-poisson-vertex-module"></span><h2>spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex module<a class="headerlink" href="#module-spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex">
 <em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.</code><code class="descname">SpikeSourcePoissonVertex</code><span class="sig-paren">(</span><em>n_neurons</em>, <em>constraints</em>, <em>label</em>, <em>seed</em>, <em>max_atoms_per_core</em>, <em>model</em>, <em>rate=None</em>, <em>start=None</em>, <em>duration=None</em>, <em>rates=None</em>, <em>starts=None</em>, <em>durations=None</em>, <em>max_rate=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_poisson_vertex.html#SpikeSourcePoissonVertex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">pacman.model.graphs.application.application_vertex.ApplicationVertex</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_generates_data_specification.AbstractGeneratesDataSpecification</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_has_associated_binary.AbstractHasAssociatedBinary</span></code>, <a class="reference internal" href="spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.abstract_spike_recordable.AbstractSpikeRecordable" title="spynnaker.pyNN.models.common.abstract_spike_recordable.AbstractSpikeRecordable"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.common.abstract_spike_recordable.AbstractSpikeRecordable</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_provides_outgoing_partition_constraints.AbstractProvidesOutgoingPartitionConstraints</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_changable_after_run.AbstractChangableAfterRun</span></code>, <a class="reference internal" href="spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.abstract_read_parameters_before_set.AbstractReadParametersBeforeSet" title="spynnaker.pyNN.models.abstract_models.abstract_read_parameters_before_set.AbstractReadParametersBeforeSet"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.abstract_models.abstract_read_parameters_before_set.AbstractReadParametersBeforeSet</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_rewrites_data_specification.AbstractRewritesDataSpecification</span></code>, <a class="reference internal" href="spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.simple_population_settable.SimplePopulationSettable" title="spynnaker.pyNN.models.common.simple_population_settable.SimplePopulationSettable"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.common.simple_population_settable.SimplePopulationSettable</span></code></a>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.impl.provides_key_to_atom_mapping_impl.ProvidesKeyToAtomMappingImpl</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">pacman.model.graphs.application.application_vertex.ApplicationVertex</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_generates_data_specification.AbstractGeneratesDataSpecification</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_has_associated_binary.AbstractHasAssociatedBinary</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.common.abstract_spike_recordable.AbstractSpikeRecordable</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_provides_outgoing_partition_constraints.AbstractProvidesOutgoingPartitionConstraints</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_changable_after_run.AbstractChangableAfterRun</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.abstract_models.abstract_read_parameters_before_set.AbstractReadParametersBeforeSet</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_rewrites_data_specification.AbstractRewritesDataSpecification</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.common.simple_population_settable.SimplePopulationSettable</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.impl.provides_key_to_atom_mapping_impl.ProvidesKeyToAtomMappingImpl</span></code></p>
 <p>A Poisson Spike source object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; </li>
+<li><strong>constraints</strong> &#8211; </li>
+<li><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; </li>
+<li><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; </li>
+<li><strong>max_atoms_per_core</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; </li>
+<li><strong>model</strong> &#8211; </li>
+<li><strong>of float rate</strong> (<em>iterable</em>) &#8211; </li>
+<li><strong>of int start</strong> (<em>iterable</em>) &#8211; </li>
+<li><strong>of int duration</strong> (<em>iterable</em>) &#8211; </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 <dl class="attribute">
 <dt id="spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex.SPIKE_RECORDING_REGION_ID">
 <code class="descname">SPIKE_RECORDING_REGION_ID</code><em class="property"> = 0</em><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex.SPIKE_RECORDING_REGION_ID" title="Permalink to this definition">¶</a></dt>
@@ -551,20 +439,19 @@ If None the assumption is all neurons are recording</li>
 
 <dl class="method">
 <dt id="spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex.clear_spike_recording">
-<code class="descname">clear_spike_recording</code><span class="sig-paren">(</span><em>buffer_manager</em>, <em>placements</em>, <em>graph_mapper</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_poisson_vertex.html#SpikeSourcePoissonVertex.clear_spike_recording"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex.clear_spike_recording" title="Permalink to this definition">¶</a></dt>
+<code class="descname">clear_spike_recording</code><span class="sig-paren">(</span><em>buffer_manager</em>, <em>placements</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_poisson_vertex.html#SpikeSourcePoissonVertex.clear_spike_recording"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex.clear_spike_recording" title="Permalink to this definition">¶</a></dt>
 <dd><p>Clear the recorded data from the object</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>buffer_manager</strong> &#8211; the buffer manager object</li>
-<li><strong>placements</strong> &#8211; the placements object</li>
-<li><strong>graph_mapper</strong> &#8211; the graph mapper object</li>
+<li><strong>buffer_manager</strong> (<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.interface.buffer_management.html#spinn_front_end_common.interface.buffer_management.BufferManager" title="(in SpiNNFrontEndCommon v)"><em>BufferManager</em></a>) &#8211; the buffer manager object</li>
+<li><strong>placements</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placements" title="(in PACMAN v)"><em>Placements</em></a>) &#8211; the placements object</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">None</p>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></p>
 </td>
 </tr>
 </tbody>
@@ -574,14 +461,38 @@ If None the assumption is all neurons are recording</li>
 <dl class="method">
 <dt id="spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex.create_machine_vertex">
 <code class="descname">create_machine_vertex</code><span class="sig-paren">(</span><em>vertex_slice</em>, <em>resources_required</em>, <em>label=None</em>, <em>constraints=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_poisson_vertex.html#SpikeSourcePoissonVertex.create_machine_vertex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex.create_machine_vertex" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Create a machine vertex from this application vertex</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) &#8211; The slice of atoms that the machine vertex will cover,
+or None to use the default slice</li>
+<li><strong>resources_required</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.resources/#pacman.model.resources.ResourceContainer" title="(in PACMAN v)"><em>ResourceContainer</em></a>) &#8211; The resources used by the machine vertex.</li>
+<li><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) &#8211; human readable label for the machine vertex</li>
+<li><strong>constraints</strong> (<em>iterable</em><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v)"><em>AbstractConstraint</em></a><em>)</em><em></em>) &#8211; Constraints to be passed on to the machine vertex.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex.describe">
 <code class="descname">describe</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_poisson_vertex.html#SpikeSourcePoissonVertex.describe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex.describe" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a human-readable description of the cell or synapse type.</p>
-<p>The output may be customised by specifying a different template        together with an associated template engine        (see <code class="docutils literal"><span class="pre">pyNN.descriptions</span></code>).</p>
+<p>The output may be customised by specifying a different template        together with an associated template engine        (see <code class="xref py py-mod docutils literal"><span class="pre">pyNN.descriptions</span></code>).</p>
 <p>If template is None, then a dictionary containing the template context        will be returned.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a>(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a>, ..)</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
@@ -596,7 +507,7 @@ If None the assumption is all neurons are recording</li>
 
 <dl class="method">
 <dt id="spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex.generate_data_specification">
-<code class="descname">generate_data_specification</code><span class="sig-paren">(</span><em>spec</em>, <em>placement</em>, <em>machine_time_step</em>, <em>time_scale_factor</em>, <em>graph_mapper</em>, <em>routing_info</em>, <em>data_n_time_steps</em>, <em>graph</em>, <em>first_machine_time_step</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_poisson_vertex.html#SpikeSourcePoissonVertex.generate_data_specification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex.generate_data_specification" title="Permalink to this definition">¶</a></dt>
+<code class="descname">generate_data_specification</code><span class="sig-paren">(</span><em>spec</em>, <em>placement</em>, <em>machine_time_step</em>, <em>time_scale_factor</em>, <em>routing_info</em>, <em>data_n_time_steps</em>, <em>graph</em>, <em>first_machine_time_step</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_poisson_vertex.html#SpikeSourcePoissonVertex.generate_data_specification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex.generate_data_specification" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generate a data specification.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -605,10 +516,16 @@ If None the assumption is all neurons are recording</li>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification v)"><em>DataSpecificationGenerator</em></a>) &#8211; The data specification to write to</li>
 <li><strong>placement</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placement" title="(in PACMAN v)"><em>Placement</em></a>) &#8211; The placement the vertex is located at</li>
+<li><strong>machine_time_step</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; </li>
+<li><strong>time_scale_factor</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; </li>
+<li><strong>routing_info</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.routing_info/#pacman.model.routing_info.RoutingInfo" title="(in PACMAN v)"><em>RoutingInfo</em></a>) &#8211; </li>
+<li><strong>data_n_time_steps</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; </li>
+<li><strong>graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineGraph" title="(in PACMAN v)"><em>MachineGraph</em></a>) &#8211; </li>
+<li><strong>first_machine_time_step</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; </li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">None</p>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></p>
 </td>
 </tr>
 </tbody>
@@ -623,7 +540,7 @@ If None the assumption is all neurons are recording</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a></td>
 </tr>
 </tbody>
 </table>
@@ -665,7 +582,7 @@ If None the assumption is all neurons are recording</li>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A list of constraints</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list(<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v)">AbstractConstraint</a>)</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v)">AbstractConstraint</a>)</td>
 </tr>
 </tbody>
 </table>
@@ -679,7 +596,9 @@ If None the assumption is all neurons are recording</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>vertex_slice</strong> &#8211; </td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
 </tr>
 </tbody>
 </table>
@@ -688,7 +607,19 @@ If None the assumption is all neurons are recording</li>
 <dl class="method">
 <dt id="spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex.get_recording_sdram_usage">
 <code class="descname">get_recording_sdram_usage</code><span class="sig-paren">(</span><em>vertex_slice</em>, <em>machine_time_step</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_poisson_vertex.html#SpikeSourcePoissonVertex.get_recording_sdram_usage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex.get_recording_sdram_usage" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; </li>
+<li><strong>machine_time_step</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex.get_resources_used_by_atoms">
@@ -698,12 +629,19 @@ If None the assumption is all neurons are recording</li>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; the low value of atoms to calculate resources from</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; the low value of atoms to calculate resources from</li>
+<li><strong>vertex_slice</strong> &#8211; </li>
+<li><strong>machine_time_step</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; </li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a Resource container that contains a
-CPUCyclesPerTickResource, DTCMResource and SDRAMResource</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">a Resource container that contains a
+CPUCyclesPerTickResource, DTCMResource and SDRAMResource</p>
+</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.resources/#pacman.model.resources.ResourceContainer" title="(in PACMAN v)">ResourceContainer</a></td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.resources/#pacman.model.resources.ResourceContainer" title="(in PACMAN v)">ResourceContainer</a></p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -711,21 +649,23 @@ CPUCyclesPerTickResource, DTCMResource and SDRAMResource</td>
 
 <dl class="method">
 <dt id="spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex.get_spikes">
-<code class="descname">get_spikes</code><span class="sig-paren">(</span><em>placements</em>, <em>graph_mapper</em>, <em>buffer_manager</em>, <em>machine_time_step</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_poisson_vertex.html#SpikeSourcePoissonVertex.get_spikes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex.get_spikes" title="Permalink to this definition">¶</a></dt>
+<code class="descname">get_spikes</code><span class="sig-paren">(</span><em>placements</em>, <em>buffer_manager</em>, <em>machine_time_step</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_poisson_vertex.html#SpikeSourcePoissonVertex.get_spikes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex.get_spikes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get the recorded spikes from the object</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>placements</strong> &#8211; the placements object</li>
-<li><strong>graph_mapper</strong> &#8211; the graph mapper object</li>
-<li><strong>buffer_manager</strong> &#8211; the buffer manager object</li>
-<li><strong>machine_time_step</strong> &#8211; the time step of the simulation</li>
+<li><strong>placements</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placements" title="(in PACMAN v)"><em>Placements</em></a>) &#8211; the placements object</li>
+<li><strong>buffer_manager</strong> (<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.interface.buffer_management.html#spinn_front_end_common.interface.buffer_management.BufferManager" title="(in SpiNNFrontEndCommon v)"><em>BufferManager</em></a>) &#8211; the buffer manager object</li>
+<li><strong>machine_time_step</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; the time step of the simulation, in microseconds</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A numpy array of 2-element arrays of (neuron_id, time)            ordered by time</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A numpy array of 2-element arrays of (neuron_id, time)            ordered by time, one element per event</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">ndarray</a>(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a>,<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a>))</p>
 </td>
 </tr>
 </tbody>
@@ -740,7 +680,9 @@ CPUCyclesPerTickResource, DTCMResource and SDRAMResource</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Sampling interval in micro seconds</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Sampling interval in microseconds</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a></td>
 </tr>
 </tbody>
 </table>
@@ -756,7 +698,7 @@ CPUCyclesPerTickResource, DTCMResource and SDRAMResource</td>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if spikes are being recorded, False otherwise</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></td>
 </tr>
 </tbody>
 </table>
@@ -809,7 +751,7 @@ CPUCyclesPerTickResource, DTCMResource and SDRAMResource</td>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">None</p>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></p>
 </td>
 </tr>
 </tbody>
@@ -818,7 +760,7 @@ CPUCyclesPerTickResource, DTCMResource and SDRAMResource</td>
 
 <dl class="method">
 <dt id="spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex.regenerate_data_specification">
-<code class="descname">regenerate_data_specification</code><span class="sig-paren">(</span><em>spec</em>, <em>placement</em>, <em>machine_time_step</em>, <em>time_scale_factor</em>, <em>graph_mapper</em>, <em>routing_info</em>, <em>graph</em>, <em>first_machine_time_step</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_poisson_vertex.html#SpikeSourcePoissonVertex.regenerate_data_specification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex.regenerate_data_specification" title="Permalink to this definition">¶</a></dt>
+<code class="descname">regenerate_data_specification</code><span class="sig-paren">(</span><em>spec</em>, <em>placement</em>, <em>machine_time_step</em>, <em>time_scale_factor</em>, <em>routing_info</em>, <em>graph</em>, <em>first_machine_time_step</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_poisson_vertex.html#SpikeSourcePoissonVertex.regenerate_data_specification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex.regenerate_data_specification" title="Permalink to this definition">¶</a></dt>
 <dd><p>Regenerate the data specification, only generating regions that            have changed and need to be reloaded</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -827,6 +769,11 @@ CPUCyclesPerTickResource, DTCMResource and SDRAMResource</td>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification v)"><em>DataSpecificationGenerator</em></a>) &#8211; Where to write the regenerated spec</li>
 <li><strong>placement</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placement" title="(in PACMAN v)"><em>Placement</em></a>) &#8211; Where are we regenerating for?</li>
+<li><strong>machine_time_step</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; </li>
+<li><strong>time_scale_factor</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; </li>
+<li><strong>routing_info</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.routing_info/#pacman.model.routing_info.RoutingInfo" title="(in PACMAN v)"><em>RoutingInfo</em></a>) &#8211; </li>
+<li><strong>graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.machine/#pacman.model.graphs.machine.MachineGraph" title="(in PACMAN v)"><em>MachineGraph</em></a>) &#8211; </li>
+<li><strong>first_machine_time_step</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; </li>
 </ul>
 </td>
 </tr>
@@ -842,7 +789,7 @@ CPUCyclesPerTickResource, DTCMResource and SDRAMResource</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></td>
 </tr>
 </tbody>
 </table>
@@ -856,7 +803,7 @@ CPUCyclesPerTickResource, DTCMResource and SDRAMResource</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></td>
 </tr>
 </tbody>
 </table>
@@ -864,16 +811,15 @@ CPUCyclesPerTickResource, DTCMResource and SDRAMResource</td>
 
 <dl class="method">
 <dt id="spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex.reserve_memory_regions">
-<code class="descname">reserve_memory_regions</code><span class="sig-paren">(</span><em>spec</em>, <em>placement</em>, <em>graph_mapper</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_poisson_vertex.html#SpikeSourcePoissonVertex.reserve_memory_regions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex.reserve_memory_regions" title="Permalink to this definition">¶</a></dt>
+<code class="descname">reserve_memory_regions</code><span class="sig-paren">(</span><em>spec</em>, <em>placement</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_poisson_vertex.html#SpikeSourcePoissonVertex.reserve_memory_regions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex.reserve_memory_regions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reserve memory regions for Poisson source parameters and output            buffer.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>spec</strong> &#8211; the data specification writer</li>
-<li><strong>placement</strong> &#8211; the location this vertex resides on in the machine</li>
-<li><strong>graph_mapper</strong> &#8211; the mapping between app and machine graphs</li>
+<li><strong>spec</strong> (<em>DataSpecification</em>) &#8211; the data specification writer</li>
+<li><strong>placement</strong> (<em>Placement</em>) &#8211; the location this vertex resides on in the machine</li>
 </ul>
 </td>
 </tr>
@@ -892,16 +838,17 @@ CPUCyclesPerTickResource, DTCMResource and SDRAMResource</td>
 <dl class="method">
 <dt id="spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex.set_recording_spikes">
 <code class="descname">set_recording_spikes</code><span class="sig-paren">(</span><em>new_state=True</em>, <em>sampling_interval=None</em>, <em>indexes=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_poisson_vertex.html#SpikeSourcePoissonVertex.set_recording_spikes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex.set_recording_spikes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set spikes to being recorded.             If new_state is false all other parameters are ignored.</p>
+<dd><p>Set spikes to being recorded.             If <cite>new_state</cite> is false all other parameters are ignored.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>new_state</strong> (<em>bool</em>) &#8211; Set if the spikes are recording or not</li>
-<li><strong>sampling_interval</strong> &#8211; The interval at which spikes are recorded.            Must be a whole multiple of the timestep
-None will be taken as the timestep</li>
-<li><strong>indexes</strong> &#8211; The indexes of the neurons that will record spikes.
+<li><strong>new_state</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) &#8211; Set if the spikes are recording or not</li>
+<li><strong>sampling_interval</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) &#8211; The interval at which spikes are recorded.
+Must be a whole multiple of the timestep.
+None will be taken as the timestep.</li>
+<li><strong>indexes</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) &#8211; The indexes of the neurons that will record spikes.
 If None the assumption is all neurons are recording</li>
 </ul>
 </td>
@@ -919,8 +866,8 @@ If None the assumption is all neurons are recording</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>key</strong> (<em>str</em>) &#8211; the name of the parameter to change</li>
-<li><strong>value</strong> (<em>Any</em><em> or </em><em>float</em><em> or </em><em>int</em><em> or </em><em>list</em><em>(</em><em>float</em><em>) or </em><em>list</em><em>(</em><em>int</em><em>)</em><em></em>) &#8211; the new value of the parameter to assign</li>
+<li><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; the name of the parameter to change</li>
+<li><strong>value</strong> (<em>Any</em><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>)</em><em></em>) &#8211; the new value of the parameter to assign</li>
 </ul>
 </td>
 </tr>
@@ -946,7 +893,7 @@ If None the assumption is all neurons are recording</li>
 <dl class="class">
 <dt id="spynnaker.pyNN.models.spike_source.SpikeSourceArray">
 <em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.spike_source.</code><code class="descname">SpikeSourceArray</code><span class="sig-paren">(</span><em>spike_times=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_array.html#SpikeSourceArray"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.SpikeSourceArray" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel" title="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel</span></code></a></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel</span></code></p>
 <dl class="method">
 <dt id="spynnaker.pyNN.models.spike_source.SpikeSourceArray.create_vertex">
 <code class="descname">create_vertex</code><span class="sig-paren">(</span><em>n_neurons</em>, <em>label</em>, <em>constraints</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_array.html#SpikeSourceArray.create_vertex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.SpikeSourceArray.create_vertex" title="Permalink to this definition">¶</a></dt>
@@ -956,9 +903,9 @@ If None the assumption is all neurons are recording</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons in the population</li>
-<li><strong>label</strong> (<em>str</em>) &#8211; The label to give to the vertex</li>
-<li><strong>constraints</strong> (<em>list</em><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v)"><em>AbstractConstraint</em></a><em>) or </em><em>None</em>) &#8211; A list of constraints to give to the vertex, or None</li>
+<li><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The number of neurons in the population</li>
+<li><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The label to give to the vertex</li>
+<li><strong>constraints</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v)"><em>AbstractConstraint</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) &#8211; A list of constraints to give to the vertex, or None</li>
 </ul>
 </td>
 </tr>
@@ -982,7 +929,7 @@ If None the assumption is all neurons are recording</li>
 <dl class="class">
 <dt id="spynnaker.pyNN.models.spike_source.SpikeSourceFromFile">
 <em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.spike_source.</code><code class="descname">SpikeSourceFromFile</code><span class="sig-paren">(</span><em>spike_time_file</em>, <em>min_atom=None</em>, <em>max_atom=None</em>, <em>min_time=None</em>, <em>max_time=None</em>, <em>split_value='t'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_from_file.html#SpikeSourceFromFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.SpikeSourceFromFile" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.spike_source.spike_source_array.SpikeSourceArray" title="spynnaker.pyNN.models.spike_source.spike_source_array.SpikeSourceArray"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.spike_source.spike_source_array.SpikeSourceArray</span></code></a></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.spike_source.spike_source_array.SpikeSourceArray</span></code></p>
 <p>SpikeSourceArray that works from a file</p>
 <dl class="attribute">
 <dt id="spynnaker.pyNN.models.spike_source.SpikeSourceFromFile.spike_times">
@@ -994,7 +941,7 @@ If None the assumption is all neurons are recording</li>
 <dl class="class">
 <dt id="spynnaker.pyNN.models.spike_source.SpikeSourcePoisson">
 <em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.spike_source.</code><code class="descname">SpikeSourcePoisson</code><span class="sig-paren">(</span><em>rate=1.0</em>, <em>start=0</em>, <em>duration=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_poisson.html#SpikeSourcePoisson"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoisson" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel" title="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel</span></code></a></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel</span></code></p>
 <dl class="method">
 <dt id="spynnaker.pyNN.models.spike_source.SpikeSourcePoisson.create_vertex">
 <code class="descname">create_vertex</code><span class="sig-paren">(</span><em>n_neurons</em>, <em>label</em>, <em>constraints</em>, <em>seed</em>, <em>max_rate</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_poisson.html#SpikeSourcePoisson.create_vertex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoisson.create_vertex" title="Permalink to this definition">¶</a></dt>
@@ -1004,9 +951,9 @@ If None the assumption is all neurons are recording</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons in the population</li>
-<li><strong>label</strong> (<em>str</em>) &#8211; The label to give to the vertex</li>
-<li><strong>constraints</strong> (<em>list</em><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v)"><em>AbstractConstraint</em></a><em>) or </em><em>None</em>) &#8211; A list of constraints to give to the vertex, or None</li>
+<li><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The number of neurons in the population</li>
+<li><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The label to give to the vertex</li>
+<li><strong>constraints</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v)"><em>AbstractConstraint</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) &#8211; A list of constraints to give to the vertex, or None</li>
 </ul>
 </td>
 </tr>
@@ -1040,7 +987,7 @@ If None the assumption is all neurons are recording</li>
 <dl class="class">
 <dt id="spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVariable">
 <em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.spike_source.</code><code class="descname">SpikeSourcePoissonVariable</code><span class="sig-paren">(</span><em>rates</em>, <em>starts</em>, <em>durations=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_poisson_variable.html#SpikeSourcePoissonVariable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVariable" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel" title="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel</span></code></a></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel</span></code></p>
 <dl class="method">
 <dt id="spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVariable.create_vertex">
 <code class="descname">create_vertex</code><span class="sig-paren">(</span><em>n_neurons</em>, <em>label</em>, <em>constraints</em>, <em>seed</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_poisson_variable.html#SpikeSourcePoissonVariable.create_vertex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVariable.create_vertex" title="Permalink to this definition">¶</a></dt>
@@ -1088,9 +1035,10 @@ If None the assumption is all neurons are recording</li>
           <a href="spynnaker.pyNN.models.neuron.threshold_types.html" title="spynnaker.pyNN.models.neuron.threshold_types package"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
-          <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.models.html" >spynnaker.pyNN.models package</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="modules.html" >spynnaker</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="spynnaker.pyNN.models.html" >spynnaker.pyNN.models package</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

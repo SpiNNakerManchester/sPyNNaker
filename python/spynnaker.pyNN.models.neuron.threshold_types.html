@@ -47,10 +47,11 @@
           <a href="spynnaker.pyNN.models.neuron.synapse_types.html" title="spynnaker.pyNN.models.neuron.synapse_types package"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
-          <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.models.html" >spynnaker.pyNN.models package</a> &#187;</li>
-          <li class="nav-item nav-item-4"><a href="spynnaker.pyNN.models.neuron.html" accesskey="U">spynnaker.pyNN.models.neuron package</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="modules.html" >spynnaker</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="spynnaker.pyNN.models.html" >spynnaker.pyNN.models package</a> &#187;</li>
+          <li class="nav-item nav-item-5"><a href="spynnaker.pyNN.models.neuron.html" accesskey="U">spynnaker.pyNN.models.neuron package</a> &#187;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -58,10 +59,6 @@
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">spynnaker.pyNN.models.neuron.threshold_types package</a><ul>
-<li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.models.neuron.threshold_types.abstract_threshold_type">spynnaker.pyNN.models.neuron.threshold_types.abstract_threshold_type module</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.models.neuron.threshold_types.threshold_type_maass_stochastic">spynnaker.pyNN.models.neuron.threshold_types.threshold_type_maass_stochastic module</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.models.neuron.threshold_types.threshold_type_static">spynnaker.pyNN.models.neuron.threshold_types.threshold_type_static module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.models.neuron.threshold_types">Module contents</a></li>
 </ul>
 </li>
@@ -100,346 +97,18 @@
             
   <div class="section" id="spynnaker-pynn-models-neuron-threshold-types-package">
 <h1>spynnaker.pyNN.models.neuron.threshold_types package<a class="headerlink" href="#spynnaker-pynn-models-neuron-threshold-types-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-spynnaker.pyNN.models.neuron.threshold_types.abstract_threshold_type">
-<span id="spynnaker-pynn-models-neuron-threshold-types-abstract-threshold-type-module"></span><h2>spynnaker.pyNN.models.neuron.threshold_types.abstract_threshold_type module<a class="headerlink" href="#module-spynnaker.pyNN.models.neuron.threshold_types.abstract_threshold_type" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="spynnaker.pyNN.models.neuron.threshold_types.abstract_threshold_type.AbstractThresholdType">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.threshold_types.abstract_threshold_type.</code><code class="descname">AbstractThresholdType</code><span class="sig-paren">(</span><em>data_types</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/threshold_types/abstract_threshold_type.html#AbstractThresholdType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.threshold_types.abstract_threshold_type.AbstractThresholdType" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent" title="spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent</span></code></a></p>
-<p>Represents types of threshold for a neuron (e.g., stochastic).</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data_types</strong> (<em>list</em><em>(</em><a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification.enums/#data_specification.enums.DataType" title="(in DataSpecification v)"><em>DataType</em></a><em>)</em><em></em>) &#8211; A list of data types in the component structure, in the order that
-they appear</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</div>
-<div class="section" id="module-spynnaker.pyNN.models.neuron.threshold_types.threshold_type_maass_stochastic">
-<span id="spynnaker-pynn-models-neuron-threshold-types-threshold-type-maass-stochastic-module"></span><h2>spynnaker.pyNN.models.neuron.threshold_types.threshold_type_maass_stochastic module<a class="headerlink" href="#module-spynnaker.pyNN.models.neuron.threshold_types.threshold_type_maass_stochastic" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="spynnaker.pyNN.models.neuron.threshold_types.threshold_type_maass_stochastic.ThresholdTypeMaassStochastic">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.threshold_types.threshold_type_maass_stochastic.</code><code class="descname">ThresholdTypeMaassStochastic</code><span class="sig-paren">(</span><em>du_th</em>, <em>tau_th</em>, <em>v_thresh</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/threshold_types/threshold_type_maass_stochastic.html#ThresholdTypeMaassStochastic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.threshold_types.threshold_type_maass_stochastic.ThresholdTypeMaassStochastic" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.neuron.threshold_types.abstract_threshold_type.AbstractThresholdType" title="spynnaker.pyNN.models.neuron.threshold_types.abstract_threshold_type.AbstractThresholdType"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.neuron.threshold_types.abstract_threshold_type.AbstractThresholdType</span></code></a></p>
-<p>A stochastic threshold.</p>
-<p>Habenschuss S, Jonke Z, Maass W. Stochastic computations in cortical     microcircuit models. <em>PLoS Computational Biology.</em> 2013;9(11):e1003311.     <a class="reference external" href="https://doi.org/10.1371/journal.pcbi.1003311">doi:10.1371/journal.pcbi.1003311</a></p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>du_th</strong> (<em>float</em>) &#8211; <span class="math">\(du_{thresh}\)</span></li>
-<li><strong>tau_th</strong> (<em>float</em>) &#8211; <span class="math">\(\tau_{thresh}\)</span></li>
-<li><strong>v_thresh</strong> (<em>float</em>) &#8211; <span class="math">\(V_{thresh}\)</span></li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.threshold_types.threshold_type_maass_stochastic.ThresholdTypeMaassStochastic.add_parameters">
-<code class="descname">add_parameters</code><span class="sig-paren">(</span><em>parameters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/threshold_types/threshold_type_maass_stochastic.html#ThresholdTypeMaassStochastic.add_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.threshold_types.threshold_type_maass_stochastic.ThresholdTypeMaassStochastic.add_parameters" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add the initial values of the parameters to the parameter holder</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; A holder of the parameters</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.threshold_types.threshold_type_maass_stochastic.ThresholdTypeMaassStochastic.add_state_variables">
-<code class="descname">add_state_variables</code><span class="sig-paren">(</span><em>state_variables</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/threshold_types/threshold_type_maass_stochastic.html#ThresholdTypeMaassStochastic.add_state_variables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.threshold_types.threshold_type_maass_stochastic.ThresholdTypeMaassStochastic.add_state_variables" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add the initial values of the state variables to the state            variables holder</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; A holder of the state variables</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.threshold_types.threshold_type_maass_stochastic.ThresholdTypeMaassStochastic.du_th">
-<code class="descname">du_th</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.threshold_types.threshold_type_maass_stochastic.ThresholdTypeMaassStochastic.du_th" title="Permalink to this definition">¶</a></dt>
-<dd><p><span class="math">\(du_{thresh}\)</span></p>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.threshold_types.threshold_type_maass_stochastic.ThresholdTypeMaassStochastic.get_n_cpu_cycles">
-<code class="descname">get_n_cpu_cycles</code><span class="sig-paren">(</span><em>n_neurons</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/threshold_types/threshold_type_maass_stochastic.html#ThresholdTypeMaassStochastic.get_n_cpu_cycles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.threshold_types.threshold_type_maass_stochastic.ThresholdTypeMaassStochastic.get_n_cpu_cycles" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the number of CPU cycles required to update the state</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons to get the cycles for</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.threshold_types.threshold_type_maass_stochastic.ThresholdTypeMaassStochastic.get_units">
-<code class="descname">get_units</code><span class="sig-paren">(</span><em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/threshold_types/threshold_type_maass_stochastic.html#ThresholdTypeMaassStochastic.get_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.threshold_types.threshold_type_maass_stochastic.ThresholdTypeMaassStochastic.get_units" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the units of the given variable</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.threshold_types.threshold_type_maass_stochastic.ThresholdTypeMaassStochastic.get_values">
-<code class="descname">get_values</code><span class="sig-paren">(</span><em>parameters</em>, <em>state_variables</em>, <em>vertex_slice</em>, <em>ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/threshold_types/threshold_type_maass_stochastic.html#ThresholdTypeMaassStochastic.get_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.threshold_types.threshold_type_maass_stochastic.ThresholdTypeMaassStochastic.get_values" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the values to be written to the machine for this model</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters</li>
-<li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables</li>
-<li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; The slice of variables being retrieved</li>
-<li><strong>ts</strong> (<em>float</em>) &#8211; The time to be advanced in one call to the update of this component</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A list with the same length as self.struct.field_types</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list(int or float or list(int) or list(float) or
-RangedList)</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.threshold_types.threshold_type_maass_stochastic.ThresholdTypeMaassStochastic.has_variable">
-<code class="descname">has_variable</code><span class="sig-paren">(</span><em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/threshold_types/threshold_type_maass_stochastic.html#ThresholdTypeMaassStochastic.has_variable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.threshold_types.threshold_type_maass_stochastic.ThresholdTypeMaassStochastic.has_variable" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determine if this component has a variable by the given name</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.threshold_types.threshold_type_maass_stochastic.ThresholdTypeMaassStochastic.tau_th">
-<code class="descname">tau_th</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.threshold_types.threshold_type_maass_stochastic.ThresholdTypeMaassStochastic.tau_th" title="Permalink to this definition">¶</a></dt>
-<dd><p><span class="math">\(\tau_{thresh}\)</span></p>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.threshold_types.threshold_type_maass_stochastic.ThresholdTypeMaassStochastic.update_values">
-<code class="descname">update_values</code><span class="sig-paren">(</span><em>values</em>, <em>parameters</em>, <em>state_variables</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/threshold_types/threshold_type_maass_stochastic.html#ThresholdTypeMaassStochastic.update_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.threshold_types.threshold_type_maass_stochastic.ThresholdTypeMaassStochastic.update_values" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the parameters and state variables with the given struct            values that have been read from the machine</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>values</strong> (<em>list</em><em>(</em><em>list</em><em>)</em><em></em>) &#8211; The values read from the machine, one for each struct element</li>
-<li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters to update</li>
-<li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables to update</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.threshold_types.threshold_type_maass_stochastic.ThresholdTypeMaassStochastic.v_thresh">
-<code class="descname">v_thresh</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.threshold_types.threshold_type_maass_stochastic.ThresholdTypeMaassStochastic.v_thresh" title="Permalink to this definition">¶</a></dt>
-<dd><p><span class="math">\(V_{thresh}\)</span></p>
-</dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="section" id="module-spynnaker.pyNN.models.neuron.threshold_types.threshold_type_static">
-<span id="spynnaker-pynn-models-neuron-threshold-types-threshold-type-static-module"></span><h2>spynnaker.pyNN.models.neuron.threshold_types.threshold_type_static module<a class="headerlink" href="#module-spynnaker.pyNN.models.neuron.threshold_types.threshold_type_static" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="spynnaker.pyNN.models.neuron.threshold_types.threshold_type_static.ThresholdTypeStatic">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.threshold_types.threshold_type_static.</code><code class="descname">ThresholdTypeStatic</code><span class="sig-paren">(</span><em>v_thresh</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/threshold_types/threshold_type_static.html#ThresholdTypeStatic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.threshold_types.threshold_type_static.ThresholdTypeStatic" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.neuron.threshold_types.abstract_threshold_type.AbstractThresholdType" title="spynnaker.pyNN.models.neuron.threshold_types.abstract_threshold_type.AbstractThresholdType"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.neuron.threshold_types.abstract_threshold_type.AbstractThresholdType</span></code></a></p>
-<p>A threshold that is a static value.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>v_thresh</strong> (<em>float</em>) &#8211; <span class="math">\(V_{thresh}\)</span></td>
-</tr>
-</tbody>
-</table>
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.threshold_types.threshold_type_static.ThresholdTypeStatic.add_parameters">
-<code class="descname">add_parameters</code><span class="sig-paren">(</span><em>parameters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/threshold_types/threshold_type_static.html#ThresholdTypeStatic.add_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.threshold_types.threshold_type_static.ThresholdTypeStatic.add_parameters" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add the initial values of the parameters to the parameter holder</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; A holder of the parameters</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.threshold_types.threshold_type_static.ThresholdTypeStatic.add_state_variables">
-<code class="descname">add_state_variables</code><span class="sig-paren">(</span><em>state_variables</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/threshold_types/threshold_type_static.html#ThresholdTypeStatic.add_state_variables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.threshold_types.threshold_type_static.ThresholdTypeStatic.add_state_variables" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add the initial values of the state variables to the state            variables holder</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; A holder of the state variables</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.threshold_types.threshold_type_static.ThresholdTypeStatic.get_n_cpu_cycles">
-<code class="descname">get_n_cpu_cycles</code><span class="sig-paren">(</span><em>n_neurons</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/threshold_types/threshold_type_static.html#ThresholdTypeStatic.get_n_cpu_cycles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.threshold_types.threshold_type_static.ThresholdTypeStatic.get_n_cpu_cycles" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the number of CPU cycles required to update the state</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons to get the cycles for</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.threshold_types.threshold_type_static.ThresholdTypeStatic.get_units">
-<code class="descname">get_units</code><span class="sig-paren">(</span><em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/threshold_types/threshold_type_static.html#ThresholdTypeStatic.get_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.threshold_types.threshold_type_static.ThresholdTypeStatic.get_units" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the units of the given variable</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.threshold_types.threshold_type_static.ThresholdTypeStatic.get_values">
-<code class="descname">get_values</code><span class="sig-paren">(</span><em>parameters</em>, <em>state_variables</em>, <em>vertex_slice</em>, <em>ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/threshold_types/threshold_type_static.html#ThresholdTypeStatic.get_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.threshold_types.threshold_type_static.ThresholdTypeStatic.get_values" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the values to be written to the machine for this model</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters</li>
-<li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables</li>
-<li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; The slice of variables being retrieved</li>
-<li><strong>ts</strong> (<em>float</em>) &#8211; The time to be advanced in one call to the update of this component</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A list with the same length as self.struct.field_types</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list(int or float or list(int) or list(float) or
-RangedList)</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.threshold_types.threshold_type_static.ThresholdTypeStatic.has_variable">
-<code class="descname">has_variable</code><span class="sig-paren">(</span><em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/threshold_types/threshold_type_static.html#ThresholdTypeStatic.has_variable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.threshold_types.threshold_type_static.ThresholdTypeStatic.has_variable" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determine if this component has a variable by the given name</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.threshold_types.threshold_type_static.ThresholdTypeStatic.update_values">
-<code class="descname">update_values</code><span class="sig-paren">(</span><em>values</em>, <em>parameters</em>, <em>state_variables</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/threshold_types/threshold_type_static.html#ThresholdTypeStatic.update_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.threshold_types.threshold_type_static.ThresholdTypeStatic.update_values" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the parameters and state variables with the given struct            values that have been read from the machine</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>values</strong> (<em>list</em><em>(</em><em>list</em><em>)</em><em></em>) &#8211; The values read from the machine, one for each struct element</li>
-<li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters to update</li>
-<li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables to update</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.threshold_types.threshold_type_static.ThresholdTypeStatic.v_thresh">
-<code class="descname">v_thresh</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.threshold_types.threshold_type_static.ThresholdTypeStatic.v_thresh" title="Permalink to this definition">¶</a></dt>
-<dd><p><span class="math">\(V_{thresh}\)</span></p>
-</dd></dl>
-
-</dd></dl>
-
-</div>
 <div class="section" id="module-spynnaker.pyNN.models.neuron.threshold_types">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.models.neuron.threshold_types" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="spynnaker.pyNN.models.neuron.threshold_types.AbstractThresholdType">
 <em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.threshold_types.</code><code class="descname">AbstractThresholdType</code><span class="sig-paren">(</span><em>data_types</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/threshold_types/abstract_threshold_type.html#AbstractThresholdType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.threshold_types.AbstractThresholdType" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent" title="spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent</span></code></a></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent</span></code></p>
 <p>Represents types of threshold for a neuron (e.g., stochastic).</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data_types</strong> (<em>list</em><em>(</em><a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification.enums/#data_specification.enums.DataType" title="(in DataSpecification v)"><em>DataType</em></a><em>)</em><em></em>) &#8211; A list of data types in the component structure, in the order that
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data_types</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification.enums/#data_specification.enums.DataType" title="(in DataSpecification v)"><em>DataType</em></a><em>)</em><em></em>) &#8211; A list of data types in the component structure, in the order that
 they appear</td>
 </tr>
 </tbody>
@@ -449,13 +118,13 @@ they appear</td>
 <dl class="class">
 <dt id="spynnaker.pyNN.models.neuron.threshold_types.ThresholdTypeStatic">
 <em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.threshold_types.</code><code class="descname">ThresholdTypeStatic</code><span class="sig-paren">(</span><em>v_thresh</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/threshold_types/threshold_type_static.html#ThresholdTypeStatic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.threshold_types.ThresholdTypeStatic" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.neuron.threshold_types.abstract_threshold_type.AbstractThresholdType" title="spynnaker.pyNN.models.neuron.threshold_types.abstract_threshold_type.AbstractThresholdType"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.neuron.threshold_types.abstract_threshold_type.AbstractThresholdType</span></code></a></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.neuron.threshold_types.abstract_threshold_type.AbstractThresholdType</span></code></p>
 <p>A threshold that is a static value.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>v_thresh</strong> (<em>float</em>) &#8211; <span class="math">\(V_{thresh}\)</span></td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>v_thresh</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(V_{thresh}\)</span></td>
 </tr>
 </tbody>
 </table>
@@ -467,7 +136,7 @@ they appear</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; A holder of the parameters</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; A holder of the parameters</td>
 </tr>
 </tbody>
 </table>
@@ -481,7 +150,7 @@ they appear</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; A holder of the state variables</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; A holder of the state variables</td>
 </tr>
 </tbody>
 </table>
@@ -495,9 +164,9 @@ they appear</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons to get the cycles for</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The number of neurons to get the cycles for</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
 </tr>
 </tbody>
 </table>
@@ -511,7 +180,7 @@ they appear</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The name of the variable</td>
 </tr>
 </tbody>
 </table>
@@ -526,18 +195,18 @@ they appear</td>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters</li>
-<li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables</li>
+<li><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; The holder of the parameters</li>
+<li><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; The holder of the state variables</li>
 <li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; The slice of variables being retrieved</li>
-<li><strong>ts</strong> (<em>float</em>) &#8211; The time to be advanced in one call to the update of this component</li>
+<li><strong>ts</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; The time to be advanced in one call to the update of this component</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A list with the same length as self.struct.field_types</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list(int or float or list(int) or list(float) or
-RangedList)</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a> or <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a> or <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a>) or <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a>) or
+<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangedList" title="(in SpiNNUtils v)">RangedList</a>)</p>
 </td>
 </tr>
 </tbody>
@@ -552,9 +221,9 @@ RangedList)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The name of the variable</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></td>
 </tr>
 </tbody>
 </table>
@@ -569,9 +238,9 @@ RangedList)</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>values</strong> (<em>list</em><em>(</em><em>list</em><em>)</em><em></em>) &#8211; The values read from the machine, one for each struct element</li>
-<li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters to update</li>
-<li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables to update</li>
+<li><strong>values</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>)</em><em></em>) &#8211; The values read from the machine, one for each struct element</li>
+<li><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; The holder of the parameters to update</li>
+<li><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; The holder of the state variables to update</li>
 </ul>
 </td>
 </tr>
@@ -590,7 +259,7 @@ RangedList)</p>
 <dl class="class">
 <dt id="spynnaker.pyNN.models.neuron.threshold_types.ThresholdTypeMaassStochastic">
 <em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.threshold_types.</code><code class="descname">ThresholdTypeMaassStochastic</code><span class="sig-paren">(</span><em>du_th</em>, <em>tau_th</em>, <em>v_thresh</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/threshold_types/threshold_type_maass_stochastic.html#ThresholdTypeMaassStochastic"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.threshold_types.ThresholdTypeMaassStochastic" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.neuron.threshold_types.abstract_threshold_type.AbstractThresholdType" title="spynnaker.pyNN.models.neuron.threshold_types.abstract_threshold_type.AbstractThresholdType"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.neuron.threshold_types.abstract_threshold_type.AbstractThresholdType</span></code></a></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.neuron.threshold_types.abstract_threshold_type.AbstractThresholdType</span></code></p>
 <p>A stochastic threshold.</p>
 <p>Habenschuss S, Jonke Z, Maass W. Stochastic computations in cortical     microcircuit models. <em>PLoS Computational Biology.</em> 2013;9(11):e1003311.     <a class="reference external" href="https://doi.org/10.1371/journal.pcbi.1003311">doi:10.1371/journal.pcbi.1003311</a></p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -598,9 +267,9 @@ RangedList)</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>du_th</strong> (<em>float</em>) &#8211; <span class="math">\(du_{thresh}\)</span></li>
-<li><strong>tau_th</strong> (<em>float</em>) &#8211; <span class="math">\(\tau_{thresh}\)</span></li>
-<li><strong>v_thresh</strong> (<em>float</em>) &#8211; <span class="math">\(V_{thresh}\)</span></li>
+<li><strong>du_th</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(du_{thresh}\)</span></li>
+<li><strong>tau_th</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(\tau_{thresh}\)</span></li>
+<li><strong>v_thresh</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(V_{thresh}\)</span></li>
 </ul>
 </td>
 </tr>
@@ -614,7 +283,7 @@ RangedList)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; A holder of the parameters</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; A holder of the parameters</td>
 </tr>
 </tbody>
 </table>
@@ -628,7 +297,7 @@ RangedList)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; A holder of the state variables</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; A holder of the state variables</td>
 </tr>
 </tbody>
 </table>
@@ -648,9 +317,9 @@ RangedList)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons to get the cycles for</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The number of neurons to get the cycles for</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
 </tr>
 </tbody>
 </table>
@@ -664,7 +333,7 @@ RangedList)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The name of the variable</td>
 </tr>
 </tbody>
 </table>
@@ -679,18 +348,18 @@ RangedList)</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters</li>
-<li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables</li>
+<li><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; The holder of the parameters</li>
+<li><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; The holder of the state variables</li>
 <li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; The slice of variables being retrieved</li>
-<li><strong>ts</strong> (<em>float</em>) &#8211; The time to be advanced in one call to the update of this component</li>
+<li><strong>ts</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; The time to be advanced in one call to the update of this component</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A list with the same length as self.struct.field_types</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list(int or float or list(int) or list(float) or
-RangedList)</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a> or <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a> or <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a>) or <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a>) or
+<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangedList" title="(in SpiNNUtils v)">RangedList</a>)</p>
 </td>
 </tr>
 </tbody>
@@ -705,9 +374,9 @@ RangedList)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The name of the variable</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></td>
 </tr>
 </tbody>
 </table>
@@ -728,9 +397,9 @@ RangedList)</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>values</strong> (<em>list</em><em>(</em><em>list</em><em>)</em><em></em>) &#8211; The values read from the machine, one for each struct element</li>
-<li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters to update</li>
-<li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables to update</li>
+<li><strong>values</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>)</em><em></em>) &#8211; The values read from the machine, one for each struct element</li>
+<li><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; The holder of the parameters to update</li>
+<li><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; The holder of the state variables to update</li>
 </ul>
 </td>
 </tr>
@@ -771,10 +440,11 @@ RangedList)</p>
           <a href="spynnaker.pyNN.models.neuron.synapse_types.html" title="spynnaker.pyNN.models.neuron.synapse_types package"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
-          <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.models.html" >spynnaker.pyNN.models package</a> &#187;</li>
-          <li class="nav-item nav-item-4"><a href="spynnaker.pyNN.models.neuron.html" >spynnaker.pyNN.models.neuron package</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="modules.html" >spynnaker</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="spynnaker.pyNN.models.html" >spynnaker.pyNN.models package</a> &#187;</li>
+          <li class="nav-item nav-item-5"><a href="spynnaker.pyNN.models.neuron.html" >spynnaker.pyNN.models.neuron package</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

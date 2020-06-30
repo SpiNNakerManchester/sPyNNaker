@@ -78,19 +78,26 @@
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
+<span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">pacman.model.graphs.application</span> <span class="kn">import</span> <span class="n">ApplicationEdge</span>
 <span class="kn">from</span> <span class="nn">.delay_afferent_machine_edge</span> <span class="kn">import</span> <span class="n">DelayAfferentMachineEdge</span>
 
 
-<div class="viewcode-block" id="DelayAfferentApplicationEdge"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.delay_afferent_application_edge.DelayAfferentApplicationEdge">[docs]</a><span class="k">class</span> <span class="nc">DelayAfferentApplicationEdge</span><span class="p">(</span><span class="n">ApplicationEdge</span><span class="p">):</span>
+<div class="viewcode-block" id="DelayAfferentApplicationEdge"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.DelayAfferentApplicationEdge">[docs]</a><span class="k">class</span> <span class="nc">DelayAfferentApplicationEdge</span><span class="p">(</span><span class="n">ApplicationEdge</span><span class="p">):</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prevertex</span><span class="p">,</span> <span class="n">delayvertex</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pre_vertex</span><span class="p">,</span> <span class="n">delay_vertex</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param AbstractPopulationVertex pre_vertex:</span>
+<span class="sd">        :param DelayExtensionVertex delay_vertex:</span>
+<span class="sd">        :param str label:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">DelayAfferentApplicationEdge</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="n">prevertex</span><span class="p">,</span> <span class="n">delayvertex</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
+            <span class="n">pre_vertex</span><span class="p">,</span> <span class="n">delay_vertex</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
 
-<div class="viewcode-block" id="DelayAfferentApplicationEdge.create_machine_edge"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.delay_afferent_application_edge.DelayAfferentApplicationEdge.create_machine_edge">[docs]</a>    <span class="k">def</span> <span class="nf">create_machine_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pre_vertex</span><span class="p">,</span> <span class="n">post_vertex</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">DelayAfferentMachineEdge</span><span class="p">(</span><span class="n">pre_vertex</span><span class="p">,</span> <span class="n">post_vertex</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span></div></div>
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">ApplicationEdge</span><span class="o">.</span><span class="n">_create_machine_edge</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_create_machine_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pre_vertex</span><span class="p">,</span> <span class="n">post_vertex</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">DelayAfferentMachineEdge</span><span class="p">(</span><span class="n">pre_vertex</span><span class="p">,</span> <span class="n">post_vertex</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span></div>
 </pre></div>
 
           </div>

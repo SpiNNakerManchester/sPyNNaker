@@ -20,46 +20,6 @@ Subpackages
 Submodules
 ----------
 
-spynnaker.pyNN.models.neuron.abstract_population_vertex module
---------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.models.neuron.abstract_population_vertex
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model module
---------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model_standard module
------------------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model_standard
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.models.neuron.connection_holder module
------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.models.neuron.connection_holder
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.models.neuron.generator_data module
---------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.models.neuron.generator_data
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 spynnaker.pyNN.models.neuron.master_pop_table module
 ----------------------------------------------------
 
@@ -68,26 +28,10 @@ spynnaker.pyNN.models.neuron.master_pop_table module
     :undoc-members:
     :show-inheritance:
 
-spynnaker.pyNN.models.neuron.population_machine_vertex module
--------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.models.neuron.population_machine_vertex
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 spynnaker.pyNN.models.neuron.synapse_io module
 ----------------------------------------------
 
 .. automodule:: spynnaker.pyNN.models.neuron.synapse_io
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.models.neuron.synaptic_manager module
-----------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.models.neuron.synaptic_manager
     :members:
     :undoc-members:
     :show-inheritance:

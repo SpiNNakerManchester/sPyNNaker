@@ -85,14 +85,13 @@
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="GraphEdgeWeightUpdater"><a class="viewcode-back" href="../../../../spynnaker.pyNN.overridden_pacman_functions.html#spynnaker.pyNN.overridden_pacman_functions.graph_edge_weight_updater.GraphEdgeWeightUpdater">[docs]</a><span class="k">class</span> <span class="nc">GraphEdgeWeightUpdater</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Removes graph edges that aren&#39;t required</span>
+<div class="viewcode-block" id="GraphEdgeWeightUpdater"><a class="viewcode-back" href="../../../../spynnaker.pyNN.overridden_pacman_functions.html#spynnaker.pyNN.overridden_pacman_functions.GraphEdgeWeightUpdater">[docs]</a><span class="k">class</span> <span class="nc">GraphEdgeWeightUpdater</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Updates the weights of all edges.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">,</span> <span class="n">graph_mapper</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param machine_graph: the machine_graph whose edges are to be updated</span>
-<span class="sd">        :param graph_mapper: the graph mapper between graphs</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># create progress bar</span>
@@ -104,7 +103,7 @@
         <span class="k">for</span> <span class="n">partition</span> <span class="ow">in</span> <span class="n">progress</span><span class="o">.</span><span class="n">over</span><span class="p">(</span><span class="n">machine_graph</span><span class="o">.</span><span class="n">outgoing_edge_partitions</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">edge</span> <span class="ow">in</span> <span class="n">partition</span><span class="o">.</span><span class="n">edges</span><span class="p">:</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">edge</span><span class="p">,</span> <span class="n">AbstractWeightUpdatable</span><span class="p">):</span>
-                    <span class="n">edge</span><span class="o">.</span><span class="n">update_weight</span><span class="p">(</span><span class="n">graph_mapper</span><span class="p">)</span>
+                    <span class="n">edge</span><span class="o">.</span><span class="n">update_weight</span><span class="p">()</span>
 
         <span class="c1"># return nothing</span>
         <span class="k">return</span> <span class="n">machine_graph</span></div>

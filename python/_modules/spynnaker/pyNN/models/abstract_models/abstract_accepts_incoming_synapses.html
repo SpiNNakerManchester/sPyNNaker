@@ -83,50 +83,80 @@
 
 
 <span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">AbstractBase</span><span class="p">)</span>
-<div class="viewcode-block" id="AbstractAcceptsIncomingSynapses"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.abstract_accepts_incoming_synapses.AbstractAcceptsIncomingSynapses">[docs]</a><span class="k">class</span> <span class="nc">AbstractAcceptsIncomingSynapses</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractAcceptsIncomingSynapses"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses">[docs]</a><span class="k">class</span> <span class="nc">AbstractAcceptsIncomingSynapses</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Indicates an object that can be a post-vertex in a PyNN projection.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
 
     <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractAcceptsIncomingSynapses.get_synapse_id_by_target"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.abstract_accepts_incoming_synapses.AbstractAcceptsIncomingSynapses.get_synapse_id_by_target">[docs]</a>    <span class="k">def</span> <span class="nf">get_synapse_id_by_target</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractAcceptsIncomingSynapses.get_synapse_id_by_target"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.get_synapse_id_by_target">[docs]</a>    <span class="k">def</span> <span class="nf">get_synapse_id_by_target</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the ID of a synapse given the name.</span>
 
-<span class="sd">        :param target: The name of the synapse</span>
-<span class="sd">        :type target: str</span>
+<span class="sd">        :param str target: The name of the synapse</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
     <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractAcceptsIncomingSynapses.set_synapse_dynamics"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.abstract_accepts_incoming_synapses.AbstractAcceptsIncomingSynapses.set_synapse_dynamics">[docs]</a>    <span class="k">def</span> <span class="nf">set_synapse_dynamics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_dynamics</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractAcceptsIncomingSynapses.set_synapse_dynamics"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.set_synapse_dynamics">[docs]</a>    <span class="k">def</span> <span class="nf">set_synapse_dynamics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_dynamics</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Set the synapse dynamics of this vertex.</span>
+
+<span class="sd">        :param AbstractSynapseDynamics synapse_dynamics:</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
     <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractAcceptsIncomingSynapses.get_maximum_delay_supported_in_ms"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.abstract_accepts_incoming_synapses.AbstractAcceptsIncomingSynapses.get_maximum_delay_supported_in_ms">[docs]</a>    <span class="k">def</span> <span class="nf">get_maximum_delay_supported_in_ms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractAcceptsIncomingSynapses.get_maximum_delay_supported_in_ms"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.get_maximum_delay_supported_in_ms">[docs]</a>    <span class="k">def</span> <span class="nf">get_maximum_delay_supported_in_ms</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the maximum delay supported by this vertex.</span>
+
+<span class="sd">        :param int machine_time_step: microseconds</span>
+<span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
     <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractAcceptsIncomingSynapses.add_pre_run_connection_holder"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.abstract_accepts_incoming_synapses.AbstractAcceptsIncomingSynapses.add_pre_run_connection_holder">[docs]</a>    <span class="k">def</span> <span class="nf">add_pre_run_connection_holder</span><span class="p">(</span>
+<div class="viewcode-block" id="AbstractAcceptsIncomingSynapses.add_pre_run_connection_holder"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.add_pre_run_connection_holder">[docs]</a>    <span class="k">def</span> <span class="nf">add_pre_run_connection_holder</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">connection_holder</span><span class="p">,</span> <span class="n">projection_edge</span><span class="p">,</span> <span class="n">synapse_information</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Add a connection holder to the vertex to be filled in when the\</span>
 <span class="sd">            connections are actually generated.</span>
+
+<span class="sd">        :param ConnectionHolder connection_holder:</span>
+<span class="sd">        :param ProjectionApplicationEdge projection_edge:</span>
+<span class="sd">        :param SynapseInformation synapse_information:</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
     <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractAcceptsIncomingSynapses.get_connections_from_machine"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.abstract_accepts_incoming_synapses.AbstractAcceptsIncomingSynapses.get_connections_from_machine">[docs]</a>    <span class="k">def</span> <span class="nf">get_connections_from_machine</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">edge</span><span class="p">,</span> <span class="n">graph_mapper</span><span class="p">,</span> <span class="n">routing_infos</span><span class="p">,</span>
+<div class="viewcode-block" id="AbstractAcceptsIncomingSynapses.get_connections_from_machine"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.get_connections_from_machine">[docs]</a>    <span class="k">def</span> <span class="nf">get_connections_from_machine</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">edge</span><span class="p">,</span> <span class="n">routing_infos</span><span class="p">,</span>
             <span class="n">synapse_information</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">using_extra_monitor_cores</span><span class="p">,</span>
             <span class="n">placements</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">monitor_api</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">monitor_cores</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">handle_time_out_configuration</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fixed_routes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">extra_monitor</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="sd">&quot;&quot;&quot; Get the connections from the machine post-run.</span>
+
+<span class="sd">        :param ~spinnman.Transceiver transceiver:</span>
+<span class="sd">        :param ~pacman.model.placements.Placement placement:</span>
+<span class="sd">        :param ProjectionMachineEdge edge:</span>
+<span class="sd">        :param ~pacman.model.routing_info.RoutingInfo routing_infos:</span>
+<span class="sd">        :param SynapseInformation synapse_information:</span>
+<span class="sd">        :param int machine_time_step: microseconds</span>
+<span class="sd">        :param bool using_extra_monitor_cores:</span>
+<span class="sd">        :param placements:</span>
+<span class="sd">        :type placements: None or ~pacman.model.placements.Placements</span>
+<span class="sd">        :param monitor_api:</span>
+<span class="sd">        :type monitor_api: None or \</span>
+<span class="sd">            ~spinn_front_end_common.utility_models.DataSpeedUpPacketGatherMachineVertex</span>
+<span class="sd">        :param monitor_placement:</span>
+<span class="sd">        :type monitor_placement: None or ~pacman.model.placements.Placement</span>
+<span class="sd">        :param monitor_cores:</span>
+<span class="sd">        :type monitor_cores: None or \</span>
+<span class="sd">            iterable(~spinn_front_end_common.utility_models.ExtraMonitorSupportMachineVertex)</span>
+<span class="sd">        :param bool handle_time_out_configuration:</span>
+<span class="sd">        :param fixed_routes:</span>
+<span class="sd">        :type fixed_routes: None or \</span>
+<span class="sd">            dict(tuple(int,int),~spinn_machine.FixedRouteEntry)</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
     <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractAcceptsIncomingSynapses.clear_connection_cache"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.abstract_accepts_incoming_synapses.AbstractAcceptsIncomingSynapses.clear_connection_cache">[docs]</a>    <span class="k">def</span> <span class="nf">clear_connection_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractAcceptsIncomingSynapses.clear_connection_cache"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.clear_connection_cache">[docs]</a>    <span class="k">def</span> <span class="nf">clear_connection_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Clear the connection data stored in the vertex so far.</span>
 <span class="sd">        &quot;&quot;&quot;</span></div></div>
 </pre></div>

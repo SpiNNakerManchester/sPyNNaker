@@ -83,11 +83,11 @@
 <span class="kn">from</span> <span class="nn">spinn_utilities.ranged.ranged_list</span> <span class="kn">import</span> <span class="n">RangedList</span>
 
 
-<div class="viewcode-block" id="SpynnakerRangedList"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.utilities.ranged.html#spynnaker.pyNN.utilities.ranged.spynnaker_ranged_list.SpynnakerRangedList">[docs]</a><span class="k">class</span> <span class="nc">SpynnakerRangedList</span><span class="p">(</span><span class="n">RangedList</span><span class="p">):</span>
+<div class="viewcode-block" id="SpynnakerRangedList"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.utilities.ranged.html#spynnaker.pyNN.utilities.ranged.SpynnakerRangedList">[docs]</a><span class="k">class</span> <span class="nc">SpynnakerRangedList</span><span class="p">(</span><span class="n">RangedList</span><span class="p">):</span>
 
     <span class="nd">@staticmethod</span>
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">RangedList</span><span class="o">.</span><span class="n">is_list</span><span class="p">)</span>
-<div class="viewcode-block" id="SpynnakerRangedList.is_list"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.utilities.ranged.html#spynnaker.pyNN.utilities.ranged.spynnaker_ranged_list.SpynnakerRangedList.is_list">[docs]</a>    <span class="k">def</span> <span class="nf">is_list</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
+<div class="viewcode-block" id="SpynnakerRangedList.is_list"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.utilities.ranged.html#spynnaker.pyNN.utilities.ranged.SpynnakerRangedList.is_list">[docs]</a>    <span class="k">def</span> <span class="nf">is_list</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">RandomDistribution</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">True</span>
@@ -96,7 +96,7 @@
 
     <span class="nd">@staticmethod</span>
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">RangedList</span><span class="o">.</span><span class="n">as_list</span><span class="p">)</span>
-<div class="viewcode-block" id="SpynnakerRangedList.as_list"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.utilities.ranged.html#spynnaker.pyNN.utilities.ranged.spynnaker_ranged_list.SpynnakerRangedList.as_list">[docs]</a>    <span class="k">def</span> <span class="nf">as_list</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">ids</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="SpynnakerRangedList.as_list"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.utilities.ranged.html#spynnaker.pyNN.utilities.ranged.SpynnakerRangedList.as_list">[docs]</a>    <span class="k">def</span> <span class="nf">as_list</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">ids</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">RandomDistribution</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">value</span><span class="o">.</span><span class="n">next</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">size</span><span class="p">)</span>

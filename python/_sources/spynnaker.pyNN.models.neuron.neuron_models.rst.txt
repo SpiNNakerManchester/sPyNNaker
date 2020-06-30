@@ -1,34 +1,6 @@
 spynnaker.pyNN.models.neuron.neuron_models package
 ==================================================
 
-Submodules
-----------
-
-spynnaker.pyNN.models.neuron.neuron_models.abstract_neuron_model module
------------------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.models.neuron.neuron_models.abstract_neuron_model
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.models.neuron.neuron_models.neuron_model_izh module
-------------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.models.neuron.neuron_models.neuron_model_izh
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.models.neuron.neuron_models.neuron_model_leaky_integrate_and_fire module
----------------------------------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.models.neuron.neuron_models.neuron_model_leaky_integrate_and_fire
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-
 Module contents
 ---------------
 

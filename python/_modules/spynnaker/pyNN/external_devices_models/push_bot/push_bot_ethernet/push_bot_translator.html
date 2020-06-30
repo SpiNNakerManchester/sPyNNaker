@@ -95,7 +95,7 @@
     <span class="k">return</span> <span class="n">uint_value</span>
 
 
-<div class="viewcode-block" id="PushBotTranslator"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet.html#spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet.push_bot_translator.PushBotTranslator">[docs]</a><span class="k">class</span> <span class="nc">PushBotTranslator</span><span class="p">(</span><span class="n">AbstractEthernetTranslator</span><span class="p">):</span>
+<div class="viewcode-block" id="PushBotTranslator"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet.html#spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet.PushBotTranslator">[docs]</a><span class="k">class</span> <span class="nc">PushBotTranslator</span><span class="p">(</span><span class="n">AbstractEthernetTranslator</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Translates packets between PushBot Multicast packets and PushBot\</span>
 <span class="sd">        Wi-Fi Commands</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -114,7 +114,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__pushbot_wifi_connection</span> <span class="o">=</span> <span class="n">pushbot_wifi_connection</span>
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractEthernetTranslator</span><span class="o">.</span><span class="n">translate_control_packet</span><span class="p">)</span>
-<div class="viewcode-block" id="PushBotTranslator.translate_control_packet"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet.html#spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet.push_bot_translator.PushBotTranslator.translate_control_packet">[docs]</a>    <span class="k">def</span> <span class="nf">translate_control_packet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multicast_packet</span><span class="p">):</span>
+<div class="viewcode-block" id="PushBotTranslator.translate_control_packet"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet.html#spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet.PushBotTranslator.translate_control_packet">[docs]</a>    <span class="k">def</span> <span class="nf">translate_control_packet</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">multicast_packet</span><span class="p">):</span>
         <span class="c1"># pylint: disable=too-many-statements, too-many-branches</span>
         <span class="n">key</span> <span class="o">=</span> <span class="n">multicast_packet</span><span class="o">.</span><span class="n">key</span>
 

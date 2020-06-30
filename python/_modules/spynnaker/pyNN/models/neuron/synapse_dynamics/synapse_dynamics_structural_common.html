@@ -79,6 +79,7 @@
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
 <span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">from</span> <span class="nn">data_specification.enums.data_type</span> <span class="kn">import</span> <span class="n">DataType</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
@@ -88,10 +89,9 @@
 <span class="kn">from</span> <span class="nn">.abstract_synapse_dynamics_structural</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractSynapseDynamicsStructural</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">SynapticConfigurationException</span>
-<span class="kn">import</span> <span class="nn">math</span>
 
 
-<div class="viewcode-block" id="SynapseDynamicsStructuralCommon"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_structural_common.SynapseDynamicsStructuralCommon">[docs]</a><span class="k">class</span> <span class="nc">SynapseDynamicsStructuralCommon</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="SynapseDynamicsStructuralCommon"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralCommon">[docs]</a><span class="k">class</span> <span class="nc">SynapseDynamicsStructuralCommon</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Utility class that holds properties of synaptic rewiring\</span>
 <span class="sd">        both in the presence and absence of STDP.</span>
 
@@ -135,45 +135,45 @@
     <span class="c1"># 7 32-bit numbers (fast; p_rew; s_max; app_no_atoms; machine_no_atoms;</span>
     <span class="c1"># low_atom; high_atom) + 2 4-word RNG seeds (shared_seed; local_seed)</span>
     <span class="c1"># + 1 32-bit number (no_pre_pops)</span>
-    <span class="n">REWIRING_DATA_SIZE</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">_REWIRING_DATA_SIZE</span> <span class="o">=</span> <span class="p">(</span>
         <span class="p">(</span><span class="mi">7</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span><span class="p">)</span> <span class="o">+</span> <span class="n">BYTES_PER_WORD</span><span class="p">)</span>
 
     <span class="c1"># Size excluding key_atom_info (as variable length)</span>
     <span class="c1"># 4 16-bit numbers (no_pre_vertices; sp_control; delay_lo; delay_hi)</span>
     <span class="c1"># + 3 32-bit numbers (weight; connection_type; total_no_atoms)</span>
-    <span class="n">PRE_POP_INFO_BASE_SIZE</span> <span class="o">=</span> <span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">BYTES_PER_SHORT</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span><span class="p">)</span>
+    <span class="n">_PRE_POP_INFO_BASE_SIZE</span> <span class="o">=</span> <span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">BYTES_PER_SHORT</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span><span class="p">)</span>
 
     <span class="c1"># 5 32-bit numbers (key; mask; n_atoms; lo_atom; m_pop_index)</span>
-    <span class="n">KEY_ATOM_INFO_SIZE</span> <span class="o">=</span> <span class="p">(</span><span class="mi">5</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span><span class="p">)</span>
+    <span class="n">_KEY_ATOM_INFO_SIZE</span> <span class="o">=</span> <span class="p">(</span><span class="mi">5</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span><span class="p">)</span>
 
     <span class="c1"># 1 16-bit number (neuron_index)</span>
     <span class="c1"># + 2 8-bit numbers (sub_pop_index; pop_index)</span>
-    <span class="n">POST_TO_PRE_ENTRY_SIZE</span> <span class="o">=</span> <span class="n">BYTES_PER_SHORT</span> <span class="o">+</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">_POST_TO_PRE_ENTRY_SIZE</span> <span class="o">=</span> <span class="n">BYTES_PER_SHORT</span> <span class="o">+</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="mi">1</span><span class="p">)</span>
 
+    <span class="c1">#: Default value for frequency of rewiring</span>
     <span class="n">DEFAULT_F_REW</span> <span class="o">=</span> <span class="mi">10</span><span class="o">**</span><span class="mi">4</span>
+    <span class="c1">#: Default value for initial weight on connection formation</span>
     <span class="n">DEFAULT_INITIAL_WEIGHT</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="c1">#: Default value for initial delay on connection formation</span>
     <span class="n">DEFAULT_INITIAL_DELAY</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="c1">#: Default value for maximum fan-in per target layer neuron</span>
     <span class="n">DEFAULT_S_MAX</span> <span class="o">=</span> <span class="mi">32</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">partner_selection</span><span class="p">,</span> <span class="n">formation</span><span class="p">,</span> <span class="n">elimination</span><span class="p">,</span> <span class="n">f_rew</span><span class="p">,</span>
             <span class="n">initial_weight</span><span class="p">,</span> <span class="n">initial_delay</span><span class="p">,</span> <span class="n">s_max</span><span class="p">,</span> <span class="n">seed</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-
-<span class="sd">        :param partner_selection: The partner selection rule</span>
-<span class="sd">        :param formation: The formation rule</span>
-<span class="sd">        :param elimination: The elimination rule</span>
-<span class="sd">        :param f_rew: How many rewiring attempts will be done per second.</span>
-<span class="sd">        :type f_rew: int</span>
-<span class="sd">        :param initial_weight:\</span>
+<span class="sd">        :param AbstractPartnerSelection partner_selection:</span>
+<span class="sd">            The partner selection rule</span>
+<span class="sd">        :param AbstractFormation formation: The formation rule</span>
+<span class="sd">        :param AbstractElimination elimination: The elimination rule</span>
+<span class="sd">        :param int f_rew: How many rewiring attempts will be done per second.</span>
+<span class="sd">        :param float initial_weight:</span>
 <span class="sd">            Initial weight assigned to a newly formed connection</span>
-<span class="sd">        :type initial_weight: float</span>
 <span class="sd">        :param initial_delay: Delay assigned to a newly formed connection</span>
 <span class="sd">        :type initial_delay: int or (int, int)</span>
-<span class="sd">        :param s_max: Maximum fan-in per target layer neuron</span>
-<span class="sd">        :type s_max: int</span>
-<span class="sd">        :param seed: seed the random number generators</span>
-<span class="sd">        :type seed: int</span>
+<span class="sd">        :param int s_max: Maximum fan-in per target layer neuron</span>
+<span class="sd">        :param int seed: seed the random number generators</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__partner_selection</span> <span class="o">=</span> <span class="n">partner_selection</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__formation</span> <span class="o">=</span> <span class="n">formation</span>
@@ -194,18 +194,23 @@
         <span class="c1"># Addition information -- used for SDRAM usage</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__actual_sdram_usage</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
-<div class="viewcode-block" id="SynapseDynamicsStructuralCommon.set_projection_parameter"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_structural_common.SynapseDynamicsStructuralCommon.set_projection_parameter">[docs]</a>    <span class="k">def</span> <span class="nf">set_projection_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="n">has_set</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__partner_selection</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__formation</span><span class="p">,</span>
-                     <span class="bp">self</span><span class="o">.</span><span class="n">__elimination</span><span class="p">]:</span>
+<div class="viewcode-block" id="SynapseDynamicsStructuralCommon.set_projection_parameter"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralCommon.set_projection_parameter">[docs]</a>    <span class="k">def</span> <span class="nf">set_projection_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param str param:</span>
+<span class="sd">        :param value:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__partner_selection</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__formation</span><span class="p">,</span>
+                     <span class="bp">self</span><span class="o">.</span><span class="n">__elimination</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">param</span><span class="p">):</span>
                 <span class="nb">setattr</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
-                <span class="n">has_set</span> <span class="o">=</span> <span class="kc">True</span>
                 <span class="k">break</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">has_set</span><span class="p">:</span>
+        <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Unknown parameter </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">param</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="SynapseDynamicsStructuralCommon.get_parameter_names"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_structural_common.SynapseDynamicsStructuralCommon.get_parameter_names">[docs]</a>    <span class="k">def</span> <span class="nf">get_parameter_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SynapseDynamicsStructuralCommon.get_parameter_names"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralCommon.get_parameter_names">[docs]</a>    <span class="k">def</span> <span class="nf">get_parameter_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :rtype: list(str)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;initial_weight&#39;</span><span class="p">,</span> <span class="s1">&#39;initial_delay&#39;</span><span class="p">,</span> <span class="s1">&#39;f_rew&#39;</span><span class="p">,</span> <span class="s1">&#39;p_rew&#39;</span><span class="p">,</span> <span class="s1">&#39;s_max&#39;</span><span class="p">]</span>
         <span class="n">names</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__partner_selection</span><span class="o">.</span><span class="n">get_parameter_names</span><span class="p">())</span>
         <span class="n">names</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__formation</span><span class="o">.</span><span class="n">get_parameter_names</span><span class="p">())</span>
@@ -230,11 +235,28 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__actual_sdram_usage</span>
 
-<div class="viewcode-block" id="SynapseDynamicsStructuralCommon.write_parameters"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_structural_common.SynapseDynamicsStructuralCommon.write_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">write_parameters</span><span class="p">(</span>
+<div class="viewcode-block" id="SynapseDynamicsStructuralCommon.write_parameters"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralCommon.write_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">write_parameters</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span>
-            <span class="n">application_graph</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">,</span> <span class="n">post_slice</span><span class="p">,</span> <span class="n">graph_mapper</span><span class="p">,</span>
-            <span class="n">routing_info</span><span class="p">,</span> <span class="n">synapse_indices</span><span class="p">):</span>
+            <span class="n">application_graph</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">,</span> <span class="n">post_slice</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span>
+            <span class="n">synapse_indices</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Write the synapse parameters to the spec.</span>
+
+<span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
+<span class="sd">            the data spec</span>
+<span class="sd">        :param int region: region ID</span>
+<span class="sd">        :param int machine_time_step: the duration of a machine time step (ms)</span>
+<span class="sd">        :param dict(AbstractSynapseType,float) weight_scales:</span>
+<span class="sd">            scaling the weights</span>
+<span class="sd">        :param ~pacman.model.graphs.application.ApplicationGraph\</span>
+<span class="sd">                application_graph:</span>
+<span class="sd">            the entire, highest level, graph of the network to be simulated</span>
+<span class="sd">        :param AbstractPopulationVertex app_vertex:</span>
+<span class="sd">            the highest level object of the post-synaptic population</span>
+<span class="sd">        :param ~pacman.model.graphs.common.Slice post_slice:</span>
+<span class="sd">            the slice of the app vertex corresponding to this machine vertex</span>
+<span class="sd">        :param ~pacman.model.routing_info.RoutingInfo routing_info:</span>
+<span class="sd">            All of the routing information on the network</span>
+<span class="sd">        :param dict(tuple(SynapseInformation,int),int) synapse_indices:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span><span class="s2">&quot;Writing structural plasticity parameters&quot;</span><span class="p">)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span><span class="n">region</span><span class="p">)</span>
@@ -250,12 +272,11 @@
 
         <span class="c1"># Write the pre-population info</span>
         <span class="n">pop_index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__write_prepopulation_info</span><span class="p">(</span>
-            <span class="n">spec</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">,</span> <span class="n">structural_edges</span><span class="p">,</span> <span class="n">graph_mapper</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span>
-            <span class="n">weight_scales</span><span class="p">,</span> <span class="n">post_slice</span><span class="p">,</span> <span class="n">synapse_indices</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">)</span>
+            <span class="n">spec</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">,</span> <span class="n">structural_edges</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span>
+            <span class="n">post_slice</span><span class="p">,</span> <span class="n">synapse_indices</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">)</span>
 
         <span class="c1"># Write the post-to-pre table</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__write_post_to_pre_table</span><span class="p">(</span>
-            <span class="n">spec</span><span class="p">,</span> <span class="n">pop_index</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">,</span> <span class="n">post_slice</span><span class="p">,</span> <span class="n">graph_mapper</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__write_post_to_pre_table</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">pop_index</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">,</span> <span class="n">post_slice</span><span class="p">)</span>
 
         <span class="c1"># Write the component parameters</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__partner_selection</span><span class="o">.</span><span class="n">write_parameters</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
@@ -267,10 +288,14 @@
             <span class="n">dynamics</span><span class="o">.</span><span class="n">elimination</span><span class="o">.</span><span class="n">write_parameters</span><span class="p">(</span>
                 <span class="n">spec</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">[</span><span class="n">synapse_info</span><span class="o">.</span><span class="n">synapse_type</span><span class="p">])</span></div>
 
-    <span class="k">def</span> <span class="nf">__get_structural_edges</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">application_graph</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">):</span>
-        <span class="n">structural_application_edges</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">app_edge</span> <span class="ow">in</span> <span class="n">application_graph</span><span class="o">.</span><span class="n">get_edges_ending_at_vertex</span><span class="p">(</span>
-                <span class="n">app_vertex</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__get_structural_edges</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_graph</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param ~pacman.model.graphs.application.ApplicationGraph app_graph:</span>
+<span class="sd">        :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:</span>
+<span class="sd">        :rtype: list(tuple(ProjectionApplicationEdge, SynapseInformation))</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">structural_edges</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">app_edge</span> <span class="ow">in</span> <span class="n">app_graph</span><span class="o">.</span><span class="n">get_edges_ending_at_vertex</span><span class="p">(</span><span class="n">app_vertex</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">app_edge</span><span class="p">,</span> <span class="n">ProjectionApplicationEdge</span><span class="p">):</span>
                 <span class="n">found</span> <span class="o">=</span> <span class="kc">False</span>
                 <span class="k">for</span> <span class="n">synapse_info</span> <span class="ow">in</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">synapse_information</span><span class="p">:</span>
@@ -278,30 +303,24 @@
                                   <span class="n">AbstractSynapseDynamicsStructural</span><span class="p">):</span>
                         <span class="k">if</span> <span class="n">found</span><span class="p">:</span>
                             <span class="k">raise</span> <span class="n">SynapticConfigurationException</span><span class="p">(</span>
-                                <span class="s2">&quot;Only one Projection between each pair of&quot;</span>
-                                <span class="s2">&quot; Populations can use structural plasticity &quot;</span><span class="p">)</span>
+                                <span class="s2">&quot;Only one Projection between each pair of &quot;</span>
+                                <span class="s2">&quot;Populations can use structural plasticity&quot;</span><span class="p">)</span>
                         <span class="n">found</span> <span class="o">=</span> <span class="kc">True</span>
-                        <span class="n">structural_application_edges</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                            <span class="p">(</span><span class="n">app_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">))</span>
-
-        <span class="k">return</span> <span class="n">structural_application_edges</span>
+                        <span class="n">structural_edges</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">app_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">structural_edges</span>
 
     <span class="k">def</span> <span class="nf">__write_common_rewiring_data</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">,</span> <span class="n">post_slice</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">n_pre_pops</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Write the non-sub-population synapse parameters to the spec.</span>
 
-<span class="sd">        :param spec: the data spec</span>
-<span class="sd">        :type spec: spec</span>
-<span class="sd">        :param app_vertex: \</span>
+<span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
+<span class="sd">            the data spec</span>
+<span class="sd">        :param AbstractPopulationVertex app_vertex:</span>
 <span class="sd">            the highest level object of the post-synaptic population</span>
-<span class="sd">        :type app_vertex: :py:class:`ApplicationVertex`</span>
-<span class="sd">        :param post_slice: \</span>
+<span class="sd">        :param ~pacman.model.graphs.common.Slice post_slice:</span>
 <span class="sd">            the slice of the app vertex corresponding to this machine vertex</span>
-<span class="sd">        :type post_slice: :py:class:`Slice`</span>
-<span class="sd">        :param machine_time_step: the duration of a machine time step (ms)</span>
-<span class="sd">        :type machine_time_step: int</span>
-<span class="sd">        :param n_pre_pops: the number of pre-populations</span>
-<span class="sd">        :type n_pre_pops: int</span>
+<span class="sd">        :param int machine_time_step: the duration of a machine time step (ms)</span>
+<span class="sd">        :param int n_pre_pops: the number of pre-populations</span>
 <span class="sd">        :return: None</span>
 <span class="sd">        :rtype: None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -347,18 +366,29 @@
         <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">n_pre_pops</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__write_prepopulation_info</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">,</span> <span class="n">structural_edges</span><span class="p">,</span> <span class="n">graph_mapper</span><span class="p">,</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">,</span> <span class="n">structural_edges</span><span class="p">,</span>
             <span class="n">routing_info</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span> <span class="n">post_slice</span><span class="p">,</span> <span class="n">synapse_indices</span><span class="p">,</span>
             <span class="n">machine_time_step</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
+<span class="sd">        :param AbstractPopulationVertex app_vertex:</span>
+<span class="sd">        :param list(tuple(ProjectionApplicationEdge,SynapseInformation)) \</span>
+<span class="sd">                structural_edges:</span>
+<span class="sd">        :param RoutingInfo routing_info:</span>
+<span class="sd">        :param dict(AbstractSynapseType,float) weight_scales:</span>
+<span class="sd">        :param ~pacman.model.graphs.common.Slice post_slice:</span>
+<span class="sd">        :param dict(tuple(SynapseInformation,int),int) synapse_indices:</span>
+<span class="sd">        :param int machine_time_step:</span>
+<span class="sd">        :rtype: dict(tuple(AbstractPopulationVertex,SynapseInformation),int)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">pop_index</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
         <span class="n">index</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">synapse_info</span> <span class="ow">in</span> <span class="n">structural_edges</span><span class="p">:</span>
             <span class="n">pop_index</span><span class="p">[</span><span class="n">app_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">]</span> <span class="o">=</span> <span class="n">index</span>
             <span class="n">index</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="n">all_machine_edges</span> <span class="o">=</span> <span class="n">graph_mapper</span><span class="o">.</span><span class="n">get_machine_edges</span><span class="p">(</span><span class="n">app_edge</span><span class="p">)</span>
             <span class="n">machine_edges</span> <span class="o">=</span> <span class="p">[</span>
-                <span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">all_machine_edges</span>
-                <span class="k">if</span> <span class="n">graph_mapper</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">post_vertex</span><span class="p">)</span> <span class="o">==</span> <span class="n">post_slice</span><span class="p">]</span>
+                <span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">machine_edges</span>
+                <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">vertex_slice</span> <span class="o">==</span> <span class="n">post_slice</span><span class="p">]</span>
             <span class="n">dynamics</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">synapse_dynamics</span>
 
             <span class="c1"># Number of machine edges</span>
@@ -388,23 +418,28 @@
             <span class="c1"># Machine edge information</span>
             <span class="k">for</span> <span class="n">machine_edge</span> <span class="ow">in</span> <span class="n">machine_edges</span><span class="p">:</span>
                 <span class="n">r_info</span> <span class="o">=</span> <span class="n">routing_info</span><span class="o">.</span><span class="n">get_routing_info_for_edge</span><span class="p">(</span><span class="n">machine_edge</span><span class="p">)</span>
-                <span class="n">vertex_slice</span> <span class="o">=</span> <span class="n">graph_mapper</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">machine_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="p">)</span>
-                <span class="n">skey</span> <span class="o">=</span> <span class="p">(</span><span class="n">synapse_info</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">,</span> <span class="n">post_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">)</span>
+                <span class="n">vertex_slice</span> <span class="o">=</span> <span class="n">machine_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">vertex_slice</span>
                 <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">r_info</span><span class="o">.</span><span class="n">first_key</span><span class="p">)</span>
                 <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">r_info</span><span class="o">.</span><span class="n">first_mask</span><span class="p">)</span>
                 <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span>
                 <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">)</span>
-                <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">synapse_indices</span><span class="p">[</span><span class="n">skey</span><span class="p">])</span>
+                <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span>
+                    <span class="n">synapse_indices</span><span class="p">[</span><span class="n">synapse_info</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">])</span>
         <span class="k">return</span> <span class="n">pop_index</span>
 
     <span class="k">def</span> <span class="nf">__write_post_to_pre_table</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">pop_index</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">,</span> <span class="n">post_slice</span><span class="p">,</span> <span class="n">graph_mapper</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">pop_index</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">,</span> <span class="n">post_slice</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Post to pre table is basically the transpose of the synaptic\</span>
-<span class="sd">            matrix</span>
+<span class="sd">            matrix.</span>
+
+<span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
+<span class="sd">        :param dict(tuple(AbstractPopulationVertex,SynapseInformation),int) \</span>
+<span class="sd">                pop_index:</span>
+<span class="sd">        :param AbstractPopulationVertex app_vertex:</span>
+<span class="sd">        :param ~pacman.model.graphs.common.Slice post_slice:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Get connections for this post slice</span>
-        <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">app_vertex</span><span class="p">,</span> <span class="n">post_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">)</span>
-        <span class="n">slice_conns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__connections</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="n">slice_conns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__connections</span><span class="p">[</span><span class="n">app_vertex</span><span class="p">,</span> <span class="n">post_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">]</span>
         <span class="c1"># Make a single large array of connections</span>
         <span class="n">connections</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span>
             <span class="p">[</span><span class="n">conn</span> <span class="k">for</span> <span class="p">(</span><span class="n">conn</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="ow">in</span> <span class="n">slice_conns</span><span class="p">])</span>
@@ -418,11 +453,11 @@
              <span class="k">for</span> <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">a_edge</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">s_info</span><span class="p">)</span> <span class="ow">in</span> <span class="n">slice_conns</span><span class="p">],</span> <span class="n">conn_lens</span><span class="p">)</span>
         <span class="c1"># Make a single large array of sub-population index</span>
         <span class="n">subpop_indices</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span>
-            <span class="p">[</span><span class="n">graph_mapper</span><span class="o">.</span><span class="n">get_machine_vertex_index</span><span class="p">(</span><span class="n">m_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="p">)</span>
+            <span class="p">[</span><span class="n">m_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">index</span>
              <span class="k">for</span> <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">m_edge</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="ow">in</span> <span class="n">slice_conns</span><span class="p">],</span> <span class="n">conn_lens</span><span class="p">)</span>
         <span class="c1"># Get the low atom for each source and subtract</span>
         <span class="n">lo_atoms</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span>
-            <span class="p">[</span><span class="n">graph_mapper</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">m_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="p">)</span><span class="o">.</span><span class="n">lo_atom</span>
+            <span class="p">[</span><span class="n">m_edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span>
              <span class="k">for</span> <span class="p">(</span><span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">m_edge</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="ow">in</span> <span class="n">slice_conns</span><span class="p">],</span> <span class="n">conn_lens</span><span class="p">)</span>
         <span class="n">connections</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">connections</span><span class="p">[</span><span class="s2">&quot;source&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">lo_atoms</span>
         <span class="n">connections</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">connections</span><span class="p">[</span><span class="s2">&quot;target&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">post_slice</span><span class="o">.</span><span class="n">lo_atom</span>
@@ -448,10 +483,14 @@
             <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">padded_rows</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">formats</span><span class="o">=</span><span class="s2">&quot;u1, u1, u2&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="s2">&quot;u4&quot;</span><span class="p">)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">post_to_pre</span><span class="p">)</span>
 
-<div class="viewcode-block" id="SynapseDynamicsStructuralCommon.get_parameters_sdram_usage_in_bytes"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_structural_common.SynapseDynamicsStructuralCommon.get_parameters_sdram_usage_in_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">get_parameters_sdram_usage_in_bytes</span><span class="p">(</span>
+<div class="viewcode-block" id="SynapseDynamicsStructuralCommon.get_parameters_sdram_usage_in_bytes"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralCommon.get_parameters_sdram_usage_in_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">get_parameters_sdram_usage_in_bytes</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">application_graph</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get SDRAM usage</span>
 
+<span class="sd">        :param ~pacman.model.graphs.application.ApplicationGraph \</span>
+<span class="sd">                application_graph:</span>
+<span class="sd">        :param AbstractPopulationVertex app_vertex:</span>
+<span class="sd">        :param int n_neurons:</span>
 <span class="sd">        :return: SDRAM usage</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -475,44 +514,60 @@
             <span class="n">param_sizes</span> <span class="o">+=</span> <span class="n">dynamics</span><span class="o">.</span><span class="n">elimination</span>\
                 <span class="o">.</span><span class="n">get_parameters_sdram_usage_in_bytes</span><span class="p">()</span>
 
-        <span class="k">return</span> <span class="nb">int</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">REWIRING_DATA_SIZE</span> <span class="o">+</span>
-                   <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">PRE_POP_INFO_BASE_SIZE</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">structural_edges</span><span class="p">))</span> <span class="o">+</span>
-                   <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">KEY_ATOM_INFO_SIZE</span> <span class="o">*</span> <span class="n">n_sub_edges</span><span class="p">)</span> <span class="o">+</span>
-                   <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">POST_TO_PRE_ENTRY_SIZE</span> <span class="o">*</span> <span class="n">n_neurons</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__s_max</span><span class="p">)</span> <span class="o">+</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_REWIRING_DATA_SIZE</span> <span class="o">+</span>
+                   <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_PRE_POP_INFO_BASE_SIZE</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">structural_edges</span><span class="p">))</span> <span class="o">+</span>
+                   <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_KEY_ATOM_INFO_SIZE</span> <span class="o">*</span> <span class="n">n_sub_edges</span><span class="p">)</span> <span class="o">+</span>
+                   <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_POST_TO_PRE_ENTRY_SIZE</span> <span class="o">*</span> <span class="n">n_neurons</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__s_max</span><span class="p">)</span> <span class="o">+</span>
                    <span class="n">param_sizes</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="SynapseDynamicsStructuralCommon.synaptic_data_update"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_structural_common.SynapseDynamicsStructuralCommon.synaptic_data_update">[docs]</a>    <span class="k">def</span> <span class="nf">synaptic_data_update</span><span class="p">(</span>
+<div class="viewcode-block" id="SynapseDynamicsStructuralCommon.synaptic_data_update"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralCommon.synaptic_data_update">[docs]</a>    <span class="k">def</span> <span class="nf">synaptic_data_update</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">connections</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span>
             <span class="n">machine_edge</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Set synaptic data</span>
+
+<span class="sd">        :param ~numpy.ndarray connections:</span>
+<span class="sd">        :param ~pacman.model.graphs.common.Slice post_vertex_slice:</span>
+<span class="sd">        :param ProjectionApplicationEdge app_edge:</span>
+<span class="sd">        :param SynapseInformation synapse_info:</span>
+<span class="sd">        :param ProjectionMachineEdge machine_edge:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">synapse_info</span><span class="o">.</span><span class="n">synapse_dynamics</span><span class="p">,</span>
                           <span class="n">AbstractSynapseDynamicsStructural</span><span class="p">):</span>
             <span class="k">return</span>
-        <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">app_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__connections</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__connections</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__connections</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+        <span class="n">collector</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__connections</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">app_edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">),</span> <span class="p">[])</span>
+        <span class="n">collector</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
             <span class="p">(</span><span class="n">connections</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">machine_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="SynapseDynamicsStructuralCommon.n_words_for_plastic_connections"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_structural_common.SynapseDynamicsStructuralCommon.n_words_for_plastic_connections">[docs]</a>    <span class="k">def</span> <span class="nf">n_words_for_plastic_connections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<div class="viewcode-block" id="SynapseDynamicsStructuralCommon.n_words_for_plastic_connections"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralCommon.n_words_for_plastic_connections">[docs]</a>    <span class="k">def</span> <span class="nf">n_words_for_plastic_connections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Set size of plastic connections in words</span>
+
+<span class="sd">        :param int value:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__actual_row_max_length</span> <span class="o">=</span> <span class="n">value</span></div>
 
-<div class="viewcode-block" id="SynapseDynamicsStructuralCommon.n_words_for_static_connections"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_structural_common.SynapseDynamicsStructuralCommon.n_words_for_static_connections">[docs]</a>    <span class="k">def</span> <span class="nf">n_words_for_static_connections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<div class="viewcode-block" id="SynapseDynamicsStructuralCommon.n_words_for_static_connections"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralCommon.n_words_for_static_connections">[docs]</a>    <span class="k">def</span> <span class="nf">n_words_for_static_connections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Set size of static connections in words</span>
+
+<span class="sd">        :param int value:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__actual_row_max_length</span> <span class="o">=</span> <span class="n">value</span></div>
 
-<div class="viewcode-block" id="SynapseDynamicsStructuralCommon.get_vertex_executable_suffix"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_structural_common.SynapseDynamicsStructuralCommon.get_vertex_executable_suffix">[docs]</a>    <span class="k">def</span> <span class="nf">get_vertex_executable_suffix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SynapseDynamicsStructuralCommon.get_vertex_executable_suffix"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralCommon.get_vertex_executable_suffix">[docs]</a>    <span class="k">def</span> <span class="nf">get_vertex_executable_suffix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;_structural&quot;</span>
         <span class="n">name</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__partner_selection</span><span class="o">.</span><span class="n">vertex_executable_suffix</span>
         <span class="n">name</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__formation</span><span class="o">.</span><span class="n">vertex_executable_suffix</span>
         <span class="n">name</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__elimination</span><span class="o">.</span><span class="n">vertex_executable_suffix</span>
         <span class="k">return</span> <span class="n">name</span></div>
 
-<div class="viewcode-block" id="SynapseDynamicsStructuralCommon.is_same_as"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_structural_common.SynapseDynamicsStructuralCommon.is_same_as">[docs]</a>    <span class="k">def</span> <span class="nf">is_same_as</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_dynamics</span><span class="p">):</span>
+<div class="viewcode-block" id="SynapseDynamicsStructuralCommon.is_same_as"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralCommon.is_same_as">[docs]</a>    <span class="k">def</span> <span class="nf">is_same_as</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_dynamics</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param SynapseDynamicsStructuralCommon synapse_dynamics:</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Note noqa because exact type comparison is required here</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__s_max</span> <span class="o">==</span> <span class="n">synapse_dynamics</span><span class="o">.</span><span class="n">s_max</span> <span class="ow">and</span>
@@ -548,14 +603,23 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">partner_selection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :rtype: AbstractPartnerSelection</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__partner_selection</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">formation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :rtype: AbstractFormation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__formation</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">elimination</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :rtype: AbstractElimination</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__elimination</span></div>
 </pre></div>
 

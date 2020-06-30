@@ -90,12 +90,9 @@
 
 
 <span class="nd">@supports_injection</span>
-<div class="viewcode-block" id="PushBotSpiNNakerLinkRetinaDevice"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.html#spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_retina_device.PushBotSpiNNakerLinkRetinaDevice">[docs]</a><span class="k">class</span> <span class="nc">PushBotSpiNNakerLinkRetinaDevice</span><span class="p">(</span>
+<div class="viewcode-block" id="PushBotSpiNNakerLinkRetinaDevice"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.html#spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.PushBotSpiNNakerLinkRetinaDevice">[docs]</a><span class="k">class</span> <span class="nc">PushBotSpiNNakerLinkRetinaDevice</span><span class="p">(</span>
         <span class="n">AbstractPushBotRetinaDevice</span><span class="p">,</span> <span class="n">ApplicationSpiNNakerLinkVertex</span><span class="p">):</span>
-    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s2">&quot;__graph_mapper&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__new_key_command&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;__routing_infos&quot;</span><span class="p">]</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;__new_key_command&quot;</span><span class="p">]</span>
 
     <span class="n">default_parameters</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;board_address&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
 
@@ -103,6 +100,15 @@
             <span class="bp">self</span><span class="p">,</span> <span class="n">spinnaker_link_id</span><span class="p">,</span> <span class="n">protocol</span><span class="p">,</span> <span class="n">resolution</span><span class="p">,</span>
             <span class="n">board_address</span><span class="o">=</span><span class="n">default_parameters</span><span class="p">[</span><span class="s1">&#39;board_address&#39;</span><span class="p">],</span>
             <span class="n">label</span><span class="o">=</span><span class="n">default_parameters</span><span class="p">[</span><span class="s1">&#39;label&#39;</span><span class="p">]):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param spinnaker_link_id:</span>
+<span class="sd">        :param protocol:</span>
+<span class="sd">        :type protocol: MunichIoSpiNNakerLinkProtocol</span>
+<span class="sd">        :param resolution:</span>
+<span class="sd">        :type resolution: PushBotRetinaResolution</span>
+<span class="sd">        :param board_address:</span>
+<span class="sd">        :param label:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">AbstractPushBotRetinaDevice</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">protocol</span><span class="p">,</span> <span class="n">resolution</span><span class="p">)</span>
         <span class="n">ApplicationSpiNNakerLinkVertex</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
@@ -111,21 +117,13 @@
             <span class="n">board_address</span><span class="o">=</span><span class="n">board_address</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
 
         <span class="c1"># stores for the injection aspects</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__graph_mapper</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__routing_infos</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__new_key_command</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="nd">@inject</span><span class="p">(</span><span class="s2">&quot;MemoryGraphMapper&quot;</span><span class="p">)</span>
-<div class="viewcode-block" id="PushBotSpiNNakerLinkRetinaDevice.graph_mapper"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.html#spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_retina_device.PushBotSpiNNakerLinkRetinaDevice.graph_mapper">[docs]</a>    <span class="k">def</span> <span class="nf">graph_mapper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">graph_mapper</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__graph_mapper</span> <span class="o">=</span> <span class="n">graph_mapper</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__routing_infos</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_update_new_key_payload</span><span class="p">()</span></div>
-
     <span class="nd">@inject</span><span class="p">(</span><span class="s2">&quot;MemoryRoutingInfos&quot;</span><span class="p">)</span>
-<div class="viewcode-block" id="PushBotSpiNNakerLinkRetinaDevice.routing_info"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.html#spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.push_bot_spinnaker_link_retina_device.PushBotSpiNNakerLinkRetinaDevice.routing_info">[docs]</a>    <span class="k">def</span> <span class="nf">routing_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__routing_infos</span> <span class="o">=</span> <span class="n">routing_info</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__graph_mapper</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_update_new_key_payload</span><span class="p">()</span></div>
+<div class="viewcode-block" id="PushBotSpiNNakerLinkRetinaDevice.routing_info"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.html#spynnaker.pyNN.external_devices_models.push_bot.push_bot_spinnaker_link.PushBotSpiNNakerLinkRetinaDevice.routing_info">[docs]</a>    <span class="k">def</span> <span class="nf">routing_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">):</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">routing_info</span><span class="o">.</span><span class="n">get_first_key_from_pre_vertex</span><span class="p">(</span>
+            <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">machine_vertices</span><span class="p">)[</span><span class="mi">0</span><span class="p">],</span> <span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__new_key_command</span><span class="o">.</span><span class="n">payload</span> <span class="o">=</span> <span class="n">key</span></div>
 
     <span class="nd">@property</span>
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractPushBotRetinaDevice</span><span class="o">.</span><span class="n">start_resume_commands</span><span class="p">)</span>
@@ -143,13 +141,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">__new_key_command</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_protocol</span><span class="o">.</span><span class="n">set_retina_key</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
                 <span class="n">new_commands</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__new_key_command</span><span class="p">)</span>
             <span class="n">new_commands</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">new_commands</span>
-
-    <span class="k">def</span> <span class="nf">_update_new_key_payload</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">vertex</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__graph_mapper</span><span class="o">.</span><span class="n">get_machine_vertices</span><span class="p">(</span><span class="bp">self</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__routing_infos</span><span class="o">.</span><span class="n">get_first_key_from_pre_vertex</span><span class="p">(</span>
-            <span class="n">vertex</span><span class="p">,</span> <span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__new_key_command</span><span class="o">.</span><span class="n">payload</span> <span class="o">=</span> <span class="n">key</span></div>
+        <span class="k">return</span> <span class="n">new_commands</span></div>
 </pre></div>
 
           </div>

@@ -122,10 +122,11 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">resources_required</span><span class="p">,</span> <span class="n">is_recording</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">app_vertex</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">SpikeSourcePoissonMachineVertex</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="n">constraints</span><span class="p">)</span>
+            <span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="o">=</span><span class="n">constraints</span><span class="p">,</span> <span class="n">app_vertex</span><span class="o">=</span><span class="n">app_vertex</span><span class="p">,</span>
+            <span class="n">vertex_slice</span><span class="o">=</span><span class="n">vertex_slice</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__is_recording</span> <span class="o">=</span> <span class="n">is_recording</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__resources</span> <span class="o">=</span> <span class="n">resources_required</span>
 

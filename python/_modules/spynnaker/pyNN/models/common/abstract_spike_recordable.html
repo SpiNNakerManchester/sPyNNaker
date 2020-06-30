@@ -83,14 +83,14 @@
 
 
 <span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">AbstractBase</span><span class="p">)</span>
-<div class="viewcode-block" id="AbstractSpikeRecordable"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.abstract_spike_recordable.AbstractSpikeRecordable">[docs]</a><span class="k">class</span> <span class="nc">AbstractSpikeRecordable</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Indicates that spikes can be recorded from this object</span>
+<div class="viewcode-block" id="AbstractSpikeRecordable"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.AbstractSpikeRecordable">[docs]</a><span class="k">class</span> <span class="nc">AbstractSpikeRecordable</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Indicates that spikes can be recorded from this object.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
 
     <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractSpikeRecordable.is_recording_spikes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.abstract_spike_recordable.AbstractSpikeRecordable.is_recording_spikes">[docs]</a>    <span class="k">def</span> <span class="nf">is_recording_spikes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractSpikeRecordable.is_recording_spikes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.AbstractSpikeRecordable.is_recording_spikes">[docs]</a>    <span class="k">def</span> <span class="nf">is_recording_spikes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Determine if spikes are being recorded</span>
 
 <span class="sd">        :return: True if spikes are being recorded, False otherwise</span>
@@ -98,48 +98,55 @@
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
     <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractSpikeRecordable.set_recording_spikes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.abstract_spike_recordable.AbstractSpikeRecordable.set_recording_spikes">[docs]</a>    <span class="k">def</span> <span class="nf">set_recording_spikes</span><span class="p">(</span>
+<div class="viewcode-block" id="AbstractSpikeRecordable.set_recording_spikes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.AbstractSpikeRecordable.set_recording_spikes">[docs]</a>    <span class="k">def</span> <span class="nf">set_recording_spikes</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">new_state</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">indexes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Set spikes to being recorded. \</span>
-<span class="sd">            If new_state is false all other parameters are ignored.</span>
+<span class="sd">            If `new_state` is false all other parameters are ignored.</span>
 
-<span class="sd">        :param new_state: Set if the spikes are recording or not</span>
-<span class="sd">        :type new_state: bool</span>
-<span class="sd">        :param sampling_interval: The interval at which spikes are recorded.\</span>
-<span class="sd">            Must be a whole multiple of the timestep</span>
-<span class="sd">            None will be taken as the timestep</span>
+<span class="sd">        :param bool new_state: Set if the spikes are recording or not</span>
+<span class="sd">        :param sampling_interval: The interval at which spikes are recorded.</span>
+<span class="sd">            Must be a whole multiple of the timestep.</span>
+<span class="sd">            None will be taken as the timestep.</span>
+<span class="sd">        :type sampling_interval: int or None</span>
 <span class="sd">        :param indexes: The indexes of the neurons that will record spikes.</span>
 <span class="sd">            If None the assumption is all neurons are recording</span>
+<span class="sd">        :type indexes: list(int) or None</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
     <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractSpikeRecordable.clear_spike_recording"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.abstract_spike_recordable.AbstractSpikeRecordable.clear_spike_recording">[docs]</a>    <span class="k">def</span> <span class="nf">clear_spike_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">graph_mapper</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractSpikeRecordable.clear_spike_recording"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.AbstractSpikeRecordable.clear_spike_recording">[docs]</a>    <span class="k">def</span> <span class="nf">clear_spike_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">placements</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Clear the recorded data from the object</span>
 
 <span class="sd">        :param buffer_manager: the buffer manager object</span>
-<span class="sd">        :param placements: the placements object</span>
-<span class="sd">        :param graph_mapper: the graph mapper object</span>
+<span class="sd">        :type buffer_manager:</span>
+<span class="sd">            ~spinn_front_end_common.interface.buffer_management.BufferManager</span>
+<span class="sd">        :param ~pacman.model.placements.Placements placements:</span>
+<span class="sd">            the placements object</span>
 <span class="sd">        :rtype: None</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
     <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractSpikeRecordable.get_spikes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.abstract_spike_recordable.AbstractSpikeRecordable.get_spikes">[docs]</a>    <span class="k">def</span> <span class="nf">get_spikes</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">graph_mapper</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractSpikeRecordable.get_spikes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.AbstractSpikeRecordable.get_spikes">[docs]</a>    <span class="k">def</span> <span class="nf">get_spikes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the recorded spikes from the object</span>
 
-<span class="sd">        :param placements: the placements object</span>
-<span class="sd">        :param graph_mapper: the graph mapper object</span>
+<span class="sd">        :param ~pacman.model.placements.Placements placements:</span>
+<span class="sd">            the placements object</span>
 <span class="sd">        :param buffer_manager: the buffer manager object</span>
-<span class="sd">        :param machine_time_step: the time step of the simulation</span>
+<span class="sd">        :type buffer_manager:</span>
+<span class="sd">            ~spinn_front_end_common.interface.buffer_management.BufferManager</span>
+<span class="sd">        :param int machine_time_step:</span>
+<span class="sd">            the time step of the simulation, in microseconds</span>
 <span class="sd">        :return: A numpy array of 2-element arrays of (neuron_id, time)\</span>
-<span class="sd">            ordered by time</span>
+<span class="sd">            ordered by time, one element per event</span>
+<span class="sd">        :rtype: ~numpy.ndarray(tuple(int,int))</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
     <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractSpikeRecordable.get_spikes_sampling_interval"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.abstract_spike_recordable.AbstractSpikeRecordable.get_spikes_sampling_interval">[docs]</a>    <span class="k">def</span> <span class="nf">get_spikes_sampling_interval</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractSpikeRecordable.get_spikes_sampling_interval"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.AbstractSpikeRecordable.get_spikes_sampling_interval">[docs]</a>    <span class="k">def</span> <span class="nf">get_spikes_sampling_interval</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Return the current sampling interval for spikes</span>
 
-<span class="sd">        :return: Sampling interval in micro seconds</span>
+<span class="sd">        :return: Sampling interval in microseconds</span>
+<span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span></div></div>
 </pre></div>
 

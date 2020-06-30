@@ -47,10 +47,11 @@
           <a href="spynnaker.pyNN.models.utility_models.delays.html" title="spynnaker.pyNN.models.utility_models.delays package"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
-          <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.models.html" >spynnaker.pyNN.models package</a> &#187;</li>
-          <li class="nav-item nav-item-4"><a href="spynnaker.pyNN.models.utility_models.html" accesskey="U">spynnaker.pyNN.models.utility_models package</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="modules.html" >spynnaker</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="spynnaker.pyNN.models.html" >spynnaker.pyNN.models package</a> &#187;</li>
+          <li class="nav-item nav-item-5"><a href="spynnaker.pyNN.models.utility_models.html" accesskey="U">spynnaker.pyNN.models.utility_models package</a> &#187;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -58,9 +59,6 @@
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">spynnaker.pyNN.models.utility_models.spike_injector package</a><ul>
-<li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.models.utility_models.spike_injector.spike_injector">spynnaker.pyNN.models.utility_models.spike_injector.spike_injector module</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex">spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.models.utility_models.spike_injector">Module contents</a></li>
 </ul>
 </li>
@@ -99,209 +97,12 @@
             
   <div class="section" id="spynnaker-pynn-models-utility-models-spike-injector-package">
 <h1>spynnaker.pyNN.models.utility_models.spike_injector package<a class="headerlink" href="#spynnaker-pynn-models-utility-models-spike-injector-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-spynnaker.pyNN.models.utility_models.spike_injector.spike_injector">
-<span id="spynnaker-pynn-models-utility-models-spike-injector-spike-injector-module"></span><h2>spynnaker.pyNN.models.utility_models.spike_injector.spike_injector module<a class="headerlink" href="#module-spynnaker.pyNN.models.utility_models.spike_injector.spike_injector" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="spynnaker.pyNN.models.utility_models.spike_injector.spike_injector.SpikeInjector">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.utility_models.spike_injector.spike_injector.</code><code class="descname">SpikeInjector</code><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/spike_injector/spike_injector.html#SpikeInjector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.spike_injector.spike_injector.SpikeInjector" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel" title="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel</span></code></a></p>
-<dl class="method">
-<dt id="spynnaker.pyNN.models.utility_models.spike_injector.spike_injector.SpikeInjector.create_vertex">
-<code class="descname">create_vertex</code><span class="sig-paren">(</span><em>n_neurons</em>, <em>label</em>, <em>constraints</em>, <em>port</em>, <em>virtual_key</em>, <em>reserve_reverse_ip_tag</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/spike_injector/spike_injector.html#SpikeInjector.create_vertex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.spike_injector.spike_injector.SpikeInjector.create_vertex" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a vertex for a population of the model</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons in the population</li>
-<li><strong>label</strong> (<em>str</em>) &#8211; The label to give to the vertex</li>
-<li><strong>constraints</strong> (<em>list</em><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v)"><em>AbstractConstraint</em></a><em>) or </em><em>None</em>) &#8211; A list of constraints to give to the vertex, or None</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">An application vertex for the population</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v)">ApplicationVertex</a></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.utility_models.spike_injector.spike_injector.SpikeInjector.default_population_parameters">
-<code class="descname">default_population_parameters</code><em class="property"> = {'port': None, 'virtual_key': None, 'reserve_reverse_ip_tag': False}</em><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.spike_injector.spike_injector.SpikeInjector.default_population_parameters" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="section" id="module-spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex">
-<span id="spynnaker-pynn-models-utility-models-spike-injector-spike-injector-vertex-module"></span><h2>spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex module<a class="headerlink" href="#module-spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.</code><code class="descname">SpikeInjectorVertex</code><span class="sig-paren">(</span><em>n_neurons</em>, <em>label</em>, <em>constraints</em>, <em>port</em>, <em>virtual_key</em>, <em>reserve_reverse_ip_tag</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/spike_injector/spike_injector_vertex.html#SpikeInjectorVertex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.utility_models.reverse_ip_tag_multi_cast_source.ReverseIpTagMultiCastSource</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_provides_outgoing_partition_constraints.AbstractProvidesOutgoingPartitionConstraints</span></code>, <a class="reference internal" href="spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.abstract_spike_recordable.AbstractSpikeRecordable" title="spynnaker.pyNN.models.common.abstract_spike_recordable.AbstractSpikeRecordable"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.common.abstract_spike_recordable.AbstractSpikeRecordable</span></code></a>, <a class="reference internal" href="spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.simple_population_settable.SimplePopulationSettable" title="spynnaker.pyNN.models.common.simple_population_settable.SimplePopulationSettable"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.common.simple_population_settable.SimplePopulationSettable</span></code></a></p>
-<p>An Injector of Spikes for PyNN populations.  This only allows the user        to specify the virtual_key of the population to identify the population</p>
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.SPIKE_RECORDING_REGION_ID">
-<code class="descname">SPIKE_RECORDING_REGION_ID</code><em class="property"> = 0</em><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.SPIKE_RECORDING_REGION_ID" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.clear_spike_recording">
-<code class="descname">clear_spike_recording</code><span class="sig-paren">(</span><em>buffer_manager</em>, <em>placements</em>, <em>graph_mapper</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/spike_injector/spike_injector_vertex.html#SpikeInjectorVertex.clear_spike_recording"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.clear_spike_recording" title="Permalink to this definition">¶</a></dt>
-<dd><p>Clear the recorded data from the object</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>buffer_manager</strong> &#8211; the buffer manager object</li>
-<li><strong>placements</strong> &#8211; the placements object</li>
-<li><strong>graph_mapper</strong> &#8211; the graph mapper object</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">None</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.default_parameters">
-<code class="descname">default_parameters</code><em class="property"> = {'label': 'spikeInjector', 'port': None, 'virtual_key': None}</em><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.default_parameters" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.describe">
-<code class="descname">describe</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/spike_injector/spike_injector_vertex.html#SpikeInjectorVertex.describe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.describe" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns a human-readable description of the cell or synapse type.</p>
-<p>The output may be customised by specifying a different template
-together with an associated template engine
-(see <code class="docutils literal"><span class="pre">pyNN.descriptions</span></code>).</p>
-<p>If template is None, then a dictionary containing the template context
-will be returned.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.get_outgoing_partition_constraints">
-<code class="descname">get_outgoing_partition_constraints</code><span class="sig-paren">(</span><em>partition</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/spike_injector/spike_injector_vertex.html#SpikeInjectorVertex.get_outgoing_partition_constraints"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.get_outgoing_partition_constraints" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get constraints to be added to the given edge that comes out of            this vertex.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>partition</strong> (<em>AbstractOutgoingEdgePartition</em>) &#8211; An edge that comes out of this vertex</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A list of constraints</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list(<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v)">AbstractConstraint</a>)</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.get_spikes">
-<code class="descname">get_spikes</code><span class="sig-paren">(</span><em>placements</em>, <em>graph_mapper</em>, <em>buffer_manager</em>, <em>machine_time_step</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/spike_injector/spike_injector_vertex.html#SpikeInjectorVertex.get_spikes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.get_spikes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the recorded spikes from the object</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>placements</strong> &#8211; the placements object</li>
-<li><strong>graph_mapper</strong> &#8211; the graph mapper object</li>
-<li><strong>buffer_manager</strong> &#8211; the buffer manager object</li>
-<li><strong>machine_time_step</strong> &#8211; the time step of the simulation</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A numpy array of 2-element arrays of (neuron_id, time)            ordered by time</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.get_spikes_sampling_interval">
-<code class="descname">get_spikes_sampling_interval</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/spike_injector/spike_injector_vertex.html#SpikeInjectorVertex.get_spikes_sampling_interval"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.get_spikes_sampling_interval" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the current sampling interval for spikes</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Sampling interval in micro seconds</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.is_recording_spikes">
-<code class="descname">is_recording_spikes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/spike_injector/spike_injector_vertex.html#SpikeInjectorVertex.is_recording_spikes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.is_recording_spikes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determine if spikes are being recorded</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if spikes are being recorded, False otherwise</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.port">
-<code class="descname">port</code><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.port" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.set_recording_spikes">
-<code class="descname">set_recording_spikes</code><span class="sig-paren">(</span><em>new_state=True</em>, <em>sampling_interval=None</em>, <em>indexes=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/spike_injector/spike_injector_vertex.html#SpikeInjectorVertex.set_recording_spikes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.set_recording_spikes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set spikes to being recorded.             If new_state is false all other parameters are ignored.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>new_state</strong> (<em>bool</em>) &#8211; Set if the spikes are recording or not</li>
-<li><strong>sampling_interval</strong> &#8211; The interval at which spikes are recorded.            Must be a whole multiple of the timestep
-None will be taken as the timestep</li>
-<li><strong>indexes</strong> &#8211; The indexes of the neurons that will record spikes.
-If None the assumption is all neurons are recording</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.virtual_key">
-<code class="descname">virtual_key</code><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex.SpikeInjectorVertex.virtual_key" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
-</div>
 <div class="section" id="module-spynnaker.pyNN.models.utility_models.spike_injector">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.models.utility_models.spike_injector" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="spynnaker.pyNN.models.utility_models.spike_injector.SpikeInjector">
 <em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.utility_models.spike_injector.</code><code class="descname">SpikeInjector</code><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/spike_injector/spike_injector.html#SpikeInjector"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.spike_injector.SpikeInjector" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.models.html#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel" title="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel</span></code></a></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel</span></code></p>
 <dl class="method">
 <dt id="spynnaker.pyNN.models.utility_models.spike_injector.SpikeInjector.create_vertex">
 <code class="descname">create_vertex</code><span class="sig-paren">(</span><em>n_neurons</em>, <em>label</em>, <em>constraints</em>, <em>port</em>, <em>virtual_key</em>, <em>reserve_reverse_ip_tag</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/spike_injector/spike_injector.html#SpikeInjector.create_vertex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.spike_injector.SpikeInjector.create_vertex" title="Permalink to this definition">¶</a></dt>
@@ -311,9 +112,9 @@ If None the assumption is all neurons are recording</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons in the population</li>
-<li><strong>label</strong> (<em>str</em>) &#8211; The label to give to the vertex</li>
-<li><strong>constraints</strong> (<em>list</em><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v)"><em>AbstractConstraint</em></a><em>) or </em><em>None</em>) &#8211; A list of constraints to give to the vertex, or None</li>
+<li><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The number of neurons in the population</li>
+<li><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The label to give to the vertex</li>
+<li><strong>constraints</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v)"><em>AbstractConstraint</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) &#8211; A list of constraints to give to the vertex, or None</li>
 </ul>
 </td>
 </tr>
@@ -359,10 +160,11 @@ If None the assumption is all neurons are recording</li>
           <a href="spynnaker.pyNN.models.utility_models.delays.html" title="spynnaker.pyNN.models.utility_models.delays package"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
-          <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.models.html" >spynnaker.pyNN.models package</a> &#187;</li>
-          <li class="nav-item nav-item-4"><a href="spynnaker.pyNN.models.utility_models.html" >spynnaker.pyNN.models.utility_models package</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="modules.html" >spynnaker</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="spynnaker.pyNN.models.html" >spynnaker.pyNN.models package</a> &#187;</li>
+          <li class="nav-item nav-item-5"><a href="spynnaker.pyNN.models.utility_models.html" >spynnaker.pyNN.models.utility_models package</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

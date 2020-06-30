@@ -82,7 +82,7 @@
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="n">AbstractPopulationSettable</span>
 
 
-<div class="viewcode-block" id="SimplePopulationSettable"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.simple_population_settable.SimplePopulationSettable">[docs]</a><span class="k">class</span> <span class="nc">SimplePopulationSettable</span><span class="p">(</span><span class="n">AbstractPopulationSettable</span><span class="p">):</span>
+<div class="viewcode-block" id="SimplePopulationSettable"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.SimplePopulationSettable">[docs]</a><span class="k">class</span> <span class="nc">SimplePopulationSettable</span><span class="p">(</span><span class="n">AbstractPopulationSettable</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; An object all of whose properties can be accessed from a PyNN\</span>
 <span class="sd">        Population i.e. no properties are hidden</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -90,14 +90,14 @@
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractPopulationSettable</span><span class="o">.</span><span class="n">get_value</span><span class="p">)</span>
-<div class="viewcode-block" id="SimplePopulationSettable.get_value"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.simple_population_settable.SimplePopulationSettable.get_value">[docs]</a>    <span class="k">def</span> <span class="nf">get_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+<div class="viewcode-block" id="SimplePopulationSettable.get_value"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.SimplePopulationSettable.get_value">[docs]</a>    <span class="k">def</span> <span class="nf">get_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
             <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Population </span><span class="si">{}</span><span class="s2"> does not have parameter </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span></div>
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractPopulationSettable</span><span class="o">.</span><span class="n">set_value</span><span class="p">)</span>
-<div class="viewcode-block" id="SimplePopulationSettable.set_value"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.simple_population_settable.SimplePopulationSettable.set_value">[docs]</a>    <span class="k">def</span> <span class="nf">set_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<div class="viewcode-block" id="SimplePopulationSettable.set_value"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.SimplePopulationSettable.set_value">[docs]</a>    <span class="k">def</span> <span class="nf">set_value</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Parameter </span><span class="si">{}</span><span class="s2"> not found&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
         <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div></div>

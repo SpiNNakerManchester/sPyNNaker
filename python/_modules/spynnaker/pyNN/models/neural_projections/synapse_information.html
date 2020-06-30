@@ -79,9 +79,13 @@
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
 <span class="kn">from</span> <span class="nn">pyNN.random</span> <span class="kn">import</span> <span class="n">NumpyRNG</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neural_projections.connectors</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AbstractGenerateConnectorOnMachine</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.synapse_dynamics</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AbstractGenerateOnMachine</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="SynapseInformation"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.synapse_information.SynapseInformation">[docs]</a><span class="k">class</span> <span class="nc">SynapseInformation</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="SynapseInformation"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation">[docs]</a><span class="k">class</span> <span class="nc">SynapseInformation</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Contains the synapse information including the connector, synapse type\</span>
 <span class="sd">        and synapse dynamics</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -101,6 +105,25 @@
                  <span class="n">prepop_is_view</span><span class="p">,</span> <span class="n">postpop_is_view</span><span class="p">,</span> <span class="n">rng</span><span class="p">,</span>
                  <span class="n">synapse_dynamics</span><span class="p">,</span> <span class="n">synapse_type</span><span class="p">,</span>
                  <span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">delays</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param AbstractConnector connector:</span>
+<span class="sd">            The connector connected to the synapse</span>
+<span class="sd">        :param PyNNPopulationCommon pre_population:</span>
+<span class="sd">            The population sending spikes to the synapse</span>
+<span class="sd">        :param PyNNPopulationCommon post_population:</span>
+<span class="sd">            The population hosting the synapse</span>
+<span class="sd">        :param bool prepop_is_view: Whether the prepopulation is a view</span>
+<span class="sd">        :param bool postpop_is_view: Whether the postpopulation is a view</span>
+<span class="sd">        :param rng: Seeded random number generator</span>
+<span class="sd">        :type rng: ~pyNN.random.NumpyRNG or None</span>
+<span class="sd">        :param AbstractSynapseDynamics synapse_dynamics:</span>
+<span class="sd">            The dynamic behaviour of the synapse</span>
+<span class="sd">        :param AbstractSynapseType synapse_type: The type of the synapse</span>
+<span class="sd">        :param weights: The synaptic weights</span>
+<span class="sd">        :type weights: float or list(float) or ~numpy.ndarray(float) or None</span>
+<span class="sd">        :param delays: The total synaptic delays</span>
+<span class="sd">        :type delays: float or list(float) or ~numpy.ndarray(float) or None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__connector</span> <span class="o">=</span> <span class="n">connector</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__pre_population</span> <span class="o">=</span> <span class="n">pre_population</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__post_population</span> <span class="o">=</span> <span class="n">post_population</span>
@@ -114,51 +137,117 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">connector</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The connector connected to the synapse</span>
+
+<span class="sd">        :rtype: AbstractConnector</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__connector</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">pre_population</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The population sending spikes to the synapse</span>
+
+<span class="sd">        :rtype: PyNNPopulationCommon</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pre_population</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">post_population</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The population hosting the synapse</span>
+
+<span class="sd">        :rtype: PyNNPopulationCommon</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__post_population</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_pre_neurons</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The number of neurons in the prepopulation</span>
+
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pre_population</span><span class="o">.</span><span class="n">size</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_post_neurons</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The number of neurons in the postpopulation</span>
+
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__post_population</span><span class="o">.</span><span class="n">size</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">prepop_is_view</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Whether the prepopulation is a view</span>
+
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__prepop_is_view</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">postpop_is_view</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Whether the postpopulation is a view</span>
+
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__postpop_is_view</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">rng</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Random number generator</span>
+
+<span class="sd">        :rtype: ~pyNN.random.NumpyRNG</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__rng</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">synapse_dynamics</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The dynamic behaviour of the synapse</span>
+
+<span class="sd">        :rtype: AbstractSynapseDynamics</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_dynamics</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">synapse_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The type of the synapse</span>
+
+<span class="sd">        :rtype: AbstractSynapseType</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_type</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">weights</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The synaptic weights (if any)</span>
+
+<span class="sd">        :rtype: float or list(float) or ~numpy.ndarray(float) or None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__weights</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">delays</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delays</span></div>
+        <span class="sd">&quot;&quot;&quot; The total synaptic delays (if any)</span>
+
+<span class="sd">        :rtype: float or list(float) or ~numpy.ndarray(float) or None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__delays</span>
+
+<div class="viewcode-block" id="SynapseInformation.may_generate_on_machine"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation.may_generate_on_machine">[docs]</a>    <span class="k">def</span> <span class="nf">may_generate_on_machine</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Do we describe a collection of synapses whose synaptic matrix may</span>
+<span class="sd">            be generated on SpiNNaker instead of needing to be calculated in</span>
+<span class="sd">            this process and uploaded? This depends on the connector, the</span>
+<span class="sd">            definitions of the weights and delays, and the dynamics of the</span>
+<span class="sd">            synapses.</span>
+
+<span class="sd">        :return: True if the synaptic matrix may be generated on machine (or</span>
+<span class="sd">            may have already been so done)</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">connector_gen</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">connector</span><span class="p">,</span> <span class="n">AbstractGenerateConnectorOnMachine</span><span class="p">)</span> <span class="ow">and</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">connector</span><span class="o">.</span><span class="n">generate_on_machine</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">weights</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">delays</span><span class="p">))</span>
+        <span class="n">synapse_gen</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">synapse_dynamics</span><span class="p">,</span> <span class="n">AbstractGenerateOnMachine</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">connector_gen</span> <span class="ow">and</span> <span class="n">synapse_gen</span></div></div>
 </pre></div>
 
           </div>

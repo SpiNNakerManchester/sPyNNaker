@@ -88,12 +88,13 @@
 <span class="kn">from</span> <span class="nn">.abstract_timing_dependence</span> <span class="kn">import</span> <span class="n">AbstractTimingDependence</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">SynapseStructureWeightAccumulator</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.plasticity.stdp.common.plasticity_helpers</span> \
-    <span class="kn">import</span> <span class="p">(</span>
-        <span class="n">STDP_FIXED_POINT_ONE</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron.plasticity.stdp.common</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">STDP_FIXED_POINT_ONE</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="TimingDependenceRecurrent"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.timing_dependence_recurrent.TimingDependenceRecurrent">[docs]</a><span class="k">class</span> <span class="nc">TimingDependenceRecurrent</span><span class="p">(</span><span class="n">AbstractTimingDependence</span><span class="p">):</span>
+<div class="viewcode-block" id="TimingDependenceRecurrent"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceRecurrent">[docs]</a><span class="k">class</span> <span class="nc">TimingDependenceRecurrent</span><span class="p">(</span><span class="n">AbstractTimingDependence</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; A timing dependence STDP rule based on recurrences.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s2">&quot;__accumulator_depression_plus_one&quot;</span><span class="p">,</span>
         <span class="s2">&quot;__accumulator_potentiation_minus_one&quot;</span><span class="p">,</span>
@@ -125,7 +126,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_structure</span> <span class="o">=</span> <span class="n">SynapseStructureWeightAccumulator</span><span class="p">()</span>
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractTimingDependence</span><span class="o">.</span><span class="n">is_same_as</span><span class="p">)</span>
-<div class="viewcode-block" id="TimingDependenceRecurrent.is_same_as"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.timing_dependence_recurrent.TimingDependenceRecurrent.is_same_as">[docs]</a>    <span class="k">def</span> <span class="nf">is_same_as</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timing_dependence</span><span class="p">):</span>
+<div class="viewcode-block" id="TimingDependenceRecurrent.is_same_as"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceRecurrent.is_same_as">[docs]</a>    <span class="k">def</span> <span class="nf">is_same_as</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timing_dependence</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">timing_dependence</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
                 <span class="n">timing_dependence</span><span class="p">,</span> <span class="n">TimingDependenceRecurrent</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">False</span>
@@ -140,29 +141,41 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">vertex_executable_suffix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The suffix to be appended to the vertex executable for this rule</span>
+
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dual_fsm</span><span class="p">:</span>
             <span class="k">return</span> <span class="s2">&quot;recurrent_dual_fsm&quot;</span>
         <span class="k">return</span> <span class="s2">&quot;recurrent_pre_stochastic&quot;</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">pre_trace_n_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The number of bytes used by the pre-trace of the rule per neuron</span>
+
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># When using the separate FSMs, pre-trace contains window length,</span>
         <span class="c1"># otherwise it&#39;s in the synapse</span>
         <span class="k">return</span> <span class="n">BYTES_PER_SHORT</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dual_fsm</span> <span class="k">else</span> <span class="mi">0</span>
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractTimingDependence</span><span class="o">.</span><span class="n">get_parameters_sdram_usage_in_bytes</span><span class="p">)</span>
-<div class="viewcode-block" id="TimingDependenceRecurrent.get_parameters_sdram_usage_in_bytes"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.timing_dependence_recurrent.TimingDependenceRecurrent.get_parameters_sdram_usage_in_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">get_parameters_sdram_usage_in_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TimingDependenceRecurrent.get_parameters_sdram_usage_in_bytes"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceRecurrent.get_parameters_sdram_usage_in_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">get_parameters_sdram_usage_in_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># 2 * 32-bit parameters</span>
         <span class="c1"># 2 * LUTS with STDP_FIXED_POINT_ONE * 16-bit entries</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">BYTES_PER_WORD</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span>
-            <span class="n">BYTES_PER_SHORT</span> <span class="o">*</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">STDP_FIXED_POINT_ONE</span><span class="p">))</span></div>
+        <span class="k">return</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span>
+            <span class="mi">2</span> <span class="o">*</span> <span class="n">STDP_FIXED_POINT_ONE</span> <span class="o">*</span> <span class="n">BYTES_PER_SHORT</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">n_weight_terms</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The number of weight terms expected by this timing rule</span>
+
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="mi">1</span>
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractTimingDependence</span><span class="o">.</span><span class="n">write_parameters</span><span class="p">)</span>
-<div class="viewcode-block" id="TimingDependenceRecurrent.write_parameters"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.timing_dependence_recurrent.TimingDependenceRecurrent.write_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">write_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">):</span>
+<div class="viewcode-block" id="TimingDependenceRecurrent.write_parameters"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceRecurrent.write_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">write_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">):</span>
 
         <span class="c1"># Write parameters</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__accumulator_depression_plus_one</span><span class="p">,</span>
@@ -195,10 +208,14 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">synaptic_structure</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get the synaptic structure of the plastic part of the rows</span>
+
+<span class="sd">        :rtype: AbstractSynapseStructure</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_structure</span>
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractTimingDependence</span><span class="o">.</span><span class="n">get_parameter_names</span><span class="p">)</span>
-<div class="viewcode-block" id="TimingDependenceRecurrent.get_parameter_names"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.timing_dependence_recurrent.TimingDependenceRecurrent.get_parameter_names">[docs]</a>    <span class="k">def</span> <span class="nf">get_parameter_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="TimingDependenceRecurrent.get_parameter_names"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.TimingDependenceRecurrent.get_parameter_names">[docs]</a>    <span class="k">def</span> <span class="nf">get_parameter_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;accumulator_depression&#39;</span><span class="p">,</span> <span class="s1">&#39;accumulator_potentiation&#39;</span><span class="p">,</span>
                 <span class="s1">&#39;mean_pre_window&#39;</span><span class="p">,</span> <span class="s1">&#39;mean_post_window&#39;</span><span class="p">,</span> <span class="s1">&#39;dual_fsm&#39;</span><span class="p">]</span></div></div>
 </pre></div>

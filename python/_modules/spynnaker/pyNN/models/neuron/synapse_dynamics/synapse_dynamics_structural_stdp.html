@@ -88,7 +88,7 @@
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.exceptions</span> <span class="kn">import</span> <span class="n">SynapticConfigurationException</span>
 
 
-<div class="viewcode-block" id="SynapseDynamicsStructuralSTDP"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_structural_stdp.SynapseDynamicsStructuralSTDP">[docs]</a><span class="k">class</span> <span class="nc">SynapseDynamicsStructuralSTDP</span><span class="p">(</span>
+<div class="viewcode-block" id="SynapseDynamicsStructuralSTDP"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralSTDP">[docs]</a><span class="k">class</span> <span class="nc">SynapseDynamicsStructuralSTDP</span><span class="p">(</span>
         <span class="n">SynapseDynamicsSTDP</span><span class="p">,</span> <span class="n">AbstractSynapseDynamicsStructural</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Class that enables synaptic rewiring in the presence of STDP.</span>
 
@@ -96,30 +96,6 @@
 <span class="sd">        operate in parallel with STDP synapses.</span>
 
 <span class="sd">        Written by Petrut Bogdan.</span>
-
-
-<span class="sd">    :param partner_selection: The partner selection rule</span>
-<span class="sd">    :param formation: The formation rule</span>
-<span class="sd">    :param elimination: The elimination rule</span>
-<span class="sd">    :param timing_dependence: The STDP timing dependence</span>
-<span class="sd">    :param weight_dependence: The STDP weight dependence</span>
-<span class="sd">    :param voltage_dependence: The STDP voltage dependence</span>
-<span class="sd">    :param dendritic_delay_fraction: The STDP dendritic delay fraction</span>
-<span class="sd">    :param f_rew: How many rewiring attempts will be done per second.</span>
-<span class="sd">    :type f_rew: int</span>
-<span class="sd">    :param initial_weight: Weight assigned to a newly formed connection</span>
-<span class="sd">    :type initial_weight: float</span>
-<span class="sd">    :param initial_delay:\</span>
-<span class="sd">        Delay assigned to a newly formed connection; a single value means a\</span>
-<span class="sd">        fixed delay value, or a tuple of two values means the delay will be\</span>
-<span class="sd">        chosen at random from a uniform distribution between the given values</span>
-<span class="sd">    :type initial_delay: float or (float, float)</span>
-<span class="sd">    :param s_max: Maximum fan-in per target layer neuron</span>
-<span class="sd">    :type s_max: int</span>
-<span class="sd">    :param seed: seed the random number generators</span>
-<span class="sd">    :type seed: int</span>
-<span class="sd">    :param weight: The weight of connections formed by the connector</span>
-<span class="sd">    :param delay: The delay of connections formed by the connector</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;__common_sp&quot;</span><span class="p">]</span>
 
@@ -132,6 +108,32 @@
             <span class="n">initial_delay</span><span class="o">=</span><span class="n">CommonSP</span><span class="o">.</span><span class="n">DEFAULT_INITIAL_DELAY</span><span class="p">,</span>
             <span class="n">s_max</span><span class="o">=</span><span class="n">CommonSP</span><span class="o">.</span><span class="n">DEFAULT_S_MAX</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">weight</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">delay</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">backprop_delay</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param AbstractPartnerSelection partner_selection:</span>
+<span class="sd">            The partner selection rule</span>
+<span class="sd">        :param AbstractFormation formation: The formation rule</span>
+<span class="sd">        :param AbstractElimination elimination: The elimination rule</span>
+<span class="sd">        :param AbstractTimingDependence timing_dependence:</span>
+<span class="sd">        :param AbstractWeightDependence weight_dependence:</span>
+<span class="sd">        :param None voltage_dependence:</span>
+<span class="sd">            The STDP voltage dependence (unsupported)</span>
+<span class="sd">        :param float dendritic_delay_fraction:</span>
+<span class="sd">            The STDP dendritic delay fraction</span>
+<span class="sd">        :param int f_rew:</span>
+<span class="sd">            How many rewiring attempts will be done per second.</span>
+<span class="sd">        :param float initial_weight:</span>
+<span class="sd">            Weight assigned to a newly formed connection</span>
+<span class="sd">        :param initial_delay:</span>
+<span class="sd">            Delay assigned to a newly formed connection; a single value means</span>
+<span class="sd">            a fixed delay value, or a tuple of two values means the delay will</span>
+<span class="sd">            be chosen at random from a uniform distribution between the given</span>
+<span class="sd">            values</span>
+<span class="sd">        :type initial_delay: float or tuple(float, float)</span>
+<span class="sd">        :param int s_max: Maximum fan-in per target layer neuron</span>
+<span class="sd">        :param int seed: seed the random number generators</span>
+<span class="sd">        :param float weight: The weight of connections formed by the connector</span>
+<span class="sd">        :param float delay: The delay of connections formed by the connector</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">SynapseDynamicsStructuralSTDP</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">timing_dependence</span><span class="p">,</span> <span class="n">weight_dependence</span><span class="p">,</span> <span class="n">voltage_dependence</span><span class="p">,</span>
             <span class="n">dendritic_delay_fraction</span><span class="p">,</span> <span class="n">weight</span><span class="p">,</span> <span class="n">delay</span><span class="p">,</span> <span class="n">pad_to_length</span><span class="o">=</span><span class="n">s_max</span><span class="p">,</span>
@@ -141,7 +143,7 @@
             <span class="n">initial_delay</span><span class="p">,</span> <span class="n">s_max</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span>
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">SynapseDynamicsSTDP</span><span class="o">.</span><span class="n">merge</span><span class="p">)</span>
-<div class="viewcode-block" id="SynapseDynamicsStructuralSTDP.merge"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_structural_stdp.SynapseDynamicsStructuralSTDP.merge">[docs]</a>    <span class="k">def</span> <span class="nf">merge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_dynamics</span><span class="p">):</span>
+<div class="viewcode-block" id="SynapseDynamicsStructuralSTDP.merge"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralSTDP.merge">[docs]</a>    <span class="k">def</span> <span class="nf">merge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_dynamics</span><span class="p">):</span>
         <span class="c1"># If other is structural, check structural matches</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">synapse_dynamics</span><span class="p">,</span> <span class="n">AbstractSynapseDynamicsStructural</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__common_sp</span><span class="o">.</span><span class="n">is_same_as</span><span class="p">(</span><span class="n">synapse_dynamics</span><span class="p">):</span>
@@ -160,20 +162,23 @@
         <span class="k">return</span> <span class="bp">self</span></div>
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseDynamicsStructural</span><span class="o">.</span><span class="n">write_structural_parameters</span><span class="p">)</span>
-<div class="viewcode-block" id="SynapseDynamicsStructuralSTDP.write_structural_parameters"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_structural_stdp.SynapseDynamicsStructuralSTDP.write_structural_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">write_structural_parameters</span><span class="p">(</span>
+<div class="viewcode-block" id="SynapseDynamicsStructuralSTDP.write_structural_parameters"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralSTDP.write_structural_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">write_structural_parameters</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span>
-            <span class="n">application_graph</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">,</span> <span class="n">post_slice</span><span class="p">,</span> <span class="n">graph_mapper</span><span class="p">,</span>
+            <span class="n">application_graph</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">,</span> <span class="n">post_slice</span><span class="p">,</span>
             <span class="n">routing_info</span><span class="p">,</span> <span class="n">synapse_indices</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__common_sp</span><span class="o">.</span><span class="n">write_parameters</span><span class="p">(</span>
             <span class="n">spec</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span> <span class="n">application_graph</span><span class="p">,</span>
-            <span class="n">app_vertex</span><span class="p">,</span> <span class="n">post_slice</span><span class="p">,</span> <span class="n">graph_mapper</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span>
-            <span class="n">synapse_indices</span><span class="p">)</span></div>
+            <span class="n">app_vertex</span><span class="p">,</span> <span class="n">post_slice</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span> <span class="n">synapse_indices</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="SynapseDynamicsStructuralSTDP.set_projection_parameter"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_structural_stdp.SynapseDynamicsStructuralSTDP.set_projection_parameter">[docs]</a>    <span class="k">def</span> <span class="nf">set_projection_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<div class="viewcode-block" id="SynapseDynamicsStructuralSTDP.set_projection_parameter"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralSTDP.set_projection_parameter">[docs]</a>    <span class="k">def</span> <span class="nf">set_projection_parameter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param str param:</span>
+<span class="sd">        :param value:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__common_sp</span><span class="o">.</span><span class="n">set_projection_parameter</span><span class="p">(</span><span class="n">param</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">SynapseDynamicsSTDP</span><span class="o">.</span><span class="n">is_same_as</span><span class="p">)</span>
-<div class="viewcode-block" id="SynapseDynamicsStructuralSTDP.is_same_as"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_structural_stdp.SynapseDynamicsStructuralSTDP.is_same_as">[docs]</a>    <span class="k">def</span> <span class="nf">is_same_as</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_dynamics</span><span class="p">):</span>
+<div class="viewcode-block" id="SynapseDynamicsStructuralSTDP.is_same_as"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralSTDP.is_same_as">[docs]</a>    <span class="k">def</span> <span class="nf">is_same_as</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_dynamics</span><span class="p">):</span>
         <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">synapse_dynamics</span><span class="p">,</span> <span class="n">SynapseDynamicsSTDP</span><span class="p">)</span> <span class="ow">and</span>
                 <span class="ow">not</span> <span class="nb">super</span><span class="p">(</span><span class="n">SynapseDynamicsStructuralSTDP</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">is_same_as</span><span class="p">(</span>
                     <span class="n">synapse_dynamics</span><span class="p">)):</span>
@@ -181,7 +186,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__common_sp</span><span class="o">.</span><span class="n">is_same_as</span><span class="p">(</span><span class="n">synapse_dynamics</span><span class="p">)</span></div>
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">SynapseDynamicsSTDP</span><span class="o">.</span><span class="n">get_vertex_executable_suffix</span><span class="p">)</span>
-<div class="viewcode-block" id="SynapseDynamicsStructuralSTDP.get_vertex_executable_suffix"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_structural_stdp.SynapseDynamicsStructuralSTDP.get_vertex_executable_suffix">[docs]</a>    <span class="k">def</span> <span class="nf">get_vertex_executable_suffix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SynapseDynamicsStructuralSTDP.get_vertex_executable_suffix"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralSTDP.get_vertex_executable_suffix">[docs]</a>    <span class="k">def</span> <span class="nf">get_vertex_executable_suffix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">name</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">SynapseDynamicsStructuralSTDP</span><span class="p">,</span>
                      <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_vertex_executable_suffix</span><span class="p">()</span>
         <span class="n">name</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__common_sp</span><span class="o">.</span><span class="n">get_vertex_executable_suffix</span><span class="p">()</span>
@@ -189,20 +194,20 @@
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseDynamicsStructural</span>
                <span class="o">.</span><span class="n">get_structural_parameters_sdram_usage_in_bytes</span><span class="p">)</span>
-<div class="viewcode-block" id="SynapseDynamicsStructuralSTDP.get_structural_parameters_sdram_usage_in_bytes"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_structural_stdp.SynapseDynamicsStructuralSTDP.get_structural_parameters_sdram_usage_in_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">get_structural_parameters_sdram_usage_in_bytes</span><span class="p">(</span>
+<div class="viewcode-block" id="SynapseDynamicsStructuralSTDP.get_structural_parameters_sdram_usage_in_bytes"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralSTDP.get_structural_parameters_sdram_usage_in_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">get_structural_parameters_sdram_usage_in_bytes</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">application_graph</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__common_sp</span><span class="o">.</span><span class="n">get_parameters_sdram_usage_in_bytes</span><span class="p">(</span>
             <span class="n">application_graph</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">)</span></div>
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">SynapseDynamicsSTDP</span><span class="o">.</span><span class="n">get_n_words_for_plastic_connections</span><span class="p">)</span>
-<div class="viewcode-block" id="SynapseDynamicsStructuralSTDP.get_n_words_for_plastic_connections"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_structural_stdp.SynapseDynamicsStructuralSTDP.get_n_words_for_plastic_connections">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_words_for_plastic_connections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_connections</span><span class="p">):</span>
+<div class="viewcode-block" id="SynapseDynamicsStructuralSTDP.get_n_words_for_plastic_connections"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralSTDP.get_n_words_for_plastic_connections">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_words_for_plastic_connections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_connections</span><span class="p">):</span>
         <span class="n">value</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">SynapseDynamicsStructuralSTDP</span><span class="p">,</span>
                       <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_n_words_for_plastic_connections</span><span class="p">(</span><span class="n">n_connections</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__common_sp</span><span class="o">.</span><span class="n">n_words_for_plastic_connections</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">value</span></div>
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSynapseDynamicsStructural</span><span class="o">.</span><span class="n">set_connections</span><span class="p">)</span>
-<div class="viewcode-block" id="SynapseDynamicsStructuralSTDP.set_connections"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_structural_stdp.SynapseDynamicsStructuralSTDP.set_connections">[docs]</a>    <span class="k">def</span> <span class="nf">set_connections</span><span class="p">(</span>
+<div class="viewcode-block" id="SynapseDynamicsStructuralSTDP.set_connections"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralSTDP.set_connections">[docs]</a>    <span class="k">def</span> <span class="nf">set_connections</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">connections</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span>
             <span class="n">machine_edge</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__common_sp</span><span class="o">.</span><span class="n">synaptic_data_update</span><span class="p">(</span>
@@ -210,7 +215,7 @@
             <span class="n">machine_edge</span><span class="p">)</span></div>
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">SynapseDynamicsSTDP</span><span class="o">.</span><span class="n">get_parameter_names</span><span class="p">)</span>
-<div class="viewcode-block" id="SynapseDynamicsStructuralSTDP.get_parameter_names"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_structural_stdp.SynapseDynamicsStructuralSTDP.get_parameter_names">[docs]</a>    <span class="k">def</span> <span class="nf">get_parameter_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="SynapseDynamicsStructuralSTDP.get_parameter_names"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralSTDP.get_parameter_names">[docs]</a>    <span class="k">def</span> <span class="nf">get_parameter_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">names</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span>
             <span class="n">SynapseDynamicsStructuralSTDP</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_parameter_names</span><span class="p">()</span>
         <span class="n">names</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__common_sp</span><span class="o">.</span><span class="n">get_parameter_names</span><span class="p">())</span>
@@ -257,11 +262,11 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__common_sp</span><span class="o">.</span><span class="n">elimination</span>
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">SynapseDynamicsSTDP</span><span class="o">.</span><span class="n">get_weight_mean</span><span class="p">)</span>
-<div class="viewcode-block" id="SynapseDynamicsStructuralSTDP.get_weight_mean"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_structural_stdp.SynapseDynamicsStructuralSTDP.get_weight_mean">[docs]</a>    <span class="k">def</span> <span class="nf">get_weight_mean</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connector</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
+<div class="viewcode-block" id="SynapseDynamicsStructuralSTDP.get_weight_mean"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralSTDP.get_weight_mean">[docs]</a>    <span class="k">def</span> <span class="nf">get_weight_mean</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connector</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_weight_maximum</span><span class="p">(</span><span class="n">connector</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span></div>
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">SynapseDynamicsSTDP</span><span class="o">.</span><span class="n">get_weight_maximum</span><span class="p">)</span>
-<div class="viewcode-block" id="SynapseDynamicsStructuralSTDP.get_weight_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_structural_stdp.SynapseDynamicsStructuralSTDP.get_weight_maximum">[docs]</a>    <span class="k">def</span> <span class="nf">get_weight_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connector</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
+<div class="viewcode-block" id="SynapseDynamicsStructuralSTDP.get_weight_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.SynapseDynamicsStructuralSTDP.get_weight_maximum">[docs]</a>    <span class="k">def</span> <span class="nf">get_weight_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">connector</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
         <span class="n">w_max</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">SynapseDynamicsStructuralSTDP</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">get_weight_maximum</span><span class="p">(</span>
             <span class="n">connector</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">w_max</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__common_sp</span><span class="o">.</span><span class="n">initial_weight</span><span class="p">)</span></div></div>

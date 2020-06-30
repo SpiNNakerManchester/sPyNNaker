@@ -1,58 +1,6 @@
 spynnaker.pyNN.models.neuron.synapse_types package
 ==================================================
 
-Submodules
-----------
-
-spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type module
------------------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.models.neuron.synapse_types.synapse_type_alpha module
---------------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.models.neuron.synapse_types.synapse_type_alpha
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.models.neuron.synapse_types.synapse_type_delta module
---------------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.models.neuron.synapse_types.synapse_type_delta
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.models.neuron.synapse_types.synapse_type_dual_exponential module
--------------------------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.models.neuron.synapse_types.synapse_type_dual_exponential
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential module
---------------------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.models.neuron.synapse_types.synapse_type_semd module
--------------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.models.neuron.synapse_types.synapse_type_semd
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-
 Module contents
 ---------------
 

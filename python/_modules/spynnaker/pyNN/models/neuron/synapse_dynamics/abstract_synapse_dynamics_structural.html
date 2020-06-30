@@ -84,37 +84,68 @@
 
 
 <span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">AbstractBase</span><span class="p">)</span>
-<div class="viewcode-block" id="AbstractSynapseDynamicsStructural"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.abstract_synapse_dynamics_structural.AbstractSynapseDynamicsStructural">[docs]</a><span class="k">class</span> <span class="nc">AbstractSynapseDynamicsStructural</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractSynapseDynamicsStructural"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamicsStructural">[docs]</a><span class="k">class</span> <span class="nc">AbstractSynapseDynamicsStructural</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 
     <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractSynapseDynamicsStructural.get_structural_parameters_sdram_usage_in_bytes"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.abstract_synapse_dynamics_structural.AbstractSynapseDynamicsStructural.get_structural_parameters_sdram_usage_in_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">get_structural_parameters_sdram_usage_in_bytes</span><span class="p">(</span>
+<div class="viewcode-block" id="AbstractSynapseDynamicsStructural.get_structural_parameters_sdram_usage_in_bytes"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamicsStructural.get_structural_parameters_sdram_usage_in_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">get_structural_parameters_sdram_usage_in_bytes</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">application_graph</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the size of the structural parameters</span>
+
+<span class="sd">        :param ~pacman.model.graphs.application.ApplicationGraph \</span>
+<span class="sd">                application_graph:</span>
+<span class="sd">        :param ~spynnaker.pyNN.models.neuron.AbstractPopulationVertex \</span>
+<span class="sd">                app_vertex:</span>
+<span class="sd">        :param int n_neurons:</span>
+<span class="sd">        :param int n_synapse_types:</span>
+<span class="sd">        :return: the size of the parameters, in bytes</span>
+<span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
     <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractSynapseDynamicsStructural.write_structural_parameters"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.abstract_synapse_dynamics_structural.AbstractSynapseDynamicsStructural.write_structural_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">write_structural_parameters</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span>
-            <span class="n">weight_scales</span><span class="p">,</span> <span class="n">application_graph</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">,</span> <span class="n">post_slice</span><span class="p">,</span>
-            <span class="n">graph_mapper</span><span class="p">,</span> <span class="n">routing_info</span><span class="p">,</span> <span class="n">synapse_indices</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractSynapseDynamicsStructural.write_structural_parameters"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamicsStructural.write_structural_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">write_structural_parameters</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span>
+            <span class="n">application_graph</span><span class="p">,</span> <span class="n">app_vertex</span><span class="p">,</span> <span class="n">post_slice</span><span class="p">,</span>
+            <span class="n">routing_info</span><span class="p">,</span> <span class="n">synapse_indices</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Write structural plasticity parameters</span>
+
+<span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
+<span class="sd">        :param int region: region ID</span>
+<span class="sd">        :param int machine_time_step:</span>
+<span class="sd">        :param weight_scales:</span>
+<span class="sd">        :type weight_scales: ~numpy.ndarray or list(float)</span>
+<span class="sd">        :param ~pacman.model.graphs.application.ApplicationGraph\</span>
+<span class="sd">                application_graph:</span>
+<span class="sd">        :param AbstractPopulationVertex app_vertex:</span>
+<span class="sd">        :param ~pacman.model.graphs.common.Slice post_slice:</span>
+<span class="sd">        :param ~pacman.model.routing_info.RoutingInfo routing_info:</span>
+<span class="sd">        :param dict(tuple(SynapseInformation,int),int) synapse_indices:</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
     <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractSynapseDynamicsStructural.set_connections"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.abstract_synapse_dynamics_structural.AbstractSynapseDynamicsStructural.set_connections">[docs]</a>    <span class="k">def</span> <span class="nf">set_connections</span><span class="p">(</span>
+<div class="viewcode-block" id="AbstractSynapseDynamicsStructural.set_connections"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamicsStructural.set_connections">[docs]</a>    <span class="k">def</span> <span class="nf">set_connections</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">connections</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">app_edge</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span>
             <span class="n">machine_edge</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Set connections for structural plasticity</span>
+
+<span class="sd">        :param ~numpy.ndarray connections:</span>
+<span class="sd">        :param ~pacman.model.graphs.common.Slice post_vertex_slice:</span>
+<span class="sd">        :param ProjectionApplicationEdge app_edge:</span>
+<span class="sd">        :param SynapseInformation synapse_info:</span>
+<span class="sd">        :param ProjectionMachineEdge machine_edge:</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
     <span class="nd">@abstractproperty</span>
     <span class="k">def</span> <span class="nf">f_rew</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; The frequency of rewiring</span>
+
+<span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
     <span class="nd">@abstractproperty</span>
     <span class="k">def</span> <span class="nf">s_max</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; The maximum number of synapses</span>
+
+<span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
     <span class="nd">@abstractproperty</span>
@@ -125,26 +156,36 @@
     <span class="nd">@abstractproperty</span>
     <span class="k">def</span> <span class="nf">initial_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; The weight of a formed connection</span>
+
+<span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
     <span class="nd">@abstractproperty</span>
     <span class="k">def</span> <span class="nf">initial_delay</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; The delay of a formed connection</span>
+
+<span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
     <span class="nd">@abstractproperty</span>
     <span class="k">def</span> <span class="nf">partner_selection</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; The partner selection rule</span>
+
+<span class="sd">        :rtype: AbstractPartnerSelection</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
     <span class="nd">@abstractproperty</span>
     <span class="k">def</span> <span class="nf">formation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; The formation rule</span>
+
+<span class="sd">        :rtype: AbstractFormation</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
     <span class="nd">@abstractproperty</span>
     <span class="k">def</span> <span class="nf">elimination</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; The elimination rule</span>
+
+<span class="sd">        :rtype: AbstractElimination</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 </pre></div>
 

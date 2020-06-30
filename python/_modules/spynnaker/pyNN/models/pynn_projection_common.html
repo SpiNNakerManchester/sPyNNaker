@@ -82,12 +82,13 @@
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
 <span class="kn">from</span> <span class="nn">pyNN.random</span> <span class="kn">import</span> <span class="n">RandomDistribution</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> \
-    <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.progress_bar</span> <span class="kn">import</span> <span class="n">ProgressBar</span>
 <span class="kn">from</span> <span class="nn">pacman.model.constraints.partitioner_constraints</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">SameAtomsAsVertexConstraint</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities</span> <span class="kn">import</span> <span class="n">helpful_functions</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.helpful_functions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">locate_extra_monitor_mc_receiver</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.exceptions</span> <span class="kn">import</span> <span class="n">ConfigurationException</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractAcceptsIncomingSynapses</span><span class="p">)</span>
@@ -130,6 +131,27 @@
             <span class="n">target</span><span class="p">,</span> <span class="n">pre_synaptic_population</span><span class="p">,</span> <span class="n">post_synaptic_population</span><span class="p">,</span>
             <span class="n">prepop_is_view</span><span class="p">,</span> <span class="n">postpop_is_view</span><span class="p">,</span>
             <span class="n">rng</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">user_max_delay</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">time_scale_factor</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param spinnaker_control: The simulator engine core.</span>
+<span class="sd">        :type spinnaker_control:</span>
+<span class="sd">            ~spinn_front_end_common.interface.abstract_spinnaker_base.AbstractSpinnakerBase</span>
+<span class="sd">        :param AbstractConnector connector:</span>
+<span class="sd">            What is the connector for this projection.</span>
+<span class="sd">        :param AbstractSynapseDynamics synapse_dynamics_stdp:</span>
+<span class="sd">            How synapses behave</span>
+<span class="sd">        :param str target: What is the target on the post-synaptic population?</span>
+<span class="sd">        :param AbstractPopulationVertex pre_synaptic_population:</span>
+<span class="sd">            Where do we connect from?</span>
+<span class="sd">        :param AbstractPopulationVertex post_synaptic_population:</span>
+<span class="sd">            Where do we connect to?</span>
+<span class="sd">        :param rng:</span>
+<span class="sd">        :type rng: ~pyNN.random.NumpyRNG or None</span>
+<span class="sd">        :param int machine_time_step:</span>
+<span class="sd">        :param float user_max_delay: User-provided max delay</span>
+<span class="sd">        :param label: Label for the projection, or None to generate one</span>
+<span class="sd">        :type label: str or None</span>
+<span class="sd">        :param int time_scale_factor:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=too-many-arguments, too-many-locals</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__spinnaker_control</span> <span class="o">=</span> <span class="n">spinnaker_control</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__projection_edge</span> <span class="o">=</span> <span class="kc">None</span>
@@ -137,16 +159,16 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__has_retrieved_synaptic_list_from_machine</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__requires_mapping</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__label</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">pre_vertex</span> <span class="o">=</span> <span class="n">pre_synaptic_population</span><span class="o">.</span><span class="n">_get_vertex</span>
+        <span class="n">post_vertex</span> <span class="o">=</span> <span class="n">post_synaptic_population</span><span class="o">.</span><span class="n">_get_vertex</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">post_synaptic_population</span><span class="o">.</span><span class="n">_get_vertex</span><span class="p">,</span>
-                          <span class="n">AbstractAcceptsIncomingSynapses</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">post_vertex</span><span class="p">,</span> <span class="n">AbstractAcceptsIncomingSynapses</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
                 <span class="s2">&quot;postsynaptic population is not designed to receive&quot;</span>
                 <span class="s2">&quot; synaptic projections&quot;</span><span class="p">)</span>
 
         <span class="c1"># sort out synapse type</span>
-        <span class="n">synapse_type</span> <span class="o">=</span> <span class="n">post_synaptic_population</span><span class="o">.</span><span class="n">_get_vertex</span>\
-            <span class="o">.</span><span class="n">get_synapse_id_by_target</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+        <span class="n">synapse_type</span> <span class="o">=</span> <span class="n">post_vertex</span><span class="o">.</span><span class="n">get_synapse_id_by_target</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">synapse_type</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
                 <span class="s2">&quot;Synapse target </span><span class="si">{}</span><span class="s2"> not found in </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
@@ -163,8 +185,7 @@
 
         <span class="c1"># set the plasticity dynamics for the post pop (allows plastic stuff</span>
         <span class="c1">#  when needed)</span>
-        <span class="n">post_synaptic_population</span><span class="o">.</span><span class="n">_get_vertex</span><span class="o">.</span><span class="n">set_synapse_dynamics</span><span class="p">(</span>
-            <span class="n">synapse_dynamics_stdp</span><span class="p">)</span>
+        <span class="n">post_vertex</span><span class="o">.</span><span class="n">set_synapse_dynamics</span><span class="p">(</span><span class="n">synapse_dynamics_stdp</span><span class="p">)</span>
 
         <span class="c1"># Set and store synapse information for future processing</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_information</span> <span class="o">=</span> <span class="n">SynapseInformation</span><span class="p">(</span>
@@ -185,11 +206,12 @@
 
         <span class="c1"># check if all delays requested can fit into the natively supported</span>
         <span class="c1"># delays in the models</span>
-        <span class="n">post_vertex_max_supported_delay_ms</span> <span class="o">=</span> \
-            <span class="n">post_synaptic_population</span><span class="o">.</span><span class="n">_get_vertex</span> \
-            <span class="o">.</span><span class="n">get_maximum_delay_supported_in_ms</span><span class="p">(</span><span class="n">machine_time_step</span><span class="p">)</span>
-        <span class="n">max_supported_delay_ms</span> <span class="o">=</span> <span class="n">post_vertex_max_supported_delay_ms</span> <span class="o">+</span> \
-            <span class="n">_delay_extension_max_supported_delay</span> <span class="o">*</span> <span class="p">(</span><span class="n">machine_time_step</span> <span class="o">/</span> <span class="mf">1000.0</span><span class="p">)</span>
+        <span class="n">post_vertex_max_supported_delay_ms</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">post_vertex</span><span class="o">.</span><span class="n">get_maximum_delay_supported_in_ms</span><span class="p">(</span><span class="n">machine_time_step</span><span class="p">))</span>
+        <span class="n">max_supported_delay_ms</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">post_vertex_max_supported_delay_ms</span> <span class="o">+</span>
+            <span class="n">_delay_extension_max_supported_delay</span> <span class="o">*</span>
+            <span class="p">(</span><span class="n">machine_time_step</span> <span class="o">/</span> <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">max_delay</span> <span class="o">&gt;</span> <span class="n">max_supported_delay_ms</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">ConfigurationException</span><span class="p">(</span>
                 <span class="s2">&quot;The maximum delay </span><span class="si">{}</span><span class="s2"> for projection is not supported &quot;</span>
@@ -209,9 +231,7 @@
             <span class="n">spinnaker_control</span><span class="o">.</span><span class="n">increment_none_labelled_edge_count</span><span class="p">()</span>
 
         <span class="c1"># Find out if there is an existing edge between the populations</span>
-        <span class="n">edge_to_merge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_existing_edge</span><span class="p">(</span>
-            <span class="n">pre_synaptic_population</span><span class="o">.</span><span class="n">_get_vertex</span><span class="p">,</span>
-            <span class="n">post_synaptic_population</span><span class="o">.</span><span class="n">_get_vertex</span><span class="p">)</span>
+        <span class="n">edge_to_merge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_existing_edge</span><span class="p">(</span><span class="n">pre_vertex</span><span class="p">,</span> <span class="n">post_vertex</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">edge_to_merge</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
 
             <span class="c1"># If there is an existing edge, add the connector</span>
@@ -221,9 +241,8 @@
 
             <span class="c1"># If there isn&#39;t an existing edge, create a new one</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__projection_edge</span> <span class="o">=</span> <span class="n">ProjectionApplicationEdge</span><span class="p">(</span>
-                <span class="n">pre_synaptic_population</span><span class="o">.</span><span class="n">_get_vertex</span><span class="p">,</span>
-                <span class="n">post_synaptic_population</span><span class="o">.</span><span class="n">_get_vertex</span><span class="p">,</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_information</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
+                <span class="n">pre_vertex</span><span class="p">,</span> <span class="n">post_vertex</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_information</span><span class="p">,</span>
+                <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">)</span>
 
             <span class="c1"># add edge to the graph</span>
             <span class="n">spinnaker_control</span><span class="o">.</span><span class="n">add_application_edge</span><span class="p">(</span>
@@ -249,7 +268,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__virtual_connection_list</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">spinnaker_control</span><span class="o">.</span><span class="n">use_virtual_board</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__virtual_connection_list</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-            <span class="n">pre_vertex</span> <span class="o">=</span> <span class="n">pre_synaptic_population</span><span class="o">.</span><span class="n">_get_vertex</span>
             <span class="n">connection_holder</span> <span class="o">=</span> <span class="n">ConnectionHolder</span><span class="p">(</span>
                 <span class="kc">None</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">,</span> <span class="n">post_vertex</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__virtual_connection_list</span><span class="p">)</span>
@@ -260,18 +278,29 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">requires_mapping</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Whether this projection requires mapping.</span>
+
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__requires_mapping</span>
 
 <div class="viewcode-block" id="PyNNProjectionCommon.mark_no_changes"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.pynn_projection_common.PyNNProjectionCommon.mark_no_changes">[docs]</a>    <span class="k">def</span> <span class="nf">mark_no_changes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="c1"># Does Nothing currently</span>
+        <span class="sd">&quot;&quot;&quot; Mark this projection as not having changes to be mapped.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__requires_mapping</span> <span class="o">=</span> <span class="kc">False</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">_synapse_information</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :rtype: SynapseInformation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_information</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">_projection_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :rtype: ProjectionApplicationEdge</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__projection_edge</span>
 
     <span class="k">def</span> <span class="nf">_find_existing_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pre_synaptic_vertex</span><span class="p">,</span> <span class="n">post_synaptic_vertex</span><span class="p">):</span>
@@ -279,12 +308,13 @@
 <span class="sd">            edge which has the same post and pre vertex</span>
 
 <span class="sd">        :param pre_synaptic_vertex: the source vertex of the multapse</span>
-<span class="sd">        :type pre_synaptic_vertex: \</span>
-<span class="sd">            pacman.model.graph.application.ApplicationVertex</span>
+<span class="sd">        :type pre_synaptic_vertex:</span>
+<span class="sd">            ~pacman.model.graphs.application.ApplicationVertex</span>
 <span class="sd">        :param post_synaptic_vertex: The destination vertex of the multapse</span>
-<span class="sd">        :type post_synaptic_vertex: \</span>
-<span class="sd">            pacman.model.graph.application.ApplicationVertex</span>
+<span class="sd">        :type post_synaptic_vertex:</span>
+<span class="sd">            ~pacman.model.graphs.application.ApplicationVertex</span>
 <span class="sd">        :return: None or the edge going to these vertices.</span>
+<span class="sd">        :rtype: ~.ApplicationEdge</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># Find edges ending at the postsynaptic vertex</span>
@@ -302,12 +332,21 @@
             <span class="n">max_delay_for_projection</span><span class="p">,</span> <span class="n">max_delay_per_neuron</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span>
             <span class="n">time_scale_factor</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Instantiate delay extension component</span>
+
+<span class="sd">        :param PyNNPopulationCommon pre_synaptic_population:</span>
+<span class="sd">        :param PyNNPopulationCommon post_synaptic_population:</span>
+<span class="sd">        :param int max_delay_for_projection:</span>
+<span class="sd">        :param int max_delay_per_neuron:</span>
+<span class="sd">        :param int machine_time_step:</span>
+<span class="sd">        :param int time_scale_factor:</span>
+<span class="sd">        :rtype: DelayedApplicationEdge</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
-
-        <span class="c1"># Create a delay extension vertex to do the extra delays</span>
         <span class="n">delay_vertex</span> <span class="o">=</span> <span class="n">pre_synaptic_population</span><span class="o">.</span><span class="n">_internal_delay_vertex</span>
         <span class="n">pre_vertex</span> <span class="o">=</span> <span class="n">pre_synaptic_population</span><span class="o">.</span><span class="n">_get_vertex</span>
+        <span class="n">post_vertex</span> <span class="o">=</span> <span class="n">post_synaptic_population</span><span class="o">.</span><span class="n">_get_vertex</span>
+
+        <span class="c1"># Create a delay extension vertex to do the extra delays</span>
         <span class="k">if</span> <span class="n">delay_vertex</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">delay_name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">_delayed&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
             <span class="n">delay_vertex</span> <span class="o">=</span> <span class="n">DelayExtensionVertex</span><span class="p">(</span>
@@ -334,7 +373,6 @@
             <span class="n">delay_vertex</span><span class="o">.</span><span class="n">n_delay_stages</span> <span class="o">=</span> <span class="n">n_stages</span>
 
         <span class="c1"># Create the delay edge if there isn&#39;t one already</span>
-        <span class="n">post_vertex</span> <span class="o">=</span> <span class="n">post_synaptic_population</span><span class="o">.</span><span class="n">_get_vertex</span>
         <span class="n">delay_edge</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_find_existing_edge</span><span class="p">(</span><span class="n">delay_vertex</span><span class="p">,</span> <span class="n">post_vertex</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">delay_edge</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">delay_edge</span> <span class="o">=</span> <span class="n">DelayedApplicationEdge</span><span class="p">(</span>
@@ -350,6 +388,14 @@
     <span class="k">def</span> <span class="nf">_get_synaptic_data</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">as_list</span><span class="p">,</span> <span class="n">data_to_get</span><span class="p">,</span> <span class="n">fixed_values</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">notify</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">handle_time_out_configuration</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param bool as_list:</span>
+<span class="sd">        :param list(int) data_to_get:</span>
+<span class="sd">        :param list(tuple(str,int)) fixed_values:</span>
+<span class="sd">        :param callable(ConnectionHolder,None) notify:</span>
+<span class="sd">        :param bool handle_time_out_configuration:</span>
+<span class="sd">        :rtype: ConnectionHolder</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="n">post_vertex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__projection_edge</span><span class="o">.</span><span class="n">post_vertex</span>
         <span class="n">pre_vertex</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__projection_edge</span><span class="o">.</span><span class="n">pre_vertex</span>
@@ -389,6 +435,13 @@
     <span class="k">def</span> <span class="nf">__get_projection_data</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">data_to_get</span><span class="p">,</span> <span class="n">pre_vertex</span><span class="p">,</span> <span class="n">post_vertex</span><span class="p">,</span> <span class="n">connection_holder</span><span class="p">,</span>
             <span class="n">handle_time_out_configuration</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param str data_to_get:</span>
+<span class="sd">        :param .ApplicationVertex pre_vertex:</span>
+<span class="sd">        :param .AbstractPopulationVertex post_vertex:</span>
+<span class="sd">        :param ConnectionHolder connection_holder:</span>
+<span class="sd">        :param bool handle_time_out_configuration:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=too-many-arguments, too-many-locals</span>
         <span class="n">ctl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__spinnaker_control</span>
 
@@ -405,7 +458,7 @@
             <span class="n">receivers</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="n">extra_monitor_placements</span> <span class="o">=</span> <span class="kc">None</span>
 
-        <span class="n">edges</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="n">graph_mapper</span><span class="o">.</span><span class="n">get_machine_edges</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__projection_edge</span><span class="p">)</span>
+        <span class="n">edges</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__projection_edge</span><span class="o">.</span><span class="n">machine_edges</span>
         <span class="n">progress</span> <span class="o">=</span> <span class="n">ProgressBar</span><span class="p">(</span>
             <span class="n">edges</span><span class="p">,</span> <span class="s2">&quot;Getting </span><span class="si">{}</span><span class="s2">s for projection between </span><span class="si">{}</span><span class="s2"> and </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                 <span class="n">data_to_get</span><span class="p">,</span> <span class="n">pre_vertex</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">post_vertex</span><span class="o">.</span><span class="n">label</span><span class="p">))</span>
@@ -415,7 +468,7 @@
 
             <span class="c1"># if using extra monitor data extractor find local receiver</span>
             <span class="k">if</span> <span class="n">extra_monitors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">receiver</span> <span class="o">=</span> <span class="n">helpful_functions</span><span class="o">.</span><span class="n">locate_extra_monitor_mc_receiver</span><span class="p">(</span>
+                <span class="n">receiver</span> <span class="o">=</span> <span class="n">locate_extra_monitor_mc_receiver</span><span class="p">(</span>
                     <span class="n">placement_x</span><span class="o">=</span><span class="n">placement</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">placement_y</span><span class="o">=</span><span class="n">placement</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
                     <span class="n">machine</span><span class="o">=</span><span class="n">ctl</span><span class="o">.</span><span class="n">machine</span><span class="p">,</span>
                     <span class="n">packet_gather_cores_to_ethernet_connection_map</span><span class="o">=</span><span class="n">receivers</span><span class="p">)</span>
@@ -426,7 +479,7 @@
                 <span class="n">sender_extra_monitor_core</span> <span class="o">=</span> <span class="kc">None</span>
 
             <span class="n">connections</span> <span class="o">=</span> <span class="n">post_vertex</span><span class="o">.</span><span class="n">get_connections_from_machine</span><span class="p">(</span>
-                <span class="n">ctl</span><span class="o">.</span><span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">edge</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">graph_mapper</span><span class="p">,</span>
+                <span class="n">ctl</span><span class="o">.</span><span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">edge</span><span class="p">,</span>
                 <span class="n">ctl</span><span class="o">.</span><span class="n">routing_infos</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_information</span><span class="p">,</span>
                 <span class="n">ctl</span><span class="o">.</span><span class="n">machine_time_step</span><span class="p">,</span> <span class="n">extra_monitors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
                 <span class="n">ctl</span><span class="o">.</span><span class="n">placements</span><span class="p">,</span> <span class="n">receiver</span><span class="p">,</span> <span class="n">extra_monitors</span><span class="p">,</span>
@@ -447,7 +500,8 @@
 <div class="viewcode-block" id="PyNNProjectionCommon.size"><a class="viewcode-back" href="../../../../spynnaker.pyNN.models.html#spynnaker.pyNN.models.pynn_projection_common.PyNNProjectionCommon.size">[docs]</a>    <span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gather</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Return the total number of connections.</span>
 
-<span class="sd">        :param gather: If False, only get the number of connections locally.\</span>
+<span class="sd">        :param bool gather:</span>
+<span class="sd">            If False, only get the number of connections locally.</span>
 <span class="sd">            Which means nothing on SpiNNaker...</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># TODO</span>

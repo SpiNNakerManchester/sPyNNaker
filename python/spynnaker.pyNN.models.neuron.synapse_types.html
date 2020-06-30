@@ -47,10 +47,11 @@
           <a href="spynnaker.pyNN.models.neuron.synapse_dynamics.html" title="spynnaker.pyNN.models.neuron.synapse_dynamics package"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
-          <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.models.html" >spynnaker.pyNN.models package</a> &#187;</li>
-          <li class="nav-item nav-item-4"><a href="spynnaker.pyNN.models.neuron.html" accesskey="U">spynnaker.pyNN.models.neuron package</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="modules.html" >spynnaker</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="spynnaker.pyNN.models.html" >spynnaker.pyNN.models package</a> &#187;</li>
+          <li class="nav-item nav-item-5"><a href="spynnaker.pyNN.models.neuron.html" accesskey="U">spynnaker.pyNN.models.neuron package</a> &#187;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -58,13 +59,6 @@
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">spynnaker.pyNN.models.neuron.synapse_types package</a><ul>
-<li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type">spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type module</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.models.neuron.synapse_types.synapse_type_alpha">spynnaker.pyNN.models.neuron.synapse_types.synapse_type_alpha module</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.models.neuron.synapse_types.synapse_type_delta">spynnaker.pyNN.models.neuron.synapse_types.synapse_type_delta module</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.models.neuron.synapse_types.synapse_type_dual_exponential">spynnaker.pyNN.models.neuron.synapse_types.synapse_type_dual_exponential module</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential">spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential module</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.models.neuron.synapse_types.synapse_type_semd">spynnaker.pyNN.models.neuron.synapse_types.synapse_type_semd module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.models.neuron.synapse_types">Module contents</a></li>
 </ul>
 </li>
@@ -103,1155 +97,18 @@
             
   <div class="section" id="spynnaker-pynn-models-neuron-synapse-types-package">
 <h1>spynnaker.pyNN.models.neuron.synapse_types package<a class="headerlink" href="#spynnaker-pynn-models-neuron-synapse-types-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type">
-<span id="spynnaker-pynn-models-neuron-synapse-types-abstract-synapse-type-module"></span><h2>spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type module<a class="headerlink" href="#module-spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type.AbstractSynapseType">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type.</code><code class="descname">AbstractSynapseType</code><span class="sig-paren">(</span><em>data_types</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/abstract_synapse_type.html#AbstractSynapseType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type.AbstractSynapseType" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent" title="spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent</span></code></a></p>
-<p>Represents the synapse types supported.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data_types</strong> (<em>list</em><em>(</em><a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification.enums/#data_specification.enums.DataType" title="(in DataSpecification v)"><em>DataType</em></a><em>)</em><em></em>) &#8211; A list of data types in the component structure, in the order that
-they appear</td>
-</tr>
-</tbody>
-</table>
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type.AbstractSynapseType.get_n_synapse_types">
-<code class="descname">get_n_synapse_types</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/abstract_synapse_type.html#AbstractSynapseType.get_n_synapse_types"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type.AbstractSynapseType.get_n_synapse_types" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the number of synapse types supported.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The number of synapse types supported</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type.AbstractSynapseType.get_synapse_id_by_target">
-<code class="descname">get_synapse_id_by_target</code><span class="sig-paren">(</span><em>target</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/abstract_synapse_type.html#AbstractSynapseType.get_synapse_id_by_target"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type.AbstractSynapseType.get_synapse_id_by_target" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the ID of a synapse given the name.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The ID of the synapse</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type.AbstractSynapseType.get_synapse_targets">
-<code class="descname">get_synapse_targets</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/abstract_synapse_type.html#AbstractSynapseType.get_synapse_targets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type.AbstractSynapseType.get_synapse_targets" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the target names of the synapse type.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">an array of strings</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">array(str)</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="section" id="module-spynnaker.pyNN.models.neuron.synapse_types.synapse_type_alpha">
-<span id="spynnaker-pynn-models-neuron-synapse-types-synapse-type-alpha-module"></span><h2>spynnaker.pyNN.models.neuron.synapse_types.synapse_type_alpha module<a class="headerlink" href="#module-spynnaker.pyNN.models.neuron.synapse_types.synapse_type_alpha" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_alpha.SynapseTypeAlpha">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.synapse_types.synapse_type_alpha.</code><code class="descname">SynapseTypeAlpha</code><span class="sig-paren">(</span><em>exc_response</em>, <em>exc_exp_response</em>, <em>tau_syn_E</em>, <em>inh_response</em>, <em>inh_exp_response</em>, <em>tau_syn_I</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_alpha.html#SynapseTypeAlpha"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_alpha.SynapseTypeAlpha" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type.AbstractSynapseType" title="spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type.AbstractSynapseType"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type.AbstractSynapseType</span></code></a></p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>exc_response</strong> (<em>float</em>) &#8211; <span class="math">\(response^\mathrm{linear}_e\)</span></li>
-<li><strong>exc_exp_response</strong> (<em>float</em>) &#8211; <span class="math">\(response^\mathrm{exponential}_e\)</span></li>
-<li><strong>tau_syn_E</strong> (<em>float</em>) &#8211; <span class="math">\(\tau^{syn}_e\)</span></li>
-<li><strong>inh_response</strong> (<em>float</em>) &#8211; <span class="math">\(response^\mathrm{linear}_i\)</span></li>
-<li><strong>inh_exp_response</strong> (<em>float</em>) &#8211; <span class="math">\(response^\mathrm{exponential}_i\)</span></li>
-<li><strong>tau_syn_I</strong> (<em>float</em>) &#8211; <span class="math">\(\tau^{syn}_i\)</span></li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_alpha.SynapseTypeAlpha.add_parameters">
-<code class="descname">add_parameters</code><span class="sig-paren">(</span><em>parameters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_alpha.html#SynapseTypeAlpha.add_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_alpha.SynapseTypeAlpha.add_parameters" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add the initial values of the parameters to the parameter holder</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; A holder of the parameters</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_alpha.SynapseTypeAlpha.add_state_variables">
-<code class="descname">add_state_variables</code><span class="sig-paren">(</span><em>state_variables</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_alpha.html#SynapseTypeAlpha.add_state_variables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_alpha.SynapseTypeAlpha.add_state_variables" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add the initial values of the state variables to the state            variables holder</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; A holder of the state variables</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_alpha.SynapseTypeAlpha.exc_response">
-<code class="descname">exc_response</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_alpha.SynapseTypeAlpha.exc_response" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_alpha.SynapseTypeAlpha.get_n_cpu_cycles">
-<code class="descname">get_n_cpu_cycles</code><span class="sig-paren">(</span><em>n_neurons</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_alpha.html#SynapseTypeAlpha.get_n_cpu_cycles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_alpha.SynapseTypeAlpha.get_n_cpu_cycles" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the number of CPU cycles required to update the state</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons to get the cycles for</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_alpha.SynapseTypeAlpha.get_n_synapse_types">
-<code class="descname">get_n_synapse_types</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_alpha.html#SynapseTypeAlpha.get_n_synapse_types"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_alpha.SynapseTypeAlpha.get_n_synapse_types" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the number of synapse types supported.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The number of synapse types supported</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_alpha.SynapseTypeAlpha.get_synapse_id_by_target">
-<code class="descname">get_synapse_id_by_target</code><span class="sig-paren">(</span><em>target</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_alpha.html#SynapseTypeAlpha.get_synapse_id_by_target"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_alpha.SynapseTypeAlpha.get_synapse_id_by_target" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the ID of a synapse given the name.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The ID of the synapse</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_alpha.SynapseTypeAlpha.get_synapse_targets">
-<code class="descname">get_synapse_targets</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_alpha.html#SynapseTypeAlpha.get_synapse_targets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_alpha.SynapseTypeAlpha.get_synapse_targets" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the target names of the synapse type.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">an array of strings</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">array(str)</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_alpha.SynapseTypeAlpha.get_units">
-<code class="descname">get_units</code><span class="sig-paren">(</span><em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_alpha.html#SynapseTypeAlpha.get_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_alpha.SynapseTypeAlpha.get_units" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the units of the given variable</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_alpha.SynapseTypeAlpha.get_values">
-<code class="descname">get_values</code><span class="sig-paren">(</span><em>parameters</em>, <em>state_variables</em>, <em>vertex_slice</em>, <em>ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_alpha.html#SynapseTypeAlpha.get_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_alpha.SynapseTypeAlpha.get_values" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the values to be written to the machine for this model</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters</li>
-<li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables</li>
-<li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; The slice of variables being retrieved</li>
-<li><strong>ts</strong> (<em>int</em>) &#8211; The time to be advanced in one call to the update of this component</li>
-<li><strong>ts</strong> &#8211; machine time step</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A list with the same length as self.struct.field_types</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list(int or float or list(int) or list(float) or
-RangedList)</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_alpha.SynapseTypeAlpha.has_variable">
-<code class="descname">has_variable</code><span class="sig-paren">(</span><em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_alpha.html#SynapseTypeAlpha.has_variable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_alpha.SynapseTypeAlpha.has_variable" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determine if this component has a variable by the given name</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_alpha.SynapseTypeAlpha.inh_response">
-<code class="descname">inh_response</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_alpha.SynapseTypeAlpha.inh_response" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_alpha.SynapseTypeAlpha.tau_syn_E">
-<code class="descname">tau_syn_E</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_alpha.SynapseTypeAlpha.tau_syn_E" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_alpha.SynapseTypeAlpha.tau_syn_I">
-<code class="descname">tau_syn_I</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_alpha.SynapseTypeAlpha.tau_syn_I" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_alpha.SynapseTypeAlpha.update_values">
-<code class="descname">update_values</code><span class="sig-paren">(</span><em>values</em>, <em>parameters</em>, <em>state_variables</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_alpha.html#SynapseTypeAlpha.update_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_alpha.SynapseTypeAlpha.update_values" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the parameters and state variables with the given struct            values that have been read from the machine</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>values</strong> (<em>list</em><em>(</em><em>list</em><em>)</em><em></em>) &#8211; The values read from the machine, one for each struct element</li>
-<li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters to update</li>
-<li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables to update</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="section" id="module-spynnaker.pyNN.models.neuron.synapse_types.synapse_type_delta">
-<span id="spynnaker-pynn-models-neuron-synapse-types-synapse-type-delta-module"></span><h2>spynnaker.pyNN.models.neuron.synapse_types.synapse_type_delta module<a class="headerlink" href="#module-spynnaker.pyNN.models.neuron.synapse_types.synapse_type_delta" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_delta.SynapseTypeDelta">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.synapse_types.synapse_type_delta.</code><code class="descname">SynapseTypeDelta</code><span class="sig-paren">(</span><em>isyn_exc</em>, <em>isyn_inh</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_delta.html#SynapseTypeDelta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_delta.SynapseTypeDelta" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type.AbstractSynapseType" title="spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type.AbstractSynapseType"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type.AbstractSynapseType</span></code></a></p>
-<p>This represents a synapse type with two delta synapses</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>isyn_exc</strong> (<em>float</em>) &#8211; <span class="math">\(I^{syn}_e\)</span></li>
-<li><strong>isyn_inh</strong> (<em>float</em>) &#8211; <span class="math">\(I^{syn}_i\)</span></li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_delta.SynapseTypeDelta.add_parameters">
-<code class="descname">add_parameters</code><span class="sig-paren">(</span><em>parameters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_delta.html#SynapseTypeDelta.add_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_delta.SynapseTypeDelta.add_parameters" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add the initial values of the parameters to the parameter holder</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; A holder of the parameters</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_delta.SynapseTypeDelta.add_state_variables">
-<code class="descname">add_state_variables</code><span class="sig-paren">(</span><em>state_variables</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_delta.html#SynapseTypeDelta.add_state_variables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_delta.SynapseTypeDelta.add_state_variables" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add the initial values of the state variables to the state            variables holder</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; A holder of the state variables</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_delta.SynapseTypeDelta.get_n_cpu_cycles">
-<code class="descname">get_n_cpu_cycles</code><span class="sig-paren">(</span><em>n_neurons</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_delta.html#SynapseTypeDelta.get_n_cpu_cycles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_delta.SynapseTypeDelta.get_n_cpu_cycles" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the number of CPU cycles required to update the state</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons to get the cycles for</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_delta.SynapseTypeDelta.get_n_synapse_types">
-<code class="descname">get_n_synapse_types</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_delta.html#SynapseTypeDelta.get_n_synapse_types"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_delta.SynapseTypeDelta.get_n_synapse_types" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the number of synapse types supported.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The number of synapse types supported</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_delta.SynapseTypeDelta.get_synapse_id_by_target">
-<code class="descname">get_synapse_id_by_target</code><span class="sig-paren">(</span><em>target</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_delta.html#SynapseTypeDelta.get_synapse_id_by_target"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_delta.SynapseTypeDelta.get_synapse_id_by_target" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the ID of a synapse given the name.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The ID of the synapse</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_delta.SynapseTypeDelta.get_synapse_targets">
-<code class="descname">get_synapse_targets</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_delta.html#SynapseTypeDelta.get_synapse_targets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_delta.SynapseTypeDelta.get_synapse_targets" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the target names of the synapse type.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">an array of strings</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">array(str)</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_delta.SynapseTypeDelta.get_units">
-<code class="descname">get_units</code><span class="sig-paren">(</span><em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_delta.html#SynapseTypeDelta.get_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_delta.SynapseTypeDelta.get_units" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the units of the given variable</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_delta.SynapseTypeDelta.get_values">
-<code class="descname">get_values</code><span class="sig-paren">(</span><em>parameters</em>, <em>state_variables</em>, <em>vertex_slice</em>, <em>ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_delta.html#SynapseTypeDelta.get_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_delta.SynapseTypeDelta.get_values" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the values to be written to the machine for this model</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters</li>
-<li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables</li>
-<li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; The slice of variables being retrieved</li>
-<li><strong>ts</strong> (<em>float</em>) &#8211; The time to be advanced in one call to the update of this component</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A list with the same length as self.struct.field_types</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list(int or float or list(int) or list(float) or
-RangedList)</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_delta.SynapseTypeDelta.has_variable">
-<code class="descname">has_variable</code><span class="sig-paren">(</span><em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_delta.html#SynapseTypeDelta.has_variable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_delta.SynapseTypeDelta.has_variable" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determine if this component has a variable by the given name</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_delta.SynapseTypeDelta.isyn_exc">
-<code class="descname">isyn_exc</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_delta.SynapseTypeDelta.isyn_exc" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_delta.SynapseTypeDelta.isyn_inh">
-<code class="descname">isyn_inh</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_delta.SynapseTypeDelta.isyn_inh" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_delta.SynapseTypeDelta.update_values">
-<code class="descname">update_values</code><span class="sig-paren">(</span><em>values</em>, <em>parameters</em>, <em>state_variables</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_delta.html#SynapseTypeDelta.update_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_delta.SynapseTypeDelta.update_values" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the parameters and state variables with the given struct            values that have been read from the machine</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>values</strong> (<em>list</em><em>(</em><em>list</em><em>)</em><em></em>) &#8211; The values read from the machine, one for each struct element</li>
-<li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters to update</li>
-<li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables to update</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="section" id="module-spynnaker.pyNN.models.neuron.synapse_types.synapse_type_dual_exponential">
-<span id="spynnaker-pynn-models-neuron-synapse-types-synapse-type-dual-exponential-module"></span><h2>spynnaker.pyNN.models.neuron.synapse_types.synapse_type_dual_exponential module<a class="headerlink" href="#module-spynnaker.pyNN.models.neuron.synapse_types.synapse_type_dual_exponential" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_dual_exponential.SynapseTypeDualExponential">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.synapse_types.synapse_type_dual_exponential.</code><code class="descname">SynapseTypeDualExponential</code><span class="sig-paren">(</span><em>tau_syn_E</em>, <em>tau_syn_E2</em>, <em>tau_syn_I</em>, <em>isyn_exc</em>, <em>isyn_exc2</em>, <em>isyn_inh</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_dual_exponential.html#SynapseTypeDualExponential"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_dual_exponential.SynapseTypeDualExponential" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type.AbstractSynapseType" title="spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type.AbstractSynapseType"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type.AbstractSynapseType</span></code></a></p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>tau_syn_E</strong> (<em>float</em>) &#8211; <span class="math">\(\tau^{syn}_{e_1}\)</span></li>
-<li><strong>tau_syn_E2</strong> (<em>float</em>) &#8211; <span class="math">\(\tau^{syn}_{e_2}\)</span></li>
-<li><strong>tau_syn_I</strong> (<em>float</em>) &#8211; <span class="math">\(\tau^{syn}_i\)</span></li>
-<li><strong>isyn_exc</strong> (<em>float</em>) &#8211; <span class="math">\(I^{syn}_{e_1}\)</span></li>
-<li><strong>isyn_exc2</strong> (<em>float</em>) &#8211; <span class="math">\(I^{syn}_{e_2}\)</span></li>
-<li><strong>isyn_inh</strong> (<em>float</em>) &#8211; <span class="math">\(I^{syn}_i\)</span></li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_dual_exponential.SynapseTypeDualExponential.add_parameters">
-<code class="descname">add_parameters</code><span class="sig-paren">(</span><em>parameters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_dual_exponential.html#SynapseTypeDualExponential.add_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_dual_exponential.SynapseTypeDualExponential.add_parameters" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add the initial values of the parameters to the parameter holder</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; A holder of the parameters</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_dual_exponential.SynapseTypeDualExponential.add_state_variables">
-<code class="descname">add_state_variables</code><span class="sig-paren">(</span><em>state_variables</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_dual_exponential.html#SynapseTypeDualExponential.add_state_variables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_dual_exponential.SynapseTypeDualExponential.add_state_variables" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add the initial values of the state variables to the state            variables holder</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; A holder of the state variables</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_dual_exponential.SynapseTypeDualExponential.get_n_cpu_cycles">
-<code class="descname">get_n_cpu_cycles</code><span class="sig-paren">(</span><em>n_neurons</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_dual_exponential.html#SynapseTypeDualExponential.get_n_cpu_cycles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_dual_exponential.SynapseTypeDualExponential.get_n_cpu_cycles" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the number of CPU cycles required to update the state</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons to get the cycles for</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_dual_exponential.SynapseTypeDualExponential.get_n_synapse_types">
-<code class="descname">get_n_synapse_types</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_dual_exponential.html#SynapseTypeDualExponential.get_n_synapse_types"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_dual_exponential.SynapseTypeDualExponential.get_n_synapse_types" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the number of synapse types supported.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The number of synapse types supported</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_dual_exponential.SynapseTypeDualExponential.get_synapse_id_by_target">
-<code class="descname">get_synapse_id_by_target</code><span class="sig-paren">(</span><em>target</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_dual_exponential.html#SynapseTypeDualExponential.get_synapse_id_by_target"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_dual_exponential.SynapseTypeDualExponential.get_synapse_id_by_target" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the ID of a synapse given the name.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The ID of the synapse</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_dual_exponential.SynapseTypeDualExponential.get_synapse_targets">
-<code class="descname">get_synapse_targets</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_dual_exponential.html#SynapseTypeDualExponential.get_synapse_targets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_dual_exponential.SynapseTypeDualExponential.get_synapse_targets" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the target names of the synapse type.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">an array of strings</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">array(str)</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_dual_exponential.SynapseTypeDualExponential.get_units">
-<code class="descname">get_units</code><span class="sig-paren">(</span><em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_dual_exponential.html#SynapseTypeDualExponential.get_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_dual_exponential.SynapseTypeDualExponential.get_units" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the units of the given variable</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_dual_exponential.SynapseTypeDualExponential.get_values">
-<code class="descname">get_values</code><span class="sig-paren">(</span><em>parameters</em>, <em>state_variables</em>, <em>vertex_slice</em>, <em>ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_dual_exponential.html#SynapseTypeDualExponential.get_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_dual_exponential.SynapseTypeDualExponential.get_values" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the values to be written to the machine for this model</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters</li>
-<li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables</li>
-<li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; The slice of variables being retrieved</li>
-<li><strong>ts</strong> (<em>int</em>) &#8211; The time to be advanced in one call to the update of this component</li>
-<li><strong>ts</strong> &#8211; machine time step</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A list with the same length as self.struct.field_types</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list(int or float or list(int) or list(float) or
-RangedList)</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_dual_exponential.SynapseTypeDualExponential.has_variable">
-<code class="descname">has_variable</code><span class="sig-paren">(</span><em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_dual_exponential.html#SynapseTypeDualExponential.has_variable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_dual_exponential.SynapseTypeDualExponential.has_variable" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determine if this component has a variable by the given name</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_dual_exponential.SynapseTypeDualExponential.isyn_exc">
-<code class="descname">isyn_exc</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_dual_exponential.SynapseTypeDualExponential.isyn_exc" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_dual_exponential.SynapseTypeDualExponential.isyn_exc2">
-<code class="descname">isyn_exc2</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_dual_exponential.SynapseTypeDualExponential.isyn_exc2" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_dual_exponential.SynapseTypeDualExponential.isyn_inh">
-<code class="descname">isyn_inh</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_dual_exponential.SynapseTypeDualExponential.isyn_inh" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_dual_exponential.SynapseTypeDualExponential.tau_syn_E">
-<code class="descname">tau_syn_E</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_dual_exponential.SynapseTypeDualExponential.tau_syn_E" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_dual_exponential.SynapseTypeDualExponential.tau_syn_E2">
-<code class="descname">tau_syn_E2</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_dual_exponential.SynapseTypeDualExponential.tau_syn_E2" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_dual_exponential.SynapseTypeDualExponential.tau_syn_I">
-<code class="descname">tau_syn_I</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_dual_exponential.SynapseTypeDualExponential.tau_syn_I" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_dual_exponential.SynapseTypeDualExponential.update_values">
-<code class="descname">update_values</code><span class="sig-paren">(</span><em>values</em>, <em>parameters</em>, <em>state_variables</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_dual_exponential.html#SynapseTypeDualExponential.update_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_dual_exponential.SynapseTypeDualExponential.update_values" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the parameters and state variables with the given struct            values that have been read from the machine</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>values</strong> (<em>list</em><em>(</em><em>list</em><em>)</em><em></em>) &#8211; The values read from the machine, one for each struct element</li>
-<li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters to update</li>
-<li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables to update</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="section" id="module-spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential">
-<span id="spynnaker-pynn-models-neuron-synapse-types-synapse-type-exponential-module"></span><h2>spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential module<a class="headerlink" href="#module-spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential.SynapseTypeExponential">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential.</code><code class="descname">SynapseTypeExponential</code><span class="sig-paren">(</span><em>tau_syn_E</em>, <em>tau_syn_I</em>, <em>isyn_exc</em>, <em>isyn_inh</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_exponential.html#SynapseTypeExponential"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential.SynapseTypeExponential" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type.AbstractSynapseType" title="spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type.AbstractSynapseType"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type.AbstractSynapseType</span></code></a></p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>tau_syn_E</strong> (<em>float</em>) &#8211; <span class="math">\(\tau^{syn}_e\)</span></li>
-<li><strong>tau_syn_I</strong> (<em>float</em>) &#8211; <span class="math">\(\tau^{syn}_i\)</span></li>
-<li><strong>isyn_exc</strong> (<em>float</em>) &#8211; <span class="math">\(I^{syn}_e\)</span></li>
-<li><strong>isyn_inh</strong> (<em>float</em>) &#8211; <span class="math">\(I^{syn}_i\)</span></li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential.SynapseTypeExponential.add_parameters">
-<code class="descname">add_parameters</code><span class="sig-paren">(</span><em>parameters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_exponential.html#SynapseTypeExponential.add_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential.SynapseTypeExponential.add_parameters" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add the initial values of the parameters to the parameter holder</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; A holder of the parameters</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential.SynapseTypeExponential.add_state_variables">
-<code class="descname">add_state_variables</code><span class="sig-paren">(</span><em>state_variables</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_exponential.html#SynapseTypeExponential.add_state_variables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential.SynapseTypeExponential.add_state_variables" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add the initial values of the state variables to the state            variables holder</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; A holder of the state variables</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential.SynapseTypeExponential.get_n_cpu_cycles">
-<code class="descname">get_n_cpu_cycles</code><span class="sig-paren">(</span><em>n_neurons</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_exponential.html#SynapseTypeExponential.get_n_cpu_cycles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential.SynapseTypeExponential.get_n_cpu_cycles" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the number of CPU cycles required to update the state</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons to get the cycles for</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential.SynapseTypeExponential.get_n_synapse_types">
-<code class="descname">get_n_synapse_types</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_exponential.html#SynapseTypeExponential.get_n_synapse_types"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential.SynapseTypeExponential.get_n_synapse_types" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the number of synapse types supported.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The number of synapse types supported</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential.SynapseTypeExponential.get_synapse_id_by_target">
-<code class="descname">get_synapse_id_by_target</code><span class="sig-paren">(</span><em>target</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_exponential.html#SynapseTypeExponential.get_synapse_id_by_target"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential.SynapseTypeExponential.get_synapse_id_by_target" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the ID of a synapse given the name.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The ID of the synapse</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential.SynapseTypeExponential.get_synapse_targets">
-<code class="descname">get_synapse_targets</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_exponential.html#SynapseTypeExponential.get_synapse_targets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential.SynapseTypeExponential.get_synapse_targets" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the target names of the synapse type.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">an array of strings</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">array(str)</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential.SynapseTypeExponential.get_units">
-<code class="descname">get_units</code><span class="sig-paren">(</span><em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_exponential.html#SynapseTypeExponential.get_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential.SynapseTypeExponential.get_units" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the units of the given variable</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential.SynapseTypeExponential.get_values">
-<code class="descname">get_values</code><span class="sig-paren">(</span><em>parameters</em>, <em>state_variables</em>, <em>vertex_slice</em>, <em>ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_exponential.html#SynapseTypeExponential.get_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential.SynapseTypeExponential.get_values" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the values to be written to the machine for this model</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters</li>
-<li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables</li>
-<li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; The slice of variables being retrieved</li>
-<li><strong>ts</strong> (<em>int</em>) &#8211; The time to be advanced in one call to the update of this component</li>
-<li><strong>ts</strong> &#8211; machine time step</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A list with the same length as self.struct.field_types</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list(int or float or list(int) or list(float) or
-RangedList)</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential.SynapseTypeExponential.has_variable">
-<code class="descname">has_variable</code><span class="sig-paren">(</span><em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_exponential.html#SynapseTypeExponential.has_variable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential.SynapseTypeExponential.has_variable" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determine if this component has a variable by the given name</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential.SynapseTypeExponential.isyn_exc">
-<code class="descname">isyn_exc</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential.SynapseTypeExponential.isyn_exc" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential.SynapseTypeExponential.isyn_inh">
-<code class="descname">isyn_inh</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential.SynapseTypeExponential.isyn_inh" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential.SynapseTypeExponential.tau_syn_E">
-<code class="descname">tau_syn_E</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential.SynapseTypeExponential.tau_syn_E" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential.SynapseTypeExponential.tau_syn_I">
-<code class="descname">tau_syn_I</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential.SynapseTypeExponential.tau_syn_I" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential.SynapseTypeExponential.update_values">
-<code class="descname">update_values</code><span class="sig-paren">(</span><em>values</em>, <em>parameters</em>, <em>state_variables</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_exponential.html#SynapseTypeExponential.update_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential.SynapseTypeExponential.update_values" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the parameters and state variables with the given struct            values that have been read from the machine</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>values</strong> (<em>list</em><em>(</em><em>list</em><em>)</em><em></em>) &#8211; The values read from the machine, one for each struct element</li>
-<li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters to update</li>
-<li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables to update</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="section" id="module-spynnaker.pyNN.models.neuron.synapse_types.synapse_type_semd">
-<span id="spynnaker-pynn-models-neuron-synapse-types-synapse-type-semd-module"></span><h2>spynnaker.pyNN.models.neuron.synapse_types.synapse_type_semd module<a class="headerlink" href="#module-spynnaker.pyNN.models.neuron.synapse_types.synapse_type_semd" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_semd.SynapseTypeSEMD">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.synapse_types.synapse_type_semd.</code><code class="descname">SynapseTypeSEMD</code><span class="sig-paren">(</span><em>tau_syn_E</em>, <em>tau_syn_E2</em>, <em>tau_syn_I</em>, <em>isyn_exc</em>, <em>isyn_exc2</em>, <em>isyn_inh</em>, <em>multiplicator</em>, <em>exc2_old</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_semd.html#SynapseTypeSEMD"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_semd.SynapseTypeSEMD" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type.AbstractSynapseType" title="spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type.AbstractSynapseType"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type.AbstractSynapseType</span></code></a></p>
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_semd.SynapseTypeSEMD.add_parameters">
-<code class="descname">add_parameters</code><span class="sig-paren">(</span><em>parameters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_semd.html#SynapseTypeSEMD.add_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_semd.SynapseTypeSEMD.add_parameters" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add the initial values of the parameters to the parameter holder</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; A holder of the parameters</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_semd.SynapseTypeSEMD.add_state_variables">
-<code class="descname">add_state_variables</code><span class="sig-paren">(</span><em>state_variables</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_semd.html#SynapseTypeSEMD.add_state_variables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_semd.SynapseTypeSEMD.add_state_variables" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add the initial values of the state variables to the state            variables holder</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; A holder of the state variables</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_semd.SynapseTypeSEMD.exc2_old">
-<code class="descname">exc2_old</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_semd.SynapseTypeSEMD.exc2_old" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_semd.SynapseTypeSEMD.get_n_cpu_cycles">
-<code class="descname">get_n_cpu_cycles</code><span class="sig-paren">(</span><em>n_neurons</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_semd.html#SynapseTypeSEMD.get_n_cpu_cycles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_semd.SynapseTypeSEMD.get_n_cpu_cycles" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the number of CPU cycles required to update the state</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons to get the cycles for</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_semd.SynapseTypeSEMD.get_n_synapse_types">
-<code class="descname">get_n_synapse_types</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_semd.html#SynapseTypeSEMD.get_n_synapse_types"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_semd.SynapseTypeSEMD.get_n_synapse_types" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the number of synapse types supported.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The number of synapse types supported</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_semd.SynapseTypeSEMD.get_synapse_id_by_target">
-<code class="descname">get_synapse_id_by_target</code><span class="sig-paren">(</span><em>target</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_semd.html#SynapseTypeSEMD.get_synapse_id_by_target"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_semd.SynapseTypeSEMD.get_synapse_id_by_target" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the ID of a synapse given the name.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The ID of the synapse</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_semd.SynapseTypeSEMD.get_synapse_targets">
-<code class="descname">get_synapse_targets</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_semd.html#SynapseTypeSEMD.get_synapse_targets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_semd.SynapseTypeSEMD.get_synapse_targets" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the target names of the synapse type.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">an array of strings</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">array(str)</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_semd.SynapseTypeSEMD.get_units">
-<code class="descname">get_units</code><span class="sig-paren">(</span><em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_semd.html#SynapseTypeSEMD.get_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_semd.SynapseTypeSEMD.get_units" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the units of the given variable</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_semd.SynapseTypeSEMD.get_values">
-<code class="descname">get_values</code><span class="sig-paren">(</span><em>parameters</em>, <em>state_variables</em>, <em>vertex_slice</em>, <em>ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_semd.html#SynapseTypeSEMD.get_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_semd.SynapseTypeSEMD.get_values" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the values to be written to the machine for this model</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters</li>
-<li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables</li>
-<li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; The slice of variables being retrieved</li>
-<li><strong>ts</strong> (<em>float</em>) &#8211; The time to be advanced in one call to the update of this component</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A list with the same length as self.struct.field_types</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list(int or float or list(int) or list(float) or
-RangedList)</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_semd.SynapseTypeSEMD.has_variable">
-<code class="descname">has_variable</code><span class="sig-paren">(</span><em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_semd.html#SynapseTypeSEMD.has_variable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_semd.SynapseTypeSEMD.has_variable" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determine if this component has a variable by the given name</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_semd.SynapseTypeSEMD.isyn_exc">
-<code class="descname">isyn_exc</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_semd.SynapseTypeSEMD.isyn_exc" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_semd.SynapseTypeSEMD.isyn_exc2">
-<code class="descname">isyn_exc2</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_semd.SynapseTypeSEMD.isyn_exc2" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_semd.SynapseTypeSEMD.isyn_inh">
-<code class="descname">isyn_inh</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_semd.SynapseTypeSEMD.isyn_inh" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_semd.SynapseTypeSEMD.multiplicator">
-<code class="descname">multiplicator</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_semd.SynapseTypeSEMD.multiplicator" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_semd.SynapseTypeSEMD.tau_syn_E">
-<code class="descname">tau_syn_E</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_semd.SynapseTypeSEMD.tau_syn_E" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_semd.SynapseTypeSEMD.tau_syn_E2">
-<code class="descname">tau_syn_E2</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_semd.SynapseTypeSEMD.tau_syn_E2" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_semd.SynapseTypeSEMD.tau_syn_I">
-<code class="descname">tau_syn_I</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_semd.SynapseTypeSEMD.tau_syn_I" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.synapse_types.synapse_type_semd.SynapseTypeSEMD.update_values">
-<code class="descname">update_values</code><span class="sig-paren">(</span><em>values</em>, <em>parameters</em>, <em>state_variables</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_semd.html#SynapseTypeSEMD.update_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.synapse_type_semd.SynapseTypeSEMD.update_values" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the parameters and state variables with the given struct            values that have been read from the machine</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>values</strong> (<em>list</em><em>(</em><em>list</em><em>)</em><em></em>) &#8211; The values read from the machine, one for each struct element</li>
-<li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters to update</li>
-<li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables to update</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-</div>
 <div class="section" id="module-spynnaker.pyNN.models.neuron.synapse_types">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.models.neuron.synapse_types" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType">
 <em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.synapse_types.</code><code class="descname">AbstractSynapseType</code><span class="sig-paren">(</span><em>data_types</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/abstract_synapse_type.html#AbstractSynapseType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="spynnaker.pyNN.models.neuron.implementations.html#spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent" title="spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent</span></code></a></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent</span></code></p>
 <p>Represents the synapse types supported.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data_types</strong> (<em>list</em><em>(</em><a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification.enums/#data_specification.enums.DataType" title="(in DataSpecification v)"><em>DataType</em></a><em>)</em><em></em>) &#8211; A list of data types in the component structure, in the order that
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data_types</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification.enums/#data_specification.enums.DataType" title="(in DataSpecification v)"><em>DataType</em></a><em>)</em><em></em>) &#8211; A list of data types in the component structure, in the order that
 they appear</td>
 </tr>
 </tbody>
@@ -1266,7 +123,7 @@ they appear</td>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The number of synapse types supported</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
 </tr>
 </tbody>
 </table>
@@ -1282,7 +139,7 @@ they appear</td>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The ID of the synapse</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
 </tr>
 </tbody>
 </table>
@@ -1298,7 +155,7 @@ they appear</td>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">an array of strings</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">array(str)</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/array.html#module-array" title="(in Python v3.6)">array</a>(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a>)</td>
 </tr>
 </tbody>
 </table>
@@ -1309,18 +166,18 @@ they appear</td>
 <dl class="class">
 <dt id="spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDualExponential">
 <em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.synapse_types.</code><code class="descname">SynapseTypeDualExponential</code><span class="sig-paren">(</span><em>tau_syn_E</em>, <em>tau_syn_E2</em>, <em>tau_syn_I</em>, <em>isyn_exc</em>, <em>isyn_exc2</em>, <em>isyn_inh</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_dual_exponential.html#SynapseTypeDualExponential"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDualExponential" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type.AbstractSynapseType" title="spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type.AbstractSynapseType"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type.AbstractSynapseType</span></code></a></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type.AbstractSynapseType</span></code></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>tau_syn_E</strong> (<em>float</em>) &#8211; <span class="math">\(\tau^{syn}_{e_1}\)</span></li>
-<li><strong>tau_syn_E2</strong> (<em>float</em>) &#8211; <span class="math">\(\tau^{syn}_{e_2}\)</span></li>
-<li><strong>tau_syn_I</strong> (<em>float</em>) &#8211; <span class="math">\(\tau^{syn}_i\)</span></li>
-<li><strong>isyn_exc</strong> (<em>float</em>) &#8211; <span class="math">\(I^{syn}_{e_1}\)</span></li>
-<li><strong>isyn_exc2</strong> (<em>float</em>) &#8211; <span class="math">\(I^{syn}_{e_2}\)</span></li>
-<li><strong>isyn_inh</strong> (<em>float</em>) &#8211; <span class="math">\(I^{syn}_i\)</span></li>
+<li><strong>tau_syn_E</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(\tau^{syn}_{e_1}\)</span></li>
+<li><strong>tau_syn_E2</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(\tau^{syn}_{e_2}\)</span></li>
+<li><strong>tau_syn_I</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(\tau^{syn}_i\)</span></li>
+<li><strong>isyn_exc</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(I^{syn}_{e_1}\)</span></li>
+<li><strong>isyn_exc2</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(I^{syn}_{e_2}\)</span></li>
+<li><strong>isyn_inh</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(I^{syn}_i\)</span></li>
 </ul>
 </td>
 </tr>
@@ -1334,7 +191,7 @@ they appear</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; A holder of the parameters</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; A holder of the parameters</td>
 </tr>
 </tbody>
 </table>
@@ -1348,7 +205,7 @@ they appear</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; A holder of the state variables</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; A holder of the state variables</td>
 </tr>
 </tbody>
 </table>
@@ -1362,9 +219,9 @@ they appear</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons to get the cycles for</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The number of neurons to get the cycles for</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
 </tr>
 </tbody>
 </table>
@@ -1380,7 +237,7 @@ they appear</td>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The number of synapse types supported</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
 </tr>
 </tbody>
 </table>
@@ -1396,7 +253,7 @@ they appear</td>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The ID of the synapse</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
 </tr>
 </tbody>
 </table>
@@ -1412,7 +269,7 @@ they appear</td>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">an array of strings</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">array(str)</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/array.html#module-array" title="(in Python v3.6)">array</a>(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a>)</td>
 </tr>
 </tbody>
 </table>
@@ -1426,7 +283,7 @@ they appear</td>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The name of the variable</td>
 </tr>
 </tbody>
 </table>
@@ -1441,10 +298,10 @@ they appear</td>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters</li>
-<li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables</li>
+<li><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; The holder of the parameters</li>
+<li><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; The holder of the state variables</li>
 <li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; The slice of variables being retrieved</li>
-<li><strong>ts</strong> (<em>int</em>) &#8211; The time to be advanced in one call to the update of this component</li>
+<li><strong>ts</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The time to be advanced in one call to the update of this component</li>
 <li><strong>ts</strong> &#8211; machine time step</li>
 </ul>
 </td>
@@ -1452,8 +309,8 @@ they appear</td>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A list with the same length as self.struct.field_types</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list(int or float or list(int) or list(float) or
-RangedList)</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a> or <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a> or <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a>) or <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a>) or
+<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangedList" title="(in SpiNNUtils v)">RangedList</a>)</p>
 </td>
 </tr>
 </tbody>
@@ -1468,9 +325,9 @@ RangedList)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The name of the variable</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></td>
 </tr>
 </tbody>
 </table>
@@ -1515,9 +372,9 @@ RangedList)</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>values</strong> (<em>list</em><em>(</em><em>list</em><em>)</em><em></em>) &#8211; The values read from the machine, one for each struct element</li>
-<li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters to update</li>
-<li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables to update</li>
+<li><strong>values</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>)</em><em></em>) &#8211; The values read from the machine, one for each struct element</li>
+<li><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; The holder of the parameters to update</li>
+<li><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; The holder of the state variables to update</li>
 </ul>
 </td>
 </tr>
@@ -1530,16 +387,16 @@ RangedList)</p>
 <dl class="class">
 <dt id="spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential">
 <em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.synapse_types.</code><code class="descname">SynapseTypeExponential</code><span class="sig-paren">(</span><em>tau_syn_E</em>, <em>tau_syn_I</em>, <em>isyn_exc</em>, <em>isyn_inh</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_exponential.html#SynapseTypeExponential"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeExponential" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type.AbstractSynapseType" title="spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type.AbstractSynapseType"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type.AbstractSynapseType</span></code></a></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type.AbstractSynapseType</span></code></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>tau_syn_E</strong> (<em>float</em>) &#8211; <span class="math">\(\tau^{syn}_e\)</span></li>
-<li><strong>tau_syn_I</strong> (<em>float</em>) &#8211; <span class="math">\(\tau^{syn}_i\)</span></li>
-<li><strong>isyn_exc</strong> (<em>float</em>) &#8211; <span class="math">\(I^{syn}_e\)</span></li>
-<li><strong>isyn_inh</strong> (<em>float</em>) &#8211; <span class="math">\(I^{syn}_i\)</span></li>
+<li><strong>tau_syn_E</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(\tau^{syn}_e\)</span></li>
+<li><strong>tau_syn_I</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(\tau^{syn}_i\)</span></li>
+<li><strong>isyn_exc</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(I^{syn}_e\)</span></li>
+<li><strong>isyn_inh</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(I^{syn}_i\)</span></li>
 </ul>
 </td>
 </tr>
@@ -1553,7 +410,7 @@ RangedList)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; A holder of the parameters</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; A holder of the parameters</td>
 </tr>
 </tbody>
 </table>
@@ -1567,7 +424,7 @@ RangedList)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; A holder of the state variables</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; A holder of the state variables</td>
 </tr>
 </tbody>
 </table>
@@ -1581,9 +438,9 @@ RangedList)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons to get the cycles for</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The number of neurons to get the cycles for</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
 </tr>
 </tbody>
 </table>
@@ -1599,7 +456,7 @@ RangedList)</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The number of synapse types supported</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
 </tr>
 </tbody>
 </table>
@@ -1615,7 +472,7 @@ RangedList)</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The ID of the synapse</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
 </tr>
 </tbody>
 </table>
@@ -1631,7 +488,7 @@ RangedList)</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">an array of strings</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">array(str)</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/array.html#module-array" title="(in Python v3.6)">array</a>(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a>)</td>
 </tr>
 </tbody>
 </table>
@@ -1645,7 +502,7 @@ RangedList)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The name of the variable</td>
 </tr>
 </tbody>
 </table>
@@ -1660,10 +517,10 @@ RangedList)</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters</li>
-<li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables</li>
+<li><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; The holder of the parameters</li>
+<li><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; The holder of the state variables</li>
 <li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; The slice of variables being retrieved</li>
-<li><strong>ts</strong> (<em>int</em>) &#8211; The time to be advanced in one call to the update of this component</li>
+<li><strong>ts</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The time to be advanced in one call to the update of this component</li>
 <li><strong>ts</strong> &#8211; machine time step</li>
 </ul>
 </td>
@@ -1671,8 +528,8 @@ RangedList)</p>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A list with the same length as self.struct.field_types</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list(int or float or list(int) or list(float) or
-RangedList)</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a> or <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a> or <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a>) or <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a>) or
+<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangedList" title="(in SpiNNUtils v)">RangedList</a>)</p>
 </td>
 </tr>
 </tbody>
@@ -1687,9 +544,9 @@ RangedList)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The name of the variable</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></td>
 </tr>
 </tbody>
 </table>
@@ -1724,9 +581,9 @@ RangedList)</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>values</strong> (<em>list</em><em>(</em><em>list</em><em>)</em><em></em>) &#8211; The values read from the machine, one for each struct element</li>
-<li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters to update</li>
-<li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables to update</li>
+<li><strong>values</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>)</em><em></em>) &#8211; The values read from the machine, one for each struct element</li>
+<li><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; The holder of the parameters to update</li>
+<li><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; The holder of the state variables to update</li>
 </ul>
 </td>
 </tr>
@@ -1739,15 +596,15 @@ RangedList)</p>
 <dl class="class">
 <dt id="spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDelta">
 <em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.synapse_types.</code><code class="descname">SynapseTypeDelta</code><span class="sig-paren">(</span><em>isyn_exc</em>, <em>isyn_inh</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_delta.html#SynapseTypeDelta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeDelta" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type.AbstractSynapseType" title="spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type.AbstractSynapseType"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type.AbstractSynapseType</span></code></a></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type.AbstractSynapseType</span></code></p>
 <p>This represents a synapse type with two delta synapses</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>isyn_exc</strong> (<em>float</em>) &#8211; <span class="math">\(I^{syn}_e\)</span></li>
-<li><strong>isyn_inh</strong> (<em>float</em>) &#8211; <span class="math">\(I^{syn}_i\)</span></li>
+<li><strong>isyn_exc</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(I^{syn}_e\)</span></li>
+<li><strong>isyn_inh</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(I^{syn}_i\)</span></li>
 </ul>
 </td>
 </tr>
@@ -1761,7 +618,7 @@ RangedList)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; A holder of the parameters</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; A holder of the parameters</td>
 </tr>
 </tbody>
 </table>
@@ -1775,7 +632,7 @@ RangedList)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; A holder of the state variables</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; A holder of the state variables</td>
 </tr>
 </tbody>
 </table>
@@ -1789,9 +646,9 @@ RangedList)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons to get the cycles for</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The number of neurons to get the cycles for</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
 </tr>
 </tbody>
 </table>
@@ -1807,7 +664,7 @@ RangedList)</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The number of synapse types supported</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
 </tr>
 </tbody>
 </table>
@@ -1823,7 +680,7 @@ RangedList)</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The ID of the synapse</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
 </tr>
 </tbody>
 </table>
@@ -1839,7 +696,7 @@ RangedList)</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">an array of strings</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">array(str)</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/array.html#module-array" title="(in Python v3.6)">array</a>(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a>)</td>
 </tr>
 </tbody>
 </table>
@@ -1853,7 +710,7 @@ RangedList)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The name of the variable</td>
 </tr>
 </tbody>
 </table>
@@ -1868,18 +725,18 @@ RangedList)</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters</li>
-<li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables</li>
+<li><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; The holder of the parameters</li>
+<li><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; The holder of the state variables</li>
 <li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; The slice of variables being retrieved</li>
-<li><strong>ts</strong> (<em>float</em>) &#8211; The time to be advanced in one call to the update of this component</li>
+<li><strong>ts</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; The time to be advanced in one call to the update of this component</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A list with the same length as self.struct.field_types</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list(int or float or list(int) or list(float) or
-RangedList)</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a> or <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a> or <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a>) or <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a>) or
+<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangedList" title="(in SpiNNUtils v)">RangedList</a>)</p>
 </td>
 </tr>
 </tbody>
@@ -1894,9 +751,9 @@ RangedList)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The name of the variable</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></td>
 </tr>
 </tbody>
 </table>
@@ -1921,9 +778,9 @@ RangedList)</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>values</strong> (<em>list</em><em>(</em><em>list</em><em>)</em><em></em>) &#8211; The values read from the machine, one for each struct element</li>
-<li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters to update</li>
-<li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables to update</li>
+<li><strong>values</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>)</em><em></em>) &#8211; The values read from the machine, one for each struct element</li>
+<li><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; The holder of the parameters to update</li>
+<li><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; The holder of the state variables to update</li>
 </ul>
 </td>
 </tr>
@@ -1936,18 +793,18 @@ RangedList)</p>
 <dl class="class">
 <dt id="spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeAlpha">
 <em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.synapse_types.</code><code class="descname">SynapseTypeAlpha</code><span class="sig-paren">(</span><em>exc_response</em>, <em>exc_exp_response</em>, <em>tau_syn_E</em>, <em>inh_response</em>, <em>inh_exp_response</em>, <em>tau_syn_I</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_alpha.html#SynapseTypeAlpha"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeAlpha" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type.AbstractSynapseType" title="spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type.AbstractSynapseType"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type.AbstractSynapseType</span></code></a></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type.AbstractSynapseType</span></code></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>exc_response</strong> (<em>float</em>) &#8211; <span class="math">\(response^\mathrm{linear}_e\)</span></li>
-<li><strong>exc_exp_response</strong> (<em>float</em>) &#8211; <span class="math">\(response^\mathrm{exponential}_e\)</span></li>
-<li><strong>tau_syn_E</strong> (<em>float</em>) &#8211; <span class="math">\(\tau^{syn}_e\)</span></li>
-<li><strong>inh_response</strong> (<em>float</em>) &#8211; <span class="math">\(response^\mathrm{linear}_i\)</span></li>
-<li><strong>inh_exp_response</strong> (<em>float</em>) &#8211; <span class="math">\(response^\mathrm{exponential}_i\)</span></li>
-<li><strong>tau_syn_I</strong> (<em>float</em>) &#8211; <span class="math">\(\tau^{syn}_i\)</span></li>
+<li><strong>exc_response</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(response^\mathrm{linear}_e\)</span></li>
+<li><strong>exc_exp_response</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(response^\mathrm{exponential}_e\)</span></li>
+<li><strong>tau_syn_E</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(\tau^{syn}_e\)</span></li>
+<li><strong>inh_response</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(response^\mathrm{linear}_i\)</span></li>
+<li><strong>inh_exp_response</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(response^\mathrm{exponential}_i\)</span></li>
+<li><strong>tau_syn_I</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(\tau^{syn}_i\)</span></li>
 </ul>
 </td>
 </tr>
@@ -1961,7 +818,7 @@ RangedList)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; A holder of the parameters</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; A holder of the parameters</td>
 </tr>
 </tbody>
 </table>
@@ -1975,7 +832,7 @@ RangedList)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; A holder of the state variables</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; A holder of the state variables</td>
 </tr>
 </tbody>
 </table>
@@ -1994,9 +851,9 @@ RangedList)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons to get the cycles for</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The number of neurons to get the cycles for</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
 </tr>
 </tbody>
 </table>
@@ -2012,7 +869,7 @@ RangedList)</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The number of synapse types supported</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
 </tr>
 </tbody>
 </table>
@@ -2028,7 +885,7 @@ RangedList)</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The ID of the synapse</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
 </tr>
 </tbody>
 </table>
@@ -2044,7 +901,7 @@ RangedList)</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">an array of strings</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">array(str)</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/array.html#module-array" title="(in Python v3.6)">array</a>(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a>)</td>
 </tr>
 </tbody>
 </table>
@@ -2058,7 +915,7 @@ RangedList)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The name of the variable</td>
 </tr>
 </tbody>
 </table>
@@ -2073,10 +930,10 @@ RangedList)</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters</li>
-<li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables</li>
+<li><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; The holder of the parameters</li>
+<li><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; The holder of the state variables</li>
 <li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; The slice of variables being retrieved</li>
-<li><strong>ts</strong> (<em>int</em>) &#8211; The time to be advanced in one call to the update of this component</li>
+<li><strong>ts</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The time to be advanced in one call to the update of this component</li>
 <li><strong>ts</strong> &#8211; machine time step</li>
 </ul>
 </td>
@@ -2084,8 +941,8 @@ RangedList)</p>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A list with the same length as self.struct.field_types</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list(int or float or list(int) or list(float) or
-RangedList)</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a> or <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a> or <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a>) or <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a>) or
+<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangedList" title="(in SpiNNUtils v)">RangedList</a>)</p>
 </td>
 </tr>
 </tbody>
@@ -2100,9 +957,9 @@ RangedList)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The name of the variable</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></td>
 </tr>
 </tbody>
 </table>
@@ -2132,9 +989,9 @@ RangedList)</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>values</strong> (<em>list</em><em>(</em><em>list</em><em>)</em><em></em>) &#8211; The values read from the machine, one for each struct element</li>
-<li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters to update</li>
-<li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables to update</li>
+<li><strong>values</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>)</em><em></em>) &#8211; The values read from the machine, one for each struct element</li>
+<li><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; The holder of the parameters to update</li>
+<li><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; The holder of the state variables to update</li>
 </ul>
 </td>
 </tr>
@@ -2147,7 +1004,25 @@ RangedList)</p>
 <dl class="class">
 <dt id="spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD">
 <em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.synapse_types.</code><code class="descname">SynapseTypeSEMD</code><span class="sig-paren">(</span><em>tau_syn_E</em>, <em>tau_syn_E2</em>, <em>tau_syn_I</em>, <em>isyn_exc</em>, <em>isyn_exc2</em>, <em>isyn_inh</em>, <em>multiplicator</em>, <em>exc2_old</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_semd.html#SynapseTypeSEMD"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type.AbstractSynapseType" title="spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type.AbstractSynapseType"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type.AbstractSynapseType</span></code></a></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type.AbstractSynapseType</span></code></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>tau_syn_E</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(\tau^{syn}_{e_1}\)</span></li>
+<li><strong>tau_syn_E2</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(\tau^{syn}_{e_2}\)</span></li>
+<li><strong>tau_syn_I</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(\tau^{syn}_i\)</span></li>
+<li><strong>isyn_exc</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(I^{syn}_{e_1}\)</span></li>
+<li><strong>isyn_exc2</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(I^{syn}_{e_2}\)</span></li>
+<li><strong>isyn_inh</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; <span class="math">\(I^{syn}_i\)</span></li>
+<li><strong>multiplicator</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; </li>
+<li><strong>exc2_old</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.add_parameters">
 <code class="descname">add_parameters</code><span class="sig-paren">(</span><em>parameters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/synapse_types/synapse_type_semd.html#SynapseTypeSEMD.add_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.synapse_types.SynapseTypeSEMD.add_parameters" title="Permalink to this definition">¶</a></dt>
@@ -2156,7 +1031,7 @@ RangedList)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; A holder of the parameters</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; A holder of the parameters</td>
 </tr>
 </tbody>
 </table>
@@ -2170,7 +1045,7 @@ RangedList)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; A holder of the state variables</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; A holder of the state variables</td>
 </tr>
 </tbody>
 </table>
@@ -2189,9 +1064,9 @@ RangedList)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons to get the cycles for</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The number of neurons to get the cycles for</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
 </tr>
 </tbody>
 </table>
@@ -2207,7 +1082,7 @@ RangedList)</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The number of synapse types supported</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
 </tr>
 </tbody>
 </table>
@@ -2223,7 +1098,7 @@ RangedList)</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The ID of the synapse</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
 </tr>
 </tbody>
 </table>
@@ -2239,7 +1114,7 @@ RangedList)</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">an array of strings</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">array(str)</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/array.html#module-array" title="(in Python v3.6)">array</a>(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a>)</td>
 </tr>
 </tbody>
 </table>
@@ -2253,7 +1128,7 @@ RangedList)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The name of the variable</td>
 </tr>
 </tbody>
 </table>
@@ -2268,18 +1143,19 @@ RangedList)</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters</li>
-<li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables</li>
+<li><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; The holder of the parameters</li>
+<li><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; The holder of the state variables</li>
 <li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; The slice of variables being retrieved</li>
-<li><strong>ts</strong> (<em>float</em>) &#8211; The time to be advanced in one call to the update of this component</li>
+<li><strong>ts</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The time to be advanced in one call to the update of this component</li>
+<li><strong>ts</strong> &#8211; machine time step</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A list with the same length as self.struct.field_types</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list(int or float or list(int) or list(float) or
-RangedList)</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a> or <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a> or <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a>) or <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a>) or
+<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangedList" title="(in SpiNNUtils v)">RangedList</a>)</p>
 </td>
 </tr>
 </tbody>
@@ -2294,9 +1170,9 @@ RangedList)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The name of the variable</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></td>
 </tr>
 </tbody>
 </table>
@@ -2346,9 +1222,9 @@ RangedList)</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>values</strong> (<em>list</em><em>(</em><em>list</em><em>)</em><em></em>) &#8211; The values read from the machine, one for each struct element</li>
-<li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters to update</li>
-<li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables to update</li>
+<li><strong>values</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>)</em><em></em>) &#8211; The values read from the machine, one for each struct element</li>
+<li><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; The holder of the parameters to update</li>
+<li><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; The holder of the state variables to update</li>
 </ul>
 </td>
 </tr>
@@ -2383,10 +1259,11 @@ RangedList)</p>
           <a href="spynnaker.pyNN.models.neuron.synapse_dynamics.html" title="spynnaker.pyNN.models.neuron.synapse_dynamics package"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
-          <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.models.html" >spynnaker.pyNN.models package</a> &#187;</li>
-          <li class="nav-item nav-item-4"><a href="spynnaker.pyNN.models.neuron.html" >spynnaker.pyNN.models.neuron package</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="modules.html" >spynnaker</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="spynnaker.pyNN.models.html" >spynnaker.pyNN.models package</a> &#187;</li>
+          <li class="nav-item nav-item-5"><a href="spynnaker.pyNN.models.neuron.html" >spynnaker.pyNN.models.neuron package</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

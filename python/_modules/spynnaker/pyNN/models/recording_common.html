@@ -102,9 +102,8 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">population</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param population: the population to record for</span>
+<span class="sd">        :param PyNNPopulationCommon population: the population to record for</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">__population</span> <span class="o">=</span> <span class="n">population</span>
 
         <span class="c1"># file flags, allows separate files for the recorded variables</span>
@@ -126,10 +125,11 @@
                 <span class="n">indexes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Tell the vertex to record data.</span>
 
-<span class="sd">        :param variable: the variable to record, valued variables to record\</span>
-<span class="sd">            are: &#39;gsyn_exc&#39;, &#39;gsyn_inh&#39;, &#39;v&#39;, &#39;spikes&#39;</span>
-<span class="sd">        :param sampling_interval: the interval to record them</span>
+<span class="sd">        :param str variable: the variable to record, valued variables to\</span>
+<span class="sd">            record are: &#39;gsyn_exc&#39;, &#39;gsyn_inh&#39;, &#39;v&#39;, &#39;spikes&#39;</span>
+<span class="sd">        :param int sampling_interval: the interval to record them</span>
 <span class="sd">        :param indexes: List of indexes to record or None for all</span>
+<span class="sd">        :type indexes: list(int) or None</span>
 <span class="sd">        :return: None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -169,9 +169,8 @@
                     <span class="s2">&quot;input. You will receive current measurements instead.&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_get_recorded_pynn7</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">variable</span> <span class="o">==</span> <span class="s2">&quot;spikes&quot;</span><span class="p">:</span>
-            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_spikes</span><span class="p">()</span>
-
+        <span class="sd">&quot;&quot;&quot; Get recorded data in PyNN 0.7 format. Must not be spikes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">ids</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_recorded_matrix</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span>
         <span class="n">n_machine_time_steps</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="n">n_neurons</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
@@ -187,8 +186,9 @@
         <span class="sd">&quot;&quot;&quot; Perform safety checks and get the recorded data from the vertex\</span>
 <span class="sd">            in matrix format.</span>
 
-<span class="sd">        :param variable: the variable name to read. supported variable names</span>
-<span class="sd">            are :&#39;gsyn_exc&#39;, &#39;gsyn_inh&#39;, &#39;v&#39;</span>
+<span class="sd">        :param str variable:</span>
+<span class="sd">            the variable name to read. supported variable names are:</span>
+<span class="sd">            &#39;gsyn_exc&#39;, &#39;gsyn_inh&#39;, &#39;v&#39;</span>
 <span class="sd">        :return: data, indexes, sampling_interval</span>
 <span class="sd">        :rtype: tuple(~numpy.ndarray, list(int), float)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -231,7 +231,7 @@
             <span class="c1"># data</span>
             <span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">_vertex</span><span class="o">.</span><span class="n">get_data</span><span class="p">(</span>
                 <span class="n">variable</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">no_machine_time_steps</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">placements</span><span class="p">,</span>
-                <span class="n">sim</span><span class="o">.</span><span class="n">graph_mapper</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">buffer_manager</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">machine_time_step</span><span class="p">)</span>
+                <span class="n">sim</span><span class="o">.</span><span class="n">buffer_manager</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">machine_time_step</span><span class="p">)</span>
             <span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">indexes</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">)</span> <span class="o">=</span> <span class="n">results</span>
 
         <span class="k">return</span> <span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">indexes</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="p">)</span>
@@ -240,6 +240,7 @@
         <span class="sd">&quot;&quot;&quot; How to get spikes from a vertex.</span>
 
 <span class="sd">        :return: the spikes from a vertex</span>
+<span class="sd">        :rtype: ~numpy.ndarray</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="c1"># check we&#39;re in a state where we can get spikes</span>
@@ -266,15 +267,13 @@
         <span class="c1"># assuming we got here, everything is OK, so we should go get the</span>
         <span class="c1"># spikes</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">_vertex</span><span class="o">.</span><span class="n">get_spikes</span><span class="p">(</span>
-            <span class="n">sim</span><span class="o">.</span><span class="n">placements</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">graph_mapper</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">buffer_manager</span><span class="p">,</span>
-            <span class="n">sim</span><span class="o">.</span><span class="n">machine_time_step</span><span class="p">)</span>
+            <span class="n">sim</span><span class="o">.</span><span class="n">placements</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">buffer_manager</span><span class="p">,</span> <span class="n">sim</span><span class="o">.</span><span class="n">machine_time_step</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_turn_off_all_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indexes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Turns off recording, is used by a pop saying `.record()`</span>
 
 <span class="sd">        :rtype: None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="c1"># check for standard record which includes spikes</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">_vertex</span><span class="p">,</span> <span class="n">AbstractNeuronRecordable</span><span class="p">):</span>
             <span class="n">variables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">_vertex</span><span class="o">.</span><span class="n">get_recordable_variables</span><span class="p">()</span>
@@ -283,7 +282,7 @@
                     <span class="n">variable</span><span class="p">,</span> <span class="n">new_state</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indexes</span><span class="o">=</span><span class="n">indexes</span><span class="p">)</span>
 
         <span class="c1"># check for spikes</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">_vertex</span><span class="p">,</span> <span class="n">AbstractSpikeRecordable</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">_vertex</span><span class="p">,</span> <span class="n">AbstractSpikeRecordable</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__population</span><span class="o">.</span><span class="n">_vertex</span><span class="o">.</span><span class="n">set_recording_spikes</span><span class="p">(</span>
                 <span class="n">new_state</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indexes</span><span class="o">=</span><span class="n">indexes</span><span class="p">)</span></div>
 </pre></div>

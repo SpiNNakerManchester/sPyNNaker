@@ -87,13 +87,14 @@
 <span class="kn">from</span> <span class="nn">spinn_utilities.log</span> <span class="kn">import</span> <span class="n">FormatAdapter</span>
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.common</span> <span class="kn">import</span> <span class="n">recording_utils</span>
 <span class="kn">from</span> <span class="nn">pacman.model.resources.variable_sdram</span> <span class="kn">import</span> <span class="n">VariableSDRAM</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="n">BYTES_PER_WORD</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">BYTES_PER_WORD</span><span class="p">,</span> <span class="n">BITS_PER_WORD</span><span class="p">,</span> <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span><span class="p">)</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">FormatAdapter</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">))</span>
 <span class="n">_TWO_WORDS</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">Struct</span><span class="p">(</span><span class="s2">&quot;&lt;II&quot;</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="MultiSpikeRecorder"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.multi_spike_recorder.MultiSpikeRecorder">[docs]</a><span class="k">class</span> <span class="nc">MultiSpikeRecorder</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="MultiSpikeRecorder"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.MultiSpikeRecorder">[docs]</a><span class="k">class</span> <span class="nc">MultiSpikeRecorder</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s2">&quot;__record&quot;</span><span class="p">]</span>
 
@@ -102,45 +103,74 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">record</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__record</span>
 
     <span class="nd">@record</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">record</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">record</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__record</span> <span class="o">=</span> <span class="n">record</span>
 
-<div class="viewcode-block" id="MultiSpikeRecorder.get_sdram_usage_in_bytes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.multi_spike_recorder.MultiSpikeRecorder.get_sdram_usage_in_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">get_sdram_usage_in_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">spikes_per_timestep</span><span class="p">):</span>
+<div class="viewcode-block" id="MultiSpikeRecorder.get_sdram_usage_in_bytes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.MultiSpikeRecorder.get_sdram_usage_in_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">get_sdram_usage_in_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">spikes_per_timestep</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :rtype: ~pacman.model.resources.AbstractSDRAM</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__record</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">ConstantSDRAM</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
-        <span class="n">out_spike_bytes</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">n_neurons</span> <span class="o">/</span> <span class="mf">32.0</span><span class="p">))</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
+        <span class="n">out_spike_bytes</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">n_neurons</span> <span class="o">/</span> <span class="n">BITS_PER_WORD</span><span class="p">))</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">VariableSDRAM</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span>
             <span class="n">out_spike_bytes</span> <span class="o">*</span> <span class="n">spikes_per_timestep</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="MultiSpikeRecorder.get_dtcm_usage_in_bytes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.multi_spike_recorder.MultiSpikeRecorder.get_dtcm_usage_in_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">get_dtcm_usage_in_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="MultiSpikeRecorder.get_dtcm_usage_in_bytes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.MultiSpikeRecorder.get_dtcm_usage_in_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">get_dtcm_usage_in_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__record</span><span class="p">:</span>
             <span class="k">return</span> <span class="mi">0</span>
         <span class="k">return</span> <span class="n">BYTES_PER_WORD</span></div>
 
-<div class="viewcode-block" id="MultiSpikeRecorder.get_n_cpu_cycles"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.multi_spike_recorder.MultiSpikeRecorder.get_n_cpu_cycles">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_cpu_cycles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">):</span>
+<div class="viewcode-block" id="MultiSpikeRecorder.get_n_cpu_cycles"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.MultiSpikeRecorder.get_n_cpu_cycles">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_cpu_cycles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param int n_neurons:</span>
+<span class="sd">        :rtype: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__record</span><span class="p">:</span>
             <span class="k">return</span> <span class="mi">0</span>
         <span class="k">return</span> <span class="n">n_neurons</span> <span class="o">*</span> <span class="mi">4</span></div>
 
-<div class="viewcode-block" id="MultiSpikeRecorder.get_spikes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.multi_spike_recorder.MultiSpikeRecorder.get_spikes">[docs]</a>    <span class="k">def</span> <span class="nf">get_spikes</span><span class="p">(</span>
+<div class="viewcode-block" id="MultiSpikeRecorder.get_spikes"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.MultiSpikeRecorder.get_spikes">[docs]</a>    <span class="k">def</span> <span class="nf">get_spikes</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span>
-            <span class="n">placements</span><span class="p">,</span> <span class="n">graph_mapper</span><span class="p">,</span> <span class="n">application_vertex</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">):</span>
+            <span class="n">placements</span><span class="p">,</span> <span class="n">application_vertex</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param str label:</span>
+<span class="sd">        :param buffer_manager: the buffer manager object</span>
+<span class="sd">        :type buffer_manager: \</span>
+<span class="sd">            ~spinn_front_end_common.interface.buffer_management.BufferManager</span>
+<span class="sd">        :param int region:</span>
+<span class="sd">        :param ~pacman.model.placements.Placements placements:</span>
+<span class="sd">        :param application_vertex:</span>
+<span class="sd">        :type application_vertex: \</span>
+<span class="sd">            ~pacman.model.graphs.application.ApplicationVertex</span>
+<span class="sd">        :param int machine_time_step: microseconds</span>
+<span class="sd">        :return: A numpy array of 2-element arrays of (neuron_id, time)\</span>
+<span class="sd">            ordered by time, one element per event</span>
+<span class="sd">        :rtype: ~numpy.ndarray(tuple(int,int))</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="n">spike_times</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
         <span class="n">spike_ids</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-        <span class="n">ms_per_tick</span> <span class="o">=</span> <span class="n">machine_time_step</span> <span class="o">/</span> <span class="mf">1000.0</span>
+        <span class="n">ms_per_tick</span> <span class="o">=</span> <span class="n">machine_time_step</span> <span class="o">/</span> <span class="n">MICRO_TO_MILLISECOND_CONVERSION</span>
 
-        <span class="n">vertices</span> <span class="o">=</span> <span class="n">graph_mapper</span><span class="o">.</span><span class="n">get_machine_vertices</span><span class="p">(</span><span class="n">application_vertex</span><span class="p">)</span>
+        <span class="n">vertices</span> <span class="o">=</span> <span class="n">application_vertex</span><span class="o">.</span><span class="n">machine_vertices</span>
         <span class="n">missing</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">progress</span> <span class="o">=</span> <span class="n">ProgressBar</span><span class="p">(</span>
             <span class="n">vertices</span><span class="p">,</span> <span class="s2">&quot;Getting spikes for </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">label</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">vertex</span> <span class="ow">in</span> <span class="n">progress</span><span class="o">.</span><span class="n">over</span><span class="p">(</span><span class="n">vertices</span><span class="p">):</span>
             <span class="n">placement</span> <span class="o">=</span> <span class="n">placements</span><span class="o">.</span><span class="n">get_placement_of_vertex</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span>
-            <span class="n">vertex_slice</span> <span class="o">=</span> <span class="n">graph_mapper</span><span class="o">.</span><span class="n">get_slice</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span>
+            <span class="n">vertex_slice</span> <span class="o">=</span> <span class="n">vertex</span><span class="o">.</span><span class="n">vertex_slice</span>
 
             <span class="c1"># Read the spikes from the buffer manager</span>
             <span class="n">neuron_param_data</span><span class="p">,</span> <span class="n">data_missing</span> <span class="o">=</span> \
@@ -149,13 +179,13 @@
                 <span class="n">missing</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">placement</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_process_spike_data</span><span class="p">(</span>
                 <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">ms_per_tick</span><span class="p">,</span>
-                <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">/</span> <span class="mf">32.0</span><span class="p">)),</span>
+                <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">/</span> <span class="n">BITS_PER_WORD</span><span class="p">)),</span>
                 <span class="n">neuron_param_data</span><span class="p">,</span> <span class="n">spike_ids</span><span class="p">,</span> <span class="n">spike_times</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                <span class="s2">&quot;Population </span><span class="si">{}</span><span class="s2"> is missing spike data in region </span><span class="si">{}</span><span class="s2"> from the&quot;</span>
-                <span class="s2">&quot; following cores: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span>
+                <span class="s2">&quot;Population </span><span class="si">{}</span><span class="s2"> is missing spike data in region </span><span class="si">{}</span><span class="s2"> from the &quot;</span>
+                <span class="s2">&quot;following cores: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span>
                 <span class="n">recording_utils</span><span class="o">.</span><span class="n">make_missing_string</span><span class="p">(</span><span class="n">missing</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">spike_ids</span><span class="p">:</span>
@@ -170,6 +200,14 @@
     <span class="k">def</span> <span class="nf">_process_spike_data</span><span class="p">(</span>
             <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">ms_per_tick</span><span class="p">,</span> <span class="n">n_words</span><span class="p">,</span> <span class="n">raw_data</span><span class="p">,</span> <span class="n">spike_ids</span><span class="p">,</span>
             <span class="n">spike_times</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param ~pacman.model.graphs.common.Slice vertex_slice:</span>
+<span class="sd">        :param int ms_per_tick:</span>
+<span class="sd">        :param int n_words:</span>
+<span class="sd">        :param bytearray raw_data:</span>
+<span class="sd">        :param list(~numpy.ndarray) spike_ids:</span>
+<span class="sd">        :param list(~numpy.ndarray) spike_times:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="n">n_bytes_per_block</span> <span class="o">=</span> <span class="n">n_words</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
         <span class="n">offset</span> <span class="o">=</span> <span class="mi">0</span>

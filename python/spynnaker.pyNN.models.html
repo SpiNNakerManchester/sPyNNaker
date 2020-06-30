@@ -47,8 +47,9 @@
           <a href="spynnaker.pyNN.model_binaries.html" title="spynnaker.pyNN.model_binaries package"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="spynnaker.pyNN.html" accesskey="U">spynnaker.pyNN package</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="modules.html" >spynnaker</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.html" accesskey="U">spynnaker.pyNN package</a> &#187;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -58,7 +59,6 @@
 <li><a class="reference internal" href="#">spynnaker.pyNN.models package</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.models.abstract_pynn_model">spynnaker.pyNN.models.abstract_pynn_model module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.models.defaults">spynnaker.pyNN.models.defaults module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.models.pynn_population_common">spynnaker.pyNN.models.pynn_population_common module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.models.pynn_projection_common">spynnaker.pyNN.models.pynn_projection_common module</a></li>
@@ -106,124 +106,49 @@
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="spynnaker.pyNN.models.abstract_models.html">spynnaker.pyNN.models.abstract_models package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.abstract_models.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.abstract_models.html#module-spynnaker.pyNN.models.abstract_models.abstract_accepts_incoming_synapses">spynnaker.pyNN.models.abstract_models.abstract_accepts_incoming_synapses module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.abstract_models.html#module-spynnaker.pyNN.models.abstract_models.abstract_contains_units">spynnaker.pyNN.models.abstract_models.abstract_contains_units module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.abstract_models.html#module-spynnaker.pyNN.models.abstract_models.abstract_filterable_edge">spynnaker.pyNN.models.abstract_models.abstract_filterable_edge module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.abstract_models.html#module-spynnaker.pyNN.models.abstract_models.abstract_population_initializable">spynnaker.pyNN.models.abstract_models.abstract_population_initializable module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.abstract_models.html#module-spynnaker.pyNN.models.abstract_models.abstract_population_settable">spynnaker.pyNN.models.abstract_models.abstract_population_settable module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.abstract_models.html#module-spynnaker.pyNN.models.abstract_models.abstract_read_parameters_before_set">spynnaker.pyNN.models.abstract_models.abstract_read_parameters_before_set module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.abstract_models.html#module-spynnaker.pyNN.models.abstract_models.abstract_settable">spynnaker.pyNN.models.abstract_models.abstract_settable module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.abstract_models.html#module-spynnaker.pyNN.models.abstract_models.abstract_weight_updatable">spynnaker.pyNN.models.abstract_models.abstract_weight_updatable module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.abstract_models.html#module-spynnaker.pyNN.models.abstract_models">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="spynnaker.pyNN.models.common.html">spynnaker.pyNN.models.common package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.common.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.common.html#module-spynnaker.pyNN.models.common.abstract_neuron_recordable">spynnaker.pyNN.models.common.abstract_neuron_recordable module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.common.html#module-spynnaker.pyNN.models.common.abstract_spike_recordable">spynnaker.pyNN.models.common.abstract_spike_recordable module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.common.html#module-spynnaker.pyNN.models.common.eieio_spike_recorder">spynnaker.pyNN.models.common.eieio_spike_recorder module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.common.html#module-spynnaker.pyNN.models.common.multi_spike_recorder">spynnaker.pyNN.models.common.multi_spike_recorder module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.common.html#module-spynnaker.pyNN.models.common.neuron_recorder">spynnaker.pyNN.models.common.neuron_recorder module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.common.html#module-spynnaker.pyNN.models.common.recording_utils">spynnaker.pyNN.models.common.recording_utils module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.common.html#module-spynnaker.pyNN.models.common.simple_population_settable">spynnaker.pyNN.models.common.simple_population_settable module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.common.html#module-spynnaker.pyNN.models.common">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html">spynnaker.pyNN.models.neural_projections package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#subpackages">Subpackages</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="spynnaker.pyNN.models.neural_projections.connectors.html">spynnaker.pyNN.models.neural_projections.connectors package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neural_projections.connectors.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neural_projections.connectors.html#module-spynnaker.pyNN.models.neural_projections.connectors.abstract_connector">spynnaker.pyNN.models.neural_projections.connectors.abstract_connector module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neural_projections.connectors.html#module-spynnaker.pyNN.models.neural_projections.connectors.abstract_connector_supports_views_on_machine">spynnaker.pyNN.models.neural_projections.connectors.abstract_connector_supports_views_on_machine module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neural_projections.connectors.html#module-spynnaker.pyNN.models.neural_projections.connectors.abstract_generate_connector_on_machine">spynnaker.pyNN.models.neural_projections.connectors.abstract_generate_connector_on_machine module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neural_projections.connectors.html#module-spynnaker.pyNN.models.neural_projections.connectors.all_to_all_connector">spynnaker.pyNN.models.neural_projections.connectors.all_to_all_connector module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neural_projections.connectors.html#module-spynnaker.pyNN.models.neural_projections.connectors.array_connector">spynnaker.pyNN.models.neural_projections.connectors.array_connector module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neural_projections.connectors.html#module-spynnaker.pyNN.models.neural_projections.connectors.csa_connector">spynnaker.pyNN.models.neural_projections.connectors.csa_connector module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neural_projections.connectors.html#module-spynnaker.pyNN.models.neural_projections.connectors.distance_dependent_probability_connector">spynnaker.pyNN.models.neural_projections.connectors.distance_dependent_probability_connector module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neural_projections.connectors.html#module-spynnaker.pyNN.models.neural_projections.connectors.fixed_number_post_connector">spynnaker.pyNN.models.neural_projections.connectors.fixed_number_post_connector module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neural_projections.connectors.html#module-spynnaker.pyNN.models.neural_projections.connectors.fixed_number_pre_connector">spynnaker.pyNN.models.neural_projections.connectors.fixed_number_pre_connector module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neural_projections.connectors.html#module-spynnaker.pyNN.models.neural_projections.connectors.fixed_probability_connector">spynnaker.pyNN.models.neural_projections.connectors.fixed_probability_connector module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neural_projections.connectors.html#module-spynnaker.pyNN.models.neural_projections.connectors.from_list_connector">spynnaker.pyNN.models.neural_projections.connectors.from_list_connector module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neural_projections.connectors.html#module-spynnaker.pyNN.models.neural_projections.connectors.index_based_probability_connector">spynnaker.pyNN.models.neural_projections.connectors.index_based_probability_connector module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neural_projections.connectors.html#module-spynnaker.pyNN.models.neural_projections.connectors.kernel_connector">spynnaker.pyNN.models.neural_projections.connectors.kernel_connector module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neural_projections.connectors.html#module-spynnaker.pyNN.models.neural_projections.connectors.multapse_connector">spynnaker.pyNN.models.neural_projections.connectors.multapse_connector module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neural_projections.connectors.html#module-spynnaker.pyNN.models.neural_projections.connectors.one_to_one_connector">spynnaker.pyNN.models.neural_projections.connectors.one_to_one_connector module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neural_projections.connectors.html#module-spynnaker.pyNN.models.neural_projections.connectors.small_world_connector">spynnaker.pyNN.models.neural_projections.connectors.small_world_connector module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neural_projections.connectors.html#module-spynnaker.pyNN.models.neural_projections.connectors">Module contents</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#module-spynnaker.pyNN.models.neural_projections.delay_afferent_application_edge">spynnaker.pyNN.models.neural_projections.delay_afferent_application_edge module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#module-spynnaker.pyNN.models.neural_projections.delay_afferent_machine_edge">spynnaker.pyNN.models.neural_projections.delay_afferent_machine_edge module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#module-spynnaker.pyNN.models.neural_projections.delayed_application_edge">spynnaker.pyNN.models.neural_projections.delayed_application_edge module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#module-spynnaker.pyNN.models.neural_projections.delayed_machine_edge">spynnaker.pyNN.models.neural_projections.delayed_machine_edge module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#module-spynnaker.pyNN.models.neural_projections.projection_application_edge">spynnaker.pyNN.models.neural_projections.projection_application_edge module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#module-spynnaker.pyNN.models.neural_projections.projection_machine_edge">spynnaker.pyNN.models.neural_projections.projection_machine_edge module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#module-spynnaker.pyNN.models.neural_projections.synapse_information">spynnaker.pyNN.models.neural_projections.synapse_information module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#module-spynnaker.pyNN.models.neural_projections">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="spynnaker.pyNN.models.neural_properties.html">spynnaker.pyNN.models.neural_properties package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.neural_properties.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.neural_properties.html#module-spynnaker.pyNN.models.neural_properties.neural_parameter">spynnaker.pyNN.models.neural_properties.neural_parameter module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.neural_properties.html#module-spynnaker.pyNN.models.neural_properties">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="spynnaker.pyNN.models.neuron.html">spynnaker.pyNN.models.neuron package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.neuron.html#subpackages">Subpackages</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="spynnaker.pyNN.models.neuron.additional_inputs.html">spynnaker.pyNN.models.neuron.additional_inputs package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.additional_inputs.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.additional_inputs.html#module-spynnaker.pyNN.models.neuron.additional_inputs.abstract_additional_input">spynnaker.pyNN.models.neuron.additional_inputs.abstract_additional_input module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.additional_inputs.html#module-spynnaker.pyNN.models.neuron.additional_inputs.additional_input_ca2_adaptive">spynnaker.pyNN.models.neuron.additional_inputs.additional_input_ca2_adaptive module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.additional_inputs.html#module-spynnaker.pyNN.models.neuron.additional_inputs">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="spynnaker.pyNN.models.neuron.builds.html">spynnaker.pyNN.models.neuron.builds package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.builds.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.builds.html#module-spynnaker.pyNN.models.neuron.builds.eif_cond_alpha_isfa_ista">spynnaker.pyNN.models.neuron.builds.eif_cond_alpha_isfa_ista module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.builds.html#module-spynnaker.pyNN.models.neuron.builds.hh_cond_exp">spynnaker.pyNN.models.neuron.builds.hh_cond_exp module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.builds.html#module-spynnaker.pyNN.models.neuron.builds.if_cond_alpha">spynnaker.pyNN.models.neuron.builds.if_cond_alpha module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.builds.html#module-spynnaker.pyNN.models.neuron.builds.if_cond_exp_base">spynnaker.pyNN.models.neuron.builds.if_cond_exp_base module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.builds.html#module-spynnaker.pyNN.models.neuron.builds.if_cond_exp_stoc">spynnaker.pyNN.models.neuron.builds.if_cond_exp_stoc module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.builds.html#module-spynnaker.pyNN.models.neuron.builds.if_curr_alpha">spynnaker.pyNN.models.neuron.builds.if_curr_alpha module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.builds.html#module-spynnaker.pyNN.models.neuron.builds.if_curr_delta">spynnaker.pyNN.models.neuron.builds.if_curr_delta module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.builds.html#module-spynnaker.pyNN.models.neuron.builds.if_curr_dual_exp_base">spynnaker.pyNN.models.neuron.builds.if_curr_dual_exp_base module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.builds.html#module-spynnaker.pyNN.models.neuron.builds.if_curr_exp_base">spynnaker.pyNN.models.neuron.builds.if_curr_exp_base module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.builds.html#module-spynnaker.pyNN.models.neuron.builds.if_curr_exp_ca2_adaptive">spynnaker.pyNN.models.neuron.builds.if_curr_exp_ca2_adaptive module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.builds.html#module-spynnaker.pyNN.models.neuron.builds.if_curr_exp_semd_base">spynnaker.pyNN.models.neuron.builds.if_curr_exp_semd_base module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.builds.html#module-spynnaker.pyNN.models.neuron.builds.if_facets_hardware1">spynnaker.pyNN.models.neuron.builds.if_facets_hardware1 module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.builds.html#module-spynnaker.pyNN.models.neuron.builds.izk_cond_exp_base">spynnaker.pyNN.models.neuron.builds.izk_cond_exp_base module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.builds.html#module-spynnaker.pyNN.models.neuron.builds.izk_curr_exp_base">spynnaker.pyNN.models.neuron.builds.izk_curr_exp_base module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.builds.html#module-spynnaker.pyNN.models.neuron.builds">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="spynnaker.pyNN.models.neuron.implementations.html">spynnaker.pyNN.models.neuron.implementations package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.implementations.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.implementations.html#module-spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl">spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.implementations.html#module-spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component">spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.implementations.html#module-spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard">spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.implementations.html#module-spynnaker.pyNN.models.neuron.implementations.ranged_dict_vertex_slice">spynnaker.pyNN.models.neuron.implementations.ranged_dict_vertex_slice module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.implementations.html#module-spynnaker.pyNN.models.neuron.implementations">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="spynnaker.pyNN.models.neuron.input_types.html">spynnaker.pyNN.models.neuron.input_types package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.input_types.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.input_types.html#module-spynnaker.pyNN.models.neuron.input_types.abstract_input_type">spynnaker.pyNN.models.neuron.input_types.abstract_input_type module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.input_types.html#module-spynnaker.pyNN.models.neuron.input_types.input_type_conductance">spynnaker.pyNN.models.neuron.input_types.input_type_conductance module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.input_types.html#module-spynnaker.pyNN.models.neuron.input_types.input_type_current">spynnaker.pyNN.models.neuron.input_types.input_type_current module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.input_types.html#module-spynnaker.pyNN.models.neuron.input_types.input_type_current_semd">spynnaker.pyNN.models.neuron.input_types.input_type_current_semd module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.input_types.html#module-spynnaker.pyNN.models.neuron.input_types.input_type_delta">spynnaker.pyNN.models.neuron.input_types.input_type_delta module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.input_types.html#module-spynnaker.pyNN.models.neuron.input_types">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="spynnaker.pyNN.models.neuron.neuron_models.html">spynnaker.pyNN.models.neuron.neuron_models package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.neuron_models.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.neuron_models.html#module-spynnaker.pyNN.models.neuron.neuron_models.abstract_neuron_model">spynnaker.pyNN.models.neuron.neuron_models.abstract_neuron_model module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.neuron_models.html#module-spynnaker.pyNN.models.neuron.neuron_models.neuron_model_izh">spynnaker.pyNN.models.neuron.neuron_models.neuron_model_izh module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.neuron_models.html#module-spynnaker.pyNN.models.neuron.neuron_models.neuron_model_leaky_integrate_and_fire">spynnaker.pyNN.models.neuron.neuron_models.neuron_model_leaky_integrate_and_fire module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.neuron_models.html#module-spynnaker.pyNN.models.neuron.neuron_models">Module contents</a></li>
 </ul>
 </li>
@@ -231,43 +156,22 @@
 <li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.plasticity.html#subpackages">Subpackages</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="spynnaker.pyNN.models.neuron.plasticity.stdp.html">spynnaker.pyNN.models.neuron.plasticity.stdp package</a><ul>
 <li class="toctree-l6"><a class="reference internal" href="spynnaker.pyNN.models.neuron.plasticity.stdp.html#subpackages">Subpackages</a><ul>
-<li class="toctree-l7"><a class="reference internal" href="spynnaker.pyNN.models.neuron.plasticity.stdp.common.html">spynnaker.pyNN.models.neuron.plasticity.stdp.common package</a><ul>
-<li class="toctree-l8"><a class="reference internal" href="spynnaker.pyNN.models.neuron.plasticity.stdp.common.html#submodules">Submodules</a></li>
-<li class="toctree-l8"><a class="reference internal" href="spynnaker.pyNN.models.neuron.plasticity.stdp.common.html#module-spynnaker.pyNN.models.neuron.plasticity.stdp.common.plasticity_helpers">spynnaker.pyNN.models.neuron.plasticity.stdp.common.plasticity_helpers module</a></li>
-<li class="toctree-l8"><a class="reference internal" href="spynnaker.pyNN.models.neuron.plasticity.stdp.common.html#module-spynnaker.pyNN.models.neuron.plasticity.stdp.common">Module contents</a></li>
-</ul>
-</li>
 <li class="toctree-l7"><a class="reference internal" href="spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.html">spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure package</a><ul>
-<li class="toctree-l8"><a class="reference internal" href="spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.html#submodules">Submodules</a></li>
-<li class="toctree-l8"><a class="reference internal" href="spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.html#module-spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.abstract_synapse_structure">spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.abstract_synapse_structure module</a></li>
-<li class="toctree-l8"><a class="reference internal" href="spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.html#module-spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.synapse_structure_weight_accumulator">spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.synapse_structure_weight_accumulator module</a></li>
-<li class="toctree-l8"><a class="reference internal" href="spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.html#module-spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.synapse_structure_weight_only">spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.synapse_structure_weight_only module</a></li>
 <li class="toctree-l8"><a class="reference internal" href="spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure.html#module-spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l7"><a class="reference internal" href="spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.html">spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence package</a><ul>
-<li class="toctree-l8"><a class="reference internal" href="spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.html#submodules">Submodules</a></li>
-<li class="toctree-l8"><a class="reference internal" href="spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.html#module-spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.abstract_timing_dependence">spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.abstract_timing_dependence module</a></li>
-<li class="toctree-l8"><a class="reference internal" href="spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.html#module-spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.timing_dependence_pfister_spike_triplet">spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.timing_dependence_pfister_spike_triplet module</a></li>
-<li class="toctree-l8"><a class="reference internal" href="spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.html#module-spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.timing_dependence_recurrent">spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.timing_dependence_recurrent module</a></li>
-<li class="toctree-l8"><a class="reference internal" href="spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.html#module-spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.timing_dependence_spike_nearest_pair">spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.timing_dependence_spike_nearest_pair module</a></li>
-<li class="toctree-l8"><a class="reference internal" href="spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.html#module-spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.timing_dependence_spike_pair">spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.timing_dependence_spike_pair module</a></li>
-<li class="toctree-l8"><a class="reference internal" href="spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.html#module-spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.timing_dependence_vogels_2011">spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.timing_dependence_vogels_2011 module</a></li>
 <li class="toctree-l8"><a class="reference internal" href="spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence.html#module-spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l7"><a class="reference internal" href="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.html">spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence package</a><ul>
-<li class="toctree-l8"><a class="reference internal" href="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.html#submodules">Submodules</a></li>
-<li class="toctree-l8"><a class="reference internal" href="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.html#module-spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.abstract_has_a_plus_a_minus">spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.abstract_has_a_plus_a_minus module</a></li>
-<li class="toctree-l8"><a class="reference internal" href="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.html#module-spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.abstract_weight_dependence">spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.abstract_weight_dependence module</a></li>
-<li class="toctree-l8"><a class="reference internal" href="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.html#module-spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.weight_dependence_additive">spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.weight_dependence_additive module</a></li>
-<li class="toctree-l8"><a class="reference internal" href="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.html#module-spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.weight_dependence_additive_triplet">spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.weight_dependence_additive_triplet module</a></li>
-<li class="toctree-l8"><a class="reference internal" href="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.html#module-spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.weight_dependence_multiplicative">spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.weight_dependence_multiplicative module</a></li>
 <li class="toctree-l8"><a class="reference internal" href="spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.html#module-spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence">Module contents</a></li>
 </ul>
 </li>
 </ul>
 </li>
+<li class="toctree-l6"><a class="reference internal" href="spynnaker.pyNN.models.neuron.plasticity.stdp.html#submodules">Submodules</a></li>
+<li class="toctree-l6"><a class="reference internal" href="spynnaker.pyNN.models.neuron.plasticity.stdp.html#module-spynnaker.pyNN.models.neuron.plasticity.stdp.common">spynnaker.pyNN.models.neuron.plasticity.stdp.common module</a></li>
 <li class="toctree-l6"><a class="reference internal" href="spynnaker.pyNN.models.neuron.plasticity.stdp.html#module-spynnaker.pyNN.models.neuron.plasticity.stdp">Module contents</a></li>
 </ul>
 </li>
@@ -281,24 +185,14 @@
 <li class="toctree-l5"><a class="reference internal" href="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.html">spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis package</a><ul>
 <li class="toctree-l6"><a class="reference internal" href="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.html#subpackages">Subpackages</a><ul>
 <li class="toctree-l7"><a class="reference internal" href="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.html">spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination package</a><ul>
-<li class="toctree-l8"><a class="reference internal" href="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.html#submodules">Submodules</a></li>
-<li class="toctree-l8"><a class="reference internal" href="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.html#module-spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.abstract_elimination">spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.abstract_elimination module</a></li>
-<li class="toctree-l8"><a class="reference internal" href="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.html#module-spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.random_by_weight_elimination">spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.random_by_weight_elimination module</a></li>
 <li class="toctree-l8"><a class="reference internal" href="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.html#module-spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l7"><a class="reference internal" href="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.formation.html">spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.formation package</a><ul>
-<li class="toctree-l8"><a class="reference internal" href="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.formation.html#submodules">Submodules</a></li>
-<li class="toctree-l8"><a class="reference internal" href="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.formation.html#module-spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.formation.abstract_formation">spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.formation.abstract_formation module</a></li>
-<li class="toctree-l8"><a class="reference internal" href="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.formation.html#module-spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.formation.distance_dependent_formation">spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.formation.distance_dependent_formation module</a></li>
 <li class="toctree-l8"><a class="reference internal" href="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.formation.html#module-spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.formation">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l7"><a class="reference internal" href="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.partner_selection.html">spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.partner_selection package</a><ul>
-<li class="toctree-l8"><a class="reference internal" href="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.partner_selection.html#submodules">Submodules</a></li>
-<li class="toctree-l8"><a class="reference internal" href="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.partner_selection.html#module-spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.partner_selection.abstract_partner_selection">spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.partner_selection.abstract_partner_selection module</a></li>
-<li class="toctree-l8"><a class="reference internal" href="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.partner_selection.html#module-spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.partner_selection.last_neuron_selection">spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.partner_selection.last_neuron_selection module</a></li>
-<li class="toctree-l8"><a class="reference internal" href="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.partner_selection.html#module-spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.partner_selection.random_selection">spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.partner_selection.random_selection module</a></li>
 <li class="toctree-l8"><a class="reference internal" href="spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.partner_selection.html#module-spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.partner_selection">Module contents</a></li>
 </ul>
 </li>
@@ -313,63 +207,29 @@
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="spynnaker.pyNN.models.neuron.synapse_dynamics.html">spynnaker.pyNN.models.neuron.synapse_dynamics package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.synapse_dynamics.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.synapse_dynamics.html#module-spynnaker.pyNN.models.neuron.synapse_dynamics.abstract_generate_on_machine">spynnaker.pyNN.models.neuron.synapse_dynamics.abstract_generate_on_machine module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.synapse_dynamics.html#module-spynnaker.pyNN.models.neuron.synapse_dynamics.abstract_plastic_synapse_dynamics">spynnaker.pyNN.models.neuron.synapse_dynamics.abstract_plastic_synapse_dynamics module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.synapse_dynamics.html#module-spynnaker.pyNN.models.neuron.synapse_dynamics.abstract_static_synapse_dynamics">spynnaker.pyNN.models.neuron.synapse_dynamics.abstract_static_synapse_dynamics module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.synapse_dynamics.html#module-spynnaker.pyNN.models.neuron.synapse_dynamics.abstract_synapse_dynamics">spynnaker.pyNN.models.neuron.synapse_dynamics.abstract_synapse_dynamics module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.synapse_dynamics.html#module-spynnaker.pyNN.models.neuron.synapse_dynamics.abstract_synapse_dynamics_structural">spynnaker.pyNN.models.neuron.synapse_dynamics.abstract_synapse_dynamics_structural module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.synapse_dynamics.html#module-spynnaker.pyNN.models.neuron.synapse_dynamics.pynn_synapse_dynamics">spynnaker.pyNN.models.neuron.synapse_dynamics.pynn_synapse_dynamics module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.synapse_dynamics.html#module-spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_static">spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_static module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.synapse_dynamics.html#module-spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_stdp">spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_stdp module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.synapse_dynamics.html#module-spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_structural_common">spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_structural_common module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.synapse_dynamics.html#module-spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_structural_static">spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_structural_static module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.synapse_dynamics.html#module-spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_structural_stdp">spynnaker.pyNN.models.neuron.synapse_dynamics.synapse_dynamics_structural_stdp module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.synapse_dynamics.html#module-spynnaker.pyNN.models.neuron.synapse_dynamics">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="spynnaker.pyNN.models.neuron.synapse_types.html">spynnaker.pyNN.models.neuron.synapse_types package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.synapse_types.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.synapse_types.html#module-spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type">spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.synapse_types.html#module-spynnaker.pyNN.models.neuron.synapse_types.synapse_type_alpha">spynnaker.pyNN.models.neuron.synapse_types.synapse_type_alpha module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.synapse_types.html#module-spynnaker.pyNN.models.neuron.synapse_types.synapse_type_delta">spynnaker.pyNN.models.neuron.synapse_types.synapse_type_delta module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.synapse_types.html#module-spynnaker.pyNN.models.neuron.synapse_types.synapse_type_dual_exponential">spynnaker.pyNN.models.neuron.synapse_types.synapse_type_dual_exponential module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.synapse_types.html#module-spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential">spynnaker.pyNN.models.neuron.synapse_types.synapse_type_exponential module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.synapse_types.html#module-spynnaker.pyNN.models.neuron.synapse_types.synapse_type_semd">spynnaker.pyNN.models.neuron.synapse_types.synapse_type_semd module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.synapse_types.html#module-spynnaker.pyNN.models.neuron.synapse_types">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="spynnaker.pyNN.models.neuron.threshold_types.html">spynnaker.pyNN.models.neuron.threshold_types package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.threshold_types.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.threshold_types.html#module-spynnaker.pyNN.models.neuron.threshold_types.abstract_threshold_type">spynnaker.pyNN.models.neuron.threshold_types.abstract_threshold_type module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.threshold_types.html#module-spynnaker.pyNN.models.neuron.threshold_types.threshold_type_maass_stochastic">spynnaker.pyNN.models.neuron.threshold_types.threshold_type_maass_stochastic module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.threshold_types.html#module-spynnaker.pyNN.models.neuron.threshold_types.threshold_type_static">spynnaker.pyNN.models.neuron.threshold_types.threshold_type_static module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.neuron.threshold_types.html#module-spynnaker.pyNN.models.neuron.threshold_types">Module contents</a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.neuron.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.neuron.html#module-spynnaker.pyNN.models.neuron.abstract_population_vertex">spynnaker.pyNN.models.neuron.abstract_population_vertex module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.neuron.html#module-spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model">spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.neuron.html#module-spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model_standard">spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model_standard module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.neuron.html#module-spynnaker.pyNN.models.neuron.connection_holder">spynnaker.pyNN.models.neuron.connection_holder module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.neuron.html#module-spynnaker.pyNN.models.neuron.generator_data">spynnaker.pyNN.models.neuron.generator_data module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.neuron.html#module-spynnaker.pyNN.models.neuron.master_pop_table">spynnaker.pyNN.models.neuron.master_pop_table module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.neuron.html#module-spynnaker.pyNN.models.neuron.population_machine_vertex">spynnaker.pyNN.models.neuron.population_machine_vertex module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.neuron.html#module-spynnaker.pyNN.models.neuron.synapse_io">spynnaker.pyNN.models.neuron.synapse_io module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.neuron.html#module-spynnaker.pyNN.models.neuron.synaptic_manager">spynnaker.pyNN.models.neuron.synaptic_manager module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.neuron.html#module-spynnaker.pyNN.models.neuron">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="spynnaker.pyNN.models.spike_source.html">spynnaker.pyNN.models.spike_source package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.spike_source.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.spike_source.html#module-spynnaker.pyNN.models.spike_source.spike_source_array">spynnaker.pyNN.models.spike_source.spike_source_array module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.spike_source.html#module-spynnaker.pyNN.models.spike_source.spike_source_array_vertex">spynnaker.pyNN.models.spike_source.spike_source_array_vertex module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.spike_source.html#module-spynnaker.pyNN.models.spike_source.spike_source_from_file">spynnaker.pyNN.models.spike_source.spike_source_from_file module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.spike_source.html#module-spynnaker.pyNN.models.spike_source.spike_source_poisson">spynnaker.pyNN.models.spike_source.spike_source_poisson module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.spike_source.html#module-spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex">spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.spike_source.html#module-spynnaker.pyNN.models.spike_source.spike_source_poisson_variable">spynnaker.pyNN.models.spike_source.spike_source_poisson_variable module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.spike_source.html#module-spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex">spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.spike_source.html#module-spynnaker.pyNN.models.spike_source">Module contents</a></li>
 </ul>
@@ -377,24 +237,14 @@
 <li class="toctree-l1"><a class="reference internal" href="spynnaker.pyNN.models.utility_models.html">spynnaker.pyNN.models.utility_models package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="spynnaker.pyNN.models.utility_models.html#subpackages">Subpackages</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="spynnaker.pyNN.models.utility_models.delays.html">spynnaker.pyNN.models.utility_models.delays package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.utility_models.delays.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.utility_models.delays.html#module-spynnaker.pyNN.models.utility_models.delays.delay_block">spynnaker.pyNN.models.utility_models.delays.delay_block module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.utility_models.delays.html#module-spynnaker.pyNN.models.utility_models.delays.delay_extension_machine_vertex">spynnaker.pyNN.models.utility_models.delays.delay_extension_machine_vertex module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.utility_models.delays.html#module-spynnaker.pyNN.models.utility_models.delays.delay_extension_vertex">spynnaker.pyNN.models.utility_models.delays.delay_extension_vertex module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.utility_models.delays.html#module-spynnaker.pyNN.models.utility_models.delays.delay_generator_data">spynnaker.pyNN.models.utility_models.delays.delay_generator_data module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.utility_models.delays.html#module-spynnaker.pyNN.models.utility_models.delays">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="spynnaker.pyNN.models.utility_models.spike_injector.html">spynnaker.pyNN.models.utility_models.spike_injector package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.utility_models.spike_injector.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.utility_models.spike_injector.html#module-spynnaker.pyNN.models.utility_models.spike_injector.spike_injector">spynnaker.pyNN.models.utility_models.spike_injector.spike_injector module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.utility_models.spike_injector.html#module-spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex">spynnaker.pyNN.models.utility_models.spike_injector.spike_injector_vertex module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.utility_models.spike_injector.html#module-spynnaker.pyNN.models.utility_models.spike_injector">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="spynnaker.pyNN.models.utility_models.synapse_expander.html">spynnaker.pyNN.models.utility_models.synapse_expander package</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.utility_models.synapse_expander.html#submodules">Submodules</a></li>
-<li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.utility_models.synapse_expander.html#module-spynnaker.pyNN.models.utility_models.synapse_expander.synapse_expander">spynnaker.pyNN.models.utility_models.synapse_expander.synapse_expander module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="spynnaker.pyNN.models.utility_models.synapse_expander.html#module-spynnaker.pyNN.models.utility_models.synapse_expander">Module contents</a></li>
 </ul>
 </li>
@@ -409,137 +259,17 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="module-spynnaker.pyNN.models.abstract_pynn_model">
-<span id="spynnaker-pynn-models-abstract-pynn-model-module"></span><h2>spynnaker.pyNN.models.abstract_pynn_model module<a class="headerlink" href="#module-spynnaker.pyNN.models.abstract_pynn_model" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.abstract_pynn_model.</code><code class="descname">AbstractPyNNModel</code><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_pynn_model.html#AbstractPyNNModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
-<p>A Model that can be passed in to a Population object in PyNN</p>
-<dl class="method">
-<dt id="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.create_vertex">
-<code class="descname">create_vertex</code><span class="sig-paren">(</span><em>n_neurons</em>, <em>label</em>, <em>constraints</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_pynn_model.html#AbstractPyNNModel.create_vertex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.create_vertex" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a vertex for a population of the model</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons in the population</li>
-<li><strong>label</strong> (<em>str</em>) &#8211; The label to give to the vertex</li>
-<li><strong>constraints</strong> (<em>list</em><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v)"><em>AbstractConstraint</em></a><em>) or </em><em>None</em>) &#8211; A list of constraints to give to the vertex, or None</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">An application vertex for the population</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v)">ApplicationVertex</a></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.default_initial_values">
-<code class="descname">default_initial_values</code><em class="property"> = {}</em><a class="headerlink" href="#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.default_initial_values" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.default_parameters">
-<code class="descname">default_parameters</code><em class="property"> = {}</em><a class="headerlink" href="#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.default_parameters" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.default_population_parameters">
-<code class="descname">default_population_parameters</code><a class="headerlink" href="#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.default_population_parameters" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="docutils">
-<dt>Get the default values for the parameters at the population level</dt>
-<dd>These are parameters that can be passed in to the Population            constructor in addition to the standard PyNN options</dd>
-</dl>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">dict(str, Any)</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="classmethod">
-<dt id="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.get_max_atoms_per_core">
-<em class="property">classmethod </em><code class="descname">get_max_atoms_per_core</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_pynn_model.html#AbstractPyNNModel.get_max_atoms_per_core"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.get_max_atoms_per_core" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the maximum number of atoms per core for this model</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="classmethod">
-<dt id="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.get_parameter_names">
-<em class="property">classmethod </em><code class="descname">get_parameter_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_pynn_model.html#AbstractPyNNModel.get_parameter_names"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.get_parameter_names" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the names of the parameters of the model</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list(str)</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="classmethod">
-<dt id="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.has_parameter">
-<em class="property">classmethod </em><code class="descname">has_parameter</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_pynn_model.html#AbstractPyNNModel.has_parameter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.has_parameter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determine if the model has a parameter with the given name</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> (<em>str</em>) &#8211; The name of the parameter to check for</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="classmethod">
-<dt id="spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.set_model_max_atoms_per_core">
-<em class="property">classmethod </em><code class="descname">set_model_max_atoms_per_core</code><span class="sig-paren">(</span><em>n_atoms=9223372036854775807</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/abstract_pynn_model.html#AbstractPyNNModel.set_model_max_atoms_per_core"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.abstract_pynn_model.AbstractPyNNModel.set_model_max_atoms_per_core" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the maximum number of atoms per core for this model</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_atoms</strong> (<em>int</em><em> or </em><em>None</em>) &#8211; The new maximum, or None for the largest possible</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-</div>
 <div class="section" id="module-spynnaker.pyNN.models.defaults">
 <span id="spynnaker-pynn-models-defaults-module"></span><h2>spynnaker.pyNN.models.defaults module<a class="headerlink" href="#module-spynnaker.pyNN.models.defaults" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="spynnaker.pyNN.models.defaults.default_initial_values">
 <code class="descclassname">spynnaker.pyNN.models.defaults.</code><code class="descname">default_initial_values</code><span class="sig-paren">(</span><em>state_variables</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/defaults.html#default_initial_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.defaults.default_initial_values" title="Permalink to this definition">¶</a></dt>
-<dd><p>Specifies arguments which are state variables.  Only works on the        __init__ method of a class that is additionally decorated with        <code class="xref py py-meth docutils literal"><span class="pre">defaults`()</span></code></p>
+<dd><p>Specifies arguments which are state variables.  Only works on the        <code class="docutils literal"><span class="pre">__init__</span></code> method of a class that is additionally decorated with        <a class="reference internal" href="#spynnaker.pyNN.models.defaults.defaults" title="spynnaker.pyNN.models.defaults.defaults"><code class="xref py py-meth docutils literal"><span class="pre">defaults()</span></code></a></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>state_variables</strong> (<em>set of str</em>) &#8211; The names of the arguments that are state variables</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>state_variables</strong> (<em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>)</em><em></em>) &#8211; The names of the arguments that are state variables</td>
 </tr>
 </tbody>
 </table>
@@ -548,12 +278,12 @@
 <dl class="function">
 <dt id="spynnaker.pyNN.models.defaults.default_parameters">
 <code class="descclassname">spynnaker.pyNN.models.defaults.</code><code class="descname">default_parameters</code><span class="sig-paren">(</span><em>parameters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/defaults.html#default_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.defaults.default_parameters" title="Permalink to this definition">¶</a></dt>
-<dd><p>Specifies arguments which are parameters.  Only works on the __init__        method of a class that is additionally decorated with        <code class="xref py py-meth docutils literal"><span class="pre">defaults`()</span></code></p>
+<dd><p>Specifies arguments which are parameters.  Only works on the         <code class="docutils literal"><span class="pre">__init__</span></code> method of a class that is additionally decorated with        <a class="reference internal" href="#spynnaker.pyNN.models.defaults.defaults" title="spynnaker.pyNN.models.defaults.defaults"><code class="xref py py-meth docutils literal"><span class="pre">defaults()</span></code></a></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parameters</strong> (<em>set of str</em>) &#8211; The names of the arguments that are parameters</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parameters</strong> (<em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>)</em><em></em>) &#8211; The names of the arguments that are parameters</td>
 </tr>
 </tbody>
 </table>
@@ -562,13 +292,33 @@
 <dl class="function">
 <dt id="spynnaker.pyNN.models.defaults.defaults">
 <code class="descclassname">spynnaker.pyNN.models.defaults.</code><code class="descname">defaults</code><span class="sig-paren">(</span><em>cls</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/defaults.html#defaults"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.defaults.defaults" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the default parameters and state variables from the arguments to        the __init__ method.  This uses the decorators        <a class="reference internal" href="#spynnaker.pyNN.models.defaults.default_parameters" title="spynnaker.pyNN.models.defaults.default_parameters"><code class="xref py py-func docutils literal"><span class="pre">default_parameters()</span></code></a> and <a class="reference internal" href="#spynnaker.pyNN.models.defaults.default_initial_values" title="spynnaker.pyNN.models.defaults.default_initial_values"><code class="xref py py-func docutils literal"><span class="pre">default_initial_values()</span></code></a> to        determine the parameters and state variables respectively.        If only one is specified, the other is assumed to be the remaining        arguments.        If neither are specified, it is assumed that all default arguments are        parameters.</p>
+<dd><p>Get the default parameters and state variables from the arguments to        the <code class="docutils literal"><span class="pre">__init__</span></code> method.  This uses the decorators        <a class="reference internal" href="#spynnaker.pyNN.models.defaults.default_parameters" title="spynnaker.pyNN.models.defaults.default_parameters"><code class="xref py py-func docutils literal"><span class="pre">default_parameters()</span></code></a> and <a class="reference internal" href="#spynnaker.pyNN.models.defaults.default_initial_values" title="spynnaker.pyNN.models.defaults.default_initial_values"><code class="xref py py-func docutils literal"><span class="pre">default_initial_values()</span></code></a> to        determine the parameters and state variables respectively.        If only one is specified, the other is assumed to be the remaining        arguments.        If neither are specified, it is assumed that all default arguments are        parameters.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="spynnaker.pyNN.models.defaults.get_dict_from_init">
 <code class="descclassname">spynnaker.pyNN.models.defaults.</code><code class="descname">get_dict_from_init</code><span class="sig-paren">(</span><em>init</em>, <em>skip=None</em>, <em>include=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/defaults.html#get_dict_from_init"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.defaults.get_dict_from_init" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Get an argument initialisation dictionary by examining an         <code class="docutils literal"><span class="pre">__init__</span></code> method or function.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>init</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#callable" title="(in Python v3.6)"><em>callable</em></a>) &#8211; The method.</li>
+<li><strong>skip</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#frozenset" title="(in Python v3.6)"><em>frozenset</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>)</em><em></em>) &#8211; The arguments to be skipped, if any</li>
+<li><strong>include</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#frozenset" title="(in Python v3.6)"><em>frozenset</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>)</em><em></em>) &#8211; The arguments that must be present, if any</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">an initialisation dictionary</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a>(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a>, Any)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 </div>
 <div class="section" id="module-spynnaker.pyNN.models.pynn_population_common">
@@ -576,7 +326,27 @@
 <dl class="class">
 <dt id="spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon">
 <em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.pynn_population_common.</code><code class="descname">PyNNPopulationCommon</code><span class="sig-paren">(</span><em>spinnaker_control</em>, <em>size</em>, <em>label</em>, <em>constraints</em>, <em>model</em>, <em>structure</em>, <em>initial_values</em>, <em>additional_parameters=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/pynn_population_common.html#PyNNPopulationCommon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Base class for PyNN populations.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>spinnaker_control</strong> (<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.interface.html#spinn_front_end_common.interface.abstract_spinnaker_base.AbstractSpinnakerBase" title="(in SpiNNFrontEndCommon v)"><em>AbstractSpinnakerBase</em></a>) &#8211; The simulator engine core.</li>
+<li><strong>size</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) &#8211; The size of the population; external devices may use None</li>
+<li><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) &#8211; The label for the population, or None for a default</li>
+<li><strong>constraints</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v)"><em>AbstractConstraint</em></a><em>)</em><em></em>) &#8211; How do we constrain where to put things on SpiNNaker</li>
+<li><strong>model</strong> (<em>AbstractPyNNModel</em><em> or
+</em><a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationVertex" title="(in PACMAN v)"><em>ApplicationVertex</em></a>) &#8211; What neuron model is being run by this population</li>
+<li><strong>structure</strong> (<a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/space.html#pyNN.space.BaseStructure" title="(in PyNN v0.9)"><em>BaseStructure</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) &#8211; How the neurons are arranged in space</li>
+<li><strong>initial_values</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>Any</em><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) &#8211; Initialisation for model variables.</li>
+<li><strong>additional_parameters</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>Any</em><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) &#8211; Any extra parameters to pass to the model&#8217;s vertex creation             function.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 <dl class="method">
 <dt id="spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.add_placement_constraint">
 <code class="descname">add_placement_constraint</code><span class="sig-paren">(</span><em>x</em>, <em>y</em>, <em>p=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/pynn_population_common.html#PyNNPopulationCommon.add_placement_constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.add_placement_constraint" title="Permalink to this definition">¶</a></dt>
@@ -586,9 +356,9 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>x</strong> (<em>int</em>) &#8211; The x-coordinate of the placement constraint</li>
-<li><strong>y</strong> (<em>int</em>) &#8211; The y-coordinate of the placement constraint</li>
-<li><strong>p</strong> (<em>int</em>) &#8211; The processor ID of the placement constraint (optional)</li>
+<li><strong>x</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The x-coordinate of the placement constraint</li>
+<li><strong>y</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The y-coordinate of the placement constraint</li>
+<li><strong>p</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The processor ID of the placement constraint (optional)</li>
 </ul>
 </td>
 </tr>
@@ -600,12 +370,29 @@
 <dt id="spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.conductance_based">
 <code class="descname">conductance_based</code><a class="headerlink" href="#spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.conductance_based" title="Permalink to this definition">¶</a></dt>
 <dd><p>True if the population uses conductance inputs</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.first_id">
 <code class="descname">first_id</code><a class="headerlink" href="#spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.first_id" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>The ID of the first member of the population.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.get">
@@ -616,15 +403,16 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>parameter_names</strong> &#8211; Name of parameter. This is either a single            string or a list of strings</li>
-<li><strong>gather</strong> &#8211; pointless on sPyNNaker</li>
+<li><strong>parameter_names</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>)</em><em></em>) &#8211; Name of parameter. This is either a single            string or a list of strings</li>
+<li><strong>gather</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) &#8211; pointless on sPyNNaker</li>
+<li><strong>simplify</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) &#8211; ignored</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A single list of values (or possibly a single value) if            paramter_names is a string, or a dict of these if parameter names            is a list.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">str or list(str) or dict(str,str) or dict(str,list(str))</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a> or <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a>) or <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a>(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a>,<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a>) or <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a>(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a>,<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a>))</p>
 </td>
 </tr>
 </tbody>
@@ -640,15 +428,15 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>parameter_names</strong> &#8211; Name of parameter. This is either a            single string or a list of strings</li>
-<li><strong>selector</strong> &#8211; a description of the subrange to accept.             Or None for all.             See: _selector_to_ids in             SpiNNUtils.spinn_utilities.ranged.abstract_sized.py</li>
+<li><strong>selector</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#slice" title="(in Python v3.6)"><em>slice</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>) or </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>)</em><em></em>) &#8211; a description of the subrange to accept.             Or None for all. See:             <a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.AbstractSized.selector_to_ids" title="(in SpiNNUtils v)"><code class="xref py py-meth docutils literal"><span class="pre">selector_to_ids()</span></code></a></li>
+<li><strong>parameter_names</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>)</em><em></em>) &#8211; Name of parameter. This is either a            single string or a list of strings</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A single list of values (or possibly a single value) if            paramter_names is a string or a dict of these if parameter names            is a list.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">str or list(str) or dict(str,str) or dict(str,list(str))</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a> or <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a>) or <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a>(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a>,<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a>) or <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a>(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a>,<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a>))</p>
 </td>
 </tr>
 </tbody>
@@ -665,7 +453,14 @@
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>gather</strong> &#8211; pointless on sPyNNaker</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>spikes</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>ndarray</em></a>) &#8211; </li>
+<li><strong>gather</strong> &#8211; pointless on sPyNNaker</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a>,<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a>)</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -677,20 +472,50 @@
 <dd><p>Given the ID(s) of cell(s) in the Population, return its (their)            index (order in the Population).</p>
 <p>Defined by
 <a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/populations.html">http://neuralensemble.org/docs/PyNN/reference/populations.html</a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>id</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>)</em><em></em>) &#8211; </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a> or iterable(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a>)</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.id_to_local_index">
 <code class="descname">id_to_local_index</code><span class="sig-paren">(</span><em>cell_id</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/pynn_population_common.html#PyNNPopulationCommon.id_to_local_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.id_to_local_index" title="Permalink to this definition">¶</a></dt>
-<dd><p>Given the ID(s) of cell(s) in the Population, return its (their)            index (order in the Population), counting only cells on the local            MPI node.
-Defined by
+<dd><p>Given the ID(s) of cell(s) in the Population, return its (their)            index (order in the Population), counting only cells on the local            MPI node.</p>
+<p>Defined by
 <a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/populations.html">http://neuralensemble.org/docs/PyNN/reference/populations.html</a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>cell_id</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>)</em><em></em>) &#8211; </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a> or iterable(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a>)</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
 <dt id="spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.index_to_id">
 <code class="descname">index_to_id</code><span class="sig-paren">(</span><em>index</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/pynn_population_common.html#PyNNPopulationCommon.index_to_id"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.index_to_id" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given the index (order in the Population) of cell(s) in the            Population, return their ID(s)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>index</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><em>iterable</em><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>)</em><em></em>) &#8211; </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a> or iterable(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a>)</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -705,12 +530,29 @@ Defined by
 <dt id="spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.label">
 <code class="descname">label</code><a class="headerlink" href="#spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.label" title="Permalink to this definition">¶</a></dt>
 <dd><p>The label of the population</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.last_id">
 <code class="descname">last_id</code><a class="headerlink" href="#spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.last_id" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>The ID of the last member of the population.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.local_size">
@@ -723,7 +565,8 @@ Defined by
 <dl class="method">
 <dt id="spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.mark_no_changes">
 <code class="descname">mark_no_changes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/pynn_population_common.html#PyNNPopulationCommon.mark_no_changes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.mark_no_changes" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Mark this population as not having changes to be mapped.</p>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.positions">
@@ -734,7 +577,16 @@ Defined by
 <dl class="attribute">
 <dt id="spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.requires_mapping">
 <code class="descname">requires_mapping</code><a class="headerlink" href="#spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.requires_mapping" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Whether this population requires mapping.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.set">
@@ -750,8 +602,8 @@ Defined by
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>parameter</strong> (<em>str</em><em> or </em><em>dict</em>) &#8211; the parameter to set</li>
-<li><strong>value</strong> &#8211; the value of the parameter to set.</li>
+<li><strong>parameter</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><em>Any</em><em>)</em><em></em>) &#8211; the parameter to set</li>
+<li><strong>value</strong> (<em>Any</em>) &#8211; the value of the parameter to set.</li>
 </ul>
 </td>
 </tr>
@@ -774,9 +626,10 @@ Defined by
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>selector</strong> &#8211; See RangedList.set_value_by_selector as this is just             a pass through method</li>
-<li><strong>parameter</strong> &#8211; the parameter to set</li>
-<li><strong>value</strong> &#8211; the value of the parameter to set.</li>
+<li><strong>selector</strong> &#8211; See <code class="xref py py-meth docutils literal"><span class="pre">RangedList.set_value_by_selector()</span></code> as this is just a
+pass through method</li>
+<li><strong>parameter</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>)</em><em></em>) &#8211; the parameter to set</li>
+<li><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; the value of the parameter to set.</li>
 </ul>
 </td>
 </tr>
@@ -788,6 +641,14 @@ Defined by
 <dt id="spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.set_constraint">
 <code class="descname">set_constraint</code><span class="sig-paren">(</span><em>constraint</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/pynn_population_common.html#PyNNPopulationCommon.set_constraint"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.set_constraint" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply a constraint to a population that restricts the processor            onto which its atoms will be placed.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>constraint</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.constraints/#pacman.model.constraints.AbstractConstraint" title="(in PACMAN v)"><em>AbstractConstraint</em></a>) &#8211; </td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">
@@ -798,7 +659,8 @@ Defined by
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>constraint_dict</strong> (<em>dict</em><em>(</em><em>str</em><em>, </em><em>int</em><em>)</em><em></em>) &#8211; A dictionary containing &#8220;x&#8221;, &#8220;y&#8221; and            optionally &#8220;p&#8221; as keys, and ints as values</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>constraint_dict</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em>,</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>)</em><em></em>) &#8211; A dictionary containing &#8220;x&#8221;, &#8220;y&#8221; and optionally &#8220;p&#8221; as keys, and
+ints as values</td>
 </tr>
 </tbody>
 </table>
@@ -812,7 +674,7 @@ Defined by
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>max_atoms_per_core</strong> &#8211; the new value for the max atoms per core.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>max_atoms_per_core</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; the new value for the max atoms per core.</td>
 </tr>
 </tbody>
 </table>
@@ -822,12 +684,28 @@ Defined by
 <dt id="spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.size">
 <code class="descname">size</code><a class="headerlink" href="#spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.size" title="Permalink to this definition">¶</a></dt>
 <dd><p>The number of neurons in the population</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="attribute">
 <dt id="spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.structure">
 <code class="descname">structure</code><a class="headerlink" href="#spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon.structure" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the structure for the population.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/space.html#pyNN.space.BaseStructure" title="(in PyNN v0.9)">BaseStructure</a> or <a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
@@ -838,17 +716,48 @@ Defined by
 <dl class="class">
 <dt id="spynnaker.pyNN.models.pynn_projection_common.PyNNProjectionCommon">
 <em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.pynn_projection_common.</code><code class="descname">PyNNProjectionCommon</code><span class="sig-paren">(</span><em>spinnaker_control</em>, <em>connector</em>, <em>synapse_dynamics_stdp</em>, <em>target</em>, <em>pre_synaptic_population</em>, <em>post_synaptic_population</em>, <em>prepop_is_view</em>, <em>postpop_is_view</em>, <em>rng</em>, <em>machine_time_step</em>, <em>user_max_delay</em>, <em>label</em>, <em>time_scale_factor</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/pynn_projection_common.html#PyNNProjectionCommon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.pynn_projection_common.PyNNProjectionCommon" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
 <p>A container for all the connections of a given type (same synapse type        and plasticity mechanisms) between two populations, together with        methods to set parameters of those connections, including of        plasticity mechanisms.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>spinnaker_control</strong> (<a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.interface.html#spinn_front_end_common.interface.abstract_spinnaker_base.AbstractSpinnakerBase" title="(in SpiNNFrontEndCommon v)"><em>AbstractSpinnakerBase</em></a>) &#8211; The simulator engine core.</li>
+<li><strong>connector</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector" title="spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector"><em>AbstractConnector</em></a>) &#8211; What is the connector for this projection.</li>
+<li><strong>synapse_dynamics_stdp</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics" title="spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractSynapseDynamics"><em>AbstractSynapseDynamics</em></a>) &#8211; How synapses behave</li>
+<li><strong>target</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; What is the target on the post-synaptic population?</li>
+<li><strong>pre_synaptic_population</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex" title="spynnaker.pyNN.models.neuron.AbstractPopulationVertex"><em>AbstractPopulationVertex</em></a>) &#8211; Where do we connect from?</li>
+<li><strong>post_synaptic_population</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPopulationVertex" title="spynnaker.pyNN.models.neuron.AbstractPopulationVertex"><em>AbstractPopulationVertex</em></a>) &#8211; Where do we connect to?</li>
+<li><strong>rng</strong> (<a class="reference external" href="http://neuralensemble.org/docs/PyNN/reference/random.html#pyNN.random.NumpyRNG" title="(in PyNN v0.9)"><em>NumpyRNG</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) &#8211; </li>
+<li><strong>machine_time_step</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; </li>
+<li><strong>user_max_delay</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; User-provided max delay</li>
+<li><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) &#8211; Label for the projection, or None to generate one</li>
+<li><strong>time_scale_factor</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 <dl class="method">
 <dt id="spynnaker.pyNN.models.pynn_projection_common.PyNNProjectionCommon.mark_no_changes">
 <code class="descname">mark_no_changes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/pynn_projection_common.html#PyNNProjectionCommon.mark_no_changes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.pynn_projection_common.PyNNProjectionCommon.mark_no_changes" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Mark this projection as not having changes to be mapped.</p>
+</dd></dl>
 
 <dl class="attribute">
 <dt id="spynnaker.pyNN.models.pynn_projection_common.PyNNProjectionCommon.requires_mapping">
 <code class="descname">requires_mapping</code><a class="headerlink" href="#spynnaker.pyNN.models.pynn_projection_common.PyNNProjectionCommon.requires_mapping" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Whether this projection requires mapping.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="spynnaker.pyNN.models.pynn_projection_common.PyNNProjectionCommon.size">
@@ -858,7 +767,8 @@ Defined by
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>gather</strong> &#8211; If False, only get the number of connections locally.            Which means nothing on SpiNNaker...</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>gather</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) &#8211; If False, only get the number of connections locally.
+Which means nothing on SpiNNaker...</td>
 </tr>
 </tbody>
 </table>
@@ -872,13 +782,13 @@ Defined by
 <dl class="class">
 <dt id="spynnaker.pyNN.models.recording_common.RecordingCommon">
 <em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.recording_common.</code><code class="descname">RecordingCommon</code><span class="sig-paren">(</span><em>population</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/recording_common.html#RecordingCommon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.recording_common.RecordingCommon" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
 <p>Object to hold recording behaviour.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>population</strong> &#8211; the population to record for</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>population</strong> (<a class="reference internal" href="#spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon" title="spynnaker.pyNN.models.pynn_population_common.PyNNPopulationCommon"><em>PyNNPopulationCommon</em></a>) &#8211; the population to record for</td>
 </tr>
 </tbody>
 </table>
@@ -912,8 +822,9 @@ Defined by
           <a href="spynnaker.pyNN.model_binaries.html" title="spynnaker.pyNN.model_binaries package"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="modules.html" >spynnaker</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

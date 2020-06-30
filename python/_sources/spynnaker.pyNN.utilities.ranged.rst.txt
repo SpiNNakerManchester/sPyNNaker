@@ -1,26 +1,6 @@
 spynnaker.pyNN.utilities.ranged package
 =======================================
 
-Submodules
-----------
-
-spynnaker.pyNN.utilities.ranged.spynnaker_ranged_dict module
-------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.utilities.ranged.spynnaker_ranged_dict
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.utilities.ranged.spynnaker_ranged_list module
-------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.utilities.ranged.spynnaker_ranged_list
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-
 Module contents
 ---------------
 

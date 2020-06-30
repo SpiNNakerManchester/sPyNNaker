@@ -86,7 +86,7 @@
 <span class="n">DEFAULT_MAX_ATOMS_PER_CORE</span> <span class="o">=</span> <span class="mi">500</span>
 
 
-<div class="viewcode-block" id="SpikeSourcePoissonVariable"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_poisson_variable.SpikeSourcePoissonVariable">[docs]</a><span class="k">class</span> <span class="nc">SpikeSourcePoissonVariable</span><span class="p">(</span><span class="n">AbstractPyNNModel</span><span class="p">):</span>
+<div class="viewcode-block" id="SpikeSourcePoissonVariable"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVariable">[docs]</a><span class="k">class</span> <span class="nc">SpikeSourcePoissonVariable</span><span class="p">(</span><span class="n">AbstractPyNNModel</span><span class="p">):</span>
 
     <span class="n">default_population_parameters</span> <span class="o">=</span> <span class="n">_population_parameters</span>
 
@@ -96,18 +96,18 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_durations</span> <span class="o">=</span> <span class="n">durations</span>
 
     <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="SpikeSourcePoissonVariable.set_model_max_atoms_per_core"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_poisson_variable.SpikeSourcePoissonVariable.set_model_max_atoms_per_core">[docs]</a>    <span class="k">def</span> <span class="nf">set_model_max_atoms_per_core</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">n_atoms</span><span class="o">=</span><span class="n">DEFAULT_MAX_ATOMS_PER_CORE</span><span class="p">):</span>
+<div class="viewcode-block" id="SpikeSourcePoissonVariable.set_model_max_atoms_per_core"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVariable.set_model_max_atoms_per_core">[docs]</a>    <span class="k">def</span> <span class="nf">set_model_max_atoms_per_core</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">n_atoms</span><span class="o">=</span><span class="n">DEFAULT_MAX_ATOMS_PER_CORE</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">SpikeSourcePoissonVariable</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">set_model_max_atoms_per_core</span><span class="p">(</span>
             <span class="n">n_atoms</span><span class="p">)</span></div>
 
     <span class="nd">@classmethod</span>
-<div class="viewcode-block" id="SpikeSourcePoissonVariable.get_max_atoms_per_core"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_poisson_variable.SpikeSourcePoissonVariable.get_max_atoms_per_core">[docs]</a>    <span class="k">def</span> <span class="nf">get_max_atoms_per_core</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
+<div class="viewcode-block" id="SpikeSourcePoissonVariable.get_max_atoms_per_core"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVariable.get_max_atoms_per_core">[docs]</a>    <span class="k">def</span> <span class="nf">get_max_atoms_per_core</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">cls</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">super</span><span class="p">(</span>
                 <span class="n">SpikeSourcePoissonVariable</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">_max_atoms_per_core</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">DEFAULT_MAX_ATOMS_PER_CORE</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">SpikeSourcePoissonVariable</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="n">get_max_atoms_per_core</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="SpikeSourcePoissonVariable.create_vertex"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_poisson_variable.SpikeSourcePoissonVariable.create_vertex">[docs]</a>    <span class="k">def</span> <span class="nf">create_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">seed</span><span class="p">):</span>
+<div class="viewcode-block" id="SpikeSourcePoissonVariable.create_vertex"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourcePoissonVariable.create_vertex">[docs]</a>    <span class="k">def</span> <span class="nf">create_vertex</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">seed</span><span class="p">):</span>
         <span class="c1"># pylint: disable=arguments-differ</span>
         <span class="n">max_atoms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_max_atoms_per_core</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">SpikeSourcePoissonVertex</span><span class="p">(</span>

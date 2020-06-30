@@ -83,7 +83,7 @@
 <span class="kn">from</span> <span class="nn">.spike_source_array_vertex</span> <span class="kn">import</span> <span class="n">SpikeSourceArrayVertex</span>
 
 
-<div class="viewcode-block" id="SpikeSourceArray"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_array.SpikeSourceArray">[docs]</a><span class="k">class</span> <span class="nc">SpikeSourceArray</span><span class="p">(</span><span class="n">AbstractPyNNModel</span><span class="p">):</span>
+<div class="viewcode-block" id="SpikeSourceArray"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourceArray">[docs]</a><span class="k">class</span> <span class="nc">SpikeSourceArray</span><span class="p">(</span><span class="n">AbstractPyNNModel</span><span class="p">):</span>
 
     <span class="n">default_population_parameters</span> <span class="o">=</span> <span class="p">{}</span>
 
@@ -93,7 +93,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__spike_times</span> <span class="o">=</span> <span class="n">spike_times</span>
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractPyNNModel</span><span class="o">.</span><span class="n">create_vertex</span><span class="p">)</span>
-<div class="viewcode-block" id="SpikeSourceArray.create_vertex"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.spike_source_array.SpikeSourceArray.create_vertex">[docs]</a>    <span class="k">def</span> <span class="nf">create_vertex</span><span class="p">(</span>
+<div class="viewcode-block" id="SpikeSourceArray.create_vertex"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.spike_source.html#spynnaker.pyNN.models.spike_source.SpikeSourceArray.create_vertex">[docs]</a>    <span class="k">def</span> <span class="nf">create_vertex</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="p">):</span>
         <span class="n">max_atoms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_max_atoms_per_core</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">SpikeSourceArrayVertex</span><span class="p">(</span>

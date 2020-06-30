@@ -47,10 +47,11 @@
           <a href="spynnaker.pyNN.models.utility_models.spike_injector.html" title="spynnaker.pyNN.models.utility_models.spike_injector package"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
-          <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.models.html" >spynnaker.pyNN.models package</a> &#187;</li>
-          <li class="nav-item nav-item-4"><a href="spynnaker.pyNN.models.utility_models.html" accesskey="U">spynnaker.pyNN.models.utility_models package</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="modules.html" >spynnaker</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="spynnaker.pyNN.models.html" >spynnaker.pyNN.models package</a> &#187;</li>
+          <li class="nav-item nav-item-5"><a href="spynnaker.pyNN.models.utility_models.html" accesskey="U">spynnaker.pyNN.models.utility_models package</a> &#187;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -58,8 +59,6 @@
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">spynnaker.pyNN.models.utility_models.synapse_expander package</a><ul>
-<li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.models.utility_models.synapse_expander.synapse_expander">spynnaker.pyNN.models.utility_models.synapse_expander.synapse_expander module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.models.utility_models.synapse_expander">Module contents</a></li>
 </ul>
 </li>
@@ -98,20 +97,33 @@
             
   <div class="section" id="spynnaker-pynn-models-utility-models-synapse-expander-package">
 <h1>spynnaker.pyNN.models.utility_models.synapse_expander package<a class="headerlink" href="#spynnaker-pynn-models-utility-models-synapse-expander-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-spynnaker.pyNN.models.utility_models.synapse_expander.synapse_expander">
-<span id="spynnaker-pynn-models-utility-models-synapse-expander-synapse-expander-module"></span><h2>spynnaker.pyNN.models.utility_models.synapse_expander.synapse_expander module<a class="headerlink" href="#module-spynnaker.pyNN.models.utility_models.synapse_expander.synapse_expander" title="Permalink to this headline">¶</a></h2>
-<dl class="function">
-<dt id="spynnaker.pyNN.models.utility_models.synapse_expander.synapse_expander.synapse_expander">
-<code class="descclassname">spynnaker.pyNN.models.utility_models.synapse_expander.synapse_expander.</code><code class="descname">synapse_expander</code><span class="sig-paren">(</span><em>app_graph</em>, <em>graph_mapper</em>, <em>placements</em>, <em>transceiver</em>, <em>provenance_file_path</em>, <em>executable_finder</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/synapse_expander/synapse_expander.html#synapse_expander"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.synapse_expander.synapse_expander.synapse_expander" title="Permalink to this definition">¶</a></dt>
-<dd><p>Run the synapse expander - needs to be done after data has been loaded</p>
-</dd></dl>
-
-</div>
 <div class="section" id="module-spynnaker.pyNN.models.utility_models.synapse_expander">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.models.utility_models.synapse_expander" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="spynnaker.pyNN.models.utility_models.synapse_expander.synapse_expander">
+<code class="descclassname">spynnaker.pyNN.models.utility_models.synapse_expander.</code><code class="descname">synapse_expander</code><span class="sig-paren">(</span><em>app_graph</em>, <em>placements</em>, <em>transceiver</em>, <em>provenance_file_path</em>, <em>executable_finder</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/synapse_expander/synapse_expander.html#synapse_expander"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.synapse_expander.synapse_expander" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the synapse expander.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Needs to be done after data has been loaded.</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>app_graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationGraph" title="(in PACMAN v)"><em>ApplicationGraph</em></a>) &#8211; The graph containing the vertices that might need expanding.</li>
+<li><strong>placements</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placements" title="(in PACMAN v)"><em>Placements</em></a>) &#8211; Where all vertices are on the machine.</li>
+<li><strong>transceiver</strong> (<a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman/#spinnman.transceiver.Transceiver" title="(in SpiNNMan v)"><em>Transceiver</em></a>) &#8211; How to talk to the machine.</li>
+<li><strong>provenance_file_path</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; Where provenance data should be written.</li>
+<li><strong>executable_finder</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.html#spinn_utilities.executable_finder.ExecutableFinder" title="(in SpiNNUtils v)"><em>ExecutableFinder</em></a>) &#8211; How to find the synapse expander binaries.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </div>
 </div>
 
@@ -137,10 +149,11 @@
           <a href="spynnaker.pyNN.models.utility_models.spike_injector.html" title="spynnaker.pyNN.models.utility_models.spike_injector package"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
-          <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.models.html" >spynnaker.pyNN.models package</a> &#187;</li>
-          <li class="nav-item nav-item-4"><a href="spynnaker.pyNN.models.utility_models.html" >spynnaker.pyNN.models.utility_models package</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="modules.html" >spynnaker</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="spynnaker.pyNN.models.html" >spynnaker.pyNN.models package</a> &#187;</li>
+          <li class="nav-item nav-item-5"><a href="spynnaker.pyNN.models.utility_models.html" >spynnaker.pyNN.models.utility_models package</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

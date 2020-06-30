@@ -4,58 +4,10 @@ spynnaker.pyNN.models.common package
 Submodules
 ----------
 
-spynnaker.pyNN.models.common.abstract_neuron_recordable module
---------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.models.common.abstract_neuron_recordable
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.models.common.abstract_spike_recordable module
--------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.models.common.abstract_spike_recordable
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.models.common.eieio_spike_recorder module
---------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.models.common.eieio_spike_recorder
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.models.common.multi_spike_recorder module
---------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.models.common.multi_spike_recorder
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.models.common.neuron_recorder module
----------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.models.common.neuron_recorder
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 spynnaker.pyNN.models.common.recording_utils module
 ---------------------------------------------------
 
 .. automodule:: spynnaker.pyNN.models.common.recording_utils
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.models.common.simple_population_settable module
---------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.models.common.simple_population_settable
     :members:
     :undoc-members:
     :show-inheritance:

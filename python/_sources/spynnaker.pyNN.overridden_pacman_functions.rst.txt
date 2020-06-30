@@ -1,50 +1,6 @@
 spynnaker.pyNN.overridden_pacman_functions package
 ==================================================
 
-Submodules
-----------
-
-spynnaker.pyNN.overridden_pacman_functions.graph_edge_filter module
--------------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.overridden_pacman_functions.graph_edge_filter
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.overridden_pacman_functions.graph_edge_weight_updater module
----------------------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.overridden_pacman_functions.graph_edge_weight_updater
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.overridden_pacman_functions.on_chip_bit_field_generator module
------------------------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.overridden_pacman_functions.on_chip_bit_field_generator
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.overridden_pacman_functions.spynnaker_data_specification_writer module
--------------------------------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.overridden_pacman_functions.spynnaker_data_specification_writer
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.overridden_pacman_functions.spynnaker_machine_bit_field_router_compressor module
------------------------------------------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.overridden_pacman_functions.spynnaker_machine_bit_field_router_compressor
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-
 Module contents
 ---------------
 

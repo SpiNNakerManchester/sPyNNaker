@@ -47,9 +47,10 @@
           <a href="spynnaker.pyNN.models.neural_projections.connectors.html" title="spynnaker.pyNN.models.neural_projections.connectors package"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
-          <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.models.html" accesskey="U">spynnaker.pyNN.models package</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="modules.html" >spynnaker</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="spynnaker.pyNN.models.html" accesskey="U">spynnaker.pyNN.models package</a> &#187;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -57,8 +58,6 @@
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">spynnaker.pyNN.models.neural_properties package</a><ul>
-<li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.models.neural_properties.neural_parameter">spynnaker.pyNN.models.neural_properties.neural_parameter module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.models.neural_properties">Module contents</a></li>
 </ul>
 </li>
@@ -97,98 +96,19 @@
             
   <div class="section" id="spynnaker-pynn-models-neural-properties-package">
 <h1>spynnaker.pyNN.models.neural_properties package<a class="headerlink" href="#spynnaker-pynn-models-neural-properties-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-spynnaker.pyNN.models.neural_properties.neural_parameter">
-<span id="spynnaker-pynn-models-neural-properties-neural-parameter-module"></span><h2>spynnaker.pyNN.models.neural_properties.neural_parameter module<a class="headerlink" href="#module-spynnaker.pyNN.models.neural_properties.neural_parameter" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="spynnaker.pyNN.models.neural_properties.neural_parameter.NeuronParameter">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neural_properties.neural_parameter.</code><code class="descname">NeuronParameter</code><span class="sig-paren">(</span><em>value</em>, <em>data_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_properties/neural_parameter.html#NeuronParameter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_properties.neural_parameter.NeuronParameter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
-<p>A settable parameter of a neuron model.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>value</strong> (<em>int</em><em> or </em><em>float</em><em> or </em><em>bool</em><em> or </em><em>list</em><em>(</em><em>int</em><em>) or </em><em>list</em><em>(</em><em>float</em><em>) or             </em><em>list</em><em>(</em><em>bool</em><em>) or </em><em>ndarray</em><em> or             </em><em>AbstractList</em>) &#8211; what the value of the parameter is; if a list or array,            potentially provides a different value for each neuron</li>
-<li><strong>data_type</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification.enums/#data_specification.enums.DataType" title="(in DataSpecification v)"><em>DataType</em></a>) &#8211; The serialization type of the parameter in the neuron model.</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neural_properties.neural_parameter.NeuronParameter.get_dataspec_datatype">
-<code class="descname">get_dataspec_datatype</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_properties/neural_parameter.html#NeuronParameter.get_dataspec_datatype"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_properties.neural_parameter.NeuronParameter.get_dataspec_datatype" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the serialization type of the parameter in the neuron model.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification.enums/#data_specification.enums.DataType" title="(in DataSpecification v)">DataType</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neural_properties.neural_parameter.NeuronParameter.get_value">
-<code class="descname">get_value</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_properties/neural_parameter.html#NeuronParameter.get_value"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_properties.neural_parameter.NeuronParameter.get_value" title="Permalink to this definition">¶</a></dt>
-<dd><p>What the value of the parameter is; if a list or array,            potentially provides a different value for each neuron.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">int or float or bool or list(int) or list(float) or             list(bool) or ndarray or             AbstractList</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neural_properties.neural_parameter.NeuronParameter.iterator_by_slice">
-<code class="descname">iterator_by_slice</code><span class="sig-paren">(</span><em>slice_start</em>, <em>slice_stop</em>, <em>spec</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_properties/neural_parameter.html#NeuronParameter.iterator_by_slice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_properties.neural_parameter.NeuronParameter.iterator_by_slice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates an iterator over the commands to use to write the            parameter to the data specification being generated.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>slice_start</strong> (<em>int</em>) &#8211; Inclusive start of the range</li>
-<li><strong>slice_stop</strong> (<em>int</em>) &#8211; Exclusive end of the range</li>
-<li><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification v)"><em>DataSpecificationGenerator</em></a>) &#8211; The data specification to eventually write to.
-(Note that this does not actually do the write).</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Iterator that produces a command to write to the            specification for each element in the slice.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">six.Iterator(tuple(bytearray, str))</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-</div>
 <div class="section" id="module-spynnaker.pyNN.models.neural_properties">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.models.neural_properties" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
 <dt id="spynnaker.pyNN.models.neural_properties.NeuronParameter">
 <em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neural_properties.</code><code class="descname">NeuronParameter</code><span class="sig-paren">(</span><em>value</em>, <em>data_type</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_properties/neural_parameter.html#NeuronParameter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_properties.NeuronParameter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
 <p>A settable parameter of a neuron model.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>value</strong> (<em>int</em><em> or </em><em>float</em><em> or </em><em>bool</em><em> or </em><em>list</em><em>(</em><em>int</em><em>) or </em><em>list</em><em>(</em><em>float</em><em>) or             </em><em>list</em><em>(</em><em>bool</em><em>) or </em><em>ndarray</em><em> or             </em><em>AbstractList</em>) &#8211; what the value of the parameter is; if a list or array,            potentially provides a different value for each neuron</li>
+<li><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a><em>) or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a><em>) or             </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a><em>) or </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)"><em>ndarray</em></a><em> or             </em><a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.AbstractList" title="(in SpiNNUtils v)"><em>AbstractList</em></a>) &#8211; what the value of the parameter is; if a list or array,            potentially provides a different value for each neuron</li>
 <li><strong>data_type</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification.enums/#data_specification.enums.DataType" title="(in DataSpecification v)"><em>DataType</em></a>) &#8211; The serialization type of the parameter in the neuron model.</li>
 </ul>
 </td>
@@ -217,7 +137,7 @@
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">int or float or bool or list(int) or list(float) or             list(bool) or ndarray or             AbstractList</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a> or <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a> or <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a> or <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a>) or <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a>) or             <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a>) or <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">ndarray</a> or             <a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.AbstractList" title="(in SpiNNUtils v)">AbstractList</a></td>
 </tr>
 </tbody>
 </table>
@@ -232,8 +152,8 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>slice_start</strong> (<em>int</em>) &#8211; Inclusive start of the range</li>
-<li><strong>slice_stop</strong> (<em>int</em>) &#8211; Exclusive end of the range</li>
+<li><strong>slice_start</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; Inclusive start of the range</li>
+<li><strong>slice_stop</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; Exclusive end of the range</li>
 <li><strong>spec</strong> (<a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification/#data_specification.DataSpecificationGenerator" title="(in DataSpecification v)"><em>DataSpecificationGenerator</em></a>) &#8211; The data specification to eventually write to.
 (Note that this does not actually do the write).</li>
 </ul>
@@ -242,7 +162,7 @@
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Iterator that produces a command to write to the            specification for each element in the slice.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">six.Iterator(tuple(bytearray, str))</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">six.Iterator(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a>(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#bytearray" title="(in Python v3.6)">bytearray</a>, <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a>))</p>
 </td>
 </tr>
 </tbody>
@@ -276,9 +196,10 @@
           <a href="spynnaker.pyNN.models.neural_projections.connectors.html" title="spynnaker.pyNN.models.neural_projections.connectors package"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
-          <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.models.html" >spynnaker.pyNN.models package</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="modules.html" >spynnaker</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="spynnaker.pyNN.models.html" >spynnaker.pyNN.models package</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

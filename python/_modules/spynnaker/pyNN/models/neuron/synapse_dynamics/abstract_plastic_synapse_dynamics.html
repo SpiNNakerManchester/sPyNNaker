@@ -84,7 +84,7 @@
 
 
 <span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">AbstractBase</span><span class="p">)</span>
-<div class="viewcode-block" id="AbstractPlasticSynapseDynamics"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.abstract_plastic_synapse_dynamics.AbstractPlasticSynapseDynamics">[docs]</a><span class="k">class</span> <span class="nc">AbstractPlasticSynapseDynamics</span><span class="p">(</span><span class="n">AbstractSynapseDynamics</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractPlasticSynapseDynamics"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractPlasticSynapseDynamics">[docs]</a><span class="k">class</span> <span class="nc">AbstractPlasticSynapseDynamics</span><span class="p">(</span><span class="n">AbstractSynapseDynamics</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Synapses which change over time</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># pylint: disable=too-many-arguments</span>
@@ -92,7 +92,7 @@
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
 
     <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractPlasticSynapseDynamics.get_n_words_for_plastic_connections"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.abstract_plastic_synapse_dynamics.AbstractPlasticSynapseDynamics.get_n_words_for_plastic_connections">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_words_for_plastic_connections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_connections</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractPlasticSynapseDynamics.get_n_words_for_plastic_connections"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractPlasticSynapseDynamics.get_n_words_for_plastic_connections">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_words_for_plastic_connections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_connections</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the number of 32-bit words for `n_connections` in a single row.</span>
 
 <span class="sd">        :param int n_connections:</span>
@@ -100,7 +100,7 @@
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
     <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractPlasticSynapseDynamics.get_plastic_synaptic_data"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.abstract_plastic_synapse_dynamics.AbstractPlasticSynapseDynamics.get_plastic_synaptic_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_plastic_synaptic_data</span><span class="p">(</span>
+<div class="viewcode-block" id="AbstractPlasticSynapseDynamics.get_plastic_synaptic_data"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractPlasticSynapseDynamics.get_plastic_synaptic_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_plastic_synaptic_data</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">connections</span><span class="p">,</span> <span class="n">connection_row_indices</span><span class="p">,</span> <span class="n">n_rows</span><span class="p">,</span>
             <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the fixed-plastic data, and plastic-plastic data for each row,\</span>
@@ -128,21 +128,21 @@
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
     <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractPlasticSynapseDynamics.get_n_plastic_plastic_words_per_row"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.abstract_plastic_synapse_dynamics.AbstractPlasticSynapseDynamics.get_n_plastic_plastic_words_per_row">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_plastic_plastic_words_per_row</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pp_size</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractPlasticSynapseDynamics.get_n_plastic_plastic_words_per_row"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractPlasticSynapseDynamics.get_n_plastic_plastic_words_per_row">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_plastic_plastic_words_per_row</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pp_size</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the number of plastic plastic words to be read from each row.</span>
 
 <span class="sd">        :param ~numpy.ndarray pp_size:</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
     <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractPlasticSynapseDynamics.get_n_fixed_plastic_words_per_row"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.abstract_plastic_synapse_dynamics.AbstractPlasticSynapseDynamics.get_n_fixed_plastic_words_per_row">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_fixed_plastic_words_per_row</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fp_size</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractPlasticSynapseDynamics.get_n_fixed_plastic_words_per_row"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractPlasticSynapseDynamics.get_n_fixed_plastic_words_per_row">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_fixed_plastic_words_per_row</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fp_size</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the number of fixed plastic words to be read from each row.</span>
 
 <span class="sd">        :param ~numpy.ndarray fp_size:</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
     <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractPlasticSynapseDynamics.get_n_synapses_in_rows"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.abstract_plastic_synapse_dynamics.AbstractPlasticSynapseDynamics.get_n_synapses_in_rows">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_synapses_in_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pp_size</span><span class="p">,</span> <span class="n">fp_size</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractPlasticSynapseDynamics.get_n_synapses_in_rows"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractPlasticSynapseDynamics.get_n_synapses_in_rows">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_synapses_in_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pp_size</span><span class="p">,</span> <span class="n">fp_size</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the number of synapses in each of the rows with plastic sizes\</span>
 <span class="sd">            `pp_size` and `fp_size`.</span>
 
@@ -151,7 +151,7 @@
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
     <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractPlasticSynapseDynamics.read_plastic_synaptic_data"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.abstract_plastic_synapse_dynamics.AbstractPlasticSynapseDynamics.read_plastic_synaptic_data">[docs]</a>    <span class="k">def</span> <span class="nf">read_plastic_synaptic_data</span><span class="p">(</span>
+<div class="viewcode-block" id="AbstractPlasticSynapseDynamics.read_plastic_synaptic_data"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neuron.synapse_dynamics.html#spynnaker.pyNN.models.neuron.synapse_dynamics.AbstractPlasticSynapseDynamics.read_plastic_synaptic_data">[docs]</a>    <span class="k">def</span> <span class="nf">read_plastic_synaptic_data</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">pp_size</span><span class="p">,</span> <span class="n">pp_data</span><span class="p">,</span>
             <span class="n">fp_size</span><span class="p">,</span> <span class="n">fp_data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Read the connections indicated in the connection indices from the\</span>

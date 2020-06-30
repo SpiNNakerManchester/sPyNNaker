@@ -87,7 +87,7 @@
 <span class="n">_population_parameters</span><span class="p">[</span><span class="s2">&quot;n_steps_per_timestep&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
 
 
-<div class="viewcode-block" id="AbstractPyNNNeuronModelStandard"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model_standard.AbstractPyNNNeuronModelStandard">[docs]</a><span class="k">class</span> <span class="nc">AbstractPyNNNeuronModelStandard</span><span class="p">(</span><span class="n">AbstractPyNNNeuronModel</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractPyNNNeuronModelStandard"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModelStandard">[docs]</a><span class="k">class</span> <span class="nc">AbstractPyNNNeuronModelStandard</span><span class="p">(</span><span class="n">AbstractPyNNNeuronModel</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; A neuron model that follows the sPyNNaker standard composed model \</span>
 <span class="sd">        pattern for point neurons.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -118,7 +118,7 @@
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractPyNNNeuronModel</span><span class="o">.</span><span class="n">create_vertex</span><span class="p">,</span>
                <span class="n">additional_arguments</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;n_steps_per_timestep&quot;</span><span class="p">})</span>
-<div class="viewcode-block" id="AbstractPyNNNeuronModelStandard.create_vertex"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.abstract_pynn_neuron_model_standard.AbstractPyNNNeuronModelStandard.create_vertex">[docs]</a>    <span class="k">def</span> <span class="nf">create_vertex</span><span class="p">(</span>
+<div class="viewcode-block" id="AbstractPyNNNeuronModelStandard.create_vertex"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.AbstractPyNNNeuronModelStandard.create_vertex">[docs]</a>    <span class="k">def</span> <span class="nf">create_vertex</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">n_neurons</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="n">spikes_per_second</span><span class="p">,</span>
             <span class="n">ring_buffer_sigma</span><span class="p">,</span> <span class="n">incoming_spike_buffer_size</span><span class="p">,</span>
             <span class="n">n_steps_per_timestep</span><span class="p">):</span>

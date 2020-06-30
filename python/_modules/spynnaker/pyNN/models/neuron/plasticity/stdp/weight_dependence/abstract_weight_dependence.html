@@ -84,10 +84,10 @@
 
 
 <span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">AbstractBase</span><span class="p">)</span>
-<div class="viewcode-block" id="AbstractWeightDependence"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.abstract_weight_dependence.AbstractWeightDependence">[docs]</a><span class="k">class</span> <span class="nc">AbstractWeightDependence</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractWeightDependence"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence">[docs]</a><span class="k">class</span> <span class="nc">AbstractWeightDependence</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
 
-<div class="viewcode-block" id="AbstractWeightDependence.get_provenance_data"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.abstract_weight_dependence.AbstractWeightDependence.get_provenance_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_provenance_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pre_population_label</span><span class="p">,</span> <span class="n">post_population_label</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractWeightDependence.get_provenance_data"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence.get_provenance_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_provenance_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pre_population_label</span><span class="p">,</span> <span class="n">post_population_label</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get any provenance data</span>
 
 <span class="sd">        :param str pre_population_label: label of pre.</span>
@@ -100,14 +100,14 @@
         <span class="k">return</span> <span class="nb">list</span><span class="p">()</span></div>
 
     <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractWeightDependence.get_parameter_names"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.abstract_weight_dependence.AbstractWeightDependence.get_parameter_names">[docs]</a>    <span class="k">def</span> <span class="nf">get_parameter_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractWeightDependence.get_parameter_names"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence.get_parameter_names">[docs]</a>    <span class="k">def</span> <span class="nf">get_parameter_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Returns the parameter names</span>
 
 <span class="sd">        :rtype: iterable(str)</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
     <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractWeightDependence.is_same_as"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.abstract_weight_dependence.AbstractWeightDependence.is_same_as">[docs]</a>    <span class="k">def</span> <span class="nf">is_same_as</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weight_dependence</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractWeightDependence.is_same_as"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence.is_same_as">[docs]</a>    <span class="k">def</span> <span class="nf">is_same_as</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weight_dependence</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Determine if this weight dependence is the same as another</span>
 
 <span class="sd">        :param AbstractWeightDependence weight_dependence:</span>
@@ -122,7 +122,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
     <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractWeightDependence.get_parameters_sdram_usage_in_bytes"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.abstract_weight_dependence.AbstractWeightDependence.get_parameters_sdram_usage_in_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">get_parameters_sdram_usage_in_bytes</span><span class="p">(</span>
+<div class="viewcode-block" id="AbstractWeightDependence.get_parameters_sdram_usage_in_bytes"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence.get_parameters_sdram_usage_in_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">get_parameters_sdram_usage_in_bytes</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">n_synapse_types</span><span class="p">,</span> <span class="n">n_weight_terms</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the amount of SDRAM used by the parameters of this rule</span>
 
@@ -132,7 +132,7 @@
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
     <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractWeightDependence.write_parameters"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.abstract_weight_dependence.AbstractWeightDependence.write_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">write_parameters</span><span class="p">(</span>
+<div class="viewcode-block" id="AbstractWeightDependence.write_parameters"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.html#spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.AbstractWeightDependence.write_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">write_parameters</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">weight_scales</span><span class="p">,</span> <span class="n">n_weight_terms</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Write the parameters of the rule to the spec</span>
 

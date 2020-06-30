@@ -1,50 +1,6 @@
 spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence package
 ======================================================================
 
-Submodules
-----------
-
-spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.abstract_has_a_plus_a_minus module
--------------------------------------------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.abstract_has_a_plus_a_minus
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.abstract_weight_dependence module
-------------------------------------------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.abstract_weight_dependence
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.weight_dependence_additive module
-------------------------------------------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.weight_dependence_additive
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.weight_dependence_additive_triplet module
---------------------------------------------------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.weight_dependence_additive_triplet
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.weight_dependence_multiplicative module
-------------------------------------------------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence.weight_dependence_multiplicative
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-
 Module contents
 ---------------
 

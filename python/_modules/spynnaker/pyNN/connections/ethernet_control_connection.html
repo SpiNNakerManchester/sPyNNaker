@@ -85,7 +85,7 @@
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="EthernetControlConnection"><a class="viewcode-back" href="../../../../spynnaker.pyNN.connections.html#spynnaker.pyNN.connections.ethernet_control_connection.EthernetControlConnection">[docs]</a><span class="k">class</span> <span class="nc">EthernetControlConnection</span><span class="p">(</span><span class="n">LiveEventConnection</span><span class="p">):</span>
+<div class="viewcode-block" id="EthernetControlConnection"><a class="viewcode-back" href="../../../../spynnaker.pyNN.connections.html#spynnaker.pyNN.connections.EthernetControlConnection">[docs]</a><span class="k">class</span> <span class="nc">EthernetControlConnection</span><span class="p">(</span><span class="n">LiveEventConnection</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; A connection that can translate Ethernet control messages received\</span>
 <span class="sd">        from a Population</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -95,9 +95,13 @@
             <span class="bp">self</span><span class="p">,</span> <span class="n">translator</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">live_packet_gather_label</span><span class="p">,</span> <span class="n">local_host</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">local_port</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param translator: The translator of multicast to control commands</span>
-<span class="sd">        :param local_host: The optional host to listen on</span>
-<span class="sd">        :param local_port: The optional port to listen on</span>
+<span class="sd">        :param AbstractEthernetTranslator translator:</span>
+<span class="sd">            The translator of multicast to control commands</span>
+<span class="sd">        :param str label: The label of the vertex to attach the translator to</span>
+<span class="sd">        :param str live_packet_gather_label: The label of the LPG vertex that</span>
+<span class="sd">            this control connection will listen to.</span>
+<span class="sd">        :param str local_host: The optional host to listen on</span>
+<span class="sd">        :param int local_port: The optional port to listen on</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">EthernetControlConnection</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">live_packet_gather_label</span><span class="p">,</span> <span class="n">receive_labels</span><span class="o">=</span><span class="p">[</span><span class="n">label</span><span class="p">],</span>
@@ -106,7 +110,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__translators</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">translator</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_receive_callback</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_translate</span><span class="p">,</span> <span class="n">translate_key</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-<div class="viewcode-block" id="EthernetControlConnection.add_translator"><a class="viewcode-back" href="../../../../spynnaker.pyNN.connections.html#spynnaker.pyNN.connections.ethernet_control_connection.EthernetControlConnection.add_translator">[docs]</a>    <span class="k">def</span> <span class="nf">add_translator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">translator</span><span class="p">):</span>
+<div class="viewcode-block" id="EthernetControlConnection.add_translator"><a class="viewcode-back" href="../../../../spynnaker.pyNN.connections.html#spynnaker.pyNN.connections.EthernetControlConnection.add_translator">[docs]</a>    <span class="k">def</span> <span class="nf">add_translator</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">translator</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Add another translator that routes via the LPG.</span>
+
+<span class="sd">        :param str label: The label of the vertex to attach the translator to</span>
+<span class="sd">        :param AbstractEthernetTranslator translator:</span>
+<span class="sd">            The translator of multicast to control commands</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">EthernetControlConnection</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">add_receive_label</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__translators</span><span class="p">[</span><span class="n">label</span><span class="p">]</span> <span class="o">=</span> <span class="n">translator</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_receive_callback</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_translate</span><span class="p">,</span> <span class="n">translate_key</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>

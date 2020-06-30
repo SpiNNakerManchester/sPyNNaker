@@ -4,14 +4,6 @@ spynnaker.pyNN.models.spike_source package
 Submodules
 ----------
 
-spynnaker.pyNN.models.spike_source.spike_source_array module
-------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.models.spike_source.spike_source_array
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 spynnaker.pyNN.models.spike_source.spike_source_array_vertex module
 -------------------------------------------------------------------
 
@@ -20,34 +12,10 @@ spynnaker.pyNN.models.spike_source.spike_source_array_vertex module
     :undoc-members:
     :show-inheritance:
 
-spynnaker.pyNN.models.spike_source.spike_source_from_file module
-----------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.models.spike_source.spike_source_from_file
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.models.spike_source.spike_source_poisson module
---------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.models.spike_source.spike_source_poisson
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex module
 -----------------------------------------------------------------------------
 
 .. automodule:: spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.models.spike_source.spike_source_poisson_variable module
------------------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.models.spike_source.spike_source_poisson_variable
     :members:
     :undoc-members:
     :show-inheritance:

@@ -83,7 +83,7 @@
 <span class="kn">from</span> <span class="nn">enum</span> <span class="kn">import</span> <span class="n">Enum</span>
 
 
-<div class="viewcode-block" id="SendType"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.abstract_multicast_controllable_device.SendType">[docs]</a><span class="k">class</span> <span class="nc">SendType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">SendType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; The data type to be sent in the payload of the multicast packet</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">SEND_TYPE_INT</span> <span class="o">=</span> <span class="mi">0</span>
@@ -91,11 +91,11 @@
     <span class="n">SEND_TYPE_ACCUM</span> <span class="o">=</span> <span class="mi">2</span>
     <span class="n">SEND_TYPE_UACCUM</span> <span class="o">=</span> <span class="mi">3</span>
     <span class="n">SEND_TYPE_FRACT</span> <span class="o">=</span> <span class="mi">4</span>
-    <span class="n">SEND_TYPE_UFRACT</span> <span class="o">=</span> <span class="mi">5</span></div>
+    <span class="n">SEND_TYPE_UFRACT</span> <span class="o">=</span> <span class="mi">5</span>
 
 
 <span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">AbstractBase</span><span class="p">)</span>
-<div class="viewcode-block" id="AbstractMulticastControllableDevice"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.abstract_multicast_controllable_device.AbstractMulticastControllableDevice">[docs]</a><span class="k">class</span> <span class="nc">AbstractMulticastControllableDevice</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractMulticastControllableDevice"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.AbstractMulticastControllableDevice">[docs]</a><span class="k">class</span> <span class="nc">AbstractMulticastControllableDevice</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; A device that can be controlled by sending multicast packets to it,\</span>
 <span class="sd">        either directly, or via Ethernet using an AbstractEthernetTranslator</span>
 <span class="sd">    &quot;&quot;&quot;</span>

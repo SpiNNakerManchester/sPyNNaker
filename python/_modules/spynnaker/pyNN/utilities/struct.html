@@ -82,30 +82,28 @@
 <span class="kn">from</span> <span class="nn">pyNN.random</span> <span class="kn">import</span> <span class="n">RandomDistribution</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.helpful_functions</span> <span class="kn">import</span> <span class="n">is_singleton</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.ranged.ranged_list</span> <span class="kn">import</span> <span class="n">RangedList</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.utility_calls</span> <span class="kn">import</span> <span class="n">convert_to</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="n">BYTES_PER_WORD</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.utilities.utility_calls</span> <span class="kn">import</span> <span class="n">convert_to</span>
 
 
 <div class="viewcode-block" id="Struct"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.struct.Struct">[docs]</a><span class="k">class</span> <span class="nc">Struct</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Represents a C code structure</span>
+    <span class="sd">&quot;&quot;&quot; Represents a C code structure.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;__field_types&quot;</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field_types</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param field_types:\</span>
-<span class="sd">            The types of the fields, ordered as they appear in the struct</span>
-<span class="sd">        :type field_types:\</span>
-<span class="sd">            list of :py:class:`data_specification.enums.data_type.DataType`</span>
+<span class="sd">        :param list(~data_specification.enums.DataType) field_types:</span>
+<span class="sd">            The types of the fields, ordered as they appear in the struct.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__field_types</span> <span class="o">=</span> <span class="n">field_types</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">field_types</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; The types of the fields, ordered as they appear in the struct</span>
+        <span class="sd">&quot;&quot;&quot; The types of the fields, ordered as they appear in the struct.</span>
 
-<span class="sd">        :rtype: list of :py:class:`data_specification.enums.data_type.DataType`</span>
+<span class="sd">        :rtype: list(~data_specification.enums.DataType)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__field_types</span>
 
@@ -113,7 +111,7 @@
     <span class="k">def</span> <span class="nf">numpy_dtype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; The numpy data type of the struct</span>
 
-<span class="sd">        :rtype: :py:class:`numpy.dtype`</span>
+<span class="sd">        :rtype: ~numpy.dtype</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span>
             <span class="p">[(</span><span class="s2">&quot;f&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">numpy</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">data_type</span><span class="o">.</span><span class="n">struct_encoding</span><span class="p">))</span>
@@ -124,7 +122,7 @@
         <span class="sd">&quot;&quot;&quot; Get the size of the struct in whole words in an array of given\</span>
 <span class="sd">            size (default 1 item)</span>
 
-<span class="sd">        :param array_size: The number of elements in an array of structs</span>
+<span class="sd">        :param int array_size: The number of elements in an array of structs</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">datatype</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">numpy_dtype</span>
@@ -134,14 +132,15 @@
 <div class="viewcode-block" id="Struct.get_data"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.struct.Struct.get_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">array_size</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get a numpy array of uint32 of data for the given values</span>
 
-<span class="sd">        :param values:\</span>
-<span class="sd">            A list of values with length the same size as the number of fields\</span>
+<span class="sd">        :param values:</span>
+<span class="sd">            A list of values with length the same size as the number of fields</span>
 <span class="sd">            returned by field_types</span>
-<span class="sd">        :type values:\</span>
-<span class="sd">            list of (single value or list of values or RangedList of values)</span>
-<span class="sd">        :param offset: The offset into each of the values where to start</span>
-<span class="sd">        :param array_size: The number of structs to generate</span>
-<span class="sd">        :rtype: numpy.array(dtype=&quot;uint32&quot;)</span>
+<span class="sd">        :type values:</span>
+<span class="sd">            list(int or float or list(int) or list(float) or</span>
+<span class="sd">            ~spinn_utilities.ranged.RangedList)</span>
+<span class="sd">        :param int offset: The offset into each of the values where to start</span>
+<span class="sd">        :param int array_size: The number of structs to generate</span>
+<span class="sd">        :rtype: ~numpy.ndarray(dtype=&quot;uint32&quot;)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Create an array to store values in</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">array_size</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">numpy_dtype</span><span class="p">)</span>
@@ -159,7 +158,6 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">values</span><span class="o">.</span><span class="n">iter_ranges_by_slice</span><span class="p">(</span>
                         <span class="n">offset</span><span class="p">,</span> <span class="n">offset</span> <span class="o">+</span> <span class="n">array_size</span><span class="p">):</span>
-
                     <span class="c1"># Get the values and get them into the correct data type</span>
                     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">RandomDistribution</span><span class="p">):</span>
                         <span class="n">values</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">next</span><span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span>
@@ -181,10 +179,12 @@
         <span class="sd">&quot;&quot;&quot; Read a bytearray of data and convert to struct values</span>
 
 <span class="sd">        :param data: The data to be read</span>
-<span class="sd">        :param offset: Index of the byte at the start of the valid data</span>
-<span class="sd">        :param array_size: The number of struct elements to read</span>
-<span class="sd">        :return:\</span>
+<span class="sd">        :type data: bytes or bytearray</span>
+<span class="sd">        :param int offset: Index of the byte at the start of the valid data</span>
+<span class="sd">        :param int array_size: The number of struct elements to read</span>
+<span class="sd">        :return:</span>
 <span class="sd">            a list of lists of data values, one list for each struct element</span>
+<span class="sd">        :rtype: list(float)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">numpy_dtype</span><span class="o">.</span><span class="n">itemsize</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">numpy_dtype</span><span class="p">)</span>
@@ -197,22 +197,21 @@
         <span class="c1"># as numpy.frombuffer does not like an empty type</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">numpy_dtype</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">items_to_return</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># Read in the data values</span>
-            <span class="n">numpy_data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span>
-                <span class="n">data</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="n">offset</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">numpy_dtype</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="n">array_size</span><span class="p">)</span>
 
-            <span class="c1"># Go through the things to be set</span>
-            <span class="n">items_to_return</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
-            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">data_type</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">field_types</span><span class="p">):</span>
+        <span class="c1"># Read in the data values</span>
+        <span class="n">numpy_data</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span>
+            <span class="n">data</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="n">offset</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">numpy_dtype</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="n">array_size</span><span class="p">)</span>
 
-                <span class="c1"># Get the data to set for this item</span>
-                <span class="n">values</span> <span class="o">=</span> <span class="n">numpy_data</span><span class="p">[</span><span class="s2">&quot;f&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)]</span>
+        <span class="c1"># Go through the things to be set</span>
+        <span class="n">items_to_return</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">data_type</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">field_types</span><span class="p">):</span>
+            <span class="c1"># Get the data to set for this item</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="n">numpy_data</span><span class="p">[</span><span class="s2">&quot;f&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)]</span>
+            <span class="c1"># TODO: types that are integers should become integers</span>
+            <span class="n">items_to_return</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">values</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">data_type</span><span class="o">.</span><span class="n">scale</span><span class="p">))</span>
 
-                <span class="n">items_to_return</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">values</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">data_type</span><span class="o">.</span><span class="n">scale</span><span class="p">))</span>
-
-            <span class="c1"># Return values read</span>
-            <span class="k">return</span> <span class="n">items_to_return</span></div></div>
+        <span class="c1"># Return values read</span>
+        <span class="k">return</span> <span class="n">items_to_return</span></div></div>
 </pre></div>
 
           </div>

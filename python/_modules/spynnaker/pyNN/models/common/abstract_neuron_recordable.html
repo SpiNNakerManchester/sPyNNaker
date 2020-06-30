@@ -83,64 +83,80 @@
 
 
 <span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">AbstractBase</span><span class="p">)</span>
-<div class="viewcode-block" id="AbstractNeuronRecordable"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.abstract_neuron_recordable.AbstractNeuronRecordable">[docs]</a><span class="k">class</span> <span class="nc">AbstractNeuronRecordable</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractNeuronRecordable"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.AbstractNeuronRecordable">[docs]</a><span class="k">class</span> <span class="nc">AbstractNeuronRecordable</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Indicates that a variable (e.g., membrane voltage) can be recorded\</span>
-<span class="sd">        from this object</span>
+<span class="sd">        from this object.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
 
     <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractNeuronRecordable.get_recordable_variables"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.abstract_neuron_recordable.AbstractNeuronRecordable.get_recordable_variables">[docs]</a>    <span class="k">def</span> <span class="nf">get_recordable_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Returns a list of the variables this models is expected to collect</span>
+<div class="viewcode-block" id="AbstractNeuronRecordable.get_recordable_variables"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.AbstractNeuronRecordable.get_recordable_variables">[docs]</a>    <span class="k">def</span> <span class="nf">get_recordable_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Returns a list of the PyNN names of variables this model is \</span>
+<span class="sd">            expected to collect</span>
+
+<span class="sd">        :rtype: list(str)</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
     <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractNeuronRecordable.is_recording"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.abstract_neuron_recordable.AbstractNeuronRecordable.is_recording">[docs]</a>    <span class="k">def</span> <span class="nf">is_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Determines if variable is being recorded</span>
+<div class="viewcode-block" id="AbstractNeuronRecordable.is_recording"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.AbstractNeuronRecordable.is_recording">[docs]</a>    <span class="k">def</span> <span class="nf">is_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Determines if variable is being recorded.</span>
 
+<span class="sd">        :param str variable: PyNN name of the variable</span>
 <span class="sd">        :return: True if variable are being recorded, False otherwise</span>
 <span class="sd">        :rtype: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
     <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractNeuronRecordable.set_recording"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.abstract_neuron_recordable.AbstractNeuronRecordable.set_recording">[docs]</a>    <span class="k">def</span> <span class="nf">set_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">new_state</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<div class="viewcode-block" id="AbstractNeuronRecordable.set_recording"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.AbstractNeuronRecordable.set_recording">[docs]</a>    <span class="k">def</span> <span class="nf">set_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">new_state</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">sampling_interval</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                       <span class="n">indexes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Sets variable to being recorded</span>
+
+<span class="sd">        :param str variable: PyNN name of the variable</span>
+<span class="sd">        :param bool new_state:</span>
+<span class="sd">        :param sampling_interval:</span>
+<span class="sd">        :type sampling_interval: int or None</span>
+<span class="sd">        :param indexes: Which indices are to be recorded (or None for all)</span>
+<span class="sd">        :type indexes: list or None</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
     <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractNeuronRecordable.clear_recording"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.abstract_neuron_recordable.AbstractNeuronRecordable.clear_recording">[docs]</a>    <span class="k">def</span> <span class="nf">clear_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span>
-                        <span class="n">graph_mapper</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractNeuronRecordable.clear_recording"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.AbstractNeuronRecordable.clear_recording">[docs]</a>    <span class="k">def</span> <span class="nf">clear_recording</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">placements</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Clear the recorded data from the object</span>
 
+<span class="sd">        :param str variable: PyNN name of the variable</span>
 <span class="sd">        :param buffer_manager: the buffer manager object</span>
-<span class="sd">        :param placements: the placements object</span>
-<span class="sd">        :param graph_mapper: the graph mapper object</span>
+<span class="sd">        :type buffer_manager:</span>
+<span class="sd">            ~spinn_front_end_common.interface.buffer_management.BufferManager</span>
+<span class="sd">        :param ~pacman.model.placements.Placements placements:</span>
+<span class="sd">            the placements object</span>
 <span class="sd">        :rtype: None</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
     <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractNeuronRecordable.get_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.abstract_neuron_recordable.AbstractNeuronRecordable.get_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">n_machine_time_steps</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span>
-                 <span class="n">graph_mapper</span><span class="p">,</span> <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractNeuronRecordable.get_data"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.AbstractNeuronRecordable.get_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">,</span> <span class="n">n_machine_time_steps</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span>
+                 <span class="n">buffer_manager</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the recorded data</span>
 
-<span class="sd">        :param variable:</span>
-<span class="sd">        :param n_machine_time_steps:</span>
-<span class="sd">        :param placements:</span>
-<span class="sd">        :param graph_mapper:</span>
+<span class="sd">        :param str variable: PyNN name of the variable</span>
+<span class="sd">        :param int n_machine_time_steps:</span>
+<span class="sd">        :param ~pacman.model.placements.Placements placements:</span>
 <span class="sd">        :param buffer_manager:</span>
-<span class="sd">        :param machine_time_step:</span>
-<span class="sd">        :return:</span>
+<span class="sd">        :type buffer_manager:</span>
+<span class="sd">            ~spinn_front_end_common.interface.buffer_management.BufferManager</span>
+<span class="sd">        :param int machine_time_step: microseconds</span>
+<span class="sd">        :return: (data, recording_indices, sampling_interval)</span>
+<span class="sd">        :rtype: tuple(~numpy.ndarray,list(int),float)</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
         <span class="c1"># pylint: disable=too-many-arguments</span>
 
     <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractNeuronRecordable.get_neuron_sampling_interval"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.abstract_neuron_recordable.AbstractNeuronRecordable.get_neuron_sampling_interval">[docs]</a>    <span class="k">def</span> <span class="nf">get_neuron_sampling_interval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractNeuronRecordable.get_neuron_sampling_interval"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.common.html#spynnaker.pyNN.models.common.AbstractNeuronRecordable.get_neuron_sampling_interval">[docs]</a>    <span class="k">def</span> <span class="nf">get_neuron_sampling_interval</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variable</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Returns the current sampling interval for this variable</span>
 
-<span class="sd">        :param variable: PyNN name of the variable</span>
-<span class="sd">        :return: Sampling interval in micro seconds</span>
+<span class="sd">        :param str variable: PyNN name of the variable</span>
+<span class="sd">        :return: Sampling interval in microseconds</span>
+<span class="sd">        :rtype: float</span>
 <span class="sd">        &quot;&quot;&quot;</span></div></div>
 </pre></div>
 

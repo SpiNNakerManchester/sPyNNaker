@@ -1,26 +1,6 @@
 spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.formation package
 ===================================================================================
 
-Submodules
-----------
-
-spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.formation.abstract_formation module
------------------------------------------------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.formation.abstract_formation
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.formation.distance_dependent_formation module
----------------------------------------------------------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.formation.distance_dependent_formation
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-
 Module contents
 ---------------
 

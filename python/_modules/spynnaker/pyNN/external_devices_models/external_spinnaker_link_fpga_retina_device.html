@@ -96,7 +96,7 @@
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="get_y_from_fpga_retina"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.external_spinnaker_link_fpga_retina_device.get_y_from_fpga_retina">[docs]</a><span class="k">def</span> <span class="nf">get_y_from_fpga_retina</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">mode</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">get_y_from_fpga_retina</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">mode</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="mi">128</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">key</span> <span class="o">&amp;</span> <span class="mh">0x7f</span>
     <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="mi">64</span><span class="p">:</span>
@@ -105,10 +105,10 @@
         <span class="k">return</span> <span class="n">key</span> <span class="o">&amp;</span> <span class="mh">0x1f</span>
     <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="mi">16</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">key</span> <span class="o">&amp;</span> <span class="mh">0xf</span>
-    <span class="k">return</span> <span class="kc">None</span></div>
+    <span class="k">return</span> <span class="kc">None</span>
 
 
-<div class="viewcode-block" id="get_x_from_fpga_retina"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.external_spinnaker_link_fpga_retina_device.get_x_from_fpga_retina">[docs]</a><span class="k">def</span> <span class="nf">get_x_from_fpga_retina</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">mode</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">get_x_from_fpga_retina</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">mode</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="mi">128</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">key</span> <span class="o">&gt;&gt;</span> <span class="mi">7</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0x7f</span>
     <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="mi">64</span><span class="p">:</span>
@@ -117,10 +117,10 @@
         <span class="k">return</span> <span class="p">(</span><span class="n">key</span> <span class="o">&gt;&gt;</span> <span class="mi">5</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0x1f</span>
     <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="mi">16</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">key</span> <span class="o">&gt;&gt;</span> <span class="mi">4</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0xf</span>
-    <span class="k">return</span> <span class="kc">None</span></div>
+    <span class="k">return</span> <span class="kc">None</span>
 
 
-<div class="viewcode-block" id="get_spike_value_from_fpga_retina"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.external_spinnaker_link_fpga_retina_device.get_spike_value_from_fpga_retina">[docs]</a><span class="k">def</span> <span class="nf">get_spike_value_from_fpga_retina</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">mode</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">get_spike_value_from_fpga_retina</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">mode</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="mi">128</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">key</span> <span class="o">&gt;&gt;</span> <span class="mi">14</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0x1</span>
     <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="mi">64</span><span class="p">:</span>
@@ -129,10 +129,10 @@
         <span class="k">return</span> <span class="p">(</span><span class="n">key</span> <span class="o">&gt;&gt;</span> <span class="mi">14</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0x1</span>
     <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="mi">16</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">key</span> <span class="o">&gt;&gt;</span> <span class="mi">14</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mh">0x1</span>
-    <span class="k">return</span> <span class="kc">None</span></div>
+    <span class="k">return</span> <span class="kc">None</span>
 
 
-<div class="viewcode-block" id="ExternalFPGARetinaDevice"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.external_spinnaker_link_fpga_retina_device.ExternalFPGARetinaDevice">[docs]</a><span class="k">class</span> <span class="nc">ExternalFPGARetinaDevice</span><span class="p">(</span>
+<div class="viewcode-block" id="ExternalFPGARetinaDevice"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.ExternalFPGARetinaDevice">[docs]</a><span class="k">class</span> <span class="nc">ExternalFPGARetinaDevice</span><span class="p">(</span>
         <span class="n">ApplicationSpiNNakerLinkVertex</span><span class="p">,</span> <span class="n">AbstractSendMeMulticastCommandsVertex</span><span class="p">,</span>
         <span class="n">AbstractProvidesOutgoingPartitionConstraints</span><span class="p">,</span>
         <span class="n">ProvidesKeyToAtomMappingImpl</span><span class="p">):</span>
@@ -189,7 +189,7 @@
             <span class="s2">&quot;the FPGA retina does not recognise this mode&quot;</span><span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="ExternalFPGARetinaDevice.get_n_neurons"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.external_spinnaker_link_fpga_retina_device.ExternalFPGARetinaDevice.get_n_neurons">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_neurons</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="n">polarity</span><span class="p">):</span>
+<div class="viewcode-block" id="ExternalFPGARetinaDevice.get_n_neurons"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.ExternalFPGARetinaDevice.get_n_neurons">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_neurons</span><span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="n">polarity</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="n">ExternalFPGARetinaDevice</span><span class="o">.</span><span class="n">MODE_128</span><span class="p">:</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">polarity</span> <span class="o">==</span> <span class="n">ExternalFPGARetinaDevice</span><span class="o">.</span><span class="n">UP_POLARITY</span> <span class="ow">or</span>
                     <span class="n">polarity</span> <span class="o">==</span> <span class="n">ExternalFPGARetinaDevice</span><span class="o">.</span><span class="n">DOWN_POLARITY</span><span class="p">):</span>
@@ -230,7 +230,7 @@
     <span class="k">def</span> <span class="nf">timed_commands</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">[]</span>
 
-<div class="viewcode-block" id="ExternalFPGARetinaDevice.get_outgoing_partition_constraints"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.external_spinnaker_link_fpga_retina_device.ExternalFPGARetinaDevice.get_outgoing_partition_constraints">[docs]</a>    <span class="k">def</span> <span class="nf">get_outgoing_partition_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">partition</span><span class="p">):</span>
+<div class="viewcode-block" id="ExternalFPGARetinaDevice.get_outgoing_partition_constraints"><a class="viewcode-back" href="../../../../spynnaker.pyNN.external_devices_models.html#spynnaker.pyNN.external_devices_models.ExternalFPGARetinaDevice.get_outgoing_partition_constraints">[docs]</a>    <span class="k">def</span> <span class="nf">get_outgoing_partition_constraints</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">partition</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">FixedKeyAndMaskConstraint</span><span class="p">([</span>
             <span class="n">BaseKeyAndMask</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__fixed_key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__fixed_mask</span><span class="p">)])]</span></div></div>
 </pre></div>

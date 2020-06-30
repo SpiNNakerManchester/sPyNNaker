@@ -1,26 +1,6 @@
 spynnaker.pyNN.models.neuron.additional_inputs package
 ======================================================
 
-Submodules
-----------
-
-spynnaker.pyNN.models.neuron.additional_inputs.abstract_additional_input module
--------------------------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.models.neuron.additional_inputs.abstract_additional_input
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.models.neuron.additional_inputs.additional_input_ca2_adaptive module
------------------------------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.models.neuron.additional_inputs.additional_input_ca2_adaptive
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-
 Module contents
 ---------------
 

@@ -201,7 +201,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cmd_pair</span>
 
 
-<div class="viewcode-block" id="NeuronParameter"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_properties.html#spynnaker.pyNN.models.neural_properties.neural_parameter.NeuronParameter">[docs]</a><span class="k">class</span> <span class="nc">NeuronParameter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="NeuronParameter"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_properties.html#spynnaker.pyNN.models.neural_properties.NeuronParameter">[docs]</a><span class="k">class</span> <span class="nc">NeuronParameter</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; A settable parameter of a neuron model.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -225,7 +225,7 @@
                 <span class="n">data_type</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">Commands</span><span class="o">.</span><span class="n">WRITE</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>  <span class="c1"># @UndefinedVariable</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__data_type</span> <span class="o">=</span> <span class="n">data_type</span>
 
-<div class="viewcode-block" id="NeuronParameter.get_value"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_properties.html#spynnaker.pyNN.models.neural_properties.neural_parameter.NeuronParameter.get_value">[docs]</a>    <span class="k">def</span> <span class="nf">get_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="NeuronParameter.get_value"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_properties.html#spynnaker.pyNN.models.neural_properties.NeuronParameter.get_value">[docs]</a>    <span class="k">def</span> <span class="nf">get_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; What the value of the parameter is; if a list or array,\</span>
 <span class="sd">            potentially provides a different value for each neuron.</span>
 
@@ -235,14 +235,14 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__value</span></div>
 
-<div class="viewcode-block" id="NeuronParameter.get_dataspec_datatype"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_properties.html#spynnaker.pyNN.models.neural_properties.neural_parameter.NeuronParameter.get_dataspec_datatype">[docs]</a>    <span class="k">def</span> <span class="nf">get_dataspec_datatype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="NeuronParameter.get_dataspec_datatype"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_properties.html#spynnaker.pyNN.models.neural_properties.NeuronParameter.get_dataspec_datatype">[docs]</a>    <span class="k">def</span> <span class="nf">get_dataspec_datatype</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the serialization type of the parameter in the neuron model.</span>
 
 <span class="sd">        :rtype: ~data_specification.enums.DataType</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__data_type</span></div>
 
-<div class="viewcode-block" id="NeuronParameter.iterator_by_slice"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_properties.html#spynnaker.pyNN.models.neural_properties.neural_parameter.NeuronParameter.iterator_by_slice">[docs]</a>    <span class="k">def</span> <span class="nf">iterator_by_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slice_start</span><span class="p">,</span> <span class="n">slice_stop</span><span class="p">,</span> <span class="n">spec</span><span class="p">):</span>
+<div class="viewcode-block" id="NeuronParameter.iterator_by_slice"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_properties.html#spynnaker.pyNN.models.neural_properties.NeuronParameter.iterator_by_slice">[docs]</a>    <span class="k">def</span> <span class="nf">iterator_by_slice</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slice_start</span><span class="p">,</span> <span class="n">slice_stop</span><span class="p">,</span> <span class="n">spec</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Creates an iterator over the commands to use to write the\</span>
 <span class="sd">            parameter to the data specification being generated.</span>
 

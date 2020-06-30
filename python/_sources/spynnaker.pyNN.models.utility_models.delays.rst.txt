@@ -1,42 +1,6 @@
 spynnaker.pyNN.models.utility_models.delays package
 ===================================================
 
-Submodules
-----------
-
-spynnaker.pyNN.models.utility_models.delays.delay_block module
---------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.models.utility_models.delays.delay_block
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.models.utility_models.delays.delay_extension_machine_vertex module
----------------------------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.models.utility_models.delays.delay_extension_machine_vertex
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.models.utility_models.delays.delay_extension_vertex module
--------------------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.models.utility_models.delays.delay_extension_vertex
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.models.utility_models.delays.delay_generator_data module
------------------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.models.utility_models.delays.delay_generator_data
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-
 Module contents
 ---------------
 

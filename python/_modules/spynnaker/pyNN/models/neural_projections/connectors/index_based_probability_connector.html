@@ -98,8 +98,8 @@
                                <span class="n">tan</span><span class="p">,</span> <span class="n">tanh</span><span class="p">,</span> <span class="n">maximum</span><span class="p">,</span> <span class="n">minimum</span><span class="p">,</span> <span class="n">e</span><span class="o">=</span><span class="n">e</span><span class="p">,</span> <span class="n">pi</span><span class="o">=</span><span class="n">pi</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="IndexBasedProbabilityConnector"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.index_based_probability_connector.IndexBasedProbabilityConnector">[docs]</a><span class="k">class</span> <span class="nc">IndexBasedProbabilityConnector</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Make connections using a probability distribution which varies</span>
+<div class="viewcode-block" id="IndexBasedProbabilityConnector"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.IndexBasedProbabilityConnector">[docs]</a><span class="k">class</span> <span class="nc">IndexBasedProbabilityConnector</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Make connections using a probability distribution which varies\</span>
 <span class="sd">        dependent upon the indices of the pre- and post-populations.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -112,15 +112,20 @@
             <span class="bp">self</span><span class="p">,</span> <span class="n">index_expression</span><span class="p">,</span> <span class="n">allow_self_connections</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">rng</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">safe</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param `string` index_expression:</span>
+<span class="sd">        :param str index_expression:</span>
 <span class="sd">            the right-hand side of a valid python expression for</span>
 <span class="sd">            probability, involving the indices of the pre and post populations,</span>
 <span class="sd">            that can be parsed by eval(), that computes a probability dist.</span>
-<span class="sd">        :param `bool` allow_self_connections:</span>
-<span class="sd">            if the connector is used to connect a</span>
-<span class="sd">            Population to itself, this flag determines whether a neuron is</span>
-<span class="sd">            allowed to connect to itself, or only to other neurons in the</span>
-<span class="sd">            Population.</span>
+<span class="sd">        :param bool allow_self_connections:</span>
+<span class="sd">            if the connector is used to connect a Population to itself, this</span>
+<span class="sd">            flag determines whether a neuron is allowed to connect to itself,</span>
+<span class="sd">            or only to other neurons in the Population.</span>
+<span class="sd">        :param rng:</span>
+<span class="sd">            Seeded random number generator, or None to make one when needed</span>
+<span class="sd">        :type rng: ~pyNN.random.NumpyRNG or None</span>
+<span class="sd">        :param bool safe:</span>
+<span class="sd">        :param callable callback: Ignored</span>
+<span class="sd">        :param bool verbose:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">IndexBasedProbabilityConnector</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">safe</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
@@ -130,6 +135,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__probs</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="nf">_update_probs_from_index_expression</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param SynapseInformation synapse_info:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># note: this only needs to be done once</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__probs</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># numpy array of probabilities using the index_expression</span>
@@ -139,7 +147,7 @@
                 <span class="p">(</span><span class="n">synapse_info</span><span class="o">.</span><span class="n">n_pre_neurons</span><span class="p">,</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_post_neurons</span><span class="p">))</span>
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_delay_maximum</span><span class="p">)</span>
-<div class="viewcode-block" id="IndexBasedProbabilityConnector.get_delay_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.index_based_probability_connector.IndexBasedProbabilityConnector.get_delay_maximum">[docs]</a>    <span class="k">def</span> <span class="nf">get_delay_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
+<div class="viewcode-block" id="IndexBasedProbabilityConnector.get_delay_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.IndexBasedProbabilityConnector.get_delay_maximum">[docs]</a>    <span class="k">def</span> <span class="nf">get_delay_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_update_probs_from_index_expression</span><span class="p">(</span><span class="n">synapse_info</span><span class="p">)</span>
         <span class="n">n_connections</span> <span class="o">=</span> <span class="n">utility_calls</span><span class="o">.</span><span class="n">get_probable_maximum_selected</span><span class="p">(</span>
             <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_pre_neurons</span> <span class="o">*</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_post_neurons</span><span class="p">,</span>
@@ -148,7 +156,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_delay_maximum</span><span class="p">(</span><span class="n">synapse_info</span><span class="o">.</span><span class="n">delays</span><span class="p">,</span> <span class="n">n_connections</span><span class="p">)</span></div>
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_n_connections_from_pre_vertex_maximum</span><span class="p">)</span>
-<div class="viewcode-block" id="IndexBasedProbabilityConnector.get_n_connections_from_pre_vertex_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.index_based_probability_connector.IndexBasedProbabilityConnector.get_n_connections_from_pre_vertex_maximum">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_connections_from_pre_vertex_maximum</span><span class="p">(</span>
+<div class="viewcode-block" id="IndexBasedProbabilityConnector.get_n_connections_from_pre_vertex_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.IndexBasedProbabilityConnector.get_n_connections_from_pre_vertex_maximum">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_connections_from_pre_vertex_maximum</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">min_delay</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">max_delay</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_update_probs_from_index_expression</span><span class="p">(</span><span class="n">synapse_info</span><span class="p">)</span>
@@ -165,14 +173,14 @@
             <span class="n">n_connections</span><span class="p">,</span> <span class="n">min_delay</span><span class="p">,</span> <span class="n">max_delay</span><span class="p">)</span></div>
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_n_connections_to_post_vertex_maximum</span><span class="p">)</span>
-<div class="viewcode-block" id="IndexBasedProbabilityConnector.get_n_connections_to_post_vertex_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.index_based_probability_connector.IndexBasedProbabilityConnector.get_n_connections_to_post_vertex_maximum">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_connections_to_post_vertex_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
+<div class="viewcode-block" id="IndexBasedProbabilityConnector.get_n_connections_to_post_vertex_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.IndexBasedProbabilityConnector.get_n_connections_to_post_vertex_maximum">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_connections_to_post_vertex_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_update_probs_from_index_expression</span><span class="p">(</span><span class="n">synapse_info</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">utility_calls</span><span class="o">.</span><span class="n">get_probable_maximum_selected</span><span class="p">(</span>
             <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_pre_neurons</span> <span class="o">*</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_post_neurons</span><span class="p">,</span>
             <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_pre_neurons</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">amax</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__probs</span><span class="p">))</span></div>
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_weight_maximum</span><span class="p">)</span>
-<div class="viewcode-block" id="IndexBasedProbabilityConnector.get_weight_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.index_based_probability_connector.IndexBasedProbabilityConnector.get_weight_maximum">[docs]</a>    <span class="k">def</span> <span class="nf">get_weight_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
+<div class="viewcode-block" id="IndexBasedProbabilityConnector.get_weight_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.IndexBasedProbabilityConnector.get_weight_maximum">[docs]</a>    <span class="k">def</span> <span class="nf">get_weight_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_update_probs_from_index_expression</span><span class="p">(</span><span class="n">synapse_info</span><span class="p">)</span>
         <span class="n">n_connections</span> <span class="o">=</span> <span class="n">utility_calls</span><span class="o">.</span><span class="n">get_probable_maximum_selected</span><span class="p">(</span>
             <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_pre_neurons</span> <span class="o">*</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_post_neurons</span><span class="p">,</span>
@@ -181,11 +189,9 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_weight_maximum</span><span class="p">(</span><span class="n">synapse_info</span><span class="o">.</span><span class="n">weights</span><span class="p">,</span> <span class="n">n_connections</span><span class="p">)</span></div>
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">create_synaptic_block</span><span class="p">)</span>
-<div class="viewcode-block" id="IndexBasedProbabilityConnector.create_synaptic_block"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.index_based_probability_connector.IndexBasedProbabilityConnector.create_synaptic_block">[docs]</a>    <span class="k">def</span> <span class="nf">create_synaptic_block</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">pre_slices</span><span class="p">,</span> <span class="n">pre_slice_index</span><span class="p">,</span> <span class="n">post_slices</span><span class="p">,</span>
-            <span class="n">post_slice_index</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
-            <span class="n">synapse_type</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
-
+<div class="viewcode-block" id="IndexBasedProbabilityConnector.create_synaptic_block"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.IndexBasedProbabilityConnector.create_synaptic_block">[docs]</a>    <span class="k">def</span> <span class="nf">create_synaptic_block</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">pre_slices</span><span class="p">,</span> <span class="n">pre_slice_index</span><span class="p">,</span> <span class="n">post_slices</span><span class="p">,</span> <span class="n">post_slice_index</span><span class="p">,</span>
+            <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">synapse_type</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
         <span class="c1"># setup probs here</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_update_probs_from_index_expression</span><span class="p">(</span><span class="n">synapse_info</span><span class="p">)</span>
 
@@ -225,6 +231,12 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">allow_self_connections</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; If the connector is used to connect a Population to itself, this\</span>
+<span class="sd">            flag determines whether a neuron is allowed to connect to itself,\</span>
+<span class="sd">            or only to other neurons in the Population.</span>
+
+<span class="sd">        :rtype: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__allow_self_connections</span>
 
     <span class="nd">@allow_self_connections</span><span class="o">.</span><span class="n">setter</span>
@@ -233,6 +245,12 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">index_expression</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; The right-hand side of a valid python expression for probability,\</span>
+<span class="sd">            involving the indices of the pre and post populations, that can\</span>
+<span class="sd">            be parsed by eval(), that computes a probability dist.</span>
+
+<span class="sd">        :rtype: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__index_expression</span>
 
     <span class="nd">@index_expression</span><span class="o">.</span><span class="n">setter</span>

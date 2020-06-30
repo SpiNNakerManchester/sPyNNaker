@@ -92,7 +92,7 @@
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="CSAConnector"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.csa_connector.CSAConnector">[docs]</a><span class="k">class</span> <span class="nc">CSAConnector</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="p">):</span>
+<div class="viewcode-block" id="CSAConnector"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.CSAConnector">[docs]</a><span class="k">class</span> <span class="nc">CSAConnector</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Make connections using a Connection Set Algebra (Djurfeldt 2012)\</span>
 <span class="sd">        description between the neurons in the pre- and post-populations.</span>
 <span class="sd">        If you get TypeError in Python 3 see:</span>
@@ -104,8 +104,15 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cset</span><span class="p">,</span> <span class="n">safe</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">callback</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param &#39;?&#39; cset:</span>
+<span class="sd">        :param csa.connset.CSet cset:</span>
 <span class="sd">            A description of the connection set between populations</span>
+<span class="sd">        :param bool safe:</span>
+<span class="sd">        :param callable callback: Ignored</span>
+<span class="sd">        :param bool verbose:</span>
+<span class="sd">        :raises ImportError:</span>
+<span class="sd">            if the `csa` library isn&#39;t present; it&#39;s tricky to install in</span>
+<span class="sd">            some environments so we don&#39;t force it to be present unless you</span>
+<span class="sd">            want to actually use this class.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">CSAConnector</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">safe</span><span class="p">,</span> <span class="n">callback</span><span class="p">,</span> <span class="n">verbose</span><span class="p">)</span>
         <span class="n">found</span><span class="p">,</span> <span class="n">ex</span> <span class="o">=</span> <span class="n">_csa_found</span>
@@ -118,19 +125,20 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__full_cset</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_delay_maximum</span><span class="p">)</span>
-<div class="viewcode-block" id="CSAConnector.get_delay_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.csa_connector.CSAConnector.get_delay_maximum">[docs]</a>    <span class="k">def</span> <span class="nf">get_delay_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
+<div class="viewcode-block" id="CSAConnector.get_delay_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.CSAConnector.get_delay_maximum">[docs]</a>    <span class="k">def</span> <span class="nf">get_delay_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
         <span class="n">n_conns_max</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_pre_neurons</span> <span class="o">*</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_post_neurons</span>
         <span class="c1"># we can probably look at the array and do better than this?</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_delay_maximum</span><span class="p">(</span><span class="n">synapse_info</span><span class="o">.</span><span class="n">delays</span><span class="p">,</span> <span class="n">n_conns_max</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">_get_n_connections</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
-                           <span class="n">synapse_info</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_get_n_connections</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:</span>
+<span class="sd">        :param ~pacman.model.graphs.common.Slice post_vertex_slice:</span>
+<span class="sd">        :param SynapseInformation synapse_info:</span>
+<span class="sd">        :rtype: tuple(int, cset.connset.CSet)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># do the work from self._cset in here</span>
-        <span class="c1"># get the values for this slice</span>
-        <span class="n">pre_lo</span> <span class="o">=</span> <span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span>
-        <span class="n">pre_hi</span> <span class="o">=</span> <span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span>
-        <span class="n">post_lo</span> <span class="o">=</span> <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span>
-        <span class="n">post_hi</span> <span class="o">=</span> <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span>
 
         <span class="c1"># this is where the magic needs to happen somehow</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__full_cset</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -140,22 +148,21 @@
 
         <span class="c1"># use CSA to cross the range of this vertex&#39;s neurons with the cset</span>
         <span class="n">pair_list</span> <span class="o">=</span> <span class="n">csa</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span>
-            <span class="nb">range</span><span class="p">(</span><span class="n">pre_lo</span><span class="p">,</span> <span class="n">pre_hi</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span>
-            <span class="nb">range</span><span class="p">(</span><span class="n">post_lo</span><span class="p">,</span> <span class="n">post_hi</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__full_cset</span>
+            <span class="nb">range</span><span class="p">(</span><span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span>
+            <span class="nb">range</span><span class="p">(</span><span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span> \
+            <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__full_cset</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;full cset: &#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__full_cset</span><span class="p">)</span>
             <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;this vertex pair_list: &#39;</span><span class="p">,</span> <span class="n">pair_list</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;this vertex pre_neurons: &#39;</span><span class="p">,</span>
-                  <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">pair_list</span><span class="p">])</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;this vertex post_neurons: &#39;</span><span class="p">,</span>
-                  <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">pair_list</span><span class="p">])</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;this vertex pre_neurons: &#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">pair_list</span><span class="p">])</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;this vertex post_neurons: &#39;</span><span class="p">,</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">pair_list</span><span class="p">])</span>
 
         <span class="n">n_connections</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pair_list</span><span class="p">)</span>  <span class="c1"># size of the array created</span>
         <span class="k">return</span> <span class="n">n_connections</span><span class="p">,</span> <span class="n">pair_list</span>
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_n_connections_from_pre_vertex_maximum</span><span class="p">)</span>
-<div class="viewcode-block" id="CSAConnector.get_n_connections_from_pre_vertex_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.csa_connector.CSAConnector.get_n_connections_from_pre_vertex_maximum">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_connections_from_pre_vertex_maximum</span><span class="p">(</span>
+<div class="viewcode-block" id="CSAConnector.get_n_connections_from_pre_vertex_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.CSAConnector.get_n_connections_from_pre_vertex_maximum">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_connections_from_pre_vertex_maximum</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">min_delay</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">max_delay</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">n_connections_max</span> <span class="o">=</span> <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span>
@@ -166,20 +173,19 @@
             <span class="n">n_connections_max</span><span class="p">,</span> <span class="n">min_delay</span><span class="p">,</span> <span class="n">max_delay</span><span class="p">)</span></div>
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_n_connections_to_post_vertex_maximum</span><span class="p">)</span>
-<div class="viewcode-block" id="CSAConnector.get_n_connections_to_post_vertex_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.csa_connector.CSAConnector.get_n_connections_to_post_vertex_maximum">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_connections_to_post_vertex_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
+<div class="viewcode-block" id="CSAConnector.get_n_connections_to_post_vertex_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.CSAConnector.get_n_connections_to_post_vertex_maximum">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_connections_to_post_vertex_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
         <span class="n">n_connections_max</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_pre_neurons</span>
         <span class="k">return</span> <span class="n">n_connections_max</span></div>
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_weight_maximum</span><span class="p">)</span>
-<div class="viewcode-block" id="CSAConnector.get_weight_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.csa_connector.CSAConnector.get_weight_maximum">[docs]</a>    <span class="k">def</span> <span class="nf">get_weight_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
+<div class="viewcode-block" id="CSAConnector.get_weight_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.CSAConnector.get_weight_maximum">[docs]</a>    <span class="k">def</span> <span class="nf">get_weight_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
         <span class="n">n_conns_max</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_pre_neurons</span> <span class="o">*</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_post_neurons</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_weight_maximum</span><span class="p">(</span><span class="n">synapse_info</span><span class="o">.</span><span class="n">weights</span><span class="p">,</span> <span class="n">n_conns_max</span><span class="p">)</span></div>
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">create_synaptic_block</span><span class="p">)</span>
-<div class="viewcode-block" id="CSAConnector.create_synaptic_block"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.csa_connector.CSAConnector.create_synaptic_block">[docs]</a>    <span class="k">def</span> <span class="nf">create_synaptic_block</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">pre_slices</span><span class="p">,</span> <span class="n">pre_slice_index</span><span class="p">,</span> <span class="n">post_slices</span><span class="p">,</span>
-            <span class="n">post_slice_index</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span>
-            <span class="n">synapse_type</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
+<div class="viewcode-block" id="CSAConnector.create_synaptic_block"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.CSAConnector.create_synaptic_block">[docs]</a>    <span class="k">def</span> <span class="nf">create_synaptic_block</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">pre_slices</span><span class="p">,</span> <span class="n">pre_slice_index</span><span class="p">,</span> <span class="n">post_slices</span><span class="p">,</span> <span class="n">post_slice_index</span><span class="p">,</span>
+            <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">synapse_type</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
         <span class="n">n_connections</span><span class="p">,</span> <span class="n">pair_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_n_connections</span><span class="p">(</span>
             <span class="n">pre_vertex_slice</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">)</span>
 
@@ -206,7 +212,11 @@
         <span class="n">block</span><span class="p">[</span><span class="s2">&quot;synapse_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">synapse_type</span>
         <span class="k">return</span> <span class="n">block</span></div>
 
-<div class="viewcode-block" id="CSAConnector.show_connection_set"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.csa_connector.CSAConnector.show_connection_set">[docs]</a>    <span class="k">def</span> <span class="nf">show_connection_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_pre_neurons</span><span class="p">,</span> <span class="n">n_post_neurons</span><span class="p">):</span>
+<div class="viewcode-block" id="CSAConnector.show_connection_set"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.CSAConnector.show_connection_set">[docs]</a>    <span class="k">def</span> <span class="nf">show_connection_set</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_pre_neurons</span><span class="p">,</span> <span class="n">n_post_neurons</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param int n_pre_neurons:</span>
+<span class="sd">        :param int n_post_neurons:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Yuck; this was supposed to be available to the user from scripts...</span>
         <span class="n">csa</span><span class="o">.</span><span class="n">show</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__full_connection_set</span><span class="p">,</span> <span class="n">n_pre_neurons</span><span class="p">,</span> <span class="n">n_post_neurons</span><span class="p">)</span></div>
 

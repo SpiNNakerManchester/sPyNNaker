@@ -84,7 +84,7 @@
 
 
 <span class="nd">@add_metaclass</span><span class="p">(</span><span class="n">AbstractBase</span><span class="p">)</span>
-<div class="viewcode-block" id="AbstractElimination"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.html#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.abstract_elimination.AbstractElimination">[docs]</a><span class="k">class</span> <span class="nc">AbstractElimination</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractElimination"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.html#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.AbstractElimination">[docs]</a><span class="k">class</span> <span class="nc">AbstractElimination</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; An elimination rule</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -98,14 +98,14 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
     <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractElimination.get_parameters_sdram_usage_in_bytes"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.html#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.abstract_elimination.AbstractElimination.get_parameters_sdram_usage_in_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">get_parameters_sdram_usage_in_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractElimination.get_parameters_sdram_usage_in_bytes"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.html#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.AbstractElimination.get_parameters_sdram_usage_in_bytes">[docs]</a>    <span class="k">def</span> <span class="nf">get_parameters_sdram_usage_in_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Get the amount of SDRAM used by the parameters of this rule</span>
 
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
     <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractElimination.write_parameters"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.html#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.abstract_elimination.AbstractElimination.write_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">write_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">weight_scale</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractElimination.write_parameters"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.html#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.AbstractElimination.write_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">write_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">weight_scale</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Write the parameters of the rule to the spec</span>
 
 <span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
@@ -113,7 +113,7 @@
 <span class="sd">        &quot;&quot;&quot;</span></div>
 
     <span class="nd">@abstractmethod</span>
-<div class="viewcode-block" id="AbstractElimination.get_parameter_names"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.html#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.abstract_elimination.AbstractElimination.get_parameter_names">[docs]</a>    <span class="k">def</span> <span class="nf">get_parameter_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractElimination.get_parameter_names"><a class="viewcode-back" href="../../../../../../../../spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.html#spynnaker.pyNN.models.neuron.structural_plasticity.synaptogenesis.elimination.AbstractElimination.get_parameter_names">[docs]</a>    <span class="k">def</span> <span class="nf">get_parameter_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Return the names of the parameters supported by this rule</span>
 
 <span class="sd">        :rtype: iterable(str)</span>

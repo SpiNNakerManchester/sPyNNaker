@@ -6,10 +6,21 @@ Subpackages
 
 .. toctree::
 
-    spynnaker.pyNN.models.neuron.plasticity.stdp.common
     spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure
     spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence
     spynnaker.pyNN.models.neuron.plasticity.stdp.weight_dependence
+
+Submodules
+----------
+
+spynnaker.pyNN.models.neuron.plasticity.stdp.common module
+----------------------------------------------------------
+
+.. automodule:: spynnaker.pyNN.models.neuron.plasticity.stdp.common
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 
 Module contents
 ---------------

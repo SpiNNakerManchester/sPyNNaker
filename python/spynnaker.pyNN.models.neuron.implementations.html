@@ -47,10 +47,11 @@
           <a href="spynnaker.pyNN.models.neuron.builds.html" title="spynnaker.pyNN.models.neuron.builds package"
              accesskey="P">previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
-          <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.models.html" >spynnaker.pyNN.models package</a> &#187;</li>
-          <li class="nav-item nav-item-4"><a href="spynnaker.pyNN.models.neuron.html" accesskey="U">spynnaker.pyNN.models.neuron package</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="modules.html" >spynnaker</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="spynnaker.pyNN.models.html" >spynnaker.pyNN.models package</a> &#187;</li>
+          <li class="nav-item nav-item-5"><a href="spynnaker.pyNN.models.neuron.html" accesskey="U">spynnaker.pyNN.models.neuron package</a> &#187;</li> 
       </ul>
     </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
@@ -58,11 +59,6 @@
   <h3><a href="index.html">Table Of Contents</a></h3>
   <ul>
 <li><a class="reference internal" href="#">spynnaker.pyNN.models.neuron.implementations package</a><ul>
-<li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl">spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl module</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component">spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component module</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard">spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard module</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.models.neuron.implementations.ranged_dict_vertex_slice">spynnaker.pyNN.models.neuron.implementations.ranged_dict_vertex_slice module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.models.neuron.implementations">Module contents</a></li>
 </ul>
 </li>
@@ -101,1473 +97,12 @@
             
   <div class="section" id="spynnaker-pynn-models-neuron-implementations-package">
 <h1>spynnaker.pyNN.models.neuron.implementations package<a class="headerlink" href="#spynnaker-pynn-models-neuron-implementations-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl">
-<span id="spynnaker-pynn-models-neuron-implementations-abstract-neuron-impl-module"></span><h2>spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl module<a class="headerlink" href="#module-spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl.AbstractNeuronImpl">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl.</code><code class="descname">AbstractNeuronImpl</code><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_neuron_impl.html#AbstractNeuronImpl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl.AbstractNeuronImpl" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
-<p>An abstraction of a whole neuron model including all parts</p>
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl.AbstractNeuronImpl.add_parameters">
-<code class="descname">add_parameters</code><span class="sig-paren">(</span><em>parameters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_neuron_impl.html#AbstractNeuronImpl.add_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl.AbstractNeuronImpl.add_parameters" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add the initial values of the parameters to the parameter holder</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; A holder of the parameters</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl.AbstractNeuronImpl.add_state_variables">
-<code class="descname">add_state_variables</code><span class="sig-paren">(</span><em>state_variables</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_neuron_impl.html#AbstractNeuronImpl.add_state_variables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl.AbstractNeuronImpl.add_state_variables" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add the initial values of the state variables to the state            variables holder</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; A holder of the state variables</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl.AbstractNeuronImpl.binary_name">
-<code class="descname">binary_name</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl.AbstractNeuronImpl.binary_name" title="Permalink to this definition">¶</a></dt>
-<dd><p>The name of the binary executable of this implementation</p>
-<p>:rtype str</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl.AbstractNeuronImpl.get_data">
-<code class="descname">get_data</code><span class="sig-paren">(</span><em>parameters</em>, <em>state_variables</em>, <em>vertex_slice</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_neuron_impl.html#AbstractNeuronImpl.get_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl.AbstractNeuronImpl.get_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the data <em>to be written to the machine</em> for this model</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters</li>
-<li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables</li>
-<li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; The slice of the vertex to generate parameters for</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">ndarray(uint32)</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl.AbstractNeuronImpl.get_dtcm_usage_in_bytes">
-<code class="descname">get_dtcm_usage_in_bytes</code><span class="sig-paren">(</span><em>n_neurons</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_neuron_impl.html#AbstractNeuronImpl.get_dtcm_usage_in_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl.AbstractNeuronImpl.get_dtcm_usage_in_bytes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the DTCM memory usage required</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons to get the usage for</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl.AbstractNeuronImpl.get_global_weight_scale">
-<code class="descname">get_global_weight_scale</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_neuron_impl.html#AbstractNeuronImpl.get_global_weight_scale"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl.AbstractNeuronImpl.get_global_weight_scale" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the weight scaling required by this model</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl.AbstractNeuronImpl.get_n_cpu_cycles">
-<code class="descname">get_n_cpu_cycles</code><span class="sig-paren">(</span><em>n_neurons</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_neuron_impl.html#AbstractNeuronImpl.get_n_cpu_cycles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl.AbstractNeuronImpl.get_n_cpu_cycles" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the number of CPU cycles required to update the state</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons to get the cycles for</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl.AbstractNeuronImpl.get_n_synapse_types">
-<code class="descname">get_n_synapse_types</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_neuron_impl.html#AbstractNeuronImpl.get_n_synapse_types"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl.AbstractNeuronImpl.get_n_synapse_types" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the number of synapse types supported by the model</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl.AbstractNeuronImpl.get_recordable_data_types">
-<code class="descname">get_recordable_data_types</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_neuron_impl.html#AbstractNeuronImpl.get_recordable_data_types"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl.AbstractNeuronImpl.get_recordable_data_types" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the data type of the variables that can be recorded</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">dict of name of variable to DataType of variable</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl.AbstractNeuronImpl.get_recordable_units">
-<code class="descname">get_recordable_units</code><span class="sig-paren">(</span><em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_neuron_impl.html#AbstractNeuronImpl.get_recordable_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl.AbstractNeuronImpl.get_recordable_units" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the units of the given variable that can be recorded</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl.AbstractNeuronImpl.get_recordable_variable_index">
-<code class="descname">get_recordable_variable_index</code><span class="sig-paren">(</span><em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_neuron_impl.html#AbstractNeuronImpl.get_recordable_variable_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl.AbstractNeuronImpl.get_recordable_variable_index" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the index of the variable in the list of variables that can be            recorded</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl.AbstractNeuronImpl.get_recordable_variables">
-<code class="descname">get_recordable_variables</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_neuron_impl.html#AbstractNeuronImpl.get_recordable_variables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl.AbstractNeuronImpl.get_recordable_variables" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the names of the variables that can be recorded in this model</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list(str)</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl.AbstractNeuronImpl.get_sdram_usage_in_bytes">
-<code class="descname">get_sdram_usage_in_bytes</code><span class="sig-paren">(</span><em>n_neurons</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_neuron_impl.html#AbstractNeuronImpl.get_sdram_usage_in_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl.AbstractNeuronImpl.get_sdram_usage_in_bytes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the SDRAM memory usage required</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons to get the usage for</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl.AbstractNeuronImpl.get_synapse_id_by_target">
-<code class="descname">get_synapse_id_by_target</code><span class="sig-paren">(</span><em>target</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_neuron_impl.html#AbstractNeuronImpl.get_synapse_id_by_target"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl.AbstractNeuronImpl.get_synapse_id_by_target" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the ID of a synapse given the name</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>target</strong> (<em>str</em>) &#8211; The name of the synapse</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl.AbstractNeuronImpl.get_synapse_targets">
-<code class="descname">get_synapse_targets</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_neuron_impl.html#AbstractNeuronImpl.get_synapse_targets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl.AbstractNeuronImpl.get_synapse_targets" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the target names of the synapse type</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list(str)</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl.AbstractNeuronImpl.get_units">
-<code class="descname">get_units</code><span class="sig-paren">(</span><em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_neuron_impl.html#AbstractNeuronImpl.get_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl.AbstractNeuronImpl.get_units" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the units of the given variable</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl.AbstractNeuronImpl.is_conductance_based">
-<code class="descname">is_conductance_based</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl.AbstractNeuronImpl.is_conductance_based" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determine if the model uses conductance</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl.AbstractNeuronImpl.is_recordable">
-<code class="descname">is_recordable</code><span class="sig-paren">(</span><em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_neuron_impl.html#AbstractNeuronImpl.is_recordable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl.AbstractNeuronImpl.is_recordable" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determine if the given variable can be recorded</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl.AbstractNeuronImpl.model_name">
-<code class="descname">model_name</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl.AbstractNeuronImpl.model_name" title="Permalink to this definition">¶</a></dt>
-<dd><p>The name of the model</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl.AbstractNeuronImpl.read_data">
-<code class="descname">read_data</code><span class="sig-paren">(</span><em>data</em>, <em>offset</em>, <em>vertex_slice</em>, <em>parameters</em>, <em>state_variables</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_neuron_impl.html#AbstractNeuronImpl.read_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl.AbstractNeuronImpl.read_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read the parameters and state variables of the model            <em>from the given data</em> (read from the machine)</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>data</strong> (<em>bytearray</em><em> or </em><em>bytes</em><em> or </em><em>memoryview</em>) &#8211; The data to be read</li>
-<li><strong>offset</strong> (<em>int</em>) &#8211; The offset where the data should be read from</li>
-<li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; The slice of the vertex to read parameters for</li>
-<li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters to update</li>
-<li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables to update</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="section" id="module-spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component">
-<span id="spynnaker-pynn-models-neuron-implementations-abstract-standard-neuron-component-module"></span><h2>spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component module<a class="headerlink" href="#module-spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.</code><code class="descname">AbstractStandardNeuronComponent</code><span class="sig-paren">(</span><em>data_types</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_standard_neuron_component.html#AbstractStandardNeuronComponent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
-<p>Represents a component of a standard neural model.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data_types</strong> (<em>list</em><em>(</em><a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification.enums/#data_specification.enums.DataType" title="(in DataSpecification v)"><em>DataType</em></a><em>)</em><em></em>) &#8211; A list of data types in the component structure, in the order that
-they appear</td>
-</tr>
-</tbody>
-</table>
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent.add_parameters">
-<code class="descname">add_parameters</code><span class="sig-paren">(</span><em>parameters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_standard_neuron_component.html#AbstractStandardNeuronComponent.add_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent.add_parameters" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add the initial values of the parameters to the parameter holder</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; A holder of the parameters</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent.add_state_variables">
-<code class="descname">add_state_variables</code><span class="sig-paren">(</span><em>state_variables</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_standard_neuron_component.html#AbstractStandardNeuronComponent.add_state_variables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent.add_state_variables" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add the initial values of the state variables to the state            variables holder</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; A holder of the state variables</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent.get_data">
-<code class="descname">get_data</code><span class="sig-paren">(</span><em>parameters</em>, <em>state_variables</em>, <em>vertex_slice</em>, <em>ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_standard_neuron_component.html#AbstractStandardNeuronComponent.get_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent.get_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the data <em>to be written to the machine</em> for this model.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters</li>
-<li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables</li>
-<li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; The slice of the vertex to generate parameters for</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">ndarray(uint32)</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent.get_dtcm_usage_in_bytes">
-<code class="descname">get_dtcm_usage_in_bytes</code><span class="sig-paren">(</span><em>n_neurons</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_standard_neuron_component.html#AbstractStandardNeuronComponent.get_dtcm_usage_in_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent.get_dtcm_usage_in_bytes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the DTCM memory usage required</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons to get the usage for</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent.get_n_cpu_cycles">
-<code class="descname">get_n_cpu_cycles</code><span class="sig-paren">(</span><em>n_neurons</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_standard_neuron_component.html#AbstractStandardNeuronComponent.get_n_cpu_cycles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent.get_n_cpu_cycles" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the number of CPU cycles required to update the state</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons to get the cycles for</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent.get_sdram_usage_in_bytes">
-<code class="descname">get_sdram_usage_in_bytes</code><span class="sig-paren">(</span><em>n_neurons</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_standard_neuron_component.html#AbstractStandardNeuronComponent.get_sdram_usage_in_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent.get_sdram_usage_in_bytes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the SDRAM memory usage required</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons to get the usage for</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent.get_units">
-<code class="descname">get_units</code><span class="sig-paren">(</span><em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_standard_neuron_component.html#AbstractStandardNeuronComponent.get_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent.get_units" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the units of the given variable</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent.get_values">
-<code class="descname">get_values</code><span class="sig-paren">(</span><em>parameters</em>, <em>state_variables</em>, <em>vertex_slice</em>, <em>ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_standard_neuron_component.html#AbstractStandardNeuronComponent.get_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent.get_values" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the values to be written to the machine for this model</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters</li>
-<li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables</li>
-<li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; The slice of variables being retrieved</li>
-<li><strong>ts</strong> (<em>float</em>) &#8211; The time to be advanced in one call to the update of this component</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A list with the same length as self.struct.field_types</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list(int or float or list(int) or list(float) or
-RangedList)</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent.has_variable">
-<code class="descname">has_variable</code><span class="sig-paren">(</span><em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_standard_neuron_component.html#AbstractStandardNeuronComponent.has_variable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent.has_variable" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determine if this component has a variable by the given name</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent.read_data">
-<code class="descname">read_data</code><span class="sig-paren">(</span><em>data</em>, <em>offset</em>, <em>vertex_slice</em>, <em>parameters</em>, <em>state_variables</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_standard_neuron_component.html#AbstractStandardNeuronComponent.read_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent.read_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read the parameters and state variables of the model            <em>from the given data</em> (read from the machine)</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>data</strong> (<em>bytes</em><em> or </em><em>bytearray</em><em> or </em><em>memoryview</em>) &#8211; The data to be read</li>
-<li><strong>offset</strong> (<em>int</em>) &#8211; The offset where the data should be read from</li>
-<li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; The slice of the vertex to read parameters for</li>
-<li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters to update</li>
-<li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables to update</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The offset after reading the data</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">int</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent.struct">
-<code class="descname">struct</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent.struct" title="Permalink to this definition">¶</a></dt>
-<dd><p>The structure of the component. This structure will have copies in            both SDRAM (the initialisation values) and DTCM (the working copy).</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">Struct</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent.update_values">
-<code class="descname">update_values</code><span class="sig-paren">(</span><em>values</em>, <em>parameters</em>, <em>state_variables</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_standard_neuron_component.html#AbstractStandardNeuronComponent.update_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.abstract_standard_neuron_component.AbstractStandardNeuronComponent.update_values" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the parameters and state variables with the given struct            values that have been read from the machine</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>values</strong> (<em>list</em><em>(</em><em>list</em><em>)</em><em></em>) &#8211; The values read from the machine, one for each struct element</li>
-<li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters to update</li>
-<li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables to update</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="section" id="module-spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard">
-<span id="spynnaker-pynn-models-neuron-implementations-neuron-impl-standard-module"></span><h2>spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard module<a class="headerlink" href="#module-spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.</code><code class="descname">NeuronImplStandard</code><span class="sig-paren">(</span><em>model_name</em>, <em>binary</em>, <em>neuron_model</em>, <em>input_type</em>, <em>synapse_type</em>, <em>threshold_type</em>, <em>additional_input_type=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl.AbstractNeuronImpl" title="spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl.AbstractNeuronImpl"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl.AbstractNeuronImpl</span></code></a></p>
-<p>The standard componentised neuron implementation.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>model_name</strong> (<em>str</em>) &#8211; </li>
-<li><strong>binary</strong> (<em>str</em>) &#8211; </li>
-<li><strong>neuron_model</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.neuron_models.html#spynnaker.pyNN.models.neuron.neuron_models.abstract_neuron_model.AbstractNeuronModel" title="spynnaker.pyNN.models.neuron.neuron_models.abstract_neuron_model.AbstractNeuronModel"><em>AbstractNeuronModel</em></a>) &#8211; </li>
-<li><strong>input_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.input_types.html#spynnaker.pyNN.models.neuron.input_types.abstract_input_type.AbstractInputType" title="spynnaker.pyNN.models.neuron.input_types.abstract_input_type.AbstractInputType"><em>AbstractInputType</em></a>) &#8211; </li>
-<li><strong>synapse_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type.AbstractSynapseType" title="spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type.AbstractSynapseType"><em>AbstractSynapseType</em></a>) &#8211; </li>
-<li><strong>threshold_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.threshold_types.html#spynnaker.pyNN.models.neuron.threshold_types.abstract_threshold_type.AbstractThresholdType" title="spynnaker.pyNN.models.neuron.threshold_types.abstract_threshold_type.AbstractThresholdType"><em>AbstractThresholdType</em></a>) &#8211; </li>
-<li><strong>additional_input_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.additional_inputs.html#spynnaker.pyNN.models.neuron.additional_inputs.abstract_additional_input.AbstractAdditionalInput" title="spynnaker.pyNN.models.neuron.additional_inputs.abstract_additional_input.AbstractAdditionalInput"><em>AbstractAdditionalInput</em></a><em> or </em><em>None</em>) &#8211; </li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard.add_parameters">
-<code class="descname">add_parameters</code><span class="sig-paren">(</span><em>parameters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.add_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard.add_parameters" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add the initial values of the parameters to the parameter holder</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; A holder of the parameters</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard.add_state_variables">
-<code class="descname">add_state_variables</code><span class="sig-paren">(</span><em>state_variables</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.add_state_variables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard.add_state_variables" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add the initial values of the state variables to the state            variables holder</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; A holder of the state variables</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard.binary_name">
-<code class="descname">binary_name</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard.binary_name" title="Permalink to this definition">¶</a></dt>
-<dd><p>The name of the binary executable of this implementation</p>
-<p>:rtype str</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard.get_data">
-<code class="descname">get_data</code><span class="sig-paren">(</span><em>parameters</em>, <em>state_variables</em>, <em>vertex_slice</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.get_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard.get_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the data <em>to be written to the machine</em> for this model</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters</li>
-<li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables</li>
-<li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; The slice of the vertex to generate parameters for</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">ndarray(uint32)</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard.get_dtcm_usage_in_bytes">
-<code class="descname">get_dtcm_usage_in_bytes</code><span class="sig-paren">(</span><em>n_neurons</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.get_dtcm_usage_in_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard.get_dtcm_usage_in_bytes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the DTCM memory usage required</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons to get the usage for</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard.get_global_weight_scale">
-<code class="descname">get_global_weight_scale</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.get_global_weight_scale"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard.get_global_weight_scale" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the weight scaling required by this model</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard.get_n_cpu_cycles">
-<code class="descname">get_n_cpu_cycles</code><span class="sig-paren">(</span><em>n_neurons</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.get_n_cpu_cycles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard.get_n_cpu_cycles" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the number of CPU cycles required to update the state</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons to get the cycles for</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard.get_n_synapse_types">
-<code class="descname">get_n_synapse_types</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.get_n_synapse_types"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard.get_n_synapse_types" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the number of synapse types supported by the model</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard.get_recordable_data_types">
-<code class="descname">get_recordable_data_types</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.get_recordable_data_types"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard.get_recordable_data_types" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the data type of the variables that can be recorded</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">dict of name of variable to DataType of variable</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard.get_recordable_units">
-<code class="descname">get_recordable_units</code><span class="sig-paren">(</span><em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.get_recordable_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard.get_recordable_units" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the units of the given variable that can be recorded</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard.get_recordable_variable_index">
-<code class="descname">get_recordable_variable_index</code><span class="sig-paren">(</span><em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.get_recordable_variable_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard.get_recordable_variable_index" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the index of the variable in the list of variables that can be            recorded</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard.get_recordable_variables">
-<code class="descname">get_recordable_variables</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.get_recordable_variables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard.get_recordable_variables" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the names of the variables that can be recorded in this model</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list(str)</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard.get_sdram_usage_in_bytes">
-<code class="descname">get_sdram_usage_in_bytes</code><span class="sig-paren">(</span><em>n_neurons</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.get_sdram_usage_in_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard.get_sdram_usage_in_bytes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the SDRAM memory usage required</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons to get the usage for</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard.get_synapse_id_by_target">
-<code class="descname">get_synapse_id_by_target</code><span class="sig-paren">(</span><em>target</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.get_synapse_id_by_target"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard.get_synapse_id_by_target" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the ID of a synapse given the name</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>target</strong> (<em>str</em>) &#8211; The name of the synapse</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard.get_synapse_targets">
-<code class="descname">get_synapse_targets</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.get_synapse_targets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard.get_synapse_targets" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the target names of the synapse type</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list(str)</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard.get_units">
-<code class="descname">get_units</code><span class="sig-paren">(</span><em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.get_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard.get_units" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the units of the given variable</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard.is_conductance_based">
-<code class="descname">is_conductance_based</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard.is_conductance_based" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determine if the model uses conductance</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard.is_recordable">
-<code class="descname">is_recordable</code><span class="sig-paren">(</span><em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.is_recordable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard.is_recordable" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determine if the given variable can be recorded</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard.model_name">
-<code class="descname">model_name</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard.model_name" title="Permalink to this definition">¶</a></dt>
-<dd><p>The name of the model</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard.n_steps_per_timestep">
-<code class="descname">n_steps_per_timestep</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard.n_steps_per_timestep" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard.read_data">
-<code class="descname">read_data</code><span class="sig-paren">(</span><em>data</em>, <em>offset</em>, <em>vertex_slice</em>, <em>parameters</em>, <em>state_variables</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.read_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.neuron_impl_standard.NeuronImplStandard.read_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read the parameters and state variables of the model            <em>from the given data</em> (read from the machine)</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>data</strong> (<em>bytearray</em><em> or </em><em>bytes</em><em> or </em><em>memoryview</em>) &#8211; The data to be read</li>
-<li><strong>offset</strong> (<em>int</em>) &#8211; The offset where the data should be read from</li>
-<li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; The slice of the vertex to read parameters for</li>
-<li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters to update</li>
-<li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables to update</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-</div>
-<div class="section" id="module-spynnaker.pyNN.models.neuron.implementations.ranged_dict_vertex_slice">
-<span id="spynnaker-pynn-models-neuron-implementations-ranged-dict-vertex-slice-module"></span><h2>spynnaker.pyNN.models.neuron.implementations.ranged_dict_vertex_slice module<a class="headerlink" href="#module-spynnaker.pyNN.models.neuron.implementations.ranged_dict_vertex_slice" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="spynnaker.pyNN.models.neuron.implementations.ranged_dict_vertex_slice.RangedDictVertexSlice">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.implementations.ranged_dict_vertex_slice.</code><code class="descname">RangedDictVertexSlice</code><span class="sig-paren">(</span><em>ranged_dict</em>, <em>vertex_slice</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/ranged_dict_vertex_slice.html#RangedDictVertexSlice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.ranged_dict_vertex_slice.RangedDictVertexSlice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
-<p>A slice of a ranged dict to be used to update values</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>ranged_dict</strong> (<em>RangeDictionary</em>) &#8211; </li>
-<li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; </li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</div>
 <div class="section" id="module-spynnaker.pyNN.models.neuron.implementations">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-spynnaker.pyNN.models.neuron.implementations" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
-<dt id="spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.implementations.</code><code class="descname">AbstractStandardNeuronComponent</code><span class="sig-paren">(</span><em>data_types</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_standard_neuron_component.html#AbstractStandardNeuronComponent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
-<p>Represents a component of a standard neural model.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data_types</strong> (<em>list</em><em>(</em><a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification.enums/#data_specification.enums.DataType" title="(in DataSpecification v)"><em>DataType</em></a><em>)</em><em></em>) &#8211; A list of data types in the component structure, in the order that
-they appear</td>
-</tr>
-</tbody>
-</table>
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.add_parameters">
-<code class="descname">add_parameters</code><span class="sig-paren">(</span><em>parameters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_standard_neuron_component.html#AbstractStandardNeuronComponent.add_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.add_parameters" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add the initial values of the parameters to the parameter holder</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; A holder of the parameters</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.add_state_variables">
-<code class="descname">add_state_variables</code><span class="sig-paren">(</span><em>state_variables</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_standard_neuron_component.html#AbstractStandardNeuronComponent.add_state_variables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.add_state_variables" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add the initial values of the state variables to the state            variables holder</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; A holder of the state variables</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.get_data">
-<code class="descname">get_data</code><span class="sig-paren">(</span><em>parameters</em>, <em>state_variables</em>, <em>vertex_slice</em>, <em>ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_standard_neuron_component.html#AbstractStandardNeuronComponent.get_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.get_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the data <em>to be written to the machine</em> for this model.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters</li>
-<li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables</li>
-<li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; The slice of the vertex to generate parameters for</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">ndarray(uint32)</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.get_dtcm_usage_in_bytes">
-<code class="descname">get_dtcm_usage_in_bytes</code><span class="sig-paren">(</span><em>n_neurons</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_standard_neuron_component.html#AbstractStandardNeuronComponent.get_dtcm_usage_in_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.get_dtcm_usage_in_bytes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the DTCM memory usage required</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons to get the usage for</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.get_n_cpu_cycles">
-<code class="descname">get_n_cpu_cycles</code><span class="sig-paren">(</span><em>n_neurons</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_standard_neuron_component.html#AbstractStandardNeuronComponent.get_n_cpu_cycles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.get_n_cpu_cycles" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the number of CPU cycles required to update the state</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons to get the cycles for</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.get_sdram_usage_in_bytes">
-<code class="descname">get_sdram_usage_in_bytes</code><span class="sig-paren">(</span><em>n_neurons</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_standard_neuron_component.html#AbstractStandardNeuronComponent.get_sdram_usage_in_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.get_sdram_usage_in_bytes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the SDRAM memory usage required</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons to get the usage for</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.get_units">
-<code class="descname">get_units</code><span class="sig-paren">(</span><em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_standard_neuron_component.html#AbstractStandardNeuronComponent.get_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.get_units" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the units of the given variable</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.get_values">
-<code class="descname">get_values</code><span class="sig-paren">(</span><em>parameters</em>, <em>state_variables</em>, <em>vertex_slice</em>, <em>ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_standard_neuron_component.html#AbstractStandardNeuronComponent.get_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.get_values" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the values to be written to the machine for this model</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters</li>
-<li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables</li>
-<li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; The slice of variables being retrieved</li>
-<li><strong>ts</strong> (<em>float</em>) &#8211; The time to be advanced in one call to the update of this component</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A list with the same length as self.struct.field_types</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list(int or float or list(int) or list(float) or
-RangedList)</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.has_variable">
-<code class="descname">has_variable</code><span class="sig-paren">(</span><em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_standard_neuron_component.html#AbstractStandardNeuronComponent.has_variable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.has_variable" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determine if this component has a variable by the given name</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.read_data">
-<code class="descname">read_data</code><span class="sig-paren">(</span><em>data</em>, <em>offset</em>, <em>vertex_slice</em>, <em>parameters</em>, <em>state_variables</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_standard_neuron_component.html#AbstractStandardNeuronComponent.read_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.read_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read the parameters and state variables of the model            <em>from the given data</em> (read from the machine)</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>data</strong> (<em>bytes</em><em> or </em><em>bytearray</em><em> or </em><em>memoryview</em>) &#8211; The data to be read</li>
-<li><strong>offset</strong> (<em>int</em>) &#8211; The offset where the data should be read from</li>
-<li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; The slice of the vertex to read parameters for</li>
-<li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters to update</li>
-<li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables to update</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The offset after reading the data</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">int</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.struct">
-<code class="descname">struct</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.struct" title="Permalink to this definition">¶</a></dt>
-<dd><p>The structure of the component. This structure will have copies in            both SDRAM (the initialisation values) and DTCM (the working copy).</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">Struct</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.update_values">
-<code class="descname">update_values</code><span class="sig-paren">(</span><em>values</em>, <em>parameters</em>, <em>state_variables</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_standard_neuron_component.html#AbstractStandardNeuronComponent.update_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.update_values" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the parameters and state variables with the given struct            values that have been read from the machine</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>values</strong> (<em>list</em><em>(</em><em>list</em><em>)</em><em></em>) &#8211; The values read from the machine, one for each struct element</li>
-<li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters to update</li>
-<li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables to update</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.implementations.</code><code class="descname">NeuronImplStandard</code><span class="sig-paren">(</span><em>model_name</em>, <em>binary</em>, <em>neuron_model</em>, <em>input_type</em>, <em>synapse_type</em>, <em>threshold_type</em>, <em>additional_input_type=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="#spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl.AbstractNeuronImpl" title="spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl.AbstractNeuronImpl"><code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl.AbstractNeuronImpl</span></code></a></p>
-<p>The standard componentised neuron implementation.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>model_name</strong> (<em>str</em>) &#8211; </li>
-<li><strong>binary</strong> (<em>str</em>) &#8211; </li>
-<li><strong>neuron_model</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.neuron_models.html#spynnaker.pyNN.models.neuron.neuron_models.abstract_neuron_model.AbstractNeuronModel" title="spynnaker.pyNN.models.neuron.neuron_models.abstract_neuron_model.AbstractNeuronModel"><em>AbstractNeuronModel</em></a>) &#8211; </li>
-<li><strong>input_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.input_types.html#spynnaker.pyNN.models.neuron.input_types.abstract_input_type.AbstractInputType" title="spynnaker.pyNN.models.neuron.input_types.abstract_input_type.AbstractInputType"><em>AbstractInputType</em></a>) &#8211; </li>
-<li><strong>synapse_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type.AbstractSynapseType" title="spynnaker.pyNN.models.neuron.synapse_types.abstract_synapse_type.AbstractSynapseType"><em>AbstractSynapseType</em></a>) &#8211; </li>
-<li><strong>threshold_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.threshold_types.html#spynnaker.pyNN.models.neuron.threshold_types.abstract_threshold_type.AbstractThresholdType" title="spynnaker.pyNN.models.neuron.threshold_types.abstract_threshold_type.AbstractThresholdType"><em>AbstractThresholdType</em></a>) &#8211; </li>
-<li><strong>additional_input_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.additional_inputs.html#spynnaker.pyNN.models.neuron.additional_inputs.abstract_additional_input.AbstractAdditionalInput" title="spynnaker.pyNN.models.neuron.additional_inputs.abstract_additional_input.AbstractAdditionalInput"><em>AbstractAdditionalInput</em></a><em> or </em><em>None</em>) &#8211; </li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.add_parameters">
-<code class="descname">add_parameters</code><span class="sig-paren">(</span><em>parameters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.add_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.add_parameters" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add the initial values of the parameters to the parameter holder</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; A holder of the parameters</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.add_state_variables">
-<code class="descname">add_state_variables</code><span class="sig-paren">(</span><em>state_variables</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.add_state_variables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.add_state_variables" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add the initial values of the state variables to the state            variables holder</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; A holder of the state variables</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.binary_name">
-<code class="descname">binary_name</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.binary_name" title="Permalink to this definition">¶</a></dt>
-<dd><p>The name of the binary executable of this implementation</p>
-<p>:rtype str</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_data">
-<code class="descname">get_data</code><span class="sig-paren">(</span><em>parameters</em>, <em>state_variables</em>, <em>vertex_slice</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.get_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the data <em>to be written to the machine</em> for this model</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters</li>
-<li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables</li>
-<li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; The slice of the vertex to generate parameters for</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">ndarray(uint32)</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_dtcm_usage_in_bytes">
-<code class="descname">get_dtcm_usage_in_bytes</code><span class="sig-paren">(</span><em>n_neurons</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.get_dtcm_usage_in_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_dtcm_usage_in_bytes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the DTCM memory usage required</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons to get the usage for</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_global_weight_scale">
-<code class="descname">get_global_weight_scale</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.get_global_weight_scale"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_global_weight_scale" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the weight scaling required by this model</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_n_cpu_cycles">
-<code class="descname">get_n_cpu_cycles</code><span class="sig-paren">(</span><em>n_neurons</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.get_n_cpu_cycles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_n_cpu_cycles" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the number of CPU cycles required to update the state</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons to get the cycles for</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_n_synapse_types">
-<code class="descname">get_n_synapse_types</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.get_n_synapse_types"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_n_synapse_types" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the number of synapse types supported by the model</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_recordable_data_types">
-<code class="descname">get_recordable_data_types</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.get_recordable_data_types"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_recordable_data_types" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the data type of the variables that can be recorded</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">dict of name of variable to DataType of variable</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_recordable_units">
-<code class="descname">get_recordable_units</code><span class="sig-paren">(</span><em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.get_recordable_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_recordable_units" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the units of the given variable that can be recorded</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_recordable_variable_index">
-<code class="descname">get_recordable_variable_index</code><span class="sig-paren">(</span><em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.get_recordable_variable_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_recordable_variable_index" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the index of the variable in the list of variables that can be            recorded</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_recordable_variables">
-<code class="descname">get_recordable_variables</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.get_recordable_variables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_recordable_variables" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the names of the variables that can be recorded in this model</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list(str)</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_sdram_usage_in_bytes">
-<code class="descname">get_sdram_usage_in_bytes</code><span class="sig-paren">(</span><em>n_neurons</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.get_sdram_usage_in_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_sdram_usage_in_bytes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the SDRAM memory usage required</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons to get the usage for</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_synapse_id_by_target">
-<code class="descname">get_synapse_id_by_target</code><span class="sig-paren">(</span><em>target</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.get_synapse_id_by_target"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_synapse_id_by_target" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the ID of a synapse given the name</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>target</strong> (<em>str</em>) &#8211; The name of the synapse</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_synapse_targets">
-<code class="descname">get_synapse_targets</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.get_synapse_targets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_synapse_targets" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the target names of the synapse type</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list(str)</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_units">
-<code class="descname">get_units</code><span class="sig-paren">(</span><em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.get_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_units" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the units of the given variable</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.is_conductance_based">
-<code class="descname">is_conductance_based</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.is_conductance_based" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determine if the model uses conductance</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.is_recordable">
-<code class="descname">is_recordable</code><span class="sig-paren">(</span><em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.is_recordable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.is_recordable" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determine if the given variable can be recorded</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.model_name">
-<code class="descname">model_name</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.model_name" title="Permalink to this definition">¶</a></dt>
-<dd><p>The name of the model</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.n_steps_per_timestep">
-<code class="descname">n_steps_per_timestep</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.n_steps_per_timestep" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.read_data">
-<code class="descname">read_data</code><span class="sig-paren">(</span><em>data</em>, <em>offset</em>, <em>vertex_slice</em>, <em>parameters</em>, <em>state_variables</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.read_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.read_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read the parameters and state variables of the model            <em>from the given data</em> (read from the machine)</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>data</strong> (<em>bytearray</em><em> or </em><em>bytes</em><em> or </em><em>memoryview</em>) &#8211; The data to be read</li>
-<li><strong>offset</strong> (<em>int</em>) &#8211; The offset where the data should be read from</li>
-<li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; The slice of the vertex to read parameters for</li>
-<li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters to update</li>
-<li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables to update</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
 <dt id="spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl">
 <em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.implementations.</code><code class="descname">AbstractNeuronImpl</code><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_neuron_impl.html#AbstractNeuronImpl"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
 <p>An abstraction of a whole neuron model including all parts</p>
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.implementations.AbstractNeuronImpl.add_parameters">
@@ -1577,7 +112,7 @@ RangedList)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; A holder of the parameters</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; A holder of the parameters</td>
 </tr>
 </tbody>
 </table>
@@ -1591,7 +126,7 @@ RangedList)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; A holder of the state variables</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; A holder of the state variables</td>
 </tr>
 </tbody>
 </table>
@@ -1613,13 +148,13 @@ RangedList)</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters</li>
-<li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables</li>
+<li><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; The holder of the parameters</li>
+<li><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; The holder of the state variables</li>
 <li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; The slice of the vertex to generate parameters for</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">ndarray(uint32)</p>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">ndarray</a>(uint32)</p>
 </td>
 </tr>
 </tbody>
@@ -1634,9 +169,9 @@ RangedList)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons to get the usage for</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The number of neurons to get the usage for</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
 </tr>
 </tbody>
 </table>
@@ -1650,7 +185,7 @@ RangedList)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
 </tr>
 </tbody>
 </table>
@@ -1664,9 +199,9 @@ RangedList)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons to get the cycles for</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The number of neurons to get the cycles for</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
 </tr>
 </tbody>
 </table>
@@ -1680,7 +215,7 @@ RangedList)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
 </tr>
 </tbody>
 </table>
@@ -1708,7 +243,7 @@ RangedList)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The name of the variable</td>
 </tr>
 </tbody>
 </table>
@@ -1722,9 +257,9 @@ RangedList)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The name of the variable</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
 </tr>
 </tbody>
 </table>
@@ -1738,7 +273,7 @@ RangedList)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list(str)</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a>)</td>
 </tr>
 </tbody>
 </table>
@@ -1752,9 +287,9 @@ RangedList)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_neurons</strong> (<em>int</em>) &#8211; The number of neurons to get the usage for</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The number of neurons to get the usage for</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
 </tr>
 </tbody>
 </table>
@@ -1768,9 +303,9 @@ RangedList)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>target</strong> (<em>str</em>) &#8211; The name of the synapse</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>target</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The name of the synapse</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">int</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
 </tr>
 </tbody>
 </table>
@@ -1784,7 +319,7 @@ RangedList)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">list(str)</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a>)</td>
 </tr>
 </tbody>
 </table>
@@ -1798,7 +333,7 @@ RangedList)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The name of the variable</td>
 </tr>
 </tbody>
 </table>
@@ -1812,7 +347,7 @@ RangedList)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></td>
 </tr>
 </tbody>
 </table>
@@ -1826,9 +361,9 @@ RangedList)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<em>str</em>) &#8211; The name of the variable</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The name of the variable</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">bool</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></td>
 </tr>
 </tbody>
 </table>
@@ -1842,7 +377,7 @@ RangedList)</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">str</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a></td>
 </tr>
 </tbody>
 </table>
@@ -1857,11 +392,571 @@ RangedList)</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>data</strong> (<em>bytearray</em><em> or </em><em>bytes</em><em> or </em><em>memoryview</em>) &#8211; The data to be read</li>
-<li><strong>offset</strong> (<em>int</em>) &#8211; The offset where the data should be read from</li>
+<li><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#bytearray" title="(in Python v3.6)"><em>bytearray</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#bytes" title="(in Python v3.6)"><em>bytes</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#memoryview" title="(in Python v3.6)"><em>memoryview</em></a>) &#8211; The data to be read</li>
+<li><strong>offset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The offset where the data should be read from</li>
 <li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; The slice of the vertex to read parameters for</li>
-<li><strong>parameters</strong> (<em>RangeDictionary</em>) &#8211; The holder of the parameters to update</li>
-<li><strong>state_variables</strong> (<em>RangeDictionary</em>) &#8211; The holder of the state variables to update</li>
+<li><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; The holder of the parameters to update</li>
+<li><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; The holder of the state variables to update</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.implementations.</code><code class="descname">AbstractStandardNeuronComponent</code><span class="sig-paren">(</span><em>data_types</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_standard_neuron_component.html#AbstractStandardNeuronComponent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Represents a component of a standard neural model.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data_types</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://dataspecification.readthedocs.io/en/latest/data_specification.enums/#data_specification.enums.DataType" title="(in DataSpecification v)"><em>DataType</em></a><em>)</em><em></em>) &#8211; A list of data types in the component structure, in the order that
+they appear</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.add_parameters">
+<code class="descname">add_parameters</code><span class="sig-paren">(</span><em>parameters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_standard_neuron_component.html#AbstractStandardNeuronComponent.add_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.add_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the initial values of the parameters to the parameter holder</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; A holder of the parameters</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.add_state_variables">
+<code class="descname">add_state_variables</code><span class="sig-paren">(</span><em>state_variables</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_standard_neuron_component.html#AbstractStandardNeuronComponent.add_state_variables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.add_state_variables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the initial values of the state variables to the state            variables holder</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; A holder of the state variables</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.get_data">
+<code class="descname">get_data</code><span class="sig-paren">(</span><em>parameters</em>, <em>state_variables</em>, <em>vertex_slice</em>, <em>ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_standard_neuron_component.html#AbstractStandardNeuronComponent.get_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.get_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the data <em>to be written to the machine</em> for this model.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; The holder of the parameters</li>
+<li><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; The holder of the state variables</li>
+<li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; The slice of the vertex to generate parameters for</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">ndarray</a>(uint32)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.get_dtcm_usage_in_bytes">
+<code class="descname">get_dtcm_usage_in_bytes</code><span class="sig-paren">(</span><em>n_neurons</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_standard_neuron_component.html#AbstractStandardNeuronComponent.get_dtcm_usage_in_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.get_dtcm_usage_in_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the DTCM memory usage required</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The number of neurons to get the usage for</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.get_n_cpu_cycles">
+<code class="descname">get_n_cpu_cycles</code><span class="sig-paren">(</span><em>n_neurons</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_standard_neuron_component.html#AbstractStandardNeuronComponent.get_n_cpu_cycles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.get_n_cpu_cycles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the number of CPU cycles required to update the state</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The number of neurons to get the cycles for</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.get_sdram_usage_in_bytes">
+<code class="descname">get_sdram_usage_in_bytes</code><span class="sig-paren">(</span><em>n_neurons</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_standard_neuron_component.html#AbstractStandardNeuronComponent.get_sdram_usage_in_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.get_sdram_usage_in_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the SDRAM memory usage required</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The number of neurons to get the usage for</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.get_units">
+<code class="descname">get_units</code><span class="sig-paren">(</span><em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_standard_neuron_component.html#AbstractStandardNeuronComponent.get_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.get_units" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the units of the given variable</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The name of the variable</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.get_values">
+<code class="descname">get_values</code><span class="sig-paren">(</span><em>parameters</em>, <em>state_variables</em>, <em>vertex_slice</em>, <em>ts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_standard_neuron_component.html#AbstractStandardNeuronComponent.get_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.get_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the values to be written to the machine for this model</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; The holder of the parameters</li>
+<li><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; The holder of the state variables</li>
+<li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; The slice of variables being retrieved</li>
+<li><strong>ts</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) &#8211; The time to be advanced in one call to the update of this component</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A list with the same length as self.struct.field_types</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a> or <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a> or <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a>) or <a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#float" title="(in Python v3.6)">float</a>) or
+<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangedList" title="(in SpiNNUtils v)">RangedList</a>)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.has_variable">
+<code class="descname">has_variable</code><span class="sig-paren">(</span><em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_standard_neuron_component.html#AbstractStandardNeuronComponent.has_variable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.has_variable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if this component has a variable by the given name</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The name of the variable</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.read_data">
+<code class="descname">read_data</code><span class="sig-paren">(</span><em>data</em>, <em>offset</em>, <em>vertex_slice</em>, <em>parameters</em>, <em>state_variables</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_standard_neuron_component.html#AbstractStandardNeuronComponent.read_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.read_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the parameters and state variables of the model            <em>from the given data</em> (read from the machine)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#bytes" title="(in Python v3.6)"><em>bytes</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#bytearray" title="(in Python v3.6)"><em>bytearray</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#memoryview" title="(in Python v3.6)"><em>memoryview</em></a>) &#8211; The data to be read</li>
+<li><strong>offset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The offset where the data should be read from</li>
+<li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; The slice of the vertex to read parameters for</li>
+<li><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; The holder of the parameters to update</li>
+<li><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; The holder of the state variables to update</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The offset after reading the data</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.struct">
+<code class="descname">struct</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.struct" title="Permalink to this definition">¶</a></dt>
+<dd><p>The structure of the component. This structure will have copies in            both SDRAM (the initialisation values) and DTCM (the working copy).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.struct.Struct" title="spynnaker.pyNN.utilities.struct.Struct">Struct</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.update_values">
+<code class="descname">update_values</code><span class="sig-paren">(</span><em>values</em>, <em>parameters</em>, <em>state_variables</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/abstract_standard_neuron_component.html#AbstractStandardNeuronComponent.update_values"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.AbstractStandardNeuronComponent.update_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the parameters and state variables with the given struct            values that have been read from the machine</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>values</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a><em>)</em><em></em>) &#8211; The values read from the machine, one for each struct element</li>
+<li><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; The holder of the parameters to update</li>
+<li><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; The holder of the state variables to update</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard">
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.implementations.</code><code class="descname">NeuronImplStandard</code><span class="sig-paren">(</span><em>model_name</em>, <em>binary</em>, <em>neuron_model</em>, <em>input_type</em>, <em>synapse_type</em>, <em>threshold_type</em>, <em>additional_input_type=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.neuron.implementations.abstract_neuron_impl.AbstractNeuronImpl</span></code></p>
+<p>The standard componentised neuron implementation.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>model_name</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; </li>
+<li><strong>binary</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; </li>
+<li><strong>neuron_model</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.neuron_models.html#spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel" title="spynnaker.pyNN.models.neuron.neuron_models.AbstractNeuronModel"><em>AbstractNeuronModel</em></a>) &#8211; </li>
+<li><strong>input_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.input_types.html#spynnaker.pyNN.models.neuron.input_types.AbstractInputType" title="spynnaker.pyNN.models.neuron.input_types.AbstractInputType"><em>AbstractInputType</em></a>) &#8211; </li>
+<li><strong>synapse_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.synapse_types.html#spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType" title="spynnaker.pyNN.models.neuron.synapse_types.AbstractSynapseType"><em>AbstractSynapseType</em></a>) &#8211; </li>
+<li><strong>threshold_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.threshold_types.html#spynnaker.pyNN.models.neuron.threshold_types.AbstractThresholdType" title="spynnaker.pyNN.models.neuron.threshold_types.AbstractThresholdType"><em>AbstractThresholdType</em></a>) &#8211; </li>
+<li><strong>additional_input_type</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neuron.additional_inputs.html#spynnaker.pyNN.models.neuron.additional_inputs.AbstractAdditionalInput" title="spynnaker.pyNN.models.neuron.additional_inputs.AbstractAdditionalInput"><em>AbstractAdditionalInput</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)"><em>None</em></a>) &#8211; </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.add_parameters">
+<code class="descname">add_parameters</code><span class="sig-paren">(</span><em>parameters</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.add_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.add_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the initial values of the parameters to the parameter holder</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; A holder of the parameters</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.add_state_variables">
+<code class="descname">add_state_variables</code><span class="sig-paren">(</span><em>state_variables</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.add_state_variables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.add_state_variables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the initial values of the state variables to the state            variables holder</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; A holder of the state variables</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.binary_name">
+<code class="descname">binary_name</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.binary_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>The name of the binary executable of this implementation</p>
+<p>:rtype str</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_data">
+<code class="descname">get_data</code><span class="sig-paren">(</span><em>parameters</em>, <em>state_variables</em>, <em>vertex_slice</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.get_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the data <em>to be written to the machine</em> for this model</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; The holder of the parameters</li>
+<li><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; The holder of the state variables</li>
+<li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; The slice of the vertex to generate parameters for</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.19)">ndarray</a>(uint32)</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_dtcm_usage_in_bytes">
+<code class="descname">get_dtcm_usage_in_bytes</code><span class="sig-paren">(</span><em>n_neurons</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.get_dtcm_usage_in_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_dtcm_usage_in_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the DTCM memory usage required</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The number of neurons to get the usage for</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_global_weight_scale">
+<code class="descname">get_global_weight_scale</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.get_global_weight_scale"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_global_weight_scale" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the weight scaling required by this model</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_n_cpu_cycles">
+<code class="descname">get_n_cpu_cycles</code><span class="sig-paren">(</span><em>n_neurons</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.get_n_cpu_cycles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_n_cpu_cycles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the number of CPU cycles required to update the state</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The number of neurons to get the cycles for</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_n_synapse_types">
+<code class="descname">get_n_synapse_types</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.get_n_synapse_types"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_n_synapse_types" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the number of synapse types supported by the model</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_recordable_data_types">
+<code class="descname">get_recordable_data_types</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.get_recordable_data_types"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_recordable_data_types" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the data type of the variables that can be recorded</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">dict of name of variable to DataType of variable</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_recordable_units">
+<code class="descname">get_recordable_units</code><span class="sig-paren">(</span><em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.get_recordable_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_recordable_units" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the units of the given variable that can be recorded</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The name of the variable</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_recordable_variable_index">
+<code class="descname">get_recordable_variable_index</code><span class="sig-paren">(</span><em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.get_recordable_variable_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_recordable_variable_index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the index of the variable in the list of variables that can be            recorded</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The name of the variable</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_recordable_variables">
+<code class="descname">get_recordable_variables</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.get_recordable_variables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_recordable_variables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the names of the variables that can be recorded in this model</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a>)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_sdram_usage_in_bytes">
+<code class="descname">get_sdram_usage_in_bytes</code><span class="sig-paren">(</span><em>n_neurons</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.get_sdram_usage_in_bytes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_sdram_usage_in_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the SDRAM memory usage required</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>n_neurons</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The number of neurons to get the usage for</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_synapse_id_by_target">
+<code class="descname">get_synapse_id_by_target</code><span class="sig-paren">(</span><em>target</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.get_synapse_id_by_target"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_synapse_id_by_target" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the ID of a synapse given the name</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>target</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The name of the synapse</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_synapse_targets">
+<code class="descname">get_synapse_targets</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.get_synapse_targets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_synapse_targets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the target names of the synapse type</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#list" title="(in Python v3.6)">list</a>(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a>)</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_units">
+<code class="descname">get_units</code><span class="sig-paren">(</span><em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.get_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.get_units" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the units of the given variable</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The name of the variable</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.is_conductance_based">
+<code class="descname">is_conductance_based</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.is_conductance_based" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if the model uses conductance</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.is_recordable">
+<code class="descname">is_recordable</code><span class="sig-paren">(</span><em>variable</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.is_recordable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.is_recordable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if the given variable can be recorded</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>variable</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; The name of the variable</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.model_name">
+<code class="descname">model_name</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.model_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>The name of the model</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.n_steps_per_timestep">
+<code class="descname">n_steps_per_timestep</code><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.n_steps_per_timestep" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.read_data">
+<code class="descname">read_data</code><span class="sig-paren">(</span><em>data</em>, <em>offset</em>, <em>vertex_slice</em>, <em>parameters</em>, <em>state_variables</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/neuron_impl_standard.html#NeuronImplStandard.read_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.NeuronImplStandard.read_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read the parameters and state variables of the model            <em>from the given data</em> (read from the machine)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#bytearray" title="(in Python v3.6)"><em>bytearray</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#bytes" title="(in Python v3.6)"><em>bytes</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#memoryview" title="(in Python v3.6)"><em>memoryview</em></a>) &#8211; The data to be read</li>
+<li><strong>offset</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)"><em>int</em></a>) &#8211; The offset where the data should be read from</li>
+<li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; The slice of the vertex to read parameters for</li>
+<li><strong>parameters</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; The holder of the parameters to update</li>
+<li><strong>state_variables</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; The holder of the state variables to update</li>
 </ul>
 </td>
 </tr>
@@ -1874,14 +969,14 @@ RangedList)</p>
 <dl class="class">
 <dt id="spynnaker.pyNN.models.neuron.implementations.RangedDictVertexSlice">
 <em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.implementations.</code><code class="descname">RangedDictVertexSlice</code><span class="sig-paren">(</span><em>ranged_dict</em>, <em>vertex_slice</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/implementations/ranged_dict_vertex_slice.html#RangedDictVertexSlice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.implementations.RangedDictVertexSlice" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
 <p>A slice of a ranged dict to be used to update values</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>ranged_dict</strong> (<em>RangeDictionary</em>) &#8211; </li>
+<li><strong>ranged_dict</strong> (<a class="reference external" href="https://spinnutils.readthedocs.io/en/latest/spinn_utilities.ranged.html#spinn_utilities.ranged.RangeDictionary" title="(in SpiNNUtils v)"><em>RangeDictionary</em></a>) &#8211; </li>
 <li><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; </li>
 </ul>
 </td>
@@ -1915,10 +1010,11 @@ RangedList)</p>
           <a href="spynnaker.pyNN.models.neuron.builds.html" title="spynnaker.pyNN.models.neuron.builds package"
              >previous</a> |</li>
         <li class="nav-item nav-item-0"><a href="index.html">sPyNNaker  documentation</a> &#187;</li>
-          <li class="nav-item nav-item-1"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
-          <li class="nav-item nav-item-2"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
-          <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.models.html" >spynnaker.pyNN.models package</a> &#187;</li>
-          <li class="nav-item nav-item-4"><a href="spynnaker.pyNN.models.neuron.html" >spynnaker.pyNN.models.neuron package</a> &#187;</li> 
+          <li class="nav-item nav-item-1"><a href="modules.html" >spynnaker</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="spynnaker.html" >spynnaker package</a> &#187;</li>
+          <li class="nav-item nav-item-3"><a href="spynnaker.pyNN.html" >spynnaker.pyNN package</a> &#187;</li>
+          <li class="nav-item nav-item-4"><a href="spynnaker.pyNN.models.html" >spynnaker.pyNN.models package</a> &#187;</li>
+          <li class="nav-item nav-item-5"><a href="spynnaker.pyNN.models.neuron.html" >spynnaker.pyNN.models.neuron package</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

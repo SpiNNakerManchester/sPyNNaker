@@ -1,26 +1,6 @@
 spynnaker.pyNN.protocols package
 ================================
 
-Submodules
-----------
-
-spynnaker.pyNN.protocols.munich_io_ethernet_protocol module
------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.protocols.munich_io_ethernet_protocol
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spynnaker.pyNN.protocols.munich_io_spinnaker_link_protocol module
------------------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.protocols.munich_io_spinnaker_link_protocol
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-
 Module contents
 ---------------
 

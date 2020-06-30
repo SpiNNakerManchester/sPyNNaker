@@ -131,6 +131,36 @@
             <span class="n">user_extra_algorithms_pre_run</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">time_scale_factor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">extra_post_run_algorithms</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">extra_mapping_algorithms</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">extra_load_algorithms</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">front_end_versions</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param str graph_label:</span>
+<span class="sd">        :param database_socket_addresses:</span>
+<span class="sd">        :type database_socket_addresses:</span>
+<span class="sd">            iterable(~spinn_utilities.socket_address.SocketAddress)</span>
+<span class="sd">        :param n_chips_required:</span>
+<span class="sd">        :type n_chips_required: int or None</span>
+<span class="sd">        :param n_boards_required:</span>
+<span class="sd">        :type n_boards_required: int or None</span>
+<span class="sd">        :param int timestep:</span>
+<span class="sd">        :param float max_delay:</span>
+<span class="sd">        :param float min_delay:</span>
+<span class="sd">        :param str hostname:</span>
+<span class="sd">        :param user_extra_algorithm_xml_path:</span>
+<span class="sd">        :type user_extra_algorithm_xml_path: str or None</span>
+<span class="sd">        :param user_extra_mapping_inputs:</span>
+<span class="sd">        :type user_extra_mapping_inputs: dict(str, Any) or None</span>
+<span class="sd">        :param user_extra_algorithms_pre_run:</span>
+<span class="sd">        :type user_extra_algorithms_pre_run: list(str) or None</span>
+<span class="sd">        :param time_scale_factor:</span>
+<span class="sd">        :type time_scale_factor:</span>
+<span class="sd">        :param extra_post_run_algorithms:</span>
+<span class="sd">        :type extra_post_run_algorithms: list(str) or None</span>
+<span class="sd">        :param extra_mapping_algorithms:</span>
+<span class="sd">        :type extra_mapping_algorithms: list(str) or None</span>
+<span class="sd">        :param extra_load_algorithms:</span>
+<span class="sd">        :type extra_load_algorithms: list(str) or None</span>
+<span class="sd">        :param front_end_versions:</span>
+<span class="sd">        :type front_end_versions:</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=too-many-arguments, too-many-locals</span>
 
         <span class="c1"># add model binaries</span>
@@ -414,16 +444,16 @@
 <div class="viewcode-block" id="AbstractSpiNNakerCommon.stop"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.stop">[docs]</a>    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">turn_off_machine</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">clear_routing_tables</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
              <span class="n">clear_tags</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param turn_off_machine: decides if the machine should be powered down\</span>
-<span class="sd">            after running the execution. Note that this powers down all boards\</span>
+<span class="sd">        :param turn_off_machine: decides if the machine should be powered down</span>
+<span class="sd">            after running the execution. Note that this powers down all boards</span>
 <span class="sd">            connected to the BMP connections given to the transceiver</span>
-<span class="sd">        :type turn_off_machine: bool</span>
-<span class="sd">        :param clear_routing_tables: informs the tool chain if it\</span>
+<span class="sd">        :type turn_off_machine: bool or None</span>
+<span class="sd">        :param clear_routing_tables: informs the tool chain if it</span>
 <span class="sd">            should turn off the clearing of the routing tables</span>
-<span class="sd">        :type clear_routing_tables: bool</span>
-<span class="sd">        :param clear_tags: informs the tool chain if it should clear the tags\</span>
+<span class="sd">        :type clear_routing_tables: bool or None</span>
+<span class="sd">        :param clear_tags: informs the tool chain if it should clear the tags</span>
 <span class="sd">            off the machine at stop</span>
-<span class="sd">        :type clear_tags: boolean</span>
+<span class="sd">        :type clear_tags: bool or None</span>
 <span class="sd">        :rtype: None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=protected-access</span>
@@ -439,6 +469,8 @@
         <span class="sd">&quot;&quot;&quot; Run the model created.</span>
 
 <span class="sd">        :param run_time: the time (in milliseconds) to run the simulation for</span>
+<span class="sd">        :type run_time: float or int</span>
+<span class="sd">        :rtype: None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=protected-access</span>
 
@@ -462,7 +494,8 @@
 <div class="viewcode-block" id="AbstractSpiNNakerCommon.register_binary_search_path"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.register_binary_search_path">[docs]</a>    <span class="k">def</span> <span class="nf">register_binary_search_path</span><span class="p">(</span><span class="n">search_path</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Register an additional binary search path for executables.</span>
 
-<span class="sd">        :param search_path: absolute search path for binaries</span>
+<span class="sd">        :param str search_path: absolute search path for binaries</span>
+<span class="sd">        :rtype: None</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=protected-access</span>
         <span class="n">AbstractSpiNNakerCommon</span><span class="o">.</span><span class="n">__EXECUTABLE_FINDER</span><span class="o">.</span><span class="n">add_path</span><span class="p">(</span><span class="n">search_path</span><span class="p">)</span></div>
@@ -486,16 +519,15 @@
             <span class="n">neuron_type</span><span class="o">.</span><span class="n">set_model_max_atoms_per_core</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="AbstractSpiNNakerCommon.get_projections_data"><a class="viewcode-back" href="../../../spynnaker.pyNN.html#spynnaker.pyNN.abstract_spinnaker_common.AbstractSpiNNakerCommon.get_projections_data">[docs]</a>    <span class="k">def</span> <span class="nf">get_projections_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">projection_to_attribute_map</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Common data extractor for projection data. Allows fully \</span>
+        <span class="sd">&quot;&quot;&quot; Common data extractor for projection data. Allows fully</span>
 <span class="sd">            exploitation of the ????</span>
 
-<span class="sd">        :param projection_to_attribute_map: \</span>
+<span class="sd">        :param projection_to_attribute_map:</span>
 <span class="sd">            the projection to attributes mapping</span>
-<span class="sd">        :type projection_to_attribute_map: \</span>
-<span class="sd">            dict of projection with set of attributes</span>
+<span class="sd">        :type projection_to_attribute_map:</span>
+<span class="sd">            dict(PyNNProjectionCommon, list(int) or tuple(int) or None)</span>
 <span class="sd">        :return: a extracted data object with get method for getting the data</span>
-<span class="sd">        :rtype: \</span>
-<span class="sd">            :py:class:`spynnaker.pyNN.utilities.extracted_data.ExtractedData`</span>
+<span class="sd">        :rtype: ExtractedData</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># pylint: disable=protected-access</span>
 
@@ -560,12 +592,8 @@
 
         <span class="c1"># iterate though projections</span>
         <span class="k">for</span> <span class="n">projection</span> <span class="ow">in</span> <span class="n">projections</span><span class="p">:</span>
-
             <span class="c1"># iteration though the projections machine edges to locate chips</span>
-            <span class="n">edges</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_graph_mapper</span><span class="o">.</span><span class="n">get_machine_edges</span><span class="p">(</span>
-                <span class="n">projection</span><span class="o">.</span><span class="n">_projection_edge</span><span class="p">)</span>
-
-            <span class="k">for</span> <span class="n">edge</span> <span class="ow">in</span> <span class="n">edges</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">edge</span> <span class="ow">in</span> <span class="n">projection</span><span class="o">.</span><span class="n">_projection_edge</span><span class="o">.</span><span class="n">machine_edges</span><span class="p">:</span>
                 <span class="n">placement</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_placements</span><span class="o">.</span><span class="n">get_placement_of_vertex</span><span class="p">(</span>
                     <span class="n">edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="p">)</span>
                 <span class="n">chip</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_machine</span><span class="o">.</span><span class="n">get_chip_at</span><span class="p">(</span><span class="n">placement</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
@@ -584,12 +612,11 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">id_counter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot; Getter for id_counter, currently used by the populations.</span>
+        <span class="sd">&quot;&quot;&quot; The id_counter, currently used by the populations.</span>
 
 <span class="sd">        .. note::</span>
 <span class="sd">            Maybe it could live in the pop class???</span>
 
-<span class="sd">        :return:</span>
 <span class="sd">        :rtype: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__id_counter</span>
@@ -601,9 +628,7 @@
 <span class="sd">        .. note::</span>
 <span class="sd">            Maybe it could live in the pop class???</span>
 
-<span class="sd">        :param new_value: new value for id_counter</span>
-<span class="sd">        :type new_value: int</span>
-<span class="sd">        :return:</span>
+<span class="sd">        :param int new_value: new value for id_counter</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__id_counter</span> <span class="o">=</span> <span class="n">new_value</span></div>
 </pre></div>

@@ -83,26 +83,21 @@
 <span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.utility_models.delays</span> <span class="kn">import</span> <span class="n">DelayExtensionVertex</span>
 
 
-<div class="viewcode-block" id="SpynnakerDataSpecificationWriter"><a class="viewcode-back" href="../../../../spynnaker.pyNN.overridden_pacman_functions.html#spynnaker.pyNN.overridden_pacman_functions.spynnaker_data_specification_writer.SpynnakerDataSpecificationWriter">[docs]</a><span class="k">class</span> <span class="nc">SpynnakerDataSpecificationWriter</span><span class="p">(</span>
-        <span class="n">GraphDataSpecificationWriter</span><span class="p">):</span>
+<div class="viewcode-block" id="SpynnakerDataSpecificationWriter"><a class="viewcode-back" href="../../../../spynnaker.pyNN.overridden_pacman_functions.html#spynnaker.pyNN.overridden_pacman_functions.SpynnakerDataSpecificationWriter">[docs]</a><span class="k">class</span> <span class="nc">SpynnakerDataSpecificationWriter</span><span class="p">(</span><span class="n">GraphDataSpecificationWriter</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Executes data specification generation for sPyNNaker</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
 
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">hostname</span><span class="p">,</span>
-            <span class="n">report_default_directory</span><span class="p">,</span> <span class="n">write_text_specs</span><span class="p">,</span> <span class="n">machine</span><span class="p">,</span>
-            <span class="n">data_n_timesteps</span><span class="p">,</span> <span class="n">graph_mapper</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">hostname</span><span class="p">,</span> <span class="n">report_default_directory</span><span class="p">,</span>
+            <span class="n">write_text_specs</span><span class="p">,</span> <span class="n">machine</span><span class="p">,</span> <span class="n">data_n_timesteps</span><span class="p">):</span>
         <span class="c1"># pylint: disable=too-many-arguments, signature-differs</span>
 
         <span class="n">delay_extensions</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
         <span class="n">placement_order</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">placement</span> <span class="ow">in</span> <span class="n">placements</span><span class="o">.</span><span class="n">placements</span><span class="p">:</span>
-            <span class="n">associated_vertex</span> <span class="o">=</span> <span class="n">graph_mapper</span><span class="o">.</span><span class="n">get_application_vertex</span><span class="p">(</span>
-                <span class="n">placement</span><span class="o">.</span><span class="n">vertex</span><span class="p">)</span>
-
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">associated_vertex</span><span class="p">,</span> <span class="n">DelayExtensionVertex</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">placement</span><span class="o">.</span><span class="n">vertex</span><span class="o">.</span><span class="n">app_vertex</span><span class="p">,</span> <span class="n">DelayExtensionVertex</span><span class="p">):</span>
                 <span class="n">delay_extensions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">placement</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">placement_order</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">placement</span><span class="p">)</span>
@@ -110,8 +105,7 @@
 
         <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">SpynnakerDataSpecificationWriter</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__call__</span><span class="p">(</span>
             <span class="n">placements</span><span class="p">,</span> <span class="n">hostname</span><span class="p">,</span> <span class="n">report_default_directory</span><span class="p">,</span> <span class="n">write_text_specs</span><span class="p">,</span>
-            <span class="n">machine</span><span class="p">,</span> <span class="n">data_n_timesteps</span><span class="p">,</span> <span class="n">graph_mapper</span><span class="p">,</span>
-            <span class="n">placement_order</span><span class="p">)</span></div>
+            <span class="n">machine</span><span class="p">,</span> <span class="n">data_n_timesteps</span><span class="p">,</span> <span class="n">placement_order</span><span class="p">)</span></div>
 </pre></div>
 
           </div>

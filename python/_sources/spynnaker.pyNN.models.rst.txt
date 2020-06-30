@@ -17,14 +17,6 @@ Subpackages
 Submodules
 ----------
 
-spynnaker.pyNN.models.abstract_pynn_model module
-------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.models.abstract_pynn_model
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 spynnaker.pyNN.models.defaults module
 -------------------------------------
 
