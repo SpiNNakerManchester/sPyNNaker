@@ -311,4 +311,4 @@ def get_n_bits(n_values):
         return 0
     if n_values == 1:
         return 1
-    return (w - 1).bit_length()
+    return (n_values - 1).bit_length()
