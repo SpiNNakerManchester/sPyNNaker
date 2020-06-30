@@ -14,8 +14,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy
-from .abstract_formation import AbstractFormation
 from spinn_utilities.overrides import overrides
+from .abstract_formation import AbstractFormation
 
 
 class DistanceDependentFormation(AbstractFormation):
@@ -33,20 +33,20 @@ class DistanceDependentFormation(AbstractFormation):
     ]
 
     def __init__(
-            self, grid=numpy.array([16, 16]), p_form_forward=0.16,
+            self, grid=(16, 16), p_form_forward=0.16,
             sigma_form_forward=2.5, p_form_lateral=1.0,
             sigma_form_lateral=1.0):
         """
-
         :param grid: (x, y) dimensions of the grid of distance
-        :param p_form_forward:\
+        :type grid: tuple(int,int) or list(int) or ~numpy.ndarray(int)
+        :param float p_form_forward:
             The peak probability of formation on feed-forward connections
-        :param sigma_form_forward:\
+        :param float sigma_form_forward:
             The spread of probability with distance of formation on\
             feed-forward connections
-        :param p_form_lateral:\
+        :param float p_form_lateral:
             The peak probability of formation on lateral connections
-        :param sigma_form_lateral:\
+        :param float sigma_form_lateral:
             The spread of probability with distance of formation on\
             lateral connections
         """
@@ -76,12 +76,10 @@ class DistanceDependentFormation(AbstractFormation):
     def generate_distance_probability_array(self, probability, sigma):
         """ Generate the exponentially decaying probability LUTs.
 
-        :param probability: peak probability
-        :type probability: float
-        :param sigma: spread
-        :type sigma: float
+        :param float probability: peak probability
+        :param float sigma: spread
         :return: distance-dependent probabilities
-        :rtype: numpy.ndarray(float)
+        :rtype: ~numpy.ndarray(float)
         """
         euclidian_distances = numpy.ones(self.__grid ** 2) * numpy.nan
         for row in range(euclidian_distances.shape[0]):
@@ -118,14 +116,12 @@ class DistanceDependentFormation(AbstractFormation):
         """ Compute the distance between points x0 and x1 place on the grid\
             using periodic boundary conditions.
 
-        :param x0: first point in space
-        :type x0: np.ndarray of ints
-        :param x1: second point in space
-        :type x1: np.ndarray of ints
-        :param grid: shape of grid
-        :type grid: np.ndarray of ints
-        :param metric: distance metric, i.e. euclidian or manhattan
-        :type metric: str
+        :param ~numpy.ndarray(int) x0: first point in space
+        :param ~numpy.ndarray(int) x1: second point in space
+        :param ~numpy.ndarray(int) grid: shape of grid
+        :param str metric:
+            distance metric, i.e. ``euclidian`` or ``manhattan`` or
+            ``equidistant``
         :return: the distance
         :rtype: float
         """

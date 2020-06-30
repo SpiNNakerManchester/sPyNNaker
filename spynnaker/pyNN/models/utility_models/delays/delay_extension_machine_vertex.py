@@ -42,9 +42,24 @@ class DelayExtensionMachineVertex(
 
     N_EXTRA_PROVENANCE_DATA_ENTRIES = len(EXTRA_PROVENANCE_DATA_ENTRIES)
 
-    def __init__(self, resources_required, label, constraints=None):
+    def __init__(self, resources_required, label, constraints=None,
+                 app_vertex=None, vertex_slice=None):
+        """
+        :param ~pacman.model.resources.ResourceContainer resources_required:
+            The resources required by the vertex
+        :param str label: The optional name of the vertex
+        :param iterable(AbstractConstraint) constraints:
+            The optional initial constraints of the vertex
+        :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
+            The application vertex that caused this machine vertex to be
+            created. If None, there is no such application vertex.
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            The slice of the application vertex that this machine vertex
+            implements.
+        """
         super(DelayExtensionMachineVertex, self).__init__(
-            label, constraints=constraints)
+            label, constraints=constraints, app_vertex=app_vertex,
+            vertex_slice=vertex_slice)
         self.__resources = resources_required
 
     @property
