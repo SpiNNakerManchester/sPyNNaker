@@ -82,19 +82,11 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
     @property
     @overrides(AbstractTimingDependence.vertex_executable_suffix)
     def vertex_executable_suffix(self):
-        """ The suffix to be appended to the vertex executable for this rule
-
-        :rtype: str
-        """
         return "vogels_2011"
 
     @property
     @overrides(AbstractTimingDependence.pre_trace_n_bytes)
     def pre_trace_n_bytes(self):
-        """ The number of bytes used by the pre-trace of the rule per neuron
-
-        :rtype: int
-        """
         # Trace entries consist of a single 16-bit number
         return BYTES_PER_SHORT
 
@@ -105,10 +97,6 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
     @property
     @overrides(AbstractTimingDependence.n_weight_terms)
     def n_weight_terms(self):
-        """ The number of weight terms expected by this timing rule
-
-        :rtype: int
-        """
         return 1
 
     @overrides(AbstractTimingDependence.write_parameters)
@@ -124,10 +112,6 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
     @property
     @overrides(AbstractTimingDependence.synaptic_structure)
     def synaptic_structure(self):
-        """ Get the synaptic structure of the plastic part of the rows
-
-        :rtype: AbstractSynapseStructure
-        """
         return self.__synapse_structure
 
     @overrides(AbstractTimingDependence.get_parameter_names)

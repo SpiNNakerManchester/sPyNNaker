@@ -18,12 +18,11 @@ import struct
 import numpy
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.log import FormatAdapter
-from pacman.model.resources.constant_sdram import ConstantSDRAM
-from pacman.model.resources.variable_sdram import VariableSDRAM
+from pacman.model.resources import ConstantSDRAM, VariableSDRAM
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BITS_PER_WORD, MICRO_TO_MILLISECOND_CONVERSION)
 from spynnaker.pyNN.utilities.utility_calls import ceildiv
-from spynnaker.pyNN.models.common import recording_utils
+from spynnaker.pyNN.models.common.recording_utils import make_missing_string
 
 logger = FormatAdapter(logging.getLogger(__name__))
 _TWO_WORDS = struct.Struct("<II")
@@ -122,7 +121,7 @@ class MultiSpikeRecorder(object):
             logger.warning(
                 "Population {} is missing spike data in region {} from the "
                 "following cores: {}", label, region,
-                recording_utils.make_missing_string(missing))
+                make_missing_string(missing))
 
         if not spike_ids:
             return numpy.zeros((0, 2))
