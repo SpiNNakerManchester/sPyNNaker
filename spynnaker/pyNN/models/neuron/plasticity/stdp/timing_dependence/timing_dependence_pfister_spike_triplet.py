@@ -15,9 +15,10 @@
 
 import logging
 from spinn_utilities.overrides import overrides
-from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-from spynnaker.pyNN.models.neuron.plasticity.stdp.common\
-    .plasticity_helpers import get_exp_lut_array
+from spinn_front_end_common.utilities.constants import (
+    BYTES_PER_WORD, MICRO_TO_MILLISECOND_CONVERSION)
+from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
+    get_exp_lut_array)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence\
     import AbstractTimingDependence
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure\
@@ -28,6 +29,12 @@ logger = logging.getLogger(__name__)
 
 
 class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
+    """ A timing dependence STDP rule based on spike triplets.
+
+    Jean-Pascal Pfister, Wulfram Gerstner. Triplets of Spikes in a Model of
+    Spike Timing-Dependent Plasticity. *Journal of Neuroscience*,
+    20 September 2006, 26 (38) 9673-9682; DOI: 10.1523/JNEUROSCI.1425-06.2006
+    """
     __slots__ = [
         "__synapse_structure",
         "__tau_minus",
@@ -41,6 +48,12 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
 
     # noinspection PyPep8Naming
     def __init__(self, tau_plus, tau_minus, tau_x, tau_y):
+        r"""
+        :param float tau_plus: :math:`\tau_+`
+        :param float tau_minus: :math:`\tau_-`
+        :param float tau_x: :math:`\tau_x`
+        :param float tau_y: :math:`\tau_y`
+        """
         self.__tau_plus = tau_plus
         self.__tau_minus = tau_minus
         self.__tau_x = tau_x
@@ -48,7 +61,8 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
 
         self.__synapse_structure = SynapseStructureWeightOnly()
 
-        ts = get_simulator().machine_time_step / 1000.0
+        ts = get_simulator().machine_time_step
+        ts = ts / MICRO_TO_MILLISECOND_CONVERSION
         self.__tau_plus_data = get_exp_lut_array(ts, self.__tau_plus)
         self.__tau_minus_data = get_exp_lut_array(ts, self.__tau_minus)
         self.__tau_x_data = get_exp_lut_array(ts, self.__tau_x, shift=2)
@@ -56,18 +70,34 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
 
     @property
     def tau_plus(self):
+        r""" :math:`\tau_+`
+
+        :rtype: float
+        """
         return self.__tau_plus
 
     @property
     def tau_minus(self):
+        r""" :math:`\tau_-`
+
+        :rtype: float
+        """
         return self.__tau_minus
 
     @property
     def tau_x(self):
+        r""" :math:`\tau_x`
+
+        :rtype: float
+        """
         return self.__tau_x
 
     @property
     def tau_y(self):
+        r""" :math:`\tau_y`
+
+        :rtype: float
+        """
         return self.__tau_y
 
     @overrides(AbstractTimingDependence.is_same_as)
@@ -83,10 +113,18 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
 
     @property
     def vertex_executable_suffix(self):
+        """ The suffix to be appended to the vertex executable for this rule
+
+        :rtype: str
+        """
         return "pfister_triplet"
 
     @property
     def pre_trace_n_bytes(self):
+        """ The number of bytes used by the pre-trace of the rule per neuron
+
+        :rtype: int
+        """
         # Triplet rule trace entries consists of two 16-bit traces - R1 and R2
         return BYTES_PER_WORD
 
@@ -99,6 +137,10 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
 
     @property
     def n_weight_terms(self):
+        """ The number of weight terms expected by this timing rule
+
+        :rtype: int
+        """
         return 2
 
     @overrides(AbstractTimingDependence.write_parameters)
@@ -112,6 +154,10 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
 
     @property
     def synaptic_structure(self):
+        """ Get the synaptic structure of the plastic part of the rows
+
+        :rtype: AbstractSynapseStructure
+        """
         return self.__synapse_structure
 
     @overrides(AbstractTimingDependence.get_parameter_names)

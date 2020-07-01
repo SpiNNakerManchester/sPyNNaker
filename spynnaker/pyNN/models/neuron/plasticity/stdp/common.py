@@ -23,10 +23,20 @@ STDP_FIXED_POINT_ONE = (1 << 11)
 
 
 def float_to_fixed(value):
+    """
+    :param float value:
+    :rtype: int
+    """
     return int(round(float(value) * STDP_FIXED_POINT_ONE))
 
 
 def get_exp_lut_array(time_step, time_constant, shift=0):
+    """
+    :param int time_step:
+    :param float time_constant:
+    :param int shift:
+    :rtype: ~numpy.ndarray
+    """
     # Compute the actual exponential decay parameter
     # NB: lambda is a reserved word in Python
     l_ambda = time_step / float(time_constant)
