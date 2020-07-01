@@ -19,5 +19,5 @@ from .neuron_impl_standard import NeuronImplStandard
 from .ranged_dict_vertex_slice import RangedDictVertexSlice
 
 __all__ = [
-    "AbstractStandardNeuronComponent", "NeuronImplStandard",
-    "AbstractNeuronImpl", "RangedDictVertexSlice"]
+    "AbstractNeuronImpl", "AbstractStandardNeuronComponent",
+    "NeuronImplStandard", "RangedDictVertexSlice"]
