@@ -42,18 +42,19 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
             self, p_connect, allow_self_connections=True, safe=True,
             callback=None, verbose=False, rng=None):
         """
-        :param p_connect:
+        :param float p_connect:
             a float between zero and one. Each potential connection is created\
             with this probability.
-        :type p_connect: float
-        :param allow_self_connections:
+        :param bool allow_self_connections:
             if the connector is used to connect a Population to itself, this\
             flag determines whether a neuron is allowed to connect to itself,\
             or only to other neurons in the Population.
-        :type allow_self_connections: bool
-        :param `pyNN.Space` space:
-            a Space object, needed if you wish to specify distance-dependent\
-            weights or delays - not implemented
+        :param bool safe:
+        :param callable callback: Ignored
+        :param bool verbose:
+        :param rng:
+            Seeded random number generator, or None to make one when needed
+        :type rng: ~pyNN.random.NumpyRNG or None
         """
         super(FixedProbabilityConnector, self).__init__(
             safe, callback, verbose)
@@ -109,9 +110,8 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type, synapse_info):
+            self, pre_slices, pre_slice_index, post_slices, post_slice_index,
+            pre_vertex_slice, post_vertex_slice, synapse_type, synapse_info):
         # pylint: disable=too-many-arguments
         n_items = pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms
         items = self._rng.next(n_items)
@@ -147,28 +147,25 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
     def gen_connector_id(self):
         return ConnectorIDs.FIXED_PROBABILITY_CONNECTOR.value
 
-    @overrides(AbstractGenerateConnectorOnMachine.
-               gen_connector_params)
+    @overrides(AbstractGenerateConnectorOnMachine.gen_connector_params)
     def gen_connector_params(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type, synapse_info):
+            self, pre_slices, pre_slice_index, post_slices, post_slice_index,
+            pre_vertex_slice, post_vertex_slice, synapse_type, synapse_info):
         params = self._basic_connector_params(synapse_info)
-
-        params.extend([self.__allow_self_connections])
+        params.append(self.__allow_self_connections)
 
         # If prob=1.0 has been specified, take care when scaling value to
         # ensure that it doesn't wrap round to zero as an unsigned long fract
-        params.extend([DataType.U032.encode_as_int(
-            DataType.U032.max if self._p_connect == 1.0 else self._p_connect)])
+        params.append(DataType.U032.encode_as_int(
+            DataType.U032.max if self._p_connect == 1.0 else self._p_connect))
 
         params.extend(self._get_connector_seed(
             pre_vertex_slice, post_vertex_slice, self._rng))
         return numpy.array(params, dtype="uint32")
 
     @property
-    @overrides(AbstractGenerateConnectorOnMachine.
-               gen_connector_params_size_in_bytes)
+    @overrides(
+        AbstractGenerateConnectorOnMachine.gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
         # view + params + seeds
         return self._view_params_bytes + (N_GEN_PARAMS * BYTES_PER_WORD)

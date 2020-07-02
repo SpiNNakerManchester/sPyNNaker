@@ -15,11 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Izhekevich neuron type
 #ifndef _NEURON_MODEL_IZH_CURR_IMPL_H_
 #define _NEURON_MODEL_IZH_CURR_IMPL_H_
 
 #include "neuron_model.h"
 
+//! The state variables of an Izhekevich model neuron
 typedef struct neuron_t {
     // nominally 'fixed' parameters
     REAL A;
@@ -31,13 +34,14 @@ typedef struct neuron_t {
     REAL V;
     REAL U;
 
-    // offset current [nA]
+    //! offset current [nA]
     REAL I_offset;
 
-    // current timestep - simple correction for threshold
+    //! current timestep - simple correction for threshold
     REAL this_h;
 } neuron_t;
 
+//! Global neuron parameters for Izhekevich model neuron
 typedef struct global_neuron_params_t {
     REAL machine_timestep_ms;
 } global_neuron_params_t;
