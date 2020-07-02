@@ -51,7 +51,7 @@ class AbstractNeuronModel(
     def global_struct(self):
         """ Get the global parameters structure
 
-        :rtype: Struct
+        :rtype: ~spynnaker.pyNN.utilities.struct.Struct
         """
         return self.__global_struct
 

@@ -50,22 +50,25 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
             self, n, allow_self_connections=True, with_replacement=False,
             safe=True, callback=None, verbose=False, rng=None):
         """
-        :param n: \
+        :param int n:
             number of random post-synaptic neurons connected to pre-neurons.
-        :type n: int
-        :param allow_self_connections: \
-            if the connector is used to connect a Population to itself, this\
-            flag determines whether a neuron is allowed to connect to itself,\
+        :param bool allow_self_connections:
+            if the connector is used to connect a Population to itself, this
+            flag determines whether a neuron is allowed to connect to itself,
             or only to other neurons in the Population.
-        :type allow_self_connections: bool
-        :param with_replacement: \
-            this flag determines how the random selection of post-synaptic\
-            neurons is performed; if true, then every post-synaptic neuron\
-            can be chosen on each occasion, and so multiple connections\
-            between neuron pairs are possible; if false, then once a\
-            post-synaptic neuron has been connected to a pre-neuron, it can't\
+        :param bool with_replacement:
+            this flag determines how the random selection of post-synaptic
+            neurons is performed; if true, then every post-synaptic neuron
+            can be chosen on each occasion, and so multiple connections
+            between neuron pairs are possible; if false, then once a
+            post-synaptic neuron has been connected to a pre-neuron, it can't
             be connected again.
-        :type with_replacement: bool
+        :param bool safe:
+        :param callable callback: Ignored
+        :param bool verbose:
+        :param rng:
+            Seeded random number generator, or None to make one when needed
+        :type rng: ~pyNN.random.NumpyRNG or None
         """
         super(FixedNumberPostConnector, self).__init__(
             safe, callback, verbose, rng)
@@ -98,6 +101,10 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
             synapse_info.raw_delays_in_ms, n_connections)
 
     def _get_post_neurons(self, synapse_info):
+        """
+        :param SynapseInformation synapse_info:
+        :rtype: list(~numpy.ndarray)
+        """
         # If we haven't set the array up yet, do it now
         if not self.__post_neurons_set:
             self.__post_neurons = [None] * synapse_info.n_pre_neurons
@@ -152,15 +159,40 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
         return self.__post_neurons
 
     def _post_neurons_in_slice(self, post_vertex_slice, n, synapse_info):
+        """
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param int n:
+        :param SynapseInformation synapse_info:
+        :rtype: ~numpy.ndarray
+        """
         post_neurons = self._get_post_neurons(synapse_info)
 
         # Get the nth array and get the bits we need for
         # this post-vertex slice
         this_post_neuron_array = post_neurons[n]
 
-        return this_post_neuron_array[
-            (this_post_neuron_array >= post_vertex_slice.lo_atom) &
-            (this_post_neuron_array <= post_vertex_slice.hi_atom)]
+        return this_post_neuron_array[numpy.logical_and(
+            post_vertex_slice.lo_atom <= this_post_neuron_array,
+            this_post_neuron_array <= post_vertex_slice.hi_atom)]
+
+    def _n_post_neurons_in_slice(self, post_vertex_slice, n, synapse_info):
+        """ Count the number of post neurons in the slice. \
+            Faster than ``len(_post_neurons_in_slice(...))``.
+
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param int n:
+        :param SynapseInformation synapse_info:
+        :rtype: int
+        """
+        post_neurons = self._get_post_neurons(synapse_info)
+
+        # Get the nth array and get the bits we need for
+        # this post-vertex slice
+        this_post_neuron_array = post_neurons[n]
+
+        return numpy.count_nonzero(numpy.logical_and(
+            post_vertex_slice.lo_atom <= this_post_neuron_array,
+            this_post_neuron_array <= post_vertex_slice.hi_atom))
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
@@ -199,20 +231,18 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type, synapse_info, timestep_in_us):
+            self, pre_slices, pre_slice_index, post_slices, post_slice_index,
+            pre_vertex_slice, post_vertex_slice, synapse_type, synapse_info,
+            timestep_in_us):
         # pylint: disable=too-many-arguments
         # Get lo and hi for the pre vertex
         lo = pre_vertex_slice.lo_atom
         hi = pre_vertex_slice.hi_atom
 
         # Get number of connections
-        n_connections = 0
-        for n in range(lo, hi + 1):
-            n_connections += len(
-                self._post_neurons_in_slice(post_vertex_slice, n,
-                                            synapse_info))
+        n_connections = sum(
+            self._n_post_neurons_in_slice(post_vertex_slice, n, synapse_info)
+            for n in range(lo, hi + 1))
 
         # Set up the block
         block = numpy.zeros(
@@ -223,11 +253,10 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
         post_neurons_in_slice = []
         pre_vertex_array = numpy.arange(lo, hi + 1)
         for n in range(lo, hi + 1):
-            post_neurons = self._post_neurons_in_slice(
-                post_vertex_slice, n, synapse_info)
-            for m in range(0, len(post_neurons)):
-                post_neurons_in_slice.append(post_neurons[m])
-                pre_neurons_in_slice.append(pre_vertex_array[n-lo])
+            for pn in self._post_neurons_in_slice(
+                    post_vertex_slice, n, synapse_info):
+                post_neurons_in_slice.append(pn)
+                pre_neurons_in_slice.append(pre_vertex_array[n - lo])
 
         block["source"] = pre_neurons_in_slice
         block["target"] = post_neurons_in_slice
@@ -259,9 +288,8 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
     @overrides(AbstractGenerateConnectorOnMachine.
                gen_connector_params)
     def gen_connector_params(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type, synapse_info):
+            self, pre_slices, pre_slice_index, post_slices, post_slice_index,
+            pre_vertex_slice, post_vertex_slice, synapse_type, synapse_info):
         params = self._basic_connector_params(synapse_info)
 
         # The same seed needs to be sent to each of the slices
@@ -284,7 +312,7 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
         return numpy.array(params, dtype="uint32")
 
     @property
-    @overrides(AbstractGenerateConnectorOnMachine.
-               gen_connector_params_size_in_bytes)
+    @overrides(
+        AbstractGenerateConnectorOnMachine.gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
         return self._view_params_bytes + (N_GEN_PARAMS * BYTES_PER_WORD)

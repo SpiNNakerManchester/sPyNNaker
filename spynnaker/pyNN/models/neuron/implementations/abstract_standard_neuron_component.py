@@ -40,7 +40,7 @@ class AbstractStandardNeuronComponent(with_metaclass(AbstractBase, object)):
         """ The structure of the component. This structure will have copies in\
             both SDRAM (the initialisation values) and DTCM (the working copy).
 
-        :rtype: ~spynnaker.pyNN.models.neuron.implementations.Struct
+        :rtype: ~spynnaker.pyNN.utilities.struct.Struct
         """
         return self.__struct
 

@@ -39,6 +39,15 @@ def _check_args(args_to_find, default_args, init):
 
 
 def get_dict_from_init(init, skip=None, include=None):
+    """ Get an argument initialisation dictionary by examining an \
+        ``__init__`` method or function.
+
+    :param callable init: The method.
+    :param frozenset(str) skip: The arguments to be skipped, if any
+    :param frozenset(str) include: The arguments that must be present, if any
+    :return: an initialisation dictionary
+    :rtype: dict(str, Any)
+    """
     init_args = _get_args(init)
     n_defaults = 0 if init_args.defaults is None else len(init_args.defaults)
     n_args = 0 if init_args.args is None else len(init_args.args)
@@ -60,12 +69,12 @@ def get_dict_from_init(init, skip=None, include=None):
 
 
 def default_parameters(parameters):
-    """ Specifies arguments which are parameters.  Only works on the __init__\
-        method of a class that is additionally decorated with\
-        :py:meth:`defaults``
+    """ Specifies arguments which are parameters.  Only works on the \
+        ``__init__`` method of a class that is additionally decorated with\
+        :py:meth:`defaults`
 
-    :param parameters: The names of the arguments that are parameters
-    :type parameters: set of str
+    :param iterable(str) parameters:
+        The names of the arguments that are parameters
     """
     def wrap(method):
         # Find the real method in case we use multiple of these decorators
@@ -74,7 +83,7 @@ def default_parameters(parameters):
             method = getattr(method, "_method")
 
         # Set the parameters of the method to be used later
-        method._parameters = parameters
+        method._parameters = frozenset(parameters)
         method_args = _get_args(method)
 
         def wrapper(*args, **kwargs):
@@ -97,11 +106,11 @@ def default_parameters(parameters):
 
 def default_initial_values(state_variables):
     """ Specifies arguments which are state variables.  Only works on the\
-        __init__ method of a class that is additionally decorated with\
-        :py:meth:`defaults``
+        ``__init__`` method of a class that is additionally decorated with\
+        :py:meth:`defaults`
 
-    :param state_variables: The names of the arguments that are state variables
-    :type state_variables: set of str
+    :param iterable(str) state_variables:
+        The names of the arguments that are state variables
     """
     def wrap(method):
         # Find the real method in case we use multiple of these decorators
@@ -110,7 +119,7 @@ def default_initial_values(state_variables):
             method = getattr(method, "_method")
 
         # Store the state variables of the method to be used later
-        method._state_variables = state_variables
+        method._state_variables = frozenset(state_variables)
         method_args = _get_args(method)
 
         def wrapper(*args, **kwargs):
@@ -133,7 +142,7 @@ def default_initial_values(state_variables):
 
 def defaults(cls):
     """ Get the default parameters and state variables from the arguments to\
-        the __init__ method.  This uses the decorators\
+        the ``__init__`` method.  This uses the decorators\
         :py:func:`default_parameters` and :py:func:`default_initial_values` to\
         determine the parameters and state variables respectively.\
         If only one is specified, the other is assumed to be the remaining\

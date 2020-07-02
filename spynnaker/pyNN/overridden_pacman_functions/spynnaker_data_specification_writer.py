@@ -18,26 +18,21 @@ from spinn_front_end_common.interface.interface_functions import (
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 
 
-class SpynnakerDataSpecificationWriter(
-        GraphDataSpecificationWriter):
+class SpynnakerDataSpecificationWriter(GraphDataSpecificationWriter):
     """ Executes data specification generation for sPyNNaker
     """
 
     __slots__ = ()
 
     def __call__(
-            self, placements, hostname,
-            report_default_directory, write_text_specs, machine,
-            data_simtime_in_us, graph_mapper=None):
+            self, placements, hostname, report_default_directory,
+            write_text_specs, machine, data_simtime_in_us):
         # pylint: disable=too-many-arguments, signature-differs
 
         delay_extensions = list()
         placement_order = list()
         for placement in placements.placements:
-            associated_vertex = graph_mapper.get_application_vertex(
-                placement.vertex)
-
-            if isinstance(associated_vertex, DelayExtensionVertex):
+            if isinstance(placement.vertex.app_vertex, DelayExtensionVertex):
                 delay_extensions.append(placement)
             else:
                 placement_order.append(placement)
@@ -45,5 +40,4 @@ class SpynnakerDataSpecificationWriter(
 
         return super(SpynnakerDataSpecificationWriter, self).__call__(
             placements, hostname, report_default_directory, write_text_specs,
-            machine, data_simtime_in_us, graph_mapper,
-            placement_order)
+            machine, data_simtime_in_us, placement_order)

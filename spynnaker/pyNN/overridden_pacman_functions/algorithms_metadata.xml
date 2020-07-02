@@ -75,10 +75,6 @@
                 <param_type>MemoryMachineGraph</param_type>
             </parameter>
             <parameter>
-                <param_name>graph_mapper</param_name>
-                <param_type>MemoryGraphMapper</param_type>
-            </parameter>
-            <parameter>
                 <param_name>placements</param_name>
                 <param_type>MemoryPlacements</param_type>
             </parameter>
@@ -129,7 +125,6 @@
             <param_name>app_id</param_name>
             <param_name>provenance_file_path</param_name>
             <param_name>machine_graph</param_name>
-            <param_name>graph_mapper</param_name>
             <param_name>placements</param_name>
             <param_name>produce_report</param_name>
             <param_name>default_report_folder</param_name>
@@ -160,10 +155,6 @@
             <parameter>
                 <param_name>app_graph</param_name>
                 <param_type>MemoryApplicationGraph</param_type>
-            </parameter>
-            <parameter>
-                <param_name>graph_mapper</param_name>
-                <param_type>MemoryGraphMapper</param_type>
             </parameter>
             <parameter>
                 <param_name>executable_finder</param_name>
@@ -209,7 +200,6 @@
         <required_inputs>
             <param_name>app_graph</param_name>
             <param_name>placements</param_name>
-            <param_name>graph_mapper</param_name>
             <param_name>executable_finder</param_name>
             <param_name>provenance_file_path</param_name>
             <param_name>transceiver</param_name>
@@ -230,21 +220,22 @@
         <python_class>GraphEdgeFilter</python_class>
         <input_definitions>
             <parameter>
-                <param_name>machine_graph</param_name>
-                <param_type>MemoryMachineGraph</param_type>
+                <param_name>app_graph</param_name>
+                <param_type>MemoryApplicationGraph</param_type>
             </parameter>
             <parameter>
-                <param_name>graph_mapper</param_name>
-                <param_type>MemoryGraphMapper</param_type>
+                <param_name>machine_graph</param_name>
+                <param_type>MemoryMachineGraph</param_type>
             </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>machine_graph</param_name>
-            <param_name>graph_mapper</param_name>
         </required_inputs>
+        <optional_inputs>
+            <param_name>app_graph</param_name>
+        </optional_inputs>
         <outputs>
             <param_type>MemoryMachineGraph</param_type>
-            <param_type>MemoryGraphMapper</param_type>
             <token>EdgesFiltered</token>
         </outputs>
     </algorithm>
@@ -256,14 +247,9 @@
                 <param_name>machine_graph</param_name>
                 <param_type>MemoryMachineGraph</param_type>
             </parameter>
-            <parameter>
-                <param_name>graph_mapper</param_name>
-                <param_type>MemoryGraphMapper</param_type>
-            </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>machine_graph</param_name>
-            <param_name>graph_mapper</param_name>
         </required_inputs>
         <outputs>
             <param_type>MemoryMachineGraph</param_type>
@@ -297,10 +283,6 @@
                 <param_name>data_simtime_in_us</param_name>
                 <param_type>DataSimtimeInUs</param_type>
             </parameter>
-            <parameter>
-                <param_name>graph_mapper</param_name>
-                <param_type>MemoryGraphMapper</param_type>
-            </parameter>
         </input_definitions>
         <required_inputs>
             <param_name>placements</param_name>
@@ -310,9 +292,6 @@
             <param_name>machine</param_name>
             <param_name>data_simtime_in_us</param_name>
         </required_inputs>
-        <optional_inputs>
-            <param_name>graph_mapper</param_name>
-        </optional_inputs>
         <outputs>
             <param_type>DataSpecificationTargets</param_type>
             <param_type>RegionSizes</param_type>

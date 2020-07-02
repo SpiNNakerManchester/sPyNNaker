@@ -56,11 +56,12 @@ class SpikeSourcePoissonMachineVertex(
         1: "PROB_FUNC"}
 
     def __init__(
-            self, resources_required, is_recording, timestep_in_us,
-            label=None, constraints=None,):
+            self, resources_required, is_recording, timestep_in_us, constraints=None,
+            label=None, app_vertex=None, vertex_slice=None):
         # pylint: disable=too-many-arguments
         super(SpikeSourcePoissonMachineVertex, self).__init__(
-            timestep_in_us, label, constraints=constraints)
+            timestep_in_us, label, constraints=constraints, app_vertex=app_vertex,
+            vertex_slice=vertex_slice)
         self.__is_recording = is_recording
         self.__resources = resources_required
 

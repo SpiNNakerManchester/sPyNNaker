@@ -27,15 +27,13 @@ logger = logging.getLogger(__name__)
 
 
 class SpikeInjectorVertex(
-        ReverseIpTagMultiCastSource,
-        AbstractProvidesOutgoingPartitionConstraints,
-        AbstractSpikeRecordable, SimplePopulationSettable):
+        ReverseIpTagMultiCastSource, SimplePopulationSettable,
+        AbstractProvidesOutgoingPartitionConstraints, AbstractSpikeRecordable):
     """ An Injector of Spikes for PyNN populations.  This only allows the user\
         to specify the virtual_key of the population to identify the population
     """
     __slots__ = [
         "__receive_port",
-        "__requires_mapping",
         "__spike_recorder",
         "__virtual_key"]
 
@@ -48,7 +46,6 @@ class SpikeInjectorVertex(
             self, n_neurons, label, constraints, port, virtual_key,
             reserve_reverse_ip_tag, timestep_in_us=None):
         # pylint: disable=too-many-arguments
-        self.__requires_mapping = True
         self.__receive_port = None
         self.__virtual_key = None
 
@@ -92,7 +89,6 @@ class SpikeInjectorVertex(
             logger.warning("Indexes currently not supported "
                            "so being ignored")
         self.enable_recording(new_state)
-        self.__requires_mapping = not self.__spike_recorder.record
         self.__spike_recorder.record = new_state
 
     @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
@@ -100,21 +96,18 @@ class SpikeInjectorVertex(
         return self.timestep_in_us
 
     @overrides(AbstractSpikeRecordable.get_spikes)
-    def get_spikes(
-            self, placements, graph_mapper, buffer_manager):
+    def get_spikes(self, placements, buffer_manager):
         return self.__spike_recorder.get_spikes(
             self.label, buffer_manager,
-            SpikeInjectorVertex.SPIKE_RECORDING_REGION_ID,
-            placements, graph_mapper, self,
+            SpikeInjectorVertex.SPIKE_RECORDING_REGION_ID, placements, self,
             lambda vertex:
                 vertex.virtual_key
                 if vertex.virtual_key is not None
                 else 0)
 
     @overrides(AbstractSpikeRecordable.clear_spike_recording)
-    def clear_spike_recording(self, buffer_manager, placements, graph_mapper):
-        machine_vertices = graph_mapper.get_machine_vertices(self)
-        for machine_vertex in machine_vertices:
+    def clear_spike_recording(self, buffer_manager, placements):
+        for machine_vertex in self.machine_vertices:
             placement = placements.get_placement_of_vertex(machine_vertex)
             buffer_manager.clear_recorded_data(
                 placement.x, placement.y, placement.p,
@@ -134,7 +127,7 @@ class SpikeInjectorVertex(
 
         The output may be customised by specifying a different template
         together with an associated template engine
-        (see ``pyNN.descriptions``).
+        (see :py:mod:`pyNN.descriptions`).
 
         If template is None, then a dictionary containing the template context
         will be returned.

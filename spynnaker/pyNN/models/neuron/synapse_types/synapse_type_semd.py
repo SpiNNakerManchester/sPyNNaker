@@ -17,6 +17,8 @@ import numpy
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from .abstract_synapse_type import AbstractSynapseType
+from spinn_front_end_common.utilities.constants import (
+    MICRO_TO_MILLISECOND_CONVERSION)
 
 TAU_SYN_E = 'tau_syn_E'
 TAU_SYN_E2 = 'tau_syn_E2'
@@ -53,6 +55,16 @@ class SynapseTypeSEMD(AbstractSynapseType):
     def __init__(
             self, tau_syn_E, tau_syn_E2, tau_syn_I, isyn_exc, isyn_exc2,
             isyn_inh, multiplicator, exc2_old):
+        r"""
+        :param float tau_syn_E: :math:`\tau^{syn}_{e_1}`
+        :param float tau_syn_E2: :math:`\tau^{syn}_{e_2}`
+        :param float tau_syn_I: :math:`\tau^{syn}_i`
+        :param float isyn_exc: :math:`I^{syn}_{e_1}`
+        :param float isyn_exc2: :math:`I^{syn}_{e_2}`
+        :param float isyn_inh: :math:`I^{syn}_i`
+        :param float multiplicator:
+        :param float exc2_old:
+        """
         super(SynapseTypeSEMD, self).__init__(
             [DataType.U032,    # decay_E
              DataType.U032,    # init_E
@@ -103,10 +115,17 @@ class SynapseTypeSEMD(AbstractSynapseType):
     @overrides(AbstractSynapseType.get_values)
     def get_values(
             self, parameters, state_variables, vertex_slice, timestamp_in_us):
+        """
+        :param int timestamp_in_us:
+        """
+        # pylint: disable=arguments-differ
+        tsfloat = float(timestamp_in_us) / MICRO_TO_MILLISECOND_CONVERSION
 
-        tsfloat = float(timestamp_in_us) / 1000.0
-        decay = lambda x: numpy.exp(-tsfloat / x)  # noqa E731
-        init = lambda x: (x / tsfloat) * (1.0 - numpy.exp(-tsfloat / x))  # noqa E731
+        def decay(x):
+            return numpy.exp(-tsfloat / x)
+
+        def init(x):
+            return (x / tsfloat) * (1.0 - numpy.exp(-tsfloat / x))
 
         # Add the rest of the data
         return [parameters[TAU_SYN_E].apply_operation(decay),

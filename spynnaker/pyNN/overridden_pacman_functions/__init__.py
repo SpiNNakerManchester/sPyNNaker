@@ -12,3 +12,11 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+from .graph_edge_filter import GraphEdgeFilter
+from .graph_edge_weight_updater import GraphEdgeWeightUpdater
+from .spynnaker_data_specification_writer import (
+    SpynnakerDataSpecificationWriter)
+
+__all__ = ["GraphEdgeFilter", "GraphEdgeWeightUpdater",
+           "SpynnakerDataSpecificationWriter"]
