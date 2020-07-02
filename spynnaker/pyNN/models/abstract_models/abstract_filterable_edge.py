@@ -25,10 +25,9 @@ class AbstractFilterableEdge(object):
     __slots__ = ()
 
     @abstractmethod
-    def filter_edge(self, graph_mapper):
+    def filter_edge(self):
         """ Determine if this edge should be filtered out
 
-        :param graph_mapper: the mapper between graphs
         :return: True if the edge should be filtered
         :rtype: bool
         """

@@ -33,6 +33,7 @@
 #define _NEURON_H_
 
 #include <common/neuron-typedefs.h>
+#include <spin1_api.h>
 
 //! \brief translate the data stored in the NEURON_PARAMS data region in SDRAM
 //!        and convert it into c based objects for use.

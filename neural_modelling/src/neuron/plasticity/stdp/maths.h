@@ -22,6 +22,7 @@
 
 // Standard includes
 #include <common/neuron-typedefs.h>
+#include <debug.h>
 #include <spin1_api.h>
 
 //---------------------------------------
