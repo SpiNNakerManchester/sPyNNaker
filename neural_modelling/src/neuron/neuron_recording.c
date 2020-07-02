@@ -308,7 +308,7 @@ bool neuron_recording_initialise(
         return false;
     }
     data_addr = &header[1];
-    log_info("Recording %d variables and %d bitfield variables",
+    log_debug("Recording %d variables and %d bitfield variables",
             N_RECORDED_VARS, N_BITFIELD_VARS);
 
     if (!allocate_word_dtcm(n_neurons)) {

@@ -37,7 +37,7 @@ static bool bit_field_filter_initialise(address_t bitfield_region_address) {
     filter_region_t *filter_region = (filter_region_t *)
             bitfield_region_address;
 
-    log_info("Found %d bitfields of which %d have redundancy "
+    log_debug("Found %d bitfields of which %d have redundancy "
             "of which %d merged in", filter_region->n_filters,
             filter_region->n_redundancy_filters,
             filter_region->n_merged_filters);
