@@ -24,6 +24,7 @@
 
 #include <neuron/plasticity/synapse_dynamics.h>
 #include <neuron/synapse_row.h>
+#include <debug.h>
 #include <random.h>
 
 // Define the formation and elimination params

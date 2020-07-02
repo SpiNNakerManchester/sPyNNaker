@@ -51,7 +51,7 @@ class AbstractNeuronModel(
     def global_struct(self):
         """ Get the global parameters structure
 
-        :rtype: Struct
+        :rtype: ~spynnaker.pyNN.utilities.struct.Struct
         """
         return self.__global_struct
 
@@ -69,7 +69,7 @@ class AbstractNeuronModel(
         return usage + (self.__global_struct.get_size_in_whole_words() *
                         BYTES_PER_WORD)
 
-    def get_global_values(self, ts):
+    def get_global_values(self, ts):  # pylint: disable=unused-argument
         """ Get the global values to be written to the machine for this model
 
         :param float ts: The time to advance the model at each call
