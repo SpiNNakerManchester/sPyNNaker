@@ -16,12 +16,17 @@
  */
 
 /**
- *! \file
- *! \brief Common functions for kernel generation
+ * \file
+ * \brief Common functions for kernel generation
  */
 #include "common_kernel.h"
 #include <stdlib.h>
 
+//! \brief Unsigned integer division.
+//! \param[in] dividend: The value being divided
+//! \param[in] divider: The value doing the dividing
+//! \param[out] remainder: The remainder
+//! \return The quotient
 uint16_t uidiv(uint32_t dividend, uint16_t divider, uint16_t *remainder) {
     if (dividend == 0 || dividend < divider) {
     	*remainder = (uint16_t) dividend;

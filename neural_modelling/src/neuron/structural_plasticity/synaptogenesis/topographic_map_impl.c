@@ -16,13 +16,10 @@
  */
 
 /*! \file
+ * \brief This file contains the main functions for probabilistic
+ * synaptogenesis.
  *
- * SUMMARY
- *  \brief This file contains the main functions for probabilistic
- *  synaptogenesis.
- *
- * Author: Petrut Bogdan
- *
+ * \author Petrut Bogdan
  */
 #include <neuron/structural_plasticity/synaptogenesis_dynamics.h>
 #include <neuron/population_table/population_table.h>
@@ -49,25 +46,30 @@
 // Structures and global data                                                 |
 //-----------------------------------------------------------------------------
 
-// the instantiation of the previous struct
+//! the instantiation of the rewiring data
 rewiring_data_t rewiring_data;
 
-// inverse of synaptic matrix
+//! inverse of synaptic matrix
 static post_to_pre_entry *post_to_pre_table;
 
-// pre-population information table
+//! pre-population information table
 pre_pop_info_table_t pre_info;
 
-// The formation parameters per pre-population
-static struct formation_params **formation_params;
+//! The formation parameters per pre-population
+static formation_params_t **formation_params;
 
-// The elimination parameters per pre-population
-static struct elimination_params **elimination_params;
+//! The elimination parameters per pre-population
+static elimination_params_t **elimination_params;
 
-// Current states in use
+//! \brief Current states in use.
+//!
+//! synaptogenesis_row_restructure() moves states from here to ::free_states
 static circular_buffer current_state_queue;
 
-// Free current states
+//! \brief Free current states.
+//!
+//! synaptogenesis_dynamics_rewire() moves states from here to
+//! ::current_state_queue
 static circular_buffer free_states;
 
 void print_post_to_pre_entry(void) {
@@ -83,14 +85,49 @@ void print_post_to_pre_entry(void) {
 }
 
 //-----------------------------------------------------------------------------
+// Access helpers for circular buffers
+//-----------------------------------------------------------------------------
+static inline void _queue_state(current_state_t *state) {
+    if (__builtin_expect(
+            !circular_buffer_add(current_state_queue, (uint32_t) state), 0)) {
+        log_error("Could not add state (0x%08x) to queued states", state);
+        rt_error(RTE_SWERR);
+    }
+}
+
+static inline current_state_t *_get_state(void) {
+    current_state_t *state;
+    if (__builtin_expect(
+            !circular_buffer_get_next(current_state_queue, (uint32_t *) &state),
+            0)) {
+        log_error("Could not read a state!");
+        rt_error(RTE_SWERR);
+    }
+    return state;
+}
+
+static inline void _free_state(current_state_t *state) {
+    if (__builtin_expect(
+            !circular_buffer_add(free_states, (uint32_t) state), 0)) {
+        log_error("Could not add state (0x%08x) to free states", state);
+        rt_error(RTE_SWERR);
+    }
+}
+
+static inline current_state_t *_alloc_state(void) {
+    current_state_t *state;
+    if (__builtin_expect(
+            !circular_buffer_get_next(free_states, (uint32_t *) &state), 0)) {
+        log_error("Ran out of states!");
+        rt_error(RTE_SWERR);
+    }
+    return state;
+}
+
+//-----------------------------------------------------------------------------
 // Initialisation                                                             |
 //-----------------------------------------------------------------------------
 
-//! \brief Initialisation of synaptic rewiring (synaptogenesis)
-//! parameters (random seed, spread of receptive field etc.)
-//! \param[in] sdram_sp_address Address of the start of the SDRAM region
-//! which contains synaptic rewiring params.
-//! \return true when successful
 bool synaptogenesis_dynamics_initialise(address_t sdram_sp_address) {
     log_debug("SR init.");
 
@@ -121,10 +158,7 @@ bool synaptogenesis_dynamics_initialise(address_t sdram_sp_address) {
         rt_error(RTE_SWERR);
     }
     for (uint32_t i = 0; i < n_states; i++) {
-        if (!circular_buffer_add(free_states, (uint32_t) &states[i])) {
-            log_error("Could not add state %u to free states", i);
-            rt_error(RTE_SWERR);
-        }
+        _free_state(&states[i]);
     }
 
     partner_init(&data);
@@ -209,11 +243,7 @@ bool synaptogenesis_dynamics_rewire(
     }
 
     // Saving current state
-    current_state_t *current_state;
-    if (!circular_buffer_get_next(free_states, (uint32_t *) &current_state)) {
-        log_error("Ran out of states!");
-        rt_error(RTE_SWERR);
-    }
+    current_state_t *current_state = _alloc_state();
     current_state->pre_syn_id = neuron_id;
     current_state->post_syn_id = post_id;
     current_state->element_exists = entry.neuron_index != 0xFFFF;
@@ -225,32 +255,21 @@ bool synaptogenesis_dynamics_rewire(
     current_state->post_to_pre.sub_pop_index = pre_sub_pop;
     current_state->local_seed = &rewiring_data.local_seed;
     current_state->post_low_atom = rewiring_data.low_atom;
-    circular_buffer_add(current_state_queue, (uint32_t) current_state);
+    _queue_state(current_state);
     return true;
 }
 
-//! \brief This function is a rewiring DMA callback
-//! \param[in] dma_id: the ID of the DMA
-//! \param[in] dma_tag: the DMA tag, i.e. the tag used for reading row for
-//!                     rewiring
-//! \return nothing
 bool synaptogenesis_row_restructure(uint32_t time, address_t row) {
-    current_state_t *current_state;
-    if (!circular_buffer_get_next(current_state_queue,
-            (uint32_t *) &current_state)) {
-        log_error("Could not read a state!");
-        rt_error(RTE_SWERR);
-    }
+    current_state_t *current_state = _get_state();
 
     // the selected pre- and postsynaptic IDs are in current_state
     bool return_value;
     if (current_state->element_exists) {
-
         // find the offset of the neuron in the current row
         if (synapse_dynamics_find_neuron(
                 current_state->post_syn_id, row,
-                &(current_state->weight), &(current_state->delay),
-                &(current_state->offset), &(current_state->synapse_type))) {
+                &current_state->weight, &current_state->delay,
+                &current_state->offset, &current_state->synapse_type)) {
             return_value = synaptogenesis_elimination_rule(current_state,
                     elimination_params[current_state->post_to_pre.pop_index],
                     time, row);
@@ -259,7 +278,6 @@ bool synaptogenesis_row_restructure(uint32_t time, address_t row) {
             return_value = false;
         }
     } else {
-
         // Can't form if the row is full
         uint32_t no_elems = synapse_dynamics_n_connections_in_row(
                 synapse_row_fixed_region(row));
@@ -268,24 +286,19 @@ bool synaptogenesis_row_restructure(uint32_t time, address_t row) {
             return_value = false;
         } else {
             return_value = synaptogenesis_formation_rule(current_state,
-                formation_params[current_state->post_to_pre.pop_index],
-                time, row);
+                    formation_params[current_state->post_to_pre.pop_index],
+                    time, row);
         }
     }
 
-    circular_buffer_add(free_states, (uint32_t) current_state);
+    _free_state(current_state);
     return return_value;
 }
 
-//! retrieve the period of rewiring
-//! based on is_fast(), this can either mean how many times rewiring happens
-//! in a timestep, or how many timesteps have to pass until rewiring happens.
 int32_t synaptogenesis_rewiring_period(void) {
     return rewiring_data.p_rew;
 }
 
-//! controls whether rewiring is attempted multiple times per timestep
-//! or after a number of timesteps.
 bool synaptogenesis_is_fast(void) {
     return rewiring_data.fast == 1;
 }

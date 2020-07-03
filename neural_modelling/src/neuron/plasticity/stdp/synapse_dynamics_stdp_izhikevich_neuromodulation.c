@@ -314,7 +314,7 @@ void synapse_dynamics_process_neuromodulator_event(
 // can this be inlined?
 void synapse_dynamics_stdp_process_plastic_synapse(
         uint32_t control_word, uint32_t last_pre_time, pre_trace_t last_pre_trace,
-		pre_event_history_t* event_history, weight_t *ring_buffers, uint32_t time,
+		pre_trace_t new_pre_trace, weight_t *ring_buffers, uint32_t time,
 		plastic_synapse_t* plastic_words) {
 
 	// Extract control-word components
@@ -348,7 +348,7 @@ void synapse_dynamics_stdp_process_plastic_synapse(
 		post_delay = 0;
 	}
 	plastic_synapse_t final_state = izhikevich_neuromodulation_plasticity_update_synapse(
-		time, last_pre_time, last_pre_trace, event_history->prev_trace,
+		time, last_pre_time, last_pre_trace, new_pre_trace,
 		post_delay, delay_axonal, current_state,
 		&post_event_history[index]);
 

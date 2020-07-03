@@ -15,15 +15,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// Include post_events and common
+//! \file
+//! \brief STDP core implementation
+//!
+//! "mad" for "Mapping and Debugging"?
 #include "post_events.h"
 #include "synapse_dynamics_stdp_common.h"
 
 /* PRIVATE FUNCTIONS */
 
 //---------------------------------------
-// Synapse update loop
-//---------------------------------------
+//! \brief Synapse update loop core
+//! \param[in] time: The current time
+//! \param[in] last_pre_time: The time of the last previous pre-event
+//! \param[in] last_pre_trace: The last previous pre-trace
+//! \param[in] new_pre_trace: The new pre-trace
+//! \param[in] delay_dendritic: The dendritic delay for the synapse
+//! \param[in] delay_axonal: The axonal delay for the synapse
+//! \param[in] current_state: The current state
+//! \param[in] post_event_history: The history
+//! \return The new basic state of the synapse
 static inline final_state_t mad_plasticity_update_synapse(
         const uint32_t time,
         const uint32_t last_pre_time, const pre_trace_t last_pre_trace,
@@ -114,8 +125,12 @@ bool synapse_dynamics_stdp_initialise(
 }
 
 //---------------------------------------
+//! \brief Get the axonal delay
+//! \param[in] x: The packed plastic synapse control word
+//! \return the axonal delay
 static inline index_t sparse_axonal_delay(uint32_t x) {
 #if 1
+	// No axonal delay, ever
     use(x);
     return 0;
 #else
@@ -136,7 +151,7 @@ void synapse_dynamics_process_neuromodulator_event(
 // can this be inlined?
 void synapse_dynamics_stdp_process_plastic_synapse(
         uint32_t control_word, uint32_t last_pre_time, pre_trace_t last_pre_trace,
-		pre_event_history_t* event_history, weight_t *ring_buffers, uint32_t time,
+		pre_trace_t new_pre_trace, weight_t *ring_buffers, uint32_t time,
 		plastic_synapse_t* plastic_words) {
 
 	// Extract control-word components
@@ -167,7 +182,7 @@ void synapse_dynamics_stdp_process_plastic_synapse(
 		post_delay = 0;
 	}
 	final_state_t final_state = mad_plasticity_update_synapse(
-			time, last_pre_time, last_pre_trace, event_history->prev_trace,
+			time, last_pre_time, last_pre_trace, new_pre_trace,
 			post_delay, delay_axonal, current_state,
 			&post_event_history[index]);
 

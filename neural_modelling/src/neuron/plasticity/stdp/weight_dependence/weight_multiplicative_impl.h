@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Multiplicative single-term weight dependence rule
 #ifndef _WEIGHT_MULTIPLICATIVE_IMPL_H_
 #define _WEIGHT_MULTIPLICATIVE_IMPL_H_
 
@@ -28,35 +30,42 @@
 //---------------------------------------
 // Structures
 //---------------------------------------
+//! The configuration of the rule
 typedef struct {
-    int32_t min_weight;
-    int32_t max_weight;
+    int32_t min_weight;    //!< Minimum weight
+    int32_t max_weight;    //!< Maximum weight
 
-    int32_t a2_plus;
-    int32_t a2_minus;
+    int32_t a2_plus;       //!< Amount to move weight on potentiation
+    int32_t a2_minus;      //!< Amount to move weight on depression
 } plasticity_weight_region_data_t;
 
+//! The current state data for the rule
 typedef struct {
-    int32_t weight;
+    int32_t weight;        //!< The current weight
 
+    //! The shift to use when multiplying
     uint32_t weight_multiply_right_shift;
+    //! Reference to the configuration data
     const plasticity_weight_region_data_t *weight_region;
 } weight_state_t;
 
 #include "weight_one_term.h"
 
 //---------------------------------------
-// Externals
-//---------------------------------------
-extern plasticity_weight_region_data_t *plasticity_weight_region_data;
-extern uint32_t *weight_multiply_right_shift;
-
-//---------------------------------------
 // Weight dependance functions
 //---------------------------------------
+/*!
+ * \brief Gets the initial weight state.
+ * \param[in] weight: The weight at the start
+ * \param[in] synapse_type: The type of synapse involved
+ * \return The initial weight state.
+ */
 static inline weight_state_t weight_get_initial(
         weight_t weight, index_t synapse_type) {
-    return (weight_state_t ) {
+    extern plasticity_weight_region_data_t *plasticity_weight_region_data;
+    extern uint32_t *weight_multiply_right_shift;
+
+    return (weight_state_t) {
         .weight = (int32_t) weight,
         .weight_multiply_right_shift =
                 weight_multiply_right_shift[synapse_type],
@@ -65,6 +74,10 @@ static inline weight_state_t weight_get_initial(
 }
 
 //---------------------------------------
+//! \brief Apply the depression rule to the weight state
+//! \param[in] state: The weight state to update
+//! \param[in] depression: The amount of depression to apply
+//! \return the updated weight state
 static inline weight_state_t weight_one_term_apply_depression(
         weight_state_t state, int32_t depression) {
     // Calculate scale
@@ -80,6 +93,10 @@ static inline weight_state_t weight_one_term_apply_depression(
     return state;
 }
 //---------------------------------------
+//! \brief Apply the potentiation rule to the weight state
+//! \param[in] state: The weight state to update
+//! \param[in] potentiation: The amount of potentiation to apply
+//! \return the updated weight state
 static inline weight_state_t weight_one_term_apply_potentiation(
         weight_state_t state, int32_t potentiation) {
     // Calculate scale
@@ -95,6 +112,11 @@ static inline weight_state_t weight_one_term_apply_potentiation(
     return state;
 }
 //---------------------------------------
+/*!
+ * \brief Gets the final weight.
+ * \param[in] new_state: The updated weight state
+ * \return The new weight.
+ */
 static inline weight_t weight_get_final(weight_state_t new_state) {
     log_debug("\tnew_weight:%d\n", new_state.weight);
 
