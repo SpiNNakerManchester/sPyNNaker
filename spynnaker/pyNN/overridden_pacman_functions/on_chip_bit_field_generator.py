@@ -108,6 +108,8 @@ class OnChipBitFieldGenerator(object):
         bit_field_app_id = transceiver.app_id_tracker.get_new_id()
         progress.update(1)
 
+        # update progress bar
+        progress.end()
         # run app
         system_control_logic.run_system_application(
             expander_cores, bit_field_app_id, transceiver,
@@ -115,8 +117,6 @@ class OnChipBitFieldGenerator(object):
             read_bit_field_generator_iobuf, self._check_for_success,
             None, [CPUState.FINISHED], False, 0,
             "bit_field_expander_on_{}_{}_{}.txt")
-        # update progress bar
-        progress.end()
 
         # read in bit fields for debugging purposes
         if generating_bitfield_report:
