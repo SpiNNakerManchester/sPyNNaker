@@ -16,7 +16,9 @@
 import logging
 import os
 import math
+
 from spinn_utilities.overrides import overrides
+from spinn_utilities import logger_utils
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
 from pacman.executor.injection_decorator import inject_items
@@ -70,6 +72,7 @@ _VERTEX_TDMA_FAILURE_MSG = (
     "TDMA in the given time. The population would need a time "
     "scale factor of {} to correctly execute this TDMA.")
 
+
 class AbstractPopulationVertex(
         ApplicationVertex, AbstractGeneratesDataSpecification,
         AbstractHasAssociatedBinary, AbstractContainsUnits,
@@ -122,7 +125,8 @@ class AbstractPopulationVertex(
     _BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 9 * BYTES_PER_WORD
 
     # fraction of the real time we will use for spike transmissions
-    FRACTION_OF_TIME_FOR_SPIKE_SENDING = 0.5
+    FRACTION_OF_TIME_FOR_SPIKE_SENDING = 0.8
+    FRACTION_OF_TIME_STEP_BEFORE_SPIKE_SENDING = 0.1
 
     # default number of cores to fire at same time from this population
     _DEFAULT_N_CORES_AT_SAME_TIME = 7
@@ -437,11 +441,6 @@ class AbstractPopulationVertex(
         self.__has_reset_last = False
         self.__updated_state_variables.clear()
 
-        # Get some information
-        key = routing_info.get_first_key_from_pre_vertex(
-            machine_vertex, constants.SPIKE_PARTITION_ID)
-        vertex_slice = graph_mapper.get_slice(machine_vertex)
-
         # pylint: disable=too-many-arguments
         n_atoms = vertex_slice.n_atoms
         spec.comment("\nWriting Neuron Parameters for {} Neurons:\n".format(
@@ -489,19 +488,56 @@ class AbstractPopulationVertex(
             self.FRACTION_OF_TIME_FOR_SPIKE_SENDING))
         if total_time_needed > total_time_available:
             time_scale_factor_needed = (
-                math.ceil(total_time_needed / machine_time_step))
+                math.ceil((total_time_needed / machine_time_step) /
+                          self.FRACTION_OF_TIME_FOR_SPIKE_SENDING))
             msg = _VERTEX_TDMA_FAILURE_MSG.format(
                  self.label, time_scale_factor_needed)
             logger.error(msg)
             raise SpynnakerException(msg)
 
+        # figure initial offset (used to try to interleave packets from other
+        # populations into the TDMA without extending the overall time, and
+        # trying to stop multiple packets in flight at same time).
+
+        # Figure bits needed to figure out time between spikes.
+        # cores 0-4 have 2 atoms, core 5 has 1 atom
+        #############################################
+        #        0  .5   1   .5    2   .5   3    .5   4   .5   5  .5
+        # T2-[   X   Y                      X     Y
+        #    |           X   Y                        X    Y
+        #    |                     X    Y                      X   Y
+        #    [  X    Y                      X     Y
+        #       |-------| T
+        #               X    Y                        X    Y
+        #               |----| T4
+        #                   T3 ->  X    Y
+        # T4 is the spreader between populations. X is pop0 firing, Y is pop1
+        # firing
+        n_non_system_vertices = 0
+        pop_verts = list()
+        for vertex in app_graph.vertices:
+            if isinstance(vertex, AbstractPopulationVertex):
+                n_non_system_vertices += 1
+                pop_verts.append(vertex)
+        initial_offset = pop_verts.index(self) * int(
+            math.ceil(n_non_system_vertices / self.__time_between_cores))
+
+        # add the offset of a portion of the time step BEFORE doing any slots
+        # to allow initial processing to work.
+        #TODO PUT BACK += when happy!
+        initial_offset = int(math.ceil(
+            (machine_time_step * time_scale_factor) *
+            self.FRACTION_OF_TIME_STEP_BEFORE_SPIKE_SENDING))
+
         # Write the number of microseconds between sending spikes on average
+        # core slot
         spec.write_value(vertex_index & n_slots)
+        # time between spikes
         spec.write_value(data=time_between_spikes)
+        # time between cores
         spec.write_value(data=self.__time_between_cores)
-        spec.write_value(
-            data=app_graph.vertices.index(self) * int(math.ceil(
-                len(app_graph.vertices) / self.__time_between_cores)))
+        # initial offset
+        spec.write_value(data=initial_offset)
 
         # Write whether the key is to be used, and then the key, or 0 if it
         # isn't to be used

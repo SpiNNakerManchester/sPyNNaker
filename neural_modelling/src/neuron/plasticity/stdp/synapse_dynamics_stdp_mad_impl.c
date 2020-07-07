@@ -207,6 +207,8 @@ void synapse_dynamics_print_plastic_synapses(
     use(fixed_region_address);
     use(ring_buffer_to_input_buffer_left_shifts);
 
+#if LOG_LEVEL >= LOG_DEBUG
+
     // Extract separate arrays of weights (from plastic region),
     // Control words (from fixed region) and number of plastic synapses
     synapse_row_plastic_data_t *data_ptr =
@@ -242,7 +244,7 @@ void synapse_dynamics_print_plastic_synapses(
             synapse_row_sparse_index(control_word, synapse_index_mask),
             SYNAPSE_DELAY_MASK, synapse_type_index_bits);
     }
-
+#endif // LOG_LEVEL >= LOG_DEBUG
 }
 
 //---------------------------------------
@@ -399,7 +401,7 @@ bool synapse_dynamics_process_plastic_synapses(
         uint32_t accumulation = ring_buffers[ring_buffer_index] +
                 synapse_structure_get_final_weight(final_state);
 
-        log_info(
+        log_debug(
             "final weight = %d",
             synapse_structure_get_final_weight(final_state));
 

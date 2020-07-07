@@ -402,6 +402,10 @@ void spike_processing_clear_input_buffer(void) {
 
     if(clear_input_buffers_of_late_packets) {
         log_debug("clearing buffer");
+        spike_t spike;
+        while(in_spikes_get_next_spike(&spike)){
+            log_debug("late spike id %u", spike);
+        }
         in_spikes_clear();
     }
 }

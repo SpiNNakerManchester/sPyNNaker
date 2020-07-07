@@ -51,6 +51,9 @@ static uint32_t expected_time;
 //! the initial offset
 static uint32_t initial_offset;
 
+//! n times the core got behind its tdma
+static uint32_t n_behind_times = 0;
+
 //! The recording flags
 static uint32_t recording_flags = 0;
 
@@ -105,11 +108,12 @@ bool neuron_initialise(address_t address, address_t recording_address, // EXPORT
 
     time_between_spikes = params->time_between_spikes * sv->cpu_clk;
     time_between_cores = params->time_between_cores * sv->cpu_clk;
-    core_slot = params->core_slot * sv->cpu_clk;
+    core_slot = params->core_slot;
     initial_offset = params->initial_offset * sv->cpu_clk;
     log_info("\t time between spikes %u", time_between_spikes);
     log_info("\t time between core index's %u", time_between_cores);
     log_info("\t core slot %u", core_slot);
+    log_info("\t initial offset %u", initial_offset);
 
     // Check if there is a key to use
     use_key = params->has_key;
@@ -162,6 +166,10 @@ void neuron_pause(address_t address) { // EXPORTED
         neuron_recording_finalise();
     }
 
+    if (n_behind_times > 0) {
+        log_error("core fell behind its tdma slot %d times", n_behind_times);
+    }
+
     // call neuron implementation function to do the work
     neuron_impl_store_neuron_parameters(
             address, START_OF_GLOBAL_PARAMETERS, n_neurons);
@@ -170,11 +178,38 @@ void neuron_pause(address_t address) { // EXPORTED
 //! \brief internal method for sending a spike with the TDMA tie in
 //! \param[in] neuron_index: the neuron index.
 //! \param[in] phase: the current phase this vertex thinks its in.
-static inline void neuron_tdma_spike_processing(
+static inline uint32_t neuron_tdma_spike_processing(
         index_t neuron_index, uint32_t phase, uint timer_period,
         uint timer_count) {
     // Spin1 API ticks - to know when the timer wraps
     extern uint ticks;
+
+    // if we're too early. select the next index to where we are and wait
+    if (neuron_index > phase) {
+        int overall_time_lost = (sv->cpu_clk * timer_period) - tc[T1_COUNT];
+        //log_info("neuron index %d and phase %d", neuron_index, phase);
+        //log_info("overall lost is %u", overall_time_lost);
+        overall_time_lost -= (time_between_cores * core_slot);
+        //log_info("overall with core offset is %u", overall_time_lost);
+        if (overall_time_lost < 0) {
+            // Send the spike as missed all chances
+            log_info(
+                "missed the whole window. fire NOW! for neuron index %d n tick %d",
+                neuron_index, ticks);
+            while (!spin1_send_mc_packet(key | neuron_index, 0, NO_PAYLOAD)) {
+                spin1_delay_us(1);
+            }
+            return phase;
+        }
+        uint32_t nearest_phase = overall_time_lost / time_between_spikes;
+        uint32_t remainder = overall_time_lost % time_between_spikes;
+        if (remainder == 0) {
+            phase = nearest_phase;
+        } else {
+            phase = nearest_phase + 1;
+        }
+        //log_info("going for phase %d", phase);
+    }
 
     // Set the next expected time to wait for between spike sending
     expected_time = (
@@ -183,14 +218,21 @@ static inline void neuron_tdma_spike_processing(
          initial_offset));
 
     // Wait until the expected time to send
+    int counter = 0;
     while ((ticks == timer_count) && (tc[T1_COUNT] > expected_time)) {
+        counter +=1;
         // Do Nothing
+    }
+    if (counter == 0) {
+        n_behind_times += 1;
     }
 
     // Send the spike
     while (!spin1_send_mc_packet(key | neuron_index, 0, NO_PAYLOAD)) {
         spin1_delay_us(1);
     }
+
+    return phase + 1;
 }
 
 void neuron_do_timestep_update( // EXPORTED
@@ -220,9 +262,8 @@ void neuron_do_timestep_update( // EXPORTED
             synapse_dynamics_process_post_synaptic_event(time, neuron_index);
 
             if (use_key) {
-                 neuron_tdma_spike_processing(
+                 phase = neuron_tdma_spike_processing(
                     neuron_index, phase, timer_period, timer_count);
-                 phase += 1;
             }
         } else {
             log_debug("the neuron %d has been determined to not spike",
