@@ -101,6 +101,9 @@ uint32_t biggest_fill_size_of_input_buffer = 0;
 //! end of a timer tick.
 static bool clear_input_buffers_of_late_packets = false;
 
+static uint32_t last_packet_insert = 0;
+bool received_packet_this_step = false;
+uint32_t packets_in_buffer_at_time = 0;
 
 /* PRIVATE FUNCTIONS - static for inlining */
 
@@ -292,11 +295,16 @@ static void multicast_packet_received_callback(uint key, uint payload) {
             if (spin1_trigger_user_event(0, 0)) {
                 dma_busy = true;
             } else {
-                log_debug("Could not trigger user event\n");
+                log_warning("Could not trigger user event\n");
             }
         }
     } else {
         log_debug("Could not add spike");
+    }
+    last_packet_insert = tc[T1_COUNT];
+    received_packet_this_step = true;
+    if(in_spikes_size() > packets_in_buffer_at_time){
+        packets_in_buffer_at_time = in_spikes_size();
     }
 }
 
@@ -398,7 +406,9 @@ void user_event_callback(uint unused0, uint unused1) {
 void spike_processing_clear_input_buffer(void) {
     // Record the count whether clearing or not for provenance
     count_input_buffer_packets_lost += in_spikes_size();
-    log_debug("current lost packets = %d", count_input_buffer_packets_lost);
+    //log_info(
+    //    "current lost packets = %d, max in buffer = %d",
+    //    count_input_buffer_packets_lost, packets_in_buffer_at_time);
 
     if(clear_input_buffers_of_late_packets) {
         log_debug("clearing buffer");
@@ -408,6 +418,15 @@ void spike_processing_clear_input_buffer(void) {
         }
         in_spikes_clear();
     }
+
+    /*if (received_packet_this_step) {
+        log_info("last packet came in with this much time to go %d", last_packet_insert);
+    }
+    else {
+        log_info("didnt receive this time step");
+    }*/
+    last_packet_insert = 0;
+    received_packet_this_step = false;
 }
 
 bool spike_processing_initialise( // EXPORTED

@@ -336,6 +336,7 @@ void timer_callback(uint timer_count, uint unused) {
 
     // Now do neuron time step update
     neuron_do_timestep_update(time, timer_count, timer_period);
+
     profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
 }
 

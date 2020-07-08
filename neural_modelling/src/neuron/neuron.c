@@ -57,6 +57,9 @@ static uint32_t n_behind_times = 0;
 //! The recording flags
 static uint32_t recording_flags = 0;
 
+//!
+static uint32_t phase;
+
 //! parameters that reside in the neuron_parameter_data_region
 struct neuron_parameters {
     uint32_t core_slot;
@@ -136,8 +139,9 @@ bool neuron_initialise(address_t address, address_t recording_address, // EXPORT
     // Read the size of the incoming spike buffer to use
     *incoming_spike_buffer_size = params->incoming_spike_buffer_size;
 
-    log_debug("\t n_neurons = %u, spike buffer size = %u", n_neurons,
-            *incoming_spike_buffer_size);
+    log_info(
+        "\t n_neurons = %u, spike buffer size = %u",
+        n_neurons, *incoming_spike_buffer_size);
 
     // Call the neuron implementation initialise function to setup DTCM etc.
     if (!neuron_impl_initialise(n_neurons)) {
@@ -178,37 +182,49 @@ void neuron_pause(address_t address) { // EXPORTED
 //! \brief internal method for sending a spike with the TDMA tie in
 //! \param[in] neuron_index: the neuron index.
 //! \param[in] phase: the current phase this vertex thinks its in.
-static inline uint32_t neuron_tdma_spike_processing(
-        index_t neuron_index, uint32_t phase, uint timer_period,
-        uint timer_count) {
+static inline void neuron_tdma_spike_processing(
+        index_t neuron_index, uint timer_period, uint timer_count) {
     // Spin1 API ticks - to know when the timer wraps
     extern uint ticks;
 
     // if we're too early. select the next index to where we are and wait
     if (neuron_index > phase) {
-        int overall_time_lost = (sv->cpu_clk * timer_period) - tc[T1_COUNT];
+        int tc1_count = tc[T1_COUNT];
+        int how_much_time_has_passed = (sv->cpu_clk * timer_period) - tc1_count;
         //log_info("neuron index %d and phase %d", neuron_index, phase);
-        //log_info("overall lost is %u", overall_time_lost);
-        overall_time_lost -= (time_between_cores * core_slot);
-        //log_info("overall with core offset is %u", overall_time_lost);
-        if (overall_time_lost < 0) {
-            // Send the spike as missed all chances
-            log_info(
-                "missed the whole window. fire NOW! for neuron index %d n tick %d",
-                neuron_index, ticks);
-            while (!spin1_send_mc_packet(key | neuron_index, 0, NO_PAYLOAD)) {
-                spin1_delay_us(1);
+        //log_info("how much time has passed is %u", how_much_time_has_passed);
+        bool found_phase_id = false;
+        while (!found_phase_id) {
+            int time_when_phase_started = time_between_spikes * phase;
+            //log_info(
+            //    "time_when_phase_started = %d for phase %d",
+            //    time_when_phase_started, phase);
+
+            int time_when_phase_slot_started =
+                time_when_phase_started + initial_offset +
+                (time_between_cores * core_slot);
+            //log_info(
+            //    "time_when_phase_slot_started = %d", time_when_phase_slot_started);
+
+            if (time_when_phase_slot_started < how_much_time_has_passed) {
+                log_info("up phase id");
+                phase += 1;
             }
-            return phase;
+            else{
+                found_phase_id = true;
+                log_debug("phase id %d", phase);
+            }
+            if (phase > n_neurons) {
+                log_info(
+                    "missed the whole TDMA. go NOW! for neuron %d on tick %d",
+                    neuron_index, ticks);
+                while (!spin1_send_mc_packet(
+                        key | neuron_index, 0, NO_PAYLOAD)) {
+                    spin1_delay_us(1);
+                }
+                return;
+            }
         }
-        uint32_t nearest_phase = overall_time_lost / time_between_spikes;
-        uint32_t remainder = overall_time_lost % time_between_spikes;
-        if (remainder == 0) {
-            phase = nearest_phase;
-        } else {
-            phase = nearest_phase + 1;
-        }
-        //log_info("going for phase %d", phase);
     }
 
     // Set the next expected time to wait for between spike sending
@@ -232,14 +248,14 @@ static inline uint32_t neuron_tdma_spike_processing(
         spin1_delay_us(1);
     }
 
-    return phase + 1;
+    phase += 1;
 }
 
 void neuron_do_timestep_update( // EXPORTED
         timer_t time, uint timer_count, uint timer_period) {
 
     // the phase in this timer tick im in (not tied to neuron index)
-    uint32_t phase = 0;
+    phase = 0;
 
     // Prepare recording for the next timestep
     neuron_recording_setup_for_next_recording();
@@ -262,14 +278,16 @@ void neuron_do_timestep_update( // EXPORTED
             synapse_dynamics_process_post_synaptic_event(time, neuron_index);
 
             if (use_key) {
-                 phase = neuron_tdma_spike_processing(
-                    neuron_index, phase, timer_period, timer_count);
+                 neuron_tdma_spike_processing(
+                     neuron_index, timer_period, timer_count);
             }
         } else {
             log_debug("the neuron %d has been determined to not spike",
                       neuron_index);
          }
     }
+
+    //log_info("time left of the timer after tdma is %d", tc[T1_COUNT]);
 
     // Disable interrupts to avoid possible concurrent access
     uint cpsr = spin1_int_disable();

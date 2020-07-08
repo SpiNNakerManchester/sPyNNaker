@@ -18,7 +18,6 @@ import os
 import math
 
 from spinn_utilities.overrides import overrides
-from spinn_utilities import logger_utils
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
 from pacman.executor.injection_decorator import inject_items
@@ -107,7 +106,9 @@ class AbstractPopulationVertex(
         "__initial_state_variables",
         "__has_reset_last",
         "__updated_state_variables",
-        "__pop_level_spike_control"]
+        "__pop_level_spike_control",
+        "__fraction_of_waiting",
+        "__fraction_of_sending"]
 
     #: recording region IDs
     _SPIKE_RECORDING_REGION = 0
@@ -224,7 +225,23 @@ class AbstractPopulationVertex(
         if self.__time_between_cores is None:
             self.__time_between_cores = self._DEFAULT_TIME_BETWEEN_CORES
 
+        # fraction of time spend sending
+        self.__fraction_of_sending = helpful_functions.read_config(
+            config, "Simulation", "fraction_of_time_spike_sending")
+        if self.__fraction_of_sending is None:
+            self.__fraction_of_sending = (
+                self.FRACTION_OF_TIME_FOR_SPIKE_SENDING)
+        else:
+            self.__fraction_of_sending = float(self.__fraction_of_sending)
 
+        # fraction of time waiting before sending
+        self.__fraction_of_waiting = helpful_functions.read_config(
+            config, "Simulation", "fraction_of_time_before_sending")
+        if self.__fraction_of_waiting is None:
+            self.__fraction_of_waiting = (
+                self.FRACTION_OF_TIME_STEP_BEFORE_SPIKE_SENDING)
+        else:
+            self.__fraction_of_waiting = float(self.__fraction_of_waiting)
 
     @property
     @overrides(ApplicationVertex.n_atoms)
@@ -481,15 +498,15 @@ class AbstractPopulationVertex(
         time_between_spikes = self.__time_between_cores * n_slots
 
         # figure how much time this TDMA needs
-        total_time_needed = (n_phases + 1) * time_between_spikes
+        total_time_needed = n_phases * time_between_spikes
 
         total_time_available = int(math.ceil(
             (machine_time_step * time_scale_factor) *
-            self.FRACTION_OF_TIME_FOR_SPIKE_SENDING))
+            self.__fraction_of_sending))
         if total_time_needed > total_time_available:
             time_scale_factor_needed = (
                 math.ceil((total_time_needed / machine_time_step) /
-                          self.FRACTION_OF_TIME_FOR_SPIKE_SENDING))
+                          self.__fraction_of_sending))
             msg = _VERTEX_TDMA_FAILURE_MSG.format(
                  self.label, time_scale_factor_needed)
             logger.error(msg)
@@ -527,7 +544,7 @@ class AbstractPopulationVertex(
         #TODO PUT BACK += when happy!
         initial_offset = int(math.ceil(
             (machine_time_step * time_scale_factor) *
-            self.FRACTION_OF_TIME_STEP_BEFORE_SPIKE_SENDING))
+            self.__fraction_of_waiting))
 
         # Write the number of microseconds between sending spikes on average
         # core slot
