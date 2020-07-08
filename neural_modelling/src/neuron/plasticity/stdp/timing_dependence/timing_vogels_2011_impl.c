@@ -15,21 +15,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Initialisation for timing_vogels_2011_impl.h
 #include "timing_vogels_2011_impl.h"
 
 //---------------------------------------
 // Globals
 //---------------------------------------
-// Exponential lookup-tables
+//! Lookup table for pre-computed _&tau;_
 int16_lut *tau_lookup;
 
-// Global plasticity parameter data
+//! Global plasticity parameter data
 plasticity_trace_region_data_t plasticity_trace_region_data;
 
 //---------------------------------------
 // Functions
 //---------------------------------------
-uint32_t *timing_initialise(uint32_t* address) {
+address_t timing_initialise(address_t address) {
     log_info("timing_initialise: starting");
     log_info("\tVogels 2011 timing rule");
 

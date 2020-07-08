@@ -135,7 +135,7 @@ class SpikeSourcePoissonVertex(
         "__spike_recorder",
         "__start",
         "__time_to_spike",
-        "__kiss_seed",
+        "__kiss_seed",  # dict indexed by vertex slice
         "__n_subvertices",
         "__n_data_specs",
         "__max_rate",
@@ -152,6 +152,17 @@ class SpikeSourcePoissonVertex(
             max_atoms_per_core, model, rate=None, start=None,
             duration=None, rates=None, starts=None, durations=None,
             max_rate=None):
+        """
+        :param int n_neurons:
+        :param constraints:
+        :param str label:
+        :param float seed:
+        :param int max_atoms_per_core:
+        :param model:
+        :param iterable of float rate:
+        :param iterable of int start:
+        :param iterable of int duration:
+        """
         # pylint: disable=too-many-arguments
         super(SpikeSourcePoissonVertex, self).__init__(
             label, constraints, max_atoms_per_core)
@@ -433,6 +444,9 @@ class SpikeSourcePoissonVertex(
         self.__change_requires_neuron_parameters_reload = True
 
     def _max_spikes_per_ts(self, machine_time_step):
+        """
+        :param int machine_time_step:
+        """
         ts_per_second = MICROSECONDS_PER_SECOND / float(machine_time_step)
         if float(self.__max_rate) / ts_per_second < \
                 SLOW_RATE_PER_TICK_CUTOFF:
@@ -446,6 +460,10 @@ class SpikeSourcePoissonVertex(
         return int(math.ceil(max_spikes_per_ts)) + 1.0
 
     def get_recording_sdram_usage(self, vertex_slice, machine_time_step):
+        """
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :param int machine_time_step:
+        """
         variable_sdram = self.__spike_recorder.get_sdram_usage_in_bytes(
             vertex_slice.n_atoms, self._max_spikes_per_ts(machine_time_step))
         constant_sdram = ConstantSDRAM(
@@ -460,8 +478,11 @@ class SpikeSourcePoissonVertex(
         additional_arguments={"machine_time_step"}
     )
     def get_resources_used_by_atoms(self, vertex_slice, machine_time_step):
+        """
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :param int machine_time_step:
+        """
         # pylint: disable=arguments-differ
-
         poisson_params_sz = self.get_rates_bytes(vertex_slice)
         other = ConstantSDRAM(
             SYSTEM_BYTES_REQUIREMENT +
@@ -486,6 +507,7 @@ class SpikeSourcePoissonVertex(
     def n_atoms(self):
         return self.__n_atoms
 
+    @overrides(ApplicationVertex.create_machine_vertex)
     def create_machine_vertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
@@ -493,7 +515,7 @@ class SpikeSourcePoissonVertex(
         self.__n_subvertices += 1
         return SpikeSourcePoissonMachineVertex(
             resources_required, self.__spike_recorder.record,
-            constraints, label)
+            constraints, label, self, vertex_slice)
 
     @property
     def max_rate(self):
@@ -512,20 +534,22 @@ class SpikeSourcePoissonVertex(
     def get_rates_bytes(self, vertex_slice):
         """ Gets the size of the Poisson rates in bytes
 
-        :param vertex_slice:
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :rtype: int
         """
         n_rates = sum(len(self.__data["rates"][i]) for i in range(
             vertex_slice.lo_atom, vertex_slice.hi_atom + 1))
         return ((vertex_slice.n_atoms * PARAMS_WORDS_PER_NEURON) +
                 (n_rates * PARAMS_WORDS_PER_RATE)) * BYTES_PER_WORD
 
-    def reserve_memory_regions(self, spec, placement, graph_mapper):
+    def reserve_memory_regions(self, spec, placement):
         """ Reserve memory regions for Poisson source parameters and output\
             buffer.
 
-        :param spec: the data specification writer
-        :param placement: the location this vertex resides on in the machine
-        :param graph_mapper: the mapping between app and machine graphs
+        :param ~data_specification.DataSpecification spec:
+            the data specification writer
+        :param ~pacman.models.placements.Placement placement:
+            the location this vertex resides on in the machine
         :return: None
         """
         spec.comment("\nReserving memory space for data regions:\n\n")
@@ -537,8 +561,7 @@ class SpikeSourcePoissonVertex(
             label='setup')
 
         # reserve poisson parameters and rates DSG region
-        self._reserve_poisson_params_rates_region(
-            placement, graph_mapper, spec)
+        self._reserve_poisson_params_rates_region(placement, spec)
 
         spec.reserve_memory_region(
             region=_REGIONS.SPIKE_HISTORY_REGION.value,
@@ -550,36 +573,38 @@ class SpikeSourcePoissonVertex(
 
         placement.vertex.reserve_provenance_data_region(spec)
 
-    def _reserve_poisson_params_rates_region(
-                self, placement, graph_mapper, spec):
+    def _reserve_poisson_params_rates_region(self, placement, spec):
         """ Allocate space for the Poisson parameters and rates regions as\
             they can be reused for setters after an initial run
 
-        :param placement: the location on machine for this vertex
-        :param graph_mapper: the mapping between machine and application graphs
-        :param spec: the DSG writer
-        :return:  None
+        :param ~pacman.models.placements.Placement placement:
+            the location on machine for this vertex
+        :param ~data_specification.DataSpecification spec: the DSG writer
+        :return: None
         """
         spec.reserve_memory_region(
             region=_REGIONS.POISSON_PARAMS_REGION.value,
             size=PARAMS_BASE_WORDS * 4, label="PoissonParams")
         spec.reserve_memory_region(
             region=_REGIONS.RATES_REGION.value,
-            size=self.get_rates_bytes(graph_mapper.get_slice(
-                placement.vertex)), label='PoissonRates')
+            size=self.get_rates_bytes(placement.vertex.vertex_slice),
+            label='PoissonRates')
 
     def _write_poisson_parameters(
             self, spec, graph, placement, routing_info,
             vertex_slice, machine_time_step, time_scale_factor):
         """ Generate Parameter data for Poisson spike sources
 
-        :param spec: the data specification writer
-        :param key: the routing key for this vertex
-        :param vertex_slice:\
-            the slice of atoms a machine vertex holds from its application\
+        :param ~data_specification.DataSpecification spec:
+            the data specification writer
+        :param ~pacman.model.graphs.machine.MachineGraph graph:
+        :param ~pacman.model.placements.Placement placement:
+        :param ~pacman.model.routing_info.RoutingInfo routing_info:
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            the slice of atoms a machine vertex holds from its application
             vertex
-        :param machine_time_step: the time between timer tick updates.
-        :param time_scale_factor:\
+        :param int machine_time_step: the time between timer tick updates.
+        :param int time_scale_factor:
             the scaling between machine time step and real time
         """
         # pylint: disable=too-many-arguments, too-many-locals
@@ -664,26 +689,26 @@ class SpikeSourcePoissonVertex(
         spec.write_value(data=vertex_slice.n_atoms)
 
         # Write the random seed (4 words), generated randomly!
-        kiss_key = (vertex_slice.lo_atom, vertex_slice.hi_atom)
-        if kiss_key not in self.__kiss_seed:
+        if vertex_slice not in self.__kiss_seed:
             if self.__rng is None:
                 self.__rng = numpy.random.RandomState(self.__seed)
-            self.__kiss_seed[kiss_key] = validate_mars_kiss_64_seed([
+            self.__kiss_seed[vertex_slice] = validate_mars_kiss_64_seed([
                 self.__rng.randint(-0x80000000, 0x7FFFFFFF) + 0x80000000
                 for _ in range(4)])
-        for value in self.__kiss_seed[kiss_key]:
+        for value in self.__kiss_seed[vertex_slice]:
             spec.write_value(data=value)
 
     def _write_poisson_rates(self, spec, vertex_slice, machine_time_step,
                              first_machine_time_step):
         """ Generate Rate data for Poisson spike sources
 
-        :param spec: the data specification writer
-        :param vertex_slice:\
-            the slice of atoms a machine vertex holds from its application\
+        :param ~data_specification.DataSpecification spec:
+            the data specification writer
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            the slice of atoms a machine vertex holds from its application
             vertex
-        :param machine_time_step: the time between timer tick updates.
-        :param first_machine_time_step:\
+        :param int machine_time_step: the time between timer tick updates.
+        :param int first_machine_time_step:
             First machine time step to start from the correct index
         """
         spec.comment("\nWriting Rates for {} poisson sources:\n"
@@ -825,36 +850,41 @@ class SpikeSourcePoissonVertex(
     @inject_items({
         "machine_time_step": "MachineTimeStep",
         "time_scale_factor": "TimeScaleFactor",
-        "graph_mapper": "MemoryGraphMapper",
         "routing_info": "MemoryRoutingInfos",
         "graph": "MemoryMachineGraph",
         "first_machine_time_step": "FirstMachineTimeStep"})
     @overrides(
         AbstractRewritesDataSpecification.regenerate_data_specification,
         additional_arguments={
-            "machine_time_step", "time_scale_factor", "graph_mapper",
+            "machine_time_step", "time_scale_factor",
             "routing_info", "graph", "first_machine_time_step"})
     def regenerate_data_specification(
             self, spec, placement, machine_time_step, time_scale_factor,
-            graph_mapper, routing_info, graph, first_machine_time_step):
+            routing_info, graph, first_machine_time_step):
+        """
+        :param int machine_time_step:
+        :param int time_scale_factor:
+        :param ~pacman.model.routing_info.RoutingInfo routing_info:
+        :param ~pacman.model.graphs.machine.MachineGraph graph:
+        :param int first_machine_time_step:
+        """
         # pylint: disable=too-many-arguments, arguments-differ
 
         # reserve the neuron parameters data region
-        self._reserve_poisson_params_rates_region(
-            placement, graph_mapper, spec)
+        self._reserve_poisson_params_rates_region(placement, spec)
 
         # write parameters
-        vertex_slice = graph_mapper.get_slice(placement.vertex)
         self._write_poisson_parameters(
             spec=spec, graph=graph, placement=placement,
             routing_info=routing_info,
-            vertex_slice=vertex_slice,
+            vertex_slice=placement.vertex.vertex_slice,
             machine_time_step=machine_time_step,
             time_scale_factor=time_scale_factor)
 
         # write rates
-        self._write_poisson_rates(spec, vertex_slice, machine_time_step,
-                                  first_machine_time_step)
+        self._write_poisson_rates(
+            spec, placement.vertex.vertex_slice, machine_time_step,
+            first_machine_time_step)
 
         # end spec
         spec.end_specification()
@@ -883,8 +913,7 @@ class SpikeSourcePoissonVertex(
         seed_array = transceiver.read_memory(
             placement.x, placement.y, poisson_params + SEED_OFFSET_BYTES,
             SEED_SIZE_BYTES)
-        kiss_key = (vertex_slice.lo_atom, vertex_slice.hi_atom)
-        self.__kiss_seed[kiss_key] = struct.unpack_from("<4I", seed_array)
+        self.__kiss_seed[vertex_slice] = struct.unpack_from("<4I", seed_array)
 
         # locate SDRAM address where the rates are stored
         poisson_rate_region_sdram_address = \
@@ -940,7 +969,6 @@ class SpikeSourcePoissonVertex(
     @inject_items({
         "machine_time_step": "MachineTimeStep",
         "time_scale_factor": "TimeScaleFactor",
-        "graph_mapper": "MemoryGraphMapper",
         "routing_info": "MemoryRoutingInfos",
         "data_n_time_steps": "DataNTimeSteps",
         "graph": "MemoryMachineGraph",
@@ -949,24 +977,29 @@ class SpikeSourcePoissonVertex(
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
         additional_arguments={
-            "machine_time_step", "time_scale_factor", "graph_mapper",
-            "routing_info", "data_n_time_steps", "graph",
-            "first_machine_time_step"
+            "machine_time_step", "time_scale_factor", "routing_info",
+            "data_n_time_steps", "graph", "first_machine_time_step"
         }
     )
     def generate_data_specification(
             self, spec, placement, machine_time_step, time_scale_factor,
-            graph_mapper, routing_info, data_n_time_steps, graph,
-            first_machine_time_step):
+            routing_info, data_n_time_steps, graph, first_machine_time_step):
+        """
+        :param int machine_time_step:
+        :param int time_scale_factor:
+        :param ~pacman.model.routing_info.RoutingInfo routing_info:
+        :param int data_n_time_steps:
+        :param ~pacman.model.graphs.machine.MachineGraph graph:
+        :param int first_machine_time_step:
+        """
         # pylint: disable=too-many-arguments, arguments-differ
         self.__machine_time_step = machine_time_step
-        vertex = placement.vertex
-        vertex_slice = graph_mapper.get_slice(vertex)
+        vertex_slice = placement.vertex.vertex_slice
 
         spec.comment("\n*** Spec for SpikeSourcePoisson Instance ***\n\n")
 
         # Reserve SDRAM space for memory areas:
-        self.reserve_memory_regions(spec, placement, graph_mapper)
+        self.reserve_memory_regions(spec, placement)
 
         # write setup data
         spec.switch_write_focus(_REGIONS.SYSTEM_REGION.value)
@@ -976,8 +1009,7 @@ class SpikeSourcePoissonVertex(
 
         # write recording data
         spec.switch_write_focus(_REGIONS.SPIKE_HISTORY_REGION.value)
-        sdram = self.get_recording_sdram_usage(
-            vertex_slice, machine_time_step)
+        sdram = self.get_recording_sdram_usage(vertex_slice, machine_time_step)
         recorded_region_sizes = [sdram.get_total_sdram(data_n_time_steps)]
         spec.write_array(recording_utilities.get_recording_header_array(
             recorded_region_sizes))
@@ -1008,12 +1040,11 @@ class SpikeSourcePoissonVertex(
         return ExecutableType.USES_SIMULATION_INTERFACE
 
     @overrides(AbstractSpikeRecordable.get_spikes)
-    def get_spikes(
-            self, placements, graph_mapper, buffer_manager, machine_time_step):
+    def get_spikes(self, placements, buffer_manager, machine_time_step):
         return self.__spike_recorder.get_spikes(
             self.label, buffer_manager,
             SpikeSourcePoissonVertex.SPIKE_RECORDING_REGION_ID,
-            placements, graph_mapper, self, machine_time_step)
+            placements, self, machine_time_step)
 
     @overrides(AbstractProvidesOutgoingPartitionConstraints.
                get_outgoing_partition_constraints)
@@ -1021,9 +1052,8 @@ class SpikeSourcePoissonVertex(
         return [ContiguousKeyRangeContraint()]
 
     @overrides(AbstractSpikeRecordable.clear_spike_recording)
-    def clear_spike_recording(self, buffer_manager, placements, graph_mapper):
-        machine_vertices = graph_mapper.get_machine_vertices(self)
-        for machine_vertex in machine_vertices:
+    def clear_spike_recording(self, buffer_manager, placements):
+        for machine_vertex in self.machine_vertices:
             placement = placements.get_placement_of_vertex(machine_vertex)
             buffer_manager.clear_recorded_data(
                 placement.x, placement.y, placement.p,
@@ -1034,10 +1064,12 @@ class SpikeSourcePoissonVertex(
 
         The output may be customised by specifying a different template\
         together with an associated template engine\
-        (see ``pyNN.descriptions``).
+        (see :py:mod:`pyNN.descriptions`).
 
         If template is None, then a dictionary containing the template context\
         will be returned.
+
+        :rtype: dict(str, ...)
         """
 
         parameters = dict()

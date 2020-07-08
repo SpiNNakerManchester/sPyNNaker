@@ -21,6 +21,6 @@ from .abstract_pynn_neuron_model import AbstractPyNNNeuronModel
 from .abstract_pynn_neuron_model_standard import (
     AbstractPyNNNeuronModelStandard)
 
-__all__ = ["AbstractPopulationVertex", "ConnectionHolder", "SynapticManager",
-           "PopulationMachineVertex", "AbstractPyNNNeuronModel",
-           "AbstractPyNNNeuronModelStandard"]
+__all__ = ["AbstractPopulationVertex", "AbstractPyNNNeuronModel",
+           "AbstractPyNNNeuronModelStandard", "ConnectionHolder",
+           "PopulationMachineVertex", "SynapticManager"]

@@ -15,6 +15,11 @@
 
 from .abstract_pynn_neuron_model import AbstractPyNNNeuronModel
 from spynnaker.pyNN.models.neuron.implementations import NeuronImplStandard
+from spinn_utilities.overrides import overrides
+
+_population_parameters = dict(
+    AbstractPyNNNeuronModel.default_population_parameters)
+_population_parameters["n_steps_per_timestep"] = 1
 
 
 class AbstractPyNNNeuronModelStandard(AbstractPyNNNeuronModel):
@@ -23,6 +28,8 @@ class AbstractPyNNNeuronModelStandard(AbstractPyNNNeuronModel):
     """
 
     __slots__ = []
+
+    default_population_parameters = _population_parameters
 
     def __init__(
             self, model_name, binary, neuron_model, input_type,
@@ -43,3 +50,15 @@ class AbstractPyNNNeuronModelStandard(AbstractPyNNNeuronModel):
         AbstractPyNNNeuronModel.__init__(self, NeuronImplStandard(
             model_name, binary, neuron_model, input_type, synapse_type,
             threshold_type, additional_input_type))
+
+    @overrides(AbstractPyNNNeuronModel.create_vertex,
+               additional_arguments={"n_steps_per_timestep"})
+    def create_vertex(
+            self, n_neurons, label, constraints, spikes_per_second,
+            ring_buffer_sigma, incoming_spike_buffer_size,
+            n_steps_per_timestep):
+        # pylint: disable=arguments-differ
+        self._model.n_steps_per_timestep = n_steps_per_timestep
+        return super(AbstractPyNNNeuronModelStandard, self).create_vertex(
+            n_neurons, label, constraints, spikes_per_second,
+            ring_buffer_sigma, incoming_spike_buffer_size)
