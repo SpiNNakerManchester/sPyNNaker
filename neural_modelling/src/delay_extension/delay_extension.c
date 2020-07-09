@@ -27,6 +27,7 @@
 #include <debug.h>
 #include <simulation.h>
 #include <spin1_api.h>
+#include <common/spike-send-delay.h>
 
 //! values for the priority for each callback
 enum delay_extension_callback_priorities {
@@ -114,9 +115,6 @@ static uint32_t expected_time;
 
 //! Number of times we had to back off because the comms hardware was busy
 static uint32_t n_delays = 0;
-
-//! Spin1 API ticks - to know when the timer wraps
-extern uint ticks;
 
 //! Used for configuring the timer hardware
 static uint32_t timer_period = 0;
@@ -330,8 +328,7 @@ static inline void spike_process(void) {
 
     // Get current time slot of incoming spike counters
     uint32_t current_time_slot = time & num_delay_slots_mask;
-    uint8_t *current_time_slot_spike_counters =
-            spike_counters[current_time_slot];
+    uint8_t *current_spike_counters = spike_counters[current_time_slot];
 
     log_debug("Current time slot %u", current_time_slot);
 
@@ -340,29 +337,84 @@ static inline void spike_process(void) {
     while (in_spikes_get_next_spike(&s)) {
         n_processed_spikes++;
 
-        if ((s & incoming_mask) == incoming_key) {
-            // Mask out neuron ID
-            uint32_t neuron_id = key_n(s);
-            if (neuron_id < num_neurons) {
-                // Increment counter
-                current_time_slot_spike_counters[neuron_id]++;
-                log_debug("Incrementing counter %u = %u\n",
-                        neuron_id,
-                        current_time_slot_spike_counters[neuron_id]);
-                n_spikes_added++;
-            } else {
-                log_debug("Invalid neuron ID %u", neuron_id);
-            }
-        } else {
+        if ((s & incoming_mask) != incoming_key) {
             log_debug("Invalid spike key 0x%08x", s);
+            continue;
         }
+
+        // Mask out neuron ID
+        uint32_t neuron_id = key_n(s);
+        if (neuron_id >= num_neurons) {
+            log_debug("Invalid neuron ID %u", neuron_id);
+            continue;
+        }
+
+        // Increment counter
+        current_spike_counters[neuron_id]++;
+        log_debug("Incrementing counter %u = %u\n",
+                neuron_id, current_spike_counters[neuron_id]);
+        n_spikes_added++;
     }
 
     // reactivate interrupts as critical section complete
     spin1_mode_restore(state);
 }
 
+//! \brief The processing of a single delay stage for timer_callback()
+//! \param[in] now: The current time
+//! \param[in] d: The delay stage index
+static inline void process_delay_stage(uint now, uint32_t d) {
+    // If any neurons emit spikes after this delay stage
+    bit_field_t delay_stage_config = neuron_delay_stage_config[d];
+    if (empty_bit_field(delay_stage_config, neuron_bit_field_words)) {
+        // Nothing to do
+        return;
+    }
+
+    // Get key mask for this delay stage and it's time slot
+    uint32_t delay = (d + 1) * DELAY_STAGE_LENGTH;
+    uint32_t time_slot = (time - delay) & num_delay_slots_mask;
+    uint8_t *delay_stage_spike_counters = spike_counters[time_slot];
+
+    log_debug("%u: Checking time slot %u for delay stage %u",
+            time, time_slot, d);
+
+    // Loop through neurons
+    for (uint32_t n = 0; n < num_neurons; n++) {
+        // If this neuron emits a spike after this stage
+        if (bit_field_test(delay_stage_config, n)) {
+            // Calculate key all spikes coming from this neuron will be
+            // sent with
+            uint32_t spike_key = ((d * num_neurons) + n) + key;
+            uint32_t spike_count = delay_stage_spike_counters[n];
+
+            if (spike_count > 0) {
+                log_debug("Neuron %u sending %u spikes after delay "
+                        "stage %u with key %x",
+                        n, spike_count, d, spike_key);
+            }
+
+            // Loop through counted spikes and send
+            for (uint32_t s = 0; s < spike_count; s++) {
+                while (!spin1_send_mc_packet(spike_key, 0, NO_PAYLOAD)) {
+                    spin1_delay_us(1);
+                }
+                n_spikes_sent++;
+            }
+        }
+
+        // Wait until the expected time to send
+        while (need_to_wait_for_send_time(now, expected_time)) {
+            // Do Nothing... except track how much nothing we've done
+            n_delays++;
+        }
+        expected_time -= time_between_spikes;
+    }
+}
+
 //! \brief Main timer callback
+//! \details Delegates to spike_process() and process_delay_stage() for most
+//!     of the work.
 //! \param[in] timer_count: The current time
 //! \param unused1: unused
 static void timer_callback(uint timer_count, uint unused1) {
@@ -396,55 +448,11 @@ static void timer_callback(uint timer_count, uint unused1) {
     }
 
     // Set the next expected time to wait for between spike sending
-    expected_time = sv->cpu_clk * timer_period;
+    expected_time = expected_spike_wait_time(timer_period);
 
     // Loop through delay stages
     for (uint32_t d = 0; d < num_delay_stages; d++) {
-        // If any neurons emit spikes after this delay stage
-        bit_field_t delay_stage_config = neuron_delay_stage_config[d];
-        if (nonempty_bit_field(delay_stage_config, neuron_bit_field_words)) {
-            // Get key mask for this delay stage and it's time slot
-            uint32_t delay_stage_delay = (d + 1) * DELAY_STAGE_LENGTH;
-            uint32_t delay_stage_time_slot =
-                    (time - delay_stage_delay) & num_delay_slots_mask;
-            uint8_t *delay_stage_spike_counters =
-                    spike_counters[delay_stage_time_slot];
-
-            log_debug("%u: Checking time slot %u for delay stage %u",
-                    time, delay_stage_time_slot, d);
-
-            // Loop through neurons
-            for (uint32_t n = 0; n < num_neurons; n++) {
-                // If this neuron emits a spike after this stage
-                if (bit_field_test(delay_stage_config, n)) {
-                    // Calculate key all spikes coming from this neuron will be
-                    // sent with
-                    uint32_t spike_key = ((d * num_neurons) + n) + key;
-
-                    if (delay_stage_spike_counters[n] > 0) {
-                        log_debug("Neuron %u sending %u spikes after delay"
-                                "stage %u with key %x",
-                                n, delay_stage_spike_counters[n], d,
-                                spike_key);
-                    }
-
-                    // Loop through counted spikes and send
-                    for (uint32_t s = 0; s < delay_stage_spike_counters[n]; s++) {
-                        while (!spin1_send_mc_packet(spike_key, 0, NO_PAYLOAD)) {
-                            spin1_delay_us(1);
-                        }
-                        n_spikes_sent++;
-                    }
-                }
-
-                // Wait until the expected time to send
-                while ((ticks == timer_count) && (tc[T1_COUNT] > expected_time)) {
-                    // Do Nothing
-                    n_delays++;
-                }
-                expected_time -= time_between_spikes;
-            }
-        }
+        process_delay_stage(timer_count, d);
     }
 
     // Zero all counters in current time slot

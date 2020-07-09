@@ -270,7 +270,7 @@ bool synapse_dynamics_initialise(
 
     // Load timing dependence data
     address_t weight_region_address = timing_initialise(address);
-    if (address == NULL) {
+    if (weight_region_address == NULL) {
         return false;
     }
 

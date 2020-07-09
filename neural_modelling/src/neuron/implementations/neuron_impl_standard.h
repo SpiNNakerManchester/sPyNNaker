@@ -89,7 +89,7 @@ static bool neuron_impl_initialise(uint32_t n_neurons) {
     if (sizeof(global_neuron_params_t)) {
         global_parameters = spin1_malloc(sizeof(global_neuron_params_t));
         if (global_parameters == NULL) {
-            log_error("Unable to allocate global neuron parameters"
+            log_error("Unable to allocate global neuron parameters "
                     "- Out of DTCM");
             return false;
         }

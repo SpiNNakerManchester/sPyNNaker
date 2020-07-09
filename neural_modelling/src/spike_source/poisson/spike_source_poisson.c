@@ -38,11 +38,9 @@
 #include <profiler.h>
 
 #include <common/spin1-wfi.h>
+#include <common/spike-send-delay.h>
 
 // ----------------------------------------------------------------------
-
-//! Spin1 API ticks, to know when the timer wraps
-extern uint ticks;
 
 //! data structure for Poisson sources
 typedef struct spike_source_t {
@@ -512,7 +510,7 @@ static bool store_poisson_parameters(void) {
 //! \param[in] timer_count: Time to send spike at
 static void send_spike(uint32_t spike_key, uint32_t timer_count) {
     // Wait until the expected time to send
-    while ((ticks == timer_count) && (tc[T1_COUNT] > expected_time)) {
+    while (need_to_wait_for_send_time(timer_count, expected_time)) {
         // Do Nothing
     }
     expected_time -= ssp_params.time_between_spikes;
@@ -715,7 +713,7 @@ static void timer_callback(uint timer_count, uint unused) {
     }
 
     // Set the next expected time to wait for between spike sending
-    expected_time = sv->cpu_clk * timer_period;
+    expected_time = expected_spike_wait_time(timer_period);
 
     // Loop through spike sources
     for (index_t s_id = 0; s_id < ssp_params.n_spike_sources; s_id++) {

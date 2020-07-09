@@ -67,7 +67,7 @@ static inline int16_lut *maths_copy_int16_lut(address_t *address) {
     spin1_memcpy(lut, sdram_lut, size);
 
     // Pad to number of words (+ 1 for size / shift header)
-    const uint32_t num_words = (lut->size / 2) + (((lut->size & 1) != 0) ? 1 : 0);
+    const uint32_t num_words = (lut->size >> 1) + (lut->size & 1);
     *address += num_words + 1;
 
     return lut;

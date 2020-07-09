@@ -109,6 +109,7 @@ static inline u016 decay_u016(u016 x, decay_t decay) {
 //! \param[in] x: the value to decayed
 //! \param[in] d: the amount to decay the value by
 //! \return the new decayed value
+#ifndef USE_C11
 #define decay(x, d) ({ \
     __typeof__(x) tmp = (x); \
     if (__builtin_types_compatible_p(__typeof__(x), s1615)) {\
@@ -124,5 +125,15 @@ static inline u016 decay_u016(u016 x, decay_t decay) {
     }\
     tmp; \
 })
+#else // USE_C11
+#define decay(x, d) \
+    _Generic((x),                       \
+        s1615:   decay_s1615((x), (d)), \
+        u1616:   decay_u1616((x), (d)), \
+        s015:    decay_s015((x), (d)),  \
+        u016:    decay_u016((x), (d)),  \
+        default: abort(1)               \
+    )
+#endif // USE_C11
 
 #endif // _DECAY_H_

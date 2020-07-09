@@ -31,8 +31,8 @@ typedef struct plastic_synapse_t {
     int16_t accumulator;
 } plastic_synapse_t;
 
-//! The update state is a weight state with 32-bit ARM-friendly version of the
-//! accumulator
+//! \brief The update state is a weight state with 32-bit ARM-friendly version
+//!     of the accumulator
 typedef struct update_state_t {
     //! The weight staet
     weight_state_t weight_state;

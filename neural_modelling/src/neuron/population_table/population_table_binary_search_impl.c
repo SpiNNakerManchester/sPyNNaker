@@ -52,6 +52,15 @@ typedef struct {
     uint32_t is_single : 1;  //!< whether this is a direct/single address
 } address_and_row_length;
 
+//! \brief The memory layout in SDRAM of the first part of the population table
+//!     configuration. Address list data (array of ::address_and_row_length) is
+//!     packed on the end.
+typedef struct {
+    uint32_t table_length;
+    uint32_t addr_list_length;
+    master_population_table_entry data[];
+} pop_table_config_t;
+
 //! The master population table. This is sorted.
 static master_population_table_entry *master_population_table;
 
@@ -174,14 +183,14 @@ bool population_table_initialise(
         address_t table_address, address_t synapse_rows_address,
         address_t direct_rows_address, uint32_t *row_max_n_words) {
     log_debug("population_table_initialise: starting");
+    pop_table_config_t *config = (pop_table_config_t *) table_address;
 
-    master_population_table_length = table_address[0];
+    master_population_table_length = config->table_length;
     log_debug("master pop table length is %d\n", master_population_table_length);
     log_debug("master pop table entry size is %d\n",
             sizeof(master_population_table_entry));
     uint32_t n_master_pop_bytes =
             master_population_table_length * sizeof(master_population_table_entry);
-    uint32_t n_master_pop_words = n_master_pop_bytes >> 2;
     log_debug("pop table size is %d\n", n_master_pop_bytes);
 
     // only try to malloc if there's stuff to malloc.
@@ -193,7 +202,7 @@ bool population_table_initialise(
         }
     }
 
-    uint32_t address_list_length = table_address[1];
+    uint32_t address_list_length = config->addr_list_length;
     uint32_t n_address_list_bytes =
             address_list_length * sizeof(address_and_row_length);
 
@@ -212,9 +221,9 @@ bool population_table_initialise(
             address_list_length, n_address_list_bytes);
 
     // Copy the master population table
-    spin1_memcpy(master_population_table, &table_address[2],
+    spin1_memcpy(master_population_table, config->data,
             n_master_pop_bytes);
-    spin1_memcpy(address_list, &table_address[2 + n_master_pop_words],
+    spin1_memcpy(address_list, &config->data[master_population_table_length],
             n_address_list_bytes);
 
     // Store the base address
@@ -353,10 +362,10 @@ bool population_table_get_next_address(
                 *row_address = (address_t) (block_address + neuron_offset);
                 *n_bytes_to_transfer = stride * sizeof(uint32_t);
                 log_debug(
-                    "neuron_id = %u, block_address = 0x%.8x,"
-                    "row_length = %u, row_address = 0x%.8x, n_bytes = %u",
-                    last_neuron_id, block_address, row_length, *row_address,
-                    *n_bytes_to_transfer);
+                        "neuron_id = %u, block_address = 0x%.8x,"
+                        "row_length = %u, row_address = 0x%.8x, n_bytes = %u",
+                        last_neuron_id, block_address, row_length,
+                        *row_address, *n_bytes_to_transfer);
                 *spike = last_spike;
                 is_valid = true;
             }
