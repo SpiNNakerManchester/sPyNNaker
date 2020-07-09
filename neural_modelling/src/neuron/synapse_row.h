@@ -142,49 +142,49 @@ static inline size_t synapse_row_plastic_size(const void *row) {
 //! \brief Returns the address of the plastic region
 //! \param[in] row: The synaptic row
 //! \return Address of the plastic region of the row
-static inline address_t synapse_row_plastic_region(void *row) {
+static inline void *synapse_row_plastic_region(void *row) {
     synapse_row_plastic_part_t *the_row = row;
-    return (address_t) the_row->data;
+    return the_row->data;
 }
 
 //! \brief Returns the address of the non-plastic (or fixed) region
 //! \param[in] row: The synaptic row
 //! \return Address of the fixed region of the row
-static inline address_t synapse_row_fixed_region(void *row) {
+static inline synapse_row_fixed_part_t *synapse_row_fixed_region(void *row) {
     synapse_row_plastic_part_t *the_row = row;
-    return (address_t) &the_row->data[the_row->size];
+    return (synapse_row_fixed_part_t *) &the_row->data[the_row->size];
 }
 
 //! \brief The number of fixed synapses in the row
 //! \param[in] fixed: The fixed region of the synaptic row
 //! \return Size of the fixed region of the row (in words)
-static inline size_t synapse_row_num_fixed_synapses(const void *fixed) {
-    const synapse_row_fixed_part_t *fix = fixed;
-    return fix->num_fixed;
+static inline size_t synapse_row_num_fixed_synapses(
+        const synapse_row_fixed_part_t *fixed) {
+    return fixed->num_fixed;
 }
 
 //! \brief The number of plastic controls in the row
 //! \param[in] fixed: The fixed region of the synaptic row
 //! \return Size of the fixed-plastic region of the row (in _half_ words)
-static inline size_t synapse_row_num_plastic_controls(const void *fixed) {
-    const synapse_row_fixed_part_t *fix = fixed;
-    return fix->num_plastic;
+static inline size_t synapse_row_num_plastic_controls(
+        const synapse_row_fixed_part_t *fixed) {
+    return fixed->num_plastic;
 }
 
 //! \brief The array of plastic controls in the row
 //! \param[in] fixed: The fixed region of the synaptic row
 //! \return Address of the fixed-plastic region of the row
-static inline control_t* synapse_row_plastic_controls(void *fixed) {
-    synapse_row_fixed_part_t *fix = fixed;
-    return (control_t *) &fix->data[fix->num_fixed];
+static inline control_t* synapse_row_plastic_controls(
+        synapse_row_fixed_part_t *fixed) {
+    return (control_t *) &fixed->data[fixed->num_fixed];
 }
 
 //! \brief The array of fixed weights in the row
 //! \param[in] fixed: The fixed region of the synaptic row
 //! \return Address of the fixed-fixed region of the row
-static inline uint32_t *synapse_row_fixed_weight_controls(void *fixed) {
-    synapse_row_fixed_part_t *fix = fixed;
-    return fix->data;
+static inline uint32_t *synapse_row_fixed_weight_controls(
+        synapse_row_fixed_part_t *fixed) {
+    return fixed->data;
 }
 
 // The following are offset calculations into the ring buffers

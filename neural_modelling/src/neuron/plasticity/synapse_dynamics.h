@@ -38,12 +38,13 @@ bool synapse_dynamics_initialise(
 
 //! \brief Processes the dynamics of the synapses
 //! \param[in,out] plastic_region_address: Where the plastic data is
-//! \param[in] fixed_region_address: Where the fixed data is
+//! \param[in] fixed_region: Where the fixed data is
 //! \param[in,out] ring_buffers: The ring buffers
 //! \param[in] time: The current simulation time
 //! \return ???
 bool synapse_dynamics_process_plastic_synapses(
-        address_t plastic_region_address, address_t fixed_region_address,
+        address_t plastic_region_address,
+        synapse_row_fixed_part_t *fixed_region,
         weight_t *ring_buffers, uint32_t time);
 
 //! \brief Informs the synapses that the neuron fired
@@ -61,11 +62,12 @@ input_t synapse_dynamics_get_intrinsic_bias(
 
 //! \brief Print the synapse dynamics
 //! \param[in] plastic_region_address: Where the plastic data is
-//! \param[in] fixed_region_address: Where the fixed data is
+//! \param[in] fixed_region: Where the fixed data is
 //! \param[in] ring_buffer_to_input_buffer_left_shifts:
 //!     How to interpret the values from the ring buffers
 void synapse_dynamics_print_plastic_synapses(
-        address_t plastic_region_address, address_t fixed_region_address,
+        address_t plastic_region_address,
+        synapse_row_fixed_part_t *fixed_region,
         uint32_t *ring_buffer_to_input_buffer_left_shifts);
 
 //! \brief returns the counters for plastic pre synaptic events based on (if
@@ -116,6 +118,7 @@ bool synapse_dynamics_add_neuron(
 //! \brief Get the number of connections in the given row
 //! \param[in] fixed: the fixed region of the synaptic row
 //! \return The number of connections in the row
-uint32_t synapse_dynamics_n_connections_in_row(address_t fixed);
+uint32_t synapse_dynamics_n_connections_in_row(
+        synapse_row_fixed_part_t *fixed);
 
 #endif // _SYNAPSE_DYNAMICS_H_

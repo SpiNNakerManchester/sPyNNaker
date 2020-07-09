@@ -45,18 +45,20 @@ static inline bool synaptogenesis_elimination_rule(
         uint32_t time, address_t restrict row) {
     use(time);
 
+    // Note that this is really a long unsigned fract, but the operations
+    // produce the same machine code when done with unsigned integers.
     uint32_t random_number = mars_kiss64_seed(*(current_state->local_seed));
 
     // Is weight depressed?
-    if (current_state->weight < params->threshold &&
-            random_number > params->prob_elim_depression) {
-        return false;
-    }
-
-    // Is weight potentiated or unchanged?
-    if (current_state->weight >= params->threshold &&
-            random_number > params->prob_elim_potentiation) {
-        return false;
+    if (current_state->weight < params->threshold) {
+        if (random_number > params->prob_elim_depression) {
+            return false;
+        }
+    } else {
+        // Weight is potentiated or unchanged
+        if (random_number > params->prob_elim_potentiation) {
+            return false;
+        }
     }
 
     return sp_structs_remove_synapse(current_state, row);

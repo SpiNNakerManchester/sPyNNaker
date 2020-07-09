@@ -26,6 +26,7 @@
 #include <neuron/synapse_row.h>
 #include <debug.h>
 #include <random.h>
+#include <stdfix-full-iso.h> // explicitly for ulrbits() and u032
 
 // Define the formation and elimination params
 struct elimination_params;
@@ -108,6 +109,13 @@ typedef struct {
     //! synapse type
     uint32_t synapse_type;
 } current_state_t;
+
+//! \brief Get the next U(0,1) random number from an RNG
+//! \param[in] state: The seed/state for the RNG
+//! \return a uniformly-distributed random fract in the range 0-1.
+static inline u032 next_random(mars_kiss64_seed_t state) {
+    return ulrbits(mars_kiss64_seed(state));
+}
 
 //! \brief unpack the spike into key and identifying information for the
 //!     neuron; Identify pop, sub-population and low and high atoms
@@ -194,11 +202,10 @@ static inline bool sp_structs_add_synapse(
         current_state_t *restrict current_state, address_t restrict row) {
     uint32_t appr_scaled_weight = current_state->pre_population_info->weight;
 
-    uint32_t actual_delay;
     uint32_t offset = current_state->pre_population_info->delay_hi -
             current_state->pre_population_info->delay_lo;
-    actual_delay = ulrbits(mars_kiss64_seed(*(current_state->local_seed))) *
-        offset + current_state->pre_population_info->delay_lo;
+    uint32_t actual_delay = next_random(*current_state->local_seed) * offset +
+            current_state->pre_population_info->delay_lo;
 
     if (!synapse_dynamics_add_neuron(
             current_state->post_syn_id, row, appr_scaled_weight, actual_delay,
@@ -271,7 +278,7 @@ static inline uint8_t *sp_structs_read_in_common(
     uint32_t n_elements =
             rewiring_data->s_max * rewiring_data->machine_no_atoms;
 
-    for (uint32_t i=0; i < n_elements; i++){
+    for (uint32_t i=0; i < n_elements; i++) {
         log_debug("index %d, pop index %d, sub pop index %d, neuron_index %d",
                 i, post_to_pre_table[i]->pop_index,
                 post_to_pre_table[i]->sub_pop_index,

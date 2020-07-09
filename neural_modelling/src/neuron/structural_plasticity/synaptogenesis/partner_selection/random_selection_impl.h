@@ -34,6 +34,22 @@ static inline void partner_spike_received(uint32_t time, spike_t spike) {
     use(spike);
 }
 
+//! \brief Convert a neuron ID into its subpopulation ID
+//! \param[in] preapppop_info: The prepopulation information
+//! \param[in] n_id: The neuron ID
+//! \return The ID of the subpopulation containing that neuron ID
+static inline uint32_t pick_subpopulation(
+        const pre_info_t *restrict preapppop_info, uint32_t n_id) {
+    uint32_t sum = 0;
+    for (uint32_t i = 0; i < preapppop_info->no_pre_vertices; i++) {
+        sum += preapppop_info->key_atom_info[i].n_atoms;
+        if (sum >= n_id) {
+            return i;
+        }
+    }
+    return 0; // really an error? Should be unreachable as used...
+}
+
 //! \brief Choose the potential (remote) synaptic partner
 //! \param[in] time: The current time
 //! \param[out] population_id: The ID of the other population
@@ -52,27 +68,19 @@ static inline bool potential_presynaptic_partner(
     extern pre_pop_info_table_t pre_info;
 
     use(time);
-    uint32_t pop_id = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) *
+    uint32_t pop_id = next_random(rewiring_data.local_seed) *
             pre_info.no_pre_pops;
     *population_id = pop_id;
     pre_info_t *preapppop_info = pre_info.prepop_info[pop_id];
 
     // Select presynaptic sub-population
-    uint32_t n_id = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) *
+    uint32_t n_id = next_random(rewiring_data.local_seed) *
             preapppop_info->total_no_atoms;
-    uint32_t subpop_id = 0;
-    uint32_t sum = 0;
-    for (uint32_t i = 0; i < preapppop_info->no_pre_vertices; i++) {
-        sum += preapppop_info->key_atom_info[i].n_atoms;
-        if (sum >= n_id) {
-            subpop_id = i;
-            break;
-        }
-    }
+    uint32_t subpop_id = pick_subpopulation(preapppop_info, n_id);
     *sub_population_id = subpop_id;
 
     // Select a presynaptic neuron ID
-    n_id = ulrbits(mars_kiss64_seed(rewiring_data.local_seed)) *
+    n_id = next_random(rewiring_data.local_seed) *
             preapppop_info->key_atom_info[subpop_id].n_atoms;
 
     *neuron_id = n_id;

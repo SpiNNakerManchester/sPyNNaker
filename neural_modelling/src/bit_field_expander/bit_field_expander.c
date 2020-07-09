@@ -318,9 +318,8 @@ bool process_synaptic_row(synaptic_row_t row) {
     }
 
     // Get address of non-plastic region from row
-    address_t fixed_region_address = synapse_row_fixed_region(row);
-    uint32_t fixed_synapse =
-            synapse_row_num_fixed_synapses(fixed_region_address);
+    synapse_row_fixed_part_t *fixed_region = synapse_row_fixed_region(row);
+    uint32_t fixed_synapse = synapse_row_num_fixed_synapses(fixed_region);
     if (fixed_synapse == 0) {
         log_debug("plastic and fixed do not have entries, so can be pruned");
         return false;

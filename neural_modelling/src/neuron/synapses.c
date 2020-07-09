@@ -99,14 +99,12 @@ static inline void print_synaptic_row(synaptic_row_t synaptic_row) {
     log_debug("----------------------------------------\n");
 
     // Get details of fixed region
-    address_t fixed_region_address = synapse_row_fixed_region(synaptic_row);
-    address_t fixed_synapses =
-            synapse_row_fixed_weight_controls(fixed_region_address);
-    size_t n_fixed_synapses =
-            synapse_row_num_fixed_synapses(fixed_region_address);
+    synapse_row_fixed_part_t *fixed_region = synapse_row_fixed_region(synaptic_row);
+    address_t fixed_synapses = synapse_row_fixed_weight_controls(fixed_region);
+    size_t n_fixed_synapses = synapse_row_num_fixed_synapses(fixed_region);
     log_debug("Fixed region %u fixed synapses (%u plastic control words):\n",
             n_fixed_synapses,
-            synapse_row_num_plastic_controls(fixed_region_address));
+            synapse_row_num_plastic_controls(fixed_region));
 
     for (uint32_t i = 0; i < n_fixed_synapses; i++) {
         uint32_t synapse = fixed_synapses[i];
@@ -131,7 +129,7 @@ static inline void print_synaptic_row(synaptic_row_t synaptic_row) {
         address_t plastic_region_address =
                 synapse_row_plastic_region(synaptic_row);
         synapse_dynamics_print_plastic_synapses(
-                plastic_region_address, fixed_region_address,
+                plastic_region_address, fixed_region,
                 ring_buffer_to_input_left_shifts);
     }
 
@@ -198,7 +196,7 @@ static inline void print_inputs(void) {
 //! \param[in] fixed_region_address: The fixed region of the synaptic matrix
 //! \param[in] time: The current simulation time
 static inline void process_fixed_synapses(
-        address_t fixed_region_address, uint32_t time) {
+        synapse_row_fixed_part_t *fixed_region_address, uint32_t time) {
     register uint32_t *synaptic_words =
             synapse_row_fixed_weight_controls(fixed_region_address);
     register uint32_t fixed_synapse =
@@ -354,7 +352,7 @@ bool synapses_process_synaptic_row(
         uint32_t time, synaptic_row_t row, bool *write_back) {
 
     // Get address of non-plastic region from row
-    address_t fixed_region_address = synapse_row_fixed_region(row);
+    synapse_row_fixed_part_t *fixed_region = synapse_row_fixed_region(row);
 
     // **TODO** multiple optimised synaptic row formats
     //if (plastic_tag(row) == 0) {
@@ -367,7 +365,7 @@ bool synapses_process_synaptic_row(
         profiler_write_entry_disable_fiq(
                 PROFILER_ENTER | PROFILER_PROCESS_PLASTIC_SYNAPSES);
         if (!synapse_dynamics_process_plastic_synapses(plastic_region_address,
-                fixed_region_address, ring_buffers, time)) {
+                fixed_region, ring_buffers, time)) {
             return false;
         }
         profiler_write_entry_disable_fiq(
@@ -381,7 +379,7 @@ bool synapses_process_synaptic_row(
     // **NOTE** this is done after initiating DMA in an attempt
     // to hide cost of DMA behind this loop to improve the chance
     // that the DMA controller is ready to read next synaptic row afterwards
-    process_fixed_synapses(fixed_region_address, time);
+    process_fixed_synapses(fixed_region, time);
     //}
     return true;
 }

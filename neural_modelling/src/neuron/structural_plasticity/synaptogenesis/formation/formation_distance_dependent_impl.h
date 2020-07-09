@@ -125,8 +125,7 @@ static inline bool synaptogenesis_formation_rule(
         }
         probability = params->prob_tables[params->ff_prob_size + distance];
     }
-    uint16_t r = ulrbits(mars_kiss64_seed(*(current_state->local_seed)))
-            * MAX_SHORT;
+    uint16_t r = next_random(*current_state->local_seed) * MAX_SHORT;
     if (r > probability) {
         return false;
     }
