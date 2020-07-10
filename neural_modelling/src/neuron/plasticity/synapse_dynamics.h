@@ -95,14 +95,14 @@ uint32_t synapse_dynamics_get_plastic_saturation_count(void);
 //! \param[out] synapse_type: address to contain the synapse type of the connection
 //! \return was the search successful?
 bool synapse_dynamics_find_neuron(
-        uint32_t id, address_t row, weight_t *weight, uint16_t *delay,
+        uint32_t id, synaptic_row_t row, weight_t *weight, uint16_t *delay,
         uint32_t *offset, uint32_t *synapse_type);
 
 //! \brief Remove the entry at the specified offset in the synaptic row
 //! \param[in] offset: the offset in the row at which to remove the entry
 //! \param[in] row: the core-local address of the synaptic row
 //! \return was the removal successful?
-bool synapse_dynamics_remove_neuron(uint32_t offset, address_t row);
+bool synapse_dynamics_remove_neuron(uint32_t offset, synaptic_row_t row);
 
 //! \brief Add an entry in the synaptic row
 //! \param[in] id: the (core-local) ID of the post-synaptic neuron to be added
@@ -112,7 +112,7 @@ bool synapse_dynamics_remove_neuron(uint32_t offset, address_t row);
 //! \param[in] type: the type of the connection (e.g. inhibitory)
 //! \return was the addition successful?
 bool synapse_dynamics_add_neuron(
-        uint32_t id, address_t row, weight_t weight,
+        uint32_t id, synaptic_row_t row, weight_t weight,
         uint32_t delay, uint32_t type);
 
 //! \brief Get the number of connections in the given row

@@ -26,11 +26,11 @@
 #include <simulation.h>
 #include <debug.h>
 
-//! DMA buffer structure combines the row read from SDRAM with information
-//! about the read.
+//! \brief DMA buffer structure combines the row read from SDRAM with
+//!     information about the read.
 typedef struct dma_buffer {
     //! Address in SDRAM to write back plastic region to
-    address_t sdram_writeback_address;
+    synaptic_row_t sdram_writeback_address;
 
     //! \brief Key of originating spike
     //! \details used to allow row data to be re-used for multiple spikes
@@ -40,7 +40,7 @@ typedef struct dma_buffer {
     uint32_t n_bytes_transferred;
 
     //! Row data
-    address_t row;
+    synaptic_row_t row;
 } dma_buffer;
 
 //! The number of DMA Buffers to use
@@ -96,7 +96,7 @@ static uint32_t n_successful_rewires = 0;
 //! \param[in] n_bytes_to_transfer: The size of the synaptic row
 //! \param[in] spike: The spike that triggered this read
 static inline void do_dma_read(
-        address_t row_address, size_t n_bytes_to_transfer, spike_t spike) {
+        synaptic_row_t row_address, size_t n_bytes_to_transfer, spike_t spike) {
     // Write the SDRAM address of the plastic region and the
     // Key of the originating spike to the beginning of DMA buffer
     dma_buffer *next_buffer = &dma_buffers[next_buffer_to_fill];
@@ -124,7 +124,7 @@ static inline void do_dma_read(
 //! \param[in,out] n_process_spike: Accumulator of number of processed spikes
 //! \return True if there's something to do
 static inline bool is_something_to_do(
-        address_t *row_address, size_t *n_bytes_to_transfer,
+        synaptic_row_t *row_address, size_t *n_bytes_to_transfer,
         spike_t *spike, uint32_t *n_rewire, uint32_t *n_process_spike) {
     // Disable interrupts here as dma_busy modification is a critical section
     uint cpsr = spin1_int_disable();
@@ -188,7 +188,7 @@ static inline bool is_something_to_do(
 static void setup_synaptic_dma_read(dma_buffer *current_buffer,
         uint32_t *n_rewires, uint32_t *n_synapse_processes) {
     // Set up to store the DMA location and size to read
-    address_t row_address;
+    synaptic_row_t row_address;
     size_t n_bytes_to_transfer;
     spike_t spike;
     dma_n_spikes = 0;
@@ -237,12 +237,13 @@ static inline void setup_synaptic_dma_write(
     // Get the number of plastic bytes and the write back address from the
     // synaptic row
     size_t write_size = buffer->n_bytes_transferred;
-    address_t sdram_start_address = buffer->sdram_writeback_address;
-    address_t dtcm_start_address = buffer->row;
+    void *sdram_start_address = buffer->sdram_writeback_address;
+    void *dtcm_start_address = buffer->row;
     if (plastic_only) {
         write_size = synapse_row_plastic_size(buffer->row) * sizeof(uint32_t);
-        sdram_start_address = synapse_row_plastic_region(sdram_start_address);
-        dtcm_start_address = synapse_row_plastic_region(dtcm_start_address);
+        sdram_start_address =
+                synapse_row_plastic_region(buffer->sdram_writeback_address);
+        dtcm_start_address = synapse_row_plastic_region(buffer->row);
     }
 
     log_debug("Writing back %u bytes of plastic region to %08x for spike %u",
@@ -334,9 +335,9 @@ static void dma_complete_callback(uint unused, uint tag) {
                     current_buffer->row);
 
             // Print out the row for debugging
-            for (uint32_t i = 0;
+            for (uint32_t i = 0, *row = (uint32_t *) current_buffer->row;
                     i < (current_buffer->n_bytes_transferred >> 2); i++) {
-                log_error("%u: 0x%.8x", i, current_buffer->row[i]);
+                log_debug("%u: 0x%.8x", i, row[i]);
             }
             rt_error(RTE_SWERR);
         }

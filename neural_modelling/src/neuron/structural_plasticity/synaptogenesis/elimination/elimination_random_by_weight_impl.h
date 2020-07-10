@@ -42,7 +42,7 @@ struct elimination_params {
 static inline bool synaptogenesis_elimination_rule(
         current_state_t *restrict current_state,
         const elimination_params_t *params,
-        uint32_t time, address_t restrict row) {
+        uint32_t time, synaptic_row_t restrict row) {
     use(time);
 
     // Note that this is really a long unsigned fract, but the operations

@@ -241,7 +241,8 @@ bool population_table_initialise(
 }
 
 bool population_table_get_first_address(
-        spike_t spike, address_t* row_address, size_t* n_bytes_to_transfer) {
+        spike_t spike, synaptic_row_t *row_address,
+        size_t *n_bytes_to_transfer) {
     // locate the position in the binary search / array
     log_debug("searching for key %d", spike);
     int position = population_table_position_in_the_master_pop_array(spike);
@@ -331,9 +332,10 @@ int population_table_position_in_the_master_pop_array(spike_t spike) {
 }
 
 bool population_table_get_next_address(
-        spike_t *spike, address_t *row_address, size_t *n_bytes_to_transfer) {
+        spike_t *spike, synaptic_row_t *row_address,
+        size_t *n_bytes_to_transfer) {
     // If there are no more items in the list, return false
-    if (items_to_go <= 0) {
+    if (items_to_go == 0) {
         return false;
     }
 
@@ -344,7 +346,7 @@ bool population_table_get_next_address(
         // If the row is a direct row, indicate this by specifying the
         // n_bytes_to_transfer is 0
         if (is_single(item)) {
-            *row_address = (address_t) (
+            *row_address = (synaptic_row_t) (
                     get_direct_address(item) + direct_rows_base_address +
                     (last_neuron_id * sizeof(uint32_t)));
             *n_bytes_to_transfer = 0;
@@ -359,7 +361,7 @@ bool population_table_get_next_address(
                 uint32_t neuron_offset =
                         last_neuron_id * stride * sizeof(uint32_t);
 
-                *row_address = (address_t) (block_address + neuron_offset);
+                *row_address = (synaptic_row_t) (block_address + neuron_offset);
                 *n_bytes_to_transfer = stride * sizeof(uint32_t);
                 log_debug(
                         "neuron_id = %u, block_address = 0x%.8x,"

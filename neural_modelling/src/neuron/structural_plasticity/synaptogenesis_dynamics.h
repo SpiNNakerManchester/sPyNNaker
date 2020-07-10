@@ -43,13 +43,14 @@ bool synaptogenesis_dynamics_initialise(
 //! \param[out] n_bytes: variable to hold the size of the row
 //! \return True if a row is to be transferred, false otherwise
 bool synaptogenesis_dynamics_rewire(uint32_t time,
-        spike_t *spike, address_t *synaptic_row_address, uint32_t *n_bytes);
+        spike_t *spike, synaptic_row_t *synaptic_row_address,
+        uint32_t *n_bytes);
 
 //! \brief Performs the actual restructuring of a row
 //! \param[in] time: The time of the restructure
 //! \param[in] row: The row to restructure
 //! \return True if the row was changed and needs to be written back
-bool synaptogenesis_row_restructure(uint32_t time, address_t row);
+bool synaptogenesis_row_restructure(uint32_t time, synaptic_row_t row);
 
 //! \brief retrieve the period of rewiring
 //! \return Based on synaptogenesis_is_fast(), this can either be how many times

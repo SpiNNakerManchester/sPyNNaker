@@ -187,7 +187,7 @@ bool synaptogenesis_dynamics_initialise(address_t sdram_sp_address) {
 }
 
 bool synaptogenesis_dynamics_rewire(
-        uint32_t time, spike_t *spike, address_t *synaptic_row_address,
+        uint32_t time, spike_t *spike, synaptic_row_t *synaptic_row_address,
         uint32_t *n_bytes) {
     // Randomly choose a postsynaptic (application neuron)
     uint32_t post_id = next_random(rewiring_data.shared_seed) *
@@ -257,7 +257,7 @@ bool synaptogenesis_dynamics_rewire(
     return true;
 }
 
-bool synaptogenesis_row_restructure(uint32_t time, address_t row) {
+bool synaptogenesis_row_restructure(uint32_t time, synaptic_row_t row) {
     current_state_t *current_state = _get_state();
 
     // the selected pre- and postsynaptic IDs are in current_state

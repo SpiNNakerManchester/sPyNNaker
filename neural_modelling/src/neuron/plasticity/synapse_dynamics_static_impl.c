@@ -114,7 +114,7 @@ uint32_t synapse_dynamics_get_plastic_saturation_count(void) {
 }
 
 bool synapse_dynamics_find_neuron(
-        uint32_t id, address_t row, weight_t *weight, uint16_t *delay,
+        uint32_t id, synaptic_row_t row, weight_t *weight, uint16_t *delay,
         uint32_t *offset, uint32_t *synapse_type) {
     synapse_row_fixed_part_t *fixed_region = synapse_row_fixed_region(row);
     int32_t fixed_synapse = synapse_row_num_fixed_synapses(fixed_region);
@@ -141,7 +141,7 @@ bool synapse_dynamics_find_neuron(
     return false;
 }
 
-bool synapse_dynamics_remove_neuron(uint32_t offset, address_t row) {
+bool synapse_dynamics_remove_neuron(uint32_t offset, synaptic_row_t row) {
     synapse_row_fixed_part_t *fixed_region = synapse_row_fixed_region(row);
     int32_t fixed_synapse = synapse_row_num_fixed_synapses(fixed_region);
     uint32_t *synaptic_words = synapse_row_fixed_weight_controls(fixed_region);
@@ -167,7 +167,7 @@ static inline uint32_t _fixed_synapse_convert(
 }
 
 bool synapse_dynamics_add_neuron(
-        uint32_t id, address_t row, weight_t weight,
+        uint32_t id, synaptic_row_t row, weight_t weight,
         uint32_t delay, uint32_t type) {
     synapse_row_fixed_part_t *fixed_region = synapse_row_fixed_region(row);
     int32_t fixed_synapse = synapse_row_num_fixed_synapses(fixed_region);

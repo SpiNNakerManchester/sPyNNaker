@@ -92,7 +92,7 @@ static inline const char *get_type_char(uint32_t synapse_type) {
 static inline void print_synaptic_row(synaptic_row_t synaptic_row) {
 #if LOG_LEVEL >= LOG_DEBUG
     log_debug("Synaptic row, at address %08x Num plastic words:%u\n",
-            (uint32_t) synaptic_row, synapse_row_plastic_size(synaptic_row));
+            synaptic_row, synapse_row_plastic_size(synaptic_row));
     if (synaptic_row == NULL) {
         return;
     }
@@ -350,7 +350,6 @@ void synapses_do_timestep_update(timer_t time) {
 
 bool synapses_process_synaptic_row(
         uint32_t time, synaptic_row_t row, bool *write_back) {
-
     // Get address of non-plastic region from row
     synapse_row_fixed_part_t *fixed_region = synapse_row_fixed_region(row);
 
