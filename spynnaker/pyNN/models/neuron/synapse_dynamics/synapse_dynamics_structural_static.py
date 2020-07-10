@@ -16,9 +16,7 @@
 from spinn_utilities.overrides import overrides
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
-from .synapse_dynamics_structural_common import (
-    SynapseDynamicsStructuralCommon as
-        CommonSP)
+from .synapse_dynamics_structural_common import StructuralPlasticityCommon
 from .synapse_dynamics_static import SynapseDynamicsStatic
 from .synapse_dynamics_stdp import SynapseDynamicsSTDP
 from .synapse_dynamics_structural_stdp import SynapseDynamicsStructuralSTDP
@@ -38,10 +36,10 @@ class SynapseDynamicsStructuralStatic(
 
     def __init__(
             self, partner_selection, formation, elimination,
-            f_rew=CommonSP.DEFAULT_F_REW,
-            initial_weight=CommonSP.DEFAULT_INITIAL_WEIGHT,
-            initial_delay=CommonSP.DEFAULT_INITIAL_DELAY,
-            s_max=CommonSP.DEFAULT_S_MAX, seed=None,
+            f_rew=StructuralPlasticityCommon.DEFAULT_F_REW,
+            initial_weight=StructuralPlasticityCommon.DEFAULT_INITIAL_WEIGHT,
+            initial_delay=StructuralPlasticityCommon.DEFAULT_INITIAL_DELAY,
+            s_max=StructuralPlasticityCommon.DEFAULT_S_MAX, seed=None,
             weight=0.0, delay=1.0):
         """
         :param AbstractPartnerSelection partner_selection:
@@ -65,7 +63,7 @@ class SynapseDynamicsStructuralStatic(
         super(SynapseDynamicsStructuralStatic, self).__init__(
             weight=weight, delay=delay, pad_to_length=s_max)
 
-        self.__common_sp = CommonSP(
+        self.__common_sp = StructuralPlasticityCommon(
             partner_selection, formation, elimination, f_rew, initial_weight,
             initial_delay, s_max, seed)
 

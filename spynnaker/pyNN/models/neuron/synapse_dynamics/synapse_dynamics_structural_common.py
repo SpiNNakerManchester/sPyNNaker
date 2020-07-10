@@ -26,7 +26,7 @@ from .abstract_synapse_dynamics_structural import (
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 
 
-class SynapseDynamicsStructuralCommon(object):
+class StructuralPlasticityCommon(object):
     """ Utility class that holds properties of synaptic rewiring\
         both in the presence and absence of STDP.
 
@@ -500,7 +500,7 @@ class SynapseDynamicsStructuralCommon(object):
 
     def is_same_as(self, synapse_dynamics):
         """
-        :param SynapseDynamicsStructuralCommon synapse_dynamics:
+        :param StructuralPlasticityCommon synapse_dynamics:
         :rtype: bool
         """
         # Note noqa because exact type comparison is required here

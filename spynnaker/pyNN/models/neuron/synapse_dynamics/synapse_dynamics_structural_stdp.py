@@ -17,9 +17,7 @@ from spinn_utilities.overrides import overrides
 from .synapse_dynamics_stdp import SynapseDynamicsSTDP
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
-from .synapse_dynamics_structural_common import (
-    SynapseDynamicsStructuralCommon as
-        CommonSP)
+from .synapse_dynamics_structural_common import StructuralPlasticityCommon
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 
 
@@ -38,10 +36,10 @@ class SynapseDynamicsStructuralSTDP(
             self, partner_selection, formation, elimination,
             timing_dependence=None, weight_dependence=None,
             voltage_dependence=None, dendritic_delay_fraction=1.0,
-            f_rew=CommonSP.DEFAULT_F_REW,
-            initial_weight=CommonSP.DEFAULT_INITIAL_WEIGHT,
-            initial_delay=CommonSP.DEFAULT_INITIAL_DELAY,
-            s_max=CommonSP.DEFAULT_S_MAX, seed=None,
+            f_rew=StructuralPlasticityCommon.DEFAULT_F_REW,
+            initial_weight=StructuralPlasticityCommon.DEFAULT_INITIAL_WEIGHT,
+            initial_delay=StructuralPlasticityCommon.DEFAULT_INITIAL_DELAY,
+            s_max=StructuralPlasticityCommon.DEFAULT_S_MAX, seed=None,
             weight=0.0, delay=1.0, backprop_delay=True):
         """
         :param AbstractPartnerSelection partner_selection:
@@ -73,7 +71,7 @@ class SynapseDynamicsStructuralSTDP(
             timing_dependence, weight_dependence, voltage_dependence,
             dendritic_delay_fraction, weight, delay, pad_to_length=s_max,
             backprop_delay=backprop_delay)
-        self.__common_sp = CommonSP(
+        self.__common_sp = StructuralPlasticityCommon(
             partner_selection, formation, elimination, f_rew, initial_weight,
             initial_delay, s_max, seed)
 
