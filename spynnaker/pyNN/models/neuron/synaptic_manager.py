@@ -1100,7 +1100,8 @@ class SynapticManager(object):
                 monitor_api.load_system_routing_tables(
                     txrx, monitor_cores, placements)
                 monitor_api.set_cores_for_data_streaming(
-                    txrx, monitor_cores, placements)
+                    txrx, monitor_cores, placements, n_channels=8,
+                    intermediate_channel_waits=4)
 
             # read in the synaptic block
             if not is_single:
