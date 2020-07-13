@@ -41,7 +41,7 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
             routing_infos, time_to_try_for_each_iteration, use_timer_cut_off,
             machine_time_step, time_scale_factor,
             no_sync_changes, threshold_percentage,
-            executable_targets, compress_only_when_needed=True,
+            executable_targets,
             compress_as_much_as_possible=False, provenance_data_objects=None):
         """ entrance for routing table compression with bit field
 
@@ -56,8 +56,6 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
          before its considered a success
         :param executable_finder: where are binaries are located
         :param read_algorithm_iobuf: bool flag saying if read iobuf
-        :param compress_only_when_needed: bool flag asking if compress only \
-        when needed
         :param compress_as_much_as_possible: bool flag asking if should \
         compress as much as possible
         :rtype: None
@@ -82,7 +80,6 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
                 time_scale_factor=time_scale_factor,
                 no_sync_changes=no_sync_changes,
                 threshold_percentage=threshold_percentage,
-                compress_only_when_needed=compress_only_when_needed,
                 compress_as_much_as_possible=compress_as_much_as_possible,
                 executable_targets=executable_targets)
 
