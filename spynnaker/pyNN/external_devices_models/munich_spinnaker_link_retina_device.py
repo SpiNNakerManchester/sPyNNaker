@@ -125,6 +125,9 @@ class MunichRetinaDevice(
         get_outgoing_partition_constraints,
         additional_arguments={"machine_graph": "MemoryMachineGraph"})
     def get_outgoing_partition_constraints(self, partition, machine_graph):
+        """
+        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
+        """
         # pylint: disable=arguments-differ
         return produce_key_constraint_based_off_outgoing_partitions(
             machine_graph=machine_graph, vertex=self,

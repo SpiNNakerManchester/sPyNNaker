@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
 from pacman.executor.injection_decorator import inject_items
@@ -27,8 +26,6 @@ from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl)
 from spinn_front_end_common.utility_models import MultiCastCommand
 from spynnaker.pyNN.exceptions import SpynnakerException
-
-logger = logging.getLogger(__name__)
 
 
 def get_y_from_fpga_retina(key, mode):
@@ -171,6 +168,9 @@ class ExternalFPGARetinaDevice(
         get_outgoing_partition_constraints,
         additional_arguments={"machine_graph": "MemoryMachineGraph"})
     def get_outgoing_partition_constraints(self, partition, machine_graph):
+        """
+        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
+        """
         # pylint: disable=arguments-differ
         return produce_key_constraint_based_off_outgoing_partitions(
             machine_graph=machine_graph, vertex=self,
