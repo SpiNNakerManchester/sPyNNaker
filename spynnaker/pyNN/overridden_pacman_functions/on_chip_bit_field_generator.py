@@ -97,7 +97,7 @@ class OnChipBitFieldGenerator(object):
 
         # progress bar
         progress = ProgressBar(
-            len(app_graph.vertices) * 2,
+            len(app_graph.vertices) * 2 + 1,
             "Running bitfield generation on chip")
 
         # get data
