@@ -258,22 +258,28 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
                 pre_vertex_slice.lo_atom, pre_vertex_slice.hi_atom + 1):
             pre_r, pre_c = divmod(pre_idx, self._pre_w)
             coords[pre_idx] = []
+
+            # Test whether the coordinates should be included based on the
+            # step function (in the pre) and skip if not
+            if not (((pre_r - self._pre_start_h) % self._pre_step_h == 0) and
+                    ((pre_c - self._pre_start_w) % self._pre_step_w == 0)):
+                continue
+
             # Loop over post-vertices
             for post_idx in range(
                     post_vertex_slice.lo_atom, post_vertex_slice.hi_atom + 1):
 
                 # convert to common coord system
-                r = post_as_pre_r[post_idx - post_lo]
-                c = post_as_pre_c[post_idx - post_lo]
-                if not (0 <= r < self._common_h and 0 <= c < self._common_w):
-                    continue
+                pac_r = post_as_pre_r[post_idx - post_lo]
+                pac_c = post_as_pre_c[post_idx - post_lo]
 
-                r, c = self.__pre_as_post(r, c)
+                # now convert common to pre coords
+                pap_r, pap_c = self.__pre_as_post(pac_r, pac_c)
 
                 # Obtain coordinates to test against kernel sizes
-                dr = r - pre_r
+                dr = pap_r - pre_r
                 kr = hh - dr
-                dc = c - pre_c
+                dc = pap_c - pre_c
                 kc = hw - dc
 
                 if 0 <= kr < self._kernel_h and 0 <= kc < self._kernel_w:
