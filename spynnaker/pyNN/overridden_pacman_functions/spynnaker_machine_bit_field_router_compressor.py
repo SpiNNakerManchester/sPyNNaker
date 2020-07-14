@@ -19,8 +19,9 @@ from spinn_front_end_common.abstract_models.\
     abstract_supports_bit_field_generation import \
     AbstractSupportsBitFieldGeneration
 from spinn_front_end_common.interface.interface_functions.\
-    machine_bit_field_router_compressor import \
-    MachineBitFieldRouterCompressor
+    machine_bit_field_router_compressor import (
+    MachineBitFieldPairRouterCompressor,
+    MachineBitFieldUnorderedRouterCompressor)
 from spinn_front_end_common.utilities import system_control_logic
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinnman.model import ExecutableTargets
@@ -62,7 +63,7 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
         """
 
         # build machine compressor
-        machine_bit_field_router_compressor = MachineBitFieldRouterCompressor()
+        machine_bit_field_router_compressor = self.compressor_factory()
         (compressor_executable_targets, prov_items) = \
             machine_bit_field_router_compressor(
                 routing_tables=routing_tables, transceiver=transceiver,
@@ -151,3 +152,17 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
                 provenance_file_path, executable_finder, True, None,
                 [CPUState.FINISHED], needs_sync_barrier, no_sync_changes,
                 "rerun_of_synaptic_expander_on_{}_{}_{}.txt")
+
+
+class SpynnakerMachineBitFieldUnorderedRouterCompressor(
+    SpynnakerMachineBitFieldRouterCompressor):
+
+    def compressor_factory(self):
+        return MachineBitFieldUnorderedRouterCompressor()
+
+
+class SpynnakerMachineBitFieldPairRouterCompressor(
+    SpynnakerMachineBitFieldRouterCompressor):
+
+    def compressor_factory(self):
+        return MachineBitFieldPairRouterCompressor()
