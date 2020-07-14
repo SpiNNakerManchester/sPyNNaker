@@ -17,6 +17,7 @@ import logging
 import os
 import math
 
+from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
@@ -511,6 +512,13 @@ class AbstractPopulationVertex(
                  self.label, time_scale_factor_needed)
             logger.error(msg)
             raise SpynnakerException(msg)
+        else:
+            true_fraction = 1 / (
+                (machine_time_step * time_scale_factor) / total_time_needed)
+            warn_once(
+                logger,
+                "could reduce fraction of time for sending to {}".format(
+                    true_fraction))
 
         # figure initial offset (used to try to interleave packets from other
         # populations into the TDMA without extending the overall time, and
@@ -541,8 +549,7 @@ class AbstractPopulationVertex(
 
         # add the offset of a portion of the time step BEFORE doing any slots
         # to allow initial processing to work.
-        #TODO PUT BACK += when happy!
-        initial_offset = int(math.ceil(
+        initial_offset += int(math.ceil(
             (machine_time_step * time_scale_factor) *
             self.__fraction_of_waiting))
 

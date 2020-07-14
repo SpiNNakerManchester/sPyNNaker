@@ -12,9 +12,9 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 import os
 import logging
+import statistics
 from collections import defaultdict
 
 from spinn_utilities.log import FormatAdapter
@@ -26,6 +26,27 @@ logger = FormatAdapter(logging.getLogger(__name__))
 class RedundantPacketCountReport(object):
 
     _FILE_NAME = "redundant_packet_count.rpt"
+    _N_PROV_ITEMS_NEEDED = 4
+    _MAX = 100
+
+    _CORE_LEVEL_MSG = (
+        "core {} \n\n    {} packets received.\n    {} were detected as "
+        "redundant packets by the bitfield filter.\n    {} were detected as "
+        "having no targets after the DMA stage.\n    {} were detected as "
+        "packets which we should not have received in the first place. \n"
+        "    Overall this makes a redundant percentage of {}\n")
+
+    _SUMMARY_LEVEL_MSG = (
+        "overall, the core with the most incoming packets had {} packets.\n"
+        "         The core with the least incoming packets had {} packets.\n"
+        "         The core with the most redundant packets had {} packets.\n"
+        "         The core with the least redundant packets had {} packets.\n"
+        "         The average incoming and redundant were {} and {}.\n"
+        "         The max and min percentages of redundant packets are {}"
+        " and {}. \n"
+        "         The average redundant percentages from each core were {} "
+        "accordingly."
+    )
 
     def __call__(self, provenance_items, report_default_directory):
         file_name = os.path.join(report_default_directory, self._FILE_NAME)
@@ -37,9 +58,12 @@ class RedundantPacketCountReport(object):
             logger.exception("Generate_placement_reports: Can't open file"
                              " {} for writing.", self._FILE_NAME)
 
-    @staticmethod
-    def _write_report(output, provenance_items):
+    def _write_report(self, output, provenance_items):
         data = defaultdict(dict)
+
+        overall_entries = list()
+        overall_redundant = list()
+        overall_redundant_percentage = list()
 
         for provenance_item in provenance_items:
             last_name = provenance_item.names[-1]
@@ -55,7 +79,7 @@ class RedundantPacketCountReport(object):
                 data[key][last_name] = provenance_item.value
 
                 # accum enough data on a core to do summary
-                if len(data[key].keys()) == 4:
+                if len(data[key].keys()) == self._N_PROV_ITEMS_NEEDED:
 
                     # total packets received
                     total = (
@@ -78,26 +102,29 @@ class RedundantPacketCountReport(object):
 
                     percentage = 0
                     if total != 0:
-                        percentage = (100.0 / total) * redundant
+                        percentage = (self._MAX / total) * redundant
 
-                    output.write(
-                        "core {} \n\n"
-                        "    {} packets received.\n"
-                        "    {} were detected as redundant packets by the "
-                        "bitfield filter.\n"
-                        "    {} were detected as having no "
-                        "targets after the DMA stage.\n"
-                        "    {} were detected as "
-                        "packets which we should not have received in the "
-                        "first place. \n"
-                        "    Overall this makes a redundant "
-                        "percentage of {}\n".format(
-                            key, total,
-                            data[key][
-                                PopulationMachineVertex.
-                                BIT_FIELD_FILTERED_PACKETS],
-                            data[key][PopulationMachineVertex.GHOST_SEARCHES],
-                            data[key][
-                                PopulationMachineVertex.
-                                INVALID_MASTER_POP_HITS],
-                            percentage))
+                    # add to the trackers for summary data
+                    overall_entries.append(total)
+                    overall_redundant.append(redundant)
+                    overall_redundant_percentage.append(percentage)
+
+                    output.write(self._CORE_LEVEL_MSG.format(
+                        key, total,
+                        data[key][
+                            PopulationMachineVertex.
+                            BIT_FIELD_FILTERED_PACKETS],
+                        data[key][PopulationMachineVertex.GHOST_SEARCHES],
+                        data[key][
+                            PopulationMachineVertex.INVALID_MASTER_POP_HITS],
+                        percentage))
+
+        # do summary
+        output.write(self._SUMMARY_LEVEL_MSG.format(
+            max(overall_entries), min(overall_entries),
+            max(overall_redundant), min(overall_redundant),
+            statistics.mean(overall_entries),
+            statistics.mean(overall_redundant),
+            max(overall_redundant_percentage),
+            min(overall_redundant_percentage),
+            statistics.mean(overall_redundant_percentage)))
