@@ -14,14 +14,16 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-
+from six import add_metaclass
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spinn_utilities.overrides import overrides
 from spinn_front_end_common.abstract_models.\
     abstract_supports_bit_field_generation import \
     AbstractSupportsBitFieldGeneration
 from spinn_front_end_common.interface.interface_functions.\
     machine_bit_field_router_compressor import (
-    MachineBitFieldPairRouterCompressor,
-    MachineBitFieldUnorderedRouterCompressor)
+        MachineBitFieldPairRouterCompressor,
+        MachineBitFieldUnorderedRouterCompressor)
 from spinn_front_end_common.utilities import system_control_logic
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinnman.model import ExecutableTargets
@@ -31,7 +33,7 @@ from spynnaker.pyNN.models.utility_models.synapse_expander. \
 
 logger = logging.getLogger(__name__)
 
-
+@add_metaclass(AbstractBase)
 class SpynnakerMachineBitFieldRouterCompressor(object):
 
     def __call__(
@@ -96,6 +98,10 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
 
         return prov_items
 
+    @abstractmethod
+    def compressor_factory(self):
+        "Method to call the specific compressor to use"
+
     @staticmethod
     def _locate_synaptic_expander_cores(
             cores, executable_finder, placements, machine):
@@ -155,14 +161,16 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
 
 
 class SpynnakerMachineBitFieldUnorderedRouterCompressor(
-    SpynnakerMachineBitFieldRouterCompressor):
+        SpynnakerMachineBitFieldRouterCompressor):
 
+    @overrides(SpynnakerMachineBitFieldRouterCompressor.compressor_factory)
     def compressor_factory(self):
         return MachineBitFieldUnorderedRouterCompressor()
 
 
 class SpynnakerMachineBitFieldPairRouterCompressor(
-    SpynnakerMachineBitFieldRouterCompressor):
+        SpynnakerMachineBitFieldRouterCompressor):
 
+    @overrides(SpynnakerMachineBitFieldRouterCompressor.compressor_factory)
     def compressor_factory(self):
         return MachineBitFieldPairRouterCompressor()
