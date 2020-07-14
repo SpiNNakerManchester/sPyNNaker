@@ -449,7 +449,7 @@ class DelayExtensionVertex(
     @overrides(AbstractProvidesNKeysForPartition.get_n_keys_for_partition)
     def get_n_keys_for_partition(self, partition):
         """
-        :param ~pacman.model.graphs.OutgoingEdgePartition partition:
+        :param ~pacman.model.graphs.AbstractSingleSourcePartition partition:
         :rtype: int
         """
         vertex_slice = partition.pre_vertex.vertex_slice
