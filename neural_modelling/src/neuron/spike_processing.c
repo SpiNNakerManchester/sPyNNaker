@@ -167,7 +167,7 @@ static inline bool is_something_to_do(
     cpsr = spin1_int_disable();
 
     // track for provenance
-    uint32_t input_buffer_filled_size = in_spikes_real_size();
+    uint32_t input_buffer_filled_size = in_spikes_size();
     if (biggest_fill_size_of_input_buffer < input_buffer_filled_size) {
         biggest_fill_size_of_input_buffer = input_buffer_filled_size;
     }

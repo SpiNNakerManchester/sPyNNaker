@@ -840,6 +840,7 @@ class SynapticManager(object):
                         generate_on_machine.append(_Gen(
                             synapse_info, pre_slices, pre_vertex_slice,
                             pre_vertex.index, edge.app_edge, rinfo))
+                        spec.comment("Will generate on machine")
                         continue
 
                     block_addr, single_addr, index = self.__write_block(
@@ -1452,14 +1453,6 @@ class SynapticManager(object):
 
         block = None
         if max_row_length > 0 and synaptic_block_offset is not None:
-            # if exploiting the extra monitor cores, need to set the machine
-            # for data extraction mode
-            if using_monitors and handle_time_out_configuration:
-                data_receiver.load_system_routing_tables(
-                    txrx, monitor_cores, placements)
-                data_receiver.set_cores_for_data_streaming(
-                    txrx, monitor_cores, placements)
-
             # read in the synaptic block
             if not is_single:
                 block = self.__read_multiple_synaptic_blocks(
@@ -1471,12 +1464,6 @@ class SynapticManager(object):
                     txrx, data_receiver, placement, n_rows,
                     direct_synapses_address + synaptic_block_offset,
                     using_monitors, extra_monitor, fixed_routes, placements)
-
-            if using_monitors and handle_time_out_configuration:
-                data_receiver.unset_cores_for_data_streaming(
-                    txrx, monitor_cores, placements)
-                data_receiver.load_application_routing_tables(
-                    txrx, monitor_cores, placements)
 
         result = (block, max_row_length)
         self.__retrieved_blocks[placement, key, index] = result

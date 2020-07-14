@@ -78,8 +78,9 @@ static bool bit_field_filter_initialise(address_t bitfield_region_address) {
         log_debug("putting key %d in position %d", key, position_in_array);
 
         // alloc sdram into right region
-        connectivity_bit_field[position_in_array] = spin1_malloc(
-                sizeof(bit_field_t) * n_words);
+        //connectivity_bit_field[position_in_array] = spin1_malloc(
+        //        sizeof(bit_field_t) * n_words);
+        connectivity_bit_field[position_in_array] = NULL;
         if (connectivity_bit_field[position_in_array] == NULL) {
             log_debug(
                     "could not initialise bit field for key %d, packets with "
@@ -106,5 +107,10 @@ static bool bit_field_filter_initialise(address_t bitfield_region_address) {
         }
     }
     population_table_set_connectivity_bit_field(connectivity_bit_field);
+
+    log_info(
+        "was able to read %d bitfields into DTCM. Failed to read %d bitfields",
+        filter_region->n_redundancy_filters - failed_bit_field_reads,
+        failed_bit_field_reads);
     return true;
 }
