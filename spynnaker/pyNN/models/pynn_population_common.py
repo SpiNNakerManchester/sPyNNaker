@@ -74,10 +74,19 @@ class PyNNPopulationCommon(object):
                 raise ConfigurationException(
                     "A population cannot have a negative or zero size.")
             population_parameters = dict(model.default_population_parameters)
+
+            if (additional_parameters is not None and
+                    "rb_left_shifts" in additional_parameters.keys()):
+                rb_left_shifts = additional_parameters['rb_left_shifts']
+                del additional_parameters['rb_left_shifts']
+            else:
+                rb_left_shifts = None
             if additional_parameters is not None:
                 population_parameters.update(additional_parameters)
             self.__vertex = model.create_vertex(
                 size, label, constraints, **population_parameters)
+            if rb_left_shifts is not None:
+                self.__vertex.rb_left_shifts = rb_left_shifts
 
         # Use a provided application vertex directly
         elif isinstance(model, ApplicationVertex):

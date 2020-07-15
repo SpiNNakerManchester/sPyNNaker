@@ -445,6 +445,7 @@ class SynapticManager(object):
         weights_signed = False
         rate_stats = [RunningStats() for _ in range(n_synapse_types)]
         steps_per_second = MICRO_TO_SECOND_CONVERSION / machine_timestep
+        min_max_weight = numpy.ones(n_synapse_types) * 2 ** 32
 
         for app_edge in application_graph.get_edges_ending_at_vertex(
                 application_vertex):
@@ -472,6 +473,9 @@ class SynapticManager(object):
 
                     weight_max = (synapse_dynamics.get_weight_maximum(
                         connector, synapse_info) * weight_scale)
+                    min_max_weight[synapse_type] = \
+                        min(min_max_weight[synapse_type], weight_max)
+
                     biggest_weight[synapse_type] = max(
                         biggest_weight[synapse_type], weight_max)
 
@@ -518,6 +522,10 @@ class SynapticManager(object):
                     total_weights[synapse_type])
                 max_weights[synapse_type] = max(
                     max_weights[synapse_type], biggest_weight[synapse_type])
+            # This is to deal with very small weights that are floored to 0
+            mmw = 2**math.floor(math.log(min_max_weight[synapse_type], 2))
+            max_weights[synapse_type] = min(mmw * 2 ** 15,
+                                            max_weights[synapse_type])
 
         # Convert these to powers
         max_weight_powers = (
@@ -534,8 +542,8 @@ class SynapticManager(object):
         # Add another bit of shift to prevent overflows
         if weights_signed:
             max_weight_powers = (m + 1 for m in max_weight_powers)
-
-        return list(max_weight_powers)
+        rb_ls = list(max_weight_powers)
+        return rb_ls
 
     @staticmethod
     def _get_weight_scale(ring_buffer_to_input_left_shift):
@@ -914,11 +922,23 @@ class SynapticManager(object):
             weight_scale):
         """ Get the ring buffer shifts for this vertex
         """
+        if (self.__ring_buffer_shifts is None and
+                hasattr(application_vertex, "rb_left_shifts")):
+            print("=" * 80)
+            print("Using given values for RB left shifts.")
+            self.__ring_buffer_shifts = application_vertex.rb_left_shifts
+            print("RB left shifts for {:20}".format(application_vertex.label),
+                  "=", self.__ring_buffer_shifts)
+            print("-" * 80)
         if self.__ring_buffer_shifts is None:
+            print("=" * 80)
+            print("Computing values for RB left shifts...")
             self.__ring_buffer_shifts = \
                 self._get_ring_buffer_to_input_left_shifts(
                     application_vertex, application_graph, machine_timestep,
                     weight_scale)
+            print("RB left shifts for {:20}".format(application_vertex.label),
+                  "=", self.__ring_buffer_shifts)
         return self.__ring_buffer_shifts
 
     def write_data_spec(
