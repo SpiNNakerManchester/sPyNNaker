@@ -61,8 +61,7 @@ class AbstractAcceptsIncomingSynapses(object):
     def get_connections_from_machine(
             self, transceiver, placement, edge, routing_infos,
             synapse_information, machine_time_step, using_extra_monitor_cores,
-            placements=None, monitor_api=None, monitor_cores=None,
-            handle_time_out_configuration=True, fixed_routes=None,
+            placements=None, monitor_api=None, fixed_routes=None,
             extra_monitor=None):
         # pylint: disable=too-many-arguments
         """ Get the connections from the machine post-run.
@@ -79,13 +78,8 @@ class AbstractAcceptsIncomingSynapses(object):
         :param monitor_api:
         :type monitor_api: None or \
             ~spinn_front_end_common.utility_models.DataSpeedUpPacketGatherMachineVertex
-        :param monitor_placement:
-        :type monitor_placement: None or ~pacman.model.placements.Placement
-        :param monitor_cores:
-        :type monitor_cores: None or \
-            iterable(~spinn_front_end_common.utility_models.ExtraMonitorSupportMachineVertex)
-        :param bool handle_time_out_configuration:
         :param fixed_routes:
+        :param extra_monitor: the extra monitor for this
         :type fixed_routes: None or \
             dict(tuple(int,int),~spinn_machine.FixedRouteEntry)
         """
