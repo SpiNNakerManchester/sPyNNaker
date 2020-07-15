@@ -33,6 +33,7 @@ from spynnaker.pyNN.models.utility_models.synapse_expander. \
 
 logger = logging.getLogger(__name__)
 
+
 @add_metaclass(AbstractBase)
 class SpynnakerMachineBitFieldRouterCompressor(object):
 
