@@ -75,17 +75,23 @@ class DelayExtensionVertex(
         "__n_subvertices",
         "__n_data_specs"]
 
+    ESTIMATED_CPU_CYCLES = 128
+
     def __init__(self, n_neurons, delay_per_stage, source_vertex,
                  machine_time_step, time_scale_factor, constraints=None,
                  label="DelayExtension"):
         """
-        :param n_neurons: the number of neurons
-        :param delay_per_stage: the delay per stage
-        :param source_vertex: where messages are coming from
-        :param machine_time_step: how long is the machine time step
-        :param time_scale_factor: what slowdown factor has been applied
-        :param constraints: the vertex constraints
-        :param label: the vertex label
+        :param int n_neurons: the number of neurons
+        :param int delay_per_stage: the delay per stage
+        :param ~pacman.model.graphs.application.ApplicationVertex \
+                source_vertex:
+            where messages are coming from
+        :param int machine_time_step: how long is the machine time step
+        :param int time_scale_factor: what slowdown factor has been applied
+        :param iterable(~pacman.model.constraints.AbstractConstraint) \
+                constraints:
+            the vertex constraints
+        :param str label: the vertex label
         """
         # pylint: disable=too-many-arguments
         super(DelayExtensionVertex, self).__init__(label, constraints, 256)
@@ -114,13 +120,16 @@ class DelayExtensionVertex(
             constraints=None):
         self.__n_subvertices += 1
         return DelayExtensionMachineVertex(
-            resources_required, label, constraints)
+            resources_required, label, constraints, self, vertex_slice)
 
     @inject_items({
         "graph": "MemoryApplicationGraph"})
     @overrides(SplitterByAtoms.get_resources_used_by_atoms,
                additional_arguments={"graph"})
     def get_resources_used_by_atoms(self, vertex_slice, graph):
+        """
+        :param ~pacman.model.graphs.application.ApplicationGraph graph:
+        """
         # pylint: disable=arguments-differ
         out_edges = graph.get_edges_starting_at_vertex(self)
         return ResourceContainer(
@@ -139,6 +148,8 @@ class DelayExtensionVertex(
     def n_delay_stages(self):
         """ The maximum number of delay stages required by any connection\
             out of this delay extension vertex
+
+        :rtype: int
         """
         return self.__n_delay_stages
 
@@ -148,17 +159,23 @@ class DelayExtensionVertex(
 
     @property
     def source_vertex(self):
+        """
+        :rtype: ~pacman.model.graphs.application.ApplicationVertex
+        """
         return self.__source_vertex
 
     def add_delays(self, vertex_slice, source_ids, stages):
         """ Add delayed connections for a given vertex slice
+
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :param list(int) source_ids:
+        :param list(int) stages:
         """
-        key = (vertex_slice.lo_atom, vertex_slice.hi_atom)
-        if key not in self.__delay_blocks:
-            self.__delay_blocks[key] = DelayBlock(
+        if vertex_slice not in self.__delay_blocks:
+            self.__delay_blocks[vertex_slice] = DelayBlock(
                 self.__n_delay_stages, self.__delay_per_stage, vertex_slice)
         for (source_id, stage) in zip(source_ids, stages):
-            self.__delay_blocks[key].add_delay(source_id, stage)
+            self.__delay_blocks[vertex_slice].add_delay(source_id, stage)
 
     def add_generator_data(
             self, max_row_n_synapses, max_delayed_row_n_synapses,
@@ -166,9 +183,21 @@ class DelayExtensionVertex(
             pre_vertex_slice, post_vertex_slice, synapse_information,
             max_stage, machine_time_step):
         """ Add delays for a connection to be generated
+
+        :param int max_row_n_synapses:
+        :param int max_delayed_row_n_synapses:
+        :param list(~pacman.model.graphs.common.Slice) pre_slices:
+        :param int pre_slice_index:
+        :param list(~pacman.model.graphs.common.Slice) post_slices:
+        :param int post_slice_index:
+        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+        :param ~spynnaker.pyNN.models.neural_projections.SynapseInformation \
+                synapse_information:
+        :param int max_stage:
+        :param int machine_time_step:
         """
-        key = (post_vertex_slice.lo_atom, post_vertex_slice.hi_atom)
-        self.__delay_generator_data[key].append(
+        self.__delay_generator_data[post_vertex_slice].append(
             DelayGeneratorData(
                 max_row_n_synapses, max_delayed_row_n_synapses,
                 pre_slices, pre_slice_index, post_slices, post_slice_index,
@@ -177,18 +206,17 @@ class DelayExtensionVertex(
 
     @inject_items({
         "machine_graph": "MemoryMachineGraph",
-        "graph_mapper": "MemoryGraphMapper",
-        "routing_infos": "MemoryRoutingInfos"
-    })
+        "routing_infos": "MemoryRoutingInfos"})
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,
-        additional_arguments={
-            "machine_graph", "graph_mapper", "routing_infos"
-        })
+        additional_arguments={"machine_graph", "routing_infos"})
     def generate_data_specification(
-            self, spec, placement,
-            machine_graph, graph_mapper, routing_infos):
-        # pylint: disable=too-many-arguments, arguments-differ
+            self, spec, placement, machine_graph, routing_infos):
+        """
+        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
+        :param ~pacman.model.routing_info.RoutingInfo routing_infos:
+        """
+        # pylint: disable=arguments-differ
 
         vertex = placement.vertex
 
@@ -197,7 +225,7 @@ class DelayExtensionVertex(
 
         # ###################################################################
         # Reserve SDRAM space for memory areas:
-        vertex_slice = graph_mapper.get_slice(vertex)
+        vertex_slice = vertex.vertex_slice
         n_words_per_stage = int(
             math.ceil(vertex_slice.n_atoms / BITS_PER_WORD))
         delay_params_sz = BYTES_PER_WORD * (
@@ -206,8 +234,7 @@ class DelayExtensionVertex(
 
         spec.reserve_memory_region(
             region=_DELEXT_REGIONS.SYSTEM.value,
-            size=SIMULATION_N_BYTES,
-            label='setup')
+            size=SIMULATION_N_BYTES, label='setup')
 
         spec.reserve_memory_region(
             region=_DELEXT_REGIONS.DELAY_PARAMS.value,
@@ -216,7 +243,7 @@ class DelayExtensionVertex(
         # reserve region for provenance
         vertex.reserve_provenance_data_region(spec)
 
-        self.write_setup_info(
+        self._write_setup_info(
             spec, self.__machine_time_step, self.__time_scale_factor)
 
         spec.comment("\n*** Spec for Delay Extension Instance ***\n\n")
@@ -230,8 +257,7 @@ class DelayExtensionVertex(
             vertex)
 
         for incoming_edge in incoming_edges:
-            incoming_slice = graph_mapper.get_slice(
-                incoming_edge.pre_vertex)
+            incoming_slice = incoming_edge.pre_vertex.vertex_slice
             if (incoming_slice.lo_atom == vertex_slice.lo_atom and
                     incoming_slice.hi_atom == vertex_slice.hi_atom):
                 r_info = routing_infos.get_routing_info_for_edge(incoming_edge)
@@ -245,9 +271,8 @@ class DelayExtensionVertex(
             self.__n_subvertices, self.__machine_time_step,
             self.__time_scale_factor, n_outgoing_edges)
 
-        key = (vertex_slice.lo_atom, vertex_slice.hi_atom)
-        if key in self.__delay_generator_data:
-            generator_data = self.__delay_generator_data[key]
+        if vertex_slice in self.__delay_generator_data:
+            generator_data = self.__delay_generator_data[vertex_slice]
             expander_size = sum(data.size for data in generator_data)
             expander_size += _EXPANDER_BASE_PARAMS_SIZE
             spec.reserve_memory_region(
@@ -263,8 +288,12 @@ class DelayExtensionVertex(
         # End-of-Spec:
         spec.end_specification()
 
-    def write_setup_info(self, spec, machine_time_step, time_scale_factor):
-
+    def _write_setup_info(self, spec, machine_time_step, time_scale_factor):
+        """
+        :param ~data_specification.DataSpecificationGenerator spec:
+        :param int machine_time_step:
+        :param int time_scale_factor:
+        """
         # Write this to the system region (to be picked up by the simulation):
         spec.switch_write_focus(_DELEXT_REGIONS.SYSTEM.value)
         spec.write_array(simulation_utilities.get_simulation_header_array(
@@ -276,6 +305,16 @@ class DelayExtensionVertex(
             total_n_vertices, machine_time_step, time_scale_factor,
             n_outgoing_edges):
         """ Generate Delay Parameter data
+
+        :param ~data_specification.DataSpecificationGenerator spec:
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :param int key:
+        :param int incoming_key:
+        :param int incoming_mask:
+        :param int total_n_vertices:
+        :param int machine_time_step:
+        :param int time_scale_factor:
+        :param int n_outgoing_edges:
         """
         # pylint: disable=too-many-arguments
 
@@ -317,19 +356,25 @@ class DelayExtensionVertex(
         spec.write_value(n_outgoing_edges)
 
         # Write the actual delay blocks (create a new one if it doesn't exist)
-        key = (vertex_slice.lo_atom, vertex_slice.hi_atom)
-        if key in self.__delay_blocks:
-            delay_block = self.__delay_blocks[key]
+        if vertex_slice in self.__delay_blocks:
+            delay_block = self.__delay_blocks[vertex_slice]
         else:
             delay_block = DelayBlock(
                 self.__n_delay_stages, self.__delay_per_stage, vertex_slice)
         spec.write_array(array_values=delay_block.delay_block)
 
     def get_cpu_usage_for_atoms(self, vertex_slice):
-        n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
-        return 128 * n_atoms
+        """
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :rtype: int
+        """
+        return self.ESTIMATED_CPU_CYCLES * vertex_slice.n_atoms
 
     def get_sdram_usage_for_atoms(self, out_edges):
+        """
+        :param list(.ApplicationEdge) out_edges:
+        :rtype: int
+        """
         return (
             SYSTEM_BYTES_REQUIREMENT +
             DelayExtensionMachineVertex.get_provenance_data_size(
@@ -338,6 +383,8 @@ class DelayExtensionVertex(
 
     def _get_edge_generator_size(self, synapse_info):
         """ Get the size of the generator data for a given synapse info object
+
+        :param SynapseInformation synapse_info:
         """
         connector = synapse_info.connector
         dynamics = synapse_info.synapse_dynamics
@@ -358,6 +405,9 @@ class DelayExtensionVertex(
 
     def _get_size_of_generator_information(self, out_edges):
         """ Get the size of the generator data for all edges
+
+        :param list(.ApplicationEdge) out_edges:
+        :rtype: int
         """
         gen_on_machine = False
         size = 0
@@ -382,9 +432,12 @@ class DelayExtensionVertex(
         return size
 
     def get_dtcm_usage_for_atoms(self, vertex_slice):
-        n_atoms = (vertex_slice.hi_atom - vertex_slice.lo_atom) + 1
+        """
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :rtype: int
+        """
         words_per_atom = 11 + 16
-        return words_per_atom * BYTES_PER_WORD * n_atoms
+        return words_per_atom * BYTES_PER_WORD * vertex_slice.n_atoms
 
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
     def get_binary_file_name(self):
@@ -394,8 +447,13 @@ class DelayExtensionVertex(
     def get_binary_start_type(self):
         return ExecutableType.USES_SIMULATION_INTERFACE
 
-    def get_n_keys_for_partition(self, partition, graph_mapper):
-        vertex_slice = graph_mapper.get_slice(partition.pre_vertex)
+    @overrides(AbstractProvidesNKeysForPartition.get_n_keys_for_partition)
+    def get_n_keys_for_partition(self, partition):
+        """
+        :param ~pacman.model.graphs.OutgoingEdgePartition partition:
+        :rtype: int
+        """
+        vertex_slice = partition.pre_vertex.vertex_slice
         if self.__n_delay_stages == 0:
             return 1
         return vertex_slice.n_atoms * self.__n_delay_stages
@@ -407,6 +465,8 @@ class DelayExtensionVertex(
 
     def gen_on_machine(self, vertex_slice):
         """ Determine if the given slice needs to be generated on the machine
+
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :rtype: bool
         """
-        key = (vertex_slice.lo_atom, vertex_slice.hi_atom)
-        return key in self.__delay_generator_data
+        return vertex_slice in self.__delay_generator_data

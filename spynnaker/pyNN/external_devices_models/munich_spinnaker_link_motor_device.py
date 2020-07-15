@@ -81,6 +81,18 @@ class MunichMotorDevice(
             self, spinnaker_link_id, board_address=None, speed=30,
             sample_time=4096, update_time=512, delay_time=5,
             delta_threshold=23, continue_if_not_different=True, label=None):
+        """
+        :param int spinnaker_link_id:
+            The SpiNNaker link to which the motor is connected
+        :param str board_address:
+        :param int speed:
+        :param int sample_time:
+        :param int update_time:
+        :param int delay_time:
+        :param int delta_threshold:
+        :param bool continue_if_not_different:
+        :param str label:
+        """
         # pylint: disable=too-many-arguments
 
         super(MunichMotorDevice, self).__init__(label)
@@ -102,7 +114,8 @@ class MunichMotorDevice(
     @overrides(SplitterByAtoms.create_machine_vertex)
     def create_machine_vertex(self, vertex_slice, resources_required,
                               label=None, constraints=None):
-        return SimpleMachineVertex(resources_required, label, constraints)
+        return SimpleMachineVertex(
+            resources_required, label, constraints, self, vertex_slice)
 
     @overrides(SplitterByAtoms.get_resources_used_by_atoms)
     def get_resources_used_by_atoms(self, vertex_slice):
@@ -177,9 +190,13 @@ class MunichMotorDevice(
 
     def reserve_memory_regions(self, spec):
         """ Reserve SDRAM space for memory areas:
-        1) Area for information on what data to record
-        2) area for start commands
-        3) area for end commands
+
+        #. Area for information on what data to record
+        #. area for start commands
+        #. area for end commands
+
+        :param spec: The data specification to write to
+        :type spec: ~data_specification.DataSpecificationGenerator
         """
         spec.comment("\nReserving memory space for data regions:\n\n")
 
