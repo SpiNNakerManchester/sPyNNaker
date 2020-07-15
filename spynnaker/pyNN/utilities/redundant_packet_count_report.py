@@ -45,7 +45,8 @@ class RedundantPacketCountReport(object):
         "         The max and min percentages of redundant packets are {}"
         " and {}. \n"
         "         The average redundant percentages from each core were {} "
-        "accordingly."
+        "accordingly.\n"
+        "          The total packets flown in system was {}"
     )
 
     def __call__(self, provenance_items, report_default_directory):
@@ -127,4 +128,5 @@ class RedundantPacketCountReport(object):
             statistics.mean(overall_redundant),
             max(overall_redundant_percentage),
             min(overall_redundant_percentage),
-            statistics.mean(overall_redundant_percentage)))
+            statistics.mean(overall_redundant_percentage),
+            sum(overall_entries)))

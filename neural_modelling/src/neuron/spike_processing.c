@@ -92,7 +92,7 @@ static uint32_t n_successful_rewires = 0;
 
 //! count how many packets were lost from the input buffer because of late
 //! arrival
-uint32_t count_input_buffer_packets_lost = 0;
+uint32_t count_input_buffer_packets_late = 0;
 
 //! tracker of how full the input buffer got.
 uint32_t biggest_fill_size_of_input_buffer = 0;
@@ -104,6 +104,9 @@ static bool clear_input_buffers_of_late_packets = false;
 static uint32_t last_packet_insert = 0;
 bool received_packet_this_step = false;
 uint32_t packets_in_buffer_at_time = 0;
+
+int spikes_received_this_time_step = 0;
+int total_spikes_received = 0;
 
 /* PRIVATE FUNCTIONS - static for inlining */
 
@@ -299,13 +302,15 @@ static void multicast_packet_received_callback(uint key, uint payload) {
             }
         }
     } else {
-        log_debug("Could not add spike");
+        log_info("Could not add spike");
     }
     last_packet_insert = tc[T1_COUNT];
     received_packet_this_step = true;
-    if(in_spikes_size() > packets_in_buffer_at_time){
+    if(in_spikes_size() > packets_in_buffer_at_time) {
         packets_in_buffer_at_time = in_spikes_size();
     }
+    spikes_received_this_time_step += 1;
+    total_spikes_received +=1;
 }
 
 //! \brief Called when a DMA completes
@@ -405,10 +410,12 @@ void user_event_callback(uint unused0, uint unused1) {
 //! \brief clears the input buffer of packets and records them
 void spike_processing_clear_input_buffer(void) {
     // Record the count whether clearing or not for provenance
-    count_input_buffer_packets_lost += in_spikes_size();
+    count_input_buffer_packets_late += in_spikes_size();
+    log_info("reiceved %d packets this time step", spikes_received_this_time_step);
+    spikes_received_this_time_step = 0;
     //log_info(
     //    "current lost packets = %d, max in buffer = %d",
-    //    count_input_buffer_packets_lost, packets_in_buffer_at_time);
+    //    count_input_buffer_packets_late, packets_in_buffer_at_time);
 
     if(clear_input_buffers_of_late_packets) {
         log_debug("clearing buffer");
@@ -485,6 +492,10 @@ uint32_t spike_processing_get_spike_processing_count(void) {
     return spike_processing_count;
 }
 
+int spike_processing_total_spikes(void) {
+    return total_spikes_received;
+}
+
 //! \brief get the address of the circular buffer used for buffering received
 //!     spikes before processing them
 //! \return address of circular buffer
@@ -497,7 +508,7 @@ uint32_t spike_processing_get_successful_rewires(void) { // EXPORTED
 }
 
 uint32_t spike_processing_get_n_packets_dropped_from_lateness(void) { // EXPORTED
-    return count_input_buffer_packets_lost;
+    return count_input_buffer_packets_late;
 }
 
 uint32_t spike_processing_get_max_filled_input_buffer_size(void) {

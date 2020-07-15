@@ -295,7 +295,7 @@ class PopulationMachineVertex(
                     label, x, y, p, n_ghost_searches))))
         provenance_items.append(ProvenanceDataItem(
             self._add_name(names, self.BIT_FIELDS_NOT_READ),
-            failed_to_read_bit_fields, report=failed_to_read_bit_fields > 0,
+            failed_to_read_bit_fields, report=False,
             message=(
                 "The filter for stopping redundant DMA's couldn't be fully "
                 "filled in, it failed to read {} entries, which means it "
@@ -323,7 +323,8 @@ class PopulationMachineVertex(
             n_packets_filtered_by_bit_field_filter,
             report=(
                     n_packets_filtered_by_bit_field_filter > 0 and (
-                    n_buffer_overflows > 0 or times_timer_tic_overran > 0)),
+                        n_buffer_overflows > 0 or
+                        times_timer_tic_overran > 0)),
             message=(
                 "There were {} packets received by {}:{}:{} that were "
                 "filtered by the Bitfield filterer on the core. These packets "
