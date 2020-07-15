@@ -1313,7 +1313,7 @@ class SynapticManager(object):
             transceiver, placement, master_pop_table, indirect_synapses,
             direct_synapses, key, pre_vertex_slice.n_atoms, index,
             using_extra_monitor_cores, placements, monitor_api,
-            fixed_routes=fixed_routes)
+            extra_monitor, fixed_routes=fixed_routes)
 
         # Get the block for the connections from the delayed pre_vertex
         delayed_data = None
