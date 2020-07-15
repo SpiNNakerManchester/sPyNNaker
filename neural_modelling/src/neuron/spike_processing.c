@@ -105,9 +105,6 @@ static uint32_t last_packet_insert = 0;
 bool received_packet_this_step = false;
 uint32_t packets_in_buffer_at_time = 0;
 
-int spikes_received_this_time_step = 0;
-int total_spikes_received = 0;
-
 /* PRIVATE FUNCTIONS - static for inlining */
 
 //! \brief Perform a DMA read of a synaptic row
@@ -247,8 +244,11 @@ static void setup_synaptic_dma_read(dma_buffer *current_buffer,
             do_dma_read(row_address, n_bytes_to_transfer, spike);
             setup_done = true;
         }
+
+        // needs to be here to ensure that its only recording actual spike
+        // processing and not the surplus DMA requests.
+        spike_processing_count++;
     }
-    spike_processing_count++;
 }
 
 //! \brief Set up a DMA write of synaptic data.
@@ -309,8 +309,6 @@ static void multicast_packet_received_callback(uint key, uint payload) {
     if(in_spikes_size() > packets_in_buffer_at_time) {
         packets_in_buffer_at_time = in_spikes_size();
     }
-    spikes_received_this_time_step += 1;
-    total_spikes_received +=1;
 }
 
 //! \brief Called when a DMA completes
@@ -411,8 +409,6 @@ void user_event_callback(uint unused0, uint unused1) {
 void spike_processing_clear_input_buffer(void) {
     // Record the count whether clearing or not for provenance
     count_input_buffer_packets_late += in_spikes_size();
-    log_info("reiceved %d packets this time step", spikes_received_this_time_step);
-    spikes_received_this_time_step = 0;
     //log_info(
     //    "current lost packets = %d, max in buffer = %d",
     //    count_input_buffer_packets_late, packets_in_buffer_at_time);
@@ -490,10 +486,6 @@ uint32_t spike_processing_get_dma_complete_count(void) {
 
 uint32_t spike_processing_get_spike_processing_count(void) {
     return spike_processing_count;
-}
-
-int spike_processing_total_spikes(void) {
-    return total_spikes_received;
 }
 
 //! \brief get the address of the circular buffer used for buffering received
