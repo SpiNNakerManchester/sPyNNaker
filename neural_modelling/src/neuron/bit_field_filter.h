@@ -78,9 +78,8 @@ static bool bit_field_filter_initialise(address_t bitfield_region_address) {
         log_debug("putting key %d in position %d", key, position_in_array);
 
         // alloc sdram into right region
-        //connectivity_bit_field[position_in_array] = spin1_malloc(
-        //        sizeof(bit_field_t) * n_words);
-        connectivity_bit_field[position_in_array] = NULL;
+        connectivity_bit_field[position_in_array] = spin1_malloc(
+                sizeof(bit_field_t) * n_words);
         if (connectivity_bit_field[position_in_array] == NULL) {
             log_debug(
                     "could not initialise bit field for key %d, packets with "
