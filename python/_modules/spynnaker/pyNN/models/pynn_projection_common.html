@@ -462,18 +462,29 @@
         <span class="n">progress</span> <span class="o">=</span> <span class="n">ProgressBar</span><span class="p">(</span>
             <span class="n">edges</span><span class="p">,</span> <span class="s2">&quot;Getting </span><span class="si">{}</span><span class="s2">s for projection between </span><span class="si">{}</span><span class="s2"> and </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                 <span class="n">data_to_get</span><span class="p">,</span> <span class="n">pre_vertex</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">post_vertex</span><span class="o">.</span><span class="n">label</span><span class="p">))</span>
+
+        <span class="c1"># store receivers to reduce surplus calls</span>
+        <span class="n">data_receivers</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
         <span class="k">for</span> <span class="n">edge</span> <span class="ow">in</span> <span class="n">progress</span><span class="o">.</span><span class="n">over</span><span class="p">(</span><span class="n">edges</span><span class="p">):</span>
             <span class="n">placement</span> <span class="o">=</span> <span class="n">ctl</span><span class="o">.</span><span class="n">placements</span><span class="o">.</span><span class="n">get_placement_of_vertex</span><span class="p">(</span>
                 <span class="n">edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="p">)</span>
 
             <span class="c1"># if using extra monitor data extractor find local receiver</span>
-            <span class="k">if</span> <span class="n">extra_monitors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">extra_monitors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">handle_time_out_configuration</span><span class="p">:</span>
                 <span class="n">receiver</span> <span class="o">=</span> <span class="n">locate_extra_monitor_mc_receiver</span><span class="p">(</span>
                     <span class="n">placement_x</span><span class="o">=</span><span class="n">placement</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">placement_y</span><span class="o">=</span><span class="n">placement</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
                     <span class="n">machine</span><span class="o">=</span><span class="n">ctl</span><span class="o">.</span><span class="n">machine</span><span class="p">,</span>
                     <span class="n">packet_gather_cores_to_ethernet_connection_map</span><span class="o">=</span><span class="n">receivers</span><span class="p">)</span>
                 <span class="n">sender_extra_monitor_core</span> <span class="o">=</span> <span class="n">extra_monitor_placements</span><span class="p">[</span>
                     <span class="n">placement</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">y</span><span class="p">]</span>
+
+                <span class="k">if</span> <span class="n">receiver</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">data_receivers</span><span class="p">:</span>
+                    <span class="n">data_receivers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">receiver</span><span class="p">)</span>
+                    <span class="n">receiver</span><span class="o">.</span><span class="n">load_system_routing_tables</span><span class="p">(</span>
+                        <span class="n">ctl</span><span class="o">.</span><span class="n">transceiver</span><span class="p">,</span> <span class="n">extra_monitors</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">placements</span><span class="p">)</span>
+                    <span class="n">receiver</span><span class="o">.</span><span class="n">set_cores_for_data_streaming</span><span class="p">(</span>
+                        <span class="n">ctl</span><span class="o">.</span><span class="n">transceiver</span><span class="p">,</span> <span class="n">extra_monitors</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">placements</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">receiver</span> <span class="o">=</span> <span class="kc">None</span>
                 <span class="n">sender_extra_monitor_core</span> <span class="o">=</span> <span class="kc">None</span>
@@ -482,11 +493,17 @@
                 <span class="n">ctl</span><span class="o">.</span><span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">edge</span><span class="p">,</span>
                 <span class="n">ctl</span><span class="o">.</span><span class="n">routing_infos</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_information</span><span class="p">,</span>
                 <span class="n">ctl</span><span class="o">.</span><span class="n">machine_time_step</span><span class="p">,</span> <span class="n">extra_monitors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span>
-                <span class="n">ctl</span><span class="o">.</span><span class="n">placements</span><span class="p">,</span> <span class="n">receiver</span><span class="p">,</span> <span class="n">extra_monitors</span><span class="p">,</span>
-                <span class="n">handle_time_out_configuration</span><span class="p">,</span>
-                <span class="n">ctl</span><span class="o">.</span><span class="n">fixed_routes</span><span class="p">,</span> <span class="n">sender_extra_monitor_core</span><span class="p">)</span>
+                <span class="n">ctl</span><span class="o">.</span><span class="n">placements</span><span class="p">,</span> <span class="n">receiver</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">fixed_routes</span><span class="p">,</span>
+                <span class="n">sender_extra_monitor_core</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">connections</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">connection_holder</span><span class="o">.</span><span class="n">add_connections</span><span class="p">(</span><span class="n">connections</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">data_receiver</span> <span class="ow">in</span> <span class="n">data_receivers</span><span class="p">:</span>
+            <span class="n">data_receiver</span><span class="o">.</span><span class="n">unset_cores_for_data_streaming</span><span class="p">(</span>
+                <span class="n">ctl</span><span class="o">.</span><span class="n">transceiver</span><span class="p">,</span> <span class="n">extra_monitors</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">placements</span><span class="p">)</span>
+            <span class="n">data_receiver</span><span class="o">.</span><span class="n">load_application_routing_tables</span><span class="p">(</span>
+                <span class="n">ctl</span><span class="o">.</span><span class="n">transceiver</span><span class="p">,</span> <span class="n">extra_monitors</span><span class="p">,</span> <span class="n">ctl</span><span class="o">.</span><span class="n">placements</span><span class="p">)</span>
+
         <span class="n">connection_holder</span><span class="o">.</span><span class="n">finish</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">_clear_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

@@ -126,8 +126,7 @@
 <div class="viewcode-block" id="AbstractAcceptsIncomingSynapses.get_connections_from_machine"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.abstract_models.html#spynnaker.pyNN.models.abstract_models.AbstractAcceptsIncomingSynapses.get_connections_from_machine">[docs]</a>    <span class="k">def</span> <span class="nf">get_connections_from_machine</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">edge</span><span class="p">,</span> <span class="n">routing_infos</span><span class="p">,</span>
             <span class="n">synapse_information</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">using_extra_monitor_cores</span><span class="p">,</span>
-            <span class="n">placements</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">monitor_api</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">monitor_cores</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">handle_time_out_configuration</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fixed_routes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">placements</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">monitor_api</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fixed_routes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">extra_monitor</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="c1"># pylint: disable=too-many-arguments</span>
         <span class="sd">&quot;&quot;&quot; Get the connections from the machine post-run.</span>
@@ -144,13 +143,8 @@
 <span class="sd">        :param monitor_api:</span>
 <span class="sd">        :type monitor_api: None or \</span>
 <span class="sd">            ~spinn_front_end_common.utility_models.DataSpeedUpPacketGatherMachineVertex</span>
-<span class="sd">        :param monitor_placement:</span>
-<span class="sd">        :type monitor_placement: None or ~pacman.model.placements.Placement</span>
-<span class="sd">        :param monitor_cores:</span>
-<span class="sd">        :type monitor_cores: None or \</span>
-<span class="sd">            iterable(~spinn_front_end_common.utility_models.ExtraMonitorSupportMachineVertex)</span>
-<span class="sd">        :param bool handle_time_out_configuration:</span>
 <span class="sd">        :param fixed_routes:</span>
+<span class="sd">        :param extra_monitor: the extra monitor for this</span>
 <span class="sd">        :type fixed_routes: None or \</span>
 <span class="sd">            dict(tuple(int,int),~spinn_machine.FixedRouteEntry)</span>
 <span class="sd">        &quot;&quot;&quot;</span></div>

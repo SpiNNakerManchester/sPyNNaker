@@ -1319,7 +1319,6 @@
             <span class="bp">self</span><span class="p">,</span> <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">machine_edge</span><span class="p">,</span>
             <span class="n">routing_infos</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span>
             <span class="n">using_extra_monitor_cores</span><span class="p">,</span> <span class="n">placements</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">monitor_api</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">monitor_cores</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">handle_time_out_configuration</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">fixed_routes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">extra_monitor</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param ~spinnman.transceiver.Transceiver transceiver:</span>
@@ -1343,14 +1342,6 @@
 <span class="sd">            Must not be ``None`` if ``using_extra_monitor_cores`` is true.</span>
 <span class="sd">        :type monitor_api:</span>
 <span class="sd">            ~spinn_front_end_common.utility_models.DataSpeedUpPacketGatherMachineVertex</span>
-<span class="sd">        :param monitor_cores: Where are all the monitors?</span>
-<span class="sd">            Must not be ``None`` if ``using_extra_monitor_cores`` is true.</span>
-<span class="sd">        :type monitor_cores:</span>
-<span class="sd">            list(~spinn_front_end_common.utility_models.ExtraMonitorSupportMachineVertex)</span>
-<span class="sd">            or None</span>
-<span class="sd">        :param bool handle_time_out_configuration:</span>
-<span class="sd">            Should we reconfigure the on-chip network to not time out?</span>
-<span class="sd">            (Should be true under all normal circumstances.)</span>
 <span class="sd">        :param fixed_routes:</span>
 <span class="sd">            What is the planned configuration of the Fixed Route packet</span>
 <span class="sd">            routing?</span>
@@ -1387,7 +1378,7 @@
             <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">master_pop_table</span><span class="p">,</span> <span class="n">indirect_synapses</span><span class="p">,</span>
             <span class="n">direct_synapses</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span>
             <span class="n">using_extra_monitor_cores</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">monitor_api</span><span class="p">,</span>
-            <span class="n">extra_monitor</span><span class="p">,</span> <span class="n">monitor_cores</span><span class="p">,</span> <span class="n">fixed_routes</span><span class="o">=</span><span class="n">fixed_routes</span><span class="p">)</span>
+            <span class="n">extra_monitor</span><span class="p">,</span> <span class="n">fixed_routes</span><span class="o">=</span><span class="n">fixed_routes</span><span class="p">)</span>
 
         <span class="c1"># Get the block for the connections from the delayed pre_vertex</span>
         <span class="n">delayed_data</span> <span class="o">=</span> <span class="kc">None</span>
@@ -1398,8 +1389,7 @@
                 <span class="n">direct_synapses</span><span class="p">,</span> <span class="n">delayed_key</span><span class="p">,</span>
                 <span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">*</span> <span class="n">app_edge</span><span class="o">.</span><span class="n">n_delay_stages</span><span class="p">,</span>
                 <span class="n">index</span><span class="p">,</span> <span class="n">using_extra_monitor_cores</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span>
-                <span class="n">monitor_api</span><span class="p">,</span> <span class="n">extra_monitor</span><span class="p">,</span> <span class="n">monitor_cores</span><span class="p">,</span>
-                <span class="n">handle_time_out_configuration</span><span class="p">,</span> <span class="n">fixed_routes</span><span class="o">=</span><span class="n">fixed_routes</span><span class="p">)</span>
+                <span class="n">monitor_api</span><span class="p">,</span> <span class="n">extra_monitor</span><span class="p">,</span> <span class="n">fixed_routes</span><span class="o">=</span><span class="n">fixed_routes</span><span class="p">)</span>
 
         <span class="c1"># Convert the blocks into connections</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_synapses</span><span class="p">(</span>
@@ -1462,8 +1452,7 @@
             <span class="bp">self</span><span class="p">,</span> <span class="n">txrx</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">master_pop_table_address</span><span class="p">,</span>
             <span class="n">indirect_synapses_address</span><span class="p">,</span> <span class="n">direct_synapses_address</span><span class="p">,</span>
             <span class="n">key</span><span class="p">,</span> <span class="n">n_rows</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">using_monitors</span><span class="p">,</span> <span class="n">placements</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">data_receiver</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">extra_monitor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">monitor_cores</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-            <span class="n">handle_time_out_configuration</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fixed_routes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <span class="n">data_receiver</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">extra_monitor</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fixed_routes</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Read in a synaptic block from a given processor and vertex on\</span>
 <span class="sd">            the machine</span>
 
@@ -1479,8 +1468,6 @@
 <span class="sd">        :param ~.Placements placements:</span>
 <span class="sd">        :param ~.DataSpeedUpPacketGatherMachineVertex data_receiver:</span>
 <span class="sd">        :param ~.ExtraMonitorSupportMachineVertex extra_monitor:</span>
-<span class="sd">        :param list(~.ExtraMonitorSupportMachineVertex) monitor_cores:</span>
-<span class="sd">        :param bool handle_time_out_configuration:</span>
 <span class="sd">        :param dict(tuple(int,int),~.FixedRouteEntry) fixed_routes:</span>
 <span class="sd">        :rtype: tuple(bytearray, int)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1499,14 +1486,6 @@
 
         <span class="n">block</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">max_row_length</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">synaptic_block_offset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="c1"># if exploiting the extra monitor cores, need to set the machine</span>
-            <span class="c1"># for data extraction mode</span>
-            <span class="k">if</span> <span class="n">using_monitors</span> <span class="ow">and</span> <span class="n">handle_time_out_configuration</span><span class="p">:</span>
-                <span class="n">data_receiver</span><span class="o">.</span><span class="n">load_system_routing_tables</span><span class="p">(</span>
-                    <span class="n">txrx</span><span class="p">,</span> <span class="n">monitor_cores</span><span class="p">,</span> <span class="n">placements</span><span class="p">)</span>
-                <span class="n">data_receiver</span><span class="o">.</span><span class="n">set_cores_for_data_streaming</span><span class="p">(</span>
-                    <span class="n">txrx</span><span class="p">,</span> <span class="n">monitor_cores</span><span class="p">,</span> <span class="n">placements</span><span class="p">)</span>
-
             <span class="c1"># read in the synaptic block</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">is_single</span><span class="p">:</span>
                 <span class="n">block</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__read_multiple_synaptic_blocks</span><span class="p">(</span>
@@ -1518,12 +1497,6 @@
                     <span class="n">txrx</span><span class="p">,</span> <span class="n">data_receiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">,</span> <span class="n">n_rows</span><span class="p">,</span>
                     <span class="n">direct_synapses_address</span> <span class="o">+</span> <span class="n">synaptic_block_offset</span><span class="p">,</span>
                     <span class="n">using_monitors</span><span class="p">,</span> <span class="n">extra_monitor</span><span class="p">,</span> <span class="n">fixed_routes</span><span class="p">,</span> <span class="n">placements</span><span class="p">)</span>
-
-            <span class="k">if</span> <span class="n">using_monitors</span> <span class="ow">and</span> <span class="n">handle_time_out_configuration</span><span class="p">:</span>
-                <span class="n">data_receiver</span><span class="o">.</span><span class="n">unset_cores_for_data_streaming</span><span class="p">(</span>
-                    <span class="n">txrx</span><span class="p">,</span> <span class="n">monitor_cores</span><span class="p">,</span> <span class="n">placements</span><span class="p">)</span>
-                <span class="n">data_receiver</span><span class="o">.</span><span class="n">load_application_routing_tables</span><span class="p">(</span>
-                    <span class="n">txrx</span><span class="p">,</span> <span class="n">monitor_cores</span><span class="p">,</span> <span class="n">placements</span><span class="p">)</span>
 
         <span class="n">result</span> <span class="o">=</span> <span class="p">(</span><span class="n">block</span><span class="p">,</span> <span class="n">max_row_length</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__retrieved_blocks</span><span class="p">[</span><span class="n">placement</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">result</span>
