@@ -836,8 +836,7 @@ class SynapticManager(object):
                         generate_on_machine.append(_Gen(
                             synapse_info, pre_slices, pre_vertex_slice,
                             pre_vertex.index, app_edge, rinfo))
-                    else:
-                         continue
+                        continue
 
                     block_addr, single_addr, index = self.__write_block(
                         spec, synapse_info, pre_slices, pre_vertex.index,
@@ -903,7 +902,7 @@ class SynapticManager(object):
             connector.generate_on_machine(
                 synapse_info.weights, synapse_info.delays) and
             isinstance(dynamics, AbstractGenerateOnMachine) and
-            dynamics.generate_on_machine and
+            dynamics.generate_on_machine() and
             not isinstance(
                 self.synapse_dynamics, AbstractSynapseDynamicsStructural) and
             not self.__is_direct(
