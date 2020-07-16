@@ -1089,4 +1089,3 @@ class SpikeSourcePoissonVertex(
     @overrides(AbstractSpikeRecordable.get_spike_machine_vertices)
     def get_spike_machine_vertices(self):
         return self.machine_vertices
-
