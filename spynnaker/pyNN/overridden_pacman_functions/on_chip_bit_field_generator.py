@@ -97,7 +97,7 @@ class OnChipBitFieldGenerator(object):
 
         # progress bar
         progress = ProgressBar(
-            len(app_graph.vertices) + 2,
+            len(app_graph.vertices) * 2 + 1,
             "Running bitfield generation on chip")
 
         # get data
@@ -113,8 +113,8 @@ class OnChipBitFieldGenerator(object):
             expander_cores, bit_field_app_id, transceiver,
             provenance_file_path, executable_finder,
             read_bit_field_generator_iobuf, self._check_for_success,
-            None, [CPUState.FINISHED], False, 0,
-            "bit_field_expander_on_{}_{}_{}.txt")
+            [CPUState.FINISHED], False, 0,
+            "bit_field_expander_on_{}_{}_{}.txt", progress_bar=progress)
         # update progress bar
         progress.end()
 

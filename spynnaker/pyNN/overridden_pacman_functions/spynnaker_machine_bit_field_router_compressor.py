@@ -14,13 +14,16 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-
+from six import add_metaclass
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
+from spinn_utilities.overrides import overrides
 from spinn_front_end_common.abstract_models.\
     abstract_supports_bit_field_generation import \
     AbstractSupportsBitFieldGeneration
 from spinn_front_end_common.interface.interface_functions.\
-    machine_bit_field_router_compressor import \
-    MachineBitFieldRouterCompressor
+    machine_bit_field_router_compressor import (
+        MachineBitFieldPairRouterCompressor,
+        MachineBitFieldUnorderedRouterCompressor)
 from spinn_front_end_common.utilities import system_control_logic
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinnman.model import ExecutableTargets
@@ -31,6 +34,7 @@ from spynnaker.pyNN.models.utility_models.synapse_expander. \
 logger = logging.getLogger(__name__)
 
 
+@add_metaclass(AbstractBase)
 class SpynnakerMachineBitFieldRouterCompressor(object):
 
     def __call__(
@@ -41,7 +45,7 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
             routing_infos, time_to_try_for_each_iteration, use_timer_cut_off,
             machine_time_step, time_scale_factor,
             no_sync_changes, threshold_percentage,
-            executable_targets, compress_only_when_needed=True,
+            executable_targets,
             compress_as_much_as_possible=False, provenance_data_objects=None):
         """ entrance for routing table compression with bit field
 
@@ -56,15 +60,13 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
          before its considered a success
         :param executable_finder: where are binaries are located
         :param read_algorithm_iobuf: bool flag saying if read iobuf
-        :param compress_only_when_needed: bool flag asking if compress only \
-        when needed
         :param compress_as_much_as_possible: bool flag asking if should \
         compress as much as possible
         :rtype: None
         """
 
         # build machine compressor
-        machine_bit_field_router_compressor = MachineBitFieldRouterCompressor()
+        machine_bit_field_router_compressor = self.compressor_factory()
         (compressor_executable_targets, prov_items) = \
             machine_bit_field_router_compressor(
                 routing_tables=routing_tables, transceiver=transceiver,
@@ -82,7 +84,6 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
                 time_scale_factor=time_scale_factor,
                 no_sync_changes=no_sync_changes,
                 threshold_percentage=threshold_percentage,
-                compress_only_when_needed=compress_only_when_needed,
                 compress_as_much_as_possible=compress_as_much_as_possible,
                 executable_targets=executable_targets)
 
@@ -97,6 +98,10 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
             executable_finder, True, no_sync_changes)
 
         return prov_items
+
+    @abstractmethod
+    def compressor_factory(self):
+        "Method to call the specific compressor to use"
 
     @staticmethod
     def _locate_synaptic_expander_cores(
@@ -151,6 +156,22 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
             expander_app_id = transceiver.app_id_tracker.get_new_id()
             system_control_logic.run_system_application(
                 synaptic_expander_rerun_cores, expander_app_id, transceiver,
-                provenance_file_path, executable_finder, True, None, None,
+                provenance_file_path, executable_finder, True, None,
                 [CPUState.FINISHED], needs_sync_barrier, no_sync_changes,
                 "rerun_of_synaptic_expander_on_{}_{}_{}.txt")
+
+
+class SpynnakerMachineBitFieldUnorderedRouterCompressor(
+        SpynnakerMachineBitFieldRouterCompressor):
+
+    @overrides(SpynnakerMachineBitFieldRouterCompressor.compressor_factory)
+    def compressor_factory(self):
+        return MachineBitFieldUnorderedRouterCompressor()
+
+
+class SpynnakerMachineBitFieldPairRouterCompressor(
+        SpynnakerMachineBitFieldRouterCompressor):
+
+    @overrides(SpynnakerMachineBitFieldRouterCompressor.compressor_factory)
+    def compressor_factory(self):
+        return MachineBitFieldPairRouterCompressor()
