@@ -66,8 +66,8 @@ class ProjectionMachineEdge(
         # Filter one-to-one connections that are out of range
         # Note: there may be other connectors stored on the same edge!
 
-        pre_app_vertex = self.pre_vertex.machine_vertices
-        post_app_vertex = self.post_vertex.machine_vertices
+        pre_app_vertex = self.pre_vertex.app_vertex
+        post_app_vertex = self.post_vertex.app_vertex
         n_filtered = 0
         for synapse_info in self.__synapse_information:
             # process pre atoms

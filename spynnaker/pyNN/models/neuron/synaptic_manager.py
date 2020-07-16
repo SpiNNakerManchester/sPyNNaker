@@ -820,7 +820,7 @@ class SynapticManager(object):
                 else:
                     pre_vertex = edge.pre_vertex
                     pre_slices = app_edge.pre_vertex.vertex_slices
-                    pre_vertex_slice = edge.pre_vertex.vertex_slices
+                    pre_vertex_slice = edge.pre_vertex.vertex_slice
 
                 pre_slice_idx = pre_vertex.index
 

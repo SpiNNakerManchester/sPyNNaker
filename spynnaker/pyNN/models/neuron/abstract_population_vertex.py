@@ -904,12 +904,12 @@ class AbstractPopulationVertex(
             len(self.__neuron_impl.get_recordable_variables()))
 
     @overrides(AbstractSpikeRecordable.get_spike_machine_vertices)
-    def get_spike_machine_vertices(self, graph_mapper):
-        return graph_mapper.get_machine_vertices(self)
+    def get_spike_machine_vertices(self):
+        return self.machine_vertices
 
-    @overrides(AbstractNeuronRecordable.get_machine_vertices_for)
-    def get_machine_vertices_for(self, variable, graph_mapper):
-        return graph_mapper.get_machine_vertices(self)
+    #@overrides(AbstractNeuronRecordable.get_machine_vertices_for)
+    #def get_machine_vertices_for(self, variable, graph_mapper):
+    #    return graph_mapper.get_machine_vertices(self)
 
     def _clear_recording_region(
             self, buffer_manager, placements, recording_region_id):
