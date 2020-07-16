@@ -379,13 +379,13 @@ bool synapse_dynamics_process_plastic_synapses(
         	syn_ind_from_delay += RECURRENT_SYNAPSE_OFFSET;
         }
 
-        neuron_pointer_t neuron = &neuron_array[neuron_ind];
-        neuron->syn_state[syn_ind_from_delay].z_bar_inp = 1024; // !!!! Check what units this is in - same as weight? !!!!
-
-
         // Create update state from the plastic synaptic word
         update_state_t current_state =
                 synapse_structure_get_update_state(*plastic_words, type);
+
+        neuron_pointer_t neuron = &neuron_array[neuron_ind];
+        neuron->syn_state[syn_ind_from_delay].z_bar_inp = 1024; // !!!! Check what units this is in - same as weight? !!!!
+
 
     	if (PRINT_PLASTICITY){
 //            io_printf(IO_BUF, "neuron ind: %u, synapse ind: %u, type: %u, zbar: %k\n",
@@ -446,11 +446,13 @@ bool synapse_dynamics_process_plastic_synapses(
         if (accumulation < ring_buffers[ring_buffer_index] + synapse_structure_get_final_weight(final_state)
             && ring_buffers[ring_buffer_index] > 0 && synapse_structure_get_final_weight(final_state) > 0){
             accumulation = ring_buffers[ring_buffer_index];
+            plastic_saturation_count++;
         }
         // underflow check
         if (accumulation > ring_buffers[ring_buffer_index] + synapse_structure_get_final_weight(final_state)
             && ring_buffers[ring_buffer_index] < 0 && synapse_structure_get_final_weight(final_state) < 0){
             accumulation = ring_buffers[ring_buffer_index];
+            plastic_saturation_count++;
         }
 
 //        uint32_t sat_test = accumulation & 0x20000;

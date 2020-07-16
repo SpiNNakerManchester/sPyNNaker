@@ -377,13 +377,25 @@ bool synapse_dynamics_process_plastic_synapses(
         	syn_ind_from_delay += RECURRENT_SYNAPSE_OFFSET;
         }
 
-        neuron_pointer_t neuron = &neuron_array[neuron_ind];
-        neuron->syn_state[syn_ind_from_delay].z_bar_inp = 1024; // !!!! Check what units this is in - same as weight? !!!!
-
-
         // Create update state from the plastic synaptic word
         update_state_t current_state =
                 synapse_structure_get_update_state(*plastic_words, type);
+
+        neuron_pointer_t neuron = &neuron_array[neuron_ind];
+        neuron->syn_state[syn_ind_from_delay].z_bar_inp = 1024k; // !!!! Check what units this is in - same as weight? !!!!
+
+//        io_printf(IO_BUF, "initial_weight: d%d, k%k, u%u - ", current_state.initial_weight, current_state.initial_weight, current_state.initial_weight);
+//        if (current_state.initial_weight > 0){
+//            io_printf(IO_BUF, "+ve\n");
+//        }
+//        else if(current_state.initial_weight < 0){
+//            io_printf(IO_BUF, "-ve\n");
+//            neuron->syn_state[syn_ind_from_delay].z_bar_inp *= -1k;
+//        }
+//        else{
+//            io_printf(IO_BUF, "0\n");
+//        }
+
 
     	if (PRINT_PLASTICITY){
 //            io_printf(IO_BUF, "neuron ind: %u, synapse ind: %u, type: %u, zbar: %k\n",
@@ -443,6 +455,17 @@ bool synapse_dynamics_process_plastic_synapses(
 //            accumulation = sat_test - 1;
 //            plastic_saturation_count++;
 //        }
+
+        // overflow check
+        if (accumulation < ring_buffers[ring_buffer_index] + synapse_structure_get_final_weight(final_state)
+            && ring_buffers[ring_buffer_index] > 0 && synapse_structure_get_final_weight(final_state) > 0){
+            accumulation = ring_buffers[ring_buffer_index];
+        }
+        // underflow check
+        if (accumulation > ring_buffers[ring_buffer_index] + synapse_structure_get_final_weight(final_state)
+            && ring_buffers[ring_buffer_index] < 0 && synapse_structure_get_final_weight(final_state) < 0){
+            accumulation = ring_buffers[ring_buffer_index];
+        }
 
         ring_buffers[ring_buffer_index] = accumulation;
 

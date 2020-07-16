@@ -445,17 +445,17 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 //            io_printf(IO_BUF, " umm ");
 //            accum exp_0 = expk(global_parameters->mean_0 / (accum)ticks_for_mean);
 //            accum exp_1 = expk(global_parameters->mean_1 / (accum)ticks_for_mean);
-            accum exp_0 = expk(global_parameters->readout_V_0 * 0.1k);
-            accum exp_1 = expk(global_parameters->readout_V_1 * 0.1k);
+            accum exp_0 = expk(global_parameters->readout_V_0);// * 0.1k);
+            accum exp_1 = expk(global_parameters->readout_V_1);// * 0.1k);
 //            io_printf(IO_BUF, "or here - ");
             if (exp_0 == 0k && exp_1 == 0k){
                 if (global_parameters->readout_V_0 > global_parameters->readout_V_1){
-                    softmax_0 = 10k;
+                    softmax_0 = 1k;
                     softmax_1 = 0k;
                 }
                 else{
                     softmax_0 = 0k;
-                    softmax_1 = 10k;
+                    softmax_1 = 1k;
                 }
             }
             else{
@@ -475,11 +475,14 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
                 learning_signal = softmax_0 - 1.k;
                 is_it_right = 0;
             }
-//            if (softmax_0 > 0.5){
-//                choice = 0;
+//            if (learning_signal > 0.5){
+//                learning_signal = 1k;
+//            }
+//            else if (learning_signal < -0.5){
+//                learning_signal = -1k;
 //            }
 //            else{
-//                choice = 1;
+//                learning_signal = 0k;
 //            }
             while (!spin1_send_mc_packet(
                     key | neuron_index,  bitsk(learning_signal), 1 )) {
@@ -526,13 +529,13 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 //        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = is_it_right;
     }
     else if (neuron_index == 1){
-//        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[55].z_bar;
+//        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[40].z_bar;
 //        recorded_variable_values[V_RECORDING_INDEX] = neuron->syn_state[55].z_bar;
         recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[40].delta_w;
 //        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = softmax_0;
     }
     else{
-//        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[1].z_bar;
+//        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[0].z_bar;
 //        recorded_variable_values[V_RECORDING_INDEX] = neuron->syn_state[1].z_bar;
         recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->syn_state[0].delta_w;
 //        recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = softmax_0;
