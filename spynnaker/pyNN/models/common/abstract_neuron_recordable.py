@@ -107,11 +107,10 @@ class AbstractNeuronRecordable(object):
         """
 
     @abstractmethod
-    def get_recording_slice(self, graph_mapper, vertex):
+    def get_recording_slice(self, vertex):
         """ returns the slice of vertex for this machine vertex in recording \
         space.
 
-        :param graph_mapper: the graph mapper
         :param vertex: the machine vertex
         :return: the slice of recorded atoms.
         """

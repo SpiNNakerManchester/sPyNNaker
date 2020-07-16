@@ -1090,3 +1090,4 @@ class SpikeSourcePoissonVertex(
     def get_spike_machine_vertices(self):
         return self.machine_vertices
 
+

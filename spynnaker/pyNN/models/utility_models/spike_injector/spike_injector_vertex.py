@@ -119,7 +119,6 @@ class SpikeInjectorVertex(
     def get_spike_machine_vertices(self):
         return self.machine_vertices
 
-
     @overrides(AbstractProvidesOutgoingPartitionConstraints.
                get_outgoing_partition_constraints)
     def get_outgoing_partition_constraints(self, partition):

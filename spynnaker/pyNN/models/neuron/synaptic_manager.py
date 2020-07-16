@@ -822,8 +822,6 @@ class SynapticManager(object):
                     pre_slices = app_edge.pre_vertex.vertex_slices
                     pre_vertex_slice = edge.pre_vertex.vertex_slice
 
-                pre_slice_idx = pre_vertex.index
-
                 for synapse_info in edge.app_edge.synapse_information:
                     rinfo = routing_info.get_routing_info_for_edge(edge)
 

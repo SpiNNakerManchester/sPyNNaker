@@ -254,17 +254,6 @@ class NeuronRecorder(object):
             sampling_rate, label, placement_data)
         return placement_data
 
-    @staticmethod
-    def expected_rows_for_a_run_time(n_machine_time_steps, sampling_rate):
-        """ determines how many rows to see based off how long its ran for
-
-        :param int n_machine_time_steps: map of vertex to time steps
-        :param float sampling_rate: the sampling rate for a given variable
-        :return: how many rows there should be.
-        :rtype: int
-        """
-        return int(math.ceil(n_machine_time_steps / sampling_rate))
-
     def get_matrix_data(
             self, label, buffer_manager, region, placements,
             application_vertex, variable, n_machine_time_steps):
