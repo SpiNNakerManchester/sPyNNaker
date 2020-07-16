@@ -221,7 +221,7 @@ class AbstractPopulationVertex(
             self.__pop_level_spike_control = self._DEFAULT_N_CORES_AT_SAME_TIME
 
         # set the time between cores to fire
-        self.__time_between_cores = helpful_functions.read_config_int(
+        self.__time_between_cores = helpful_functions.read_config_float(
             config, "Simulation", "time_between_cores")
         if self.__time_between_cores is None:
             self.__time_between_cores = self._DEFAULT_TIME_BETWEEN_CORES
@@ -496,7 +496,8 @@ class AbstractPopulationVertex(
         n_slots = int(math.ceil(n_cores / self.__pop_level_spike_control))
 
         # figure T2
-        time_between_spikes = self.__time_between_cores * n_slots
+        time_between_spikes = int(
+            math.ceil(self.__time_between_cores * n_slots))
 
         # figure how much time this TDMA needs
         total_time_needed = n_phases * time_between_spikes

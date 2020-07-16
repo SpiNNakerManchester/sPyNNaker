@@ -259,7 +259,7 @@ bool population_table_get_first_address(
 
     // check we have a entry in the bit field for this (possible not to due to
     // DTCM limitations or router table compression). If not, go to DMA check.
-    /*log_debug("checking bit field");
+    log_debug("checking bit field");
     if (connectivity_bit_field[position] != NULL) {
         log_debug("can be checked, bitfield is allocated");
         // check that the bit flagged for this neuron id does hit a
@@ -275,7 +275,7 @@ bool population_table_get_first_address(
         log_debug("bit_field was not set up. "
                 "either its due to a lack of dtcm, or because the "
                 "bitfield was merged into the routing table");
-    }*/
+    }
 
     // going to do a DMA to read the matrix and see if there's a hit.
     log_debug("about to set items");
