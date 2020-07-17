@@ -26,7 +26,7 @@ from spinn_utilities.overrides import overrides
 from spinn_machine import SDRAM
 from pacman.model.placements import Placement
 from pacman.model.resources import ResourceContainer
-from pacman.model.graphs.common import GraphMapper, Slice
+from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex
 from pacman.model.routing_info import (
     RoutingInfo, PartitionRoutingInfo, BaseKeyAndMask)
@@ -38,8 +38,7 @@ from spynnaker.pyNN.models.neuron import SynapticManager
 from spynnaker.pyNN.abstract_spinnaker_common import AbstractSpiNNakerCommon
 import spynnaker.pyNN.abstract_spinnaker_common as abstract_spinnaker_common
 from spynnaker.pyNN.models.neural_projections import (
-    ProjectionApplicationEdge, ProjectionMachineEdge, SynapseInformation,
-    DelayedApplicationEdge, DelayedMachineEdge)
+    ProjectionApplicationEdge, SynapseInformation, DelayedApplicationEdge)
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractGenerateConnectorOnMachine, OneToOneConnector, AllToAllConnector,
     FromListConnector)
@@ -118,7 +117,8 @@ class SimpleApplicationVertex(ApplicationVertex):
     def create_machine_vertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
-        return SimpleMachineVertex(resources_required, label, constraints)
+        return SimpleMachineVertex(
+            resources_required, label, constraints, self, vertex_slice)
 
     @overrides(ApplicationVertex.get_resources_used_by_atoms)
     def get_resources_used_by_atoms(self, vertex_slice):
@@ -152,14 +152,16 @@ class TestSynapticManager(unittest.TestCase):
 
         placements = Placements()
         pre_app_vertex = SimpleApplicationVertex(10, label="pre")
-        pre_vertex = SimpleMachineVertex(resources=None, label="pre_m")
-        placements.add_placement(Placement(pre_vertex, 0, 0, 1))
         pre_vertex_slice = Slice(0, 9)
+        pre_vertex = pre_app_vertex.create_machine_vertex(
+            pre_vertex_slice, None)
+        placements.add_placement(Placement(pre_vertex, 0, 0, 1))
         post_app_vertex = SimpleApplicationVertex(10, label="post")
-        post_vertex = SimpleMachineVertex(resources=None, label="post_m")
+        post_vertex_slice = Slice(0, 9)
+        post_vertex = post_app_vertex.create_machine_vertex(
+            post_vertex_slice, None)
         post_vertex_placement = Placement(post_vertex, 0, 0, 2)
         placements.add_placement(post_vertex_placement)
-        post_vertex_slice = Slice(0, 9)
         delay_app_vertex = DelayExtensionVertex(
             10, 16, pre_app_vertex, 1000, 1, label="delay")
         delay_vertex = delay_app_vertex.create_machine_vertex(
@@ -204,10 +206,10 @@ class TestSynapticManager(unittest.TestCase):
         delay_edge.add_synapse_information(all_to_all_synapse_information)
         delay_edge.add_synapse_information(from_list_synapse_information)
         app_edge.delay_edge = delay_edge
-        machine_edge = ProjectionMachineEdge(
-            app_edge.synapse_information, pre_vertex, post_vertex)
-        delay_machine_edge = DelayedMachineEdge(
-            delay_edge.synapse_information, delay_vertex, post_vertex)
+        machine_edge = app_edge.create_machine_edge(
+            pre_vertex, post_vertex, label=None)
+        delay_machine_edge = delay_edge.create_machine_edge(
+            delay_vertex, post_vertex, label=None)
         partition_name = "TestPartition"
 
         graph = MachineGraph("Test")
@@ -223,16 +225,6 @@ class TestSynapticManager(unittest.TestCase):
         app_graph.add_vertex(delay_app_vertex)
         app_graph.add_edge(app_edge, partition_name)
         app_graph.add_edge(delay_edge, partition_name)
-
-        graph_mapper = GraphMapper()
-        graph_mapper.add_vertex_mapping(
-            pre_vertex, pre_vertex_slice, pre_app_vertex)
-        graph_mapper.add_vertex_mapping(
-            post_vertex, post_vertex_slice, post_app_vertex)
-        graph_mapper.add_vertex_mapping(
-            delay_vertex, pre_vertex_slice, delay_app_vertex)
-        graph_mapper.add_edge_mapping(machine_edge, app_edge)
-        graph_mapper.add_edge_mapping(delay_machine_edge, delay_edge)
 
         routing_info = RoutingInfo()
         key = 0
@@ -258,7 +250,7 @@ class TestSynapticManager(unittest.TestCase):
         synaptic_manager.write_data_spec(
             spec, post_app_vertex, post_vertex_slice, post_vertex,
             post_vertex_placement, graph, app_graph, routing_info,
-            graph_mapper, 1.0, machine_time_step)
+            1.0, machine_time_step)
         spec.end_specification()
         spec_writer.close()
 
@@ -278,7 +270,7 @@ class TestSynapticManager(unittest.TestCase):
         try:
             connections_1 = synaptic_manager.get_connections_from_machine(
                 post_app_vertex, transceiver, placements, app_edge,
-                graph_mapper, direct_synapse_information_1, machine_time_step)
+                direct_synapse_information_1, machine_time_step)
 
             # Check that all the connections have the right weight and delay
             assert len(connections_1) == post_vertex_slice.n_atoms
@@ -287,7 +279,7 @@ class TestSynapticManager(unittest.TestCase):
 
             connections_2 = synaptic_manager.get_connections_from_machine(
                 post_app_vertex, transceiver, placements, app_edge,
-                graph_mapper, direct_synapse_information_2, machine_time_step)
+                direct_synapse_information_2, machine_time_step)
 
             # Check that all the connections have the right weight and delay
             assert len(connections_2) == post_vertex_slice.n_atoms
@@ -296,8 +288,7 @@ class TestSynapticManager(unittest.TestCase):
 
             connections_3 = synaptic_manager.get_connections_from_machine(
                 post_app_vertex, transceiver, placements, app_edge,
-                graph_mapper, all_to_all_synapse_information,
-                machine_time_step)
+                all_to_all_synapse_information, machine_time_step)
 
             # Check that all the connections have the right weight and delay
             assert len(connections_3) == \
@@ -307,7 +298,7 @@ class TestSynapticManager(unittest.TestCase):
 
             connections_4 = synaptic_manager.get_connections_from_machine(
                 post_app_vertex, transceiver, placements, app_edge,
-                graph_mapper, from_list_synapse_information, machine_time_step)
+                from_list_synapse_information, machine_time_step)
 
             # Check that all the connections have the right weight and delay
             assert len(connections_4) == len(from_list_list)
