@@ -156,7 +156,7 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
             expander_app_id = transceiver.app_id_tracker.get_new_id()
             system_control_logic.run_system_application(
                 synaptic_expander_rerun_cores, expander_app_id, transceiver,
-                provenance_file_path, executable_finder, True, None,
+                provenance_file_path, executable_finder, False, None,
                 [CPUState.FINISHED], needs_sync_barrier, no_sync_changes,
                 "rerun_of_synaptic_expander_on_{}_{}_{}.txt")
 
