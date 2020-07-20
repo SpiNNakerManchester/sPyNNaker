@@ -110,6 +110,8 @@ class SynapticManager(object):
         "__delay_edge_info",
         "__m_edge_info",
         "__delay_m_edge_info",
+        "_host_generated_block_addr",
+        "_on_chip_generated_block_addr",
         # Overridable (for testing only) region IDs
         "_synapse_params_region",
         "_pop_table_region",
@@ -209,6 +211,10 @@ class SynapticManager(object):
 
         # A map of synapse information for each machine pre vertex to index
         self.__synapse_indices = dict()
+
+        # Track writes inside the synaptic matrix region (to meet sizes):
+        self._host_generated_block_addr = 0
+        self._on_chip_generated_block_addr = 0
 
     @property
     def host_written_matrix_size(self):
@@ -840,6 +846,8 @@ class SynapticManager(object):
                         app_key_info, d_app_key_info, block_addr, single_addr,
                         spec, all_syn_block_sz, single_synapses, routing_info)
 
+        self._host_generated_block_addr = block_addr
+
         # Skip blocks that will be written on the machine, but add them
         # to the master population table
         generator_data = list()
@@ -848,6 +856,8 @@ class SynapticManager(object):
                 gen_data, post_slices, post_slice_index, post_vertex_slice,
                 machine_time_step, block_addr, all_syn_block_sz,
                 generator_data, routing_info)
+
+        self._on_chip_generated_block_addr = block_addr
 
         # Finish the master population table
         self.__poptable_type.finish_master_pop_table(
@@ -1607,6 +1617,9 @@ class SynapticManager(object):
         :param float weight_scale: How to scale the weights of the synapses
         :param int machine_time_step:
         """
+        # reset for this machine vertex
+        self._host_generated_block_addr = 0
+        self._on_chip_generated_block_addr = 0
 
         # Create an index of delay keys into this vertex
         for m_edge in machine_graph.get_edges_ending_at_vertex(machine_vertex):
