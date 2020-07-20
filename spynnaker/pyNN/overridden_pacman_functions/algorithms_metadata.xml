@@ -148,6 +148,10 @@
         <python_class>SpynnakerMachineBitFieldPairRouterCompressor</python_class>
         <input_definitions>
             <parameter>
+                <param_name>read_expander_iobuf</param_name>
+                <param_type>RouterCompressorWithBitFieldExpanderReadIOBuf</param_type>
+            </parameter>
+            <parameter>
                 <param_name>routing_tables</param_name>
                 <param_type>MemoryRoutingTables</param_type>
             </parameter>
@@ -257,6 +261,7 @@
             <param_name>machine_time_step</param_name>
             <param_name>time_scale_factor</param_name>
             <param_name>executable_targets</param_name>
+            <param_name>read_expander_iobuf</param_name>
             <token part="BitFieldData">DataLoaded</token>
         </required_inputs>
         <optional_inputs>
