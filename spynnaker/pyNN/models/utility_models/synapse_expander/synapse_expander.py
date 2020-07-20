@@ -36,7 +36,7 @@ DELAY_EXPANDER = "delay_expander.aplx"
 
 def synapse_expander(
         app_graph, placements, transceiver, provenance_file_path,
-        executable_finder, extract_iobuf, no_sync_changes):
+        executable_finder, extract_iobuf):
     """ Run the synapse expander.
 
     .. note::
@@ -71,8 +71,7 @@ def synapse_expander(
         executable_finder, extract_iobuf, functools.partial(
             _fill_in_connection_data, placements=placements,
             expanded_pop_vertices=expanded_pop_vertices),
-        None, [CPUState.FINISHED], False, no_sync_changes,
-        "synapse_expander_on_{}_{}_{}.txt")
+        [CPUState.FINISHED], False, "synapse_expander_on_{}_{}_{}.txt")
 
 
 def _plan_expansion(app_graph, placements, synapse_expander_bin,

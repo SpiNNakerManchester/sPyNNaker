@@ -186,6 +186,8 @@ class AbstractSpiNNakerCommon(with_metaclass(
         extra_mapping_inputs["RouterCompressorWithBitFieldReadIOBuf"] = \
             self.config.getboolean(
                 "Reports", "write_router_compressor_with_bitfield_iobuf")
+        extra_mapping_inputs["SynapticExpanderReadIOBuf"] = \
+            self.config.getboolean("Reports", "write_expander_iobuf")
         if user_extra_mapping_inputs is not None:
             extra_mapping_inputs.update(user_extra_mapping_inputs)
 
