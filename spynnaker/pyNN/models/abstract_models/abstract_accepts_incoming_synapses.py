@@ -59,7 +59,7 @@ class AbstractAcceptsIncomingSynapses(object):
 
     @abstractmethod
     def get_connections_from_machine(
-            self, transceiver, placements, app_edge, synapse_info, 
+            self, transceiver, placements, app_edge, synapse_info,
             machine_time_step):
         # pylint: disable=too-many-arguments
         """ Get the connections from the machine post-run.
