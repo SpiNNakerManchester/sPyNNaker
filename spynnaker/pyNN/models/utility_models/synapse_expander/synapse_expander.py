@@ -102,7 +102,7 @@ def _plan_expansion(app_graph, placements, synapse_expander_bin,
 
 
 def _fill_in_connection_data(
-        expanded_pop_vertices, placements, expander_cores, transceiver):
+        expander_cores, transceiver, expanded_pop_vertices, placements):
     """ Once expander has run, fill in the connection data
 
     :rtype: None
