@@ -106,8 +106,13 @@
                 <param_name>provenance_data_objects</param_name>
                 <param_type>RouterCompressorProvenanceItems</param_type>
             </parameter>
+            <parameter>
+                <param_name>read_expander_iobuf</param_name>
+                <param_type>RouterCompressorWithBitFieldExpanderReadIOBuf</param_type>
+            </parameter>
         </input_definitions>
         <required_inputs>
+            <param_name>read_expander_iobuf</param_name>
             <param_name>executable_finder</param_name>
             <param_name>read_algorithm_iobuf</param_name>
             <param_name>routing_tables</param_name>
