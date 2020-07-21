@@ -273,7 +273,7 @@ class _MasterPopEntry(object):
             extra_info = address_list[next_addr].extra
             extra_info.core_mask = self.__core_mask
             extra_info.n_neurons = self.__n_neurons
-            extra_info.core_shift = self.__core_shift
+            extra_info.mask_shift = self.__core_shift
             next_addr += 1
             n_entries += 1
 
