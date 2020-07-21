@@ -306,7 +306,7 @@ static void multicast_packet_received_callback(uint key, uint payload) {
     }
     last_packet_insert = tc[T1_COUNT];
     received_packet_this_step = true;
-    if(in_spikes_size() > packets_in_buffer_at_time) {
+    if (in_spikes_size() > packets_in_buffer_at_time) {
         packets_in_buffer_at_time = in_spikes_size();
     }
 }
@@ -413,10 +413,10 @@ void spike_processing_clear_input_buffer(void) {
     //    "current lost packets = %d, max in buffer = %d",
     //    count_input_buffer_packets_late, packets_in_buffer_at_time);
 
-    if(clear_input_buffers_of_late_packets) {
+    if (clear_input_buffers_of_late_packets) {
         log_debug("clearing buffer");
         spike_t spike;
-        while(in_spikes_get_next_spike(&spike)){
+        while (in_spikes_get_next_spike(&spike)) {
             log_debug("late spike id %u", spike);
         }
         in_spikes_clear();
