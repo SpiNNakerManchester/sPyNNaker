@@ -1356,8 +1356,7 @@ class SynapticManager(object):
                 post_slices, post_slice_index, pre_slice, post_vertex_slice,
                 gen.synapse_info, gen.app_edge.n_delay_stages + 1,
                 machine_time_step))
-            key = (post_vertex_slice.lo_atom, post_vertex_slice.hi_atom)
-            self.__gen_on_machine[key] = True
+            self.__gen_on_machine[post_vertex_slice] = True
         return block_addr
 
     def __on_chip_addresses(
