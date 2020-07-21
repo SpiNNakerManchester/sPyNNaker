@@ -30,14 +30,13 @@ class KeySpaceTracker(ElementAllocatorAlgorithm):
             n_keys = 2 ** self.count_trailing_0s(mask)
             self._allocate_elements(key, n_keys)
 
-    def is_allocated(self, key, mask):
+    def is_allocated(self, key, n_keys):
         """ Determine if any of the keys in the mask are allocated
             NOTE assumes mask is all 1s followed by all 0s
         """
         index = self._find_slot(key)
         if index is None:
             return True
-        n_keys = 2 ** self.count_trailing_0s(mask)
         space = self._check_allocation(index, key, n_keys)
         return space is None
 
