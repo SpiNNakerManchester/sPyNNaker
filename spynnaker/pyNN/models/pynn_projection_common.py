@@ -405,7 +405,7 @@ class PyNNProjectionCommon(object):
             placement = ctl.placements.get_placement_of_vertex(
                 edge.post_vertex)
             # if using extra monitor data extractor find local receiver
-            if extra_monitors is not None:
+            if extra_monitors is not None and handle_time_out_configuration:
                 receiver = locate_extra_monitor_mc_receiver(
                     placement_x=placement.x, placement_y=placement.y,
                     machine=ctl.machine,
@@ -427,9 +427,8 @@ class PyNNProjectionCommon(object):
                 ctl.transceiver, placement, edge,
                 ctl.routing_infos, self.__synapse_information,
                 ctl.machine_time_step, extra_monitors is not None,
-                ctl.placements, receiver, extra_monitors,
-                handle_time_out_configuration,
-                ctl.fixed_routes, sender_extra_monitor_core)
+                ctl.placements, receiver, ctl.fixed_routes,
+                sender_extra_monitor_core)
             if connections is not None:
                 connection_holder.add_connections(connections)
 

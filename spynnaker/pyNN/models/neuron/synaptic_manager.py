@@ -1273,7 +1273,6 @@ class SynapticManager(object):
             self, transceiver, placement, machine_edge,
             routing_infos, synapse_info, machine_time_step,
             using_extra_monitor_cores, placements=None, monitor_api=None,
-            monitor_cores=None, handle_time_out_configuration=True,
             fixed_routes=None, extra_monitor=None):
         """
         :param ~spinnman.transceiver.Transceiver transceiver:
@@ -1297,14 +1296,6 @@ class SynapticManager(object):
             Must not be ``None`` if ``using_extra_monitor_cores`` is true.
         :type monitor_api:
             ~spinn_front_end_common.utility_models.DataSpeedUpPacketGatherMachineVertex
-        :param monitor_cores: Where are all the monitors?
-            Must not be ``None`` if ``using_extra_monitor_cores`` is true.
-        :type monitor_cores:
-            list(~spinn_front_end_common.utility_models.ExtraMonitorSupportMachineVertex)
-            or None
-        :param bool handle_time_out_configuration:
-            Should we reconfigure the on-chip network to not time out?
-            (Should be true under all normal circumstances.)
         :param fixed_routes:
             What is the planned configuration of the Fixed Route packet
             routing?
@@ -1341,7 +1332,7 @@ class SynapticManager(object):
             transceiver, placement, master_pop_table, indirect_synapses,
             direct_synapses, key, pre_vertex_slice.n_atoms, index,
             using_extra_monitor_cores, placements, monitor_api,
-            extra_monitor, monitor_cores, fixed_routes=fixed_routes)
+            extra_monitor, fixed_routes=fixed_routes)
 
         # Get the block for the connections from the delayed pre_vertex
         delayed_data = None
@@ -1352,8 +1343,7 @@ class SynapticManager(object):
                 direct_synapses, delayed_key,
                 pre_vertex_slice.n_atoms * app_edge.n_delay_stages,
                 index, using_extra_monitor_cores, placements,
-                monitor_api, extra_monitor, monitor_cores,
-                handle_time_out_configuration, fixed_routes=fixed_routes)
+                monitor_api, extra_monitor, fixed_routes=fixed_routes)
 
         # Convert the blocks into connections
         return self._read_synapses(
@@ -1416,8 +1406,7 @@ class SynapticManager(object):
             self, txrx, placement, master_pop_table_address,
             indirect_synapses_address, direct_synapses_address,
             key, n_rows, index, using_monitors, placements=None,
-            data_receiver=None, extra_monitor=None, monitor_cores=None,
-            handle_time_out_configuration=True, fixed_routes=None):
+            data_receiver=None, extra_monitor=None, fixed_routes=None):
         """ Read in a synaptic block from a given processor and vertex on\
             the machine
 
@@ -1433,8 +1422,6 @@ class SynapticManager(object):
         :param ~.Placements placements:
         :param ~.DataSpeedUpPacketGatherMachineVertex data_receiver:
         :param ~.ExtraMonitorSupportMachineVertex extra_monitor:
-        :param list(~.ExtraMonitorSupportMachineVertex) monitor_cores:
-        :param bool handle_time_out_configuration:
         :param dict(tuple(int,int),~.FixedRouteEntry) fixed_routes:
         :rtype: tuple(bytearray, int)
         """
