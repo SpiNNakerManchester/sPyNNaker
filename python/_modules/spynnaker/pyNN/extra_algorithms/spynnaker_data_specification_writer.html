@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>spynnaker.pyNN.overridden_pacman_functions.graph_edge_weight_updater &#8212; sPyNNaker  documentation</title>
+    <title>spynnaker.pyNN.extra_algorithms.spynnaker_data_specification_writer &#8212; sPyNNaker  documentation</title>
     
     <link rel="stylesheet" href="../../../../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
@@ -62,7 +62,7 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <h1>Source code for spynnaker.pyNN.overridden_pacman_functions.graph_edge_weight_updater</h1><div class="highlight"><pre>
+  <h1>Source code for spynnaker.pyNN.extra_algorithms.spynnaker_data_specification_writer</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Copyright (c) 2017-2019 The University of Manchester</span>
 <span class="c1">#</span>
 <span class="c1"># This program is free software: you can redistribute it and/or modify</span>
@@ -78,35 +78,34 @@
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">spinn_utilities.progress_bar</span> <span class="kn">import</span> <span class="n">ProgressBar</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="n">AbstractWeightUpdatable</span>
-
-<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.interface_functions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">GraphDataSpecificationWriter</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.utility_models.delays</span> <span class="kn">import</span> <span class="n">DelayExtensionVertex</span>
 
 
-<div class="viewcode-block" id="GraphEdgeWeightUpdater"><a class="viewcode-back" href="../../../../spynnaker.pyNN.overridden_pacman_functions.html#spynnaker.pyNN.overridden_pacman_functions.GraphEdgeWeightUpdater">[docs]</a><span class="k">class</span> <span class="nc">GraphEdgeWeightUpdater</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Updates the weights of all edges.</span>
+<div class="viewcode-block" id="SpynnakerDataSpecificationWriter"><a class="viewcode-back" href="../../../../spynnaker.pyNN.extra_algorithms.html#spynnaker.pyNN.extra_algorithms.spynnaker_data_specification_writer.SpynnakerDataSpecificationWriter">[docs]</a><span class="k">class</span> <span class="nc">SpynnakerDataSpecificationWriter</span><span class="p">(</span><span class="n">GraphDataSpecificationWriter</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Executes data specification generation for sPyNNaker</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        :param machine_graph: the machine_graph whose edges are to be updated</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
 
-        <span class="c1"># create progress bar</span>
-        <span class="n">progress</span> <span class="o">=</span> <span class="n">ProgressBar</span><span class="p">(</span>
-            <span class="n">machine_graph</span><span class="o">.</span><span class="n">n_outgoing_edge_partitions</span><span class="p">,</span>
-            <span class="s2">&quot;Updating edge weights&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">placements</span><span class="p">,</span> <span class="n">hostname</span><span class="p">,</span> <span class="n">report_default_directory</span><span class="p">,</span>
+            <span class="n">write_text_specs</span><span class="p">,</span> <span class="n">machine</span><span class="p">,</span> <span class="n">data_n_timesteps</span><span class="p">):</span>
+        <span class="c1"># pylint: disable=too-many-arguments, signature-differs</span>
 
-        <span class="c1"># start checking edges to decide which ones need pruning....</span>
-        <span class="k">for</span> <span class="n">partition</span> <span class="ow">in</span> <span class="n">progress</span><span class="o">.</span><span class="n">over</span><span class="p">(</span><span class="n">machine_graph</span><span class="o">.</span><span class="n">outgoing_edge_partitions</span><span class="p">):</span>
-            <span class="k">for</span> <span class="n">edge</span> <span class="ow">in</span> <span class="n">partition</span><span class="o">.</span><span class="n">edges</span><span class="p">:</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">edge</span><span class="p">,</span> <span class="n">AbstractWeightUpdatable</span><span class="p">):</span>
-                    <span class="n">edge</span><span class="o">.</span><span class="n">update_weight</span><span class="p">()</span>
+        <span class="n">delay_extensions</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="n">placement_order</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">placement</span> <span class="ow">in</span> <span class="n">placements</span><span class="o">.</span><span class="n">placements</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">placement</span><span class="o">.</span><span class="n">vertex</span><span class="o">.</span><span class="n">app_vertex</span><span class="p">,</span> <span class="n">DelayExtensionVertex</span><span class="p">):</span>
+                <span class="n">delay_extensions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">placement</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">placement_order</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">placement</span><span class="p">)</span>
+        <span class="n">placement_order</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">delay_extensions</span><span class="p">)</span>
 
-        <span class="c1"># return nothing</span>
-        <span class="k">return</span> <span class="n">machine_graph</span></div>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">SpynnakerDataSpecificationWriter</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__call__</span><span class="p">(</span>
+            <span class="n">placements</span><span class="p">,</span> <span class="n">hostname</span><span class="p">,</span> <span class="n">report_default_directory</span><span class="p">,</span> <span class="n">write_text_specs</span><span class="p">,</span>
+            <span class="n">machine</span><span class="p">,</span> <span class="n">data_n_timesteps</span><span class="p">,</span> <span class="n">placement_order</span><span class="p">)</span></div>
 </pre></div>
 
           </div>

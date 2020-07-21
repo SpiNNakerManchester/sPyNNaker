@@ -63,12 +63,8 @@
 <li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.constants">spynnaker.pyNN.utilities.constants module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.extracted_data">spynnaker.pyNN.utilities.extracted_data module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.fake_HBP_Portal_machine_provider">spynnaker.pyNN.utilities.fake_HBP_Portal_machine_provider module</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.redundant_packet_count_report">spynnaker.pyNN.utilities.redundant_packet_count_report module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.running_stats">spynnaker.pyNN.utilities.running_stats module</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.spynnaker_connection_holder_generations">spynnaker.pyNN.utilities.spynnaker_connection_holder_generations module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.spynnaker_failed_state">spynnaker.pyNN.utilities.spynnaker_failed_state module</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.spynnaker_neuron_network_specification_report">spynnaker.pyNN.utilities.spynnaker_neuron_network_specification_report module</a></li>
-<li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.spynnaker_synaptic_matrix_report">spynnaker.pyNN.utilities.spynnaker_synaptic_matrix_report module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.struct">spynnaker.pyNN.utilities.struct module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.utilities.utility_calls">spynnaker.pyNN.utilities.utility_calls module</a></li>
 <li><a class="reference internal" href="#module-spynnaker.pyNN.utilities">Module contents</a></li>
@@ -437,15 +433,6 @@
 </dd></dl>
 
 </div>
-<div class="section" id="module-spynnaker.pyNN.utilities.redundant_packet_count_report">
-<span id="spynnaker-pynn-utilities-redundant-packet-count-report-module"></span><h2>spynnaker.pyNN.utilities.redundant_packet_count_report module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.redundant_packet_count_report" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="spynnaker.pyNN.utilities.redundant_packet_count_report.RedundantPacketCountReport">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.utilities.redundant_packet_count_report.</code><code class="descname">RedundantPacketCountReport</code><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/redundant_packet_count_report.html#RedundantPacketCountReport"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.redundant_packet_count_report.RedundantPacketCountReport" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-</dd></dl>
-
-</div>
 <div class="section" id="module-spynnaker.pyNN.utilities.running_stats">
 <span id="spynnaker-pynn-utilities-running-stats-module"></span><h2>spynnaker.pyNN.utilities.running_stats module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.running_stats" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
@@ -546,28 +533,6 @@ From: <a class="reference external" href="http://www.johndcook.com/blog/skewness
 </dd></dl>
 
 </div>
-<div class="section" id="module-spynnaker.pyNN.utilities.spynnaker_connection_holder_generations">
-<span id="spynnaker-pynn-utilities-spynnaker-connection-holder-generations-module"></span><h2>spynnaker.pyNN.utilities.spynnaker_connection_holder_generations module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.spynnaker_connection_holder_generations" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="spynnaker.pyNN.utilities.spynnaker_connection_holder_generations.SpYNNakerConnectionHolderGenerator">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.utilities.spynnaker_connection_holder_generations.</code><code class="descname">SpYNNakerConnectionHolderGenerator</code><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/spynnaker_connection_holder_generations.html#SpYNNakerConnectionHolderGenerator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.spynnaker_connection_holder_generations.SpYNNakerConnectionHolderGenerator" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<p>Sets up connection holders for reports to use.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>application_graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationGraph" title="(in PACMAN v)"><em>ApplicationGraph</em></a>) &#8211; app graph</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the set of connection holders for after DSG generation</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a>(<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a>(<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge" title="spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge">ProjectionApplicationEdge</a>, <a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation">SynapseInformation</a>),         <a class="reference internal" href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.ConnectionHolder" title="spynnaker.pyNN.models.neuron.ConnectionHolder">ConnectionHolder</a>)</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</div>
 <div class="section" id="module-spynnaker.pyNN.utilities.spynnaker_failed_state">
 <span id="spynnaker-pynn-utilities-spynnaker-failed-state-module"></span><h2>spynnaker.pyNN.utilities.spynnaker_failed_state module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.spynnaker_failed_state" title="Permalink to this headline">¶</a></h2>
 <dl class="class">
@@ -605,51 +570,6 @@ From: <a class="reference external" href="http://www.johndcook.com/blog/skewness
 <code class="descname">set_number_of_neurons_per_core</code><span class="sig-paren">(</span><em>neuron_type</em>, <em>max_permitted</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/spynnaker_failed_state.html#SpynnakerFailedState.set_number_of_neurons_per_core"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.spynnaker_failed_state.SpynnakerFailedState.set_number_of_neurons_per_core" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
-</dd></dl>
-
-</div>
-<div class="section" id="module-spynnaker.pyNN.utilities.spynnaker_neuron_network_specification_report">
-<span id="spynnaker-pynn-utilities-spynnaker-neuron-network-specification-report-module"></span><h2>spynnaker.pyNN.utilities.spynnaker_neuron_network_specification_report module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.spynnaker_neuron_network_specification_report" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="spynnaker.pyNN.utilities.spynnaker_neuron_network_specification_report.SpYNNakerNeuronGraphNetworkSpecificationReport">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.utilities.spynnaker_neuron_network_specification_report.</code><code class="descname">SpYNNakerNeuronGraphNetworkSpecificationReport</code><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/spynnaker_neuron_network_specification_report.html#SpYNNakerNeuronGraphNetworkSpecificationReport"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.spynnaker_neuron_network_specification_report.SpYNNakerNeuronGraphNetworkSpecificationReport" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<p>Produces a report describing the graph created from the neural         populations and projections.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>report_folder</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; the report folder to put figure into</li>
-<li><strong>application_graph</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.application/#pacman.model.graphs.application.ApplicationGraph" title="(in PACMAN v)"><em>ApplicationGraph</em></a>) &#8211; the app graph</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</div>
-<div class="section" id="module-spynnaker.pyNN.utilities.spynnaker_synaptic_matrix_report">
-<span id="spynnaker-pynn-utilities-spynnaker-synaptic-matrix-report-module"></span><h2>spynnaker.pyNN.utilities.spynnaker_synaptic_matrix_report module<a class="headerlink" href="#module-spynnaker.pyNN.utilities.spynnaker_synaptic_matrix_report" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="spynnaker.pyNN.utilities.spynnaker_synaptic_matrix_report.SpYNNakerSynapticMatrixReport">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.utilities.spynnaker_synaptic_matrix_report.</code><code class="descname">SpYNNakerSynapticMatrixReport</code><a class="reference internal" href="_modules/spynnaker/pyNN/utilities/spynnaker_synaptic_matrix_report.html#SpYNNakerSynapticMatrixReport"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.utilities.spynnaker_synaptic_matrix_report.SpYNNakerSynapticMatrixReport" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.6/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
-<p>Generate the synaptic matrices for reporting purposes.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>report_folder</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) &#8211; where to write the report</li>
-<li><strong>connection_holder</strong> (<a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a><em>(</em><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#tuple" title="(in Python v3.6)"><em>tuple</em></a><em>(</em><a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge" title="spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge"><em>ProjectionApplicationEdge</em></a><em>, </em><a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a><em>)</em><em></em><em>,         </em><a class="reference internal" href="spynnaker.pyNN.models.neuron.html#spynnaker.pyNN.models.neuron.ConnectionHolder" title="spynnaker.pyNN.models.neuron.ConnectionHolder"><em>ConnectionHolder</em></a><em>)</em><em></em>) &#8211; where the synaptic matrices are stored         (possibly after retrieval from the machine)</li>
-<li><strong>dsg_targets</strong> &#8211; used to check if connection holders are populated</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
 </dd></dl>
 
 </div>

@@ -8,7 +8,6 @@ Subpackages
 
     spynnaker.pyNN.models.utility_models.delays
     spynnaker.pyNN.models.utility_models.spike_injector
-    spynnaker.pyNN.models.utility_models.synapse_expander
 
 Module contents
 ---------------

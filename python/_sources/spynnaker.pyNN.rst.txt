@@ -8,9 +8,9 @@ Subpackages
 
     spynnaker.pyNN.connections
     spynnaker.pyNN.external_devices_models
+    spynnaker.pyNN.extra_algorithms
     spynnaker.pyNN.model_binaries
     spynnaker.pyNN.models
-    spynnaker.pyNN.overridden_pacman_functions
     spynnaker.pyNN.protocols
     spynnaker.pyNN.utilities
 

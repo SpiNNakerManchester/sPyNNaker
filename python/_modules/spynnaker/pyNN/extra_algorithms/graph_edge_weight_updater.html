@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>spynnaker.pyNN.utilities.spynnaker_connection_holder_generations &#8212; sPyNNaker  documentation</title>
+    <title>spynnaker.pyNN.extra_algorithms.graph_edge_weight_updater &#8212; sPyNNaker  documentation</title>
     
     <link rel="stylesheet" href="../../../../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
@@ -62,7 +62,7 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <h1>Source code for spynnaker.pyNN.utilities.spynnaker_connection_holder_generations</h1><div class="highlight"><pre>
+  <h1>Source code for spynnaker.pyNN.extra_algorithms.graph_edge_weight_updater</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Copyright (c) 2017-2019 The University of Manchester</span>
 <span class="c1">#</span>
 <span class="c1"># This program is free software: you can redistribute it and/or modify</span>
@@ -80,52 +80,33 @@
 
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.progress_bar</span> <span class="kn">import</span> <span class="n">ProgressBar</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neuron</span> <span class="kn">import</span> <span class="n">ConnectionHolder</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neural_projections</span> <span class="kn">import</span> <span class="n">ProjectionApplicationEdge</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="n">AbstractWeightUpdatable</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="SpYNNakerConnectionHolderGenerator"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.spynnaker_connection_holder_generations.SpYNNakerConnectionHolderGenerator">[docs]</a><span class="k">class</span> <span class="nc">SpYNNakerConnectionHolderGenerator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Sets up connection holders for reports to use.</span>
-
-<span class="sd">    :param ~pacman.model.graphs.application.ApplicationGraph \</span>
-<span class="sd">            application_graph:</span>
-<span class="sd">        app graph</span>
-<span class="sd">    :return: the set of connection holders for after DSG generation</span>
-<span class="sd">    :rtype: dict(tuple(ProjectionApplicationEdge, SynapseInformation), \</span>
-<span class="sd">        ConnectionHolder)</span>
+<div class="viewcode-block" id="GraphEdgeWeightUpdater"><a class="viewcode-back" href="../../../../spynnaker.pyNN.extra_algorithms.html#spynnaker.pyNN.extra_algorithms.graph_edge_weight_updater.GraphEdgeWeightUpdater">[docs]</a><span class="k">class</span> <span class="nc">GraphEdgeWeightUpdater</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Updates the weights of all edges.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">application_graph</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">machine_graph</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :param machine_graph: the machine_graph whose edges are to be updated</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># create progress bar</span>
         <span class="n">progress</span> <span class="o">=</span> <span class="n">ProgressBar</span><span class="p">(</span>
-            <span class="n">application_graph</span><span class="o">.</span><span class="n">n_outgoing_edge_partitions</span><span class="p">,</span>
-            <span class="s2">&quot;Generating connection holders for reporting connection data.&quot;</span><span class="p">)</span>
+            <span class="n">machine_graph</span><span class="o">.</span><span class="n">n_outgoing_edge_partitions</span><span class="p">,</span>
+            <span class="s2">&quot;Updating edge weights&quot;</span><span class="p">)</span>
 
-        <span class="n">data_holders</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">partition</span> <span class="ow">in</span> <span class="n">progress</span><span class="o">.</span><span class="n">over</span><span class="p">(</span>
-                <span class="n">application_graph</span><span class="o">.</span><span class="n">outgoing_edge_partitions</span><span class="p">):</span>
+        <span class="c1"># start checking edges to decide which ones need pruning....</span>
+        <span class="k">for</span> <span class="n">partition</span> <span class="ow">in</span> <span class="n">progress</span><span class="o">.</span><span class="n">over</span><span class="p">(</span><span class="n">machine_graph</span><span class="o">.</span><span class="n">outgoing_edge_partitions</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">edge</span> <span class="ow">in</span> <span class="n">partition</span><span class="o">.</span><span class="n">edges</span><span class="p">:</span>
-                <span class="c1"># add pre run generators so that reports can extract without</span>
-                <span class="c1"># going to machine.</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">edge</span><span class="p">,</span> <span class="n">ProjectionApplicationEdge</span><span class="p">):</span>
-                    <span class="c1"># build connection holders</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_generate_holder_for_edge</span><span class="p">(</span><span class="n">edge</span><span class="p">,</span> <span class="n">data_holders</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">edge</span><span class="p">,</span> <span class="n">AbstractWeightUpdatable</span><span class="p">):</span>
+                    <span class="n">edge</span><span class="o">.</span><span class="n">update_weight</span><span class="p">()</span>
 
-        <span class="c1"># return the two holders</span>
-        <span class="k">return</span> <span class="n">data_holders</span>
-
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_generate_holder_for_edge</span><span class="p">(</span><span class="n">edge</span><span class="p">,</span> <span class="n">data_holders</span><span class="p">):</span>
-        <span class="c1"># build connection holders</span>
-        <span class="n">connection_holder</span> <span class="o">=</span> <span class="n">ConnectionHolder</span><span class="p">(</span>
-            <span class="kc">None</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">edge</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">,</span> <span class="n">edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span>
-
-        <span class="k">for</span> <span class="n">synapse_information</span> <span class="ow">in</span> <span class="n">edge</span><span class="o">.</span><span class="n">synapse_information</span><span class="p">:</span>
-            <span class="n">edge</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">add_pre_run_connection_holder</span><span class="p">(</span>
-                <span class="n">connection_holder</span><span class="p">,</span> <span class="n">edge</span><span class="p">,</span> <span class="n">synapse_information</span><span class="p">)</span>
-            <span class="c1"># store for the report generations</span>
-            <span class="n">data_holders</span><span class="p">[</span><span class="n">edge</span><span class="p">,</span> <span class="n">synapse_information</span><span class="p">]</span> <span class="o">=</span> <span class="n">connection_holder</span></div>
+        <span class="c1"># return nothing</span>
+        <span class="k">return</span> <span class="n">machine_graph</span></div>
 </pre></div>
 
           </div>
