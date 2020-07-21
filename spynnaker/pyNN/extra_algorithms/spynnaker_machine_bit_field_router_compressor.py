@@ -28,8 +28,7 @@ from spinn_front_end_common.utilities import system_control_logic
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState
-from spynnaker.pyNN.models.utility_models.synapse_expander. \
-    synapse_expander import SYNAPSE_EXPANDER
+from spynnaker.pyNN.extra_algorithms.synapse_expander import SYNAPSE_EXPANDER
 
 logger = logging.getLogger(__name__)
 
