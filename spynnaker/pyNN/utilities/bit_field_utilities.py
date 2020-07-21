@@ -236,3 +236,5 @@ def write_bitfield_init_data(
     # ensure if nothing else that n bitfields in bitfield region set to 0
     spec.switch_write_focus(bit_field_region_id)
     spec.write_value(0)
+    spec.write_value(0)
+    spec.write_value(0)
