@@ -251,6 +251,9 @@
         <span class="n">extra_mapping_inputs</span><span class="p">[</span><span class="s2">&quot;RouterCompressorWithBitFieldReadIOBuf&quot;</span><span class="p">]</span> <span class="o">=</span> \
             <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getboolean</span><span class="p">(</span>
                 <span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;write_router_compressor_with_bitfield_iobuf&quot;</span><span class="p">)</span>
+        <span class="n">extra_mapping_inputs</span><span class="p">[</span>
+            <span class="s2">&quot;RouterCompressorWithBitFieldExpanderReadIOBuf&quot;</span><span class="p">]</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">getboolean</span><span class="p">(</span><span class="s2">&quot;Reports&quot;</span><span class="p">,</span> <span class="s2">&quot;write_expander_iobuf&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">user_extra_mapping_inputs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">extra_mapping_inputs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">user_extra_mapping_inputs</span><span class="p">)</span>
 
