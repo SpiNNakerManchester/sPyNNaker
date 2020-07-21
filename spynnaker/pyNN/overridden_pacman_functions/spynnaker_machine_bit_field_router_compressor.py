@@ -43,8 +43,7 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
             placements, executable_finder, read_algorithm_iobuf,
             produce_report, default_report_folder, target_length,
             routing_infos, time_to_try_for_each_iteration, use_timer_cut_off,
-            machine_time_step, time_scale_factor,
-            no_sync_changes, threshold_percentage,
+            machine_time_step, time_scale_factor, threshold_percentage,
             executable_targets, read_expander_iobuf,
             compress_as_much_as_possible=False, provenance_data_objects=None):
         """ entrance for routing table compression with bit field
@@ -83,7 +82,6 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
                 use_timer_cut_off=use_timer_cut_off,
                 machine_time_step=machine_time_step,
                 time_scale_factor=time_scale_factor,
-                no_sync_changes=no_sync_changes,
                 threshold_percentage=threshold_percentage,
                 compress_as_much_as_possible=compress_as_much_as_possible,
                 executable_targets=executable_targets)
@@ -96,7 +94,7 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
         # just rerun the synaptic expander for safety purposes
         self._rerun_synaptic_cores(
             expander_chip_cores, transceiver, provenance_file_path,
-            executable_finder, True, no_sync_changes, read_expander_iobuf)
+            executable_finder, True, read_expander_iobuf)
 
         return prov_items
 
@@ -142,7 +140,7 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
     def _rerun_synaptic_cores(
             synaptic_expander_rerun_cores, transceiver,
             provenance_file_path, executable_finder, needs_sync_barrier,
-            no_sync_changes, read_expander_iobuf):
+            read_expander_iobuf):
         """ reruns the synaptic expander
 
         :param synaptic_expander_rerun_cores: the cores to rerun the synaptic /
@@ -160,7 +158,7 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
                 synaptic_expander_rerun_cores, expander_app_id, transceiver,
                 provenance_file_path, executable_finder, read_expander_iobuf,
                 None, [CPUState.FINISHED], needs_sync_barrier,
-                no_sync_changes, "rerun_of_synaptic_expander_on_{}_{}_{}.txt")
+                "rerun_of_synaptic_expander_on_{}_{}_{}.txt")
 
 
 class SpynnakerMachineBitFieldUnorderedRouterCompressor(
