@@ -514,12 +514,14 @@ class AbstractPopulationVertex(
             logger.error(msg)
             raise SpynnakerException(msg)
         else:
-            true_fraction = 1 / (
-                (machine_time_step * time_scale_factor) / total_time_needed)
-            warn_once(
-                logger,
-                "could reduce fraction of time for sending to {}".format(
-                    true_fraction))
+            if total_time_needed != 0:
+                true_fraction = 1 / (
+                    (machine_time_step * time_scale_factor) /
+                    total_time_needed)
+                warn_once(
+                    logger,
+                    "could reduce fraction of time for sending to {}".format(
+                        true_fraction))
 
         # figure initial offset (used to try to interleave packets from other
         # populations into the TDMA without extending the overall time, and
