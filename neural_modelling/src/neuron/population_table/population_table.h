@@ -48,8 +48,10 @@ bool population_table_get_first_address(
 
 //! \brief Get the position in the master population table.
 //! \param[in] spike: The spike received
-//! \return The position in the master pop table
-int population_table_position_in_the_master_pop_array(spike_t spike);
+//! \param[out] position: The position found (only if returns true)
+//! \return True if there is a matching entry, False otherwise
+bool population_table_position_in_the_master_pop_array(
+        spike_t spike, uint32_t *position);
 
 //! \brief Get the next row data for a previously given spike.  If no spike has
 //!        been given, return False.

@@ -72,15 +72,19 @@ static bool bit_field_filter_initialise(address_t bitfield_region_address) {
                 filter_region->filters[cur_bit_field].n_atoms);
 
         // locate the position in the array to match the master pop element.
-        int position_in_array =
-                population_table_position_in_the_master_pop_array(key);
+        int position;
+        if (!population_table_position_in_the_master_pop_array(key, &position)) {
+            log_error("Could not find key %u!", key);
+            rt_error(RTE_SWERR);
+        }
 
-        log_debug("putting key %d in position %d", key, position_in_array);
+
+        log_debug("putting key %d in position %d", key, position);
 
         // alloc sdram into right region
-        connectivity_bit_field[position_in_array] = spin1_malloc(
+        connectivity_bit_field[position] = spin1_malloc(
                 sizeof(bit_field_t) * n_words);
-        if (connectivity_bit_field[position_in_array] == NULL) {
+        if (connectivity_bit_field[position] == NULL) {
             log_debug(
                     "could not initialise bit field for key %d, packets with "
                     "that key will use a DMA to check if the packet targets "
@@ -90,7 +94,7 @@ static bool bit_field_filter_initialise(address_t bitfield_region_address) {
         } else {  // read in bit field into correct location
             // read in the bits for the bitfield (think this avoids a for loop)
             spin1_memcpy(
-                    connectivity_bit_field[position_in_array],
+                    connectivity_bit_field[position],
                     filter_region->filters[cur_bit_field].data,
                     sizeof(uint32_t) * n_words);
 
@@ -100,8 +104,7 @@ static bool bit_field_filter_initialise(address_t bitfield_region_address) {
                     bit_field_word_index < n_words;
                     bit_field_word_index++){
                 log_debug("%x",
-                        connectivity_bit_field[position_in_array][
-                                bit_field_word_index]);
+                        connectivity_bit_field[position][bit_field_word_index]);
             }
         }
     }

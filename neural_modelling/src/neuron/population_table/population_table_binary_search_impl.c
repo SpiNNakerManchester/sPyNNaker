@@ -339,11 +339,10 @@ bool population_table_get_first_address(
         spike_t spike, address_t* row_address, size_t* n_bytes_to_transfer) {
     // locate the position in the binary search / array
     log_debug("searching for key %d", spike);
-    int position = population_table_position_in_the_master_pop_array(spike);
-    log_debug("position = %d", position);
 
     // check we don't have a complete miss
-    if (position == NOT_IN_MASTER_POP_TABLE_FLAG) {
+    int position;
+    if (!population_table_position_in_the_master_pop_array(spike, &position)) {
         invalid_master_pop_hits++;
         log_debug("Ghost searches: %u\n", ghost_pop_table_searches);
         log_debug("spike %u (= %x): "
@@ -351,6 +350,7 @@ bool population_table_get_first_address(
                 spike, spike);
         return false;
     }
+    log_debug("position = %d", position);
 
     master_population_table_entry entry = master_population_table[position];
     if (entry.count == 0) {
@@ -414,7 +414,8 @@ bool population_table_get_first_address(
     return get_next;
 }
 
-int population_table_position_in_the_master_pop_array(spike_t spike) {
+bool population_table_position_in_the_master_pop_array(
+        spike_t spike, uint32_t *position) {
     uint32_t imin = 0;
     uint32_t imax = master_population_table_length;
 
@@ -422,7 +423,8 @@ int population_table_position_in_the_master_pop_array(spike_t spike) {
         int imid = (imax + imin) >> 1;
         master_population_table_entry entry = master_population_table[imid];
         if ((spike & entry.mask) == entry.key) {
-            return imid;
+            *position = imid;
+            return true;
         } else if (entry.key < spike) {
 
             // Entry must be in upper part of the table
@@ -432,7 +434,7 @@ int population_table_position_in_the_master_pop_array(spike_t spike) {
             imax = imid;
         }
     }
-    return NOT_IN_MASTER_POP_TABLE_FLAG;
+    return false;
 }
 
 bool population_table_get_next_address(
@@ -445,7 +447,7 @@ bool population_table_get_next_address(
     bool is_valid = false;
     do {
         address_and_row_length item = address_list[next_item].addr;
-        if (item.address == INVALID_ADDRESS) {
+        if (item.address != INVALID_ADDRESS) {
 
             // If the row is a direct row, indicate this by specifying the
             // n_bytes_to_transfer is 0
