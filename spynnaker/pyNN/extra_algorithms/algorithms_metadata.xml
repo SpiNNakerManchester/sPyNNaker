@@ -191,7 +191,7 @@
         <input_definitions>
             <parameter>
                 <param_name>read_expander_iobuf</param_name>
-                <param_type>RouterCompressorWithBitFieldExpanderReadIOBuf</param_type>
+                <param_type>SynapticExpanderReadIOBuf</param_type>
             </parameter>
             <parameter>
                 <param_name>routing_tables</param_name>
