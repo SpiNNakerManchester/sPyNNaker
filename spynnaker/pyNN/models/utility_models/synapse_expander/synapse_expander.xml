@@ -48,6 +48,7 @@
             </parameter>
         </input_definitions>
         <required_inputs>
+            <param_name>extract_iobuf</param_name>
             <param_name>app_graph</param_name>
             <param_name>placements</param_name>
             <param_name>transceiver</param_name>
