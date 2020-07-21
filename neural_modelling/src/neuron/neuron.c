@@ -77,10 +77,6 @@ struct neuron_parameters {
 #define START_OF_GLOBAL_PARAMETERS \
     (sizeof(struct neuron_parameters) / sizeof(uint32_t))
 
-// 80000 = 40 * n cores (200) * n neurons per core (10) (1 packet per reception per pop)
-// 160000 = 40 * n cores (200) * n neurons per core (10) * n pops receiving from (2) (1 packet per reception)
-#define CPU_CYCLES_PER_INTERRUPT_TO_CALLBACK 2500
-
 //! \brief does the memory copy for the neuron parameters
 //! \param[in] address: the address where the neuron parameters are stored
 //!     in SDRAM
