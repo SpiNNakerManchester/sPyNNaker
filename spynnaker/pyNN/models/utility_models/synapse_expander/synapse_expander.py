@@ -18,6 +18,7 @@ from six import iteritems
 
 from spinn_front_end_common.utilities.system_control_logic import \
     run_system_application
+from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_utilities.progress_bar import ProgressBar
 from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState
@@ -86,7 +87,8 @@ def _plan_expansion(app_graph, placements, synapse_expander_bin,
                     placement = placements.get_placement_of_vertex(m_vertex)
                     expander_cores.add_processor(
                         synapse_expander_bin,
-                        placement.x, placement.y, placement.p)
+                        placement.x, placement.y, placement.p,
+                        executable_type=ExecutableType.SYSTEM)
                     gen_on_machine = True
             if gen_on_machine:
                 expanded_pop_vertices.append(vertex)
@@ -96,7 +98,8 @@ def _plan_expansion(app_graph, placements, synapse_expander_bin,
                     placement = placements.get_placement_of_vertex(m_vertex)
                     expander_cores.add_processor(
                         delay_expander_bin,
-                        placement.x, placement.y, placement.p)
+                        placement.x, placement.y, placement.p,
+                        executable_type=ExecutableType.SYSTEM)
 
     return expander_cores, expanded_pop_vertices
 
