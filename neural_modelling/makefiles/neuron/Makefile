@@ -36,11 +36,9 @@ MODELS = IF_curr_exp \
 	     IF_curr_alpha \
 	     IF_curr_alpha_stdp_mad_pair_additive \
          IF_cond_exp_structural_last_neuron_distance_weight \
-         IF_curr_exp_stdp_mad_pair_additive_structural_last_neuron_distance_weight \
          IF_curr_exp_structural_last_neuron_distance_weight \
          IF_curr_exp_structural_random_distance_weight \
          IF_cond_exp_stdp_mad_pair_additive_structural_last_neuron_distance_weight \
-         IF_cond_exp_stdp_mad_nearest_pair_additive_structural_last_neuron_distance_weight \
          IF_cond_exp_stdp_mad_pair_additive_structural_random_distance_weight \
          IF_curr_exp_stdp_mad_pair_additive_structural_random_distance_weight \
          IF_curr_exp_sEMD \
