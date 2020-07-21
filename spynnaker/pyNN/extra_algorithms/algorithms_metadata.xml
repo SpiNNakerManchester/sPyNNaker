@@ -18,8 +18,50 @@
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		xsi:schemaLocation="https://github.com/SpiNNakerManchester/PACMAN
 			https://raw.githubusercontent.com/SpiNNakerManchester/PACMAN/master/pacman/operations/algorithms_metadata_schema.xsd">
+    <algorithm name="SynapseExpander">
+        <python_module>spynnaker.pyNN.extra_algorithms.synapse_expander</python_module>
+        <python_function>synapse_expander</python_function>
+        <input_definitions>
+            <parameter>
+                <param_name>app_graph</param_name>
+                <param_type>MemoryApplicationGraph</param_type>
+            </parameter>
+            <parameter>
+                <param_name>placements</param_name>
+                <param_type>MemoryPlacements</param_type>
+            </parameter>
+            <parameter>
+                <param_name>transceiver</param_name>
+                <param_type>MemoryTransceiver</param_type>
+            </parameter>
+            <parameter>
+                <param_name>provenance_file_path</param_name>
+                <param_type>SystemProvenanceFilePath</param_type>
+            </parameter>
+            <parameter>
+                <param_name>executable_finder</param_name>
+                <param_type>ExecutableFinder</param_type>
+            </parameter>
+            <parameter>
+                <param_name>extract_iobuf</param_name>
+                <param_type>SynapticExpanderReadIOBuf</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
+            <param_name>extract_iobuf</param_name>
+            <param_name>app_graph</param_name>
+            <param_name>placements</param_name>
+            <param_name>transceiver</param_name>
+            <param_name>provenance_file_path</param_name>
+            <param_name>executable_finder</param_name>
+            <token part="DSGDataLoaded">DataLoaded</token>
+        </required_inputs>
+        <outputs>
+            <token part="SynapseDataExpanded">DataLoaded</token>
+        </outputs>
+    </algorithm>
     <algorithm name="SpynnakerMachineBitFieldUnorderedRouterCompressor">
-        <python_module>spynnaker.pyNN.overridden_pacman_functions.spynnaker_machine_bit_field_router_compressor</python_module>
+        <python_module>spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor</python_module>
         <python_class>SpynnakerMachineBitFieldUnorderedRouterCompressor</python_class>
         <input_definitions>
             <parameter>
@@ -139,7 +181,7 @@
         </outputs>
     </algorithm>
     <algorithm name="SpynnakerMachineBitFieldPairRouterCompressor">
-        <python_module>spynnaker.pyNN.overridden_pacman_functions.spynnaker_machine_bit_field_router_compressor</python_module>
+        <python_module>spynnaker.pyNN.extra_algorithms.spynnaker_machine_bit_field_router_compressor</python_module>
         <python_class>SpynnakerMachineBitFieldPairRouterCompressor</python_class>
         <input_definitions>
             <parameter>
@@ -259,7 +301,7 @@
         </outputs>
     </algorithm>
     <algorithm name="OnChipBitFieldGenerator">
-        <python_module>spynnaker.pyNN.overridden_pacman_functions.on_chip_bit_field_generator</python_module>
+        <python_module>spynnaker.pyNN.extra_algorithms.on_chip_bit_field_generator</python_module>
         <python_class>OnChipBitFieldGenerator</python_class>
         <input_definitions>
             <parameter>
@@ -326,7 +368,7 @@
         </outputs>
     </algorithm>
     <algorithm name="GraphEdgeFilter">
-        <python_module>spynnaker.pyNN.overridden_pacman_functions.graph_edge_filter</python_module>
+        <python_module>spynnaker.pyNN.extra_algorithms.graph_edge_filter</python_module>
         <python_class>GraphEdgeFilter</python_class>
         <input_definitions>
             <parameter>
@@ -350,7 +392,7 @@
         </outputs>
     </algorithm>
     <algorithm name="GraphEdgeWeightUpdater">
-        <python_module>spynnaker.pyNN.overridden_pacman_functions.graph_edge_weight_updater</python_module>
+        <python_module>spynnaker.pyNN.extra_algorithms.graph_edge_weight_updater</python_module>
         <python_class>GraphEdgeWeightUpdater</python_class>
         <input_definitions>
             <parameter>
@@ -366,7 +408,7 @@
         </outputs>
     </algorithm>
     <algorithm name="SpynnakerDataSpecificationWriter">
-        <python_module>spynnaker.pyNN.overridden_pacman_functions.spynnaker_data_specification_writer</python_module>
+        <python_module>spynnaker.pyNN.extra_algorithms.spynnaker_data_specification_writer</python_module>
         <python_class>SpynnakerDataSpecificationWriter</python_class>
         <input_definitions>
             <parameter>
@@ -408,7 +450,7 @@
         </outputs>
     </algorithm>
     <algorithm name="SynapticMatrixReport">
-        <python_module>spynnaker.pyNN.utilities.spynnaker_synaptic_matrix_report</python_module>
+        <python_module>spynnaker.pyNN.extra_algorithms.spynnaker_synaptic_matrix_report</python_module>
         <python_class>SpYNNakerSynapticMatrixReport</python_class>
         <input_definitions>
             <parameter>
@@ -431,7 +473,7 @@
         </required_inputs>
     </algorithm>
     <algorithm name="RedundantPacketCountReport">
-        <python_module>spynnaker.pyNN.utilities.redundant_packet_count_report</python_module>
+        <python_module>spynnaker.pyNN.extra_algorithms.redundant_packet_count_report</python_module>
         <python_class>RedundantPacketCountReport</python_class>
         <input_definitions>
             <parameter>
@@ -449,7 +491,7 @@
         </required_inputs>
     </algorithm>
     <algorithm name="SpYNNakerConnectionHolderGenerator">
-        <python_module>spynnaker.pyNN.utilities.spynnaker_connection_holder_generations</python_module>
+        <python_module>spynnaker.pyNN.extra_algorithms.spynnaker_connection_holder_generations</python_module>
         <python_class>SpYNNakerConnectionHolderGenerator</python_class>
         <input_definitions>
             <parameter>
@@ -465,7 +507,7 @@
         </outputs>
     </algorithm>
     <algorithm name="SpYNNakerNeuronGraphNetworkSpecificationReport">
-        <python_module>spynnaker.pyNN.utilities.spynnaker_neuron_network_specification_report</python_module>
+        <python_module>spynnaker.pyNN.extra_algorithms.spynnaker_neuron_network_specification_report</python_module>
         <python_class>SpYNNakerNeuronGraphNetworkSpecificationReport</python_class>
         <input_definitions>
             <parameter>
