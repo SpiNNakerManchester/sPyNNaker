@@ -251,6 +251,7 @@ class DelayExtensionVertex(
             vertex, SPIKE_PARTITION_ID)
 
         # Default to zero in cases of unconnected vertexes
+        # https://github.com/SpiNNakerManchester/sPyNNaker/issues/850
         if key is None:
             key = 0
         incoming_key = 0
