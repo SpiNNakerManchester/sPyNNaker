@@ -28,8 +28,7 @@ from spinn_front_end_common.utilities import system_control_logic
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState
-from spynnaker.pyNN.models.utility_models.synapse_expander. \
-    synapse_expander import SYNAPSE_EXPANDER
+from spynnaker.pyNN.extra_algorithms.synapse_expander import SYNAPSE_EXPANDER
 
 logger = logging.getLogger(__name__)
 
@@ -43,9 +42,8 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
             placements, executable_finder, read_algorithm_iobuf,
             produce_report, default_report_folder, target_length,
             routing_infos, time_to_try_for_each_iteration, use_timer_cut_off,
-            machine_time_step, time_scale_factor,
-            no_sync_changes, threshold_percentage,
-            executable_targets,
+            machine_time_step, time_scale_factor, threshold_percentage,
+            executable_targets, read_expander_iobuf,
             compress_as_much_as_possible=False, provenance_data_objects=None):
         """ entrance for routing table compression with bit field
 
@@ -62,6 +60,7 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
         :param read_algorithm_iobuf: bool flag saying if read iobuf
         :param compress_as_much_as_possible: bool flag asking if should \
         compress as much as possible
+        :param read_expander_iobuf: reads the synaptic expander iobuf.
         :rtype: None
         """
 
@@ -82,7 +81,6 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
                 use_timer_cut_off=use_timer_cut_off,
                 machine_time_step=machine_time_step,
                 time_scale_factor=time_scale_factor,
-                no_sync_changes=no_sync_changes,
                 threshold_percentage=threshold_percentage,
                 compress_as_much_as_possible=compress_as_much_as_possible,
                 executable_targets=executable_targets)
@@ -95,7 +93,7 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
         # just rerun the synaptic expander for safety purposes
         self._rerun_synaptic_cores(
             expander_chip_cores, transceiver, provenance_file_path,
-            executable_finder, True, no_sync_changes)
+            executable_finder, True, read_expander_iobuf)
 
         return prov_items
 
@@ -141,7 +139,7 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
     def _rerun_synaptic_cores(
             synaptic_expander_rerun_cores, transceiver,
             provenance_file_path, executable_finder, needs_sync_barrier,
-            no_sync_changes):
+            read_expander_iobuf):
         """ reruns the synaptic expander
 
         :param synaptic_expander_rerun_cores: the cores to rerun the synaptic /
@@ -149,6 +147,7 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
         :param transceiver: spinnman instance
         :param provenance_file_path: prov file path
         :param executable_finder: finder of binary file paths
+        :param read_expander_iobuf: bool for reading off iobuf if needed
         :rtype: None
         """
         if synaptic_expander_rerun_cores.total_processors != 0:
@@ -156,8 +155,8 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
             expander_app_id = transceiver.app_id_tracker.get_new_id()
             system_control_logic.run_system_application(
                 synaptic_expander_rerun_cores, expander_app_id, transceiver,
-                provenance_file_path, executable_finder, True, None,
-                [CPUState.FINISHED], needs_sync_barrier, no_sync_changes,
+                provenance_file_path, executable_finder, read_expander_iobuf,
+                None, [CPUState.FINISHED], needs_sync_barrier,
                 "rerun_of_synaptic_expander_on_{}_{}_{}.txt")
 
 
