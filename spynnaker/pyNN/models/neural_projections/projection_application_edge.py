@@ -18,7 +18,6 @@ from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationEdge
 from pacman.model.partitioner_interfaces import AbstractSlicesConnect
 from .projection_machine_edge import ProjectionMachineEdge
-from spynnaker.pyNN.models.abstract_models import AbstractFilterableEdge
 logger = logging.getLogger(__name__)
 _DynamicsStructural = None
 
@@ -33,7 +32,7 @@ def _are_dynamics_structural(synapse_dynamics):
     return isinstance(synapse_dynamics, _DynamicsStructural)
 
 
-class ProjectionApplicationEdge(ApplicationEdge, AbstractFilterableEdge, AbstractSlicesConnect):
+class ProjectionApplicationEdge(ApplicationEdge, AbstractSlicesConnect):
     """ An edge which terminates on an :py:class:`AbstractPopulationVertex`.
     """
     __slots__ = [
@@ -101,12 +100,6 @@ class ProjectionApplicationEdge(ApplicationEdge, AbstractFilterableEdge, Abstrac
             self, pre_vertex, post_vertex, label):
         return ProjectionMachineEdge(
             self.__synapse_information, pre_vertex, post_vertex, self, label)
-
-    @overrides(AbstractFilterableEdge.filter_edge)
-    def filter_edge(self):
-        return all(
-            not _are_dynamics_structural(syn_info.synapse_dynamics)
-            for syn_info in self.__synapse_information)
 
     @overrides(AbstractSlicesConnect.could_connect)
     def could_connect(self, pre_slice, post_slice):
