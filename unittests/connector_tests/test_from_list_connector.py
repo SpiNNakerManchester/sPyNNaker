@@ -161,4 +161,5 @@ def test_could_connect():
             if count:
                 assert(connector.could_connect(None, pre_slice, post_slice))
             else:
-                assert(not connector.could_connect(None, pre_slice, post_slice))
+                assert(not connector.could_connect(
+                    None, pre_slice, post_slice))
