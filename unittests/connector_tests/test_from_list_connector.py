@@ -151,8 +151,8 @@ def test_could_connect():
     connector = FromListConnector(
         [[0, 0], [1, 2], [2, 0], [3, 3], [2, 6], [1, 8], [4, 1], [5, 0],
          [6, 2], [4, 8]])
-    pre_slices = [Slice(0,3), Slice(4,6), Slice(7,9)]
-    post_slices = [Slice(0,2), Slice(3,5), Slice(6,9)]
+    pre_slices = [Slice(0, 3), Slice(4, 6), Slice(7, 9)]
+    post_slices = [Slice(0, 2), Slice(3, 5), Slice(6, 9)]
     for pre_slice in pre_slices:
         for post_slice in post_slices:
             count = connector.get_n_connections(
