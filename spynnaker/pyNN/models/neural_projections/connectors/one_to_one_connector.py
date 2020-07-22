@@ -189,7 +189,8 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
             post_lo = synapse_info.post_population._indexes[0]
             post_hi = synapse_info.post_population._indexes[-1]
             if ((pre_slice.hi_atom - pre_lo < post_slice.lo_atom - post_lo) or
-                    (pre_slice.lo_atom - pre_lo > post_slice.hi_atom - post_lo) or
+                    (pre_slice.lo_atom - pre_lo >
+                     post_slice.hi_atom - post_lo) or
                     (pre_slice.hi_atom < pre_lo) or
                     (pre_slice.lo_atom > pre_hi) or
                     (post_slice.hi_atom < post_lo) or
