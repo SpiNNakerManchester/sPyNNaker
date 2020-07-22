@@ -208,19 +208,19 @@ static void neuron_impl_load_neuron_parameters(
 
     neuron_model_set_global_neuron_params(global_parameters);
 
-    io_printf(IO_BUF, "\nPrinting global params\n");
-    io_printf(IO_BUF, "seed 1: %u \n", global_parameters->kiss_seed[0]);
-    io_printf(IO_BUF, "seed 2: %u \n", global_parameters->kiss_seed[1]);
-    io_printf(IO_BUF, "seed 3: %u \n", global_parameters->kiss_seed[2]);
-    io_printf(IO_BUF, "seed 4: %u \n", global_parameters->kiss_seed[3]);
-    io_printf(IO_BUF, "ticks_per_second: %k \n\n", global_parameters->ticks_per_second);
-//    io_printf(IO_BUF, "prob_command: %k \n\n", global_parameters->prob_command);
-    io_printf(IO_BUF, "rate on: %k \n\n", global_parameters->rate_on);
-    io_printf(IO_BUF, "rate off: %k \n\n", global_parameters->rate_off);
-    io_printf(IO_BUF, "mean 0: %k \n\n", global_parameters->mean_0);
-    io_printf(IO_BUF, "mean 1: %k \n\n", global_parameters->mean_1);
-    io_printf(IO_BUF, "poisson key: %u \n\n", global_parameters->p_key);
-    io_printf(IO_BUF, "poisson pop size: %u \n\n", global_parameters->p_pop_size);
+//    io_printf(IO_BUF, "\nPrinting global params\n");
+//    io_printf(IO_BUF, "seed 1: %u \n", global_parameters->kiss_seed[0]);
+//    io_printf(IO_BUF, "seed 2: %u \n", global_parameters->kiss_seed[1]);
+//    io_printf(IO_BUF, "seed 3: %u \n", global_parameters->kiss_seed[2]);
+//    io_printf(IO_BUF, "seed 4: %u \n", global_parameters->kiss_seed[3]);
+//    io_printf(IO_BUF, "ticks_per_second: %k \n\n", global_parameters->ticks_per_second);
+////    io_printf(IO_BUF, "prob_command: %k \n\n", global_parameters->prob_command);
+//    io_printf(IO_BUF, "rate on: %k \n\n", global_parameters->rate_on);
+//    io_printf(IO_BUF, "rate off: %k \n\n", global_parameters->rate_off);
+//    io_printf(IO_BUF, "mean 0: %k \n\n", global_parameters->mean_0);
+//    io_printf(IO_BUF, "mean 1: %k \n\n", global_parameters->mean_1);
+//    io_printf(IO_BUF, "poisson key: %u \n\n", global_parameters->p_key);
+//    io_printf(IO_BUF, "poisson pop size: %u \n\n", global_parameters->p_pop_size);
 
 
     for (index_t n = 0; n < n_neurons; n++) {

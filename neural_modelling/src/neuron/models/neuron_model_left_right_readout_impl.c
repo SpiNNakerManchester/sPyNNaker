@@ -23,18 +23,18 @@ void neuron_model_set_global_neuron_params(
 
     local_eta = params->eta;
 
-    io_printf(IO_BUF, "local eta = %k\n", local_eta);
-    io_printf(IO_BUF, "readout_V_0 = %k\n", params->readout_V_0);
-    io_printf(IO_BUF, "readout_V_1 = %k\n", params->readout_V_1);
-    io_printf(IO_BUF, "rate_on = %k\n", params->rate_on);
-    io_printf(IO_BUF, "rate_off = %k\n", params->rate_off);
-    io_printf(IO_BUF, "mean_0 = %k\n", params->mean_0);
-    io_printf(IO_BUF, "mean_1 = %k\n", params->mean_1);
-    io_printf(IO_BUF, "cross_entropy = %k\n", params->cross_entropy);
-    io_printf(IO_BUF, "p_key = %u\n", params->p_key);
-    io_printf(IO_BUF, "p_pop_size = %u\n", params->p_pop_size);
-    io_printf(IO_BUF, "readout_V_1 = %k\n", params->readout_V_1);
-    io_printf(IO_BUF, "readout_V_1 = %k\n", params->readout_V_1);
+//    io_printf(IO_BUF, "local eta = %k\n", local_eta);
+//    io_printf(IO_BUF, "readout_V_0 = %k\n", params->readout_V_0);
+//    io_printf(IO_BUF, "readout_V_1 = %k\n", params->readout_V_1);
+//    io_printf(IO_BUF, "rate_on = %k\n", params->rate_on);
+//    io_printf(IO_BUF, "rate_off = %k\n", params->rate_off);
+//    io_printf(IO_BUF, "mean_0 = %k\n", params->mean_0);
+//    io_printf(IO_BUF, "mean_1 = %k\n", params->mean_1);
+//    io_printf(IO_BUF, "cross_entropy = %k\n", params->cross_entropy);
+//    io_printf(IO_BUF, "p_key = %u\n", params->p_key);
+//    io_printf(IO_BUF, "p_pop_size = %u\n", params->p_pop_size);
+//    io_printf(IO_BUF, "readout_V_1 = %k\n", params->readout_V_1);
+//    io_printf(IO_BUF, "readout_V_1 = %k\n", params->readout_V_1);
 //    io_printf(IO_BUF, "local eta = %k\n", params->);
 
     // Does Nothing - no params
