@@ -250,8 +250,11 @@ class DelayExtensionVertex(
         key = routing_infos.get_first_key_from_pre_vertex(
             vertex, SPIKE_PARTITION_ID)
 
-        incoming_key = None
-        incoming_mask = None
+        # Default to zero in cases of unconnected vertexes
+        if key is None:
+            key = 0
+        incoming_key = 0
+        incoming_mask = 0
         incoming_edges = machine_graph.get_edges_ending_at_vertex(
             vertex)
 
