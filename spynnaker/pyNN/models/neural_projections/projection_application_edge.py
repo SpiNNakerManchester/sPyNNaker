@@ -104,7 +104,7 @@ class ProjectionApplicationEdge(ApplicationEdge, AbstractSlicesConnect):
     @overrides(AbstractSlicesConnect.could_connect)
     def could_connect(self, pre_slice, post_slice):
         for synapse_info in self.__synapse_information:
-            # https://github.com/SpiNNakerManchester/sPyNNaker/issues/848
+            # Structual Plasticity can learn connection not originally specified 
             if _are_dynamics_structural(synapse_info.synapse_dynamics):
                 return True
             if synapse_info.connector.could_connect(
