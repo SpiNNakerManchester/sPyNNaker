@@ -39,7 +39,8 @@ class ProjectionApplicationEdge(ApplicationEdge, AbstractFilterableEdge):
     __slots__ = [
         "__delay_edge",
         "__stored_synaptic_data_from_machine",
-        "__synapse_information"]
+        "__synapse_information",
+        "__machine_edges_by_slices"]
 
     def __init__(
             self, pre_vertex, post_vertex, synapse_information, label=None):
@@ -61,6 +62,9 @@ class ProjectionApplicationEdge(ApplicationEdge, AbstractFilterableEdge):
         self.__delay_edge = None
 
         self.__stored_synaptic_data_from_machine = None
+
+        # Keep the machine edges by pre- and post-vertex
+        self.__machine_edges_by_slices = dict()
 
     def add_synapse_information(self, synapse_information):
         """
@@ -99,8 +103,20 @@ class ProjectionApplicationEdge(ApplicationEdge, AbstractFilterableEdge):
     @overrides(ApplicationEdge._create_machine_edge)
     def _create_machine_edge(
             self, pre_vertex, post_vertex, label):
-        return ProjectionMachineEdge(
+        edge = ProjectionMachineEdge(
             self.__synapse_information, pre_vertex, post_vertex, self, label)
+        self.__machine_edges_by_slices[
+            pre_vertex.vertex_slice, post_vertex.vertex_slice] = edge
+        if self.__delay_edge is not None:
+            delayed = self.__delay_edge._get_machine_edge(
+                pre_vertex, post_vertex)
+            if delayed is not None:
+                edge.delay_edge = delayed
+        return edge
+
+    def _get_machine_edge(self, pre_vertex, post_vertex):
+        return self.__machine_edges_by_slices.get(
+            (pre_vertex.vertex_slice, post_vertex.vertex_slice))
 
     @overrides(AbstractFilterableEdge.filter_edge)
     def filter_edge(self):

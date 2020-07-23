@@ -47,6 +47,15 @@ class ProjectionMachineEdge(
             traffic_weight=traffic_weight)
 
         self.__synapse_information = synapse_information
+        self.__delay_edge = None
+
+    @property
+    def delay_edge(self):
+        return self.__delay_edge
+
+    @delay_edge.setter
+    def delay_edge(self, delay_edge):
+        self.__delay_edge = delay_edge
 
     @property
     def synapse_information(self):

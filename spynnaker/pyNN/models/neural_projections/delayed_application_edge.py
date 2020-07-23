@@ -20,19 +20,27 @@ from .delayed_machine_edge import DelayedMachineEdge
 
 class DelayedApplicationEdge(ApplicationEdge):
     __slots__ = [
-        "__synapse_information"]
+        "__synapse_information"
+        "__machine_edges_by_slices"
+        "__undelayed_edge"]
 
     def __init__(
-            self, pre_vertex, post_vertex, synapse_information, label=None):
+            self, pre_vertex, post_vertex, synapse_information, undelayed_edge,
+            label=None):
         """
         :param DelayExtensionVertex pre_vertex:
         :param AbstractPopulationVertex post_vertex:
         :param SynapseInformation synapse_information:
+        :param ProjectionApplicationEdge undelayed_edge:
         :param str label:
         """
         super(DelayedApplicationEdge, self).__init__(
             pre_vertex, post_vertex, label=label)
         self.__synapse_information = [synapse_information]
+        self.__undelayed_edge = undelayed_edge
+
+        # Keep the machine edges by pre- and post-slice
+        self.__machine_edges_by_slices = dict()
 
     @property
     def synapse_information(self):
@@ -49,5 +57,16 @@ class DelayedApplicationEdge(ApplicationEdge):
 
     @overrides(ApplicationEdge._create_machine_edge)
     def _create_machine_edge(self, pre_vertex, post_vertex, label):
-        return DelayedMachineEdge(
+        edge = DelayedMachineEdge(
             self.__synapse_information, pre_vertex, post_vertex, self, label)
+        self.__machine_edges_by_slices[
+            pre_vertex.vertex_slice, post_vertex.vertex_slice] = edge
+        undelayed = self.__undelayed_edge._get_machine_edge(
+            pre_vertex, post_vertex)
+        if undelayed is not None:
+            undelayed.delay_edge = edge
+        return edge
+
+    def _get_machine_edge(self, pre_vertex, post_vertex):
+        return self.__machine_edges_by_slices.get(
+            (pre_vertex.vertex_slice, post_vertex.vertex_slice))
