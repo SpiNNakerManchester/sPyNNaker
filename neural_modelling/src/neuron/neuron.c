@@ -203,7 +203,7 @@ static inline void neuron_tdma_spike_processing(
             //    "time_when_phase_slot_started = %d", time_when_phase_slot_started);
 
             if (time_when_phase_slot_started < how_much_time_has_passed) {
-                log_info("up phase id");
+                log_debug("up phase id");
                 phase += 1;
             }
             else{

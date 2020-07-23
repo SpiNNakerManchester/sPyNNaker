@@ -243,8 +243,8 @@ bool population_table_get_first_address(
         invalid_master_pop_hits++;
         log_debug("Ghost searches: %u\n", ghost_pop_table_searches);
         log_debug("spike %u (= %x): "
-                "population not found in master population table",
-                spike, spike);
+                  "population not found in master population table",
+                  spike, spike);
         return false;
     }
 
