@@ -54,7 +54,8 @@ enum spike_processing_dma_tags {
 extern uint32_t time;
 
 // True if the DMA "loop" is currently running
-static volatile bool dma_busy;
+//static volatile bool dma_busy;
+volatile bool dma_busy;
 
 // The DTCM buffers for the synapse rows
 static dma_buffer dma_buffers[N_DMA_BUFFERS];
@@ -68,6 +69,11 @@ static uint32_t buffer_being_read;
 static uint32_t max_n_words;
 
 static uint32_t single_fixed_synapse[4];
+
+// FLUSH SPIKES variables needed
+static uint32_t total_flushed_spikes;
+static uint32_t max_flushed_spikes;
+extern bool timer_callback_active;
 
 static volatile uint32_t rewires_to_do = 0;
 
@@ -249,7 +255,7 @@ static void multicast_packet_received_callback(uint key, uint payload) {
         // If we're not already processing synaptic DMAs,
         // flag pipeline as busy and trigger a feed event
         // NOTE: locking is not used here because this is assumed to be FIQ
-        if (!dma_busy) {
+        if (!dma_busy && !timer_callback_active) {
             log_debug("Sending user event for new spike");
             if (spin1_trigger_user_event(0, 0)) {
                 dma_busy = true;
@@ -259,6 +265,27 @@ static void multicast_packet_received_callback(uint key, uint payload) {
         }
     } else {
         log_debug("Could not add spike");
+    }
+     // if timer is getting low, don't do next DMA and instead flush spike buffer
+     // originally 6657 clock cycles from the end of the interval was used
+    if (tc[T1_COUNT] < 3300){//6657){
+    	    uint cpsr = spin1_int_disable();
+    	    uint32_t spikes_remaining = in_spikes_flush_buffer();
+    	    timer_callback_active = true;
+    	    spin1_mode_restore(cpsr);
+
+    	    if (spikes_remaining > 0){
+    	    	total_flushed_spikes += spikes_remaining;
+
+    	    	if (spikes_remaining > max_flushed_spikes){
+    	    		max_flushed_spikes = spikes_remaining;
+    	    	}
+
+    	    	log_info("--------At time: %u, flushed spikes: %u", time, spikes_remaining);
+
+    	    	//io_printf(IO_BUF, "At time: %u, flushed spikes: %u\n",
+    	    	//		time, spikes_remaining);
+    	    }
     }
 }
 
@@ -455,4 +482,13 @@ uint32_t spike_processing_get_and_reset_pipeline_restarts_this_tick(){
 
 uint32_t spike_processing_get_pipeline_deactivation_time(){
 	return spike_pipeline_deactivation_time;
+}
+
+// FLUSH SPIKES
+uint32_t spike_processing_get_total_flushed_spikes(){
+	return total_flushed_spikes;
+}
+
+uint32_t spike_processing_get_max_flushed_spikes(){
+	return max_flushed_spikes;
 }

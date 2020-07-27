@@ -67,6 +67,8 @@ struct neuron_provenance {
     uint32_t max_pipeline_restarts;
     uint32_t timer_callback_completed;
     uint32_t spike_pipeline_deactivated;
+    uint32_t max_flushed_spikes;
+    uint32_t total_flushed_spikes;
 };
 
 //! values for the priority for each callback
@@ -125,6 +127,10 @@ bool rewiring = false;
 // FOR DEBUGGING!
 uint32_t count_rewires = 0;
 
+// FLUSH SPIKES
+bool timer_callback_active = false;
+extern volatile bool dma_busy;
+
 
 //! \brief Initialises the recording parts of the model
 //! \param[in] recording_address: the address in SDRAM where to store
@@ -152,6 +158,8 @@ void c_main_store_provenance_data(address_t provenance_region) {
     prov->max_pipeline_restarts = max_pipeline_restarts;
     prov->timer_callback_completed = timer_callback_completed;
     prov->spike_pipeline_deactivated = spike_pipeline_deactivated;
+    prov->max_flushed_spikes = spike_processing_get_max_flushed_spikes();
+    prov->total_flushed_spikes = spike_processing_get_total_flushed_spikes();
     log_debug("finished other provenance data");
 }
 
@@ -369,6 +377,14 @@ void timer_callback(uint timer_count, uint unused) {
     if (recording_flags > 0) {
         recording_do_timestep_update(time);
     }
+
+    // FLUSH SPIKES and PROCESS SPIKES AFTER NEURON UPDATES ARE DONE.
+    if (dma_busy){
+    	spin1_trigger_user_event(0, 0);
+
+    } // else no spikes have been received while we were processing the neurons.
+
+    timer_callback_active = false;
 
     profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
 }

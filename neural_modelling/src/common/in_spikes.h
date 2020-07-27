@@ -21,6 +21,9 @@
 #include "neuron-typedefs.h"
 #include <circular_buffer.h>
 
+#include <debug.h>
+#include <sark.h>
+
 static circular_buffer buffer;
 
 // initialize_spike_buffer
@@ -80,6 +83,15 @@ static inline uint32_t in_spikes_real_size(void) {
 
 static inline uint32_t in_spikes_value_at_index(uint32_t index) {
     return circular_buffer_value_at_index(buffer, index);
+}
+
+// FLUSH SPIKES
+static inline uint32_t in_spikes_flush_buffer() {
+
+	uint32_t num_spikes_left = circular_buffer_size(buffer);
+	circular_buffer_clear(buffer);
+
+	return num_spikes_left;
 }
 
 #endif // _IN_SPIKES_H_

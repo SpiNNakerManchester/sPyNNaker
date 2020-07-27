@@ -50,4 +50,14 @@ uint32_t spike_processing_get_and_reset_pipeline_restarts_this_tick();
 //! \return uint32_t pipeline deactivation time
 uint32_t spike_processing_get_pipeline_deactivation_time();
 
+// FLUSH SPIKES
+//! \brief returns the total unprocessed spikes from a simulation
+//! \return total unprocessed spikes
+uint32_t spike_processing_get_total_flushed_spikes();
+
+//! \brief returns the maximum unprocessed spikes from a single
+//! simulation timestep.
+//! \return maximum unprocessed spikes from a single timestep.
+uint32_t spike_processing_get_max_flushed_spikes();
+
 #endif // _SPIKE_PROCESSING_H_

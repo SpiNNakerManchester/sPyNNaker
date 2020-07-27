@@ -51,6 +51,8 @@ class PopulationMachineVertex(
         MAX_PIPELINE_RESTARTS = 7
         TIMER_CALLBACK_COMPLETED = 8
         SPIKES_PIPELINE_ACTIVATED = 9
+        MAX_FLUSHED_SPIKES = 10
+        TOTAL_FLUSHED_SPIKES = 11
 
     PROFILE_TAG_LABELS = {
         0: "TIMER",
@@ -129,6 +131,12 @@ class PopulationMachineVertex(
         spike_pipeline_deactivated = provenance_data[
             self.EXTRA_PROVENANCE_DATA_ENTRIES.
                 SPIKES_PIPELINE_ACTIVATED.value]
+        max_flushed_spikes = provenance_data[
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.
+                MAX_FLUSHED_SPIKES.value]
+        total_flushed_spikes = provenance_data[
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.
+                TOTAL_FLUSHED_SPIKES.value]
 
         label, x, y, p, names = self._get_placement_details(placement)
 
@@ -181,6 +189,27 @@ class PopulationMachineVertex(
                 "was {}. Empirically, we can deal with ~20 for real time "
                 "performance using a 0.1 ms timestep.".format(
                     label, x, y, p, max_spikes_in_a_tick))))
+
+        provenance_items.append(ProvenanceDataItem(
+            self._add_name(names,
+                           "MAX_FLUSHED_SPIKES"),
+            max_flushed_spikes,
+            report=max_flushed_spikes > 0,
+            message=(
+                "Max number of flushed spikes for {} on {}, {}, {} "
+                "was {}. ".format(
+                    label, x, y, p, max_flushed_spikes))))
+
+        provenance_items.append(ProvenanceDataItem(
+            self._add_name(names,
+                           "TOTAL_FLUSHED_SPIKES"),
+            total_flushed_spikes,
+            report=total_flushed_spikes > 0,
+            message=(
+                "Total number of flushed spikes for {} on {}, {}, {} "
+                "was {}. ".format(
+                    label, x, y, p, total_flushed_spikes))))
+
         provenance_items.append(ProvenanceDataItem(
             self._add_name(names,
                            "MAX_DMAS_IN_A_TICK"),
@@ -189,10 +218,10 @@ class PopulationMachineVertex(
             self._add_name(names,
                            "MAX_PIPELINE_RESTARTS"),
             max_pipeline_restarts))
-        provenance_items.append(ProvenanceDataItem(
-            self._add_name(names,
-                           "MAX_PIPELINE_RESTARTS"),
-            max_pipeline_restarts))
+        # provenance_items.append(ProvenanceDataItem(
+        #     self._add_name(names,
+        #                    "MAX_PIPELINE_RESTARTS"),
+        #     max_pipeline_restarts))
         provenance_items.append(ProvenanceDataItem(
             self._add_name(names,
                            "TIMER_CALLBACK_COMPLETED"),
