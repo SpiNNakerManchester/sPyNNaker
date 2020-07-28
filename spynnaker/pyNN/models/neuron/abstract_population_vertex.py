@@ -24,10 +24,9 @@ from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
 from spinn_front_end_common.abstract_models import (
-    AbstractChangableAfterRun, AbstractProvidesIncomingPartitionConstraints,
-    AbstractProvidesOutgoingPartitionConstraints, AbstractHasAssociatedBinary,
-    AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification,
-    AbstractCanReset)
+    AbstractChangableAfterRun, AbstractProvidesOutgoingPartitionConstraints,
+    AbstractHasAssociatedBinary, AbstractGeneratesDataSpecification,
+    AbstractRewritesDataSpecification, AbstractCanReset)
 from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl)
 from spinn_front_end_common.utilities import (
@@ -74,7 +73,6 @@ class AbstractPopulationVertex(
         AbstractHasAssociatedBinary, AbstractContainsUnits,
         AbstractSpikeRecordable,  AbstractNeuronRecordable,
         AbstractProvidesOutgoingPartitionConstraints,
-        AbstractProvidesIncomingPartitionConstraints,
         AbstractPopulationInitializable, AbstractPopulationSettable,
         AbstractChangableAfterRun, AbstractRewritesDataSpecification,
         AbstractReadParametersBeforeSet, AbstractAcceptsIncomingSynapses,
@@ -207,24 +205,19 @@ class AbstractPopulationVertex(
         return self.__neuron_recorder
 
     @inject_items({
-        "graph": "MemoryApplicationGraph",
-        "machine_time_step": "MachineTimeStep"
+        "graph": "MemoryApplicationGraph"
     })
     @overrides(
         ApplicationVertex.get_resources_used_by_atoms,
-        additional_arguments={
-            "graph", "machine_time_step"
-        }
+        additional_arguments={"graph"}
     )
-    def get_resources_used_by_atoms(
-            self, vertex_slice, graph, machine_time_step):
+    def get_resources_used_by_atoms(self, vertex_slice, graph):
         # pylint: disable=arguments-differ
 
         variableSDRAM = self.__neuron_recorder.get_variable_sdram_usage(
             vertex_slice)
         constantSDRAM = ConstantSDRAM(
-                self._get_sdram_usage_for_atoms(
-                    vertex_slice, graph, machine_time_step))
+            self._get_sdram_usage_for_atoms(vertex_slice, graph))
 
         # set resources required from this object
         container = ResourceContainer(
@@ -293,8 +286,7 @@ class AbstractPopulationVertex(
             self._BYTES_TILL_START_OF_GLOBAL_PARAMETERS +
             self.__neuron_impl.get_sdram_usage_in_bytes(vertex_slice.n_atoms))
 
-    def _get_sdram_usage_for_atoms(
-            self, vertex_slice, graph, machine_time_step):
+    def _get_sdram_usage_for_atoms(self, vertex_slice, graph):
         sdram_requirement = (
             SYSTEM_BYTES_REQUIREMENT +
             self._get_sdram_usage_for_neuron_params(vertex_slice) +
@@ -302,7 +294,7 @@ class AbstractPopulationVertex(
             PopulationMachineVertex.get_provenance_data_size(
                 len(PopulationMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES)) +
             self.__synapse_manager.get_sdram_usage_in_bytes(
-                vertex_slice, machine_time_step, graph, self) +
+                vertex_slice, graph, self) +
             profile_utils.get_profile_region_size(
                 self.__n_profile_samples) +
             bit_field_utilities.get_estimated_sdram_for_bit_field_region(
@@ -560,9 +552,8 @@ class AbstractPopulationVertex(
 
         # allow the synaptic matrix to write its data spec-able data
         self.__synapse_manager.write_data_spec(
-            spec, self, vertex_slice, vertex, placement, machine_graph,
-            application_graph, routing_info,
-            weight_scale, machine_time_step)
+            spec, self, vertex_slice, vertex, machine_graph, application_graph,
+            routing_info, weight_scale, machine_time_step)
         vertex.set_on_chip_generatable_area(
             self.__synapse_manager.host_written_matrix_size,
             self.__synapse_manager.on_chip_written_matrix_size)
@@ -841,16 +832,6 @@ class AbstractPopulationVertex(
     def get_maximum_delay_supported_in_ms(self, machine_time_step):
         return self.__synapse_manager.get_maximum_delay_supported_in_ms(
             machine_time_step)
-
-    @overrides(AbstractProvidesIncomingPartitionConstraints.
-               get_incoming_partition_constraints)
-    def get_incoming_partition_constraints(self, partition):
-        """ Gets the constraints for partitions going into this vertex.
-
-        :param partition: partition that goes into this vertex
-        :return: list of constraints
-        """
-        return self.__synapse_manager.get_incoming_partition_constraints()
 
     @overrides(AbstractProvidesOutgoingPartitionConstraints.
                get_outgoing_partition_constraints)

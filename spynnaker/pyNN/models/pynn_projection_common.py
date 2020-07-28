@@ -309,7 +309,7 @@ class PyNNProjectionCommon(object):
         if delay_edge is None:
             delay_edge = DelayedApplicationEdge(
                 delay_vertex, post_vertex, self.__synapse_information,
-                label="{}_delayed_to_{}".format(
+                self.__projection_edge, label="{}_delayed_to_{}".format(
                     pre_vertex.label, post_vertex.label))
             self.__spinnaker_control.add_application_edge(
                 delay_edge, constants.SPIKE_PARTITION_ID)

@@ -29,6 +29,9 @@ logger = logging.getLogger(__name__)
 # means addresses have to be aligned to these offsets
 _ADDRESS_SCALE = 16
 
+# A padding byte
+_PADDING_BYTE = 0xDD
+
 
 def _n_bits(field):
     """ Get the number of bits in a field (ctypes doesn't do this)
@@ -378,8 +381,8 @@ class MasterPopTableAsBinarySearch(object):
         self.__n_addresses = 0
 
     def update_master_population_table(
-            self, block_start_addr, row_length, key_and_mask, core_mask,
-            core_shift, n_neurons, is_single=False):
+            self, block_start_addr, row_length, key_and_mask, core_mask=0,
+            core_shift=0, n_neurons=0, is_single=False):
         """ Add an entry in the binary search to deal with the synaptic matrix
 
         :param int block_start_addr: where the synaptic matrix block starts
@@ -540,3 +543,20 @@ class MasterPopTableAsBinarySearch(object):
         """ The maximum index of a synaptic connection
         """
         return _MAX_ADDRESS_COUNT
+
+    def write_padding(self, spec, next_block_start_address):
+        """
+        :param ~.DataSpecificationGenerator spec:
+        :param int next_block_start_address:
+        :rtype: int
+        """
+        next_allowed = self.get_next_allowed_address(next_block_start_address)
+        padding = next_allowed - next_block_start_address
+        if padding != 0:
+
+            # Pad out data file with the added alignment bytes:
+            spec.comment("\nWriting population table required padding\n")
+            spec.write_array(numpy.repeat(
+                numpy.array(_PADDING_BYTE, dtype="uint8"), padding).view(
+                    "uint32"))
+        return next_allowed

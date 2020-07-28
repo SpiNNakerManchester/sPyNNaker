@@ -19,6 +19,7 @@ from six import raise_from
 
 from spinn_front_end_common.utilities.constants import \
     MICRO_TO_MILLISECOND_CONVERSION, BYTES_PER_WORD
+from spinn_front_end_common.utilities import globals_variables
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractConnector)
 from spynnaker.pyNN.utilities.constants import MAX_SUPPORTED_DELAY_TICS
@@ -304,45 +305,41 @@ class SynapseIORowBased(object):
         return row_data
 
     def get_synapses(
-            self, synapse_info, pre_slices, pre_slice_index,
-            post_slices, post_slice_index, pre_vertex_slice,
-            post_vertex_slice, n_delay_stages,
-            n_synapse_types, weight_scales, machine_time_step,
-            app_edge, machine_edge, max_row_info):
+            self, synapse_info, n_delay_stages, n_synapse_types, weight_scales,
+            machine_edge, max_row_info):
         """ Get the synapses as an array of words for non-delayed synapses and\
             an array of words for delayed synapses. This is used to prepare\
             information for *deployment to SpiNNaker*.
 
         :param SynapseInformation synapse_info:
-        :param list(~pacman.model.graphs.common.Slice) pre_slices:
-        :param int pre_slice_index:
-        :param list(~pacman.model.graphs.common.Slice) post_slices:
-        :param int post_slice_index:
-        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
         :param int n_delay_stages:
-        :param MasterPopTableAsBinarySearch population_table:
         :param int n_synapse_types:
         :param dict(AbstractSynapseType,float) weight_scales:
-        :param int machine_time_step:
-        :param ProjectionApplicationEdge app_edge:
         :param ProjectionMachineEdge machine_edge:
-        :return: (row_data, max_row_length, delayed_row_data,
-            max_delayed_row_length, delayed_source_ids, stages)
+        :param MaxRowInfo max_row_info:
+        :return: (row_data, delayed_row_data, delayed_source_ids, stages)
         :rtype:
-            tuple(~numpy.ndarray, int, ~numpy.ndarray, int, ~numpy.ndarray,\
+            tuple(~numpy.ndarray, ~numpy.ndarray, ~numpy.ndarray,\
             ~numpy.ndarray)
         """
         # pylint: disable=too-many-arguments, too-many-locals
         # pylint: disable=assignment-from-no-return
         # Get delays in timesteps
+        machine_time_step = globals_variables.get_simulator().machine_time_step
         max_delay = self.get_maximum_delay_supported_in_ms(machine_time_step)
         if max_delay is not None:
             max_delay *= (MICRO_TO_MILLISECOND_CONVERSION / machine_time_step)
 
         # Get the actual connections
+        app_edge = machine_edge.app_edge
+        pre_slices = app_edge.pre_vertex.vertex_slices
+        post_slices = app_edge.post_vertex.vertex_slices
+        pre_slice_idx = machine_edge.pre_vertex.index
+        post_slice_idx = machine_edge.post_vertex.index
+        pre_vertex_slice = machine_edge.pre_vertex.vertex_slice
+        post_vertex_slice = machine_edge.post_vertex.vertex_slice
         connections = synapse_info.connector.create_synaptic_block(
-            pre_slices, pre_slice_index, post_slices, post_slice_index,
+            pre_slices, pre_slice_idx, post_slices, post_slice_idx,
             pre_vertex_slice, post_vertex_slice, synapse_info.synapse_type,
             synapse_info)
 
@@ -479,26 +476,27 @@ class SynapseIORowBased(object):
             connections, machine_time_step, weight_scales, synapse_info)
 
     def read_all_synapses(
-            self, synapse_info, pre_vertex_slice, post_vertex_slice,
-            max_row_length, delayed_max_row_length, n_synapse_types,
-            weight_scales, data, delayed_data, machine_time_step):
+            self, data, delayed_data, synapse_info, n_synapse_types,
+            weight_scales, machine_edge, max_row_info):
         """ Read the synapses for a given projection synapse information\
             object out of the given delayed and undelayed data.
 
-        :param SynapseInformation synapse_info:
-        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
-        :param int max_row_length:
-        :param int delayed_max_row_length:
-        :param int n_synapse_types:
-        :param dict(AbstractSynapseType,float) weight_scales:
         :param bytearray data:
         :param bytearray delayed_data:
-        :param int machine_time_step:
+        :param SynapseInformation synapse_info:
+        :param int n_synapse_types:
+        :param dict(AbstractSynapseType,float) weight_scales:
+        :param MachineEdge machine_edge:
+        :param MaxRowInfo max_row_info:
         :return: array with ``weight`` and ``delay`` columns
         :rtype: ~numpy.ndarray
         """
         connections = []
+        machine_time_step = globals_variables.get_simulator().machine_time_step
+        pre_vertex_slice = machine_edge.pre_vertex.vertex_slice
+        post_vertex_slice = machine_edge.post_vertex.vertex_slice
+        max_row_length = max_row_info.undelayed_max_words
+        delayed_max_row_length = max_row_info.delayed_max_words
         connections.append(self.read_some_synapses(
             synapse_info, pre_vertex_slice, post_vertex_slice, max_row_length,
             n_synapse_types, weight_scales, data, machine_time_step,

@@ -29,7 +29,8 @@ class ProjectionMachineEdge(
         MachineEdge, AbstractFilterableEdge,
         AbstractWeightUpdatable, AbstractProvidesLocalProvenanceData):
     __slots__ = [
-        "__synapse_information"]
+        "__synapse_information",
+        "__delay_edge"]
 
     def __init__(
             self, synapse_information, pre_vertex, post_vertex, app_edge,

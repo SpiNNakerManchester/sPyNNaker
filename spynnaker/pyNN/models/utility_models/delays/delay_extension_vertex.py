@@ -182,7 +182,7 @@ class DelayExtensionVertex(
             self, max_row_n_synapses, max_delayed_row_n_synapses,
             pre_slices, pre_slice_index, post_slices, post_slice_index,
             pre_vertex_slice, post_vertex_slice, synapse_information,
-            max_stage, machine_time_step):
+            max_stage):
         """ Add delays for a connection to be generated
 
         :param int max_row_n_synapses:
@@ -196,14 +196,13 @@ class DelayExtensionVertex(
         :param ~spynnaker.pyNN.models.neural_projections.SynapseInformation \
                 synapse_information:
         :param int max_stage:
-        :param int machine_time_step:
         """
         self.__delay_generator_data[post_vertex_slice].append(
             DelayGeneratorData(
                 max_row_n_synapses, max_delayed_row_n_synapses,
                 pre_slices, pre_slice_index, post_slices, post_slice_index,
                 pre_vertex_slice, post_vertex_slice,
-                synapse_information, max_stage, machine_time_step))
+                synapse_information, max_stage, self.__machine_time_step))
 
     @inject_items({
         "machine_graph": "MemoryMachineGraph",
