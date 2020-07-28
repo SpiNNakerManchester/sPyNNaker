@@ -20,8 +20,7 @@ import sys
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement, read_config)
-from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, MICRO_TO_SECOND_CONVERSION)
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.models.neuron.generator_data import GeneratorData
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractGenerateConnectorOnMachine)
@@ -37,8 +36,8 @@ from spynnaker.pyNN.models.neuron.master_pop_table import (
     MasterPopTableAsBinarySearch)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.models.neuron.synapse_dynamics import SynapseDynamicsSTDP
-from spinn_front_end_common.utilities.utility_objs.provenance_data_item import (
-    ProvenanceDataItem)
+from spinn_front_end_common.utilities.utility_objs\
+    .provenance_data_item import ProvenanceDataItem
 
 TIME_STAMP_BYTES = BYTES_PER_WORD
 
@@ -561,205 +560,6 @@ class SynapticManager(object):
                     size=synapse_structural_dynamics_sz,
                     label='synapseDynamicsStructuralParams')
 
-#     @staticmethod
-#     def _ring_buffer_expected_upper_bound(
-#             weight_mean, weight_std_dev, spikes_per_second,
-#             machine_timestep, n_synapses_in, sigma):
-#         """ Provides expected upper bound on accumulated values in a ring\
-#             buffer element.
-#
-#         Requires an assessment of maximum Poisson input rate.
-#
-#         Assumes knowledge of mean and SD of weight distribution, fan-in\
-#         and timestep.
-#
-#         All arguments should be assumed real values except n_synapses_in\
-#         which will be an integer.
-#
-#         :param float weight_mean: Mean of weight distribution (in either nA or\
-#             microSiemens as required)
-#         :param float weight_std_dev: SD of weight distribution
-#         :param float spikes_per_second: Maximum expected Poisson rate in Hz
-#         :param int machine_timestep: in us
-#         :param int n_synapses_in: No of connected synapses
-#         :param float sigma: How many SD above the mean to go for upper bound;\
-#             a good starting choice is 5.0. Given length of simulation we can\
-#             set this for approximate number of saturation events.
-#         :rtype: float
-#         """
-#         # E[ number of spikes ] in a timestep
-#         steps_per_second = MICRO_TO_SECOND_CONVERSION / machine_timestep
-#         average_spikes_per_timestep = (
-#             float(n_synapses_in * spikes_per_second) / steps_per_second)
-#
-#         # Exact variance contribution from inherent Poisson variation
-#         poisson_variance = average_spikes_per_timestep * (weight_mean ** 2)
-#
-#         # Upper end of range for Poisson summation required below
-#         # upper_bound needs to be an integer
-#         upper_bound = int(round(average_spikes_per_timestep +
-#                                 POSSION_SIGMA_SUMMATION_LIMIT *
-#                                 math.sqrt(average_spikes_per_timestep)))
-#
-#         # Closed-form exact solution for summation that gives the variance
-#         # contributed by weight distribution variation when modulated by
-#         # Poisson PDF.  Requires scipy.special for gamma and incomplete gamma
-#         # functions. Beware: incomplete gamma doesn't work the same as
-#         # Mathematica because (1) it's regularised and needs a further
-#         # multiplication and (2) it's actually the complement that is needed
-#         # i.e. 'gammaincc']
-#
-#         weight_variance = 0.0
-#
-#         if weight_std_dev > 0:
-#             # pylint: disable=no-member
-#             lngamma = special.gammaln(1 + upper_bound)
-#             gammai = special.gammaincc(
-#                 1 + upper_bound, average_spikes_per_timestep)
-#
-#             big_ratio = (math.log(average_spikes_per_timestep) * upper_bound -
-#                          lngamma)
-#
-#             if -701.0 < big_ratio < 701.0 and big_ratio != 0.0:
-#                 log_weight_variance = (
-#                     -average_spikes_per_timestep +
-#                     math.log(average_spikes_per_timestep) +
-#                     2.0 * math.log(weight_std_dev) +
-#                     math.log(math.exp(average_spikes_per_timestep) * gammai -
-#                              math.exp(big_ratio)))
-#                 weight_variance = math.exp(log_weight_variance)
-#
-#         # upper bound calculation -> mean + n * SD
-#         return ((average_spikes_per_timestep * weight_mean) +
-#                 (sigma * math.sqrt(poisson_variance + weight_variance)))
-#
-#     def _get_ring_buffer_to_input_left_shifts(
-#             self, application_vertex, application_graph, machine_timestep,
-#             weight_scale):
-#         """ Get the scaling of the ring buffer to provide as much accuracy as\
-#             possible without too much overflow
-#
-#         :param .ApplicationVertex application_vertex:
-#         :param .ApplicationGraph application_graph:
-#         :param int machine_timestep:
-#         :param float weight_scale:
-#         :rtype: list(int)
-#         """
-#         weight_scale_squared = weight_scale * weight_scale
-#         n_synapse_types = self.__n_synapse_types
-#         running_totals = [RunningStats() for _ in range(n_synapse_types)]
-#         delay_running_totals = [RunningStats() for _ in range(n_synapse_types)]
-#         total_weights = numpy.zeros(n_synapse_types)
-#         biggest_weight = numpy.zeros(n_synapse_types)
-#         weights_signed = False
-#         rate_stats = [RunningStats() for _ in range(n_synapse_types)]
-#         steps_per_second = MICRO_TO_SECOND_CONVERSION / machine_timestep
-#
-#         for app_edge in application_graph.get_edges_ending_at_vertex(
-#                 application_vertex):
-#             if isinstance(app_edge, ProjectionApplicationEdge):
-#                 for synapse_info in app_edge.synapse_information:
-#                     synapse_type = synapse_info.synapse_type
-#                     synapse_dynamics = synapse_info.synapse_dynamics
-#                     connector = synapse_info.connector
-#
-#                     weight_mean = (
-#                         synapse_dynamics.get_weight_mean(
-#                             connector, synapse_info) * weight_scale)
-#                     n_connections = \
-#                         connector.get_n_connections_to_post_vertex_maximum(
-#                             synapse_info)
-#                     weight_variance = synapse_dynamics.get_weight_variance(
-#                         connector, synapse_info.weights) * weight_scale_squared
-#                     running_totals[synapse_type].add_items(
-#                         weight_mean, weight_variance, n_connections)
-#
-#                     delay_variance = synapse_dynamics.get_delay_variance(
-#                         connector, synapse_info.delays)
-#                     delay_running_totals[synapse_type].add_items(
-#                         0.0, delay_variance, n_connections)
-#
-#                     weight_max = (synapse_dynamics.get_weight_maximum(
-#                         connector, synapse_info) * weight_scale)
-#                     biggest_weight[synapse_type] = max(
-#                         biggest_weight[synapse_type], weight_max)
-#
-#                     spikes_per_tick = max(
-#                         1.0, self.__spikes_per_second / steps_per_second)
-#                     spikes_per_second = self.__spikes_per_second
-#                     if isinstance(app_edge.pre_vertex,
-#                                   SpikeSourcePoissonVertex):
-#                         rate = app_edge.pre_vertex.max_rate
-#                         # If non-zero rate then use it; otherwise keep default
-#                         if rate != 0:
-#                             spikes_per_second = rate
-#                         if hasattr(spikes_per_second, "__getitem__"):
-#                             spikes_per_second = numpy.max(spikes_per_second)
-#                         elif isinstance(spikes_per_second, RandomDistribution):
-#                             spikes_per_second = get_maximum_probable_value(
-#                                 spikes_per_second, app_edge.pre_vertex.n_atoms)
-#                         prob = 1.0 - (
-#                             (1.0 / 100.0) / app_edge.pre_vertex.n_atoms)
-#                         spikes_per_tick = spikes_per_second / steps_per_second
-#                         spikes_per_tick = scipy.stats.poisson.ppf(
-#                             prob, spikes_per_tick)
-#                     rate_stats[synapse_type].add_items(
-#                         spikes_per_second, 0, n_connections)
-#                     total_weights[synapse_type] += spikes_per_tick * (
-#                         weight_max * n_connections)
-#
-#                     if synapse_dynamics.are_weights_signed():
-#                         weights_signed = True
-#
-#         max_weights = numpy.zeros(n_synapse_types)
-#         for synapse_type in range(n_synapse_types):
-#             if delay_running_totals[synapse_type].variance == 0.0:
-#                 max_weights[synapse_type] = max(total_weights[synapse_type],
-#                                                 biggest_weight[synapse_type])
-#             else:
-#                 stats = running_totals[synapse_type]
-#                 rates = rate_stats[synapse_type]
-#                 max_weights[synapse_type] = min(
-#                     self._ring_buffer_expected_upper_bound(
-#                         stats.mean, stats.standard_deviation, rates.mean,
-#                         machine_timestep, stats.n_items,
-#                         self.__ring_buffer_sigma),
-#                     total_weights[synapse_type])
-#                 max_weights[synapse_type] = max(
-#                     max_weights[synapse_type], biggest_weight[synapse_type])
-#
-#         # Convert these to powers; we could use int.bit_length() for this if
-#         # they were integers, but they aren't...
-#         max_weight_powers = (
-#             0 if w <= 0 else int(math.ceil(max(0, math.log(w, 2))))
-#             for w in max_weights)
-#
-#         # If 2^max_weight_power equals the max weight, we have to add another
-#         # power, as range is 0 - (just under 2^max_weight_power)!
-#         max_weight_powers = (
-#             w + 1 if (2 ** w) <= a else w
-#             for w, a in zip(max_weight_powers, max_weights))
-#
-#         # If we have synapse dynamics that uses signed weights,
-#         # Add another bit of shift to prevent overflows
-#         if weights_signed:
-#             max_weight_powers = (m + 1 for m in max_weight_powers)
-#
-#         return list(max_weight_powers)
-#
-#     @staticmethod
-#     def __get_weight_scale(ring_buffer_to_input_left_shift):
-#         """ Return the amount to scale the weights by to convert them from \
-#             floating point values to 16-bit fixed point numbers which can be \
-#             shifted left by ring_buffer_to_input_left_shift to produce an\
-#             s1615 fixed point number
-#
-#         :param int ring_buffer_to_input_left_shift:
-#         :rtype: float
-#         """
-#         return float(math.pow(2, 16 - (ring_buffer_to_input_left_shift + 1)))
-#
-# >>>>>>> refs/remotes/origin/master
     def _write_synapse_parameters(
             self, spec, min_weights, weight_scale):
         """Get the ring buffer shifts and scaling factors.
