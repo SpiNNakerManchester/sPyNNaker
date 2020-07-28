@@ -22,7 +22,7 @@ from spinn_utilities.overrides import overrides
 from spinn_machine import SDRAM
 from pacman.model.placements import Placement
 from pacman.model.resources import ResourceContainer
-from pacman.model.graphs.common import GraphMapper, Slice
+from pacman.model.graphs.common import Slice
 from pacman.model.graphs.machine import MachineGraph, SimpleMachineVertex
 from pacman.model.routing_info import (
     RoutingInfo, PartitionRoutingInfo, BaseKeyAndMask)
@@ -34,7 +34,7 @@ from spynnaker.pyNN.models.neuron import SynapticManager
 from spynnaker.pyNN.abstract_spinnaker_common import AbstractSpiNNakerCommon
 import spynnaker.pyNN.abstract_spinnaker_common as abstract_spinnaker_common
 from spynnaker.pyNN.models.neural_projections import (
-    ProjectionApplicationEdge, ProjectionMachineEdge, SynapseInformation)
+    ProjectionApplicationEdge, SynapseInformation)
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractGenerateConnectorOnMachine, AllToAllConnector, OneToOneConnector)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
@@ -98,7 +98,8 @@ class SimpleApplicationVertex(ApplicationVertex):
     def create_machine_vertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
-        return SimpleMachineVertex(resources_required, label, constraints)
+        return SimpleMachineVertex(
+            resources_required, label, constraints, self, vertex_slice)
 
     @overrides(ApplicationVertex.get_resources_used_by_atoms)
     def get_resources_used_by_atoms(self, vertex_slice):
@@ -223,11 +224,13 @@ class TestSynapticManager(unittest.TestCase):
         machine_time_step = 1000.0
 
         pre_app_vertex = SimpleApplicationVertex(10)
-        pre_vertex = SimpleMachineVertex(resources=None)
         pre_vertex_slice = Slice(0, 9)
+        pre_vertex = pre_app_vertex.create_machine_vertex(
+            pre_vertex_slice, None)
         post_app_vertex = SimpleApplicationVertex(10)
-        post_vertex = SimpleMachineVertex(resources=None)
         post_vertex_slice = Slice(0, 9)
+        post_vertex = post_app_vertex.create_machine_vertex(
+            post_vertex_slice, None)
         post_slice_index = 0
 
         one_to_one_connector_1 = OneToOneConnector(None)
@@ -253,21 +256,14 @@ class TestSynapticManager(unittest.TestCase):
             pre_app_vertex, post_app_vertex, direct_synapse_information_1)
         app_edge.add_synapse_information(direct_synapse_information_2)
         app_edge.add_synapse_information(all_to_all_synapse_information)
-        machine_edge = ProjectionMachineEdge(
-            app_edge.synapse_information, pre_vertex, post_vertex)
+        machine_edge = app_edge.create_machine_edge(
+            pre_vertex, post_vertex, label=None)
         partition_name = "TestPartition"
 
         graph = MachineGraph("Test")
         graph.add_vertex(pre_vertex)
         graph.add_vertex(post_vertex)
         graph.add_edge(machine_edge, partition_name)
-
-        graph_mapper = GraphMapper()
-        graph_mapper.add_vertex_mapping(
-            pre_vertex, pre_vertex_slice, pre_app_vertex)
-        graph_mapper.add_vertex_mapping(
-            post_vertex, post_vertex_slice, post_app_vertex)
-        graph_mapper.add_edge_mapping(machine_edge, app_edge)
 
         weight_scales = [4096.0, 4096.0]
 
@@ -282,8 +278,8 @@ class TestSynapticManager(unittest.TestCase):
         spec_writer = FileDataWriter(temp_spec)
         spec = DataSpecificationGenerator(spec_writer, None)
         master_pop_sz = 1000
-        master_pop_region = 0
         all_syn_block_sz = 2000
+        master_pop_region = 0
         synapse_region = 1
         direct_region = 2
         spec.reserve_memory_region(master_pop_region, master_pop_sz)
@@ -293,11 +289,15 @@ class TestSynapticManager(unittest.TestCase):
             n_synapse_types=2, ring_buffer_sigma=5.0, spikes_per_second=100.0,
             min_weights=None, weight_random_sigma=None,
             max_stdp_spike_delta=None, config=config)
+        # Poke in our testing region IDs
+        synaptic_manager._pop_table_region = master_pop_region
+        synaptic_manager._synaptic_matrix_region = synapse_region
+        synaptic_manager._direct_matrix_region = direct_region
+
         synaptic_manager._write_synaptic_matrix_and_master_population_table(
             spec, [post_vertex_slice], post_slice_index, post_vertex,
             post_vertex_slice, all_syn_block_sz, weight_scales,
-            master_pop_region, synapse_region, direct_region, routing_info,
-            graph_mapper, graph, machine_time_step)
+            routing_info, graph, machine_time_step)
         spec.end_specification()
         spec_writer.close()
 
@@ -347,7 +347,7 @@ class TestSynapticManager(unittest.TestCase):
             using_monitors=False)
         connections_1 = synaptic_manager._read_synapses(
             direct_synapse_information_1, pre_vertex_slice, post_vertex_slice,
-            row_len_1, 0, 2, weight_scales, data_1, None, machine_time_step)
+            row_len_1, 0, weight_scales, data_1, None, machine_time_step)
 
         # The first matrix is a 1-1 matrix, so row length is 1
         assert row_len_1 == 1
@@ -366,7 +366,7 @@ class TestSynapticManager(unittest.TestCase):
             using_monitors=False)
         connections_2 = synaptic_manager._read_synapses(
             direct_synapse_information_2, pre_vertex_slice, post_vertex_slice,
-            row_len_2, 0, 2, weight_scales, data_2, None, machine_time_step)
+            row_len_2, 0, weight_scales, data_2, None, machine_time_step)
 
         # The second matrix is a 1-1 matrix, so row length is 1
         assert row_len_2 == 1
@@ -385,7 +385,7 @@ class TestSynapticManager(unittest.TestCase):
             using_monitors=False)
         connections_3 = synaptic_manager._read_synapses(
             all_to_all_synapse_information, pre_vertex_slice,
-            post_vertex_slice, row_len_3, 0, 2, weight_scales, data_3, None,
+            post_vertex_slice, row_len_3, 0, weight_scales, data_3, None,
             machine_time_step)
 
         # The third matrix is an all-to-all matrix, so length is n_atoms

@@ -28,8 +28,8 @@ from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utility_models import CommandSender
 from spinn_front_end_common.utilities.utility_objs import ExecutableFinder
 from spinn_front_end_common.utilities import globals_variables
-from spynnaker.pyNN.models.utility_models import synapse_expander
-from spynnaker.pyNN import overridden_pacman_functions, model_binaries
+from spinn_front_end_common.utilities.helpful_functions import read_config
+from spynnaker.pyNN import extra_algorithms, model_binaries
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.spynnaker_simulator_interface import (
     SpynnakerSimulatorInterface)
@@ -65,6 +65,36 @@ class AbstractSpiNNakerCommon(with_metaclass(
             user_extra_algorithms_pre_run=None, time_scale_factor=None,
             extra_post_run_algorithms=None, extra_mapping_algorithms=None,
             extra_load_algorithms=None, front_end_versions=None):
+        """
+        :param str graph_label:
+        :param database_socket_addresses:
+        :type database_socket_addresses:
+            iterable(~spinn_utilities.socket_address.SocketAddress)
+        :param n_chips_required:
+        :type n_chips_required: int or None
+        :param n_boards_required:
+        :type n_boards_required: int or None
+        :param int timestep:
+        :param float max_delay:
+        :param float min_delay:
+        :param str hostname:
+        :param user_extra_algorithm_xml_path:
+        :type user_extra_algorithm_xml_path: str or None
+        :param user_extra_mapping_inputs:
+        :type user_extra_mapping_inputs: dict(str, Any) or None
+        :param user_extra_algorithms_pre_run:
+        :type user_extra_algorithms_pre_run: list(str) or None
+        :param time_scale_factor:
+        :type time_scale_factor:
+        :param extra_post_run_algorithms:
+        :type extra_post_run_algorithms: list(str) or None
+        :param extra_mapping_algorithms:
+        :type extra_mapping_algorithms: list(str) or None
+        :param extra_load_algorithms:
+        :type extra_load_algorithms: list(str) or None
+        :param front_end_versions:
+        :type front_end_versions:
+        """
         # pylint: disable=too-many-arguments, too-many-locals
 
         # add model binaries
@@ -86,11 +116,8 @@ class AbstractSpiNNakerCommon(with_metaclass(
         # using auto pause and resume
         extra_algorithm_xml_path = list()
         extra_algorithm_xml_path.append(os.path.join(
-            os.path.dirname(overridden_pacman_functions.__file__),
+            os.path.dirname(extra_algorithms.__file__),
             "algorithms_metadata.xml"))
-        extra_algorithm_xml_path.append(os.path.join(
-            os.path.dirname(synapse_expander.__file__),
-            "synapse_expander.xml"))
         if user_extra_algorithm_xml_path is not None:
             extra_algorithm_xml_path.extend(user_extra_algorithm_xml_path)
 
@@ -118,9 +145,45 @@ class AbstractSpiNNakerCommon(with_metaclass(
             front_end_versions=versions)
 
         extra_mapping_inputs = dict()
+        extra_mapping_inputs['RouterBitfieldCompressionReport'] = \
+            self.config.getboolean(
+                "Reports", "generate_router_compression_with_bitfield_report")
+
+        extra_mapping_inputs['RouterCompressorBitFieldUseCutOff'] = \
+            self.config.getboolean(
+                "Mapping",
+                "router_table_compression_with_bit_field_use_time_cutoff")
+
+        time = read_config(
+            self.config, "Mapping",
+            "router_table_compression_with_bit_field_iteration_time")
+        if time is not None:
+            time = int(time)
+        extra_mapping_inputs['RouterCompressorBitFieldTimePerAttempt'] = time
+
+        extra_mapping_inputs["RouterCompressorBitFieldPreAllocSize"] = \
+            self.config.getint(
+                "Mapping",
+                "router_table_compression_with_bit_field_pre_alloced_sdram")
+        extra_mapping_inputs["RouterCompressorBitFieldPercentageThreshold"] = \
+            self.config.getint(
+                "Mapping",
+                "router_table_compression_with_bit_field_acceptance_threshold")
         extra_mapping_inputs['CreateAtomToEventIdMapping'] = \
             self.config.getboolean(
                 "Database", "create_routing_info_to_neuron_id_mapping")
+        extra_mapping_inputs["ReadBitFieldGeneratorIOBUF"] = \
+            self.config.getboolean("Reports", "read_bif_field_iobuf")
+        extra_mapping_inputs["GenerateBitFieldReport"] = \
+            self.config.getboolean("Reports", "generate_bit_field_report")
+        extra_mapping_inputs["GenerateBitFieldSummaryReport"] = \
+            self.config.getboolean(
+                "Reports", "generate_bit_field_summary_report")
+        extra_mapping_inputs["RouterCompressorWithBitFieldReadIOBuf"] = \
+            self.config.getboolean(
+                "Reports", "write_router_compressor_with_bitfield_iobuf")
+        extra_mapping_inputs["SynapticExpanderReadIOBuf"] = \
+            self.config.getboolean("Reports", "write_expander_iobuf")
         if user_extra_mapping_inputs is not None:
             extra_mapping_inputs.update(user_extra_mapping_inputs)
 
@@ -131,11 +194,14 @@ class AbstractSpiNNakerCommon(with_metaclass(
         if extra_post_run_algorithms is None:
             extra_post_run_algorithms = []
         extra_load_algorithms.append("SynapseExpander")
+        extra_load_algorithms.append("OnChipBitFieldGenerator")
         extra_algorithms_pre_run = []
 
         if self.config.getboolean("Reports", "draw_network_graph"):
             extra_mapping_algorithms.append(
                 "SpYNNakerConnectionHolderGenerator")
+            extra_mapping_algorithms.append(
+                "PreAllocateForBitFieldRouterCompressor")
             extra_load_algorithms.append(
                 "SpYNNakerNeuronGraphNetworkSpecificationReport")
 
@@ -311,16 +377,16 @@ class AbstractSpiNNakerCommon(with_metaclass(
     def stop(self, turn_off_machine=None, clear_routing_tables=None,
              clear_tags=None):
         """
-        :param turn_off_machine: decides if the machine should be powered down\
-            after running the execution. Note that this powers down all boards\
+        :param turn_off_machine: decides if the machine should be powered down
+            after running the execution. Note that this powers down all boards
             connected to the BMP connections given to the transceiver
-        :type turn_off_machine: bool
-        :param clear_routing_tables: informs the tool chain if it\
+        :type turn_off_machine: bool or None
+        :param clear_routing_tables: informs the tool chain if it
             should turn off the clearing of the routing tables
-        :type clear_routing_tables: bool
-        :param clear_tags: informs the tool chain if it should clear the tags\
+        :type clear_routing_tables: bool or None
+        :param clear_tags: informs the tool chain if it should clear the tags
             off the machine at stop
-        :type clear_tags: boolean
+        :type clear_tags: bool or None
         :rtype: None
         """
         # pylint: disable=protected-access
@@ -330,12 +396,14 @@ class AbstractSpiNNakerCommon(with_metaclass(
         super(AbstractSpiNNakerCommon, self).stop(
             turn_off_machine, clear_routing_tables, clear_tags)
         self.reset_number_of_neurons_per_core()
-        globals_variables.unset_simulator()
+        globals_variables.unset_simulator(self)
 
     def run(self, run_time):
         """ Run the model created.
 
         :param run_time: the time (in milliseconds) to run the simulation for
+        :type run_time: float or int
+        :rtype: None
         """
         # pylint: disable=protected-access
 
@@ -343,13 +411,24 @@ class AbstractSpiNNakerCommon(with_metaclass(
         self._dsg_algorithm = "SpynnakerDataSpecificationWriter"
         for projection in self._projections:
             projection._clear_cache()
+
+        if (self.config.getboolean("Reports", "reports_enabled") and
+                self.config.getboolean(
+                    "Reports", "write_redundant_packet_count_report") and
+                not self._use_virtual_board and run_time is not None and
+                not self._has_ran and self._config.getboolean(
+                    "Reports", "writeProvenanceData")):
+            self.extend_extra_post_run_algorithms(
+                ["RedundantPacketCountReport"])
+
         super(AbstractSpiNNakerCommon, self).run(run_time)
 
     @staticmethod
     def register_binary_search_path(search_path):
         """ Register an additional binary search path for executables.
 
-        :param search_path: absolute search path for binaries
+        :param str search_path: absolute search path for binaries
+        :rtype: None
         """
         # pylint: disable=protected-access
         AbstractSpiNNakerCommon.__EXECUTABLE_FINDER.add_path(search_path)
@@ -373,16 +452,15 @@ class AbstractSpiNNakerCommon(with_metaclass(
             neuron_type.set_model_max_atoms_per_core()
 
     def get_projections_data(self, projection_to_attribute_map):
-        """ Common data extractor for projection data. Allows fully \
+        """ Common data extractor for projection data. Allows fully
             exploitation of the ????
 
-        :param projection_to_attribute_map: \
+        :param projection_to_attribute_map:
             the projection to attributes mapping
-        :type projection_to_attribute_map: \
-            dict of projection with set of attributes
+        :type projection_to_attribute_map:
+            dict(PyNNProjectionCommon, list(int) or tuple(int) or None)
         :return: a extracted data object with get method for getting the data
-        :rtype: \
-            :py:class:`spynnaker.pyNN.utilities.extracted_data.ExtractedData`
+        :rtype: ExtractedData
         """
         # pylint: disable=protected-access
 
@@ -447,12 +525,8 @@ class AbstractSpiNNakerCommon(with_metaclass(
 
         # iterate though projections
         for projection in projections:
-
             # iteration though the projections machine edges to locate chips
-            edges = self._graph_mapper.get_machine_edges(
-                projection._projection_edge)
-
-            for edge in edges:
+            for edge in projection._projection_edge.machine_edges:
                 placement = self._placements.get_placement_of_vertex(
                     edge.post_vertex)
                 chip = self._machine.get_chip_at(placement.x, placement.y)
@@ -471,12 +545,11 @@ class AbstractSpiNNakerCommon(with_metaclass(
 
     @property
     def id_counter(self):
-        """ Getter for id_counter, currently used by the populations.
+        """ The id_counter, currently used by the populations.
 
         .. note::
             Maybe it could live in the pop class???
 
-        :return:
         :rtype: int
         """
         return self.__id_counter
@@ -488,8 +561,6 @@ class AbstractSpiNNakerCommon(with_metaclass(
         .. note::
             Maybe it could live in the pop class???
 
-        :param new_value: new value for id_counter
-        :type new_value: int
-        :return:
+        :param int new_value: new value for id_counter
         """
         self.__id_counter = new_value

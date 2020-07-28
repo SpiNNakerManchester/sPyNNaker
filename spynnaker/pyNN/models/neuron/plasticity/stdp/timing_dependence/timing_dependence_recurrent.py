@@ -23,12 +23,13 @@ from spinn_front_end_common.utilities.constants import (
 from .abstract_timing_dependence import AbstractTimingDependence
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
     SynapseStructureWeightAccumulator)
-from spynnaker.pyNN.models.neuron.plasticity.stdp.common.plasticity_helpers \
-    import (
-        STDP_FIXED_POINT_ONE)
+from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
+    STDP_FIXED_POINT_ONE)
 
 
 class TimingDependenceRecurrent(AbstractTimingDependence):
+    """ A timing dependence STDP rule based on recurrences.
+    """
     __slots__ = [
         "__accumulator_depression_plus_one",
         "__accumulator_potentiation_minus_one",
@@ -75,12 +76,20 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
 
     @property
     def vertex_executable_suffix(self):
+        """ The suffix to be appended to the vertex executable for this rule
+
+        :rtype: str
+        """
         if self.__dual_fsm:
             return "recurrent_dual_fsm"
         return "recurrent_pre_stochastic"
 
     @property
     def pre_trace_n_bytes(self):
+        """ The number of bytes used by the pre-trace of the rule per neuron
+
+        :rtype: int
+        """
         # When using the separate FSMs, pre-trace contains window length,
         # otherwise it's in the synapse
         return BYTES_PER_SHORT if self.__dual_fsm else 0
@@ -89,11 +98,15 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
     def get_parameters_sdram_usage_in_bytes(self):
         # 2 * 32-bit parameters
         # 2 * LUTS with STDP_FIXED_POINT_ONE * 16-bit entries
-        return (BYTES_PER_WORD * 2) + (
-            BYTES_PER_SHORT * (2 * STDP_FIXED_POINT_ONE))
+        return (2 * BYTES_PER_WORD) + (
+            2 * STDP_FIXED_POINT_ONE * BYTES_PER_SHORT)
 
     @property
     def n_weight_terms(self):
+        """ The number of weight terms expected by this timing rule
+
+        :rtype: int
+        """
         return 1
 
     @overrides(AbstractTimingDependence.write_parameters)
@@ -130,6 +143,10 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
 
     @property
     def synaptic_structure(self):
+        """ Get the synaptic structure of the plastic part of the rows
+
+        :rtype: AbstractSynapseStructure
+        """
         return self.__synapse_structure
 
     @overrides(AbstractTimingDependence.get_parameter_names)

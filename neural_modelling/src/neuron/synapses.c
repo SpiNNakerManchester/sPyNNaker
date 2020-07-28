@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Implementation of non-inlined API in synapses.h
 #include "synapses.h"
 #include "spike_processing.h"
 #include "neuron.h"
@@ -26,46 +28,67 @@
 
 //! if using profiler import profiler tags
 #ifdef PROFILER_ENABLED
-    #include "profile_tags.h"
-#endif
+#include "profile_tags.h"
+#endif //PROFILER_ENABLED
 
-// Globals required for synapse benchmarking to work.
+//! Globals required for synapse benchmarking to work.
 uint32_t  num_fixed_pre_synaptic_events = 0;
 
-// The number of neurons
+//! The number of neurons
 static uint32_t n_neurons;
 
-// The number of synapse types
+//! The number of synapse types
 static uint32_t n_synapse_types;
 
-// Ring buffers to handle delays between synapses and neurons
+//! Ring buffers to handle delays between synapses and neurons
 static weight_t *ring_buffers;
 
-// Ring buffer size
+//! Ring buffer size
 static uint32_t ring_buffer_size;
 
 // The weight value represented by the LSB of a weight
 static REAL *min_weights;
 
-// Count of the number of times the ring buffers have saturated
+//! Count of the number of times the ring buffers have saturated
 static uint32_t saturation_count = 0;
 
+//! \brief Number of bits needed for the synapse type and index
+//! \details
+//! ```
+//! synapse_index_bits + synapse_type_bits
+//! ```
 static uint32_t synapse_type_index_bits;
+//! \brief Mask to pick out the synapse type and index.
+//! \details
+//! ```
+//! synapse_index_mask | synapse_type_mask
+//! ```
 static uint32_t synapse_type_index_mask;
+//! Number of bits in the synapse index
 static uint32_t synapse_index_bits;
+//! Mask to pick out the synapse index.
 static uint32_t synapse_index_mask;
+//! Number of bits in the synapse type
 static uint32_t synapse_type_bits;
+//! Mask to pick out the synapse type.
 static uint32_t synapse_type_mask;
 
 
 /* PRIVATE FUNCTIONS */
 
 #if LOG_LEVEL >= LOG_DEBUG
-static const char *get_type_char(uint32_t synapse_type) {
+//! \brief get the synapse type character
+//! \param[in] synapse_type: the synapse type
+//! \return a single character string describing the synapse type
+static inline const char *get_type_char(uint32_t synapse_type) {
     return neuron_get_synapse_type_char(synapse_type);
 }
 #endif // LOG_LEVEL >= LOG_DEBUG
 
+//! \brief Print a synaptic row.
+//!
+//! Only does anything when debugging.
+//! \param[in] synaptic_row: The synaptic row to print
 static inline void print_synaptic_row(synaptic_row_t synaptic_row) {
 #if LOG_LEVEL >= LOG_DEBUG
     log_debug("Synaptic row, at address %08x Num plastic words:%u\n",
@@ -117,14 +140,17 @@ static inline void print_synaptic_row(synaptic_row_t synaptic_row) {
 #endif // LOG_LEVEL >= LOG_DEBUG
 }
 
+//! \brief Print the contents of the ring buffers.
+//!
+//! Only does anything when debugging.
+//! \param[in] time: The current timestamp
 static inline void print_ring_buffers(uint32_t time) {
 #if LOG_LEVEL >= LOG_DEBUG
-    io_printf(IO_BUF, "Ring Buffer at %u\n", time);
-    io_printf(IO_BUF, "----------------------------------------\n");
+    log_debug("Ring Buffer at %u\n", time);
+    log_debug("----------------------------------------\n");
     for (uint32_t n = 0; n < n_neurons; n++) {
         for (uint32_t t = 0; t < n_synapse_types; t++) {
-            const char *type_string = get_type_char(t);
-            bool empty = true;
+            // Determine if this row can be omitted
             for (uint32_t d = 0; d < (1 << SYNAPSE_DELAY_BITS); d++) {
                 empty = empty && (ring_buffers[
                         synapses_get_ring_buffer_index(d + time, t, n,
@@ -140,16 +166,31 @@ static inline void print_ring_buffers(uint32_t time) {
                     synapses_print_weight(ring_buffers[ring_buffer_index],
                             min_weights[t]);
                 }
-                io_printf(IO_BUF, "\n");
             }
+            continue;
+        doPrint:
+            // Have to print the row
+            log_debug("%3d(%s):", n, get_type_char(t));
+            for (uint32_t d = 0; d < (1 << SYNAPSE_DELAY_BITS); d++) {
+                log_debug(" ");
+                uint32_t ring_buffer_index = synapses_get_ring_buffer_index(
+                        d + time, t, n, synapse_type_index_bits,
+                        synapse_index_bits);
+                synapses_print_weight(ring_buffers[ring_buffer_index],
+                        ring_buffer_to_input_left_shifts[t]);
+            }
+            log_debug("\n");
         }
     }
-    io_printf(IO_BUF, "----------------------------------------\n");
+    log_debug("----------------------------------------\n");
 #else
     use(time);
 #endif // LOG_LEVEL >= LOG_DEBUG
 }
 
+//! \brief Print the neuron inputs.
+//!
+//! Only does anything when debugging.
 static inline void print_inputs(void) {
 #if LOG_LEVEL >= LOG_DEBUG
     log_debug("Inputs\n");
@@ -158,9 +199,12 @@ static inline void print_inputs(void) {
 }
 
 
-// This is the "inner loop" of the neural simulation.
-// Every spike event could cause up to 256 different weights to
-// be put into the ring buffer.
+//! \brief This is the "inner loop" of the neural simulation.
+//!
+//! Every spike event could cause up to 256 different weights to
+//! be put into the ring buffer.
+//! \param[in] fixed_region_address: The fixed region of the synaptic matrix
+//! \param[in] time: The current simulation time
 static inline void process_fixed_synapses(
         address_t fixed_region_address, uint32_t time) {
     register uint32_t *synaptic_words =
@@ -207,8 +251,8 @@ static inline void process_fixed_synapses(
 
 //! private method for doing output debug data on the synapses
 static inline void print_synapse_parameters(void) {
-//! only if the models are compiled in debug mode will this method contain
-//! said lines.
+// only if the models are compiled in debug mode will this method contain
+// said lines.
 #if LOG_LEVEL >= LOG_DEBUG
     // again neuron_synapse_shaping_params has moved to implementation
     neuron_print_synapse_parameters();
@@ -217,9 +261,8 @@ static inline void print_synapse_parameters(void) {
 
 /* INTERFACE FUNCTIONS */
 bool synapses_initialise(
-        address_t synapse_params_address, address_t direct_matrix_address,
-        uint32_t n_neurons_value, uint32_t n_synapse_types_value,
-        REAL **min_weights_out, address_t *direct_synapses_address) {
+        address_t synapse_params_address, uint32_t n_neurons_value,
+		uint32_t n_synapse_types_value, REAL **min_weights_out) {
     log_debug("synapses_initialise: starting");
     n_neurons = n_neurons_value;
     n_synapse_types = n_synapse_types_value;
@@ -232,24 +275,6 @@ bool synapses_initialise(
     }
     spin1_memcpy(min_weights, synapse_params_address, n_synapse_types * sizeof(REAL));
     *min_weights_out = min_weights;
-
-    // Work out the positions of the direct and indirect synaptic matrices
-    // and copy the direct matrix to DTCM
-    uint32_t direct_matrix_size = direct_matrix_address[0];
-    log_debug("Direct matrix malloc size is %d", direct_matrix_size);
-
-    if (direct_matrix_size != 0) {
-        *direct_synapses_address = spin1_malloc(direct_matrix_size);
-        if (*direct_synapses_address == NULL) {
-            log_error("Not enough memory to allocate direct matrix");
-            return false;
-        }
-        log_debug("Copying %u bytes of direct synapses to 0x%08x",
-                direct_matrix_size, *direct_synapses_address);
-        spin1_memcpy(
-                *direct_synapses_address, &direct_matrix_address[1],
-                direct_matrix_size);
-    }
 
     log_debug("synapses_initialise: completed successfully");
     print_synapse_parameters();
@@ -384,4 +409,14 @@ void synapses_flush_ring_buffers(void) {
     for (uint32_t i = 0; i < ring_buffer_size; i++) {
         ring_buffers[i] = 0;
     }
+}
+
+//! \brief allows clearing of DTCM used by synapses
+//! \return true if successful
+bool synapses_shut_down(void) {
+    sark_free(min_weights);
+    sark_free(ring_buffers);
+    num_fixed_pre_synaptic_events = 0;
+    saturation_count = 0;
+    return true;
 }

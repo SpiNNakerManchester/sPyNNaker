@@ -32,6 +32,9 @@ class AbstractPyNNNeuronModel(AbstractPyNNModel):
     default_population_parameters = _population_parameters
 
     def __init__(self, model):
+        """
+        :param AbstractNeuronImpl model: The model implementation
+        """
         self.__model = model
 
     @property

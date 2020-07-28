@@ -15,12 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*!\file
+/*!
+ * @dir
+ * @brief Implementation of simulator for a single neural population on a
+ *      SpiNNaker CPU core. Or rather of a slice of a population.
  *
- * SUMMARY
- *  \brief This file contains the main function of the application framework,
- *  which the application programmer uses to configure and run applications.
- *
+ * @file
+ * @brief This file contains the main function of the application framework,
+ *      which the application programmer uses to configure and run applications.
  *
  * This is the main entrance class for most of the neural models. The following
  * Figure shows how all of the c code
@@ -29,7 +31,6 @@
  * (such as plasticity, spike processing, utilities, synapse types, models)
  *
  * @image html spynnaker_c_code_flow.png
- *
  */
 
 #include <common/in_spikes.h>
@@ -41,26 +42,42 @@
 #include "plasticity/synapse_dynamics.h"
 #include "structural_plasticity/synaptogenesis_dynamics.h"
 #include "profile_tags.h"
+#include "direct_synapses.h"
+#include "bit_field_filter.h"
 
 #include <data_specification.h>
 #include <simulation.h>
 #include <profiler.h>
 #include <debug.h>
+#include <bit_field.h>
+#include <filter_info.h>
 
 /* validates that the model being compiled does indeed contain a application
  * magic number*/
 #ifndef APPLICATION_NAME_HASH
-#define APPLICATION_NAME_HASH 0
 #error APPLICATION_NAME_HASH was undefined.  Make sure you define this\
     constant
 #endif
 
+//! The provenance information written on application shutdown.
 struct neuron_provenance {
+    //! A count of presynaptic events.
     uint32_t n_pre_synaptic_events;
+    //! A count of synaptic saturations.
     uint32_t n_synaptic_weight_saturations;
+    //! A count of the times that the synaptic input circular buffers overflowed
     uint32_t n_input_buffer_overflows;
+    //! The current time.
     uint32_t current_timer_tick;
+    //! The number of STDP weight saturations.
     uint32_t n_plastic_synaptic_weight_saturations;
+    uint32_t n_ghost_pop_table_searches;
+    uint32_t n_failed_bitfield_reads;
+    uint32_t n_dmas_complete;
+    uint32_t n_spikes_processed;
+    uint32_t n_invalid_master_pop_table_hits;
+    uint32_t n_filtered_by_bitfield;
+    //! The number of rewirings performed.
     uint32_t n_rewires;
 };
 
@@ -74,11 +91,14 @@ typedef enum callback_priorities {
 
 // Globals
 
-//! the current timer tick value
-//! the timer tick callback returning the same value.
+//! The current timer tick value.
+// the timer tick callback returning the same value.
 uint32_t time;
 
+//! timer tick period (in microseconds)
 static uint32_t timer_period;
+
+//! timer phase offset (in microseconds)
 static uint32_t timer_offset;
 
 //! The number of timer ticks to run for before being expected to exit
@@ -102,8 +122,9 @@ uint32_t count_rewire_attempts = 0;
 //! The number of neurons on the core
 static uint32_t n_neurons;
 
-
-void c_main_store_provenance_data(address_t provenance_region) {
+//! \brief Callback to store provenance data (format: neuron_provenance).
+//! \param[out] provenance_region: Where to write the provenance data
+static void c_main_store_provenance_data(address_t provenance_region) {
     log_debug("writing other provenance data");
     struct neuron_provenance *prov = (void *) provenance_region;
 
@@ -113,15 +134,22 @@ void c_main_store_provenance_data(address_t provenance_region) {
     prov->n_input_buffer_overflows = spike_processing_get_buffer_overflows();
     prov->current_timer_tick = time;
     prov->n_plastic_synaptic_weight_saturations =
-            synapse_dynamics_get_plastic_saturation_count();
+        synapse_dynamics_get_plastic_saturation_count();
+    prov->n_ghost_pop_table_searches =
+        spike_processing_get_ghost_pop_table_searches();
+    prov->n_failed_bitfield_reads = failed_bit_field_reads;
+    prov->n_dmas_complete = spike_processing_get_dma_complete_count();
+    prov->n_spikes_processed = spike_processing_get_spike_processing_count();
+    prov->n_invalid_master_pop_table_hits =
+        spike_processing_get_invalid_master_pop_table_hits();
+    prov->n_filtered_by_bitfield = population_table_get_filtered_packet_count();
     prov->n_rewires = spike_processing_get_successful_rewires();
+
     log_debug("finished other provenance data");
 }
 
 //! \brief Initialises the model by reading in the regions and checking
 //!        recording data.
-//! \param[in] timer_period a pointer for the memory address where the timer
-//!            period should be stored during the function.
 //! \return True if it successfully initialised, false otherwise
 static bool initialise(void) {
     log_debug("Initialise: started");
@@ -159,13 +187,18 @@ static bool initialise(void) {
 
     // Set up the synapses
     REAL *min_weights;
-    address_t indirect_synapses_address =
-            data_specification_get_region(SYNAPTIC_MATRIX_REGION, ds_regions);
-    address_t direct_synapses_address;
+
     if (!synapses_initialise(
             data_specification_get_region(SYNAPSE_PARAMS_REGION, ds_regions),
+            n_neurons, n_synapse_types, &min_weights)) {
+        return false;
+    }
+
+    // set up direct synapses
+    address_t direct_synapses_address;
+    if (!direct_synapses_initialise(
             data_specification_get_region(DIRECT_MATRIX_REGION, ds_regions),
-            n_neurons, n_synapse_types, &min_weights, &direct_synapses_address)) {
+            &direct_synapses_address)) {
         return false;
     }
 
@@ -173,24 +206,21 @@ static bool initialise(void) {
     uint32_t row_max_n_words;
     if (!population_table_initialise(
             data_specification_get_region(POPULATION_TABLE_REGION, ds_regions),
-            indirect_synapses_address, direct_synapses_address,
-            &row_max_n_words)) {
+            data_specification_get_region(SYNAPTIC_MATRIX_REGION, ds_regions),
+            direct_synapses_address, &row_max_n_words)) {
         return false;
     }
-    // Set up the synapse dynamics
-    address_t synapse_dynamics_region_address =
-            data_specification_get_region(SYNAPSE_DYNAMICS_REGION, ds_regions);
-    address_t syn_dyn_end_address = synapse_dynamics_initialise(
-            synapse_dynamics_region_address, n_neurons, n_synapse_types,
-            min_weights);
 
-    if (synapse_dynamics_region_address && !syn_dyn_end_address) {
+    // Set up the synapse dynamics
+    if (!synapse_dynamics_initialise(
+            data_specification_get_region(SYNAPSE_DYNAMICS_REGION, ds_regions),
+            n_neurons, n_synapse_types, min_weights)) {
         return false;
     }
 
     // Set up structural plasticity dynamics
-    if (synapse_dynamics_region_address &&
-            !synaptogenesis_dynamics_initialise(syn_dyn_end_address)) {
+    if (!synaptogenesis_dynamics_initialise(data_specification_get_region(
+            STRUCTURAL_DYNAMICS_REGION, ds_regions))) {
         return false;
     }
 
@@ -205,12 +235,18 @@ static bool initialise(void) {
     // Setup profiler
     profiler_init(data_specification_get_region(PROFILER_REGION, ds_regions));
 
+    log_info("initialising the bit field region");
+    print_post_to_pre_entry();
+    if (!bit_field_filter_initialise(data_specification_get_region(
+            BIT_FIELD_FILTER_REGION, ds_regions))) {
+        return false;
+    }
+
     log_debug("Initialise: finished");
     return true;
 }
 
 //! \brief the function to call when resuming a simulation
-//! \return None
 void resume_callback(void) {
     data_specification_metadata_t *ds_regions =
             data_specification_get_data_address();
@@ -232,10 +268,9 @@ void resume_callback(void) {
 }
 
 //! \brief Timer interrupt callback
-//! \param[in] timer_count the number of times this call back has been
+//! \param[in] timer_count: the number of times this call back has been
 //!            executed since start of simulation
-//! \param[in] unused unused parameter kept for API consistency
-//! \return None
+//! \param[in] unused: unused parameter kept for API consistency
 void timer_callback(uint timer_count, uint unused) {
     use(unused);
 

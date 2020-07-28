@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Implementation of non-inlined API in neuron_recording.h
 #include "neuron_recording.h"
 #include <bit_field.h>
 #include <stddef.h>
@@ -88,7 +90,7 @@ static void reset_record_counter(void) {
 }
 
 //! \brief wrapper to recording finalise
-void neuron_recording_finalise(void){
+void neuron_recording_finalise(void) {
     recording_finalise();
 }
 
@@ -99,13 +101,12 @@ static inline uint32_t bitfield_data_size(uint32_t n_neurons) {
     return sizeof(bitfield_values_t) + (get_bit_field_size(n_neurons) * sizeof(uint32_t));
 }
 
-//! \brief reads recording data from sdram
-//! \param[in] recording_address: sdram location for the recording data
+//! \brief reads recording data from SDRAM
+//! \param[in] recording_address: SDRAM location for the recording data
 //! \param[in] n_neurons: the number of neurons to setup for
-//! \return bool stating if the read was successful or not
+//! \return Whether the read was successful
 static bool neuron_recording_read_in_elements(
-        void *data_address, uint32_t n_neurons) {
-
+        void *recording_address, uint32_t n_neurons) {
     // Round up the number of bytes to align at a word boundary i.e. round to
     // the next multiple of 4
     uint32_t ceil_n_entries = (n_neurons + CEIL_TO_4) & FLOOR_TO_4;
@@ -118,7 +119,7 @@ static bool neuron_recording_read_in_elements(
         uint8_t indices[ceil_n_entries];
     } neuron_recording_data_t;
 
-    neuron_recording_data_t *data = data_address;
+    neuron_recording_data_t *data = recording_address;
 
     for (uint32_t i = 0; i < N_RECORDED_VARS; i++) {
         recording_info[i].rate = data[i].rate;
@@ -185,18 +186,17 @@ static bool neuron_recording_read_in_elements(
 
 bool neuron_recording_reset(uint32_t n_neurons) {
     recording_reset();
-    bool success = neuron_recording_read_in_elements(reset_address, n_neurons);
-    if (!success){
+    if (!neuron_recording_read_in_elements(reset_address, n_neurons)) {
         log_error("failed to reread in the new elements after reset");
         return false;
     }
     return true;
 }
 
-//! \brief handles all the dtcm allocations
-//! \param[in] n_neurons: how many neurons to set dtcm for
-static inline bool allocate_dtcm(uint32_t n_neurons) {
-
+//! \brief handles all the DTCM allocations for recording words
+//! \param[in] n_neurons: how many neurons to set DTCM for
+//! \return True on success
+static inline bool allocate_word_dtcm(uint32_t n_neurons) {
     recording_info = spin1_malloc(N_RECORDED_VARS * sizeof(recording_info_t));
     if (recording_info == NULL) {
         log_error("Could not allocated space for recording_info");
@@ -204,7 +204,8 @@ static inline bool allocate_dtcm(uint32_t n_neurons) {
     }
 
     // allocate dtcm for the overall holder for indexes
-    neuron_recording_indexes = spin1_malloc(N_RECORDED_VARS * sizeof(uint8_t *));
+    neuron_recording_indexes =
+            spin1_malloc(N_RECORDED_VARS * sizeof(uint8_t *));
     if (neuron_recording_indexes == NULL) {
         log_error("Could not allocate space for var_recording_indexes");
         return false;
@@ -217,26 +218,25 @@ static inline bool allocate_dtcm(uint32_t n_neurons) {
     }
 
     for (uint32_t i = 0; i < N_RECORDED_VARS; i++) {
-
         // clear recorded values pointer
         recording_info[i].values = NULL;
 
         // allocate dtcm for indexes for each recording region
         neuron_recording_indexes[i] = spin1_malloc(n_neurons * sizeof(uint8_t));
-        if (neuron_recording_indexes[i] == NULL){
+        if (neuron_recording_indexes[i] == NULL) {
             log_error("failed to allocate memory for recording index %d", i);
             return false;
         }
     }
 
-    // successfully allocated all dtcm.
+    // successfully allocated all DTCM.
     return true;
 }
 
-//! \brief handles all the dtcm allocations
-//! \param[in] n_neurons: how many neurons to set dtcm for
+//! \brief handles all the DTCM allocations for recording bitfields
+//! \param[in] n_neurons: how many neurons to set DTCM for
+//! \return True on success
 static inline bool allocate_bitfield_dtcm(uint32_t n_neurons) {
-
     bitfield_info = spin1_malloc(N_BITFIELD_VARS * sizeof(bitfield_info_t));
     if (bitfield_info == NULL) {
         log_error("Failed to allocate space for bitfield_info");
@@ -244,7 +244,8 @@ static inline bool allocate_bitfield_dtcm(uint32_t n_neurons) {
     }
 
     // allocate dtcm for the overall holder for indexes
-    bitfield_recording_indexes = spin1_malloc(N_BITFIELD_VARS * sizeof(uint8_t *));
+    bitfield_recording_indexes =
+            spin1_malloc(N_BITFIELD_VARS * sizeof(uint8_t *));
     if (bitfield_recording_indexes == NULL) {
         log_error("Could not allocate space for bitfield_recording_indexes");
         return false;
@@ -257,31 +258,33 @@ static inline bool allocate_bitfield_dtcm(uint32_t n_neurons) {
     }
 
     for (uint32_t i = 0; i < N_BITFIELD_VARS; i++) {
-
         // clear recorded values pointer
         bitfield_info[i].values = NULL;
 
         // allocate dtcm for indexes for each recording region
-        bitfield_recording_indexes[i] = spin1_malloc(n_neurons * sizeof(uint8_t));
-        if (bitfield_recording_indexes[i] == NULL){
+        bitfield_recording_indexes[i] =
+                spin1_malloc(n_neurons * sizeof(uint8_t));
+        if (bitfield_recording_indexes[i] == NULL) {
             log_error("failed to allocate memory for bitfield index %d", i);
             return false;
         }
     }
 
-    // successfully allocated all dtcm.
+    // successfully allocated all DTCM.
     return true;
 }
 
+//! The heading of the neuron recording region.
 typedef struct neuron_recording_header {
+    //! The number of word-sized variables to record
     uint32_t n_recorded_vars;
+    //! The number of bitfield variables to record
     uint32_t n_bitfield_vars;
 } neuron_recording_header_t;
 
 bool neuron_recording_initialise(
         void *recording_address, uint32_t *recording_flags,
         uint32_t n_neurons) {
-
     // boot up the basic recording
     void *data_addr = recording_address;
     bool success = recording_initialize(&data_addr, recording_flags);
@@ -294,34 +297,32 @@ bool neuron_recording_initialise(
     neuron_recording_header_t *header = data_addr;
     if (header->n_recorded_vars != N_RECORDED_VARS) {
         log_error("Data spec number of recording variables %d != "
-            "neuron implementation number of recorded variables %d",
-            header->n_recorded_vars, N_RECORDED_VARS);
+                "neuron implementation number of recorded variables %d",
+                header->n_recorded_vars, N_RECORDED_VARS);
         return false;
     }
     if (header->n_bitfield_vars != N_BITFIELD_VARS) {
-            log_error("Data spec number of bitfield variables %d != "
+        log_error("Data spec number of bitfield variables %d != "
                 "neuron implementation number of bitfield variables %d",
                 header->n_bitfield_vars, N_BITFIELD_VARS);
-            return false;
-        }
+        return false;
+    }
     data_addr = &header[1];
     log_info("Recording %d variables and %d bitfield variables",
             N_RECORDED_VARS, N_BITFIELD_VARS);
 
-    bool dtcm_allocated = allocate_dtcm(n_neurons);
-    if (!dtcm_allocated) {
-        log_error("failed to allocate dtcm for the neuron recording structs.");
+    if (!allocate_word_dtcm(n_neurons)) {
+        log_error("failed to allocate DTCM for the neuron recording structs.");
         return false;
     }
-    dtcm_allocated = allocate_bitfield_dtcm(n_neurons);
-    if (!dtcm_allocated) {
-        log_error("failed to allocate dtcm for the bitfield recording structs");
+    if (!allocate_bitfield_dtcm(n_neurons)) {
+        log_error("failed to allocate DTCM for the bitfield recording structs");
         return false;
     }
 
     // read in the sdram params into the allocated data objects
     reset_address = data_addr;
-    if (!neuron_recording_read_in_elements(data_addr, n_neurons)){
+    if (!neuron_recording_read_in_elements(data_addr, n_neurons)) {
         log_error("failed to read in the elements");
         return false;
     }
