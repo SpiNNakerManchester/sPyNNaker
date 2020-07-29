@@ -318,7 +318,7 @@ void timer_callback(uint timer_count, uint unused) {
     }
 
     // First do synapses timestep update, as this is time-critical
-    synapses_do_timestep_update(time);
+    int packets_received = synapses_do_timestep_update(time);
 
     // Then do rewiring
     if (rewiring &&
@@ -335,7 +335,8 @@ void timer_callback(uint timer_count, uint unused) {
     }
 
     // Now do neuron time step update
-    neuron_do_timestep_update(time, timer_count, timer_period);
+    neuron_do_timestep_update(
+        time, timer_count, timer_period, packets_received);
 
     profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
 }

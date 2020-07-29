@@ -25,6 +25,7 @@
 #include "plasticity/synapse_dynamics.h"
 #include <debug.h>
 #include <utils.h>
+#include <tdma_processing.h>
 
 //! The key to be used for this core (will be ORed with neuron ID)
 static key_t key;
@@ -36,36 +37,11 @@ static bool use_key;
 //! The number of neurons on the core
 static uint32_t n_neurons;
 
-//! The number of clock ticks between sending each spike
-static uint32_t time_between_spikes;
-
-//! The number of clock ticks between core index's
-static uint32_t time_between_cores;
-
-//! The next change in the time between spikes
-static uint32_t core_slot;
-
-//! The expected current clock tick of timer_1 when the next spike can be sent
-static uint32_t expected_time;
-
-//! the initial offset
-static uint32_t initial_offset;
-
-//! n times the core got behind its tdma
-static uint32_t n_behind_times = 0;
-
 //! The recording flags
 static uint32_t recording_flags = 0;
 
-//!
-static uint32_t phase;
-
 //! parameters that reside in the neuron_parameter_data_region
 struct neuron_parameters {
-    uint32_t core_slot;
-    uint32_t time_between_spikes;
-    uint32_t time_between_cores;
-    uint32_t initial_offset;
     uint32_t has_key;
     uint32_t transmission_key;
     uint32_t n_neurons_to_simulate;
@@ -99,20 +75,18 @@ bool neuron_resume(address_t address) { // EXPORTED
     return neuron_load_neuron_parameters(address);
 }
 
-bool neuron_initialise(address_t address, address_t recording_address, // EXPORTED
+bool neuron_initialise(
+        address_t address, address_t recording_address, // EXPORTED
         uint32_t *n_neurons_value, uint32_t *n_synapse_types_value,
         uint32_t *incoming_spike_buffer_size) {
     log_debug("neuron_initialise: starting");
-    struct neuron_parameters *params = (void *) address;
 
-    time_between_spikes = params->time_between_spikes * sv->cpu_clk;
-    time_between_cores = params->time_between_cores * sv->cpu_clk;
-    core_slot = params->core_slot;
-    initial_offset = params->initial_offset * sv->cpu_clk;
-    log_info("\t time between spikes %u", time_between_spikes);
-    log_info("\t time between core index's %u", time_between_cores);
-    log_info("\t core slot %u", core_slot);
-    log_info("\t initial offset %u", initial_offset);
+    // init the TDMA
+    void *data_addr = address;
+    tdma_processing_initialise(&data_addr);
+
+    // cast left over SDRAM into neuron struct.
+    struct neuron_parameters *params = data_addr;
 
     // Check if there is a key to use
     use_key = params->has_key;
@@ -145,7 +119,7 @@ bool neuron_initialise(address_t address, address_t recording_address, // EXPORT
     }
 
     // load the data into the allocated DTCM spaces.
-    if (!neuron_load_neuron_parameters(address)) {
+    if (!neuron_load_neuron_parameters(data_addr)) {
         return false;
     }
 
@@ -166,8 +140,10 @@ void neuron_pause(address_t address) { // EXPORTED
         neuron_recording_finalise();
     }
 
-    if (n_behind_times > 0) {
-        log_error("core fell behind its tdma slot %d times", n_behind_times);
+    if (tdma_processing_times_behind() > 0) {
+        log_error(
+            "core fell behind its tdma slot %d times",
+            tdma_processing_times_behind());
     }
 
     // call neuron implementation function to do the work
@@ -175,83 +151,12 @@ void neuron_pause(address_t address) { // EXPORTED
             address, START_OF_GLOBAL_PARAMETERS, n_neurons);
 }
 
-//! \brief internal method for sending a spike with the TDMA tie in
-//! \param[in] neuron_index: the neuron index.
-//! \param[in] phase: the current phase this vertex thinks its in.
-static inline void neuron_tdma_spike_processing(
-        index_t neuron_index, uint timer_period, uint timer_count) {
-    // Spin1 API ticks - to know when the timer wraps
-    extern uint ticks;
-
-    // if we're too early. select the next index to where we are and wait
-    if (neuron_index > phase) {
-        int tc1_count = tc[T1_COUNT];
-        int how_much_time_has_passed = (sv->cpu_clk * timer_period) - tc1_count;
-        //log_info("neuron index %d and phase %d", neuron_index, phase);
-        //log_info("how much time has passed is %u", how_much_time_has_passed);
-        bool found_phase_id = false;
-        while (!found_phase_id) {
-            int time_when_phase_started = time_between_spikes * phase;
-            //log_info(
-            //    "time_when_phase_started = %d for phase %d",
-            //    time_when_phase_started, phase);
-
-            int time_when_phase_slot_started =
-                time_when_phase_started + initial_offset +
-                (time_between_cores * core_slot);
-            //log_info(
-            //    "time_when_phase_slot_started = %d", time_when_phase_slot_started);
-
-            if (time_when_phase_slot_started < how_much_time_has_passed) {
-                log_debug("up phase id");
-                phase += 1;
-            }
-            else{
-                found_phase_id = true;
-                log_debug("phase id %d", phase);
-            }
-            if (phase > n_neurons) {
-                log_info(
-                    "missed the whole TDMA. go NOW! for neuron %d on tick %d",
-                    neuron_index, ticks);
-                while (!spin1_send_mc_packet(
-                        key | neuron_index, 0, NO_PAYLOAD)) {
-                    spin1_delay_us(1);
-                }
-                return;
-            }
-        }
-    }
-
-    // Set the next expected time to wait for between spike sending
-    expected_time = (
-        (sv->cpu_clk * timer_period) -
-        ((phase * time_between_spikes) + (time_between_cores * core_slot) +
-         initial_offset));
-
-    // Wait until the expected time to send
-    int counter = 0;
-    while ((ticks == timer_count) && (tc[T1_COUNT] > expected_time)) {
-        counter +=1;
-        // Do Nothing
-    }
-    if (counter == 0) {
-        n_behind_times += 1;
-    }
-
-    // Send the spike
-    while (!spin1_send_mc_packet(key | neuron_index, 0, NO_PAYLOAD)) {
-        spin1_delay_us(1);
-    }
-
-    phase += 1;
-}
-
 void neuron_do_timestep_update( // EXPORTED
-        timer_t time, uint timer_count, uint timer_period) {
+        timer_t time, uint timer_count, uint timer_period,
+        int n_packets_received) {
 
     // the phase in this timer tick im in (not tied to neuron index)
-    phase = 0;
+    tdma_processing_reset_phase();
 
     // Prepare recording for the next timestep
     neuron_recording_setup_for_next_recording();
@@ -264,7 +169,8 @@ void neuron_do_timestep_update( // EXPORTED
                 synapse_dynamics_get_intrinsic_bias(time, neuron_index);
 
         // call the implementation function (boolean for spike)
-        bool spike = neuron_impl_do_timestep_update(neuron_index, external_bias);
+        bool spike = neuron_impl_do_timestep_update(
+            neuron_index, external_bias, n_packets_received);
 
         // If the neuron has spiked
         if (spike) {
@@ -274,8 +180,9 @@ void neuron_do_timestep_update( // EXPORTED
             synapse_dynamics_process_post_synaptic_event(time, neuron_index);
 
             if (use_key) {
-                 neuron_tdma_spike_processing(
-                     neuron_index, timer_period, timer_count);
+                tdma_processing_send_packet(
+                    neuron_index, (key | neuron_index), timer_period,
+                    timer_count, n_neurons);
             }
         } else {
             log_debug("the neuron %d has been determined to not spike",

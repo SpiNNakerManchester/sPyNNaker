@@ -101,9 +101,20 @@ uint32_t biggest_fill_size_of_input_buffer = 0;
 //! end of a timer tick.
 static bool clear_input_buffers_of_late_packets = false;
 
-static uint32_t last_packet_insert = 0;
+//! cycles left on the timer when the last packet was received.
+static uint32_t time_left_when_last_packet_arrived = 0;
+
+//! bool saying if we recieved a packet this time step
 bool received_packet_this_step = false;
-uint32_t packets_in_buffer_at_time = 0;
+
+//! the maximum number of packets in the in buffer over the simulation
+uint32_t max_packets_in_buffer_at_time = 0;
+
+//! the number of packets received this time step
+int packets_this_time_step = 0;
+
+//! the number of packets with payloads received this time step
+int payload_packets_this_time_step = 0;
 
 /* PRIVATE FUNCTIONS - static for inlining */
 
@@ -281,34 +292,57 @@ static inline void setup_synaptic_dma_write(
     }
 }
 
+//! \brief handles the interrupt stuff and prov data gathering
+static inline void packet_reception_post_processing(void) {
+    // If we're not already processing synaptic DMAs,
+    // flag pipeline as busy and trigger a feed event
+    // NOTE: locking is not used here because this is assumed to be FIQ
+    if (!dma_busy) {
+        log_debug("Sending user event for new spike");
+        if (spin1_trigger_user_event(0, 0)) {
+            dma_busy = true;
+        } else {
+            log_warning("Could not trigger user event\n");
+        }
+    }
+
+    // prov updating
+    time_left_when_last_packet_arrived = tc[T1_COUNT];
+    received_packet_this_step = true;
+    if (in_spikes_size() > max_packets_in_buffer_at_time) {
+        max_packets_in_buffer_at_time = in_spikes_size();
+    }
+}
+
 //! \brief Called when a multicast packet is received
 //! \param[in] key: The key of the packet. The spike.
-//! \param payload: Ignored
+//! \param payload: the payload of the packet. The count.
 static void multicast_packet_received_callback(uint key, uint payload) {
-    use(payload);
-    log_debug("Received spike %x at %d, DMA Busy = %d", key, time, dma_busy);
 
-    // If there was space to add spike to incoming spike queue
-    if (in_spikes_add_spike(key)) {
-        // If we're not already processing synaptic DMAs,
-        // flag pipeline as busy and trigger a feed event
-        // NOTE: locking is not used here because this is assumed to be FIQ
-        if (!dma_busy) {
-            log_debug("Sending user event for new spike");
-            if (spin1_trigger_user_event(0, 0)) {
-                dma_busy = true;
-            } else {
-                log_warning("Could not trigger user event\n");
-            }
+    // handle the 2 cases separately
+    if(payload == 0) {
+        log_debug(
+            "Received spike %x at %d, DMA Busy = %d", key, time, dma_busy);
+        packets_this_time_step += 1;
+        // set to 1 to work with the loop.
+        payload = 1;
+    }
+    else {
+        log_debug(
+            "Received spike %x with payload %d at %d, DMA Busy = %d",
+            key, payload, time, dma_busy);
+        payload_packets_this_time_step += 1;
+    }
+
+    // cycle through the packet insertion
+    for (uint count = 0; count < payload; count++) {
+        if (! in_spikes_add_spike(key)) {
+            log_info("Could not add spike");
         }
-    } else {
-        log_info("Could not add spike");
     }
-    last_packet_insert = tc[T1_COUNT];
-    received_packet_this_step = true;
-    if (in_spikes_size() > packets_in_buffer_at_time) {
-        packets_in_buffer_at_time = in_spikes_size();
-    }
+
+    // handle prov and interrupts
+    packet_reception_post_processing();
 }
 
 //! \brief Called when a DMA completes
@@ -406,12 +440,17 @@ void user_event_callback(uint unused0, uint unused1) {
 /* INTERFACE FUNCTIONS - cannot be static */
 
 //! \brief clears the input buffer of packets and records them
-void spike_processing_clear_input_buffer(void) {
+int spike_processing_clear_input_buffer(void) {
+
+    // Record the number of packets received this timer tick
+    int to_return = packets_this_time_step;
+    packets_this_time_step = 0;
+
     // Record the count whether clearing or not for provenance
     count_input_buffer_packets_late += in_spikes_size();
     //log_info(
     //    "current lost packets = %d, max in buffer = %d",
-    //    count_input_buffer_packets_late, packets_in_buffer_at_time);
+    //    count_input_buffer_packets_late, max_packets_in_buffer_at_time);
 
     if (clear_input_buffers_of_late_packets) {
         log_debug("clearing buffer");
@@ -423,13 +462,14 @@ void spike_processing_clear_input_buffer(void) {
     }
 
     /*if (received_packet_this_step) {
-        log_info("last packet came in with this much time to go %d", last_packet_insert);
+        log_info("last packet came in with this much time to go %d", time_left_when_last_packet_arrived);
     }
     else {
         log_info("didnt receive this time step");
     }*/
-    last_packet_insert = 0;
+    time_left_when_last_packet_arrived = 0;
     received_packet_this_step = false;
+    return to_return;
 }
 
 bool spike_processing_initialise( // EXPORTED
@@ -459,6 +499,8 @@ bool spike_processing_initialise( // EXPORTED
 
     // Set up the callbacks
     spin1_callback_on(MC_PACKET_RECEIVED,
+            multicast_packet_received_callback, mc_packet_callback_priority);
+    spin1_callback_on(MCPL_PACKET_RECEIVED,
             multicast_packet_received_callback, mc_packet_callback_priority);
     simulation_dma_transfer_done_callback_on(
             DMA_TAG_READ_SYNAPTIC_ROW, dma_complete_callback);

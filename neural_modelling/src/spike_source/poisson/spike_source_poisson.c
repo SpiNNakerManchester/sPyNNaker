@@ -510,7 +510,9 @@ static bool store_poisson_parameters(void) {
 //! \brief Spread Poisson spikes for even packet reception at destination
 //! \param[in] spike_key: the key to transmit
 //! \param[in] timer_count: Time to send spike at
-static void send_spike(uint32_t spike_key, uint32_t timer_count) {
+//! \param[in] num_spikes: the number of spikes to send
+static void send_spikes(
+        uint32_t spike_key, uint32_t num_spikes, uint32_t timer_count) {
     // Wait until the expected time to send
     while ((ticks == timer_count) && (tc[T1_COUNT] > expected_time)) {
         // Do Nothing
@@ -519,8 +521,16 @@ static void send_spike(uint32_t spike_key, uint32_t timer_count) {
 
     // Send the spike
     log_debug("Sending spike packet %x at %d\n", spike_key, time);
-    while (!spin1_send_mc_packet(spike_key, 0, NO_PAYLOAD)) {
-        spin1_delay_us(1);
+
+    // if multiple spikes, send as a payload. else send 1 spike
+    if (num_spikes > 1) {
+        while (!spin1_send_mc_packet(spike_key, num_spikes, WITH_PAYLOAD)) {
+            spin1_delay_us(1);
+        }
+    } else {
+        while (!spin1_send_mc_packet(spike_key, 0, NO_PAYLOAD)) {
+            spin1_delay_us(1);
+        }
     }
 }
 
@@ -629,9 +639,7 @@ static void process_fast_source(
             if (ssp_params.has_key) {
                 // Send spikes
                 const uint32_t spike_key = ssp_params.key | s_id;
-                for (uint32_t index = 0; index < num_spikes; index++) {
-                    send_spike(spike_key, timer_count);
-                }
+                send_spikes(spike_key, num_spikes, timer_count);
             }
         }
     }
@@ -653,7 +661,7 @@ static void process_slow_source(
             // if no key has been given, do not send spike to fabric.
             if (ssp_params.has_key) {
                 // Send package
-                send_spike(ssp_params.key | s_id, timer_count);
+                send_spikes(ssp_params.key | s_id, 1, timer_count);
             }
 
             // Update time to spike (note, this might not get us back above

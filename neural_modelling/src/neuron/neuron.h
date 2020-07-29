@@ -61,7 +61,8 @@ bool neuron_initialise(
 //! \param[in] timer_count: used for detecting a wrapping timer
 //! \param[in] timer_period: the intended amount of time per timer tick
 void neuron_do_timestep_update(
-        timer_t time, uint timer_count, uint timer_period);
+        timer_t time, uint timer_count, uint timer_period,
+        int packets_this_time_step);
 
 //! \brief Prepare to resume simulation of the neurons
 //! \param[in] address: the address where the neuron parameters are stored

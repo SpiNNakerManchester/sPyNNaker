@@ -322,14 +322,14 @@ bool synapses_initialise(
     return true;
 }
 
-void synapses_do_timestep_update(timer_t time) {
+int synapses_do_timestep_update(timer_t time) {
     print_ring_buffers(time);
 
     // Disable interrupts to stop DMAs interfering with the ring buffers
     uint32_t state = spin1_irq_disable();
 
     // Clear any outstanding spikes if enabled (or just count them if not)
-    spike_processing_clear_input_buffer();
+    int packets_received = spike_processing_clear_input_buffer();
 
     // Transfer the input from the ring buffers into the input buffers
     for (uint32_t neuron_index = 0; neuron_index < n_neurons;
@@ -360,6 +360,8 @@ void synapses_do_timestep_update(timer_t time) {
 
     // Re-enable the interrupts
     spin1_mode_restore(state);
+
+    return packets_received;
 }
 
 bool synapses_process_synaptic_row(

@@ -415,8 +415,10 @@ static void timer_callback(uint timer_count, uint unused1) {
 
             // Loop through neurons
             for (uint32_t n = 0; n < num_neurons; n++) {
+
                 // If this neuron emits a spike after this stage
                 if (bit_field_test(delay_stage_config, n)) {
+
                     // Calculate key all spikes coming from this neuron will be
                     // sent with
                     uint32_t spike_key = ((d * num_neurons) + n) + key;
@@ -428,11 +430,26 @@ static void timer_callback(uint timer_count, uint unused1) {
                                 spike_key);
                     }
 
-                    // Loop through counted spikes and send
-                    for (uint32_t s = 0; s < delay_stage_spike_counters[n]; s++) {
+                    // fire many spikes as payload, 1 as none payload.
+                    if (delay_stage_spike_counters[n] > 1) {
+                        log_debug(
+                            "seeing packet with key %d and payload %d",
+                            spike_key, delay_stage_spike_counters[n]);
+                        while (!spin1_send_mc_packet(
+                                spike_key, delay_stage_spike_counters[n],
+                                WITH_PAYLOAD)) {
+                            spin1_delay_us(1);
+                        }
+
+                        // update counter
+                        n_spikes_sent += delay_stage_spike_counters[n];
+                    } else if (delay_stage_spike_counters[n]  == 1) {
+                        log_debug("sending spike with key %d", spike_key);
                         while (!spin1_send_mc_packet(spike_key, 0, NO_PAYLOAD)) {
                             spin1_delay_us(1);
                         }
+
+                        // update counter
                         n_spikes_sent++;
                     }
                 }
