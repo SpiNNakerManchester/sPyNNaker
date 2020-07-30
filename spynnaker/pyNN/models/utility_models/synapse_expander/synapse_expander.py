@@ -166,4 +166,4 @@ def _fill_in_connection_data(expanded_pop_vertices, transceiver):
     """
     for vertex, m_vertex, placement in expanded_pop_vertices:
         vertex.read_generated_connection_holders(
-            transceiver, placement, m_vertex.post_vertex_slice)
+            transceiver, placement, m_vertex.vertex_slice)
