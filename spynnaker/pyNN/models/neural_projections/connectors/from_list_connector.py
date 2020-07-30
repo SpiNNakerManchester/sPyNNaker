@@ -80,6 +80,16 @@ class FromListConnector(AbstractConnector):
         # Call the conn_list setter, as this sets the internal values
         self.conn_list = conn_list
 
+    @overrides(AbstractConnector.set_projection_information)
+    def set_projection_information(self, machine_time_step, synapse_info):
+        AbstractConnector.set_projection_information(
+            self, machine_time_step, synapse_info)
+        # now we want to tell the synapse_info about weights and delays
+        if self.__weights is not None:
+            synapse_info.weights = self.__weights.flatten()
+        if self.__delays is not None:
+            synapse_info.delays = self.__delays
+
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
         if self.__delays is None:
@@ -225,7 +235,8 @@ class FromListConnector(AbstractConnector):
         if self.__weights is None:
             return super(FromListConnector, self).get_weight_minimum(
                 weights, weight_random_sigma)
-        return numpy.amin(numpy.abs(self.__weights))
+        return super(FromListConnector, self).get_weight_minimum(
+            self.__weights, weight_random_sigma)
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(

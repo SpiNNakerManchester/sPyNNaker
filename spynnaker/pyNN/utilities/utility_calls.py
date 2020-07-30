@@ -299,3 +299,32 @@ def get_n_bits(n_values):
     if n_values == 1:
         return 1
     return int(math.ceil(math.log(n_values, 2)))
+
+
+def float_gcd(a, b):
+    """ Floating point gcd of two values
+    """
+    if (a < b) :
+        return float_gcd(b, a)
+
+    # base case
+    if (abs(b) < 0.001) :
+        return a
+    else :
+        return (float_gcd(b, a - math.floor(a / b) * b))
+
+
+def float_gcd_of_array(input):
+    """ Work out the floating point gcd of an array of numbers
+
+    :param numpy.float(array) input: the input array
+    :return: the floating point gcd of the array
+    :rtype: float
+    """
+    gcd = float_gcd(input[0], input[1])
+
+    for i in range(2, len(input)):
+        gcd = float_gcd(gcd, input[i])
+
+    return gcd
+

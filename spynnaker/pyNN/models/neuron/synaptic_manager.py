@@ -35,7 +35,8 @@ from spynnaker.pyNN.utilities.utility_calls import get_n_bits
 from spynnaker.pyNN.models.neuron.master_pop_table import (
     MasterPopTableAsBinarySearch)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
-from spynnaker.pyNN.models.neuron.synapse_dynamics import SynapseDynamicsSTDP
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    SynapseDynamicsSTDP, SynapseDynamicsStructuralStatic)
 from spinn_front_end_common.utilities.utility_objs\
     .provenance_data_item import ProvenanceDataItem
 
@@ -1003,7 +1004,8 @@ class SynapticManager(object):
         """
         if abs(value) < 1.0:
             return DataType.S1615.closest_representable_value(value)
-        return 1 / (DataType.S1615.closest_representable_value(1 / value))
+        return 1 / (
+            DataType.S1615.closest_representable_value_above(1 / value))
 
     def _calculate_min_weights(
             self, application_vertex, application_graph, weight_scale):
@@ -1030,6 +1032,13 @@ class SynapticManager(object):
                         if min_delta is not None and min_delta != 0:
                             min_weights[synapse_type] = min(
                                 min_weights[synapse_type], min_delta)
+                    elif isinstance(synapse_dynamics,
+                                    SynapseDynamicsStructuralStatic):
+                        weight_min = synapse_dynamics.initial_weight
+                        weight_min *= weight_scale
+                        if weight_min != 0:
+                            min_weights[synapse_type] = min(
+                                min_weights[synapse_type], weight_min)
 
         # Convert values to their closest representable value to ensure
         # that division works for the minimum value
@@ -1053,15 +1062,27 @@ class SynapticManager(object):
         for app_edge in app_graph.get_edges_ending_at_vertex(app_vertex):
             if isinstance(app_edge, ProjectionApplicationEdge):
                 for synapse_info in app_edge.synapse_information:
-                    weight = synapse_info.weights
-                    if numpy.isscalar(weight):
-                        synapse_type = synapse_info.synapse_type
-                        r_weight = weight / min_weights[synapse_type]
-                        r_weight = DataType.UINT16.closest_representable_value(
-                            r_weight) * min_weights[synapse_type]
-                        if weight != r_weight:
-                            self.__weight_provenance[weight, r_weight].append(
-                                (app_edge, synapse_info))
+                    weights = synapse_info.weights
+                    synapse_type = synapse_info.synapse_type
+                    min_weight = min_weights[synapse_type]
+                    if numpy.isscalar(weights):
+                        self.__check_weight(
+                            min_weight, weights, app_edge, synapse_info)
+                    elif hasattr(weights, "__getitem__"):
+                        for w in weights:
+                            self.__check_weight(
+                                min_weight, w, app_edge, synapse_info)
+
+    def __check_weight(self, min_weight, weight, app_edge, synapse_info):
+        """ Warn the user about a weight that can't be represented properly
+            where possible
+        """
+        r_weight = weight / min_weight
+        r_weight = DataType.UINT16.closest_representable_value(
+            r_weight) * min_weight
+        if weight != r_weight:
+            self.__weight_provenance[weight, r_weight].append(
+                (app_edge, synapse_info))
 
     def _get_min_weights(
             self, application_vertex, application_graph, weight_scale):

@@ -294,7 +294,13 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         elif numpy.isscalar(weights):
             return abs(weights)
         elif hasattr(weights, "__getitem__"):
-            return numpy.amax(numpy.abs(weights))
+            # Have to assume here that the list of weights that has been
+            # provided has different (non-zero) values in it.  In order to
+            # represent these correctly, it's the greatest common divisor
+            # across the array of weights that we need
+            non_zero_weights = numpy.abs(weights)[
+                numpy.nonzero(numpy.abs(weights))]
+            return utility_calls.float_gcd_of_array(non_zero_weights)
         raise Exception("Unrecognised weight format")
 
     def _get_weight_maximum(self, weights, n_connections):

@@ -158,6 +158,10 @@ class SynapseInformation(object):
         """
         return self.__weights
 
+    @weights.setter
+    def weights(self, weights):
+        self.__weights = weights
+
     @property
     def delays(self):
         """ The total synaptic delays (if any)
@@ -165,6 +169,10 @@ class SynapseInformation(object):
         :rtype: float or list(float) or ~numpy.ndarray(float) or None
         """
         return self.__delays
+
+    @delays.setter
+    def delays(self, delays):
+        self.__delays = delays
 
     def may_generate_on_machine(self):
         """ Do we describe a collection of synapses whose synaptic matrix may
