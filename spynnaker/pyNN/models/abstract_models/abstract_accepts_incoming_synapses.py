@@ -47,20 +47,8 @@ class AbstractAcceptsIncomingSynapses(object):
         """
 
     @abstractmethod
-    def add_pre_run_connection_holder(
-            self, connection_holder, projection_edge, synapse_information):
-        """ Add a connection holder to the vertex to be filled in when the\
-            connections are actually generated.
-
-        :param ConnectionHolder connection_holder:
-        :param ProjectionApplicationEdge projection_edge:
-        :param SynapseInformation synapse_information:
-        """
-
-    @abstractmethod
     def get_connections_from_machine(
-            self, transceiver, placements, app_edge, synapse_info,
-            machine_time_step):
+            self, transceiver, placements, app_edge, synapse_info):
         # pylint: disable=too-many-arguments
         """ Get the connections from the machine post-run.
 
@@ -69,22 +57,6 @@ class AbstractAcceptsIncomingSynapses(object):
         :param ProjectionMachineEdge edge:
         :param ~pacman.model.routing_info.RoutingInfo routing_infos:
         :param SynapseInformation synapse_information:
-        :param int machine_time_step: microseconds
-        :param bool using_extra_monitor_cores:
-        :param placements:
-        :type placements: None or ~pacman.model.placements.Placements
-        :param monitor_api:
-        :type monitor_api: None or \
-            ~spinn_front_end_common.utility_models.DataSpeedUpPacketGatherMachineVertex
-        :param monitor_placement:
-        :type monitor_placement: None or ~pacman.model.placements.Placement
-        :param monitor_cores:
-        :type monitor_cores: None or \
-            iterable(~spinn_front_end_common.utility_models.ExtraMonitorSupportMachineVertex)
-        :param bool handle_time_out_configuration:
-        :param fixed_routes:
-        :type fixed_routes: None or \
-            dict(tuple(int,int),~spinn_machine.FixedRouteEntry)
         """
 
     @abstractmethod

@@ -204,9 +204,8 @@ class PyNNProjectionCommon(object):
                 None, False, pre_vertex.n_atoms, post_vertex.n_atoms,
                 self.__virtual_connection_list)
 
-            post_vertex.add_pre_run_connection_holder(
-                connection_holder, self.__projection_edge,
-                self.__synapse_information)
+            self.__synapse_information.add_pre_run_connection_holder(
+                connection_holder)
 
     @property
     def requires_mapping(self):
@@ -345,14 +344,14 @@ class PyNNProjectionCommon(object):
         # possible later date
         connection_holder = ConnectionHolder(
             data_to_get, as_list, pre_vertex.n_atoms, post_vertex.n_atoms,
-            fixed_values=fixed_values, notify=notify)
+            fixed_values=fixed_values, notify=notify,
+            app_edge=self.__projection_edge)
 
         # If we haven't run, add the holder to get connections, and return it
         # and set up a callback for after run to fill in this connection holder
         if not self.__spinnaker_control.has_ran:
-            post_vertex.add_pre_run_connection_holder(
-                connection_holder, self.__projection_edge,
-                self.__synapse_information)
+            self.__synapse_information.add_pre_run_connection_holder(
+                connection_holder)
             return connection_holder
 
         # Otherwise, get the connections now, as we have ran and therefore can
@@ -366,7 +365,7 @@ class PyNNProjectionCommon(object):
 
         connections = post_vertex.get_connections_from_machine(
             ctl.transceiver, ctl.placements, self.__projection_edge,
-            self.__synapse_information, ctl.machine_time_step)
+            self.__synapse_information)
         if connections is not None:
             connection_holder.add_connections(connections)
         connection_holder.finish()

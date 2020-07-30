@@ -38,7 +38,6 @@ class ProjectionApplicationEdge(ApplicationEdge, AbstractFilterableEdge):
     """
     __slots__ = [
         "__delay_edge",
-        "__stored_synaptic_data_from_machine",
         "__synapse_information",
         "__machine_edges_by_slices"]
 
@@ -60,8 +59,6 @@ class ProjectionApplicationEdge(ApplicationEdge, AbstractFilterableEdge):
         # The edge from the delay extension of the pre_vertex to the
         # post_vertex - this might be None if no long delays are present
         self.__delay_edge = None
-
-        self.__stored_synaptic_data_from_machine = None
 
         # Keep the machine edges by pre- and post-vertex
         self.__machine_edges_by_slices = dict()

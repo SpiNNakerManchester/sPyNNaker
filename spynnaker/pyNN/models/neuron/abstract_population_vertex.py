@@ -804,27 +804,12 @@ class AbstractPopulationVertex(
         """
         self.__synapse_manager.synapse_dynamics = synapse_dynamics
 
-    @overrides(AbstractAcceptsIncomingSynapses.add_pre_run_connection_holder)
-    def add_pre_run_connection_holder(
-            self, connection_holder, projection_edge, synapse_information):
-        self.__synapse_manager.add_pre_run_connection_holder(
-            connection_holder, projection_edge, synapse_information)
-
-    def get_connection_holders(self):
-        """
-        :rtype: dict(tuple(ProjectionApplicationEdge,SynapseInformation),\
-            ConnectionHolder)
-        """
-        return self.__synapse_manager.get_connection_holders()
-
     @overrides(AbstractAcceptsIncomingSynapses.get_connections_from_machine)
     def get_connections_from_machine(
-            self, transceiver, placements, app_edge,
-            synapse_info, machine_time_step):
+            self, transceiver, placements, app_edge, synapse_info):
         # pylint: disable=too-many-arguments
         return self.__synapse_manager.get_connections_from_machine(
-            self, transceiver, placements, app_edge,
-            synapse_info, machine_time_step)
+            self, transceiver, placements, app_edge, synapse_info)
 
     def clear_connection_cache(self):
         self.__synapse_manager.clear_connection_cache()
@@ -935,3 +920,8 @@ class AbstractPopulationVertex(
         if self.__synapse_manager.changes_during_run:
             self.__change_requires_data_generation = True
             self.__change_requires_neuron_parameters_reload = False
+
+    def read_generated_connection_holders(
+            self, transceiver, placement, post_vertex_slice):
+        self.__synapse_manager.read_generated_connection_holders(
+            transceiver, placement, post_vertex_slice)

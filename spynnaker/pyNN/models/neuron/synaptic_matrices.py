@@ -21,8 +21,6 @@ from collections import defaultdict
 from pacman.model.routing_info import BaseKeyAndMask
 
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-from spinn_front_end_common.utilities.helpful_functions import (
-    locate_memory_region_for_placement)
 
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.models.neuron.master_pop_table import (
@@ -120,11 +118,12 @@ class SynapticMatrices(object):
         matrix = SynapticMatrixApp(
             self.__synapse_io, self.__poptable, synapse_info, app_edge,
             self.__n_synapse_types, self.__all_single_syn_sz,
-            self.__post_vertex_slice)
+            self.__post_vertex_slice, self.__synaptic_matrix_region,
+            self.__direct_matrix_region)
         self.__matrices[key] = matrix
         return matrix
 
-    def size(self, app_edges):
+    def synapses_size(self, app_edges):
         """ The size of the synaptic blocks in bytes
 
         :rtype: int
@@ -138,8 +137,16 @@ class SynapticMatrices(object):
                 for synapse_info in in_edge.synapse_information:
                     memory_size = self.__add_synapse_size(
                         memory_size, synapse_info, in_edge)
+        return memory_size
+
+    def size(self, app_edges):
+        """ The size required by all parts of the matrices
+
+        :rtype: int
+        """
+
         return (
-            int(memory_size * _SYNAPSE_SDRAM_OVERSCALE) +
+            self.synapses_size(app_edges) +
             self.__gen_info_size(app_edges) +
             self.__poptable.get_master_population_table_size(app_edges))
 
@@ -232,7 +239,7 @@ class SynapticMatrices(object):
                 app_matrix = self.__app_matrix(app_edge, synapse_info)
                 app_matrix.set_info(
                     all_syn_block_sz, app_key_info, d_app_key_info,
-                    routing_info, weight_scales)
+                    routing_info, weight_scales, m_edges)
 
                 # If we can generate the connector on the machine, do so
                 if app_matrix.can_generate_on_machine(single_addr):
@@ -449,13 +456,12 @@ class SynapticMatrices(object):
 
     def get_connections_from_machine(
             self, transceiver, placement, app_edge, synapse_info):
-        synapses_address = locate_memory_region_for_placement(
-            placement, self._synaptic_matrix_region, transceiver)
-        single_address = BYTES_PER_WORD + locate_memory_region_for_placement(
-            placement, self._direct_matrix_region, transceiver)
         matrix = self.__app_matrix(app_edge, synapse_info)
-        return matrix.get_connections(
-            transceiver, placement, synapses_address, single_address)
+        return matrix.get_connections(transceiver, placement)
+
+    def read_generated_connection_holders(self, transceiver, placement):
+        for matrix in iteritems(self.__matrices):
+            matrix.read_generated_connection_holders(transceiver, placement)
 
     def clear_connection_cache(self):
         for matrix in itervalues(self.__matrices):

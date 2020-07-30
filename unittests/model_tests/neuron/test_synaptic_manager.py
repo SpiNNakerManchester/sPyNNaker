@@ -270,7 +270,7 @@ class TestSynapticManager(unittest.TestCase):
         try:
             connections_1 = synaptic_manager.get_connections_from_machine(
                 post_app_vertex, transceiver, placements, app_edge,
-                direct_synapse_information_1, machine_time_step)
+                direct_synapse_information_1)
 
             # Check that all the connections have the right weight and delay
             assert len(connections_1) == post_vertex_slice.n_atoms
@@ -279,7 +279,7 @@ class TestSynapticManager(unittest.TestCase):
 
             connections_2 = synaptic_manager.get_connections_from_machine(
                 post_app_vertex, transceiver, placements, app_edge,
-                direct_synapse_information_2, machine_time_step)
+                direct_synapse_information_2)
 
             # Check that all the connections have the right weight and delay
             assert len(connections_2) == post_vertex_slice.n_atoms
@@ -288,7 +288,7 @@ class TestSynapticManager(unittest.TestCase):
 
             connections_3 = synaptic_manager.get_connections_from_machine(
                 post_app_vertex, transceiver, placements, app_edge,
-                all_to_all_synapse_information, machine_time_step)
+                all_to_all_synapse_information)
 
             # Check that all the connections have the right weight and delay
             assert len(connections_3) == \
@@ -298,7 +298,7 @@ class TestSynapticManager(unittest.TestCase):
 
             connections_4 = synaptic_manager.get_connections_from_machine(
                 post_app_vertex, transceiver, placements, app_edge,
-                from_list_synapse_information, machine_time_step)
+                from_list_synapse_information)
 
             # Check that all the connections have the right weight and delay
             assert len(connections_4) == len(from_list_list)

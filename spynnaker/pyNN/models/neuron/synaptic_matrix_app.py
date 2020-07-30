@@ -4,8 +4,10 @@ from six import itervalues
 from pacman.model.graphs.common.slice import Slice
 
 from spinn_front_end_common.utilities import globals_variables
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from spinn_front_end_common.utilities.helpful_functions import (
+    locate_memory_region_for_placement)
 
-from spynnaker.pyNN.models.neural_projections import ProjectionMachineEdge
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractGenerateConnectorOnMachine)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
@@ -31,19 +33,20 @@ class SynapticMatrixApp(object):
         "__n_synapse_types",
         "__all_single_syn_sz",
         "__post_vertex_slice",
-        "__n_m_edges",
+        "__synaptic_matrix_region",
+        "__direct_matrix_region",
         "__matrices",
         "__max_row_info",
-        "__pre_run_connection_holders",
         "__all_syn_block_sz",
         "__app_key_info",
         "__delay_app_key_info",
         "__routing_info",
         "__weight_scales",
-        "__syn_mat_offset",
-        "__delay_syn_mat_offset",
+        "__m_edges",
         "__matrix_size",
         "__delay_matrix_size",
+        "__syn_mat_offset",
+        "__delay_syn_mat_offset",
         "__index",
         "__received_block",
         "__delay_received_block"
@@ -51,7 +54,8 @@ class SynapticMatrixApp(object):
 
     def __init__(
             self, synapse_io, poptable, synapse_info, app_edge,
-            n_synapse_types, all_single_syn_sz, post_vertex_slice):
+            n_synapse_types, all_single_syn_sz, post_vertex_slice,
+            synaptic_matrix_region, direct_matrix_region):
         self.__synapse_io = synapse_io
         self.__poptable = poptable
         self.__synapse_info = synapse_info
@@ -59,9 +63,8 @@ class SynapticMatrixApp(object):
         self.__n_synapse_types = n_synapse_types
         self.__all_single_syn_sz = all_single_syn_sz
         self.__post_vertex_slice = post_vertex_slice
-
-        # Number of machine edges, calculated dynamically
-        self.__n_m_edges = None
+        self.__synaptic_matrix_region = synaptic_matrix_region
+        self.__direct_matrix_region = direct_matrix_region
 
         # Map of machine_edge to .SynapticMatrix
         self.__matrices = dict()
@@ -72,28 +75,30 @@ class SynapticMatrixApp(object):
             app_edge.n_delay_stages, self.__poptable,
             globals_variables.get_simulator().machine_time_step, app_edge)
 
-        self.__pre_run_connection_holders = list()
-
         # These are set directly later
         self.__all_syn_block_sz = None
         self.__app_key_info = None
         self.__delay_app_key_info = None
         self.__routing_info = None
         self.__weight_scales = None
+        self.__m_edges = None
+
+        self.__matrix_size = (
+            self.__app_edge.pre_vertex.n_atoms *
+            self.__max_row_info.undelayed_max_bytes)
+        self.__delay_matrix_size = (
+            self.__app_edge.pre_vertex.n_atoms *
+            self.__app_edge.n_delay_stages *
+            self.__max_row_info.delayed_max_bytes)
 
         # These are computed during synaptic generation
         self.__syn_mat_offset = None
         self.__delay_syn_mat_offset = None
-        self.__matrix_size = None
-        self.__delay_matrix_size = None
         self.__index = None
 
         # These are stored when blocks are read
         self.__received_block = None
         self.__delay_received_block = None
-
-    def add_pre_run_connection_holder(self, holder):
-        self.__pre_run_connection_holders.append(holder)
 
     def __get_matrix(self, machine_edge):
         """ Get or create a matrix object
@@ -120,30 +125,12 @@ class SynapticMatrixApp(object):
         return matrix
 
     @property
-    def __m_edges(self):
-        n_edges = 0
-        for m_edge in self.__app_edge.machine_edges:
-            # Skip edges that are not of the right type
-            if not isinstance(m_edge, ProjectionMachineEdge):
-                continue
-            yield m_edge
-            n_edges += 1
-        self.__n_m_edges = n_edges
-
-    @property
-    def __n_edges(self):
-        if self.__n_m_edges is None:
-            self.__n_m_edges = len(list(self.__m_edges))
-        return self.__n_m_edges
-
-    @property
     def size(self):
         """ The number of bytes required by the synaptic matrices
 
         :rtype: int
         """
-        n_atoms = self.__app_edge.pre_vertex.n_atoms
-        return self.__max_row_info.undelayed_max_bytes * n_atoms
+        return self.__matrix_size
 
     @property
     def delayed_size(self):
@@ -151,9 +138,7 @@ class SynapticMatrixApp(object):
 
         :rtype: int
         """
-        n_atoms = self.__app_edge.pre_vertex.n_atoms
-        return (self.__max_row_info.delayed_max_bytes * n_atoms *
-                self.__app_edge.n_delay_stages)
+        return self.__delay_matrix_size
 
     @property
     def generator_info_size(self):
@@ -191,7 +176,9 @@ class SynapticMatrixApp(object):
         connector = self.__synapse_info.connector
         dynamics = self.__synapse_info.synapse_dynamics
 
-        if (not self.__is_app_edge_direct(single_addr) or
+        # If the whole app edge can be done with direct synapses, or there are
+        # structural connections, don't generate on the machine
+        if (self.__is_app_edge_direct(single_addr) or
                 isinstance(dynamics, AbstractSynapseDynamicsStructural)):
             return False
 
@@ -216,12 +203,13 @@ class SynapticMatrixApp(object):
         return True
 
     def set_info(self, all_syn_block_sz, app_key_info, delay_app_key_info,
-                 routing_info, weight_scales):
+                 routing_info, weight_scales, m_edges):
         self.__all_syn_block_sz = all_syn_block_sz
         self.__app_key_info = app_key_info
         self.__delay_app_key_info = delay_app_key_info
         self.__routing_info = routing_info
         self.__weight_scales = weight_scales
+        self.__m_edges = m_edges
 
     def write_matrix(self, spec, block_addr, single_addr, single_synapses):
         """ Write a synaptic matrix from host
@@ -231,7 +219,6 @@ class SynapticMatrixApp(object):
         is_delayed = bool(self.__max_row_info.delayed_max_n_synapses)
         undelayed_matrix_data = list()
         delayed_matrix_data = list()
-        only_one_edge = self.__n_edges == 1
         for m_edge in self.__m_edges:
 
             # Get a synaptic matrix for each machine edge
@@ -243,7 +230,7 @@ class SynapticMatrixApp(object):
             # matrix to be used by using write_machine_matrix; it will make
             # no difference if this isn't actually a direct edge since there
             # is only one anyway...
-            if self.__app_key_info is None or only_one_edge:
+            if self.__app_key_info is None or len(self.__m_edges) == 1:
                 block_addr, single_addr = matrix.write_machine_matrix(
                     spec, block_addr, single_synapses, single_addr, row_data)
             elif is_undelayed:
@@ -263,15 +250,12 @@ class SynapticMatrixApp(object):
         # If there is an app key, add a single matrix and entry
         # to the population table but also put in padding
         # between tables when necessary
-        multiple_edges = self.__n_edges > 1
-        if self.__app_key_info is not None and multiple_edges:
+        if self.__app_key_info is not None and len(self.__m_edges) > 1:
             block_addr = self.__write_app_matrix(
                 spec, block_addr, undelayed_matrix_data)
         if self.__delay_app_key_info is not None:
             block_addr = self.__write_delay_app_matrix(
                 spec, block_addr, delayed_matrix_data)
-
-        self.__finish_connection_holders()
 
         return block_addr, single_addr
 
@@ -297,13 +281,15 @@ class SynapticMatrixApp(object):
         # fixed for all synaptic matrices from the same source application
         # vertex
         for m_edge, row_data in matrix_data:
-            spec.write_array(row_data)
             size = (self.__max_row_info.undelayed_max_bytes *
                     m_edge.pre_vertex.vertex_slice.n_atoms)
+            row_data_size = len(row_data) * BYTES_PER_WORD
+            if row_data_size != size:
+                raise Exception("Data incorrect size: {} instead of {}".format(
+                    row_data_size, size))
+            spec.write_array(row_data)
             block_addr = self.__next_addr(block_addr, size)
 
-        # Store the data to be used to read synapses
-        self.__matrix_size = block_addr - self.__syn_mat_offset
         return block_addr
 
     def __write_delay_app_matrix(self, spec, block_addr, matrix_data):
@@ -328,13 +314,15 @@ class SynapticMatrixApp(object):
         # fixed for all synaptic matrices from the same source application
         # vertex
         for _, pre_slice, row_data in matrix_data:
-            spec.write_array(row_data)
             n_rows = pre_slice.n_atoms * self.__app_edge.n_delay_stages
             size = self.__max_row_info.delayed_max_bytes * n_rows
+            row_data_size = len(row_data) * BYTES_PER_WORD
+            if size != row_data_size:
+                raise Exception("Data incorrect size: {} instead of {}".format(
+                    row_data_size, size))
+            spec.write_array(row_data)
             block_addr = self.__next_addr(block_addr, size)
 
-        # Store the data to be used to read synapses
-        self.__delay_matrix_size = block_addr - self.__delay_syn_mat_offset
         return block_addr
 
     def write_on_chip_matrix_data(self, generator_data, block_addr):
@@ -374,7 +362,6 @@ class SynapticMatrixApp(object):
             # memory is needed.
             generator_data.append(matrix.get_generator_data(
                 syn_mat_offset, d_mat_offset))
-            self.__gen_on_machine = True
         return block_addr
 
     def __reserve_app_blocks(self, block_addr):
@@ -416,8 +403,6 @@ class SynapticMatrixApp(object):
             self.__app_key_info.core_shift, self.__app_key_info.n_neurons)
         self.__update_synapse_index(index)
         self.__syn_mat_offset = block_addr
-        self.__matrix_size = (self.__app_edge.pre_vertex.n_atoms *
-                              self.__max_row_info.undelayed_max_bytes)
         block_addr = self.__next_addr(block_addr, self.__matrix_size)
         return block_addr
 
@@ -435,26 +420,16 @@ class SynapticMatrixApp(object):
             self.__delay_app_key_info.n_neurons)
         self.__update_synapse_index(index)
         self.__delay_syn_mat_offset = block_addr
-        n_rows = (self.__app_edge.pre_vertex.n_atoms *
-                  self.__app_edge.n_delay_stages)
-        self.__delay_matrix_size = (
-            self.__max_row_info.delayed_max_bytes * n_rows)
         block_addr = self.__next_addr(block_addr, self.__delay_matrix_size)
         return block_addr
 
     def __update_connection_holders(self, data, delayed_data, machine_edge):
-        for conn_holder in self.__pre_run_connection_holders:
+        for conn_holder in self.__synapse_info.pre_run_connection_holders:
             conn_holder.add_connections(
                 self.__synapse_io.read_all_synapses(
                     data, delayed_data, self.__synapse_info,
                     self.__n_synapse_types, self.__weight_scales,
                     machine_edge, self.__max_row_info))
-
-    def __finish_connection_holders(self):
-        """ Finish the connection holders in this object
-        """
-        for conn_holder in self.__pre_run_connection_holders:
-            conn_holder.finish()
 
     def __update_master_pop_table(self, block_addr, max_words, key_info):
         index = self.__poptable.update_master_population_table(
@@ -488,15 +463,19 @@ class SynapticMatrixApp(object):
             raise Exception(
                 "Index of " + self.__synapse_info + " has changed!")
 
-    def get_connections(
-            self, transceiver, placement, synapses_address, single_address):
+    def get_connections(self, transceiver, placement):
+        synapses_address = locate_memory_region_for_placement(
+            placement, self.__synaptic_matrix_region, transceiver)
+        single_address = (locate_memory_region_for_placement(
+            placement, self.__direct_matrix_region, transceiver) +
+            BYTES_PER_WORD)
         connections = list()
         if (self.__app_key_info is not None or
                 self.__delay_app_key_info is not None):
             connections.extend(self.__read_connections(
                 transceiver, placement, synapses_address))
         if self.__app_key_info is None or self.__delay_app_key_info is None:
-            for m_edge in self.__app_edge.machine_edges:
+            for m_edge in self.__m_edges:
                 matrix = self.__get_matrix(m_edge)
                 connections.extend(matrix.read_connections(
                     transceiver, placement, synapses_address, single_address))
@@ -507,6 +486,18 @@ class SynapticMatrixApp(object):
         self.__delay_received_block = None
         for matrix in itervalues(self.__matrices):
             matrix.clear_connection_cache()
+
+    def read_generated_connection_holders(self, transceiver, placement):
+        if self.__synapse_info.pre_run_connection_holders:
+            synapses_address = locate_memory_region_for_placement(
+                placement, self.__synaptic_matrix_region, transceiver)
+            single_address = (locate_memory_region_for_placement(
+                placement, self.__direct_matrix_region, transceiver) +
+                BYTES_PER_WORD)
+            connections = self.get_connections(
+                transceiver, placement, synapses_address, single_address)
+            for holder in self.__synapse_info.pre_run_connection_holders:
+                holder.add_connections(connections)
 
     def __read_connections(self, transceiver, placement, synapses_address):
         pre_slice = Slice(0, self.__app_edge.pre_vertex.n_atoms + 1)

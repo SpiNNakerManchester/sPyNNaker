@@ -15,12 +15,10 @@
 
 import logging
 import os
-from six import iteritems
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.make_tools.replacer import Replacer
 from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState
-from spinn_front_end_common.utilities import globals_variables
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
@@ -74,8 +72,7 @@ def synapse_expander(
             [CPUState.FINISHED])
         progress.update()
         finished = True
-        _fill_in_connection_data(
-            expanded_pop_vertices, placements, transceiver)
+        _fill_in_connection_data(expanded_pop_vertices, transceiver)
         _extract_iobuf(expander_cores, transceiver, provenance_file_path)
         progress.end()
     except Exception:  # pylint: disable=broad-except
@@ -100,16 +97,13 @@ def _plan_expansion(app_graph, placements, synapse_expander_bin,
         # Add all machine vertices of the population vertex to ones
         # that need synapse expansion
         if isinstance(vertex, AbstractPopulationVertex):
-            gen_on_machine = False
             for m_vertex in vertex.machine_vertices:
                 if vertex.gen_on_machine(m_vertex.vertex_slice):
                     placement = placements.get_placement_of_vertex(m_vertex)
                     expander_cores.add_processor(
                         synapse_expander_bin,
                         placement.x, placement.y, placement.p)
-                    gen_on_machine = True
-            if gen_on_machine:
-                expanded_pop_vertices.append(vertex)
+                expanded_pop_vertices.append((vertex, m_vertex, placement))
         elif isinstance(vertex, DelayExtensionVertex):
             for m_vertex in vertex.machine_vertices:
                 if vertex.gen_on_machine(m_vertex.vertex_slice):
@@ -165,22 +159,11 @@ def _handle_failure(expander_cores, transceiver, provenance_file_path):
                    display=True)
 
 
-def _fill_in_connection_data(expanded_pop_vertices, placements, transceiver):
+def _fill_in_connection_data(expanded_pop_vertices, transceiver):
     """ Once expander has run, fill in the connection data
 
     :rtype: None
     """
-    ctl = globals_variables.get_simulator()
-
-    for vertex in expanded_pop_vertices:
-        conn_holders = vertex.get_connection_holders()
-        for (app_edge, synapse_info), conn_holder_list in iteritems(
-                conn_holders):
-            # Only do this if this synapse_info has been generated
-            # on the machine using the expander
-            if synapse_info.may_generate_on_machine():
-                conns = vertex.get_connections_from_machine(
-                    transceiver, placements, app_edge,
-                    synapse_info, ctl.machine_time_step)
-                for conn_holder in conn_holder_list:
-                    conn_holder.add_connections(conns)
+    for vertex, m_vertex, placement in expanded_pop_vertices:
+        vertex.read_generated_connection_holders(
+            transceiver, placement, m_vertex.post_vertex_slice)

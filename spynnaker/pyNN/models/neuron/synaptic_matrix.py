@@ -31,11 +31,12 @@ class SynapticMatrix(object):
         "__weight_scales",
         "__all_syn_block_sz",
         "__all_single_syn_sz",
+        "__matrix_size",
+        "__delay_matrix_size",
+        "__single_matrix_size",
         "__index",
         "__syn_mat_offset",
         "__delay_syn_mat_offset",
-        "__matrix_size",
-        "__delay_matrix_size",
         "__is_single",
         "__received_block",
         "__delay_received_block"
@@ -58,11 +59,21 @@ class SynapticMatrix(object):
         self.__all_syn_block_sz = all_syn_block_sz
         self.__all_single_syn_sz = all_single_syn_sz
 
+        # The matrix size can be calculated up-front; use for checking later
+        self.__matrix_size = (
+            self.__max_row_info.undelayed_max_bytes *
+            self.__machine_edge.pre_vertex.vertex_slice.n_atoms)
+        self.__delay_matrix_size = (
+            self.__max_row_info.delayed_max_bytes *
+            self.__machine_edge.pre_vertex.vertex_slice.n_atoms *
+            self.__app_edge.n_delay_stages)
+        self.__single_matrix_size = (
+            self.__machine_edge.pre_vertex.vertex_slice.n_atoms *
+            BYTES_PER_WORD)
+
         self.__index = None
         self.__syn_mat_offset = None
         self.__delay_syn_mat_offset = None
-        self.__matrix_size = None
-        self.__delay_matrix_size = None
         self.__is_single = False
         self.__received_block = None
         self.__delay_received_block = None
@@ -86,7 +97,7 @@ class SynapticMatrix(object):
         """
         pre_vertex_slice = self.__machine_edge.pre_vertex.vertex_slice
         post_vertex_slice = self.__machine_edge.post_vertex.vertex_slice
-        next_addr = single_addr + (pre_vertex_slice.n_atoms * BYTES_PER_WORD)
+        next_addr = single_addr + self.__single_matrix_size
         is_direct = (
             next_addr <= self.__all_single_syn_sz and
             not self.is_delayed and
@@ -132,7 +143,13 @@ class SynapticMatrix(object):
                 self.__update_synapse_index(index)
             return block_addr, single_addr
 
-        if self.is_direct(single_addr):
+        size = len(row_data) * BYTES_PER_WORD
+        if size != self.__matrix_size:
+            raise Exception("Data is incorrect size: {} instead of {}".format(
+                size, self.__matrix_size))
+
+        is_direct, _ = self.is_direct(single_addr)
+        if is_direct:
             single_addr = self.__write_single_machine_matrix(
                 single_synapses, single_addr, row_data)
             return block_addr, single_addr
@@ -144,7 +161,6 @@ class SynapticMatrix(object):
         self.__update_synapse_index(index)
         spec.write_array(row_data)
         self.__syn_mat_offset = block_addr
-        self.__matrix_size = len(row_data) * 4
         block_addr = self.__next_addr(block_addr, self.__matrix_size)
         return block_addr, single_addr
 
@@ -159,6 +175,11 @@ class SynapticMatrix(object):
                 self.__update_synapse_index(index)
             return block_addr
 
+        size = len(row_data) * BYTES_PER_WORD
+        if size != self.__delay_matrix_size:
+            raise Exception("Data is incorrect size: {} instead of {}".format(
+                size, self.__delay_matrix_size))
+
         block_addr = self.__poptable.write_padding(spec, block_addr)
         index = self.__poptable.update_master_population_table(
             block_addr, self.__max_row_info.delayed_max_words,
@@ -166,7 +187,6 @@ class SynapticMatrix(object):
         self.__update_synapse_index(index)
         spec.write_array(row_data)
         self.__delay_syn_mat_offset = block_addr
-        self.__delay_matrix_size = len(row_data) * 4
         block_addr = self.__next_addr(block_addr, self.__delay_matrix_size)
         return block_addr
 
@@ -176,15 +196,18 @@ class SynapticMatrix(object):
             vertex
         """
         single_rows = row_data.reshape(-1, 4)[:, 3]
+        data_size = len(single_rows) * BYTES_PER_WORD
+        if data_size != self.__single_matrix_size:
+            raise Exception("Row data incorrect size: {} instead of {}".format(
+                data_size, self.__single_matrix_size))
         index = self.__poptable.update_master_population_table(
             single_addr, self.__max_row_info.undelayed_max_words,
             self.__routing_info.first_key_and_mask, is_single=True)
         self.__update_synapse_index(index)
         single_synapses.append(single_rows)
         self.__syn_mat_offset = single_addr
-        single_addr = single_addr + (len(single_rows) * 4)
-        self.__matrix_size = single_addr - self.__syn_mat_offset
         self.__is_single = True
+        single_addr = single_addr + self.__single_matrix_size
         return single_addr
 
     def write_on_chip_delay_data(self):
@@ -214,11 +237,8 @@ class SynapticMatrix(object):
             return app_block_addr, _SYN_REGION_UNUSED
 
         addr = app_block_addr
-        matrix_size = (
-            self.__max_row_info.undelayed_max_bytes *
-            self.__machine_edge.pre_vertex.vertex_slice.n_atoms)
         app_block_addr = self.__next_addr(
-            app_block_addr, matrix_size, max_app_addr)
+            app_block_addr, self.__matrix_size, max_app_addr)
         return app_block_addr, addr
 
     def next_app_delay_on_chip_address(self, app_block_addr, max_app_addr):
@@ -226,12 +246,8 @@ class SynapticMatrix(object):
             return app_block_addr, _SYN_REGION_UNUSED
 
         addr = app_block_addr
-        matrix_size = (
-            self.__max_row_info.delayed_max_bytes *
-            self.__machine_edge.pre_vertex.vertex_slice.n_atoms *
-            self.__app_edge.n_delay_stages)
         app_block_addr = self.__next_addr(
-            app_block_addr, matrix_size, max_app_addr)
+            app_block_addr, self.__delay_matrix_size, max_app_addr)
         return app_block_addr, addr
 
     def next_on_chip_address(self, block_addr):
@@ -249,9 +265,6 @@ class SynapticMatrix(object):
             block_addr, self.__max_row_info.undelayed_max_words,
             self.__routing_info.first_key_and_mask)
         self.__update_synapse_index(index)
-        self.__matrix_size = (
-            self.__max_row_info.undelayed_max_bytes *
-            self.__machine_edge.pre_vertex.vertex_slice.n_atoms)
         self.__syn_mat_offset = block_addr
         block_addr = self.__next_addr(block_addr, self.__matrix_size)
         return block_addr, self.__syn_mat_offset
@@ -271,10 +284,6 @@ class SynapticMatrix(object):
             block_addr, self.__max_row_info.delayed_max_words,
             self.__delay_routing_info.first_key_and_mask)
         self.__update_synapse_index(index)
-        self.__delay_matrix_size = (
-            self.__max_row_info.delayed_max_bytes *
-            self.__machine_edge.pre_vertex.vertex_slice.n_atoms *
-            self.__app_edge.n_delay_stages)
         self.__delay_syn_mat_offset = block_addr
         block_addr = self.__next_addr(block_addr, self.__delay_matrix_size)
         return block_addr, self.__delay_syn_mat_offset
@@ -303,7 +312,7 @@ class SynapticMatrix(object):
             max_addr = self.__all_syn_block_sz
         if next_addr > max_addr:
             raise Exception(
-                "Too much synaptic memory has been reserved: {} of {}".format(
+                "Too much synaptic memory has been used: {} of {}".format(
                     next_addr, max_addr))
         return next_addr
 
@@ -372,11 +381,16 @@ class SynapticMatrix(object):
         self.__received_block = block
         return block
 
-    def __get_single_block(self, transceiver, placement, synapses_address):
-        block = self._get_block(transceiver, placement, synapses_address)
+    def __get_single_block(self, transceiver, placement, single_address):
+        if self.__received_block is not None:
+            return self.__received_block
+        address = self.__syn_mat_offset + single_address
+        block = transceiver.read_memory(
+            placement.x, placement.y, address, self.__single_matrix_size)
         numpy_data = numpy.asarray(block, dtype="uint8").view("uint32")
         n_rows = len(numpy_data)
         numpy_block = numpy.zeros((n_rows, BYTES_PER_WORD), dtype="uint32")
         numpy_block[:, 3] = numpy_data
         numpy_block[:, 1] = 1
+        self.__received_block = numpy_block
         return numpy_block.tobytes()

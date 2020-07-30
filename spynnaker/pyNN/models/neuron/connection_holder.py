@@ -48,11 +48,17 @@ class ConnectionHolder(object):
 
         # A callback to call with the data when finished
         "__notify",
+
+        # The app edge where the connections are read from
+        "__app_edge",
+
+        # The number of machine edges that have been filled in
+        "__n_machine_edges"
     )
 
     def __init__(
             self, data_items_to_return, as_list, n_pre_atoms, n_post_atoms,
-            connections=None, fixed_values=None, notify=None):
+            connections=None, fixed_values=None, notify=None, app_edge=None):
         """
         :param data_items_to_return: A list of data fields to be returned
         :type data_items_to_return: list(int) or tuple(int) or None
@@ -78,6 +84,10 @@ class ConnectionHolder(object):
             This should accept a single parameter, which will contain the
             data requested
         :type notify: callable(ConnectionHolder, None) or None
+        :param app_edge:
+            The application edge the connection holder is filling from.  If\
+            specified, when all the machine edges of the application edge\
+            have been filled in, the holder will automatically close.
         """
         # pylint: disable=too-many-arguments
         self.__data_items_to_return = data_items_to_return
@@ -88,6 +98,9 @@ class ConnectionHolder(object):
         self.__data_items = None
         self.__notify = notify
         self.__fixed_values = fixed_values
+        self.__app_edge = app_edge
+
+        self.__n_machine_edges = 0
 
     def add_connections(self, connections):
         """ Add connections to the holder to be returned
@@ -99,6 +112,10 @@ class ConnectionHolder(object):
         if self.__connections is None:
             self.__connections = list()
         self.__connections.append(connections)
+        if self.__app_edge is not None:
+            self.__n_machine_edges += 1
+            if self.__n_machine_edges == len(self.__app_edge.machine_edges):
+                self.finish()
 
     @property
     def connections(self):

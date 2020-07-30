@@ -34,7 +34,8 @@ class SynapseInformation(object):
         "__synapse_dynamics",
         "__synapse_type",
         "__weights",
-        "__delays"]
+        "__delays",
+        "__pre_run_connection_holders"]
 
     def __init__(self, connector, pre_population, post_population,
                  prepop_is_view, postpop_is_view, rng,
@@ -69,6 +70,9 @@ class SynapseInformation(object):
         self.__synapse_type = synapse_type
         self.__weights = weights
         self.__delays = delays
+
+        # Make a list of holders to be updated
+        self.__pre_run_connection_holders = list()
 
     @property
     def connector(self):
@@ -183,3 +187,13 @@ class SynapseInformation(object):
         synapse_gen = isinstance(
             self.synapse_dynamics, AbstractGenerateOnMachine)
         return connector_gen and synapse_gen
+
+    @property
+    def pre_run_connection_holders(self):
+        return self.__pre_run_connection_holders
+
+    def add_pre_run_connection_holder(self, pre_run_connection_holder):
+        self.__pre_run_connection_holders.append(pre_run_connection_holder)
+
+    def clear_pre_run_connection_holders(self):
+        self.__pre_run_connection_holders.clear()

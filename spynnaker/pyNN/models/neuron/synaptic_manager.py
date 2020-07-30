@@ -63,7 +63,6 @@ class SynapticManager(object):
     __slots__ = [
         "__n_synapse_types",
         "__all_single_syn_sz",
-        "__pre_run_connection_holders",
         "__ring_buffer_sigma",
         "__spikes_per_second",
         "__synapse_dynamics",
@@ -242,23 +241,6 @@ class SynapticManager(object):
         if self.__synapse_dynamics is None:
             return ""
         return self.__synapse_dynamics.get_vertex_executable_suffix()
-
-    def add_pre_run_connection_holder(
-            self, connection_holder, app_edge, synapse_info):
-        """
-        :param ConnectionHolder connection_holder:
-        :param ProjectionApplicationEdge app_edge:
-        :param SynapseInformation synapse_info:
-        """
-        self.__pre_run_connection_holders[app_edge, synapse_info].append(
-            connection_holder)
-
-    def get_connection_holders(self):
-        """
-        :rtype: dict(tuple(ProjectionApplicationEdge,SynapseInformation),\
-            ConnectionHolder)
-        """
-        return self.__pre_run_connection_holders
 
     def get_n_cpu_cycles(self):
         """
@@ -626,7 +608,7 @@ class SynapticManager(object):
         in_edges = application_graph.get_edges_ending_at_vertex(
             application_vertex)
         matrices = self.__get_synaptic_matrices(post_vertex_slice)
-        all_syn_block_sz = matrices.size(in_edges)
+        all_syn_block_sz = matrices.synapses_size(in_edges)
         self._reserve_memory_regions(
             spec, post_vertex_slice, all_syn_block_sz, application_graph,
             application_vertex)
@@ -747,3 +729,8 @@ class SynapticManager(object):
         if self.__synapse_dynamics is None:
             return False
         return self.__synapse_dynamics.changes_during_run
+
+    def read_generated_connection_holders(
+            self, transceiver, placement, post_vertex_slice):
+        matrices = self.__get_synaptic_matrices(post_vertex_slice)
+        matrices.read_generated_connection_holders(transceiver, placement)
