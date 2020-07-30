@@ -51,7 +51,8 @@ struct neuron_parameters {
 
 //! Offset of start of global parameters, in words.
 #define START_OF_GLOBAL_PARAMETERS \
-    (sizeof(struct neuron_parameters) / sizeof(uint32_t))
+    ((sizeof(struct neuron_parameters) + \
+      sizeof(struct tdma_parameters)) / sizeof(uint32_t))
 
 //! \brief does the memory copy for the neuron parameters
 //! \param[in] address: the address where the neuron parameters are stored
@@ -60,6 +61,7 @@ struct neuron_parameters {
 static bool neuron_load_neuron_parameters(address_t address) {
     log_debug("loading parameters");
     // call the neuron implementation functions to do the work
+    log_info("words for global is %d", START_OF_GLOBAL_PARAMETERS);
     neuron_impl_load_neuron_parameters(
         address, START_OF_GLOBAL_PARAMETERS, n_neurons);
     return true;
@@ -119,7 +121,7 @@ bool neuron_initialise(
     }
 
     // load the data into the allocated DTCM spaces.
-    if (!neuron_load_neuron_parameters(data_addr)) {
+    if (!neuron_load_neuron_parameters(address)) {
         return false;
     }
 
@@ -181,8 +183,8 @@ void neuron_do_timestep_update( // EXPORTED
 
             if (use_key) {
                 tdma_processing_send_packet(
-                    neuron_index, (key | neuron_index), timer_period,
-                    timer_count, n_neurons);
+                    neuron_index, (key | neuron_index), 0, NO_PAYLOAD,
+                    timer_period, timer_count, n_neurons);
             }
         } else {
             log_debug("the neuron %d has been determined to not spike",

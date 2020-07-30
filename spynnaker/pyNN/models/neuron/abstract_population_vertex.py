@@ -17,6 +17,8 @@ import logging
 import os
 import math
 
+from spinn_front_end_common.abstract_models.impl.requires_tdma import \
+    RequiresTDMA
 from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
@@ -66,15 +68,9 @@ _C_MAIN_BASE_DTCM_USAGE_IN_BYTES = 3 * BYTES_PER_WORD
 _C_MAIN_BASE_SDRAM_USAGE_IN_BYTES = 18 * BYTES_PER_WORD
 _C_MAIN_BASE_N_CPU_CYCLES = 0
 
-# error message for when the vertex TDMA isnt feasible.
-_VERTEX_TDMA_FAILURE_MSG = (
-    "population {} does not have enough time to execute the "
-    "TDMA in the given time. The population would need a time "
-    "scale factor of {} to correctly execute this TDMA.")
-
 
 class AbstractPopulationVertex(
-        ApplicationVertex, AbstractGeneratesDataSpecification,
+        ApplicationVertex, RequiresTDMA, AbstractGeneratesDataSpecification,
         AbstractHasAssociatedBinary, AbstractContainsUnits,
         AbstractSpikeRecordable,  AbstractNeuronRecordable,
         AbstractProvidesOutgoingPartitionConstraints,
@@ -106,10 +102,7 @@ class AbstractPopulationVertex(
         "__n_data_specs",
         "__initial_state_variables",
         "__has_reset_last",
-        "__updated_state_variables",
-        "__pop_level_spike_control",
-        "__fraction_of_waiting",
-        "__fraction_of_sending"]
+        "__updated_state_variables"]
 
     #: recording region IDs
     _SPIKE_RECORDING_REGION = 0
@@ -121,20 +114,9 @@ class AbstractPopulationVertex(
     _TRAFFIC_IDENTIFIER = "BufferTraffic"
 
     # 7 elements before the start of global parameters
-    # 1. core slot, 2. micro secs before spike,
-    # 3. time between cores 4. initial offset. 5. has key, 6. key, 7. n atoms,
-    # 8. n synapse types, 9. incoming spike buffer size.
-    _BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 9 * BYTES_PER_WORD
-
-    # fraction of the real time we will use for spike transmissions
-    FRACTION_OF_TIME_FOR_SPIKE_SENDING = 0.8
-    FRACTION_OF_TIME_STEP_BEFORE_SPIKE_SENDING = 0.1
-
-    # default number of cores to fire at same time from this population
-    _DEFAULT_N_CORES_AT_SAME_TIME = 7
-
-    # default number of microseconds between cores firing
-    _DEFAULT_TIME_BETWEEN_CORES = 50
+    # 1. has key, 2. key, 3. n atoms,
+    # 4. n synapse types, 5. incoming spike buffer size.
+    _BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 5 * BYTES_PER_WORD
 
     def __init__(
             self, n_neurons, label, constraints, max_atoms_per_core,
@@ -166,6 +148,7 @@ class AbstractPopulationVertex(
         # pylint: disable=too-many-arguments, too-many-locals
         ApplicationVertex.__init__(
             self, label, constraints, max_atoms_per_core)
+        RequiresTDMA.__init__(self)
 
         self.__n_atoms = n_neurons
         self.__n_subvertices = 0
@@ -213,36 +196,6 @@ class AbstractPopulationVertex(
         # Set up for profiling
         self.__n_profile_samples = helpful_functions.read_config_int(
             config, "Reports", "n_profile_samples")
-
-        # set the number of cores expected to fire at any given time
-        self.__pop_level_spike_control = helpful_functions.read_config_int(
-            config, "Simulation", "pop_spike_quantity")
-        if self.__pop_level_spike_control is None:
-            self.__pop_level_spike_control = self._DEFAULT_N_CORES_AT_SAME_TIME
-
-        # set the time between cores to fire
-        self.__time_between_cores = helpful_functions.read_config_float(
-            config, "Simulation", "time_between_cores")
-        if self.__time_between_cores is None:
-            self.__time_between_cores = self._DEFAULT_TIME_BETWEEN_CORES
-
-        # fraction of time spend sending
-        self.__fraction_of_sending = helpful_functions.read_config(
-            config, "Simulation", "fraction_of_time_spike_sending")
-        if self.__fraction_of_sending is None:
-            self.__fraction_of_sending = (
-                self.FRACTION_OF_TIME_FOR_SPIKE_SENDING)
-        else:
-            self.__fraction_of_sending = float(self.__fraction_of_sending)
-
-        # fraction of time waiting before sending
-        self.__fraction_of_waiting = helpful_functions.read_config(
-            config, "Simulation", "fraction_of_time_before_sending")
-        if self.__fraction_of_waiting is None:
-            self.__fraction_of_waiting = (
-                self.FRACTION_OF_TIME_STEP_BEFORE_SPIKE_SENDING)
-        else:
-            self.__fraction_of_waiting = float(self.__fraction_of_waiting)
 
     @property
     @overrides(ApplicationVertex.n_atoms)
@@ -339,6 +292,7 @@ class AbstractPopulationVertex(
         """
         return (
             self._BYTES_TILL_START_OF_GLOBAL_PARAMETERS +
+            self.tdma_sdram_size_in_bytes +
             self.__neuron_impl.get_sdram_usage_in_bytes(vertex_slice.n_atoms))
 
     def _get_sdram_usage_for_atoms(
@@ -438,9 +392,7 @@ class AbstractPopulationVertex(
                 max_atoms = vertex_slice.n_atoms
         return max_atoms
 
-    def _write_neuron_parameters(
-            self, spec, key, vertex_slice, machine_time_step,
-            time_scale_factor, app_graph):
+    def _write_neuron_parameters(self, spec, key, vertex_slice):
 
         # If resetting, reset any state variables that need to be reset
         if (self.__has_reset_last and
@@ -468,103 +420,10 @@ class AbstractPopulationVertex(
         spec.switch_write_focus(
             region=constants.POPULATION_BASED_REGIONS.NEURON_PARAMS.value)
 
-        # Figure bits needed to figure out time between spikes.
-        # cores 0-4 have 2 atoms, core 5 has 1 atom
-        #############################################
-        #        0     1       2      3       4      5
-        # T2-[   X                    X
-        #    |         X                      X
-        #    |                 X                     X
-        #    [  X                     X
-        #       |------| T
-        #              X                      X
-        #                      X <- T3
-        # T = time_between_cores T2 = time_between_spikes
-        # T3 = end of TDMA (equiv of ((n_phases + 1) * T2))
-        # cutoff = 2. n_phases = 3 max_atoms = 2
-
-        # constants etc just to get into head
-        # clock cycles = 200 Mhz = 200 = sv->cpu_clk
-        # 1ms = 200000 for timer 1. = clock cycles
-        # 200 per microsecond
-        # machine time step = microseconds already.
-        # __time_between_cores = microseconds.
-
-        vertex_index = self.vertex_slices.index(vertex_slice)
-        n_cores = len(self.vertex_slices)
-        n_phases = self._find_max_atoms_on_core()
-        n_slots = int(math.ceil(n_cores / self.__pop_level_spike_control))
-
-        # figure T2
-        time_between_spikes = int(
-            math.ceil(self.__time_between_cores * n_slots))
-
-        # figure how much time this TDMA needs
-        total_time_needed = n_phases * time_between_spikes
-
-        total_time_available = int(math.ceil(
-            (machine_time_step * time_scale_factor) *
-            self.__fraction_of_sending))
-        if total_time_needed > total_time_available:
-            time_scale_factor_needed = (
-                math.ceil((total_time_needed / machine_time_step) /
-                          self.__fraction_of_sending))
-            msg = _VERTEX_TDMA_FAILURE_MSG.format(
-                 self.label, time_scale_factor_needed)
-            logger.error(msg)
-            raise SpynnakerException(msg)
-        else:
-            if total_time_needed != 0:
-                true_fraction = 1 / (
-                    (machine_time_step * time_scale_factor) /
-                    total_time_needed)
-                warn_once(
-                    logger,
-                    "could reduce fraction of time for sending to {}".format(
-                        true_fraction))
-
-        # figure initial offset (used to try to interleave packets from other
-        # populations into the TDMA without extending the overall time, and
-        # trying to stop multiple packets in flight at same time).
-
-        # Figure bits needed to figure out time between spikes.
-        # cores 0-4 have 2 atoms, core 5 has 1 atom
-        #############################################
-        #        0  .5   1   .5    2   .5   3    .5   4   .5   5  .5
-        # T2-[   X   Y                      X     Y
-        #    |           X   Y                        X    Y
-        #    |                     X    Y                      X   Y
-        #    [  X    Y                      X     Y
-        #       |-------| T
-        #               X    Y                        X    Y
-        #               |----| T4
-        #                   T3 ->  X    Y
-        # T4 is the spreader between populations. X is pop0 firing, Y is pop1
-        # firing
-        n_non_system_vertices = 0
-        pop_verts = list()
-        for vertex in app_graph.vertices:
-            if isinstance(vertex, AbstractPopulationVertex):
-                n_non_system_vertices += 1
-                pop_verts.append(vertex)
-        initial_offset = pop_verts.index(self) * int(
-            math.ceil(n_non_system_vertices / self.__time_between_cores))
-
-        # add the offset of a portion of the time step BEFORE doing any slots
-        # to allow initial processing to work.
-        initial_offset += int(math.ceil(
-            (machine_time_step * time_scale_factor) *
-            self.__fraction_of_waiting))
-
-        # Write the number of microseconds between sending spikes on average
-        # core slot
-        spec.write_value(vertex_index & n_slots)
-        # time between spikes
-        spec.write_value(data=time_between_spikes)
-        # time between cores
-        spec.write_value(data=self.__time_between_cores)
-        # initial offset
-        spec.write_value(data=initial_offset)
+        # store the tdma data here for this slice.
+        data = self.generate_tdma_data_specification_data(
+            self.vertex_slices.index(vertex_slice))
+        spec.write_array(data)
 
         # Write whether the key is to be used, and then the key, or 0 if it
         # isn't to be used
@@ -590,18 +449,11 @@ class AbstractPopulationVertex(
         spec.write_array(neuron_data)
 
     @inject_items({
-        "machine_time_step": "MachineTimeStep",
-        "time_scale_factor": "TimeScaleFactor",
-        "routing_info": "MemoryRoutingInfos",
-        "app_graph": "MemoryApplicationGraph"})
+        "time_scale_factor": "TimeScaleFactor"})
     @overrides(
         AbstractRewritesDataSpecification.regenerate_data_specification,
-        additional_arguments={
-            "machine_time_step", "time_scale_factor",
-            "routing_info", "app_graph"})
-    def regenerate_data_specification(
-            self, spec, placement, machine_time_step, time_scale_factor,
-            routing_info, app_graph):
+        additional_arguments={"routing_info"})
+    def regenerate_data_specification(self, spec, placement, routing_info):
         # pylint: disable=too-many-arguments, arguments-differ
         vertex_slice = placement.vertex.vertex_slice
 
@@ -612,10 +464,7 @@ class AbstractPopulationVertex(
         self._write_neuron_parameters(
             key=routing_info.get_first_key_from_pre_vertex(
                 placement.vertex, constants.SPIKE_PARTITION_ID),
-            machine_time_step=machine_time_step, spec=spec,
-            time_scale_factor=time_scale_factor,
-            vertex_slice=vertex_slice, app_graph=app_graph)
-
+            spec=spec, vertex_slice=vertex_slice)
         # close spec
         spec.end_specification()
 
@@ -642,7 +491,7 @@ class AbstractPopulationVertex(
         additional_arguments={
             "machine_time_step", "time_scale_factor",
             "application_graph", "machine_graph", "routing_info",
-            "data_n_time_steps", "n_key_map",
+            "data_n_time_steps", "n_key_map"
         })
     def generate_data_specification(
             self, spec, placement, machine_time_step, time_scale_factor,
@@ -656,6 +505,7 @@ class AbstractPopulationVertex(
         :param routing_info: (injected)
         :param data_n_time_steps: (injected)
         :param n_key_map: (injected)
+        :param tdma_data: (injected)
         """
         # pylint: disable=too-many-arguments, arguments-differ
         vertex = placement.vertex
@@ -688,9 +538,7 @@ class AbstractPopulationVertex(
             vertex_slice, data_n_time_steps)
 
         # Write the neuron parameters
-        self._write_neuron_parameters(
-            spec, key, vertex_slice, machine_time_step, time_scale_factor,
-            application_graph)
+        self._write_neuron_parameters(spec, key, vertex_slice)
 
         # write profile data
         profile_utils.write_profile_region_data(
@@ -899,12 +747,14 @@ class AbstractPopulationVertex(
         # shift past the extra stuff before neuron parameters that we don't
         # need to read
         neuron_parameters_sdram_address = (
-            neuron_region_sdram_address +
+            neuron_region_sdram_address + self.tdma_sdram_size_in_bytes +
             self._BYTES_TILL_START_OF_GLOBAL_PARAMETERS)
 
         # get size of neuron params
         size_of_region = self._get_sdram_usage_for_neuron_params(vertex_slice)
-        size_of_region -= self._BYTES_TILL_START_OF_GLOBAL_PARAMETERS
+        size_of_region -= (
+            self._BYTES_TILL_START_OF_GLOBAL_PARAMETERS +
+            self.tdma_sdram_size_in_bytes)
 
         # get data from the machine
         byte_array = transceiver.read_memory(
