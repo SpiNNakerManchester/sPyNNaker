@@ -460,7 +460,7 @@ class SynapticMatrices(object):
         return matrix.get_connections(transceiver, placement)
 
     def read_generated_connection_holders(self, transceiver, placement):
-        for matrix in iteritems(self.__matrices):
+        for matrix in itervalues(self.__matrices):
             matrix.read_generated_connection_holders(transceiver, placement)
 
     def clear_connection_cache(self):
