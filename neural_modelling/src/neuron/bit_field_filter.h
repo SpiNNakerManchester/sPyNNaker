@@ -72,7 +72,7 @@ static bool bit_field_filter_initialise(address_t bitfield_region_address) {
                 filter_region->filters[cur_bit_field].n_atoms);
 
         // locate the position in the array to match the master pop element.
-        int position;
+        uint32_t position;
         if (!population_table_position_in_the_master_pop_array(key, &position)) {
             log_error("Could not find key %u!", key);
             rt_error(RTE_SWERR);

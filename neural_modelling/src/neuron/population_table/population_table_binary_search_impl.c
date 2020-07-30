@@ -341,7 +341,7 @@ bool population_table_get_first_address(
     log_debug("searching for key %d", spike);
 
     // check we don't have a complete miss
-    int position;
+    uint32_t position;
     if (!population_table_position_in_the_master_pop_array(spike, &position)) {
         invalid_master_pop_hits++;
         log_debug("Ghost searches: %u\n", ghost_pop_table_searches);
