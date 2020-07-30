@@ -304,13 +304,13 @@ def get_n_bits(n_values):
 def float_gcd(a, b):
     """ Floating point gcd of two values
     """
-    if (a < b) :
+    if (a < b):
         return float_gcd(b, a)
 
     # base case
-    if (abs(b) < 0.001) :
+    if (abs(b) < 0.001):
         return a
-    else :
+    else:
         return (float_gcd(b, a - math.floor(a / b) * b))
 
 
@@ -330,4 +330,3 @@ def float_gcd_of_array(input):
         gcd = float_gcd(gcd, input[i])
 
     return gcd
-
