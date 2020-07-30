@@ -321,6 +321,9 @@ def float_gcd_of_array(input):
     :return: the floating point gcd of the array
     :rtype: float
     """
+    if len(input) == 1:
+        return input[0]
+
     gcd = float_gcd(input[0], input[1])
 
     for i in range(2, len(input)):
