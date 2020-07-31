@@ -20,8 +20,8 @@ from .delayed_machine_edge import DelayedMachineEdge
 
 class DelayedApplicationEdge(ApplicationEdge):
     __slots__ = [
-        "__synapse_information"
-        "__machine_edges_by_slices"
+        "__synapse_information",
+        "__machine_edges_by_slices",
         "__undelayed_edge"]
 
     def __init__(
@@ -55,6 +55,10 @@ class DelayedApplicationEdge(ApplicationEdge):
         """
         self.__synapse_information.append(synapse_information)
 
+    @property
+    def undelayed_edge(self):
+        return self.__undelayed_edge
+
     @overrides(ApplicationEdge._create_machine_edge)
     def _create_machine_edge(self, pre_vertex, post_vertex, label):
         edge = DelayedMachineEdge(
@@ -65,6 +69,7 @@ class DelayedApplicationEdge(ApplicationEdge):
             pre_vertex, post_vertex)
         if undelayed is not None:
             undelayed.delay_edge = edge
+            edge.undelayed_edge = undelayed
         return edge
 
     def _get_machine_edge(self, pre_vertex, post_vertex):

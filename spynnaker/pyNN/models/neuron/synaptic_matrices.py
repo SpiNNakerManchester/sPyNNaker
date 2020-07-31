@@ -18,11 +18,14 @@ import numpy
 from six import iteritems, itervalues
 from collections import defaultdict
 
+from spinn_utilities.ordered_set import OrderedSet
+
 from pacman.model.routing_info import BaseKeyAndMask
 
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
-from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
+from spynnaker.pyNN.models.neural_projections import (
+    ProjectionApplicationEdge, DelayedApplicationEdge)
 from spynnaker.pyNN.models.neuron.master_pop_table import (
     MasterPopTableAsBinarySearch)
 
@@ -281,14 +284,19 @@ class SynapticMatrices(object):
     def __in_edges_by_app_edge(self, in_machine_edges, routing_info):
         """ Get machine edges by application edge dictionary
         """
-        in_edges_by_app_edge = defaultdict(list)
+        in_edges_by_app_edge = defaultdict(OrderedSet)
         key_space_tracker = KeySpaceTracker()
         for edge in in_machine_edges:
             rinfo = routing_info.get_routing_info_for_edge(edge)
             key_space_tracker.allocate_keys(rinfo)
             app_edge = edge.app_edge
             if isinstance(app_edge, ProjectionApplicationEdge):
-                in_edges_by_app_edge[app_edge].append(edge)
+                in_edges_by_app_edge[app_edge].add(edge)
+            elif isinstance(app_edge, DelayedApplicationEdge):
+                # We need to make sure that if an undelayed edge is filtered
+                # but a delayed one is not, we still pick it up
+                in_edges_by_app_edge[app_edge.undelayed_edge].add(
+                    edge.undelayed_edge)
         return in_edges_by_app_edge, key_space_tracker
 
     @staticmethod
@@ -401,10 +409,10 @@ class SynapticMatrices(object):
             rinfo = routing_info.get_routing_info_for_edge(m_edge)
             vertex_slice = m_edge.pre_vertex.vertex_slice
             pre_slices.append(vertex_slice)
-            # No routing info at all? Odd but doesn't work...
+            # No routing info at all? Must have been filtered, so doesn't work
             if rinfo is None:
                 return None
-            # Mask is not the same as the last mask?  Doesn't work...
+            # Mask is not the same as the last mask?  Doesn't work
             if mask is not None and rinfo.first_mask != mask:
                 return None
             mask = rinfo.first_mask
@@ -438,10 +446,10 @@ class SynapticMatrices(object):
             rinfo = routing_info.get_routing_info_for_edge(m_edge.delay_edge)
             vertex_slice = m_edge.pre_vertex.vertex_slice
             pre_slices.append(vertex_slice)
-            # No routing info at all? Odd but doesn't work...
+            # No routing info at all? Must have been filtered, so doesn't work
             if rinfo is None:
                 return None
-            # Mask is not the same as the last mask?  Doesn't work...
+            # Mask is not the same as the last mask?  Doesn't work
             if mask is not None and rinfo.first_mask != mask:
                 return None
             mask = rinfo.first_mask
@@ -470,6 +478,10 @@ class SynapticMatrices(object):
     @property
     def gen_on_machine(self):
         return self.__gen_on_machine
+
+    def get_index(self, app_edge, synapse_info, machine_edge):
+        matrix = self.__app_matrix(app_edge, synapse_info)
+        return matrix.get_index(machine_edge)
 
 
 class _AppKeyInfo(object):

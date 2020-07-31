@@ -22,7 +22,8 @@ from spynnaker.pyNN.models.abstract_models import AbstractFilterableEdge
 
 class DelayedMachineEdge(MachineEdge, AbstractFilterableEdge):
     __slots__ = [
-        "__synapse_information"]
+        "__synapse_information",
+        "__undelayed_edge"]
 
     def __init__(
             self, synapse_information, pre_vertex, post_vertex, app_edge,
@@ -39,6 +40,15 @@ class DelayedMachineEdge(MachineEdge, AbstractFilterableEdge):
             pre_vertex, post_vertex, label=label, traffic_weight=weight,
             app_edge=app_edge)
         self.__synapse_information = synapse_information
+        self.__undelayed_edge = None
+
+    @property
+    def undelayed_edge(self):
+        return self.__undelayed_edge
+
+    @undelayed_edge.setter
+    def undelayed_edge(self, undelayed_edge):
+        self.__undelayed_edge = undelayed_edge
 
     @overrides(AbstractFilterableEdge.filter_edge)
     def filter_edge(self):

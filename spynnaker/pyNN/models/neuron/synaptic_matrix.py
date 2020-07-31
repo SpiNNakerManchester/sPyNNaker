@@ -1,3 +1,18 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import numpy
 
 from spinn_front_end_common.utilities import globals_variables
@@ -316,6 +331,10 @@ class SynapticMatrix(object):
                     next_addr, max_addr))
         return next_addr
 
+    @property
+    def index(self):
+        return self.__index
+
     def __update_synapse_index(self, index):
         """ Update the index of a synapse, checking it matches against indices\
             for other synapse_info for the same edge
@@ -336,7 +355,7 @@ class SynapticMatrix(object):
         connections = list()
 
         if self.__syn_mat_offset is not None:
-            if self.is_single:
+            if self.__is_single:
                 block = self.__get_single_block(
                     transceiver, placement, single_address)
             else:
@@ -345,7 +364,7 @@ class SynapticMatrix(object):
             connections.append(self.__synapse_io.read_some_synapses(
                 self.__synapse_info, pre_slice, post_slice,
                 self.__max_row_info.undelayed_max_words,
-                self.__n_synapse_types, self.__weight_scales[placement], block,
+                self.__n_synapse_types, self.__weight_scales, block,
                 machine_time_step, delayed=False))
 
         if self.__delay_syn_mat_offset is not None:
@@ -354,7 +373,7 @@ class SynapticMatrix(object):
             connections.append(self.__synapse_io.read_some_synapses(
                 self.__synapse_info, pre_slice, post_slice,
                 self.__max_row_info.delayed_max_words, self.__n_synapse_types,
-                self.__weight_scales[placement], block,
+                self.__weight_scales, block,
                 machine_time_step, delayed=True))
 
         return connections

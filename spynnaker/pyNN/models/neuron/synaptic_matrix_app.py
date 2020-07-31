@@ -1,3 +1,18 @@
+# Copyright (c) 2017-2019 The University of Manchester
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import math
 from six import itervalues
 
@@ -43,6 +58,7 @@ class SynapticMatrixApp(object):
         "__routing_info",
         "__weight_scales",
         "__m_edges",
+        "__use_app_keys",
         "__matrix_size",
         "__delay_matrix_size",
         "__syn_mat_offset",
@@ -82,6 +98,7 @@ class SynapticMatrixApp(object):
         self.__routing_info = None
         self.__weight_scales = None
         self.__m_edges = None
+        self.__use_app_keys = None
 
         self.__matrix_size = (
             self.__app_edge.pre_vertex.n_atoms *
@@ -211,12 +228,21 @@ class SynapticMatrixApp(object):
         self.__weight_scales = weight_scales
         self.__m_edges = m_edges
 
+        # If there are delay and undelayed parts to this vertex, to use app
+        # keys both parts must be able to use them to keep the indices
+        # straight; also enforce that the number of machine edges is > 1 as
+        # if there is only one, one-to-one connections might be possible, and
+        # if not, there is no difference anyway.
+        is_undelayed = bool(self.__max_row_info.undelayed_max_n_synapses)
+        is_delayed = bool(self.__max_row_info.delayed_max_n_synapses)
+        is_app_key = not is_undelayed or app_key_info is not None
+        is_delay_app_key = not is_delayed or delay_app_key_info is not None
+        self.__use_app_keys = (
+            is_app_key and is_delay_app_key and len(m_edges) > 1)
+
     def write_matrix(self, spec, block_addr, single_addr, single_synapses):
         """ Write a synaptic matrix from host
         """
-        # Write the synaptic matrix for an incoming application vertex
-        is_undelayed = bool(self.__max_row_info.undelayed_max_n_synapses)
-        is_delayed = bool(self.__max_row_info.delayed_max_n_synapses)
         undelayed_matrix_data = list()
         delayed_matrix_data = list()
         for m_edge in self.__m_edges:
@@ -226,34 +252,22 @@ class SynapticMatrixApp(object):
             row_data, delay_row_data = matrix.get_row_data()
             self.__update_connection_holders(row_data, delay_row_data, m_edge)
 
-            # If there is a single edge here, we allow the one-to-one direct
-            # matrix to be used by using write_machine_matrix; it will make
-            # no difference if this isn't actually a direct edge since there
-            # is only one anyway...
-            if self.__app_key_info is None or len(self.__m_edges) == 1:
-                block_addr, single_addr = matrix.write_machine_matrix(
-                    spec, block_addr, single_synapses, single_addr, row_data)
-            elif is_undelayed:
+            if self.__use_app_keys:
                 # If there is an app_key, save the data to be written later
-                # Note: row_data will not be blank here since we told it to
-                # generate a matrix of a given size
                 undelayed_matrix_data.append((m_edge, row_data))
-
-            if self.__delay_app_key_info is None:
+                delayed_matrix_data.append((m_edge, delay_row_data))
+            else:
+                # If no app keys, write the data as normal
+                block_addr, single_addr = matrix.write_machine_matrix(
+                    spec, block_addr, single_synapses, single_addr,
+                    row_data)
                 block_addr = matrix.write_delayed_machine_matrix(
                     spec, block_addr, delay_row_data)
-            elif is_delayed:
-                # If there is a delay_app_key, save the data for delays
-                # Note delayed_row_data will not be blank as above.
-                delayed_matrix_data.append((m_edge, delay_row_data))
 
-        # If there is an app key, add a single matrix and entry
-        # to the population table but also put in padding
-        # between tables when necessary
-        if self.__app_key_info is not None and len(self.__m_edges) > 1:
+        # If there is an app key, add a single matrix
+        if self.__use_app_keys:
             block_addr = self.__write_app_matrix(
                 spec, block_addr, undelayed_matrix_data)
-        if self.__delay_app_key_info is not None:
             block_addr = self.__write_delay_app_matrix(
                 spec, block_addr, delayed_matrix_data)
 
@@ -340,17 +354,14 @@ class SynapticMatrixApp(object):
         for m_edge in self.__m_edges:
             matrix = self.__get_matrix(m_edge)
 
-            if self.__app_key_info is not None:
+            if self.__use_app_keys:
                 syn_addr, syn_mat_offset = matrix.next_app_on_chip_address(
                     syn_addr, syn_max_addr)
-            else:
-                block_addr, syn_mat_offset = matrix.next_on_chip_address(
-                    block_addr)
-
-            if self.__delay_app_key_info is not None:
                 del_addr, d_mat_offset = matrix.next_app_delay_on_chip_address(
                     del_addr, del_max_addr)
             else:
+                block_addr, syn_mat_offset = matrix.next_on_chip_address(
+                    block_addr)
                 block_addr, d_mat_offset = matrix.next_delay_on_chip_address(
                     block_addr)
 
@@ -368,26 +379,31 @@ class SynapticMatrixApp(object):
         """ Reserve blocks for a whole-application-vertex matrix if possible,\
             and tell the master population table
         """
+        if not self.__use_app_keys:
+            return (block_addr, _SYN_REGION_UNUSED, _SYN_REGION_UNUSED, None,
+                    None)
+
         is_undelayed = bool(self.__max_row_info.undelayed_max_n_synapses)
         is_delayed = bool(self.__max_row_info.delayed_max_n_synapses)
 
         syn_block_addr = _SYN_REGION_UNUSED
         syn_max_addr = None
-        if is_undelayed and self.__app_key_info is not None:
+        if is_undelayed:
             syn_block_addr = block_addr
             block_addr = self.__reserve_mpop_block(block_addr)
             syn_max_addr = block_addr
-        elif self.__app_key_info is not None:
+        else:
             self.__add_invalid_entry(self.__app_key_info)
 
         delay_block_addr = _SYN_REGION_UNUSED
         delay_max_addr = None
-        if is_delayed and self.__delay_app_key_info is not None:
+        if is_delayed:
             delay_block_addr = block_addr
             block_addr = self.__reserve_delay_mpop_block(block_addr)
             delay_max_addr = block_addr
-        elif self.__delay_app_key_info is not None:
+        else:
             self.__add_invalid_entry(self.__delay_app_key_info)
+
         return (block_addr, syn_block_addr, delay_block_addr, syn_max_addr,
                 delay_max_addr)
 
@@ -469,16 +485,15 @@ class SynapticMatrixApp(object):
         single_address = (locate_memory_region_for_placement(
             placement, self.__direct_matrix_region, transceiver) +
             BYTES_PER_WORD)
+        if self.__use_app_keys:
+            return self.__read_connections(
+                transceiver, placement, synapses_address)
+
         connections = list()
-        if (self.__app_key_info is not None or
-                self.__delay_app_key_info is not None):
-            connections.extend(self.__read_connections(
-                transceiver, placement, synapses_address))
-        if self.__app_key_info is None or self.__delay_app_key_info is None:
-            for m_edge in self.__m_edges:
-                matrix = self.__get_matrix(m_edge)
-                connections.extend(matrix.read_connections(
-                    transceiver, placement, synapses_address, single_address))
+        for m_edge in self.__m_edges:
+            matrix = self.__get_matrix(m_edge)
+            connections.extend(matrix.read_connections(
+                transceiver, placement, synapses_address, single_address))
         return connections
 
     def clear_connection_cache(self):
@@ -489,13 +504,7 @@ class SynapticMatrixApp(object):
 
     def read_generated_connection_holders(self, transceiver, placement):
         if self.__synapse_info.pre_run_connection_holders:
-            synapses_address = locate_memory_region_for_placement(
-                placement, self.__synaptic_matrix_region, transceiver)
-            single_address = (locate_memory_region_for_placement(
-                placement, self.__direct_matrix_region, transceiver) +
-                BYTES_PER_WORD)
-            connections = self.get_connections(
-                transceiver, placement, synapses_address, single_address)
+            connections = self.get_connections(transceiver, placement)
             for holder in self.__synapse_info.pre_run_connection_holders:
                 holder.add_connections(connections)
 
@@ -540,3 +549,9 @@ class SynapticMatrixApp(object):
             placement.x, placement.y, address, self.__delay_matrix_size)
         self.__received_block = block
         return block
+
+    def get_index(self, machine_edge):
+        if self.__index is not None:
+            return self.__index
+        matrix = self.__get_matrix(machine_edge)
+        return matrix.index

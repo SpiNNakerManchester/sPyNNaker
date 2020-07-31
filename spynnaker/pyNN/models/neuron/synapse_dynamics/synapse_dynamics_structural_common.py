@@ -173,7 +173,7 @@ class SynapseDynamicsStructuralCommon(object):
     def write_parameters(
             self, spec, region, machine_time_step, weight_scales,
             application_graph, app_vertex, post_slice, routing_info,
-            synapse_indices):
+            synaptic_matrices):
         """ Write the synapse parameters to the spec.
 
         :param ~data_specification.DataSpecificationGenerator spec:
@@ -191,7 +191,7 @@ class SynapseDynamicsStructuralCommon(object):
             the slice of the app vertex corresponding to this machine vertex
         :param ~pacman.model.routing_info.RoutingInfo routing_info:
             All of the routing information on the network
-        :param dict(tuple(SynapseInformation,int),int) synapse_indices:
+        :param SynapticMatrices synaptic_matrices:
         """
         spec.comment("Writing structural plasticity parameters")
         spec.switch_write_focus(region)
@@ -208,7 +208,7 @@ class SynapseDynamicsStructuralCommon(object):
         # Write the pre-population info
         pop_index = self.__write_prepopulation_info(
             spec, app_vertex, structural_edges, routing_info, weight_scales,
-            post_slice, synapse_indices, machine_time_step)
+            post_slice, synaptic_matrices, machine_time_step)
 
         # Write the post-to-pre table
         self.__write_post_to_pre_table(spec, pop_index, app_vertex, post_slice)
@@ -302,7 +302,7 @@ class SynapseDynamicsStructuralCommon(object):
 
     def __write_prepopulation_info(
             self, spec, app_vertex, structural_edges,
-            routing_info, weight_scales, post_slice, synapse_indices,
+            routing_info, weight_scales, post_slice, synaptic_matrices,
             machine_time_step):
         """
         :param ~data_specification.DataSpecificationGenerator spec:
@@ -312,7 +312,7 @@ class SynapseDynamicsStructuralCommon(object):
         :param RoutingInfo routing_info:
         :param dict(AbstractSynapseType,float) weight_scales:
         :param ~pacman.model.graphs.common.Slice post_slice:
-        :param dict(tuple(SynapseInformation,int),int) synapse_indices:
+        :param SynapticMatrices synaptic_matrices:
         :param int machine_time_step:
         :rtype: dict(tuple(AbstractPopulationVertex,SynapseInformation),int)
         """
@@ -358,8 +358,8 @@ class SynapseDynamicsStructuralCommon(object):
                 spec.write_value(r_info.first_mask)
                 spec.write_value(vertex_slice.n_atoms)
                 spec.write_value(vertex_slice.lo_atom)
-                spec.write_value(
-                    synapse_indices[synapse_info, vertex_slice.lo_atom])
+                spec.write_value(synaptic_matrices.get_index(
+                    app_edge, synapse_info, machine_edge))
         return pop_index
 
     def __write_post_to_pre_table(

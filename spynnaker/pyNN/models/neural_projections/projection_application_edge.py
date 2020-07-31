@@ -109,6 +109,7 @@ class ProjectionApplicationEdge(ApplicationEdge, AbstractFilterableEdge):
                 pre_vertex, post_vertex)
             if delayed is not None:
                 edge.delay_edge = delayed
+                delayed.undelayed_edge = edge
         return edge
 
     def _get_machine_edge(self, pre_vertex, post_vertex):

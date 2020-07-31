@@ -635,7 +635,7 @@ class SynapticManager(object):
                     spec, self._struct_dynamics_region, machine_time_step,
                     self.__weight_scales, application_graph,
                     application_vertex, post_vertex_slice, routing_info,
-                    self.__synapse_indices)
+                    matrices)
 
         self._write_on_machine_data_spec(spec, post_vertex_slice, gen_data)
 
