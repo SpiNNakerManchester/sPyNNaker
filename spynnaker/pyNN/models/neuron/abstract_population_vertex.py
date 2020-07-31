@@ -15,11 +15,9 @@
 
 import logging
 import os
-import math
 
 from spinn_front_end_common.abstract_models.impl.requires_tdma import \
     RequiresTDMA
-from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
@@ -49,7 +47,7 @@ from spynnaker.pyNN.models.abstract_models import (
     AbstractPopulationInitializable, AbstractAcceptsIncomingSynapses,
     AbstractPopulationSettable, AbstractReadParametersBeforeSet,
     AbstractContainsUnits)
-from spynnaker.pyNN.exceptions import InvalidParameterType, SpynnakerException
+from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.utilities.ranged import (
     SpynnakerRangeDictionary, SpynnakerRangedList)
 from .synapse_dynamics import AbstractSynapseDynamicsStructural
