@@ -1052,10 +1052,11 @@ class SynapticManager(object):
                        for m in min_weights]
 
         self.__check_weights(
-            min_weights, application_graph, application_vertex)
+            min_weights, weight_scale, application_graph, application_vertex)
         return min_weights
 
-    def __check_weights(self, min_weights, app_graph, app_vertex):
+    def __check_weights(
+            self, min_weights, weight_scale, app_graph, app_vertex):
         """ Warn the user about weights that can't be represented properly
             where possible
         """
@@ -1067,19 +1068,22 @@ class SynapticManager(object):
                     min_weight = min_weights[synapse_type]
                     if numpy.isscalar(weights):
                         self.__check_weight(
-                            min_weight, weights, app_edge, synapse_info)
+                            min_weight, weights, weight_scale, app_edge,
+                            synapse_info)
                     elif hasattr(weights, "__getitem__"):
                         for w in weights:
                             self.__check_weight(
-                                min_weight, w, app_edge, synapse_info)
+                                min_weight, w, weight_scale, app_edge,
+                                synapse_info)
 
-    def __check_weight(self, min_weight, weight, app_edge, synapse_info):
+    def __check_weight(
+            self, min_weight, weight, weight_scale, app_edge, synapse_info):
         """ Warn the user about a weight that can't be represented properly
             where possible
         """
-        r_weight = weight / min_weight
-        r_weight = DataType.UINT16.closest_representable_value(
-            r_weight) * min_weight
+        r_weight = weight * weight_scale / min_weight
+        r_weight = (DataType.UINT16.closest_representable_value(
+            r_weight) * min_weight) / weight_scale
         if weight != r_weight:
             self.__weight_provenance[weight, r_weight].append(
                 (app_edge, synapse_info))
