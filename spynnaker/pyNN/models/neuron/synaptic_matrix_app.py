@@ -522,7 +522,7 @@ class SynapticMatrixApp(object):
                 machine_time_step, delayed=False))
 
         if self.__delay_syn_mat_offset is not None:
-            block = self.__get_delay_block(
+            block = self.__get_delayed_block(
                 transceiver, placement, synapses_address)
             connections.append(self.__synapse_io.read_some_synapses(
                 self.__synapse_info, pre_slice, self.__post_vertex_slice,
