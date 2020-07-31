@@ -31,7 +31,7 @@ from .synapse_dynamics import (
 from spynnaker.pyNN.models.neuron.synapse_io import SynapseIORowBased
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
-from spynnaker.pyNN.utilities.utility_calls import get_n_bits
+from spynnaker.pyNN.utilities.utility_calls import get_n_bits, float_gcd
 from spynnaker.pyNN.models.neuron.master_pop_table import (
     MasterPopTableAsBinarySearch)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
@@ -1029,6 +1029,8 @@ class SynapticManager(object):
                         min_delta = synapse_dynamics.get_weight_min_delta(
                             self.__max_stdp_spike_delta)
                         min_delta *= weight_scale
+                        # This also depends on the earlier calculated minimum
+                        min_delta = float_gcd(min_delta, weight_min)
                         if min_delta is not None and min_delta != 0:
                             min_weights[synapse_type] = min(
                                 min_weights[synapse_type], min_delta)
