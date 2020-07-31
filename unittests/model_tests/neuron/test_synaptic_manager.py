@@ -201,7 +201,8 @@ class TestSynapticManager(unittest.TestCase):
         app_edge.add_synapse_information(from_list_synapse_information)
         delay_app_vertex.n_delay_stages = n_delay_stages
         delay_edge = DelayedApplicationEdge(
-            delay_app_vertex, post_app_vertex, direct_synapse_information_1)
+            delay_app_vertex, post_app_vertex, direct_synapse_information_1,
+            app_edge)
         delay_edge.add_synapse_information(direct_synapse_information_2)
         delay_edge.add_synapse_information(all_to_all_synapse_information)
         delay_edge.add_synapse_information(from_list_synapse_information)
@@ -249,8 +250,7 @@ class TestSynapticManager(unittest.TestCase):
             spikes_per_second=100.0, config=config)
         synaptic_manager.write_data_spec(
             spec, post_app_vertex, post_vertex_slice, post_vertex,
-            post_vertex_placement, graph, app_graph, routing_info,
-            1.0, machine_time_step)
+            graph, app_graph, routing_info, 1.0, machine_time_step)
         spec.end_specification()
         spec_writer.close()
 
@@ -269,7 +269,7 @@ class TestSynapticManager(unittest.TestCase):
         report_folder = mkdtemp()
         try:
             connections_1 = synaptic_manager.get_connections_from_machine(
-                post_app_vertex, transceiver, placements, app_edge,
+                transceiver, placements, app_edge,
                 direct_synapse_information_1)
 
             # Check that all the connections have the right weight and delay
@@ -278,7 +278,7 @@ class TestSynapticManager(unittest.TestCase):
             assert all([conn["delay"] == 1.0 for conn in connections_1])
 
             connections_2 = synaptic_manager.get_connections_from_machine(
-                post_app_vertex, transceiver, placements, app_edge,
+                transceiver, placements, app_edge,
                 direct_synapse_information_2)
 
             # Check that all the connections have the right weight and delay
@@ -287,7 +287,7 @@ class TestSynapticManager(unittest.TestCase):
             assert all([conn["delay"] == 2.0 for conn in connections_2])
 
             connections_3 = synaptic_manager.get_connections_from_machine(
-                post_app_vertex, transceiver, placements, app_edge,
+                transceiver, placements, app_edge,
                 all_to_all_synapse_information)
 
             # Check that all the connections have the right weight and delay
@@ -297,7 +297,7 @@ class TestSynapticManager(unittest.TestCase):
             assert all([conn["delay"] == 4.0 for conn in connections_3])
 
             connections_4 = synaptic_manager.get_connections_from_machine(
-                post_app_vertex, transceiver, placements, app_edge,
+                transceiver, placements, app_edge,
                 from_list_synapse_information)
 
             # Check that all the connections have the right weight and delay
