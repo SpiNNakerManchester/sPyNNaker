@@ -152,8 +152,11 @@ class DistanceDependentFormation(AbstractFormation):
     @overrides(AbstractFormation.write_parameters)
     def write_parameters(self, spec):
         spec.write_array(self.__grid)
-        spec.write_array(DataType.S031.encode_as_numpy_int_array(
-            1 / self.__grid))
+        # Work out the reciprocal, but zero them if >= 1 as they are not
+        # representable as S031 in that case, and not used anyway
+        recip = 1 / self.__grid
+        recip[recip >= 1.0] = 0
+        spec.write_array(DataType.S031.encode_as_numpy_int_array(recip))
         spec.write_value(len(self.__ff_distance_probabilities))
         spec.write_value(len(self.__lat_distance_probabilities))
         spec.write_array(self.__ff_distance_probabilities.view("<u4"))
