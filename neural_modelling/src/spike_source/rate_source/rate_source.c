@@ -245,6 +245,13 @@ static void timer_callback(uint timer_count, uint unused) {
 
     uint32_t time_to_check;
 
+    //LP TMP for US replica
+    if(looping == 2 &&  time >= 18000) {
+
+        return;
+
+    }
+
     if(looping) {
 
         if(index >= n_rates) {

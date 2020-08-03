@@ -32,6 +32,7 @@
 #include <recording.h>
 #include <debug.h>
 #include <random.h>
+#include <round.h>
 
 #define V_RECORDING_INDEX 0
 #define GSYN_EXCITATORY_RECORDING_INDEX 1
@@ -461,7 +462,7 @@ static inline REAL neuron_impl_post_syn_urate(index_t neuron_index) {
 
     neuron_pointer_t neuron = &neuron_array[neuron_index];
 
-    REAL a = set_spike_source_rate(neuron, neuron->U_membrane * neuron->plasticity_rate_multiplier);
+    REAL a = set_spike_source_rate(neuron, MULT_ROUND_STOCHASTIC_ACCUM(neuron->U_membrane, neuron->plasticity_rate_multiplier));
 
     //io_printf(IO_BUF, "Rate(U) %k\n", a);
 
