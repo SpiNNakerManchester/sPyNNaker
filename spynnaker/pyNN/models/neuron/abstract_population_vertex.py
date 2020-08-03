@@ -446,8 +446,7 @@ class AbstractPopulationVertex(
             self._parameters, self._state_variables, vertex_slice)
         spec.write_array(neuron_data)
 
-    @inject_items({
-        "time_scale_factor": "TimeScaleFactor"})
+    @inject_items({"routing_info": "MemoryRoutingInfos"})
     @overrides(
         AbstractRewritesDataSpecification.regenerate_data_specification,
         additional_arguments={"routing_info"})
