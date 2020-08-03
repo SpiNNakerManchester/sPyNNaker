@@ -45,15 +45,14 @@ static inline index_t synapses_get_ring_buffer_index_combined(
 }
 
 // Converts a weight stored in a synapse row to an input
-// UNUSED!!!!!! CHECK convert_rate_to_input in synapses.c!!!
 static inline input_t synapses_convert_weight_to_input(
-        uint32_t weight, uint32_t left_shift) {
+        int32_t weight, uint32_t left_shift) {
     union {
-        uint32_t input_type;
+        int32_t input_type;
         s1615 output_type;
     } converter;
 
-    converter.input_type = (uint32_t) (weight) << left_shift;
+    converter.input_type = (int32_t) (weight) << left_shift;
 
     return converter.output_type;
 }

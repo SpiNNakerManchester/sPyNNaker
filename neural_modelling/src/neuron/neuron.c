@@ -366,7 +366,7 @@ void neuron_do_timestep_update( // EXPORTED
 //                }
 //                expected_time -= time_between_spikes;
 
-            io_printf(IO_BUF, "sending %k\n", neuron_impl_get_rate_diff(neuron_index));
+            //io_printf(IO_BUF, "sending %k\n", neuron_impl_get_rate_diff(neuron_index));
 
             if(use_key){
                 // Send the spike
@@ -380,7 +380,7 @@ void neuron_do_timestep_update( // EXPORTED
             log_debug("the neuron %d has been determined to not spike",
                     neuron_index);
         }
-            io_printf(IO_BUF, "Sent\n");
+            //io_printf(IO_BUF, "Sent\n");
     }
 
     // Disable interrupts to avoid possible concurrent access

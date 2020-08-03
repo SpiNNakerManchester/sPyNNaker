@@ -23,6 +23,7 @@
 #include <debug.h>
 #include <spin1_api.h>
 #include <utils.h>
+#include <round.h>
 
 //! if using profiler import profiler tags
 #ifdef PROFILER_ENABLED
@@ -204,7 +205,7 @@ static inline void process_fixed_synapses(
                             ring_buffer_to_input_left_shifts[combined_synapse_neuron_index >> synapse_index_bits]);
 
         // Add weight to current ring buffer value
-        REAL accumulation = ring_buffers[ring_buffer_index] + (convert_rate_to_input(rate_diff) * weight);
+        REAL accumulation = ring_buffers[ring_buffer_index] + MULT_ROUND_STOCHASTIC_ACCUM(convert_rate_to_input(rate_diff), weight);
 
         // Saturation check, MAYBE WE SHOULD CAP THE MAX INCOMING VALUES?
 //        s3231 sat_test = accumulation & 0x100000000;
@@ -215,7 +216,7 @@ static inline void process_fixed_synapses(
 
         ring_buffers[ring_buffer_index] = accumulation;
 
-        io_printf(IO_BUF, "added %k * %k = %k sh %k\n", weight, rate_diff, ring_buffers[ring_buffer_index], (rate_diff * weight));
+        //io_printf(IO_BUF, "added %k * %k = %k sh %k\n", weight, rate_diff, ring_buffers[ring_buffer_index], (rate_diff * weight));
     }
 }
 
@@ -310,7 +311,7 @@ bool synapses_initialise(
         ring_buffers[i] = starting_rate;
     }
 
-    io_printf(IO_BUF, "starting rate %k\n", starting_rate);
+    //io_printf(IO_BUF, "starting rate %k\n", starting_rate);
 
     synapse_type_index_bits = log_n_neurons + log_n_synapse_types;
     synapse_type_index_mask = (1 << synapse_type_index_bits) - 1;

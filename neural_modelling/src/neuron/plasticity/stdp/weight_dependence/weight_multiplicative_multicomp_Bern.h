@@ -81,7 +81,7 @@ static inline int32_t convert_real_to_int(REAL value) {
 
     converter.input_type = (value);
 
-    io_printf(IO_BUF, "weight conv %k returning %k\n", value, converter.output_type);
+    //io_printf(IO_BUF, "weight conv %k returning %k\n", value, converter.output_type);
 
     return converter.output_type;
 }
@@ -89,14 +89,14 @@ static inline int32_t convert_real_to_int(REAL value) {
 //---------------------------------------
 static inline weight_state_t weight_one_term_apply_update(weight_state_t state, REAL total_rate) {
 
-    io_printf(IO_BUF, "pre weight %k, learning rate %k\n", state.weight, state.weight_region->learning_rate);
+    //io_printf(IO_BUF, "pre weight %k, learning rate %k\n", state.weight, state.weight_region->learning_rate);
 
-    io_printf(IO_BUF, "learning rate * rate %k, shift %d\n", state.weight_region->learning_rate * total_rate, state.weight_shift);
+    //io_printf(IO_BUF, "learning rate * rate %k, shift %d\n", state.weight_region->learning_rate * total_rate, state.weight_shift);
 
     //DOUBLE CHECK YOU DON'T LOSE THE SIGN FOR NEGATIVE MULTS!!!
     state.weight = state.weight + ((convert_real_to_int(state.weight_region->learning_rate * total_rate)) >> state.weight_shift);
 
-    io_printf(IO_BUF, "weight updated %k\n", state.weight);
+    //io_printf(IO_BUF, "weight updated %k\n", state.weight);
 
     //MORE EFFICIENT WAY TO DO THIS?
     if(state.weight < state.weight_region->min_weight) {
@@ -108,7 +108,7 @@ static inline weight_state_t weight_one_term_apply_update(weight_state_t state, 
         state.weight = state.weight_region->max_weight;
     }
 
-    io_printf(IO_BUF, "max %k min %k\n", state.weight_region->max_weight, state.weight_region->min_weight);
+    //io_printf(IO_BUF, "max %k min %k\n", state.weight_region->max_weight, state.weight_region->min_weight);
 
     return state;
 }

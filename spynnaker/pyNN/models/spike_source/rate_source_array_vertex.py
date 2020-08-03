@@ -43,8 +43,8 @@ from .rate_source_array_machine_vertex import (
 
 logger = logging.getLogger(__name__)
 
-# bool has_key; uint32_t key; uint32_t elements; uint32_t timer_offset;
-PARAMS_BASE_WORDS = 4
+# bool has_key; uint32_t key; uint32_t elements; uint32_t timer_offset; uint32_t looping;
+PARAMS_BASE_WORDS = 5
 
 START_OF_RATE_GENERATOR_PARAMETERS = PARAMS_BASE_WORDS * 4
 
@@ -65,7 +65,7 @@ class RateSourceArrayVertex(ApplicationVertex, AbstractGeneratesDataSpecificatio
 
     def __init__(
             self, n_neurons, rate_times, rate_values, constraints, label,
-            max_atoms_per_core, model):
+            max_atoms_per_core, model, looping=0):
         # pylint: disable=too-many-arguments
         self.__model_name = "RateSourceArray"
         self.__model = model
@@ -80,6 +80,8 @@ class RateSourceArrayVertex(ApplicationVertex, AbstractGeneratesDataSpecificatio
 
         self.__n_subvertices = 0
         self.__n_data_specs = 0
+
+        self.__looping = looping
 
         super(RateSourceArrayVertex, self).__init__(
             label=label, constraints=constraints,
@@ -131,14 +133,12 @@ class RateSourceArrayVertex(ApplicationVertex, AbstractGeneratesDataSpecificatio
 
         return container
 
-    @staticmethod
-    def get_params_bytes(vertex_slice):
+    def get_params_bytes(self, vertex_slice):
         """ Gets the size of the poisson parameters in bytes
 
         :param vertex_slice:
         """
-        # TMP YOU CAN GENERATE MAX 50 RATES DURING THE SIMULATION
-        return (PARAMS_BASE_WORDS +(2 * 50)) * 4
+        return (PARAMS_BASE_WORDS + (2 * len(self.__rate_times))) * 4
 
     @property
     def n_atoms(self):
@@ -189,7 +189,7 @@ class RateSourceArrayVertex(ApplicationVertex, AbstractGeneratesDataSpecificatio
         spec.reserve_memory_region(
             region=_REGIONS.RATE_PARAMS_REGION.value,
             size=self.get_params_bytes(graph_mapper.get_slice(
-                placement.vertex)), label='PoissonParams')
+                placement.vertex)), label='RateParams')
 
     @staticmethod
     def _convert_ms_to_n_timesteps(value, machine_time_step):
@@ -254,6 +254,8 @@ class RateSourceArrayVertex(ApplicationVertex, AbstractGeneratesDataSpecificatio
             int(math.ceil(max_offset / self.__n_subvertices)) *
             self.__n_data_specs)
         self.__n_data_specs += 1
+
+        spec.write_value(data=1 if self.__looping else 0)
 
         j = 0
         for i in range(len(self.__rate_times)):

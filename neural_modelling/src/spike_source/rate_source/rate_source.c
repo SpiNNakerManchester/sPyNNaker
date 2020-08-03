@@ -75,7 +75,9 @@ typedef struct rate_value {
 }rate_value;
 
 struct config {
+
     global_parameters globals;
+    uint32_t loop;
     rate_value rates[];
 };
 
@@ -96,6 +98,12 @@ static uint32_t infinite_run;
 static uint32_t timer_period;
 
 static uint32_t index;
+
+static uint32_t looping;
+static uint32_t n_rates;
+
+static uint32_t iteration;
+static uint32_t expected;
 
 
 //! \brief method for reading the parameters stored in Poisson parameter region
@@ -124,7 +132,14 @@ static bool read_rate_parameters(struct config *config) {
         // store spike source data into DTCM
         spin1_memcpy(rates, config->rates,
                 params.elements * sizeof(rate_value));
+
+        looping = config->loop;
+        n_rates = params.elements;
     }
+
+    iteration = 0;
+    expected = 0;
+
     log_info("read_rate_parameters: completed successfully");
     return true;
 }
@@ -226,17 +241,57 @@ static void timer_callback(uint timer_count, uint unused) {
         return;
     }
 
-    io_printf(IO_BUF, "%d %d %d\n", rates[index].time, rates[index].rate, time);
+    //io_printf(IO_BUF, "%d %d %d\n", rates[index].time, rates[index].rate, time);
 
-    if(rates[index].time == time) {
+    uint32_t time_to_check;
 
-        while (!spin1_send_mc_packet(params.key, rates[index].rate, WITH_PAYLOAD)) {
+    if(looping) {
+
+        if(index >= n_rates) {
+
+            if(!iteration) {
+
+                expected = time;
+            }
+
+            index = 0;
+            iteration += expected;
+        }
+
+        time_to_check = rates[index].time + iteration;
+    }
+    else {
+
+        time_to_check = rates[index].time;
+    }
+
+    if(time_to_check == time) {
+
+        //URBANCZIK-SENN RESULTS, THIS IS TO HAVE A NON 0 INPUT AT EVERY TIMESTEP. REMOVE THE IF FOR NORMAL SIMS!
+        if((time_to_check == 0) && (rates[index].rate & 0x80000000)) {
+
+            while (!spin1_send_mc_packet(params.key, 0, WITH_PAYLOAD)) {
+            spin1_delay_us(1);
+            }
+        }
+        else {
+
+            while (!spin1_send_mc_packet(params.key, rates[index].rate, WITH_PAYLOAD)) {
+                spin1_delay_us(1);
+            }
+
+            //io_printf(IO_BUF, "%k t %d\n", rates[index].rate, time);
+        }
+
+        index++;
+    }
+    else {
+
+        while (!spin1_send_mc_packet(params.key, 0, WITH_PAYLOAD)) {
             spin1_delay_us(1);
         }
 
-        io_printf(IO_BUF, "Sent %d time %d\n", rates[index].rate, time);
-
-        index++;
+       //io_printf(IO_BUF, "%k t %d\n", 0, time);
     }
 
     profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);

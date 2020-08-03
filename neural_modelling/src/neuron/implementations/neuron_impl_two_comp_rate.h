@@ -168,7 +168,7 @@ static void neuron_impl_load_neuron_parameters(
         next += n_words_needed(n_neurons * sizeof(neuron_t));
     }
 
-    io_printf(IO_BUF, "copied neuron params\n");
+    //io_printf(IO_BUF, "copied neuron params\n");
 
     if (sizeof(input_type_t)) {
         log_debug("reading input type parameters");
@@ -211,9 +211,9 @@ static void neuron_impl_load_neuron_parameters(
     next += n_words_needed(rate_lut_size * sizeof(REAL));
 
 
-    io_printf(IO_BUF, "LUT vals:\n");
-    for(uint i = 0; i < 17; i++)
-        io_printf(IO_BUF, "%k\n", rate_lut[i]);
+    //io_printf(IO_BUF, "LUT vals:\n");
+    //for(uint i = 0; i < 17; i++)
+    //    io_printf(IO_BUF, "%k\n", rate_lut[i]);
 
 
 #if LOG_LEVEL >= LOG_DEBUG
@@ -236,25 +236,28 @@ static inline REAL set_spike_source_rate(neuron_pointer_t neuron, REAL somatic_v
 	REAL rate;
 
 	// Compute the rate function based on sigmoid approximation
-	if (somatic_voltage < 0.0k){
-		rate = 0.001k;
-	} else if (somatic_voltage > 2.0k) {
-		rate = 150.0k;
-	}
-	else {
-
-        // Compute the square and cube for the rate function (the values are shifted to stay on 32 bits)
-	    //REAL voltage_sq = ((somatic_voltage * somatic_voltage));
-	    //REAL voltage_cube = ((voltage_sq * somatic_voltage));
-
-	    //io_printf(IO_BUF, "sq %k, cub %k\n", voltage_sq, voltage_cube);
-
-	    //rate = ((cubic_term * voltage_cube)) +
-	    //       ((square_term * voltage_sq)) +
-	    //       ((linear_term * somatic_voltage)) +
-	    //       constant_term;
-	    rate = rate_lut[(uint32_t) (somatic_voltage << 4)];
-	}
+//	if (somatic_voltage < 0.0k){
+//		rate = 0.001k;
+//	} else if (somatic_voltage > 2.0k) {
+//		rate = 150.0k;
+//	}
+//	else {
+//
+//        // Compute the square and cube for the rate function (the values are shifted to stay on 32 bits)
+//	    //REAL voltage_sq = ((somatic_voltage * somatic_voltage));
+//	    //REAL voltage_cube = ((voltage_sq * somatic_voltage));
+//
+//	    //io_printf(IO_BUF, "sq %k, cub %k\n", voltage_sq, voltage_cube);
+//
+//	    //rate = ((cubic_term * voltage_cube)) +
+//	    //       ((square_term * voltage_sq)) +
+//	    //       ((linear_term * somatic_voltage)) +
+//	    //       constant_term;
+//	    rate = rate_lut[(uint32_t) (somatic_voltage << 4)];
+//	}
+//    } else {
+        rate = somatic_voltage > 0.0k ? somatic_voltage : 0.0k;
+//    }
 
 	return rate;
 }
@@ -264,7 +267,7 @@ static inline REAL set_spike_source_rate(neuron_pointer_t neuron, REAL somatic_v
 static bool neuron_impl_do_timestep_update(index_t neuron_index,
         input_t external_bias, state_t *recorded_variable_values) {
 
-    io_printf(IO_BUF, "neuron index %d\n", neuron_index);
+    //io_printf(IO_BUF, "neuron index %d\n", neuron_index);
     // Get the neuron itself
     neuron_pointer_t neuron = &neuron_array[neuron_index];
 
@@ -314,7 +317,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     external_bias += additional_input_get_input_value_as_current(
             additional_input, voltage);
 
-    io_printf(IO_BUF, "pre rate %k pre diff %k\n", neuron->rate_at_last_setting, neuron->rate_diff);
+    //io_printf(IO_BUF, "pre rate %k pre diff %k\n", neuron->rate_at_last_setting, neuron->rate_diff);
 
     // update neuron parameters
     state_t result = neuron_model_state_update(
@@ -332,7 +335,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
     REAL rate_diff = rate - neuron->rate_at_last_setting;
 
-    io_printf(IO_BUF, "curr rate %k, rate diff %k\n", rate, rate_diff);
+    //io_printf(IO_BUF, "curr rate %k, rate diff %k\n", rate, rate_diff);
 
     neuron->rate_diff = rate_diff;
 
@@ -340,7 +343,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
 	// Has rate changed by more than a predefined threshold since it was last
 	// used to update the mean isi ticks?
-	if ((rate_diff) > neuron->rate_update_threshold || (rate_diff) < -neuron->rate_update_threshold){
+	if ((rate_diff) >= neuron->rate_update_threshold || (rate_diff) <= -neuron->rate_update_threshold){
 		// then update the rate
 		neuron->rate_at_last_setting = rate;
 
@@ -351,9 +354,9 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     // Call functions to get the input values to be recorded
     recorded_variable_values[V_RECORDING_INDEX] = neuron->U_membrane;
     recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->V;
-    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->rate_at_last_setting;
+    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->U_membrane * neuron->plasticity_rate_multiplier;
 
-    io_printf(IO_BUF, "final rate %k\n", neuron->rate_at_last_setting);
+    //io_printf(IO_BUF, "final rate %k\n", neuron->rate_at_last_setting);
 
 #if LOG_LEVEL >= LOG_DEBUG
     neuron_model_print_state_variables(neuron);
@@ -428,7 +431,7 @@ uint inline neuron_impl_get_rate_diff(index_t neuron_index) {
 
     converter.input = neuron_array[neuron_index].rate_diff;
 
-    io_printf(IO_BUF, "returning %k conv %k\n", neuron_array[neuron_index].rate_diff, converter.output);
+    //io_printf(IO_BUF, "returning %k conv %k\n", neuron_array[neuron_index].rate_diff, converter.output);
 
     return converter.output;
 }
@@ -437,7 +440,7 @@ uint inline neuron_impl_get_rate_diff(index_t neuron_index) {
 //! \param[in] neuron_index: the index of the neuron
 uint32_t neuron_impl_get_starting_rate() {
 
-    io_printf(IO_BUF, "returning %k\n", neuron_array[0].rate_at_last_setting);
+    //io_printf(IO_BUF, "returning %k\n", neuron_array[0].rate_at_last_setting);
 
     return neuron_array[0].rate_at_last_setting;;
 }
@@ -448,7 +451,7 @@ static inline REAL neuron_impl_post_syn_vrate(index_t neuron_index) {
 
     REAL a =  set_spike_source_rate(neuron, neuron->V);
 
-    io_printf(IO_BUF, "Rate(V) %k\n", a);
+    //io_printf(IO_BUF, "Rate(V) %k\n", a);
 
     return a;
 
@@ -460,7 +463,7 @@ static inline REAL neuron_impl_post_syn_urate(index_t neuron_index) {
 
     REAL a = set_spike_source_rate(neuron, neuron->U_membrane * neuron->plasticity_rate_multiplier);
 
-    io_printf(IO_BUF, "Rate(vtgt) %k\n", a);
+    //io_printf(IO_BUF, "Rate(U) %k\n", a);
 
     return a;
 }

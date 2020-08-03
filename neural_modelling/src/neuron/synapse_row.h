@@ -44,6 +44,8 @@
 
 #include <common/neuron-typedefs.h>
 
+#define SYNAPSE_WEIGHTS_SIGNED
+
 //! how many bits the synapse weight will take
 #ifndef SYNAPSE_WEIGHT_BITS
 #define SYNAPSE_WEIGHT_BITS 16

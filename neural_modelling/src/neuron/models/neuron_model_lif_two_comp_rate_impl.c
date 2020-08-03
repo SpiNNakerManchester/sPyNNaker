@@ -40,19 +40,21 @@ state_t neuron_model_state_update(
     //  exc_input[1] - inh_input[1];
 
     // update dendrite
-    neuron->V = dendrite_input_this_timestep * neuron->tau_L;
+    neuron->V = dendrite_input_this_timestep;
 
     // Get the soma input in nA
     //Isyn (exc_input[0] contains g_E * E_E, while exc_input[2] is g_E)
+    // It's a sum to reflect the design Of US paper, E_I is negative, which means that this
+    // becomes a difference
     input_t soma_input_this_timestep =
-        exc_input[0] - inh_input[0] + neuron->I_offset;
+        exc_input[0] + inh_input[0] + neuron->I_offset;
 
-    io_printf(IO_BUF, "dend input %k, soma input %k\n", dendrite_input_this_timestep, soma_input_this_timestep);
+    //io_printf(IO_BUF, "dend input %k, soma input %k\n", dendrite_input_this_timestep, soma_input_this_timestep);
 
     neuron->U_membrane = (neuron->g_D * neuron->V + soma_input_this_timestep) /
                             (neuron->g_L + neuron->g_D + exc_input[2] + inh_input[2]);
 
-    io_printf(IO_BUF, "U %k, V %k\n", neuron->U_membrane, neuron->V);
+    //io_printf(IO_BUF, "U %k, V %k\n", neuron->U_membrane, neuron->V);
 
     return neuron->U_membrane;
 }

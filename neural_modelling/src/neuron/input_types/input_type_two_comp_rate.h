@@ -67,7 +67,8 @@ static inline void input_type_convert_excitatory_input_to_current(
 //    }
 
 	// Convert conductance based (teacher) input
-	exc_input[0] = exc_input[0] * input_type->Teach_rev_E;
+	// SHOULD WE SUBTRACT MEMBRANE_VOLTAGE??????????????????????????????????????
+	exc_input[0] = exc_input[0] * (input_type->Teach_rev_E);
 
 
 }
@@ -83,8 +84,8 @@ static inline void input_type_convert_inhibitory_input_to_current(
 
 
 	// Convert conductance based (teacher) input
-	// (this is positive because it vill be subtracted to exc when computing U)
-	inh_input[0] = inh_input[0] * input_type->Teach_rev_I;
+	// SHOULD WE SUBTRACT MEMBRANE_VOLTAGE??????????????????????????????????????
+	inh_input[0] = inh_input[0] * (input_type->Teach_rev_I);
 
 }
 

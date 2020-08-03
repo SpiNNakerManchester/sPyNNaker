@@ -23,12 +23,13 @@ class RateSourceArray(AbstractPyNNModel):
 
     default_population_parameters = {}
 
-    def __init__(self, rate_times=[], rate_values=[]):
+    def __init__(self, rate_times=[], rate_values=[], looping=0):
 
         if len(rate_times) != len(rate_values):
             raise Exception("Rate Source Array Error: Rate times and Rate Values must have the same length.")
         self.__rate_times = rate_times
         self.__rate_values = rate_values
+        self.__looping = looping
 
     @classmethod
     def set_model_max_atoms_per_core(cls, n_atoms=DEFAULT_MAX_ATOMS_PER_CORE):
@@ -46,7 +47,7 @@ class RateSourceArray(AbstractPyNNModel):
             self, n_neurons, label, constraints):
         max_atoms = self.get_max_atoms_per_core()
         return RateSourceArrayVertex(
-            n_neurons, self.__rate_times, self.__rate_values, constraints, label, max_atoms, self)
+            n_neurons, self.__rate_times, self.__rate_values, constraints, label, max_atoms, self, self.__looping)
 
     @property
     def _rate_times(self):
