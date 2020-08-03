@@ -169,7 +169,8 @@ class SynapticMatrixApp(object):
         :rtype: int
         """
         if self.__max_row_info.delayed_max_n_synapses > 0:
-            size = self.__n_subatoms * self.__max_row_info.delayed_max_bytes
+            size = (self.__n_subatoms * self.__max_row_info.delayed_max_bytes *
+                    self.__app_edge.n_delay_stages)
             for _ in range(self.__n_subedges):
                 addr = self.__poptable.get_next_allowed_address(addr)
                 addr += size
