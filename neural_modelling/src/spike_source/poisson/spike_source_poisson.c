@@ -33,6 +33,7 @@
 #include <bit_field.h>
 #include <stdfix-full-iso.h>
 #include <limits.h>
+#include <tdma_processing.h>
 
 #include "profile_tags.h"
 #include <profiler.h>
@@ -82,7 +83,8 @@ typedef enum region {
     RATES,                //!< rates to apply; source_info
     SPIKE_HISTORY_REGION, //!< spike history recording region
     PROVENANCE_REGION,    //!< provenance region
-    PROFILER_REGION       //!< profiling region
+    PROFILER_REGION,      //!< profiling region
+    TDMA_REGION,          //!< tdma processing region
 } region;
 
 //! The number of recording regions
@@ -428,6 +430,13 @@ static bool initialize(void) {
         return false;
     }
 
+    // set up tdma processing
+        // get tdma parameters
+    void *data_addr = data_specification_get_region(TDMA_REGION, ds_regions);
+    if (!tdma_processing_initialise(&data_addr)) {
+        return false;
+    }
+
     // print spike sources for debug purposes
 #if LOG_LEVEL >= LOG_DEBUG
     print_spike_sources();
@@ -505,33 +514,6 @@ static bool store_poisson_parameters(void) {
 
     log_info("store_parameters: completed successfully");
     return true;
-}
-
-//! \brief Spread Poisson spikes for even packet reception at destination
-//! \param[in] spike_key: the key to transmit
-//! \param[in] timer_count: Time to send spike at
-//! \param[in] num_spikes: the number of spikes to send
-static void send_spikes(
-        uint32_t spike_key, uint32_t num_spikes, uint32_t timer_count) {
-    // Wait until the expected time to send
-    while ((ticks == timer_count) && (tc[T1_COUNT] > expected_time)) {
-        // Do Nothing
-    }
-    expected_time -= ssp_params.time_between_spikes;
-
-    // Send the spike
-    log_debug("Sending spike packet %x at %d\n", spike_key, time);
-
-    // if multiple spikes, send as a payload. else send 1 spike
-    if (num_spikes > 1) {
-        while (!spin1_send_mc_packet(spike_key, num_spikes, WITH_PAYLOAD)) {
-            spin1_delay_us(1);
-        }
-    } else {
-        while (!spin1_send_mc_packet(spike_key, 0, NO_PAYLOAD)) {
-            spin1_delay_us(1);
-        }
-    }
 }
 
 //! \brief Expand the space for recording spikes.
@@ -639,7 +621,9 @@ static void process_fast_source(
             if (ssp_params.has_key) {
                 // Send spikes
                 const uint32_t spike_key = ssp_params.key | s_id;
-                send_spikes(spike_key, num_spikes, timer_count);
+                tdma_processing_send_packet(
+                    s_id, spike_key, num_spikes, WITH_PAYLOAD,
+                    timer_period, timer_count,  ssp_params.n_spike_sources);
             }
         }
     }
@@ -661,7 +645,9 @@ static void process_slow_source(
             // if no key has been given, do not send spike to fabric.
             if (ssp_params.has_key) {
                 // Send package
-                send_spikes(ssp_params.key | s_id, 1, timer_count);
+                tdma_processing_send_packet(
+                    s_id, ssp_params.key | s_id, 0, NO_PAYLOAD,
+                    timer_period, timer_count,  ssp_params.n_spike_sources);
             }
 
             // Update time to spike (note, this might not get us back above
@@ -722,10 +708,8 @@ static void timer_callback(uint timer_count, uint unused) {
         return;
     }
 
-    // Set the next expected time to wait for between spike sending
-    expected_time = sv->cpu_clk * timer_period;
-
     // Loop through spike sources
+    tdma_processing_reset_phase();
     for (index_t s_id = 0; s_id < ssp_params.n_spike_sources; s_id++) {
         // If this spike source is active this tick
         spike_source_t *spike_source = &source[s_id];

@@ -19,6 +19,8 @@ import numpy
 import scipy.stats
 import struct
 
+from spinn_front_end_common.abstract_models.impl.requires_tdma import \
+    RequiresTDMA
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from pacman.executor.injection_decorator import inject_items
@@ -118,7 +120,7 @@ class SpikeSourcePoissonVertex(
         AbstractProvidesOutgoingPartitionConstraints,
         AbstractChangableAfterRun, AbstractReadParametersBeforeSet,
         AbstractRewritesDataSpecification, SimplePopulationSettable,
-        ProvidesKeyToAtomMappingImpl):
+        ProvidesKeyToAtomMappingImpl, RequiresTDMA):
     """ A Poisson Spike source object
     """
     __slots__ = [
@@ -164,8 +166,9 @@ class SpikeSourcePoissonVertex(
         :param iterable of int duration:
         """
         # pylint: disable=too-many-arguments
-        super(SpikeSourcePoissonVertex, self).__init__(
-            label, constraints, max_atoms_per_core)
+        ApplicationVertex.__init__(
+            self, label, constraints, max_atoms_per_core)
+        RequiresTDMA.__init__(self)
 
         # atoms params
         self.__n_atoms = n_neurons
@@ -487,7 +490,7 @@ class SpikeSourcePoissonVertex(
         other = ConstantSDRAM(
             SYSTEM_BYTES_REQUIREMENT +
             SpikeSourcePoissonMachineVertex.get_provenance_data_size(0) +
-            poisson_params_sz +
+            poisson_params_sz + self.tdma_sdram_size_in_bytes() +
             recording_utilities.get_recording_header_size(1) +
             recording_utilities.get_recording_data_constant_size(1) +
             profile_utils.get_profile_region_size(self.__n_profile_samples))
@@ -570,6 +573,10 @@ class SpikeSourcePoissonVertex(
 
         profile_utils.reserve_profile_region(
             spec, _REGIONS.PROFILER_REGION.value, self.__n_profile_samples)
+
+        spec.reserve_memory_region(
+            region=_REGIONS.TDMA_REGION.value, label="tdma_region",
+            size=self.tdma_sdram_size_in_bytes())
 
         placement.vertex.reserve_provenance_data_region(spec)
 
@@ -1027,6 +1034,11 @@ class SpikeSourcePoissonVertex(
         profile_utils.write_profile_region_data(
             spec, _REGIONS.PROFILER_REGION.value,
             self.__n_profile_samples)
+
+        # write tdma params
+        spec.switch_write_focus(_REGIONS.TDMA_REGION.value)
+        spec.write_array(self.generate_tdma_data_specification_data(
+            self.vertex_slices.index(vertex_slice)))
 
         # End-of-Spec:
         spec.end_specification()

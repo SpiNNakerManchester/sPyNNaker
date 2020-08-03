@@ -50,6 +50,7 @@ class SpikeSourcePoissonMachineVertex(
         SPIKE_HISTORY_REGION = 3
         PROVENANCE_REGION = 4
         PROFILER_REGION = 5
+        TDMA_REGION = 6
 
     PROFILE_TAG_LABELS = {
         0: "TIMER",
