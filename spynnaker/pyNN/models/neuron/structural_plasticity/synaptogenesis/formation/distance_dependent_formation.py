@@ -19,8 +19,9 @@ from .abstract_formation import AbstractFormation
 from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
-# Number of words in the parameter struct excluding VLAs
-_WORDS_IN_STRUCT = 6
+# 6 32-bit words (grid_x, grid_y, grid_x_recip, grid_y_recep, ff_prob_size,
+#                 lat_prob_size)
+_PARAMS_SIZE_IN_BYTES = 6 * BYTES_PER_WORD
 
 
 class DistanceDependentFormation(AbstractFormation):
@@ -75,7 +76,7 @@ class DistanceDependentFormation(AbstractFormation):
 
     @overrides(AbstractFormation.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(self):
-        return (BYTES_PER_WORD * _WORDS_IN_STRUCT +
+        return (_PARAMS_SIZE_IN_BYTES +
                 len(self.__ff_distance_probabilities) * 2 +
                 len(self.__lat_distance_probabilities) * 2)
 
