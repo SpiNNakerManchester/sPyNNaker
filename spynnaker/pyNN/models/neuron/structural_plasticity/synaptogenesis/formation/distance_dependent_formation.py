@@ -16,6 +16,7 @@
 import numpy
 from spinn_utilities.overrides import overrides
 from .abstract_formation import AbstractFormation
+from data_specification.enums.data_type import DataType
 
 
 class DistanceDependentFormation(AbstractFormation):
@@ -146,6 +147,8 @@ class DistanceDependentFormation(AbstractFormation):
     @overrides(AbstractFormation.write_parameters)
     def write_parameters(self, spec):
         spec.write_array(self.__grid)
+        spec.write_array(DataType.S031.encode_as_numpy_int_array(
+            1 / self._grid))
         spec.write_value(len(self.__ff_distance_probabilities))
         spec.write_value(len(self.__lat_distance_probabilities))
         spec.write_array(self.__ff_distance_probabilities.view("<u4"))
