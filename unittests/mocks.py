@@ -94,7 +94,7 @@ class MockSimulator(object):
              "ring_buffer_sigma": "5",
              "one_to_one_connection_dtcm_max_bytes": "0",
              "drop_late_spikes": True,
-             "pop_spike_quantity": 10,
+             "app_machine_quantity": 10,
              "time_between_cores": 1.2,
              "fraction_of_time_spike_sending": 0.5,
              "fraction_of_time_before_sending": 0.01
