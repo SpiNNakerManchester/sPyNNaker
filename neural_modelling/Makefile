@@ -57,5 +57,6 @@ endif
 
 doxygen: $(TAGFILES)
 	$(DOXYGEN)
+doxysetup: $(TAGFILES)
 
-.PHONY: all clean doxygen
+.PHONY: all clean doxygen doxysetup
