@@ -148,7 +148,7 @@ class DistanceDependentFormation(AbstractFormation):
     def write_parameters(self, spec):
         spec.write_array(self.__grid)
         spec.write_array(DataType.S031.encode_as_numpy_int_array(
-            1 / self._grid))
+            1 / self.__grid))
         spec.write_value(len(self.__ff_distance_probabilities))
         spec.write_value(len(self.__lat_distance_probabilities))
         spec.write_array(self.__ff_distance_probabilities.view("<u4"))
