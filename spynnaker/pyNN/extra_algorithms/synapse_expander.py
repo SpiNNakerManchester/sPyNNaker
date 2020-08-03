@@ -66,10 +66,9 @@ def synapse_expander(
     expander_app_id = transceiver.app_id_tracker.get_new_id()
     run_system_application(
         expander_cores, expander_app_id, transceiver, provenance_file_path,
-        executable_finder, extract_iobuf, functools.partial(
-            _fill_in_connection_data, placements=placements,
-            expanded_pop_vertices=expanded_pop_vertices),
+        executable_finder, extract_iobuf, None,
         [CPUState.FINISHED], False, "synapse_expander_on_{}_{}_{}.txt")
+    _fill_in_connection_data(transceiver, expanded_pop_vertices, placements)
 
 
 def _plan_expansion(app_graph, placements, synapse_expander_bin,
@@ -105,7 +104,7 @@ def _plan_expansion(app_graph, placements, synapse_expander_bin,
 
 
 def _fill_in_connection_data(
-        expander_cores, transceiver, expanded_pop_vertices, placements):
+        transceiver, expanded_pop_vertices, placements):
     """ Once expander has run, fill in the connection data
 
     :rtype: None

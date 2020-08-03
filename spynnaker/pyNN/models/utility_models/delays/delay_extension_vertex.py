@@ -273,12 +273,8 @@ class DelayExtensionVertex(
                 incoming_key = r_info.first_key
                 incoming_mask = r_info.first_mask
 
-        n_outgoing_edges = len(
-            machine_graph.get_edges_starting_at_vertex(vertex))
         self.write_delay_parameters(
-            spec, vertex_slice, key, incoming_key, incoming_mask,
-            self.__n_subvertices, self.__machine_time_step,
-            self.__time_scale_factor, n_outgoing_edges)
+            spec, vertex_slice, key, incoming_key, incoming_mask)
 
         if vertex_slice in self.__delay_generator_data:
             generator_data = self.__delay_generator_data[vertex_slice]
@@ -315,9 +311,7 @@ class DelayExtensionVertex(
             time_scale_factor))
 
     def write_delay_parameters(
-            self, spec, vertex_slice, key, incoming_key, incoming_mask,
-            total_n_vertices, machine_time_step, time_scale_factor,
-            n_outgoing_edges):
+            self, spec, vertex_slice, key, incoming_key, incoming_mask):
         """ Generate Delay Parameter data
 
         :param ~data_specification.DataSpecificationGenerator spec:
@@ -325,10 +319,6 @@ class DelayExtensionVertex(
         :param int key:
         :param int incoming_key:
         :param int incoming_mask:
-        :param int total_n_vertices:
-        :param int machine_time_step:
-        :param int time_scale_factor:
-        :param int n_outgoing_edges:
         """
         # pylint: disable=too-many-arguments
 

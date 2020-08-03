@@ -490,7 +490,7 @@ class SpikeSourcePoissonVertex(
         other = ConstantSDRAM(
             SYSTEM_BYTES_REQUIREMENT +
             SpikeSourcePoissonMachineVertex.get_provenance_data_size(0) +
-            poisson_params_sz + self.tdma_sdram_size_in_bytes() +
+            poisson_params_sz + self.tdma_sdram_size_in_bytes +
             recording_utilities.get_recording_header_size(1) +
             recording_utilities.get_recording_data_constant_size(1) +
             profile_utils.get_profile_region_size(self.__n_profile_samples))
@@ -576,7 +576,7 @@ class SpikeSourcePoissonVertex(
 
         spec.reserve_memory_region(
             region=_REGIONS.TDMA_REGION.value, label="tdma_region",
-            size=self.tdma_sdram_size_in_bytes())
+            size=self.tdma_sdram_size_in_bytes)
 
         placement.vertex.reserve_provenance_data_region(spec)
 
