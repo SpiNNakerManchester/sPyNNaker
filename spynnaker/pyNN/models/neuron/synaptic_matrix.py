@@ -276,6 +276,7 @@ class SynapticMatrix(object):
 
         # Otherwise add a master population table entry for the incoming
         # machine vertex
+        block_addr = self.__poptable.get_next_allowed_address(block_addr)
         index = self.__poptable.update_master_population_table(
             block_addr, self.__max_row_info.undelayed_max_words,
             self.__routing_info.first_key_and_mask)
@@ -295,6 +296,7 @@ class SynapticMatrix(object):
 
         # Otherwise add a master population table entry for the incoming
         # machine vertex
+        block_addr = self.__poptable.get_next_allowed_address(block_addr)
         index = self.__poptable.update_master_population_table(
             block_addr, self.__max_row_info.delayed_max_words,
             self.__delay_routing_info.first_key_and_mask)

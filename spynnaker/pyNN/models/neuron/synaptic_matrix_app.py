@@ -411,8 +411,7 @@ class SynapticMatrixApp(object):
         """ Reserve a block in the master population table and check it hasn't\
             overrun the allocation
         """
-        block_addr = self.__poptable.get_next_allowed_address(
-            block_addr)
+        block_addr = self.__poptable.get_next_allowed_address(block_addr)
         index = self.__poptable.update_master_population_table(
             block_addr, self.__max_row_info.undelayed_max_words,
             self.__app_key_info.key_and_mask, self.__app_key_info.core_mask,
@@ -426,8 +425,7 @@ class SynapticMatrixApp(object):
         """ Reserve a block in the master population table and check it hasn't\
             overrun the allocation
         """
-        block_addr = self.__poptable.get_next_allowed_address(
-            block_addr)
+        block_addr = self.__poptable.get_next_allowed_address(block_addr)
         index = self.__poptable.update_master_population_table(
             block_addr, self.__max_row_info.delayed_max_words,
             self.__delay_app_key_info.key_and_mask,
