@@ -110,8 +110,8 @@ class SynapticMatrixApp(object):
             self.__app_edge.n_delay_stages *
             self.__max_row_info.delayed_max_bytes)
         vertex = self.__app_edge.pre_vertex
-        self.__n_subatoms = min(
-            vertex.get_max_atoms_per_core(), vertex.n_atoms)
+        self.__n_subatoms = int(min(
+            vertex.get_max_atoms_per_core(), vertex.n_atoms))
         self.__n_subedges = int(math.ceil(vertex.n_atoms / self.__n_subatoms))
 
         # These are computed during synaptic generation
