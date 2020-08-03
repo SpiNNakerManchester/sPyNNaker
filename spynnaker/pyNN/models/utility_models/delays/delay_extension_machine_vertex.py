@@ -150,6 +150,7 @@ class DelayExtensionMachineVertex(
             n_times_tdma_fell_behind, report=n_times_tdma_fell_behind > 0,
             message=(
                 "The TDMA fell behind by {} times. try increasing the "
-                "time_between_cores in the corrasponding .cfg")))
+                "time_between_cores in the corrasponding .cfg".format(
+                    n_times_tdma_fell_behind))))
 
         return provenance_items
