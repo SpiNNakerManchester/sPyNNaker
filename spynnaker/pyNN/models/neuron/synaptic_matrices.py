@@ -138,8 +138,9 @@ class SynapticMatrices(object):
         for in_edge in app_edges:
             if isinstance(in_edge, ProjectionApplicationEdge):
                 for synapse_info in in_edge.synapse_information:
-                    memory_size = self.__add_synapse_size(
-                        memory_size, synapse_info, in_edge)
+                    matrix = self.__app_matrix(in_edge, synapse_info)
+                    memory_size = matrix.add_matrix_size(memory_size)
+                    memory_size = matrix.add_delayed_matrix_size(memory_size)
         return memory_size
 
     def size(self, app_edges):
@@ -147,26 +148,10 @@ class SynapticMatrices(object):
 
         :rtype: int
         """
-
         return (
             self.synapses_size(app_edges) +
             self.__gen_info_size(app_edges) +
             self.__poptable.get_master_population_table_size(app_edges))
-
-    def __add_synapse_size(self, memory_size, synapse_info, app_edge):
-        """ Add the size of synapses for a given application edge
-
-        :param int memory_size:
-        :param SynapseInformation synapse_info:
-        :param ProjectionApplicationEdge app_edge:
-        :rtype: int
-        """
-        matrix = self.__app_matrix(app_edge, synapse_info)
-        memory_size = self.__poptable.get_next_allowed_address(memory_size)
-        memory_size += matrix.size
-        memory_size = self.__poptable.get_next_allowed_address(memory_size)
-        memory_size += matrix.delayed_size
-        return memory_size
 
     def __gen_info_size(self, app_edges):
         """ The size in bytes of the synaptic expander parameters

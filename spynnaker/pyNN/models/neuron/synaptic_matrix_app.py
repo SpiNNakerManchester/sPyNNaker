@@ -12,7 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+from __future__ import division
 import math
 from six import itervalues
 
@@ -61,6 +61,8 @@ class SynapticMatrixApp(object):
         "__use_app_keys",
         "__matrix_size",
         "__delay_matrix_size",
+        "__n_subatoms",
+        "__n_subedges",
         "__syn_mat_offset",
         "__delay_syn_mat_offset",
         "__index",
@@ -107,6 +109,10 @@ class SynapticMatrixApp(object):
             self.__app_edge.pre_vertex.n_atoms *
             self.__app_edge.n_delay_stages *
             self.__max_row_info.delayed_max_bytes)
+        vertex = self.__app_edge.pre_vertex
+        self.__n_subatoms = min(
+            vertex.get_max_atoms_per_core(), vertex.n_atoms)
+        self.__n_subedges = int(math.ceil(vertex.n_atoms / self.__n_subatoms))
 
         # These are computed during synaptic generation
         self.__syn_mat_offset = None
@@ -141,21 +147,33 @@ class SynapticMatrixApp(object):
         self.__matrices[machine_edge] = matrix
         return matrix
 
-    @property
-    def size(self):
-        """ The number of bytes required by the synaptic matrices
+    def add_matrix_size(self, addr):
+        """ Add the bytes required by the synaptic matrices
 
+        :param addr: The initial address
+        :return: The final address after adding synapses
         :rtype: int
         """
-        return self.__matrix_size
+        if self.__max_row_info.undelayed_max_n_synapses > 0:
+            size = self.__n_subatoms * self.__max_row_info.undelayed_max_bytes
+            for _ in range(self.__n_subedges):
+                addr = self.__poptable.get_next_allowed_address(addr)
+                addr += size
+        return addr
 
-    @property
-    def delayed_size(self):
-        """ The number of bytes required by the delayed synaptic matrices
+    def add_delayed_matrix_size(self, addr):
+        """ Add the bytes required by the delayed synaptic matrices
 
+        :param addr: The initial address
+        :return: The final address after adding synapses
         :rtype: int
         """
-        return self.__delay_matrix_size
+        if self.__max_row_info.delayed_max_n_synapses > 0:
+            size = self.__n_subatoms * self.__max_row_info.delayed_max_bytes
+            for _ in range(self.__n_subedges):
+                addr = self.__poptable.get_next_allowed_address(addr)
+                addr += size
+        return addr
 
     @property
     def generator_info_size(self):
@@ -163,13 +181,6 @@ class SynapticMatrixApp(object):
         """
         if not self.__synapse_info.may_generate_on_machine():
             return 0
-
-        # Get the number of likely machine vertices
-        max_atoms = self.__app_edge.pre_vertex.get_max_atoms_per_core()
-        if self.__app_edge.pre_vertex.n_atoms < max_atoms:
-            max_atoms = self.__app_edge.pre_vertex.n_atoms
-        n_edge_vertices = int(math.ceil(
-            float(self.__app_edge.pre_vertex.n_atoms) / float(max_atoms)))
 
         connector = self.__synapse_info.connector
         dynamics = self.__synapse_info.synapse_dynamics
@@ -182,7 +193,7 @@ class SynapticMatrixApp(object):
             connector.gen_connector_params_size_in_bytes,
             dynamics.gen_matrix_params_size_in_bytes
         ))
-        return gen_size * n_edge_vertices
+        return gen_size * self.__n_subedges
 
     def can_generate_on_machine(self, single_addr):
         """ Determine if an app edge can be generated on the machine
