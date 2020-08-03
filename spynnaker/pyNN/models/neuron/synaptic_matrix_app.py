@@ -454,10 +454,11 @@ class SynapticMatrixApp(object):
         self.__update_synapse_index(index)
 
     def __add_invalid_entry(self, key_info):
-        index = self.__poptable.add_invalid_entry(
-            key_info.key_and_mask, key_info.core_mask, key_info.core_shift,
-            key_info.n_neurons)
-        self.__update_synapse_index(index)
+        if key_info is not None:
+            index = self.__poptable.add_invalid_entry(
+                key_info.key_and_mask, key_info.core_mask, key_info.core_shift,
+                key_info.n_neurons)
+            self.__update_synapse_index(index)
 
     def __next_addr(self, block_addr, size):
         next_addr = block_addr + size
