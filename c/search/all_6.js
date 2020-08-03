@@ -22,7 +22,9 @@ var searchData=
   ['global_5fparameters_256',['global_parameters',['../spike__source__poisson_8c.html#structglobal__parameters',1,'global_parameters'],['../neuron__impl__standard_8h.html#a3080a592212f89a8d8dde67f13a58949',1,'global_parameters():&#160;neuron_impl_standard.h']]],
   ['global_5fparams_257',['global_params',['../neuron__model__izh__impl_8c.html#a60d02bd3fd0eb5694bf3d08679d4565d',1,'neuron_model_izh_impl.c']]],
   ['grid_5fx_258',['grid_x',['../formation__distance__dependent__impl_8h.html#a4cc7f4da55e2fba7b0f12d0b1856f90a',1,'formation_params']]],
-  ['grid_5fy_259',['grid_y',['../formation__distance__dependent__impl_8h.html#a1bb0a8d3a12b2bc16b2f00d7e6b54b4f',1,'formation_params']]],
-  ['gsyn_5fexc_5frecording_5findex_260',['GSYN_EXC_RECORDING_INDEX',['../neuron__impl__standard_8h.html#a68f96be069d7309d70ec3343afad2e03a1f4a97c6e4523af2fea20d3ca50dbd0e',1,'neuron_impl_standard.h']]],
-  ['gsyn_5finh_5frecording_5findex_261',['GSYN_INH_RECORDING_INDEX',['../neuron__impl__standard_8h.html#a68f96be069d7309d70ec3343afad2e03a0e4025cde485021d43ae9284bee78c6e',1,'neuron_impl_standard.h']]]
+  ['grid_5fx_5frecip_259',['grid_x_recip',['../formation__distance__dependent__impl_8h.html#a36308a64f1768104aa73dd155c05a87b',1,'formation_params']]],
+  ['grid_5fy_260',['grid_y',['../formation__distance__dependent__impl_8h.html#a1bb0a8d3a12b2bc16b2f00d7e6b54b4f',1,'formation_params']]],
+  ['grid_5fy_5frecip_261',['grid_y_recip',['../formation__distance__dependent__impl_8h.html#a5e8b9fd4addaadfef9a0604acf4ea8c7',1,'formation_params']]],
+  ['gsyn_5fexc_5frecording_5findex_262',['GSYN_EXC_RECORDING_INDEX',['../neuron__impl__standard_8h.html#a68f96be069d7309d70ec3343afad2e03a1f4a97c6e4523af2fea20d3ca50dbd0e',1,'neuron_impl_standard.h']]],
+  ['gsyn_5finh_5frecording_5findex_263',['GSYN_INH_RECORDING_INDEX',['../neuron__impl__standard_8h.html#a68f96be069d7309d70ec3343afad2e03a0e4025cde485021d43ae9284bee78c6e',1,'neuron_impl_standard.h']]]
 ];
