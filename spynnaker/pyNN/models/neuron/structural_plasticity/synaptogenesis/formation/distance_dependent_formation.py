@@ -17,6 +17,10 @@ import numpy
 from spinn_utilities.overrides import overrides
 from .abstract_formation import AbstractFormation
 from data_specification.enums.data_type import DataType
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+
+# Number of words in the parameter struct excluding VLAs
+_WORDS_IN_STRUCT = 6
 
 
 class DistanceDependentFormation(AbstractFormation):
@@ -71,7 +75,8 @@ class DistanceDependentFormation(AbstractFormation):
 
     @overrides(AbstractFormation.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(self):
-        return (4 + 4 + 4 + 4 + len(self.__ff_distance_probabilities) * 2 +
+        return (BYTES_PER_WORD * _WORDS_IN_STRUCT +
+                len(self.__ff_distance_probabilities) * 2 +
                 len(self.__lat_distance_probabilities) * 2)
 
     def generate_distance_probability_array(self, probability, sigma):
