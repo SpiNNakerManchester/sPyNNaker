@@ -196,4 +196,4 @@ class SynapseInformation(object):
         self.__pre_run_connection_holders.append(pre_run_connection_holder)
 
     def clear_pre_run_connection_holders(self):
-        self.__pre_run_connection_holders.clear()
+        del self.__pre_run_connection_holders[:]
