@@ -320,7 +320,7 @@ static inline void packet_reception_post_processing(void) {
 static void multicast_packet_received_callback(uint key, uint payload) {
 
     // handle the 2 cases separately
-    if(payload == 0) {
+    if (payload == 0) {
         log_debug(
             "Received spike %x at %d, DMA Busy = %d", key, time, dma_busy);
         packets_this_time_step += 1;
@@ -462,7 +462,8 @@ int spike_processing_clear_input_buffer(void) {
     }
 
     /*if (received_packet_this_step) {
-        log_info("last packet came in with this much time to go %d", time_left_when_last_packet_arrived);
+        log_info("last packet came in with this much time to go %d",
+                 time_left_when_last_packet_arrived);
     }
     else {
         log_info("didnt receive this time step");
