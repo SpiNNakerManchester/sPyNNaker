@@ -449,11 +449,14 @@ class SynapseIORowBased(object):
         :return: array with ``weight`` and ``delay`` columns
         :rtype: ~numpy.ndarray
         """
+        # If there is no data, return nothing
+        if data is None or not len(data):
+            return numpy.zeros(
+                0, dtype=AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE)
+
         # Translate the data into rows
-        row_data = None
-        if data is not None and len(data):
-            row_data = numpy.frombuffer(data, dtype="<u4").reshape(
-                -1, (max_row_length + _N_HEADER_WORDS))
+        row_data = numpy.frombuffer(data, dtype="<u4").reshape(
+            -1, (max_row_length + _N_HEADER_WORDS))
 
         dynamics = synapse_info.synapse_dynamics
         if isinstance(dynamics, AbstractStaticSynapseDynamics):
@@ -467,6 +470,7 @@ class SynapseIORowBased(object):
                 dynamics, pre_vertex_slice, post_vertex_slice, n_synapse_types,
                 row_data, delayed)
 
+        # There might still be no connections if the row was all padding
         if not connections.size:
             return numpy.zeros(
                 0, dtype=AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE)

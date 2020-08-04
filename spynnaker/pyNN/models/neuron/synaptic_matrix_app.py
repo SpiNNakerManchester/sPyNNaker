@@ -14,6 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from __future__ import division
 import math
+import numpy
 from six import itervalues
 
 from pacman.model.graphs.common.slice import Slice
@@ -516,6 +517,7 @@ class SynapticMatrixApp(object):
     def read_generated_connection_holders(self, transceiver, placement):
         if self.__synapse_info.pre_run_connection_holders:
             connections = self.get_connections(transceiver, placement)
+            connections = numpy.concatenate(connections)
             for holder in self.__synapse_info.pre_run_connection_holders:
                 holder.add_connections(connections)
 
@@ -529,7 +531,7 @@ class SynapticMatrixApp(object):
             connections.append(self.__synapse_io.read_some_synapses(
                 self.__synapse_info, pre_slice, self.__post_vertex_slice,
                 self.__max_row_info.undelayed_max_words,
-                self.__n_synapse_types, self.__weight_scales[placement], block,
+                self.__n_synapse_types, self.__weight_scales, block,
                 machine_time_step, delayed=False))
 
         if self.__delay_syn_mat_offset is not None:
@@ -538,7 +540,7 @@ class SynapticMatrixApp(object):
             connections.append(self.__synapse_io.read_some_synapses(
                 self.__synapse_info, pre_slice, self.__post_vertex_slice,
                 self.__max_row_info.delayed_max_words, self.__n_synapse_types,
-                self.__weight_scales[placement], block,
+                self.__weight_scales, block,
                 machine_time_step, delayed=True))
 
         return connections
@@ -558,7 +560,7 @@ class SynapticMatrixApp(object):
         address = self.__delay_syn_mat_offset + synapses_address
         block = transceiver.read_memory(
             placement.x, placement.y, address, self.__delay_matrix_size)
-        self.__received_block = block
+        self.__delay_received_block = block
         return block
 
     def get_index(self, machine_edge):

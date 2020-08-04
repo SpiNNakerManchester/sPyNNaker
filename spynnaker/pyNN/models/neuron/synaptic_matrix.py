@@ -399,7 +399,7 @@ class SynapticMatrix(object):
         address = self.__delay_syn_mat_offset + synapses_address
         block = transceiver.read_memory(
             placement.x, placement.y, address, self.__delay_matrix_size)
-        self.__received_block = block
+        self.__delay_received_block = block
         return block
 
     def __get_single_block(self, transceiver, placement, single_address):

@@ -85,7 +85,6 @@ class SynapticMatrices(object):
 
         # Set up the master population table
         self.__poptable = MasterPopTableAsBinarySearch()
-        self.__poptable.initialise_table()
 
         # Map of (app_edge, synapse_info) to SynapticMatrixApp
         self.__matrices = dict()
@@ -194,6 +193,7 @@ class SynapticMatrices(object):
 
         # Track writes inside the synaptic matrix region:
         block_addr = 0
+        self.__poptable.initialise_table()
 
         # Get the application projection edges incoming to this machine vertex
         in_machine_edges = machine_graph.get_edges_ending_at_vertex(
