@@ -24,11 +24,6 @@ from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
 
-from spynnaker.pyNN.models.neural_projections.connectors import (
-    AbstractGenerateConnectorOnMachine)
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractGenerateOnMachine, AbstractSynapseDynamicsStructural)
-
 from .synaptic_matrix import SynapticMatrix
 from .generator_data import GeneratorData
 
