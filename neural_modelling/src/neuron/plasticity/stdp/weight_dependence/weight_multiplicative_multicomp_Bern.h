@@ -24,6 +24,7 @@
 #include <neuron/synapse_row.h>
 
 #include <debug.h>
+#include <round.h>
 
 //---------------------------------------
 // Structures
@@ -93,7 +94,6 @@ static inline weight_state_t weight_one_term_apply_update(weight_state_t state, 
 
     //io_printf(IO_BUF, "learning rate * rate %k, shift %d\n", state.weight_region->learning_rate * total_rate, state.weight_shift);
 
-    //DOUBLE CHECK YOU DON'T LOSE THE SIGN FOR NEGATIVE MULTS!!!
     state.weight = state.weight + ((convert_real_to_int(state.weight_region->learning_rate * total_rate)) >> state.weight_shift);
 
     //io_printf(IO_BUF, "weight updated %k\n", state.weight);

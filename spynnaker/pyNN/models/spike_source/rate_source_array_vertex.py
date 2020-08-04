@@ -255,7 +255,7 @@ class RateSourceArrayVertex(ApplicationVertex, AbstractGeneratesDataSpecificatio
             self.__n_data_specs)
         self.__n_data_specs += 1
 
-        spec.write_value(data=1 if self.__looping else 0)
+        spec.write_value(data=self.__looping if self.__looping else 0)
 
         j = 0
         for i in range(len(self.__rate_times)):

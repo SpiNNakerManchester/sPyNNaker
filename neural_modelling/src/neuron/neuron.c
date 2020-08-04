@@ -358,6 +358,8 @@ void neuron_do_timestep_update( // EXPORTED
             synapse_dynamics_process_post_synaptic_event(neuron_index,
                neuron_impl_post_syn_urate(neuron_index), neuron_impl_post_syn_vrate(neuron_index));
 
+              //io_printf(IO_BUF, "ur %k, vr %k, t %d\n", neuron_impl_post_syn_urate(neuron_index), neuron_impl_post_syn_vrate(neuron_index), time);
+
 //            if (use_key) {
 //                // Wait until the expected time to send
 //                while ((ticks == timer_count) &&

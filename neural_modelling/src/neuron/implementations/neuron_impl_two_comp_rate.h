@@ -68,6 +68,9 @@ static global_neuron_params_pointer_t global_parameters;
 //! The synapse shaping parameters
 static synapse_param_t *neuron_synapse_shaping_params;
 
+//! Array indicating for each neuron if it received the teaching signal this timestep
+static uint8_t *teaching;
+
 //! Data structure for the output rate LUT
 static REAL *rate_lut;
 static uint32_t rate_lut_size;
@@ -131,6 +134,15 @@ static bool neuron_impl_initialise(uint32_t n_neurons) {
                     " - Out of DTCM");
             return false;
         }
+    }
+
+    // Allocate DTCM for the teaching array
+    teaching = spin1_malloc(n_neurons * sizeof(uint8_t));
+    if (teaching == NULL) {
+
+        log_error("Unable to teaching array"
+                    " - Out of DTCM");
+            return false;
     }
 
     return true;
@@ -320,6 +332,17 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
     //io_printf(IO_BUF, "pre rate %k pre diff %k\n", neuron->rate_at_last_setting, neuron->rate_diff);
 
+    //io_printf(IO_BUF, "ex %k, in %k\n", exc_input_values[2], inh_input_values[2]);
+
+    if (exc_input_values[2] == 0.0k && inh_input_values[2] == 0.0k) {
+
+        teaching[neuron_index] = 0;
+    }
+    else {
+
+        teaching[neuron_index] = 1;
+    }
+
     // update neuron parameters
     state_t result = neuron_model_state_update(
             NUM_EXCITATORY_RECEPTORS, exc_input_values,
@@ -462,11 +485,14 @@ static inline REAL neuron_impl_post_syn_urate(index_t neuron_index) {
 
     neuron_pointer_t neuron = &neuron_array[neuron_index];
 
-    REAL a = set_spike_source_rate(neuron, MULT_ROUND_STOCHASTIC_ACCUM(neuron->U_membrane, neuron->plasticity_rate_multiplier));
+    if (teaching[neuron_index] != 0) {
+
+        return set_spike_source_rate(neuron, neuron->U_membrane * neuron->plasticity_rate_multiplier);
+    }
+
+    return set_spike_source_rate(neuron, neuron->V);
 
     //io_printf(IO_BUF, "Rate(U) %k\n", a);
-
-    return a;
 }
 
 #if LOG_LEVEL >= LOG_DEBUG

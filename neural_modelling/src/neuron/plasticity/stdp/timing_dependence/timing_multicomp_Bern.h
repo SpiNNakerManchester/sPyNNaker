@@ -30,6 +30,8 @@ typedef int16_t pre_trace_t;
 // Include debug header for log_info etc
 #include <debug.h>
 
+#include <round.h>
+
 // Include generic plasticity maths functions
 #include <neuron/plasticity/stdp/maths.h>
 #include <neuron/plasticity/stdp/stdp_typedefs.h>
@@ -56,12 +58,12 @@ static inline update_state_t timing_apply_rate(update_state_t current_state, REA
     REAL post_rate = post_u - post_v;
 
     // LP tmp truncation to 2^-13
-    if(post_rate < 0 && post_rate >= -0.000122k)
-        post_rate = 0;
+    //if(post_rate < 0 && post_rate >= -0.000122k)
+    //    post_rate = 0;
 
     //io_printf(IO_BUF, "rate diff plast %k\n", post_rate);
 
-    post_rate *= pre_rate;
+    post_rate = post_rate * pre_rate;
 
     //io_printf(IO_BUF, " pre_rate %k rate product plast %k\n", pre_rate, post_rate);
 
