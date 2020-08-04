@@ -492,6 +492,9 @@ class SynapticMatrixApp(object):
                 "Index of " + self.__synapse_info + " has changed!")
 
     def get_connections(self, transceiver, placement):
+        # This might happen if the matrix is never actually generated
+        if self.__m_edges is None:
+            return []
         synapses_address = locate_memory_region_for_placement(
             placement, self.__synaptic_matrix_region, transceiver)
         single_address = (locate_memory_region_for_placement(
@@ -517,9 +520,10 @@ class SynapticMatrixApp(object):
     def read_generated_connection_holders(self, transceiver, placement):
         if self.__synapse_info.pre_run_connection_holders:
             connections = self.get_connections(transceiver, placement)
-            connections = numpy.concatenate(connections)
-            for holder in self.__synapse_info.pre_run_connection_holders:
-                holder.add_connections(connections)
+            if connections:
+                connections = numpy.concatenate(connections)
+                for holder in self.__synapse_info.pre_run_connection_holders:
+                    holder.add_connections(connections)
 
     def __read_connections(self, transceiver, placement, synapses_address):
         pre_slice = Slice(0, self.__app_edge.pre_vertex.n_atoms + 1)
