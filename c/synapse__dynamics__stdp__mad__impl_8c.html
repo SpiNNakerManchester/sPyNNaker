@@ -79,14 +79,14 @@ $(function() {
 
 <p>STDP core implementation.  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &lt;static-assert.h&gt;</code><br />
+<div class="textblock"><code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/static-assert_8h.html">static-assert.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="synapses_8h_source.html">neuron/synapses.h</a>&gt;</code><br />
 <code>#include &quot;<a class="el" href="maths_8h_source.html">maths.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="post__events_8h_source.html">post_events.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="weight_8h_source.html">weight_dependence/weight.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="timing_8h_source.html">timing_dependence/timing.h</a>&quot;</code><br />
-<code>#include &lt;debug.h&gt;</code><br />
-<code>#include &lt;utils.h&gt;</code><br />
+<code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/debug_8h.html">debug.h</a>&gt;</code><br />
+<code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/utils_8h.html">utils.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="synapse__dynamics_8h_source.html">neuron/plasticity/synapse_dynamics.h</a>&gt;</code><br />
 <code>#include &lt;stddef.h&gt;</code><br />
 </div><table class="memberdecls">
@@ -117,22 +117,22 @@ Functions</h2></td></tr>
 <tr class="memitem:aa195e42fb2e365fe51384e2ef8a95ec8"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="synapse__structure__weight__accumulator__impl_8h.html#a174a20aa9aac3b4c8ecda186d8db0083">final_state_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#aa195e42fb2e365fe51384e2ef8a95ec8">plasticity_update_synapse</a> (const uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, const uint32_t last_pre_time, const <a class="el" href="timing__recurrent__pre__stochastic__impl_8h.html#structpre__trace__t">pre_trace_t</a> last_pre_trace, const <a class="el" href="timing__recurrent__pre__stochastic__impl_8h.html#structpre__trace__t">pre_trace_t</a> new_pre_trace, const uint32_t delay_dendritic, const uint32_t delay_axonal, <a class="el" href="synapse__structure__weight__state__accumulator__window__impl_8h.html#structupdate__state__t">update_state_t</a> current_state, const <a class="el" href="post__events_8h.html#structpost__event__history__t">post_event_history_t</a> *<a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a9738c22cad44349036699b2383355540">post_event_history</a>)</td></tr>
 <tr class="memdesc:aa195e42fb2e365fe51384e2ef8a95ec8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Synapse update loop core.  <a href="synapse__dynamics__stdp__mad__impl_8c.html#aa195e42fb2e365fe51384e2ef8a95ec8">More...</a><br /></td></tr>
 <tr class="separator:aa195e42fb2e365fe51384e2ef8a95ec8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3b1ce651b5787830bfbd4ddd26e993f4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a3b1ce651b5787830bfbd4ddd26e993f4">synapse_dynamics_print_plastic_synapses</a> (address_t plastic_region_address, address_t fixed_region_address, uint32_t *ring_buffer_to_input_buffer_left_shifts)</td></tr>
+<tr class="memitem:a3b1ce651b5787830bfbd4ddd26e993f4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a3b1ce651b5787830bfbd4ddd26e993f4">synapse_dynamics_print_plastic_synapses</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> plastic_region_address, <a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> fixed_region_address, uint32_t *ring_buffer_to_input_buffer_left_shifts)</td></tr>
 <tr class="memdesc:a3b1ce651b5787830bfbd4ddd26e993f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print the synapse dynamics.  <a href="synapse__dynamics__stdp__mad__impl_8c.html#a3b1ce651b5787830bfbd4ddd26e993f4">More...</a><br /></td></tr>
 <tr class="separator:a3b1ce651b5787830bfbd4ddd26e993f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abade6b73a469c1ff0e54366f065343e5"><td class="memItemLeft" align="right" valign="top">static index_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#abade6b73a469c1ff0e54366f065343e5">sparse_axonal_delay</a> (uint32_t x)</td></tr>
+<tr class="memitem:abade6b73a469c1ff0e54366f065343e5"><td class="memItemLeft" align="right" valign="top">static <a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#aab1410d3f3644ff465752cab5b56e420">index_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#abade6b73a469c1ff0e54366f065343e5">sparse_axonal_delay</a> (uint32_t x)</td></tr>
 <tr class="memdesc:abade6b73a469c1ff0e54366f065343e5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the axonal delay.  <a href="synapse__dynamics__stdp__mad__impl_8c.html#abade6b73a469c1ff0e54366f065343e5">More...</a><br /></td></tr>
 <tr class="separator:abade6b73a469c1ff0e54366f065343e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4a1c98d660ba6a17d4678ae9ef2a5526"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a4a1c98d660ba6a17d4678ae9ef2a5526">synapse_dynamics_initialise</a> (address_t address, uint32_t <a class="el" href="synapses_8c.html#a7368643a28282d8b3429f0fb145aa5db">n_neurons</a>, uint32_t <a class="el" href="synapses_8c.html#adedb27b3ece4d4dece0aee776a136427">n_synapse_types</a>, uint32_t *ring_buffer_to_input_buffer_left_shifts)</td></tr>
+<tr class="memitem:a4a1c98d660ba6a17d4678ae9ef2a5526"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a4a1c98d660ba6a17d4678ae9ef2a5526">synapse_dynamics_initialise</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> address, uint32_t <a class="el" href="synapses_8c.html#a7368643a28282d8b3429f0fb145aa5db">n_neurons</a>, uint32_t <a class="el" href="synapses_8c.html#adedb27b3ece4d4dece0aee776a136427">n_synapse_types</a>, uint32_t *ring_buffer_to_input_buffer_left_shifts)</td></tr>
 <tr class="memdesc:a4a1c98d660ba6a17d4678ae9ef2a5526"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise the synapse dynamics.  <a href="synapse__dynamics__stdp__mad__impl_8c.html#a4a1c98d660ba6a17d4678ae9ef2a5526">More...</a><br /></td></tr>
 <tr class="separator:a4a1c98d660ba6a17d4678ae9ef2a5526"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab23d9244a75db91ab20874d4da0e5ef8"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#ab23d9244a75db91ab20874d4da0e5ef8">synapse_dynamics_process_plastic_synapses</a> (address_t plastic_region_address, address_t fixed_region_address, weight_t *<a class="el" href="synapses_8c.html#a9d013c2e9d5eddd8472bd57e9b21ff99">ring_buffers</a>, uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>)</td></tr>
+<tr class="memitem:ab23d9244a75db91ab20874d4da0e5ef8"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#ab23d9244a75db91ab20874d4da0e5ef8">synapse_dynamics_process_plastic_synapses</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> plastic_region_address, <a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> fixed_region_address, weight_t *<a class="el" href="synapses_8c.html#a9d013c2e9d5eddd8472bd57e9b21ff99">ring_buffers</a>, uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>)</td></tr>
 <tr class="memdesc:ab23d9244a75db91ab20874d4da0e5ef8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Processes the dynamics of the synapses.  <a href="synapse__dynamics__stdp__mad__impl_8c.html#ab23d9244a75db91ab20874d4da0e5ef8">More...</a><br /></td></tr>
 <tr class="separator:ab23d9244a75db91ab20874d4da0e5ef8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5087bc7e79f5dc3850f73239c5c463a3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a5087bc7e79f5dc3850f73239c5c463a3">synapse_dynamics_process_post_synaptic_event</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, index_t neuron_index)</td></tr>
+<tr class="memitem:a5087bc7e79f5dc3850f73239c5c463a3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a5087bc7e79f5dc3850f73239c5c463a3">synapse_dynamics_process_post_synaptic_event</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, <a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#aab1410d3f3644ff465752cab5b56e420">index_t</a> neuron_index)</td></tr>
 <tr class="memdesc:a5087bc7e79f5dc3850f73239c5c463a3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Informs the synapses that the neuron fired.  <a href="synapse__dynamics__stdp__mad__impl_8c.html#a5087bc7e79f5dc3850f73239c5c463a3">More...</a><br /></td></tr>
 <tr class="separator:a5087bc7e79f5dc3850f73239c5c463a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a06ce5830924c098a9668b25c9f09c7cc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a06ce5830924c098a9668b25c9f09c7cc">synapse_dynamics_get_intrinsic_bias</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, index_t neuron_index)</td></tr>
+<tr class="memitem:a06ce5830924c098a9668b25c9f09c7cc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="neuron-typedefs_8h.html#ac412098e688b864e8f4e2f3c0ed86591">input_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a06ce5830924c098a9668b25c9f09c7cc">synapse_dynamics_get_intrinsic_bias</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, <a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#aab1410d3f3644ff465752cab5b56e420">index_t</a> neuron_index)</td></tr>
 <tr class="memdesc:a06ce5830924c098a9668b25c9f09c7cc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the intrinsic bias of the synapses.  <a href="synapse__dynamics__stdp__mad__impl_8c.html#a06ce5830924c098a9668b25c9f09c7cc">More...</a><br /></td></tr>
 <tr class="separator:a06ce5830924c098a9668b25c9f09c7cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a24b755e1d96fcab4e950b83796376e75"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a24b755e1d96fcab4e950b83796376e75">synapse_dynamics_get_plastic_pre_synaptic_events</a> (void)</td></tr>
@@ -141,19 +141,19 @@ Functions</h2></td></tr>
 <tr class="memitem:a540b2206e6909e8e88c3a98a47ddcb2a"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a540b2206e6909e8e88c3a98a47ddcb2a">synapse_dynamics_get_plastic_saturation_count</a> (void)</td></tr>
 <tr class="memdesc:a540b2206e6909e8e88c3a98a47ddcb2a"><td class="mdescLeft">&#160;</td><td class="mdescRight">returns the number of ring buffer saturation events due to adding plastic weights.  <a href="synapse__dynamics__stdp__mad__impl_8c.html#a540b2206e6909e8e88c3a98a47ddcb2a">More...</a><br /></td></tr>
 <tr class="separator:a540b2206e6909e8e88c3a98a47ddcb2a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a523b611e80cd9f9e0880f825a6adbe9f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a523b611e80cd9f9e0880f825a6adbe9f">synapse_dynamics_find_neuron</a> (uint32_t id, address_t row, weight_t *weight, uint16_t *delay, uint32_t *offset, uint32_t *synapse_type)</td></tr>
+<tr class="memitem:a523b611e80cd9f9e0880f825a6adbe9f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a523b611e80cd9f9e0880f825a6adbe9f">synapse_dynamics_find_neuron</a> (uint32_t id, <a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> row, weight_t *weight, uint16_t *delay, uint32_t *<a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/normal_8c.html#a638ef372ed2ec556988b492934d0dcdd">offset</a>, uint32_t *synapse_type)</td></tr>
 <tr class="memdesc:a523b611e80cd9f9e0880f825a6adbe9f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Searches the synaptic row for the the connection with the specified post-synaptic ID.  <a href="synapse__dynamics__stdp__mad__impl_8c.html#a523b611e80cd9f9e0880f825a6adbe9f">More...</a><br /></td></tr>
 <tr class="separator:a523b611e80cd9f9e0880f825a6adbe9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abc297b864cdfaa0cd6e7115cd064baef"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#abc297b864cdfaa0cd6e7115cd064baef">synapse_dynamics_remove_neuron</a> (uint32_t offset, address_t row)</td></tr>
+<tr class="memitem:abc297b864cdfaa0cd6e7115cd064baef"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#abc297b864cdfaa0cd6e7115cd064baef">synapse_dynamics_remove_neuron</a> (uint32_t <a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/normal_8c.html#a638ef372ed2ec556988b492934d0dcdd">offset</a>, <a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> row)</td></tr>
 <tr class="memdesc:abc297b864cdfaa0cd6e7115cd064baef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Remove the entry at the specified offset in the synaptic row.  <a href="synapse__dynamics__stdp__mad__impl_8c.html#abc297b864cdfaa0cd6e7115cd064baef">More...</a><br /></td></tr>
 <tr class="separator:abc297b864cdfaa0cd6e7115cd064baef"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a06f2e2d805f0d8aa8b3ca7b687f24a24"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="synapse__row_8h.html#aeae1e8aa0c0095434ba488866ef21aa2">control_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a06f2e2d805f0d8aa8b3ca7b687f24a24">control_conversion</a> (uint32_t id, uint32_t delay, uint32_t type)</td></tr>
 <tr class="memdesc:a06f2e2d805f0d8aa8b3ca7b687f24a24"><td class="mdescLeft">&#160;</td><td class="mdescRight">packing all of the information into the required plastic control word  <a href="synapse__dynamics__stdp__mad__impl_8c.html#a06f2e2d805f0d8aa8b3ca7b687f24a24">More...</a><br /></td></tr>
 <tr class="separator:a06f2e2d805f0d8aa8b3ca7b687f24a24"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a30b01777aad5fef37adccffc7cbef483"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a30b01777aad5fef37adccffc7cbef483">synapse_dynamics_add_neuron</a> (uint32_t id, address_t row, weight_t weight, uint32_t delay, uint32_t type)</td></tr>
+<tr class="memitem:a30b01777aad5fef37adccffc7cbef483"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a30b01777aad5fef37adccffc7cbef483">synapse_dynamics_add_neuron</a> (uint32_t id, <a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> row, weight_t weight, uint32_t delay, uint32_t type)</td></tr>
 <tr class="memdesc:a30b01777aad5fef37adccffc7cbef483"><td class="mdescLeft">&#160;</td><td class="mdescRight">Add an entry in the synaptic row.  <a href="synapse__dynamics__stdp__mad__impl_8c.html#a30b01777aad5fef37adccffc7cbef483">More...</a><br /></td></tr>
 <tr class="separator:a30b01777aad5fef37adccffc7cbef483"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9bc6d64da323d9f5b06333efae6ff107"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a9bc6d64da323d9f5b06333efae6ff107">synapse_dynamics_n_connections_in_row</a> (address_t fixed)</td></tr>
+<tr class="memitem:a9bc6d64da323d9f5b06333efae6ff107"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__dynamics__stdp__mad__impl_8c.html#a9bc6d64da323d9f5b06333efae6ff107">synapse_dynamics_n_connections_in_row</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> fixed)</td></tr>
 <tr class="memdesc:a9bc6d64da323d9f5b06333efae6ff107"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the number of connections in the given row.  <a href="synapse__dynamics__stdp__mad__impl_8c.html#a9bc6d64da323d9f5b06333efae6ff107">More...</a><br /></td></tr>
 <tr class="separator:a9bc6d64da323d9f5b06333efae6ff107"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -425,13 +425,13 @@ The per-synapse information. </td></tr>
         <tr>
           <td class="memname">void synapse_dynamics_print_plastic_synapses </td>
           <td>(</td>
-          <td class="paramtype">address_t&#160;</td>
+          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td>
           <td class="paramname"><em>plastic_region_address</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">address_t&#160;</td>
+          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td>
           <td class="paramname"><em>fixed_region_address</em>, </td>
         </tr>
         <tr>
@@ -470,7 +470,7 @@ The per-synapse information. </td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static index_t sparse_axonal_delay </td>
+          <td class="memname">static <a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#aab1410d3f3644ff465752cab5b56e420">index_t</a> sparse_axonal_delay </td>
           <td>(</td>
           <td class="paramtype">uint32_t&#160;</td>
           <td class="paramname"><em>x</em></td><td>)</td>
@@ -504,7 +504,7 @@ The per-synapse information. </td></tr>
         <tr>
           <td class="memname">bool synapse_dynamics_initialise </td>
           <td>(</td>
-          <td class="paramtype">address_t&#160;</td>
+          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td>
           <td class="paramname"><em>address</em>, </td>
         </tr>
         <tr>
@@ -556,13 +556,13 @@ The per-synapse information. </td></tr>
         <tr>
           <td class="memname">bool synapse_dynamics_process_plastic_synapses </td>
           <td>(</td>
-          <td class="paramtype">address_t&#160;</td>
+          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td>
           <td class="paramname"><em>plastic_region_address</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">address_t&#160;</td>
+          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td>
           <td class="paramname"><em>fixed_region_address</em>, </td>
         </tr>
         <tr>
@@ -614,7 +614,7 @@ The per-synapse information. </td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">index_t&#160;</td>
+          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#aab1410d3f3644ff465752cab5b56e420">index_t</a>&#160;</td>
           <td class="paramname"><em>neuron_index</em>&#160;</td>
         </tr>
         <tr>
@@ -651,7 +651,7 @@ The per-synapse information. </td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">index_t&#160;</td>
+          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#aab1410d3f3644ff465752cab5b56e420">index_t</a>&#160;</td>
           <td class="paramname"><em>neuron_index</em>&#160;</td>
         </tr>
         <tr>
@@ -731,7 +731,7 @@ The per-synapse information. </td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">address_t&#160;</td>
+          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td>
           <td class="paramname"><em>row</em>, </td>
         </tr>
         <tr>
@@ -797,7 +797,7 @@ The per-synapse information. </td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">address_t&#160;</td>
+          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td>
           <td class="paramname"><em>row</em>&#160;</td>
         </tr>
         <tr>
@@ -888,7 +888,7 @@ The per-synapse information. </td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">address_t&#160;</td>
+          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td>
           <td class="paramname"><em>row</em>, </td>
         </tr>
         <tr>
@@ -941,7 +941,7 @@ The per-synapse information. </td></tr>
         <tr>
           <td class="memname">uint32_t synapse_dynamics_n_connections_in_row </td>
           <td>(</td>
-          <td class="paramtype">address_t&#160;</td>
+          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td>
           <td class="paramname"><em>fixed</em></td><td>)</td>
           <td></td>
         </tr>
@@ -965,7 +965,7 @@ The per-synapse information. </td></tr>
 <div class="ttc" id="asynapse__types__alpha__impl_8h_html_a6a9484756434bfd11111a5187ac8f4bb"><div class="ttname"><a href="synapse__types__alpha__impl_8h.html#a6a9484756434bfd11111a5187ac8f4bb">SYNAPSE_TYPE_BITS</a></div><div class="ttdeci">#define SYNAPSE_TYPE_BITS</div><div class="ttdoc">Number of bits to encode the synapse type.</div><div class="ttdef"><b>Definition:</b> synapse_types_alpha_impl.h:31</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Aug 3 2020 23:24:25 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Aug 4 2020 08:41:21 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.17
 </small></address>

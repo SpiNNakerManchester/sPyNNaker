@@ -79,17 +79,17 @@ $(function() {
 
 <p>Expands bitfields on SpiNNaker to reduce data transfer times.  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &lt;bit_field.h&gt;</code><br />
-<code>#include &lt;utils.h&gt;</code><br />
-<code>#include &lt;spin1_api.h&gt;</code><br />
-<code>#include &lt;data_specification.h&gt;</code><br />
-<code>#include &lt;debug.h&gt;</code><br />
+<div class="textblock"><code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html">bit_field.h</a>&gt;</code><br />
+<code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/utils_8h.html">utils.h</a>&gt;</code><br />
+<code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spin1__api_8h.html">spin1_api.h</a>&gt;</code><br />
+<code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/data__specification_8h.html">data_specification.h</a>&gt;</code><br />
+<code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/debug_8h.html">debug.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="population__table_8h_source.html">neuron/population_table/population_table.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="direct__synapses_8h_source.html">neuron/direct_synapses.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="synapse__row_8h_source.html">neuron/synapse_row.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="sp__structs_8h_source.html">neuron/structural_plasticity/synaptogenesis/sp_structs.h</a>&gt;</code><br />
-<code>#include &lt;filter_info.h&gt;</code><br />
-<code>#include &lt;key_atom_map.h&gt;</code><br />
+<code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/filter__info_8h.html">filter_info.h</a>&gt;</code><br />
+<code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/key__atom__map_8h.html">key_atom_map.h</a>&gt;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Data Structures</h2></td></tr>
@@ -141,7 +141,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bit_
 <tr class="memitem:a138926c3ded07524f2b617eb4ba8b96b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bit__field__expander_8c.html#a138926c3ded07524f2b617eb4ba8b96b">process_synaptic_row</a> (<a class="el" href="neuron-typedefs_8h.html#a883af5b0c4fbeeb762d784a8e162da64">synaptic_row_t</a> row)</td></tr>
 <tr class="memdesc:a138926c3ded07524f2b617eb4ba8b96b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check plastic and fixed elements to see if there is a target.  <a href="bit__field__expander_8c.html#a138926c3ded07524f2b617eb4ba8b96b">More...</a><br /></td></tr>
 <tr class="separator:a138926c3ded07524f2b617eb4ba8b96b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a21dbad8aad4a6f1e8ceaa3fa74e8a988"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bit__field__expander_8c.html#a21dbad8aad4a6f1e8ceaa3fa74e8a988">do_sdram_read_and_test</a> (address_t row_address, uint32_t n_bytes_to_transfer)</td></tr>
+<tr class="memitem:a21dbad8aad4a6f1e8ceaa3fa74e8a988"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bit__field__expander_8c.html#a21dbad8aad4a6f1e8ceaa3fa74e8a988">do_sdram_read_and_test</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> row_address, uint32_t n_bytes_to_transfer)</td></tr>
 <tr class="memdesc:a21dbad8aad4a6f1e8ceaa3fa74e8a988"><td class="mdescLeft">&#160;</td><td class="mdescRight">Do an SDRAM read to get synaptic row.  <a href="bit__field__expander_8c.html#a21dbad8aad4a6f1e8ceaa3fa74e8a988">More...</a><br /></td></tr>
 <tr class="separator:a21dbad8aad4a6f1e8ceaa3fa74e8a988"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adea012901ce452aebbfc9dd88abaa69a"><td class="memItemLeft" align="right" valign="top"><a id="adea012901ce452aebbfc9dd88abaa69a"></a>
@@ -163,26 +163,26 @@ int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bit__
 <tr class="memdesc:a9132a44b6d09c3f7ffd226f8e16f11a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Magic flag for if the region id is not setup. <br /></td></tr>
 <tr class="separator:a9132a44b6d09c3f7ffd226f8e16f11a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae5b6bc86a4a4b0a6873f106ef9082005"><td class="memItemLeft" align="right" valign="top"><a id="ae5b6bc86a4a4b0a6873f106ef9082005"></a>
-address_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bit__field__expander_8c.html#ae5b6bc86a4a4b0a6873f106ef9082005">master_pop_base_address</a></td></tr>
+<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bit__field__expander_8c.html#ae5b6bc86a4a4b0a6873f106ef9082005">master_pop_base_address</a></td></tr>
 <tr class="memdesc:ae5b6bc86a4a4b0a6873f106ef9082005"><td class="mdescLeft">&#160;</td><td class="mdescRight">Master population table base address. <br /></td></tr>
 <tr class="separator:ae5b6bc86a4a4b0a6873f106ef9082005"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa848568a69120df24c0430e5ee983c5c"><td class="memItemLeft" align="right" valign="top"><a id="aa848568a69120df24c0430e5ee983c5c"></a>
-address_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bit__field__expander_8c.html#aa848568a69120df24c0430e5ee983c5c">synaptic_matrix_base_address</a></td></tr>
+<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bit__field__expander_8c.html#aa848568a69120df24c0430e5ee983c5c">synaptic_matrix_base_address</a></td></tr>
 <tr class="memdesc:aa848568a69120df24c0430e5ee983c5c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Synaptic matrix base address. <br /></td></tr>
 <tr class="separator:aa848568a69120df24c0430e5ee983c5c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a445fa555a051ef68edc27fc90a89ec65"><td class="memItemLeft" align="right" valign="top"><a id="a445fa555a051ef68edc27fc90a89ec65"></a>
-filter_region_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bit__field__expander_8c.html#a445fa555a051ef68edc27fc90a89ec65">bit_field_base_address</a></td></tr>
+<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/filter__info_8h.html">filter_region_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bit__field__expander_8c.html#a445fa555a051ef68edc27fc90a89ec65">bit_field_base_address</a></td></tr>
 <tr class="memdesc:a445fa555a051ef68edc27fc90a89ec65"><td class="mdescLeft">&#160;</td><td class="mdescRight">Bitfield base address. <br /></td></tr>
 <tr class="separator:a445fa555a051ef68edc27fc90a89ec65"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa1da3d4b23e323da04f859a8d9eb6c69"><td class="memItemLeft" align="right" valign="top"><a id="aa1da3d4b23e323da04f859a8d9eb6c69"></a>
-address_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bit__field__expander_8c.html#aa1da3d4b23e323da04f859a8d9eb6c69">direct_matrix_region_base_address</a></td></tr>
+<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bit__field__expander_8c.html#aa1da3d4b23e323da04f859a8d9eb6c69">direct_matrix_region_base_address</a></td></tr>
 <tr class="memdesc:aa1da3d4b23e323da04f859a8d9eb6c69"><td class="mdescLeft">&#160;</td><td class="mdescRight">Direct matrix base address. <br /></td></tr>
 <tr class="separator:aa1da3d4b23e323da04f859a8d9eb6c69"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a37444ff66ef05a9fff67975a7b9a3427"><td class="memItemLeft" align="right" valign="top"><a id="a37444ff66ef05a9fff67975a7b9a3427"></a>
-address_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bit__field__expander_8c.html#a37444ff66ef05a9fff67975a7b9a3427">structural_matrix_region_base_address</a> = NULL</td></tr>
+<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bit__field__expander_8c.html#a37444ff66ef05a9fff67975a7b9a3427">structural_matrix_region_base_address</a> = <a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spinnaker_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a></td></tr>
 <tr class="memdesc:a37444ff66ef05a9fff67975a7b9a3427"><td class="mdescLeft">&#160;</td><td class="mdescRight">Structural matrix region base address. <br /></td></tr>
 <tr class="separator:a37444ff66ef05a9fff67975a7b9a3427"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7e8f73474622d82215423413dec84223"><td class="memItemLeft" align="right" valign="top">address_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bit__field__expander_8c.html#a7e8f73474622d82215423413dec84223">direct_synapses_address</a></td></tr>
+<tr class="memitem:a7e8f73474622d82215423413dec84223"><td class="memItemLeft" align="right" valign="top"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bit__field__expander_8c.html#a7e8f73474622d82215423413dec84223">direct_synapses_address</a></td></tr>
 <tr class="memdesc:a7e8f73474622d82215423413dec84223"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stores the DMA based master pop entries.  <a href="bit__field__expander_8c.html#a7e8f73474622d82215423413dec84223">More...</a><br /></td></tr>
 <tr class="separator:a7e8f73474622d82215423413dec84223"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af9b6824a750777e79471f086307d51b9"><td class="memItemLeft" align="right" valign="top"><a id="af9b6824a750777e79471f086307d51b9"></a>
@@ -190,7 +190,7 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 <tr class="memdesc:af9b6824a750777e79471f086307d51b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stores the max row size for DMA reads (used when extracting a synapse row from sdram. <br /></td></tr>
 <tr class="separator:af9b6824a750777e79471f086307d51b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ace2af7f42ceddbe32acd8a8e32c9aa4e"><td class="memItemLeft" align="right" valign="top"><a id="ace2af7f42ceddbe32acd8a8e32c9aa4e"></a>
-key_atom_data_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bit__field__expander_8c.html#ace2af7f42ceddbe32acd8a8e32c9aa4e">keys_to_max_atoms</a></td></tr>
+<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/key__atom__map_8h.html">key_atom_data_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bit__field__expander_8c.html#ace2af7f42ceddbe32acd8a8e32c9aa4e">keys_to_max_atoms</a></td></tr>
 <tr class="memdesc:ace2af7f42ceddbe32acd8a8e32c9aa4e"><td class="mdescLeft">&#160;</td><td class="mdescRight">The list of key to max atom maps. <br /></td></tr>
 <tr class="separator:ace2af7f42ceddbe32acd8a8e32c9aa4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a10c000a085edd682afcaf53023749648"><td class="memItemLeft" align="right" valign="top"><a id="a10c000a085edd682afcaf53023749648"></a>
@@ -201,7 +201,7 @@ uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bit__field__expander_8c.html#aecf3dda26a0c94057f7ff47a66de4e68">n_vertex_regions</a> = 0</td></tr>
 <tr class="memdesc:aecf3dda26a0c94057f7ff47a66de4e68"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of vertex regions to process. <br /></td></tr>
 <tr class="separator:aecf3dda26a0c94057f7ff47a66de4e68"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abab455406701d8b67a962835f9175899"><td class="memItemLeft" align="right" valign="top">bit_field_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bit__field__expander_8c.html#abab455406701d8b67a962835f9175899">fake_bit_fields</a></td></tr>
+<tr class="memitem:abab455406701d8b67a962835f9175899"><td class="memItemLeft" align="right" valign="top"><a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#a70e667669dab5c870f1f8f97d96b4abd">bit_field_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bit__field__expander_8c.html#abab455406701d8b67a962835f9175899">fake_bit_fields</a></td></tr>
 <tr class="memdesc:abab455406701d8b67a962835f9175899"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fake bitfield holder.  <a href="bit__field__expander_8c.html#abab455406701d8b67a962835f9175899">More...</a><br /></td></tr>
 <tr class="separator:abab455406701d8b67a962835f9175899"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaf22062ead0b27184e006d45487af894"><td class="memItemLeft" align="right" valign="top"><a id="aaf22062ead0b27184e006d45487af894"></a>
@@ -293,7 +293,7 @@ What region to find structural plasticity information in. </td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">static vcpu_t* vcpu </td>
+          <td class="memname">static vcpu_t* <a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html">vcpu</a> </td>
           <td>(</td>
           <td class="paramtype">void&#160;</td>
           <td class="paramname"></td><td>)</td>
@@ -436,7 +436,7 @@ What region to find structural plasticity information in. </td></tr>
         <tr>
           <td class="memname">static bool do_sdram_read_and_test </td>
           <td>(</td>
-          <td class="paramtype">address_t&#160;</td>
+          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td>
           <td class="paramname"><em>row_address</em>, </td>
         </tr>
         <tr>
@@ -499,7 +499,7 @@ What region to find structural plasticity information in. </td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">address_t direct_synapses_address</td>
+          <td class="memname"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> direct_synapses_address</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -516,7 +516,7 @@ What region to find structural plasticity information in. </td></tr>
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bit_field_t* fake_bit_fields</td>
+          <td class="memname"><a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#a70e667669dab5c870f1f8f97d96b4abd">bit_field_t</a>* fake_bit_fields</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -527,32 +527,47 @@ What region to find structural plasticity information in. </td></tr>
 </div>
 </div>
 </div><!-- contents -->
+<div class="ttc" id="asark_8h_html_abe2018e60bb35fb629cdbb057368a2f4"><div class="ttname"><a href="http://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html#abe2018e60bb35fb629cdbb057368a2f4">rt_error</a></div><div class="ttdeci">void rt_error(uint code,...)</div></div>
 <div class="ttc" id="acommon__mem_8h_html"><div class="ttname"><a href="common__mem_8h.html">common_mem.h</a></div><div class="ttdoc">Utility functions for working with memory.</div></div>
 <div class="ttc" id="aconnection__generator_8c_html_structconnection__generator"><div class="ttname"><a href="connection__generator_8c.html#structconnection__generator">connection_generator</a></div><div class="ttdoc">The data for a connection generator.</div><div class="ttdef"><b>Definition:</b> connection_generator.c:66</div></div>
 <div class="ttc" id="asynapse__expander_8c_html_ab2b96fb3f7cddc88c3b12263c25f0fc1"><div class="ttname"><a href="synapse__expander_8c.html#ab2b96fb3f7cddc88c3b12263c25f0fc1">run_synapse_expander</a></div><div class="ttdeci">static bool run_synapse_expander(address_t params_address, address_t synaptic_matrix_region)</div><div class="ttdoc">Read the data for the expander.</div><div class="ttdef"><b>Definition:</b> synapse_expander.c:159</div></div>
 <div class="ttc" id="acommon__mem_8h_html_a293d12ada8b9ace4a1b4b19aa49df3fe"><div class="ttname"><a href="common__mem_8h.html#a293d12ada8b9ace4a1b4b19aa49df3fe">fast_memcpy</a></div><div class="ttdeci">static void fast_memcpy(void *restrict to, const void *restrict from, size_t num_bytes)</div><div class="ttdoc">A small and fast version of memcpy().</div><div class="ttdef"><b>Definition:</b> common_mem.h:34</div></div>
 <div class="ttc" id="asynapse__expander_8c_html_aa14f4f1d4c84183b7bf7108bf930a23c"><div class="ttname"><a href="synapse__expander_8c.html#aa14f4f1d4c84183b7bf7108bf930a23c">c_main</a></div><div class="ttdeci">void c_main(void)</div><div class="ttdoc">Entry point.</div><div class="ttdef"><b>Definition:</b> synapse_expander.c:189</div></div>
 <div class="ttc" id="amatrix__generator_8c_html_a89c345a0d16ecd5e110347ddf2253d08"><div class="ttname"><a href="matrix__generator_8c.html#a89c345a0d16ecd5e110347ddf2253d08">matrix_generator_generate</a></div><div class="ttdeci">bool matrix_generator_generate(matrix_generator_t generator, address_t synaptic_matrix, address_t delayed_synaptic_matrix, uint32_t max_row_n_words, uint32_t max_delayed_row_n_words, uint32_t max_row_n_synapses, uint32_t max_delayed_row_n_synapses, uint32_t n_synapse_type_bits, uint32_t n_synapse_index_bits, uint32_t synapse_type, accum *weight_scales, uint32_t post_slice_start, uint32_t post_slice_count, uint32_t pre_slice_start, uint32_t pre_slice_count, connection_generator_t connection_generator, param_generator_t delay_generator, param_generator_t weight_generator, uint32_t max_stage, accum timestep_per_delay)</div><div class="ttdoc">Generate a matrix with a matrix generator.</div><div class="ttdef"><b>Definition:</b> matrix_generator.c:191</div></div>
+<div class="ttc" id="asark_8h_html_a3cf9347d757f8d978aa2d35927e21806a228d90e8251d61de8cf4fe5026008998"><div class="ttname"><a href="http://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html#a3cf9347d757f8d978aa2d35927e21806a228d90e8251d61de8cf4fe5026008998">RTE_ABORT</a></div><div class="ttdeci">RTE_ABORT</div></div>
 <div class="ttc" id="aconnection__generator_8c_html_ab9b132e35b3d39240d34e7f225193910"><div class="ttname"><a href="connection__generator_8c.html#ab9b132e35b3d39240d34e7f225193910">connection_generator_free</a></div><div class="ttdeci">void connection_generator_free(connection_generator_t generator)</div><div class="ttdoc">Finish with a connection generator.</div><div class="ttdef"><b>Definition:</b> connection_generator.c:142</div></div>
 <div class="ttc" id="aparam__generator_8c_html_a20b9f761fb073750e083d131cf49812e"><div class="ttname"><a href="param__generator_8c.html#a20b9f761fb073750e083d131cf49812e">param_generator_free</a></div><div class="ttdeci">void param_generator_free(param_generator_t generator)</div><div class="ttdoc">Finish with a parameter generator.</div><div class="ttdef"><b>Definition:</b> param_generator.c:149</div></div>
+<div class="ttc" id="aspin1__api_8h.html_html"><div class="ttname"><a href="http://spinnakermanchester.github.io/spinnaker_tools/spin1__api_8h.html">spin1_api.h</a></div></div>
+<div class="ttc" id="adata__specification_8h.html_html"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/data__specification_8h.html">data_specification.h</a></div></div>
 <div class="ttc" id="asynapse__expander_8c_html_a796837af1a5d205aa367196d5a7001bf"><div class="ttname"><a href="synapse__expander_8c.html#a796837af1a5d205aa367196d5a7001bf">read_connection_builder_region</a></div><div class="ttdeci">static bool read_connection_builder_region(address_t *in_region, address_t synaptic_matrix_region, uint32_t post_slice_start, uint32_t post_slice_count, uint32_t n_synapse_type_bits, uint32_t n_synapse_index_bits, accum *weight_scales)</div><div class="ttdoc">Generate the synapses for a single connector.</div><div class="ttdef"><b>Definition:</b> synapse_expander.c:80</div></div>
 <div class="ttc" id="aconnection__generator_8c_html_a1a3c815932172e25183bbd6c237d0974"><div class="ttname"><a href="connection__generator_8c.html#a1a3c815932172e25183bbd6c237d0974">connection_generator_init</a></div><div class="ttdeci">connection_generator_t connection_generator_init(uint32_t hash, address_t *in_region)</div><div class="ttdoc">Initialise a specific connection generator.</div><div class="ttdef"><b>Definition:</b> connection_generator.c:103</div></div>
 <div class="ttc" id="aspike__source__poisson_8c_html_a1b9edddb3735d131c67e9e824f07c402"><div class="ttname"><a href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a></div><div class="ttdeci">region</div><div class="ttdoc">spike source array region IDs in human readable form</div><div class="ttdef"><b>Definition:</b> spike_source_poisson.c:79</div></div>
 <div class="ttc" id="aconnection__generator_8h_html"><div class="ttname"><a href="connection__generator_8h.html">connection_generator.h</a></div><div class="ttdoc">Connection Generator interface.</div></div>
+<div class="ttc" id="aspin1__api_8h_html_a070d2ce7b6bb7e5c05602aa8c308d0c4"><div class="ttname"><a href="http://spinnakermanchester.github.io/spinnaker_tools/spin1__api_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a></div><div class="ttdeci">#define NULL</div></div>
+<div class="ttc" id="asark_8h_html_a8c3cb686bab55b58b206f7f13b7ecafa"><div class="ttname"><a href="http://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html#a8c3cb686bab55b58b206f7f13b7ecafa">sark_cpu_state</a></div><div class="ttdeci">void sark_cpu_state(cpu_state state)</div></div>
 <div class="ttc" id="amatrix__generator_8h_html"><div class="ttname"><a href="matrix__generator_8h.html">matrix_generator.h</a></div><div class="ttdoc">Interface for matrix generation.</div></div>
 <div class="ttc" id="amatrix__generator_8c_html_structmatrix__generator"><div class="ttname"><a href="matrix__generator_8c.html#structmatrix__generator">matrix_generator</a></div><div class="ttdoc">The data for a matrix generator.</div><div class="ttdef"><b>Definition:</b> matrix_generator.c:67</div></div>
+<div class="ttc" id="areverse__iptag__multicast__source_8c_html"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/reverse__iptag__multicast__source_8c.html">config</a></div></div>
+<div class="ttc" id="adebug_8h.html_html"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/debug_8h.html">debug.h</a></div></div>
 <div class="ttc" id="asynapse__expander_8c_html_structexpander__config"><div class="ttname"><a href="synapse__expander_8c.html#structexpander__config">expander_config</a></div><div class="ttdoc">The configuration of the synapse expander.</div><div class="ttdef"><b>Definition:</b> synapse_expander.c:56</div></div>
 <div class="ttc" id="aregions_8h_html_ae999d786209aa275138bef0bf9012295ad5778663b1d738822f9b1b5ce9dd9061"><div class="ttname"><a href="regions_8h.html#ae999d786209aa275138bef0bf9012295ad5778663b1d738822f9b1b5ce9dd9061">SYNAPTIC_MATRIX_REGION</a></div><div class="ttdeci">@ SYNAPTIC_MATRIX_REGION</div><div class="ttdoc">synaptic matrix; 4</div><div class="ttdef"><b>Definition:</b> regions.h:31</div></div>
 <div class="ttc" id="amatrix__generator_8c_html_a9539b11486e767ca5114db0390a505a1"><div class="ttname"><a href="matrix__generator_8c.html#a9539b11486e767ca5114db0390a505a1">matrix_generator_init</a></div><div class="ttdeci">matrix_generator_t matrix_generator_init(uint32_t hash, address_t *in_region)</div><div class="ttdoc">Initialise a specific matrix generator.</div><div class="ttdef"><b>Definition:</b> matrix_generator.c:86</div></div>
+<div class="ttc" id="adebug_8h_html_a9845e8157cc395cb8f3ed1761048e4f3"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/debug_8h.html#a9845e8157cc395cb8f3ed1761048e4f3">log_debug</a></div><div class="ttdeci">void log_debug(const char *message,...)</div></div>
 <div class="ttc" id="aregions_8h_html"><div class="ttname"><a href="regions_8h.html">regions.h</a></div><div class="ttdoc">Standard layout of DSG regions in neuron code.</div></div>
 <div class="ttc" id="amatrix__generator_8c_html_aafbab40316b9861d41999287c65d1dbe"><div class="ttname"><a href="matrix__generator_8c.html#aafbab40316b9861d41999287c65d1dbe">matrix_generator_free</a></div><div class="ttdeci">void matrix_generator_free(matrix_generator_t generator)</div><div class="ttdoc">Finish with a matrix generator.</div><div class="ttdef"><b>Definition:</b> matrix_generator.c:113</div></div>
+<div class="ttc" id="adebug_8h_html_af4431e39155e80c53e1f9aab22d5a0ef"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/debug_8h.html#af4431e39155e80c53e1f9aab22d5a0ef">log_info</a></div><div class="ttdeci">void log_info(const char *message,...)</div></div>
+<div class="ttc" id="acommon-typedefs_8h_html_ac8dc08dd5f5827994d1b06351f925669"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a></div><div class="ttdeci">uint32_t * address_t</div></div>
+<div class="ttc" id="adebug_8h_html_a0327644dae0a0a5d4bdc8f7b6f54e31e"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/debug_8h.html#a0327644dae0a0a5d4bdc8f7b6f54e31e">log_error</a></div><div class="ttdeci">void log_error(const char *message,...)</div></div>
 <div class="ttc" id="aparam__generator_8h_html"><div class="ttname"><a href="param__generator_8h.html">param_generator.h</a></div><div class="ttdoc">Interface for parameter generator.</div></div>
+<div class="ttc" id="adata__specification_8h_html_a77cda8f0103039e98d16777000de889a"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/data__specification_8h.html#a77cda8f0103039e98d16777000de889a">data_specification_get_data_address</a></div><div class="ttdeci">data_specification_metadata_t * data_specification_get_data_address(void)</div></div>
+<div class="ttc" id="asark_8h_html_a37318835424d76f3f5b321058887236da504ca9cb33bebc4ff8b20b3eb97facbd"><div class="ttname"><a href="http://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html#a37318835424d76f3f5b321058887236da504ca9cb33bebc4ff8b20b3eb97facbd">CPU_STATE_RUN</a></div><div class="ttdeci">CPU_STATE_RUN</div></div>
 <div class="ttc" id="aparam__generator_8c_html_ae52a45690f00dfe7384a14645b3512de"><div class="ttname"><a href="param__generator_8c.html#ae52a45690f00dfe7384a14645b3512de">param_generator_init</a></div><div class="ttdeci">param_generator_t param_generator_init(uint32_t hash, address_t *in_region)</div><div class="ttdoc">Initialise a specific parameter generator.</div><div class="ttdef"><b>Definition:</b> param_generator.c:115</div></div>
+<div class="ttc" id="adata__specification_8h_html"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/data__specification_8h.html">data_specification_metadata_t</a></div></div>
 <div class="ttc" id="aregions_8h_html_ae999d786209aa275138bef0bf9012295adb65127156b69789622d7edc85785aa9"><div class="ttname"><a href="regions_8h.html#ae999d786209aa275138bef0bf9012295adb65127156b69789622d7edc85785aa9">CONNECTOR_BUILDER_REGION</a></div><div class="ttdeci">@ CONNECTOR_BUILDER_REGION</div><div class="ttdoc">connection building; 10</div><div class="ttdef"><b>Definition:</b> regions.h:37</div></div>
 <div class="ttc" id="asynapse__expander_8c_html_structconnection__builder__config"><div class="ttname"><a href="synapse__expander_8c.html#structconnection__builder__config">connection_builder_config</a></div><div class="ttdoc">The configuration of the connection builder.</div><div class="ttdef"><b>Definition:</b> synapse_expander.c:35</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Aug 3 2020 23:24:24 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Aug 4 2020 08:41:21 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.17
 </small></address>

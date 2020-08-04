@@ -1,6 +1,19 @@
 var searchData=
 [
-  ['elimination_5fparams_1228',['elimination_params',['../elimination__random__by__weight__impl_8h.html#structelimination__params',1,'']]],
-  ['exp_5fparams_5ft_1229',['exp_params_t',['../synapse__types__semd__impl_8h.html#structexp__params__t',1,'']]],
-  ['expander_5fconfig_1230',['expander_config',['../synapse__expander_8c.html#structexpander__config',1,'']]]
+  ['data_5fin_5fconfig_5ft_1863',['data_in_config_t',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/data__speed__up__packet__gatherer_8c.html',1,'']]],
+  ['data_5fin_5fdata_5fitems_1864',['data_in_data_items',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/extra__monitor__support_8c.html',1,'']]],
+  ['data_5fout_5fconfig_5ft_1865',['data_out_config_t',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/data__speed__up__packet__gatherer_8c.html',1,'']]],
+  ['data_5fspecification_5fmetadata_5ft_1866',['data_specification_metadata_t',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/data__specification_8h.html',1,'']]],
+  ['data_5fspeed_5fout_5fconfig_5ft_1867',['data_speed_out_config_t',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/extra__monitor__support_8c.html',1,'']]],
+  ['delay_5fbuilder_5fconfig_1868',['delay_builder_config',['../delay__expander_8c.html#structdelay__builder__config',1,'']]],
+  ['delay_5fextension_5fprovenance_1869',['delay_extension_provenance',['../delay__extension_8c.html#structdelay__extension__provenance',1,'']]],
+  ['delay_5fparameters_1870',['delay_parameters',['../delay__extension_8h.html#structdelay__parameters',1,'']]],
+  ['delay_5fvalue_1871',['delay_value',['../matrix__generator__common_8h.html#structdelay__value',1,'']]],
+  ['delta_5fparams_5ft_1872',['delta_params_t',['../synapse__types__delta__impl_8h.html#structdelta__params__t',1,'']]],
+  ['diagnostics_5ft_1873',['diagnostics_t',['http://spinnakermanchester.github.io/spinnaker_tools/spin1__api_8h.html',1,'']]],
+  ['divmod_1874',['divmod',['http://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html',1,'']]],
+  ['dma_5fbuffer_1875',['dma_buffer',['../spike__processing_8c.html#structdma__buffer',1,'']]],
+  ['dma_5fqueue_5ft_1876',['dma_queue_t',['http://spinnakermanchester.github.io/spinnaker_tools/spin1__api__params_8h.html',1,'']]],
+  ['dsg_5fheader_5ft_1877',['dsg_header_t',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/extra__monitor__support_8c.html',1,'']]],
+  ['dumped_5fpacket_5ft_1878',['dumped_packet_t',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/extra__monitor__support_8c.html',1,'']]]
 ];

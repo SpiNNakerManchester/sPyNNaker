@@ -1,12 +1,20 @@
 var searchData=
 [
-  ['v_5fmembrane_2147',['V_membrane',['../neuron__model__lif__impl_8h.html#a86bb63a4a0e56518c44af0beefe8ac31',1,'neuron_t']]],
-  ['v_5freset_2148',['V_reset',['../neuron__model__lif__impl_8h.html#ad64e3dbdebb524738dac569369fcb146',1,'neuron_t']]],
-  ['v_5frest_2149',['V_rest',['../neuron__model__lif__impl_8h.html#a0448414012bd86a39307aa97378ca8f2',1,'neuron_t']]],
-  ['v_5frev_5fe_2150',['V_rev_E',['../input__type__none_8h.html#ace17cbedca27bd81e3e9d7fd6c6fe774',1,'input_type_t']]],
-  ['v_5frev_5fi_2151',['V_rev_I',['../input__type__none_8h.html#aab156892eda9d422b7d1dd8dfc7b979e',1,'input_type_t']]],
-  ['v_5fthresh_2152',['v_thresh',['../threshold__type__static_8h.html#ab45ec840ac2e212feee7e2b5782a8ed0',1,'threshold_type_t']]],
-  ['value_2153',['value',['../munich__protocol_8h.html#ae25a937e1086e1ccf5579cdbe4764743',1,'munich_key_t']]],
-  ['value_5fas_5fpayload_2154',['value_as_payload',['../threshold__type__static_8h.html#ad2d30a17b1fabe86ed294e5aa2732e8f',1,'threshold_type_t']]],
-  ['values_2155',['values',['../maths_8h.html#a17b6c0ddd56ccaec45d3191da3f1c209',1,'int16_lut::values()'],['../param__generator__kernel_8h.html#aa55383a91c659f798dc4faf98cfd18ea',1,'all_kernel_params::values()']]]
+  ['udp_5fport_3371',['udp_port',['http://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html#a9af5a7e4f460fd1c35798062643bd0c1',1,'srom_data']]],
+  ['uncompressed_5frouter_5ftable_3372',['uncompressed_router_table',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/compressor__sorter__structs_8h.html#a69f0516a2f97f34460eea02de697034e',1,'comms_sdram_t']]],
+  ['uncompressed_5ftable_3373',['uncompressed_table',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/compressor__sorter__structs_8h.html#a8082501788d19b0833dc0d130c0bd796',1,'uncompressed_table_region_data_t']]],
+  ['undef_5fvec_3374',['undef_vec',['http://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html#a144656d1732c8ec4a1107c2febc1fa1d',1,'sark_vec']]],
+  ['unix_5ftime_3375',['unix_time',['http://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html#a8145163b1034a8f183abf180bc4c15b1',1,'sv']]],
+  ['update_5ftime_3376',['update_time',['../robot__motor__control_8c.html#af91db5a416282fefdb525fadbc6f5f8f',1,'motor_control_config_t::update_time()'],['../robot__motor__control_8c.html#a86e18fc3ab6be6646e80307e68187e63',1,'update_time():&#160;robot_motor_control.c']]],
+  ['use_5fkey_3377',['use_key',['../neuron_8c.html#ab9132b5a04a7bdb8ac2e4293c1ec96bf',1,'neuron.c']]],
+  ['user_3378',['user',['http://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html#a18e7d6c2a8cb792fef5ce82895db082a',1,'event_data']]],
+  ['user0_3379',['user0',['http://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html#a3dffcf3dab335fc4c0a84acfd4b502bb',1,'vcpu']]],
+  ['user1_3380',['user1',['http://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html#a56cd6d66d640742bc6d18bdc1764377f',1,'vcpu']]],
+  ['user2_3381',['user2',['http://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html#ae20cca30ebae3ea9287230334eeabb66',1,'vcpu']]],
+  ['user3_3382',['user3',['http://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html#a4f6cb948e8edb36f376f4981b2fff632',1,'vcpu']]],
+  ['user_5fevent_5fqueue_5ffull_3383',['user_event_queue_full',['http://spinnakermanchester.github.io/spinnaker_tools/spin1__api_8h.html#a11e53d98ac6e7ea41af537a5bf27ba15',1,'diagnostics_t']]],
+  ['utmp0_3384',['utmp0',['http://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html#a0c8f7f3a5dd2e0c0849fab9c2b96aae2',1,'sv']]],
+  ['utmp1_3385',['utmp1',['http://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html#a12817e1d225e91a98018d8f6722b2ee7',1,'sv']]],
+  ['utmp2_3386',['utmp2',['http://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html#a25b658e55d291af39cdf0b7107600428',1,'sv']]],
+  ['utmp3_3387',['utmp3',['http://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html#a6dfeb178325bba48d19ab6a27b9daf47',1,'sv']]]
 ];

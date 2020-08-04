@@ -81,9 +81,9 @@ $(function() {
 <code>#include &quot;<a class="el" href="matrix__generator_8h_source.html">matrix_generator.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="connection__generator_8h_source.html">connection_generator.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="param__generator_8h_source.html">param_generator.h</a>&quot;</code><br />
-<code>#include &lt;spin1_api.h&gt;</code><br />
-<code>#include &lt;data_specification.h&gt;</code><br />
-<code>#include &lt;debug.h&gt;</code><br />
+<code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spin1__api_8h.html">spin1_api.h</a>&gt;</code><br />
+<code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/data__specification_8h.html">data_specification.h</a>&gt;</code><br />
+<code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/debug_8h.html">debug.h</a>&gt;</code><br />
 <code>#include &quot;<a class="el" href="common__mem_8h_source.html">common_mem.h</a>&quot;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
@@ -97,10 +97,10 @@ Data Structures</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a796837af1a5d205aa367196d5a7001bf"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__expander_8c.html#a796837af1a5d205aa367196d5a7001bf">read_connection_builder_region</a> (address_t *in_region, address_t synaptic_matrix_region, uint32_t post_slice_start, uint32_t post_slice_count, uint32_t n_synapse_type_bits, uint32_t n_synapse_index_bits, accum *weight_scales)</td></tr>
+<tr class="memitem:a796837af1a5d205aa367196d5a7001bf"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__expander_8c.html#a796837af1a5d205aa367196d5a7001bf">read_connection_builder_region</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> *in_region, <a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> synaptic_matrix_region, uint32_t post_slice_start, uint32_t post_slice_count, uint32_t n_synapse_type_bits, uint32_t n_synapse_index_bits, accum *weight_scales)</td></tr>
 <tr class="memdesc:a796837af1a5d205aa367196d5a7001bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate the synapses for a single connector.  <a href="synapse__expander_8c.html#a796837af1a5d205aa367196d5a7001bf">More...</a><br /></td></tr>
 <tr class="separator:a796837af1a5d205aa367196d5a7001bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab2b96fb3f7cddc88c3b12263c25f0fc1"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__expander_8c.html#ab2b96fb3f7cddc88c3b12263c25f0fc1">run_synapse_expander</a> (address_t params_address, address_t synaptic_matrix_region)</td></tr>
+<tr class="memitem:ab2b96fb3f7cddc88c3b12263c25f0fc1"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapse__expander_8c.html#ab2b96fb3f7cddc88c3b12263c25f0fc1">run_synapse_expander</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> params_address, <a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> synaptic_matrix_region)</td></tr>
 <tr class="memdesc:ab2b96fb3f7cddc88c3b12263c25f0fc1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read the data for the expander.  <a href="synapse__expander_8c.html#ab2b96fb3f7cddc88c3b12263c25f0fc1">More...</a><br /></td></tr>
 <tr class="separator:ab2b96fb3f7cddc88c3b12263c25f0fc1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa14f4f1d4c84183b7bf7108bf930a23c"><td class="memItemLeft" align="right" valign="top"><a id="aa14f4f1d4c84183b7bf7108bf930a23c"></a>
@@ -286,13 +286,13 @@ n_synapse_index_bits</td>
         <tr>
           <td class="memname">static bool read_connection_builder_region </td>
           <td>(</td>
-          <td class="paramtype">address_t *&#160;</td>
+          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> *&#160;</td>
           <td class="paramname"><em>in_region</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">address_t&#160;</td>
+          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td>
           <td class="paramname"><em>synaptic_matrix_region</em>, </td>
         </tr>
         <tr>
@@ -367,13 +367,13 @@ n_synapse_index_bits</td>
         <tr>
           <td class="memname">static bool run_synapse_expander </td>
           <td>(</td>
-          <td class="paramtype">address_t&#160;</td>
+          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td>
           <td class="paramname"><em>params_address</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">address_t&#160;</td>
+          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td>
           <td class="paramname"><em>synaptic_matrix_region</em>&#160;</td>
         </tr>
         <tr>
@@ -404,7 +404,7 @@ n_synapse_index_bits</td>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Aug 3 2020 23:24:25 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Aug 4 2020 08:41:22 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.17
 </small></address>

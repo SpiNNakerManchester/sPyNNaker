@@ -82,13 +82,13 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:adba45d439e3c65751b2508e6ae744e15"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synaptogenesis__dynamics_8h.html#adba45d439e3c65751b2508e6ae744e15">synaptogenesis_dynamics_initialise</a> (address_t sdram_sp_address)</td></tr>
+<tr class="memitem:adba45d439e3c65751b2508e6ae744e15"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synaptogenesis__dynamics_8h.html#adba45d439e3c65751b2508e6ae744e15">synaptogenesis_dynamics_initialise</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> sdram_sp_address)</td></tr>
 <tr class="memdesc:adba45d439e3c65751b2508e6ae744e15"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialisation of synaptic rewiring (synaptogenesis) parameters (random seed, spread of receptive field etc.)  <a href="synaptogenesis__dynamics_8h.html#adba45d439e3c65751b2508e6ae744e15">More...</a><br /></td></tr>
 <tr class="separator:adba45d439e3c65751b2508e6ae744e15"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1a8123da1bd797e82cb3193a0ce43847"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synaptogenesis__dynamics_8h.html#a1a8123da1bd797e82cb3193a0ce43847">synaptogenesis_dynamics_rewire</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, <a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> *spike, address_t *synaptic_row_address, uint32_t *n_bytes)</td></tr>
+<tr class="memitem:a1a8123da1bd797e82cb3193a0ce43847"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synaptogenesis__dynamics_8h.html#a1a8123da1bd797e82cb3193a0ce43847">synaptogenesis_dynamics_rewire</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, <a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> *spike, <a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> *synaptic_row_address, uint32_t *n_bytes)</td></tr>
 <tr class="memdesc:a1a8123da1bd797e82cb3193a0ce43847"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function called (usually on a timer from <a class="el" href="bit__field__expander_8c.html#aa14f4f1d4c84183b7bf7108bf930a23c" title="Entry point.">c_main()</a>) to trigger the process of synaptic rewiring.  <a href="synaptogenesis__dynamics_8h.html#a1a8123da1bd797e82cb3193a0ce43847">More...</a><br /></td></tr>
 <tr class="separator:a1a8123da1bd797e82cb3193a0ce43847"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac08559ca2e23561471aebd3f4097e348"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synaptogenesis__dynamics_8h.html#ac08559ca2e23561471aebd3f4097e348">synaptogenesis_row_restructure</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, address_t row)</td></tr>
+<tr class="memitem:ac08559ca2e23561471aebd3f4097e348"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synaptogenesis__dynamics_8h.html#ac08559ca2e23561471aebd3f4097e348">synaptogenesis_row_restructure</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, <a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> row)</td></tr>
 <tr class="memdesc:ac08559ca2e23561471aebd3f4097e348"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs the actual restructuring of a row.  <a href="synaptogenesis__dynamics_8h.html#ac08559ca2e23561471aebd3f4097e348">More...</a><br /></td></tr>
 <tr class="separator:ac08559ca2e23561471aebd3f4097e348"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afa57eee149b8ef2c30e2239c22f0957e"><td class="memItemLeft" align="right" valign="top">int32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synaptogenesis__dynamics_8h.html#afa57eee149b8ef2c30e2239c22f0957e">synaptogenesis_rewiring_period</a> (void)</td></tr>
@@ -117,7 +117,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="syna
         <tr>
           <td class="memname">bool synaptogenesis_dynamics_initialise </td>
           <td>(</td>
-          <td class="paramtype">address_t&#160;</td>
+          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td>
           <td class="paramname"><em>sdram_sp_address</em></td><td>)</td>
           <td></td>
         </tr>
@@ -156,7 +156,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="syna
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">address_t *&#160;</td>
+          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> *&#160;</td>
           <td class="paramname"><em>synaptic_row_address</em>, </td>
         </tr>
         <tr>
@@ -202,7 +202,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="syna
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">address_t&#160;</td>
+          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td>
           <td class="paramname"><em>row</em>&#160;</td>
         </tr>
         <tr>
@@ -305,7 +305,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="syna
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Aug 3 2020 23:24:25 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Aug 4 2020 08:41:22 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.17
 </small></address>

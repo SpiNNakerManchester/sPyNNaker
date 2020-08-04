@@ -80,9 +80,9 @@ $(function() {
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &quot;<a class="el" href="population__table_8h_source.html">population_table.h</a>&quot;</code><br />
 <code>#include &lt;<a class="el" href="synapse__row_8h_source.html">neuron/synapse_row.h</a>&gt;</code><br />
-<code>#include &lt;debug.h&gt;</code><br />
+<code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/debug_8h.html">debug.h</a>&gt;</code><br />
 <code>#include &lt;stdbool.h&gt;</code><br />
-<code>#include &lt;bit_field.h&gt;</code><br />
+<code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html">bit_field.h</a>&gt;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Data Structures</h2></td></tr>
@@ -130,16 +130,16 @@ Functions</h2></td></tr>
 <tr class="memdesc:a3c2c10dcc54c9ec95a730e4c1324a2c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Prints the master pop table.  <a href="population__table__binary__search__impl_8c.html#a3c2c10dcc54c9ec95a730e4c1324a2c5">More...</a><br /></td></tr>
 <tr class="separator:a3c2c10dcc54c9ec95a730e4c1324a2c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">API functions</div></td></tr>
-<tr class="memitem:a5f92af4dd47e65504cbbbcb265083196"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table__binary__search__impl_8c.html#a5f92af4dd47e65504cbbbcb265083196">population_table_initialise</a> (address_t table_address, address_t synapse_rows_address, address_t direct_rows_address, uint32_t *<a class="el" href="bit__field__expander_8c.html#af9b6824a750777e79471f086307d51b9">row_max_n_words</a>)</td></tr>
+<tr class="memitem:a5f92af4dd47e65504cbbbcb265083196"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table__binary__search__impl_8c.html#a5f92af4dd47e65504cbbbcb265083196">population_table_initialise</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> table_address, <a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> synapse_rows_address, <a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> direct_rows_address, uint32_t *<a class="el" href="bit__field__expander_8c.html#af9b6824a750777e79471f086307d51b9">row_max_n_words</a>)</td></tr>
 <tr class="memdesc:a5f92af4dd47e65504cbbbcb265083196"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets up the table.  <a href="population__table__binary__search__impl_8c.html#a5f92af4dd47e65504cbbbcb265083196">More...</a><br /></td></tr>
 <tr class="separator:a5f92af4dd47e65504cbbbcb265083196"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8bda7c27a3c9d52a2f95c4b6edd58944"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table__binary__search__impl_8c.html#a8bda7c27a3c9d52a2f95c4b6edd58944">population_table_get_first_address</a> (<a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> spike, address_t *row_address, size_t *n_bytes_to_transfer)</td></tr>
+<tr class="memitem:a8bda7c27a3c9d52a2f95c4b6edd58944"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table__binary__search__impl_8c.html#a8bda7c27a3c9d52a2f95c4b6edd58944">population_table_get_first_address</a> (<a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> spike, <a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> *row_address, <a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#a29d85914ddff32967d85ada69854206d">size_t</a> *n_bytes_to_transfer)</td></tr>
 <tr class="memdesc:a8bda7c27a3c9d52a2f95c4b6edd58944"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the first row data for the given input spike.  <a href="population__table__binary__search__impl_8c.html#a8bda7c27a3c9d52a2f95c4b6edd58944">More...</a><br /></td></tr>
 <tr class="separator:a8bda7c27a3c9d52a2f95c4b6edd58944"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1d265f6b135058a82e5b5806b35c6539"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table__binary__search__impl_8c.html#a1d265f6b135058a82e5b5806b35c6539">population_table_position_in_the_master_pop_array</a> (<a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> spike)</td></tr>
 <tr class="memdesc:a1d265f6b135058a82e5b5806b35c6539"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the position in the master population table.  <a href="population__table__binary__search__impl_8c.html#a1d265f6b135058a82e5b5806b35c6539">More...</a><br /></td></tr>
 <tr class="separator:a1d265f6b135058a82e5b5806b35c6539"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6ab19e2b1b4c0ed25d126d7cd7763ccf"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table__binary__search__impl_8c.html#a6ab19e2b1b4c0ed25d126d7cd7763ccf">population_table_get_next_address</a> (<a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> *spike, address_t *row_address, size_t *n_bytes_to_transfer)</td></tr>
+<tr class="memitem:a6ab19e2b1b4c0ed25d126d7cd7763ccf"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table__binary__search__impl_8c.html#a6ab19e2b1b4c0ed25d126d7cd7763ccf">population_table_get_next_address</a> (<a class="el" href="neuron-typedefs_8h.html#a6f8f96f76107734fe756b67227742b32">spike_t</a> *spike, <a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> *row_address, <a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#a29d85914ddff32967d85ada69854206d">size_t</a> *n_bytes_to_transfer)</td></tr>
 <tr class="memdesc:a6ab19e2b1b4c0ed25d126d7cd7763ccf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the next row data for a previously given spike. If no spike has been given, return False.  <a href="population__table__binary__search__impl_8c.html#a6ab19e2b1b4c0ed25d126d7cd7763ccf">More...</a><br /></td></tr>
 <tr class="separator:a6ab19e2b1b4c0ed25d126d7cd7763ccf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3d02d2b908f0d3115192eb6010038b54"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table__binary__search__impl_8c.html#a3d02d2b908f0d3115192eb6010038b54">population_table_get_ghost_pop_table_searches</a> (void)</td></tr>
@@ -148,7 +148,7 @@ Functions</h2></td></tr>
 <tr class="memitem:a7bbffa9367a5934939379717554169b9"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table__binary__search__impl_8c.html#a7bbffa9367a5934939379717554169b9">population_table_get_invalid_master_pop_hits</a> (void)</td></tr>
 <tr class="memdesc:a7bbffa9367a5934939379717554169b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the number of master pop table key misses.  <a href="population__table__binary__search__impl_8c.html#a7bbffa9367a5934939379717554169b9">More...</a><br /></td></tr>
 <tr class="separator:a7bbffa9367a5934939379717554169b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac70a245279c010501448e8bf7d985bd6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table__binary__search__impl_8c.html#ac70a245279c010501448e8bf7d985bd6">population_table_set_connectivity_bit_field</a> (bit_field_t *connectivity_bit_fields)</td></tr>
+<tr class="memitem:ac70a245279c010501448e8bf7d985bd6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table__binary__search__impl_8c.html#ac70a245279c010501448e8bf7d985bd6">population_table_set_connectivity_bit_field</a> (<a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#a70e667669dab5c870f1f8f97d96b4abd">bit_field_t</a> *connectivity_bit_fields)</td></tr>
 <tr class="memdesc:ac70a245279c010501448e8bf7d985bd6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the connectivity lookup map.  <a href="population__table__binary__search__impl_8c.html#ac70a245279c010501448e8bf7d985bd6">More...</a><br /></td></tr>
 <tr class="separator:ac70a245279c010501448e8bf7d985bd6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afcbeec022a055055de66ed0e4d9dfb54"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table__binary__search__impl_8c.html#afcbeec022a055055de66ed0e4d9dfb54">population_table_shut_down</a> (void)</td></tr>
@@ -182,7 +182,7 @@ static <a class="el" href="population__table__binary__search__impl_8c.html#struc
 <tr class="memdesc:ab790496cf8bf2823f3da09aa7bb6e40f"><td class="mdescLeft">&#160;</td><td class="mdescRight">The array of information that points into the synaptic matrix. <br /></td></tr>
 <tr class="separator:ab790496cf8bf2823f3da09aa7bb6e40f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad2ce101a5edabbd6b4f3d3e0f61d4592"><td class="memItemLeft" align="right" valign="top"><a id="ad2ce101a5edabbd6b4f3d3e0f61d4592"></a>
-static address_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table__binary__search__impl_8c.html#ad2ce101a5edabbd6b4f3d3e0f61d4592">synaptic_rows_base_address</a></td></tr>
+static <a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table__binary__search__impl_8c.html#ad2ce101a5edabbd6b4f3d3e0f61d4592">synaptic_rows_base_address</a></td></tr>
 <tr class="memdesc:ad2ce101a5edabbd6b4f3d3e0f61d4592"><td class="mdescLeft">&#160;</td><td class="mdescRight">Base address for the synaptic matrix's indirect rows. <br /></td></tr>
 <tr class="separator:ad2ce101a5edabbd6b4f3d3e0f61d4592"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a53f683b47d1883d1fe9dc988c1b6a101"><td class="memItemLeft" align="right" valign="top"><a id="a53f683b47d1883d1fe9dc988c1b6a101"></a>
@@ -218,7 +218,7 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
 <tr class="memdesc:a442bf46f572f3fc97a52421b7e1a0f87"><td class="mdescLeft">&#160;</td><td class="mdescRight">The number of packets dropped because the bitfield filter says they don't hit anything. <br /></td></tr>
 <tr class="separator:a442bf46f572f3fc97a52421b7e1a0f87"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af5132d7f50c964c1994dcefe0a008a88"><td class="memItemLeft" align="right" valign="top"><a id="af5132d7f50c964c1994dcefe0a008a88"></a>
-bit_field_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table__binary__search__impl_8c.html#af5132d7f50c964c1994dcefe0a008a88">connectivity_bit_field</a></td></tr>
+<a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#a70e667669dab5c870f1f8f97d96b4abd">bit_field_t</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="population__table__binary__search__impl_8c.html#af5132d7f50c964c1994dcefe0a008a88">connectivity_bit_field</a></td></tr>
 <tr class="memdesc:af5132d7f50c964c1994dcefe0a008a88"><td class="mdescLeft">&#160;</td><td class="mdescRight">The bitfield map. <br /></td></tr>
 <tr class="separator:af5132d7f50c964c1994dcefe0a008a88"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -528,19 +528,19 @@ whether this is a direct/single address </td></tr>
         <tr>
           <td class="memname">bool population_table_initialise </td>
           <td>(</td>
-          <td class="paramtype">address_t&#160;</td>
+          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td>
           <td class="paramname"><em>table_address</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">address_t&#160;</td>
+          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td>
           <td class="paramname"><em>synapse_rows_address</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">address_t&#160;</td>
+          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td>
           <td class="paramname"><em>direct_rows_address</em>, </td>
         </tr>
         <tr>
@@ -586,13 +586,13 @@ whether this is a direct/single address </td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">address_t *&#160;</td>
+          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> *&#160;</td>
           <td class="paramname"><em>row_address</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">size_t *&#160;</td>
+          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#a29d85914ddff32967d85ada69854206d">size_t</a> *&#160;</td>
           <td class="paramname"><em>n_bytes_to_transfer</em>&#160;</td>
         </tr>
         <tr>
@@ -658,13 +658,13 @@ whether this is a direct/single address </td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">address_t *&#160;</td>
+          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> *&#160;</td>
           <td class="paramname"><em>row_address</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">size_t *&#160;</td>
+          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#a29d85914ddff32967d85ada69854206d">size_t</a> *&#160;</td>
           <td class="paramname"><em>n_bytes_to_transfer</em>&#160;</td>
         </tr>
         <tr>
@@ -739,7 +739,7 @@ whether this is a direct/single address </td></tr>
         <tr>
           <td class="memname">void population_table_set_connectivity_bit_field </td>
           <td>(</td>
-          <td class="paramtype">bit_field_t *&#160;</td>
+          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#a70e667669dab5c870f1f8f97d96b4abd">bit_field_t</a> *&#160;</td>
           <td class="paramname"><em>connectivity_bit_fields</em></td><td>)</td>
           <td></td>
         </tr>
@@ -876,7 +876,7 @@ whether this is a direct/single address </td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Aug 3 2020 23:24:25 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Aug 4 2020 08:41:21 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.17
 </small></address>

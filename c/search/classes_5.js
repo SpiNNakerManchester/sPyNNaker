@@ -1,13 +1,12 @@
 var searchData=
 [
-  ['fixed_5fpost_1231',['fixed_post',['../connection__generator__fixed__post_8h.html#structfixed__post',1,'']]],
-  ['fixed_5fpost_5fparams_1232',['fixed_post_params',['../connection__generator__fixed__post_8h.html#structfixed__post__params',1,'']]],
-  ['fixed_5fpre_1233',['fixed_pre',['../connection__generator__fixed__pre_8h.html#structfixed__pre',1,'']]],
-  ['fixed_5fpre_5fglobals_5ft_1234',['fixed_pre_globals_t',['../connection__generator__fixed__pre_8h.html#structfixed__pre__globals__t',1,'']]],
-  ['fixed_5fpre_5fparams_1235',['fixed_pre_params',['../connection__generator__fixed__pre_8h.html#structfixed__pre__params',1,'']]],
-  ['fixed_5fprob_1236',['fixed_prob',['../connection__generator__fixed__prob_8h.html#structfixed__prob',1,'']]],
-  ['fixed_5fprob_5fparams_1237',['fixed_prob_params',['../connection__generator__fixed__prob_8h.html#structfixed__prob__params',1,'']]],
-  ['fixed_5ftotal_1238',['fixed_total',['../connection__generator__fixed__total_8h.html#structfixed__total',1,'']]],
-  ['fixed_5ftotal_5fparams_1239',['fixed_total_params',['../connection__generator__fixed__total_8h.html#structfixed__total__params',1,'']]],
-  ['formation_5fparams_1240',['formation_params',['../formation__distance__dependent__impl_8h.html#structformation__params',1,'']]]
+  ['eieio_5fheader_5fbitfields_1879',['eieio_header_bitfields',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/eieio_8h.html',1,'']]],
+  ['eieio_5fheader_5fbitfields_2e_5f_5funnamed_5f_5f_1880',['eieio_header_bitfields.__unnamed__',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/eieio_8h.html',1,'']]],
+  ['elimination_5fparams_1881',['elimination_params',['../elimination__random__by__weight__impl_8h.html#structelimination__params',1,'']]],
+  ['entry_5ft_1882',['entry_t',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/routing__table_8h.html',1,'']]],
+  ['event_1883',['event',['http://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html',1,'']]],
+  ['event_5fdata_1884',['event_data',['http://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html',1,'']]],
+  ['event_5fvec_1885',['event_vec',['http://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html',1,'']]],
+  ['exp_5fparams_5ft_1886',['exp_params_t',['../synapse__types__semd__impl_8h.html#structexp__params__t',1,'']]],
+  ['expander_5fconfig_1887',['expander_config',['../synapse__expander_8c.html#structexpander__config',1,'']]]
 ];

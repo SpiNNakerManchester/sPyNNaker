@@ -80,8 +80,8 @@ $(function() {
 <p>The implementation of the functions in <a class="el" href="connection__generator_8h.html" title="Connection Generator interface.">connection_generator.h</a>.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &quot;<a class="el" href="connection__generator_8h_source.html">connection_generator.h</a>&quot;</code><br />
-<code>#include &lt;spin1_api.h&gt;</code><br />
-<code>#include &lt;debug.h&gt;</code><br />
+<code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spin1__api_8h.html">spin1_api.h</a>&gt;</code><br />
+<code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/debug_8h.html">debug.h</a>&gt;</code><br />
 <code>#include &quot;<a class="el" href="generator__types_8h_source.html">generator_types.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="connection__generator__one__to__one_8h_source.html">connection_generators/connection_generator_one_to_one.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="connection__generator__all__to__all_8h_source.html">connection_generators/connection_generator_all_to_all.h</a>&quot;</code><br />
@@ -119,7 +119,7 @@ Enumerations</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a1a3c815932172e25183bbd6c237d0974"><td class="memItemLeft" align="right" valign="top">connection_generator_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="connection__generator_8c.html#a1a3c815932172e25183bbd6c237d0974">connection_generator_init</a> (uint32_t hash, address_t *in_region)</td></tr>
+<tr class="memitem:a1a3c815932172e25183bbd6c237d0974"><td class="memItemLeft" align="right" valign="top">connection_generator_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="connection__generator_8c.html#a1a3c815932172e25183bbd6c237d0974">connection_generator_init</a> (uint32_t hash, <a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> *in_region)</td></tr>
 <tr class="memdesc:a1a3c815932172e25183bbd6c237d0974"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise a specific connection generator.  <a href="connection__generator_8c.html#a1a3c815932172e25183bbd6c237d0974">More...</a><br /></td></tr>
 <tr class="separator:a1a3c815932172e25183bbd6c237d0974"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a82fb9cd00aa5c51cdcbf97879763f28e"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="connection__generator_8c.html#a82fb9cd00aa5c51cdcbf97879763f28e">connection_generator_generate</a> (connection_generator_t generator, uint32_t pre_slice_start, uint32_t pre_slice_count, uint32_t pre_neuron_index, uint32_t post_slice_start, uint32_t post_slice_count, uint32_t max_row_length, uint16_t *indices)</td></tr>
@@ -263,7 +263,7 @@ data</td>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">address_t *&#160;</td>
+          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> *&#160;</td>
           <td class="paramname"><em>region</em>&#160;</td>
         </tr>
         <tr>
@@ -478,7 +478,7 @@ data</td>
 <div class="ttc" id="aconnection__generator__one__to__one_8h_html_a519a2706ae01863c6124c8dc78a6a8a7"><div class="ttname"><a href="connection__generator__one__to__one_8h.html#a519a2706ae01863c6124c8dc78a6a8a7">connection_generator_one_to_one_free</a></div><div class="ttdeci">static void connection_generator_one_to_one_free(void *generator)</div><div class="ttdoc">Free the one-to-one connection generator.</div><div class="ttdef"><b>Definition:</b> connection_generator_one_to_one.h:60</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Aug 3 2020 23:24:25 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Aug 4 2020 08:41:22 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.17
 </small></address>

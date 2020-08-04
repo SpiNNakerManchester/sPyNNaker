@@ -1,8 +1,4 @@
 var searchData=
 [
-  ['source_5finfo_1288',['source_info',['../spike__source__poisson_8c.html#structsource__info',1,'']]],
-  ['spike_5fsource_5ft_1289',['spike_source_t',['../spike__source__poisson_8c.html#structspike__source__t',1,'']]],
-  ['stdp_5fparams_1290',['stdp_params',['../synapse__dynamics__stdp__mad__impl_8c.html#structstdp__params',1,'']]],
-  ['synapse_5fparam_5ft_1291',['synapse_param_t',['../synapse__types__semd__impl_8h.html#structsynapse__param__t',1,'']]],
-  ['synapse_5frow_5fplastic_5fdata_5ft_1292',['synapse_row_plastic_data_t',['../synapse__dynamics__stdp__mad__impl_8c.html#structsynapse__row__plastic__data__t',1,'']]]
+  ['one_5fto_5fone_1942',['one_to_one',['../connection__generator__one__to__one_8h.html#structone__to__one',1,'']]]
 ];

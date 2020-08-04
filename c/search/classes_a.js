@@ -1,10 +1,8 @@
 var searchData=
 [
-  ['neuron_5fparameters_1255',['neuron_parameters',['../neuron_8c.html#structneuron__parameters',1,'']]],
-  ['neuron_5fprovenance_1256',['neuron_provenance',['../c__main_8c.html#structneuron__provenance',1,'']]],
-  ['neuron_5frecording_5fheader_1257',['neuron_recording_header',['../neuron__recording_8c.html#structneuron__recording__header',1,'']]],
-  ['neuron_5ft_1258',['neuron_t',['../neuron__model__lif__impl_8h.html#structneuron__t',1,'']]],
-  ['normal_5fclipped_5fboundary_5fparams_1259',['normal_clipped_boundary_params',['../param__generator__normal__clipped__to__boundary_8h.html#structnormal__clipped__boundary__params',1,'']]],
-  ['normal_5fclipped_5fparams_1260',['normal_clipped_params',['../param__generator__normal__clipped_8h.html#structnormal__clipped__params',1,'']]],
-  ['normal_5fparams_1261',['normal_params',['../param__generator__normal_8h.html#structnormal__params',1,'']]]
+  ['kernel_1913',['kernel',['../connection__generator__kernel_8h.html#structkernel',1,'']]],
+  ['key_5fatom_5fdata_5ft_1914',['key_atom_data_t',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/key__atom__map_8h.html',1,'']]],
+  ['key_5fatom_5finfo_5ft_1915',['key_atom_info_t',['../sp__structs_8h.html#structkey__atom__info__t',1,'']]],
+  ['key_5fatom_5fpair_5ft_1916',['key_atom_pair_t',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/key__atom__map_8h.html',1,'']]],
+  ['key_5fmask_5ft_1917',['key_mask_t',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/routing__table_8h.html',1,'']]]
 ];

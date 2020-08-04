@@ -78,7 +78,7 @@ $(function() {
 <p>Static synaptic matrix implementation.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;stdbool.h&gt;</code><br />
-<code>#include &lt;debug.h&gt;</code><br />
+<code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/debug_8h.html">debug.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="delay__extension_8h_source.html">delay_extension/delay_extension.h</a>&gt;</code><br />
 <code>#include &quot;<a class="el" href="matrix__generator__common_8h_source.html">matrix_generator_common.h</a>&quot;</code><br />
 <code>#include &lt;<a class="el" href="generator__types_8h_source.html">synapse_expander/generator_types.h</a>&gt;</code><br />
@@ -118,7 +118,7 @@ Macros</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a34e736f14eb0b8aa28b50e8b1d053acf"><td class="memItemLeft" align="right" valign="top">static void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator__static_8h.html#a34e736f14eb0b8aa28b50e8b1d053acf">matrix_generator_static_initialize</a> (address_t *<a class="el" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a>)</td></tr>
+<tr class="memitem:a34e736f14eb0b8aa28b50e8b1d053acf"><td class="memItemLeft" align="right" valign="top">static void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator__static_8h.html#a34e736f14eb0b8aa28b50e8b1d053acf">matrix_generator_static_initialize</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> *<a class="el" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a>)</td></tr>
 <tr class="memdesc:a34e736f14eb0b8aa28b50e8b1d053acf"><td class="mdescLeft">&#160;</td><td class="mdescRight">How to initialise the static synaptic matrix generator.  <a href="matrix__generator__static_8h.html#a34e736f14eb0b8aa28b50e8b1d053acf">More...</a><br /></td></tr>
 <tr class="separator:a34e736f14eb0b8aa28b50e8b1d053acf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a21c6ce388b821caaa1268c3d6abb9ef1"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator__static_8h.html#a21c6ce388b821caaa1268c3d6abb9ef1">matrix_generator_static_free</a> (void *generator)</td></tr>
@@ -127,7 +127,7 @@ Functions</h2></td></tr>
 <tr class="memitem:abef0ba0fc1675b818c5385bb2e99aafa"><td class="memItemLeft" align="right" valign="top">static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator__static_8h.html#abef0ba0fc1675b818c5385bb2e99aafa">build_static_word</a> (uint16_t weight, uint16_t delay, uint32_t type, uint16_t post_index, uint32_t <a class="el" href="synapses_8c.html#af20079aa1e3c31a3efd344176025ce0f">synapse_type_bits</a>, uint32_t <a class="el" href="synapses_8c.html#a840b87d6e981394dff1224fc0b8cd9c3">synapse_index_bits</a>)</td></tr>
 <tr class="memdesc:abef0ba0fc1675b818c5385bb2e99aafa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Build a static synaptic word from components.  <a href="matrix__generator__static_8h.html#abef0ba0fc1675b818c5385bb2e99aafa">More...</a><br /></td></tr>
 <tr class="separator:abef0ba0fc1675b818c5385bb2e99aafa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a691175407865992f7fef972af2aeec92"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator__static_8h.html#a691175407865992f7fef972af2aeec92">matrix_generator_static_write_row</a> (void *generator, address_t synaptic_matrix, address_t delayed_synaptic_matrix, uint32_t n_pre_neurons, uint32_t pre_neuron_index, uint32_t max_row_n_words, uint32_t max_delayed_row_n_words, uint32_t <a class="el" href="synapses_8c.html#af20079aa1e3c31a3efd344176025ce0f">synapse_type_bits</a>, uint32_t <a class="el" href="synapses_8c.html#a840b87d6e981394dff1224fc0b8cd9c3">synapse_index_bits</a>, uint32_t synapse_type, uint32_t n_synapses, uint16_t *indices, uint16_t *delays, uint16_t *weights, uint32_t max_stage)</td></tr>
+<tr class="memitem:a691175407865992f7fef972af2aeec92"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="matrix__generator__static_8h.html#a691175407865992f7fef972af2aeec92">matrix_generator_static_write_row</a> (void *generator, <a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> synaptic_matrix, <a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> delayed_synaptic_matrix, uint32_t n_pre_neurons, uint32_t pre_neuron_index, uint32_t max_row_n_words, uint32_t max_delayed_row_n_words, uint32_t <a class="el" href="synapses_8c.html#af20079aa1e3c31a3efd344176025ce0f">synapse_type_bits</a>, uint32_t <a class="el" href="synapses_8c.html#a840b87d6e981394dff1224fc0b8cd9c3">synapse_index_bits</a>, uint32_t synapse_type, uint32_t n_synapses, uint16_t *indices, uint16_t *delays, uint16_t *weights, uint32_t max_stage)</td></tr>
 <tr class="memdesc:a691175407865992f7fef972af2aeec92"><td class="mdescLeft">&#160;</td><td class="mdescRight">How to generate a row of a static synaptic matrix.  <a href="matrix__generator__static_8h.html#a691175407865992f7fef972af2aeec92">More...</a><br /></td></tr>
 <tr class="separator:a691175407865992f7fef972af2aeec92"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -146,7 +146,7 @@ Functions</h2></td></tr>
         <tr>
           <td class="memname">static void* matrix_generator_static_initialize </td>
           <td>(</td>
-          <td class="paramtype">address_t *&#160;</td>
+          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> *&#160;</td>
           <td class="paramname"><em>region</em></td><td>)</td>
           <td></td>
         </tr>
@@ -295,13 +295,13 @@ Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">address_t&#160;</td>
+          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td>
           <td class="paramname"><em>synaptic_matrix</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">address_t&#160;</td>
+          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td>
           <td class="paramname"><em>delayed_synaptic_matrix</em>, </td>
         </tr>
         <tr>
@@ -416,7 +416,7 @@ Functions</h2></td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Mon Aug 3 2020 23:24:25 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Aug 4 2020 08:41:22 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.17
 </small></address>

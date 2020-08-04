@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['input_5ftype_5ft_1243',['input_type_t',['../input__type__none_8h.html#structinput__type__t',1,'']]],
-  ['int16_5flut_1244',['int16_lut',['../maths_8h.html#structint16__lut',1,'']]]
+  ['global_5fneuron_5fparams_5ft_1900',['global_neuron_params_t',['../neuron__model__lif__impl_8h.html#structglobal__neuron__params__t',1,'']]],
+  ['global_5fparameters_1901',['global_parameters',['../spike__source__poisson_8c.html#structglobal__parameters',1,'']]]
 ];
