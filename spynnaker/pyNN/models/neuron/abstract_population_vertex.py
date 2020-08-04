@@ -555,8 +555,8 @@ class AbstractPopulationVertex(
             spec, self, vertex_slice, vertex, machine_graph, application_graph,
             routing_info, weight_scale, machine_time_step)
         vertex.set_on_chip_generatable_area(
-            self.__synapse_manager.host_written_matrix_size,
-            self.__synapse_manager.on_chip_written_matrix_size)
+            self.__synapse_manager.host_written_matrix_size(vertex_slice),
+            self.__synapse_manager.on_chip_written_matrix_size(vertex_slice))
 
         # write up the bitfield builder data
         bit_field_utilities.write_bitfield_init_data(
