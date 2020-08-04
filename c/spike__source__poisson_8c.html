@@ -81,17 +81,17 @@ $(function() {
 <p>This file contains the main functions for a Poisson spike generator.  
 <a href="#details">More...</a></p>
 <div class="textblock"><code>#include &lt;<a class="el" href="maths-util_8h_source.html">common/maths-util.h</a>&gt;</code><br />
-<code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/data__specification_8h.html">data_specification.h</a>&gt;</code><br />
-<code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/recording_8h.html">recording.h</a>&gt;</code><br />
-<code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/debug_8h.html">debug.h</a>&gt;</code><br />
+<code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/data__specification_8h.html">data_specification.h</a>&gt;</code><br />
+<code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/recording_8h.html">recording.h</a>&gt;</code><br />
+<code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html">debug.h</a>&gt;</code><br />
 <code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/random_8h.html">random.h</a>&gt;</code><br />
-<code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/simulation_8h.html">simulation.h</a>&gt;</code><br />
+<code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/simulation_8h.html">simulation.h</a>&gt;</code><br />
 <code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_tools/spin1__api_8h.html">spin1_api.h</a>&gt;</code><br />
 <code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html">bit_field.h</a>&gt;</code><br />
 <code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/stdfix-full-iso_8h.html">stdfix-full-iso.h</a>&gt;</code><br />
 <code>#include &lt;limits.h&gt;</code><br />
 <code>#include &quot;<a class="el" href="spike__source_2poisson_2profile__tags_8h_source.html">profile_tags.h</a>&quot;</code><br />
-<code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/profiler_8h.html">profiler.h</a>&gt;</code><br />
+<code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/profiler_8h.html">profiler.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="spin1-wfi_8h_source.html">common/spin1-wfi.h</a>&gt;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
@@ -183,7 +183,7 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 <tr class="memitem:af4847de2b9a2d080b0e03eabccb7308d"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#af4847de2b9a2d080b0e03eabccb7308d">read_rates</a> (<a class="el" href="spike__source__poisson_8c.html#structsource__info">source_info</a> *sdram_sources)</td></tr>
 <tr class="memdesc:af4847de2b9a2d080b0e03eabccb7308d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read the rates of the Poisson.  <a href="spike__source__poisson_8c.html#af4847de2b9a2d080b0e03eabccb7308d">More...</a><br /></td></tr>
 <tr class="separator:af4847de2b9a2d080b0e03eabccb7308d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a25d26d2a2c3ec75e4013c7a5e42bc5a7"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a25d26d2a2c3ec75e4013c7a5e42bc5a7">initialise_recording</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/data__specification_8h.html">data_specification_metadata_t</a> *ds_regions)</td></tr>
+<tr class="memitem:a25d26d2a2c3ec75e4013c7a5e42bc5a7"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a25d26d2a2c3ec75e4013c7a5e42bc5a7">initialise_recording</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/data__specification_8h.html">data_specification_metadata_t</a> *ds_regions)</td></tr>
 <tr class="memdesc:a25d26d2a2c3ec75e4013c7a5e42bc5a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise the recording parts of the model.  <a href="spike__source__poisson_8c.html#a25d26d2a2c3ec75e4013c7a5e42bc5a7">More...</a><br /></td></tr>
 <tr class="separator:a25d26d2a2c3ec75e4013c7a5e42bc5a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a03a8e4045b51680cc94b4359837fa796"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a03a8e4045b51680cc94b4359837fa796">initialize</a> (void)</td></tr>
@@ -906,7 +906,7 @@ Array of rate descriptors. </td></tr>
         <tr>
           <td class="memname">static bool initialise_recording </td>
           <td>(</td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/data__specification_8h.html">data_specification_metadata_t</a> *&#160;</td>
+          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/data__specification_8h.html">data_specification_metadata_t</a> *&#160;</td>
           <td class="paramname"><em>ds_regions</em></td><td>)</td>
           <td></td>
         </tr>
@@ -1420,7 +1420,7 @@ Array of rate descriptors. </td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Aug 4 2020 08:41:22 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Aug 4 2020 09:00:51 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.17
 </small></address>

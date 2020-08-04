@@ -96,10 +96,10 @@ Functions</h2></td></tr>
 <tr class="memitem:aa1ad92bb519344d001dba972cdd0be5f"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#aa1ad92bb519344d001dba972cdd0be5f">synapses_print_weight</a> (weight_t weight, uint32_t left_shift)</td></tr>
 <tr class="memdesc:aa1ad92bb519344d001dba972cdd0be5f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print the weight of a synapse.  <a href="synapses_8h.html#aa1ad92bb519344d001dba972cdd0be5f">More...</a><br /></td></tr>
 <tr class="separator:aa1ad92bb519344d001dba972cdd0be5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af18f202350f50a1bc5444062a9e1ee43"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#af18f202350f50a1bc5444062a9e1ee43">synapses_initialise</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> synapse_params_address, uint32_t <a class="el" href="synapses_8c.html#a7368643a28282d8b3429f0fb145aa5db">n_neurons</a>, uint32_t <a class="el" href="synapses_8c.html#adedb27b3ece4d4dece0aee776a136427">n_synapse_types</a>, uint32_t **ring_buffer_to_input_buffer_left_shifts)</td></tr>
+<tr class="memitem:af18f202350f50a1bc5444062a9e1ee43"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#af18f202350f50a1bc5444062a9e1ee43">synapses_initialise</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> synapse_params_address, uint32_t <a class="el" href="synapses_8c.html#a7368643a28282d8b3429f0fb145aa5db">n_neurons</a>, uint32_t <a class="el" href="synapses_8c.html#adedb27b3ece4d4dece0aee776a136427">n_synapse_types</a>, uint32_t **ring_buffer_to_input_buffer_left_shifts)</td></tr>
 <tr class="memdesc:af18f202350f50a1bc5444062a9e1ee43"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise the synapse processing.  <a href="synapses_8h.html#af18f202350f50a1bc5444062a9e1ee43">More...</a><br /></td></tr>
 <tr class="separator:af18f202350f50a1bc5444062a9e1ee43"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad88a7e6b3773f1e0f334b7410f182987"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#ad88a7e6b3773f1e0f334b7410f182987">synapses_do_timestep_update</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#a3b72c02431c8c631ab35793169a96ca0">timer_t</a> <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>)</td></tr>
+<tr class="memitem:ad88a7e6b3773f1e0f334b7410f182987"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#ad88a7e6b3773f1e0f334b7410f182987">synapses_do_timestep_update</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#a3b72c02431c8c631ab35793169a96ca0">timer_t</a> <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>)</td></tr>
 <tr class="memdesc:ad88a7e6b3773f1e0f334b7410f182987"><td class="mdescLeft">&#160;</td><td class="mdescRight">Do all the synapse processing for a timestep.  <a href="synapses_8h.html#ad88a7e6b3773f1e0f334b7410f182987">More...</a><br /></td></tr>
 <tr class="separator:ad88a7e6b3773f1e0f334b7410f182987"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa1ceab23dea834d6189f496b5133d983"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="synapses_8h.html#aa1ceab23dea834d6189f496b5133d983">synapses_process_synaptic_row</a> (uint32_t <a class="el" href="spike__source__poisson_8c.html#ae73654f333e4363463ad8c594eca1905">time</a>, <a class="el" href="neuron-typedefs_8h.html#a883af5b0c4fbeeb762d784a8e162da64">synaptic_row_t</a> row, bool *write_back)</td></tr>
@@ -342,7 +342,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="syna
         <tr>
           <td class="memname">bool synapses_initialise </td>
           <td>(</td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td>
+          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a>&#160;</td>
           <td class="paramname"><em>synapse_params_address</em>, </td>
         </tr>
         <tr>
@@ -394,7 +394,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="syna
         <tr>
           <td class="memname">void synapses_do_timestep_update </td>
           <td>(</td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/common-typedefs_8h.html#a3b72c02431c8c631ab35793169a96ca0">timer_t</a>&#160;</td>
+          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#a3b72c02431c8c631ab35793169a96ca0">timer_t</a>&#160;</td>
           <td class="paramname"><em>time</em></td><td>)</td>
           <td></td>
         </tr>
@@ -524,7 +524,7 @@ true if successful </dd></dl>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Aug 4 2020 08:41:22 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Aug 4 2020 09:00:51 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.17
 </small></address>

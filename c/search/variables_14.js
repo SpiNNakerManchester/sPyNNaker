@@ -1,8 +1,8 @@
 var searchData=
 [
   ['udp_5fport_3371',['udp_port',['http://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html#a9af5a7e4f460fd1c35798062643bd0c1',1,'srom_data']]],
-  ['uncompressed_5frouter_5ftable_3372',['uncompressed_router_table',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/compressor__sorter__structs_8h.html#a69f0516a2f97f34460eea02de697034e',1,'comms_sdram_t']]],
-  ['uncompressed_5ftable_3373',['uncompressed_table',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/compressor__sorter__structs_8h.html#a8082501788d19b0833dc0d130c0bd796',1,'uncompressed_table_region_data_t']]],
+  ['uncompressed_5frouter_5ftable_3372',['uncompressed_router_table',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/compressor__sorter__structs_8h.html#a69f0516a2f97f34460eea02de697034e',1,'comms_sdram_t']]],
+  ['uncompressed_5ftable_3373',['uncompressed_table',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/compressor__sorter__structs_8h.html#a8082501788d19b0833dc0d130c0bd796',1,'uncompressed_table_region_data_t']]],
   ['undef_5fvec_3374',['undef_vec',['http://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html#a144656d1732c8ec4a1107c2febc1fa1d',1,'sark_vec']]],
   ['unix_5ftime_3375',['unix_time',['http://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html#a8145163b1034a8f183abf180bc4c15b1',1,'sv']]],
   ['update_5ftime_3376',['update_time',['../robot__motor__control_8c.html#af91db5a416282fefdb525fadbc6f5f8f',1,'motor_control_config_t::update_time()'],['../robot__motor__control_8c.html#a86e18fc3ab6be6646e80307e68187e63',1,'update_time():&#160;robot_motor_control.c']]],

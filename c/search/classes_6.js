@@ -1,7 +1,7 @@
 var searchData=
 [
-  ['filter_5finfo_5ft_1888',['filter_info_t',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/filter__info_8h.html',1,'']]],
-  ['filter_5fregion_5ft_1889',['filter_region_t',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/filter__info_8h.html',1,'']]],
+  ['filter_5finfo_5ft_1888',['filter_info_t',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/filter__info_8h.html',1,'']]],
+  ['filter_5fregion_5ft_1889',['filter_region_t',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/filter__info_8h.html',1,'']]],
   ['fixed_5fpost_1890',['fixed_post',['../connection__generator__fixed__post_8h.html#structfixed__post',1,'']]],
   ['fixed_5fpost_5fparams_1891',['fixed_post_params',['../connection__generator__fixed__post_8h.html#structfixed__post__params',1,'']]],
   ['fixed_5fpre_1892',['fixed_pre',['../connection__generator__fixed__pre_8h.html#structfixed__pre',1,'']]],

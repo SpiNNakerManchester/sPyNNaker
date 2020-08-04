@@ -91,7 +91,7 @@ $(function() {
 <div class="line"><a name="l00025"></a><span class="lineno">   25</span>&#160;<span class="preprocessor">#ifndef __MATRIX_GENERATOR_COMMON_H__</span></div>
 <div class="line"><a name="l00026"></a><span class="lineno">   26</span>&#160;<span class="preprocessor">#define __MATRIX_GENERATOR_COMMON_H__</span></div>
 <div class="line"><a name="l00027"></a><span class="lineno">   27</span>&#160; </div>
-<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="preprocessor">#include &lt;<a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/debug_8h.html">debug.h</a>&gt;</span></div>
+<div class="line"><a name="l00028"></a><span class="lineno">   28</span>&#160;<span class="preprocessor">#include &lt;<a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html">debug.h</a>&gt;</span></div>
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160; </div>
 <div class="line"><a name="l00033"></a><span class="lineno"><a class="line" href="matrix__generator__common_8h.html#a16027d8acc5301e440cefa086eb9db2a">   33</a></span>&#160;<span class="preprocessor">#define MAX_DELAY 16</span></div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160; </div>
@@ -105,14 +105,14 @@ $(function() {
 <div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160; </div>
 <div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;    <span class="comment">// Ensure delay is at least 1</span></div>
 <div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;    <span class="keywordflow">if</span> (delay &lt; 1) {</div>
-<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;        <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/debug_8h.html#a9845e8157cc395cb8f3ed1761048e4f3">log_debug</a>(<span class="stringliteral">&quot;Delay of %u is too small&quot;</span>, delay);</div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;        <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a9845e8157cc395cb8f3ed1761048e4f3">log_debug</a>(<span class="stringliteral">&quot;Delay of %u is too small&quot;</span>, delay);</div>
 <div class="line"><a name="l00055"></a><span class="lineno">   55</span>&#160;        delay = 1;</div>
 <div class="line"><a name="l00056"></a><span class="lineno">   56</span>&#160;    }</div>
 <div class="line"><a name="l00057"></a><span class="lineno">   57</span>&#160; </div>
 <div class="line"><a name="l00058"></a><span class="lineno">   58</span>&#160;    <span class="comment">// Ensure that the delay is less than the maximum</span></div>
 <div class="line"><a name="l00059"></a><span class="lineno">   59</span>&#160;    uint16_t stage = (delay - 1) / <a class="code" href="matrix__generator__common_8h.html#a16027d8acc5301e440cefa086eb9db2a">MAX_DELAY</a>;</div>
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;    <span class="keywordflow">if</span> (stage &gt;= max_stage) {</div>
-<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;        <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/debug_8h.html#a9845e8157cc395cb8f3ed1761048e4f3">log_debug</a>(<span class="stringliteral">&quot;Delay of %u is too big&quot;</span>, delay);</div>
+<div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160;        <a class="codeRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a9845e8157cc395cb8f3ed1761048e4f3">log_debug</a>(<span class="stringliteral">&quot;Delay of %u is too big&quot;</span>, delay);</div>
 <div class="line"><a name="l00062"></a><span class="lineno">   62</span>&#160;        stage = max_stage - 1;</div>
 <div class="line"><a name="l00063"></a><span class="lineno">   63</span>&#160;        delay = (stage * <a class="code" href="matrix__generator__common_8h.html#a16027d8acc5301e440cefa086eb9db2a">MAX_DELAY</a>);</div>
 <div class="line"><a name="l00064"></a><span class="lineno">   64</span>&#160;    }</div>
@@ -126,12 +126,12 @@ $(function() {
 </div><!-- fragment --></div><!-- contents -->
 <div class="ttc" id="amatrix__generator__common_8h_html_a16027d8acc5301e440cefa086eb9db2a"><div class="ttname"><a href="matrix__generator__common_8h.html#a16027d8acc5301e440cefa086eb9db2a">MAX_DELAY</a></div><div class="ttdeci">#define MAX_DELAY</div><div class="ttdoc">The maximum delay value that can be represented on core.</div><div class="ttdef"><b>Definition:</b> matrix_generator_common.h:33</div></div>
 <div class="ttc" id="amatrix__generator__common_8h_html_aaffaf8d20874f964c224271c048c1375"><div class="ttname"><a href="matrix__generator__common_8h.html#aaffaf8d20874f964c224271c048c1375">get_delay</a></div><div class="ttdeci">static struct delay_value get_delay(uint16_t delay_value, uint32_t max_stage)</div><div class="ttdoc">Get a converted delay value and stage.</div><div class="ttdef"><b>Definition:</b> matrix_generator_common.h:49</div></div>
-<div class="ttc" id="adebug_8h.html_html"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/debug_8h.html">debug.h</a></div></div>
+<div class="ttc" id="adebug_8h.html_html"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html">debug.h</a></div></div>
 <div class="ttc" id="amatrix__generator__common_8h_html_structdelay__value"><div class="ttname"><a href="matrix__generator__common_8h.html#structdelay__value">delay_value</a></div><div class="ttdoc">A converted final delay value and delay stage.</div><div class="ttdef"><b>Definition:</b> matrix_generator_common.h:38</div></div>
-<div class="ttc" id="adebug_8h_html_a9845e8157cc395cb8f3ed1761048e4f3"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag/debug_8h.html#a9845e8157cc395cb8f3ed1761048e4f3">log_debug</a></div><div class="ttdeci">void log_debug(const char *message,...)</div></div>
+<div class="ttc" id="adebug_8h_html_a9845e8157cc395cb8f3ed1761048e4f3"><div class="ttname"><a href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/debug_8h.html#a9845e8157cc395cb8f3ed1761048e4f3">log_debug</a></div><div class="ttdeci">void log_debug(const char *message,...)</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Aug 4 2020 08:41:21 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Aug 4 2020 09:00:50 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.17
 </small></address>
