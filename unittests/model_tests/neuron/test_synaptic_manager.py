@@ -170,26 +170,26 @@ class TestSynapticManager(unittest.TestCase):
         one_to_one_connector_1 = OneToOneConnector(None)
         direct_synapse_information_1 = SynapseInformation(
             one_to_one_connector_1, pre_app_vertex, post_app_vertex, False,
-            False, None, SynapseDynamicsStatic(), 0, 1.5, 1.0)
+            False, None, SynapseDynamicsStatic(), 0, True, 1.5, 1.0)
         one_to_one_connector_1.set_projection_information(
             machine_time_step, direct_synapse_information_1)
         one_to_one_connector_2 = OneToOneConnector(None)
         direct_synapse_information_2 = SynapseInformation(
             one_to_one_connector_2, pre_app_vertex, post_app_vertex, False,
-            False, None, SynapseDynamicsStatic(), 1, 2.5, 2.0)
+            False, None, SynapseDynamicsStatic(), 1, True, 2.5, 2.0)
         one_to_one_connector_2.set_projection_information(
             machine_time_step, direct_synapse_information_2)
         all_to_all_connector = AllToAllConnector()
         all_to_all_synapse_information = SynapseInformation(
             all_to_all_connector, pre_app_vertex, post_app_vertex, False,
-            False, None, SynapseDynamicsStatic(), 0, 4.5, 4.0)
+            False, None, SynapseDynamicsStatic(), 0, True, 4.5, 4.0)
         all_to_all_connector.set_projection_information(
             machine_time_step, all_to_all_synapse_information)
         from_list_list = [(i, i, i, (i * 5) + 1) for i in range(10)]
         from_list_connector = FromListConnector(conn_list=from_list_list)
         from_list_synapse_information = SynapseInformation(
             from_list_connector, pre_app_vertex, post_app_vertex, False,
-            False, None, SynapseDynamicsStatic(), 0)
+            False, None, SynapseDynamicsStatic(), 0, True)
         from_list_connector.set_projection_information(
             machine_time_step, from_list_synapse_information)
         n_delay_stages = int(math.ceil(
