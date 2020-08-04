@@ -90,15 +90,20 @@ typedef struct {
     mars_kiss64_seed_t *local_seed;
     //! Low atom copied from rewiring data
     uint32_t post_low_atom;
-    // what are the currently selecting pre- and post-synaptic neurons
+    //! The currently selecting pre-synaptic neuron ID
     uint32_t pre_syn_id;
+    //! The currently selecting post-synaptic neuron ID
     uint32_t post_syn_id;
     //! does the connection already exist
     uint32_t element_exists;
     // information extracted from the post to pre table
+    //! Entry from ::post_to_pre_table
     post_to_pre_entry *post_to_pre_table_entry;
+    //! Entry from ::pre_pop_info_table_t.prepop_info
     pre_info_t *pre_population_info;
+    //! Entry from ::pre_info_t::key_atom_info
     key_atom_info_t *key_atom_info;
+    //! Copy of current post-to-pre entry
     post_to_pre_entry post_to_pre;
     //! offset in synaptic row (if exists)
     uint32_t offset;
@@ -110,11 +115,13 @@ typedef struct {
     uint32_t synapse_type;
 } current_state_t;
 
-//! \brief Get the next U(0,1) random number from an RNG
-//! \param[in] state: The seed/state for the RNG
-//! \return a uniformly-distributed random fract in the range 0-1.
-static inline u032 next_random(mars_kiss64_seed_t state) {
-    return ulrbits(mars_kiss64_seed(state));
+//! \brief Get a random unsigned integer up to (but not including) a given
+//!     maximum
+//! \param[in] max: The maximum value allowed
+//! \param[in] seed: The random seed to use
+//! \return The generated value
+static inline uint32_t rand_int(uint32_t max, mars_kiss64_seed_t seed) {
+    return muliulr(max, ulrbits(mars_kiss64_seed(seed)));
 }
 
 //! \brief unpack the spike into key and identifying information for the
@@ -204,7 +211,7 @@ static inline bool sp_structs_add_synapse(
 
     uint32_t offset = current_state->pre_population_info->delay_hi -
             current_state->pre_population_info->delay_lo;
-    uint32_t actual_delay = next_random(*current_state->local_seed) * offset +
+    uint32_t actual_delay = rand_int(offset, *(current_state->local_seed)) +
             current_state->pre_population_info->delay_lo;
 
     if (!synapse_dynamics_add_neuron(

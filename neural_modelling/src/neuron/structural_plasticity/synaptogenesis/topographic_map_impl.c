@@ -193,8 +193,8 @@ bool synaptogenesis_dynamics_rewire(
         uint32_t time, spike_t *spike, synaptic_row_t *synaptic_row_address,
         uint32_t *n_bytes) {
     // Randomly choose a postsynaptic (application neuron)
-    uint32_t post_id = next_random(rewiring_data.shared_seed) *
-            rewiring_data.app_no_atoms;
+    uint32_t post_id = rand_int(rewiring_data.app_no_atoms,
+            rewiring_data.shared_seed);
 
     // Check if neuron is in the current machine vertex
     if (post_id < rewiring_data.low_atom ||
@@ -205,8 +205,8 @@ bool synaptogenesis_dynamics_rewire(
 
     // Select an arbitrary synaptic element for the neurons
     uint32_t row_offset = post_id * rewiring_data.s_max;
-    uint32_t column_offset =
-            next_random(rewiring_data.local_seed) * rewiring_data.s_max;
+    uint32_t column_offset = rand_int(rewiring_data.s_max,
+            rewiring_data.local_seed);
     uint32_t total_offset = row_offset + column_offset;
     post_to_pre_entry entry = post_to_pre_table[total_offset];
     uint32_t pre_app_pop = 0, pre_sub_pop = 0, m_pop_index = 0, neuron_id = 0;

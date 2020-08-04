@@ -42,6 +42,10 @@ struct formation_params {
     uint32_t grid_x;
     //! Size of grid containing neurons, Y-dimension
     uint32_t grid_y;
+    //! Reciprocal of grid_x
+    unsigned long fract grid_x_recip;
+    //! Reciprocal of grid_y
+    unsigned long fract grid_y_recip;
     //! Size of FF probability table
     uint32_t ff_prob_size;
     //! Size of LAT probability table
@@ -74,23 +78,26 @@ static inline bool synaptogenesis_formation_rule(
     // To do this I need to take the DIV and MOD of the
     // post-synaptic neuron ID, of the pre-synaptic neuron ID
     // Compute the distance of these 2 measures
-    int32_t pre_x, pre_y, post_x, post_y, pre_global_id, post_global_id;
+    uint32_t pre_x, pre_y, post_x, post_y;
     // Pre computation requires querying the table with global information
-    pre_global_id = current_state->key_atom_info->lo_atom +
+    uint32_t pre_global_id = current_state->key_atom_info->lo_atom +
             current_state->pre_syn_id;
-    post_global_id = current_state->post_syn_id + current_state->post_low_atom;
+    uint32_t post_global_id = current_state->post_syn_id +
+            current_state->post_low_atom;
 
     if (params->grid_x > 1) {
-        pre_x = pre_global_id / params->grid_x;
-        post_x = post_global_id / params->grid_x;
+        pre_x = muliulr(pre_global_id, params->grid_x_recip);
+        post_x = muliulr(post_global_id, params->grid_x_recip);
     } else {
         pre_x = 0;
         post_x = 0;
     }
 
     if (params->grid_y > 1) {
-        pre_y = pre_global_id % params->grid_y;
-        post_y = post_global_id % params->grid_y;
+        uint32_t pre_y_div = muliulr(pre_global_id, params->grid_y_recip);
+        uint32_t post_y_div = muliulr(post_global_id, params->grid_y_recip);
+        pre_y = pre_global_id - (pre_y_div * params->grid_y);
+        post_y = post_global_id - (post_y_div * params->grid_y);
     } else {
         pre_y = 0;
         post_y = 0;
@@ -125,7 +132,7 @@ static inline bool synaptogenesis_formation_rule(
         }
         probability = params->prob_tables[params->ff_prob_size + distance];
     }
-    uint16_t r = next_random(*current_state->local_seed) * MAX_SHORT;
+    uint32_t r = rand_int(MAX_SHORT, *current_state->local_seed);
     if (r > probability) {
         return false;
     }

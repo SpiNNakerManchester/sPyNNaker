@@ -73,7 +73,7 @@ static inline bool potential_presynaptic_partner(
     if (!n_spikes[buffer]) {
         return false;
     }
-    uint32_t offset = next_random(rewiring_data.local_seed) * n_spikes[buffer];
+    uint32_t offset = rand_int(n_spikes[buffer], rewiring_data.local_seed);
     *spike = last_spikes_buffer[buffer][offset];
     return sp_structs_find_by_spike(&pre_info, *spike, neuron_id,
             population_id, sub_population_id, m_pop_index);

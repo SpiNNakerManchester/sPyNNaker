@@ -68,24 +68,23 @@ static inline bool potential_presynaptic_partner(
     extern pre_pop_info_table_t pre_info;
 
     use(time);
-    uint32_t pop_id = next_random(rewiring_data.local_seed) *
-            pre_info.no_pre_pops;
+    uint32_t pop_id = rand_int(pre_info.no_pre_pops, rewiring_data.local_seed);
     *population_id = pop_id;
     pre_info_t *preapppop_info = pre_info.prepop_info[pop_id];
 
     // Select presynaptic sub-population
-    uint32_t n_id = next_random(rewiring_data.local_seed) *
-            preapppop_info->total_no_atoms;
+    uint32_t n_id = rand_int(preapppop_info->total_no_atoms,
+            rewiring_data.local_seed);
     uint32_t subpop_id = pick_subpopulation(preapppop_info, n_id);
     *sub_population_id = subpop_id;
+    const key_atom_info_t *kai = &preapppop_info->key_atom_info[subpop_id];
 
     // Select a presynaptic neuron ID
-    n_id = next_random(rewiring_data.local_seed) *
-            preapppop_info->key_atom_info[subpop_id].n_atoms;
+    n_id = rand_int(kai->n_atoms, rewiring_data.local_seed);
 
     *neuron_id = n_id;
-    *spike = preapppop_info->key_atom_info[subpop_id].key | n_id;
-    *m_pop_index = preapppop_info->key_atom_info[subpop_id].m_pop_index;
+    *spike = kai->key | n_id;
+    *m_pop_index = kai->m_pop_index;
     return true;
 }
 

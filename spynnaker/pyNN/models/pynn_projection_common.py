@@ -397,18 +397,29 @@ class PyNNProjectionCommon(object):
         progress = ProgressBar(
             edges, "Getting {}s for projection between {} and {}".format(
                 data_to_get, pre_vertex.label, post_vertex.label))
+
+        # store receivers to reduce surplus calls
+        data_receivers = list()
+
         for edge in progress.over(edges):
             placement = ctl.placements.get_placement_of_vertex(
                 edge.post_vertex)
 
             # if using extra monitor data extractor find local receiver
-            if extra_monitors is not None:
+            if extra_monitors is not None and handle_time_out_configuration:
                 receiver = locate_extra_monitor_mc_receiver(
                     placement_x=placement.x, placement_y=placement.y,
                     machine=ctl.machine,
                     packet_gather_cores_to_ethernet_connection_map=receivers)
                 sender_extra_monitor_core = extra_monitor_placements[
                     placement.x, placement.y]
+
+                if receiver not in data_receivers:
+                    data_receivers.append(receiver)
+                    receiver.load_system_routing_tables(
+                        ctl.transceiver, extra_monitors, ctl.placements)
+                    receiver.set_cores_for_data_streaming(
+                        ctl.transceiver, extra_monitors, ctl.placements)
             else:
                 receiver = None
                 sender_extra_monitor_core = None
@@ -417,11 +428,17 @@ class PyNNProjectionCommon(object):
                 ctl.transceiver, placement, edge,
                 ctl.routing_infos, self.__synapse_information,
                 ctl.machine_time_step, extra_monitors is not None,
-                ctl.placements, receiver, extra_monitors,
-                handle_time_out_configuration,
-                ctl.fixed_routes, sender_extra_monitor_core)
+                ctl.placements, receiver, ctl.fixed_routes,
+                sender_extra_monitor_core)
             if connections is not None:
                 connection_holder.add_connections(connections)
+
+        for data_receiver in data_receivers:
+            data_receiver.unset_cores_for_data_streaming(
+                ctl.transceiver, extra_monitors, ctl.placements)
+            data_receiver.load_application_routing_tables(
+                ctl.transceiver, extra_monitors, ctl.placements)
+
         connection_holder.finish()
 
     def _clear_cache(self):
