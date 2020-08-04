@@ -161,11 +161,11 @@ class SynapticManager(object):
 
     def host_written_matrix_size(self, post_vertex_slice):
         matrices = self.__get_synaptic_matrices(post_vertex_slice)
-        return matrices.host_written_matrix_size
+        return matrices.host_generated_block_addr
 
     def on_chip_written_matrix_size(self, post_vertex_slice):
         matrices = self.__get_synaptic_matrices(post_vertex_slice)
-        return (matrices.on_chip_generated_matrix_size -
+        return (matrices.on_chip_generated_block_addr -
                 matrices.host_generated_block_addr)
 
     @property
