@@ -33,13 +33,14 @@ class SynapseInformation(object):
         "__rng",
         "__synapse_dynamics",
         "__synapse_type",
+        "__is_virtual_machine",
         "__weights",
         "__delays",
         "__pre_run_connection_holders"]
 
     def __init__(self, connector, pre_population, post_population,
                  prepop_is_view, postpop_is_view, rng,
-                 synapse_dynamics, synapse_type,
+                 synapse_dynamics, synapse_type, is_virtual_machine,
                  weights=None, delays=None):
         """
         :param AbstractConnector connector:
@@ -55,6 +56,7 @@ class SynapseInformation(object):
         :param AbstractSynapseDynamics synapse_dynamics:
             The dynamic behaviour of the synapse
         :param AbstractSynapseType synapse_type: The type of the synapse
+        :param bool is_virtual_machine: Is the machine virtual?
         :param weights: The synaptic weights
         :type weights: float or list(float) or ~numpy.ndarray(float) or None
         :param delays: The total synaptic delays
@@ -70,6 +72,7 @@ class SynapseInformation(object):
         self.__synapse_type = synapse_type
         self.__weights = weights
         self.__delays = delays
+        self.__is_virtual_machine = is_virtual_machine
 
         # Make a list of holders to be updated
         self.__pre_run_connection_holders = list()
@@ -181,11 +184,15 @@ class SynapseInformation(object):
             may have already been so done)
         :rtype: bool
         """
+        # If we are using a virtual machine, we can't generate on the machine
+        if self.__is_virtual_machine:
+            return False
         connector_gen = (
             isinstance(self.connector, AbstractGenerateConnectorOnMachine) and
             self.connector.generate_on_machine(self.weights, self.delays))
-        synapse_gen = isinstance(
-            self.synapse_dynamics, AbstractGenerateOnMachine)
+        synapse_gen = (
+            isinstance(self.synapse_dynamics, AbstractGenerateOnMachine) and
+            self.synapse_dynamics.generate_on_machine)
         return connector_gen and synapse_gen
 
     @property

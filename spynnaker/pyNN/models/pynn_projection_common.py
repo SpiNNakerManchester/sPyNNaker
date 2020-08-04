@@ -123,8 +123,8 @@ class PyNNProjectionCommon(object):
         self.__synapse_information = SynapseInformation(
             connector, pre_synaptic_population, post_synaptic_population,
             prepop_is_view, postpop_is_view, rng, synapse_dynamics_stdp,
-            synapse_type, synapse_dynamics_stdp.weight,
-            synapse_dynamics_stdp.delay)
+            synapse_type, spinnaker_control.use_virtual_board,
+            synapse_dynamics_stdp.weight, synapse_dynamics_stdp.delay)
 
         # Set projection information in connector
         connector.set_projection_information(

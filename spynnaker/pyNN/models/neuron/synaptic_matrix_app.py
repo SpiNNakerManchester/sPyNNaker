@@ -203,22 +203,9 @@ class SynapticMatrixApp(object):
         :param int single_addr:
         :rtype: bool
         """
-        connector = self.__synapse_info.connector
-        dynamics = self.__synapse_info.synapse_dynamics
-
-        # If the whole app edge can be done with direct synapses, or there are
-        # structural connections, don't generate on the machine
-        if (self.__is_app_edge_direct(single_addr) or
-                isinstance(dynamics, AbstractSynapseDynamicsStructural)):
-            return False
-
         return (
-            isinstance(connector, AbstractGenerateConnectorOnMachine) and
-            connector.generate_on_machine(
-                self.__synapse_info.weights, self.__synapse_info.delays) and
-            isinstance(dynamics, AbstractGenerateOnMachine) and
-            dynamics.generate_on_machine
-        )
+            self.__synapse_info.may_generate_on_machine() and
+            not self.__is_app_edge_direct(single_addr))
 
     def __is_app_edge_direct(self, single_addr):
         """ Determine if an app edge can use the direct matrix for all of its\

@@ -205,3 +205,8 @@ class SynapseDynamicsStructuralSTDP(
         w_max = super(SynapseDynamicsStructuralSTDP, self).get_weight_maximum(
             connector, synapse_info)
         return max(w_max, self.__common_sp.initial_weight)
+
+    @overrides(SynapseDynamicsSTDP.generate_on_machine)
+    def generate_on_machine(self):
+        # Never generate structural connections on the machine
+        return False
