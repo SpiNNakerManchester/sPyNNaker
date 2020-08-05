@@ -147,6 +147,6 @@ class DelayExtensionMachineVertex(
             n_delays))
         provenance_items.append(
             self._app_vertex.get_tdma_provenance_item(
-                names, n_times_tdma_fell_behind))
+                names, x, y, p, n_times_tdma_fell_behind))
 
         return provenance_items

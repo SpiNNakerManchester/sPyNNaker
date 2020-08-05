@@ -81,6 +81,8 @@ struct neuron_provenance {
     uint32_t n_rewires;
     uint32_t n_packets_dropped_from_lateness;
     uint32_t spike_processing_get_max_filled_input_buffer_size;
+    //! the number of times the TDMA fully missed its slots
+    uint32_t n_tdma_mises;
 };
 
 //! values for the priority for each callback
@@ -150,6 +152,7 @@ static void c_main_store_provenance_data(address_t provenance_region) {
         spike_processing_get_n_packets_dropped_from_lateness();
     prov->spike_processing_get_max_filled_input_buffer_size =
         spike_processing_get_max_filled_input_buffer_size();
+    prov->n_tdma_mises = tdma_processing_times_behind();
 
     log_debug("finished other provenance data");
 }

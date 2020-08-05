@@ -71,7 +71,9 @@ class PopulationMachineVertex(
         # to be processed
         N_LATE_SPIKES = 12
         # the max filled size of the input buffer
-        INPUT_BUFFER_FILLED_SIZE = 13
+        INPUT_BUFFER_FILLED_SIZE = 13,
+        # the number of tdma misses
+        TDMA_MISSES = 14,
 
     SATURATION_COUNT_NAME = "Times_synaptic_weights_have_saturated"
     SATURATION_COUNT_MESSAGE = (
@@ -136,6 +138,7 @@ class PopulationMachineVertex(
     LAST_TIMER_TICK = "Last_timer_tic_the_core_ran_to"
     TOTAL_PRE_SYNAPTIC_EVENTS = "Total_pre_synaptic_events"
     LOST_INPUT_BUFFER_PACKETS = "Times_the_input_buffer_lost_packets"
+
 
     N_ADDITIONAL_PROVENANCE_DATA_ITEMS = len(EXTRA_PROVENANCE_DATA_ENTRIES)
 
@@ -257,6 +260,8 @@ class PopulationMachineVertex(
             self.EXTRA_PROVENANCE_DATA_ENTRIES.N_LATE_SPIKES.value]
         input_buffer_max_filled_size = provenance_data[
             self.EXTRA_PROVENANCE_DATA_ENTRIES.INPUT_BUFFER_FILLED_SIZE.value]
+        tdma_misses = provenance_data[
+            self.EXTRA_PROVENANCE_DATA_ENTRIES.TDMA_MISSES.value]
 
         label, x, y, p, names = self._get_placement_details(placement)
 
@@ -345,6 +350,9 @@ class PopulationMachineVertex(
         provenance_items.append(ProvenanceDataItem(
             self._add_name(names, self._MAX_FILLED_SIZE_OF_INPUT_BUFFER_NAME),
             input_buffer_max_filled_size, report=False))
+
+        provenance_items.append(self._app_vertex.get_tdma_provenance_item(
+                names, x, y, p, tdma_misses))
         return provenance_items
 
     @overrides(AbstractReceiveBuffersToHost.get_recorded_region_ids)
