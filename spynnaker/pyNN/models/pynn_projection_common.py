@@ -404,6 +404,7 @@ class PyNNProjectionCommon(object):
         for edge in progress.over(edges):
             placement = ctl.placements.get_placement_of_vertex(
                 edge.post_vertex)
+
             # if using extra monitor data extractor find local receiver
             if extra_monitors is not None and handle_time_out_configuration:
                 receiver = locate_extra_monitor_mc_receiver(
