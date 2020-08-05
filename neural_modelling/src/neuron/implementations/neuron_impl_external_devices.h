@@ -45,7 +45,7 @@ enum send_type {
 
 
 //! The definition of the threshold
-typedef struct threshold_type_t {
+typedef struct packet_firing_data_t {
     //! The key to send to update the value
     uint32_t key;
     //! A scaling factor (>0) if the value is to be sent as payload,
@@ -63,7 +63,7 @@ typedef struct threshold_type_t {
     uint32_t time_until_next_send;
     //! Send type
     enum send_type type;
-} threshold_type_t;
+} packet_firing_data_t;
 
 //! Indices for recording of words
 enum word_recording_indices {
@@ -98,7 +98,7 @@ static input_type_t *input_type_array;
 static additional_input_t *additional_input_array;
 
 //! Threshold states array
-static threshold_type_t *threshold_type_array;
+static packet_firing_data_t *packet_firing_array;
 
 //! Global parameters for the neurons
 static global_neuron_params_t *global_parameters;
@@ -130,7 +130,7 @@ static inline uint _int_bits(int value) {
 //! \param[in] type: what type of payload are we really dealing with
 //! \param[in] value: the value, after scaling
 //! \return The word to go in the multicast packet payload
-static inline uint threshold_type_get_payload(enum send_type type, accum value) {
+static inline uint _get_payload(enum send_type type, accum value) {
     switch (type) {
     case SEND_TYPE_INT:
         return _int_bits((int) value);
@@ -196,10 +196,10 @@ static bool neuron_impl_initialise(uint32_t n_neurons) {
     }
 
     // Allocate DTCM for threshold type array and copy block of data
-    if (sizeof(threshold_type_t)) {
-        threshold_type_array =
-                spin1_malloc(n_neurons * sizeof(threshold_type_t));
-        if (threshold_type_array == NULL) {
+    if (sizeof(packet_firing_data_t)) {
+        packet_firing_array =
+                spin1_malloc(n_neurons * sizeof(packet_firing_data_t));
+        if (packet_firing_array == NULL) {
             log_error("Unable to allocate threshold type array - Out of DTCM");
             return false;
         }
@@ -280,11 +280,11 @@ static void neuron_impl_load_neuron_parameters(
         next += n_words_needed(n_neurons * sizeof(input_type_t));
     }
 
-    if (sizeof(threshold_type_t)) {
+    if (sizeof(packet_firing_data_t)) {
         log_debug("reading threshold type parameters");
-        spin1_memcpy(threshold_type_array, &address[next],
-                n_neurons * sizeof(threshold_type_t));
-        next += n_words_needed(n_neurons * sizeof(threshold_type_t));
+        spin1_memcpy(packet_firing_array, &address[next],
+                n_neurons * sizeof(packet_firing_data_t));
+        next += n_words_needed(n_neurons * sizeof(packet_firing_data_t));
     }
 
     if (sizeof(synapse_param_t)) {
@@ -331,18 +331,18 @@ static inline void send_packet(
     }
 }
 
-//! \brief Determines if the value given is above the threshold value
-//! \param[in] value: The value to determine if it is above the threshold
-//! \param[in] threshold_type: The parameters to use to determine the result
+//! \brief Determines if the device should fire
+//! \param[in] packet_firing: The parameters to use to determine if it
+//!                           should fire now
 //! \return True if the neuron should fire
-static bool threshold_type_is_above_threshold(threshold_type_t *threshold_type) {
-    if (threshold_type->time_until_next_send == 0) {
-        threshold_type->time_until_next_send =
-                threshold_type->timesteps_between_sending;
-        --threshold_type->time_until_next_send;
+static bool _test_will_fire(packet_firing_data_t *packet_firing) {
+    if (packet_firing->time_until_next_send == 0) {
+        packet_firing->time_until_next_send =
+                packet_firing->timesteps_between_sending;
+        --packet_firing->time_until_next_send;
         return true;
     }
-    --threshold_type->time_until_next_send;
+    --packet_firing->time_until_next_send;
     return false;
 }
 
@@ -360,14 +360,15 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     input_type_t *input_types = &input_type_array[neuron_index];
 
     // Get threshold and additional input parameters for this neuron
-    threshold_type_t *the_threshold_type = &threshold_type_array[neuron_index];
+    packet_firing_data_t *the_packet_firing =
+        &packet_firing_array[neuron_index];
     additional_input_t *additional_inputs =
             &additional_input_array[neuron_index];
     synapse_param_t *the_synapse_type =
             &neuron_synapse_shaping_params[neuron_index];
 
     // Store whether the neuron has spiked
-    bool has_fired = false;
+    bool will_fire = false;
 
     // Loop however many times requested; do this in reverse for efficiency,
     // and because the index doesn't actually matter
@@ -423,30 +424,30 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
                 NUM_INHIBITORY_RECEPTORS, inh_input_values,
                 external_bias, this_neuron);
 
-        // determine if a spike should occur
-        has_fired = threshold_type_is_above_threshold(the_threshold_type);
+        // determine if a packet should fly
+        will_fire = _test_will_fire(the_packet_firing);
 
         // If spike occurs, communicate to relevant parts of model
-        if (has_fired) {
-            if (the_threshold_type->value_as_payload) {
+        if (will_fire) {
+            if (the_packet_firing->value_as_payload) {
                 accum value_to_send = result;
-                if (result > the_threshold_type->max_value) {
-                    value_to_send = the_threshold_type->max_value;
+                if (result > the_packet_firing->max_value) {
+                    value_to_send = the_packet_firing->max_value;
                 }
-                if (result < the_threshold_type->min_value) {
-                    value_to_send = the_threshold_type->min_value;
+                if (result < the_packet_firing->min_value) {
+                    value_to_send = the_packet_firing->min_value;
                 }
 
-                uint payload = threshold_type_get_payload(
-                    the_threshold_type->type,
-                    value_to_send * the_threshold_type->value_as_payload);
+                uint payload = _get_payload(
+                    the_packet_firing->type,
+                    value_to_send * the_packet_firing->value_as_payload);
 
                 log_debug("Sending key=0x%08x payload=0x%08x",
-                        the_threshold_type->key, payload);
-                send_packet(the_threshold_type->key, payload, true);
+                        the_packet_firing->key, payload);
+                send_packet(the_packet_firing->key, payload, true);
             } else {
-                log_debug("Sending key=0x%08x", the_threshold_type->key);
-                send_packet(the_threshold_type->key, 0, false);
+                log_debug("Sending key=0x%08x", the_packet_firing->key);
+                send_packet(the_packet_firing->key, 0, false);
             }
         }
 
@@ -454,7 +455,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
         synapse_types_shape_input(the_synapse_type);
     }
 
-    if (has_fired) {
+    if (will_fire) {
         // Record the spike
         neuron_recording_record_bit(PACKET_RECORDING_BITFIELD, neuron_index);
     }
@@ -500,11 +501,11 @@ static void neuron_impl_store_neuron_parameters(
         next += n_words_needed(n_neurons * sizeof(input_type_t));
     }
 
-    if (sizeof(threshold_type_t)) {
+    if (sizeof(packet_firing_data_t)) {
         log_debug("writing threshold type parameters");
-        spin1_memcpy(&address[next], threshold_type_array,
-                n_neurons * sizeof(threshold_type_t));
-        next += n_words_needed(n_neurons * sizeof(threshold_type_t));
+        spin1_memcpy(&address[next], packet_firing_array,
+                n_neurons * sizeof(packet_firing_data_t));
+        next += n_words_needed(n_neurons * sizeof(packet_firing_data_t));
     }
 
     if (sizeof(synapse_param_t)) {
