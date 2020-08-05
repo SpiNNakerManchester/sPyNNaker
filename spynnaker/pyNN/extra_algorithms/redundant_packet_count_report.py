@@ -121,12 +121,15 @@ class RedundantPacketCountReport(object):
                         percentage))
 
         # do summary
-        output.write(self._SUMMARY_LEVEL_MSG.format(
-            max(overall_entries), min(overall_entries),
-            max(overall_redundant), min(overall_redundant),
-            statistics.mean(overall_entries),
-            statistics.mean(overall_redundant),
-            max(overall_redundant_percentage),
-            min(overall_redundant_percentage),
-            statistics.mean(overall_redundant_percentage),
-            sum(overall_entries)))
+        if len(overall_entries) != 0:
+            output.write(self._SUMMARY_LEVEL_MSG.format(
+                max(overall_entries), min(overall_entries),
+                max(overall_redundant), min(overall_redundant),
+                statistics.mean(overall_entries),
+                statistics.mean(overall_redundant),
+                max(overall_redundant_percentage),
+                min(overall_redundant_percentage),
+                statistics.mean(overall_redundant_percentage),
+                sum(overall_entries)))
+        else:
+            output.write("was no data to summarise")
