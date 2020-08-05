@@ -598,7 +598,7 @@ class SpikeSourcePoissonVertex(
 
     def _write_poisson_parameters(
             self, spec, graph, placement, routing_info,
-            vertex_slice, machine_time_step, time_scale_factor):
+            vertex_slice, machine_time_step):
         """ Generate Parameter data for Poisson spike sources
 
         :param ~data_specification.DataSpecification spec:
@@ -610,8 +610,6 @@ class SpikeSourcePoissonVertex(
             the slice of atoms a machine vertex holds from its application
             vertex
         :param int machine_time_step: the time between timer tick updates.
-        :param int time_scale_factor:
-            the scaling between machine time step and real time
         """
         # pylint: disable=too-many-arguments, too-many-locals
         spec.comment("\nWriting Parameters for {} poisson sources:\n"
@@ -641,35 +639,6 @@ class SpikeSourcePoissonVertex(
                 routing_info.get_routing_info_for_edge(in_edge).first_mask
             incoming_mask = ~incoming_mask & 0xFFFFFFFF
         spec.write_value(incoming_mask)
-
-        # Write the offset value
-        max_offset = (
-            machine_time_step * time_scale_factor) // _MAX_OFFSET_DENOMINATOR
-        spec.write_value(
-            int(math.ceil(max_offset / self.__n_subvertices)) *
-            self.__n_data_specs)
-        self.__n_data_specs += 1
-
-        if self.__max_spikes > 0:
-            spikes_per_timestep = (
-                self.__max_spikes /
-                (MICRO_TO_SECOND_CONVERSION // machine_time_step))
-            # avoid a possible division by zero / small number (which may
-            # result in a value that doesn't fit in a uint32) by only
-            # setting time_between_spikes if spikes_per_timestep is > 1
-            time_between_spikes = 1.0
-            if spikes_per_timestep > 1:
-                time_between_spikes = (
-                    (machine_time_step * time_scale_factor) /
-                    (spikes_per_timestep * 2.0))
-
-            spec.write_value(data=int(time_between_spikes))
-        else:
-
-            # If the rate is 0 or less, set a "time between spikes" of 1
-            # to ensure that some time is put between spikes in event
-            # of a rate change later on
-            spec.write_value(data=1)
 
         # Write the number of seconds per timestep (unsigned long fract)
         spec.write_value(
@@ -856,21 +825,19 @@ class SpikeSourcePoissonVertex(
 
     @inject_items({
         "machine_time_step": "MachineTimeStep",
-        "time_scale_factor": "TimeScaleFactor",
         "routing_info": "MemoryRoutingInfos",
         "graph": "MemoryMachineGraph",
         "first_machine_time_step": "FirstMachineTimeStep"})
     @overrides(
         AbstractRewritesDataSpecification.regenerate_data_specification,
         additional_arguments={
-            "machine_time_step", "time_scale_factor",
-            "routing_info", "graph", "first_machine_time_step"})
+            "machine_time_step", "routing_info", "graph",
+            "first_machine_time_step"})
     def regenerate_data_specification(
-            self, spec, placement, machine_time_step, time_scale_factor,
-            routing_info, graph, first_machine_time_step):
+            self, spec, placement, machine_time_step, routing_info, graph,
+            first_machine_time_step):
         """
         :param int machine_time_step:
-        :param int time_scale_factor:
         :param ~pacman.model.routing_info.RoutingInfo routing_info:
         :param ~pacman.model.graphs.machine.MachineGraph graph:
         :param int first_machine_time_step:
@@ -885,8 +852,7 @@ class SpikeSourcePoissonVertex(
             spec=spec, graph=graph, placement=placement,
             routing_info=routing_info,
             vertex_slice=placement.vertex.vertex_slice,
-            machine_time_step=machine_time_step,
-            time_scale_factor=time_scale_factor)
+            machine_time_step=machine_time_step)
 
         # write rates
         self._write_poisson_rates(
@@ -1024,7 +990,7 @@ class SpikeSourcePoissonVertex(
         # write parameters
         self._write_poisson_parameters(
             spec, graph, placement, routing_info, vertex_slice,
-            machine_time_step, time_scale_factor)
+            machine_time_step)
 
         # write rates
         self._write_poisson_rates(spec, vertex_slice, machine_time_step,

@@ -145,12 +145,8 @@ class DelayExtensionMachineVertex(
         provenance_items.append(ProvenanceDataItem(
             self._add_name(names, "Number_of_times_delayed_to_spread_traffic"),
             n_delays))
-        provenance_items.append(ProvenanceDataItem(
-            self._add_name(names, "Number_of_times_the_tdma_fell_behind"),
-            n_times_tdma_fell_behind, report=n_times_tdma_fell_behind > 0,
-            message=(
-                "The TDMA fell behind by {} times. try increasing the "
-                "time_between_cores in the corresponding .cfg".format(
-                    n_times_tdma_fell_behind))))
+        provenance_items.append(
+            self._app_vertex.get_tdma_provenance_item(
+                names, n_times_tdma_fell_behind))
 
         return provenance_items

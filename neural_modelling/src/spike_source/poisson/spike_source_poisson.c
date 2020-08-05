@@ -114,10 +114,6 @@ typedef struct global_parameters {
     uint32_t key;
     //! The mask to work out the neuron ID when setting the rate
     uint32_t set_rate_neuron_id_mask;
-    //! The offset of the timer ticks to desynchronize sources
-    uint32_t timer_offset;
-    //! The expected time to wait between spikes
-    uint32_t time_between_spikes;
     //! The time between ticks in seconds for setting the rate
     UFRACT seconds_per_tick;
     //! The number of ticks per second for setting the rate
@@ -133,6 +129,13 @@ typedef struct global_parameters {
     //! The seed for the Poisson generation process
     mars_kiss64_seed_t spike_source_seed;
 } global_parameters;
+
+//! Structure of the provenance data
+struct poisson_extension_provenance {
+    //! number of times the tdma fell behind its slot
+    uint32_t times_tdma_fell_behind;
+};
+
 
 //! The global_parameters for the sub-population
 static global_parameters ssp_params;
@@ -152,9 +155,6 @@ static source_info **source_data;
 
 //! The currently applied rate descriptors
 static spike_source_t *source;
-
-//! The expected current clock tick of timer_1
-static uint32_t expected_time;
 
 //! keeps track of which types of recording should be done to this model.
 static uint32_t recording_flags = 0;
@@ -188,6 +188,17 @@ static bool recording_in_progress = false;
 static uint32_t timer_period;
 
 // ----------------------------------------------------------------------
+
+//! \brief Writes the provenance data
+//! \param[out] provenance_region: Where to write the provenance
+static void store_provenance_data(address_t provenance_region) {
+    log_debug("writing other provenance data");
+    struct poisson_extension_provenance *prov = (void *) provenance_region;
+
+    // store the data into the provenance data region
+    prov->times_tdma_fell_behind = tdma_processing_times_behind();
+    log_debug("finished other provenance data");
+}
 
 //! \brief Get the source data for a particular spike source
 //! \param[in] id: The spike source ID
@@ -294,9 +305,8 @@ static bool read_global_parameters(global_parameters *sdram_globals) {
 
     spin1_memcpy(&ssp_params, sdram_globals, sizeof(ssp_params));
 
-    log_info("\tkey = %08x, set rate mask = %08x, timer offset = %u",
-            ssp_params.key, ssp_params.set_rate_neuron_id_mask,
-            ssp_params.timer_offset);
+    log_info("\tkey = %08x, set rate mask = %08x",
+            ssp_params.key, ssp_params.set_rate_neuron_id_mask);
     log_info("\tseed = %u %u %u %u", ssp_params.spike_source_seed[0],
             ssp_params.spike_source_seed[1],
             ssp_params.spike_source_seed[2],
@@ -411,7 +421,9 @@ static bool initialize(void) {
             &infinite_run, &time, SDP, DMA)) {
         return false;
     }
-    simulation_set_provenance_data_address(
+
+    simulation_set_provenance_function(
+            store_provenance_data,
             data_specification_get_region(PROVENANCE_REGION, ds_regions));
 
     // setup recording region
@@ -795,7 +807,7 @@ void c_main(void) {
     time = UINT32_MAX;
 
     // Set timer tick (in microseconds)
-    spin1_set_timer_tick_and_phase(timer_period, ssp_params.timer_offset);
+    spin1_set_timer_tick(timer_period);
 
     // Register callback
     spin1_callback_on(TIMER_TICK, timer_callback, TIMER);
