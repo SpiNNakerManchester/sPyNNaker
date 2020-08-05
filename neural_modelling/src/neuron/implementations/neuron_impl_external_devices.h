@@ -453,8 +453,6 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
                     neuron_index, the_packet_firing->key, 0,
                     NO_PAYLOAD, timer_period, global_timer_count,
                     n_neurons);
-
-                send_packet(the_packet_firing->key, 0, false);
             }
         }
 
