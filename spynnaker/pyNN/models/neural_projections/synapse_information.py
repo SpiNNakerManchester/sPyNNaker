@@ -56,7 +56,7 @@ class SynapseInformation(object):
         :param AbstractSynapseDynamics synapse_dynamics:
             The dynamic behaviour of the synapse
         :param AbstractSynapseType synapse_type: The type of the synapse
-        :param bool is_virtual_machine: Is the machine virtual?
+        :param bool is_virtual_machine: Whether the machine is virtual
         :param weights: The synaptic weights
         :type weights: float or list(float) or ~numpy.ndarray(float) or None
         :param delays: The total synaptic delays
@@ -192,15 +192,21 @@ class SynapseInformation(object):
             self.connector.generate_on_machine(self.weights, self.delays))
         synapse_gen = (
             isinstance(self.synapse_dynamics, AbstractGenerateOnMachine) and
-            self.synapse_dynamics.generate_on_machine)
+            self.synapse_dynamics.generate_on_machine())
         return connector_gen and synapse_gen
 
     @property
     def pre_run_connection_holders(self):
+        """ The list of connection holders to be filled in before run
+
+        :rtype: list(ConnectionHolder)
+        """
         return self.__pre_run_connection_holders
 
     def add_pre_run_connection_holder(self, pre_run_connection_holder):
-        self.__pre_run_connection_holders.append(pre_run_connection_holder)
+        """ Add a connection holder that will be filled in before run
 
-    def clear_pre_run_connection_holders(self):
-        del self.__pre_run_connection_holders[:]
+        :param ConnectionHolder pre_run_connection_holder:
+            The connection holder to be added
+        """
+        self.__pre_run_connection_holders.append(pre_run_connection_holder)
