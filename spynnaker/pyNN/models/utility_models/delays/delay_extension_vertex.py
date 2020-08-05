@@ -206,7 +206,7 @@ class DelayExtensionVertex(
             The slice of the post application vertex currently being
             considered
         :param ~spynnaker.pyNN.models.neural_projections.SynapseInformation \
-                synapse_information: 
+                synapse_information:
             The synapse information of the connection
         :param int max_stage:
             The maximum delay stage

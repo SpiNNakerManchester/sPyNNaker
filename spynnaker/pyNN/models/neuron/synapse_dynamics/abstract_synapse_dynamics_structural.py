@@ -50,7 +50,7 @@ class AbstractSynapseDynamicsStructural(object):
         :param list(float): weight_scales:
         :param ~pacman.model.graphs.application.ApplicationGraph\
                 application_graph: The application graph
-        :param AbstractPopulationVertex app_vertex: 
+        :param AbstractPopulationVertex app_vertex:
             The application vertex
         :param ~pacman.model.graphs.common.Slice post_slice:
             The slice of the vertex to generate for

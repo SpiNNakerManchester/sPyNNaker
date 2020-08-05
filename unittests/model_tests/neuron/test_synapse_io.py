@@ -48,8 +48,8 @@ from unittests.mocks import MockSimulator
      (SynapseDynamicsSTDP,
          TimingDependenceSpikePair, WeightDependenceAdditive,
       20, None, 20)])
-def test_get_max_row_length(dynamics_class, timing, weight, size, exception,
-                            max_size):
+def test_get_allowed_row_length(
+        dynamics_class, timing, weight, size, exception, max_size):
     MockSimulator.setup()
     if timing is not None and weight is not None:
         dynamics = dynamics_class(timing(), weight())
@@ -62,10 +62,10 @@ def test_get_max_row_length(dynamics_class, timing, weight, size, exception,
     in_edge = ProjectionApplicationEdge(None, None, synapse_information)
     if exception is not None:
         with pytest.raises(exception) as exc_info:
-            io._get_max_row_length(
+            io._get_allowed_row_length(
                 size, dynamics, population_table, in_edge, size)
         assert exc_info.value.max_size == max_size
     else:
-        actual_size = io._get_max_row_length(
+        actual_size = io._get_allowed_row_length(
             size, dynamics, population_table, in_edge, size)
         assert actual_size == max_size
