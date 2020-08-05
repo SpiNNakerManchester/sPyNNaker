@@ -42,7 +42,7 @@ from spinn_front_end_common.utilities import (
     helpful_functions, globals_variables)
 from spinn_front_end_common.utilities.constants import (
     SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES, BYTES_PER_WORD,
-    MICRO_TO_MILLISECOND_CONVERSION)
+    MICRO_TO_MILLISECOND_CONVERSION, MICRO_TO_SECOND_CONVERSION)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.interface.profiling import profile_utils
@@ -81,7 +81,6 @@ PARAMS_WORDS_PER_NEURON = 2
 # sqrt_lambda, isi_val, time_to_spike
 PARAMS_WORDS_PER_RATE = 8
 
-MICROSECONDS_PER_SECOND = 1000000.0
 SLOW_RATE_PER_TICK_CUTOFF = 0.01  # as suggested by MH (between Exp and Knuth)
 FAST_RATE_PER_TICK_CUTOFF = 10  # between Knuth algorithm and Gaussian approx.
 _REGIONS = SpikeSourcePoissonMachineVertex.POISSON_SPIKE_SOURCE_REGIONS
@@ -450,7 +449,7 @@ class SpikeSourcePoissonVertex(
         """
         :param int machine_time_step:
         """
-        ts_per_second = MICROSECONDS_PER_SECOND / float(machine_time_step)
+        ts_per_second = MICRO_TO_SECOND_CONVERSION / float(machine_time_step)
         if float(self.__max_rate) / ts_per_second < \
                 SLOW_RATE_PER_TICK_CUTOFF:
             return 1
@@ -654,7 +653,7 @@ class SpikeSourcePoissonVertex(
         if self.__max_spikes > 0:
             spikes_per_timestep = (
                 self.__max_spikes /
-                (MICROSECONDS_PER_SECOND // machine_time_step))
+                (MICRO_TO_SECOND_CONVERSION // machine_time_step))
             # avoid a possible division by zero / small number (which may
             # result in a value that doesn't fit in a uint32) by only
             # setting time_between_spikes if spikes_per_timestep is > 1
@@ -674,12 +673,12 @@ class SpikeSourcePoissonVertex(
 
         # Write the number of seconds per timestep (unsigned long fract)
         spec.write_value(
-            data=float(machine_time_step) / MICROSECONDS_PER_SECOND,
+            data=float(machine_time_step) / MICRO_TO_SECOND_CONVERSION,
             data_type=DataType.U032)
 
         # Write the number of timesteps per second (integer)
         spec.write_value(
-            data=int(MICROSECONDS_PER_SECOND / float(machine_time_step)))
+            data=int(MICRO_TO_SECOND_CONVERSION / float(machine_time_step)))
 
         # Write the slow-rate-per-tick-cutoff (accum)
         spec.write_value(
@@ -757,7 +756,7 @@ class SpikeSourcePoissonVertex(
 
         # Compute the spikes per tick for each rate for each atom
         spikes_per_tick = rates * (float(machine_time_step) /
-                                   MICROSECONDS_PER_SECOND)
+                                   MICRO_TO_SECOND_CONVERSION)
 
         # Determine the properties of the sources
         is_fast_source = spikes_per_tick >= SLOW_RATE_PER_TICK_CUTOFF
@@ -967,7 +966,7 @@ class SpikeSourcePoissonVertex(
             self.__data["rates"].set_value_by_id(
                 i,
                 spikes_per_tick *
-                (MICROSECONDS_PER_SECOND / float(self.__machine_time_step)))
+                (MICRO_TO_SECOND_CONVERSION / float(self.__machine_time_step)))
 
             # Store the updated time until next spike so that it can be
             # rewritten when the parameters are loaded
