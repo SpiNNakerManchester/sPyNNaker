@@ -24,7 +24,6 @@
 #include "implementations/neuron_impl.h"
 #include "plasticity/synapse_dynamics.h"
 #include <debug.h>
-#include <utils.h>
 #include <tdma_processing.h>
 
 //! The key to be used for this core (will be ORed with neuron ID)

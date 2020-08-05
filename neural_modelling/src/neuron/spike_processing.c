@@ -104,7 +104,7 @@ static bool clear_input_buffers_of_late_packets = false;
 //! cycles left on the timer when the last packet was received.
 static uint32_t time_left_when_last_packet_arrived = 0;
 
-//! bool saying if we recieved a packet this time step
+//! bool saying if we received a packet this time step
 bool received_packet_this_step = false;
 
 //! the maximum number of packets in the in buffer over the simulation
@@ -309,6 +309,8 @@ static inline void packet_reception_post_processing(void) {
     // prov updating
     time_left_when_last_packet_arrived = tc[T1_COUNT];
     received_packet_this_step = true;
+
+    // wonder if this can be done outside the mc callback somehow
     if (in_spikes_size() > max_packets_in_buffer_at_time) {
         max_packets_in_buffer_at_time = in_spikes_size();
     }
@@ -461,13 +463,6 @@ int spike_processing_clear_input_buffer(void) {
         in_spikes_clear();
     }
 
-    /*if (received_packet_this_step) {
-        log_info("last packet came in with this much time to go %d",
-                 time_left_when_last_packet_arrived);
-    }
-    else {
-        log_info("didnt receive this time step");
-    }*/
     time_left_when_last_packet_arrived = 0;
     received_packet_this_step = false;
     return to_return;
@@ -546,7 +541,7 @@ uint32_t spike_processing_get_n_packets_dropped_from_lateness(void) { // EXPORTE
     return count_input_buffer_packets_late;
 }
 
-uint32_t spike_processing_get_max_filled_input_buffer_size(void) {
+uint32_t spike_processing_get_max_filled_input_buffer_size(void) { // EXPORTED
     return biggest_fill_size_of_input_buffer;
 }
 

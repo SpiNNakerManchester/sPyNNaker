@@ -133,7 +133,7 @@ static inline void in_spikes_clear(void) {
 //!     buffer.
 //! \return The spike at the index. **WARNING:** _if there is no spike at that
 //!     index, the value returned may be arbitrary._
-static inline uint32_t in_spikes_value_at_index(uint32_t index) {
+static inline spike_t in_spikes_value_at_index(uint32_t index) {
     return circular_buffer_value_at_index(buffer, index);
 }
 #endif // _IN_SPIKES_H_

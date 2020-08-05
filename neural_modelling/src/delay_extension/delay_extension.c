@@ -29,6 +29,9 @@
 #include <spin1_api.h>
 #include <tdma_processing.h>
 
+//! the size of the circular queue for packets.
+#define IN_BUFFER_SIZE 256
+
 //! values for the priority for each callback
 enum delay_extension_callback_priorities {
     MC_PACKET = -1, //!< multicast packet reception uses FIQ
@@ -272,8 +275,8 @@ static bool initialize(void) {
             &infinite_run, &time, SDP, DMA)) {
         return false;
     }
-    log_info("done sim");
 
+    // set provenance function
     simulation_set_provenance_function(
             store_provenance_data,
             data_specification_get_region(PROVENANCE_REGION, ds_regions));
@@ -283,7 +286,6 @@ static bool initialize(void) {
             DELAY_PARAMS, ds_regions))) {
         return false;
     }
-    log_info("done params");
 
     // get tdma parameters
     void *data_addr = data_specification_get_region(TDMA_REGION, ds_regions);
@@ -396,6 +398,7 @@ static void timer_callback(uint timer_count, uint unused1) {
         return;
     }
 
+    // reset the tdma for this next cycle.
     tdma_processing_reset_phase();
 
     // Loop through delay stages
@@ -475,7 +478,7 @@ void c_main(void) {
     time = UINT32_MAX;
 
     // Initialise the incoming spike buffer
-    if (!in_spikes_initialize_spike_buffer(256)) {
+    if (!in_spikes_initialize_spike_buffer(IN_BUFFER_SIZE)) {
         rt_error(RTE_SWERR);
     }
 

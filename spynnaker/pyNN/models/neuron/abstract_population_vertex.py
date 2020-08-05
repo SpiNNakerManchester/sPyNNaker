@@ -61,11 +61,6 @@ _NEURON_BASE_DTCM_USAGE_IN_BYTES = 9 * BYTES_PER_WORD
 _NEURON_BASE_N_CPU_CYCLES_PER_NEURON = 22
 _NEURON_BASE_N_CPU_CYCLES = 10
 
-# TODO: Make sure these values are correct (particularly CPU cycles)
-_C_MAIN_BASE_DTCM_USAGE_IN_BYTES = 3 * BYTES_PER_WORD
-_C_MAIN_BASE_SDRAM_USAGE_IN_BYTES = 18 * BYTES_PER_WORD
-_C_MAIN_BASE_N_CPU_CYCLES = 0
-
 
 class AbstractPopulationVertex(
         ApplicationVertex, RequiresTDMA, AbstractGeneratesDataSpecification,
@@ -265,7 +260,7 @@ class AbstractPopulationVertex(
         :param ~pacman.model.graphs.common.Slice vertex_slice:
         """
         return (
-            _NEURON_BASE_N_CPU_CYCLES + _C_MAIN_BASE_N_CPU_CYCLES +
+            _NEURON_BASE_N_CPU_CYCLES +
             (_NEURON_BASE_N_CPU_CYCLES_PER_NEURON * vertex_slice.n_atoms) +
             self.__neuron_recorder.get_n_cpu_cycles(vertex_slice.n_atoms) +
             self.__neuron_impl.get_n_cpu_cycles(vertex_slice.n_atoms) +
@@ -383,13 +378,6 @@ class AbstractPopulationVertex(
             target[key] = copy_list
         return target
 
-    def _find_max_atoms_on_core(self):
-        max_atoms = 0
-        for vertex_slice in self.vertex_slices:
-            if vertex_slice.n_atoms > max_atoms:
-                max_atoms = vertex_slice.n_atoms
-        return max_atoms
-
     def _write_neuron_parameters(self, spec, key, vertex_slice):
 
         # If resetting, reset any state variables that need to be reset
@@ -481,7 +469,7 @@ class AbstractPopulationVertex(
         "machine_graph": "MemoryMachineGraph",
         "routing_info": "MemoryRoutingInfos",
         "data_n_time_steps": "DataNTimeSteps",
-        "n_key_map": "MemoryMachinePartitionNKeysMap",
+        "n_key_map": "MemoryMachinePartitionNKeysMap"
     })
     @overrides(
         AbstractGeneratesDataSpecification.generate_data_specification,

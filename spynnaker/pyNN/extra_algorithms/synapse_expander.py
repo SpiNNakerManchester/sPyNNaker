@@ -67,6 +67,7 @@ def synapse_expander(
         expander_cores, expander_app_id, transceiver, provenance_file_path,
         executable_finder, extract_iobuf, None,
         [CPUState.FINISHED], False, "synapse_expander_on_{}_{}_{}.txt")
+    progress.end()
     _fill_in_connection_data(transceiver, expanded_pop_vertices, placements)
 
 

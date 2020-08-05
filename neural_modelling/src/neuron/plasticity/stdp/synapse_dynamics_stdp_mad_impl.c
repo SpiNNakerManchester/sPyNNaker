@@ -235,7 +235,7 @@ void synapse_dynamics_print_plastic_synapses(
                 update_state);
         weight_t weight = synapse_structure_get_final_weight(final_state);
 
-        log_info("%08x [%3d: (w: %5u (=", control_word, i, weight);
+        log_debug("%08x [%3d: (w: %5u (=", control_word, i, weight);
         synapses_print_weight(
                 weight, ring_buffer_to_input_buffer_left_shifts[synapse_type]);
         log_debug("nA) d: %2u, %s, n = %3u)] - {%08x %08x}\n",
@@ -400,10 +400,6 @@ bool synapse_dynamics_process_plastic_synapses(
 
         uint32_t accumulation = ring_buffers[ring_buffer_index] +
                 synapse_structure_get_final_weight(final_state);
-
-        log_debug(
-            "final weight = %d",
-            synapse_structure_get_final_weight(final_state));
 
         uint32_t sat_test = accumulation & 0x10000;
         if (sat_test) {

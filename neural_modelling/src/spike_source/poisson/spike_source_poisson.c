@@ -443,7 +443,6 @@ static bool initialize(void) {
     }
 
     // set up tdma processing
-        // get tdma parameters
     void *data_addr = data_specification_get_region(TDMA_REGION, ds_regions);
     if (!tdma_processing_initialise(&data_addr)) {
         return false;
