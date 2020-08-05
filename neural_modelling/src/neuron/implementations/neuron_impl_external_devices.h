@@ -80,7 +80,7 @@ enum word_recording_indices {
 //! Indices for recording of bitfields
 enum bitfield_recording_indices {
     //! Spike event recording index
-    SPIKE_RECORDING_BITFIELD = 0,
+    PACKET_RECORDING_BITFIELD = 0,
     //! Number of recorded bitfields
     N_BITFIELD_VARS = 1
 };
@@ -367,7 +367,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
             &neuron_synapse_shaping_params[neuron_index];
 
     // Store whether the neuron has spiked
-    bool has_spiked = false;
+    bool has_fired = false;
 
     // Loop however many times requested; do this in reverse for efficiency,
     // and because the index doesn't actually matter
@@ -424,10 +424,10 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
                 external_bias, this_neuron);
 
         // determine if a spike should occur
-        has_spiked = threshold_type_is_above_threshold(the_threshold_type);
+        has_fired = threshold_type_is_above_threshold(the_threshold_type);
 
         // If spike occurs, communicate to relevant parts of model
-        if (has_spiked) {
+        if (has_fired) {
             if (the_threshold_type->value_as_payload) {
                 accum value_to_send = result;
                 if (result > the_threshold_type->max_value) {
@@ -454,9 +454,9 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
         synapse_types_shape_input(the_synapse_type);
     }
 
-    if (has_spiked) {
+    if (has_fired) {
         // Record the spike
-        neuron_recording_record_bit(SPIKE_RECORDING_BITFIELD, neuron_index);
+        neuron_recording_record_bit(PACKET_RECORDING_BITFIELD, neuron_index);
     }
 
 #if LOG_LEVEL >= LOG_DEBUG

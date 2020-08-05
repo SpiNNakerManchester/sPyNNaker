@@ -20,13 +20,12 @@ from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModelStandard
 from spynnaker.pyNN.models.defaults import default_initial_values,\
     default_parameters
 from spynnaker.pyNN.models.neuron.input_types import InputTypeCurrent
+from spynnaker.pyNN.models.neuron.neuron_models import (
+    NeuronModelLeakyIntegrateAndFire)
 from spynnaker.pyNN.models.neuron.synapse_types import SynapseTypeExponential
 from .external_device_lif_control_vertex import ExternalDeviceLifControlVertex
 from .threshold_type_multicast_device_control import (
     ThresholdTypeMulticastDeviceControl)
-from ..models.neuron.neuron_models.\
-    neuron_model_external_device_control import (
-        NeuronModelExternalDeviceControl)
 
 logger = logging.getLogger(__name__)
 
@@ -80,7 +79,7 @@ class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):
         if not devices:
             raise ConfigurationException("No devices specified")
 
-        neuron_model = NeuronModelExternalDeviceControl(
+        neuron_model = NeuronModelLeakyIntegrateAndFire(
             v, v_rest, tau_m, cm, i_offset, v_reset, tau_refrac)
         synapse_type = SynapseTypeExponential(
             tau_syn_E, tau_syn_I, isyn_exc, isyn_inh)
