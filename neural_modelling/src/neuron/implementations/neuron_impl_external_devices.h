@@ -447,7 +447,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
                     WITH_PAYLOAD, timer_period, global_timer_count,
                     n_neurons);
             } else {
-                log_debug("Sending key=0x%08x", the_threshold_type->key);
+                log_debug("Sending key=0x%08x", the_packet_firing->key);
 
                 tdma_processing_send_packet(
                     neuron_index, the_packet_firing->key, 0,
