@@ -66,10 +66,10 @@ class SpYNNakerNeuronGraphNetworkSpecificationReport(object):
         # write vertices into dot diagram
         for vertex_index, vertex in progress.over(
                 enumerate(application_graph.vertices), False):
-            # Dot needs string names for each vertex; these are not labels
             vertex_names[vertex] = str(vertex_index)
-            dot_diagram.node(vertex_names[vertex], "{} ({} neurons)".format(
-                vertex.label, vertex.n_atoms))
+            dot_diagram.node(
+                vertex_names[vertex],
+                "{} ({} neurons)".format(vertex.label, vertex.n_atoms))
 
         # write edges into dot diagram
         for partition in progress.over(

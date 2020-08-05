@@ -31,10 +31,10 @@ class SpynnakerDataSpecificationWriter(GraphDataSpecificationWriter):
         return super(SpynnakerDataSpecificationWriter, self).__call__(
             placements, hostname, report_default_directory, write_text_specs,
             machine, data_n_timesteps,
-            placement_order=self.__sort_delays_to_end(placements))
+            placement_order=self._sort_delays_to_end(placements))
 
     @staticmethod
-    def __sort_delays_to_end(placements):
+    def _sort_delays_to_end(placements):
         """
         :param ~.Placements placements:
         :rtype: list(~.Placement)

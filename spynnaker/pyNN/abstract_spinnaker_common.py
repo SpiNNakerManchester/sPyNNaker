@@ -28,8 +28,7 @@ from spinn_front_end_common.utility_models import CommandSender
 from spinn_front_end_common.utilities.utility_objs import ExecutableFinder
 from spinn_front_end_common.utilities.globals_variables import unset_simulator
 from spinn_front_end_common.utilities.helpful_functions import read_config
-from spynnaker.pyNN.models.utility_models import synapse_expander
-from spynnaker.pyNN import overridden_pacman_functions, model_binaries
+from spynnaker.pyNN import extra_algorithms, model_binaries
 from spynnaker.pyNN.utilities.constants import (
     MAX_DELAY_BLOCKS, MAX_SUPPORTED_DELAY_TICS,
     MAX_TIMER_TICS_SUPPORTED_PER_BLOCK, MIN_SUPPORTED_DELAY)
@@ -118,11 +117,8 @@ class AbstractSpiNNakerCommon(with_metaclass(
         # using auto pause and resume
         extra_algorithm_xml_path = list()
         extra_algorithm_xml_path.append(os.path.join(
-            os.path.dirname(overridden_pacman_functions.__file__),
+            os.path.dirname(extra_algorithms.__file__),
             "algorithms_metadata.xml"))
-        extra_algorithm_xml_path.append(os.path.join(
-            os.path.dirname(synapse_expander.__file__),
-            "synapse_expander.xml"))
         if user_extra_algorithm_xml_path is not None:
             extra_algorithm_xml_path.extend(user_extra_algorithm_xml_path)
 
@@ -187,6 +183,8 @@ class AbstractSpiNNakerCommon(with_metaclass(
         extra_mapping_inputs["RouterCompressorWithBitFieldReadIOBuf"] = \
             self.config.getboolean(
                 "Reports", "write_router_compressor_with_bitfield_iobuf")
+        extra_mapping_inputs["SynapticExpanderReadIOBuf"] = \
+            self.config.getboolean("Reports", "write_expander_iobuf")
         if user_extra_mapping_inputs is not None:
             extra_mapping_inputs.update(user_extra_mapping_inputs)
 
