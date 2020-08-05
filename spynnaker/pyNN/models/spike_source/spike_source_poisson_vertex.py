@@ -19,8 +19,6 @@ import numpy
 import scipy.stats
 import struct
 
-from spinn_front_end_common.abstract_models.impl.requires_tdma import \
-    RequiresTDMA
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from pacman.executor.injection_decorator import inject_items
@@ -29,6 +27,8 @@ from pacman.model.constraints.key_allocator_constraints import (
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
+from spinn_front_end_common.abstract_models.impl.requires_tdma import \
+    RequiresTDMA
 from spinn_front_end_common.abstract_models import (
     AbstractChangableAfterRun, AbstractProvidesOutgoingPartitionConstraints,
     AbstractGeneratesDataSpecification, AbstractHasAssociatedBinary,
@@ -41,7 +41,8 @@ from spinn_front_end_common.interface.buffer_management import (
 from spinn_front_end_common.utilities import (
     helpful_functions, globals_variables)
 from spinn_front_end_common.utilities.constants import (
-    SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES, BYTES_PER_WORD)
+    SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES, BYTES_PER_WORD,
+    MICRO_TO_MILLISECOND_CONVERSION)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.interface.profiling import profile_utils
@@ -81,7 +82,6 @@ PARAMS_WORDS_PER_NEURON = 2
 PARAMS_WORDS_PER_RATE = 8
 
 MICROSECONDS_PER_SECOND = 1000000.0
-MICROSECONDS_PER_MILLISECOND = 1000.0
 SLOW_RATE_PER_TICK_CUTOFF = 0.01  # as suggested by MH (between Exp and Knuth)
 FAST_RATE_PER_TICK_CUTOFF = 10  # between Knuth algorithm and Gaussian approx.
 _REGIONS = SpikeSourcePoissonMachineVertex.POISSON_SPIKE_SOURCE_REGIONS
@@ -817,13 +817,14 @@ class SpikeSourcePoissonVertex(
     @staticmethod
     def _convert_ms_to_n_timesteps(value, machine_time_step):
         return numpy.round(
-            value * (MICROSECONDS_PER_MILLISECOND /
+            value * (MICRO_TO_MILLISECOND_CONVERSION /
                      float(machine_time_step))).astype("uint32")
 
     @staticmethod
     def _convert_n_timesteps_to_ms(value, machine_time_step):
         return (
-            value / (MICROSECONDS_PER_MILLISECOND / float(machine_time_step)))
+            value / (MICRO_TO_MILLISECOND_CONVERSION /
+                     float(machine_time_step)))
 
     @overrides(AbstractSpikeRecordable.is_recording_spikes)
     def is_recording_spikes(self):
