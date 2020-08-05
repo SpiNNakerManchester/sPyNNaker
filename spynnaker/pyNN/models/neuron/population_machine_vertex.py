@@ -71,9 +71,9 @@ class PopulationMachineVertex(
         # to be processed
         N_LATE_SPIKES = 12
         # the max filled size of the input buffer
-        INPUT_BUFFER_FILLED_SIZE = 13,
+        INPUT_BUFFER_FILLED_SIZE = 13
         # the number of tdma misses
-        TDMA_MISSES = 14,
+        TDMA_MISSES = 14
 
     SATURATION_COUNT_NAME = "Times_synaptic_weights_have_saturated"
     SATURATION_COUNT_MESSAGE = (
