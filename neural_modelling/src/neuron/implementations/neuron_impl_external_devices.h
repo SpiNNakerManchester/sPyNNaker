@@ -39,6 +39,7 @@ enum send_type {
 #include <neuron/synapse_types/synapse_types_exponential_impl.h>
 #include <neuron/input_types/input_type_current.h>
 #include <neuron/additional_inputs/additional_input_none_impl.h>
+#include "tdma_processing.h"
 
 // Further includes
 #include <debug.h>
@@ -73,8 +74,10 @@ enum word_recording_indices {
     GSYN_EXC_RECORDING_INDEX = 1,
     //! Gsyn_inh (excitatory synaptic conductance/current) recording index
     GSYN_INH_RECORDING_INDEX = 2,
+    //! packet count recording region
+    PACKET_COUNT_RECORDING_INDEX = 3,
     //! Number of recorded word-sized state variables
-    N_RECORDED_VARS = 3
+    N_RECORDED_VARS = 4
 };
 
 //! Indices for recording of bitfields
@@ -108,6 +111,15 @@ static synapse_param_t *neuron_synapse_shaping_params;
 
 //! The number of steps to run per timestep
 static uint n_steps_per_timestep;
+
+//! setup from c_main
+static uint32_t n_neurons;
+
+//! setup from c_main
+static uint32_t timer_period;
+
+//! setup from c_main
+static uint global_timer_count;
 
 #ifndef SOMETIMES_UNUSED
 #define SOMETIMES_UNUSED __attribute__((unused))
@@ -352,7 +364,7 @@ SOMETIMES_UNUSED // Marked unused as only used sometimes
 //! \param[in] external_bias: External input to be applied to the neuron
 //! \return True if a spike has occurred
 static bool neuron_impl_do_timestep_update(index_t neuron_index,
-        input_t external_bias) {
+        input_t external_bias, int packets_this_time_step) {
     // Get the neuron itself
     neuron_t *this_neuron = &neuron_array[neuron_index];
 
@@ -406,6 +418,10 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
                     GSYN_EXC_RECORDING_INDEX, neuron_index, total_exc);
             neuron_recording_record_accum(
                     GSYN_INH_RECORDING_INDEX, neuron_index, total_inh);
+            // Record the number of packets received this timer tick
+            neuron_recording_record_int32(
+                PACKET_COUNT_RECORDING_INDEX, neuron_index,
+                packets_this_time_step);
         }
 
         // Call functions to convert exc_input and inh_input to current
@@ -443,9 +459,19 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
                 log_debug("Sending key=0x%08x payload=0x%08x",
                         the_threshold_type->key, payload);
-                send_packet(the_threshold_type->key, payload, true);
+
+                tdma_processing_send_packet(
+                    neuron_index, the_threshold_type->key, payload,
+                    WITH_PAYLOAD, timer_period, global_timer_count,
+                    n_neurons);
             } else {
                 log_debug("Sending key=0x%08x", the_threshold_type->key);
+
+                tdma_processing_send_packet(
+                    neuron_index, the_threshold_type->key, 0,
+                    NO_PAYLOAD, timer_period, global_timer_count,
+                    n_neurons);
+
                 send_packet(the_threshold_type->key, 0, false);
             }
         }

@@ -121,6 +121,9 @@ uint32_t count_rewire_attempts = 0;
 //! The number of neurons on the core
 static uint32_t n_neurons;
 
+//! timer count for tdma of certain models
+static uint global_timer_count;
+
 //! \brief Callback to store provenance data (format: neuron_provenance).
 //! \param[out] provenance_region: Where to write the provenance data
 static void c_main_store_provenance_data(address_t provenance_region) {
@@ -278,6 +281,7 @@ void resume_callback(void) {
 //! \param[in] unused: unused parameter kept for API consistency
 void timer_callback(uint timer_count, uint unused) {
     use(unused);
+    global_timer_count = timer_count;
 
     profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
 
