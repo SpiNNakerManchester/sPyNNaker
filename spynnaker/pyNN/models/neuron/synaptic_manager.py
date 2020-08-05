@@ -48,7 +48,9 @@ TIME_STAMP_BYTES = BYTES_PER_WORD
 
 # TODO: Make sure these values are correct (particularly CPU cycles)
 _SYNAPSES_BASE_DTCM_USAGE_IN_BYTES = 7 * BYTES_PER_WORD
-_SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES = 4
+
+# 1 for drop late packets.
+_SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES = 1 * BYTES_PER_WORD
 _SYNAPSES_BASE_N_CPU_CYCLES_PER_NEURON = 10
 _SYNAPSES_BASE_N_CPU_CYCLES = 8
 
@@ -104,6 +106,9 @@ class SynapticManager(object):
 
     # TODO make this right
     FUDGE = 0
+
+    # 1. address of direct addresses, 2. size of direct addresses matrix size
+    STATIC_SYNAPSE_MATRIX_SDRAM_IN_BYTES = 2 * BYTES_PER_WORD
 
     def __init__(self, n_synapse_types, ring_buffer_sigma, spikes_per_second,
                  config, drop_late_spikes, population_table_type=None,
@@ -325,14 +330,13 @@ class SynapticManager(object):
         return (_SYNAPSES_BASE_SDRAM_USAGE_IN_BYTES +
                 (BYTES_PER_WORD * self.__n_synapse_types))
 
-    @staticmethod
-    def _get_static_synaptic_matrix_sdram_requirements():
+    def _get_static_synaptic_matrix_sdram_requirements(self):
         """
         :rtype: int
         """
         # 4 for address of direct addresses, and
         # 4 for the size of the direct addresses matrix in bytes
-        return 2 * BYTES_PER_WORD
+        return self.STATIC_SYNAPSE_MATRIX_SDRAM_IN_BYTES
 
     def __get_max_row_info(
             self, synapse_info, post_vertex_slice, app_edge,
@@ -1171,20 +1175,20 @@ class SynapticManager(object):
         return block_addr, single_addr, index
 
     def _get_ring_buffer_shifts(
-            self, application_vertex, application_graph, machine_timestep,
+            self, application_vertex, application_graph, machine_time_step,
             weight_scale):
         """ Get the ring buffer shifts for this vertex
 
         :param .ApplicationVertex application_vertex:
         :param .ApplicationGraph application_graph:
-        :param int machine_timestep:
+        :param int machine_time_step:
         :param float weight_scale:
         :rtype: list(int)
         """
         if self.__ring_buffer_shifts is None:
             self.__ring_buffer_shifts = \
                 self._get_ring_buffer_to_input_left_shifts(
-                    application_vertex, application_graph, machine_timestep,
+                    application_vertex, application_graph, machine_time_step,
                     weight_scale)
         return self.__ring_buffer_shifts
 
@@ -1195,6 +1199,8 @@ class SynapticManager(object):
         """
         :param ~data_specification.DataSpecificationGenerator spec:
             The data specification to write to
+        :param ~pacman.model.graphs.application_graph.ApplicationGraph \
+        application_graph: the app graph
         :param AbstractPopulationVertex application_vertex:
             The vertex owning the synapses
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
