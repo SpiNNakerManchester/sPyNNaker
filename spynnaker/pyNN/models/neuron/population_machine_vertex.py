@@ -139,7 +139,6 @@ class PopulationMachineVertex(
     TOTAL_PRE_SYNAPTIC_EVENTS = "Total_pre_synaptic_events"
     LOST_INPUT_BUFFER_PACKETS = "Times_the_input_buffer_lost_packets"
 
-
     N_ADDITIONAL_PROVENANCE_DATA_ITEMS = len(EXTRA_PROVENANCE_DATA_ENTRIES)
 
     def __init__(
