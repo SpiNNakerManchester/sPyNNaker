@@ -52,10 +52,18 @@ class ProjectionMachineEdge(
 
     @property
     def delay_edge(self):
+        """ Get the matching delay edge of this edge
+
+        :rtype: DelayedMachineEdge or None
+        """
         return self.__delay_edge
 
     @delay_edge.setter
     def delay_edge(self, delay_edge):
+        """ Set the matching delay edge of this edge
+
+        :param DelayMachineEdge delay_edge: The edge to set
+        """
         self.__delay_edge = delay_edge
 
     @property

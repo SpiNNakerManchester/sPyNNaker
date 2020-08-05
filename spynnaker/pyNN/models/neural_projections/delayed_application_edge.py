@@ -29,10 +29,15 @@ class DelayedApplicationEdge(ApplicationEdge):
             label=None):
         """
         :param DelayExtensionVertex pre_vertex:
+            The delay extension at the start of the edge
         :param AbstractPopulationVertex post_vertex:
+            The target of the synapses
         :param SynapseInformation synapse_information:
+            The synapse information on this edge
         :param ProjectionApplicationEdge undelayed_edge:
+            The edge that is used for projections without extended delays
         :param str label:
+            The edge label
         """
         super(DelayedApplicationEdge, self).__init__(
             pre_vertex, post_vertex, label=label)
@@ -57,6 +62,10 @@ class DelayedApplicationEdge(ApplicationEdge):
 
     @property
     def undelayed_edge(self):
+        """ Get the edge that for projections without extended delays
+
+        :rtype: ProjectionApplicationEdge
+        """
         return self.__undelayed_edge
 
     @overrides(ApplicationEdge._create_machine_edge)
@@ -65,6 +74,7 @@ class DelayedApplicationEdge(ApplicationEdge):
             self.__synapse_information, pre_vertex, post_vertex, self, label)
         self.__machine_edges_by_slices[
             pre_vertex.vertex_slice, post_vertex.vertex_slice] = edge
+        # Set the undelayed machine vertex if it already exists
         undelayed = self.__undelayed_edge._get_machine_edge(
             pre_vertex, post_vertex)
         if undelayed is not None:
@@ -73,5 +83,13 @@ class DelayedApplicationEdge(ApplicationEdge):
         return edge
 
     def _get_machine_edge(self, pre_vertex, post_vertex):
+        """ Get a specific machine edge from this edge
+
+        :param DelayExtensionMachineVertex pre_vertex:
+            The vertex at the start of the machine edge
+        :param PopulationMachineVertex post_vertes:
+            The vertex at the end of the machine edge
+        :rtype: DelayedMachineEdge or None
+        """
         return self.__machine_edges_by_slices.get(
             (pre_vertex.vertex_slice, post_vertex.vertex_slice))

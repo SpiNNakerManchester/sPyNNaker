@@ -53,10 +53,13 @@ class AbstractAcceptsIncomingSynapses(object):
         """ Get the connections from the machine post-run.
 
         :param ~spinnman.Transceiver transceiver:
-        :param ~pacman.model.placements.Placement placement:
-        :param ProjectionMachineEdge edge:
-        :param ~pacman.model.routing_info.RoutingInfo routing_infos:
+            How to read the connection data
+        :param ~pacman.model.placements.Placements placements:
+            Where the connection data is on the machine
+        :param ProjectionApplicationEdge app_edge:
+            The edge for which the data is being read
         :param SynapseInformation synapse_information:
+            The specific projection within the edge
         """
 
     @abstractmethod

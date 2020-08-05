@@ -36,7 +36,7 @@ _PADDING_BYTE = 0xDD
 def _n_bits(field):
     """ Get the number of bits in a field (ctypes doesn't do this)
 
-    :param field: a ctype field from a structure
+    :param _ctypes.CField field: a ctype field from a structure
     :return: the number of bits
     :rtype: int
     """
@@ -55,9 +55,10 @@ def _make_array(ctype, n_items):
     """ Make an array of ctype items; done separately as the syntax is a
         little odd!
 
-    :param ctype: A ctype
+    :param _ctypes.PyCSimpleType ctype: A ctype
     :param int n_items: The number of items in the array
     :return: a ctype array
+    :rtype: _ctypes.PyCArrayType
     """
     array_type = ctype * n_items
     return array_type()
@@ -153,7 +154,8 @@ def _to_numpy(array):
     Note: no data copying is done; it is pure type conversion.  Editing
     the returned array will result in changes to the original.
 
-    :param ctypes_array array: The array to convert
+    :param _ctypes.PyCArrayType array: The array to convert
+    :rtype: numpy.ndarray
     """
     # Nothing to do if the array is 0 sized
     if not len(array):
@@ -204,6 +206,7 @@ class _MasterPopEntry(object):
         :param row_length: The length of each row in the matrix
         :param is_single: True if the address is to the direct matrix
         :return: The index of the pointer within the entry
+        :rtype: int
         """
         index = len(self.__addresses_and_row_lengths)
         if index > _MAX_ADDRESS_COUNT:
@@ -219,9 +222,10 @@ class _MasterPopEntry(object):
             between multiple entries when necessary
 
         :return: The index of the marker within the entry
+        :rtype: int
         """
         index = len(self.__addresses_and_row_lengths)
-        self.__addresses_and_row_lengths.append((0, 0, 0, False))
+        self.__addresses_and_row_lengths.append((0, 0, False, False))
         return index
 
     @property
@@ -245,7 +249,7 @@ class _MasterPopEntry(object):
         """
         :return: the memory address that this master pop entry points at
             (synaptic matrix)
-        :rtype: list(tuple(int,int,bool))
+        :rtype: list(tuple(int,int,bool,bool))
         """
         return self.__addresses_and_row_lengths
 
@@ -343,7 +347,8 @@ class MasterPopTableAsBinarySearch(object):
 
     @staticmethod
     def get_allowed_row_length(row_length):
-        """
+        """ Get the next allowed row length
+
         :param int row_length: the row length being considered
         :return: the row length available
         :rtype: int
@@ -359,7 +364,8 @@ class MasterPopTableAsBinarySearch(object):
 
     @staticmethod
     def get_next_allowed_address(next_address):
-        """
+        """ Get the next allowed address
+
         :param int next_address: The next address that would be used
         :return: The next address that can be used following next_address
         :rtype: int
@@ -374,8 +380,6 @@ class MasterPopTableAsBinarySearch(object):
 
     def initialise_table(self):
         """ Initialise the master pop data structure.
-
-        :rtype: None
         """
         self.__entries = dict()
         self.__n_addresses = 0
@@ -459,6 +463,8 @@ class MasterPopTableAsBinarySearch(object):
         :param int core_shift: The shift of the mask to get to the core_mask
         :param int n_neurons:
             The number of neurons in each machine vertex (bar the last)
+        :return: The index of the added entry
+        :rtype: int
         """
         if key_and_mask.key not in self.__entries:
             self.__entries[key_and_mask.key] = _MasterPopEntry(
@@ -515,19 +521,12 @@ class MasterPopTableAsBinarySearch(object):
         self.__entries = None
         self.__n_addresses = 0
 
-    @staticmethod
-    def get_edge_constraints():
-        """ Gets the constraints for this table on edges coming in to a vertex.
-
-        :return: a list of constraints
-        :rtype: list(:py:class:`pacman.model.constraints.AbstractConstraint`)
-        """
-        return list()
-
     @property
     def max_n_neurons_per_core(self):
         """ The maximum number of neurons per core supported when a core-mask
             is > 0.
+
+        :rtype: int
         """
         return _MAX_N_NEURONS
 
@@ -535,19 +534,28 @@ class MasterPopTableAsBinarySearch(object):
     def max_core_mask(self):
         """ The maximum core mask supported when n_neurons is > 0; this is the
             maximum number of cores that can be supported in a joined mask
+
+        :rtype: int
         """
         return _MAX_CORE_MASK
 
     @property
     def max_index(self):
         """ The maximum index of a synaptic connection
+
+        :rtype: int
         """
         return _MAX_ADDRESS_COUNT
 
     def write_padding(self, spec, next_block_start_address):
-        """
+        """ Write padding to the data spec needed between blocks to align
+            addresses correctly
+
         :param ~.DataSpecificationGenerator spec:
+            The spec to write to
         :param int next_block_start_address:
+            The address we are starting at
+        :return: The address we finish at after the padding
         :rtype: int
         """
         next_allowed = self.get_next_allowed_address(next_block_start_address)

@@ -39,8 +39,7 @@ from spynnaker.pyNN.utilities.utility_calls import (
 from spynnaker.pyNN.utilities.running_stats import RunningStats
 
 from .synapse_dynamics import (
-    AbstractSynapseDynamics, AbstractSynapseDynamicsStructural,
-    SynapseDynamicsStructuralSTDP)
+    AbstractSynapseDynamics, AbstractSynapseDynamicsStructural)
 from .synaptic_matrices import SYNAPSES_BASE_GENERATOR_SDRAM_USAGE_IN_BYTES
 from .synaptic_matrices import SynapticMatrices
 
@@ -83,7 +82,7 @@ class SynapticManager(object):
     FUDGE = 0
 
     def __init__(self, n_synapse_types, ring_buffer_sigma, spikes_per_second,
-                 config, synapse_io=None):
+                 config):
         """
         :param int n_synapse_types:
             number of synapse types on a neuron (e.g., 2 for excitatory and
@@ -96,11 +95,6 @@ class SynapticManager(object):
         :param spikes_per_second: Estimated spikes per second
         :type spikes_per_second: float or None
         :param ~configparser.RawConfigParser config: The system configuration
-        :param population_table_type:
-            What type of master population table is used
-        :type population_table_type: MasterPopTableAsBinarySearch or None
-        :param synapse_io: How IO for synapses is performed
-        :type synapse_io: SynapseIORowBased or None
         """
         self.__n_synapse_types = n_synapse_types
         self.__ring_buffer_sigma = ring_buffer_sigma
@@ -120,10 +114,8 @@ class SynapticManager(object):
         self._direct_matrix_region = \
             POPULATION_BASED_REGIONS.DIRECT_MATRIX.value
 
-        # Get the synapse IO
-        self.__synapse_io = synapse_io
-        if synapse_io is None:
-            self.__synapse_io = SynapseIORowBased()
+        # Create the synapse IO
+        self.__synapse_io = SynapseIORowBased()
 
         if self.__ring_buffer_sigma is None:
             self.__ring_buffer_sigma = config.getfloat(
@@ -149,8 +141,17 @@ class SynapticManager(object):
         self.__synaptic_matrices = dict()
 
     def __get_synaptic_matrices(self, post_vertex_slice):
+        """ Get the synaptic matrices for a given slice of the vertex
+
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+            the slice of the vertex to get the matrices for
+        :rtype: SynapticMatrices
+        """
+        # Use the cached version if possible
         if post_vertex_slice in self.__synaptic_matrices:
             return self.__synaptic_matrices[post_vertex_slice]
+
+        # Otherwise generate new ones
         matrices = SynapticMatrices(
             post_vertex_slice, self.__n_synapse_types,
             self.__all_single_syn_sz, self.__synapse_io,
@@ -160,40 +161,41 @@ class SynapticManager(object):
         return matrices
 
     def host_written_matrix_size(self, post_vertex_slice):
+        """ The size of the matrix written by the host for a given
+            machine vertex
+
+        :param post_vertex_slice: The slice of the vertex to get the size of
+        :rtype: int
+        """
         matrices = self.__get_synaptic_matrices(post_vertex_slice)
         return matrices.host_generated_block_addr
 
     def on_chip_written_matrix_size(self, post_vertex_slice):
+        """ The size of the matrix that will be written on the machine for a
+            given machine vertex
+
+        :param post_vertex_slice: The slice of the vertex to get the size of
+        :rtype: int
+        """
         matrices = self.__get_synaptic_matrices(post_vertex_slice)
         return (matrices.on_chip_generated_block_addr -
                 matrices.host_generated_block_addr)
 
     @property
     def synapse_dynamics(self):
-        """ Settable.
+        """ The synapse dynamics used by the synapses e.g. plastic or static.
+            Settable.
 
         :rtype: AbstractSynapseDynamics or None
         """
         return self.__synapse_dynamics
 
-    @staticmethod
-    def __combine_structural_stdp_dynamics(structural, stdp):
-        """
-        :param AbstractSynapseDynamicsStructural structural:
-        :param SynapseDynamicsSTDP stdp:
-        :rtype: SynapseDynamicsStructuralSTDP
-        """
-        return SynapseDynamicsStructuralSTDP(
-            structural.partner_selection, structural.formation,
-            structural.elimination,
-            stdp.timing_dependence, stdp.weight_dependence,
-            # voltage dependence is not supported
-            None, stdp.dendritic_delay_fraction,
-            structural.f_rew, structural.initial_weight,
-            structural.initial_delay, structural.s_max, structural.seed)
-
     @synapse_dynamics.setter
     def synapse_dynamics(self, synapse_dynamics):
+        """ Set the synapse dynamics.  Note that after setting, the dynamics
+            might not be the type set as it can be combined with the existing
+            dynamics in exciting ways.
+        """
         if self.__synapse_dynamics is None:
             self.__synapse_dynamics = synapse_dynamics
         else:
@@ -202,7 +204,8 @@ class SynapticManager(object):
 
     @property
     def ring_buffer_sigma(self):
-        """ Settable.
+        """ The sigma in the estimation of the maximum summed ring buffer
+            weights.  Settable.
 
         :rtype: float
         """
@@ -214,7 +217,8 @@ class SynapticManager(object):
 
     @property
     def spikes_per_second(self):
-        """ Settable.
+        """ The assumed maximum spikes per second of an incoming population.
+            Used when calculating the ring buffer weight scaling. Settable.
 
         :rtype: float
         """
@@ -225,8 +229,10 @@ class SynapticManager(object):
         self.__spikes_per_second = spikes_per_second
 
     def get_maximum_delay_supported_in_ms(self, machine_time_step):
-        """
-        :rtype: int or None
+        """ The maximum delay supported by this vertex, before delay extensions
+            are needed
+
+        :rtype: int
         """
         return self.__synapse_io.get_maximum_delay_supported_in_ms(
             machine_time_step)
@@ -267,9 +273,9 @@ class SynapticManager(object):
             self, n_atoms, app_graph, app_vertex):
         """ Get the size of the synapse dynamics region
 
-        :param int n_atoms:
-        :param ~.ApplicationGraph app_graph:
-        :param ~.ApplicationVertex app_vertex:
+        :param int n_atoms: The number of atoms on the core
+        :param ~.ApplicationGraph app_graph: The application graph
+        :param ~.ApplicationVertex app_vertex: The application vertex
         :rtype: int
         """
         if self.__synapse_dynamics is None:
@@ -288,12 +294,13 @@ class SynapticManager(object):
 
     def get_sdram_usage_in_bytes(
             self, post_vertex_slice, application_graph, app_vertex):
-        """
+        """ Get the SDRAM usage of a slice of atoms of this vertex
+
         :param ~pacman.model.graphs.common.Slice vertex_slice:
-        :param int machine_time_step:
+            The slice of atoms to get the size of
         :param ~pacman.model.graphs.application.ApplicationGraph \
-                application_graph:
-        :param AbstractPopulationVertex app_vertex:
+                application_graph: The application graph
+        :param AbstractPopulationVertex app_vertex: The application vertex
         :rtype: int
         """
         in_edges = application_graph.get_edges_ending_at_vertex(app_vertex)
@@ -307,12 +314,14 @@ class SynapticManager(object):
     def _reserve_memory_regions(
             self, spec, vertex_slice, all_syn_block_sz, application_graph,
             application_vertex):
-        """
-        :param ~.DataSpecificationGenerator spec:
+        """ Reserve memory regions for a core
+
+        :param ~.DataSpecificationGenerator spec: The data spec to reserve in
         :param ~pacman.model.graphs.common.Slice vertex_slice:
-        :param int all_syn_block_sz:
-        :param ~.ApplicationGraph application_graph:
-        :param ~.ApplicationVertex application_vertex:
+            The slice of the vertex to allocate for
+        :param int all_syn_block_sz: The memory to reserve for synapses
+        :param ~.ApplicationGraph application_graph: The application graph
+        :param ~.ApplicationVertex application_vertex: The application vertex
         """
         spec.reserve_memory_region(
             region=self._synapse_params_region,
@@ -550,16 +559,6 @@ class SynapticManager(object):
         """
         return float(math.pow(2, 16 - (ring_buffer_to_input_left_shift + 1)))
 
-    def _write_synapse_parameters(
-            self, spec, ring_buffer_shifts, weight_scale):
-        """ Get the ring buffer shifts and scaling factors.
-
-        :param ~.DataSpecificationGenerator spec:
-        :param ~numpy.ndarray ring_buffer_shifts:
-        :param float weight_scale:
-        :rtype: ~numpy.ndarray
-        """
-
     def __update_ring_buffer_shifts_and_weight_scales(
             self, application_vertex, application_graph, machine_timestep,
             weight_scale):
@@ -684,6 +683,18 @@ class SynapticManager(object):
 
     def get_connections_from_machine(
             self, transceiver, placements, app_edge, synapse_info):
+        """ Read the connections from the machine for a given projection
+
+        :param Transceiver transceiver: Used to read the data from the machine
+        :param Placements placements: Where the vertices are on the machine
+        :param ProjectionApplicationEdge app_edge:
+            The application edge of the projection
+        :param SynapseInformation synapse_info:
+            The synapse information of the projection
+        :return: The connections from the machine, with dtype
+            AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE
+        :rtype: ~numpy.ndarray
+        """
 
         post_vertices = app_edge.post_vertex.machine_vertices
 
@@ -706,16 +717,20 @@ class SynapticManager(object):
         """ True if the synapses should be generated on the machine
 
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+            The slice of the vertex to determine the generation status of
         :rtype: bool
         """
         matrices = self.__get_synaptic_matrices(post_vertex_slice)
         return matrices.gen_on_machine
 
     def reset_ring_buffer_shifts(self):
+        """ Reset the ring buffer shifts; needed if projection data changes
+            between runs
+        """
         self.__ring_buffer_shifts = None
 
     def clear_connection_cache(self):
-        """ Flush the cache of connection information.
+        """ Flush the cache of connection information; needed for a second run
         """
         for matrices in itervalues(self.__synaptic_matrices):
             matrices.clear_connection_cache()
@@ -730,7 +745,12 @@ class SynapticManager(object):
             return False
         return self.__synapse_dynamics.changes_during_run
 
-    def read_generated_connection_holders(
-            self, transceiver, placement, post_vertex_slice):
-        matrices = self.__get_synaptic_matrices(post_vertex_slice)
+    def read_generated_connection_holders(self, transceiver, placement):
+        """ Fill in any pre-run connection holders for data which is generated
+            on the machine, after it has been generated
+
+        :param Transceiver transceiver: How to read the data from the machine
+        :param Placement placement: where the data is to be read from
+        """
+        matrices = self.__get_synaptic_matrices(placement.vertex.vertex_slice)
         matrices.read_generated_connection_holders(transceiver, placement)

@@ -18,6 +18,9 @@ from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION, BYTES_PER_WORD)
 
+# Address to indicate that the synaptic region is unused
+SYN_REGION_UNUSED = 0xFFFFFFFF
+
 
 class GeneratorData(object):
     """ Data for each connection of the synapse generator.
@@ -63,9 +66,11 @@ class GeneratorData(object):
         self.__max_stage = max_stage
         self.__machine_time_step = machine_time_step
 
-        if self.__synaptic_matrix_offset != 0xFFFFFFFF:
+        # Offsets are used in words in the generator, but only
+        # if the values are valid
+        if self.__synaptic_matrix_offset != SYN_REGION_UNUSED:
             self.__synaptic_matrix_offset //= 4
-        if self.__delayed_synaptic_matrix_offset != 0xFFFFFFFF:
+        if self.__delayed_synaptic_matrix_offset != SYN_REGION_UNUSED:
             self.__delayed_synaptic_matrix_offset //= 4
 
     @property

@@ -186,16 +186,30 @@ class DelayExtensionVertex(
         """ Add delays for a connection to be generated
 
         :param int max_row_n_synapses:
+            The maximum number of synapses in a row
         :param int max_delayed_row_n_synapses:
+            The maximum number of synapses in a delay row
         :param list(~pacman.model.graphs.common.Slice) pre_slices:
+            The list of slices of the pre application vertex
         :param int pre_slice_index:
+            The index of the slice of the pre applcation vertex
+            currently being considered
         :param list(~pacman.model.graphs.common.Slice) post_slices:
+            The list of slices of the post application vertex
         :param int post_slice_index:
+            The index of the slice of the post application vertex
+            currently being considered
         :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
+            The slice of the pre applcation vertex currently being
+            considered
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
+            The slice of the post application vertex currently being
+            considered
         :param ~spynnaker.pyNN.models.neural_projections.SynapseInformation \
-                synapse_information:
+                synapse_information: 
+            The synapse information of the connection
         :param int max_stage:
+            The maximum delay stage
         """
         self.__delay_generator_data[post_vertex_slice].append(
             DelayGeneratorData(

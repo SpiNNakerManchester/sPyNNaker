@@ -105,6 +105,7 @@ class ProjectionApplicationEdge(ApplicationEdge, AbstractFilterableEdge):
         self.__machine_edges_by_slices[
             pre_vertex.vertex_slice, post_vertex.vertex_slice] = edge
         if self.__delay_edge is not None:
+            # Set the information if the delay machine edge exists
             delayed = self.__delay_edge._get_machine_edge(
                 pre_vertex, post_vertex)
             if delayed is not None:
@@ -113,6 +114,14 @@ class ProjectionApplicationEdge(ApplicationEdge, AbstractFilterableEdge):
         return edge
 
     def _get_machine_edge(self, pre_vertex, post_vertex):
+        """ Get a specific machine edge of this edge
+
+        :param PopulationMachineVertex pre_vertex:
+            The vertex at the start of the machine edge
+        :param PopulationMachineVertex post_vertex:
+            The vertex at the end of the machine edge
+        :rtype: ProjectionMachineEdge or None
+        """
         return self.__machine_edges_by_slices.get(
             (pre_vertex.vertex_slice, post_vertex.vertex_slice))
 

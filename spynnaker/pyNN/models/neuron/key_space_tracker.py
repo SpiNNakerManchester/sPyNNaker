@@ -16,6 +16,8 @@ from pacman.utilities.algorithm_utilities import ElementAllocatorAlgorithm
 
 
 class KeySpaceTracker(ElementAllocatorAlgorithm):
+    """ Tracks keys used to determine key overlap
+    """
 
     def __init__(self):
         super(KeySpaceTracker, self).__init__(0, (2**32 - 1))
@@ -23,6 +25,8 @@ class KeySpaceTracker(ElementAllocatorAlgorithm):
     def allocate_keys(self, r_info):
         """ Allocate all the keys in the routing information
             NOTE assumes masks are all 1s followed by all 0s
+
+        :param PartitionRoutingInfo r_info: The routing information to add
         """
         for key_and_mask in r_info.keys_and_masks:
             key = key_and_mask.key
@@ -33,6 +37,10 @@ class KeySpaceTracker(ElementAllocatorAlgorithm):
     def is_allocated(self, key, n_keys):
         """ Determine if any of the keys in the mask are allocated
             NOTE assumes mask is all 1s followed by all 0s
+
+        :param int key: The key at the start of the allocation
+        :param int n_keys: The number of keys to check
+        :rtype: bool
         """
         index = self._find_slot(key)
         if index is None:
@@ -44,6 +52,8 @@ class KeySpaceTracker(ElementAllocatorAlgorithm):
     def count_trailing_0s(mask):
         """ Count bitwise zeros at the LSB end of a number
             NOTE assumes a 32-bit number
+
+        :param mask: The mask to be checked
         """
         for i in range(32):
             if mask & (1 << i):

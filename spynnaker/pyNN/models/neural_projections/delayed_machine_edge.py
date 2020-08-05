@@ -44,10 +44,19 @@ class DelayedMachineEdge(MachineEdge, AbstractFilterableEdge):
 
     @property
     def undelayed_edge(self):
+        """ Get the edge used for Projections without extended delays
+
+        :rtype: ProjectionMachineEdge or None
+        """
         return self.__undelayed_edge
 
     @undelayed_edge.setter
     def undelayed_edge(self, undelayed_edge):
+        """ Set the edge used for Projections without extended delays
+
+        :param ProjectionMachineEdge undelayed_edge:
+            The edge to set
+        """
         self.__undelayed_edge = undelayed_edge
 
     @overrides(AbstractFilterableEdge.filter_edge)

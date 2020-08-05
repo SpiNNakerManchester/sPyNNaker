@@ -112,6 +112,8 @@ class ConnectionHolder(object):
         if self.__connections is None:
             self.__connections = list()
         self.__connections.append(connections)
+        # If there is an app edge, if all machine edges are done,
+        # mark this as finished
         if self.__app_edge is not None:
             self.__n_machine_edges += 1
             if self.__n_machine_edges == len(self.__app_edge.machine_edges):

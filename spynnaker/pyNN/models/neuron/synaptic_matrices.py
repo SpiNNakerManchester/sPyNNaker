@@ -70,10 +70,18 @@ class SynapticMatrices(object):
             synapse_io, synaptic_matrix_region, direct_matrix_region,
             poptable_region):
         """
-        :param list(.ApplicationEdge) app_edges:
-        :param int post_slice_index:
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
-        :param int n_synapse_types:
+            The slice of the post vertex that these matrices are for
+        :param int n_synapse_types: The number of synapse types available
+        :param int all_single_syn_sz:
+            The space available for "direct" or "single" synapses
+        :param .SynapseIO synapse_io: How to read and write synapses
+        :param int synaptic_matrix_region:
+            The region where synaptic matrices are stored
+        :param int direct_matrix_region:
+            The region where "direct" or "single" synapses are stored
+        :param int poptable_region:
+            The region where the population table is stored
         """
         self.__post_vertex_slice = post_vertex_slice
         self.__n_synapse_types = n_synapse_types
@@ -98,10 +106,16 @@ class SynapticMatrices(object):
 
     @property
     def host_generated_block_addr(self):
+        """ The address within the synaptic region after the last block
+            written by the on-host synaptic generation
+        """
         return self.__host_generated_block_addr
 
     @property
     def on_chip_generated_block_addr(self):
+        """ The address within the synaptic region after the last block
+            reserved for the on-machine synaptic generation
+        """
         return self.__on_chip_generated_block_addr
 
     def __app_matrix(self, app_edge, synapse_info):
@@ -128,6 +142,7 @@ class SynapticMatrices(object):
     def synapses_size(self, app_edges):
         """ The size of the synaptic blocks in bytes
 
+        :param app_edges: The incoming application edges
         :rtype: int
         """
         # Base size requirements
@@ -145,6 +160,7 @@ class SynapticMatrices(object):
     def size(self, app_edges):
         """ The size required by all parts of the matrices
 
+        :param app_edges: The incoming application edges
         :rtype: int
         """
         return (
@@ -155,6 +171,7 @@ class SynapticMatrices(object):
     def __gen_info_size(self, app_edges):
         """ The size in bytes of the synaptic expander parameters
 
+        :param app_edges: The incoming application edges
         :rtype: int
         """
         gen_on_machine = False
@@ -180,12 +197,15 @@ class SynapticMatrices(object):
         """ Simultaneously generates both the master population table and
             the synaptic matrix.
 
-        :param ~.DataSpecificationGenerator spec:
-        :param .MachineVertex machine_vertex:
-        :param all_syn_block_sz:
-        :param weight_scales:
+        :param ~.DataSpecificationGenerator spec: The spec to write to
+        :param .MachineVertex machine_vertex: The machine vertex to write for
+        :param int all_syn_block_sz:
+            The size in bytes of the space reserved for synapses
+        :param list(float) weight_scales: The weight scale of each synapse
         :param .RoutingInfo routing_info:
-        :param .MachineGraph machine_graph:
+            The routing information for all edges
+        :param .MachineGraph machine_graph: The machine graph
+        :return: A list of generator data to be written elsewhere
         :rtype: list(GeneratorData)
         """
         spec.comment(
@@ -267,7 +287,12 @@ class SynapticMatrices(object):
         return generator_data
 
     def __in_edges_by_app_edge(self, in_machine_edges, routing_info):
-        """ Get machine edges by application edge dictionary
+        """ Convert a list of machine edges to a dict of
+            application edge -> list of machine edges, and a key tracker
+
+        :param list(MachineEdge) in_machine_edges: The incoming machine edges
+        :param RoutingInfo routing_info: Routing information for all edges
+        :rtype: tuple(dict, KeySpaceTracker)
         """
         in_edges_by_app_edge = defaultdict(OrderedSet)
         key_space_tracker = KeySpaceTracker()
@@ -286,7 +311,12 @@ class SynapticMatrices(object):
 
     @staticmethod
     def __check_keys_adjacent(keys, mask_size):
-        """ Check that keys are all adjacent
+        """ Check that a given list of keys and slices have no gaps between
+            them
+
+        :param list(tuple(int, Slice)) keys: A list of keys and slices to check
+        :param mask_size: The number of 0s in the mask
+        :rtype: bool
         """
         key_increment = (1 << mask_size)
         last_key = None
@@ -318,6 +348,16 @@ class SynapticMatrices(object):
     def __get_app_key_and_mask(self, keys, mask, n_stages, key_space_tracker):
         """ Get a key and mask for an incoming application vertex as a whole,\
             or say it isn't possible (return None)
+
+        :param list(tuple(int, Slice)) keys:
+            The key and slice of each relevant machine vertex in the incoming
+            application vertex
+        :param int mask: The mask that covers all keys
+        :param n_stages: The number of delay stages
+        :param key_space_tracker:
+            A key space tracker that has been filled in with all keys this
+            vertex will receive
+        :rtype: None or _AppKeyInfo
         """
 
         # Can be merged only if keys are adjacent outside the mask
@@ -350,6 +390,10 @@ class SynapticMatrices(object):
 
     def __check_key_slices(self, n_atoms, slices):
         """ Check if a list of slices cover all n_atoms without any gaps
+
+        :param int n_atoms: The total number of atoms expected
+        :param list(Slice) slices: The list of slices to check
+        :rtype: bool
         """
         slices = sorted(slices, key=lambda s: s.lo_atom)
         slice_atoms = slices[-1].hi_atom - slices[0].lo_atom + 1
@@ -379,6 +423,14 @@ class SynapticMatrices(object):
                            key_space_tracker):
         """ Get a key and mask for an incoming application vertex as a whole,\
             or say it isn't possible (return None)
+
+        :param list(PopulationMachineEdge) m_edges:
+            The relevant machine edges of the application edge
+        :param PopulationApplicationEdge app_edge:
+            The application edge to get the key and mask of
+        :param RoutingInfo routing_info: The routing information of all edges
+        :param KeySpaceTracker key_space_tracker:
+            A tracker pre-filled with the keys of all incoming edges
         """
         # If there are too many pre-cores, give up now
         if len(m_edges) > self.__poptable.max_core_mask:
@@ -416,6 +468,14 @@ class SynapticMatrices(object):
                                  key_space_tracker):
         """ Get a key and mask for a whole incoming delayed application\
             vertex, or say it isn't possible (return None)
+
+        :param list(PopulationMachineEdge) m_edges:
+            The relevant machine edges of the application edge
+        :param PopulationApplicationEdge app_edge:
+            The application edge to get the key and mask of
+        :param RoutingInfo routing_info: The routing information of all edges
+        :param KeySpaceTracker key_space_tracker:
+            A tracker pre-filled with the keys of all incoming edges
         """
         # Work out if the keys allow the machine vertices to be
         # merged
@@ -449,31 +509,76 @@ class SynapticMatrices(object):
 
     def get_connections_from_machine(
             self, transceiver, placement, app_edge, synapse_info):
+        """ Get the synaptic connections from the machine
+
+        :param Transceiver transceiver: Used to read the data from the machine
+        :param Placements placements: Where the vertices are on the machine
+        :param ProjectionApplicationEdge app_edge:
+            The application edge of the projection
+        :param SynapseInformation synapse_info:
+            The synapse information of the projection
+        :return: A list of arrays of connections, each with dtype
+            AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE
+        :rtype: ~numpy.ndarray
+        """
         matrix = self.__app_matrix(app_edge, synapse_info)
         return matrix.get_connections(transceiver, placement)
 
     def read_generated_connection_holders(self, transceiver, placement):
+        """ Fill in any pre-run connection holders for data which is generated
+            on the machine, after it has been generated
+
+        :param Transceiver transceiver: How to read the data from the machine
+        :param Placement placement: where the data is to be read from
+        """
         for matrix in itervalues(self.__matrices):
             matrix.read_generated_connection_holders(transceiver, placement)
 
     def clear_connection_cache(self):
+        """ Clear any values read from the machine
+        """
         for matrix in itervalues(self.__matrices):
             matrix.clear_connection_cache()
 
     @property
     def gen_on_machine(self):
+        """ Whether any matrices need to be generated on the machine
+
+        :rtype: bool
+        """
         return self.__gen_on_machine
 
     def get_index(self, app_edge, synapse_info, machine_edge):
+        """ Get the index of an incoming projection in the population table
+
+        :param ProjectionApplicationEdge app_edge:
+            The application edge of the projection
+        :param SynapseInformation synapse_info:
+            The synapse information of the projection
+        :param ProjectionMachineEdge machine_edge:
+            The machine edge to get the index of
+        """
         matrix = self.__app_matrix(app_edge, synapse_info)
         return matrix.get_index(machine_edge)
 
 
 class _AppKeyInfo(object):
+    """ An object which holds an application key and mask along with the other
+        details
+    """
 
     __slots__ = ["app_key", "app_mask", "core_mask", "core_shift", "n_neurons"]
 
     def __init__(self, app_key, app_mask, core_mask, core_shift, n_neurons):
+        """
+
+        :param int app_key: The application-level key
+        :param int app_mask: The application-level mask
+        :param int core_mask: The mask to get the core from the key
+        :param int core_shift: The shift to get the core from the key
+        :param int n_neurons:
+            The neurons in each core (except possibly the last)
+        """
         self.app_key = app_key
         self.app_mask = app_mask
         self.core_mask = core_mask
@@ -482,4 +587,8 @@ class _AppKeyInfo(object):
 
     @property
     def key_and_mask(self):
+        """ Convenience method to get the key and mask as an object
+
+        :rtype: BaseKeyAndMask
+        """
         return BaseKeyAndMask(self.app_key, self.app_mask)

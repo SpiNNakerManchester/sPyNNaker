@@ -360,7 +360,12 @@ class PyNNProjectionCommon(object):
         return connection_holder
 
     def __get_projection_data(self, post_vertex, connection_holder):
-        # pylint: disable=too-many-locals
+        """
+        :param .AbstractPopulationVertex post_vertex:
+            The vertex that the data will be read from
+        :param ConnectionHolder connection_holder:
+            The connection holder to fill in
+        """
         ctl = self.__spinnaker_control
 
         connections = post_vertex.get_connections_from_machine(
@@ -368,7 +373,7 @@ class PyNNProjectionCommon(object):
             self.__synapse_information)
         if connections is not None:
             connection_holder.add_connections(connections)
-        connection_holder.finish()
+            connection_holder.finish()
 
     def _clear_cache(self):
         post_vertex = self.__projection_edge.post_vertex

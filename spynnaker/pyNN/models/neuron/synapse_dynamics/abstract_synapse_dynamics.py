@@ -184,8 +184,13 @@ class AbstractSynapseDynamics(object):
             row-based data to be returned from get_synaptic_data
 
         :param ~numpy.ndarray connection_row_indices:
+            The index of the row that each item should go into
         :param int n_rows:
+            The number of rows
         :param ~numpy.ndarray data:
+            The non-row-based data
+        :param int max_n_synapses:
+            The maximum number of synapses to generate in each row
         :rtype: list(~numpy.ndarray)
         """
         return [

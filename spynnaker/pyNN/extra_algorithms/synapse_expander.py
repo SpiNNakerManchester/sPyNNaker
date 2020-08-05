@@ -83,7 +83,7 @@ def _plan_expansion(app_graph, placements, synapse_expander_bin,
                     expander_cores.add_processor(
                         synapse_expander_bin,
                         placement.x, placement.y, placement.p)
-                    expanded_pop_vertices.append((vertex, m_vertex, placement))
+                    expanded_pop_vertices.append((vertex, placement))
         elif isinstance(vertex, DelayExtensionVertex):
             for m_vertex in vertex.machine_vertices:
                 if vertex.gen_on_machine(m_vertex.vertex_slice):
@@ -101,6 +101,5 @@ def _fill_in_connection_data(expanded_pop_vertices, transceiver):
 
     :rtype: None
     """
-    for vertex, m_vertex, placement in expanded_pop_vertices:
-        vertex.read_generated_connection_holders(
-            transceiver, placement, m_vertex.vertex_slice)
+    for vertex, placement in expanded_pop_vertices:
+        vertex.read_generated_connection_holders(transceiver, placement)

@@ -51,11 +51,14 @@ class AbstractPlasticSynapseDynamics(AbstractSynapseDynamics):
         Lengths are returned as an array made up of an integer for each row,\
         for each of the fixed-plastic and plastic-plastic regions.
 
-        :param ~numpy.ndarray connections:
+        :param ~numpy.ndarray connections: The connections to get data for
         :param ~numpy.ndarray connection_row_indices:
-        :param int n_rows:
+            The row into which each connection should go
+        :param int n_rows: The total number of rows
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
-        :param int n_synapse_types:
+            The slice of the post vertex to get the connections for
+        :param int n_synapse_types: The number of synapse types
+        :param int max_n_synapses: The maximum number of synapses to generate
         :return: (fp_data, pp_data, fp_size, pp_size)
         :rtype:
             tuple(~numpy.ndarray, ~numpy.ndarray, ~numpy.ndarray,

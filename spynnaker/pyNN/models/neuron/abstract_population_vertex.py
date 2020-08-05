@@ -921,7 +921,11 @@ class AbstractPopulationVertex(
             self.__change_requires_data_generation = True
             self.__change_requires_neuron_parameters_reload = False
 
-    def read_generated_connection_holders(
-            self, transceiver, placement, post_vertex_slice):
+    def read_generated_connection_holders(self, transceiver, placement):
+        """ Fill in the connection holders
+
+        :param Transceiver transceiver: How the data is to be read
+        :param Placement placement: Where the data is on the machine
+        """
         self.__synapse_manager.read_generated_connection_holders(
-            transceiver, placement, post_vertex_slice)
+            transceiver, placement)

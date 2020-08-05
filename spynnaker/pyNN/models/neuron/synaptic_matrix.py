@@ -22,15 +22,11 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import SynapseDynamicsStatic
 from spynnaker.pyNN.models.neural_projections.connectors import (
     OneToOneConnector)
 
-from .generator_data import GeneratorData
-
-
-# Address to indicate that the synaptic region is unused for the generator
-_SYN_REGION_UNUSED = 0xFFFFFFFF
+from .generator_data import GeneratorData, SYN_REGION_UNUSED
 
 
 class SynapticMatrix(object):
-    """ A single synaptic matrix
+    """ Synaptic matrix/matrices for an incoming machine edge
     """
 
     __slots__ = [
@@ -61,6 +57,29 @@ class SynapticMatrix(object):
                  app_edge, n_synapse_types, max_row_info, routing_info,
                  delay_routing_info, weight_scales, all_syn_block_sz,
                  all_single_syn_sz):
+        """
+
+        :param SynapseIO synapse_io: The reader and writer of synapses
+        :param MasterPopTableAsBinarySearch poptable:
+            The master population table
+        :param SynapseInformation synapse_info:
+            The projection synapse information
+        :param ProjectionMachineEdge machine_edge:
+            The projection machine edge
+        :param ProjectionApplicationEdge app_edge:
+            The projection application edge
+        :param int n_synapse_types: The number of synapse types accepted
+        :param MaxRowInfo max_row_info: Maximum row length information
+        :param PartitionRoutingInfo routing_info:
+            Routing information for the edge
+        :param PartitionRoutingInfo delay_routing_info:
+            Routing information for the delay edge if any
+        :param list(float) weight_scales: Weight scale for each synapse type
+        :param all_syn_block_sz:
+            The space available for all synaptic matrices
+        :param int all_single_syn_sz:
+            The space available for "direct" or "single" synapses
+        """
         self.__synapse_io = synapse_io
         self.__poptable = poptable
         self.__synapse_info = synapse_info
@@ -127,6 +146,9 @@ class SynapticMatrix(object):
 
     def get_row_data(self):
         """ Generate the row data for a synaptic matrix from the description
+
+        :return: The data and the delayed data
+        :rtype: tuple(~numpy.ndarray or None, ~numpy.ndarray or None)
         """
 
         (row_data, delayed_row_data, delayed_source_ids,
@@ -148,7 +170,18 @@ class SynapticMatrix(object):
 
     def write_machine_matrix(
             self, spec, block_addr, single_synapses, single_addr, row_data):
-        """ Write a matrix for an incoming machine vertex
+        """ Write a matrix for the incoming machine vertex
+
+        :param DataSpecificationGenerator spec: The specification to write to
+        :param int block_addr:
+            The address in the synaptic matrix region to start writing at
+        :param int single_addr:
+            The address in the "direct" or "single" matrix to start at
+        :param list single_synapses:
+            A list of "direct" or "single" synapses to write to
+        :param ~numpy.ndarray row_data: The data to write
+        :return: The updated block and single addresses
+        :rtype: tuple(int, int)
         """
         if self.__max_row_info.undelayed_max_n_synapses == 0:
             # If there is routing information, write an invalid entry
@@ -180,7 +213,14 @@ class SynapticMatrix(object):
         return block_addr, single_addr
 
     def write_delayed_machine_matrix(self, spec, block_addr, row_data):
-        """ Write a matrix for an incoming machine vertex
+        """ Write a delayed matrix for an incoming machine vertex
+
+        :param DataSpecificationGenerator spec: The specification to write to
+        :param int block_addr:
+            The address in the synaptic matrix region to start writing at
+        :param ~numpy.ndarray row_data: The data to write
+        :return: The updated block address
+        :rtype: int
         """
         if self.__max_row_info.delayed_max_n_synapses == 0:
             # If there is routing information, write an invalid entry
@@ -209,6 +249,12 @@ class SynapticMatrix(object):
             self, single_synapses, single_addr, row_data):
         """ Write a direct (single synapse) matrix for an incoming machine\
             vertex
+
+        :param list single_synapses: A list of single synapses to add to
+        :param int single_addr: The initial address to write to
+        :param ~numpy.ndarray row_data: The row data to write
+        :return: The updated single address
+        :rtype: int
         """
         single_rows = row_data.reshape(-1, 4)[:, 3]
         data_size = len(single_rows) * BYTES_PER_WORD
@@ -248,31 +294,63 @@ class SynapticMatrix(object):
                     self.__app_edge.label))
 
     def next_app_on_chip_address(self, app_block_addr, max_app_addr):
-        if self.__max_row_info.undelayed_max_n_synapses == 0:
-            return app_block_addr, _SYN_REGION_UNUSED
+        """ Allocate a machine-level address of a matrix from within an
+            app-level allocation
 
+        :param int app_block_addr:
+            The current position in the application block
+        :param int max_app_addr:
+            The position of the end of the allocation
+        :return: The address after the allocation and the allocated address
+        :rtype: int, int
+        """
+        if self.__max_row_info.undelayed_max_n_synapses == 0:
+            return app_block_addr, SYN_REGION_UNUSED
+
+        # Note: No master population table padding is needed here because
+        # the allocation is at the application level
         addr = app_block_addr
         app_block_addr = self.__next_addr(
             app_block_addr, self.__matrix_size, max_app_addr)
         return app_block_addr, addr
 
     def next_app_delay_on_chip_address(self, app_block_addr, max_app_addr):
-        if self.__max_row_info.delayed_max_n_synapses == 0:
-            return app_block_addr, _SYN_REGION_UNUSED
+        """ Allocate a machine-level address of a delayed matrix from within an
+            app-level allocation
 
+        :param int app_block_addr:
+            The current position in the application block
+        :param int max_app_addr:
+            The position of the end of the allocation
+        :return: The address after the allocation and the allocated address
+        :rtype: int, int
+        """
+        if self.__max_row_info.delayed_max_n_synapses == 0:
+            return app_block_addr, SYN_REGION_UNUSED
+
+        # Note: No master population table padding is needed here because
+        # the allocation is at the application level
         addr = app_block_addr
         app_block_addr = self.__next_addr(
             app_block_addr, self.__delay_matrix_size, max_app_addr)
         return app_block_addr, addr
 
     def next_on_chip_address(self, block_addr):
+        """ Allocate an address for a machine matrix and add it to the
+            population table
+
+        :param int block_addr:
+            The address at which to start the allocation
+        :return: The address after the allocation and the allocated address
+        :rtype: int, int
+        """
         # If there isn't any synapses, add an invalid entry
         if self.__max_row_info.undelayed_max_n_synapses == 0:
             if self.__routing_info is not None:
                 index = self.__poptable.add_invalid_entry(
                     self.__routing_info.first_key_and_mask)
                 self.__update_synapse_index(index)
-            return block_addr, _SYN_REGION_UNUSED
+            return block_addr, SYN_REGION_UNUSED
 
         # Otherwise add a master population table entry for the incoming
         # machine vertex
@@ -286,13 +364,21 @@ class SynapticMatrix(object):
         return block_addr, self.__syn_mat_offset
 
     def next_delay_on_chip_address(self, block_addr):
+        """ Allocate an address for a delayed machine matrix and add it to the
+            population table
+
+        :param int block_addr:
+            The address at which to start the allocation
+        :return: The address after the allocation and the allocated address
+        :rtype: int, int
+        """
         # If there isn't any synapses, add an invalid entry
         if self.__max_row_info.delayed_max_n_synapses == 0:
             if self.__delay_routing_info is not None:
                 index = self.__poptable.add_invalid_entry(
                     self.__delay_routing_info.first_key_and_mask)
                 self.__update_synapse_index(index)
-            return block_addr, _SYN_REGION_UNUSED
+            return block_addr, SYN_REGION_UNUSED
 
         # Otherwise add a master population table entry for the incoming
         # machine vertex
@@ -306,6 +392,14 @@ class SynapticMatrix(object):
         return block_addr, self.__delay_syn_mat_offset
 
     def get_generator_data(self, syn_mat_offset, d_mat_offset):
+        """ Get the generator data for this matrix
+
+        :param int syn_mat_offset:
+            The synaptic matrix offset to write the data to
+        :param int d_mat_offset:
+            The synaptic matrix offset to write the delayed data to
+        :rtype: GeneratorData
+        """
         return GeneratorData(
             syn_mat_offset, d_mat_offset,
             self.__max_row_info.undelayed_max_words,
@@ -322,7 +416,14 @@ class SynapticMatrix(object):
             globals_variables.get_simulator().machine_time_step)
 
     def __next_addr(self, block_addr, size, max_addr=None):
-        """ Get a block address and check it hasn't overflowed the allocation
+        """ Get the next block address and check it hasn't overflowed the
+            allocation
+
+        :param int block_addr: The address of the allocation
+        :param int size: The size of the allocation in bytes
+        :param int max_addr: The optional maximum address to measure against;
+            if not supplied, the global synaptic block limit will be used
+        :raise Exception: If the allocation overflows
         """
         next_addr = block_addr + size
         if max_addr is None:
@@ -335,11 +436,18 @@ class SynapticMatrix(object):
 
     @property
     def index(self):
+        """ The index of the matrices within the master population table
+
+        :rtype: int
+        """
         return self.__index
 
     def __update_synapse_index(self, index):
         """ Update the index of a synapse, checking it matches against indices\
-            for other synapse_info for the same edge
+            for other information for the same edge
+
+        :param index: The index to set
+        :raise Exception: If the index doesn't match an existing index
         """
         if self.__index is None:
             self.__index = index
@@ -351,6 +459,18 @@ class SynapticMatrix(object):
 
     def read_connections(
             self, transceiver, placement, synapses_address, single_address):
+        """ Read the connections from the machine
+
+        :param Transceiver transceiver: How to read the data from the machine
+        :param Placement placement: Where the matrix is on the machine
+        :param int synapses_address:
+            The base address of the synaptic matrix region
+        :param int single_address:
+            The base address of the "direct" or "single" matrix region
+        :return: A list of arrays of connections, each with dtype
+            AbstractSynapseDynamics.NUMPY_CONNECTORS_DTYPE
+        :rtype: ~numpy.ndarray
+        """
         pre_slice = self.__machine_edge.pre_vertex.vertex_slice
         post_slice = self.__machine_edge.post_vertex.vertex_slice
         machine_time_step = globals_variables.get_simulator().machine_time_step
@@ -381,10 +501,20 @@ class SynapticMatrix(object):
         return connections
 
     def clear_connection_cache(self):
+        """ Clear the saved connections
+        """
         self.__received_block = None
         self.__delay_received_block = None
 
     def __get_block(self, transceiver, placement, synapses_address):
+        """ Get a block of data for undelayed synapses
+
+        :param Transceiver transceiver: How to read the data from the machine
+        :param Placement placement: Where the matrix is on the machine
+        :param int synapses_address:
+            The base address of the synaptic matrix region
+        :rtype: bytearray
+        """
         if self.__received_block is not None:
             return self.__received_block
         address = self.__syn_mat_offset + synapses_address
@@ -394,6 +524,14 @@ class SynapticMatrix(object):
         return block
 
     def __get_delayed_block(self, transceiver, placement, synapses_address):
+        """ Get a block of data for delayed synapses
+
+        :param Transceiver transceiver: How to read the data from the machine
+        :param Placement placement: Where the matrix is on the machine
+        :param int synapses_address:
+            The base address of the synaptic matrix region
+        :rtype: bytearray
+        """
         if self.__delay_received_block is not None:
             return self.__delay_received_block
         address = self.__delay_syn_mat_offset + synapses_address
@@ -403,6 +541,14 @@ class SynapticMatrix(object):
         return block
 
     def __get_single_block(self, transceiver, placement, single_address):
+        """ Get a block of data for "direct" or "single" synapses
+
+        :param Transceiver transceiver: How to read the data from the machine
+        :param Placement placement: Where the matrix is on the machine
+        :param int single_address:
+            The base address of the "direct" or "single" matrix region
+        :rtype: bytearray
+        """
         if self.__received_block is not None:
             return self.__received_block
         address = self.__syn_mat_offset + single_address
