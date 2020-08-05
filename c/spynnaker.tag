@@ -2143,6 +2143,267 @@
     </member>
   </compound>
   <compound kind="file">
+    <name>neuron_impl_external_devices.h</name>
+    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/implementations/</path>
+    <filename>neuron__impl__external__devices_8h.html</filename>
+    <includes id="neuron__impl_8h" name="neuron_impl.h" local="yes" imported="no">neuron_impl.h</includes>
+    <includes id="neuron__model__lif__impl_8h" name="neuron_model_lif_impl.h" local="no" imported="no">neuron/models/neuron_model_lif_impl.h</includes>
+    <includes id="additional__input_8h" name="additional_input.h" local="no" imported="no">neuron/additional_inputs/additional_input.h</includes>
+    <includes id="synapse__types__exponential__impl_8h" name="synapse_types_exponential_impl.h" local="no" imported="no">neuron/synapse_types/synapse_types_exponential_impl.h</includes>
+    <includes id="input__type__current_8h" name="input_type_current.h" local="no" imported="no">neuron/input_types/input_type_current.h</includes>
+    <includes id="additional__input__none__impl_8h" name="additional_input_none_impl.h" local="no" imported="no">neuron/additional_inputs/additional_input_none_impl.h</includes>
+    <includes id="neuron__recording_8h" name="neuron_recording.h" local="no" imported="no">neuron/neuron_recording.h</includes>
+    <class kind="struct">packet_firing_data_t</class>
+    <member kind="enumeration">
+      <type></type>
+      <name>send_type</name>
+      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
+      <anchor>a73f8837bd24ba4a9abf204756c0b9b9e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>SEND_TYPE_INT</name>
+      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
+      <anchor>a73f8837bd24ba4a9abf204756c0b9b9ea3dd35dd465fc1317eaa70269b6e6dcfe</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>SEND_TYPE_UINT</name>
+      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
+      <anchor>a73f8837bd24ba4a9abf204756c0b9b9ea9f0c39dd1fcf4de8859fe4563ee3ad55</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>SEND_TYPE_ACCUM</name>
+      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
+      <anchor>a73f8837bd24ba4a9abf204756c0b9b9ea020920e4dc6523fa9322a718de973b59</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>SEND_TYPE_UACCUM</name>
+      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
+      <anchor>a73f8837bd24ba4a9abf204756c0b9b9ea7890c390703766bca2b113710272ed13</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>SEND_TYPE_FRACT</name>
+      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
+      <anchor>a73f8837bd24ba4a9abf204756c0b9b9eab4b21fb2f7c58f05dee2ce53c31a1675</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>SEND_TYPE_UFRACT</name>
+      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
+      <anchor>a73f8837bd24ba4a9abf204756c0b9b9ea27e9dfe79f29abb0c5c87831e261c176</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumeration">
+      <type></type>
+      <name>word_recording_indices</name>
+      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
+      <anchor>a68f96be069d7309d70ec3343afad2e03</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>V_RECORDING_INDEX</name>
+      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
+      <anchor>a68f96be069d7309d70ec3343afad2e03ab3af76b3ea8cdd3c68aaa7432e4acf96</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>GSYN_EXC_RECORDING_INDEX</name>
+      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
+      <anchor>a68f96be069d7309d70ec3343afad2e03a1f4a97c6e4523af2fea20d3ca50dbd0e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>GSYN_INH_RECORDING_INDEX</name>
+      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
+      <anchor>a68f96be069d7309d70ec3343afad2e03a0e4025cde485021d43ae9284bee78c6e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>N_RECORDED_VARS</name>
+      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
+      <anchor>a68f96be069d7309d70ec3343afad2e03a868c932bcf4cab46d2b226b04bc2438f</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>V_RECORDING_INDEX</name>
+      <anchorfile>neuron__impl__standard_8h.html</anchorfile>
+      <anchor>a68f96be069d7309d70ec3343afad2e03ab3af76b3ea8cdd3c68aaa7432e4acf96</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>GSYN_EXC_RECORDING_INDEX</name>
+      <anchorfile>neuron__impl__standard_8h.html</anchorfile>
+      <anchor>a68f96be069d7309d70ec3343afad2e03a1f4a97c6e4523af2fea20d3ca50dbd0e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>GSYN_INH_RECORDING_INDEX</name>
+      <anchorfile>neuron__impl__standard_8h.html</anchorfile>
+      <anchor>a68f96be069d7309d70ec3343afad2e03a0e4025cde485021d43ae9284bee78c6e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>N_RECORDED_VARS</name>
+      <anchorfile>neuron__impl__standard_8h.html</anchorfile>
+      <anchor>a68f96be069d7309d70ec3343afad2e03a868c932bcf4cab46d2b226b04bc2438f</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumeration">
+      <type></type>
+      <name>bitfield_recording_indices</name>
+      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
+      <anchor>a1a1145a27f2273fe3bf900dc1602b4e3</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>PACKET_RECORDING_BITFIELD</name>
+      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
+      <anchor>a1a1145a27f2273fe3bf900dc1602b4e3a122d35b1c72444010af712fe58cd21be</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>N_BITFIELD_VARS</name>
+      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
+      <anchor>a1a1145a27f2273fe3bf900dc1602b4e3aa2d088b9c45269b7bf9461907960c21c</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>SPIKE_RECORDING_BITFIELD</name>
+      <anchorfile>neuron__impl__standard_8h.html</anchorfile>
+      <anchor>a1a1145a27f2273fe3bf900dc1602b4e3a12b36ddd66438ef711657d3a5ff70ebb</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>N_BITFIELD_VARS</name>
+      <anchorfile>neuron__impl__standard_8h.html</anchorfile>
+      <anchor>a1a1145a27f2273fe3bf900dc1602b4e3aa2d088b9c45269b7bf9461907960c21c</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static bool</type>
+      <name>neuron_impl_initialise</name>
+      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
+      <anchor>aab6d669689876332dfb4aa6b21990d77</anchor>
+      <arglist>(uint32_t n_neurons)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>neuron_impl_add_inputs</name>
+      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
+      <anchor>a7d0403fedf08df2d791534cfe72f4fa2</anchor>
+      <arglist>(index_t synapse_type_index, index_t neuron_index, input_t weights_this_timestep)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static uint32_t</type>
+      <name>n_words_needed</name>
+      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
+      <anchor>a712ac031031f4c6e8e7979936f32a783</anchor>
+      <arglist>(size_t size)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>neuron_impl_load_neuron_parameters</name>
+      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
+      <anchor>a72b0028625c6e3cad1e4176bdba1b44e</anchor>
+      <arglist>(address_t address, uint32_t next, uint32_t n_neurons)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>send_packet</name>
+      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
+      <anchor>abd566a3d7a0a4fabe2cbb39e4954e262</anchor>
+      <arglist>(uint32_t key, uint32_t payload, bool with_payload)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static bool</type>
+      <name>neuron_impl_do_timestep_update</name>
+      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
+      <anchor>a21f9a596a5048838a60fee323e466314</anchor>
+      <arglist>(index_t neuron_index, input_t external_bias)</arglist>
+    </member>
+    <member kind="function" static="yes">
+      <type>static void</type>
+      <name>neuron_impl_store_neuron_parameters</name>
+      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
+      <anchor>af2c8c3ce110bf3e9b4d0dc27f22b4860</anchor>
+      <arglist>(address_t address, uint32_t next, uint32_t n_neurons)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>neuron_impl_print_inputs</name>
+      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
+      <anchor>aa1d6d1186174dd22b3d152b919a4ca0f</anchor>
+      <arglist>(uint32_t n_neurons)</arglist>
+    </member>
+    <member kind="function">
+      <type>void</type>
+      <name>neuron_impl_print_synapse_parameters</name>
+      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
+      <anchor>a29ad1f4cd958c5acde321fe2f2d41abe</anchor>
+      <arglist>(uint32_t n_neurons)</arglist>
+    </member>
+    <member kind="function">
+      <type>const char *</type>
+      <name>neuron_impl_get_synapse_type_char</name>
+      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
+      <anchor>ab28525e166d16dfb00284093d84c6661</anchor>
+      <arglist>(uint32_t synapse_type)</arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static neuron_t *</type>
+      <name>neuron_array</name>
+      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
+      <anchor>a2a28d6bb285e12f4b75b1fc4a77c0314</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static input_type_t *</type>
+      <name>input_type_array</name>
+      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
+      <anchor>a31058212f43265088fe71863d4ea0907</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static additional_input_t *</type>
+      <name>additional_input_array</name>
+      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
+      <anchor>a9a9983ef2e0e8377f0fc818e32eec11d</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static packet_firing_data_t *</type>
+      <name>packet_firing_array</name>
+      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
+      <anchor>a8870077736fbcaca0d2aba2bb33f1040</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static global_neuron_params_t *</type>
+      <name>global_parameters</name>
+      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
+      <anchor>a3080a592212f89a8d8dde67f13a58949</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static synapse_param_t *</type>
+      <name>neuron_synapse_shaping_params</name>
+      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
+      <anchor>ae0383b1a8ff4169668ce6e5130cfbeaf</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
+      <type>static uint</type>
+      <name>n_steps_per_timestep</name>
+      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
+      <anchor>adc2145aaa2f8435401d2c077d42c7b91</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="file">
     <name>neuron_impl_standard.h</name>
     <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/implementations/</path>
     <filename>neuron__impl__standard_8h.html</filename>
@@ -2158,6 +2419,30 @@
       <name>word_recording_indices</name>
       <anchorfile>neuron__impl__standard_8h.html</anchorfile>
       <anchor>a68f96be069d7309d70ec3343afad2e03</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>V_RECORDING_INDEX</name>
+      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
+      <anchor>a68f96be069d7309d70ec3343afad2e03ab3af76b3ea8cdd3c68aaa7432e4acf96</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>GSYN_EXC_RECORDING_INDEX</name>
+      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
+      <anchor>a68f96be069d7309d70ec3343afad2e03a1f4a97c6e4523af2fea20d3ca50dbd0e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>GSYN_INH_RECORDING_INDEX</name>
+      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
+      <anchor>a68f96be069d7309d70ec3343afad2e03a0e4025cde485021d43ae9284bee78c6e</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>N_RECORDED_VARS</name>
+      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
+      <anchor>a68f96be069d7309d70ec3343afad2e03a868c932bcf4cab46d2b226b04bc2438f</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
@@ -2189,6 +2474,18 @@
       <name>bitfield_recording_indices</name>
       <anchorfile>neuron__impl__standard_8h.html</anchorfile>
       <anchor>a1a1145a27f2273fe3bf900dc1602b4e3</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>PACKET_RECORDING_BITFIELD</name>
+      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
+      <anchor>a1a1145a27f2273fe3bf900dc1602b4e3a122d35b1c72444010af712fe58cd21be</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="enumvalue">
+      <name>N_BITFIELD_VARS</name>
+      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
+      <anchor>a1a1145a27f2273fe3bf900dc1602b4e3aa2d088b9c45269b7bf9461907960c21c</anchor>
       <arglist></arglist>
     </member>
     <member kind="enumvalue">
@@ -7574,91 +7871,6 @@
     </member>
   </compound>
   <compound kind="file">
-    <name>threshold_type_external_device_control.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/threshold_types/</path>
-    <filename>threshold__type__external__device__control_8h.html</filename>
-    <includes id="threshold__type_8h" name="threshold_type.h" local="yes" imported="no">threshold_type.h</includes>
-    <class kind="struct">threshold_type_t</class>
-    <member kind="enumeration">
-      <type></type>
-      <name>send_type</name>
-      <anchorfile>threshold__type__external__device__control_8h.html</anchorfile>
-      <anchor>a73f8837bd24ba4a9abf204756c0b9b9e</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue">
-      <name>SEND_TYPE_INT</name>
-      <anchorfile>threshold__type__external__device__control_8h.html</anchorfile>
-      <anchor>a73f8837bd24ba4a9abf204756c0b9b9ea3dd35dd465fc1317eaa70269b6e6dcfe</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue">
-      <name>SEND_TYPE_UINT</name>
-      <anchorfile>threshold__type__external__device__control_8h.html</anchorfile>
-      <anchor>a73f8837bd24ba4a9abf204756c0b9b9ea9f0c39dd1fcf4de8859fe4563ee3ad55</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue">
-      <name>SEND_TYPE_ACCUM</name>
-      <anchorfile>threshold__type__external__device__control_8h.html</anchorfile>
-      <anchor>a73f8837bd24ba4a9abf204756c0b9b9ea020920e4dc6523fa9322a718de973b59</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue">
-      <name>SEND_TYPE_UACCUM</name>
-      <anchorfile>threshold__type__external__device__control_8h.html</anchorfile>
-      <anchor>a73f8837bd24ba4a9abf204756c0b9b9ea7890c390703766bca2b113710272ed13</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue">
-      <name>SEND_TYPE_FRACT</name>
-      <anchorfile>threshold__type__external__device__control_8h.html</anchorfile>
-      <anchor>a73f8837bd24ba4a9abf204756c0b9b9eab4b21fb2f7c58f05dee2ce53c31a1675</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="enumvalue">
-      <name>SEND_TYPE_UFRACT</name>
-      <anchorfile>threshold__type__external__device__control_8h.html</anchorfile>
-      <anchor>a73f8837bd24ba4a9abf204756c0b9b9ea27e9dfe79f29abb0c5c87831e261c176</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static void</type>
-      <name>send_packet</name>
-      <anchorfile>threshold__type__external__device__control_8h.html</anchorfile>
-      <anchor>abd566a3d7a0a4fabe2cbb39e4954e262</anchor>
-      <arglist>(uint32_t key, uint32_t payload, bool with_payload)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static uint</type>
-      <name>get_payload</name>
-      <anchorfile>threshold__type__external__device__control_8h.html</anchorfile>
-      <anchor>a62ce705c4f3f3b079557f236935e1dd3</anchor>
-      <arglist>(enum send_type type, accum value)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static bool</type>
-      <name>threshold_type_is_above_threshold</name>
-      <anchorfile>threshold__type__external__device__control_8h.html</anchorfile>
-      <anchor>a78e80ccc57135aa9f338b0e82001fb89</anchor>
-      <arglist>(state_t value, threshold_type_t *threshold_type)</arglist>
-    </member>
-    <member kind="variable" static="yes">
-      <type>static uint32_t</type>
-      <name>time_between_spikes</name>
-      <anchorfile>threshold__type__external__device__control_8h.html</anchorfile>
-      <anchor>ab41b4929abf5a9fbed2f869be67bd5f5</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable" static="yes">
-      <type>static uint32_t</type>
-      <name>expected_time</name>
-      <anchorfile>threshold__type__external__device__control_8h.html</anchorfile>
-      <anchor>a8a1c8ad4577d74c25e7760e6d653eed5</anchor>
-      <arglist></arglist>
-    </member>
-  </compound>
-  <compound kind="file">
     <name>threshold_type_maass_stochastic.h</name>
     <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/threshold_types/</path>
     <filename>threshold__type__maass__stochastic_8h.html</filename>
@@ -10943,6 +11155,60 @@
     <anchor>structone__to__one</anchor>
   </compound>
   <compound kind="struct">
+    <name>packet_firing_data_t</name>
+    <filename>neuron__impl__external__devices_8h.html</filename>
+    <anchor>structpacket__firing__data__t</anchor>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>key</name>
+      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
+      <anchor>a4bc362bd05c9b3025446358e7df79cf4</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>value_as_payload</name>
+      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
+      <anchor>a1c15a9d27cf4ab85aae0d7cdbd76724c</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>accum</type>
+      <name>min_value</name>
+      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
+      <anchor>aaf0e80b11974d83d0b549c4959e9ba44</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>accum</type>
+      <name>max_value</name>
+      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
+      <anchor>a30e273060e625b08383af55e558345f3</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>timesteps_between_sending</name>
+      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
+      <anchor>a94013019ac141f16e20610a549dbb4a3</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>time_until_next_send</name>
+      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
+      <anchor>adfa239fbae3b207c2802724ad7a53d47</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable">
+      <type>enum send_type</type>
+      <name>type</name>
+      <anchorfile>neuron__impl__external__devices_8h.html</anchorfile>
+      <anchor>af2e63c0a0d937a06c71a10b3e34b71a7</anchor>
+      <arglist></arglist>
+    </member>
+  </compound>
+  <compound kind="struct">
     <name>param_generator_constant</name>
     <filename>param__generator__constant_8h.html</filename>
     <anchor>structparam__generator__constant</anchor>
@@ -11579,55 +11845,6 @@
     <name>threshold_type_t</name>
     <filename>threshold__type__static_8h.html</filename>
     <anchor>structthreshold__type__t</anchor>
-    <member kind="variable">
-      <type>uint32_t</type>
-      <name>key</name>
-      <anchorfile>threshold__type__static_8h.html</anchorfile>
-      <anchor>a22fd617733ea84d268d826b840800e7d</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>uint32_t</type>
-      <name>value_as_payload</name>
-      <anchorfile>threshold__type__static_8h.html</anchorfile>
-      <anchor>ad2d30a17b1fabe86ed294e5aa2732e8f</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>accum</type>
-      <name>min_value</name>
-      <anchorfile>threshold__type__static_8h.html</anchorfile>
-      <anchor>a0465d2ef655e684d6c6746c5e5931fb5</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>accum</type>
-      <name>max_value</name>
-      <anchorfile>threshold__type__static_8h.html</anchorfile>
-      <anchor>a2f8eb35feb7f40179d95dfd04ee1f7b3</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>uint32_t</type>
-      <name>timesteps_between_sending</name>
-      <anchorfile>threshold__type__static_8h.html</anchorfile>
-      <anchor>a25f75f467d282762aa75ad06f9d541b6</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>uint32_t</type>
-      <name>time_until_next_send</name>
-      <anchorfile>threshold__type__static_8h.html</anchorfile>
-      <anchor>a2cb932c3c21c8332038ca50b06f4d05d</anchor>
-      <arglist></arglist>
-    </member>
-    <member kind="variable">
-      <type>enum send_type</type>
-      <name>type</name>
-      <anchorfile>threshold__type__static_8h.html</anchorfile>
-      <anchor>a91ff408c17251a6b8001bb4f31d65764</anchor>
-      <arglist></arglist>
-    </member>
     <member kind="variable">
       <type>REAL</type>
       <name>du_th_inv</name>

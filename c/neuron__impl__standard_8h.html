@@ -91,14 +91,23 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
 Enumerations</h2></td></tr>
-<tr class="memitem:a68f96be069d7309d70ec3343afad2e03"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__impl__standard_8h.html#a68f96be069d7309d70ec3343afad2e03">word_recording_indices</a> { <a class="el" href="neuron__impl__standard_8h.html#a68f96be069d7309d70ec3343afad2e03ab3af76b3ea8cdd3c68aaa7432e4acf96">V_RECORDING_INDEX</a> = 0, 
+<tr class="memitem:a68f96be069d7309d70ec3343afad2e03"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__impl__standard_8h.html#a68f96be069d7309d70ec3343afad2e03">word_recording_indices</a> { <br />
+&#160;&#160;<a class="el" href="neuron__impl__external__devices_8h.html#a68f96be069d7309d70ec3343afad2e03ab3af76b3ea8cdd3c68aaa7432e4acf96">V_RECORDING_INDEX</a> = 0, 
+<a class="el" href="neuron__impl__external__devices_8h.html#a68f96be069d7309d70ec3343afad2e03a1f4a97c6e4523af2fea20d3ca50dbd0e">GSYN_EXC_RECORDING_INDEX</a> = 1, 
+<a class="el" href="neuron__impl__external__devices_8h.html#a68f96be069d7309d70ec3343afad2e03a0e4025cde485021d43ae9284bee78c6e">GSYN_INH_RECORDING_INDEX</a> = 2, 
+<a class="el" href="neuron__impl__external__devices_8h.html#a68f96be069d7309d70ec3343afad2e03a868c932bcf4cab46d2b226b04bc2438f">N_RECORDED_VARS</a> = 3, 
+<br />
+&#160;&#160;<a class="el" href="neuron__impl__standard_8h.html#a68f96be069d7309d70ec3343afad2e03ab3af76b3ea8cdd3c68aaa7432e4acf96">V_RECORDING_INDEX</a> = 0, 
 <a class="el" href="neuron__impl__standard_8h.html#a68f96be069d7309d70ec3343afad2e03a1f4a97c6e4523af2fea20d3ca50dbd0e">GSYN_EXC_RECORDING_INDEX</a> = 1, 
 <a class="el" href="neuron__impl__standard_8h.html#a68f96be069d7309d70ec3343afad2e03a0e4025cde485021d43ae9284bee78c6e">GSYN_INH_RECORDING_INDEX</a> = 2, 
 <a class="el" href="neuron__impl__standard_8h.html#a68f96be069d7309d70ec3343afad2e03a868c932bcf4cab46d2b226b04bc2438f">N_RECORDED_VARS</a> = 3
+<br />
  }</td></tr>
 <tr class="memdesc:a68f96be069d7309d70ec3343afad2e03"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indices for recording of words.  <a href="neuron__impl__standard_8h.html#a68f96be069d7309d70ec3343afad2e03">More...</a><br /></td></tr>
 <tr class="separator:a68f96be069d7309d70ec3343afad2e03"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1a1145a27f2273fe3bf900dc1602b4e3"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__impl__standard_8h.html#a1a1145a27f2273fe3bf900dc1602b4e3">bitfield_recording_indices</a> { <a class="el" href="neuron__impl__standard_8h.html#a1a1145a27f2273fe3bf900dc1602b4e3a12b36ddd66438ef711657d3a5ff70ebb">SPIKE_RECORDING_BITFIELD</a> = 0, 
+<tr class="memitem:a1a1145a27f2273fe3bf900dc1602b4e3"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="neuron__impl__standard_8h.html#a1a1145a27f2273fe3bf900dc1602b4e3">bitfield_recording_indices</a> { <a class="el" href="neuron__impl__external__devices_8h.html#a1a1145a27f2273fe3bf900dc1602b4e3a122d35b1c72444010af712fe58cd21be">PACKET_RECORDING_BITFIELD</a> = 0, 
+<a class="el" href="neuron__impl__external__devices_8h.html#a1a1145a27f2273fe3bf900dc1602b4e3aa2d088b9c45269b7bf9461907960c21c">N_BITFIELD_VARS</a> = 1, 
+<a class="el" href="neuron__impl__standard_8h.html#a1a1145a27f2273fe3bf900dc1602b4e3a12b36ddd66438ef711657d3a5ff70ebb">SPIKE_RECORDING_BITFIELD</a> = 0, 
 <a class="el" href="neuron__impl__standard_8h.html#a1a1145a27f2273fe3bf900dc1602b4e3aa2d088b9c45269b7bf9461907960c21c">N_BITFIELD_VARS</a> = 1
  }</td></tr>
 <tr class="memdesc:a1a1145a27f2273fe3bf900dc1602b4e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indices for recording of bitfields.  <a href="neuron__impl__standard_8h.html#a1a1145a27f2273fe3bf900dc1602b4e3">More...</a><br /></td></tr>
@@ -175,7 +184,7 @@ static <a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_too
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">enum <a class="el" href="neuron__impl__standard_8h.html#a68f96be069d7309d70ec3343afad2e03">word_recording_indices</a></td>
+          <td class="memname">enum <a class="el" href="neuron__impl__external__devices_8h.html#a68f96be069d7309d70ec3343afad2e03">word_recording_indices</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -183,6 +192,14 @@ static <a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_too
 <p>Indices for recording of words. </p>
 <table class="fieldtable">
 <tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a68f96be069d7309d70ec3343afad2e03ab3af76b3ea8cdd3c68aaa7432e4acf96"></a>V_RECORDING_INDEX&#160;</td><td class="fielddoc"><p>V (somatic potential) recording index. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a68f96be069d7309d70ec3343afad2e03a1f4a97c6e4523af2fea20d3ca50dbd0e"></a>GSYN_EXC_RECORDING_INDEX&#160;</td><td class="fielddoc"><p>Gsyn_exc (excitatory synaptic conductance/current) recording index. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a68f96be069d7309d70ec3343afad2e03a0e4025cde485021d43ae9284bee78c6e"></a>GSYN_INH_RECORDING_INDEX&#160;</td><td class="fielddoc"><p>Gsyn_inh (excitatory synaptic conductance/current) recording index. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a68f96be069d7309d70ec3343afad2e03a868c932bcf4cab46d2b226b04bc2438f"></a>N_RECORDED_VARS&#160;</td><td class="fielddoc"><p>Number of recorded word-sized state variables. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a68f96be069d7309d70ec3343afad2e03ab3af76b3ea8cdd3c68aaa7432e4acf96"></a>V_RECORDING_INDEX&#160;</td><td class="fielddoc"><p>V (somatic potential) recording index. </p>
 </td></tr>
 <tr><td class="fieldname"><a id="a68f96be069d7309d70ec3343afad2e03a1f4a97c6e4523af2fea20d3ca50dbd0e"></a>GSYN_EXC_RECORDING_INDEX&#160;</td><td class="fielddoc"><p>Gsyn_exc (excitatory synaptic conductance/current) recording index. </p>
 </td></tr>
@@ -201,14 +218,18 @@ static <a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_too
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">enum <a class="el" href="neuron__impl__standard_8h.html#a1a1145a27f2273fe3bf900dc1602b4e3">bitfield_recording_indices</a></td>
+          <td class="memname">enum <a class="el" href="neuron__impl__external__devices_8h.html#a1a1145a27f2273fe3bf900dc1602b4e3">bitfield_recording_indices</a></td>
         </tr>
       </table>
 </div><div class="memdoc">
 
 <p>Indices for recording of bitfields. </p>
 <table class="fieldtable">
-<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a1a1145a27f2273fe3bf900dc1602b4e3a12b36ddd66438ef711657d3a5ff70ebb"></a>SPIKE_RECORDING_BITFIELD&#160;</td><td class="fielddoc"><p>Spike event recording index. </p>
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a1a1145a27f2273fe3bf900dc1602b4e3a122d35b1c72444010af712fe58cd21be"></a>PACKET_RECORDING_BITFIELD&#160;</td><td class="fielddoc"><p>Spike event recording index. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a1a1145a27f2273fe3bf900dc1602b4e3aa2d088b9c45269b7bf9461907960c21c"></a>N_BITFIELD_VARS&#160;</td><td class="fielddoc"><p>Number of recorded bitfields. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a1a1145a27f2273fe3bf900dc1602b4e3a12b36ddd66438ef711657d3a5ff70ebb"></a>SPIKE_RECORDING_BITFIELD&#160;</td><td class="fielddoc"><p>Spike event recording index. </p>
 </td></tr>
 <tr><td class="fieldname"><a id="a1a1145a27f2273fe3bf900dc1602b4e3aa2d088b9c45269b7bf9461907960c21c"></a>N_BITFIELD_VARS&#160;</td><td class="fielddoc"><p>Number of recorded bitfields. </p>
 </td></tr>
@@ -571,7 +592,7 @@ static <a class="elRef" href="http://spinnakermanchester.github.io/spinnaker_too
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Aug 4 2020 23:24:23 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Aug 5 2020 12:58:07 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.17
 </small></address>

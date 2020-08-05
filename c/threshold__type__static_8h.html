@@ -84,7 +84,7 @@ $(function() {
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Data Structures</h2></td></tr>
 <tr class="memitem:structthreshold__type__t"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="threshold__type__static_8h.html#structthreshold__type__t">threshold_type_t</a></td></tr>
-<tr class="memdesc:structthreshold__type__t"><td class="mdescLeft">&#160;</td><td class="mdescRight">The definition of the threshold.  <a href="threshold__type__static_8h.html#structthreshold__type__t">More...</a><br /></td></tr>
+<tr class="memdesc:structthreshold__type__t"><td class="mdescLeft">&#160;</td><td class="mdescRight">Stochastic threshold configuration.  <a href="threshold__type__static_8h.html#structthreshold__type__t">More...</a><br /></td></tr>
 <tr class="separator:structthreshold__type__t"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
@@ -107,56 +107,10 @@ Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<div class="textblock"><p>The definition of the threshold. </p>
-<p>Static threshold configuration.</p>
-<p>Stochastic threshold configuration. </p>
+<div class="textblock"><p>Stochastic threshold configuration. </p>
+<p>Static threshold configuration. </p>
 </div><table class="fieldtable">
 <tr><th colspan="3">Data Fields</th></tr>
-<tr><td class="fieldtype">
-<a id="a22fd617733ea84d268d826b840800e7d"></a>uint32_t</td>
-<td class="fieldname">
-key</td>
-<td class="fielddoc">
-The key to send to update the value. </td></tr>
-<tr><td class="fieldtype">
-<a id="ad2d30a17b1fabe86ed294e5aa2732e8f"></a>uint32_t</td>
-<td class="fieldname">
-value_as_payload</td>
-<td class="fielddoc">
-<p>A scaling factor (&gt;0) if the value is to be sent as payload, False (0) if just the key </p>
-</td></tr>
-<tr><td class="fieldtype">
-<a id="a0465d2ef655e684d6c6746c5e5931fb5"></a>accum</td>
-<td class="fieldname">
-min_value</td>
-<td class="fielddoc">
-<p>The minimum allowed value to send as the payload. Values below are clipped to this value </p>
-</td></tr>
-<tr><td class="fieldtype">
-<a id="a2f8eb35feb7f40179d95dfd04ee1f7b3"></a>accum</td>
-<td class="fieldname">
-max_value</td>
-<td class="fielddoc">
-<p>The maximum allowed value to send as the payload. Values above are clipped to this value </p>
-</td></tr>
-<tr><td class="fieldtype">
-<a id="a25f75f467d282762aa75ad06f9d541b6"></a>uint32_t</td>
-<td class="fieldname">
-timesteps_between_sending</td>
-<td class="fielddoc">
-The time between sending the value. </td></tr>
-<tr><td class="fieldtype">
-<a id="a2cb932c3c21c8332038ca50b06f4d05d"></a>uint32_t</td>
-<td class="fieldname">
-time_until_next_send</td>
-<td class="fielddoc">
-The time until the next sending of the value (initially 0) </td></tr>
-<tr><td class="fieldtype">
-<a id="a91ff408c17251a6b8001bb4f31d65764"></a>enum <a class="el" href="threshold__type__external__device__control_8h.html#a73f8837bd24ba4a9abf204756c0b9b9e">send_type</a></td>
-<td class="fieldname">
-type</td>
-<td class="fielddoc">
-Send type. </td></tr>
 <tr><td class="fieldtype">
 <a id="acaf821c33da7ceffd34956d24bef0d3a"></a><a class="el" href="maths-util_8h.html#a67277c5a9b43a598ef8c22aea7dbe1b6">REAL</a></td>
 <td class="fieldname">
@@ -243,7 +197,7 @@ The value of the static threshold. </td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Aug 4 2020 23:24:23 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Wed Aug 5 2020 12:58:07 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.17
 </small></address>
