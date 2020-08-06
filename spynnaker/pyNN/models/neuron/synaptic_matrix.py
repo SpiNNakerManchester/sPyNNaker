@@ -46,6 +46,7 @@ class SynapticMatrix(object):
         "__delay_matrix_size",
         "__single_matrix_size",
         "__index",
+        "__delay_index",
         "__syn_mat_offset",
         "__delay_syn_mat_offset",
         "__is_single",
@@ -106,6 +107,7 @@ class SynapticMatrix(object):
             BYTES_PER_WORD)
 
         self.__index = None
+        self.__delay_index = None
         self.__syn_mat_offset = None
         self.__delay_syn_mat_offset = None
         self.__is_single = False
@@ -151,11 +153,16 @@ class SynapticMatrix(object):
         :rtype: tuple(~numpy.ndarray or None, ~numpy.ndarray or None)
         """
 
+        # Get the row data; note that we use the availability of the routing
+        # keys to decide if we should actually generate any data; this is
+        # because a single edge might have been filtered
         (row_data, delayed_row_data, delayed_source_ids,
          delay_stages) = self.__synapse_io.get_synapses(
             self.__synapse_info, self.__app_edge.n_delay_stages,
             self.__n_synapse_types, self.__weight_scales,
-            self.__machine_edge, self.__max_row_info)
+            self.__machine_edge, self.__max_row_info,
+            self.__routing_info is not None,
+            self.__delay_routing_info is not None)
 
         if self.__app_edge.delay_edge is not None:
             pre_vertex_slice = self.__machine_edge.pre_vertex.vertex_slice
@@ -183,12 +190,14 @@ class SynapticMatrix(object):
         :return: The updated block and single addresses
         :rtype: tuple(int, int)
         """
+        # We can't write anything if there isn't a key
+        if self.__routing_info is None:
+            return block_addr, single_addr
+
+        # If we have routing info but no synapses, write an invalid entry
         if self.__max_row_info.undelayed_max_n_synapses == 0:
-            # If there is routing information, write an invalid entry
-            if self.__routing_info is not None:
-                index = self.__poptable.add_invalid_entry(
-                    self.__routing_info.first_key_and_mask)
-                self.__update_synapse_index(index)
+            self.__index = self.__poptable.add_invalid_entry(
+                self.__routing_info.first_key_and_mask)
             return block_addr, single_addr
 
         size = len(row_data) * BYTES_PER_WORD
@@ -203,10 +212,9 @@ class SynapticMatrix(object):
             return block_addr, single_addr
 
         block_addr = self.__poptable.write_padding(spec, block_addr)
-        index = self.__poptable.update_master_population_table(
+        self.__index = self.__poptable.update_master_population_table(
             block_addr, self.__max_row_info.undelayed_max_words,
             self.__routing_info.first_key_and_mask)
-        self.__update_synapse_index(index)
         spec.write_array(row_data)
         self.__syn_mat_offset = block_addr
         block_addr = self.__next_addr(block_addr, self.__matrix_size)
@@ -222,12 +230,14 @@ class SynapticMatrix(object):
         :return: The updated block address
         :rtype: int
         """
+        # We can't write anything if there isn't a key
+        if self.__delay_routing_info is None:
+            return block_addr
+
+        # If we have routing info but no synapses, write an invalid entry
         if self.__max_row_info.delayed_max_n_synapses == 0:
-            # If there is routing information, write an invalid entry
-            if self.__delay_routing_info is not None:
-                index = self.__poptable.add_invalid_entry(
-                    self.__delay_routing_info.first_key_and_mask)
-                self.__update_synapse_index(index)
+            self.__delay_index = self.__poptable.add_invalid_entry(
+                self.__delay_routing_info.first_key_and_mask)
             return block_addr
 
         size = len(row_data) * BYTES_PER_WORD
@@ -236,10 +246,9 @@ class SynapticMatrix(object):
                 size, self.__delay_matrix_size))
 
         block_addr = self.__poptable.write_padding(spec, block_addr)
-        index = self.__poptable.update_master_population_table(
+        self.__delay_index = self.__poptable.update_master_population_table(
             block_addr, self.__max_row_info.delayed_max_words,
             self.__delay_routing_info.first_key_and_mask)
-        self.__update_synapse_index(index)
         spec.write_array(row_data)
         self.__delay_syn_mat_offset = block_addr
         block_addr = self.__next_addr(block_addr, self.__delay_matrix_size)
@@ -261,10 +270,9 @@ class SynapticMatrix(object):
         if data_size != self.__single_matrix_size:
             raise Exception("Row data incorrect size: {} instead of {}".format(
                 data_size, self.__single_matrix_size))
-        index = self.__poptable.update_master_population_table(
+        self.__index = self.__poptable.update_master_population_table(
             single_addr, self.__max_row_info.undelayed_max_words,
             self.__routing_info.first_key_and_mask, is_single=True)
-        self.__update_synapse_index(index)
         single_synapses.append(single_rows)
         self.__syn_mat_offset = single_addr
         self.__is_single = True
@@ -344,21 +352,22 @@ class SynapticMatrix(object):
         :return: The address after the allocation and the allocated address
         :rtype: int, int
         """
-        # If there isn't any synapses, add an invalid entry
+        # Can't reserve anything if there isn't a key
+        if self.__routing_info is None:
+            return block_addr, SYN_REGION_UNUSED
+
+        # If we have routing info but no synapses, add an invalid entry
         if self.__max_row_info.undelayed_max_n_synapses == 0:
-            if self.__routing_info is not None:
-                index = self.__poptable.add_invalid_entry(
-                    self.__routing_info.first_key_and_mask)
-                self.__update_synapse_index(index)
+            self.__index = self.__poptable.add_invalid_entry(
+                self.__routing_info.first_key_and_mask)
             return block_addr, SYN_REGION_UNUSED
 
         # Otherwise add a master population table entry for the incoming
         # machine vertex
         block_addr = self.__poptable.get_next_allowed_address(block_addr)
-        index = self.__poptable.update_master_population_table(
+        self.__index = self.__poptable.update_master_population_table(
             block_addr, self.__max_row_info.undelayed_max_words,
             self.__routing_info.first_key_and_mask)
-        self.__update_synapse_index(index)
         self.__syn_mat_offset = block_addr
         block_addr = self.__next_addr(block_addr, self.__matrix_size)
         return block_addr, self.__syn_mat_offset
@@ -372,21 +381,22 @@ class SynapticMatrix(object):
         :return: The address after the allocation and the allocated address
         :rtype: int, int
         """
-        # If there isn't any synapses, add an invalid entry
+        # Can't reserve anything if there isn't a key
+        if self.__delay_routing_info is None:
+            return block_addr, SYN_REGION_UNUSED
+
+        # If we have routing info but no synapses, add an invalid entry
         if self.__max_row_info.delayed_max_n_synapses == 0:
-            if self.__delay_routing_info is not None:
-                index = self.__poptable.add_invalid_entry(
-                    self.__delay_routing_info.first_key_and_mask)
-                self.__update_synapse_index(index)
+            self.__delay_index = self.__poptable.add_invalid_entry(
+                self.__delay_routing_info.first_key_and_mask)
             return block_addr, SYN_REGION_UNUSED
 
         # Otherwise add a master population table entry for the incoming
         # machine vertex
         block_addr = self.__poptable.get_next_allowed_address(block_addr)
-        index = self.__poptable.update_master_population_table(
+        self.__delay_index = self.__poptable.update_master_population_table(
             block_addr, self.__max_row_info.delayed_max_words,
             self.__delay_routing_info.first_key_and_mask)
-        self.__update_synapse_index(index)
         self.__delay_syn_mat_offset = block_addr
         block_addr = self.__next_addr(block_addr, self.__delay_matrix_size)
         return block_addr, self.__delay_syn_mat_offset
@@ -436,26 +446,19 @@ class SynapticMatrix(object):
 
     @property
     def index(self):
-        """ The index of the matrices within the master population table
+        """ The index of the matrix within the master population table
 
         :rtype: int
         """
         return self.__index
 
-    def __update_synapse_index(self, index):
-        """ Update the index of a synapse, checking it matches against indices\
-            for other information for the same edge
+    @property
+    def delay_index(self):
+        """ The index of the delayed matrix within the master population table
 
-        :param index: The index to set
-        :raise Exception: If the index doesn't match an existing index
+        :rtype: int
         """
-        if self.__index is None:
-            self.__index = index
-        elif self.__index != index:
-            # This should never happen as things should be aligned over all
-            # machine vertices, but check just in case!
-            raise Exception(
-                "Index of " + self.__synapse_info + " has changed!")
+        return self.__delay_index
 
     def read_connections(
             self, transceiver, placement, synapses_address, single_address):

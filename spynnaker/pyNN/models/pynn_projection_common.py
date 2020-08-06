@@ -30,6 +30,8 @@ from spynnaker.pyNN.models.neural_projections import (
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 from spynnaker.pyNN.utilities import constants
 from spynnaker.pyNN.models.neuron import ConnectionHolder
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    AbstractSynapseDynamicsStructural)
 
 # pylint: disable=protected-access
 
@@ -154,6 +156,12 @@ class PyNNProjectionCommon(object):
                 machine_time_step / MICRO_TO_MILLISECOND_CONVERSION):
             logger.warning("The end user entered a max delay"
                            " for which the projection breaks")
+
+        # Check structural delays, as they don't support the full range yet...
+        if isinstance(synapse_dynamics_stdp,
+                      AbstractSynapseDynamicsStructural):
+            synapse_dynamics_stdp.check_initial_delay(
+                post_vertex_max_supported_delay_ms)
 
         # check that the projection edges label is not none, and give an
         # auto generated label if set to None

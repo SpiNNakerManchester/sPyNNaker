@@ -58,6 +58,7 @@ class SynapticMatrixApp(object):
         "__syn_mat_offset",
         "__delay_syn_mat_offset",
         "__index",
+        "__delay_index",
         "__received_block",
         "__delay_received_block"
     ]
@@ -129,6 +130,7 @@ class SynapticMatrixApp(object):
         self.__syn_mat_offset = None
         self.__delay_syn_mat_offset = None
         self.__index = None
+        self.__delay_index = None
 
         # These are stored when blocks are read
         self.__received_block = None
@@ -329,17 +331,16 @@ class SynapticMatrixApp(object):
         :return: The updated block address
         :rtype: int
         """
-
-        # If there are no synapses, just write an invalid pop table entry
-        if self.__max_row_info.undelayed_max_n_synapses == 0:
-            self.__add_invalid_entry(self.__app_key_info)
+        # If there is no routing info, don't write anything
+        if self.__app_key_info is None:
             return block_addr
 
         # Write a matrix for the whole application vertex
         block_addr = self.__poptable.write_padding(spec, block_addr)
-        self.__update_master_pop_table(
-            block_addr, self.__max_row_info.undelayed_max_words,
-            self.__app_key_info)
+        self.__index = self.__poptable.update_master_population_table(
+            block_addr,  self.__max_row_info.undelayed_max_words,
+            self.__app_key_info.key_and_mask, self.__app_key_info.core_mask,
+            self.__app_key_info.core_shift, self.__app_key_info.n_neurons)
         self.__syn_mat_offset = block_addr
 
         # Write all the row data for each machine vertex one after the other.
@@ -371,17 +372,18 @@ class SynapticMatrixApp(object):
         :return: The updated block address
         :rtype: int
         """
-
-        # If there are no synapses, just write an invalid pop table entry
-        if self.__max_row_info.delayed_max_n_synapses == 0:
-            self.__add_invalid_entry(self.__delay_app_key_info)
+        # If there is no routing info, don't write anything
+        if self.__delay_app_key_info is None:
             return block_addr
 
         # Write a matrix for the whole application vertex
         block_addr = self.__poptable.write_padding(spec, block_addr)
-        self.__update_master_pop_table(
+        self.__delay_index = self.__poptable.update_master_population_table(
             block_addr, self.__max_row_info.delayed_max_words,
-            self.__delay_app_key_info)
+            self.__delay_app_key_info.key_and_mask,
+            self.__delay_app_key_info.core_mask,
+            self.__delay_app_key_info.core_shift,
+            self.__delay_app_key_info.n_neurons)
         self.__delay_syn_mat_offset = block_addr
 
         # Write all the row data for each machine vertex one after the other.
@@ -389,9 +391,10 @@ class SynapticMatrixApp(object):
         # this must be true in the current code, because the row length is
         # fixed for all synaptic matrices from the same source application
         # vertex
-        for _, pre_slice, row_data in matrix_data:
-            n_rows = pre_slice.n_atoms * self.__app_edge.n_delay_stages
-            size = self.__max_row_info.delayed_max_bytes * n_rows
+        for m_edge, row_data in matrix_data:
+            size = (self.__max_row_info.delayed_max_bytes *
+                    m_edge.pre_vertex.vertex_slice.n_atoms *
+                    self.__app_edge.n_delay_stages)
             row_data_size = len(row_data) * BYTES_PER_WORD
             if size != row_data_size:
                 raise Exception("Data incorrect size: {} instead of {}".format(
@@ -449,33 +452,20 @@ class SynapticMatrixApp(object):
 
         :param int block_addr:
             The address in the synaptic matrix region to start at
-        :return: The updated block address
-        :rtype: int
+        :return: The updated block address, the synaptic matrix address,
+            the delayed synaptic matrix address,
+            the maximum synaptic matrix address,
+            and the maximum delayed synaptic matrix address
+        :rtype: int, int, int, int, int
         """
         if not self.__use_app_keys:
             return (block_addr, SYN_REGION_UNUSED, SYN_REGION_UNUSED, None,
                     None)
 
-        is_undelayed = bool(self.__max_row_info.undelayed_max_n_synapses)
-        is_delayed = bool(self.__max_row_info.delayed_max_n_synapses)
-
-        syn_block_addr = SYN_REGION_UNUSED
-        syn_max_addr = None
-        if is_undelayed:
-            syn_block_addr = block_addr
-            block_addr = self.__reserve_mpop_block(block_addr)
-            syn_max_addr = block_addr
-        else:
-            self.__add_invalid_entry(self.__app_key_info)
-
-        delay_block_addr = SYN_REGION_UNUSED
-        delay_max_addr = None
-        if is_delayed:
-            delay_block_addr = block_addr
-            block_addr = self.__reserve_delay_mpop_block(block_addr)
-            delay_max_addr = block_addr
-        else:
-            self.__add_invalid_entry(self.__delay_app_key_info)
+        block_addr, syn_block_addr, syn_max_addr = \
+            self.__reserve_mpop_block(block_addr)
+        block_addr, delay_block_addr, delay_max_addr = \
+            self.__reserve_delay_mpop_block(block_addr)
 
         return (block_addr, syn_block_addr, delay_block_addr, syn_max_addr,
                 delay_max_addr)
@@ -486,32 +476,46 @@ class SynapticMatrixApp(object):
 
         :param int block_addr:
             The address in the synaptic matrix region to start at
-        :return: The updated block address
-        :rtype: int
+        :return: The updated block address, the reserved address,
+            and the maximum address
+        :rtype: int, int, int
         """
+        # If there is no routing information, don't reserve anything
+        if self.__app_key_info is None:
+            return block_addr, SYN_REGION_UNUSED, None
+
         block_addr = self.__poptable.get_next_allowed_address(block_addr)
-        self.__update_master_pop_table(
+        self.__index = self.__poptable.update_master_population_table(
             block_addr, self.__max_row_info.undelayed_max_words,
-            self.__app_key_info)
+            self.__app_key_info.key_and_mask, self.__app_key_info.core_mask,
+            self.__app_key_info.core_shift, self.__app_key_info.n_neurons)
         self.__syn_mat_offset = block_addr
         block_addr = self.__next_addr(block_addr, self.__matrix_size)
-        return block_addr
+        return block_addr, self.__syn_mat_offset, block_addr
 
     def __reserve_delay_mpop_block(self, block_addr):
         """ Reserve a block in the master population table for a delayed matrix
 
         :param int block_addr:
             The address in the synaptic matrix region to start at
-        :return: The updated block address
-        :rtype: int
+        :return: The updated block address, the reserved address,
+            and the maximum address
+        :rtype: int, int, int
         """
+        # If there is no routing information don't reserve anything
+        if self.__delay_app_key_info is None:
+            return block_addr, SYN_REGION_UNUSED, None
+
         block_addr = self.__poptable.get_next_allowed_address(block_addr)
-        self.__update_master_pop_table(
+        self.__delay_index = self.__poptable.update_master_population_table(
             block_addr, self.__max_row_info.delayed_max_words,
-            self.__delay_app_key_info)
+            self.__delay_app_key_info.key_and_mask,
+            self.__delay_app_key_info.core_mask,
+            self.__delay_app_key_info.core_shift,
+            self.__delay_app_key_info.n_neurons)
         self.__delay_syn_mat_offset = block_addr
         block_addr = self.__next_addr(block_addr, self.__delay_matrix_size)
-        return block_addr
+        return block_addr, self.__delay_syn_mat_offset, block_addr
 
     def __update_connection_holders(self, data, delayed_data, machine_edge):
         """ Fill in connections in the connection holders as they are created
@@ -525,30 +529,6 @@ class SynapticMatrixApp(object):
                     data, delayed_data, self.__synapse_info,
                     self.__n_synapse_types, self.__weight_scales,
                     machine_edge, self.__max_row_info))
-
-    def __update_master_pop_table(self, block_addr, max_words, key_info):
-        """ Update the master population table and set the index
-
-        :param int block_addr: The address at which the block to add starts
-        :param int max_words:
-            The maximum number of words in a row, excluding headers
-        :param _AppKeyInfo key_info: The key info for the entry
-        """
-        index = self.__poptable.update_master_population_table(
-            block_addr, max_words, key_info.key_and_mask, key_info.core_mask,
-            key_info.core_shift, key_info.n_neurons)
-        self.__update_synapse_index(index)
-
-    def __add_invalid_entry(self, key_info):
-        """ Add an invalid entry to the table, to keep indices aligned
-
-        :param _AppKeyInfo key_info: The key info for the entry
-        """
-        if key_info is not None:
-            index = self.__poptable.add_invalid_entry(
-                key_info.key_and_mask, key_info.core_mask, key_info.core_shift,
-                key_info.n_neurons)
-            self.__update_synapse_index(index)
 
     def __next_addr(self, block_addr, size):
         """ Get the next address after a block, checking it is in range
@@ -711,3 +691,17 @@ class SynapticMatrixApp(object):
             return self.__index
         matrix = self.__get_matrix(machine_edge)
         return matrix.index
+
+    def get_delay_index(self, machine_edge):
+        """ Get the index in the master population table of the delayed matrix
+            for a machine edge
+
+        :param machine_edge: The edge to get the index for
+        :rtype: int
+        """
+        # If there is an app-level index, it will be the same for all machine
+        # edges
+        if self.__delay_index is not None:
+            return self.__delay_index
+        matrix = self.__get_matrix(machine_edge)
+        return matrix.delay_index

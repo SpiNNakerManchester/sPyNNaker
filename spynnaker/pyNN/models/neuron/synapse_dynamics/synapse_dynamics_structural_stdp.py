@@ -210,3 +210,7 @@ class SynapseDynamicsStructuralSTDP(
     def generate_on_machine(self):
         # Never generate structural connections on the machine
         return False
+
+    @overrides(AbstractSynapseDynamicsStructural.check_initial_delay)
+    def check_initial_delay(self, max_delay_ms):
+        return self.__common_sp.check_initial_delay(max_delay_ms)

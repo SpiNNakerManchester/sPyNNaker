@@ -345,7 +345,7 @@ class SynapseIORowBased(object):
 
     def get_synapses(
             self, synapse_info, n_delay_stages, n_synapse_types, weight_scales,
-            machine_edge, max_row_info):
+            machine_edge, max_row_info, gen_undelayed, gen_delayed):
         """ Get the synapses as an array of words for non-delayed synapses and\
             an array of words for delayed synapses. This is used to prepare\
             information for *deployment to SpiNNaker*.
@@ -362,6 +362,10 @@ class SynapseIORowBased(object):
             The incoming machine edge that the synapses are on
         :param MaxRowInfo max_row_info:
             The maximum row information for the synapses
+        :param bool gen_undelayed:
+            Whether to generate undelayed data
+        :param bool gen_delayed:
+            Whether to generate delayed data
         :return: (row_data, delayed_row_data, delayed_source_ids, stages) where
             - row_data is the undelayed connectivity data arranged into a row
               per source, each row the same length
@@ -426,9 +430,7 @@ class SynapseIORowBased(object):
 
         # Get the data for the connections
         row_data = numpy.zeros(0, dtype="uint32")
-        if max_row_info.undelayed_max_n_synapses or \
-                isinstance(synapse_info.synapse_dynamics,
-                           AbstractSynapseDynamicsStructural):
+        if gen_undelayed and max_row_info.undelayed_max_n_synapses:
             # Get which row each connection will go into
             undelayed_row_indices = (
                     undelayed_connections["source"] - pre_vertex_slice.lo_atom)
@@ -446,7 +448,7 @@ class SynapseIORowBased(object):
         delayed_row_data = numpy.zeros(0, dtype="uint32")
         stages = numpy.zeros(0, dtype="uint32")
         delayed_source_ids = numpy.zeros(0, dtype="uint32")
-        if max_row_info.delayed_max_n_synapses:
+        if gen_delayed and max_row_info.delayed_max_n_synapses:
             # Get the delay stages and which row each delayed connection will
             # go into
             stages = numpy.floor((numpy.round(
