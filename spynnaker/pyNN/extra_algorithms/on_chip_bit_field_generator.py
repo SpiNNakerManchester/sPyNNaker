@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from collections import defaultdict
-import logging
 import math
 import os
 import struct
@@ -28,7 +27,6 @@ from spinn_front_end_common.utilities.system_control_logic import (
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 
-logger = logging.getLogger(__name__)
 _ONE_WORD = struct.Struct("<I")
 _THREE_WORDS = struct.Struct("<III")
 

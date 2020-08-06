@@ -57,10 +57,10 @@ class GraphEdgeFilter(object):
         for partition in progress.over(machine_graph.outgoing_edge_partitions):
             for edge in partition.edges:
                 if self._is_filterable(edge):
-                    logger.debug("this edge was pruned {}", edge)
+                    logger.debug("this edge was pruned: {}", edge)
                     prune_count += 1
                     continue
-                logger.debug("this edge was not pruned {}", edge)
+                logger.debug("this edge was not pruned: {}", edge)
                 no_prune_count += 1
                 self._add_edge_to_new_graph(edge, partition, new_machine_graph)
 
