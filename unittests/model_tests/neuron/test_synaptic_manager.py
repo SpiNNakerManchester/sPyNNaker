@@ -542,7 +542,7 @@ def test_pop_based_master_pop_table_standard(
     # Make the routing info line up to force an app key in the pop table if
     # the constraints match up
     routing_info = RoutingInfo()
-    n_key_bits = int(math.ceil(math.log2(100)))
+    n_key_bits = int(math.ceil(math.log(100, 2)))
     n_keys = 2**n_key_bits
     mask = 0xFFFFFFFF - (n_keys - 1)
 
