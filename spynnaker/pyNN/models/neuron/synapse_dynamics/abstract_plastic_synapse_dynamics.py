@@ -42,13 +42,13 @@ class AbstractPlasticSynapseDynamics(AbstractSynapseDynamics):
             and lengths for the fixed_plastic and plastic-plastic parts of\
             each row.
 
-        Data is returned as an array made up of an array of 32-bit words for\
-        each row, for each of the fixed-plastic and plastic-plastic data\
-        regions.  The row into which connection should go is given by\
-        `connection_row_indices`, and the total number of rows is given by\
+        Data is returned as an array made up of an array of 32-bit words for
+        each row, for each of the fixed-plastic and plastic-plastic data
+        regions.  The row into which connection should go is given by
+        `connection_row_indices`, and the total number of rows is given by
         `n_rows`.
 
-        Lengths are returned as an array made up of an integer for each row,\
+        Lengths are returned as an array made up of an integer for each row,
         for each of the fixed-plastic and plastic-plastic regions.
 
         :param ~numpy.ndarray connections:

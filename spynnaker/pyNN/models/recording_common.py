@@ -60,7 +60,7 @@ class RecordingCommon(object):
                 indexes=None):
         """ Tell the vertex to record data.
 
-        :param str variable: the variable to record, valued variables to\
+        :param str variable: the variable to record, valued variables to
             record are: 'gsyn_exc', 'gsyn_inh', 'v', 'spikes'
         :param int sampling_interval: the interval to record them
         :param indexes: List of indexes to record or None for all

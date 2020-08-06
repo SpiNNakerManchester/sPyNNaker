@@ -50,12 +50,12 @@ class AbstractRandomStats(object):
 
     @abstractmethod
     def high(self, dist):
-        """ Return the high cutoff value of the distribution, or None if the\
+        """ Return the high cutoff value of the distribution, or `None` if the\
             distribution is unbounded
         """
 
     @abstractmethod
     def low(self, dist):
-        """ Return the low cutoff value of the distribution, or None if the\
+        """ Return the low cutoff value of the distribution, or `None` if the\
             distribution is unbounded
         """

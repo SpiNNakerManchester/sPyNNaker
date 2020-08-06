@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
 from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.constraints.key_allocator_constraints import (
@@ -36,7 +35,6 @@ from spinn_front_end_common.utilities.constants import (
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.defaults import defaults
 
-logger = logging.getLogger(__name__)
 MOTOR_PARTITION_ID = "MOTOR"
 
 

@@ -12,23 +12,19 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-import logging
-import math
 import numpy
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
-from spynnaker.pyNN.utilities import utility_calls
+from spynnaker.pyNN.utilities.utility_calls import (
+    get_probable_maximum_selected, round_up)
 from spynnaker.pyNN.exceptions import SpynnakerException
 from .abstract_connector_supports_views_on_machine import (
     AbstractConnectorSupportsViewsOnMachine)
 
 N_GEN_PARAMS = 8
-
-logger = logging.getLogger(__file__)
 
 
 class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
@@ -70,7 +66,7 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
         :type rng: ~pyNN.random.NumpyRNG or None
         """
         # :param ~pyNN.space.Space space:
-        # a Space object, needed if you wish to specify distance-dependent\
+        # a Space object, needed if you wish to specify distance-dependent
         # weights or delays - not implemented
         super(FixedNumberPreConnector, self).__init__(safe, callback, verbose)
         self.__n_pre = n
@@ -201,19 +197,19 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
             max_delay=None):
         # pylint: disable=too-many-arguments
         prob_selection = 1.0 / float(synapse_info.n_pre_neurons)
-        n_connections_total = utility_calls.get_probable_maximum_selected(
+        n_connections_total = get_probable_maximum_selected(
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             self.__n_pre * synapse_info.n_post_neurons, prob_selection,
             chance=1.0/10000.0)
         prob_in_slice = min(
             float(post_vertex_slice.n_atoms) / float(
                 synapse_info.n_post_neurons), 1.0)
-        n_connections = utility_calls.get_probable_maximum_selected(
+        n_connections = get_probable_maximum_selected(
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             n_connections_total, prob_in_slice, chance=1.0/100000.0)
 
         if min_delay is None or max_delay is None:
-            return int(math.ceil(n_connections))
+            return round_up(n_connections)
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
             synapse_info.delays,

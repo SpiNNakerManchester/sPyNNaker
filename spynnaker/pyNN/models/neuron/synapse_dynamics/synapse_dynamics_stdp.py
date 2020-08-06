@@ -12,8 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-import math
 import numpy
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
@@ -27,7 +25,7 @@ from .abstract_generate_on_machine import (
     AbstractGenerateOnMachine, MatrixGeneratorID)
 from spynnaker.pyNN.exceptions import (
     InvalidParameterType, SynapticConfigurationException)
-from spynnaker.pyNN.utilities.utility_calls import get_n_bits
+from spynnaker.pyNN.utilities.utility_calls import get_n_bits, ceildiv
 
 # How large are the time-stamps stored with each event
 TIME_STAMP_BYTES = BYTES_PER_WORD
@@ -281,7 +279,7 @@ class SynapseDynamicsSTDP(
 
         # The actual number of bytes is in a word-aligned struct, so work out
         # the number of bytes as a number of words
-        return int(math.ceil(float(n_bytes) / BYTES_PER_WORD)) * BYTES_PER_WORD
+        return ceildiv(n_bytes, BYTES_PER_WORD) * BYTES_PER_WORD
 
     def __get_n_connections(self, n_connections, check_length_padded=True):
         """
@@ -303,7 +301,7 @@ class SynapseDynamicsSTDP(
             self._n_header_bytes +
             (synapse_structure.get_n_half_words_per_connection() *
              BYTES_PER_SHORT * n_connections))
-        pp_size_words = int(math.ceil(float(pp_size_bytes) / BYTES_PER_WORD))
+        pp_size_words = ceildiv(pp_size_bytes, BYTES_PER_WORD)
 
         return fp_size_words + pp_size_words
 
@@ -476,7 +474,7 @@ class SynapseDynamicsSTDP(
         """
         :param str pre_population_label:
         :param str post_population_label:
-        :rtype: \
+        :rtype:
             list(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)
         """
         prov_data = list()

@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-import math
 import numpy
 import scipy.stats
 import struct
@@ -52,7 +51,8 @@ from spynnaker.pyNN.models.abstract_models import (
     AbstractReadParametersBeforeSet)
 from .spike_source_poisson_machine_vertex import (
     SpikeSourcePoissonMachineVertex)
-from spynnaker.pyNN.utilities.utility_calls import validate_mars_kiss_64_seed
+from spynnaker.pyNN.utilities.utility_calls import (
+    validate_mars_kiss_64_seed, ceildiv, round_up)
 from spynnaker.pyNN.utilities.struct import Struct
 from spynnaker.pyNN.utilities.ranged import (
     SpynnakerRangeDictionary, SpynnakerRangedList)
@@ -457,7 +457,7 @@ class SpikeSourcePoissonVertex(
         max_spikes_per_ts = scipy.stats.poisson.ppf(
             1.0 - (1.0 / float(chance_ts)),
             float(self.__max_rate) / ts_per_second)
-        return int(math.ceil(max_spikes_per_ts)) + 1.0
+        return round_up(max_spikes_per_ts) + 1.0
 
     def get_recording_sdram_usage(self, vertex_slice, machine_time_step):
         """
@@ -640,8 +640,7 @@ class SpikeSourcePoissonVertex(
         max_offset = (
             machine_time_step * time_scale_factor) // _MAX_OFFSET_DENOMINATOR
         spec.write_value(
-            int(math.ceil(max_offset / self.__n_subvertices)) *
-            self.__n_data_specs)
+            ceildiv(max_offset, self.__n_subvertices) * self.__n_data_specs)
         self.__n_data_specs += 1
 
         if self.__max_spikes > 0:
@@ -1059,12 +1058,12 @@ class SpikeSourcePoissonVertex(
     def describe(self):
         """ Return a human-readable description of the cell or synapse type.
 
-        The output may be customised by specifying a different template\
-        together with an associated template engine\
+        The output may be customised by specifying a different template
+        together with an associated template engine
         (see :py:mod:`pyNN.descriptions`).
 
-        If template is None, then a dictionary containing the template context\
-        will be returned.
+        If template is `None`, then a dictionary containing the template
+        context will be returned.
 
         :rtype: dict(str, ...)
         """

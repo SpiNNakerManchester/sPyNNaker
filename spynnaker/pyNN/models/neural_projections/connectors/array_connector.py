@@ -12,13 +12,9 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-import logging
 import numpy
 from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
-
-logger = logging.getLogger(__name__)
 
 
 class ArrayConnector(AbstractConnector):
@@ -32,9 +28,9 @@ class ArrayConnector(AbstractConnector):
     def __init__(self, array, safe=True, callback=None, verbose=False):
         """
         :param array:
-            An explicit boolean matrix that specifies the connections\
-            between the pre- and post-populations\
-            (see PyNN documentation). Must be 2D in practice.
+            An explicit boolean matrix that specifies the connections between
+            the pre- and post-populations (see PyNN documentation).
+            Must be 2D in practice.
         :type array: ~numpy.ndarray(2, ~numpy.uint8)
         :param bool safe:
         :param callable callback: Ignored

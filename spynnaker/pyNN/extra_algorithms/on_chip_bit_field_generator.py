@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from collections import defaultdict
-import math
 import os
 import struct
 from spinn_utilities.progress_bar import ProgressBar
@@ -26,6 +25,7 @@ from spinn_front_end_common.utilities.system_control_logic import (
     run_system_application)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
+from spynnaker.pyNN.utilities.constants import BITS_PER_WORD
 
 _ONE_WORD = struct.Struct("<I")
 _THREE_WORDS = struct.Struct("<III")
@@ -68,9 +68,6 @@ class OnChipBitFieldGenerator(object):
 
     # n key to n neurons maps size in words
     _N_KEYS_DATA_SET_IN_WORDS = 1
-
-    # bits in a word
-    _BITS_IN_A_WORD = 32
 
     # bit to mask a bit
     _BIT_MASK = 1
@@ -259,7 +256,7 @@ class OnChipBitFieldGenerator(object):
                 self.__transceiver.read_memory(
                     placement.x, placement.y, read_pointer,
                     n_words * BYTES_PER_WORD))
-            yield master_pop_key, n_words * self._BITS_IN_A_WORD, bit_field
+            yield master_pop_key, n_words * BITS_PER_WORD, bit_field
 
     def _read_back_bit_fields(
             self, app_graph, default_report_folder):
@@ -307,8 +304,7 @@ class OnChipBitFieldGenerator(object):
         :return: the bit
         :rtype: int
         """
-        word_id = int(math.floor(neuron_id // cls._BITS_IN_A_WORD))
-        bit_in_word = neuron_id % cls._BITS_IN_A_WORD
+        word_id, bit_in_word = divmod(neuron_id, BITS_PER_WORD)
         flag = (bit_field[word_id] >> bit_in_word) & cls._BIT_MASK
         return flag
 

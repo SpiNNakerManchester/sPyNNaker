@@ -12,8 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-import logging
 import math
 import numpy
 from numpy import (
@@ -22,10 +20,10 @@ from numpy import (
     minimum, e, pi)
 from spinn_utilities.overrides import overrides
 from spinn_utilities.safe_eval import SafeEval
-from spynnaker.pyNN.utilities import utility_calls
+from spynnaker.pyNN.utilities.utility_calls import (
+    get_probable_maximum_selected, round_up)
 from .abstract_connector import AbstractConnector
 
-logger = logging.getLogger(__name__)
 # support for arbitrary expression for the indices
 _index_expr_context = SafeEval(math, numpy, arccos, arcsin, arctan, arctan2,
                                ceil, cos, cosh, exp, fabs, floor, fmod, hypot,
@@ -84,7 +82,7 @@ class IndexBasedProbabilityConnector(AbstractConnector):
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
         self._update_probs_from_index_expression(synapse_info)
-        n_connections = utility_calls.get_probable_maximum_selected(
+        n_connections = get_probable_maximum_selected(
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             numpy.amax(self.__probs))
@@ -95,12 +93,12 @@ class IndexBasedProbabilityConnector(AbstractConnector):
             self, post_vertex_slice, synapse_info, min_delay=None,
             max_delay=None):
         self._update_probs_from_index_expression(synapse_info)
-        n_connections = utility_calls.get_probable_maximum_selected(
+        n_connections = get_probable_maximum_selected(
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             post_vertex_slice.n_atoms, numpy.amax(self.__probs))
 
         if min_delay is None or max_delay is None:
-            return int(math.ceil(n_connections))
+            return round_up(n_connections)
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
             synapse_info.delays,
@@ -110,14 +108,14 @@ class IndexBasedProbabilityConnector(AbstractConnector):
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self, synapse_info):
         self._update_probs_from_index_expression(synapse_info)
-        return utility_calls.get_probable_maximum_selected(
+        return get_probable_maximum_selected(
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             synapse_info.n_pre_neurons, numpy.amax(self.__probs))
 
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, synapse_info):
         self._update_probs_from_index_expression(synapse_info)
-        n_connections = utility_calls.get_probable_maximum_selected(
+        n_connections = get_probable_maximum_selected(
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             numpy.amax(self.__probs))

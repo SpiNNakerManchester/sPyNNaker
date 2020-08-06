@@ -12,10 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-import logging
 import os
-import math
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
@@ -56,11 +53,10 @@ from spynnaker.pyNN.models.abstract_models import (
 from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.utilities.ranged import (
     SpynnakerRangeDictionary, SpynnakerRangedList)
+from spynnaker.pyNN.utilities.utility_calls import ceildiv
 from .synapse_dynamics import AbstractSynapseDynamicsStructural
 from .synaptic_manager import SynapticManager
 from .population_machine_vertex import PopulationMachineVertex
-
-logger = logging.getLogger(__name__)
 
 # TODO: Make sure these values are correct (particularly CPU cycles)
 _NEURON_BASE_DTCM_USAGE_IN_BYTES = 9 * BYTES_PER_WORD
@@ -88,7 +84,8 @@ class AbstractPopulationVertex(
         AbstractReadParametersBeforeSet, AbstractAcceptsIncomingSynapses,
         ProvidesKeyToAtomMappingImpl, AbstractCanReset):
     """ Underlying vertex model for Neural Populations.
-        Not actually abstract.
+
+    Not actually abstract.
     """
 
     __slots__ = [
@@ -142,8 +139,8 @@ class AbstractPopulationVertex(
         :param spikes_per_second: Expected spike rate
         :type spikes_per_second: float or None
         :param ring_buffer_sigma:
-            How many SD above the mean to go for upper bound of ring buffer \
-            size; a good starting choice is 5.0. Given length of simulation \
+            How many SD above the mean to go for upper bound of ring buffer
+            size; a good starting choice is 5.0. Given length of simulation
             we can set this for approximate number of saturation events.
         :type ring_buffer_sigma: float or None
         :param incoming_spike_buffer_size:
@@ -421,8 +418,7 @@ class AbstractPopulationVertex(
         max_offset = (
             machine_time_step * time_scale_factor) // _MAX_OFFSET_DENOMINATOR
         spec.write_value(
-            int(math.ceil(max_offset / self.__n_subvertices)) *
-            self.__n_data_specs)
+            ceildiv(max_offset, self.__n_subvertices) * self.__n_data_specs)
         self.__n_data_specs += 1
 
         # Write the number of microseconds between sending spikes
@@ -824,7 +820,7 @@ class AbstractPopulationVertex(
 
     def get_connection_holders(self):
         """
-        :rtype: dict(tuple(ProjectionApplicationEdge,SynapseInformation),\
+        :rtype: dict(tuple(ProjectionApplicationEdge,SynapseInformation),
             ConnectionHolder)
         """
         return self.__synapse_manager.get_connection_holders()
@@ -912,11 +908,11 @@ class AbstractPopulationVertex(
     def describe(self):
         """ Get a human-readable description of the cell or synapse type.
 
-        The output may be customised by specifying a different template\
-        together with an associated template engine\
+        The output may be customised by specifying a different template
+        together with an associated template engine
         (see :py:mod:`pyNN.descriptions`).
 
-        If template is None, then a dictionary containing the template context\
+        If template is None, then a dictionary containing the template context
         will be returned.
 
         :rtype: dict(str, ...)

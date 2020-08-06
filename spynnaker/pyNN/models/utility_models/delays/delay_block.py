@@ -12,9 +12,9 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-import math
 import numpy
+from spynnaker.pyNN.utilities.utility_calls import ceildiv
+from spynnaker.pyNN.utilities.constants import BITS_PER_WORD
 
 
 class DelayBlock(object):
@@ -33,7 +33,7 @@ class DelayBlock(object):
         """
         self.__delay_per_stage = delay_per_stage
         self.__n_delay_stages = n_delay_stages
-        n_words_per_row = int(math.ceil(vertex_slice.n_atoms / 32.0))
+        n_words_per_row = ceildiv(vertex_slice.n_atoms, BITS_PER_WORD)
         self.__delay_block = numpy.zeros(
             (n_delay_stages, n_words_per_row), dtype="uint32")
 

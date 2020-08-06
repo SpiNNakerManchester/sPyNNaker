@@ -13,11 +13,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import math
 import numpy
 from six import add_metaclass
 from spinn_utilities.abstract_base import (
     AbstractBase, abstractmethod, abstractproperty)
+from spynnaker.pyNN.utilities.utility_calls import ceildiv
 
 
 @add_metaclass(AbstractBase)
@@ -196,7 +196,7 @@ class AbstractSynapseDynamics(object):
         :rtype: ~numpy.ndarray
         """
         return numpy.array([
-            int(math.ceil(float(row.size) / float(item_size)))
+            ceildiv(row.size, item_size)
             for row in rows], dtype="uint32").reshape((-1, 1))
 
     def get_words(self, rows):

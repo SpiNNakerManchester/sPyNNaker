@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import math
 import numpy
 from six import raise_from
 from spinn_front_end_common.utilities.constants import (
@@ -25,6 +24,7 @@ from spynnaker.pyNN.exceptions import SynapseRowTooBigException
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractStaticSynapseDynamics, AbstractSynapseDynamicsStructural,
     AbstractSynapseDynamics)
+from spynnaker.pyNN.utilities.utility_calls import ceildiv
 
 _N_HEADER_WORDS = 3
 # There are 16 slots, one per time step
@@ -132,7 +132,7 @@ class SynapseIORowBased(object):
         :param int n_bytes:
         :rtype: int
         """
-        return math.ceil(float(n_bytes) / BYTES_PER_WORD)
+        return ceildiv(n_bytes, BYTES_PER_WORD)
 
     @staticmethod
     def _get_max_row_length(
@@ -323,7 +323,7 @@ class SynapseIORowBased(object):
         :return: (row_data, max_row_length, delayed_row_data,
             max_delayed_row_length, delayed_source_ids, stages)
         :rtype:
-            tuple(~numpy.ndarray, int, ~numpy.ndarray, int, ~numpy.ndarray,\
+            tuple(~numpy.ndarray, int, ~numpy.ndarray, int, ~numpy.ndarray,
             ~numpy.ndarray)
         """
         # pylint: disable=too-many-arguments, too-many-locals

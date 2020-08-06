@@ -12,16 +12,14 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-import logging
-import math
 import numpy.random
 from six import raise_from
 from spinn_utilities.abstract_base import abstractmethod
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.common import Slice
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-from spynnaker.pyNN.utilities import utility_calls
+from spynnaker.pyNN.utilities.utility_calls import (
+    get_probable_maximum_selected, round_up)
 from spynnaker.pyNN.exceptions import SpynnakerException
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
@@ -30,8 +28,6 @@ from .abstract_connector_supports_views_on_machine import (
     AbstractConnectorSupportsViewsOnMachine)
 
 N_GEN_PARAMS = 8
-
-logger = logging.getLogger(__name__)
 
 
 class MultapseConnector(AbstractGenerateConnectorOnMachine,
@@ -148,14 +144,14 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
         prob_in_slice = min(
             post_vertex_slice.n_atoms / float(synapse_info.n_post_neurons),
             1.0)
-        max_in_slice = utility_calls.get_probable_maximum_selected(
+        max_in_slice = get_probable_maximum_selected(
             self.__num_synapses, self.__num_synapses, prob_in_slice)
         prob_in_row = 1.0 / synapse_info.n_pre_neurons
-        n_connections = utility_calls.get_probable_maximum_selected(
+        n_connections = get_probable_maximum_selected(
             self.__num_synapses, max_in_slice, prob_in_row)
 
         if min_delay is None or max_delay is None:
-            return int(math.ceil(n_connections))
+            return round_up(n_connections)
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
             synapse_info.delays,
@@ -165,7 +161,7 @@ class MultapseConnector(AbstractGenerateConnectorOnMachine,
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self, synapse_info):
         prob_of_choosing_post_atom = 1.0 / synapse_info.n_post_neurons
-        return utility_calls.get_probable_maximum_selected(
+        return get_probable_maximum_selected(
             self.__num_synapses, self.__num_synapses,
             prob_of_choosing_post_atom)
 

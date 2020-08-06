@@ -41,12 +41,12 @@ class AbstractStaticSynapseDynamics(AbstractSynapseDynamics):
         """ Get the fixed-fixed data for each row, and lengths for the\
             fixed-fixed parts of each row.
 
-        Data is returned as an array made up of an array of 32-bit words for\
-        each row for the fixed-fixed region. The row into which connection\
-        should go is given by `connection_row_indices`, and the total number\
+        Data is returned as an array made up of an array of 32-bit words for
+        each row for the fixed-fixed region. The row into which connection
+        should go is given by `connection_row_indices`, and the total number
         of rows is given by `n_rows`.
 
-        Lengths are returned as an array made up of an integer for each row,\
+        Lengths are returned as an array made up of an integer for each row,
         for the fixed-fixed region.
 
         :param ~numpy.ndarray connections:

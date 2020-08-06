@@ -87,7 +87,7 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         if numpy.isscalar(values):
             return True
 
-        # Only certain types of random distributions are supported for\
+        # Only certain types of random distributions are supported for
         # generation on the machine
         if isinstance(values, RandomDistribution):
             return values.name in PARAM_TYPE_BY_NAME
@@ -191,14 +191,14 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
     def generate_on_machine(self, weights, delays):
         """ Determine if this instance can generate on the machine.
 
-        Default implementation returns True if the weights and delays can\
+        Default implementation returns True if the weights and delays can
         be generated on the machine
 
         :param weights:
-        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\
+        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or
             float or list(int) or list(float)
         :param delays:
-        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\
+        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or
             float or list(int) or list(float)
         :rtype: bool
         """
@@ -209,7 +209,7 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         """ Get the id of the weight generator on the machine
 
         :param weights:
-        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\
+        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or
             float or list(int) or list(float)
         :rtype: int
         """
@@ -219,7 +219,7 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         """ Get the parameters of the weight generator on the machine
 
         :param weights:
-        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\
+        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or
             float or list(int) or list(float)
         :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
@@ -234,7 +234,7 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         """ The size of the weight parameters in bytes
 
         :param weights:
-        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\
+        :type weights: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or
             float or list(int) or list(float)
         :rtype: int
         """
@@ -244,7 +244,7 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         """ Get the id of the delay generator on the machine
 
         :param delays:
-        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\
+        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or
             float or list(int) or list(float)
         :rtype: int
         """
@@ -254,7 +254,7 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         """ Get the parameters of the delay generator on the machine
 
         :param delays:
-        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\
+        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or
             float or list(int) or list(float)
         :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
@@ -269,7 +269,7 @@ class AbstractGenerateConnectorOnMachine(with_metaclass(
         """ The size of the delay parameters in bytes
 
         :param delays:
-        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or\
+        :type delays: ~numpy.ndarray or ~pyNN.random.NumpyRNG or int or
             float or list(int) or list(float)
         :rtype: int
         """

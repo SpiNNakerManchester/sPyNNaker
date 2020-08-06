@@ -39,7 +39,7 @@ from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 from spynnaker.pyNN.utilities.constants import (
     POPULATION_BASED_REGIONS, POSSION_SIGMA_SUMMATION_LIMIT)
 from spynnaker.pyNN.utilities.utility_calls import (
-    get_maximum_probable_value, get_n_bits)
+    get_maximum_probable_value, get_n_bits, ceildiv, round_up)
 from spynnaker.pyNN.utilities.running_stats import RunningStats
 from spynnaker.pyNN.models.neuron.master_pop_table import (
     MasterPopTableAsBinarySearch)
@@ -287,7 +287,7 @@ class SynapticManager(object):
 
     def get_connection_holders(self):
         """
-        :rtype: dict(tuple(ProjectionApplicationEdge,SynapseInformation),\
+        :rtype: dict(tuple(ProjectionApplicationEdge,SynapseInformation),
             ConnectionHolder)
         """
         return self.__pre_run_connection_holders
@@ -397,8 +397,8 @@ class SynapticManager(object):
                 max_atoms = in_edge.pre_vertex.get_max_atoms_per_core()
                 if in_edge.pre_vertex.n_atoms < max_atoms:
                     max_atoms = in_edge.pre_vertex.n_atoms
-                n_edge_vertices = int(math.ceil(
-                    float(in_edge.pre_vertex.n_atoms) / float(max_atoms)))
+                n_edge_vertices = ceildiv(
+                    in_edge.pre_vertex.n_atoms, max_atoms)
 
                 # Get the size
                 if synapse_info.may_generate_on_machine():
@@ -531,20 +531,20 @@ class SynapticManager(object):
 
         Requires an assessment of maximum Poisson input rate.
 
-        Assumes knowledge of mean and SD of weight distribution, fan-in\
+        Assumes knowledge of mean and SD of weight distribution, fan-in
         and timestep.
 
-        All arguments should be assumed real values except n_synapses_in\
+        All arguments should be assumed real values except n_synapses_in
         which will be an integer.
 
-        :param float weight_mean: Mean of weight distribution (in either nA or\
+        :param float weight_mean: Mean of weight distribution (in either nA or
             microSiemens as required)
         :param float weight_std_dev: SD of weight distribution
         :param float spikes_per_second: Maximum expected Poisson rate in Hz
         :param int machine_timestep: in us
         :param int n_synapses_in: No of connected synapses
-        :param float sigma: How many SD above the mean to go for upper bound;\
-            a good starting choice is 5.0. Given length of simulation we can\
+        :param float sigma: How many SD above the mean to go for upper bound;
+            a good starting choice is 5.0. Given length of simulation we can
             set this for approximate number of saturation events.
         :rtype: float
         """
@@ -692,7 +692,7 @@ class SynapticManager(object):
         # Convert these to powers; we could use int.bit_length() for this if
         # they were integers, but they aren't...
         max_weight_powers = (
-            0 if w <= 0 else int(math.ceil(max(0, math.log(w, 2))))
+            0 if w <= 0 else round_up(max(0, math.log(w, 2)))
             for w in max_weights)
 
         # If 2^max_weight_power equals the max weight, we have to add another
@@ -718,7 +718,7 @@ class SynapticManager(object):
         :param int ring_buffer_to_input_left_shift:
         :rtype: float
         """
-        return float(math.pow(2, 16 - (ring_buffer_to_input_left_shift + 1)))
+        return 2.0 ** (16 - (ring_buffer_to_input_left_shift + 1))
 
     def _write_synapse_parameters(
             self, spec, ring_buffer_shifts, weight_scale):
@@ -1097,7 +1097,7 @@ class SynapticManager(object):
             self, single_addr, connector, pre_vertex_slice, post_vertex_slice,
             app_edge, synapse_info):
         """ Determine if the given connection can be done with a "direct"\
-            synaptic matrix - this must have an exactly 1 entry per row
+            synaptic matrix. This must have an exactly 1 entry per row.
 
         :param int single_addr:
         :param AbstractConnector connector:

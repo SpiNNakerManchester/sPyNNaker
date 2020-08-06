@@ -12,21 +12,16 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-import logging
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BYTES_PER_SHORT, MICRO_TO_MILLISECOND_CONVERSION)
 from spinn_front_end_common.utilities.globals_variables import get_simulator
-from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
-    AbstractTimingDependence)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
     SynapseStructureWeightOnly)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
     float_to_fixed, get_exp_lut_array)
-
-logger = logging.getLogger(__name__)
+from .abstract_timing_dependence import AbstractTimingDependence
 
 
 class TimingDependenceVogels2011(AbstractTimingDependence):

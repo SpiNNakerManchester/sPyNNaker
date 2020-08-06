@@ -48,13 +48,13 @@ class DistanceDependentFormation(AbstractFormation):
         :param float p_form_forward:
             The peak probability of formation on feed-forward connections
         :param float sigma_form_forward:
-            The spread of probability with distance of formation on\
+            The spread of probability with distance of formation on
             feed-forward connections
         :param float p_form_lateral:
             The peak probability of formation on lateral connections
         :param float sigma_form_lateral:
-            The spread of probability with distance of formation on\
-            lateral connections
+            The spread of probability with distance of formation on lateral
+            connections
         """
         self.__grid = numpy.asarray(grid, dtype=int)
         self.__p_form_forward = p_form_forward

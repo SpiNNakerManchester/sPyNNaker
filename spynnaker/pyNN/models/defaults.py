@@ -142,13 +142,15 @@ def default_initial_values(state_variables):
 
 def defaults(cls):
     """ Get the default parameters and state variables from the arguments to\
-        the ``__init__`` method.  This uses the decorators\
-        :py:func:`default_parameters` and :py:func:`default_initial_values` to\
-        determine the parameters and state variables respectively.\
-        If only one is specified, the other is assumed to be the remaining\
-        arguments.\
-        If neither are specified, it is assumed that all default arguments are\
-        parameters.
+        the ``__init__`` method.
+
+    This uses the decorators :py:func:`default_parameters` and
+    :py:func:`default_initial_values` to determine the parameters and state
+    variables respectively.
+
+    If only one is specified, the other is assumed to be the remaining
+    arguments. If neither is specified, it is assumed that all default
+    arguments are parameters.
     """
     if not inspect.isclass(cls):
         raise Exception("{} is not a class".format(cls))

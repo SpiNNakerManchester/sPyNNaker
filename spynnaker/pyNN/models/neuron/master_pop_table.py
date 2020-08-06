@@ -12,19 +12,16 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-import logging
-import math
 import struct
 import numpy
-from spinn_front_end_common.utilities.constants import BYTES_PER_WORD, \
-    SARK_PER_MALLOC_SDRAM_USAGE
+from spinn_front_end_common.utilities.constants import (
+    BYTES_PER_WORD, SARK_PER_MALLOC_SDRAM_USAGE)
 from spynnaker.pyNN.models.neural_projections import (
     ProjectionApplicationEdge, ProjectionMachineEdge)
 from spynnaker.pyNN.exceptions import (
     SynapseRowTooBigException, SynapticConfigurationException)
+from spynnaker.pyNN.utilities.utility_calls import ceildiv
 
-logger = logging.getLogger(__name__)
 _TWO_WORDS = struct.Struct("<II")
 #: Number of words in a master population table entry
 _MASTER_POP_ENTRY_SIZE_WORDS = 3
@@ -90,7 +87,7 @@ class _MasterPopEntry(object):
     @property
     def addresses_and_row_lengths(self):
         """
-        :return: the memory address that this master pop entry points at\
+        :return: the memory address that this master pop entry points at
             (synaptic matrix)
         :rtype: list(tuple(int,int,bool))
         """
@@ -119,10 +116,11 @@ class MasterPopTableAsBinarySearch(object):
     def get_master_population_table_size(self, in_edges):
         """ Get the size of the master population table in SDRAM
 
-        :param iterable(~pacman.model.graphs.application.ApplicationEdge)\
-                in_edges:
+        :param in_edges:
             The edges arriving at the vertex that are to be handled by this
             table
+        :type in_edges:
+            iterable(~pacman.model.graphs.application.ApplicationEdge)
         :return: the size the master pop table will take in SDRAM (in bytes)
         :rtype: int
         """
@@ -141,8 +139,8 @@ class MasterPopTableAsBinarySearch(object):
                     max_atoms = in_edge.pre_vertex.n_atoms
 
                 # Get the number of likely vertices
-                n_edge_vertices = int(math.ceil(
-                    float(in_edge.pre_vertex.n_atoms) / float(max_atoms)))
+                n_edge_vertices = ceildiv(
+                    in_edge.pre_vertex.n_atoms, max_atoms)
                 n_vertices += n_edge_vertices
                 n_entries += (
                     n_edge_vertices * len(in_edge.synapse_information))

@@ -17,6 +17,9 @@ from enum import Enum
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, BYTES_PER_KB)
 
+#: The number of bits in a SpiNNaker machine word
+BITS_PER_WORD = 32
+
 POSSION_SIGMA_SUMMATION_LIMIT = 3.0
 
 BLOCK_INDEX_HEADER_WORDS = 3

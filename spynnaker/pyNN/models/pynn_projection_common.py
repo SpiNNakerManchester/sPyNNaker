@@ -14,7 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-import math
 import numpy
 from pyNN.random import RandomDistribution
 from spinn_utilities.progress_bar import ProgressBar
@@ -34,6 +33,7 @@ from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 from spynnaker.pyNN.utilities.constants import (
     MAX_DELAY_BLOCKS, MAX_TIMER_TICS_SUPPORTED_PER_BLOCK, SPIKE_PARTITION_ID)
 from spynnaker.pyNN.models.neuron import ConnectionHolder
+from spynnaker.pyNN.utilities.utility_calls import ceildiv
 
 # pylint: disable=protected-access
 
@@ -302,9 +302,9 @@ class PyNNProjectionCommon(object):
 
         # Ensure that the delay extension knows how many states it will
         # support
-        n_stages = int(math.ceil(
-            float(max_delay_for_projection - max_delay_per_neuron) /
-            float(max_delay_per_neuron)))
+        n_stages = ceildiv(
+            max_delay_for_projection - max_delay_per_neuron,
+            max_delay_per_neuron)
         if n_stages > delay_vertex.n_delay_stages:
             delay_vertex.n_delay_stages = n_stages
 

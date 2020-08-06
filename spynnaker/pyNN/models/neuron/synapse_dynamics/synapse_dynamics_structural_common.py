@@ -12,9 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 import collections
-import math
 import numpy
 from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.constants import (
@@ -24,6 +22,7 @@ from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
+from spynnaker.pyNN.utilities.utility_calls import ceildiv
 
 
 class StructuralPlasticityCommon(object):
@@ -307,8 +306,9 @@ class StructuralPlasticityCommon(object):
         """
         :param ~data_specification.DataSpecificationGenerator spec:
         :param AbstractPopulationVertex app_vertex:
-        :param list(tuple(ProjectionApplicationEdge,SynapseInformation)) \
-                structural_edges:
+        :param structural_edges:
+        :type structural_edges:
+            list(tuple(ProjectionApplicationEdge,SynapseInformation))
         :param RoutingInfo routing_info:
         :param dict(AbstractSynapseType,float) weight_scales:
         :param ~pacman.model.graphs.common.Slice post_slice:
@@ -368,8 +368,9 @@ class StructuralPlasticityCommon(object):
             matrix.
 
         :param ~data_specification.DataSpecificationGenerator spec:
-        :param dict(tuple(AbstractPopulationVertex,SynapseInformation),int) \
-                pop_index:
+        :param pop_index:
+        :type pop_index:
+            dict(tuple(AbstractPopulationVertex,SynapseInformation),int)
         :param AbstractPopulationVertex app_vertex:
         :param ~pacman.model.graphs.common.Slice post_slice:
         """
@@ -441,8 +442,7 @@ class StructuralPlasticityCommon(object):
             max_atoms = in_edge.pre_vertex.get_max_atoms_per_core()
             if in_edge.pre_vertex.n_atoms < max_atoms:
                 max_atoms = in_edge.pre_vertex.n_atoms
-            n_sub_edges += int(math.ceil(
-                float(in_edge.pre_vertex.n_atoms) / float(max_atoms)))
+            n_sub_edges += ceildiv(in_edge.pre_vertex.n_atoms, max_atoms)
             dynamics = synapse_info.synapse_dynamics
             param_sizes += dynamics.formation\
                 .get_parameters_sdram_usage_in_bytes()

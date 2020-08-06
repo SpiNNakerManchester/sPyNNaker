@@ -16,9 +16,8 @@
 """
 utility class containing simple helper methods
 """
-import os
-import logging
 import math
+import os
 import numpy
 from pyNN.random import RandomDistribution
 from scipy.stats import binom
@@ -29,7 +28,6 @@ from spynnaker.pyNN.utilities.random_stats import (
     RandomStatsNormalClippedImpl, RandomStatsNormalImpl,
     RandomStatsPoissonImpl, RandomStatsRandIntImpl, RandomStatsUniformImpl,
     RandomStatsVonmisesImpl, RandomStatsBinomialImpl)
-
 
 MAX_RATE = 2 ** 32 - 1  # To allow a unit32_t to be used to store the rate
 
@@ -45,8 +43,6 @@ STATS_BY_NAME = {
     'uniform': RandomStatsUniformImpl(),
     'randint': RandomStatsRandIntImpl(),
     'vonmises': RandomStatsVonmisesImpl()}
-
-logger = logging.getLogger(__name__)
 
 
 def check_directory_exists_and_create_if_not(filename):
@@ -287,6 +283,15 @@ def validate_mars_kiss_64_seed(seed):
     return seed
 
 
+def round_up(value):
+    """ Rounds a value up to the nearest integer.
+
+    :param float value:
+    :rtype: int
+    """
+    return int(math.ceil(value))
+
+
 def get_n_bits(n_values):
     """ Determine how many bits are required for the given number of values
 
@@ -298,4 +303,13 @@ def get_n_bits(n_values):
         return 0
     if n_values == 1:
         return 1
-    return int(math.ceil(math.log(n_values, 2)))
+    return round_up(math.log(n_values, 2))
+
+
+def ceildiv(x, y):
+    """ Divide `x` by `y` and round *up*.
+
+    :rtype: int
+    """
+    d, m = divmod(x, y)
+    return int(d) + (m != 0)

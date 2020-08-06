@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spynnaker.pyNN.models.neuron import AbstractPyNNNeuronModelStandard
@@ -26,8 +25,6 @@ from spynnaker.pyNN.models.neuron.synapse_types import SynapseTypeExponential
 from .external_device_lif_control_vertex import ExternalDeviceLifControlVertex
 from .threshold_type_multicast_device_control import (
     ThresholdTypeMulticastDeviceControl)
-
-logger = logging.getLogger(__name__)
 
 
 class ExternalDeviceLifControl(AbstractPyNNNeuronModelStandard):

@@ -16,11 +16,8 @@
 from spynnaker.pyNN.models.defaults import default_initial_values
 from spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet \
     import (
-        PushBotTranslator)
+        PushBotTranslator, get_pushbot_wifi_connection)
 from spynnaker.pyNN.external_devices_models import ExternalDeviceLifControl
-from spynnaker.pyNN.external_devices_models.push_bot.push_bot_ethernet \
-    import (
-        get_pushbot_wifi_connection)
 
 
 class PushBotLifEthernet(ExternalDeviceLifControl):

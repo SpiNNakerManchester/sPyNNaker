@@ -12,8 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-import logging
 import numpy
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
@@ -24,8 +22,6 @@ from .abstract_connector_supports_views_on_machine import (
     AbstractConnectorSupportsViewsOnMachine)
 
 N_GEN_PARAMS = 1
-
-logger = logging.getLogger(__file__)
 
 
 class AllToAllConnector(AbstractGenerateConnectorOnMachine,

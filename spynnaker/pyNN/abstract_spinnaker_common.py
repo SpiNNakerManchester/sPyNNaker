@@ -36,6 +36,7 @@ from spynnaker.pyNN.spynnaker_simulator_interface import (
     SpynnakerSimulatorInterface)
 from spynnaker.pyNN.utilities.extracted_data import ExtractedData
 from spynnaker import __version__ as version
+from spynnaker.pyNN.utilities.utility_calls import round_up
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -239,7 +240,7 @@ class AbstractSpiNNakerCommon(with_metaclass(
             self.set_up_timings(timestep, time_scale_factor)
         else:
             self.set_up_timings(
-                math.ceil(timestep * MICRO_TO_MILLISECOND_CONVERSION),
+                round_up(timestep * MICRO_TO_MILLISECOND_CONVERSION),
                 time_scale_factor)
 
         # Sort out the minimum delay
@@ -275,8 +276,7 @@ class AbstractSpiNNakerCommon(with_metaclass(
         else:
             self.__max_delay = (
                 max_delay_tics_supported * (
-                    self.machine_time_step /
-                    MICRO_TO_MILLISECOND_CONVERSION))
+                    self.machine_time_step / MICRO_TO_MILLISECOND_CONVERSION))
 
         # Sort out the time scale factor if not user specified
         # (including config)

@@ -12,18 +12,17 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-import math
 import logging
 import struct
 import numpy
-from pacman.model.resources.constant_sdram import ConstantSDRAM
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.log import FormatAdapter
-from spynnaker.pyNN.models.common import recording_utils
-from pacman.model.resources.variable_sdram import VariableSDRAM
+from pacman.model.resources import ConstantSDRAM, VariableSDRAM
 from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, BITS_PER_WORD, MICRO_TO_MILLISECOND_CONVERSION)
+    BYTES_PER_WORD, MICRO_TO_MILLISECOND_CONVERSION)
+from spynnaker.pyNN.models.common.recording_utils import make_missing_string
+from spynnaker.pyNN.utilities.utility_calls import ceildiv
+from spynnaker.pyNN.utilities.constants import BITS_PER_WORD
 
 logger = FormatAdapter(logging.getLogger(__name__))
 _TWO_WORDS = struct.Struct("<II")
@@ -54,8 +53,7 @@ class MultiSpikeRecorder(object):
         if not self.__record:
             return ConstantSDRAM(0)
 
-        out_spike_bytes = (
-            int(math.ceil(n_neurons / BITS_PER_WORD)) * BYTES_PER_WORD)
+        out_spike_bytes = ceildiv(n_neurons, BITS_PER_WORD) * BYTES_PER_WORD
         return VariableSDRAM(0, (2 * BYTES_PER_WORD) + (
             out_spike_bytes * spikes_per_timestep))
 
@@ -82,15 +80,15 @@ class MultiSpikeRecorder(object):
         """
         :param str label:
         :param buffer_manager: the buffer manager object
-        :type buffer_manager: \
+        :type buffer_manager:
             ~spinn_front_end_common.interface.buffer_management.BufferManager
         :param int region:
         :param ~pacman.model.placements.Placements placements:
         :param application_vertex:
-        :type application_vertex: \
+        :type application_vertex:
             ~pacman.model.graphs.application.ApplicationVertex
         :param int machine_time_step: microseconds
-        :return: A numpy array of 2-element arrays of (neuron_id, time)\
+        :return: A numpy array of 2-element arrays of (neuron_id, time)
             ordered by time, one element per event
         :rtype: ~numpy.ndarray(tuple(int,int))
         """
@@ -114,14 +112,14 @@ class MultiSpikeRecorder(object):
                 missing.append(placement)
             self._process_spike_data(
                 vertex_slice, ms_per_tick,
-                int(math.ceil(vertex_slice.n_atoms / BITS_PER_WORD)),
+                ceildiv(vertex_slice.n_atoms, BITS_PER_WORD),
                 neuron_param_data, spike_ids, spike_times)
 
         if missing:
             logger.warning(
                 "Population {} is missing spike data in region {} from the "
                 "following cores: {}", label, region,
-                recording_utils.make_missing_string(missing))
+                make_missing_string(missing))
 
         if not spike_ids:
             return numpy.zeros((0, 2))

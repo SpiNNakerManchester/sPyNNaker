@@ -72,7 +72,8 @@ class PyNNPopulationCommon(object):
         :param spinnaker_control: The simulator engine core.
         :type spinnaker_control:
             ~spinn_front_end_common.interface.abstract_spinnaker_base.AbstractSpinnakerBase
-        :param size: The size of the population; external devices may use None
+        :param size: The size of the population; external devices may use
+            `None`
         :type size: int or float or None
         :param label: The label for the population, or None for a default
         :type label: str or None
@@ -87,7 +88,7 @@ class PyNNPopulationCommon(object):
         :param initial_values: Initialisation for model variables.
         :type initial_values: dict(str, Any) or None
         :param additional_parameters:
-            Any extra parameters to pass to the model's vertex creation \
+            Any extra parameters to pass to the model's vertex creation
             function.
         :type additional_parameters: dict(str, Any) or None
         """
@@ -247,13 +248,13 @@ class PyNNPopulationCommon(object):
         """ Get the values of a parameter for every local cell in the\
             population.
 
-        :param parameter_names: Name of parameter. This is either a single\
+        :param parameter_names: Name of parameter. This is either a single
             string or a list of strings
         :type parameter_names: str or iterable(str)
         :param bool gather: pointless on sPyNNaker
         :param bool simplify: ignored
-        :return: A single list of values (or possibly a single value) if\
-            paramter_names is a string, or a dict of these if parameter names\
+        :return: A single list of values (or possibly a single value) if
+            paramter_names is a string, or a dict of these if parameter names
             is a list.
         :rtype: str or list(str) or dict(str,str) or dict(str,list(str))
         """
@@ -278,15 +279,15 @@ class PyNNPopulationCommon(object):
         """ Get the values of a parameter for the selected cell in the\
             population.
 
-        :param selector: a description of the subrange to accept. \
-            Or None for all. See: \
+        :param selector: a description of the subrange to accept.
+            Or `None` for all. See
             :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
         :type selector: slice or int or iterable(bool) or iterable(int)
-        :param parameter_names: Name of parameter. This is either a\
+        :param parameter_names: Name of parameter. This is either a
             single string or a list of strings
         :type parameter_names: str or iterable(str)
-        :return: A single list of values (or possibly a single value) if\
-            paramter_names is a string or a dict of these if parameter names\
+        :return: A single list of values (or possibly a single value) if
+            paramter_names is a string or a dict of these if parameter names
             is a list.
         :rtype: str or list(str) or dict(str,str) or dict(str,list(str))
         """
@@ -433,9 +434,9 @@ class PyNNPopulationCommon(object):
     def set(self, parameter, value=None):
         """ Set one or more parameters for every cell in the population.
 
-        param can be a dict, in which case value should not be supplied, or a\
-        string giving the parameter name, in which case value is the parameter\
-        value. value can be a numeric value, or list of such\
+        param can be a dict, in which case value should not be supplied, or a
+        string giving the parameter name, in which case value is the parameter
+        value. value can be a numeric value, or list of such
         (e.g. for setting spike times)::
 
             p.set("tau_m", 20.0).
@@ -460,8 +461,8 @@ class PyNNPopulationCommon(object):
     def set_by_selector(self, selector, parameter, value=None):
         """ Set one or more parameters for selected cell in the population.
 
-        param can be a dict, in which case value should not be supplied, or a\
-        string giving the parameter name, in which case value is the parameter\
+        param can be a dict, in which case value should not be supplied, or a
+        string giving the parameter name, in which case value is the parameter
         value. value can be a numeric value, or list of such
         (e.g. for setting spike times)::
 

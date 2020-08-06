@@ -25,8 +25,8 @@ class SynapseDynamicsStructuralSTDP(
         SynapseDynamicsSTDP, AbstractSynapseDynamicsStructural):
     """ Class that enables synaptic rewiring in the presence of STDP.
 
-        It acts as a wrapper around SynapseDynamicsSTDP, meaning rewiring can\
-        operate in parallel with STDP synapses.
+        It acts as a wrapper around :py:class:`SynapseDynamicsSTDP`, meaning
+        rewiring can operate in parallel with STDP synapses.
 
         Written by Petrut Bogdan.
     """
