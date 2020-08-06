@@ -62,16 +62,15 @@ from spynnaker.pyNN.utilities.ranged.spynnaker_ranged_list \
 
 logger = logging.getLogger(__name__)
 
-# uint32_t has_key; uint32_t key; uint32_t set_rate_neuron_id_mask;
-# uint32_t random_backoff_us; uint32_t time_between_spikes;
-# UFRACT seconds_per_tick; REAL ticks_per_second;
-# REAL slow_rate_per_tick_cutoff; REAL fast_rate_per_tick_cutoff;
-# uint32_t first_source_id; uint32_t n_spike_sources;
-# mars_kiss64_seed_t (uint[4]) spike_source_seed;
-PARAMS_BASE_WORDS = 15
+# 1. uint32_t has_key; 2. uint32_t key; 3. uint32_t set_rate_neuron_id_mask;
+# 4. UFRACT seconds_per_tick; 5. REAL ticks_per_second;
+# 6. REAL slow_rate_per_tick_cutoff; 7. REAL fast_rate_per_tick_cutoff;
+# 8. uint32_t first_source_id; 9. uint32_t n_spike_sources;
+# 10,11,12,13 mars_kiss64_seed_t (uint[4]) spike_source_seed;
+PARAMS_BASE_WORDS = 13
 
 # Seed offset in parameters and size on bytes
-SEED_OFFSET_BYTES = 11 * 4
+SEED_OFFSET_BYTES = 9 * 4
 SEED_SIZE_BYTES = 4 * 4
 
 # uint32_t n_rates; uint32_t index
@@ -780,6 +779,7 @@ class SpikeSourcePoissonVertex(
         final_data = numpy.concatenate([
             numpy.concatenate(([len(d), indices[i]], numpy.concatenate(d)))
             for i, d in enumerate(core_data_split[:-1])])
+        print(final_data)
         spec.write_array(final_data)
 
     @staticmethod
