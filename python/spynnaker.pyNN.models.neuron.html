@@ -959,13 +959,13 @@ or None to use the default slice</li>
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_incoming_partition_constraints">
 <code class="descname">get_incoming_partition_constraints</code><span class="sig-paren">(</span><em>partition</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.get_incoming_partition_constraints"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_incoming_partition_constraints" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get constraints to be added to the given edge that goes in to            a vertex of this vertex.</p>
+<dd><p>Get constraints to be added to the given edge partition that goes            into a vertex of this vertex.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>partition</strong> (<em>AbstractOutgoingEdgePartition</em>) &#8211; An partition that goes in to this vertex</li>
+<li><strong>partition</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs/#pacman.model.graphs.OutgoingEdgePartition" title="(in PACMAN v)"><em>OutgoingEdgePartition</em></a>) &#8211; An partition that goes in to this vertex</li>
 <li><strong>partition</strong> &#8211; partition that goes into this vertex</li>
 </ul>
 </td>
@@ -1038,13 +1038,13 @@ all. See:
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_outgoing_partition_constraints">
 <code class="descname">get_outgoing_partition_constraints</code><span class="sig-paren">(</span><em>partition</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.get_outgoing_partition_constraints"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_outgoing_partition_constraints" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get constraints to be added to the given edge that comes out of            this vertex.</p>
+<dd><p>Get constraints to be added to the given edge partition that comes            out of this vertex.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>partition</strong> (<em>AbstractOutgoingEdgePartition</em>) &#8211; An edge that comes out of this vertex</li>
+<li><strong>partition</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs/#pacman.model.graphs.OutgoingEdgePartition" title="(in PACMAN v)"><em>OutgoingEdgePartition</em></a>) &#8211; An edge that comes out of this vertex</li>
 <li><strong>partition</strong> &#8211; the partition that leaves this vertex</li>
 </ul>
 </td>
@@ -1840,7 +1840,7 @@ source, target, weight and delay</td>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>transceiver</strong> (<a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman/#spinnman.transceiver.Transceiver" title="(in SpiNNMan v)"><em>Transceiver</em></a>) &#8211; </li>
-<li><strong>placement</strong> (<em>Placement</em>) &#8211; </li>
+<li><strong>placement</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placement" title="(in PACMAN v)"><em>Placement</em></a>) &#8211; </li>
 </ul>
 </td>
 </tr>
@@ -1864,7 +1864,7 @@ source, target, weight and delay</td>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>transceiver</strong> (<a class="reference external" href="https://spinnman.readthedocs.io/en/latest/spinnman/#spinnman.transceiver.Transceiver" title="(in SpiNNMan v)"><em>Transceiver</em></a>) &#8211; </li>
-<li><strong>placement</strong> (<em>Placement</em>) &#8211; </li>
+<li><strong>placement</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.placements/#pacman.model.placements.Placement" title="(in PACMAN v)"><em>Placement</em></a>) &#8211; </li>
 </ul>
 </td>
 </tr>
