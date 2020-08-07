@@ -102,7 +102,8 @@ class SynapticManager(object):
         "_direct_matrix_region"]
 
     # TODO make this right
-    FUDGE = 0
+    _CPU_FUDGE = 0
+    _DTCM_FUDGE = 0
 
     def __init__(self, n_synapse_types, ring_buffer_sigma, spikes_per_second,
                  config, population_table_type=None, synapse_io=None):
@@ -209,22 +210,6 @@ class SynapticManager(object):
         """
         return self.__synapse_dynamics
 
-    @staticmethod
-    def __combine_structural_stdp_dynamics(structural, stdp):
-        """
-        :param AbstractSynapseDynamicsStructural structural:
-        :param SynapseDynamicsSTDP stdp:
-        :rtype: SynapseDynamicsStructuralSTDP
-        """
-        return SynapseDynamicsStructuralSTDP(
-            structural.partner_selection, structural.formation,
-            structural.elimination,
-            stdp.timing_dependence, stdp.weight_dependence,
-            # voltage dependence is not supported
-            None, stdp.dendritic_delay_fraction,
-            structural.f_rew, structural.initial_weight,
-            structural.initial_delay, structural.s_max, structural.seed)
-
     @synapse_dynamics.setter
     def synapse_dynamics(self, synapse_dynamics):
         if self.__synapse_dynamics is None:
@@ -297,14 +282,14 @@ class SynapticManager(object):
         :rtype: int
         """
         # TODO: Calculate this correctly
-        return self.FUDGE
+        return self._CPU_FUDGE
 
     def get_dtcm_usage_in_bytes(self):
         """
         :rtype: int
         """
         # TODO: Calculate this correctly
-        return self.FUDGE
+        return self._DTCM_FUDGE
 
     def _get_synapse_params_size(self):
         """
