@@ -429,7 +429,6 @@ class DelayExtensionVertex(
             self._get_edge_generator_size(synapse_info) * n_edge_vertices
             for synapse_info in edge.synapse_information)
 
-
     def get_dtcm_usage_for_atoms(self, vertex_slice):
         """
         :param ~pacman.model.graphs.common.Slice vertex_slice:

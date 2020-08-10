@@ -28,7 +28,6 @@ from spinn_front_end_common.utility_models import CommandSender
 from spinn_front_end_common.utilities.utility_objs import ExecutableFinder
 from spinn_front_end_common.utilities.globals_variables import unset_simulator
 from spinn_front_end_common.utilities.helpful_functions import read_config
-from spynnaker.pyNN import extra_algorithms, model_binaries
 from spynnaker.pyNN.utilities.constants import (
     MAX_DELAY_BLOCKS, MAX_SUPPORTED_DELAY_TICS,
     MAX_TIMER_TICS_SUPPORTED_PER_BLOCK, MIN_SUPPORTED_DELAY)
@@ -37,8 +36,23 @@ from spynnaker.pyNN.spynnaker_simulator_interface import (
 from spynnaker.pyNN.utilities.extracted_data import ExtractedData
 from spynnaker import __version__ as version
 from spynnaker.pyNN.utilities.utility_calls import round_up
+from spynnaker.pyNN import model_binaries
 
 logger = FormatAdapter(logging.getLogger(__name__))
+
+
+def _extra_algo_path():
+    """ List containing the names of the extra algorithms config files.
+
+    .. note::
+        Need to `import` within this to avoid an import loop.
+
+    :rtype: list(str)
+    """
+    import spynnaker.pyNN.extra_algorithms
+    return [os.path.join(
+        os.path.dirname(spynnaker.pyNN.extra_algorithms.__file__),
+        "algorithms_metadata.xml")]
 
 
 class AbstractSpiNNakerCommon(with_metaclass(
@@ -116,10 +130,7 @@ class AbstractSpiNNakerCommon(with_metaclass(
 
         # create XML path for where to locate sPyNNaker related functions when
         # using auto pause and resume
-        extra_algorithm_xml_path = list()
-        extra_algorithm_xml_path.append(os.path.join(
-            os.path.dirname(extra_algorithms.__file__),
-            "algorithms_metadata.xml"))
+        extra_algorithm_xml_path = _extra_algo_path()
         if user_extra_algorithm_xml_path is not None:
             extra_algorithm_xml_path.extend(user_extra_algorithm_xml_path)
 

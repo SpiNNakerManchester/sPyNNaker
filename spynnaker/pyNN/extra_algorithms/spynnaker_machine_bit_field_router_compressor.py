@@ -27,7 +27,7 @@ from spinn_front_end_common.interface.interface_functions.\
         MachineBitFieldUnorderedRouterCompressor)
 from spinn_front_end_common.utilities import system_control_logic
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
-from spynnaker.pyNN.extra_algorithms.synapse_expander import SYNAPSE_EXPANDER
+from .synapse_expander import SYNAPSE_EXPANDER
 
 logger = logging.getLogger(__name__)
 
