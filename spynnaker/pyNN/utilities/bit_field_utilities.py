@@ -14,13 +14,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from pacman.utilities.constants import FULL_MASK
-from spynnaker.pyNN.utilities.utility_calls import ceildiv
 from pacman.utilities.algorithm_utilities.partition_algorithm_utilities \
     import (
         determine_max_atoms_for_vertex)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
-from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
+from spynnaker.pyNN.utilities.utility_calls import ceildiv
 
 # number of elements
 ELEMENTS_USED_IN_EACH_BIT_FIELD = 3  # n words, key, pointer to bitfield
@@ -41,39 +39,6 @@ N_KEYS_DATA_SET_IN_WORDS = 1
 
 # the number of bits in a word (WHY IS THIS NOT A CONSTANT SOMEWHERE!)
 BIT_IN_A_WORD = 32.0
-
-
-def get_estimated_sdram_for_bit_field_region(app_graph, vertex):
-    """ Estimates the SDRAM for the bit field region
-
-    :param ~.ApplicationGraph app_graph: the app graph
-    :param ~.ApplicationVertex vertex: app vertex
-    :return: the estimated number of bytes used by the bit field region
-    :rtype: int
-    """
-    sdram = 0
-    for incoming_edge in app_graph.get_edges_ending_at_vertex(vertex):
-        if isinstance(incoming_edge, ProjectionApplicationEdge):
-            edge_pre_vertex = incoming_edge.pre_vertex
-            max_atoms = determine_max_atoms_for_vertex(edge_pre_vertex)
-            if incoming_edge.pre_vertex.n_atoms < max_atoms:
-                max_atoms = incoming_edge.pre_vertex.n_atoms
-
-            # Get the number of likely vertices
-            n_machine_vertices = ceildiv(
-                incoming_edge.pre_vertex.n_atoms, max_atoms)
-            n_atoms_per_machine_vertex = ceildiv(
-                incoming_edge.pre_vertex.n_atoms, n_machine_vertices)
-            if isinstance(edge_pre_vertex, DelayExtensionVertex):
-                n_atoms_per_machine_vertex *= \
-                    edge_pre_vertex.n_delay_stages
-            n_words_for_atoms = ceildiv(
-                n_atoms_per_machine_vertex, int(BIT_IN_A_WORD))
-            sdram += (
-                (ELEMENTS_USED_IN_EACH_BIT_FIELD + (
-                    n_words_for_atoms * n_machine_vertices)) *
-                BYTES_PER_WORD)
-    return sdram
 
 
 def get_estimated_sdram_for_key_region(app_graph, vertex):

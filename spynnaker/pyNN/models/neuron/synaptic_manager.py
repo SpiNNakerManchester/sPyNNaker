@@ -30,8 +30,7 @@ from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractGenerateConnectorOnMachine)
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from .synapse_dynamics import (
-    AbstractSynapseDynamicsStructural,
-    AbstractGenerateOnMachine, SynapseDynamicsStructuralSTDP)
+    AbstractSynapseDynamicsStructural, AbstractGenerateOnMachine)
 from spynnaker.pyNN.models.neuron.synapse_io import SynapseIORowBased
 from spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex import (
     SpikeSourcePoissonVertex)
@@ -368,7 +367,7 @@ class SynapticManager(object):
     def _get_size_of_generator_information(self, in_edges):
         """ Get the size of the synaptic expander parameters
 
-        :param list(.ApplicationEdge) in_edges:
+        :param list(~.ApplicationEdge) in_edges:
         :rtype: int
         """
         gen_on_machine = False

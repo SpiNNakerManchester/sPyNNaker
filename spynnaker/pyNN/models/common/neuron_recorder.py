@@ -149,7 +149,14 @@ class NeuronRecorder(object):
 
     def _convert_placement_matrix_data(
             self, row_data, n_rows, data_row_length, variable, n_neurons):
-
+        """
+        :param ~numpy.ndarray row_data:
+        :param int n_rows:
+        :param int data_row_length:
+        :param str variable:
+        :param int n_neurons:
+        :rtype: ~numpy.ndarray
+        """
         surplus_bytes = self._N_BYTES_FOR_TIMESTAMP
         var_data = (row_data[:, surplus_bytes:].reshape(
             n_rows * data_row_length))
@@ -162,6 +169,17 @@ class NeuronRecorder(object):
     def _process_missing_data(
             missing_str, placement, expected_rows, n_neurons, times,
             sampling_rate, label, placement_data):
+        """
+        :param str missing_str:
+        :param ~.Placement placement:
+        :param int expected_rows:
+        :param int n_neurons:
+        :param ~numpy.ndarray times:
+        :param int sampling_rate:
+        :param str label:
+        :param ~numpy.ndarray placement_data:
+        :rtype: ~numpy.ndarray
+        """
         missing_str += "({}, {}, {}); ".format(
             placement.x, placement.y, placement.p)
         # Start the fragment for this slice empty
@@ -334,7 +352,7 @@ class NeuronRecorder(object):
             ~pacman.model.graphs.application.ApplicationVertex
         :param str variable:
         :param int machine_time_step: microseconds
-        :return:
+        :return: array of atom IDs and event times
         :rtype: ~numpy.ndarray(tuple(int,int))
         """
         if variable not in self.__bitfield_variables:
@@ -649,7 +667,6 @@ class NeuronRecorder(object):
         :param ~pacman.model.graphs.commmon.Slice vertex_slice:
             the vertex slice
         :param int data_n_time_steps: how many time steps to run this time
-        :rtype: None
         """
         spec.switch_write_focus(neuron_recording_region)
         spec.write_array(get_recording_header_array(
@@ -926,4 +943,7 @@ class NeuronRecorder(object):
 
     @property
     def _indexes(self):  # for testing only
+        """
+        :rtype: dict
+        """
         return _ReadOnlyDict(self.__indexes)

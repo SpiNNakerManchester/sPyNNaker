@@ -386,7 +386,6 @@ class AbstractSpiNNakerCommon(with_metaclass(
         :param clear_tags: informs the tool chain if it should clear the tags
             off the machine at stop
         :type clear_tags: bool or None
-        :rtype: None
         """
         # pylint: disable=protected-access
         for population in self._populations:
@@ -402,7 +401,6 @@ class AbstractSpiNNakerCommon(with_metaclass(
 
         :param run_time: the time (in milliseconds) to run the simulation for
         :type run_time: float or int
-        :rtype: None
         """
         # pylint: disable=protected-access
 
@@ -427,7 +425,6 @@ class AbstractSpiNNakerCommon(with_metaclass(
         """ Register an additional binary search path for executables.
 
         :param str search_path: absolute search path for binaries
-        :rtype: None
         """
         # pylint: disable=protected-access
         AbstractSpiNNakerCommon.__EXECUTABLE_FINDER.add_path(search_path)

@@ -206,8 +206,6 @@ class RecordingCommon(object):
 
     def _turn_off_all_recording(self, indexes=None):
         """ Turns off recording, is used by a pop saying `.record()`
-
-        :rtype: None
         """
         # check for standard record which includes spikes
         if isinstance(self.__population._vertex, AbstractNeuronRecordable):

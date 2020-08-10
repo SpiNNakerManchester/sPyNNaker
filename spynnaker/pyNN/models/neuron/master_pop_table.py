@@ -206,8 +206,6 @@ class MasterPopTableAsBinarySearch(object):
 
     def initialise_table(self):
         """ Initialise the master pop data structure.
-
-        :rtype: None
         """
         self.__entries = dict()
         self.__n_addresses = 0

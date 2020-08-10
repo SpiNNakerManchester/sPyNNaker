@@ -182,7 +182,6 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
         :param ~.ExecutableFinder executable_finder:
             finder of binary file paths
         :param bool read_expander_iobuf: read off iobuf if needed
-        :rtype: None
         """
         if synaptic_expander_rerun_cores.total_processors != 0:
             logger.info("rerunning synaptic expander")

@@ -379,6 +379,7 @@ class DelayExtensionVertex(
         """ Get the size of the generator data for a given synapse info object
 
         :param SynapseInformation synapse_info:
+        :rtype: int
         """
         connector = synapse_info.connector
         dynamics = synapse_info.synapse_dynamics
@@ -403,27 +404,31 @@ class DelayExtensionVertex(
         :param list(.ApplicationEdge) out_edges:
         :rtype: int
         """
-        gen_on_machine = False
         size = 0
         for out_edge in out_edges:
             if isinstance(out_edge, DelayedApplicationEdge):
-                for synapse_info in out_edge.synapse_information:
-
-                    # Get the number of likely vertices
-                    max_atoms = out_edge.post_vertex.get_max_atoms_per_core()
-                    if out_edge.post_vertex.n_atoms < max_atoms:
-                        max_atoms = out_edge.post_vertex.n_atoms
-                    n_edge_vertices = ceildiv(
-                        out_edge.post_vertex.n_atoms, max_atoms)
-
-                    # Get the size
-                    gen_size = self._get_edge_generator_size(synapse_info)
-                    if gen_size > 0:
-                        gen_on_machine = True
-                        size += gen_size * n_edge_vertices
-        if gen_on_machine:
+                size += self.__size_of_edge_generator_info(out_edge)
+        # If there's a non-zero size, we will be generating on machine and we
+        # should add the baseline overhead
+        if size:
             size += _EXPANDER_BASE_PARAMS_SIZE
         return size
+
+    def __size_of_edge_generator_info(self, edge):
+        """
+        :param DelayedApplicationEdge edge:
+        """
+        # Get the number of likely vertices
+        max_atoms = min(
+            edge.post_vertex.get_max_atoms_per_core(),
+            edge.post_vertex.n_atoms)
+        n_edge_vertices = ceildiv(edge.post_vertex.n_atoms, max_atoms)
+
+        # Get the size for each synapse type
+        return sum(
+            self._get_edge_generator_size(synapse_info) * n_edge_vertices
+            for synapse_info in edge.synapse_information)
+
 
     def get_dtcm_usage_for_atoms(self, vertex_slice):
         """

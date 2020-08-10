@@ -19,8 +19,6 @@ from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION, MICRO_TO_SECOND_CONVERSION,
     BYTES_PER_WORD, BYTES_PER_SHORT)
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
-from .abstract_synapse_dynamics_structural import (
-    AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 from spynnaker.pyNN.utilities.utility_calls import ceildiv
 
@@ -224,8 +222,8 @@ class StructuralPlasticityCommon(object):
 
     def __get_structural_edges(self, app_graph, app_vertex):
         """
-        :param ~pacman.model.graphs.application.ApplicationGraph app_graph:
-        :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
+        :param ~.ApplicationGraph app_graph:
+        :param ~.ApplicationVertex app_vertex:
         :rtype: list(tuple(ProjectionApplicationEdge, SynapseInformation))
         """
         structural_edges = list()
@@ -233,8 +231,7 @@ class StructuralPlasticityCommon(object):
             if isinstance(app_edge, ProjectionApplicationEdge):
                 found = False
                 for synapse_info in app_edge.synapse_information:
-                    if isinstance(synapse_info.synapse_dynamics,
-                                  AbstractSynapseDynamicsStructural):
+                    if synapse_info.is_structural:
                         if found:
                             raise SynapticConfigurationException(
                                 "Only one Projection between each pair of "
@@ -247,16 +244,13 @@ class StructuralPlasticityCommon(object):
             self, spec, app_vertex, post_slice, machine_time_step, n_pre_pops):
         """ Write the non-sub-population synapse parameters to the spec.
 
-        :param ~data_specification.DataSpecificationGenerator spec:
-            the data spec
+        :param ~.DataSpecificationGenerator spec: the data spec
         :param AbstractPopulationVertex app_vertex:
             the highest level object of the post-synaptic population
         :param ~pacman.model.graphs.common.Slice post_slice:
             the slice of the app vertex corresponding to this machine vertex
         :param int machine_time_step: the duration of a machine time step (ms)
         :param int n_pre_pops: the number of pre-populations
-        :return: None
-        :rtype: None
         """
         if (self.__p_rew * MICRO_TO_MILLISECOND_CONVERSION <
                 machine_time_step / MICRO_TO_MILLISECOND_CONVERSION):
@@ -304,7 +298,7 @@ class StructuralPlasticityCommon(object):
             routing_info, weight_scales, post_slice, synapse_indices,
             machine_time_step):
         """
-        :param ~data_specification.DataSpecificationGenerator spec:
+        :param ~.DataSpecificationGenerator spec:
         :param AbstractPopulationVertex app_vertex:
         :param structural_edges:
         :type structural_edges:
@@ -367,7 +361,7 @@ class StructuralPlasticityCommon(object):
         """ Post to pre table is basically the transpose of the synaptic\
             matrix.
 
-        :param ~data_specification.DataSpecificationGenerator spec:
+        :param ~.DataSpecificationGenerator spec:
         :param pop_index:
         :type pop_index:
             dict(tuple(AbstractPopulationVertex,SynapseInformation),int)
@@ -439,21 +433,18 @@ class StructuralPlasticityCommon(object):
         param_sizes = self.__partner_selection\
             .get_parameters_sdram_usage_in_bytes()
         for (in_edge, synapse_info) in structural_edges:
-            max_atoms = in_edge.pre_vertex.get_max_atoms_per_core()
-            if in_edge.pre_vertex.n_atoms < max_atoms:
-                max_atoms = in_edge.pre_vertex.n_atoms
-            n_sub_edges += ceildiv(in_edge.pre_vertex.n_atoms, max_atoms)
-            dynamics = synapse_info.synapse_dynamics
-            param_sizes += dynamics.formation\
-                .get_parameters_sdram_usage_in_bytes()
-            param_sizes += dynamics.elimination\
-                .get_parameters_sdram_usage_in_bytes()
+            n_sub_edges += ceildiv(in_edge.pre_vertex.n_atoms, min(
+                in_edge.pre_vertex.get_max_atoms_per_core(),
+                in_edge.pre_vertex.n_atoms))
+            param_sizes += synapse_info.synapse_dynamics.\
+                get_per_edge_parameters_sdram_usage_in_bytes()
 
-        return int((self._REWIRING_DATA_SIZE +
-                   (self._PRE_POP_INFO_BASE_SIZE * len(structural_edges)) +
-                   (self._KEY_ATOM_INFO_SIZE * n_sub_edges) +
-                   (self._POST_TO_PRE_ENTRY_SIZE * n_neurons * self.__s_max) +
-                   param_sizes))
+        return int(
+            self._REWIRING_DATA_SIZE +
+            (self._PRE_POP_INFO_BASE_SIZE * len(structural_edges)) +
+            (self._KEY_ATOM_INFO_SIZE * n_sub_edges) +
+            (self._POST_TO_PRE_ENTRY_SIZE * n_neurons * self.__s_max) +
+            param_sizes)
 
     def synaptic_data_update(
             self, connections, post_vertex_slice, app_edge, synapse_info,
@@ -466,8 +457,7 @@ class StructuralPlasticityCommon(object):
         :param SynapseInformation synapse_info:
         :param ProjectionMachineEdge machine_edge:
         """
-        if not isinstance(synapse_info.synapse_dynamics,
-                          AbstractSynapseDynamicsStructural):
+        if not synapse_info.is_structural:
             return
         collector = self.__connections.setdefault(
             (app_edge.post_vertex, post_vertex_slice.lo_atom), [])

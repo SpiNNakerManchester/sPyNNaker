@@ -66,7 +66,7 @@ class AbstractAcceptsIncomingSynapses(object):
         # pylint: disable=too-many-arguments
         """ Get the connections from the machine post-run.
 
-        :param ~spinnman.Transceiver transceiver:
+        :param ~spinnman.transceiver.Transceiver transceiver:
         :param ~pacman.model.placements.Placement placement:
         :param ProjectionMachineEdge edge:
         :param ~pacman.model.routing_info.RoutingInfo routing_infos:
@@ -76,11 +76,13 @@ class AbstractAcceptsIncomingSynapses(object):
         :param placements:
         :type placements: None or ~pacman.model.placements.Placements
         :param monitor_api:
-        :type monitor_api: None or \
+        :type monitor_api: None or
             ~spinn_front_end_common.utility_models.DataSpeedUpPacketGatherMachineVertex
         :param fixed_routes:
         :param extra_monitor: the extra monitor for this
-        :type fixed_routes: None or \
+        :type extra_monitor:
+            ~spinn_front_end_common.utility_models.ExtraMonitorSupportMachineVertex
+        :type fixed_routes: None or
             dict(tuple(int,int),~spinn_machine.FixedRouteEntry)
         """
 

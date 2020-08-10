@@ -500,6 +500,11 @@ class SynapseIORowBased(object):
             self, n_synapses, pre_vertex_slice, delayed_connections):
         """ Take the delayed_connections and convert the source ids and delay\
             values
+
+        :param int n_synapses:
+        :param ~pacman.model.graphs.common.Slice pre_vertex_slice:
+        :param ~numpy.ndarray delayed_connections:
+        :rtype: ~numpy.ndarray
         """
         synapse_ids = range(len(n_synapses))
         row_stage = numpy.array([

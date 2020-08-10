@@ -548,7 +548,7 @@ class SpikeSourcePoissonVertex(
 
         :param ~data_specification.DataSpecification spec:
             the data specification writer
-        :param ~pacman.models.placements.Placement placement:
+        :param ~pacman.model.placements.Placement placement:
             the location this vertex resides on in the machine
         :return: None
         """
@@ -577,7 +577,7 @@ class SpikeSourcePoissonVertex(
         """ Allocate space for the Poisson parameters and rates regions as\
             they can be reused for setters after an initial run
 
-        :param ~pacman.models.placements.Placement placement:
+        :param ~pacman.model.placements.Placement placement:
             the location on machine for this vertex
         :param ~data_specification.DataSpecification spec: the DSG writer
         :return: None

@@ -20,6 +20,9 @@ from pacman.executor.injection_decorator import inject_items
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
+from pacman.utilities.algorithm_utilities.partition_algorithm_utilities \
+    import (
+        determine_max_atoms_for_vertex)
 from spinn_front_end_common.abstract_models import (
     AbstractChangableAfterRun, AbstractProvidesIncomingPartitionConstraints,
     AbstractProvidesOutgoingPartitionConstraints, AbstractHasAssociatedBinary,
@@ -38,25 +41,27 @@ from spinn_front_end_common.interface.simulation.simulation_utilities import (
 from spinn_front_end_common.interface.profiling.profile_utils import (
     get_profile_region_size, reserve_profile_region, write_profile_region_data)
 from spynnaker.pyNN.utilities.constants import (
-    POPULATION_BASED_REGIONS, SPIKE_PARTITION_ID)
-from spynnaker.pyNN.models.common import (
-    AbstractSpikeRecordable, AbstractNeuronRecordable, NeuronRecorder)
+    POPULATION_BASED_REGIONS, SPIKE_PARTITION_ID, BITS_PER_WORD)
+from spynnaker.pyNN.utilities.ranged import (
+    SpynnakerRangeDictionary, SpynnakerRangedList)
+from spynnaker.pyNN.utilities.utility_calls import ceildiv
 from spynnaker.pyNN.utilities.bit_field_utilities import (
     exact_sdram_for_bit_field_builder_region,
-    get_estimated_sdram_for_bit_field_region,
     get_estimated_sdram_for_key_region,
-    reserve_bit_field_regions, write_bitfield_init_data)
+    reserve_bit_field_regions, write_bitfield_init_data,
+    ELEMENTS_USED_IN_EACH_BIT_FIELD)
+from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.models.abstract_models import (
     AbstractPopulationInitializable, AbstractAcceptsIncomingSynapses,
     AbstractPopulationSettable, AbstractReadParametersBeforeSet,
     AbstractContainsUnits)
-from spynnaker.pyNN.exceptions import InvalidParameterType
-from spynnaker.pyNN.utilities.ranged import (
-    SpynnakerRangeDictionary, SpynnakerRangedList)
-from spynnaker.pyNN.utilities.utility_calls import ceildiv
+from spynnaker.pyNN.models.common import (
+    AbstractSpikeRecordable, AbstractNeuronRecordable, NeuronRecorder)
 from .synapse_dynamics import AbstractSynapseDynamicsStructural
 from .synaptic_manager import SynapticManager
 from .population_machine_vertex import PopulationMachineVertex
+from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
+from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 
 # TODO: Make sure these values are correct (particularly CPU cycles)
 _NEURON_BASE_DTCM_USAGE_IN_BYTES = 9 * BYTES_PER_WORD
@@ -324,7 +329,7 @@ class AbstractPopulationVertex(
             the slice of atoms from the application vertex
         :param ~.MachineVertex vertex: this vertex
         :param ~.MachineGraph machine_graph: machine graph
-        :param n_key_map: nkey map
+        :param ~.AbstractMachinePartitionNKeysMap n_key_map: nkey map
         :return: None
         """
         spec.comment("\nReserving memory space for data regions:\n\n")
@@ -508,13 +513,19 @@ class AbstractPopulationVertex(
             application_graph, machine_graph, routing_info, data_n_time_steps,
             n_key_map):
         """
-        :param machine_time_step: (injected)
-        :param time_scale_factor: (injected)
+        :param int machine_time_step: (injected)
+        :param int time_scale_factor: (injected)
         :param application_graph: (injected)
+        :type application_graph:
+            ~pacman.model.graphs.application.ApplicationGraph
         :param machine_graph: (injected)
-        :param routing_info: (injected)
-        :param data_n_time_steps: (injected)
+        :type machine_graph:
+            ~pacman.model.graphs.machine.MachineGraph
+        :param ~pacman.model.routing_info.RoutingInfo routing_info: (injected)
+        :param int data_n_time_steps: (injected)
         :param n_key_map: (injected)
+        :type n_key_map:
+            ~pacman.model.routing_info.AbstractMachinePartitionNKeysMap
         """
         # pylint: disable=too-many-arguments, arguments-differ
         vertex = placement.vertex
@@ -725,8 +736,6 @@ class AbstractPopulationVertex(
 
     @overrides(AbstractPopulationSettable.get_value)
     def get_value(self, key):
-        """ Get a property of the overall model.
-        """
         if key not in self._parameters:
             raise InvalidParameterType(
                 "Population {} does not have parameter {}".format(
@@ -735,8 +744,6 @@ class AbstractPopulationVertex(
 
     @overrides(AbstractPopulationSettable.set_value)
     def set_value(self, key, value):
-        """ Set a property of the overall model.
-        """
         if key not in self._parameters:
             raise InvalidParameterType(
                 "Population {} does not have parameter {}".format(
@@ -847,21 +854,11 @@ class AbstractPopulationVertex(
     @overrides(AbstractProvidesIncomingPartitionConstraints.
                get_incoming_partition_constraints)
     def get_incoming_partition_constraints(self, partition):
-        """ Gets the constraints for partitions going into this vertex.
-
-        :param partition: partition that goes into this vertex
-        :return: list of constraints
-        """
         return self.__synapse_manager.get_incoming_partition_constraints()
 
     @overrides(AbstractProvidesOutgoingPartitionConstraints.
                get_outgoing_partition_constraints)
     def get_outgoing_partition_constraints(self, partition):
-        """ Gets the constraints for partitions going out of this vertex.
-
-        :param partition: the partition that leaves this vertex
-        :return: list of constraints
-        """
         return [ContiguousKeyRangeContraint()]
 
     @overrides(
@@ -887,7 +884,6 @@ class AbstractPopulationVertex(
         :param buffer_manager: the buffer manager object
         :param placements: the placements object
         :param recording_region_id: the recorded region ID for clearing
-        :rtype: None
         """
         for machine_vertex in self.machine_vertices:
             placement = placements.get_placement_of_vertex(machine_vertex)
@@ -956,3 +952,36 @@ class AbstractPopulationVertex(
         if self.__synapse_manager.changes_during_run:
             self.__change_requires_data_generation = True
             self.__change_requires_neuron_parameters_reload = False
+
+
+def get_estimated_sdram_for_bit_field_region(app_graph, vertex):
+    """ Estimates the SDRAM for the bit field region
+
+    :param ~.ApplicationGraph app_graph: the app graph
+    :param ~.ApplicationVertex vertex: app vertex
+    :return: the estimated number of bytes used by the bit field region
+    :rtype: int
+    """
+    sdram = 0
+    for incoming_edge in app_graph.get_edges_ending_at_vertex(vertex):
+        if isinstance(incoming_edge, ProjectionApplicationEdge):
+            edge_pre_vertex = incoming_edge.pre_vertex
+            max_atoms = determine_max_atoms_for_vertex(edge_pre_vertex)
+            if incoming_edge.pre_vertex.n_atoms < max_atoms:
+                max_atoms = incoming_edge.pre_vertex.n_atoms
+
+            # Get the number of likely vertices
+            n_machine_vertices = ceildiv(
+                incoming_edge.pre_vertex.n_atoms, max_atoms)
+            n_atoms_per_machine_vertex = ceildiv(
+                incoming_edge.pre_vertex.n_atoms, n_machine_vertices)
+            if isinstance(edge_pre_vertex, DelayExtensionVertex):
+                n_atoms_per_machine_vertex *= \
+                    edge_pre_vertex.n_delay_stages
+            n_words_for_atoms = ceildiv(
+                n_atoms_per_machine_vertex, BITS_PER_WORD)
+            sdram += (
+                (ELEMENTS_USED_IN_EACH_BIT_FIELD + (
+                    n_words_for_atoms * n_machine_vertices)) *
+                BYTES_PER_WORD)
+    return sdram

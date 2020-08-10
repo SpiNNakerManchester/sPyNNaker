@@ -17,7 +17,7 @@ from pyNN.random import NumpyRNG
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractGenerateConnectorOnMachine)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    AbstractGenerateOnMachine)
+    AbstractGenerateOnMachine, AbstractSynapseDynamicsStructural)
 
 
 class SynapseInformation(object):
@@ -141,6 +141,16 @@ class SynapseInformation(object):
         :rtype: AbstractSynapseDynamics
         """
         return self.__synapse_dynamics
+
+    @property
+    def is_structural(self):
+        """ Whether the dynamic behaviour of the synapse is structurally \
+            plastic.
+
+        :rtype: bool
+        """
+        return isinstance(self.__synapse_dynamics,
+                          AbstractSynapseDynamicsStructural)
 
     @property
     def synapse_type(self):

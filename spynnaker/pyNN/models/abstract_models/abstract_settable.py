@@ -27,7 +27,7 @@ class AbstractSettable(object):
 
     @abstractmethod
     def get_value(self, key):
-        """ Get a property
+        """ Get a property of the model
 
         :param str key: the name of the property
         :rtype: Any or float or int or list(float) or list(int)
@@ -35,7 +35,7 @@ class AbstractSettable(object):
 
     @abstractmethod
     def set_value(self, key, value):
-        """ Set a property
+        """ Set a property of the model
 
         :param str key: the name of the parameter to change
         :param value: the new value of the parameter to assign
