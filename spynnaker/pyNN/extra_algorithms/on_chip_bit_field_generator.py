@@ -61,7 +61,7 @@ class OnChipBitFieldGenerator(object):
         flag for making summary report
     """
 
-    __slots__ = ("__transceiver", "__placements")
+    __slots__ = ("__transceiver", "__placements", "__binary")
 
     # flag which states that the binary finished cleanly.
     _SUCCESS = 0
@@ -109,6 +109,8 @@ class OnChipBitFieldGenerator(object):
         """
         self.__transceiver = transceiver
         self.__placements = placements
+        self.__binary = executable_finder.get_executable_path(
+            self._BIT_FIELD_EXPANDER_APLX)
 
         # progress bar
         progress = ProgressBar(
@@ -117,8 +119,7 @@ class OnChipBitFieldGenerator(object):
 
         # get data
         expander_cores = self._calculate_core_data(
-            app_graph, progress, executable_finder.get_executable_path(
-                self._BIT_FIELD_EXPANDER_APLX))
+            app_graph, progress)
 
         # load data
         bit_field_app_id = transceiver.app_id_tracker.get_new_id()
@@ -265,7 +266,6 @@ class OnChipBitFieldGenerator(object):
         :param ~.ApplicationGraph app_graph: app graph
         :param str default_report_folder: the file path for where reports are
         """
-
         # generate file
         progress = ProgressBar(
             len(app_graph.vertices), "reading back bitfields from chip")
@@ -308,13 +308,11 @@ class OnChipBitFieldGenerator(object):
         flag = (bit_field[word_id] >> bit_in_word) & cls._BIT_MASK
         return flag
 
-    def _calculate_core_data(
-            self, app_graph, progress, bit_field_expander_path):
+    def _calculate_core_data(self, app_graph, progress):
         """ gets the data needed for the bit field expander for the machine
 
         :param ~.ApplicationGraph app_graph: app graph
         :param ~.ProgressBar progress: progress bar
-        :param str bit_field_expander_path: where to find the executable
         :return: data and expander cores
         :rtype: ExecutableTargets
         """
@@ -324,23 +322,20 @@ class OnChipBitFieldGenerator(object):
         # locate verts which can have a synaptic matrix to begin with
         for app_vertex in progress.over(app_graph.vertices, False):
             for placement in self.__bitfield_placements(app_vertex):
-                self.__write_single_core_data(
-                    placement, bit_field_expander_path, expander_cores)
+                self.__write_single_core_data(placement, expander_cores)
 
         return expander_cores
 
-    def __write_single_core_data(
-            self, placement, bit_field_expander_path, expander_cores):
+    def __write_single_core_data(self, placement, expander_cores):
         """
         :param ~.Placement placement:
             The vertex must support AbstractSupportsBitFieldGeneration
-        :param str bit_field_expander_path:
         :param ~.ExecutableTargets expander_cores:
         """
         # check if the chip being considered already.
         expander_cores.add_processor(
-            bit_field_expander_path, placement.x, placement.y,
-            placement.p, executable_type=ExecutableType.SYSTEM)
+            self.__binary, placement.x, placement.y, placement.p,
+            executable_type=ExecutableType.SYSTEM)
 
         bit_field_builder_region = placement.vertex.bit_field_builder_region(
             self.__transceiver, placement)

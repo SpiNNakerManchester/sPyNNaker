@@ -285,6 +285,7 @@ class AbstractPopulationVertex(
     def get_dtcm_usage_for_atoms(self, vertex_slice):
         """
         :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :rtype: int
         """
         return (
             _NEURON_BASE_DTCM_USAGE_IN_BYTES +
@@ -298,6 +299,7 @@ class AbstractPopulationVertex(
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             the slice of atoms.
         :return: The SDRAM required for the neuron region
+        :rtype: int
         """
         return (
             self._BYTES_TILL_START_OF_GLOBAL_PARAMETERS +
@@ -305,7 +307,14 @@ class AbstractPopulationVertex(
 
     def _get_sdram_usage_for_atoms(
             self, vertex_slice, graph, machine_time_step):
-        sdram_requirement = (
+        """
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :param ~.ApplicationGraph graph:
+        :param int machine_time_step:
+        :return: number of bytes
+        :rtype: int
+        """
+        return (
             SYSTEM_BYTES_REQUIREMENT +
             self._get_sdram_usage_for_neuron_params(vertex_slice) +
             self._neuron_recorder.get_static_sdram_usage(vertex_slice) +
@@ -314,10 +323,9 @@ class AbstractPopulationVertex(
             self.__synapse_manager.get_sdram_usage_in_bytes(
                 vertex_slice, machine_time_step, graph, self) +
             get_profile_region_size(self.__n_profile_samples) +
-            get_estimated_sdram_for_bit_field_region(graph, self) +
+            self.__estimate_sdram_for_bit_field_region(graph) +
             get_estimated_sdram_for_key_region(graph, self) +
             exact_sdram_for_bit_field_builder_region())
-        return sdram_requirement
 
     def _reserve_memory_regions(
             self, spec, vertex_slice, vertex, machine_graph, n_key_map):
@@ -330,7 +338,6 @@ class AbstractPopulationVertex(
         :param ~.MachineVertex vertex: this vertex
         :param ~.MachineGraph machine_graph: machine graph
         :param ~.AbstractMachinePartitionNKeysMap n_key_map: nkey map
-        :return: None
         """
         spec.comment("\nReserving memory space for data regions:\n\n")
 
@@ -363,11 +370,10 @@ class AbstractPopulationVertex(
     def _reserve_neuron_params_data_region(self, spec, vertex_slice):
         """ Reserve the neuron parameter data region.
 
-        :param ~data_specification.DataSpecificationGenerator spec:
+        :param ~.DataSpecificationGenerator spec:
             the spec to write the DSG region to
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             the slice of atoms from the application vertex
-        :return: None
         """
         params_size = self._get_sdram_usage_for_neuron_params(vertex_slice)
         spec.reserve_memory_region(
@@ -376,6 +382,12 @@ class AbstractPopulationVertex(
 
     @staticmethod
     def __copy_ranged_dict(source, merge=None, merge_keys=None):
+        """
+        :param SpynnakerRangeDictionary source:
+        :param SpynnakerRangeDictionary merge:
+        :param set merge_keys:
+        :rtype: SpynnakerRangeDictionary
+        """
         target = SpynnakerRangeDictionary(len(source))
         for key in source.keys():
             copy_list = SpynnakerRangedList(len(source))
@@ -393,7 +405,14 @@ class AbstractPopulationVertex(
     def _write_neuron_parameters(
             self, spec, key, vertex_slice, machine_time_step,
             time_scale_factor):
-
+        """
+        :param ~.DataSpecificationGenerator spec:
+        :param key:
+        :type key: int or None
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :param int machine_time_step:
+        :param int time_scale_factor:
+        """
         # If resetting, reset any state variables that need to be reset
         if (self.__has_reset_last and
                 self.__initial_state_variables is not None):
@@ -466,6 +485,11 @@ class AbstractPopulationVertex(
     def regenerate_data_specification(
             self, spec, placement, machine_time_step, time_scale_factor,
             routing_info):
+        """
+        :param int machine_time_step: (injected)
+        :param int time_scale_factor: (injected)
+        :param ~pacman.model.routing_info.RoutingInfo routing_info: (injected)
+        """
         # pylint: disable=too-many-arguments, arguments-differ
         vertex_slice = placement.vertex.vertex_slice
 
@@ -597,7 +621,6 @@ class AbstractPopulationVertex(
 
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
     def get_binary_file_name(self):
-
         # Split binary name into title and extension
         binary_title, binary_extension = os.path.splitext(
             self.__neuron_impl.binary_name)
@@ -684,6 +707,11 @@ class AbstractPopulationVertex(
         return self.__pynn_model.default_initial_values.keys()
 
     def _get_parameter(self, variable):
+        """
+        :param str variable:
+        :rtype: str
+        :raises KeyError: If the param with that name doesn't exist
+        """
         if variable.endswith("_init"):
             # method called with "V_init"
             key = variable[:-5]
@@ -754,7 +782,6 @@ class AbstractPopulationVertex(
     @overrides(AbstractReadParametersBeforeSet.read_parameters_from_machine)
     def read_parameters_from_machine(
             self, transceiver, placement, vertex_slice):
-
         # locate SDRAM address to where the neuron parameters are stored
         neuron_region_sdram_address = locate_memory_region_for_placement(
             placement, POPULATION_BASED_REGIONS.NEURON_PARAMS.value,
@@ -789,6 +816,9 @@ class AbstractPopulationVertex(
 
     @property
     def ring_buffer_sigma(self):
+        """
+        :rtype: float or None
+        """
         return self.__synapse_manager.ring_buffer_sigma
 
     @ring_buffer_sigma.setter
@@ -800,6 +830,9 @@ class AbstractPopulationVertex(
 
     @property
     def spikes_per_second(self):
+        """
+        :rtype: float or None
+        """
         return self.__synapse_manager.spikes_per_second
 
     @spikes_per_second.setter
@@ -926,6 +959,11 @@ class AbstractPopulationVertex(
         return context
 
     def get_synapse_id_by_target(self, target):
+        """ Get the ID of a synapse given the name
+
+        :param str target: The name of the synapse
+        :rtype: int
+        """
         return self.__neuron_impl.get_synapse_id_by_target(target)
 
     def __str__(self):
@@ -953,35 +991,33 @@ class AbstractPopulationVertex(
             self.__change_requires_data_generation = True
             self.__change_requires_neuron_parameters_reload = False
 
+    def __estimate_sdram_for_bit_field_region(self, app_graph):
+        """ Estimates the SDRAM for the bit field region of this vertex
 
-def get_estimated_sdram_for_bit_field_region(app_graph, vertex):
-    """ Estimates the SDRAM for the bit field region
+        :param ~.ApplicationGraph app_graph: the app graph
+        :return: the estimated number of bytes used by the bit field region
+        :rtype: int
+        """
+        return sum(
+            self.__estimate_sdram_for_edge_bit_fields(incoming_edge)
+            for incoming_edge in app_graph.get_edges_ending_at_vertex(self)
+            if isinstance(incoming_edge, ProjectionApplicationEdge))
 
-    :param ~.ApplicationGraph app_graph: the app graph
-    :param ~.ApplicationVertex vertex: app vertex
-    :return: the estimated number of bytes used by the bit field region
-    :rtype: int
-    """
-    sdram = 0
-    for incoming_edge in app_graph.get_edges_ending_at_vertex(vertex):
-        if isinstance(incoming_edge, ProjectionApplicationEdge):
-            edge_pre_vertex = incoming_edge.pre_vertex
-            max_atoms = determine_max_atoms_for_vertex(edge_pre_vertex)
-            if incoming_edge.pre_vertex.n_atoms < max_atoms:
-                max_atoms = incoming_edge.pre_vertex.n_atoms
+    @staticmethod
+    def __estimate_sdram_for_edge_bit_fields(edge):
+        """
+        :param ProjectionApplicationEdge edge:
+        :rtype: int
+        """
+        n_atoms = edge.pre_vertex.n_atoms
+        max_atoms = min(
+            determine_max_atoms_for_vertex(edge.pre_vertex), n_atoms)
 
-            # Get the number of likely vertices
-            n_machine_vertices = ceildiv(
-                incoming_edge.pre_vertex.n_atoms, max_atoms)
-            n_atoms_per_machine_vertex = ceildiv(
-                incoming_edge.pre_vertex.n_atoms, n_machine_vertices)
-            if isinstance(edge_pre_vertex, DelayExtensionVertex):
-                n_atoms_per_machine_vertex *= \
-                    edge_pre_vertex.n_delay_stages
-            n_words_for_atoms = ceildiv(
-                n_atoms_per_machine_vertex, BITS_PER_WORD)
-            sdram += (
-                (ELEMENTS_USED_IN_EACH_BIT_FIELD + (
-                    n_words_for_atoms * n_machine_vertices)) *
-                BYTES_PER_WORD)
-    return sdram
+        # Get the number of likely vertices
+        n_machine_vertices = ceildiv(n_atoms, max_atoms)
+        n_atoms_per_machine_vertex = ceildiv(n_atoms, n_machine_vertices)
+        if isinstance(edge.pre_vertex, DelayExtensionVertex):
+            n_atoms_per_machine_vertex *= edge.pre_vertex.n_delay_stages
+        n_words_for_atoms = ceildiv(n_atoms_per_machine_vertex, BITS_PER_WORD)
+        return BYTES_PER_WORD * (ELEMENTS_USED_IN_EACH_BIT_FIELD + (
+            n_words_for_atoms * n_machine_vertices))

@@ -67,11 +67,8 @@ class WeightDependenceMultiplicative(
             (self.A_minus == weight_dependence.A_minus))
 
     @property
+    @overrides(AbstractWeightDependence.vertex_executable_suffix)
     def vertex_executable_suffix(self):
-        """ The suffix to be appended to the vertex executable for this rule
-
-        :rtype: str
-        """
         return "multiplicative"
 
     @overrides(AbstractWeightDependence.get_parameters_sdram_usage_in_bytes)
@@ -103,12 +100,8 @@ class WeightDependenceMultiplicative(
                 data=int(round(self.A_minus * w)), data_type=DataType.INT32)
 
     @property
+    @overrides(AbstractWeightDependence.weight_maximum)
     def weight_maximum(self):
-        """ The maximum weight that will ever be set in a synapse as a result\
-            of this rule
-
-        :rtype: float
-        """
         return self.__w_max
 
     @overrides(AbstractWeightDependence.get_parameter_names)

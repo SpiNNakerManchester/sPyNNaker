@@ -37,6 +37,8 @@ class PopulationMachineVertex(
         ProvidesProvenanceDataFromMachineImpl, AbstractRecordable,
         AbstractHasProfileData, AbstractSupportsBitFieldGeneration,
         AbstractSupportsBitFieldRoutingCompression):
+    """ A machine vertex that implements a neural population.
+    """
 
     __slots__ = [
         "__recorded_region_ids",

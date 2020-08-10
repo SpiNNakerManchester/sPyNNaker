@@ -31,9 +31,12 @@ from spinn_front_end_common.abstract_models import (
     AbstractRewritesDataSpecification)
 from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl)
-from spinn_front_end_common.interface.simulation import simulation_utilities
-from spinn_front_end_common.interface.buffer_management import (
-    recording_utilities)
+from spinn_front_end_common.interface.simulation.simulation_utilities import (
+    get_simulation_header_array)
+from spinn_front_end_common.interface.buffer_management.recording_utilities \
+    import (
+        get_recording_header_size, get_recording_data_constant_size,
+        get_recording_header_array)
 from spinn_front_end_common.utilities.constants import (
     SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES, BYTES_PER_WORD)
 from spinn_front_end_common.utilities.globals_variables import get_simulator
@@ -49,13 +52,13 @@ from spynnaker.pyNN.utilities.constants import (
     LIVE_POISSON_CONTROL_PARTITION_ID, SPIKE_PARTITION_ID)
 from spynnaker.pyNN.models.abstract_models import (
     AbstractReadParametersBeforeSet)
-from .spike_source_poisson_machine_vertex import (
-    SpikeSourcePoissonMachineVertex)
 from spynnaker.pyNN.utilities.utility_calls import (
     validate_mars_kiss_64_seed, ceildiv, round_up)
 from spynnaker.pyNN.utilities.struct import Struct
 from spynnaker.pyNN.utilities.ranged import (
     SpynnakerRangeDictionary, SpynnakerRangedList)
+from .spike_source_poisson_machine_vertex import (
+    SpikeSourcePoissonMachineVertex)
 
 logger = logging.getLogger(__name__)
 
@@ -154,14 +157,18 @@ class SpikeSourcePoissonVertex(
             max_rate=None):
         """
         :param int n_neurons:
-        :param constraints:
+        :param list(~pacman.model.constrants.AbstractConstraint) constraints:
         :param str label:
         :param float seed:
         :param int max_atoms_per_core:
-        :param model:
-        :param iterable of float rate:
-        :param iterable of int start:
-        :param iterable of int duration:
+        :param AbstractPyNNModel model:
+        :param float rate:
+        :param int start:
+        :param int duration:
+        :param iterable(float) rates:
+        :param iterable(int) starts:
+        :param iterable(int) durations:
+        :param float max_rate:
         """
         # pylint: disable=too-many-arguments
         super(SpikeSourcePoissonVertex, self).__init__(
@@ -446,6 +453,7 @@ class SpikeSourcePoissonVertex(
     def _max_spikes_per_ts(self, machine_time_step):
         """
         :param int machine_time_step:
+        :rtype: int or float
         """
         ts_per_second = MICROSECONDS_PER_SECOND / float(machine_time_step)
         if float(self.__max_rate) / ts_per_second < \
@@ -479,8 +487,7 @@ class SpikeSourcePoissonVertex(
     )
     def get_resources_used_by_atoms(self, vertex_slice, machine_time_step):
         """
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-        :param int machine_time_step:
+        :param int machine_time_step: (injected)
         """
         # pylint: disable=arguments-differ
         poisson_params_sz = self.get_rates_bytes(vertex_slice)
@@ -488,8 +495,8 @@ class SpikeSourcePoissonVertex(
             SYSTEM_BYTES_REQUIREMENT +
             SpikeSourcePoissonMachineVertex.get_provenance_data_size(0) +
             poisson_params_sz +
-            recording_utilities.get_recording_header_size(1) +
-            recording_utilities.get_recording_data_constant_size(1) +
+            get_recording_header_size(1) +
+            get_recording_data_constant_size(1) +
             get_profile_region_size(self.__n_profile_samples))
 
         recording = self.get_recording_sdram_usage(
@@ -546,11 +553,10 @@ class SpikeSourcePoissonVertex(
         """ Reserve memory regions for Poisson source parameters and output\
             buffer.
 
-        :param ~data_specification.DataSpecification spec:
+        :param ~data_specification.DataSpecificationGenerator spec:
             the data specification writer
         :param ~pacman.model.placements.Placement placement:
             the location this vertex resides on in the machine
-        :return: None
         """
         spec.comment("\nReserving memory space for data regions:\n\n")
 
@@ -565,7 +571,7 @@ class SpikeSourcePoissonVertex(
 
         spec.reserve_memory_region(
             region=_REGIONS.SPIKE_HISTORY_REGION.value,
-            size=recording_utilities.get_recording_header_size(1),
+            size=get_recording_header_size(1),
             label="Recording")
 
         reserve_profile_region(
@@ -577,10 +583,8 @@ class SpikeSourcePoissonVertex(
         """ Allocate space for the Poisson parameters and rates regions as\
             they can be reused for setters after an initial run
 
-        :param ~pacman.model.placements.Placement placement:
-            the location on machine for this vertex
-        :param ~data_specification.DataSpecification spec: the DSG writer
-        :return: None
+        :param ~.Placement placement: the location on machine for this vertex
+        :param ~.DataSpecificationGenerator spec: the DSG writer
         """
         spec.reserve_memory_region(
             region=_REGIONS.POISSON_PARAMS_REGION.value,
@@ -595,11 +599,10 @@ class SpikeSourcePoissonVertex(
             vertex_slice, machine_time_step, time_scale_factor):
         """ Generate Parameter data for Poisson spike sources
 
-        :param ~data_specification.DataSpecification spec:
-            the data specification writer
-        :param ~pacman.model.graphs.machine.MachineGraph graph:
-        :param ~pacman.model.placements.Placement placement:
-        :param ~pacman.model.routing_info.RoutingInfo routing_info:
+        :param ~.DataSpecificationGenerator spec: the data specification writer
+        :param ~.MachineGraph graph:
+        :param ~.Placement placement:
+        :param ~.RoutingInfo routing_info:
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             the slice of atoms a machine vertex holds from its application
             vertex
@@ -701,7 +704,7 @@ class SpikeSourcePoissonVertex(
                              first_machine_time_step):
         """ Generate Rate data for Poisson spike sources
 
-        :param ~data_specification.DataSpecification spec:
+        :param ~.DataSpecificationGenerator spec:
             the data specification writer
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             the slice of atoms a machine vertex holds from its application
@@ -808,14 +811,14 @@ class SpikeSourcePoissonVertex(
 
     @staticmethod
     def _convert_ms_to_n_timesteps(value, machine_time_step):
+        """
+        :param ~numpy.ndarray value:
+        :param int machine_time_step:
+        :rtype: ~numpy.ndarray
+        """
         return numpy.round(
             value * (MICROSECONDS_PER_MILLISECOND /
                      float(machine_time_step))).astype("uint32")
-
-    @staticmethod
-    def _convert_n_timesteps_to_ms(value, machine_time_step):
-        return (
-            value / (MICROSECONDS_PER_MILLISECOND / float(machine_time_step)))
 
     @overrides(AbstractSpikeRecordable.is_recording_spikes)
     def is_recording_spikes(self):
@@ -840,10 +843,16 @@ class SpikeSourcePoissonVertex(
 
     @staticmethod
     def get_dtcm_usage_for_atoms():
+        """
+        :rtype: int
+        """
         return 0
 
     @staticmethod
     def get_cpu_usage_for_atoms():
+        """
+        :rtype: int
+        """
         return 0
 
     @inject_items({
@@ -861,11 +870,11 @@ class SpikeSourcePoissonVertex(
             self, spec, placement, machine_time_step, time_scale_factor,
             routing_info, graph, first_machine_time_step):
         """
-        :param int machine_time_step:
-        :param int time_scale_factor:
-        :param ~pacman.model.routing_info.RoutingInfo routing_info:
-        :param ~pacman.model.graphs.machine.MachineGraph graph:
-        :param int first_machine_time_step:
+        :param int machine_time_step: (injected)
+        :param int time_scale_factor: (injected)
+        :param ~pacman.model.routing_info.RoutingInfo routing_info: (injected)
+        :param ~pacman.model.graphs.machine.MachineGraph graph: (injected)
+        :param int first_machine_time_step: (injected)
         """
         # pylint: disable=too-many-arguments, arguments-differ
 
@@ -982,12 +991,12 @@ class SpikeSourcePoissonVertex(
             self, spec, placement, machine_time_step, time_scale_factor,
             routing_info, data_n_time_steps, graph, first_machine_time_step):
         """
-        :param int machine_time_step:
-        :param int time_scale_factor:
-        :param ~pacman.model.routing_info.RoutingInfo routing_info:
-        :param int data_n_time_steps:
-        :param ~pacman.model.graphs.machine.MachineGraph graph:
-        :param int first_machine_time_step:
+        :param int machine_time_step: (injected)
+        :param int time_scale_factor: (injected)
+        :param ~pacman.model.routing_info.RoutingInfo routing_info: (injected)
+        :param int data_n_time_steps: (injected)
+        :param ~pacman.model.graphs.machine.MachineGraph graph: (injected)
+        :param int first_machine_time_step: (injected)
         """
         # pylint: disable=too-many-arguments, arguments-differ
         self.__machine_time_step = machine_time_step
@@ -1000,7 +1009,7 @@ class SpikeSourcePoissonVertex(
 
         # write setup data
         spec.switch_write_focus(_REGIONS.SYSTEM_REGION.value)
-        spec.write_array(simulation_utilities.get_simulation_header_array(
+        spec.write_array(get_simulation_header_array(
             self.get_binary_file_name(), machine_time_step,
             time_scale_factor))
 
@@ -1008,8 +1017,7 @@ class SpikeSourcePoissonVertex(
         spec.switch_write_focus(_REGIONS.SPIKE_HISTORY_REGION.value)
         sdram = self.get_recording_sdram_usage(vertex_slice, machine_time_step)
         recorded_region_sizes = [sdram.get_total_sdram(data_n_time_steps)]
-        spec.write_array(recording_utilities.get_recording_header_array(
-            recorded_region_sizes))
+        spec.write_array(get_recording_header_array(recorded_region_sizes))
 
         # write parameters
         self._write_poisson_parameters(

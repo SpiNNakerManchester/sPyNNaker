@@ -18,7 +18,7 @@ from pacman.utilities.algorithm_utilities.partition_algorithm_utilities \
     import (
         determine_max_atoms_for_vertex)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-from spynnaker.pyNN.utilities.utility_calls import ceildiv
+from .utility_calls import ceildiv
 
 # number of elements
 ELEMENTS_USED_IN_EACH_BIT_FIELD = 3  # n words, key, pointer to bitfield
@@ -42,14 +42,15 @@ BIT_IN_A_WORD = 32.0
 
 
 def get_estimated_sdram_for_key_region(app_graph, vertex):
-    """ gets an estimate of the bitfield builder region
+    """ gets an estimate of the bitfield builder region size
 
-    :param ~.ApplicationGraph app_graph: the app graph
-    :param ~.ApplicationVertex vertex: app vertex
-    :return: sdram needed
+    :param ~pacman.model.graphs.application.ApplicationGraph app_graph:
+        the app graph
+    :param ~pacman.model.graphs.application.ApplicationVertex vertex:
+        app vertex
+    :return: SDRAM needed
     :rtype: int
     """
-
     # basic sdram
     sdram = N_KEYS_DATA_SET_IN_WORDS * BYTES_PER_WORD
     for in_edge in app_graph.get_edges_ending_at_vertex(vertex):
@@ -91,6 +92,7 @@ def exact_sdram_for_bit_field_builder_region():
     """ Gets the SDRAM requirement for the builder region
 
     :return: returns the SDRAM requirement for the builder region
+    :rtype: int
     """
     return N_REGIONS_ADDRESSES * BYTES_PER_WORD
 
@@ -100,7 +102,7 @@ def _exact_sdram_for_bit_field_key_region(machine_graph, vertex):
 
     :param ~.MachineGraph machine_graph: machine graph
     :param ~.MachineVertex vertex: machine vertex
-    :return: bytes
+    :return: number of bytes
     :rtype: int
     """
     return (
@@ -114,16 +116,17 @@ def reserve_bit_field_regions(
         bit_filter_region, bit_field_key_region):
     """ reserves the regions for the bitfields
 
-    :param ~.DataSpecificationGenerator spec: dsg file
-    :param ~.MachineGraph machine_graph: machine graph
-    :param ~.AbstractMachinePartitionNKeysMap n_key_map:
+    :param ~data_specification.DataSpecificationGenerator spec: dsg file
+    :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
+        machine graph
+    :param ~pacman.model.routing_info.AbstractMachinePartitionNKeysMap \
+            n_key_map:
         map between partitions and n keys
-    :param ~.MachineVertex vertex: machine vertex
+    :param ~pacman.model.graphs.machine.MachineVertex vertex: machine vertex
     :param int bit_field_builder_region: region id for the builder region
     :param int bit_filter_region: region id for the bitfield region
     :param int bit_field_key_region: region id for the key map
     """
-
     # reserve the final destination for the bitfields
     spec.reserve_memory_region(
         region=bit_filter_region,
@@ -152,11 +155,15 @@ def write_bitfield_init_data(
         structural_dynamics_region_id, has_structural_dynamics_region):
     """ writes the init data needed for the bitfield generator
 
-    :param ~.DataSpecificationGenerator spec: data spec writer
-    :param ~.MachineVertex machine_vertex: machine vertex
-    :param ~.MachineGraph machine_graph: machine graph
-    :param ~.RoutingInfo routing_info: keys
-    :param ~.AbstractMachinePartitionNKeysMap n_key_map: map for edge to n keys
+    :param ~data_specification.DataSpecificationGenerator spec: data spec writer
+    :param ~pacman.model.graphs.machine.MachineVertex machine_vertex:
+        machine vertex
+    :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
+        machine graph
+    :param ~pacman.model.routing_info.RoutingInfo routing_info: keys
+    :param ~pacman.model.routing_info.AbstractMachinePartitionNKeysMap \
+            n_key_map:
+        map for edge to n keys
     :param int bit_field_builder_region: the region id for the bitfield builder
     :param int master_pop_region_id: the region id for the master pop table
     :param int synaptic_matrix_region_id: the region id for the synaptic matrix

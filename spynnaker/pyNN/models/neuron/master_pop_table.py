@@ -63,6 +63,11 @@ class _MasterPopEntry(object):
         self.__addresses_and_row_lengths = list()
 
     def append(self, address, row_length, is_single):
+        """
+        :param int address:
+        :param int row_length:
+        :param bool is_single:
+        """
         index = len(self.__addresses_and_row_lengths)
         self.__addresses_and_row_lengths.append(
             (address, row_length, is_single))
@@ -88,7 +93,8 @@ class _MasterPopEntry(object):
     def addresses_and_row_lengths(self):
         """
         :return: the memory address that this master pop entry points at
-            (synaptic matrix)
+            (synaptic matrix), the length of the row, and whether the entry
+            is single.
         :rtype: list(tuple(int,int,bool))
         """
         return self.__addresses_and_row_lengths
@@ -362,9 +368,9 @@ class MasterPopTableAsBinarySearch(object):
         :param ~numpy.ndarray entries:
         :param int key:
             the key to search the master pop table for a given entry
-        :return: the entry for this given key;
+        :return: the entry for this given key if one exists;
             dtype has keys: ``key``, ``mask``, ``start``, ``count``
-        :rtype: ~numpy.ndarray
+        :rtype: ~numpy.ndarray or None
         """
         imin = 0
         imax = len(entries)

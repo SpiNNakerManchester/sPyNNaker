@@ -28,7 +28,7 @@ class AbstractConnectorSupportsViewsOnMachine(object):
 
         :param list(int) indexes: the indexes array of a PopulationView
         :return: The low and high index values of the PopulationView
-        :rtype: uint, uint
+        :rtype: tuple(int, int)
         """
         view_lo = indexes[0]
         view_hi = indexes[-1]

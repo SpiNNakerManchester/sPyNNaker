@@ -65,7 +65,6 @@ class RecordingCommon(object):
         :param int sampling_interval: the interval to record them
         :param indexes: List of indexes to record or None for all
         :type indexes: list(int) or None
-        :return: None
         """
 
         get_simulator().verify_not_running()

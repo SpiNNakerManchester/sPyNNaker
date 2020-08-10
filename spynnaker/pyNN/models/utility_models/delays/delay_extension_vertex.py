@@ -285,7 +285,7 @@ class DelayExtensionVertex(
 
     def _write_setup_info(self, spec, machine_time_step, time_scale_factor):
         """
-        :param ~data_specification.DataSpecificationGenerator spec:
+        :param ~.DataSpecificationGenerator spec:
         :param int machine_time_step:
         :param int time_scale_factor:
         """
@@ -390,24 +390,22 @@ class DelayExtensionVertex(
         synapse_gen = isinstance(
             dynamics, AbstractGenerateOnMachine)
         if connector_gen and synapse_gen:
-            return sum((
-                DelayGeneratorData.BASE_SIZE,
-                connector.gen_delay_params_size_in_bytes(
-                    synapse_info.delays),
-                connector.gen_connector_params_size_in_bytes,
-            ))
+            return (
+                DelayGeneratorData.BASE_SIZE +
+                connector.gen_delay_params_size_in_bytes(synapse_info.delays) +
+                connector.gen_connector_params_size_in_bytes)
         return 0
 
     def _get_size_of_generator_information(self, out_edges):
         """ Get the size of the generator data for all edges
 
-        :param list(.ApplicationEdge) out_edges:
+        :param list(~.ApplicationEdge) out_edges:
         :rtype: int
         """
-        size = 0
-        for out_edge in out_edges:
-            if isinstance(out_edge, DelayedApplicationEdge):
-                size += self.__size_of_edge_generator_info(out_edge)
+        size = sum(
+            self.__size_of_edge_generator_info(edge)
+            for edge in out_edges
+            if isinstance(edge, DelayedApplicationEdge))
         # If there's a non-zero size, we will be generating on machine and we
         # should add the baseline overhead
         if size:
@@ -417,6 +415,7 @@ class DelayExtensionVertex(
     def __size_of_edge_generator_info(self, edge):
         """
         :param DelayedApplicationEdge edge:
+        :rtype: int
         """
         # Get the number of likely vertices
         max_atoms = min(

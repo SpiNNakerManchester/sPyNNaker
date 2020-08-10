@@ -23,9 +23,10 @@ class GraphEdgeWeightUpdater(object):
 
     def __call__(self, machine_graph):
         """
-        :param machine_graph: the machine_graph whose edges are to be updated
+        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
+            the machine_graph whose edges are to be updated
+        :rtype: ~pacman.model.graphs.machine.MachineGraph
         """
-
         # create progress bar
         progress = ProgressBar(
             machine_graph.n_outgoing_edge_partitions,

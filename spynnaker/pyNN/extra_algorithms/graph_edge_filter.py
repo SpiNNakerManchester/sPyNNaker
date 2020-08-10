@@ -33,9 +33,10 @@ class GraphEdgeFilter(object):
         :param app_graph: The application graph
         :type app_graph:
             ~pacman.model.graphs.application.ApplicationGraph or None
-        :param .MachineGraph machine_graph:
+        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
              The machine_graph whose edges are to be filtered
         :return: a new, filtered machine graph
+        :rtype: ~pacman.model.graphs.machine.MachineGraph
         """
         new_machine_graph = MachineGraph(
             label=machine_graph.label, application_graph=app_graph)
@@ -73,9 +74,9 @@ class GraphEdgeFilter(object):
     @staticmethod
     def _add_edge_to_new_graph(edge, partition, new_graph):
         """
-        :param .MachineEdge edge:
-        :param .OutgoingEdgePartition partition:
-        :param .MachineGraph new_graph:
+        :param ~.MachineEdge edge:
+        :param ~.OutgoingEdgePartition partition:
+        :param ~.MachineGraph new_graph:
         """
         new_graph.add_edge(edge, partition.identifier)
         edge.associate_application_edge()
@@ -90,16 +91,18 @@ class GraphEdgeFilter(object):
     @staticmethod
     def _is_filterable(edge):
         """
-        :param .MachineEdge edge:
+        :param ~.MachineEdge edge:
         :rtype: bool
         """
         # If our associated application edge wants to say don't filter...
         if (isinstance(edge.app_edge, AbstractFilterableEdge)
                 and not edge.app_edge.filter_edge()):
             return False
+
         if isinstance(edge, AbstractFilterableEdge):
             return edge.filter_edge()
         elif isinstance(edge.app_edge, ApplicationEdge):
             return False
+        # Bad graph construction?
         raise FilterableException(
             "cannot figure out if edge {} is prunable or not".format(edge))

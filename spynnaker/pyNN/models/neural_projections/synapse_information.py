@@ -47,8 +47,8 @@ class SynapseInformation(object):
             The population sending spikes to the synapse
         :param PyNNPopulationCommon post_population:
             The population hosting the synapse
-        :param bool prepop_is_view: Whether the prepopulation is a view
-        :param bool postpop_is_view: Whether the postpopulation is a view
+        :param bool prepop_is_view: Whether the pre-population is a view
+        :param bool postpop_is_view: Whether the post-population is a view
         :param rng: Seeded random number generator
         :type rng: ~pyNN.random.NumpyRNG or None
         :param AbstractSynapseDynamics synapse_dynamics:
@@ -96,7 +96,7 @@ class SynapseInformation(object):
 
     @property
     def n_pre_neurons(self):
-        """ The number of neurons in the prepopulation
+        """ The number of neurons in the pre-population
 
         :rtype: int
         """
@@ -104,7 +104,7 @@ class SynapseInformation(object):
 
     @property
     def n_post_neurons(self):
-        """ The number of neurons in the postpopulation
+        """ The number of neurons in the post-population
 
         :rtype: int
         """
@@ -112,7 +112,7 @@ class SynapseInformation(object):
 
     @property
     def prepop_is_view(self):
-        """ Whether the prepopulation is a view
+        """ Whether the pre-population is a view
 
         :rtype: bool
         """
@@ -120,7 +120,7 @@ class SynapseInformation(object):
 
     @property
     def postpop_is_view(self):
-        """ Whether the postpopulation is a view
+        """ Whether the post-population is a view
 
         :rtype: bool
         """

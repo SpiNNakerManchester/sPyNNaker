@@ -48,6 +48,13 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
             mean_pre_window=default_parameters['mean_pre_window'],
             mean_post_window=default_parameters['mean_post_window'],
             dual_fsm=default_parameters['dual_fsm']):
+        """
+        :param int accumulator_depression:
+        :param int accumulator_potentiation:
+        :param float mean_pre_window:
+        :param float mean_post_window:
+        :param bool dual_fsm:
+        """
         # pylint: disable=too-many-arguments
         self.__accumulator_depression_plus_one = accumulator_depression + 1
         self.__accumulator_potentiation_minus_one = \
@@ -73,21 +80,15 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
                  timing_dependence.mean_post_window))
 
     @property
+    @overrides(AbstractTimingDependence.vertex_executable_suffix)
     def vertex_executable_suffix(self):
-        """ The suffix to be appended to the vertex executable for this rule
-
-        :rtype: str
-        """
         if self.__dual_fsm:
             return "recurrent_dual_fsm"
         return "recurrent_pre_stochastic"
 
     @property
+    @overrides(AbstractTimingDependence.pre_trace_n_bytes)
     def pre_trace_n_bytes(self):
-        """ The number of bytes used by the pre-trace of the rule per neuron
-
-        :rtype: int
-        """
         # When using the separate FSMs, pre-trace contains window length,
         # otherwise it's in the synapse
         return BYTES_PER_SHORT if self.__dual_fsm else 0
@@ -100,16 +101,12 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
             2 * STDP_FIXED_POINT_ONE * BYTES_PER_SHORT)
 
     @property
+    @overrides(AbstractTimingDependence.n_weight_terms)
     def n_weight_terms(self):
-        """ The number of weight terms expected by this timing rule
-
-        :rtype: int
-        """
         return 1
 
     @overrides(AbstractTimingDependence.write_parameters)
     def write_parameters(self, spec, machine_time_step, weight_scales):
-
         # Write parameters
         spec.write_value(data=self.__accumulator_depression_plus_one,
                          data_type=DataType.INT32)
@@ -140,11 +137,8 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
             inv_cdf.astype(numpy.uint16), data_type=DataType.UINT16)
 
     @property
+    @overrides(AbstractTimingDependence.synaptic_structure)
     def synaptic_structure(self):
-        """ Get the synaptic structure of the plastic part of the rows
-
-        :rtype: AbstractSynapseStructure
-        """
         return self.__synapse_structure
 
     @overrides(AbstractTimingDependence.get_parameter_names)

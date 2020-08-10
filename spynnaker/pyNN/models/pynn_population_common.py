@@ -487,9 +487,7 @@ class PyNNPopulationCommon(object):
                 self.__vertex.set_value_by_selector(selector, key, value)
 
     def _read_parameters_before_set(self):
-        """ Reads parameters from the machine before "set" completes
-
-        :return: None
+        """ Reads parameters from the machine before "set" completes.
         """
 
         # If the tools have run before, and not reset, and the read

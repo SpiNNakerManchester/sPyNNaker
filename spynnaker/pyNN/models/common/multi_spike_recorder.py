@@ -48,14 +48,16 @@ class MultiSpikeRecorder(object):
 
     def get_sdram_usage_in_bytes(self, n_neurons, spikes_per_timestep):
         """
+        :param int n_neurons:
+        :param int spikes_per_timestep:
         :rtype: ~pacman.model.resources.AbstractSDRAM
         """
         if not self.__record:
             return ConstantSDRAM(0)
 
-        out_spike_bytes = ceildiv(n_neurons, BITS_PER_WORD) * BYTES_PER_WORD
-        return VariableSDRAM(0, (2 * BYTES_PER_WORD) + (
-            out_spike_bytes * spikes_per_timestep))
+        out_spike_words = ceildiv(n_neurons, BITS_PER_WORD)
+        return VariableSDRAM(
+            0, (2 + out_spike_words * spikes_per_timestep) * BYTES_PER_WORD)
 
     def get_dtcm_usage_in_bytes(self):
         """

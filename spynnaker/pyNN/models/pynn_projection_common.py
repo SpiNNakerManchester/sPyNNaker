@@ -249,8 +249,8 @@ class PyNNProjectionCommon(object):
         :param post_synaptic_vertex: The destination vertex of the multapse
         :type post_synaptic_vertex:
             ~pacman.model.graphs.application.ApplicationVertex
-        :return: None or the edge going to these vertices.
-        :rtype: ~.ApplicationEdge
+        :return: the edge going to these vertices, if one exists.
+        :rtype: ~.ApplicationEdge or None
         """
 
         # Find edges ending at the postsynaptic vertex

@@ -29,6 +29,7 @@ from spynnaker.pyNN.utilities.utility_calls import get_n_bits, ceildiv
 
 # How large are the time-stamps stored with each event
 TIME_STAMP_BYTES = BYTES_PER_WORD
+_HALF_WORDS_PER_WORD = 2
 
 
 class SynapseDynamicsSTDP(
@@ -284,25 +285,20 @@ class SynapseDynamicsSTDP(
     def __get_n_connections(self, n_connections, check_length_padded=True):
         """
         :param int n_connections:
-        :rtype: int
         :param bool check_length_padded:
-        :rtype: bool
+        :rtype: int
         """
         synapse_structure = self.__timing_dependence.synaptic_structure
         if self.__pad_to_length is not None and check_length_padded:
             n_connections = max(n_connections, self.__pad_to_length)
         if n_connections == 0:
             return 0
-        # 2 == two half words per word
-        fp_size_words = (
-            n_connections // 2 if n_connections % 2 == 0
-            else (n_connections + 1) // 2)
-        pp_size_bytes = (
-            self._n_header_bytes +
-            (synapse_structure.get_n_half_words_per_connection() *
-             BYTES_PER_SHORT * n_connections))
-        pp_size_words = ceildiv(pp_size_bytes, BYTES_PER_WORD)
 
+        fp_size_words = ceildiv(n_connections, _HALF_WORDS_PER_WORD)
+        pp_size_bytes = self._n_header_bytes + (
+            synapse_structure.get_n_half_words_per_connection() *
+            BYTES_PER_SHORT * n_connections)
+        pp_size_words = ceildiv(pp_size_bytes, BYTES_PER_WORD)
         return fp_size_words + pp_size_words
 
     def get_n_words_for_plastic_connections(self, n_connections):

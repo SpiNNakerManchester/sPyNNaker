@@ -15,9 +15,9 @@
 
 import numpy
 from spinn_utilities.overrides import overrides
-from .abstract_formation import AbstractFormation
 from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+from .abstract_formation import AbstractFormation
 
 # 6 32-bit words (grid_x, grid_y, grid_x_recip, grid_y_recep, ff_prob_size,
 #                 lat_prob_size)
@@ -63,10 +63,10 @@ class DistanceDependentFormation(AbstractFormation):
         self.__sigma_form_lateral = sigma_form_lateral
 
         self.__ff_distance_probabilities = \
-            self.generate_distance_probability_array(
+            self._generate_distance_probability_array(
                 self.__p_form_forward, self.__sigma_form_forward)
         self.__lat_distance_probabilities = \
-            self.generate_distance_probability_array(
+            self._generate_distance_probability_array(
                 self.__p_form_lateral, self.__sigma_form_lateral)
 
     @property
@@ -80,7 +80,7 @@ class DistanceDependentFormation(AbstractFormation):
                 len(self.__ff_distance_probabilities) * 2 +
                 len(self.__lat_distance_probabilities) * 2)
 
-    def generate_distance_probability_array(self, probability, sigma):
+    def _generate_distance_probability_array(self, probability, sigma):
         """ Generate the exponentially decaying probability LUTs.
 
         :param float probability: peak probability

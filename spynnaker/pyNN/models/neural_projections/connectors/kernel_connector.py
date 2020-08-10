@@ -46,6 +46,15 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
 
         Should these include `allow_self_connections` and `with_replacement`?
     """
+    __slots__ = (
+        "_kernel_w", "_kernel_h", "_hlf_k_w", "_hlf_k_h",
+        "_pre_w", "_pre_h", "_post_w", "_post_h",
+        "_pre_start_w", "_pre_start_h", "_post_start_w", "_post_start_h",
+        "_pre_step_w", "_pre_step_h", "_post_step_w", "_post_step_h",
+        "_krn_weights", "_krn_delays", "_shape_pre", "_shape_post",
+        "_shape_common", "_common_w", "_common_h", "_post_as_pre")
+
+    __KERNEL_ARRAY_TYPES = (numpy.ndarray, ConvolutionKernel)
 
     def __init__(
             self, shape_pre, shape_post, shape_kernel, weight_kernel,
@@ -177,13 +186,11 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
         :param ~pacman.model.graphs.common.Slice post_vertex_slice:
         :rtype: tuple(~numpy.ndarray, ~numpy.ndarray)
         """
-        # TODO: When slices become hashable, update this code to use them
-        # directly as the cache index
-        if str(post_vertex_slice) not in self._post_as_pre:
+        if post_vertex_slice not in self._post_as_pre:
             post_r, post_c = self.__to_post_coords(post_vertex_slice)
-            self._post_as_pre[str(post_vertex_slice)] = \
+            self._post_as_pre[post_vertex_slice] = \
                 self.__map_to_pre_coords(post_r, post_c)
-        return self._post_as_pre[str(post_vertex_slice)]
+        return self._post_as_pre[post_vertex_slice]
 
     def __pre_as_post(self, pre_r, pre_c):
         """ Write pre coords as post coords.
@@ -212,8 +219,8 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
             return numpy.array(vals.next(krn_size)).reshape(krn_shape)
         elif numpy.isscalar(vals):
             return vals * numpy.ones(krn_shape)
-        elif ((isinstance(vals, numpy.ndarray) or
-                isinstance(vals, ConvolutionKernel)) and
+        elif (
+                isinstance(vals, self.__KERNEL_ARRAY_TYPES) and
                 vals.shape[HEIGHT] == self._kernel_h and
                 vals.shape[WIDTH] == self._kernel_w):
             return vals.view(ConvolutionKernel)

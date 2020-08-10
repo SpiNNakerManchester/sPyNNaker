@@ -109,8 +109,7 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
     def __repr__(self):
         return "OneToOneConnector()"
 
-    def _get_pre_post_limits(
-            self, pre_slice, post_slice, synapse_info):
+    def _get_pre_post_limits(self, pre_slice, post_slice, synapse_info):
         """
         :param ~pacman.model.graphs.common.Slice pre_slice:
         :param ~pacman.model.graphs.common.Slice post_slice:

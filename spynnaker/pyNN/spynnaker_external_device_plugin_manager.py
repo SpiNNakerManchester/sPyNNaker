@@ -294,7 +294,7 @@ class SpynnakerExternalDevicePluginManager(object):
 
         :param ~pacman.model.graphs.application.ApplicationVertex vertex:
             the pre-vertex to connect the edge from
-        :param device_vertex: the post vertex to connect the edge to
+        :param device_vertex: the post-vertex to connect the edge to
         :type device_vertex:
             ~pacman.model.graphs.application.ApplicationVertex
         :param str partition_id: the partition identifier for making nets
@@ -304,12 +304,21 @@ class SpynnakerExternalDevicePluginManager(object):
 
     @staticmethod
     def add_application_vertex(vertex):
+        """
+        :param ~pacman.model.graphs.application.ApplicationVertex vertex:
+        """
         get_simulator().add_application_vertex(vertex)
 
     @staticmethod
     def machine_time_step():
+        """
+        :rtype: int
+        """
         return get_simulator().machine_time_step
 
     @staticmethod
     def time_scale_factor():
+        """
+        :rtype: int
+        """
         return get_simulator().time_scale_factor

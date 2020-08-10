@@ -28,7 +28,7 @@ class AbstractNeuronRecordable(object):
     @abstractmethod
     def get_recordable_variables(self):
         """ Returns a list of the PyNN names of variables this model is \
-            expected to collect
+            expected to collect.
 
         :rtype: list(str)
         """
@@ -45,7 +45,7 @@ class AbstractNeuronRecordable(object):
     @abstractmethod
     def set_recording(self, variable, new_state=True, sampling_interval=None,
                       indexes=None):
-        """ Sets variable to being recorded
+        """ Sets variable to being recorded.
 
         :param str variable: PyNN name of the variable
         :param bool new_state:

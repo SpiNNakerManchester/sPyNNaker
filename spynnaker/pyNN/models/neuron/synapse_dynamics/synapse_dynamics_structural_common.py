@@ -103,7 +103,7 @@ class StructuralPlasticityCommon(object):
         :param float initial_weight:
             Initial weight assigned to a newly formed connection
         :param initial_delay: Delay assigned to a newly formed connection
-        :type initial_delay: int or (int, int)
+        :type initial_delay: int or float or tuple(int or float, int or float)
         :param int s_max: Maximum fan-in per target layer neuron
         :param int seed: seed the random number generators
         """
@@ -154,7 +154,7 @@ class StructuralPlasticityCommon(object):
         """ The period of rewiring.
 
         :return: The period of rewiring
-        :rtype: int
+        :rtype: float
         """
         return self.__p_rew
 
@@ -225,6 +225,8 @@ class StructuralPlasticityCommon(object):
         :param ~.ApplicationGraph app_graph:
         :param ~.ApplicationVertex app_vertex:
         :rtype: list(tuple(ProjectionApplicationEdge, SynapseInformation))
+        :raises SynapticConfigurationException:
+            if there are two structurally-plastic projections on an edge
         """
         structural_edges = list()
         for app_edge in app_graph.get_edges_ending_at_vertex(app_vertex):
@@ -508,41 +510,64 @@ class StructuralPlasticityCommon(object):
 
     @property
     def initial_weight(self):
+        """ Initial weight assigned to a newly formed connection
+
+        :rtype: float
+        """
         return self.__initial_weight
 
     @property
     def initial_delay(self):
+        """ Delay assigned to a newly formed connection
+
+        :rtype: int or float or tuple(int or float, int or float)
+        """
         return self.__initial_delay
 
     @property
     def f_rew(self):
+        """ Frequency of rewiring (Hz)
+
+        :rtype: float
+        """
         return self.__f_rew
 
     @property
     def s_max(self):
+        """ Maximum fan-in per target layer neuron
+
+        :rtype: int
+        """
         return self.__s_max
 
     @property
     def seed(self):
+        """ seed for the random number generators
+
+        :rtype: int
+        """
         return self.__seed
 
     @property
     def partner_selection(self):
-        """
+        """ The partner selection rule
+
         :rtype: AbstractPartnerSelection
         """
         return self.__partner_selection
 
     @property
     def formation(self):
-        """
+        """ The formation rule
+
         :rtype: AbstractFormation
         """
         return self.__formation
 
     @property
     def elimination(self):
-        """
+        """ The elimination rule
+
         :rtype: AbstractElimination
         """
         return self.__elimination

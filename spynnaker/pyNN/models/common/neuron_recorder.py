@@ -205,7 +205,7 @@ class NeuronRecorder(object):
             buffer_manager, expected_rows, missing_str, sampling_rate, label):
         """ processes a placement for matrix data
 
-        :param variable: the variable to read
+        :param str variable: the variable to read
         :param ~pacman.model.placements.Placements placements:
             the placements object
         :param ~pacman.model.graphs.machine.MachineVertex vertex:
@@ -768,20 +768,12 @@ class NeuronRecorder(object):
             records = records + 1
         return data_size * records
 
-    @staticmethod
-    def __n_bytes_to_n_words(n_bytes):
-        """
-        :param int n_bytes:
-        :rtype: int
-        """
-        return (n_bytes + (BYTES_PER_WORD - 1)) // BYTES_PER_WORD
-
     def get_sdram_usage_in_bytes(self, vertex_slice):
         """
         :param ~pacman.model.graphs.common.Slice vertex_slice:
         :rtype: int
         """
-        n_words_for_n_neurons = self.__n_bytes_to_n_words(vertex_slice.n_atoms)
+        n_words_for_n_neurons = ceildiv(vertex_slice.n_atoms, BYTES_PER_WORD)
         n_bytes_for_n_neurons = n_words_for_n_neurons * BYTES_PER_WORD
         var_bytes = (
             (self._N_BYTES_PER_RATE + self._N_BYTES_PER_SIZE +

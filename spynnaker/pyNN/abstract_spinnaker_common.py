@@ -101,7 +101,7 @@ class AbstractSpiNNakerCommon(with_metaclass(
         :param user_extra_algorithms_pre_run:
         :type user_extra_algorithms_pre_run: list(str) or None
         :param time_scale_factor:
-        :type time_scale_factor:
+        :type time_scale_factor: int or None
         :param extra_post_run_algorithms:
         :type extra_post_run_algorithms: list(str) or None
         :param extra_mapping_algorithms:
@@ -109,7 +109,7 @@ class AbstractSpiNNakerCommon(with_metaclass(
         :param extra_load_algorithms:
         :type extra_load_algorithms: list(str) or None
         :param front_end_versions:
-        :type front_end_versions:
+        :type front_end_versions: list(tuple(str,str)) or None
         """
         # pylint: disable=too-many-arguments, too-many-locals
 

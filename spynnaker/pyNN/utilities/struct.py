@@ -65,7 +65,8 @@ class Struct(object):
         return (size_in_bytes + (BYTES_PER_WORD - 1)) // BYTES_PER_WORD
 
     def get_data(self, values, offset=0, array_size=1):
-        """ Get a numpy array of uint32 of data for the given values
+        """ Get a numpy array of uint32 of data for the given values. \
+            The array will be suitable for being written to SpiNNaker.
 
         :param values:
             A list of values with length the same size as the number of fields

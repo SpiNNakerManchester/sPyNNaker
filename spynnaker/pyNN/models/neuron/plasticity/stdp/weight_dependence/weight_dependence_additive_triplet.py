@@ -98,11 +98,8 @@ class WeightDependenceAdditiveTriplet(
             (self.__a3_minus == weight_dependence.A3_minus))
 
     @property
+    @overrides(AbstractWeightDependence.vertex_executable_suffix)
     def vertex_executable_suffix(self):
-        """ The suffix to be appended to the vertex executable for this rule
-
-        :rtype: str
-        """
         return "additive"
 
     @overrides(AbstractWeightDependence.get_parameters_sdram_usage_in_bytes)
@@ -110,16 +107,14 @@ class WeightDependenceAdditiveTriplet(
             self, n_synapse_types, n_weight_terms):
         if n_weight_terms != 2:
             raise NotImplementedError(
-                "Additive weight dependence only supports one or two terms")
+                "Additive weight dependence only supports two terms")
         return _SPACE_PER_SYNAPSE_TYPE * n_synapse_types
 
     @overrides(AbstractWeightDependence.write_parameters)
     def write_parameters(
             self, spec, machine_time_step, weight_scales, n_weight_terms):
-
         # Loop through each synapse type's weight scale
         for w in weight_scales:
-
             # Scale the weights
             spec.write_value(
                 data=int(round(self.__w_min * w)), data_type=DataType.INT32)
@@ -143,12 +138,8 @@ class WeightDependenceAdditiveTriplet(
                 data_type=DataType.INT32)
 
     @property
+    @overrides(AbstractWeightDependence.weight_maximum)
     def weight_maximum(self):
-        """ The maximum weight that will ever be set in a synapse as a result\
-            of this rule
-
-        :rtype: float
-        """
         return self.__w_max
 
     @overrides(AbstractWeightDependence.get_parameter_names)

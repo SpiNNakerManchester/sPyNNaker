@@ -127,6 +127,7 @@ class SynapticManager(object):
         self.__n_synapse_types = n_synapse_types
         self.__ring_buffer_sigma = ring_buffer_sigma
         self.__spikes_per_second = spikes_per_second
+        # Overridable (for testing only) region IDs
         self._synapse_params_region = \
             POPULATION_BASED_REGIONS.SYNAPSE_PARAMS.value
         self._pop_table_region = \
@@ -243,6 +244,7 @@ class SynapticManager(object):
 
     def get_maximum_delay_supported_in_ms(self, machine_time_step):
         """
+        :param int machine_time_step:
         :rtype: int or None
         """
         return self.__synapse_io.get_maximum_delay_supported_in_ms(

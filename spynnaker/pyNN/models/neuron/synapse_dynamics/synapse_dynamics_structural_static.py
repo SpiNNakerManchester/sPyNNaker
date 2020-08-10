@@ -54,7 +54,7 @@ class SynapseDynamicsStructuralStatic(
             a fixed delay value, or a tuple of two values means the delay will
             be chosen at random from a uniform distribution between the given
             values
-        :type initial_delay: float or (float, float)
+        :type initial_delay: int or float or tuple(int or float, int or float)
         :param int s_max: Maximum fan-in per target layer neuron
         :param int seed: seed the random number generators
         :param float weight: The weight of connections formed by the connector

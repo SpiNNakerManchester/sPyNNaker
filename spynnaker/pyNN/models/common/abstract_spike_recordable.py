@@ -26,7 +26,7 @@ class AbstractSpikeRecordable(object):
 
     @abstractmethod
     def is_recording_spikes(self):
-        """ Determine if spikes are being recorded
+        """ Determine if spikes are being recorded.
 
         :return: True if spikes are being recorded, False otherwise
         :rtype: bool
@@ -36,7 +36,7 @@ class AbstractSpikeRecordable(object):
     def set_recording_spikes(
             self, new_state=True, sampling_interval=None, indexes=None):
         """ Set spikes to being recorded. \
-            If `new_state` is false all other parameters are ignored.
+            If `new_state` is False all other parameters are ignored.
 
         :param bool new_state: Set if the spikes are recording or not
         :param sampling_interval: The interval at which spikes are recorded.

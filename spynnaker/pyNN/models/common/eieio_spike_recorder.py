@@ -19,9 +19,9 @@ import numpy
 from spinn_utilities.progress_bar import ProgressBar
 from spinn_utilities.log import FormatAdapter
 from spinnman.messages.eieio.data_messages import EIEIODataHeader
-from spynnaker.pyNN.models.common import recording_utils
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, MICRO_TO_MILLISECOND_CONVERSION)
+from spynnaker.pyNN.models.common.recording_utils import make_missing_string
 
 logger = FormatAdapter(logging.getLogger(__name__))
 _ONE_WORD = struct.Struct("<I")
@@ -89,26 +89,23 @@ class EIEIOSpikeRecorder(object):
         :param application_vertex:
         :type application_vertex:
             ~pacman.model.graphs.application.ApplicationVertex
-        :param int machine_time_step:
-            the time step of the simulation, in microseconds
         :param base_key_function:
         :type base_key_function:
             callable(~pacman.model.graphs.machine.MachineVertex,int)
+        :param int machine_time_step:
+            the time step of the simulation, in microseconds
         :return: A numpy array of 2-element arrays of (neuron_id, time)
             ordered by time, one element per event
         :rtype: ~numpy.ndarray(tuple(int,int))
         """
         # pylint: disable=too-many-arguments
         results = list()
-        missing = []
+        missing = list()
         ms_per_tick = machine_time_step / MICRO_TO_MILLISECOND_CONVERSION
         vertices = application_vertex.machine_vertices
         progress = ProgressBar(vertices,
                                "Getting spikes for {}".format(label))
         for vertex in progress.over(vertices):
-            placement = placements.get_placement_of_vertex(vertex)
-            vertex_slice = vertex.vertex_slice
-
             # Read the spikes
             n_buffer_times = 0
             if vertex.send_buffer_times is not None:
@@ -119,17 +116,18 @@ class EIEIOSpikeRecorder(object):
                         # assuming this must be a single integer
                         n_buffer_times += 1
 
-            if n_buffer_times > 0:
+            if n_buffer_times:
+                placement = placements.get_placement_of_vertex(vertex)
                 raw_spike_data, data_missing = \
                     buffer_manager.get_data_by_placement(placement, region)
                 if data_missing:
                     missing.append(placement)
                 self._process_spike_data(
-                    vertex_slice, raw_spike_data, ms_per_tick,
+                    vertex.vertex_slice, raw_spike_data, ms_per_tick,
                     base_key_function(vertex), results)
 
         if missing:
-            missing_str = recording_utils.make_missing_string(missing)
+            missing_str = make_missing_string(missing)
             logger.warning(
                 "Population {} is missing spike data in region {} from the"
                 " following cores: {}", label, region, missing_str)

@@ -86,6 +86,8 @@ class AbstractSynapseDynamicsStructural(object):
     @abstractproperty
     def seed(self):
         """ The seed to control the randomness
+
+        :rtype: int
         """
 
     @abstractproperty
