@@ -24,6 +24,15 @@ DIRS = $(BUILDS:%=makefiles/%)
 
 APP_OUTPUT_DIR =  $(abspath $(dir $(MAKEFILE_PATH))../spynnaker/pyNN/model_binaries)/
 
+# Locations of tag files
+TAGFILES=sllt.tag common.tag fec.tag
+SLLT_TAG=http://spinnakermanchester.github.io/spinnaker_tools/sllt.tag
+COMMON_TAG=http://spinnakermanchester.github.io/spinn_common/common.tag
+FEC_TAG=http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/fec.tag
+
+DOXYGEN ?= doxygen
+WGET ?= wget
+
 all: $(DIRS)
 	for d in $(DIRS); do $(MAKE) -C $$d || exit $$?; done
 
@@ -33,3 +42,27 @@ clean: $(DIRS)
 install-clean:
 	$(info Deleted all old files in "$(APP_OUTPUT_DIR)")
 	$(RM) $(APP_OUTPUT_DIR)*.dict $(APP_OUTPUT_DIR)logs.sqlite3  $(APP_OUTPUT_DIR)*.aplx
+
+sllt.tag: .sllt_template.tag
+	cp .sllt_template.tag sllt.tag
+ifneq (, $(shell which $(WGET)))
+	-$(WGET) -q -O sllt.tag $(SLLT_TAG)
+endif 
+
+common.tag: .common_template.tag
+	cp .common_template.tag common.tag
+ifneq (, $(shell which $(WGET)))
+	-$(WGET) -q -O common.tag $(COMMON_TAG)
+endif 
+
+fec.tag: .fec_template.tag
+	cp .fec_template.tag fec.tag
+ifneq (, $(shell which $(WGET)))
+	-$(WGET) -q -O fec.tag $(FEC_TAG)
+endif 
+
+doxygen: $(TAGFILES)
+	$(DOXYGEN)
+doxysetup: $(TAGFILES)
+
+.PHONY: all clean doxygen doxysetup
