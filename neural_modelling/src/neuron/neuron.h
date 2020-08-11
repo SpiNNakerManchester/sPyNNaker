@@ -47,22 +47,18 @@
 //!             the model
 //! \param[out] incoming_spike_buffer_size: The number of spikes to
 //!             support in the incoming spike circular buffer
-//! \param[out] timer_offset: An offset to use during launching the main
-//!             simulation loop so that we don't utterly hammer the SpiNNaker
-//!             network every timestep.
+//! \param[out] n_regions_used: The number of regions used by neuron recording
 //! \return True if the translation was successful, otherwise False
 bool neuron_initialise(
         address_t address, address_t recording_address, uint32_t *n_neurons_value,
-        uint32_t *n_synapse_types_value, uint32_t *incoming_spike_buffer_size);
+        uint32_t *n_synapse_types_value, uint32_t *incoming_spike_buffer_size,
+        uint32_t *n_regions_used);
 
 //! \brief executes all the updates to neural parameters when a given timer
 //!        period has occurred.
 //! \param[in] time: the timer tick value currently being executed
 //! \param[in] timer_count: used for detecting a wrapping timer
-//! \param[in] timer_period: the intended amount of time per timer tick
-void neuron_do_timestep_update(
-        timer_t time, uint timer_count, uint timer_period,
-        int packets_this_time_step);
+void neuron_do_timestep_update(timer_t time, uint timer_count);
 
 //! \brief Prepare to resume simulation of the neurons
 //! \param[in] address: the address where the neuron parameters are stored

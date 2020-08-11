@@ -110,16 +110,16 @@ static uint32_t simulation_ticks = 0;
 static uint32_t infinite_run;
 
 //! Timer callbacks since last rewiring
-int32_t last_rewiring_time = 0;
+static int32_t last_rewiring_time = 0;
 
 //! Rewiring period represented as an integer
-int32_t rewiring_period = 0;
+static int32_t rewiring_period = 0;
 
 //! Flag representing whether rewiring is enabled
-bool rewiring = false;
+static bool rewiring = false;
 
 //! Count the number of rewiring attempts
-uint32_t count_rewire_attempts = 0;
+static uint32_t count_rewire_attempts = 0;
 
 //! The number of neurons on the core
 static uint32_t n_neurons;
@@ -187,10 +187,12 @@ static bool initialise(void) {
     // Set up the neurons
     uint32_t n_synapse_types;
     uint32_t incoming_spike_buffer_size;
+    uint32_t n_regions_used;
     if (!neuron_initialise(
             data_specification_get_region(NEURON_PARAMS_REGION, ds_regions),
             data_specification_get_region(NEURON_RECORDING_REGION, ds_regions),
-            &n_neurons, &n_synapse_types, &incoming_spike_buffer_size)) {
+            &n_neurons, &n_synapse_types, &incoming_spike_buffer_size,
+            &n_regions_used)) {
         return false;
     }
 
@@ -240,7 +242,7 @@ static bool initialise(void) {
 
     if (!spike_processing_initialise(
             row_max_n_words, MC, USER, incoming_spike_buffer_size,
-            clear_input_buffers_of_late_packets_init)) {
+            clear_input_buffers_of_late_packets_init, n_regions_used)) {
         return false;
     }
 
@@ -326,7 +328,7 @@ void timer_callback(uint timer_count, uint unused) {
     }
 
     // First do synapses timestep update, as this is time-critical
-    int packets_received = synapses_do_timestep_update(time);
+    synapses_do_timestep_update(time);
 
     // Then do rewiring
     if (rewiring &&
@@ -343,8 +345,7 @@ void timer_callback(uint timer_count, uint unused) {
     }
 
     // Now do neuron time step update
-    neuron_do_timestep_update(
-        time, timer_count, timer_period, packets_received);
+    neuron_do_timestep_update(time, timer_count);
 
     profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);
 }

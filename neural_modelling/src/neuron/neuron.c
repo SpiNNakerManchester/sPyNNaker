@@ -60,7 +60,6 @@ struct neuron_parameters {
 static bool neuron_load_neuron_parameters(address_t address) {
     log_debug("loading parameters");
     // call the neuron implementation functions to do the work
-    log_info("words for global is %d", START_OF_GLOBAL_PARAMETERS);
     neuron_impl_load_neuron_parameters(
         address, START_OF_GLOBAL_PARAMETERS, n_neurons);
     return true;
@@ -79,7 +78,7 @@ bool neuron_resume(address_t address) { // EXPORTED
 bool neuron_initialise(
         address_t address, address_t recording_address, // EXPORTED
         uint32_t *n_neurons_value, uint32_t *n_synapse_types_value,
-        uint32_t *incoming_spike_buffer_size) {
+        uint32_t *incoming_spike_buffer_size, uint32_t *n_regions_used) {
     log_debug("neuron_initialise: starting");
 
     // init the TDMA
@@ -110,9 +109,8 @@ bool neuron_initialise(
     // Read the size of the incoming spike buffer to use
     *incoming_spike_buffer_size = params->incoming_spike_buffer_size;
 
-    log_info(
-        "\t n_neurons = %u, spike buffer size = %u",
-        n_neurons, *incoming_spike_buffer_size);
+    log_debug("\t n_neurons = %u, spike buffer size = %u", n_neurons,
+            *incoming_spike_buffer_size);
 
     // Call the neuron implementation initialise function to setup DTCM etc.
     if (!neuron_impl_initialise(n_neurons)) {
@@ -126,7 +124,7 @@ bool neuron_initialise(
 
     // setup recording region
     if (!neuron_recording_initialise(
-            recording_address, &recording_flags, n_neurons)) {
+            recording_address, &recording_flags, n_neurons, n_regions_used)) {
         return false;
     }
 
@@ -141,20 +139,12 @@ void neuron_pause(address_t address) { // EXPORTED
         neuron_recording_finalise();
     }
 
-    if (tdma_processing_times_behind() > 0) {
-        log_error(
-            "core fell behind its tdma slot %d times",
-            tdma_processing_times_behind());
-    }
-
     // call neuron implementation function to do the work
     neuron_impl_store_neuron_parameters(
             address, START_OF_GLOBAL_PARAMETERS, n_neurons);
 }
 
-void neuron_do_timestep_update( // EXPORTED
-        timer_t time, uint timer_count, uint timer_period,
-        int n_packets_received) {
+void neuron_do_timestep_update(timer_t time, uint timer_count) { // EXPORTED
 
     // the phase in this timer tick im in (not tied to neuron index)
     tdma_processing_reset_phase();
@@ -171,7 +161,7 @@ void neuron_do_timestep_update( // EXPORTED
 
         // call the implementation function (boolean for spike)
         bool spike = neuron_impl_do_timestep_update(
-            neuron_index, external_bias, n_packets_received);
+            neuron_index, external_bias);
 
         // If the neuron has spiked
         if (spike) {
@@ -182,8 +172,7 @@ void neuron_do_timestep_update( // EXPORTED
 
             if (use_key) {
                 tdma_processing_send_packet(
-                    neuron_index, (key | neuron_index), 0, NO_PAYLOAD,
-                    timer_period, timer_count, n_neurons);
+                    (key | neuron_index), 0, NO_PAYLOAD, timer_count);
             }
         } else {
             log_debug("the neuron %d has been determined to not spike",
@@ -191,7 +180,7 @@ void neuron_do_timestep_update( // EXPORTED
          }
     }
 
-    //log_info("time left of the timer after tdma is %d", tc[T1_COUNT]);
+    log_debug("time left of the timer after tdma is %d", tc[T1_COUNT]);
 
     // Disable interrupts to avoid possible concurrent access
     uint cpsr = spin1_int_disable();
