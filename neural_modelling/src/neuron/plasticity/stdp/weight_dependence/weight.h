@@ -45,7 +45,8 @@
  * \param[in] ring_buffer_to_input_buffer_left_shifts: how much a value needs
  *      to be shifted in the left direction to support comprises with fixed
  *      point arithmetic
- * \return the end of the weight region as an absolute SDRAM memory address.
+ * \return the end of the weight region as an absolute SDRAM memory address;
+ *      if NULL, the initialisation failed.
  */
 address_t weight_initialise(
         address_t address, uint32_t n_synapse_types,

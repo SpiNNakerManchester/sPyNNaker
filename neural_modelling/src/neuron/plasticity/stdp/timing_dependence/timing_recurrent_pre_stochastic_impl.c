@@ -52,12 +52,11 @@ address_t timing_initialise(address_t address) {
             plasticity_trace_region_data.accumulator_potentiation_minus_one + 1);
 
     // Copy LUTs from following memory
-    // Copy LUTs from following memory
-        uint32_t word_size = STDP_FIXED_POINT_ONE / 2;
-        spin1_memcpy(pre_exp_dist_lookup, &address[2],
-                STDP_FIXED_POINT_ONE * sizeof(uint16_t));
-        spin1_memcpy(post_exp_dist_lookup, &address[2 + word_size],
-                STDP_FIXED_POINT_ONE * sizeof(uint16_t));
+    uint32_t word_size = STDP_FIXED_POINT_ONE / 2;
+    spin1_memcpy(pre_exp_dist_lookup, &address[2],
+            STDP_FIXED_POINT_ONE * sizeof(uint16_t));
+    spin1_memcpy(post_exp_dist_lookup, &address[2 + word_size],
+            STDP_FIXED_POINT_ONE * sizeof(uint16_t));
 
     log_debug("timing_initialise: completed successfully");
 
