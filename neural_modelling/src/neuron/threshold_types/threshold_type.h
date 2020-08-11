@@ -31,7 +31,7 @@ typedef struct threshold_type_t threshold_type_t;
 //! Pointer to a threshold type
 typedef threshold_type_t* threshold_type_pointer_t;
 
-//! \brief Determines if the value given is above the threshold value
+//! \brief Determine if the value given is above the threshold value
 //! \param[in] value: The value to determine if it is above the threshold
 //! \param[in] threshold_type: The parameters to use to determine the result
 //! \return True if the neuron should fire

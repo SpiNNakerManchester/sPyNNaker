@@ -109,15 +109,16 @@ typedef struct {
     uint32_t synapse_type;
 } current_state_t;
 
-//! Get a random unsigned integer up to (but not including) a given maximum
-//! \param[in] max The maximum value allowed
-//! \param[in] seed The random seed to use
+//! \brief Get a random unsigned integer up to (but not including) a given
+//!     maximum
+//! \param[in] max: The maximum value allowed
+//! \param[in] seed: The random seed to use
 //! \return The generated value
 static inline uint32_t rand_int(uint32_t max, mars_kiss64_seed_t seed) {
     return muliulr(max, ulrbits(mars_kiss64_seed(seed)));
 }
 
-//! \brief unpack the spike into key and identifying information for the
+//! \brief Unpack the spike into key and identifying information for the
 //!     neuron; Identify pop, sub-population and low and high atoms
 //! \param[in] pre_pop_info_table: The prepopulation information table
 //! \param[in] spike: The spike to look up the information from
@@ -181,7 +182,7 @@ static inline bool sp_structs_get_sub_pop_info(
     return false;
 }
 
-//! \brief Removes a synapse from the relevant structures
+//! \brief Remove a synapse from the relevant structures
 //! \param[in,out] current_state: Describes what is to be done
 //! \param[in,out] row: The row of the synaptic matrix to be updated
 //! \return True if the synapse was removed
@@ -194,7 +195,7 @@ static inline bool sp_structs_remove_synapse(
     return true;
 }
 
-//! \brief Adds a synapse to the relevant structures
+//! \brief Add a synapse to the relevant structures
 //! \param[in,out] current_state: Describes what is to be done
 //! \param[in,out] row: The row of the synaptic matrix to be updated
 //! \return True if the synapse was added

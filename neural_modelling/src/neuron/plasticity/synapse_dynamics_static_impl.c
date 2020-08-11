@@ -151,7 +151,7 @@ bool synapse_dynamics_remove_neuron(uint32_t offset, address_t row) {
     return true;
 }
 
-//! packing all of the information into the required static control word
+//! Pack all of the information into the required static control word
 static inline uint32_t _fixed_synapse_convert(
         uint32_t id, weight_t weight, uint32_t delay, uint32_t type) {
     uint32_t new_synapse = weight << (32 - SYNAPSE_WEIGHT_BITS);

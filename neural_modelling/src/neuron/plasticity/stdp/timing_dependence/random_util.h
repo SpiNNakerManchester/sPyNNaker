@@ -17,6 +17,8 @@
 
 //! \file
 //! \brief Utility function for random number generation
+//! \details Note that this function and its state are global to the included
+//!     file, but are local to that file.
 
 //! \brief **YUCK** copy and pasted RNG to allow inlining and also to avoid
 //!     horrific executable bloat.
@@ -27,7 +29,7 @@
 //! \return random number, uniformly distributed over range 0 ..
 //!     2<sup>::STDP_FIXED_POINT_ONE</sup>
 static inline int32_t mars_kiss_fixed_point(void) {
-    // **YUCK** copy and pasted rng to allow inlining and also to avoid
+    // **YUCK** copy and pasted RNG to allow inlining and also to avoid
     // horrific executable bloat
 
     /* Seed variables */

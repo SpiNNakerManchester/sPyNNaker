@@ -28,11 +28,12 @@
 #include <simulation.h>
 #include <spin1_api.h>
 
-//! values for the priority for each callback
+//! Tthe priority for each callback
 enum delay_extension_callback_priorities {
     MC_PACKET = -1, //!< multicast packet reception uses FIQ
-    SDP = 0,        //!< SDP handling is highest ordinary priority
-    USER = 1,       //!< User interrupt is next (clearing packet received queue)
+    SDP = 0,        //!< SDP handling is direct interrupt
+    USER = 1,       //!< User interrupt is highest queued priority (used for
+                    //!< clearing the packet received queue)
     DMA = 2,        //!< DMA complete handling is next
     TIMER = 3,      //!< Regular timer tick handling is lowest priority
 };
@@ -124,9 +125,7 @@ static uint32_t timer_period = 0;
 //---------------------------------------
 // Because we don't want to include string.h or strings.h for memset
 //! \brief Sets an array of counters to zero
-//!
-//! This is basically just bzero()
-//!
+//! \details This is basically just `bzero()`
 //! \param[out] counters: The array to zero
 //! \param[in] num_items: The size of the array
 static inline void zero_spike_counters(
@@ -297,10 +296,9 @@ static bool initialize(void) {
 
 // Callbacks
 //! \brief Handles incoming spikes (FIQ)
-//!
-//! Adds the spikes to the circular buffer handling spikes for later handling by
-//! ::spike_process()
-//!
+//! \details
+//!     Adds the spikes to the circular buffer handling spikes for later
+//!     handling by ::spike_process()
 //! \param[in] key: the key of the multicast message
 //! \param payload: ignored
 static void incoming_spike_callback(uint key, uint payload) {
@@ -321,8 +319,9 @@ static inline index_t key_n(key_t k) {
 }
 
 //! \brief Processes spikes queued by ::incoming_spike_callback()
-//!
-//! Note that this has to be fairly fast; it is processing with interrupts off.
+//! \details
+//!     Note that this has to be fairly fast; it is processing with interrupts
+//!     off.
 static inline void spike_process(void) {
     // turn off interrupts as this function is critical for
     // keeping time in sync.

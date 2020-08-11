@@ -38,7 +38,7 @@
 #include <neuron/synapse_row.h>
 
 /*!
- * \brief Initialises the weight aspect of an STDP rule.
+ * \brief Initialise the weight aspect of an STDP rule.
  * \param[in] address: the absolute address in SRAM where the weight parameters
  *      are stored.
  * \param[in] n_synapse_types: The number of synapse types
@@ -53,7 +53,7 @@ address_t weight_initialise(
         uint32_t *ring_buffer_to_input_buffer_left_shifts);
 
 /*!
- * \brief Gets the initial weight state.
+ * \brief Prepare the initial weight state.
  * \param[in] weight: The weight at the start
  * \param[in] synapse_type: The type of synapse involved
  * \return The initial weight state.
@@ -61,7 +61,7 @@ address_t weight_initialise(
 static weight_state_t weight_get_initial(weight_t weight, index_t synapse_type);
 
 /*!
- * \brief Gets the final weight.
+ * \brief Compute the final weight.
  * \param[in] new_state: The updated weight state
  * \return The new weight.
  */

@@ -75,7 +75,7 @@ typedef enum {
 // Synapse shaping inline implementation
 //---------------------------------------
 
-//! \brief Applies alpha shaping to a parameter
+//! \brief Apply alpha shaping to a parameter
 //! \param[in,out] a_params: The parameter to shape
 static inline void alpha_shaping(alpha_params_t* a_params) {
     a_params->lin_buff = a_params->lin_buff + (
@@ -85,13 +85,12 @@ static inline void alpha_shaping(alpha_params_t* a_params) {
     a_params->exp_buff = decay_s1615(a_params->exp_buff, a_params->decay);
 }
 
-//! \brief decays the stuff thats sitting in the input buffers as these have not
+//! \brief Decay the stuff thats sitting in the input buffers as these have not
 //!     yet been processed and applied to the neuron.
-//!
-//! This is to compensate for the valve behaviour of a synapse in biology
-//! (spike goes in, synapse opens, then closes slowly)
-//! plus the leaky aspect of a neuron.
-//!
+//! \details
+//!     This is to compensate for the valve behaviour of a synapse in biology
+//!     (spike goes in, synapse opens, then closes slowly)
+//!     plus the leaky aspect of a neuron.
 //! \param[in,out] parameters: the parameters to update
 static inline void synapse_types_shape_input(
 		synapse_param_t *parameters) {
@@ -105,8 +104,7 @@ static inline void synapse_types_shape_input(
 #endif
 }
 
-//! \brief helper function to add input for a given timer period to a given
-//!     neuron
+//! \brief Add input for a given timer period to a given neuron
 //! \param[in] a_params: the parameter to update
 //! \param[in] input: the input to add.
 static inline void add_input_alpha(alpha_params_t *a_params, input_t input) {
@@ -120,7 +118,7 @@ static inline void add_input_alpha(alpha_params_t *a_params, input_t input) {
             * (ONE - ONE/a_params->exp_buff);
 }
 
-//! \brief adds the inputs for a give timer period to a given neuron that is
+//! \brief Add the inputs for a give timer period to a given neuron that is
 //!     being simulated by this model
 //! \details Add input from ring buffer. Zero if no spikes, otherwise one or
 //!     more weights
@@ -143,7 +141,7 @@ static inline void synapse_types_add_neuron_input(
     }
 }
 
-//! \brief extracts the excitatory input buffers from the buffers available
+//! \brief Extract the excitatory input buffers from the buffers available
 //!     for a given neuron ID
 //! \param[in] parameters: the pointer to the parameters to use
 //! \return Pointer to array of excitatory input buffers for a given neuron ID.
@@ -154,7 +152,7 @@ static inline input_t* synapse_types_get_excitatory_input(
     return &excitatory_response[0];
 }
 
-//! \brief extracts the inhibitory input buffers from the buffers available
+//! \brief Extract the inhibitory input buffers from the buffers available
 //!     for a given neuron ID
 //! \param[in] parameters: the pointer to the parameters to use
 //! \return Pointer to array of inhibitory input buffers for a given neuron ID.
@@ -165,7 +163,7 @@ static inline input_t* synapse_types_get_inhibitory_input(
     return &inhibitory_response[0];
 }
 
-//! \brief returns a human readable character for the type of synapse.
+//! \brief Get a human readable character for the type of synapse.
 //! \details Examples would be `X` = excitatory types, `I` = inhibitory types,
 //!     etc.
 //! \param[in] synapse_type_index: the synapse type index
@@ -184,7 +182,7 @@ static inline const char *synapse_types_get_type_char(
     }
 }
 
-//! \brief prints the input for a neuron ID given the available inputs
+//! \brief Print the input for a neuron ID given the available inputs
 //!     currently only executed when the models are in debug mode, as the prints
 //!     are controlled from the synapses.c print_inputs() method.
 //! \param[in] parameters: the pointer to the parameters to print
@@ -195,7 +193,7 @@ static inline void synapse_types_print_input(
             parameters->inh.lin_buff * parameters->inh.exp_buff);
 }
 
-//! \brief prints the parameters of the synapse type
+//! \brief Print the synapse type model parameters
 //! \param[in] parameters: the pointer to the parameters to print
 static inline void synapse_types_print_parameters(synapse_param_t *parameters) {
     log_debug("-------------------------------------\n");

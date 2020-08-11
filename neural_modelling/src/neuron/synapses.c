@@ -77,7 +77,7 @@ static uint32_t synapse_type_mask;
 /* PRIVATE FUNCTIONS */
 
 #if LOG_LEVEL >= LOG_DEBUG
-//! \brief get the synapse type character
+//! \brief Get the synapse type character
 //! \param[in] synapse_type: the synapse type
 //! \return a single character string describing the synapse type
 static inline const char *get_type_char(uint32_t synapse_type) {
@@ -86,8 +86,7 @@ static inline const char *get_type_char(uint32_t synapse_type) {
 #endif // LOG_LEVEL >= LOG_DEBUG
 
 //! \brief Print a synaptic row.
-//!
-//! Only does anything when debugging.
+//! \details Only does anything when debugging.
 //! \param[in] synaptic_row: The synaptic row to print
 static inline void print_synaptic_row(synaptic_row_t synaptic_row) {
 #if LOG_LEVEL >= LOG_DEBUG
@@ -142,8 +141,7 @@ static inline void print_synaptic_row(synaptic_row_t synaptic_row) {
 }
 
 //! \brief Print the contents of the ring buffers.
-//!
-//! Only does anything when debugging.
+//! \details Only does anything when debugging.
 //! \param[in] time: The current timestamp
 static inline void print_ring_buffers(uint32_t time) {
 #if LOG_LEVEL >= LOG_DEBUG
@@ -181,8 +179,7 @@ static inline void print_ring_buffers(uint32_t time) {
 }
 
 //! \brief Print the neuron inputs.
-//!
-//! Only does anything when debugging.
+//! \details Only does anything when debugging.
 static inline void print_inputs(void) {
 #if LOG_LEVEL >= LOG_DEBUG
     log_debug("Inputs\n");
@@ -192,9 +189,8 @@ static inline void print_inputs(void) {
 
 
 //! \brief This is the "inner loop" of the neural simulation.
-//!
-//! Every spike event could cause up to 256 different weights to
-//! be put into the ring buffer.
+//! \details Every spike event could cause up to 256 different weights to
+//!     be put into the ring buffer.
 //! \param[in] fixed_region_address: The fixed region of the synaptic matrix
 //! \param[in] time: The current simulation time
 static inline void process_fixed_synapses(
@@ -241,7 +237,7 @@ static inline void process_fixed_synapses(
     }
 }
 
-//! private method for doing output debug data on the synapses
+//! Print output debug data on the synapses
 static inline void print_synapse_parameters(void) {
 // only if the models are compiled in debug mode will this method contain
 // said lines.
@@ -386,16 +382,15 @@ bool synapses_process_synaptic_row(
     return true;
 }
 
-//! \brief returns the number of times the synapses have saturated their
-//!        weights.
+//! \brief Get the number of times the synapses have saturated their weights.
 //! \return the number of times the synapses have saturated.
 uint32_t synapses_get_saturation_count(void) {
     return saturation_count;
 }
 
-//! \brief returns the counters for plastic and fixed pre synaptic events
-//! based on (if the model was compiled with SYNAPSE_BENCHMARK parameter) or
-//! returns 0
+//! \brief Get the counters for plastic and fixed pre synaptic events based on
+//!     (if the model was compiled with SYNAPSE_BENCHMARK parameter) or
+//!     returns 0
 //! \return the counter for plastic and fixed pre synaptic events or 0
 uint32_t synapses_get_pre_synaptic_events(void) {
     return (num_fixed_pre_synaptic_events +
@@ -408,7 +403,7 @@ void synapses_flush_ring_buffers(void) {
     }
 }
 
-//! \brief allows clearing of DTCM used by synapses
+//! \brief Clear DTCM used by synapses
 //! \return true if successful
 bool synapses_shut_down(void) {
     sark_free(ring_buffer_to_input_left_shifts);

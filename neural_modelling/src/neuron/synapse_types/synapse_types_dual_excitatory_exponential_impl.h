@@ -79,7 +79,7 @@ typedef enum {
 // Synapse shaping inline implementation
 //---------------------------------------
 
-//! \brief Shapes a single parameter
+//! \brief Shape a single parameter
 //! \param[in,out] exp_param: The parameter to shape
 static inline void exp_shaping(exp_params_t *exp_param) {
     // decay value according to decay constant
@@ -87,13 +87,12 @@ static inline void exp_shaping(exp_params_t *exp_param) {
 			decay_s1615(exp_param->synaptic_input_value, exp_param->decay);
 }
 
-//! \brief decays the stuff thats sitting in the input buffers as these have not
-//! yet been processed and applied to the neuron.
-//!
-//! This is to compensate for the valve behaviour of a synapse in biology (spike
-//! goes in, synapse opens, then closes slowly) plus the leaky aspect of a
-//! neuron.
-//!
+//! \brief Decay the stuff thats sitting in the input buffers as these have not
+//!     yet been processed and applied to the neuron.
+//! \details
+//!     This is to compensate for the valve behaviour of a synapse in biology
+//!     (spike goes in, synapse opens, then closes slowly) plus the leaky
+//!     aspect of a neuron.
 //! \param[in,out] parameters: the parameters to update
 static inline void synapse_types_shape_input(synapse_param_t *parameters) {
 	exp_shaping(&parameters->exc);
@@ -101,8 +100,7 @@ static inline void synapse_types_shape_input(synapse_param_t *parameters) {
 	exp_shaping(&parameters->inh);
 }
 
-//! \brief helper function to add input for a given timer period to a given
-//!     neuron
+//! \brief Add input for a given timer period to a given neuron
 //! \param[in,out] exp_param: the parameter to be updated
 //! \param[in] input: the input to add.
 static inline void add_input_exp(exp_params_t *exp_param, input_t input) {
@@ -110,7 +108,7 @@ static inline void add_input_exp(exp_params_t *exp_param, input_t input) {
 			decay_s1615(input, exp_param->init);
 }
 
-//! \brief adds the inputs for a give timer period to a given neuron that is
+//! \brief Add the inputs for a give timer period to a given neuron that is
 //!     being simulated by this model
 //! \param[in] synapse_type_index: the type of input that this input is to be
 //!     considered (aka excitatory or inhibitory etc)
@@ -132,7 +130,7 @@ static inline void synapse_types_add_neuron_input(
     }
 }
 
-//! \brief extracts the excitatory input buffers from the buffers available
+//! \brief Extract the excitatory input buffers from the buffers available
 //!     for a given parameter set
 //! \param[in] parameters: the pointer to the parameters to use
 //! \return the excitatory input buffers for a given neuron ID.
@@ -143,7 +141,7 @@ static inline input_t* synapse_types_get_excitatory_input(
     return &excitatory_response[0];
 }
 
-//! \brief extracts the inhibitory input buffers from the buffers available
+//! \brief Extract the inhibitory input buffers from the buffers available
 //!     for a given parameter set
 //! \param[in] parameters: the pointer to the parameters to use
 //! \return the inhibitory input buffers for a given neuron ID.
@@ -153,11 +151,12 @@ static inline input_t* synapse_types_get_inhibitory_input(
     return &inhibitory_response[0];
 }
 
-//! \brief returns a human readable character for the type of synapse.
-//!     examples would be X = excitatory types, I = inhibitory types etc etc.
+//! \brief Get a human readable string for the type of synapse.
+//! \details
+//!     Examples would be `X` = excitatory types, `I` = inhibitory types, etc.
 //! \param[in] synapse_type_index: the synapse type index
 //!     (there is a specific index interpretation in each synapse type)
-//! \return a human readable character representing the synapse type.
+//! \return a human readable short string representing the synapse type.
 static inline const char *synapse_types_get_type_char(
         index_t synapse_type_index) {
     switch (synapse_type_index) {
@@ -173,7 +172,7 @@ static inline const char *synapse_types_get_type_char(
     }
 }
 
-//! \brief prints the input for a neuron ID given the available inputs
+//! \brief Print the input for a neuron ID given the available inputs
 //!     currently only executed when the models are in debug mode, as the prints
 //!     are controlled from the synapses.c print_inputs() method.
 //! \param[in] parameters: the pointer to the parameters to use
@@ -185,7 +184,7 @@ static inline void synapse_types_print_input(
             parameters->inh.synaptic_input_value);
 }
 
-//! \brief printer call
+//! \brief Print the synapse type model parameters
 //! \param[in] parameters: the pointer to the parameters to print
 static inline void synapse_types_print_parameters(
         synapse_param_t *parameters) {

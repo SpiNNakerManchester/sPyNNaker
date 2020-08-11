@@ -36,7 +36,7 @@ bool synapse_dynamics_initialise(
         address_t address, uint32_t n_neurons, uint32_t n_synapse_types,
         uint32_t *ring_buffer_to_input_buffer_left_shifts);
 
-//! \brief Processes the dynamics of the synapses
+//! \brief Process the dynamics of the synapses
 //! \param[in,out] plastic_region_address: Where the plastic data is
 //! \param[in] fixed_region_address: Where the fixed data is
 //! \param[in,out] ring_buffers: The ring buffers
@@ -46,7 +46,7 @@ bool synapse_dynamics_process_plastic_synapses(
         address_t plastic_region_address, address_t fixed_region_address,
         weight_t *ring_buffers, uint32_t time);
 
-//! \brief Informs the synapses that the neuron fired
+//! \brief Inform the synapses that the neuron fired
 //! \param[in] time: The current simulation time
 //! \param[in] neuron_index: Which neuron are we processing
 void synapse_dynamics_process_post_synaptic_event(
@@ -68,12 +68,13 @@ void synapse_dynamics_print_plastic_synapses(
         address_t plastic_region_address, address_t fixed_region_address,
         uint32_t *ring_buffer_to_input_buffer_left_shifts);
 
-//! \brief returns the counters for plastic pre synaptic events based on (if
-//!     the model was compiled with SYNAPSE_BENCHMARK parameter) or returns 0
+//! \brief Get the counters for plastic pre-synaptic events based on (if
+//!     the model was compiled with `SYNAPSE_BENCHMARK` parameter defined) or
+//!     returns 0
 //! \return counters for plastic pre synaptic events or 0
 uint32_t synapse_dynamics_get_plastic_pre_synaptic_events(void);
 
-//! \brief returns the number of ring buffer saturation events due to adding
+//! \brief Get the number of ring buffer saturation events due to adding
 //!     plastic weights.
 //! \return counter for saturation events or 0
 uint32_t synapse_dynamics_get_plastic_saturation_count(void);
@@ -82,7 +83,7 @@ uint32_t synapse_dynamics_get_plastic_saturation_count(void);
 // Synaptic rewiring functions
 //-----------------------------------------------------------------------------
 
-//! \brief Searches the synaptic row for the the connection with the
+//! \brief Search the synaptic row for the the connection with the
 //!     specified post-synaptic ID
 //! \param[in] id: the (core-local) ID of the neuron to search for in the
 //!     synaptic row

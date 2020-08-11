@@ -25,15 +25,15 @@
 #include <common/neuron-typedefs.h>
 #include <bit_field.h>
 
-//! \brief Sets up the table
+//! \brief Set up the table
 //! \param[in] table_address: The address of the start of the table data
-//! \param[in] synapse_rows_address: The address of the start of the synapse
-//!                                  data
-//! \param[in] direct_rows_address: The address of the start of the direct
-//!                                 synapse data
-//! \param[out] row_max_n_words: Updated with the maximum length of any row in
-//!                              the table in words
-//! \return True if the table was initialised successfully, False otherwise
+//! \param[in] synapse_rows_address:
+//!     The address of the start of the synapse data
+//! \param[in] direct_rows_address:
+//!     The address of the start of the direct synapse data
+//! \param[out] row_max_n_words:
+//!     Updated with the maximum length of any row in the table in words
+//! \return True if the table was initialised successfully, false otherwise
 bool population_table_initialise(
         address_t table_address, address_t synapse_rows_address,
         address_t direct_rows_address, uint32_t *row_max_n_words);
@@ -41,8 +41,9 @@ bool population_table_initialise(
 //! \brief Get the first row data for the given input spike
 //! \param[in] spike: The spike received
 //! \param[out] row_address: Updated with the address of the row
-//! \param[out] n_bytes_to_transfer: Updated with the number of bytes to read
-//! \return True if there is a row to read, False if not
+//! \param[out] n_bytes_to_transfer: Updated with the number of bytes to read;
+//!     zero means that the address is actually a direct row address.
+//! \return True if there is a row to read, false if not
 bool population_table_get_first_address(
         spike_t spike, address_t* row_address, size_t* n_bytes_to_transfer);
 
@@ -52,19 +53,20 @@ bool population_table_get_first_address(
 int population_table_position_in_the_master_pop_array(spike_t spike);
 
 //! \brief Get the next row data for a previously given spike.  If no spike has
-//!        been given, return False.
+//!     been given, return False.
 //! \param[out] spike: The initiating spike
 //! \param[out] row_address: Updated with the address of the row
-//! \param[out] n_bytes_to_transfer: Updated with the number of bytes to read
-//! \return True if there is a row to read, False if not
+//! \param[out] n_bytes_to_transfer: Updated with the number of bytes to read;
+//!     zero means that the address is actually a direct row address.
+//! \return True if there is a row to read, false if not
 bool population_table_get_next_address(
         spike_t *spike, address_t* row_address, size_t* n_bytes_to_transfer);
 
-//! \brief Reports how many DMAs were pointless
+//! \brief Report how many DMAs were pointless
 //! \return How many were done that were not required
 uint32_t population_table_get_ghost_pop_table_searches(void);
 
-//! \brief Sets the connectivity lookup map.
+//! \brief Set the connectivity lookup map.
 //! \param[in] connectivity_bit_fields: the connectivity lookup bitfield
 void population_table_set_connectivity_bit_field(
         bit_field_t* connectivity_bit_fields);
@@ -73,7 +75,7 @@ void population_table_set_connectivity_bit_field(
 //! \return the number of master pop table key misses
 uint32_t population_table_get_invalid_master_pop_hits(void);
 
-//! \brief Clears the DTCM allocated by the population table.
+//! \brief Clear the DTCM allocated by the population table.
 //! \return If the clearing was successful or not.
 bool population_table_shut_down(void);
 

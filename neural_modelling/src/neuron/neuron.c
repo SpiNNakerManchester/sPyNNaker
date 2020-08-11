@@ -59,10 +59,10 @@ struct neuron_parameters {
 #define START_OF_GLOBAL_PARAMETERS \
     (sizeof(struct neuron_parameters) / sizeof(uint32_t))
 
-//! \brief does the memory copy for the neuron parameters
+//! \brief Copy the neuron parameters into working memory
 //! \param[in] address: the address where the neuron parameters are stored
 //!     in SDRAM
-//! \return bool which is true if the mem copy's worked, false otherwise
+//! \return true if the memory copies worked, false otherwise
 static bool neuron_load_neuron_parameters(address_t address) {
     log_debug("loading parameters");
     // call the neuron implementation functions to do the work

@@ -21,7 +21,7 @@
 #define _SYNAPSE_STRUCTURE_WEIGHT_STATE_ACCUMULATOR_WINDOW_H_
 
 //! \brief Plastic synapse contains normal 16-bit weight, a small state machine,
-//! an accumulator, and the size of the relevance window
+//!     an accumulator, and the size of the relevance window
 typedef struct plastic_synapse_t {
     unsigned int weight : 16;        //!< The weight
     int accumulator : 4;             //!< The accumulator
@@ -29,8 +29,8 @@ typedef struct plastic_synapse_t {
     unsigned int window_length : 10; //!< The window length
 } plastic_synapse_t;
 
-//! The update state is a weight state with 32-bit ARM-friendly versions of the
-//! accumulator, state and window length
+//! \brief The update state is a weight state with 32-bit ARM-friendly versions
+//!     of the accumulator, state and window length
 typedef struct update_state_t {
     weight_state_t weight_state; //!< The weight state
 
