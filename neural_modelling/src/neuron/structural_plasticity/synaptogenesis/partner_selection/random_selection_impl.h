@@ -39,11 +39,13 @@ static inline void partner_spike_received(uint32_t time, spike_t spike) {
 //! \param[in] n_id: The neuron ID
 //! \return The ID of the subpopulation containing that neuron ID
 static inline uint32_t pick_subpopulation(
-        const pre_info_t *restrict preapppop_info, uint32_t n_id) {
+        const pre_info_t *restrict preapppop_info, uint32_t *restrict n_id) {
     uint32_t sum = 0;
     for (uint32_t i = 0; i < preapppop_info->no_pre_vertices; i++) {
+        uint32_t current_sum = sum;
         sum += preapppop_info->key_atom_info[i].n_atoms;
-        if (sum >= n_id) {
+        if (sum >= *n_id) {
+            *n_id -= current_sum;
             return i;
         }
     }
@@ -75,13 +77,9 @@ static inline bool potential_presynaptic_partner(
     // Select presynaptic sub-population
     uint32_t n_id = rand_int(preapppop_info->total_no_atoms,
             rewiring_data.local_seed);
-    uint32_t subpop_id = pick_subpopulation(preapppop_info, n_id);
+    uint32_t subpop_id = pick_subpopulation(preapppop_info, &n_id);
     *sub_population_id = subpop_id;
     const key_atom_info_t *kai = &preapppop_info->key_atom_info[subpop_id];
-
-    // Select a presynaptic neuron ID
-    n_id = rand_int(kai->n_atoms, rewiring_data.local_seed);
-
     *neuron_id = n_id;
     *spike = kai->key | n_id;
     *m_pop_index = kai->m_pop_index;
