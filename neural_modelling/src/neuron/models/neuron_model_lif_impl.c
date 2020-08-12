@@ -34,9 +34,6 @@ static inline void lif_neuron_closed_form(
     // accum -  (ufract * (accum - accum))
     // RD
     neuron->V_membrane = alpha - (neuron->exp_TC * (alpha - V_prev));
-    // SR
-//    neuron->V_membrane = alpha - MULT_ROUND_STOCHASTIC_ACCUM(
-//        neuron->exp_TC, (alpha - V_prev));
 }
 
 void neuron_model_set_global_neuron_params(
