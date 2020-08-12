@@ -27,7 +27,7 @@
 #include <synapse_expander/generator_types.h>
 
 /**
- * \brief How to initialise the static synaptic matrix generator
+ * \brief Initialise the static synaptic matrix generator
  * \param[in,out] region: Region to read parameters from.  Should be updated
  *                        to position just after parameters after calling.
  * \return A data item to be passed in to other functions later on
@@ -38,7 +38,7 @@ static void *matrix_generator_static_initialize(address_t *region) {
 }
 
 /**
- * \brief How to free any data for the static synaptic matrix generator
+ * \brief Free any data for the static synaptic matrix generator
  * \param[in] generator: The data to free
  */
 static void matrix_generator_static_free(void *generator) {
@@ -106,17 +106,17 @@ static uint32_t build_static_word(
 }
 
 /**
- * \brief How to generate a row of a static synaptic matrix
- * \param[in] generator: The data for the matrix generator, returned by the
- *                       initialise function
+ * \brief How Generate a row of a static synaptic matrix
+ * \param[in] generator:
+ *      The data for the matrix generator, returned by the initialise function
  * \param[out] synaptic_matrix: The address of the synaptic matrix to write to
- * \param[out] delayed_synaptic_matrix: The address of the synaptic matrix to
- *                                      write delayed connections to
+ * \param[out] delayed_synaptic_matrix:
+ *      The address of the synaptic matrix to write delayed connections to
  * \param[in] n_pre_neurons: The number of pre neurons to generate for
  * \param[in] pre_neuron_index: The index of the first pre neuron
  * \param[in] max_row_n_words: The maximum number of words in a normal row
- * \param[in] max_delayed_row_n_words: The maximum number of words in a
- *                                     delayed row
+ * \param[in] max_delayed_row_n_words:
+ *      The maximum number of words in a delayed row
  * \param[in] synapse_type_bits: The number of bits used for the synapse type
  * \param[in] synapse_index_bits: The number of bits used for the neuron id
  * \param[in] synapse_type: The synapse type of each connection
