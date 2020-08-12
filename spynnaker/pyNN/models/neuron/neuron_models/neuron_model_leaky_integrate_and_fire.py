@@ -54,7 +54,7 @@ class NeuronModelLeakyIntegrateAndFire(AbstractNeuronModel):
             [DataType.S1615,   # v
              DataType.S1615,   # v_rest
              DataType.S1615,   # r_membrane (= tau_m / cm)
-             DataType.S1615,   # exp_tc (= e^(-ts / tau_m))
+             DataType.U032,   # exp_tc (= e^(-ts / tau_m))
              DataType.S1615,   # i_offset
              DataType.INT32,   # count_refrac
              DataType.S1615,   # v_reset
