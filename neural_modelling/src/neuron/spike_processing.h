@@ -76,7 +76,8 @@ bool spike_processing_do_rewiring(int number_of_rewires);
 uint32_t spike_processing_get_n_packets_dropped_from_lateness(void);
 
 //! \brief clears the input buffer of packets
-void spike_processing_clear_input_buffer(void);
+//! \param[in] time: The current timestep
+void spike_processing_clear_input_buffer(timer_t time);
 
 //! \brief returns how many packets were at max inside the input buffer at
 //! any given point.

@@ -103,7 +103,10 @@ static uint32_t biggest_fill_size_of_input_buffer;
 static bool clear_input_buffers_of_late_packets;
 
 //! the number of packets received this time step
-static uint32_t packets_this_time_step;
+static struct {
+    uint32_t time;
+    uint32_t packets_this_time_step;
+} p_per_ts_struct;
 
 //! the region to record the packets per timestep in
 static uint32_t p_per_ts_region;
@@ -288,7 +291,7 @@ static inline void setup_synaptic_dma_write(
 //! \param[in] key: The key of the packet. The spike.
 //! \param payload: the payload of the packet. The count.
 static void multicast_packet_received_callback(uint key, uint payload) {
-    packets_this_time_step += 1;
+    p_per_ts_struct.packets_this_time_step += 1;
 
     // handle the 2 cases separately
     if (payload == 0) {
@@ -415,11 +418,12 @@ void user_event_callback(uint unused0, uint unused1) {
 /* INTERFACE FUNCTIONS - cannot be static */
 
 //! \brief clears the input buffer of packets and records them
-void spike_processing_clear_input_buffer(void) {
+void spike_processing_clear_input_buffer(timer_t time) {
 
     // Record the number of packets received last timer tick
-    recording_record(p_per_ts_region, &packets_this_time_step, sizeof(uint32_t));
-    packets_this_time_step = 0;
+    p_per_ts_struct.time = time;
+    recording_record(p_per_ts_region, &p_per_ts_struct, sizeof(p_per_ts_struct));
+    p_per_ts_struct.packets_this_time_step = 0;
 
     // Record the count whether clearing or not for provenance
     count_input_buffer_packets_late += in_spikes_size();

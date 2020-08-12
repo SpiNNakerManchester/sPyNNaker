@@ -329,7 +329,7 @@ void synapses_do_timestep_update(timer_t time) {
     uint32_t state = spin1_irq_disable();
 
     // Clear any outstanding spikes
-    spike_processing_clear_input_buffer();
+    spike_processing_clear_input_buffer(time);
 
     // Transfer the input from the ring buffers into the input buffers
     for (uint32_t neuron_index = 0; neuron_index < n_neurons;
