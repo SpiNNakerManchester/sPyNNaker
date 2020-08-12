@@ -41,6 +41,7 @@
 #include <neuron/decay.h>
 #include <debug.h>
 #include "synapse_types.h"
+#include "round.h"
 
 
 //---------------------------------------
@@ -77,9 +78,14 @@ typedef enum input_buffer_regions {
 //! \param[in]  parameter: the pointer to the parameters to use
 //! \return nothing
 static inline void exp_shaping(exp_params_t* exp_params) {
+    // RTN
     // decay value according to decay constant
+//	exp_params->synaptic_input_value =
+//			decay_s1615(exp_params->synaptic_input_value,
+//					exp_params->decay);
+
 	exp_params->synaptic_input_value =
-			decay_s1615(exp_params->synaptic_input_value,
+			MULT_ROUND_NEAREST_ACCUM(exp_params->synaptic_input_value,
 					exp_params->decay);
 }
 
@@ -95,8 +101,11 @@ static inline void synapse_types_shape_input(
 //! \param[in] input the inputs to add.
 //! \return None
 static inline void add_input_exp(exp_params_t* exp_params, input_t input) {
+    // RTN
+//	exp_params->synaptic_input_value = exp_params->synaptic_input_value +
+//			decay_s1615(input, exp_params->init);
 	exp_params->synaptic_input_value = exp_params->synaptic_input_value +
-			decay_s1615(input, exp_params->init);
+			MULT_ROUND_NEAREST_ACCUM(input, exp_params->init);
 }
 
 //! \brief adds the inputs for a give timer period to a given neuron that is
