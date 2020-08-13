@@ -33,6 +33,15 @@
 //!     shouldn't happen)
 #define NOT_IN_MASTER_POP_TABLE_FLAG -1
 
+//! \brief The number of bits of address.
+//!        This is a constant as it is used more than once below.
+#define N_ADDRESS_BITS 23
+
+//! \brief The shift to apply to indirect addresses.
+//!    The address is in units of four words, so this multiplies by 16 (= up
+//!    shifts by 4)
+#define INDIRECT_ADDRESS_SHIFT 4
+
 //! \brief An entry in the master population table.
 typedef struct master_population_table_entry {
     //! The key to match against the incoming message
@@ -57,13 +66,12 @@ typedef struct extra_info {
     uint32_t n_neurons: 11;
 } extra_info;
 
-
 //! \brief A packed address and row length (note: same size as extra info)
 typedef struct {
     //! the length of the row
     uint32_t row_length : 8;
     //! the address
-    uint32_t address : 23;
+    uint32_t address : N_ADDRESS_BITS;
     //! whether this is a direct/single address
     uint32_t is_single : 1;
 } address_and_row_length;
@@ -77,7 +85,7 @@ typedef union {
 
 // An Invalid address and row length; used to keep indices aligned between
 // delayed and undelayed tables
-#define INVALID_ADDRESS ((1 << 23) - 1)
+#define INVALID_ADDRESS ((1 << N_ADDRESS_BITS) - 1)
 
 //! The master population table. This is sorted.
 static master_population_table_entry *master_population_table;
@@ -143,7 +151,7 @@ static inline uint32_t get_direct_address(address_and_row_length entry) {
 //! \param[in] entry: the table entry
 //! \return a row address (which is an offset)
 static inline uint32_t get_offset(address_and_row_length entry) {
-    return entry.address << 4;
+    return entry.address << INDIRECT_ADDRESS_SHIFT;
 }
 
 //! \brief Get the standard address out of an entry
@@ -235,7 +243,17 @@ static inline uint32_t get_local_neuron_id(
 //! \return the source neuron id
 static inline uint32_t get_extended_neuron_id(
         master_population_table_entry entry, extra_info extra, spike_t spike) {
-    return get_local_neuron_id(entry, extra, spike) + get_core_sum(extra, spike);
+    uint32_t local_neuron_id = get_local_neuron_id(entry, extra, spike);
+    uint32_t neuron_id = local_neuron_id + get_core_sum(extra, spike);
+#ifdef DEBUG
+    uint32_t n_neurons = get_n_neurons(extra);
+    if (local_neuron_id > n_neurons) {
+        log_error("Spike %u is outside of expected neuron id range"
+            "(neuron id %u of maximum %u)", spike, local_neuron_id, n_neurons);
+        rt_error(RTE_SWERR);
+    }
+#endif
+    return neuron_id;
 }
 
 //! \brief Prints the master pop table.
@@ -335,6 +353,14 @@ bool population_table_initialise(
     return true;
 }
 
+#ifndef DEBUG
+static inline check_extended_neuron_ids(master_population_table_entry entry,
+        extra_info extra, uint32_t spike) {
+
+}
+#else
+#endif
+
 bool population_table_get_first_address(
         spike_t spike, address_t* row_address, size_t* n_bytes_to_transfer) {
     // locate the position in the binary search / array
@@ -364,15 +390,6 @@ bool population_table_get_first_address(
     if (is_extended(entry)) {
         extra_info extra = address_list[next_item++].extra;
         last_neuron_id = get_extended_neuron_id(entry, extra, spike);
-#ifdef DEBUG
-        uint32_t n_neurons = get_n_neurons(extra);
-        uint32_t local_neuron_id = get_local_neuron_id(entry, extra, spike);
-        if (local_neuron_id > n_neurons) {
-            log_error("Spike %u is outside of expected neuron id range"
-                "(neuron id %u of maximum %u)", spike, last_neuron_id, n_neurons);
-            rt_error(RTE_SWERR);
-        }
-#endif // DEBUG
     } else {
         last_neuron_id = get_neuron_id(entry, spike);
     }

@@ -173,7 +173,7 @@ class SynapticMatrix(object):
                 "Found delayed source IDs but no delay "
                 "edge for {}".format(self.__app_edge.label))
 
-        return (row_data, delayed_row_data)
+        return row_data, delayed_row_data
 
     def write_machine_matrix(
             self, spec, block_addr, single_synapses, single_addr, row_data):

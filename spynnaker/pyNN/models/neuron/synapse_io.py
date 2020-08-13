@@ -633,7 +633,7 @@ class SynapseIORowBased(object):
             i // pre_vertex_slice.n_atoms
             for i in synapse_ids], dtype="uint32")
         # Work out the delay for each stage
-        row_min_delay = (row_stage + 1) * 16
+        row_min_delay = (row_stage + 1) * MAX_SUPPORTED_DELAY_TICS
         # Repeat the delay for all connections in the same row
         connection_min_delay = numpy.concatenate([
             numpy.repeat(row_min_delay[i], n_synapses[i])

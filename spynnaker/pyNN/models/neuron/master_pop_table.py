@@ -16,12 +16,13 @@ from __future__ import division
 import logging
 import math
 import numpy
+import ctypes
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 from spynnaker.pyNN.exceptions import (
     SynapseRowTooBigException, SynapticConfigurationException)
 from spynnaker.pyNN.utilities.constants import (
     POPULATION_BASED_REGIONS, POP_TABLE_MAX_ROW_LENGTH)
-import ctypes
 
 logger = logging.getLogger(__name__)
 
@@ -31,6 +32,12 @@ _ADDRESS_SCALE = 16
 
 # A padding byte
 _PADDING_BYTE = 0xDD
+
+# Bits in a byte
+_BITS_PER_BYTES = 8
+
+# ctypes stores the number of bits in a bitfield in the top 16 bits
+_CTYPES_N_BITS_SHIFT = 16
 
 
 def _n_bits(field):
@@ -42,13 +49,13 @@ def _n_bits(field):
     """
     # ctypes stores the number of bits in a bitfield in the top 16 bits;
     # if it isn't a bitfield, this is 0
-    n_bits = field.size >> 16
+    n_bits = field.size >> _CTYPES_N_BITS_SHIFT
     if n_bits:
         return n_bits
 
     # If it isn't a bitfield, the number of bits is the field size (which is
     # then in bytes) multiplied by 8 (bits in a byte)
-    return 8 * field.size
+    return _BITS_PER_BYTES * field.size
 
 
 def _make_array(ctype, n_items):
@@ -141,6 +148,7 @@ _EXTRA_INFO_ENTRY_SIZE_BYTES = ctypes.sizeof(_ExtraInfoCType)
 
 # Base size - 2 words for size of table and address list
 _BASE_SIZE_BYTES = 8
+
 # Over-scale of estimate for safety
 _OVERSCALE = 2
 
@@ -162,7 +170,7 @@ def _to_numpy(array):
         return numpy.zeros(0, dtype="uint32")
 
     uint32_array = ctypes.cast(array, _UINT32_PTR)
-    n_words = (len(array) * ctypes.sizeof(array[0])) // 4
+    n_words = (len(array) * ctypes.sizeof(array[0])) // BYTES_PER_WORD
     return numpy.ctypeslib.as_array(uint32_array, (n_words,))
 
 

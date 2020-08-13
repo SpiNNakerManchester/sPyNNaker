@@ -296,7 +296,7 @@ class SynapticManager(object):
             self, post_vertex_slice, application_graph, app_vertex):
         """ Get the SDRAM usage of a slice of atoms of this vertex
 
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
             The slice of atoms to get the size of
         :param ~pacman.model.graphs.application.ApplicationGraph \
                 application_graph: The application graph

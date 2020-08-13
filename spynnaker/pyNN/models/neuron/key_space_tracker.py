@@ -13,6 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from pacman.utilities.algorithm_utilities import ElementAllocatorAlgorithm
+from pacman.utilities.constants import FULL_MASK, BITS_IN_KEY
 
 
 class KeySpaceTracker(ElementAllocatorAlgorithm):
@@ -20,7 +21,7 @@ class KeySpaceTracker(ElementAllocatorAlgorithm):
     """
 
     def __init__(self):
-        super(KeySpaceTracker, self).__init__(0, (2**32 - 1))
+        super(KeySpaceTracker, self).__init__(0, FULL_MASK)
 
     def allocate_keys(self, r_info):
         """ Allocate all the keys in the routing information
@@ -55,7 +56,7 @@ class KeySpaceTracker(ElementAllocatorAlgorithm):
 
         :param mask: The mask to be checked
         """
-        for i in range(32):
+        for i in range(BITS_IN_KEY):
             if mask & (1 << i):
                 return i
         return 32

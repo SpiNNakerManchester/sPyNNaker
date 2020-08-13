@@ -69,9 +69,9 @@ class GeneratorData(object):
         # Offsets are used in words in the generator, but only
         # if the values are valid
         if self.__synaptic_matrix_offset != SYN_REGION_UNUSED:
-            self.__synaptic_matrix_offset //= 4
+            self.__synaptic_matrix_offset //= BYTES_PER_WORD
         if self.__delayed_synaptic_matrix_offset != SYN_REGION_UNUSED:
-            self.__delayed_synaptic_matrix_offset //= 4
+            self.__delayed_synaptic_matrix_offset //= BYTES_PER_WORD
 
     @property
     def size(self):

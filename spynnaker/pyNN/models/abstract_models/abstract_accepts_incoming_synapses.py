@@ -58,7 +58,7 @@ class AbstractAcceptsIncomingSynapses(object):
             Where the connection data is on the machine
         :param ProjectionApplicationEdge app_edge:
             The edge for which the data is being read
-        :param SynapseInformation synapse_information:
+        :param SynapseInformation synapse_info:
             The specific projection within the edge
         """
 

@@ -47,7 +47,7 @@ class AbstractSynapseDynamicsStructural(object):
             The data specification to write to
         :param int region: region ID
         :param int machine_time_step: The simulation time step
-        :param list(float): weight_scales:
+        :param list(float) weight_scales: Weight scaling for each synapse type
         :param ~pacman.model.graphs.application.ApplicationGraph\
                 application_graph: The application graph
         :param AbstractPopulationVertex app_vertex:
