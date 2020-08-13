@@ -195,6 +195,7 @@ class AbstractSpiNNakerCommon(with_metaclass(
             extra_post_run_algorithms = []
         extra_load_algorithms.append("SynapseExpander")
         extra_load_algorithms.append("OnChipBitFieldGenerator")
+        extra_load_algorithms.append("FinishConnectionHolders")
         extra_algorithms_pre_run = []
 
         if self.config.getboolean("Reports", "draw_network_graph"):
@@ -208,7 +209,6 @@ class AbstractSpiNNakerCommon(with_metaclass(
         if self.config.getboolean("Reports", "reports_enabled"):
             if self.config.getboolean("Reports", "write_synaptic_report"):
                 extra_algorithms_pre_run.append("SynapticMatrixReport")
-        extra_algorithms_pre_run.append("FinishConnectionHolders")
         if user_extra_algorithms_pre_run is not None:
             extra_algorithms_pre_run.extend(user_extra_algorithms_pre_run)
 
