@@ -352,8 +352,7 @@ class PyNNProjectionCommon(object):
         # possible later date
         connection_holder = ConnectionHolder(
             data_to_get, as_list, pre_vertex.n_atoms, post_vertex.n_atoms,
-            fixed_values=fixed_values, notify=notify,
-            app_edge=self.__projection_edge)
+            fixed_values=fixed_values, notify=notify)
 
         # If we haven't run, add the holder to get connections, and return it
         # and set up a callback for after run to fill in this connection holder

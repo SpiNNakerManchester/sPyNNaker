@@ -210,3 +210,11 @@ class SynapseInformation(object):
             The connection holder to be added
         """
         self.__pre_run_connection_holders.append(pre_run_connection_holder)
+
+    def finish_connection_holders(self):
+        """ Finish all the connection holders, and clear the list so that they
+            are not generated again later
+        """
+        for holder in self.__pre_run_connection_holders:
+            holder.finish()
+        del self.__pre_run_connection_holders[:]

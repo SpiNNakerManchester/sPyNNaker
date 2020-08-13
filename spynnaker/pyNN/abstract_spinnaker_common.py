@@ -208,6 +208,7 @@ class AbstractSpiNNakerCommon(with_metaclass(
         if self.config.getboolean("Reports", "reports_enabled"):
             if self.config.getboolean("Reports", "write_synaptic_report"):
                 extra_algorithms_pre_run.append("SynapticMatrixReport")
+        extra_algorithms_pre_run.append("FinishConnectionHolders")
         if user_extra_algorithms_pre_run is not None:
             extra_algorithms_pre_run.extend(user_extra_algorithms_pre_run)
 

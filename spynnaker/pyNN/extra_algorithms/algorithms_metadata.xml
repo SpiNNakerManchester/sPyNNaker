@@ -15,9 +15,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
  -->
 <algorithms xmlns="https://github.com/SpiNNakerManchester/PACMAN"
-		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		xsi:schemaLocation="https://github.com/SpiNNakerManchester/PACMAN
-			https://raw.githubusercontent.com/SpiNNakerManchester/PACMAN/master/pacman/operations/algorithms_metadata_schema.xsd">
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="https://github.com/SpiNNakerManchester/PACMAN
+            https://raw.githubusercontent.com/SpiNNakerManchester/PACMAN/master/pacman/operations/algorithms_metadata_schema.xsd">
     <algorithm name="SynapseExpander">
         <python_module>spynnaker.pyNN.extra_algorithms.synapse_expander</python_module>
         <python_function>synapse_expander</python_function>
@@ -531,6 +531,19 @@
         </input_definitions>
         <required_inputs>
             <param_name>report_folder</param_name>
+            <param_name>application_graph</param_name>
+        </required_inputs>
+    </algorithm>
+    <algorithm name="FinishConnectionHolders">
+        <python_module>spynnaker.pyNN.extra_algorithms.connection_holder_finisher</python_module>
+        <python_function>finish_connection_holders</python_function>
+        <input_definitions>
+            <parameter>
+                <param_name>application_graph</param_name>
+                <param_type>MemoryApplicationGraph</param_type>
+            </parameter>
+        </input_definitions>
+        <required_inputs>
             <param_name>application_graph</param_name>
         </required_inputs>
     </algorithm>
