@@ -212,7 +212,7 @@ class SynapticMatrix(object):
             return block_addr, single_addr
 
         block_addr = self.__poptable.write_padding(spec, block_addr)
-        self.__index = self.__poptable.update_master_population_table(
+        self.__index = self.__poptable.add_machine_entry(
             block_addr, self.__max_row_info.undelayed_max_words,
             self.__routing_info.first_key_and_mask)
         spec.write_array(row_data)
@@ -246,7 +246,7 @@ class SynapticMatrix(object):
                 size, self.__delay_matrix_size))
 
         block_addr = self.__poptable.write_padding(spec, block_addr)
-        self.__delay_index = self.__poptable.update_master_population_table(
+        self.__delay_index = self.__poptable.add_machine_entry(
             block_addr, self.__max_row_info.delayed_max_words,
             self.__delay_routing_info.first_key_and_mask)
         spec.write_array(row_data)
@@ -270,7 +270,7 @@ class SynapticMatrix(object):
         if data_size != self.__single_matrix_size:
             raise Exception("Row data incorrect size: {} instead of {}".format(
                 data_size, self.__single_matrix_size))
-        self.__index = self.__poptable.update_master_population_table(
+        self.__index = self.__poptable.add_machine_entry(
             single_addr, self.__max_row_info.undelayed_max_words,
             self.__routing_info.first_key_and_mask, is_single=True)
         single_synapses.append(single_rows)
@@ -365,7 +365,7 @@ class SynapticMatrix(object):
         # Otherwise add a master population table entry for the incoming
         # machine vertex
         block_addr = self.__poptable.get_next_allowed_address(block_addr)
-        self.__index = self.__poptable.update_master_population_table(
+        self.__index = self.__poptable.add_machine_entry(
             block_addr, self.__max_row_info.undelayed_max_words,
             self.__routing_info.first_key_and_mask)
         self.__syn_mat_offset = block_addr
@@ -394,7 +394,7 @@ class SynapticMatrix(object):
         # Otherwise add a master population table entry for the incoming
         # machine vertex
         block_addr = self.__poptable.get_next_allowed_address(block_addr)
-        self.__delay_index = self.__poptable.update_master_population_table(
+        self.__delay_index = self.__poptable.add_machine_entry(
             block_addr, self.__max_row_info.delayed_max_words,
             self.__delay_routing_info.first_key_and_mask)
         self.__delay_syn_mat_offset = block_addr
