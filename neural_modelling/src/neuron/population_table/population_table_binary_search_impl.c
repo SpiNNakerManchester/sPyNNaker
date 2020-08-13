@@ -353,14 +353,6 @@ bool population_table_initialise(
     return true;
 }
 
-#ifndef DEBUG
-static inline check_extended_neuron_ids(master_population_table_entry entry,
-        extra_info extra, uint32_t spike) {
-
-}
-#else
-#endif
-
 bool population_table_get_first_address(
         spike_t spike, address_t* row_address, size_t* n_bytes_to_transfer) {
     // locate the position in the binary search / array
