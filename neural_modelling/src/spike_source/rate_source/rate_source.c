@@ -105,6 +105,8 @@ static uint32_t n_rates;
 static uint32_t iteration;
 static uint32_t expected;
 
+static uint32_t last_rate_sent;
+
 
 //! \brief method for reading the parameters stored in Poisson parameter region
 //! \param[in] address the absolute SDRAM memory address to which the
@@ -246,7 +248,7 @@ static void timer_callback(uint timer_count, uint unused) {
     uint32_t time_to_check;
 
     //LP TMP for US replica
-    if(looping == 2 &&  time > 14000) {
+    if(looping == 2 &&  time >= 20000) {
 
         return;
 
@@ -258,7 +260,11 @@ static void timer_callback(uint timer_count, uint unused) {
 
             if(!iteration) {
 
-                expected = time;
+                //FOR TESTING THE DELAYED EXC START, KEEP ONLY WHAT'S INSIDE THE IF CONDITION
+                if(looping == 1)
+                    expected = time;
+                else
+                    expected = index;
             }
 
             index = 0;
@@ -275,7 +281,7 @@ static void timer_callback(uint timer_count, uint unused) {
     if(time_to_check == time) {
 
         //URBANCZIK-SENN RESULTS, THIS IS TO HAVE A NON 0 INPUT AT EVERY TIMESTEP. REMOVE THE IF FOR NORMAL SIMS!
-        if((time_to_check == 0) && (rates[index].rate & 0x80000000)) {
+        if((time_to_check == 0) && (rates[index].rate == 0)) {
 
             while (!spin1_send_mc_packet(params.key, 0, WITH_PAYLOAD)) {
             spin1_delay_us(1);
@@ -287,16 +293,17 @@ static void timer_callback(uint timer_count, uint unused) {
                 spin1_delay_us(1);
             }
 
-            //io_printf(IO_BUF, "%k t %d\n", rates[index].rate, time);
+            last_rate_sent = rates[index].rate;
         }
 
         index++;
     }
     else {
 
-        while (!spin1_send_mc_packet(params.key, 0, WITH_PAYLOAD)) {
+        while (!spin1_send_mc_packet(params.key, last_rate_sent, WITH_PAYLOAD)) {
             spin1_delay_us(1);
         }
+
 
        //io_printf(IO_BUF, "%k t %d\n", 0, time);
     }

@@ -266,7 +266,7 @@ bool synapse_dynamics_process_plastic_synapses(
 
     // Update pre-synaptic trace
     log_debug("Adding pre-synaptic event to trace at time:%u", time);
-    event_history->prev_time += real_rate;
+    event_history->prev_time = real_rate;
     //event_history->prev_trace =
     //        timing_add_pre_spike(time, last_pre_time, last_pre_trace);
 
@@ -306,7 +306,7 @@ bool synapse_dynamics_process_plastic_synapses(
                 MULT_ROUND_STOCHASTIC_ACCUM(real_rate, curr_weight);
 
         // Update the old rate contribution with the new weight
-        accumulation += MULT_ROUND_STOCHASTIC_ACCUM((curr_weight - old_weight), last_pre_rate);
+        //accumulation += MULT_ROUND_STOCHASTIC_ACCUM((curr_weight - old_weight), last_pre_rate);
 
 //        uint64_t sat_test = accumulation & 0x100000000;
 //        if (sat_test) {

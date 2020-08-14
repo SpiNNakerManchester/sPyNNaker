@@ -68,9 +68,6 @@ static global_neuron_params_pointer_t global_parameters;
 //! The synapse shaping parameters
 static synapse_param_t *neuron_synapse_shaping_params;
 
-//! Array indicating for each neuron if it received the teaching signal this timestep
-static uint8_t *teaching;
-
 //! Data structure for the output rate LUT
 static REAL *rate_lut;
 static uint32_t rate_lut_size;
@@ -134,15 +131,6 @@ static bool neuron_impl_initialise(uint32_t n_neurons) {
                     " - Out of DTCM");
             return false;
         }
-    }
-
-    // Allocate DTCM for the teaching array
-    teaching = spin1_malloc(n_neurons * sizeof(uint8_t));
-    if (teaching == NULL) {
-
-        log_error("Unable to teaching array"
-                    " - Out of DTCM");
-            return false;
     }
 
     return true;
@@ -334,15 +322,6 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
     //io_printf(IO_BUF, "ex %k, in %k\n", exc_input_values[2], inh_input_values[2]);
 
-    if (exc_input_values[2] == 0.0k && inh_input_values[2] == 0.0k) {
-
-        teaching[neuron_index] = 0;
-    }
-    else {
-
-        teaching[neuron_index] = 1;
-    }
-
     // update neuron parameters
     state_t result = neuron_model_state_update(
             NUM_EXCITATORY_RECEPTORS, exc_input_values,
@@ -357,28 +336,33 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     // Compute rate diff
     REAL rate = set_spike_source_rate(neuron, soma_voltage);
 
-    REAL rate_diff = rate - neuron->rate_at_last_setting;
+    //REAL rate_diff = rate - neuron->rate_at_last_setting;
 
     //io_printf(IO_BUF, "curr rate %k, rate diff %k\n", rate, rate_diff);
 
-    neuron->rate_diff = rate_diff;
+    //neuron->rate_diff = rate_diff;
 
-    bool rate_updated = false;
+   // bool rate_updated = false;
 
 	// Has rate changed by more than a predefined threshold since it was last
 	// used to update the mean isi ticks?
-	if ((rate_diff) >= neuron->rate_update_threshold || (rate_diff) <= -neuron->rate_update_threshold){
+	//if ((rate_diff) >= neuron->rate_update_threshold || (rate_diff) <= -neuron->rate_update_threshold){
 		// then update the rate
 		neuron->rate_at_last_setting = rate;
 
-		rate_updated = true;
-	}
+		bool rate_updated = true;
+	//}
     // ************************************************************************
+
+    // TMP test for Um
+//    REAL Um = 0;
+//    if((exc_input_values[2] + inh_input_values[2]) != 0)
+//        Um = (exc_input_values[0] + inh_input_values[0]) / (exc_input_values[2] + inh_input_values[2]);
 
     // Call functions to get the input values to be recorded
     recorded_variable_values[V_RECORDING_INDEX] = neuron->U_membrane;
     recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->V;
-    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->U_membrane * neuron->plasticity_rate_multiplier;
+    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->rate_at_last_setting;
 
     //io_printf(IO_BUF, "final rate %k\n", neuron->rate_at_last_setting);
 
@@ -446,16 +430,16 @@ static void neuron_impl_store_neuron_parameters(
 
 //! \brief Returns the difference between the last updated value of rate and the previous one
 //! \param[in] neuron_index: the index of the neuron
-uint inline neuron_impl_get_rate_diff(index_t neuron_index) {
+uint inline neuron_impl_get_rate(index_t neuron_index) {
 
     union {
         REAL input;
         uint output;
     } converter;
 
-    converter.input = neuron_array[neuron_index].rate_diff;
+    converter.input = neuron_array[neuron_index].rate_at_last_setting;
 
-    //io_printf(IO_BUF, "returning %k conv %k\n", neuron_array[neuron_index].rate_diff, converter.output);
+    //io_printf(IO_BUF, "returning %k conv %k\n", neuron_array[neuron_index].rate_at_last_setting, converter.output);
 
     return converter.output;
 }
@@ -485,12 +469,7 @@ static inline REAL neuron_impl_post_syn_urate(index_t neuron_index) {
 
     neuron_pointer_t neuron = &neuron_array[neuron_index];
 
-    if (teaching[neuron_index] != 0) {
-
-        return set_spike_source_rate(neuron, neuron->U_membrane * neuron->plasticity_rate_multiplier);
-    }
-
-    return set_spike_source_rate(neuron, neuron->V);
+    return set_spike_source_rate(neuron, neuron->U_membrane * neuron->plasticity_rate_multiplier);
 
     //io_printf(IO_BUF, "Rate(U) %k\n", a);
 }

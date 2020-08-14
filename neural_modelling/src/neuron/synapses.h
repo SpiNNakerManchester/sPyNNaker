@@ -80,10 +80,10 @@ void synapses_do_timestep_update(timer_t time);
 //! \param[in] row: the synaptic row in question
 //! \param[in] write: bool saying if to write this back to SDRAM
 //! \param[in] process_id: ??????????????????
-//! \param[in] rate_diff: input rate change
+//! \param[in] rate: input rate
 //! \return bool if successful or not
 bool synapses_process_synaptic_row(
-        uint32_t time, synaptic_row_t row, bool write, uint32_t process_id, uint32_t rate_diff);
+        uint32_t time, synaptic_row_t row, bool write, uint32_t process_id, uint32_t rate);
 
 //! \brief returns the number of times the synapses have saturated their
 //!        weights.

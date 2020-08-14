@@ -373,7 +373,7 @@ void neuron_do_timestep_update( // EXPORTED
             if(use_key){
                 // Send the spike
                 while (!spin1_send_mc_packet(
-                    key | neuron_index, neuron_impl_get_rate_diff(neuron_index), WITH_PAYLOAD)) {
+                    key | neuron_index, neuron_impl_get_rate(neuron_index), WITH_PAYLOAD)) {
                     spin1_delay_us(1);
                 }
             }

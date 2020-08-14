@@ -176,7 +176,7 @@ static inline input_t convert_rate_to_input(uint32_t rate) {
 // Every spike event could cause up to 256 different weights to
 // be put into the ring buffer.
 static inline void process_fixed_synapses(
-        address_t fixed_region_address, uint32_t time, uint32_t rate_diff) {
+        address_t fixed_region_address, uint32_t time, uint32_t rate) {
     register uint32_t *synaptic_words =
             synapse_row_fixed_weight_controls(fixed_region_address);
     register uint32_t fixed_synapse =
@@ -205,7 +205,7 @@ static inline void process_fixed_synapses(
                             ring_buffer_to_input_left_shifts[combined_synapse_neuron_index >> synapse_index_bits]);
 
         // Add weight to current ring buffer value
-        REAL accumulation = ring_buffers[ring_buffer_index] + MULT_ROUND_STOCHASTIC_ACCUM(convert_rate_to_input(rate_diff), weight);
+        REAL accumulation = ring_buffers[ring_buffer_index] + MULT_ROUND_STOCHASTIC_ACCUM(convert_rate_to_input(rate), weight);
 
         // Saturation check, MAYBE WE SHOULD CAP THE MAX INCOMING VALUES?
 //        s3231 sat_test = accumulation & 0x100000000;
@@ -216,7 +216,7 @@ static inline void process_fixed_synapses(
 
         ring_buffers[ring_buffer_index] = accumulation;
 
-        //io_printf(IO_BUF, "added %k * %k = %k sh %k\n", weight, rate_diff, ring_buffers[ring_buffer_index], (rate_diff * weight));
+        //io_printf(IO_BUF, "added %k * %k = %k sh %k\n", weight, rate, ring_buffers[ring_buffer_index], (rate * weight));
     }
 }
 
@@ -345,6 +345,8 @@ void synapses_do_timestep_update(timer_t time) {
 
             neuron_add_inputs(
                     synapse_type_index, neuron_index, ring_buffers[ring_buffer_index]);
+
+            ring_buffers[ring_buffer_index] = 0.0k;
         }
     }
 
@@ -355,7 +357,7 @@ void synapses_do_timestep_update(timer_t time) {
 }
 
 bool synapses_process_synaptic_row(
-        uint32_t time, synaptic_row_t row, bool write, uint32_t process_id, uint32_t rate_diff) {
+        uint32_t time, synaptic_row_t row, bool write, uint32_t process_id, uint32_t rate) {
     print_synaptic_row(row);
 
     // Get address of non-plastic region from row
@@ -372,7 +374,7 @@ bool synapses_process_synaptic_row(
         profiler_write_entry_disable_fiq(
                 PROFILER_ENTER | PROFILER_PROCESS_PLASTIC_SYNAPSES);
         if (!synapse_dynamics_process_plastic_synapses(plastic_region_address,
-                fixed_region_address, ring_buffers, time, rate_diff)) {
+                fixed_region_address, ring_buffers, time, rate)) {
             return false;
         }
         profiler_write_entry_disable_fiq(
@@ -388,7 +390,7 @@ bool synapses_process_synaptic_row(
     // **NOTE** this is done after initiating DMA in an attempt
     // to hide cost of DMA behind this loop to improve the chance
     // that the DMA controller is ready to read next synaptic row afterwards
-    process_fixed_synapses(fixed_region_address, time, rate_diff);
+    process_fixed_synapses(fixed_region_address, time, rate);
     //}
     return true;
 }
