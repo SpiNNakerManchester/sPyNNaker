@@ -230,10 +230,6 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     // Record the voltage
     recorded_variable_values[V_RECORDING_INDEX] = voltage;
 
-    // Get the voltage
-    state_t voltage = neuron_model_get_membrane_voltage(neuron);
-    recorded_variable_values[V_RECORDING_INDEX] = voltage;
-
     // Store whether the neuron has spiked
     bool spike = false;
     state_t result;
@@ -272,14 +268,11 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
             total_inh += inh_input_values[i];
         }
 
-<<<<<<< HEAD
-=======
         // Call functions to get the input values to be recorded
         if (i == n_steps_per_timestep) {
             recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = total_exc;
             recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = total_inh;
         }
->>>>>>> 2aa4f94... potentially fixed v recording
 
         // Call functions to convert exc_input and inh_input to current
         voltage = neuron_model_get_membrane_voltage(neuron);
