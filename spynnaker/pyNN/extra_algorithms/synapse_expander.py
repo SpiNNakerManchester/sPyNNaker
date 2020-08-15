@@ -112,7 +112,7 @@ def _plan_expansion_of_vertex(
 
 
 def _fill_in_connection_data(
-        expander_cores, transceiver, expanded_pop_vertices, placements):
+        _expander_cores, transceiver, expanded_pop_vertices, placements):
     """ Once expander has run, fill in the connection data we have for the\
         expanded connection matrix.
 
