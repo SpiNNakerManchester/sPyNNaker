@@ -85,7 +85,7 @@ static inline void exp_shaping(exp_params_t* exp_params) {
 //					exp_params->decay);
 
 	exp_params->synaptic_input_value =
-			MULT_ROUND_STOCHASTIC_ACCUM(exp_params->synaptic_input_value,
+			MULT_ROUND_NEAREST_ACCUM(exp_params->synaptic_input_value,
 					exp_params->decay);
 }
 

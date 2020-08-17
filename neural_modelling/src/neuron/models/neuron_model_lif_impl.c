@@ -33,7 +33,7 @@ static inline void lif_neuron_closed_form(
     // update membrane voltage
     // accum -  (ufract * (accum - accum))
 //    neuron->V_membrane = alpha - (neuron->exp_TC * (alpha - V_prev));
-    neuron->V_membrane = alpha - MULT_ROUND_STOCHASTIC_ACCUM(
+    neuron->V_membrane = alpha - MULT_ROUND_NEAREST_ACCUM(
         neuron->exp_TC, (alpha - V_prev));
 }
 
