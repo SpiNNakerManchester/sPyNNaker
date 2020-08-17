@@ -253,10 +253,6 @@ bool synapses_initialise(
     *ring_buffer_to_input_buffer_left_shifts =
             ring_buffer_to_input_left_shifts;
 
-    for(uint32_t i = 0; i < n_synapse_types; i++) {
-
-
-    }
 
     // Work out the positions of the direct and indirect synaptic matrices
     // and copy the direct matrix to DTCM
@@ -299,7 +295,7 @@ bool synapses_initialise(
     // +1 to have the double ring buffer to write in the safe one
     uint32_t ring_buffer_size = 1 << (n_ring_buffer_bits);
 
-    ring_buffers = spin1_malloc(ring_buffer_size * sizeof(accum));
+    ring_buffers = spin1_malloc(ring_buffer_size * sizeof(REAL));
 
     if (ring_buffers == NULL) {
 

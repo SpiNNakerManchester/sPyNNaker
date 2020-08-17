@@ -54,6 +54,7 @@ bool synapse_dynamics_process_plastic_synapses(
     use(fixed_region_address);
     use(ring_buffer);
     use(time);
+    use(rate);
 
     log_error("There should be no plastic synapses!");
     return false;

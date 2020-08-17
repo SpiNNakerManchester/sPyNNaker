@@ -13,12 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .abstract_input_type import AbstractInputType
-from .input_type_conductance import InputTypeConductance
-from .input_type_current import InputTypeCurrent
-from .input_type_current_semd import InputTypeCurrentSEMD
-from .input_type_two_comp import InputTypeTwoComp
-from .input_type_pyramidal import InputTypePyramidal
+APP = $(notdir $(CURDIR))
 
-__all__ = ["AbstractInputType", "InputTypeConductance", "InputTypeCurrent",
-           "InputTypeCurrentSEMD", "InputTypeTwoComp", "InputTypePyramidal"]
+OTHER_SOURCES = $(NEURON_DIR)/neuron/models/neuron_model_pyramidal_impl.c
+NEURON_IMPL_H = $(NEURON_DIR)/neuron/implementations/neuron_impl_pyramidal.h
+SYNAPSE_DYNAMICS = $(NEURON_DIR)/neuron/plasticity/synapse_dynamics_static_impl.c
+
+include ../neural_build.mk

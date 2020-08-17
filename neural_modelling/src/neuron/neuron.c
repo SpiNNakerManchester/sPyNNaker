@@ -360,16 +360,6 @@ void neuron_do_timestep_update( // EXPORTED
 
               //io_printf(IO_BUF, "ur %k, vr %k, t %d\n", neuron_impl_post_syn_urate(neuron_index), neuron_impl_post_syn_vrate(neuron_index), time);
 
-//            if (use_key) {
-//                // Wait until the expected time to send
-//                while ((ticks == timer_count) &&
-//                        (tc[T1_COUNT] > expected_time)) {
-//                    // Do Nothing
-//                }
-//                expected_time -= time_between_spikes;
-
-            //io_printf(IO_BUF, "sending %k\n", neuron_impl_get_rate_diff(neuron_index));
-
             if(use_key){
                 // Send the spike
                 while (!spin1_send_mc_packet(

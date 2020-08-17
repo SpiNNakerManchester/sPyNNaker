@@ -15,15 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _NEURON_IMPL_TWO_COMP_RATE_H_
-#define _NEURON_IMPL_TWO_COMP_RATE_H_
+#ifndef _NEURON_IMPL_PYRAMIDAL_H_
+#define _NEURON_IMPL_PYRAMIDAL_H_
 
 #include "neuron_impl.h"
 
 // Includes for model parts used in this implementation
-#include <neuron/synapse_types/synapse_types_two_comp_rate_exponential_impl.h>
-#include <neuron/models/neuron_model_lif_two_comp_rate_impl.h>
-#include <neuron/input_types/input_type_two_comp_rate.h>
+#include <neuron/synapse_types/synapse_types_pyramidal_impl.h>
+#include <neuron/models/neuron_model_pyramidal_impl.h>
+#include <neuron/input_types/input_type_pyramidal.h>
 #include <neuron/additional_inputs/additional_input_none_impl.h>
 #include <neuron/threshold_types/threshold_type_static.h>
 
@@ -226,44 +226,16 @@ static void neuron_impl_load_neuron_parameters(
 #endif // LOG_LEVEL >= LOG_DEBUG
 }
 
-
-
-// &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-
 // Rate Update Function
 
-static inline REAL set_spike_source_rate(neuron_pointer_t neuron, REAL somatic_voltage) {
+static inline REAL set_spike_source_rate(REAL somatic_voltage) {
 
 	REAL rate;
 
-	// Compute the rate function based on sigmoid approximation
-//	if (somatic_voltage < 0.0k){
-//		rate = 0.001k;
-//	} else if (somatic_voltage > 2.0k) {
-//		rate = 150.0k;
-//	}
-//	else {
-//
-//        // Compute the square and cube for the rate function (the values are shifted to stay on 32 bits)
-//	    //REAL voltage_sq = ((somatic_voltage * somatic_voltage));
-//	    //REAL voltage_cube = ((voltage_sq * somatic_voltage));
-//
-//	    //io_printf(IO_BUF, "sq %k, cub %k\n", voltage_sq, voltage_cube);
-//
-//	    //rate = ((cubic_term * voltage_cube)) +
-//	    //       ((square_term * voltage_sq)) +
-//	    //       ((linear_term * somatic_voltage)) +
-//	    //       constant_term;
-//	    rate = rate_lut[(uint32_t) (somatic_voltage << 4)];
-//	}
-//    } else {
-        rate = somatic_voltage > 0.0k ? somatic_voltage : 0.0k;
-//    }
+    rate = somatic_voltage > 0.0k ? somatic_voltage : 0.0k;
 
 	return rate;
 }
-// &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
-
 
 static bool neuron_impl_do_timestep_update(index_t neuron_index,
         input_t external_bias, state_t *recorded_variable_values) {
@@ -317,51 +289,33 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
 
     //io_printf(IO_BUF, "pre rate %k pre diff %k\n", neuron->rate_at_last_setting, neuron->rate_diff);
 
-    //io_printf(IO_BUF, "ex %k, in %k\n", exc_input_values[2], inh_input_values[2]);
-
     // update neuron parameters
     state_t result = neuron_model_state_update(
             NUM_EXCITATORY_RECEPTORS, exc_input_values,
             NUM_INHIBITORY_RECEPTORS, inh_input_values,
             external_bias, neuron);
 
-    // ************************************************************************
+
     // determine if a spike should occur
-    // bool spike = threshold_type_is_above_threshold(result, threshold_type);
     REAL soma_voltage = result;
 
-    // Compute rate diff
-    REAL rate = set_spike_source_rate(neuron, soma_voltage);
-
-    //REAL rate_diff = rate - neuron->rate_at_last_setting;
+    // Compute rate
+    REAL rate = set_spike_source_rate(soma_voltage);
 
     //io_printf(IO_BUF, "curr rate %k, rate diff %k\n", rate, rate_diff);
 
-    //neuron->rate_diff = rate_diff;
+    neuron->rate_at_last_setting = rate;
 
-   // bool rate_updated = false;
-
-	// Has rate changed by more than a predefined threshold since it was last
-	// used to update the mean isi ticks?
-	//if ((rate_diff) >= neuron->rate_update_threshold || (rate_diff) <= -neuron->rate_update_threshold){
-		// then update the rate
-		neuron->rate_at_last_setting = rate;
-
-		bool rate_updated = true;
-	//}
-    // ************************************************************************
-
-    // TMP test for Um
-//    REAL Um = 0;
-//    if((exc_input_values[2] + inh_input_values[2]) != 0)
-//        Um = (exc_input_values[0] + inh_input_values[0]) / (exc_input_values[2] + inh_input_values[2]);
+	bool rate_updated = true;
 
     // Call functions to get the input values to be recorded
     recorded_variable_values[V_RECORDING_INDEX] = neuron->U_membrane;
-    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->V;
-    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->rate_at_last_setting;
+    recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = neuron->Va;
+    recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = neuron->Vb;
 
     //io_printf(IO_BUF, "final rate %k\n", neuron->rate_at_last_setting);
+
+    synapse_types_shape_input(synapse_type);
 
 #if LOG_LEVEL >= LOG_DEBUG
     neuron_model_print_state_variables(neuron);
@@ -454,7 +408,7 @@ static inline REAL neuron_impl_post_syn_vrate(index_t neuron_index) {
 
     neuron_pointer_t neuron = &neuron_array[neuron_index];
 
-    REAL a =  set_spike_source_rate(neuron, neuron->V);
+    REAL a =  set_spike_source_rate(neuron->Vb);
 
     //io_printf(IO_BUF, "Rate(V) %k\n", a);
 
@@ -466,7 +420,7 @@ static inline REAL neuron_impl_post_syn_urate(index_t neuron_index) {
 
     neuron_pointer_t neuron = &neuron_array[neuron_index];
 
-    return set_spike_source_rate(neuron, neuron->U_membrane * neuron->plasticity_rate_multiplier);
+    return set_spike_source_rate(neuron->U_membrane * neuron->plasticity_rate_multiplier);
 
     //io_printf(IO_BUF, "Rate(U) %k\n", a);
 }
@@ -511,4 +465,4 @@ const char *neuron_impl_get_synapse_type_char(uint32_t synapse_type) {
 
 #endif // LOG_LEVEL >= LOG_DEBUG
 
-#endif // _NEURON_IMPL_STANDARD_H_
+#endif // _NEURON_IMPL_PYRAMIDAL_H_

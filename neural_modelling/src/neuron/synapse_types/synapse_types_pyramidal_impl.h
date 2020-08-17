@@ -25,8 +25,8 @@
 * time-constants (and thus propogators) are identical.
 */
 
-#ifndef _SYNAPSE_TYPES_TWO_COMP_RATE_EXPONENTIAL_IMPL_H_
-#define _SYNAPSE_TYPES_TWO_COMP_RATE_EXPONENTIAL_IMPL_H_
+#ifndef _SYNAPSE_TYPES_PYRAMIDAL_IMPL_H_
+#define _SYNAPSE_TYPES_PYRAMIDAL_IMPL_H_
 
 
 //---------------------------------------
@@ -46,8 +46,8 @@
 //---------------------------------------
 // Synapse parameters
 //---------------------------------------
-input_t excitatory_response[NUM_EXCITATORY_RECEPTORS + 1];
-input_t inhibitory_response[NUM_INHIBITORY_RECEPTORS + 1];
+input_t excitatory_response[NUM_EXCITATORY_RECEPTORS];
+input_t inhibitory_response[NUM_INHIBITORY_RECEPTORS];
 
 typedef struct exp_params_t {
 	decay_t decay;
@@ -73,26 +73,14 @@ typedef enum input_buffer_regions {
 // Synapse shaping inline implementation
 //---------------------------------------
 
-//! \brief decays the stuff thats sitting in the input buffers
-//! (to compensate for the valve behaviour of a synapse
-//! in biology (spike goes in, synapse opens, then closes slowly) plus the
-//! leaky aspect of a neuron). as these have not yet been processed and applied
-//! to the neuron.
-//! \param[in]  parameter: the pointer to the parameters to use
-//! \return nothing
-static inline void exp_shaping(exp_params_t* exp_params) {
-    // decay value according to decay constant
-	exp_params->synaptic_input_value =
-			decay_s1615(exp_params->synaptic_input_value,
-					exp_params->decay);
-}
 
 static inline void synapse_types_shape_input(
         synapse_param_pointer_t parameter) {
-	exp_shaping(&parameter->exc);
-	exp_shaping(&parameter->exc2);
-	exp_shaping(&parameter->inh);
-	exp_shaping(&parameter->inh2);
+
+    parameter->exc.synaptic_input_value = 0;
+    parameter->exc2.synaptic_input_value = 0;
+    parameter->inh.synaptic_input_value = 0;
+    parameter->inh2.synaptic_input_value = 0;
 }
 
 //! \brief helper function to add input for a given timer period to a given
@@ -101,10 +89,7 @@ static inline void synapse_types_shape_input(
 //! \param[in] input the inputs to add.
 //! \return None
 static inline void add_input_exp(exp_params_t* exp_params, input_t input) {
-//	exp_params->synaptic_input_value = exp_params->synaptic_input_value +
-//			decay_s1615(input, exp_params->init);
-//			decay_s1615(input, exp_params->decay);
-    exp_params->synaptic_input_value = input;
+    exp_params->synaptic_input_value += input;
 }
 
 //! \brief adds the inputs for a give timer period to a given neuron that is
@@ -137,8 +122,6 @@ static inline input_t* synapse_types_get_excitatory_input(
     excitatory_response[0] = parameter->exc.synaptic_input_value;
     excitatory_response[1] = parameter->exc2.synaptic_input_value;
 
-    // For the conductance to the state update (this will be just g_E to calculate g_tot)
-    excitatory_response[2] = parameter->exc.synaptic_input_value;
     return &excitatory_response[0];
 }
 
@@ -151,8 +134,6 @@ static inline input_t* synapse_types_get_inhibitory_input(
     inhibitory_response[0] = parameter->inh.synaptic_input_value;
     inhibitory_response[1] = parameter->inh2.synaptic_input_value;
 
-    // For the conductance to the state update (just g_I to calculate g_tot)
-    inhibitory_response[2] = parameter->inh.synaptic_input_value;
     return &inhibitory_response[0];
 }
 
@@ -214,4 +195,4 @@ static inline void synapse_types_print_parameters(
             parameter->inh.synaptic_input_value);
 }
 
-#endif  // _SYNAPSE_TYPES_TWO_COMP_RATE_EXPONENTIAL_IMPL_H_
+#endif  // _SYNAPSE_TYPES_PYRAMIDAL_IMPL_H_

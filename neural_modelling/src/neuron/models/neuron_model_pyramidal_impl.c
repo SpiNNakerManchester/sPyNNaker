@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "neuron_model_lif_two_comp_rate_impl.h"
+#include "neuron_model_pyramidal_impl.h"
 
 #include <debug.h>
 
@@ -33,31 +33,28 @@ state_t neuron_model_state_update(
 	use(num_excitatory_inputs);
 	use(num_inhibitory_inputs);
 
-	log_debug("Exc 1: %12.6k, Exc 2: %12.6k", exc_input[0], exc_input[1]);
-	log_debug("Inh 1: %12.6k, Inh 2: %12.6k", inh_input[0], inh_input[1]);
+	log_debug("Exc A: %12.6k, Exc B: %12.6k", exc_input[0], exc_input[1]);
+	log_debug("Inh A: %12.6k, Inh B: %12.6k", inh_input[0], inh_input[1]);
 
-    // Get the dendrite input in nA
-    input_t dendrite_input_this_timestep =
+    // Get the apical dendrite input in nA
+    input_t apical_dendrite_input_this_timestep =
+        exc_input[0] - inh_input[0] + external_bias + neuron->I_offset;
+
+    // Get the basal dendrite input in nA
+    input_t basal_dendrite_input_this_timestep =
         exc_input[1] - inh_input[1] + external_bias + neuron->I_offset;
-    //input_t dendrite_input_this_timestep =
-    //  exc_input[1] - inh_input[1];
 
-    // update dendrite
-    neuron->V = dendrite_input_this_timestep;
+    // update dendrites
+    neuron->Va = apical_dendrite_input_this_timestep;
+    neuron->Vb = basal_dendrite_input_this_timestep;
 
-    // Get the soma input in nA
-    //Isyn (exc_input[0] contains g_E * E_E, while exc_input[2] is g_E)
-    // It's a sum to reflect the design Of US paper, E_I is negative, which means that this
-    // becomes a difference
-    input_t soma_input_this_timestep =
-        exc_input[0] + inh_input[0] + neuron->I_offset;
 
-    //io_printf(IO_BUF, "dend input %k, soma input %k\n", dendrite_input_this_timestep, soma_input_this_timestep);
+    //io_printf(IO_BUF, "apical input %k, basal input %k\n", apical_dendrite_input_this_timestep, basal_dendrite_input_this_timestep);
 
-    neuron->U_membrane = (neuron->g_D * neuron->V + soma_input_this_timestep) /
-                            (neuron->g_L + neuron->g_D + exc_input[2] + inh_input[2]);
+    neuron->U_membrane = (neuron->g_B * neuron->Vb + neuron->g_A * neuron->Va) /
+                            (neuron->g_L + neuron->g_B + neuron->g_A);
 
-    //io_printf(IO_BUF, "U %k, V %k\n", neuron->U_membrane, neuron->V);
+    //io_printf(IO_BUF, "U %k, Va %k, Vb %k\n", neuron->U_membrane, neuron->Va, neuron->Vb);
 
     return neuron->U_membrane;
 }

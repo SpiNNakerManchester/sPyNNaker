@@ -19,7 +19,8 @@ from .synapse_type_exponential import SynapseTypeExponential
 from .synapse_type_delta import SynapseTypeDelta
 from .synapse_type_alpha import SynapseTypeAlpha
 from .synapse_type_exponential_two_comp import SynapseTypeExponentialTwoComp
+from .synapse_type_pyramidal import SynapseTypePyramidal
 
 __all__ = ["AbstractSynapseType", "SynapseTypeDualExponential",
            "SynapseTypeExponential", "SynapseTypeDelta", "SynapseTypeAlpha",
-           "SynapseTypeExponentialTwoComp"]
+           "SynapseTypeExponentialTwoComp", "SynapseTypePyramidal"]

@@ -35,10 +35,12 @@ V_RESET = "v_reset"
 TAU_REFRAC = "tau_refrac"
 COUNT_REFRAC = "count_refrac"
 
-V = "v"
+Va = "v_A"
+Vb = "v_B"
 V_STAR = "v_star"
 TAU_L = "tau_L"
-G_D = "g_D"
+G_A = "g_A"
+G_B = "g_B"
 G_L = "g_L"
 
 
@@ -62,7 +64,7 @@ UNITS = {
 }
 
 
-class NeuronModelLeakyIntegrateAndFireTwoCompRate(AbstractNeuronModel, AbstractIsRateBased):
+class NeuronModelPyramidalRate(AbstractNeuronModel, AbstractIsRateBased):
     __slots__ = [
         "__u_init",
         "__u_rest",
@@ -72,9 +74,11 @@ class NeuronModelLeakyIntegrateAndFireTwoCompRate(AbstractNeuronModel, AbstractI
         "__v_reset",
 
         "__g_L",
-        "__g_D",
+        "__g_A",
+        "__g_B",
         "__tau_L",
-        "__v",
+        "__v_A",
+        "__v_B",
         "__v_star",
 
         "__rate_at_last_setting",
@@ -84,8 +88,8 @@ class NeuronModelLeakyIntegrateAndFireTwoCompRate(AbstractNeuronModel, AbstractI
         ]
 
     def __init__(
-            self, u_init, u_rest, cm, i_offset, v_reset,
-            g_D, g_L, tau_L, v_init, rate_update_threshold, starting_rate):
+            self, u_init, u_rest, cm, i_offset, v_reset, v_A, v_B, g_A,
+            g_B, g_L, tau_L, v_init, rate_update_threshold, starting_rate):
 
         global_data_types=[
                     DataType.UINT32,  # MARS KISS seed
@@ -95,23 +99,25 @@ class NeuronModelLeakyIntegrateAndFireTwoCompRate(AbstractNeuronModel, AbstractI
                     DataType.S1615,    # ticks_per_second
                     ]
 
-        super(NeuronModelLeakyIntegrateAndFireTwoCompRate, self).__init__(
+        super(NeuronModelPyramidalRate, self).__init__(
             data_types = [DataType.S1615,   # U
                 DataType.S1615,   # u_rest
                 DataType.S1615,   # r_membrane (= tau_m / cm)
                 DataType.S1615,   # i_offset
                 DataType.S1615,   # u_reset
 
-                DataType.S1615,   # V
+                DataType.S1615,   # v_A
+                DataType.S1615,   # V_B
                 DataType.S1615,   # V*
-                DataType.S1615,   # (g_D + g_L) / g_D, plasticity rate multiplier
+                DataType.S1615,   # (g_A + g_B + g_L) / g_B, plasticity rate multiplier
 
                 DataType.S1615,   # g_L
                 DataType.S1615,   # tau_L
-                DataType.S1615,   # g_D
+                DataType.S1615,   # g_A
+                DataType.S1615,   # g_B
 
-                DataType.S1615,   # REAL rate_at_last_setting; s
-                DataType.S1615,   # REAL rate_update_threshold; p
+                DataType.S1615,   # REAL rate_at_last_setting
+                DataType.S1615,   # REAL rate_update_threshold
                 DataType.S1615    # REAL rate difference
                 ],
             global_data_types=global_data_types)
@@ -120,14 +126,17 @@ class NeuronModelLeakyIntegrateAndFireTwoCompRate(AbstractNeuronModel, AbstractI
             u_init = u_rest
         self.__u_init = u_init
         self.__u_rest = u_rest
-        self.__tau_m = (1/(g_L + g_D))
+        self.__tau_m = (1/(g_L + g_A + g_B))
         self.__cm = cm
         self.__i_offset = i_offset
         self.__v_reset = v_reset
 
         self.__g_L = g_L
-        self.__g_D = g_D
+        self.__g_A = g_A
+        self.__g_B = g_B
         self.__tau_L = tau_L
+        self.__v_A = v_A
+        self.__v_B = v_B
 
         self.__rate_at_last_setting = starting_rate
         self.__rate_update_threshold = rate_update_threshold
@@ -141,13 +150,14 @@ class NeuronModelLeakyIntegrateAndFireTwoCompRate(AbstractNeuronModel, AbstractI
     @overrides(AbstractNeuronModel.add_parameters)
     def add_parameters(self, parameters):
         parameters[U_REST] = self.__u_rest
-        parameters[TAU_M] = 1 / (self.__g_L + self.__g_D)  # self.__tau_m
+        parameters[TAU_M] = 1 / (self.__g_L + self.__g_A + self.__g_B)  # self.__tau_m
         parameters[CM] = self.__cm
         parameters[I_OFFSET] = self.__i_offset
         parameters[V_RESET] = self.__v_reset
 
         parameters[TAU_L] = self.__tau_L
-        parameters[G_D] = self.__g_D
+        parameters[G_A] = self.__g_A
+        parameters[G_B] = self.__g_B
         parameters[G_L] = self.__g_L
 
         parameters[TICKS_PER_SECOND] = 0 # set in get_valuers()
@@ -157,8 +167,9 @@ class NeuronModelLeakyIntegrateAndFireTwoCompRate(AbstractNeuronModel, AbstractI
     def add_state_variables(self, state_variables):
         state_variables[U] = self.__u_init
 
-        state_variables[V] = self.__u_init # initialise to soma potential
-        state_variables[V_STAR] = self.__u_init # initialise to soma potential
+        state_variables[Va] = self.__v_A
+        state_variables[Vb] = self.__v_B
+        state_variables[V_STAR] = self.__u_init  # initialise to soma potential
 
         state_variables[RATE_AT_LAST_SETTING] = self.__rate_at_last_setting
         state_variables[RATE_DIFF] = self.__rate_diff
@@ -183,13 +194,15 @@ class NeuronModelLeakyIntegrateAndFireTwoCompRate(AbstractNeuronModel, AbstractI
                 parameters[V_RESET],
 
 
-                state_variables[V],
+                state_variables[Va],
+                state_variables[Vb],
                 state_variables[V_STAR],
-                (parameters[G_D] + parameters[G_L]) / parameters[G_D],
+                (parameters[G_A] + parameters[G_B] + parameters[G_L]) / parameters[G_B],
 
                 parameters[G_L],
                 parameters[TAU_L],
-                parameters[G_D],
+                parameters[G_A],
+                parameters[G_B],
 
                 state_variables[RATE_AT_LAST_SETTING],
                 parameters[RATE_UPDATE_THRESHOLD],
@@ -201,7 +214,7 @@ class NeuronModelLeakyIntegrateAndFireTwoCompRate(AbstractNeuronModel, AbstractI
 
         # Read the data
         (u, _u_rest, _r_membrane, _i_offset,
-         _v_reset, v, v_star, _v_star_cond,
+         _v_reset, v_A, v_B, v_star, _v_star_cond,
          rate_at_last_setting, _rate_update_threshold,
          rate_diff
          ) = values
@@ -209,7 +222,8 @@ class NeuronModelLeakyIntegrateAndFireTwoCompRate(AbstractNeuronModel, AbstractI
         # Copy the changed data only
         state_variables[U] = u
 
-        state_variables[V] = v
+        state_variables[Va] = v_A
+        state_variables[Vb] = v_B
         # state_variables[V_INIT] = v_star
 
         state_variables[RATE_AT_LAST_SETTING] = rate_at_last_setting
