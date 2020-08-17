@@ -225,17 +225,14 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
             &additional_input_array[neuron_index];
     synapse_param_pointer_t synapse_type =
             &neuron_synapse_shaping_params[neuron_index];
-    // Get the voltage
-    state_t voltage = neuron_model_get_membrane_voltage(neuron);
-    // Record the voltage
-    recorded_variable_values[V_RECORDING_INDEX] = voltage;
 
     // Store whether the neuron has spiked
     bool spike = false;
 
     // Loop however many times requested
     for (uint32_t i = n_steps_per_timestep; i > 0; i--) {
-
+        // Get the voltage
+        state_t voltage = neuron_model_get_membrane_voltage(neuron);
 
         // Get the exc and inh values from the synapses
         input_t* exc_value = synapse_types_get_excitatory_input(synapse_type);
@@ -262,6 +259,8 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
         if (i == n_steps_per_timestep) {
             recorded_variable_values[GSYN_EXCITATORY_RECORDING_INDEX] = total_exc;
             recorded_variable_values[GSYN_INHIBITORY_RECORDING_INDEX] = total_inh;
+            // Record the voltage
+            recorded_variable_values[V_RECORDING_INDEX] = voltage;
         }
 
         // Call functions to convert exc_input and inh_input to current
