@@ -12,10 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-import logging
 import os
-import math
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
@@ -23,6 +20,9 @@ from pacman.executor.injection_decorator import inject_items
 from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
+from pacman.utilities.algorithm_utilities.partition_algorithm_utilities \
+    import (
+        determine_max_atoms_for_vertex)
 from spinn_front_end_common.abstract_models import (
     AbstractChangableAfterRun, AbstractProvidesIncomingPartitionConstraints,
     AbstractProvidesOutgoingPartitionConstraints, AbstractHasAssociatedBinary,
@@ -30,29 +30,38 @@ from spinn_front_end_common.abstract_models import (
     AbstractCanReset)
 from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl)
-from spinn_front_end_common.utilities import (
-    constants as common_constants, helpful_functions, globals_variables)
 from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, SYSTEM_BYTES_REQUIREMENT)
+    BYTES_PER_WORD, SIMULATION_N_BYTES, SYSTEM_BYTES_REQUIREMENT)
+from spinn_front_end_common.utilities.helpful_functions import (
+    read_config_int, locate_memory_region_for_placement)
+from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
-from spinn_front_end_common.interface.simulation import simulation_utilities
-from spinn_front_end_common.interface.profiling import profile_utils
-from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
-from spynnaker.pyNN.models.common import (
-    AbstractSpikeRecordable, AbstractNeuronRecordable, NeuronRecorder)
-from spynnaker.pyNN.utilities import constants, bit_field_utilities
+from spinn_front_end_common.interface.simulation.simulation_utilities import (
+    get_simulation_header_array)
+from spinn_front_end_common.interface.profiling.profile_utils import (
+    get_profile_region_size, reserve_profile_region, write_profile_region_data)
+from spynnaker.pyNN.utilities.constants import (
+    POPULATION_BASED_REGIONS, SPIKE_PARTITION_ID, BITS_PER_WORD)
+from spynnaker.pyNN.utilities.ranged import (
+    SpynnakerRangeDictionary, SpynnakerRangedList)
+from spynnaker.pyNN.utilities.utility_calls import ceildiv
+from spynnaker.pyNN.utilities.bit_field_utilities import (
+    exact_sdram_for_bit_field_builder_region,
+    get_estimated_sdram_for_key_region,
+    reserve_bit_field_regions, write_bitfield_init_data,
+    ELEMENTS_USED_IN_EACH_BIT_FIELD)
+from spynnaker.pyNN.exceptions import InvalidParameterType
 from spynnaker.pyNN.models.abstract_models import (
     AbstractPopulationInitializable, AbstractAcceptsIncomingSynapses,
     AbstractPopulationSettable, AbstractReadParametersBeforeSet,
     AbstractContainsUnits)
-from spynnaker.pyNN.exceptions import InvalidParameterType
-from spynnaker.pyNN.utilities.ranged import (
-    SpynnakerRangeDictionary, SpynnakerRangedList)
+from spynnaker.pyNN.models.common import (
+    AbstractSpikeRecordable, AbstractNeuronRecordable, NeuronRecorder)
 from .synapse_dynamics import AbstractSynapseDynamicsStructural
 from .synaptic_manager import SynapticManager
 from .population_machine_vertex import PopulationMachineVertex
-
-logger = logging.getLogger(__name__)
+from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
+from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
 
 # TODO: Make sure these values are correct (particularly CPU cycles)
 _NEURON_BASE_DTCM_USAGE_IN_BYTES = 9 * BYTES_PER_WORD
@@ -80,7 +89,8 @@ class AbstractPopulationVertex(
         AbstractReadParametersBeforeSet, AbstractAcceptsIncomingSynapses,
         ProvidesKeyToAtomMappingImpl, AbstractCanReset):
     """ Underlying vertex model for Neural Populations.
-        Not actually abstract.
+
+    Not actually abstract.
     """
 
     __slots__ = [
@@ -134,8 +144,8 @@ class AbstractPopulationVertex(
         :param spikes_per_second: Expected spike rate
         :type spikes_per_second: float or None
         :param ring_buffer_sigma:
-            How many SD above the mean to go for upper bound of ring buffer \
-            size; a good starting choice is 5.0. Given length of simulation \
+            How many SD above the mean to go for upper bound of ring buffer
+            size; a good starting choice is 5.0. Given length of simulation
             we can set this for approximate number of saturation events.
         :type ring_buffer_sigma: float or None
         :param incoming_spike_buffer_size:
@@ -158,7 +168,7 @@ class AbstractPopulationVertex(
         self.__incoming_spike_buffer_size = incoming_spike_buffer_size
 
         # get config from simulator
-        config = globals_variables.get_simulator().config
+        config = get_simulator().config
 
         if incoming_spike_buffer_size is None:
             self.__incoming_spike_buffer_size = config.getint(
@@ -194,7 +204,7 @@ class AbstractPopulationVertex(
         self.__has_reset_last = True
 
         # Set up for profiling
-        self.__n_profile_samples = helpful_functions.read_config_int(
+        self.__n_profile_samples = read_config_int(
             config, "Reports", "n_profile_samples")
 
     @property
@@ -275,6 +285,7 @@ class AbstractPopulationVertex(
     def get_dtcm_usage_for_atoms(self, vertex_slice):
         """
         :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :rtype: int
         """
         return (
             _NEURON_BASE_DTCM_USAGE_IN_BYTES +
@@ -288,6 +299,7 @@ class AbstractPopulationVertex(
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             the slice of atoms.
         :return: The SDRAM required for the neuron region
+        :rtype: int
         """
         return (
             self._BYTES_TILL_START_OF_GLOBAL_PARAMETERS +
@@ -295,7 +307,14 @@ class AbstractPopulationVertex(
 
     def _get_sdram_usage_for_atoms(
             self, vertex_slice, graph, machine_time_step):
-        sdram_requirement = (
+        """
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :param ~.ApplicationGraph graph:
+        :param int machine_time_step:
+        :return: number of bytes
+        :rtype: int
+        """
+        return (
             SYSTEM_BYTES_REQUIREMENT +
             self._get_sdram_usage_for_neuron_params(vertex_slice) +
             self._neuron_recorder.get_static_sdram_usage(vertex_slice) +
@@ -303,14 +322,10 @@ class AbstractPopulationVertex(
                 len(PopulationMachineVertex.EXTRA_PROVENANCE_DATA_ENTRIES)) +
             self.__synapse_manager.get_sdram_usage_in_bytes(
                 vertex_slice, machine_time_step, graph, self) +
-            profile_utils.get_profile_region_size(
-                self.__n_profile_samples) +
-            bit_field_utilities.get_estimated_sdram_for_bit_field_region(
-                graph, self) +
-            bit_field_utilities.get_estimated_sdram_for_key_region(
-                graph, self) +
-            bit_field_utilities.exact_sdram_for_bit_field_builder_region())
-        return sdram_requirement
+            get_profile_region_size(self.__n_profile_samples) +
+            self.__estimate_sdram_for_bit_field_region(graph) +
+            get_estimated_sdram_for_key_region(graph, self) +
+            exact_sdram_for_bit_field_builder_region())
 
     def _reserve_memory_regions(
             self, spec, vertex_slice, vertex, machine_graph, n_key_map):
@@ -322,15 +337,14 @@ class AbstractPopulationVertex(
             the slice of atoms from the application vertex
         :param ~.MachineVertex vertex: this vertex
         :param ~.MachineGraph machine_graph: machine graph
-        :param n_key_map: nkey map
-        :return: None
+        :param ~.AbstractMachinePartitionNKeysMap n_key_map: nkey map
         """
         spec.comment("\nReserving memory space for data regions:\n\n")
 
         # Reserve memory:
         spec.reserve_memory_region(
             region=POPULATION_BASED_REGIONS.SYSTEM.value,
-            size=common_constants.SIMULATION_N_BYTES,
+            size=SIMULATION_N_BYTES,
             label='System')
 
         self._reserve_neuron_params_data_region(spec, vertex_slice)
@@ -340,12 +354,12 @@ class AbstractPopulationVertex(
             size=self._neuron_recorder.get_static_sdram_usage(vertex_slice),
             label="neuron recording")
 
-        profile_utils.reserve_profile_region(
+        reserve_profile_region(
             spec, POPULATION_BASED_REGIONS.PROFILING.value,
             self.__n_profile_samples)
 
         # reserve bit field region
-        bit_field_utilities.reserve_bit_field_regions(
+        reserve_bit_field_regions(
             spec, machine_graph, n_key_map, vertex,
             POPULATION_BASED_REGIONS.BIT_FIELD_BUILDER.value,
             POPULATION_BASED_REGIONS.BIT_FIELD_FILTER.value,
@@ -356,11 +370,10 @@ class AbstractPopulationVertex(
     def _reserve_neuron_params_data_region(self, spec, vertex_slice):
         """ Reserve the neuron parameter data region.
 
-        :param ~data_specification.DataSpecificationGenerator spec:
+        :param ~.DataSpecificationGenerator spec:
             the spec to write the DSG region to
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             the slice of atoms from the application vertex
-        :return: None
         """
         params_size = self._get_sdram_usage_for_neuron_params(vertex_slice)
         spec.reserve_memory_region(
@@ -369,6 +382,12 @@ class AbstractPopulationVertex(
 
     @staticmethod
     def __copy_ranged_dict(source, merge=None, merge_keys=None):
+        """
+        :param SpynnakerRangeDictionary source:
+        :param SpynnakerRangeDictionary merge:
+        :param set merge_keys:
+        :rtype: SpynnakerRangeDictionary
+        """
         target = SpynnakerRangeDictionary(len(source))
         for key in source.keys():
             copy_list = SpynnakerRangedList(len(source))
@@ -386,7 +405,14 @@ class AbstractPopulationVertex(
     def _write_neuron_parameters(
             self, spec, key, vertex_slice, machine_time_step,
             time_scale_factor):
-
+        """
+        :param ~.DataSpecificationGenerator spec:
+        :param key:
+        :type key: int or None
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+        :param int machine_time_step:
+        :param int time_scale_factor:
+        """
         # If resetting, reset any state variables that need to be reset
         if (self.__has_reset_last and
                 self.__initial_state_variables is not None):
@@ -410,15 +436,13 @@ class AbstractPopulationVertex(
             n_atoms))
 
         # Set the focus to the memory region 2 (neuron parameters):
-        spec.switch_write_focus(
-            region=constants.POPULATION_BASED_REGIONS.NEURON_PARAMS.value)
+        spec.switch_write_focus(POPULATION_BASED_REGIONS.NEURON_PARAMS.value)
 
         # Write the random back off value
         max_offset = (
             machine_time_step * time_scale_factor) // _MAX_OFFSET_DENOMINATOR
         spec.write_value(
-            int(math.ceil(max_offset / self.__n_subvertices)) *
-            self.__n_data_specs)
+            ceildiv(max_offset, self.__n_subvertices) * self.__n_data_specs)
         self.__n_data_specs += 1
 
         # Write the number of microseconds between sending spikes
@@ -461,6 +485,11 @@ class AbstractPopulationVertex(
     def regenerate_data_specification(
             self, spec, placement, machine_time_step, time_scale_factor,
             routing_info):
+        """
+        :param int machine_time_step: (injected)
+        :param int time_scale_factor: (injected)
+        :param ~pacman.model.routing_info.RoutingInfo routing_info: (injected)
+        """
         # pylint: disable=too-many-arguments, arguments-differ
         vertex_slice = placement.vertex.vertex_slice
 
@@ -470,7 +499,7 @@ class AbstractPopulationVertex(
         # write the neuron params into the new DSG region
         self._write_neuron_parameters(
             key=routing_info.get_first_key_from_pre_vertex(
-                placement.vertex, constants.SPIKE_PARTITION_ID),
+                placement.vertex, SPIKE_PARTITION_ID),
             machine_time_step=machine_time_step, spec=spec,
             time_scale_factor=time_scale_factor,
             vertex_slice=vertex_slice)
@@ -508,13 +537,19 @@ class AbstractPopulationVertex(
             application_graph, machine_graph, routing_info, data_n_time_steps,
             n_key_map):
         """
-        :param machine_time_step: (injected)
-        :param time_scale_factor: (injected)
+        :param int machine_time_step: (injected)
+        :param int time_scale_factor: (injected)
         :param application_graph: (injected)
+        :type application_graph:
+            ~pacman.model.graphs.application.ApplicationGraph
         :param machine_graph: (injected)
-        :param routing_info: (injected)
-        :param data_n_time_steps: (injected)
+        :type machine_graph:
+            ~pacman.model.graphs.machine.MachineGraph
+        :param ~pacman.model.routing_info.RoutingInfo routing_info: (injected)
+        :param int data_n_time_steps: (injected)
         :param n_key_map: (injected)
+        :type n_key_map:
+            ~pacman.model.routing_info.AbstractMachinePartitionNKeysMap
         """
         # pylint: disable=too-many-arguments, arguments-differ
         vertex = placement.vertex
@@ -533,11 +568,11 @@ class AbstractPopulationVertex(
 
         # Get the key
         key = routing_info.get_first_key_from_pre_vertex(
-            vertex, constants.SPIKE_PARTITION_ID)
+            vertex, SPIKE_PARTITION_ID)
 
         # Write the setup region
         spec.switch_write_focus(POPULATION_BASED_REGIONS.SYSTEM.value)
-        spec.write_array(simulation_utilities.get_simulation_header_array(
+        spec.write_array(get_simulation_header_array(
             self.get_binary_file_name(), machine_time_step,
             time_scale_factor))
 
@@ -551,7 +586,7 @@ class AbstractPopulationVertex(
             spec, key, vertex_slice, machine_time_step, time_scale_factor)
 
         # write profile data
-        profile_utils.write_profile_region_data(
+        write_profile_region_data(
             spec, POPULATION_BASED_REGIONS.PROFILING.value,
             self.__n_profile_samples)
 
@@ -568,7 +603,7 @@ class AbstractPopulationVertex(
             self.__synapse_manager.on_chip_written_matrix_size)
 
         # write up the bitfield builder data
-        bit_field_utilities.write_bitfield_init_data(
+        write_bitfield_init_data(
             spec, vertex, machine_graph, routing_info,
             n_key_map, POPULATION_BASED_REGIONS.BIT_FIELD_BUILDER.value,
             POPULATION_BASED_REGIONS.POPULATION_TABLE.value,
@@ -586,7 +621,6 @@ class AbstractPopulationVertex(
 
     @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
     def get_binary_file_name(self):
-
         # Split binary name into title and extension
         binary_title, binary_extension = os.path.splitext(
             self.__neuron_impl.binary_name)
@@ -673,6 +707,11 @@ class AbstractPopulationVertex(
         return self.__pynn_model.default_initial_values.keys()
 
     def _get_parameter(self, variable):
+        """
+        :param str variable:
+        :rtype: str
+        :raises KeyError: If the param with that name doesn't exist
+        """
         if variable.endswith("_init"):
             # method called with "V_init"
             key = variable[:-5]
@@ -725,8 +764,6 @@ class AbstractPopulationVertex(
 
     @overrides(AbstractPopulationSettable.get_value)
     def get_value(self, key):
-        """ Get a property of the overall model.
-        """
         if key not in self._parameters:
             raise InvalidParameterType(
                 "Population {} does not have parameter {}".format(
@@ -735,8 +772,6 @@ class AbstractPopulationVertex(
 
     @overrides(AbstractPopulationSettable.set_value)
     def set_value(self, key, value):
-        """ Set a property of the overall model.
-        """
         if key not in self._parameters:
             raise InvalidParameterType(
                 "Population {} does not have parameter {}".format(
@@ -747,12 +782,10 @@ class AbstractPopulationVertex(
     @overrides(AbstractReadParametersBeforeSet.read_parameters_from_machine)
     def read_parameters_from_machine(
             self, transceiver, placement, vertex_slice):
-
         # locate SDRAM address to where the neuron parameters are stored
-        neuron_region_sdram_address = \
-            helpful_functions.locate_memory_region_for_placement(
-                placement, POPULATION_BASED_REGIONS.NEURON_PARAMS.value,
-                transceiver)
+        neuron_region_sdram_address = locate_memory_region_for_placement(
+            placement, POPULATION_BASED_REGIONS.NEURON_PARAMS.value,
+            transceiver)
 
         # shift past the extra stuff before neuron parameters that we don't
         # need to read
@@ -783,6 +816,9 @@ class AbstractPopulationVertex(
 
     @property
     def ring_buffer_sigma(self):
+        """
+        :rtype: float or None
+        """
         return self.__synapse_manager.ring_buffer_sigma
 
     @ring_buffer_sigma.setter
@@ -794,6 +830,9 @@ class AbstractPopulationVertex(
 
     @property
     def spikes_per_second(self):
+        """
+        :rtype: float or None
+        """
         return self.__synapse_manager.spikes_per_second
 
     @spikes_per_second.setter
@@ -821,7 +860,7 @@ class AbstractPopulationVertex(
 
     def get_connection_holders(self):
         """
-        :rtype: dict(tuple(ProjectionApplicationEdge,SynapseInformation),\
+        :rtype: dict(tuple(ProjectionApplicationEdge,SynapseInformation),
             ConnectionHolder)
         """
         return self.__synapse_manager.get_connection_holders()
@@ -848,21 +887,11 @@ class AbstractPopulationVertex(
     @overrides(AbstractProvidesIncomingPartitionConstraints.
                get_incoming_partition_constraints)
     def get_incoming_partition_constraints(self, partition):
-        """ Gets the constraints for partitions going into this vertex.
-
-        :param partition: partition that goes into this vertex
-        :return: list of constraints
-        """
         return self.__synapse_manager.get_incoming_partition_constraints()
 
     @overrides(AbstractProvidesOutgoingPartitionConstraints.
                get_outgoing_partition_constraints)
     def get_outgoing_partition_constraints(self, partition):
-        """ Gets the constraints for partitions going out of this vertex.
-
-        :param partition: the partition that leaves this vertex
-        :return: list of constraints
-        """
         return [ContiguousKeyRangeContraint()]
 
     @overrides(
@@ -888,7 +917,6 @@ class AbstractPopulationVertex(
         :param buffer_manager: the buffer manager object
         :param placements: the placements object
         :param recording_region_id: the recorded region ID for clearing
-        :rtype: None
         """
         for machine_vertex in self.machine_vertices:
             placement = placements.get_placement_of_vertex(machine_vertex)
@@ -909,11 +937,11 @@ class AbstractPopulationVertex(
     def describe(self):
         """ Get a human-readable description of the cell or synapse type.
 
-        The output may be customised by specifying a different template\
-        together with an associated template engine\
+        The output may be customised by specifying a different template
+        together with an associated template engine
         (see :py:mod:`pyNN.descriptions`).
 
-        If template is None, then a dictionary containing the template context\
+        If template is None, then a dictionary containing the template context
         will be returned.
 
         :rtype: dict(str, ...)
@@ -931,6 +959,11 @@ class AbstractPopulationVertex(
         return context
 
     def get_synapse_id_by_target(self, target):
+        """ Get the ID of a synapse given the name
+
+        :param str target: The name of the synapse
+        :rtype: int
+        """
         return self.__neuron_impl.get_synapse_id_by_target(target)
 
     def __str__(self):
@@ -957,3 +990,34 @@ class AbstractPopulationVertex(
         if self.__synapse_manager.changes_during_run:
             self.__change_requires_data_generation = True
             self.__change_requires_neuron_parameters_reload = False
+
+    def __estimate_sdram_for_bit_field_region(self, app_graph):
+        """ Estimates the SDRAM for the bit field region of this vertex
+
+        :param ~.ApplicationGraph app_graph: the app graph
+        :return: the estimated number of bytes used by the bit field region
+        :rtype: int
+        """
+        return sum(
+            self.__estimate_sdram_for_edge_bit_fields(incoming_edge)
+            for incoming_edge in app_graph.get_edges_ending_at_vertex(self)
+            if isinstance(incoming_edge, ProjectionApplicationEdge))
+
+    @staticmethod
+    def __estimate_sdram_for_edge_bit_fields(edge):
+        """
+        :param ProjectionApplicationEdge edge:
+        :rtype: int
+        """
+        n_atoms = edge.pre_vertex.n_atoms
+        max_atoms = min(
+            determine_max_atoms_for_vertex(edge.pre_vertex), n_atoms)
+
+        # Get the number of likely vertices
+        n_machine_vertices = ceildiv(n_atoms, max_atoms)
+        n_atoms_per_machine_vertex = ceildiv(n_atoms, n_machine_vertices)
+        if isinstance(edge.pre_vertex, DelayExtensionVertex):
+            n_atoms_per_machine_vertex *= edge.pre_vertex.n_delay_stages
+        n_words_for_atoms = ceildiv(n_atoms_per_machine_vertex, BITS_PER_WORD)
+        return BYTES_PER_WORD * (ELEMENTS_USED_IN_EACH_BIT_FIELD + (
+            n_words_for_atoms * n_machine_vertices))

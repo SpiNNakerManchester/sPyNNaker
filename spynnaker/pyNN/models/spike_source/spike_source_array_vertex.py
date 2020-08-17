@@ -20,10 +20,10 @@ from spinn_front_end_common.utility_models import ReverseIpTagMultiCastSource
 from spinn_front_end_common.abstract_models import AbstractChangableAfterRun
 from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl)
-from spinn_front_end_common.utilities import globals_variables
+from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spynnaker.pyNN.models.common import (
     AbstractSpikeRecordable, EIEIOSpikeRecorder, SimplePopulationSettable)
-from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 
 logger = logging.getLogger(__name__)
 
@@ -66,7 +66,7 @@ class SpikeSourceArrayVertex(
             n_keys=n_neurons, label=label, constraints=constraints,
             max_atoms_per_core=max_atoms_per_core,
             send_buffer_times=_send_buffer_times(spike_times, time_step),
-            send_buffer_partition_id=constants.SPIKE_PARTITION_ID)
+            send_buffer_partition_id=SPIKE_PARTITION_ID)
 
         # handle recording
         self.__spike_recorder = EIEIOSpikeRecorder()
@@ -118,7 +118,7 @@ class SpikeSourceArrayVertex(
 
     @overrides(AbstractSpikeRecordable.get_spikes_sampling_interval)
     def get_spikes_sampling_interval(self):
-        return globals_variables.get_simulator().machine_time_step
+        return get_simulator().machine_time_step
 
     @overrides(AbstractSpikeRecordable.get_spikes)
     def get_spikes(self, placements, buffer_manager, machine_time_step):
@@ -141,11 +141,11 @@ class SpikeSourceArrayVertex(
     def describe(self):
         """ Returns a human-readable description of the cell or synapse type.
 
-        The output may be customised by specifying a different template\
-        together with an associated template engine\
+        The output may be customised by specifying a different template
+        together with an associated template engine
         (see :py:mod:`pyNN.descriptions`).
 
-        If template is None, then a dictionary containing the template\
+        If template is `None`, then a dictionary containing the template
         context will be returned.
         """
 

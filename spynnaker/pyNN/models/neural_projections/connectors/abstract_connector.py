@@ -19,14 +19,16 @@ import re
 import numpy
 from pyNN.random import NumpyRNG, RandomDistribution
 from six import string_types, with_metaclass
-
-from spinn_front_end_common.utilities.constants import \
-    MICRO_TO_MILLISECOND_CONVERSION
+from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.safe_eval import SafeEval
+from spinn_front_end_common.utilities.constants import (
+    MICRO_TO_MILLISECOND_CONVERSION)
 from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
-from spinn_utilities.abstract_base import AbstractBase, abstractmethod
-from spynnaker.pyNN.utilities import utility_calls
+from spynnaker.pyNN.utilities.utility_calls import (
+    get_probable_maximum_selected, high as upper_bound, low as lower_bound,
+    get_mean, get_variance, get_probability_within_range,
+    get_maximum_probable_value, get_minimum_probable_value, round_up)
 
 # global objects
 logger = logging.getLogger(__name__)
@@ -46,6 +48,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
     NUMPY_SYNAPSES_DTYPE = [("source", "uint32"), ("target", "uint16"),
                             ("weight", "float64"), ("delay", "float64"),
                             ("synapse_type", "uint8")]
+    _DISTANCE_REGEXP = re.compile(r'.*d\[\d*\].*')
 
     __slots__ = [
         "_delays",
@@ -142,9 +145,9 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         :param int n_connections:
         """
         if isinstance(delays, RandomDistribution):
-            max_estimated_delay = utility_calls.get_maximum_probable_value(
+            max_estimated_delay = get_maximum_probable_value(
                 delays, n_connections)
-            high = utility_calls.high(delays)
+            high = upper_bound(delays)
             if high is None:
                 return max_estimated_delay
 
@@ -175,7 +178,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         :rtype: float
         """
         if isinstance(delays, RandomDistribution):
-            return utility_calls.get_variance(delays)
+            return get_variance(delays)
         elif numpy.isscalar(delays):
             return 0.0
         elif hasattr(delays, "__getitem__"):
@@ -200,13 +203,13 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         """
         # pylint: disable=too-many-arguments
         if isinstance(delays, RandomDistribution):
-            prob_in_range = utility_calls.get_probability_within_range(
+            prob_in_range = get_probability_within_range(
                 delays, min_delay, max_delay)
-            return int(math.ceil(utility_calls.get_probable_maximum_selected(
-                n_total_connections, n_connections, prob_in_range)))
+            return round_up(get_probable_maximum_selected(
+                n_total_connections, n_connections, prob_in_range))
         elif numpy.isscalar(delays):
             if min_delay <= delays <= max_delay:
-                return int(math.ceil(n_connections))
+                return round_up(n_connections)
             return 0
         elif hasattr(delays, "__getitem__"):
             n_delayed = sum([len([
@@ -216,8 +219,8 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
                 return 0
             n_total = len(delays)
             prob_delayed = float(n_delayed) / float(n_total)
-            return int(math.ceil(utility_calls.get_probable_maximum_selected(
-                n_total_connections, n_connections, prob_delayed)))
+            return round_up(get_probable_maximum_selected(
+                n_total_connections, n_connections, prob_delayed))
         raise Exception("Unrecognised delay format")
 
     @abstractmethod
@@ -260,7 +263,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         :rtype: float
         """
         if isinstance(weights, RandomDistribution):
-            return abs(utility_calls.get_mean(weights))
+            return abs(get_mean(weights))
         elif numpy.isscalar(weights):
             return abs(weights)
         elif hasattr(weights, "__getitem__"):
@@ -277,18 +280,16 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         :rtype: float
         """
         if isinstance(weights, RandomDistribution):
-            mean_weight = utility_calls.get_mean(weights)
+            mean_weight = get_mean(weights)
             if mean_weight < 0:
-                min_weight = utility_calls.get_minimum_probable_value(
-                    weights, n_connections)
-                low = utility_calls.low(weights)
+                min_weight = get_minimum_probable_value(weights, n_connections)
+                low = lower_bound(weights)
                 if low is None:
                     return abs(min_weight)
                 return abs(max(min_weight, low))
             else:
-                max_weight = utility_calls.get_maximum_probable_value(
-                    weights, n_connections)
-                high = utility_calls.high(weights)
+                max_weight = get_maximum_probable_value(weights, n_connections)
+                high = upper_bound(weights)
                 if high is None:
                     return abs(max_weight)
                 return abs(min(max_weight, high))
@@ -317,7 +318,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         :rtype: float
         """
         if isinstance(weights, RandomDistribution):
-            return utility_calls.get_variance(weights)
+            return get_variance(weights)
         elif numpy.isscalar(weights):
             return 0.0
         elif hasattr(weights, "__getitem__"):
@@ -334,8 +335,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         :param str d_expression:
         :rtype: bool
         """
-        regexpr = re.compile(r'.*d\[\d*\].*')
-        return regexpr.match(d_expression)
+        return self._DISTANCE_REGEXP.match(d_expression)
 
     def _generate_random_values(
             self, values, n_connections, pre_vertex_slice, post_vertex_slice):

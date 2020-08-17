@@ -26,7 +26,7 @@ class LastNeuronSelection(AbstractPartnerSelection):
 
     def __init__(self, spike_buffer_size=64):
         """
-        :param spike_buffer_size: The size of the buffer for holding spikes
+        :param int spike_buffer_size: The size of the buffer for holding spikes
         """
         self.__spike_buffer_size = spike_buffer_size
 

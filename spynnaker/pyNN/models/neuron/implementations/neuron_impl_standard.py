@@ -19,7 +19,7 @@ from data_specification.enums import DataType
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.neuron.input_types import InputTypeConductance
 from .abstract_neuron_impl import AbstractNeuronImpl
-from spinn_front_end_common.utilities import globals_variables
+from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 
 # The size of the n_steps_per_timestep parameter
@@ -187,8 +187,7 @@ class NeuronImplStandard(AbstractNeuronImpl):
     @overrides(AbstractNeuronImpl.get_data)
     def get_data(self, parameters, state_variables, vertex_slice):
         # Work out the time step per step
-        ts = globals_variables.get_simulator().machine_time_step
-        ts /= self.__n_steps_per_timestep
+        ts = get_simulator().machine_time_step / self.__n_steps_per_timestep
         items = [numpy.array([self.__n_steps_per_timestep], dtype="uint32")]
         items.extend(
             component.get_data(parameters, state_variables, vertex_slice, ts)

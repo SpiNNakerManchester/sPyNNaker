@@ -17,24 +17,46 @@ import logging
 from six import add_metaclass
 from spinn_utilities.abstract_base import AbstractBase, abstractmethod
 from spinn_utilities.overrides import overrides
-from spinn_front_end_common.abstract_models.\
-    abstract_supports_bit_field_generation import \
-    AbstractSupportsBitFieldGeneration
+from spinnman.model import ExecutableTargets
+from spinnman.model.enums import CPUState
+from spinn_front_end_common.abstract_models import (
+    AbstractSupportsBitFieldGeneration)
 from spinn_front_end_common.interface.interface_functions.\
     machine_bit_field_router_compressor import (
         MachineBitFieldPairRouterCompressor,
         MachineBitFieldUnorderedRouterCompressor)
 from spinn_front_end_common.utilities import system_control_logic
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
-from spinnman.model import ExecutableTargets
-from spinnman.model.enums import CPUState
-from spynnaker.pyNN.extra_algorithms.synapse_expander import SYNAPSE_EXPANDER
+from .synapse_expander import SYNAPSE_EXPANDER
 
 logger = logging.getLogger(__name__)
 
 
 @add_metaclass(AbstractBase)
 class SpynnakerMachineBitFieldRouterCompressor(object):
+    """ Bitfield-aware on-machine routing table compression algorithm.
+
+    :param ~pacman.model.routing_tables.MulticastRoutingTables routing_tables:
+        routing tables
+    :param ~spinnman.transceiver.Transceiver transceiver: spinnman instance
+    :param ~spinn_machine.Machine machine: spinnMachine instance
+    :param int app_id: app id of the application
+    :param str provenance_file_path: file path for prov data
+    :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
+        machine graph
+    :param ~pacman.model.placements.Placements placements:
+        placements on machine
+    :param int threshold_percentage:
+        the percentage of bitfields to do on chip before its considered a
+        success
+    :param executable_finder: where are binaries are located
+    :type executable_finder:
+        ~spinn_front_end_common.utilities.utility_objs.ExecutableFinder
+    :param bool read_algorithm_iobuf: flag saying if read iobuf
+    :param bool compress_as_much_as_possible:
+        flag asking if should compress as much as possible
+    :param bool read_expander_iobuf: reads the synaptic expander iobuf.
+    """
 
     def __call__(
             self, routing_tables, transceiver, machine, app_id,
@@ -47,23 +69,19 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
             compress_as_much_as_possible=False, provenance_data_objects=None):
         """ entrance for routing table compression with bit field
 
-        :param routing_tables: routing tables
-        :param transceiver: spinnman instance
-        :param machine: spinnMachine instance
-        :param app_id: app id of the application
-        :param provenance_file_path: file path for prov data
-        :param machine_graph: machine graph
-        :param placements: placements on machine
-        :param threshold_percentage: the percentage of bitfields to do on chip\
-         before its considered a success
-        :param executable_finder: where are binaries are located
-        :param read_algorithm_iobuf: bool flag saying if read iobuf
-        :param compress_as_much_as_possible: bool flag asking if should \
-        compress as much as possible
-        :param read_expander_iobuf: reads the synaptic expander iobuf.
-        :rtype: None
+        :param ~.MulticastRoutingTables routing_tables:
+        :param ~.Transceiver transceiver:
+        :param ~.Machine machine:
+        :param int app_id:
+        :param str provenance_file_path:
+        :param ~.MachineGraph machine_graph:
+        :param ~.Placements placements:
+        :param int threshold_percentage:
+        :param ~.ExecutableFinder executable_finder:
+        :param bool read_algorithm_iobuf:
+        :param bool compress_as_much_as_possible:
+        :param bool read_expander_iobuf:
         """
-
         # build machine compressor
         machine_bit_field_router_compressor = self.compressor_factory()
         (compressor_executable_targets, prov_items) = \
@@ -99,17 +117,21 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
 
     @abstractmethod
     def compressor_factory(self):
-        "Method to call the specific compressor to use"
+        """ Creates the specific compressor to use.
 
-    @staticmethod
+        :rtype:
+            ~spinn_front_end_common.interface.interface_functions.MachineBitFieldRouterCompressor
+        """
+
     def _locate_synaptic_expander_cores(
-            cores, executable_finder, placements, machine):
+            self, cores, executable_finder, placements, machine):
         """ removes host based cores for synaptic matrix regeneration
 
-        :param cores: the cores for everything
-        :param executable_finder: way to get binary path
-        :param machine: spiNNMachine instance.
+        :param ~.ExecutableTargets cores: the cores for everything
+        :param ~.ExecutableFinder executable_finder: way to get binary path
+        :param ~.Machine machine: spiNNMachine instance.
         :return: new targets for synaptic expander
+        :rtype: ~.ExecutableTargets
         """
         new_cores = ExecutableTargets()
 
@@ -120,20 +142,32 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
         # if any ones are going to be ran on host, ignore them from the new
         # core setup
         for core_subset in cores.all_core_subsets:
-            chip = machine.get_chip_at(core_subset.x, core_subset.y)
-            for processor_id in range(0, chip.n_processors):
-                if placements.is_processor_occupied(
-                        core_subset.x, core_subset.y, processor_id):
-                    vertex = placements.get_vertex_on_processor(
-                        core_subset.x, core_subset.y, processor_id)
-                    app_vertex = vertex.app_vertex
-                    if isinstance(vertex, AbstractSupportsBitFieldGeneration):
-                        if app_vertex.gen_on_machine(vertex.vertex_slice):
-                            new_cores.add_processor(
-                                expander_executable_path,
-                                core_subset.x, core_subset.y, processor_id,
-                                executable_type=ExecutableType.SYSTEM)
+            x = core_subset.x
+            y = core_subset.y
+            for p in range(machine.get_chip_at(x, y).n_processors):
+                if self._gen_bitfield_on_machine(placements, x, y, p):
+                    new_cores.add_processor(
+                        expander_executable_path, x, y, p,
+                        executable_type=ExecutableType.SYSTEM)
         return new_cores
+
+    @staticmethod
+    def _gen_bitfield_on_machine(placements, x, y, p):
+        """ Check if the given core's vertex has bitfields generated on\
+            machine.
+
+        :param ~.Placements placements:
+        :param int x:
+        :param int y:
+        :param int p:
+        :rtype: bool
+        """
+        if placements.is_processor_occupied(x, y, p):
+            vertex = placements.get_vertex_on_processor(x, y, p)
+            if isinstance(vertex, AbstractSupportsBitFieldGeneration):
+                if vertex.app_vertex.gen_on_machine(vertex.vertex_slice):
+                    return True
+        return False
 
     @staticmethod
     def _rerun_synaptic_cores(
@@ -142,13 +176,13 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
             read_expander_iobuf):
         """ reruns the synaptic expander
 
-        :param synaptic_expander_rerun_cores: the cores to rerun the synaptic /
-        matrix generator for
-        :param transceiver: spinnman instance
-        :param provenance_file_path: prov file path
-        :param executable_finder: finder of binary file paths
-        :param read_expander_iobuf: bool for reading off iobuf if needed
-        :rtype: None
+        :param ~.ExecutableTargets synaptic_expander_rerun_cores:
+            the cores to rerun the synaptic matrix generator for
+        :param ~.Transceiver transceiver: spinnman instance
+        :param str provenance_file_path: prov file path
+        :param ~.ExecutableFinder executable_finder:
+            finder of binary file paths
+        :param bool read_expander_iobuf: read off iobuf if needed
         """
         if synaptic_expander_rerun_cores.total_processors != 0:
             logger.info("rerunning synaptic expander")
@@ -162,6 +196,30 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
 
 class SpynnakerMachineBitFieldUnorderedRouterCompressor(
         SpynnakerMachineBitFieldRouterCompressor):
+    """ Bitfield-aware on-machine routing table compression algorithm that \
+        uses the unordered routing compressor.
+
+    :param ~pacman.model.routing_tables.MulticastRoutingTables routing_tables:
+        routing tables
+    :param ~spinnman.transceiver.Transceiver transceiver: spinnman instance
+    :param ~spinn_machine.Machine machine: spinnMachine instance
+    :param int app_id: app id of the application
+    :param str provenance_file_path: file path for prov data
+    :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
+        machine graph
+    :param ~pacman.model.placements.Placements placements:
+        placements on machine
+    :param int threshold_percentage:
+        the percentage of bitfields to do on chip before its considered a
+        success
+    :param executable_finder: where are binaries are located
+    :type executable_finder:
+        ~spinn_front_end_common.utilities.utility_objs.ExecutableFinder
+    :param bool read_algorithm_iobuf: flag saying if read iobuf
+    :param bool compress_as_much_as_possible:
+        flag asking if should compress as much as possible
+    :param bool read_expander_iobuf: reads the synaptic expander iobuf.
+    """
 
     @overrides(SpynnakerMachineBitFieldRouterCompressor.compressor_factory)
     def compressor_factory(self):
@@ -170,6 +228,30 @@ class SpynnakerMachineBitFieldUnorderedRouterCompressor(
 
 class SpynnakerMachineBitFieldPairRouterCompressor(
         SpynnakerMachineBitFieldRouterCompressor):
+    """ Bitfield-aware on-machine routing table compression algorithm that \
+        uses the paired routing compressor.
+
+    :param ~pacman.model.routing_tables.MulticastRoutingTables routing_tables:
+        routing tables
+    :param ~spinnman.transceiver.Transceiver transceiver: spinnman instance
+    :param ~spinn_machine.Machine machine: spinnMachine instance
+    :param int app_id: app id of the application
+    :param str provenance_file_path: file path for prov data
+    :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
+        machine graph
+    :param ~pacman.model.placements.Placements placements:
+        placements on machine
+    :param int threshold_percentage:
+        the percentage of bitfields to do on chip before its considered a
+        success
+    :param executable_finder: where are binaries are located
+    :type executable_finder:
+        ~spinn_front_end_common.utilities.utility_objs.ExecutableFinder
+    :param bool read_algorithm_iobuf: flag saying if read iobuf
+    :param bool compress_as_much_as_possible:
+        flag asking if should compress as much as possible
+    :param bool read_expander_iobuf: reads the synaptic expander iobuf.
+    """
 
     @overrides(SpynnakerMachineBitFieldRouterCompressor.compressor_factory)
     def compressor_factory(self):

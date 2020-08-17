@@ -12,8 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-import logging
 import numpy
 from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
@@ -23,8 +21,6 @@ try:
 except ImportError as _ex:  # noqa: F821
     # Importing csa causes problems with readthedocs so allowing it to fail
     _csa_found = (False, _ex)
-
-logger = logging.getLogger(__name__)
 
 
 class CSAConnector(AbstractConnector):

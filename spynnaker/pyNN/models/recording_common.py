@@ -60,12 +60,11 @@ class RecordingCommon(object):
                 indexes=None):
         """ Tell the vertex to record data.
 
-        :param str variable: the variable to record, valued variables to\
+        :param str variable: the variable to record, valued variables to
             record are: 'gsyn_exc', 'gsyn_inh', 'v', 'spikes'
         :param int sampling_interval: the interval to record them
         :param indexes: List of indexes to record or None for all
         :type indexes: list(int) or None
-        :return: None
         """
 
         get_simulator().verify_not_running()
@@ -206,8 +205,6 @@ class RecordingCommon(object):
 
     def _turn_off_all_recording(self, indexes=None):
         """ Turns off recording, is used by a pop saying `.record()`
-
-        :rtype: None
         """
         # check for standard record which includes spikes
         if isinstance(self.__population._vertex, AbstractNeuronRecordable):

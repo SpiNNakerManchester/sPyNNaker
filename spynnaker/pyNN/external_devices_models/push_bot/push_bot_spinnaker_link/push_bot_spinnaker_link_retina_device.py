@@ -12,16 +12,12 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-import logging
 from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject, supports_injection
 from pacman.model.graphs.application import ApplicationSpiNNakerLinkVertex
 from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
 from spynnaker.pyNN.external_devices_models.push_bot import (
     AbstractPushBotRetinaDevice)
-
-logger = logging.getLogger(__name__)
 
 
 @supports_injection
@@ -36,15 +32,12 @@ class PushBotSpiNNakerLinkRetinaDevice(
             board_address=default_parameters['board_address'],
             label=default_parameters['label']):
         """
-        :param spinnaker_link_id:
-        :param protocol:
-        :type protocol: MunichIoSpiNNakerLinkProtocol
-        :param resolution:
-        :type resolution: PushBotRetinaResolution
-        :param board_address:
-        :param label:
+        :param int spinnaker_link_id:
+        :param MunichIoSpiNNakerLinkProtocol protocol:
+        :param PushBotRetinaResolution resolution:
+        :param str board_address:
+        :param str label:
         """
-
         AbstractPushBotRetinaDevice.__init__(self, protocol, resolution)
         ApplicationSpiNNakerLinkVertex.__init__(
             self, spinnaker_link_id=spinnaker_link_id,

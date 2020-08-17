@@ -12,10 +12,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 from collections import defaultdict
-import logging
-import math
 from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.constraints.key_allocator_constraints import (
@@ -30,20 +27,19 @@ from spinn_front_end_common.abstract_models import (
     AbstractProvidesOutgoingPartitionConstraints, AbstractHasAssociatedBinary)
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities.constants import (
-    SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES, BITS_PER_WORD,
-    BYTES_PER_WORD)
+    SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES, BYTES_PER_WORD)
 from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from .delay_block import DelayBlock
 from .delay_extension_machine_vertex import DelayExtensionMachineVertex
 from .delay_generator_data import DelayGeneratorData
-from spynnaker.pyNN.utilities.constants import SPIKE_PARTITION_ID
+from spynnaker.pyNN.utilities.constants import (
+    SPIKE_PARTITION_ID, BITS_PER_WORD)
 from spynnaker.pyNN.models.neural_projections import DelayedApplicationEdge
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractGenerateConnectorOnMachine)
 from spynnaker.pyNN.models.neuron.synapse_dynamics import (
     AbstractGenerateOnMachine)
-
-logger = logging.getLogger(__name__)
+from spynnaker.pyNN.utilities.utility_calls import ceildiv
 
 _DELAY_PARAM_HEADER_WORDS = 8
 # pylint: disable=protected-access
@@ -87,9 +83,10 @@ class DelayExtensionVertex(
             where messages are coming from
         :param int machine_time_step: how long is the machine time step
         :param int time_scale_factor: what slowdown factor has been applied
-        :param iterable(~pacman.model.constraints.AbstractConstraint) \
-                constraints:
+        :param constraints:
             the vertex constraints
+        :type constraints:
+            iterable(~pacman.model.constraints.AbstractConstraint)
         :param str label: the vertex label
         """
         # pylint: disable=too-many-arguments
@@ -225,8 +222,7 @@ class DelayExtensionVertex(
         # ###################################################################
         # Reserve SDRAM space for memory areas:
         vertex_slice = vertex.vertex_slice
-        n_words_per_stage = int(
-            math.ceil(vertex_slice.n_atoms / BITS_PER_WORD))
+        n_words_per_stage = ceildiv(vertex_slice.n_atoms, BITS_PER_WORD)
         delay_params_sz = BYTES_PER_WORD * (
             _DELAY_PARAM_HEADER_WORDS +
             (self.__n_delay_stages * n_words_per_stage))
@@ -289,7 +285,7 @@ class DelayExtensionVertex(
 
     def _write_setup_info(self, spec, machine_time_step, time_scale_factor):
         """
-        :param ~data_specification.DataSpecificationGenerator spec:
+        :param ~.DataSpecificationGenerator spec:
         :param int machine_time_step:
         :param int time_scale_factor:
         """
@@ -340,8 +336,7 @@ class DelayExtensionVertex(
         max_offset = (
             machine_time_step * time_scale_factor) // _MAX_OFFSET_DENOMINATOR
         spec.write_value(
-            int(math.ceil(max_offset / total_n_vertices)) *
-            self.__n_data_specs)
+            ceildiv(max_offset, total_n_vertices) * self.__n_data_specs)
         self.__n_data_specs += 1
 
         # Write the time between spikes
@@ -384,6 +379,7 @@ class DelayExtensionVertex(
         """ Get the size of the generator data for a given synapse info object
 
         :param SynapseInformation synapse_info:
+        :rtype: int
         """
         connector = synapse_info.connector
         dynamics = synapse_info.synapse_dynamics
@@ -394,41 +390,43 @@ class DelayExtensionVertex(
         synapse_gen = isinstance(
             dynamics, AbstractGenerateOnMachine)
         if connector_gen and synapse_gen:
-            return sum((
-                DelayGeneratorData.BASE_SIZE,
-                connector.gen_delay_params_size_in_bytes(
-                    synapse_info.delays),
-                connector.gen_connector_params_size_in_bytes,
-            ))
+            return (
+                DelayGeneratorData.BASE_SIZE +
+                connector.gen_delay_params_size_in_bytes(synapse_info.delays) +
+                connector.gen_connector_params_size_in_bytes)
         return 0
 
     def _get_size_of_generator_information(self, out_edges):
         """ Get the size of the generator data for all edges
 
-        :param list(.ApplicationEdge) out_edges:
+        :param list(~.ApplicationEdge) out_edges:
         :rtype: int
         """
-        gen_on_machine = False
-        size = 0
-        for out_edge in out_edges:
-            if isinstance(out_edge, DelayedApplicationEdge):
-                for synapse_info in out_edge.synapse_information:
-
-                    # Get the number of likely vertices
-                    max_atoms = out_edge.post_vertex.get_max_atoms_per_core()
-                    if out_edge.post_vertex.n_atoms < max_atoms:
-                        max_atoms = out_edge.post_vertex.n_atoms
-                    n_edge_vertices = int(math.ceil(float(
-                        out_edge.post_vertex.n_atoms) / float(max_atoms)))
-
-                    # Get the size
-                    gen_size = self._get_edge_generator_size(synapse_info)
-                    if gen_size > 0:
-                        gen_on_machine = True
-                        size += gen_size * n_edge_vertices
-        if gen_on_machine:
+        size = sum(
+            self.__size_of_edge_generator_info(edge)
+            for edge in out_edges
+            if isinstance(edge, DelayedApplicationEdge))
+        # If there's a non-zero size, we will be generating on machine and we
+        # should add the baseline overhead
+        if size:
             size += _EXPANDER_BASE_PARAMS_SIZE
         return size
+
+    def __size_of_edge_generator_info(self, edge):
+        """
+        :param DelayedApplicationEdge edge:
+        :rtype: int
+        """
+        # Get the number of likely vertices
+        max_atoms = min(
+            edge.post_vertex.get_max_atoms_per_core(),
+            edge.post_vertex.n_atoms)
+        n_edge_vertices = ceildiv(edge.post_vertex.n_atoms, max_atoms)
+
+        # Get the size for each synapse type
+        return sum(
+            self._get_edge_generator_size(synapse_info) * n_edge_vertices
+            for synapse_info in edge.synapse_information)
 
     def get_dtcm_usage_for_atoms(self, vertex_slice):
         """

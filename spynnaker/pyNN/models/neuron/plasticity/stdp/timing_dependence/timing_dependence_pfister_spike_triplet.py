@@ -13,19 +13,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, MICRO_TO_MILLISECOND_CONVERSION)
+from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
     get_exp_lut_array)
-from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence\
-    import AbstractTimingDependence
-from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure\
-    import SynapseStructureWeightOnly
-from spinn_front_end_common.utilities.globals_variables import get_simulator
-
-logger = logging.getLogger(__name__)
+from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
+    SynapseStructureWeightOnly)
+from .abstract_timing_dependence import AbstractTimingDependence
 
 
 class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
@@ -112,19 +108,13 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
             (self.__tau_y == timing_dependence.tau_y))
 
     @property
+    @overrides(AbstractTimingDependence.vertex_executable_suffix)
     def vertex_executable_suffix(self):
-        """ The suffix to be appended to the vertex executable for this rule
-
-        :rtype: str
-        """
         return "pfister_triplet"
 
     @property
+    @overrides(AbstractTimingDependence.pre_trace_n_bytes)
     def pre_trace_n_bytes(self):
-        """ The number of bytes used by the pre-trace of the rule per neuron
-
-        :rtype: int
-        """
         # Triplet rule trace entries consists of two 16-bit traces - R1 and R2
         return BYTES_PER_WORD
 
@@ -136,16 +126,12 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
         return lut_array_words * BYTES_PER_WORD
 
     @property
+    @overrides(AbstractTimingDependence.n_weight_terms)
     def n_weight_terms(self):
-        """ The number of weight terms expected by this timing rule
-
-        :rtype: int
-        """
         return 2
 
     @overrides(AbstractTimingDependence.write_parameters)
     def write_parameters(self, spec, machine_time_step, weight_scales):
-
         # Write lookup tables
         spec.write_array(self.__tau_plus_data)
         spec.write_array(self.__tau_minus_data)
@@ -153,11 +139,8 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
         spec.write_array(self.__tau_y_data)
 
     @property
+    @overrides(AbstractTimingDependence.synaptic_structure)
     def synaptic_structure(self):
-        """ Get the synaptic structure of the plastic part of the rows
-
-        :rtype: AbstractSynapseStructure
-        """
         return self.__synapse_structure
 
     @overrides(AbstractTimingDependence.get_parameter_names)

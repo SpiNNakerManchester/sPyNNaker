@@ -111,8 +111,8 @@ class _SingleValue_Iterator(Iterator):
         """ Iterator that repeats the single values the required number of\
             times.
 
-        Allows a single Value parameter to be treated the same as parameters\
-        with len. \
+        Allows a single Value parameter to be treated the same as parameters
+        with len.
         Caches `cmd_word_list` and `cmd_string` so they are only created once.
 
         :param value: The simple value that is the data for each element
@@ -146,10 +146,10 @@ class NeuronParameter(object):
 
     def __init__(self, value, data_type):
         """
-        :param value: what the value of the parameter is; if a list or array,\
+        :param value: what the value of the parameter is; if a list or array,
             potentially provides a different value for each neuron
-        :type value: int or float or bool or list(int) or list(float) or \
-            list(bool) or ~numpy.ndarray or \
+        :type value: int or float or bool or list(int) or list(float) or
+            list(bool) or ~numpy.ndarray or
             ~spinn_utilities.ranged.AbstractList
         :param ~data_specification.enums.DataType data_type:
             The serialization type of the parameter in the neuron model.
@@ -164,8 +164,8 @@ class NeuronParameter(object):
         """ What the value of the parameter is; if a list or array,\
             potentially provides a different value for each neuron.
 
-        :rtype: int or float or bool or list(int) or list(float) or \
-            list(bool) or ~numpy.ndarray or \
+        :rtype: int or float or bool or list(int) or list(float) or
+            list(bool) or ~numpy.ndarray or
             ~spinn_utilities.ranged.AbstractList
         """
         return self.__value
@@ -186,7 +186,7 @@ class NeuronParameter(object):
         :param ~data_specification.DataSpecificationGenerator spec:
             The data specification to eventually write to.
             (Note that this does not actually do the write).
-        :return: Iterator that produces a command to write to the\
+        :return: Iterator that produces a command to write to the
             specification for each element in the slice.
         :rtype: six.Iterator(tuple(bytearray, str))
         """

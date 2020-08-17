@@ -42,6 +42,8 @@ UNITS = {
 
 
 class SynapseTypeSEMD(AbstractSynapseType):
+    """ Synaptic type for a spiking elementary motion detector.
+    """
     __slots__ = [
         "__tau_syn_E",
         "__tau_syn_E2",
@@ -141,7 +143,6 @@ class SynapseTypeSEMD(AbstractSynapseType):
 
     @overrides(AbstractSynapseType.update_values)
     def update_values(self, values, parameters, state_variables):
-
         # Read the data
         (_decay_E, _init_E, isyn_exc, _decay_E2, _init_E2, isyn_exc2,
          _decay_I, _init_I, isyn_inh, _multiplicator, exc2_old) = values

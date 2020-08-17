@@ -179,7 +179,8 @@ class SynapseDynamicsStatic(
     @overrides(AbstractChangableAfterRun.mark_no_changes, extend_doc=False)
     def mark_no_changes(self):
         """ Marks the point after which changes are reported.  Immediately\
-            after calling this method, requires_mapping should return False.
+            after calling this method, :py:meth:`requires_mapping` should \
+            return False.
         """
         self.__change_requires_mapping = False
 

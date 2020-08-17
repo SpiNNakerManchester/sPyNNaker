@@ -13,17 +13,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
 import numpy
-
-from spinn_front_end_common.utilities.constants import \
-    MICRO_TO_MILLISECOND_CONVERSION
 from spinn_utilities.overrides import overrides
-from spinn_front_end_common.utilities import globals_variables
+from spinn_front_end_common.utilities.constants import (
+    MICRO_TO_MILLISECOND_CONVERSION)
+from spinn_front_end_common.utilities.globals_variables import get_simulator
 from .abstract_connector import AbstractConnector
 from spynnaker.pyNN.exceptions import InvalidParameterType
-
-logger = logging.getLogger(__name__)
 
 # Indices of the source and target in the connection list array
 _SOURCE = 0
@@ -337,8 +333,7 @@ class FromListConnector(AbstractConnector):
         self.__delays = None
         try:
             delay_column = column_names.index('delay') + _FIRST_PARAM
-            machine_time_step = globals_variables.get_simulator(
-                ).machine_time_step
+            machine_time_step = get_simulator().machine_time_step
             self.__delays = (numpy.rint(
                 numpy.array(self.__conn_list[:, delay_column]) * (
                     MICRO_TO_MILLISECOND_CONVERSION / machine_time_step)) *
@@ -373,9 +368,11 @@ class FromListConnector(AbstractConnector):
 
     @property
     def column_names(self):
-        """ The names of the columns in the array after the first two. \
-        Of particular interest is whether ``weight`` and ``delay`` columns\
-        are present.
+        """ The names of the columns in the array after the first two.
+
+        .. note::
+            Of particular interest is whether ``weight`` and ``delay`` columns
+            are present.
 
         :rtype: list(str)
         """
@@ -386,8 +383,8 @@ class FromListConnector(AbstractConnector):
         self.__column_names = column_names
 
     def get_extra_parameters(self):
-        """ Getter for the extra parameters. Excludes ``weight`` and\
-        ``delay`` columns.
+        """ Getter for the extra parameters. Excludes ``weight`` and
+            ``delay`` columns.
 
         :return: The extra parameters
         :rtype: ~numpy.ndarray

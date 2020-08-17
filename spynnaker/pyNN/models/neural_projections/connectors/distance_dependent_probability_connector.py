@@ -12,8 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-import logging
 import math
 import numpy
 from numpy import (
@@ -22,10 +20,10 @@ from numpy import (
     minimum, e, pi)
 from spinn_utilities.overrides import overrides
 from spinn_utilities.safe_eval import SafeEval
-from spynnaker.pyNN.utilities import utility_calls
+from spynnaker.pyNN.utilities.utility_calls import (
+    get_probable_maximum_selected, round_up)
 from .abstract_connector import AbstractConnector
 
-logger = logging.getLogger(__name__)
 # support for arbitrary expression for the distance dependence
 _d_expr_context = SafeEval(math, numpy, arccos, arcsin, arctan, arctan2, ceil,
                            cos, cosh, exp, fabs, floor, fmod, hypot, ldexp,
@@ -112,8 +110,7 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
     @overrides(AbstractConnector.get_delay_maximum)
     def get_delay_maximum(self, synapse_info):
         return self._get_delay_maximum(
-            synapse_info.delays,
-            utility_calls.get_probable_maximum_selected(
+            synapse_info.delays, get_probable_maximum_selected(
                 synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
                 synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
                 numpy.amax(self.__probs)))
@@ -126,12 +123,12 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
         max_prob = numpy.amax(
             self.__probs[0:synapse_info.n_pre_neurons,
                          post_vertex_slice.as_slice])
-        n_connections = utility_calls.get_probable_maximum_selected(
+        n_connections = get_probable_maximum_selected(
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             post_vertex_slice.n_atoms, max_prob)
 
         if min_delay is None or max_delay is None:
-            return int(math.ceil(n_connections))
+            return round_up(n_connections)
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
             synapse_info.delays,
@@ -141,7 +138,7 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self, synapse_info):
         # pylint: disable=too-many-arguments
-        return utility_calls.get_probable_maximum_selected(
+        return get_probable_maximum_selected(
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             synapse_info.n_post_neurons,
             numpy.amax(self.__probs))
@@ -150,8 +147,7 @@ class DistanceDependentProbabilityConnector(AbstractConnector):
     def get_weight_maximum(self, synapse_info):
         # pylint: disable=too-many-arguments
         return self._get_weight_maximum(
-            synapse_info.weights,
-            utility_calls.get_probable_maximum_selected(
+            synapse_info.weights, get_probable_maximum_selected(
                 synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
                 synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
                 numpy.amax(self.__probs)))

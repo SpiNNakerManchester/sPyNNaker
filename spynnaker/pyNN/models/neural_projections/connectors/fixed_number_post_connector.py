@@ -14,8 +14,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import print_function
-import logging
-import math
 import numpy
 from spinn_utilities.overrides import overrides
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
@@ -24,12 +22,11 @@ from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
 from .abstract_connector_supports_views_on_machine import (
     AbstractConnectorSupportsViewsOnMachine)
-from spynnaker.pyNN.utilities import utility_calls
 from spynnaker.pyNN.exceptions import SpynnakerException
+from spynnaker.pyNN.utilities.utility_calls import (
+    round_up, get_probable_maximum_selected)
 
 N_GEN_PARAMS = 8
-
-logger = logging.getLogger(__file__)
 
 
 class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
@@ -202,12 +199,12 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
         prob_in_slice = min(
             post_vertex_slice.n_atoms / float(
                 synapse_info.n_post_neurons), 1.0)
-        n_connections = utility_calls.get_probable_maximum_selected(
+        n_connections = get_probable_maximum_selected(
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             self.__n_post, prob_in_slice, chance=1.0/100000.0)
 
         if min_delay is None or max_delay is None:
-            return int(math.ceil(n_connections))
+            return round_up(n_connections)
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
             synapse_info.delays,
@@ -218,11 +215,11 @@ class FixedNumberPostConnector(AbstractGenerateConnectorOnMachine,
     def get_n_connections_to_post_vertex_maximum(self, synapse_info):
         # pylint: disable=too-many-arguments
         selection_prob = 1.0 / float(synapse_info.n_post_neurons)
-        n_connections = utility_calls.get_probable_maximum_selected(
+        n_connections = get_probable_maximum_selected(
             synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             synapse_info.n_pre_neurons, selection_prob,
             chance=1.0/100000.0)
-        return int(math.ceil(n_connections))
+        return round_up(n_connections)
 
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, synapse_info):

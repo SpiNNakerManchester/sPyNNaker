@@ -13,14 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import math
-
 from pacman.utilities.constants import FULL_MASK
+from pacman.utilities.algorithm_utilities.partition_algorithm_utilities \
+    import (
+        determine_max_atoms_for_vertex)
 from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
-from pacman.utilities.algorithm_utilities. \
-    partition_algorithm_utilities import determine_max_atoms_for_vertex
-from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
-from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
+from .utility_calls import ceildiv
 
 # number of elements
 ELEMENTS_USED_IN_EACH_BIT_FIELD = 3  # n words, key, pointer to bitfield
@@ -43,47 +41,16 @@ N_KEYS_DATA_SET_IN_WORDS = 1
 BIT_IN_A_WORD = 32.0
 
 
-def get_estimated_sdram_for_bit_field_region(app_graph, vertex):
-    """ estimates the sdram for the bit field region
-    :param app_graph: the app graph
-    :param vertex: machine vertex
-    :return: the estimated number of bytes used by the bit field region
-    """
-    sdram = 0
-    for incoming_edge in app_graph.get_edges_ending_at_vertex(vertex):
-        if isinstance(incoming_edge, ProjectionApplicationEdge):
-            edge_pre_vertex = incoming_edge.pre_vertex
-            max_atoms = determine_max_atoms_for_vertex(edge_pre_vertex)
-            if incoming_edge.pre_vertex.n_atoms < max_atoms:
-                max_atoms = incoming_edge.pre_vertex.n_atoms
-
-            # Get the number of likely vertices
-            n_machine_vertices = int(math.ceil(
-                float(incoming_edge.pre_vertex.n_atoms) /
-                float(max_atoms)))
-            n_atoms_per_machine_vertex = int(math.ceil(
-                float(incoming_edge.pre_vertex.n_atoms) /
-                n_machine_vertices))
-            if isinstance(edge_pre_vertex, DelayExtensionVertex):
-                n_atoms_per_machine_vertex *= \
-                    edge_pre_vertex.n_delay_stages
-            n_words_for_atoms = int(math.ceil(
-                n_atoms_per_machine_vertex / BIT_IN_A_WORD))
-            sdram += (
-                (ELEMENTS_USED_IN_EACH_BIT_FIELD + (
-                    n_words_for_atoms * n_machine_vertices)) *
-                BYTES_PER_WORD)
-    return sdram
-
-
 def get_estimated_sdram_for_key_region(app_graph, vertex):
-    """ gets an estimate of the bitfield builder region
+    """ gets an estimate of the bitfield builder region size
 
-    :param app_graph: the app graph
-    :param vertex: machine vertex
-    :return: sdram needed
+    :param ~pacman.model.graphs.application.ApplicationGraph app_graph:
+        the app graph
+    :param ~pacman.model.graphs.application.ApplicationVertex vertex:
+        app vertex
+    :return: SDRAM needed
+    :rtype: int
     """
-
     # basic sdram
     sdram = N_KEYS_DATA_SET_IN_WORDS * BYTES_PER_WORD
     for in_edge in app_graph.get_edges_ending_at_vertex(vertex):
@@ -93,28 +60,27 @@ def get_estimated_sdram_for_key_region(app_graph, vertex):
         max_atoms = determine_max_atoms_for_vertex(edge_pre_vertex)
         if in_edge.pre_vertex.n_atoms < max_atoms:
             max_atoms = in_edge.pre_vertex.n_atoms
-        n_edge_vertices = int(math.ceil(
-            float(in_edge.pre_vertex.n_atoms) / float(max_atoms)))
+        n_edge_vertices = ceildiv(in_edge.pre_vertex.n_atoms, max_atoms)
         sdram += (n_edge_vertices * N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP *
                   BYTES_PER_WORD)
     return sdram
 
 
-def _exact_sdram_for_bit_field_region(
-        machine_graph, vertex, n_key_map):
-    """ calculates the correct sdram for the bitfield region based off \
-        the machine graph and graph mapper
+def _exact_sdram_for_bit_field_region(machine_graph, vertex, n_key_map):
+    """ Gets the correct SDRAM for the bitfield region based off \
+        the machine graph
 
-    :param machine_graph: machine graph
-    :param vertex: the machine vertex
-    :param n_key_map: n keys map
+    :param ~.MachineGraph machine_graph: machine graph
+    :param ~.MachineVertex vertex: the machine vertex
+    :param ~.AbstractMachinePartitionNKeysMap n_key_map: n keys map
     :return: sdram in bytes
+    :rtype: int
     """
     sdram = ELEMENTS_USED_IN_BIT_FIELD_HEADER * BYTES_PER_WORD
     for incoming_edge in machine_graph.get_edges_ending_at_vertex(vertex):
         n_keys = n_key_map.n_keys_for_partition(
             machine_graph.get_outgoing_partition_for_edge(incoming_edge))
-        n_words_for_atoms = int(math.ceil(n_keys / BIT_IN_A_WORD))
+        n_words_for_atoms = ceildiv(n_keys, int(BIT_IN_A_WORD))
 
         sdram += (
             (ELEMENTS_USED_IN_EACH_BIT_FIELD + n_words_for_atoms) *
@@ -123,23 +89,26 @@ def _exact_sdram_for_bit_field_region(
 
 
 def exact_sdram_for_bit_field_builder_region():
-    """ returns the sdram requirement for the builder region
-    :return: returns the sdram requirement for the builder region
+    """ Gets the SDRAM requirement for the builder region
+
+    :return: returns the SDRAM requirement for the builder region
+    :rtype: int
     """
     return N_REGIONS_ADDRESSES * BYTES_PER_WORD
 
 
 def _exact_sdram_for_bit_field_key_region(machine_graph, vertex):
-    """ calcs the exact sdram for the bitfield key region
+    """ Calculates the exact SDRAM for the bitfield key region
 
-    :param machine_graph: machine graph
-    :param vertex: machine vertex
-    :return: bytes
+    :param ~.MachineGraph machine_graph: machine graph
+    :param ~.MachineVertex vertex: machine vertex
+    :return: number of bytes
+    :rtype: int
     """
     return (
-               N_KEYS_DATA_SET_IN_WORDS +
-               len(machine_graph.get_edges_ending_at_vertex(vertex)) *
-               N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP) * BYTES_PER_WORD
+        N_KEYS_DATA_SET_IN_WORDS +
+        len(machine_graph.get_edges_ending_at_vertex(vertex)) *
+        N_ELEMENTS_IN_EACH_KEY_N_ATOM_MAP) * BYTES_PER_WORD
 
 
 def reserve_bit_field_regions(
@@ -147,16 +116,17 @@ def reserve_bit_field_regions(
         bit_filter_region, bit_field_key_region):
     """ reserves the regions for the bitfields
 
-    :param spec: dsg file
-    :param machine_graph: machine graph
-    :param n_key_map: map between partitions and n keys
-    :param vertex: machine vertex
-    :param bit_field_builder_region: region id for the builder region
-    :param bit_filter_region: region id for the bitfield region
-    :param bit_field_key_region: region id for the key map
-    :rtype: None
+    :param ~data_specification.DataSpecificationGenerator spec: dsg file
+    :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
+        machine graph
+    :param ~pacman.model.routing_info.AbstractMachinePartitionNKeysMap \
+            n_key_map:
+        map between partitions and n keys
+    :param ~pacman.model.graphs.machine.MachineVertex vertex: machine vertex
+    :param int bit_field_builder_region: region id for the builder region
+    :param int bit_filter_region: region id for the bitfield region
+    :param int bit_field_key_region: region id for the key map
     """
-
     # reserve the final destination for the bitfields
     spec.reserve_memory_region(
         region=bit_filter_region,
@@ -185,21 +155,24 @@ def write_bitfield_init_data(
         structural_dynamics_region_id, has_structural_dynamics_region):
     """ writes the init data needed for the bitfield generator
 
-    :param spec: data spec writer
-    :param machine_vertex: machine vertex
-    :param machine_graph: machine graph
-    :param routing_info: keys
-    :param n_key_map: map for edge to n keys
-    :param bit_field_builder_region: the region id for the bitfield builder
-    :param master_pop_region_id: the region id for the master pop table
-    :param synaptic_matrix_region_id: the region id for the synaptic matrix
-    :param direct_matrix_region_id: the region id for the direct matrix
-    :param bit_field_region_id: the region id for the bit-fields
-    :param bit_field_key_map_region_id: the region id for the key map
-    :param structural_dynamics_region_id:  the region id for the structural
-    :param has_structural_dynamics_region: \
-        bool saying if the core has a has_structural_dynamics_region or not
-    :rtype: None
+    :param ~data_specification.DataSpecificationGenerator spec: data spec writer
+    :param ~pacman.model.graphs.machine.MachineVertex machine_vertex:
+        machine vertex
+    :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
+        machine graph
+    :param ~pacman.model.routing_info.RoutingInfo routing_info: keys
+    :param ~pacman.model.routing_info.AbstractMachinePartitionNKeysMap \
+            n_key_map:
+        map for edge to n keys
+    :param int bit_field_builder_region: the region id for the bitfield builder
+    :param int master_pop_region_id: the region id for the master pop table
+    :param int synaptic_matrix_region_id: the region id for the synaptic matrix
+    :param int direct_matrix_region_id: the region id for the direct matrix
+    :param int bit_field_region_id: the region id for the bit-fields
+    :param int bit_field_key_map_region_id: the region id for the key map
+    :param int structural_dynamics_region_id:  the region id for the structural
+    :param bool has_structural_dynamics_region:
+        whether the core has a structural dynamics region
     """
 
     spec.switch_write_focus(bit_field_builder_region)

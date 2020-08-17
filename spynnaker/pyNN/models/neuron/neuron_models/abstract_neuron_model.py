@@ -17,9 +17,9 @@ import numpy
 from six import with_metaclass
 from spinn_utilities.abstract_base import AbstractBase
 from spinn_utilities.overrides import overrides
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.models.neuron.implementations import (
     AbstractStandardNeuronComponent)
-from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.utilities.struct import Struct
 
 

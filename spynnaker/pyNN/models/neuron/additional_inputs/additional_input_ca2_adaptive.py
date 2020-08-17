@@ -73,11 +73,6 @@ class AdditionalInputCa2Adaptive(AbstractAdditionalInput):
 
     @overrides(AbstractAdditionalInput.get_values)
     def get_values(self, parameters, state_variables, vertex_slice, ts):
-        """
-        :param int ts: machine time step
-        """
-        # pylint: disable=arguments-differ
-
         # Add the rest of the data
         return [parameters[TAU_CA2].apply_operation(
                     operation=lambda x: numpy.exp(float(-ts) / (1000.0 * x))),

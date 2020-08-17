@@ -12,14 +12,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-import logging
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationEdge
 from .projection_machine_edge import ProjectionMachineEdge
 from spynnaker.pyNN.models.abstract_models import AbstractFilterableEdge
-
-logger = logging.getLogger(__name__)
 _DynamicsStructural = None
 
 

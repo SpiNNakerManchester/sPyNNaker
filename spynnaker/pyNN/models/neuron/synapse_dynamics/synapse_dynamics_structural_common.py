@@ -12,21 +12,18 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 import collections
-import math
 import numpy
 from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION, MICRO_TO_SECOND_CONVERSION,
     BYTES_PER_WORD, BYTES_PER_SHORT)
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
-from .abstract_synapse_dynamics_structural import (
-    AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
+from spynnaker.pyNN.utilities.utility_calls import ceildiv
 
 
-class SynapseDynamicsStructuralCommon(object):
+class StructuralPlasticityCommon(object):
     """ Utility class that holds properties of synaptic rewiring\
         both in the presence and absence of STDP.
 
@@ -106,7 +103,7 @@ class SynapseDynamicsStructuralCommon(object):
         :param float initial_weight:
             Initial weight assigned to a newly formed connection
         :param initial_delay: Delay assigned to a newly formed connection
-        :type initial_delay: int or (int, int)
+        :type initial_delay: int or float or tuple(int or float, int or float)
         :param int s_max: Maximum fan-in per target layer neuron
         :param int seed: seed the random number generators
         """
@@ -157,7 +154,7 @@ class SynapseDynamicsStructuralCommon(object):
         """ The period of rewiring.
 
         :return: The period of rewiring
-        :rtype: int
+        :rtype: float
         """
         return self.__p_rew
 
@@ -225,17 +222,18 @@ class SynapseDynamicsStructuralCommon(object):
 
     def __get_structural_edges(self, app_graph, app_vertex):
         """
-        :param ~pacman.model.graphs.application.ApplicationGraph app_graph:
-        :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
+        :param ~.ApplicationGraph app_graph:
+        :param ~.ApplicationVertex app_vertex:
         :rtype: list(tuple(ProjectionApplicationEdge, SynapseInformation))
+        :raises SynapticConfigurationException:
+            if there are two structurally-plastic projections on an edge
         """
         structural_edges = list()
         for app_edge in app_graph.get_edges_ending_at_vertex(app_vertex):
             if isinstance(app_edge, ProjectionApplicationEdge):
                 found = False
                 for synapse_info in app_edge.synapse_information:
-                    if isinstance(synapse_info.synapse_dynamics,
-                                  AbstractSynapseDynamicsStructural):
+                    if synapse_info.is_structural:
                         if found:
                             raise SynapticConfigurationException(
                                 "Only one Projection between each pair of "
@@ -248,16 +246,13 @@ class SynapseDynamicsStructuralCommon(object):
             self, spec, app_vertex, post_slice, machine_time_step, n_pre_pops):
         """ Write the non-sub-population synapse parameters to the spec.
 
-        :param ~data_specification.DataSpecificationGenerator spec:
-            the data spec
+        :param ~.DataSpecificationGenerator spec: the data spec
         :param AbstractPopulationVertex app_vertex:
             the highest level object of the post-synaptic population
         :param ~pacman.model.graphs.common.Slice post_slice:
             the slice of the app vertex corresponding to this machine vertex
         :param int machine_time_step: the duration of a machine time step (ms)
         :param int n_pre_pops: the number of pre-populations
-        :return: None
-        :rtype: None
         """
         if (self.__p_rew * MICRO_TO_MILLISECOND_CONVERSION <
                 machine_time_step / MICRO_TO_MILLISECOND_CONVERSION):
@@ -305,10 +300,11 @@ class SynapseDynamicsStructuralCommon(object):
             routing_info, weight_scales, post_slice, synapse_indices,
             machine_time_step):
         """
-        :param ~data_specification.DataSpecificationGenerator spec:
+        :param ~.DataSpecificationGenerator spec:
         :param AbstractPopulationVertex app_vertex:
-        :param list(tuple(ProjectionApplicationEdge,SynapseInformation)) \
-                structural_edges:
+        :param structural_edges:
+        :type structural_edges:
+            list(tuple(ProjectionApplicationEdge,SynapseInformation))
         :param RoutingInfo routing_info:
         :param dict(AbstractSynapseType,float) weight_scales:
         :param ~pacman.model.graphs.common.Slice post_slice:
@@ -367,9 +363,10 @@ class SynapseDynamicsStructuralCommon(object):
         """ Post to pre table is basically the transpose of the synaptic\
             matrix.
 
-        :param ~data_specification.DataSpecificationGenerator spec:
-        :param dict(tuple(AbstractPopulationVertex,SynapseInformation),int) \
-                pop_index:
+        :param ~.DataSpecificationGenerator spec:
+        :param pop_index:
+        :type pop_index:
+            dict(tuple(AbstractPopulationVertex,SynapseInformation),int)
         :param AbstractPopulationVertex app_vertex:
         :param ~pacman.model.graphs.common.Slice post_slice:
         """
@@ -438,22 +435,18 @@ class SynapseDynamicsStructuralCommon(object):
         param_sizes = self.__partner_selection\
             .get_parameters_sdram_usage_in_bytes()
         for (in_edge, synapse_info) in structural_edges:
-            max_atoms = in_edge.pre_vertex.get_max_atoms_per_core()
-            if in_edge.pre_vertex.n_atoms < max_atoms:
-                max_atoms = in_edge.pre_vertex.n_atoms
-            n_sub_edges += int(math.ceil(
-                float(in_edge.pre_vertex.n_atoms) / float(max_atoms)))
-            dynamics = synapse_info.synapse_dynamics
-            param_sizes += dynamics.formation\
-                .get_parameters_sdram_usage_in_bytes()
-            param_sizes += dynamics.elimination\
-                .get_parameters_sdram_usage_in_bytes()
+            n_sub_edges += ceildiv(in_edge.pre_vertex.n_atoms, min(
+                in_edge.pre_vertex.get_max_atoms_per_core(),
+                in_edge.pre_vertex.n_atoms))
+            param_sizes += synapse_info.synapse_dynamics.\
+                get_per_edge_parameters_sdram_usage_in_bytes()
 
-        return int((self._REWIRING_DATA_SIZE +
-                   (self._PRE_POP_INFO_BASE_SIZE * len(structural_edges)) +
-                   (self._KEY_ATOM_INFO_SIZE * n_sub_edges) +
-                   (self._POST_TO_PRE_ENTRY_SIZE * n_neurons * self.__s_max) +
-                   param_sizes))
+        return int(
+            self._REWIRING_DATA_SIZE +
+            (self._PRE_POP_INFO_BASE_SIZE * len(structural_edges)) +
+            (self._KEY_ATOM_INFO_SIZE * n_sub_edges) +
+            (self._POST_TO_PRE_ENTRY_SIZE * n_neurons * self.__s_max) +
+            param_sizes)
 
     def synaptic_data_update(
             self, connections, post_vertex_slice, app_edge, synapse_info,
@@ -466,8 +459,7 @@ class SynapseDynamicsStructuralCommon(object):
         :param SynapseInformation synapse_info:
         :param ProjectionMachineEdge machine_edge:
         """
-        if not isinstance(synapse_info.synapse_dynamics,
-                          AbstractSynapseDynamicsStructural):
+        if not synapse_info.is_structural:
             return
         collector = self.__connections.setdefault(
             (app_edge.post_vertex, post_vertex_slice.lo_atom), [])
@@ -500,7 +492,7 @@ class SynapseDynamicsStructuralCommon(object):
 
     def is_same_as(self, synapse_dynamics):
         """
-        :param SynapseDynamicsStructuralCommon synapse_dynamics:
+        :param StructuralPlasticityCommon synapse_dynamics:
         :rtype: bool
         """
         # Note noqa because exact type comparison is required here
@@ -518,41 +510,64 @@ class SynapseDynamicsStructuralCommon(object):
 
     @property
     def initial_weight(self):
+        """ Initial weight assigned to a newly formed connection
+
+        :rtype: float
+        """
         return self.__initial_weight
 
     @property
     def initial_delay(self):
+        """ Delay assigned to a newly formed connection
+
+        :rtype: int or float or tuple(int or float, int or float)
+        """
         return self.__initial_delay
 
     @property
     def f_rew(self):
+        """ Frequency of rewiring (Hz)
+
+        :rtype: float
+        """
         return self.__f_rew
 
     @property
     def s_max(self):
+        """ Maximum fan-in per target layer neuron
+
+        :rtype: int
+        """
         return self.__s_max
 
     @property
     def seed(self):
+        """ seed for the random number generators
+
+        :rtype: int
+        """
         return self.__seed
 
     @property
     def partner_selection(self):
-        """
+        """ The partner selection rule
+
         :rtype: AbstractPartnerSelection
         """
         return self.__partner_selection
 
     @property
     def formation(self):
-        """
+        """ The formation rule
+
         :rtype: AbstractFormation
         """
         return self.__formation
 
     @property
     def elimination(self):
-        """
+        """ The elimination rule
+
         :rtype: AbstractElimination
         """
         return self.__elimination

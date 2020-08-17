@@ -35,5 +35,4 @@ class AbstractReadParametersBeforeSet(object):
             the placement of a vertex
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             the slice of atoms for this vertex
-        :rtype: None
         """

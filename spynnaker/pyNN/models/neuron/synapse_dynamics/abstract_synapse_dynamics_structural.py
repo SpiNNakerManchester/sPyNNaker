@@ -86,6 +86,8 @@ class AbstractSynapseDynamicsStructural(object):
     @abstractproperty
     def seed(self):
         """ The seed to control the randomness
+
+        :rtype: int
         """
 
     @abstractproperty
@@ -122,3 +124,16 @@ class AbstractSynapseDynamicsStructural(object):
 
         :rtype: AbstractElimination
         """
+
+    def get_per_edge_parameters_sdram_usage_in_bytes(self):
+        """ Get the amount of SDRAM used by the parameters of the rules per \
+            structurally-plastic synapse.
+
+        .. note::
+            The partner selection rule is shared.
+
+        :rtype: int
+        """
+        # pylint: disable=no-member
+        return (self.formation.get_parameters_sdram_usage_in_bytes() +
+                self.elimination.get_parameters_sdram_usage_in_bytes())

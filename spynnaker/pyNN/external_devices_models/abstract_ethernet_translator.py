@@ -33,5 +33,4 @@ class AbstractEthernetTranslator(object):
         :param multicast_packet: A received multicast packet
         :type multicast_packet:
             ~spinnman.messages.eieio.data_messages.AbstractEIEIODataElement
-        :rtype: None
         """

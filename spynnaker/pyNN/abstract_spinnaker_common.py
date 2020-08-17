@@ -17,26 +17,42 @@ import logging
 import math
 import os
 from six import with_metaclass
-
-from spinn_front_end_common.utilities.constants import \
-    MICRO_TO_MILLISECOND_CONVERSION
 from spinn_utilities.abstract_base import AbstractBase
 from spinn_utilities.log import FormatAdapter
+from spinn_front_end_common.utilities.constants import (
+    MICRO_TO_MILLISECOND_CONVERSION)
 from spinn_front_end_common.interface.abstract_spinnaker_base import (
     AbstractSpinnakerBase)
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utility_models import CommandSender
 from spinn_front_end_common.utilities.utility_objs import ExecutableFinder
-from spinn_front_end_common.utilities import globals_variables
+from spinn_front_end_common.utilities.globals_variables import unset_simulator
 from spinn_front_end_common.utilities.helpful_functions import read_config
-from spynnaker.pyNN import extra_algorithms, model_binaries
-from spynnaker.pyNN.utilities import constants
+from spynnaker.pyNN.utilities.constants import (
+    MAX_DELAY_BLOCKS, MAX_SUPPORTED_DELAY_TICS,
+    MAX_TIMER_TICS_SUPPORTED_PER_BLOCK, MIN_SUPPORTED_DELAY)
 from spynnaker.pyNN.spynnaker_simulator_interface import (
     SpynnakerSimulatorInterface)
 from spynnaker.pyNN.utilities.extracted_data import ExtractedData
 from spynnaker import __version__ as version
+from spynnaker.pyNN.utilities.utility_calls import round_up
+from spynnaker.pyNN import model_binaries
 
 logger = FormatAdapter(logging.getLogger(__name__))
+
+
+def _extra_algo_path():
+    """ List containing the names of the extra algorithms config files.
+
+    .. note::
+        Need to `import` within this to avoid an import loop.
+
+    :rtype: list(str)
+    """
+    import spynnaker.pyNN.extra_algorithms
+    return [os.path.join(
+        os.path.dirname(spynnaker.pyNN.extra_algorithms.__file__),
+        "algorithms_metadata.xml")]
 
 
 class AbstractSpiNNakerCommon(with_metaclass(
@@ -85,7 +101,7 @@ class AbstractSpiNNakerCommon(with_metaclass(
         :param user_extra_algorithms_pre_run:
         :type user_extra_algorithms_pre_run: list(str) or None
         :param time_scale_factor:
-        :type time_scale_factor:
+        :type time_scale_factor: int or None
         :param extra_post_run_algorithms:
         :type extra_post_run_algorithms: list(str) or None
         :param extra_mapping_algorithms:
@@ -93,7 +109,7 @@ class AbstractSpiNNakerCommon(with_metaclass(
         :param extra_load_algorithms:
         :type extra_load_algorithms: list(str) or None
         :param front_end_versions:
-        :type front_end_versions:
+        :type front_end_versions: list(tuple(str,str)) or None
         """
         # pylint: disable=too-many-arguments, too-many-locals
 
@@ -114,10 +130,7 @@ class AbstractSpiNNakerCommon(with_metaclass(
 
         # create XML path for where to locate sPyNNaker related functions when
         # using auto pause and resume
-        extra_algorithm_xml_path = list()
-        extra_algorithm_xml_path.append(os.path.join(
-            os.path.dirname(extra_algorithms.__file__),
-            "algorithms_metadata.xml"))
+        extra_algorithm_xml_path = _extra_algo_path()
         if user_extra_algorithm_xml_path is not None:
             extra_algorithm_xml_path.extend(user_extra_algorithm_xml_path)
 
@@ -238,7 +251,7 @@ class AbstractSpiNNakerCommon(with_metaclass(
             self.set_up_timings(timestep, time_scale_factor)
         else:
             self.set_up_timings(
-                math.ceil(timestep * MICRO_TO_MILLISECOND_CONVERSION),
+                round_up(timestep * MICRO_TO_MILLISECOND_CONVERSION),
                 time_scale_factor)
 
         # Sort out the minimum delay
@@ -248,7 +261,7 @@ class AbstractSpiNNakerCommon(with_metaclass(
             raise ConfigurationException(
                 "Pacman does not support min delays below {} ms with the "
                 "current machine time step".format(
-                    constants.MIN_SUPPORTED_DELAY * self.machine_time_step))
+                    MIN_SUPPORTED_DELAY * self.machine_time_step))
         if min_delay is not None:
             self.__min_delay = min_delay
         else:
@@ -256,11 +269,9 @@ class AbstractSpiNNakerCommon(with_metaclass(
                 self.machine_time_step / MICRO_TO_MILLISECOND_CONVERSION)
 
         # Sort out the maximum delay
-        natively_supported_delay_for_models = \
-            constants.MAX_SUPPORTED_DELAY_TICS
+        natively_supported_delay_for_models = MAX_SUPPORTED_DELAY_TICS
         delay_extension_max_supported_delay = (
-            constants.MAX_DELAY_BLOCKS *
-            constants.MAX_TIMER_TICS_SUPPORTED_PER_BLOCK)
+            MAX_DELAY_BLOCKS * MAX_TIMER_TICS_SUPPORTED_PER_BLOCK)
         max_delay_tics_supported = \
             natively_supported_delay_for_models + \
             delay_extension_max_supported_delay
@@ -276,8 +287,7 @@ class AbstractSpiNNakerCommon(with_metaclass(
         else:
             self.__max_delay = (
                 max_delay_tics_supported * (
-                    self.machine_time_step /
-                    MICRO_TO_MILLISECOND_CONVERSION))
+                    self.machine_time_step / MICRO_TO_MILLISECOND_CONVERSION))
 
         # Sort out the time scale factor if not user specified
         # (including config)
@@ -387,7 +397,6 @@ class AbstractSpiNNakerCommon(with_metaclass(
         :param clear_tags: informs the tool chain if it should clear the tags
             off the machine at stop
         :type clear_tags: bool or None
-        :rtype: None
         """
         # pylint: disable=protected-access
         for population in self._populations:
@@ -396,14 +405,13 @@ class AbstractSpiNNakerCommon(with_metaclass(
         super(AbstractSpiNNakerCommon, self).stop(
             turn_off_machine, clear_routing_tables, clear_tags)
         self.reset_number_of_neurons_per_core()
-        globals_variables.unset_simulator(self)
+        unset_simulator(self)
 
     def run(self, run_time):
         """ Run the model created.
 
         :param run_time: the time (in milliseconds) to run the simulation for
         :type run_time: float or int
-        :rtype: None
         """
         # pylint: disable=protected-access
 
@@ -428,7 +436,6 @@ class AbstractSpiNNakerCommon(with_metaclass(
         """ Register an additional binary search path for executables.
 
         :param str search_path: absolute search path for binaries
-        :rtype: None
         """
         # pylint: disable=protected-access
         AbstractSpiNNakerCommon.__EXECUTABLE_FINDER.add_path(search_path)

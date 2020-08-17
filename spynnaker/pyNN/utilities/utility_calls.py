@@ -14,11 +14,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-utility class containing simple helper methods
+Utility package containing simple helper functions.
 """
-import os
-import logging
 import math
+import os
 import numpy
 from pyNN.random import RandomDistribution
 from scipy.stats import binom
@@ -29,7 +28,6 @@ from spynnaker.pyNN.utilities.random_stats import (
     RandomStatsNormalClippedImpl, RandomStatsNormalImpl,
     RandomStatsPoissonImpl, RandomStatsRandIntImpl, RandomStatsUniformImpl,
     RandomStatsVonmisesImpl, RandomStatsBinomialImpl)
-
 
 MAX_RATE = 2 ** 32 - 1  # To allow a unit32_t to be used to store the rate
 
@@ -45,8 +43,6 @@ STATS_BY_NAME = {
     'uniform': RandomStatsUniformImpl(),
     'randint': RandomStatsRandIntImpl(),
     'vonmises': RandomStatsVonmisesImpl()}
-
-logger = logging.getLogger(__name__)
 
 
 def check_directory_exists_and_create_if_not(filename):
@@ -69,7 +65,6 @@ def convert_param_to_numpy(param, no_atoms):
     :return: the converted param as an array of floats
     :rtype: ~numpy.ndarray(float)
     """
-
     # Deal with random distributions by generating values
     if isinstance(param, RandomDistribution):
 
@@ -205,6 +200,8 @@ def get_probable_maximum_selected(
     """ Get the likely maximum number of items that will be selected from a\
         set of n_trials from a total set of n_total_trials\
         with a probability of selection of selection_prob
+
+    :rtype: float
     """
     prob = 1.0 - (chance / float(n_total_trials))
     return binom.ppf(prob, n_trials, selection_prob)
@@ -213,6 +210,8 @@ def get_probable_maximum_selected(
 def get_probability_within_range(dist, lower, upper):
     """ Get the probability that a value will fall within the given range for\
         a given RandomDistribution
+
+    :rtype: float
     """
     stats = STATS_BY_NAME[dist.name]
     return (stats.cdf(dist, upper) - stats.cdf(dist, lower))
@@ -221,6 +220,8 @@ def get_probability_within_range(dist, lower, upper):
 def get_maximum_probable_value(dist, n_items, chance=(1.0 / 100.0)):
     """ Get the likely maximum value of a RandomDistribution given a\
         number of draws
+
+    :rtype: float
     """
     stats = STATS_BY_NAME[dist.name]
     prob = 1.0 - (chance / float(n_items))
@@ -230,6 +231,8 @@ def get_maximum_probable_value(dist, n_items, chance=(1.0 / 100.0)):
 def get_minimum_probable_value(dist, n_items, chance=(1.0 / 100.0)):
     """ Get the likely minimum value of a RandomDistribution given a\
         number of draws
+
+    :rtype: float
     """
     stats = STATS_BY_NAME[dist.name]
     prob = chance / float(n_items)
@@ -238,6 +241,8 @@ def get_minimum_probable_value(dist, n_items, chance=(1.0 / 100.0)):
 
 def get_mean(dist):
     """ Get the mean of a RandomDistribution
+
+    :rtype: float
     """
     stats = STATS_BY_NAME[dist.name]
     return stats.mean(dist)
@@ -245,6 +250,8 @@ def get_mean(dist):
 
 def get_standard_deviation(dist):
     """ Get the standard deviation of a RandomDistribution
+
+    :rtype: float
     """
     stats = STATS_BY_NAME[dist.name]
     return stats.std(dist)
@@ -252,6 +259,8 @@ def get_standard_deviation(dist):
 
 def get_variance(dist):
     """ Get the variance of a RandomDistribution
+
+    :rtype: float
     """
     stats = STATS_BY_NAME[dist.name]
     return stats.var(dist)
@@ -261,6 +270,8 @@ def high(dist):
     """ Gets the high or max boundary value for this distribution
 
     Could return None
+
+    :rtype: float or None
     """
     stats = STATS_BY_NAME[dist.name]
     return stats.high(dist)
@@ -270,6 +281,8 @@ def low(dist):
     """ Gets the high or min boundary value for this distribution
 
     Could return None
+
+    :rtype: float or None
     """
     stats = STATS_BY_NAME[dist.name]
     return stats.low(dist)
@@ -287,8 +300,17 @@ def validate_mars_kiss_64_seed(seed):
     return seed
 
 
+def round_up(value):
+    """ Rounds a value up to the nearest integer.
+
+    :param float value:
+    :rtype: int
+    """
+    return int(math.ceil(value))
+
+
 def get_n_bits(n_values):
-    """ Determine how many bits are required for the given number of values
+    """ Determine how many bits are required for the given number of values.
 
     :param int n_values: the number of values (starting at 0)
     :return: the number of bits required to express that many values
@@ -298,4 +320,13 @@ def get_n_bits(n_values):
         return 0
     if n_values == 1:
         return 1
-    return int(math.ceil(math.log(n_values, 2)))
+    return (n_values - 1).bit_length()
+
+
+def ceildiv(x, y):
+    """ Divide `x` by `y` and round *up*.
+
+    :rtype: int
+    """
+    d, m = divmod(x, y)
+    return int(d) + (m != 0)

@@ -12,8 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-import logging
 from threading import RLock
 import numpy
 from spinnman.connections import ConnectionListener
@@ -23,7 +21,6 @@ from spynnaker.pyNN.external_devices_models.push_bot.push_bot_parameters \
     import (
         PushBotRetinaResolution)
 
-logger = logging.getLogger(__name__)
 _RETINA_PACKET_SIZE = BYTES_PER_SHORT
 
 

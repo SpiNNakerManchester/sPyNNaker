@@ -28,7 +28,17 @@ class SpynnakerDataSpecificationWriter(GraphDataSpecificationWriter):
             self, placements, hostname, report_default_directory,
             write_text_specs, machine, data_n_timesteps):
         # pylint: disable=too-many-arguments, signature-differs
+        return super(SpynnakerDataSpecificationWriter, self).__call__(
+            placements, hostname, report_default_directory, write_text_specs,
+            machine, data_n_timesteps,
+            placement_order=self._sort_delays_to_end(placements))
 
+    @staticmethod
+    def _sort_delays_to_end(placements):
+        """
+        :param ~.Placements placements:
+        :rtype: list(~.Placement)
+        """
         delay_extensions = list()
         placement_order = list()
         for placement in placements.placements:
@@ -37,7 +47,4 @@ class SpynnakerDataSpecificationWriter(GraphDataSpecificationWriter):
             else:
                 placement_order.append(placement)
         placement_order.extend(delay_extensions)
-
-        return super(SpynnakerDataSpecificationWriter, self).__call__(
-            placements, hostname, report_default_directory, write_text_specs,
-            machine, data_n_timesteps, placement_order)
+        return placement_order

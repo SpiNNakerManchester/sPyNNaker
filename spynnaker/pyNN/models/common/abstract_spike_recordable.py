@@ -26,7 +26,7 @@ class AbstractSpikeRecordable(object):
 
     @abstractmethod
     def is_recording_spikes(self):
-        """ Determine if spikes are being recorded
+        """ Determine if spikes are being recorded.
 
         :return: True if spikes are being recorded, False otherwise
         :rtype: bool
@@ -36,7 +36,7 @@ class AbstractSpikeRecordable(object):
     def set_recording_spikes(
             self, new_state=True, sampling_interval=None, indexes=None):
         """ Set spikes to being recorded. \
-            If `new_state` is false all other parameters are ignored.
+            If `new_state` is False all other parameters are ignored.
 
         :param bool new_state: Set if the spikes are recording or not
         :param sampling_interval: The interval at which spikes are recorded.
@@ -57,7 +57,6 @@ class AbstractSpikeRecordable(object):
             ~spinn_front_end_common.interface.buffer_management.BufferManager
         :param ~pacman.model.placements.Placements placements:
             the placements object
-        :rtype: None
         """
 
     @abstractmethod
@@ -71,7 +70,7 @@ class AbstractSpikeRecordable(object):
             ~spinn_front_end_common.interface.buffer_management.BufferManager
         :param int machine_time_step:
             the time step of the simulation, in microseconds
-        :return: A numpy array of 2-element arrays of (neuron_id, time)\
+        :return: A numpy array of 2-element arrays of (neuron_id, time)
             ordered by time, one element per event
         :rtype: ~numpy.ndarray(tuple(int,int))
         """

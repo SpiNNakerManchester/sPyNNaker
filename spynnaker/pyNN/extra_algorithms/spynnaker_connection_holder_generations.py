@@ -13,12 +13,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import logging
 from spinn_utilities.progress_bar import ProgressBar
 from spynnaker.pyNN.models.neuron import ConnectionHolder
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
-
-logger = logging.getLogger(__name__)
 
 
 class SpYNNakerConnectionHolderGenerator(object):
@@ -28,11 +25,14 @@ class SpYNNakerConnectionHolderGenerator(object):
             application_graph:
         app graph
     :return: the set of connection holders for after DSG generation
-    :rtype: dict(tuple(ProjectionApplicationEdge, SynapseInformation), \
+    :rtype: dict(tuple(ProjectionApplicationEdge, SynapseInformation),
         ConnectionHolder)
     """
 
     def __call__(self, application_graph):
+        """
+        :param ~.ApplicationGraph application_graph:
+        """
         progress = ProgressBar(
             application_graph.n_outgoing_edge_partitions,
             "Generating connection holders for reporting connection data.")
@@ -41,7 +41,7 @@ class SpYNNakerConnectionHolderGenerator(object):
         for partition in progress.over(
                 application_graph.outgoing_edge_partitions):
             for edge in partition.edges:
-                # add pre run generators so that reports can extract without
+                # add pre-run generators so that reports can extract without
                 # going to machine.
                 if isinstance(edge, ProjectionApplicationEdge):
                     # build connection holders
@@ -52,6 +52,13 @@ class SpYNNakerConnectionHolderGenerator(object):
 
     @staticmethod
     def _generate_holder_for_edge(edge, data_holders):
+        """
+        :param ProjectionApplicationEdge edge:
+        :param data_holders:
+        :type data_holders:
+            dict(tuple(ProjectionApplicationEdge, SynapseInformation),
+            ConnectionHolder)
+        """
         # build connection holders
         connection_holder = ConnectionHolder(
             None, True, edge.pre_vertex.n_atoms, edge.post_vertex.n_atoms)

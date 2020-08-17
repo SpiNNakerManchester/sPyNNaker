@@ -12,8 +12,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-import logging
 import numpy
 from spinn_utilities.overrides import overrides
 from .abstract_connector import AbstractConnector
@@ -21,8 +19,6 @@ from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
 from .abstract_connector_supports_views_on_machine import (
     AbstractConnectorSupportsViewsOnMachine)
-
-logger = logging.getLogger(__name__)
 
 
 class OneToOneConnector(AbstractGenerateConnectorOnMachine,
@@ -113,8 +109,7 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
     def __repr__(self):
         return "OneToOneConnector()"
 
-    def _get_pre_post_limits(
-            self, pre_slice, post_slice, synapse_info):
+    def _get_pre_post_limits(self, pre_slice, post_slice, synapse_info):
         """
         :param ~pacman.model.graphs.common.Slice pre_slice:
         :param ~pacman.model.graphs.common.Slice post_slice:

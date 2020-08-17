@@ -14,8 +14,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from enum import Enum
-from spynnaker.pyNN.external_devices_models\
-    .abstract_multicast_controllable_device import SendType
+from spynnaker.pyNN.external_devices_models import SendType
 
 
 class AbstractPushBotOutputDevice(Enum):

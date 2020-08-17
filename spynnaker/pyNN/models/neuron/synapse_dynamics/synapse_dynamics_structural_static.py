@@ -16,8 +16,7 @@
 from spinn_utilities.overrides import overrides
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
-from .synapse_dynamics_structural_common import (
-    SynapseDynamicsStructuralCommon as CommonSP)
+from .synapse_dynamics_structural_common import StructuralPlasticityCommon
 from .synapse_dynamics_static import SynapseDynamicsStatic
 from .synapse_dynamics_stdp import SynapseDynamicsSTDP
 from .synapse_dynamics_structural_stdp import SynapseDynamicsStructuralSTDP
@@ -28,8 +27,8 @@ class SynapseDynamicsStructuralStatic(
         SynapseDynamicsStatic, AbstractSynapseDynamicsStructural):
     """ Class that enables synaptic rewiring in the absence of STDP.
 
-        It acts as a wrapper around SynapseDynamicsStatic, meaning that \
-        rewiring can operate in parallel with static synapses.
+        It acts as a wrapper around :py:class:`SynapseDynamicsStatic`, meaning
+        that rewiring can operate in parallel with static synapses.
 
         Written by Petrut Bogdan.
     """
@@ -37,10 +36,10 @@ class SynapseDynamicsStructuralStatic(
 
     def __init__(
             self, partner_selection, formation, elimination,
-            f_rew=CommonSP.DEFAULT_F_REW,
-            initial_weight=CommonSP.DEFAULT_INITIAL_WEIGHT,
-            initial_delay=CommonSP.DEFAULT_INITIAL_DELAY,
-            s_max=CommonSP.DEFAULT_S_MAX, seed=None,
+            f_rew=StructuralPlasticityCommon.DEFAULT_F_REW,
+            initial_weight=StructuralPlasticityCommon.DEFAULT_INITIAL_WEIGHT,
+            initial_delay=StructuralPlasticityCommon.DEFAULT_INITIAL_DELAY,
+            s_max=StructuralPlasticityCommon.DEFAULT_S_MAX, seed=None,
             weight=0.0, delay=1.0):
         """
         :param AbstractPartnerSelection partner_selection:
@@ -55,7 +54,7 @@ class SynapseDynamicsStructuralStatic(
             a fixed delay value, or a tuple of two values means the delay will
             be chosen at random from a uniform distribution between the given
             values
-        :type initial_delay: float or (float, float)
+        :type initial_delay: int or float or tuple(int or float, int or float)
         :param int s_max: Maximum fan-in per target layer neuron
         :param int seed: seed the random number generators
         :param float weight: The weight of connections formed by the connector
@@ -64,7 +63,7 @@ class SynapseDynamicsStructuralStatic(
         super(SynapseDynamicsStructuralStatic, self).__init__(
             weight=weight, delay=delay, pad_to_length=s_max)
 
-        self.__common_sp = CommonSP(
+        self.__common_sp = StructuralPlasticityCommon(
             partner_selection, formation, elimination, f_rew, initial_weight,
             initial_delay, s_max, seed)
 

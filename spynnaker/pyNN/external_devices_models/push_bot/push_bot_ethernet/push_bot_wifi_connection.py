@@ -14,11 +14,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import logging
-import platform
 import select
 import socket
-import subprocess
 from six import raise_from
+from spinn_utilities.overrides import overrides
+from spinn_utilities.ping import Ping
 from spinnman.connections.abstract_classes import Listenable, Connection
 from spinnman.exceptions import SpinnmanIOException, SpinnmanTimeoutException
 from spinn_front_end_common.utilities.constants import BYTES_PER_KB
@@ -102,28 +102,9 @@ class PushBotWIFIConnection(Connection, Listenable):
         # Set a general timeout on the socket
         self.__socket.settimeout(0)
 
+    @overrides(Connection.is_connected)
     def is_connected(self):
-        """ See\
-            :py:meth:`~spinnman.connections.Connection.is_connected`
-        """
-        if platform.platform().lower().startswith("windows"):
-            cmd_args = "-n 1 -w 1"
-        else:
-            cmd_args = "-c 1 -W 1"
-
-        # check if machine is active and on the network
-        for _ in range(5):  # Try up to five times...
-            # Start a ping process
-            process = subprocess.Popen(
-                "ping " + cmd_args + " " + self.__remote_ip_address,
-                shell=True, stdout=subprocess.PIPE)
-            process.wait()
-            if process.returncode == 0:
-                # ping worked
-                return True
-
-        # If the ping fails this number of times, the host cannot be contacted
-        return False
+        return Ping.host_is_reachable(self.__remote_ip_address)
 
     @property
     def local_ip_address(self):
@@ -190,18 +171,18 @@ class PushBotWIFIConnection(Connection, Listenable):
         except Exception as e:  # pylint: disable=broad-except
             raise_from(SpinnmanIOException(str(e)), e)
 
+    @overrides(Connection.close)
     def close(self):
-        """ See\
-            :py:meth:`spinnman.connections.Connection.close`
-        """
         try:
             self.__socket.shutdown(socket.SHUT_WR)
         except Exception:  # pylint: disable=broad-except
             pass
         self.__socket.close()
 
+    @overrides(Listenable.is_ready_to_receive, extend_defaults=True)
     def is_ready_to_receive(self, timeout=0):
         return bool(select.select([self.__socket], [], [], timeout)[0])
 
+    @overrides(Listenable.get_receive_method)
     def get_receive_method(self):
         return self.receive

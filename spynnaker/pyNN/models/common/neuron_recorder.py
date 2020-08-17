@@ -17,22 +17,23 @@ from __future__ import division
 from collections import OrderedDict
 import itertools
 import logging
-import math
 import numpy
 from six import raise_from, iteritems
 from six.moves import range, xrange
 from spinn_utilities.log import FormatAdapter
 from spinn_utilities.progress_bar import ProgressBar
-from pacman.model.resources.variable_sdram import VariableSDRAM
+from pacman.model.resources import VariableSDRAM
 from data_specification.enums import DataType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
-from spinn_front_end_common.utilities import globals_variables
+from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spinn_front_end_common.utilities.constants import (
-    BYTES_PER_WORD, MICRO_TO_MILLISECOND_CONVERSION, BITS_PER_WORD)
+    BYTES_PER_WORD, MICRO_TO_MILLISECOND_CONVERSION)
 from spinn_front_end_common.interface.buffer_management.recording_utilities \
     import (
         get_recording_header_array, get_recording_header_size,
         get_recording_data_constant_size)
+from spynnaker.pyNN.utilities.constants import BITS_PER_WORD
+from spynnaker.pyNN.utilities.utility_calls import ceildiv
 
 logger = FormatAdapter(logging.getLogger(__name__))
 
@@ -142,13 +143,20 @@ class NeuronRecorder(object):
         :return: Sampling interval in microseconds
         :rtype: float
         """
-        step = (globals_variables.get_simulator().machine_time_step /
+        step = (get_simulator().machine_time_step /
                 MICRO_TO_MILLISECOND_CONVERSION)
         return self.__sampling_rates[variable] * step
 
     def _convert_placement_matrix_data(
             self, row_data, n_rows, data_row_length, variable, n_neurons):
-
+        """
+        :param ~numpy.ndarray row_data:
+        :param int n_rows:
+        :param int data_row_length:
+        :param str variable:
+        :param int n_neurons:
+        :rtype: ~numpy.ndarray
+        """
         surplus_bytes = self._N_BYTES_FOR_TIMESTAMP
         var_data = (row_data[:, surplus_bytes:].reshape(
             n_rows * data_row_length))
@@ -161,6 +169,17 @@ class NeuronRecorder(object):
     def _process_missing_data(
             missing_str, placement, expected_rows, n_neurons, times,
             sampling_rate, label, placement_data):
+        """
+        :param str missing_str:
+        :param ~.Placement placement:
+        :param int expected_rows:
+        :param int n_neurons:
+        :param ~numpy.ndarray times:
+        :param int sampling_rate:
+        :param str label:
+        :param ~numpy.ndarray placement_data:
+        :rtype: ~numpy.ndarray
+        """
         missing_str += "({}, {}, {}); ".format(
             placement.x, placement.y, placement.p)
         # Start the fragment for this slice empty
@@ -186,7 +205,7 @@ class NeuronRecorder(object):
             buffer_manager, expected_rows, missing_str, sampling_rate, label):
         """ processes a placement for matrix data
 
-        :param variable: the variable to read
+        :param str variable: the variable to read
         :param ~pacman.model.placements.Placements placements:
             the placements object
         :param ~pacman.model.graphs.machine.MachineVertex vertex:
@@ -253,7 +272,7 @@ class NeuronRecorder(object):
         :return: how many rows there should be.
         :rtype: int
         """
-        return int(math.ceil(n_machine_time_steps / sampling_rate))
+        return ceildiv(n_machine_time_steps, sampling_rate)
 
     def get_matrix_data(
             self, label, buffer_manager, region, placements,
@@ -333,7 +352,7 @@ class NeuronRecorder(object):
             ~pacman.model.graphs.application.ApplicationVertex
         :param str variable:
         :param int machine_time_step: microseconds
-        :return:
+        :return: array of atom IDs and event times
         :rtype: ~numpy.ndarray(tuple(int,int))
         """
         if variable not in self.__bitfield_variables:
@@ -358,7 +377,7 @@ class NeuronRecorder(object):
                 continue
 
             # Read the spikes
-            n_words = int(math.ceil(neurons_recording / BITS_PER_WORD))
+            n_words = ceildiv(neurons_recording, BITS_PER_WORD)
             n_bytes = n_words * BYTES_PER_WORD
             n_words_with_timestamp = n_words + 1
 
@@ -479,7 +498,7 @@ class NeuronRecorder(object):
             return 1
 
         step = (
-            globals_variables.get_simulator().machine_time_step /
+            get_simulator().machine_time_step /
             MICRO_TO_MILLISECOND_CONVERSION)
         rate = int(sampling_interval / step)
         if sampling_interval != rate * step:
@@ -648,7 +667,6 @@ class NeuronRecorder(object):
         :param ~pacman.model.graphs.commmon.Slice vertex_slice:
             the vertex slice
         :param int data_n_time_steps: how many time steps to run this time
-        :rtype: None
         """
         spec.switch_write_focus(neuron_recording_region)
         spec.write_array(get_recording_header_array(
@@ -676,7 +694,7 @@ class NeuronRecorder(object):
             return 0
         if variable in self.__bitfield_variables:
             # Overflow can be ignored as it is not save if in an extra word
-            out_spike_words = int(math.ceil(n_neurons / BITS_PER_WORD))
+            out_spike_words = ceildiv(n_neurons, BITS_PER_WORD)
             out_spike_bytes = out_spike_words * BYTES_PER_WORD
             return self._N_BYTES_FOR_TIMESTAMP + out_spike_bytes
         else:
@@ -750,20 +768,12 @@ class NeuronRecorder(object):
             records = records + 1
         return data_size * records
 
-    @staticmethod
-    def __n_bytes_to_n_words(n_bytes):
-        """
-        :param int n_bytes:
-        :rtype: int
-        """
-        return (n_bytes + (BYTES_PER_WORD - 1)) // BYTES_PER_WORD
-
     def get_sdram_usage_in_bytes(self, vertex_slice):
         """
         :param ~pacman.model.graphs.common.Slice vertex_slice:
         :rtype: int
         """
-        n_words_for_n_neurons = self.__n_bytes_to_n_words(vertex_slice.n_atoms)
+        n_words_for_n_neurons = ceildiv(vertex_slice.n_atoms, BYTES_PER_WORD)
         n_bytes_for_n_neurons = n_words_for_n_neurons * BYTES_PER_WORD
         var_bytes = (
             (self._N_BYTES_PER_RATE + self._N_BYTES_PER_SIZE +
@@ -844,8 +854,7 @@ class NeuronRecorder(object):
         # out_spikes, *_values
         for variable in self.__sampling_rates:
             if variable in self.__bitfield_variables:
-                out_spike_words = int(
-                    math.ceil(vertex_slice.n_atoms / BITS_PER_WORD))
+                out_spike_words = ceildiv(vertex_slice.n_atoms, BITS_PER_WORD)
                 out_spike_bytes = out_spike_words * BYTES_PER_WORD
                 usage += self._N_BYTES_FOR_TIMESTAMP + out_spike_bytes
             else:
@@ -876,8 +885,7 @@ class NeuronRecorder(object):
         :param int n_recording:
         :param ~pacman.model.graphs.common.Slice vertex_slice:
         """
-        n_words_for_n_neurons = int(
-            math.ceil(vertex_slice.n_atoms / BYTES_PER_WORD))
+        n_words_for_n_neurons = ceildiv(vertex_slice.n_atoms, BYTES_PER_WORD)
         n_bytes_for_n_neurons = n_words_for_n_neurons * BYTES_PER_WORD
         if rate == 0:
             data.append(numpy.zeros(n_words_for_n_neurons, dtype="uint32"))
@@ -927,4 +935,7 @@ class NeuronRecorder(object):
 
     @property
     def _indexes(self):  # for testing only
+        """
+        :rtype: dict
+        """
         return _ReadOnlyDict(self.__indexes)

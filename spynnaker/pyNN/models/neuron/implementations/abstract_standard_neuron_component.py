@@ -87,7 +87,8 @@ class AbstractStandardNeuronComponent(with_metaclass(AbstractBase, object)):
 
     @abstractmethod
     def get_values(self, parameters, state_variables, vertex_slice, ts):
-        """ Get the values to be written to the machine for this model
+        # The way this docstring is built *is* a hack, but nothing else works
+        (r""" Get the values to be written to the machine for this model
 
         :param ~spinn_utilities.ranged.RangeDictionary parameters:
             The holder of the parameters
@@ -97,10 +98,14 @@ class AbstractStandardNeuronComponent(with_metaclass(AbstractBase, object)):
             The slice of variables being retrieved
         :param float ts:
             The time to be advanced in one call to the update of this component
-        :return: A list with the same length as self.struct.field_types
+        :return: A list with the same length as
+            `self.`\ """
+         ":py:attr:`~spynnaker.pyNN.models.neuron.implementations."
+         r"AbstractStandardNeuronComponent.struct`\ "
+         """`.`\\ :py:attr:`~spynnaker.pyNN.utilities.struct.Struct.field_types`
         :rtype: list(int or float or list(int) or list(float) or
             ~spinn_utilities.ranged.RangedList)
-        """
+        """)
 
     def get_data(self, parameters, state_variables, vertex_slice, ts):
         """ Get the data *to be written to the machine* for this model.
