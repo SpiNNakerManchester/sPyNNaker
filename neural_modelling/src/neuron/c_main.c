@@ -361,31 +361,5 @@ void c_main(void) {
     // Set up the timer tick callback (others are handled elsewhere)
     spin1_callback_on(TIMER_TICK, timer_callback, TIMER);
 
-    accum a = 10.000031k;
-    accum b = 10.000000k;
-    accum c = 0.007k;
-
-    accum d = a - b;
-    accum e = b - a;
-
-    accum f = d * c;
-    accum g = e * c;
-
-    accum h = 2k;
-    accum i = 0.1k;
-
-    accum j = MULT_ROUND_NEAREST_ACCUM((h + i), 0.5k);
-
-    accum z = 1.05k;
-
-    io_printf(IO_BUF, "\n\n\n\n\n\n\n\na-b %k\n", d);
-    io_printf(IO_BUF, "b-a %k\n", e);
-    io_printf(IO_BUF, "(a-b) * c %k\n", f);
-    io_printf(IO_BUF, "(b-a) * c%k\n\n\n\n\n\n\n", g);
-
-    io_printf(IO_BUF, "g %k\n\n\n\n\n", j);
-
-    io_printf(IO_BUF, "1.05 printed = %k\n\n\n\n\n\n\n\n", z);
-
     simulation_run();
 }

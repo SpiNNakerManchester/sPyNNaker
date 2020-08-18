@@ -72,6 +72,8 @@ static synapse_param_t *neuron_synapse_shaping_params;
 static REAL *rate_lut;
 static uint32_t rate_lut_size;
 
+static REAL *postsynaptic_rates;
+
 static bool neuron_impl_initialise(uint32_t n_neurons) {
     // allocate DTCM for the global parameter details
     if (sizeof(global_neuron_params_t)) {
@@ -131,6 +133,14 @@ static bool neuron_impl_initialise(uint32_t n_neurons) {
                     " - Out of DTCM");
             return false;
         }
+    }
+
+    // Allocate DTCM for the rates used for plasticity
+    postsynaptic_rates = spin1_malloc(2 * sizeof(REAL));
+    if(postsynaptic_rates == NULL) {
+        log_error("Unable to allocate postsynaptic rates array"
+                    " - Out of DTCM");
+            return false;
     }
 
     return true;
@@ -232,7 +242,7 @@ static void neuron_impl_load_neuron_parameters(
 
 // Rate Update Function
 
-static inline REAL set_spike_source_rate(neuron_pointer_t neuron, REAL somatic_voltage) {
+static inline REAL set_spike_source_rate(REAL somatic_voltage) {
 
 	REAL rate;
 
@@ -331,7 +341,7 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
     REAL soma_voltage = result;
 
     // Compute rate diff
-    REAL rate = set_spike_source_rate(neuron, soma_voltage);
+    REAL rate = set_spike_source_rate(soma_voltage);
 
     //REAL rate_diff = rate - neuron->rate_at_last_setting;
 
@@ -450,25 +460,17 @@ uint32_t neuron_impl_get_starting_rate() {
     return neuron_array[0].rate_at_last_setting;;
 }
 
-static inline REAL neuron_impl_post_syn_vrate(index_t neuron_index) {
+static inline REAL* neuron_impl_post_rates(index_t neuron_index) {
 
     neuron_pointer_t neuron = &neuron_array[neuron_index];
 
-    REAL a =  set_spike_source_rate(neuron, neuron->V);
+    postsynaptic_rates[0] =  set_spike_source_rate(neuron->V);
+    postsynaptic_rates[1] =  set_spike_source_rate(neuron->U_membrane * neuron->plasticity_rate_multiplier);
 
     //io_printf(IO_BUF, "Rate(V) %k\n", a);
 
-    return a;
+    return postsynaptic_rates;
 
-}
-
-static inline REAL neuron_impl_post_syn_urate(index_t neuron_index) {
-
-    neuron_pointer_t neuron = &neuron_array[neuron_index];
-
-    return set_spike_source_rate(neuron, neuron->U_membrane * neuron->plasticity_rate_multiplier);
-
-    //io_printf(IO_BUF, "Rate(U) %k\n", a);
 }
 
 #if LOG_LEVEL >= LOG_DEBUG

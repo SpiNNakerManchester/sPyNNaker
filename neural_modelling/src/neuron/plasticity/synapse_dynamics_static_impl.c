@@ -40,10 +40,9 @@ address_t synapse_dynamics_initialise(
 
 //---------------------------------------
 void synapse_dynamics_process_post_synaptic_event(
-        index_t neuron_index, REAL urate, REAL vrate) {
+        index_t neuron_index, REAL *rates) {
     use(neuron_index);
-    use(urate);
-    use(vrate);
+    use(rates[0]);
 }
 
 //---------------------------------------

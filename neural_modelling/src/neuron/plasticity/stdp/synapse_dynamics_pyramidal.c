@@ -23,7 +23,7 @@
 
 // Plasticity includes
 #include "maths.h"
-#include "post_events_rate.h"
+#include "post_events_rate_pyramidal.h"
 
 #include "weight_dependence/weight.h"
 #include "timing_dependence/timing.h"
@@ -41,6 +41,8 @@ static uint32_t synapse_type_mask;
 
 uint32_t num_plastic_pre_synaptic_events = 0;
 uint32_t plastic_saturation_count = 0;
+
+static REAL v_rest;
 
 //---------------------------------------
 // Macros
@@ -86,7 +88,7 @@ post_event_history_t *post_event_history;
 //---------------------------------------
 // Synapse update loop
 //---------------------------------------
-static inline final_state_t plasticity_update_synapse(
+static inline final_state_t plasticity_update_basal_synapse(
         uint32_t time,
         const REAL last_pre_time,
         update_state_t current_state,
@@ -95,7 +97,23 @@ static inline final_state_t plasticity_update_synapse(
     //Apply Urbanczik-Senn Formula
     current_state = timing_apply_rate(
                         current_state, post_event_history->u_rate,
-                        post_event_history->v_rate, last_pre_time);
+                        post_event_history->vb_rate, last_pre_time);
+
+
+    // Return final synaptic word and weight
+    return synapse_structure_get_final_state(current_state);
+}
+
+static inline final_state_t plasticity_update_apical_synapse(
+        uint32_t time,
+        const REAL last_pre_time,
+        update_state_t current_state,
+        const post_event_history_t *post_event_history) {
+
+    //Apply Urbanczik-Senn Formula
+    current_state = timing_apply_rate(
+                        current_state, v_rest,
+                        post_event_history->va, last_pre_time);
 
 
     // Return final synaptic word and weight
@@ -223,6 +241,10 @@ address_t synapse_dynamics_initialise(
             SYNAPSE_DELAY_BITS + synapse_type_index_bits;
     synapse_type_mask = (1 << log_n_synapse_types) - 1;
 
+    // Resting potential used for apical weight update. Assumed to be 0 in the Bengio paper
+    // NEEDS CHANGING IF WE WANT THE CHANCE TO USE DIFFERENT RESTING POTENTIALS!!!!!!!!!!!!!!!!
+    v_rest = 0.0k;
+
     return weight_result;
 }
 
@@ -275,10 +297,13 @@ bool synapse_dynamics_process_plastic_synapses(
         // Get next control word (auto incrementing)
         uint32_t control_word = *control_words++;
 
+        // Synapse type
         uint32_t type = synapse_row_sparse_type(
                 control_word, synapse_index_bits, synapse_type_mask);
+        // Neuron index
         uint32_t index =
                 synapse_row_sparse_index(control_word, synapse_index_mask);
+        // Neuron index and Synapse type combined
         uint32_t type_index = synapse_row_sparse_type_index(
                 control_word, synapse_type_index_mask);
 
@@ -286,13 +311,27 @@ bool synapse_dynamics_process_plastic_synapses(
         update_state_t current_state =
                 synapse_structure_get_update_state(*plastic_words, type);
 
-//        REAL old_weight = synapses_convert_weight_to_input(
-//                           synapse_structure_get_final_state(current_state),
-//                           weight_get_shift(current_state));
+        //  Determine the type of synapse ans update the state
+        // Type = 2 is apical inh, type = 1 basal exc
 
-        // Update the synapse state
-        final_state_t final_state = plasticity_update_synapse(
-                time, last_pre_rate, current_state, &post_event_history[index]);
+        final_state_t final_state;
+
+        if (type == 2) {
+
+            final_state = plasticity_update_apical_synapse(
+                    time, last_pre_rate, current_state, &post_event_history[index]);
+        }
+        else if (type == 1) {
+
+            final_state = plasticity_update_basal_synapse(
+                    time, last_pre_rate, current_state, &post_event_history[index]);
+        }
+        // LP: THIS CHECK MIGHT BE REMOVED IF WE DECIDE TO CHANGE THE SYNAPSE TYPES
+        else {
+
+            log_error("Error: Trying to update the state of a non-plastic synapse");
+            return false;
+        }
 
         uint32_t ring_buffer_index = synapses_get_ring_buffer_index_combined(
                 0, type_index, synapse_type_index_bits);
@@ -336,7 +375,7 @@ void synapse_dynamics_process_post_synaptic_event(index_t neuron_index, REAL *ra
     // Add post-event
     post_event_history_t *history = &post_event_history[neuron_index];
 
-    post_events_update(history, rates[1], rates[0]);
+    post_events_update(history, rates[0], rates[1], rates[2]);
 }
 
 input_t synapse_dynamics_get_intrinsic_bias(

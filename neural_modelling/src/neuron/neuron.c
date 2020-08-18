@@ -355,8 +355,7 @@ void neuron_do_timestep_update( // EXPORTED
             out_spikes_set_spike(spike_recording_indexes[neuron_index]);
 
             // Do any required synapse processing
-            synapse_dynamics_process_post_synaptic_event(neuron_index,
-               neuron_impl_post_syn_urate(neuron_index), neuron_impl_post_syn_vrate(neuron_index));
+            synapse_dynamics_process_post_synaptic_event(neuron_index, neuron_impl_post_rates(neuron_index));
 
               //io_printf(IO_BUF, "ur %k, vr %k, t %d\n", neuron_impl_post_syn_urate(neuron_index), neuron_impl_post_syn_vrate(neuron_index), time);
 

@@ -15,8 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _POST_EVENTS_RATE_H_
-#define _POST_EVENTS_RATE_H_
+#ifndef _POST_EVENTS_RATE_PYRAMIDAL_H_
+#define _POST_EVENTS_RATE_PYRAMIDAL_H_
 
 // Standard includes
 #include <stdbool.h>
@@ -32,7 +32,8 @@
 typedef struct {
 
     REAL u_rate;
-    REAL v_rate;
+    REAL vb_rate;
+    REAL va;
 
 } post_event_history_t;
 
@@ -56,19 +57,21 @@ static inline post_event_history_t *post_events_init_buffers(
     for (uint32_t n = 0; n < n_neurons; n++) {
         // Add initial placeholder entry to buffer
         post_event_history[n].u_rate = 0.0k;
-        post_event_history[n].v_rate = 0.0k;
+        post_event_history[n].vb_rate = 0.0k;
+        post_event_history[n].va = 0.0k;
     }
 
     return post_event_history;
 }
 
 static inline void post_events_update(
-        post_event_history_t *post_event_history, REAL u_rate, REAL v_rate) {
+        post_event_history_t *post_event_history, REAL va, REAL vb_rate, REAL u_rate) {
 
     post_event_history->u_rate = u_rate;
-    post_event_history->v_rate = v_rate;
+    post_event_history->vb_rate = vb_rate;
+    post_event_history->va = va;
 
 }
 
 
-#endif  // _POST_EVENTS_RATE_H_
+#endif  // _POST_EVENTS_RATE_PYRAMIDAL_H_

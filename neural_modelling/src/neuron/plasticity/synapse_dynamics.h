@@ -31,7 +31,7 @@ bool synapse_dynamics_process_plastic_synapses(
         REAL *ring_buffers, uint32_t time, uint32_t rate);
 
 void synapse_dynamics_process_post_synaptic_event(
-        index_t neuron_index, REAL urate, REAL vrate);
+        index_t neuron_index, REAL *rates);
 
 input_t synapse_dynamics_get_intrinsic_bias(
         uint32_t time, index_t neuron_index);
