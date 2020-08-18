@@ -495,7 +495,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         :rtype:
             list(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)
         """
-        name = "{}_{}_{}".format(
+        name = "connector_{}_{}_{}".format(
             synapse_info.pre_population.label,
             synapse_info.post_population.label, self.__class__.__name__)
         return [ProvenanceDataItem(

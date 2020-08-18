@@ -8,3 +8,4 @@
 **/*.json
 **/neural_modelling/builds/**/*.txt
 **/.nojekyll
+**/*.tag

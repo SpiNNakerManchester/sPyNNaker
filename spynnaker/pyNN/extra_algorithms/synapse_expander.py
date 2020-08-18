@@ -12,16 +12,17 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+import functools
 import logging
-import os
 from six import iteritems
+
+from spinn_front_end_common.utilities.system_control_logic import \
+    run_system_application
+from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_utilities.progress_bar import ProgressBar
-from spinn_utilities.make_tools.replacer import Replacer
 from spinnman.model import ExecutableTargets
 from spinnman.model.enums import CPUState
 from spinn_front_end_common.utilities import globals_variables
-from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.neuron import AbstractPopulationVertex
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 
@@ -33,7 +34,7 @@ DELAY_EXPANDER = "delay_expander.aplx"
 
 def synapse_expander(
         app_graph, placements, transceiver, provenance_file_path,
-        executable_finder):
+        executable_finder, extract_iobuf):
     """ Run the synapse expander.
 
     .. note::
@@ -48,6 +49,7 @@ def synapse_expander(
     :param str provenance_file_path: Where provenance data should be written.
     :param executable_finder:
         How to find the synapse expander binaries.
+    :param extract_iobuf: bool flag for extracting iobuf
     :type executable_finder:
         ~spinn_utilities.executable_finder.ExecutableFinder
     """
@@ -61,34 +63,13 @@ def synapse_expander(
     expander_cores, expanded_pop_vertices = _plan_expansion(
         app_graph, placements, synapse_bin, delay_bin, progress)
 
-    # Launch the delay receivers
     expander_app_id = transceiver.app_id_tracker.get_new_id()
-    transceiver.execute_application(expander_cores, expander_app_id)
-    progress.update()
-
-    # Wait for everything to finish
-    finished = False
-    try:
-        transceiver.wait_for_cores_to_be_in_state(
-            expander_cores.all_core_subsets, expander_app_id,
-            [CPUState.FINISHED])
-        progress.update()
-        finished = True
-        _fill_in_connection_data(
-            expanded_pop_vertices, placements, transceiver)
-        _extract_iobuf(expander_cores, transceiver, provenance_file_path)
-        progress.end()
-    except Exception:  # pylint: disable=broad-except
-        logger.exception("Synapse expander has failed")
-        _handle_failure(
-            expander_cores, transceiver, provenance_file_path)
-    finally:
-        transceiver.stop_application(expander_app_id)
-        transceiver.app_id_tracker.free_id(expander_app_id)
-
-        if not finished:
-            raise SpynnakerException(
-                "The synapse expander failed to complete")
+    run_system_application(
+        expander_cores, expander_app_id, transceiver, provenance_file_path,
+        executable_finder, extract_iobuf, functools.partial(
+            _fill_in_connection_data, placements=placements,
+            expanded_pop_vertices=expanded_pop_vertices),
+        [CPUState.FINISHED], False, "synapse_expander_on_{}_{}_{}.txt")
 
 
 def _plan_expansion(app_graph, placements, synapse_expander_bin,
@@ -106,7 +87,8 @@ def _plan_expansion(app_graph, placements, synapse_expander_bin,
                     placement = placements.get_placement_of_vertex(m_vertex)
                     expander_cores.add_processor(
                         synapse_expander_bin,
-                        placement.x, placement.y, placement.p)
+                        placement.x, placement.y, placement.p,
+                        executable_type=ExecutableType.SYSTEM)
                     gen_on_machine = True
             if gen_on_machine:
                 expanded_pop_vertices.append(vertex)
@@ -116,56 +98,14 @@ def _plan_expansion(app_graph, placements, synapse_expander_bin,
                     placement = placements.get_placement_of_vertex(m_vertex)
                     expander_cores.add_processor(
                         delay_expander_bin,
-                        placement.x, placement.y, placement.p)
+                        placement.x, placement.y, placement.p,
+                        executable_type=ExecutableType.SYSTEM)
 
     return expander_cores, expanded_pop_vertices
 
 
-def _extract_iobuf(expander_cores, transceiver, provenance_file_path,
-                   display=False):
-    """ Extract IOBuf from the cores
-    """
-    io_buffers = transceiver.get_iobuf(expander_cores.all_core_subsets)
-    core_to_replacer = dict()
-    for binary in expander_cores.binaries:
-        replacer = Replacer(binary)
-        for core_subset in expander_cores.get_cores_for_binary(binary):
-            x = core_subset.x
-            y = core_subset.y
-            for p in core_subset.processor_ids:
-                core_to_replacer[x, y, p] = replacer
-
-    for io_buf in io_buffers:
-        file_path = os.path.join(
-            provenance_file_path, "expander_{}_{}_{}.txt".format(
-                io_buf.x, io_buf.y, io_buf.p))
-        replacer = core_to_replacer[io_buf.x, io_buf.y, io_buf.p]
-        text = ""
-        for line in io_buf.iobuf.split("\n"):
-            text += replacer.replace(line) + "\n"
-        with open(file_path, "w") as writer:
-            writer.write(text)
-        if display:
-            print("{}:{}:{} {}".format(io_buf.x, io_buf.y, io_buf.p, text))
-
-
-def _handle_failure(expander_cores, transceiver, provenance_file_path):
-    """ Handle failure of the expander
-
-    :param expander_cores:
-    :param transceiver:
-    :param provenance_file_path:
-    :rtype: None
-    """
-    core_subsets = expander_cores.all_core_subsets
-    error_cores = transceiver.get_cores_not_in_state(
-        core_subsets, [CPUState.RUNNING, CPUState.FINISHED])
-    logger.error(transceiver.get_core_status_string(error_cores))
-    _extract_iobuf(expander_cores, transceiver, provenance_file_path,
-                   display=True)
-
-
-def _fill_in_connection_data(expanded_pop_vertices, placements, transceiver):
+def _fill_in_connection_data(
+        _expander_cores, transceiver, expanded_pop_vertices, placements):
     """ Once expander has run, fill in the connection data
 
     :rtype: None
