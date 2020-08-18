@@ -25,6 +25,8 @@ jobs:
         - PY_DOC_DIR=$PWD/doc/source/_build/html
     - name: Py3.7
       python: 3.7
+    - name: Py3.8
+      python: 3.8
     - name: Py2.7 (legacy)
       python: 2.7
 dist: focal
@@ -77,6 +79,8 @@ before_script:
   - make -C $SPINN_DIRS
   - make -C spinn_common install
   - make -C SpiNNFrontEndCommon/c_common install
+  # Load the tag files for doc builds
+  - make -C $NEURAL_MODELLING_DIRS doxysetup
   # Make a test config
   - echo '[Machine]' > ~/.spynnaker.cfg
   - echo "machineName = $SPINNAKER_BOARD_ADDRESS" >> ~/.spynnaker.cfg
@@ -103,8 +107,7 @@ script:
   - support/travis-sphinx.sh html -T -E -b html -d _build/doctrees-readthedocsdirhtml -D language=en . _build/html
   - support/travis-sphinx.sh json -T -b json -d _build/doctrees-json -D language=en . _build/json
   - support/travis-sphinx.sh singlehtml -T -b singlehtml -d _build/doctrees-readthedocssinglehtmllocalmedia -D language=en . _build/localmedia
-  - >
-    ( cd neural_modelling && exec doxygen )
+  - make -C $NEURAL_MODELLING_DIRS doxygen
 
 after_success:
   - >
