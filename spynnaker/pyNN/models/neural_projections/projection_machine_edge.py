@@ -19,7 +19,7 @@ from spynnaker.pyNN.utilities import utility_calls
 from pacman.model.graphs.machine import MachineEdge
 from spinn_front_end_common.interface.provenance import (
     AbstractProvidesLocalProvenanceData)
-from spynnaker.pyNN.models.abstract_models import (AbstractWeightUpdatable)
+from spynnaker.pyNN.models.abstract_models import AbstractWeightUpdatable
 
 
 class ProjectionMachineEdge(

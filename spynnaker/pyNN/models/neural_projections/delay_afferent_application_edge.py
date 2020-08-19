@@ -37,5 +37,5 @@ class DelayAfferentApplicationEdge(ApplicationEdge, AbstractSlicesConnect):
 
     @overrides(AbstractSlicesConnect.could_connect)
     def could_connect(self, pre_slice, post_slice):
-        return (pre_slice.lo_atom == post_slice.lo_atom) and \
-               (post_slice.hi_atom == pre_slice.hi_atom)
+        return ((pre_slice.lo_atom == post_slice.lo_atom) and
+                (post_slice.hi_atom == pre_slice.hi_atom))
