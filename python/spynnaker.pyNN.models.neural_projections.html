@@ -113,7 +113,7 @@
 <dl class="class">
 <dt id="spynnaker.pyNN.models.neural_projections.DelayAfferentApplicationEdge">
 <em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neural_projections.</code><code class="descname">DelayAfferentApplicationEdge</code><span class="sig-paren">(</span><em>pre_vertex</em>, <em>delay_vertex</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/delay_afferent_application_edge.html#DelayAfferentApplicationEdge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.DelayAfferentApplicationEdge" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">pacman.model.graphs.application.application_edge.ApplicationEdge</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">pacman.model.graphs.application.application_edge.ApplicationEdge</span></code>, <a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.partitioner_interfaces/#pacman.model.partitioner_interfaces.abstract_slices_connect.AbstractSlicesConnect" title="(in PACMAN v)"><code class="xref py py-class docutils literal"><span class="pre">pacman.model.partitioner_interfaces.abstract_slices_connect.AbstractSlicesConnect</span></code></a></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -127,12 +127,40 @@
 </tr>
 </tbody>
 </table>
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neural_projections.DelayAfferentApplicationEdge.could_connect">
+<code class="descname">could_connect</code><span class="sig-paren">(</span><em>pre_slice</em>, <em>post_slice</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/delay_afferent_application_edge.html#DelayAfferentApplicationEdge.could_connect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.DelayAfferentApplicationEdge.could_connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if there is a chance that one of the indexes in the
+pre slice could connect to at least one of the indexes in the
+post slice.</p>
+<p>note: This method should never return a false negative,
+but may return a false positives</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>pre_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; </li>
+<li><strong>post_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">True if a connection could be possible</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 </dd></dl>
 
 <dl class="class">
 <dt id="spynnaker.pyNN.models.neural_projections.DelayAfferentMachineEdge">
 <em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neural_projections.</code><code class="descname">DelayAfferentMachineEdge</code><span class="sig-paren">(</span><em>pre_vertex</em>, <em>post_vertex</em>, <em>label</em>, <em>app_edge</em>, <em>weight=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/delay_afferent_machine_edge.html#DelayAfferentMachineEdge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.DelayAfferentMachineEdge" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">pacman.model.graphs.machine.machine_edge.MachineEdge</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.abstract_models.abstract_filterable_edge.AbstractFilterableEdge</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.abstract_models.abstract_weight_updatable.AbstractWeightUpdatable</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">pacman.model.graphs.machine.machine_edge.MachineEdge</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.abstract_models.abstract_weight_updatable.AbstractWeightUpdatable</span></code></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -149,22 +177,6 @@
 </tbody>
 </table>
 <dl class="method">
-<dt id="spynnaker.pyNN.models.neural_projections.DelayAfferentMachineEdge.filter_edge">
-<code class="descname">filter_edge</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/delay_afferent_machine_edge.html#DelayAfferentMachineEdge.filter_edge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.DelayAfferentMachineEdge.filter_edge" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determine if this edge should be filtered out</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if the edge should be filtered</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
 <dt id="spynnaker.pyNN.models.neural_projections.DelayAfferentMachineEdge.update_weight">
 <code class="descname">update_weight</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/delay_afferent_machine_edge.html#DelayAfferentMachineEdge.update_weight"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.DelayAfferentMachineEdge.update_weight" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update the weight.</p>
@@ -175,7 +187,7 @@
 <dl class="class">
 <dt id="spynnaker.pyNN.models.neural_projections.DelayedApplicationEdge">
 <em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neural_projections.</code><code class="descname">DelayedApplicationEdge</code><span class="sig-paren">(</span><em>pre_vertex</em>, <em>post_vertex</em>, <em>synapse_information</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/delayed_application_edge.html#DelayedApplicationEdge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.DelayedApplicationEdge" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">pacman.model.graphs.application.application_edge.ApplicationEdge</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">pacman.model.graphs.application.application_edge.ApplicationEdge</span></code>, <a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.partitioner_interfaces/#pacman.model.partitioner_interfaces.abstract_slices_connect.AbstractSlicesConnect" title="(in PACMAN v)"><code class="xref py py-class docutils literal"><span class="pre">pacman.model.partitioner_interfaces.abstract_slices_connect.AbstractSlicesConnect</span></code></a></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -203,6 +215,34 @@
 </table>
 </dd></dl>
 
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neural_projections.DelayedApplicationEdge.could_connect">
+<code class="descname">could_connect</code><span class="sig-paren">(</span><em>pre_slice</em>, <em>post_slice</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/delayed_application_edge.html#DelayedApplicationEdge.could_connect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.DelayedApplicationEdge.could_connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if there is a chance that one of the indexes in the
+pre slice could connect to at least one of the indexes in the
+post slice.</p>
+<p>note: This method should never return a false negative,
+but may return a false positives</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>pre_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; </li>
+<li><strong>post_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">True if a connection could be possible</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="spynnaker.pyNN.models.neural_projections.DelayedApplicationEdge.synapse_information">
 <code class="descname">synapse_information</code><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.DelayedApplicationEdge.synapse_information" title="Permalink to this definition">¶</a></dt>
@@ -221,7 +261,7 @@
 <dl class="class">
 <dt id="spynnaker.pyNN.models.neural_projections.DelayedMachineEdge">
 <em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neural_projections.</code><code class="descname">DelayedMachineEdge</code><span class="sig-paren">(</span><em>synapse_information</em>, <em>pre_vertex</em>, <em>post_vertex</em>, <em>app_edge</em>, <em>label=None</em>, <em>weight=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/delayed_machine_edge.html#DelayedMachineEdge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.DelayedMachineEdge" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">pacman.model.graphs.machine.machine_edge.MachineEdge</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.abstract_models.abstract_filterable_edge.AbstractFilterableEdge</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">pacman.model.graphs.machine.machine_edge.MachineEdge</span></code></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -237,28 +277,12 @@
 </tr>
 </tbody>
 </table>
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neural_projections.DelayedMachineEdge.filter_edge">
-<code class="descname">filter_edge</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/delayed_machine_edge.html#DelayedMachineEdge.filter_edge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.DelayedMachineEdge.filter_edge" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determine if this edge should be filtered out</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if the edge should be filtered</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
 </dd></dl>
 
 <dl class="class">
 <dt id="spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge">
 <em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neural_projections.</code><code class="descname">ProjectionApplicationEdge</code><span class="sig-paren">(</span><em>pre_vertex</em>, <em>post_vertex</em>, <em>synapse_information</em>, <em>label=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/projection_application_edge.html#ProjectionApplicationEdge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">pacman.model.graphs.application.application_edge.ApplicationEdge</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.abstract_models.abstract_filterable_edge.AbstractFilterableEdge</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">pacman.model.graphs.application.application_edge.ApplicationEdge</span></code>, <a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.partitioner_interfaces/#pacman.model.partitioner_interfaces.abstract_slices_connect.AbstractSlicesConnect" title="(in PACMAN v)"><code class="xref py py-class docutils literal"><span class="pre">pacman.model.partitioner_interfaces.abstract_slices_connect.AbstractSlicesConnect</span></code></a></p>
 <p>An edge which terminates on an <code class="xref py py-class docutils literal"><span class="pre">AbstractPopulationVertex</span></code>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -287,6 +311,34 @@
 </table>
 </dd></dl>
 
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge.could_connect">
+<code class="descname">could_connect</code><span class="sig-paren">(</span><em>pre_slice</em>, <em>post_slice</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/projection_application_edge.html#ProjectionApplicationEdge.could_connect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge.could_connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine if there is a chance that one of the indexes in the
+pre slice could connect to at least one of the indexes in the
+post slice.</p>
+<p>note: This method should never return a false negative,
+but may return a false positives</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>pre_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; </li>
+<li><strong>post_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">True if a connection could be possible</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="attribute">
 <dt id="spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge.delay_edge">
 <code class="descname">delay_edge</code><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge.delay_edge" title="Permalink to this definition">¶</a></dt>
@@ -296,22 +348,6 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#spynnaker.pyNN.models.neural_projections.DelayedApplicationEdge" title="spynnaker.pyNN.models.neural_projections.DelayedApplicationEdge">DelayedApplicationEdge</a> or <a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge.filter_edge">
-<code class="descname">filter_edge</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/projection_application_edge.html#ProjectionApplicationEdge.filter_edge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge.filter_edge" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determine if this edge should be filtered out</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if the edge should be filtered</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></td>
 </tr>
 </tbody>
 </table>
@@ -348,7 +384,7 @@
 <dl class="class">
 <dt id="spynnaker.pyNN.models.neural_projections.ProjectionMachineEdge">
 <em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neural_projections.</code><code class="descname">ProjectionMachineEdge</code><span class="sig-paren">(</span><em>synapse_information</em>, <em>pre_vertex</em>, <em>post_vertex</em>, <em>app_edge</em>, <em>label=None</em>, <em>traffic_weight=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/projection_machine_edge.html#ProjectionMachineEdge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.ProjectionMachineEdge" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">pacman.model.graphs.machine.machine_edge.MachineEdge</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.abstract_models.abstract_filterable_edge.AbstractFilterableEdge</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.abstract_models.abstract_weight_updatable.AbstractWeightUpdatable</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.interface.provenance.abstract_provides_local_provenance_data.AbstractProvidesLocalProvenanceData</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">pacman.model.graphs.machine.machine_edge.MachineEdge</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.abstract_models.abstract_weight_updatable.AbstractWeightUpdatable</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.interface.provenance.abstract_provides_local_provenance_data.AbstractProvidesLocalProvenanceData</span></code></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -364,22 +400,6 @@
 </tr>
 </tbody>
 </table>
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neural_projections.ProjectionMachineEdge.filter_edge">
-<code class="descname">filter_edge</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/projection_machine_edge.html#ProjectionMachineEdge.filter_edge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.ProjectionMachineEdge.filter_edge" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determine if this edge should be filtered out</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">True if the edge should be filtered</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#bool" title="(in Python v3.6)">bool</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neural_projections.ProjectionMachineEdge.get_local_provenance_data">
 <code class="descname">get_local_provenance_data</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/projection_machine_edge.html#ProjectionMachineEdge.get_local_provenance_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.ProjectionMachineEdge.get_local_provenance_data" title="Permalink to this definition">¶</a></dt>

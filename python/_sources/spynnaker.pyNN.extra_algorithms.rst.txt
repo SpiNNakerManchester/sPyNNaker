@@ -4,14 +4,6 @@ spynnaker.pyNN.extra_algorithms package
 Submodules
 ----------
 
-spynnaker.pyNN.extra_algorithms.graph_edge_filter module
---------------------------------------------------------
-
-.. automodule:: spynnaker.pyNN.extra_algorithms.graph_edge_filter
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 spynnaker.pyNN.extra_algorithms.graph_edge_weight_updater module
 ----------------------------------------------------------------
 

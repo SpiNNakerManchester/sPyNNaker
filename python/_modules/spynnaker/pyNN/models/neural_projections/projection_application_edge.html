@@ -81,9 +81,8 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">pacman.model.graphs.application</span> <span class="kn">import</span> <span class="n">ApplicationEdge</span>
+<span class="kn">from</span> <span class="nn">pacman.model.partitioner_interfaces</span> <span class="kn">import</span> <span class="n">AbstractSlicesConnect</span>
 <span class="kn">from</span> <span class="nn">.projection_machine_edge</span> <span class="kn">import</span> <span class="n">ProjectionMachineEdge</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="n">AbstractFilterableEdge</span>
-
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 <span class="n">_DynamicsStructural</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -98,7 +97,7 @@
     <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">synapse_dynamics</span><span class="p">,</span> <span class="n">_DynamicsStructural</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="ProjectionApplicationEdge"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge">[docs]</a><span class="k">class</span> <span class="nc">ProjectionApplicationEdge</span><span class="p">(</span><span class="n">ApplicationEdge</span><span class="p">,</span> <span class="n">AbstractFilterableEdge</span><span class="p">):</span>
+<div class="viewcode-block" id="ProjectionApplicationEdge"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge">[docs]</a><span class="k">class</span> <span class="nc">ProjectionApplicationEdge</span><span class="p">(</span><span class="n">ApplicationEdge</span><span class="p">,</span> <span class="n">AbstractSlicesConnect</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; An edge which terminates on an :py:class:`AbstractPopulationVertex`.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
@@ -167,11 +166,16 @@
         <span class="k">return</span> <span class="n">ProjectionMachineEdge</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_information</span><span class="p">,</span> <span class="n">pre_vertex</span><span class="p">,</span> <span class="n">post_vertex</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
 
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractFilterableEdge</span><span class="o">.</span><span class="n">filter_edge</span><span class="p">)</span>
-<div class="viewcode-block" id="ProjectionApplicationEdge.filter_edge"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge.filter_edge">[docs]</a>    <span class="k">def</span> <span class="nf">filter_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">all</span><span class="p">(</span>
-            <span class="ow">not</span> <span class="n">_are_dynamics_structural</span><span class="p">(</span><span class="n">syn_info</span><span class="o">.</span><span class="n">synapse_dynamics</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">syn_info</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_information</span><span class="p">)</span></div></div>
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractSlicesConnect</span><span class="o">.</span><span class="n">could_connect</span><span class="p">)</span>
+<div class="viewcode-block" id="ProjectionApplicationEdge.could_connect"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.ProjectionApplicationEdge.could_connect">[docs]</a>    <span class="k">def</span> <span class="nf">could_connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pre_slice</span><span class="p">,</span> <span class="n">post_slice</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">synapse_info</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_information</span><span class="p">:</span>
+            <span class="c1"># Structual Plasticity can learn connection not originally included</span>
+            <span class="k">if</span> <span class="n">_are_dynamics_structural</span><span class="p">(</span><span class="n">synapse_info</span><span class="o">.</span><span class="n">synapse_dynamics</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">connector</span><span class="o">.</span><span class="n">could_connect</span><span class="p">(</span>
+                    <span class="n">synapse_info</span><span class="p">,</span> <span class="n">pre_slice</span><span class="p">,</span> <span class="n">post_slice</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="kc">False</span></div></div>
 </pre></div>
 
           </div>

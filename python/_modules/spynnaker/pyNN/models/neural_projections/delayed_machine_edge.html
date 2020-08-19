@@ -78,14 +78,10 @@
 <span class="c1"># You should have received a copy of the GNU General Public License</span>
 <span class="c1"># along with this program.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
 
-<span class="kn">from</span> <span class="nn">spinn_utilities.overrides</span> <span class="kn">import</span> <span class="n">overrides</span>
 <span class="kn">from</span> <span class="nn">pacman.model.graphs.machine</span> <span class="kn">import</span> <span class="n">MachineEdge</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neural_projections.connectors</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">OneToOneConnector</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="n">AbstractFilterableEdge</span>
 
 
-<div class="viewcode-block" id="DelayedMachineEdge"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.DelayedMachineEdge">[docs]</a><span class="k">class</span> <span class="nc">DelayedMachineEdge</span><span class="p">(</span><span class="n">MachineEdge</span><span class="p">,</span> <span class="n">AbstractFilterableEdge</span><span class="p">):</span>
+<div class="viewcode-block" id="DelayedMachineEdge"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.DelayedMachineEdge">[docs]</a><span class="k">class</span> <span class="nc">DelayedMachineEdge</span><span class="p">(</span><span class="n">MachineEdge</span><span class="p">):</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s2">&quot;__synapse_information&quot;</span><span class="p">]</span>
 
@@ -103,21 +99,7 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">DelayedMachineEdge</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">pre_vertex</span><span class="p">,</span> <span class="n">post_vertex</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">label</span><span class="p">,</span> <span class="n">traffic_weight</span><span class="o">=</span><span class="n">weight</span><span class="p">,</span>
             <span class="n">app_edge</span><span class="o">=</span><span class="n">app_edge</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_information</span> <span class="o">=</span> <span class="n">synapse_information</span>
-
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractFilterableEdge</span><span class="o">.</span><span class="n">filter_edge</span><span class="p">)</span>
-<div class="viewcode-block" id="DelayedMachineEdge.filter_edge"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.DelayedMachineEdge.filter_edge">[docs]</a>    <span class="k">def</span> <span class="nf">filter_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="c1"># Filter one-to-one connections that are out of range</span>
-        <span class="k">return</span> <span class="nb">any</span><span class="p">(</span>
-            <span class="nb">isinstance</span><span class="p">(</span><span class="n">synapse_info</span><span class="o">.</span><span class="n">connector</span><span class="p">,</span> <span class="n">OneToOneConnector</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">synapse_info</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_information</span><span class="p">)</span> \
-            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">__no_overlap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">pre_vertex</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_vertex</span><span class="p">)</span></div>
-
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">__no_overlap</span><span class="p">(</span><span class="n">pre_vertex</span><span class="p">,</span> <span class="n">post_vertex</span><span class="p">):</span>
-        <span class="n">pre</span> <span class="o">=</span> <span class="n">pre_vertex</span><span class="o">.</span><span class="n">vertex_slice</span>
-        <span class="n">post</span> <span class="o">=</span> <span class="n">post_vertex</span><span class="o">.</span><span class="n">vertex_slice</span>
-        <span class="k">return</span> <span class="n">pre</span><span class="o">.</span><span class="n">hi_atom</span> <span class="o">&lt;</span> <span class="n">post</span><span class="o">.</span><span class="n">lo_atom</span> <span class="ow">or</span> <span class="n">pre</span><span class="o">.</span><span class="n">lo_atom</span> <span class="o">&gt;</span> <span class="n">post</span><span class="o">.</span><span class="n">hi_atom</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_information</span> <span class="o">=</span> <span class="n">synapse_information</span></div>
 </pre></div>
 
           </div>

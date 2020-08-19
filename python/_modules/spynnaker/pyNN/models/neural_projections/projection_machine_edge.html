@@ -84,15 +84,12 @@
 <span class="kn">from</span> <span class="nn">pacman.model.graphs.machine</span> <span class="kn">import</span> <span class="n">MachineEdge</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.provenance</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractProvidesLocalProvenanceData</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.neural_projections.connectors</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">OneToOneConnector</span><span class="p">,</span> <span class="n">FromListConnector</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">AbstractWeightUpdatable</span><span class="p">,</span> <span class="n">AbstractFilterableEdge</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.abstract_models</span> <span class="kn">import</span> <span class="n">AbstractWeightUpdatable</span>
 
 
 <div class="viewcode-block" id="ProjectionMachineEdge"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.ProjectionMachineEdge">[docs]</a><span class="k">class</span> <span class="nc">ProjectionMachineEdge</span><span class="p">(</span>
-        <span class="n">MachineEdge</span><span class="p">,</span> <span class="n">AbstractFilterableEdge</span><span class="p">,</span>
-        <span class="n">AbstractWeightUpdatable</span><span class="p">,</span> <span class="n">AbstractProvidesLocalProvenanceData</span><span class="p">):</span>
+        <span class="n">MachineEdge</span><span class="p">,</span> <span class="n">AbstractWeightUpdatable</span><span class="p">,</span>
+        <span class="n">AbstractProvidesLocalProvenanceData</span><span class="p">):</span>
     <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span>
         <span class="s2">&quot;__synapse_information&quot;</span><span class="p">]</span>
 
@@ -119,66 +116,6 @@
 <span class="sd">        :rtype: list(SynapseInformation)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_information</span>
-
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractFilterableEdge</span><span class="o">.</span><span class="n">filter_edge</span><span class="p">)</span>
-<div class="viewcode-block" id="ProjectionMachineEdge.filter_edge"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.ProjectionMachineEdge.filter_edge">[docs]</a>    <span class="k">def</span> <span class="nf">filter_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="c1"># Filter one-to-one connections that are out of range</span>
-        <span class="c1"># Note: there may be other connectors stored on the same edge!</span>
-        <span class="n">n_filtered</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">for</span> <span class="n">synapse_info</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__synapse_information</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">synapse_info</span><span class="o">.</span><span class="n">connector</span><span class="p">,</span> <span class="n">OneToOneConnector</span><span class="p">):</span>
-                <span class="n">pre</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">vertex_slice</span>
-                <span class="n">post</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">vertex_slice</span>
-                <span class="c1"># Filter edge if both are views and outside limits</span>
-                <span class="k">if</span> <span class="p">(</span><span class="n">synapse_info</span><span class="o">.</span><span class="n">prepop_is_view</span> <span class="ow">and</span>
-                        <span class="n">synapse_info</span><span class="o">.</span><span class="n">postpop_is_view</span><span class="p">):</span>
-                    <span class="n">pre_lo</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">pre_population</span><span class="o">.</span><span class="n">_indexes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                    <span class="n">pre_hi</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">pre_population</span><span class="o">.</span><span class="n">_indexes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-                    <span class="n">post_lo</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">post_population</span><span class="o">.</span><span class="n">_indexes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                    <span class="n">post_hi</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">post_population</span><span class="o">.</span><span class="n">_indexes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-                    <span class="k">if</span> <span class="p">((</span><span class="n">pre</span><span class="o">.</span><span class="n">hi_atom</span> <span class="o">-</span> <span class="n">pre_lo</span> <span class="o">&lt;</span> <span class="n">post</span><span class="o">.</span><span class="n">lo_atom</span> <span class="o">-</span> <span class="n">post_lo</span><span class="p">)</span> <span class="ow">or</span>
-                            <span class="p">(</span><span class="n">pre</span><span class="o">.</span><span class="n">lo_atom</span> <span class="o">-</span> <span class="n">pre_lo</span> <span class="o">&gt;</span> <span class="n">post</span><span class="o">.</span><span class="n">hi_atom</span> <span class="o">-</span> <span class="n">post_lo</span><span class="p">)</span> <span class="ow">or</span>
-                            <span class="p">(</span><span class="n">pre</span><span class="o">.</span><span class="n">hi_atom</span> <span class="o">&lt;</span> <span class="n">pre_lo</span><span class="p">)</span> <span class="ow">or</span>
-                            <span class="p">(</span><span class="n">pre</span><span class="o">.</span><span class="n">lo_atom</span> <span class="o">&gt;</span> <span class="n">pre_hi</span><span class="p">)</span> <span class="ow">or</span>
-                            <span class="p">(</span><span class="n">post</span><span class="o">.</span><span class="n">hi_atom</span> <span class="o">&lt;</span> <span class="n">post_lo</span><span class="p">)</span> <span class="ow">or</span>
-                            <span class="p">(</span><span class="n">post</span><span class="o">.</span><span class="n">lo_atom</span> <span class="o">&gt;</span> <span class="n">post_hi</span><span class="p">)):</span>
-                        <span class="n">n_filtered</span> <span class="o">+=</span> <span class="mi">1</span>
-                <span class="c1"># Filter edge if pre-pop is outside limit and post_lo is bigger</span>
-                <span class="c1"># than n_pre_neurons</span>
-                <span class="k">elif</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">prepop_is_view</span><span class="p">:</span>
-                    <span class="n">pre_lo</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">pre_population</span><span class="o">.</span><span class="n">_indexes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                    <span class="n">pre_hi</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">pre_population</span><span class="o">.</span><span class="n">_indexes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-                    <span class="k">if</span> <span class="p">((</span><span class="n">pre</span><span class="o">.</span><span class="n">hi_atom</span> <span class="o">-</span> <span class="n">pre_lo</span> <span class="o">&lt;</span> <span class="n">post</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">)</span> <span class="ow">or</span>
-                            <span class="p">(</span><span class="n">pre</span><span class="o">.</span><span class="n">lo_atom</span> <span class="o">-</span> <span class="n">pre_lo</span> <span class="o">&gt;</span> <span class="n">post</span><span class="o">.</span><span class="n">hi_atom</span><span class="p">)</span> <span class="ow">or</span>
-                            <span class="p">(</span><span class="n">pre</span><span class="o">.</span><span class="n">hi_atom</span> <span class="o">&lt;</span> <span class="n">pre_lo</span><span class="p">)</span> <span class="ow">or</span>
-                            <span class="p">(</span><span class="n">pre</span><span class="o">.</span><span class="n">lo_atom</span> <span class="o">&gt;</span> <span class="n">pre_hi</span><span class="p">)):</span>
-                        <span class="n">n_filtered</span> <span class="o">+=</span> <span class="mi">1</span>
-                <span class="c1"># Filter edge if post-pop is outside limit and pre_lo is bigger</span>
-                <span class="c1"># than n_post_neurons</span>
-                <span class="k">elif</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">postpop_is_view</span><span class="p">:</span>
-                    <span class="n">post_lo</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">post_population</span><span class="o">.</span><span class="n">_indexes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                    <span class="n">post_hi</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">post_population</span><span class="o">.</span><span class="n">_indexes</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-                    <span class="k">if</span> <span class="p">((</span><span class="n">pre</span><span class="o">.</span><span class="n">hi_atom</span> <span class="o">&lt;</span> <span class="n">post</span><span class="o">.</span><span class="n">lo_atom</span> <span class="o">-</span> <span class="n">post_lo</span><span class="p">)</span> <span class="ow">or</span>
-                            <span class="p">(</span><span class="n">pre</span><span class="o">.</span><span class="n">lo_atom</span> <span class="o">&gt;</span> <span class="n">post</span><span class="o">.</span><span class="n">hi_atom</span> <span class="o">-</span> <span class="n">post_lo</span><span class="p">)</span> <span class="ow">or</span>
-                            <span class="p">(</span><span class="n">post</span><span class="o">.</span><span class="n">hi_atom</span> <span class="o">&lt;</span> <span class="n">post_lo</span><span class="p">)</span> <span class="ow">or</span>
-                            <span class="p">(</span><span class="n">post</span><span class="o">.</span><span class="n">lo_atom</span> <span class="o">&gt;</span> <span class="n">post_hi</span><span class="p">)):</span>
-                        <span class="n">n_filtered</span> <span class="o">+=</span> <span class="mi">1</span>
-                <span class="c1"># Filter edge in the usual scenario with normal populations</span>
-                <span class="k">elif</span> <span class="n">pre</span><span class="o">.</span><span class="n">hi_atom</span> <span class="o">&lt;</span> <span class="n">post</span><span class="o">.</span><span class="n">lo_atom</span> <span class="ow">or</span> <span class="n">pre</span><span class="o">.</span><span class="n">lo_atom</span> <span class="o">&gt;</span> <span class="n">post</span><span class="o">.</span><span class="n">hi_atom</span><span class="p">:</span>
-                    <span class="n">n_filtered</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">synapse_info</span><span class="o">.</span><span class="n">connector</span><span class="p">,</span> <span class="n">FromListConnector</span><span class="p">):</span>
-                <span class="n">pre_hi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span>
-                <span class="n">post_hi</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span>
-                <span class="n">pre_slices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pre_vertex</span><span class="o">.</span><span class="n">app_vertex</span><span class="o">.</span><span class="n">vertex_slices</span>
-                <span class="n">post_slices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">post_vertex</span><span class="o">.</span><span class="n">app_vertex</span><span class="o">.</span><span class="n">vertex_slices</span>
-                <span class="c1"># run through connection list and check for any connections</span>
-                <span class="c1"># between the pre and post vertices that could be filtered</span>
-                <span class="n">n_connections</span> <span class="o">=</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">connector</span><span class="o">.</span><span class="n">get_n_connections</span><span class="p">(</span>
-                    <span class="n">pre_slices</span><span class="p">,</span> <span class="n">post_slices</span><span class="p">,</span> <span class="n">pre_hi</span><span class="p">,</span> <span class="n">post_hi</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">n_connections</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="n">n_filtered</span> <span class="o">+=</span> <span class="mi">1</span>
-
-        <span class="k">return</span> <span class="n">n_filtered</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__synapse_information</span><span class="p">)</span></div>
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractWeightUpdatable</span><span class="o">.</span><span class="n">update_weight</span><span class="p">)</span>
 <div class="viewcode-block" id="ProjectionMachineEdge.update_weight"><a class="viewcode-back" href="../../../../../spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.ProjectionMachineEdge.update_weight">[docs]</a>    <span class="k">def</span> <span class="nf">update_weight</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

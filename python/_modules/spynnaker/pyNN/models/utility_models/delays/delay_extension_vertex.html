@@ -315,8 +315,12 @@
         <span class="n">key</span> <span class="o">=</span> <span class="n">routing_infos</span><span class="o">.</span><span class="n">get_first_key_from_pre_vertex</span><span class="p">(</span>
             <span class="n">vertex</span><span class="p">,</span> <span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span>
 
-        <span class="n">incoming_key</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">incoming_mask</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># Default to zero in cases of unconnected vertexes</span>
+        <span class="c1"># https://github.com/SpiNNakerManchester/sPyNNaker/issues/850</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">incoming_key</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">incoming_mask</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">incoming_edges</span> <span class="o">=</span> <span class="n">machine_graph</span><span class="o">.</span><span class="n">get_edges_ending_at_vertex</span><span class="p">(</span>
             <span class="n">vertex</span><span class="p">)</span>
 

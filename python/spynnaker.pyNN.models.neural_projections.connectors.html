@@ -126,6 +126,30 @@ checks.)</li>
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector.could_connect">
+<code class="descname">could_connect</code><span class="sig-paren">(</span><em>synapse_info</em>, <em>pre_slice</em>, <em>post_slice</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/abstract_connector.html#AbstractConnector.could_connect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector.could_connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if a pre slice and a post slice could connect.</p>
+<p>Typically used to determine if a Machine Edge should be created by
+checking that at least one of the indexes in the pre slice could
+over time connect to at least one of the indexes in the post slice.</p>
+<p>note: This method should never return a false negative,
+but may return a false positives</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>pre_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; </li>
+<li><strong>post_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; </li>
+<li><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) &#8211; </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector.create_synaptic_block">
 <code class="descname">create_synaptic_block</code><span class="sig-paren">(</span><em>pre_slices</em>, <em>pre_slice_index</em>, <em>post_slices</em>, <em>post_slice_index</em>, <em>pre_vertex_slice</em>, <em>post_vertex_slice</em>, <em>synapse_type</em>, <em>synapse_info</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/abstract_connector.html#AbstractConnector.create_synaptic_block"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector.create_synaptic_block" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a synaptic block from the data.</p>
@@ -1994,6 +2018,30 @@ extra columns in <code class="docutils literal"><span class="pre">conn_list</spa
 </dd></dl>
 
 <dl class="method">
+<dt id="spynnaker.pyNN.models.neural_projections.connectors.FromListConnector.could_connect">
+<code class="descname">could_connect</code><span class="sig-paren">(</span><em>synapse_info</em>, <em>pre_slice</em>, <em>post_slice</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/from_list_connector.html#FromListConnector.could_connect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.FromListConnector.could_connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if a pre slice and a post slice could connect.</p>
+<p>Typically used to determine if a Machine Edge should be created by
+checking that at least one of the indexes in the pre slice could
+over time connect to at least one of the indexes in the post slice.</p>
+<p>note: This method should never return a false negative,
+but may return a false positives</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>pre_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; </li>
+<li><strong>post_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; </li>
+<li><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) &#8211; </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="spynnaker.pyNN.models.neural_projections.connectors.FromListConnector.create_synaptic_block">
 <code class="descname">create_synaptic_block</code><span class="sig-paren">(</span><em>pre_slices</em>, <em>pre_slice_index</em>, <em>post_slices</em>, <em>post_slice_index</em>, <em>pre_vertex_slice</em>, <em>post_vertex_slice</em>, <em>synapse_type</em>, <em>synapse_info</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/from_list_connector.html#FromListConnector.create_synaptic_block"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.FromListConnector.create_synaptic_block" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a synaptic block from the data.</p>
@@ -2938,6 +2986,30 @@ or </em><a class="reference external" href="https://docs.python.org/3.6/library/
 </tr>
 </tbody>
 </table>
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neural_projections.connectors.OneToOneConnector.could_connect">
+<code class="descname">could_connect</code><span class="sig-paren">(</span><em>synapse_info</em>, <em>pre_slice</em>, <em>post_slice</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/one_to_one_connector.html#OneToOneConnector.could_connect"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.OneToOneConnector.could_connect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if a pre slice and a post slice could connect.</p>
+<p>Typically used to determine if a Machine Edge should be created by
+checking that at least one of the indexes in the pre slice could
+over time connect to at least one of the indexes in the post slice.</p>
+<p>note: This method should never return a false negative,
+but may return a false positives</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>pre_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; </li>
+<li><strong>post_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; </li>
+<li><strong>synapse_info</strong> (<a class="reference internal" href="spynnaker.pyNN.models.neural_projections.html#spynnaker.pyNN.models.neural_projections.SynapseInformation" title="spynnaker.pyNN.models.neural_projections.SynapseInformation"><em>SynapseInformation</em></a>) &#8211; </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="method">
 <dt id="spynnaker.pyNN.models.neural_projections.connectors.OneToOneConnector.create_synaptic_block">
 <code class="descname">create_synaptic_block</code><span class="sig-paren">(</span><em>pre_slices</em>, <em>pre_slice_index</em>, <em>post_slices</em>, <em>post_slice_index</em>, <em>pre_vertex_slice</em>, <em>post_vertex_slice</em>, <em>synapse_type</em>, <em>synapse_info</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neural_projections/connectors/one_to_one_connector.html#OneToOneConnector.create_synaptic_block"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neural_projections.connectors.OneToOneConnector.create_synaptic_block" title="Permalink to this definition">¶</a></dt>
