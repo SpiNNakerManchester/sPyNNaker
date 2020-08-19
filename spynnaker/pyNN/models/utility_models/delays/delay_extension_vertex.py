@@ -45,7 +45,10 @@ from spynnaker.pyNN.models.neuron.synapse_dynamics import (
 
 logger = logging.getLogger(__name__)
 
-_DELAY_PARAM_HEADER_WORDS = 8
+#  1. has_key 2. key 3. incoming_key 4. incoming_mask 5. n_atoms
+#  6. n_delay_stages 7. random_backoff 8. time_between_spikes
+#  9. n_outgoing_edges
+_DELAY_PARAM_HEADER_WORDS = 9
 # pylint: disable=protected-access
 _DELEXT_REGIONS = DelayExtensionMachineVertex._DELAY_EXTENSION_REGIONS
 _EXPANDER_BASE_PARAMS_SIZE = 3 * BYTES_PER_WORD
@@ -250,10 +253,6 @@ class DelayExtensionVertex(
         key = routing_infos.get_first_key_from_pre_vertex(
             vertex, SPIKE_PARTITION_ID)
 
-        # Default to zero in cases of unconnected vertexes
-        # https://github.com/SpiNNakerManchester/sPyNNaker/issues/850
-        if key is None:
-            key = 0
         incoming_key = 0
         incoming_mask = 0
         incoming_edges = machine_graph.get_edges_ending_at_vertex(
@@ -330,7 +329,12 @@ class DelayExtensionVertex(
 
         # Write header info to the memory region:
         # Write Key info for this core and the incoming key and mask:
-        spec.write_value(data=key)
+        if key is None:
+            spec.write_value(0)
+            spec.write_value(0)
+        else:
+            spec.write_value(1)
+            spec.write_value(data=key)
         spec.write_value(data=incoming_key)
         spec.write_value(data=incoming_mask)
 
