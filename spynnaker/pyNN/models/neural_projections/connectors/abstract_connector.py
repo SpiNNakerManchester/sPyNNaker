@@ -553,3 +553,21 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         """
         # pylint: disable=unused-argument
         return False
+
+    def could_connect(self, synapse_info, pre_slice, post_slice):
+        """
+        Checks if a pre slice and a post slice could connect.
+
+        Typically used to determine if a Machine Edge should be created by
+        checking that at least one of the indexes in the pre slice could
+        over time connect to at least one of the indexes in the post slice.
+
+        note: This method should never return a false negative,
+        but may return a false positives
+
+        :param ~pacman.model.graphs.common.Slice pre_slice:
+        :param ~pacman.model.graphs.common.Slice post_slice:
+        :param SynapseInformation synapse_info:
+        """
+        # Unless we know for sure we must say they could connect
+        return True

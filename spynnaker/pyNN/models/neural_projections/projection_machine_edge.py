@@ -25,15 +25,12 @@ from pacman.model.partitioner_interfaces.\
     AbstractControlsSourceOfEdges
 from spinn_front_end_common.interface.provenance import (
     AbstractProvidesLocalProvenanceData)
-from spynnaker.pyNN.models.neural_projections.connectors import (
-    OneToOneConnector, FromListConnector)
-from spynnaker.pyNN.models.abstract_models import (
-    AbstractWeightUpdatable, AbstractFilterableEdge)
+from spynnaker.pyNN.models.abstract_models import AbstractWeightUpdatable
 
 
 class ProjectionMachineEdge(
-        MachineEdge, AbstractFilterableEdge,
-        AbstractWeightUpdatable, AbstractProvidesLocalProvenanceData):
+        MachineEdge, AbstractWeightUpdatable,
+        AbstractProvidesLocalProvenanceData):
     __slots__ = [
         "__synapse_information"]
 
@@ -60,94 +57,6 @@ class ProjectionMachineEdge(
         :rtype: list(SynapseInformation)
         """
         return self.__synapse_information
-
-    @overrides(AbstractFilterableEdge.filter_edge)
-    def filter_edge(self):
-        # Filter one-to-one connections that are out of range
-        # Note: there may be other connectors stored on the same edge!
-
-        pre_app_vertex = self.pre_vertex.app_vertex
-        post_app_vertex = self.post_vertex.app_vertex
-        n_filtered = 0
-        for synapse_info in self.__synapse_information:
-            # process pre atoms
-            if isinstance(pre_app_vertex, AbstractControlsSourceOfEdges):
-                machine_slice = pre_app_vertex.get_pre_slice_for(
-                    self.pre_vertex)
-                pre_lo = machine_slice.lo_atom
-                pre_hi = machine_slice.hi_atom
-                pre_slices = pre_app_vertex.get_out_going_slices()
-            else:
-                pre_lo = self.pre_vertex.vertex_slice.lo_atom
-                pre_hi = self.pre_vertex.vertex_slice.hi_atom
-                pre_slices = pre_app_vertex.vertex_slices
-
-            # process post atoms
-            if isinstance(post_app_vertex, AbstractControlsDestinationOfEdges):
-                machine_slice = post_app_vertex.get_post_slice_for(
-                    self.post_vertex)
-                post_lo = machine_slice.lo_atom
-                post_hi = machine_slice.hi_atom
-                post_slices = post_app_vertex.get_in_coming_slices()
-            else:
-                post_lo = self.post_vertex.vertex_slice.lo_atom
-                post_hi = self.post_vertex.vertex_slice.hi_atom
-                post_slices = post_app_vertex.vertex_slices
-
-            if isinstance(synapse_info.connector, OneToOneConnector):
-                # Filter edge if both are views and outside limits
-                if (synapse_info.prepop_is_view and
-                        synapse_info.postpop_is_view):
-                    prepop_lo = synapse_info.pre_population._indexes[0]
-                    prepop_hi = synapse_info.pre_population._indexes[-1]
-                    postpop_lo = synapse_info.post_population._indexes[0]
-                    postpop_hi = synapse_info.post_population._indexes[-1]
-                    # Get test values
-                    pre_lo_test = pre_lo - prepop_lo
-                    pre_hi_test = pre_hi - prepop_lo
-                    post_lo_test = post_lo - postpop_lo
-                    post_hi_test = post_hi - postpop_lo
-                    if ((pre_hi_test < post_lo_test) or
-                            (pre_lo_test > post_hi_test) or
-                            (pre_hi < prepop_lo) or (pre_lo > prepop_hi) or
-                            (post_hi < postpop_lo) or (post_lo > postpop_hi)):
-                        n_filtered += 1
-                # Filter edge if pre-pop is outside limit and post_lo is bigger
-                # than n_pre_neurons
-                elif synapse_info.prepop_is_view:
-                    pre_lo = synapse_info.pre_population._indexes[0]
-                    pre_hi = synapse_info.pre_population._indexes[-1]
-                    if ((pre_hi_test < post_lo) or
-                            (pre_lo_test > post_hi) or
-                            (pre_hi < prepop_lo) or (pre_lo > prepop_hi)):
-                        n_filtered += 1
-                # Filter edge if post-pop is outside limit and pre_lo is bigger
-                # than n_post_neurons
-                elif synapse_info.postpop_is_view:
-                    post_lo = synapse_info.post_population._indexes[0]
-                    post_hi = synapse_info.post_population._indexes[-1]
-                    if ((pre_hi < post_lo_test) or
-                            (pre_lo > post_hi_test) or
-                            (post_hi < postpop_lo) or (post_lo > postpop_hi)):
-                        n_filtered += 1
-                # Filter edge in the usual scenario with normal populations
-                elif pre_hi < post_lo or pre_lo > post_hi:
-                    n_filtered += 1
-
-            # Filter edge in the usual scenario with normal populations
-            elif isinstance(synapse_info.connector, FromListConnector):
-                pre_hi = self.pre_vertex.vertex_slice.hi_atom
-                post_hi = self.post_vertex.vertex_slice.hi_atom
-                pre_slices = self.pre_vertex.app_vertex.vertex_slices
-                post_slices = self.post_vertex.app_vertex.vertex_slices
-                # run through connection list and check for any connections
-                # between the pre and post vertices that could be filtered
-                n_connections = synapse_info.connector.get_n_connections(
-                    pre_slices, post_slices, pre_hi, post_hi)
-                if n_connections == 0:
-                    n_filtered += 1
-
-        return n_filtered == len(self.__synapse_information)
 
     @overrides(AbstractWeightUpdatable.update_weight)
     def update_weight(self):
