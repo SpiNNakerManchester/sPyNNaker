@@ -213,6 +213,24 @@ implements.</li>
 <dd></dd></dl>
 
 <dl class="method">
+<dt id="spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.get_n_keys_for_partition">
+<code class="descclassname">DelayExtensionMachineVertex.</code><code class="descname">get_n_keys_for_partition</code><span class="sig-paren">(</span><em>_partition</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/delays/delay_extension_machine_vertex.html#DelayExtensionMachineVertex.get_n_keys_for_partition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.get_n_keys_for_partition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the number of keys required by the given partition of edges.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>_partition</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs/#pacman.model.graphs.OutgoingEdgePartition" title="(in PACMAN v)"><em>OutgoingEdgePartition</em></a>) &#8211; An partition that comes out of this vertex</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The number of keys required</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.get_provenance_data_from_machine">
 <code class="descclassname">DelayExtensionMachineVertex.</code><code class="descname">get_provenance_data_from_machine</code><span class="sig-paren">(</span><em>transceiver</em>, <em>placement</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/delays/delay_extension_machine_vertex.html#DelayExtensionMachineVertex.get_provenance_data_from_machine"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.get_provenance_data_from_machine" title="Permalink to this definition">¶</a></dt>
 <dd><p>Retrieve the provenance data.</p>
@@ -252,7 +270,7 @@ implements.</li>
 <dl class="class">
 <dt id="spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex">
 <em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.utility_models.delays.</code><code class="descname">DelayExtensionVertex</code><span class="sig-paren">(</span><em>n_neurons</em>, <em>delay_per_stage</em>, <em>source_vertex</em>, <em>machine_time_step</em>, <em>time_scale_factor</em>, <em>constraints=None</em>, <em>label='DelayExtension'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/delays/delay_extension_vertex.html#DelayExtensionVertex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">pacman.model.graphs.application.application_vertex.ApplicationVertex</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_generates_data_specification.AbstractGeneratesDataSpecification</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_has_associated_binary.AbstractHasAssociatedBinary</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_provides_outgoing_partition_constraints.AbstractProvidesOutgoingPartitionConstraints</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_provides_n_keys_for_partition.AbstractProvidesNKeysForPartition</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">pacman.model.graphs.application.application_vertex.ApplicationVertex</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_generates_data_specification.AbstractGeneratesDataSpecification</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_has_associated_binary.AbstractHasAssociatedBinary</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_provides_outgoing_partition_constraints.AbstractProvidesOutgoingPartitionConstraints</span></code></p>
 <p>Provide delays to incoming spikes in multiples of the maximum delays        of a neuron (typically 16 or 32)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -435,33 +453,6 @@ or None to use the default slice</li>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>vertex_slice</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs.common/#pacman.model.graphs.common.Slice" title="(in PACMAN v)"><em>Slice</em></a>) &#8211; </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.get_n_keys_for_partition">
-<code class="descname">get_n_keys_for_partition</code><span class="sig-paren">(</span><em>partition</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/utility_models/delays/delay_extension_vertex.html#DelayExtensionVertex.get_n_keys_for_partition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.get_n_keys_for_partition" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the number of keys required by the given partition of edges.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>partition</strong> (<a class="reference external" href="https://pacman.readthedocs.io/en/latest/pacman.model.graphs/#pacman.model.graphs.OutgoingEdgePartition" title="(in PACMAN v)"><em>OutgoingEdgePartition</em></a>) &#8211; An partition that comes out of this vertex</li>
-<li><strong>partition</strong> &#8211; </li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The number of keys required</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></p>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></p>
-</td>
 </tr>
 </tbody>
 </table>

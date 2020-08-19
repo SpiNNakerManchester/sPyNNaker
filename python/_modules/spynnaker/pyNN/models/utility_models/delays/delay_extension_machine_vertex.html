@@ -206,7 +206,11 @@
         <span class="n">provenance_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ProvenanceDataItem</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_add_name</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="s2">&quot;Number_of_times_delayed_to_spread_traffic&quot;</span><span class="p">),</span>
             <span class="n">n_delays</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">provenance_items</span></div></div>
+        <span class="k">return</span> <span class="n">provenance_items</span></div>
+
+    <span class="nd">@overrides</span><span class="p">(</span><span class="n">MachineVertex</span><span class="o">.</span><span class="n">get_n_keys_for_partition</span><span class="p">)</span>
+<div class="viewcode-block" id="DelayExtensionMachineVertex.get_n_keys_for_partition"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionMachineVertex.get_n_keys_for_partition">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_keys_for_partition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_partition</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">app_vertex</span><span class="o">.</span><span class="n">n_delay_stages</span></div></div>
 </pre></div>
 
           </div>
