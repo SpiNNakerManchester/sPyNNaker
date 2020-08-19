@@ -13,10 +13,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from .graph_edge_filter import GraphEdgeFilter
 from .graph_edge_weight_updater import GraphEdgeWeightUpdater
+from .on_chip_bit_field_generator import OnChipBitFieldGenerator
 from .spynnaker_data_specification_writer import (
     SpynnakerDataSpecificationWriter)
+from .spynnaker_machine_bit_field_router_compressor import (
+    SpynnakerMachineBitFieldPairRouterCompressor,
+    SpynnakerMachineBitFieldUnorderedRouterCompressor)
 
-__all__ = ["GraphEdgeFilter", "GraphEdgeWeightUpdater",
-           "SpynnakerDataSpecificationWriter"]
+__all__ = ["GraphEdgeWeightUpdater", "OnChipBitFieldGenerator",
+           "SpynnakerDataSpecificationWriter",
+           "SpynnakerMachineBitFieldPairRouterCompressor",
+           "SpynnakerMachineBitFieldUnorderedRouterCompressor"]
