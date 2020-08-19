@@ -26,7 +26,7 @@ from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
 from spinn_front_end_common.abstract_models import (
-    AbstractProvidesNKeysForPartition, AbstractGeneratesDataSpecification,
+    AbstractGeneratesDataSpecification,
     AbstractProvidesOutgoingPartitionConstraints, AbstractHasAssociatedBinary)
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities.constants import (
@@ -57,8 +57,7 @@ _MAX_OFFSET_DENOMINATOR = 10
 class DelayExtensionVertex(
         ApplicationVertex, AbstractGeneratesDataSpecification,
         AbstractHasAssociatedBinary,
-        AbstractProvidesOutgoingPartitionConstraints,
-        AbstractProvidesNKeysForPartition):
+        AbstractProvidesOutgoingPartitionConstraints):
     """ Provide delays to incoming spikes in multiples of the maximum delays\
         of a neuron (typically 16 or 32)
     """
@@ -250,8 +249,12 @@ class DelayExtensionVertex(
         key = routing_infos.get_first_key_from_pre_vertex(
             vertex, SPIKE_PARTITION_ID)
 
-        incoming_key = None
-        incoming_mask = None
+        # Default to zero in cases of unconnected vertexes
+        # https://github.com/SpiNNakerManchester/sPyNNaker/issues/850
+        if key is None:
+            key = 0
+        incoming_key = 0
+        incoming_mask = 0
         incoming_edges = machine_graph.get_edges_ending_at_vertex(
             vertex)
 
@@ -445,17 +448,6 @@ class DelayExtensionVertex(
     @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
     def get_binary_start_type(self):
         return ExecutableType.USES_SIMULATION_INTERFACE
-
-    @overrides(AbstractProvidesNKeysForPartition.get_n_keys_for_partition)
-    def get_n_keys_for_partition(self, partition):
-        """
-        :param ~pacman.model.graphs.OutgoingEdgePartition partition:
-        :rtype: int
-        """
-        vertex_slice = partition.pre_vertex.vertex_slice
-        if self.__n_delay_stages == 0:
-            return 1
-        return vertex_slice.n_atoms * self.__n_delay_stages
 
     @overrides(AbstractProvidesOutgoingPartitionConstraints.
                get_outgoing_partition_constraints)
