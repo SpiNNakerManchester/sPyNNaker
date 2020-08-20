@@ -32,33 +32,6 @@ class SynapseDynamicsStructuralStatic(
         rewiring can operate in parallel with static synapses.
 
         Written by Petrut Bogdan.
-<<<<<<< HEAD
-
-    :param partner_selection: The partner selection rule
-    :param formation: The formation rule
-    :param elimination: The elimination rule
-    :param f_rew: How many rewiring attempts will be done per second.
-    :type f_rew: int
-    :param initial_weight: Weight assigned to a newly formed connection
-    :type initial_weight: float
-    :param initial_delay:\
-        Delay assigned to a newly formed connection; a single value means a\
-        fixed delay value, or a tuple of two values means the delay will be\
-        chosen at random from a uniform distribution between the given values
-    :type initial_delay: float or (float, float)
-    :param s_max: Maximum fan-in per target layer neuron
-    :type s_max: int
-    :param with_replacement:\
-        If set to True (default), a new synapse can be formed in a location\
-        where a connection already exists; if False, then it must form\
-        where no connection already exists
-    :type with_replacement: bool
-    :param seed: seed the random number generators
-    :type seed: int
-    :param weight: The weight of connections formed by the connector
-    :param delay: The delay of connections formed by the connector
-=======
->>>>>>> refs/remotes/origin/master
     """
     __slots__ = ["__common_sp"]
 
