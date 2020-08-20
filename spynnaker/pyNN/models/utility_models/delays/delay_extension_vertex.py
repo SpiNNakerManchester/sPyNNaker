@@ -32,7 +32,6 @@ from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities.constants import (
     SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES, BITS_PER_WORD,
     BYTES_PER_WORD)
-from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from .delay_block import DelayBlock
 from .delay_extension_machine_vertex import DelayExtensionMachineVertex
 from .delay_generator_data import DelayGeneratorData
@@ -56,7 +55,6 @@ _MAX_OFFSET_DENOMINATOR = 10
 
 class DelayExtensionVertex(
         ApplicationVertex, AbstractGeneratesDataSpecification,
-        AbstractHasAssociatedBinary,
         AbstractProvidesOutgoingPartitionConstraints):
     """ Provide delays to incoming spikes in multiples of the maximum delays\
         of a neuron (typically 16 or 32)
@@ -440,14 +438,6 @@ class DelayExtensionVertex(
         """
         words_per_atom = 11 + 16
         return words_per_atom * BYTES_PER_WORD * vertex_slice.n_atoms
-
-    @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
-    def get_binary_file_name(self):
-        return "delay_extension.aplx"
-
-    @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
-    def get_binary_start_type(self):
-        return ExecutableType.USES_SIMULATION_INTERFACE
 
     @overrides(AbstractProvidesOutgoingPartitionConstraints.
                get_outgoing_partition_constraints)
