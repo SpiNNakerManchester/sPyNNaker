@@ -418,3 +418,10 @@ class FromListConnector(AbstractConnector):
         :rtype: list(str)
         """
         return self.__extra_parameter_names
+
+    @overrides(AbstractConnector.could_connect)
+    def could_connect(self, _synapse_info, _pre_slice, _post_slice):
+        return any((_pre_slice.lo_atom <= self.__sources) &
+                   (self.__sources <= _pre_slice.hi_atom) &
+                   (_post_slice.lo_atom <= self.__targets) &
+                   (self.__targets <= _post_slice.hi_atom))

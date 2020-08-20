@@ -16,6 +16,12 @@
 import numpy
 from spinn_utilities.overrides import overrides
 from .abstract_formation import AbstractFormation
+from data_specification.enums.data_type import DataType
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+
+# 6 32-bit words (grid_x, grid_y, grid_x_recip, grid_y_recep, ff_prob_size,
+#                 lat_prob_size)
+_PARAMS_SIZE_IN_BYTES = 6 * BYTES_PER_WORD
 
 
 class DistanceDependentFormation(AbstractFormation):
@@ -70,7 +76,8 @@ class DistanceDependentFormation(AbstractFormation):
 
     @overrides(AbstractFormation.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(self):
-        return (4 + 4 + 4 + 4 + len(self.__ff_distance_probabilities) * 2 +
+        return (_PARAMS_SIZE_IN_BYTES +
+                len(self.__ff_distance_probabilities) * 2 +
                 len(self.__lat_distance_probabilities) * 2)
 
     def generate_distance_probability_array(self, probability, sigma):
@@ -146,6 +153,11 @@ class DistanceDependentFormation(AbstractFormation):
     @overrides(AbstractFormation.write_parameters)
     def write_parameters(self, spec):
         spec.write_array(self.__grid)
+        # Work out the reciprocal, but zero them if >= 1 as they are not
+        # representable as S031 in that case, and not used anyway
+        recip = 1 / self.__grid
+        recip[recip >= 1.0] = 0
+        spec.write_array(DataType.S031.encode_as_numpy_int_array(recip))
         spec.write_value(len(self.__ff_distance_probabilities))
         spec.write_value(len(self.__lat_distance_probabilities))
         spec.write_array(self.__ff_distance_probabilities.view("<u4"))

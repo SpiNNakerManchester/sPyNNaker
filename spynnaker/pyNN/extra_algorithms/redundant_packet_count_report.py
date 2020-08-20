@@ -33,7 +33,7 @@ class RedundantPacketCountReport(object):
         try:
             with open(file_name, "w") as f:
                 self._write_report(f, provenance_items)
-        except Exception:
+        except Exception:  # pylint: disable=broad-except
             logger.exception("Generate_placement_reports: Can't open file"
                              " {} for writing.", self._FILE_NAME)
 
