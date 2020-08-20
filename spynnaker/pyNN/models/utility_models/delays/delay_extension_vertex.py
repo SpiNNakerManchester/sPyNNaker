@@ -240,7 +240,8 @@ class DelayExtensionVertex(
         vertex.reserve_provenance_data_region(spec)
 
         self._write_setup_info(
-            spec, self.__machine_time_step, self.__time_scale_factor)
+            spec, self.__machine_time_step, self.__time_scale_factor,
+            placement.vertex.get_binary_file_name())
 
         spec.comment("\n*** Spec for Delay Extension Instance ***\n\n")
 
@@ -288,17 +289,18 @@ class DelayExtensionVertex(
         # End-of-Spec:
         spec.end_specification()
 
-    def _write_setup_info(self, spec, machine_time_step, time_scale_factor):
+    def _write_setup_info(
+            self, spec, machine_time_step, time_scale_factor, binary_name):
         """
         :param ~data_specification.DataSpecificationGenerator spec:
-        :param int machine_time_step:
-        :param int time_scale_factor:
+        :param int machine_time_step:v the machine time step
+        :param int time_scale_factor: the time scale factor
+        :param str binary_name: the binary name
         """
         # Write this to the system region (to be picked up by the simulation):
         spec.switch_write_focus(_DELEXT_REGIONS.SYSTEM.value)
         spec.write_array(simulation_utilities.get_simulation_header_array(
-            self.get_binary_file_name(), machine_time_step,
-            time_scale_factor))
+            binary_name, machine_time_step, time_scale_factor))
 
     def write_delay_parameters(
             self, spec, vertex_slice, key, incoming_key, incoming_mask,
