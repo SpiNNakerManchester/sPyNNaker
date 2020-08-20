@@ -46,9 +46,7 @@ struct additional_input_t {
 //! \return The value of the input after scaling
 static input_t additional_input_get_input_value_as_current(
         struct additional_input_t *additional_input,
-        state_t membrane_voltage) {
-	use(membrane_voltage);
-
+        UNUSED state_t membrane_voltage) {
     // Decay Ca2 trace
     additional_input->I_Ca2 *= additional_input->exp_TauCa;
 

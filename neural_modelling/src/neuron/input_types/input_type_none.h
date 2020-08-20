@@ -44,11 +44,8 @@ struct input_type_t {
 //! \return Pointer to array of values of the receptor-based input after
 //!     scaling
 static input_t *input_type_get_input_value(
-        input_t *restrict value, const input_type_t *input_type,
-        uint16_t num_receptors) {
-    use(value);
-    use(input_type);
-    use(num_receptors);
+        UNUSED input_t *restrict value, UNUSED const input_type_t *input_type,
+        UNUSED uint16_t num_receptors) {
     return 0;
 }
 
@@ -60,11 +57,9 @@ static input_t *input_type_get_input_value(
 //! \param[in] input_type: The input type pointer to the parameters
 //! \param[in] membrane_voltage: The membrane voltage to use for the input
 static void input_type_convert_excitatory_input_to_current(
-        input_t *restrict exc_input, const input_type_t *input_type,
-        state_t membrane_voltage) {
-    use(exc_input);
-    use(input_type);
-    use(membrane_voltage);
+        UNUSED input_t *restrict exc_input,
+        UNUSED const input_type_t *input_type,
+        UNUSED state_t membrane_voltage) {
 }
 
 //! \brief Converts an inhibitory input into an inhibitory current
@@ -75,11 +70,9 @@ static void input_type_convert_excitatory_input_to_current(
 //! \param[in] input_type: The input type pointer to the parameters
 //! \param[in] membrane_voltage: The membrane voltage to use for the input
 static void input_type_convert_inhibitory_input_to_current(
-        input_t *restrict inh_input, const input_type_t *input_type,
-        state_t membrane_voltage) {
-    use(inh_input);
-    use(input_type);
-    use(membrane_voltage);
+        UNUSED input_t *restrict inh_input,
+        UNUSED const input_type_t *input_type,
+        UNUSED state_t membrane_voltage) {
 }
 
 #endif // _INPUT_TYPE_NONE_H_
