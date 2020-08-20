@@ -56,9 +56,9 @@ class AbstractPyNNNeuronModelStandard(AbstractPyNNNeuronModel):
     def create_vertex(
             self, n_neurons, label, constraints, spikes_per_second,
             ring_buffer_sigma, incoming_spike_buffer_size,
-            n_steps_per_timestep):
+            n_steps_per_timestep, splitter_object):
         # pylint: disable=arguments-differ
         self._model.n_steps_per_timestep = n_steps_per_timestep
         return super(AbstractPyNNNeuronModelStandard, self).create_vertex(
             n_neurons, label, constraints, spikes_per_second,
-            ring_buffer_sigma, incoming_spike_buffer_size)
+            ring_buffer_sigma, incoming_spike_buffer_size, splitter_object)
