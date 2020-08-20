@@ -304,6 +304,11 @@ def get_n_bits(n_values):
 def float_gcd(a, b):
     """ Floating point gcd of two values
     """
+    # Using absolute values for cases where a user has supplied a negative
+    # weight appears necessary for Python 2.7
+    a = abs(a)
+    b = abs(b)
+
     if (a < b):
         return float_gcd(b, a)
 
