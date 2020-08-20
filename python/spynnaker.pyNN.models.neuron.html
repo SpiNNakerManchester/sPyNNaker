@@ -654,7 +654,7 @@ max_delayed_row_length, delayed_source_ids, stages)</p>
 <dl class="class">
 <dt id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex">
 <em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.</code><code class="descname">AbstractPopulationVertex</code><span class="sig-paren">(</span><em>n_neurons</em>, <em>label</em>, <em>constraints</em>, <em>max_atoms_per_core</em>, <em>spikes_per_second</em>, <em>ring_buffer_sigma</em>, <em>incoming_spike_buffer_size</em>, <em>neuron_impl</em>, <em>pynn_model</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">pacman.model.graphs.application.application_vertex.ApplicationVertex</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_generates_data_specification.AbstractGeneratesDataSpecification</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_has_associated_binary.AbstractHasAssociatedBinary</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.abstract_models.abstract_contains_units.AbstractContainsUnits</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.common.abstract_spike_recordable.AbstractSpikeRecordable</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.common.abstract_neuron_recordable.AbstractNeuronRecordable</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_provides_outgoing_partition_constraints.AbstractProvidesOutgoingPartitionConstraints</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_provides_incoming_partition_constraints.AbstractProvidesIncomingPartitionConstraints</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.abstract_models.abstract_population_initializable.AbstractPopulationInitializable</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.abstract_models.abstract_population_settable.AbstractPopulationSettable</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_changable_after_run.AbstractChangableAfterRun</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_rewrites_data_specification.AbstractRewritesDataSpecification</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.abstract_models.abstract_read_parameters_before_set.AbstractReadParametersBeforeSet</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.abstract_models.abstract_accepts_incoming_synapses.AbstractAcceptsIncomingSynapses</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.impl.provides_key_to_atom_mapping_impl.ProvidesKeyToAtomMappingImpl</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_can_reset.AbstractCanReset</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">pacman.model.graphs.application.application_vertex.ApplicationVertex</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_generates_data_specification.AbstractGeneratesDataSpecification</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.abstract_models.abstract_contains_units.AbstractContainsUnits</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.common.abstract_spike_recordable.AbstractSpikeRecordable</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.common.abstract_neuron_recordable.AbstractNeuronRecordable</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_provides_outgoing_partition_constraints.AbstractProvidesOutgoingPartitionConstraints</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_provides_incoming_partition_constraints.AbstractProvidesIncomingPartitionConstraints</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.abstract_models.abstract_population_initializable.AbstractPopulationInitializable</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.abstract_models.abstract_population_settable.AbstractPopulationSettable</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_changable_after_run.AbstractChangableAfterRun</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_rewrites_data_specification.AbstractRewritesDataSpecification</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.abstract_models.abstract_read_parameters_before_set.AbstractReadParametersBeforeSet</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.abstract_models.abstract_accepts_incoming_synapses.AbstractAcceptsIncomingSynapses</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.impl.provides_key_to_atom_mapping_impl.ProvidesKeyToAtomMappingImpl</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_can_reset.AbstractCanReset</span></code></p>
 <p>Underlying vertex model for Neural Populations.
 Not actually abstract.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -830,34 +830,6 @@ or None to use the default slice</li>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></p>
 </td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_binary_file_name">
-<code class="descname">get_binary_file_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.get_binary_file_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_binary_file_name" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the binary name to be run for this vertex.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_binary_start_type">
-<code class="descname">get_binary_start_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/abstract_population_vertex.html#AbstractPopulationVertex.get_binary_start_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.AbstractPopulationVertex.get_binary_start_type" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the start type of the binary to be run.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utilities.utility_objs.html#spinn_front_end_common.utilities.utility_objs.ExecutableType" title="(in SpiNNFrontEndCommon v)">ExecutableType</a></td>
 </tr>
 </tbody>
 </table>
@@ -1680,8 +1652,8 @@ source, target, weight and delay</td>
 
 <dl class="class">
 <dt id="spynnaker.pyNN.models.neuron.PopulationMachineVertex">
-<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.</code><code class="descname">PopulationMachineVertex</code><span class="sig-paren">(</span><em>resources_required</em>, <em>recorded_region_ids</em>, <em>label</em>, <em>constraints</em>, <em>app_vertex</em>, <em>vertex_slice</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/population_machine_vertex.html#PopulationMachineVertex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">pacman.model.graphs.machine.machine_vertex.MachineVertex</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.interface.buffer_management.buffer_models.abstract_receive_buffers_to_host.AbstractReceiveBuffersToHost</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.interface.provenance.provides_provenance_data_from_machine_impl.ProvidesProvenanceDataFromMachineImpl</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_recordable.AbstractRecordable</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.interface.profiling.abstract_has_profile_data.AbstractHasProfileData</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_supports_bit_field_generation.AbstractSupportsBitFieldGeneration</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_supports_bit_field_routing_compression.AbstractSupportsBitFieldRoutingCompression</span></code></p>
+<em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.neuron.</code><code class="descname">PopulationMachineVertex</code><span class="sig-paren">(</span><em>resources_required</em>, <em>recorded_region_ids</em>, <em>label</em>, <em>constraints</em>, <em>app_vertex</em>, <em>vertex_slice</em>, <em>binary_file_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/population_machine_vertex.html#PopulationMachineVertex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">pacman.model.graphs.machine.machine_vertex.MachineVertex</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.interface.buffer_management.buffer_models.abstract_receive_buffers_to_host.AbstractReceiveBuffersToHost</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_has_associated_binary.AbstractHasAssociatedBinary</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.interface.provenance.provides_provenance_data_from_machine_impl.ProvidesProvenanceDataFromMachineImpl</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_recordable.AbstractRecordable</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.interface.profiling.abstract_has_profile_data.AbstractHasProfileData</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_supports_bit_field_generation.AbstractSupportsBitFieldGeneration</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_supports_bit_field_routing_compression.AbstractSupportsBitFieldRoutingCompression</span></code></p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -1698,6 +1670,7 @@ source, target, weight and delay</td>
 </tr>
 </tbody>
 </table>
+<p>&#64;param str binary_file_name: binary name to be run for this verte</p>
 <dl class="attribute">
 <dt id="spynnaker.pyNN.models.neuron.PopulationMachineVertex.BIT_FIELDS_NOT_READ">
 <code class="descname">BIT_FIELDS_NOT_READ</code><em class="property"> = 'N bit fields not able to be read into DTCM'</em><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.BIT_FIELDS_NOT_READ" title="Permalink to this definition">¶</a></dt>
@@ -1873,6 +1846,34 @@ source, target, weight and delay</td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/functions.html#int" title="(in Python v3.6)">int</a></p>
 </td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.PopulationMachineVertex.get_binary_file_name">
+<code class="descclassname">PopulationMachineVertex.</code><code class="descname">get_binary_file_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/population_machine_vertex.html#PopulationMachineVertex.get_binary_file_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.get_binary_file_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the binary name to be run for this vertex.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.neuron.PopulationMachineVertex.get_binary_start_type">
+<code class="descclassname">PopulationMachineVertex.</code><code class="descname">get_binary_start_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/neuron/population_machine_vertex.html#PopulationMachineVertex.get_binary_start_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.neuron.PopulationMachineVertex.get_binary_start_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the start type of the binary to be run.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utilities.utility_objs.html#spinn_front_end_common.utilities.utility_objs.ExecutableType" title="(in SpiNNFrontEndCommon v)">ExecutableType</a></td>
 </tr>
 </tbody>
 </table>

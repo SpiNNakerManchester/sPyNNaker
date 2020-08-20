@@ -621,7 +621,7 @@
         <span class="c1"># pylint: disable=unused-argument</span>
         <span class="k">return</span> <span class="kc">False</span></div>
 
-<div class="viewcode-block" id="AbstractConnector.could_connect"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector.could_connect">[docs]</a>    <span class="k">def</span> <span class="nf">could_connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">pre_slice</span><span class="p">,</span> <span class="n">post_slice</span><span class="p">):</span>
+<div class="viewcode-block" id="AbstractConnector.could_connect"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.AbstractConnector.could_connect">[docs]</a>    <span class="k">def</span> <span class="nf">could_connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_synapse_info</span><span class="p">,</span> <span class="n">_pre_slice</span><span class="p">,</span> <span class="n">_post_slice</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Checks if a pre slice and a post slice could connect.</span>
 
@@ -632,9 +632,9 @@
 <span class="sd">        note: This method should never return a false negative,</span>
 <span class="sd">        but may return a false positives</span>
 
-<span class="sd">        :param ~pacman.model.graphs.common.Slice pre_slice:</span>
-<span class="sd">        :param ~pacman.model.graphs.common.Slice post_slice:</span>
-<span class="sd">        :param SynapseInformation synapse_info:</span>
+<span class="sd">        :param ~pacman.model.graphs.common.Slice _pre_slice:</span>
+<span class="sd">        :param ~pacman.model.graphs.common.Slice _post_slice:</span>
+<span class="sd">        :param SynapseInformation _synapse_info:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Unless we know for sure we must say they could connect</span>
         <span class="k">return</span> <span class="kc">True</span></div></div>

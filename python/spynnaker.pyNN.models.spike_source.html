@@ -257,7 +257,7 @@ If None the assumption is all neurons are recording</li>
 <dl class="class">
 <dt id="spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex.SpikeSourcePoissonMachineVertex">
 <em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex.</code><code class="descname">SpikeSourcePoissonMachineVertex</code><span class="sig-paren">(</span><em>resources_required</em>, <em>is_recording</em>, <em>constraints=None</em>, <em>label=None</em>, <em>app_vertex=None</em>, <em>vertex_slice=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_poisson_machine_vertex.html#SpikeSourcePoissonMachineVertex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex.SpikeSourcePoissonMachineVertex" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">pacman.model.graphs.machine.machine_vertex.MachineVertex</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.interface.buffer_management.buffer_models.abstract_receive_buffers_to_host.AbstractReceiveBuffersToHost</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.interface.provenance.provides_provenance_data_from_machine_impl.ProvidesProvenanceDataFromMachineImpl</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_recordable.AbstractRecordable</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_supports_database_injection.AbstractSupportsDatabaseInjection</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.interface.profiling.abstract_has_profile_data.AbstractHasProfileData</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">pacman.model.graphs.machine.machine_vertex.MachineVertex</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.interface.buffer_management.buffer_models.abstract_receive_buffers_to_host.AbstractReceiveBuffersToHost</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.interface.provenance.provides_provenance_data_from_machine_impl.ProvidesProvenanceDataFromMachineImpl</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_recordable.AbstractRecordable</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_supports_database_injection.AbstractSupportsDatabaseInjection</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.interface.profiling.abstract_has_profile_data.AbstractHasProfileData</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_has_associated_binary.AbstractHasAssociatedBinary</span></code></p>
 <dl class="class">
 <dt id="spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex.SpikeSourcePoissonMachineVertex.POISSON_SPIKE_SOURCE_REGIONS">
 <em class="property">class </em><code class="descname">POISSON_SPIKE_SOURCE_REGIONS</code><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_poisson_machine_vertex.html#SpikeSourcePoissonMachineVertex.POISSON_SPIKE_SOURCE_REGIONS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex.SpikeSourcePoissonMachineVertex.POISSON_SPIKE_SOURCE_REGIONS" title="Permalink to this definition">¶</a></dt>
@@ -299,6 +299,34 @@ If None the assumption is all neurons are recording</li>
 <dt id="spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex.SpikeSourcePoissonMachineVertex.PROFILE_TAG_LABELS">
 <code class="descclassname">SpikeSourcePoissonMachineVertex.</code><code class="descname">PROFILE_TAG_LABELS</code><em class="property"> = {0: 'TIMER', 1: 'PROB_FUNC'}</em><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex.SpikeSourcePoissonMachineVertex.PROFILE_TAG_LABELS" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex.SpikeSourcePoissonMachineVertex.get_binary_file_name">
+<code class="descclassname">SpikeSourcePoissonMachineVertex.</code><code class="descname">get_binary_file_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_poisson_machine_vertex.html#SpikeSourcePoissonMachineVertex.get_binary_file_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex.SpikeSourcePoissonMachineVertex.get_binary_file_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the binary name to be run for this vertex.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex.SpikeSourcePoissonMachineVertex.get_binary_start_type">
+<code class="descclassname">SpikeSourcePoissonMachineVertex.</code><code class="descname">get_binary_start_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_poisson_machine_vertex.html#SpikeSourcePoissonMachineVertex.get_binary_start_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex.SpikeSourcePoissonMachineVertex.get_binary_start_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the start type of the binary to be run.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utilities.utility_objs.html#spinn_front_end_common.utilities.utility_objs.ExecutableType" title="(in SpiNNFrontEndCommon v)">ExecutableType</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 <dl class="method">
 <dt id="spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex.SpikeSourcePoissonMachineVertex.get_profile_data">
@@ -411,7 +439,7 @@ If None the assumption is all neurons are recording</li>
 <dl class="class">
 <dt id="spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex">
 <em class="property">class </em><code class="descclassname">spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.</code><code class="descname">SpikeSourcePoissonVertex</code><span class="sig-paren">(</span><em>n_neurons</em>, <em>constraints</em>, <em>label</em>, <em>seed</em>, <em>max_atoms_per_core</em>, <em>model</em>, <em>rate=None</em>, <em>start=None</em>, <em>duration=None</em>, <em>rates=None</em>, <em>starts=None</em>, <em>durations=None</em>, <em>max_rate=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_poisson_vertex.html#SpikeSourcePoissonVertex"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">pacman.model.graphs.application.application_vertex.ApplicationVertex</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_generates_data_specification.AbstractGeneratesDataSpecification</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_has_associated_binary.AbstractHasAssociatedBinary</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.common.abstract_spike_recordable.AbstractSpikeRecordable</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_provides_outgoing_partition_constraints.AbstractProvidesOutgoingPartitionConstraints</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_changable_after_run.AbstractChangableAfterRun</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.abstract_models.abstract_read_parameters_before_set.AbstractReadParametersBeforeSet</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_rewrites_data_specification.AbstractRewritesDataSpecification</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.common.simple_population_settable.SimplePopulationSettable</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.impl.provides_key_to_atom_mapping_impl.ProvidesKeyToAtomMappingImpl</span></code></p>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">pacman.model.graphs.application.application_vertex.ApplicationVertex</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_generates_data_specification.AbstractGeneratesDataSpecification</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.common.abstract_spike_recordable.AbstractSpikeRecordable</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_provides_outgoing_partition_constraints.AbstractProvidesOutgoingPartitionConstraints</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_changable_after_run.AbstractChangableAfterRun</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.abstract_models.abstract_read_parameters_before_set.AbstractReadParametersBeforeSet</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.abstract_rewrites_data_specification.AbstractRewritesDataSpecification</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spynnaker.pyNN.models.common.simple_population_settable.SimplePopulationSettable</span></code>, <code class="xref py py-class docutils literal"><span class="pre">spinn_front_end_common.abstract_models.impl.provides_key_to_atom_mapping_impl.ProvidesKeyToAtomMappingImpl</span></code></p>
 <p>A Poisson Spike source object</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -527,34 +555,6 @@ or None to use the default slice</li>
 </tr>
 <tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3.6/library/constants.html#None" title="(in Python v3.6)">None</a></p>
 </td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex.get_binary_file_name">
-<code class="descname">get_binary_file_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_poisson_vertex.html#SpikeSourcePoissonVertex.get_binary_file_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex.get_binary_file_name" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the binary name to be run for this vertex.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3.6/library/stdtypes.html#str" title="(in Python v3.6)">str</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="method">
-<dt id="spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex.get_binary_start_type">
-<code class="descname">get_binary_start_type</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/spynnaker/pyNN/models/spike_source/spike_source_poisson_vertex.html#SpikeSourcePoissonVertex.get_binary_start_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex.SpikeSourcePoissonVertex.get_binary_start_type" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the start type of the binary to be run.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://spinnfrontendcommon.readthedocs.io/en/latest/spinn_front_end_common.utilities.utility_objs.html#spinn_front_end_common.utilities.utility_objs.ExecutableType" title="(in SpiNNFrontEndCommon v)">ExecutableType</a></td>
 </tr>
 </tbody>
 </table>

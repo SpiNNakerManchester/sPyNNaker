@@ -92,12 +92,11 @@
     <span class="n">ConstantSDRAM</span><span class="p">,</span> <span class="n">CPUCyclesPerTickResource</span><span class="p">,</span> <span class="n">DTCMResource</span><span class="p">,</span> <span class="n">ResourceContainer</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.abstract_models</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">AbstractGeneratesDataSpecification</span><span class="p">,</span>
-    <span class="n">AbstractProvidesOutgoingPartitionConstraints</span><span class="p">,</span> <span class="n">AbstractHasAssociatedBinary</span><span class="p">)</span>
+    <span class="n">AbstractProvidesOutgoingPartitionConstraints</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.simulation</span> <span class="kn">import</span> <span class="n">simulation_utilities</span>
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.constants</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">SYSTEM_BYTES_REQUIREMENT</span><span class="p">,</span> <span class="n">SIMULATION_N_BYTES</span><span class="p">,</span> <span class="n">BITS_PER_WORD</span><span class="p">,</span>
     <span class="n">BYTES_PER_WORD</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spinn_front_end_common.utilities.utility_objs</span> <span class="kn">import</span> <span class="n">ExecutableType</span>
 <span class="kn">from</span> <span class="nn">.delay_block</span> <span class="kn">import</span> <span class="n">DelayBlock</span>
 <span class="kn">from</span> <span class="nn">.delay_extension_machine_vertex</span> <span class="kn">import</span> <span class="n">DelayExtensionMachineVertex</span>
 <span class="kn">from</span> <span class="nn">.delay_generator_data</span> <span class="kn">import</span> <span class="n">DelayGeneratorData</span>
@@ -121,7 +120,6 @@
 
 <div class="viewcode-block" id="DelayExtensionVertex"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex">[docs]</a><span class="k">class</span> <span class="nc">DelayExtensionVertex</span><span class="p">(</span>
         <span class="n">ApplicationVertex</span><span class="p">,</span> <span class="n">AbstractGeneratesDataSpecification</span><span class="p">,</span>
-        <span class="n">AbstractHasAssociatedBinary</span><span class="p">,</span>
         <span class="n">AbstractProvidesOutgoingPartitionConstraints</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Provide delays to incoming spikes in multiples of the maximum delays\</span>
 <span class="sd">        of a neuron (typically 16 or 32)</span>
@@ -307,7 +305,8 @@
         <span class="n">vertex</span><span class="o">.</span><span class="n">reserve_provenance_data_region</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_write_setup_info</span><span class="p">(</span>
-            <span class="n">spec</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__machine_time_step</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__time_scale_factor</span><span class="p">)</span>
+            <span class="n">spec</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__machine_time_step</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__time_scale_factor</span><span class="p">,</span>
+            <span class="n">vertex</span><span class="o">.</span><span class="n">get_binary_file_name</span><span class="p">())</span>
 
         <span class="n">spec</span><span class="o">.</span><span class="n">comment</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">*** Spec for Delay Extension Instance ***</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
@@ -355,17 +354,18 @@
         <span class="c1"># End-of-Spec:</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">end_specification</span><span class="p">()</span></div>
 
-    <span class="k">def</span> <span class="nf">_write_setup_info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">time_scale_factor</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_write_setup_info</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">time_scale_factor</span><span class="p">,</span> <span class="n">binary_name</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :param ~data_specification.DataSpecificationGenerator spec:</span>
-<span class="sd">        :param int machine_time_step:</span>
-<span class="sd">        :param int time_scale_factor:</span>
+<span class="sd">        :param int machine_time_step:v the machine time step</span>
+<span class="sd">        :param int time_scale_factor: the time scale factor</span>
+<span class="sd">        :param str binary_name: the binary name</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Write this to the system region (to be picked up by the simulation):</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">switch_write_focus</span><span class="p">(</span><span class="n">_DELEXT_REGIONS</span><span class="o">.</span><span class="n">SYSTEM</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_array</span><span class="p">(</span><span class="n">simulation_utilities</span><span class="o">.</span><span class="n">get_simulation_header_array</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">get_binary_file_name</span><span class="p">(),</span> <span class="n">machine_time_step</span><span class="p">,</span>
-            <span class="n">time_scale_factor</span><span class="p">))</span>
+            <span class="n">binary_name</span><span class="p">,</span> <span class="n">machine_time_step</span><span class="p">,</span> <span class="n">time_scale_factor</span><span class="p">))</span>
 
 <div class="viewcode-block" id="DelayExtensionVertex.write_delay_parameters"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.write_delay_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">write_delay_parameters</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">vertex_slice</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">incoming_key</span><span class="p">,</span> <span class="n">incoming_mask</span><span class="p">,</span>
@@ -505,14 +505,6 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">words_per_atom</span> <span class="o">=</span> <span class="mi">11</span> <span class="o">+</span> <span class="mi">16</span>
         <span class="k">return</span> <span class="n">words_per_atom</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span> <span class="o">*</span> <span class="n">vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span></div>
-
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractHasAssociatedBinary</span><span class="o">.</span><span class="n">get_binary_file_name</span><span class="p">)</span>
-<div class="viewcode-block" id="DelayExtensionVertex.get_binary_file_name"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.get_binary_file_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_binary_file_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s2">&quot;delay_extension.aplx&quot;</span></div>
-
-    <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractHasAssociatedBinary</span><span class="o">.</span><span class="n">get_binary_start_type</span><span class="p">)</span>
-<div class="viewcode-block" id="DelayExtensionVertex.get_binary_start_type"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.utility_models.delays.html#spynnaker.pyNN.models.utility_models.delays.DelayExtensionVertex.get_binary_start_type">[docs]</a>    <span class="k">def</span> <span class="nf">get_binary_start_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">ExecutableType</span><span class="o">.</span><span class="n">USES_SIMULATION_INTERFACE</span></div>
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractProvidesOutgoingPartitionConstraints</span><span class="o">.</span>
                <span class="n">get_outgoing_partition_constraints</span><span class="p">)</span>
