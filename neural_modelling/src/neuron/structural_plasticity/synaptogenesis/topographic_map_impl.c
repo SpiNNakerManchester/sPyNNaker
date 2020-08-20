@@ -285,21 +285,21 @@ bool synaptogenesis_row_restructure(uint32_t time, address_t row) {
             log_debug("row is full");
             return_value = false;
         } else {
-        	if (current_state->with_replacement) {
-        		// A synapse can be added anywhere on the current row, so just do it
-        		return_value = synaptogenesis_formation_rule(current_state,
-        				formation_params[current_state->post_to_pre.pop_index], time, row);
+            if (current_state->with_replacement) {
+                // A synapse can be added anywhere on the current row, so just do it
+                return_value = synaptogenesis_formation_rule(current_state,
+                        formation_params[current_state->post_to_pre.pop_index], time, row);
         	} else {
-        		// A synapse cannot be added if one exists between the current pair of neurons
-        		if (!synapse_dynamics_find_neuron(
-        				current_state->post_syn_id, row,
+        	    // A synapse cannot be added if one exists between the current pair of neurons
+        	    if (!synapse_dynamics_find_neuron(
+        	            current_state->post_syn_id, row,
 						&(current_state->weight), &(current_state->delay),
 						&(current_state->offset), &(current_state->synapse_type))) {
-        			return_value = synaptogenesis_formation_rule(current_state,
-        					formation_params[current_state->post_to_pre.pop_index], time, row);
+        		    return_value = synaptogenesis_formation_rule(current_state,
+        		        formation_params[current_state->post_to_pre.pop_index], time, row);
         		} else {
-        			log_debug("Post neuron %u already in row", current_state->post_syn_id);
-        			return_value = false;
+        		    log_debug("Post neuron %u already in row", current_state->post_syn_id);
+        		    return_value = false;
         		}
         	}
         }
