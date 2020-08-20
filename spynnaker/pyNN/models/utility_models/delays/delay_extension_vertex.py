@@ -27,7 +27,7 @@ from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
 from spinn_front_end_common.abstract_models import (
     AbstractGeneratesDataSpecification,
-    AbstractProvidesOutgoingPartitionConstraints, AbstractHasAssociatedBinary)
+    AbstractProvidesOutgoingPartitionConstraints)
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities.constants import (
     SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES, BITS_PER_WORD,
@@ -240,7 +240,8 @@ class DelayExtensionVertex(
         vertex.reserve_provenance_data_region(spec)
 
         self._write_setup_info(
-            spec, self.__machine_time_step, self.__time_scale_factor)
+            spec, self.__machine_time_step, self.__time_scale_factor,
+            vertex.get_binary_file_name())
 
         spec.comment("\n*** Spec for Delay Extension Instance ***\n\n")
 
@@ -288,16 +289,18 @@ class DelayExtensionVertex(
         # End-of-Spec:
         spec.end_specification()
 
-    def _write_setup_info(self, spec, machine_time_step, time_scale_factor):
+    def _write_setup_info(self, spec, machine_time_step, time_scale_factor,
+                          binary_file_name):
         """
         :param ~data_specification.DataSpecificationGenerator spec:
         :param int machine_time_step:
         :param int time_scale_factor:
+        :param str binary_file_name
         """
         # Write this to the system region (to be picked up by the simulation):
         spec.switch_write_focus(_DELEXT_REGIONS.SYSTEM.value)
         spec.write_array(simulation_utilities.get_simulation_header_array(
-            self.get_binary_file_name(), machine_time_step,
+            binary_file_name, machine_time_step,
             time_scale_factor))
 
     def write_delay_parameters(

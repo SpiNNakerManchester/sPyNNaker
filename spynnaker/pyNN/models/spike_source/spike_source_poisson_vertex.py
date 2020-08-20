@@ -1003,7 +1003,7 @@ class SpikeSourcePoissonVertex(
         # write setup data
         spec.switch_write_focus(_REGIONS.SYSTEM_REGION.value)
         spec.write_array(simulation_utilities.get_simulation_header_array(
-            self.get_binary_file_name(), machine_time_step,
+            placement.vertex.get_binary_file_name(), machine_time_step,
             time_scale_factor))
 
         # write recording data
