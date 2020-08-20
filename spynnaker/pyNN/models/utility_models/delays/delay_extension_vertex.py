@@ -241,7 +241,7 @@ class DelayExtensionVertex(
 
         self._write_setup_info(
             spec, self.__machine_time_step, self.__time_scale_factor,
-            placement.vertex.get_binary_file_name())
+            vertex.get_binary_file_name())
 
         spec.comment("\n*** Spec for Delay Extension Instance ***\n\n")
 
