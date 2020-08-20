@@ -100,7 +100,10 @@ class PyNNPopulationCommon(object):
                     "A population cannot have a negative or zero size.")
             population_parameters = dict(model.default_population_parameters)
             if additional_parameters is not None:
-                population_parameters.update(additional_parameters)
+                # check that the additions are suitable. report wrong ones
+                # and ignore
+                population_parameters = self._process_additional_params(
+                    additional_parameters, population_parameters)
             self.__vertex = model.create_vertex(
                 size, label, constraints, **population_parameters)
 
@@ -178,6 +181,21 @@ class PyNNPopulationCommon(object):
         if initial_values is not None:
             for variable, value in iteritems(initial_values):
                 self._initialize(variable, value)
+
+    @staticmethod
+    def _process_additional_params(
+            additional_parameters, population_parameters):
+        defaults = set(population_parameters.keys())
+        additions = set(additional_parameters.keys())
+        copy_of_additional_params = dict()
+        copy_of_additional_params.update(additional_parameters)
+        invalids = (defaults | additions) - defaults
+        for invalid in invalids:
+            logger.warning(
+                "additional_parameter {} will be ignored".format(invalid))
+            copy_of_additional_params.pop(invalid)
+        population_parameters.update(copy_of_additional_params)
+        return population_parameters
 
     @property
     def first_id(self):
