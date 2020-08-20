@@ -18,11 +18,15 @@ from spinn_utilities.overrides import overrides
 from pacman.model.graphs.machine import MachineVertex
 from spinn_front_end_common.interface.provenance import (
     ProvidesProvenanceDataFromMachineImpl)
+from spinn_front_end_common.abstract_models import (
+    AbstractHasAssociatedBinary)
 from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
+from spinn_front_end_common.utilities.utility_objs import ExecutableType
 
 
 class DelayExtensionMachineVertex(
-        MachineVertex, ProvidesProvenanceDataFromMachineImpl):
+        MachineVertex, ProvidesProvenanceDataFromMachineImpl,
+        AbstractHasAssociatedBinary):
     __slots__ = [
         "__resources"]
 
@@ -142,3 +146,15 @@ class DelayExtensionMachineVertex(
             self._add_name(names, "Number_of_times_delayed_to_spread_traffic"),
             n_delays))
         return provenance_items
+
+    @overrides(MachineVertex.get_n_keys_for_partition)
+    def get_n_keys_for_partition(self, _partition):
+        return self._vertex_slice.n_atoms * self.app_vertex.n_delay_stages
+
+    @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
+    def get_binary_file_name(self):
+        return "delay_extension.aplx"
+
+    @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
+    def get_binary_start_type(self):
+        return ExecutableType.USES_SIMULATION_INTERFACE

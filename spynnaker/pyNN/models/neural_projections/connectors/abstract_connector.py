@@ -495,7 +495,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         :rtype:
             list(~spinn_front_end_common.utilities.utility_objs.ProvenanceDataItem)
         """
-        name = "{}_{}_{}".format(
+        name = "connector_{}_{}_{}".format(
             synapse_info.pre_population.label,
             synapse_info.post_population.label, self.__class__.__name__)
         return [ProvenanceDataItem(
@@ -555,3 +555,21 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         """
         # pylint: disable=unused-argument
         return False
+
+    def could_connect(self, _synapse_info, _pre_slice, _post_slice):
+        """
+        Checks if a pre slice and a post slice could connect.
+
+        Typically used to determine if a Machine Edge should be created by
+        checking that at least one of the indexes in the pre slice could
+        over time connect to at least one of the indexes in the post slice.
+
+        note: This method should never return a false negative,
+        but may return a false positives
+
+        :param ~pacman.model.graphs.common.Slice _pre_slice:
+        :param ~pacman.model.graphs.common.Slice _post_slice:
+        :param SynapseInformation _synapse_info:
+        """
+        # Unless we know for sure we must say they could connect
+        return True
