@@ -17,12 +17,6 @@ from pyNN.random import RandomDistribution
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.utilities import utility_calls
 from pacman.model.graphs.machine import MachineEdge
-from pacman.model.partitioner_interfaces.\
-    abstract_controls_destination_of_edges import \
-    AbstractControlsDestinationOfEdges
-from pacman.model.partitioner_interfaces.\
-    abstract_controls_source_of_edges import \
-    AbstractControlsSourceOfEdges
 from spinn_front_end_common.interface.provenance import (
     AbstractProvidesLocalProvenanceData)
 from spynnaker.pyNN.models.abstract_models import AbstractWeightUpdatable
