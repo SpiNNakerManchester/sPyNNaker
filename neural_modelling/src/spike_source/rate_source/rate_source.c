@@ -254,7 +254,7 @@ static void timer_callback(uint timer_count, uint unused) {
 
     }
 
-    if(looping) {
+    if(looping < 4) {
 
         if(index >= n_rates) {
 
@@ -286,6 +286,8 @@ static void timer_callback(uint timer_count, uint unused) {
             while (!spin1_send_mc_packet(params.key, 0, WITH_PAYLOAD)) {
             spin1_delay_us(1);
             }
+
+            //io_printf(IO_BUF, "%k t %d\n", 0, time);
         }
         else {
 
@@ -293,19 +295,27 @@ static void timer_callback(uint timer_count, uint unused) {
                 spin1_delay_us(1);
             }
 
+            //io_printf(IO_BUF, "%k t %d\n", rates[index].rate, time);
+
             last_rate_sent = rates[index].rate;
         }
 
         index++;
     }
-    else {
+    else if (looping < 4){
 
         while (!spin1_send_mc_packet(params.key, last_rate_sent, WITH_PAYLOAD)) {
             spin1_delay_us(1);
         }
 
 
-       //io_printf(IO_BUF, "%k t %d\n", 0, time);
+       //io_printf(IO_BUF, "%k t %d\n", last_rate_sent, time);
+    }
+    else{
+
+       while (!spin1_send_mc_packet(params.key, 0, WITH_PAYLOAD)) {
+            spin1_delay_us(1);
+        }
     }
 
     profiler_write_entry_disable_irq_fiq(PROFILER_EXIT | PROFILER_TIMER);

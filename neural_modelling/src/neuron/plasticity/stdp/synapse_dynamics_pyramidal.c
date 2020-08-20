@@ -94,6 +94,8 @@ static inline final_state_t plasticity_update_basal_synapse(
         update_state_t current_state,
         const post_event_history_t *post_event_history) {
 
+    io_printf(IO_BUF, "basal update\n");
+
     //Apply Urbanczik-Senn Formula
     current_state = timing_apply_rate(
                         current_state, post_event_history->u_rate,
@@ -109,6 +111,8 @@ static inline final_state_t plasticity_update_apical_synapse(
         const REAL last_pre_time,
         update_state_t current_state,
         const post_event_history_t *post_event_history) {
+
+    io_printf(IO_BUF, "apical update\n");
 
     //Apply Urbanczik-Senn Formula
     current_state = timing_apply_rate(
@@ -282,7 +286,7 @@ bool synapse_dynamics_process_plastic_synapses(
     const REAL last_pre_rate = event_history->prev_time;
     //const pre_trace_t last_pre_trace = event_history->prev_trace;
 
-    //io_printf(IO_BUF, "t %d prev %k\n", time, last_pre_rate);
+    io_printf(IO_BUF, "t %d prev %k\n", time, last_pre_rate);
 
     REAL real_rate = convert_rate_to_input(rate);
 

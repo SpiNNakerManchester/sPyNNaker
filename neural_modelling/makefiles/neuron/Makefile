@@ -16,7 +16,7 @@
 MODELS = IF_exp_two_comp_rate \
 		 IF_exp_two_comp_rate_stdp_mad_Bern_plasticity \
 		 Pyramidal_rate\
-		 Pyramidal_rate_plasticity\
+		 Pyramidal_rate_stdp_mad_Bern_plasticity\
 #         IF_curr_exp \
 #         IF_cond_exp \
 #         IZK_curr_exp \

@@ -422,7 +422,7 @@ static inline REAL* neuron_impl_post_rates(index_t neuron_index) {
     postsynaptic_rates[1] =  set_spike_source_rate(neuron->Vb);
     postsynaptic_rates[2] =  set_spike_source_rate(neuron->U_membrane * neuron->plasticity_rate_multiplier);
 
-    //io_printf(IO_BUF, "Rate(V) %k\n", a);
+    io_printf(IO_BUF, "Rate(Vb) %k, Rate(U) %k\n", postsynaptic_rates[1], postsynaptic_rates[2]);
 
     return postsynaptic_rates;
 
