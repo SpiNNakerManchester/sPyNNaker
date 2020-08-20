@@ -142,3 +142,7 @@ class DelayExtensionMachineVertex(
             self._add_name(names, "Number_of_times_delayed_to_spread_traffic"),
             n_delays))
         return provenance_items
+
+    @overrides(MachineVertex.get_n_keys_for_partition)
+    def get_n_keys_for_partition(self, _partition):
+        return self._vertex_slice.n_atoms * self.app_vertex.n_delay_stages

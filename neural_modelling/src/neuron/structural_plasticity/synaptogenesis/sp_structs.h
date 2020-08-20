@@ -112,6 +112,14 @@ typedef struct {
     uint32_t synapse_type;
 } current_state_t;
 
+//! Get a random unsigned integer up to (but not including) a given maximum
+//! \param[in] max The maximum value allowed
+//! \param[in] seed The random seed to use
+//! \return The generated value
+static inline uint32_t rand_int(uint32_t max, mars_kiss64_seed_t seed) {
+    return muliulr(max, ulrbits(mars_kiss64_seed(seed)));
+}
+
 //! \brief unpack the spike into key and identifying information for the
 //!     neuron; Identify pop, sub-population and low and high atoms
 //! \param[in] pre_pop_info_table: The prepopulation information table
@@ -200,8 +208,8 @@ static inline bool sp_structs_add_synapse(
     uint32_t actual_delay;
     uint32_t offset = current_state->pre_population_info->delay_hi -
             current_state->pre_population_info->delay_lo;
-    actual_delay = ulrbits(mars_kiss64_seed(*(current_state->local_seed))) *
-        offset + current_state->pre_population_info->delay_lo;
+    actual_delay = rand_int(offset, *(current_state->local_seed)) +
+            current_state->pre_population_info->delay_lo;
 
     if (!synapse_dynamics_add_neuron(
             current_state->post_syn_id, row, appr_scaled_weight, actual_delay,
