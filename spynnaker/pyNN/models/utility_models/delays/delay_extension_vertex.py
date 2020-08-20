@@ -27,7 +27,7 @@ from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
 from spinn_front_end_common.abstract_models import (
     AbstractGeneratesDataSpecification,
-    AbstractProvidesOutgoingPartitionConstraints, AbstractHasAssociatedBinary)
+    AbstractProvidesOutgoingPartitionConstraints)
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities.constants import (
     SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES, BITS_PER_WORD,
