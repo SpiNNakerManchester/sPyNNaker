@@ -151,12 +151,10 @@ static uint32_t hypergeom(uint32_t n, uint32_t N, uint32_t K, rng_t rng) {
  * \return The number of connections generated
  */
 static uint32_t connection_generator_fixed_total_generate(
-        void *generator, uint32_t pre_slice_start, uint32_t pre_slice_count,
+        void *generator, UNUSED uint32_t pre_slice_start,
+        UNUSED uint32_t pre_slice_count,
         uint32_t pre_neuron_index, uint32_t post_slice_start,
         uint32_t post_slice_count, uint32_t max_row_length, uint16_t *indices) {
-    use(pre_slice_start);
-    use(pre_slice_count);
-
     // If there are no connections left or none to be made, return 0
     struct fixed_total *obj = generator;
     if (max_row_length == 0 || obj->params.n_connections == 0) {

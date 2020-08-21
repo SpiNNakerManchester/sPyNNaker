@@ -30,9 +30,7 @@ struct threshold_type_t {
 //! \param[in] threshold_type: The parameters to use to determine the result
 //! \return True if the neuron should fire
 static inline bool threshold_type_is_above_threshold(
-        state_t value, threshold_type_t *threshold_type) {
-	use(value);
-	use(threshold_type);
+        UNUSED state_t value, UNUSED threshold_type_t *threshold_type) {
     return 0;
 }
 
