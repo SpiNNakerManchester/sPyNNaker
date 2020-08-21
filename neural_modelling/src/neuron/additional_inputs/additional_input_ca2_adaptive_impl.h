@@ -44,7 +44,7 @@ struct additional_input_t {
 //!     parameters
 //! \param[in] membrane_voltage: The membrane voltage of the neuron
 //! \return The value of the input after scaling
-static input_t additional_input_get_input_value_as_current(
+static inline input_t additional_input_get_input_value_as_current(
         struct additional_input_t *additional_input,
         UNUSED state_t membrane_voltage) {
     // Decay Ca2 trace
@@ -57,7 +57,7 @@ static input_t additional_input_get_input_value_as_current(
 //! \brief Notifies the additional input type that the neuron has spiked
 //! \param[in] additional_input: The additional input type pointer to the
 //!     parameters
-static void additional_input_has_spiked(
+static inline void additional_input_has_spiked(
         struct additional_input_t *additional_input) {
     // Apply influx of calcium to trace
     additional_input->I_Ca2 += additional_input->I_alpha;
