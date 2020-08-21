@@ -51,7 +51,7 @@ static void *reset_address;
 //! Add to a number before applying floor to 4 to turn it into a ceil operation
 #define CEIL_TO_4 3
 
-//! \brief resets all states back to start state.
+//! \brief Reset all states back to start state.
 static void reset_record_counter(void) {
     for (uint32_t i = 0; i < N_RECORDED_VARS; i++) {
         if (recording_info[i].rate == 0) {
@@ -89,19 +89,20 @@ static void reset_record_counter(void) {
     }
 }
 
-//! \brief wrapper to recording finalise
+//! \brief Wrapper for recording_finalise()
 void neuron_recording_finalise(void) {
     recording_finalise();
 }
 
-//! \brief the number of bytes used in bitfield recording for n_neurons
+//! \brief Comute the number of bytes used in bitfield recording for
+//!     \p n_neurons
 //! \param[in] n_neurons: The number of neurons to create a bitfield for
 //! \return the size of the bitfield data structure for the number of neurons
 static inline uint32_t bitfield_data_size(uint32_t n_neurons) {
     return sizeof(bitfield_values_t) + (get_bit_field_size(n_neurons) * sizeof(uint32_t));
 }
 
-//! \brief reads recording data from SDRAM
+//! \brief Read recording data from SDRAM
 //! \param[in] recording_address: SDRAM location for the recording data
 //! \param[in] n_neurons: the number of neurons to setup for
 //! \return Whether the read was successful
@@ -193,7 +194,7 @@ bool neuron_recording_reset(uint32_t n_neurons) {
     return true;
 }
 
-//! \brief handles all the DTCM allocations for recording words
+//! \brief Handle all the DTCM allocations for recording words (state vars)
 //! \param[in] n_neurons: how many neurons to set DTCM for
 //! \return True on success
 static inline bool allocate_word_dtcm(uint32_t n_neurons) {
@@ -233,7 +234,7 @@ static inline bool allocate_word_dtcm(uint32_t n_neurons) {
     return true;
 }
 
-//! \brief handles all the DTCM allocations for recording bitfields
+//! \brief Handle all the DTCM allocations for recording bitfields (event sets)
 //! \param[in] n_neurons: how many neurons to set DTCM for
 //! \return True on success
 static inline bool allocate_bitfield_dtcm(uint32_t n_neurons) {

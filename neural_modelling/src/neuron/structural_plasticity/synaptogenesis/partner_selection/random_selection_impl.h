@@ -24,7 +24,7 @@
 #include <neuron/spike_processing.h>
 #include <debug.h>
 
-//! \brief Notifies the rule that a spike has been received
+//! \brief Notify the rule that a spike has been received
 //! \details Not used by this rule
 //! \param[in] time: The time that the spike was received at
 //! \param[in] spike:
@@ -60,7 +60,7 @@ static inline uint32_t pick_subpopulation(
 //! \param[out] spike: The spike that made this a meaningful choice.
 //!     This rule synthesises this.
 //! \param[out] m_pop_index: The master population table index.
-//! \return True if a choice was made
+//! \return Whether a choice was made
 static inline bool potential_presynaptic_partner(
         UNUSED uint32_t time, uint32_t *restrict population_id,
         uint32_t *restrict sub_population_id, uint32_t *restrict neuron_id,

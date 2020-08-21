@@ -37,51 +37,52 @@ struct formation_params;
 
 //! Entry of map from post-connection to pre-connection neural indices
 typedef struct post_to_pre_entry {
-    uint8_t pop_index;
-    uint8_t sub_pop_index;
-    uint16_t neuron_index;
+    uint8_t pop_index;          //!< Population index
+    uint8_t sub_pop_index;      //!< Subpopulation index
+    uint16_t neuron_index;      //!< Neuron index
 } post_to_pre_entry;
 
-//! information per atom
+//! information per key
 typedef struct {
-    uint32_t key;
-    uint32_t mask;
-    uint32_t n_atoms;
-    uint32_t lo_atom;
-    uint32_t m_pop_index;
+    uint32_t key;               //!< The key
+    uint32_t mask;              //!< The mask
+    uint32_t n_atoms;           //!< Number of atoms from population
+    uint32_t lo_atom;           //!< First atom in contiguous range
+    uint32_t m_pop_index;       //!< Index into master population table
 } key_atom_info_t;
 
 //! individual pre-synaptic sub-population information
 typedef struct {
-    uint16_t no_pre_vertices;
-    uint16_t sp_control;
-    uint16_t delay_lo;
-    uint16_t delay_hi;
-    uint32_t weight;
-    uint32_t connection_type;
-    uint32_t total_no_atoms;
+    uint16_t no_pre_vertices;   //!< The number of pre-vertices on the connector
+    uint16_t sp_control;        //!< Control data
+    uint16_t delay_lo;          //!< Lower bound on delay
+    uint16_t delay_hi;          //!< Upper bound on delay
+    uint32_t weight;            //!< Weight
+    uint32_t connection_type;   //!< Type of connector
+    uint32_t total_no_atoms;    //!< Number of atoms
+    //! The mapping from keys to atom ranges
     key_atom_info_t key_atom_info[];
 } pre_info_t;
 
-//! table of individual pre-synaptic information
+//! Table of individual pre-synaptic information
 typedef struct {
-    uint32_t no_pre_pops;
-    pre_info_t **prepop_info;
+    uint32_t no_pre_pops;       //!< Number of entries
+    pre_info_t **prepop_info;   //!< Pointer to array of entries
 } pre_pop_info_table_t;
 
 //! parameters of the synaptic rewiring model
 typedef struct {
-    uint32_t fast;
-    uint32_t p_rew;
-    uint32_t s_max;
-    uint32_t app_no_atoms;
-    uint32_t machine_no_atoms;
-    uint32_t low_atom;
-    uint32_t high_atom;
+    uint32_t fast;              //!< Flag: whether using fast or slow rewiring
+    uint32_t p_rew;             //!< Probability of rewiring
+    uint32_t s_max;             //!< s<sub>max</sub>
+    uint32_t app_no_atoms;      //!< Number of application atoms
+    uint32_t machine_no_atoms;  //!< Number of machine atoms
+    uint32_t low_atom;          //!< Atom ID range: low
+    uint32_t high_atom;         //!< Atom ID range: high
     // the 2 seeds that are used: shared for sync, local for everything else
     mars_kiss64_seed_t shared_seed;
     mars_kiss64_seed_t local_seed;
-    uint32_t no_pre_pops;
+    uint32_t no_pre_pops;       //!< Number of populations on pre side
 } rewiring_data_t;
 
 //! struct representing the current state of rewiring
@@ -124,7 +125,7 @@ static inline uint32_t rand_int(uint32_t max, mars_kiss64_seed_t seed) {
     return muliulr(max, ulrbits(mars_kiss64_seed(seed)));
 }
 
-//! \brief unpack the spike into key and identifying information for the
+//! \brief Unpack the spike into key and identifying information for the
 //!     neuron; Identify pop, sub-population and low and high atoms
 //! \param[in] pre_pop_info_table: The prepopulation information table
 //! \param[in] spike: The spike to look up the information from
@@ -188,7 +189,7 @@ static inline bool sp_structs_get_sub_pop_info(
     return false;
 }
 
-//! \brief Removes a synapse from the relevant structures
+//! \brief Remove a synapse from the relevant structures
 //! \param[in,out] current_state: Describes what is to be done
 //! \param[in,out] row: The row of the synaptic matrix to be updated
 //! \return True if the synapse was removed
@@ -201,7 +202,7 @@ static inline bool sp_structs_remove_synapse(
     return true;
 }
 
-//! \brief Adds a synapse to the relevant structures
+//! \brief Add a synapse to the relevant structures
 //! \param[in,out] current_state: Describes what is to be done
 //! \param[in,out] row: The row of the synaptic matrix to be updated
 //! \return True if the synapse was added

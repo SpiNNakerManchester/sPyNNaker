@@ -30,6 +30,11 @@ static const global_neuron_params_t *global_params;
  */
 static const REAL SIMPLE_TQ_OFFSET = REAL_CONST(1.85);
 
+//! \brief Critical Izhekevich constant: 140
+static const REAL BASELINE = REAL_CONST(140.0);
+//! \brief Critical Izhekevich constant: 5
+static const REAL STEP_5 = REAL_CONST(5.0);
+
 /////////////////////////////////////////////////////////////
 #if 0
 // definition for Izhikevich neuron
@@ -43,8 +48,8 @@ static inline void neuron_ode(
 
     // Update V
     dstateVar_dt[1] =
-            REAL_CONST(140.0)
-            + (REAL_CONST(5.0) + REAL_CONST(0.0400) * V_now) * V_now - U_now
+            BASELINE
+            + (STEP_5 + REAL_CONST(0.0400) * V_now) * V_now - U_now
             + input_this_timestep;
 
     // Update U
@@ -59,7 +64,8 @@ static inline void neuron_ode(
 static const REAL MAGIC_MULTIPLIER = REAL_CONST(0.040008544921875);
 
 /*!
- * \brief Midpoint is best balance between speed and accuracy so far.
+ * \brief Runge-Kutta 2 solution of one step of the Izhkevich ODE.
+ *      Midpoint is best balance between speed and accuracy so far.
  * \details From ODE solver comparison work, paper shows that Trapezoid version
  *      gives better accuracy at small speed cost
  * \param[in] h: threshold
@@ -74,17 +80,14 @@ static inline void rk2_kernel_midpoint(
     REAL a = neuron->A;
     REAL b = neuron->B;
 
-    REAL pre_alph = REAL_CONST(140.0) + input_this_timestep - lastU1;
-    REAL alpha = pre_alph
-            + (REAL_CONST(5.0) + MAGIC_MULTIPLIER * lastV1) * lastV1;
+    REAL pre_alph = BASELINE + input_this_timestep - lastU1;
+    REAL alpha = pre_alph + (STEP_5 + MAGIC_MULTIPLIER * lastV1) * lastV1;
     REAL eta = lastV1 + REAL_HALF(h * alpha);
 
     // could be represented as a long fract?
     REAL beta = REAL_HALF(h * (b * lastV1 - lastU1) * a);
 
-    neuron->V += h * (pre_alph - beta
-            + (REAL_CONST(5.0) + MAGIC_MULTIPLIER * eta) * eta);
-
+    neuron->V += h * (pre_alph - beta + (STEP_5 + MAGIC_MULTIPLIER * eta) * eta);
     neuron->U += a * h * (-lastU1 - beta + b * eta);
 }
 

@@ -41,7 +41,7 @@ struct threshold_type_t {
     REAL     neg_machine_time_step_ms_div_10;
 };
 
-//! \brief Determines if the value given is above the threshold value
+//! \brief Determine if the value given is above the threshold value
 //! \param[in] value: The value to determine if it is above the threshold
 //! \param[in] threshold_type: The parameters to use to determine the result
 //! \return True if the neuron should fire

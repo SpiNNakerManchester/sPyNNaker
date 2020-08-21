@@ -69,21 +69,23 @@ static uint32_t next_buffer_to_fill;
 //! The index of the buffer currently being filled by a DMA read
 static uint32_t buffer_being_read;
 
-//! Number of outstanding synaptogenic rewirings
+//! The number of outstanding synaptogenic rewirings
 static volatile uint32_t rewires_to_do = 0;
 
-//! The number of rewires to do when the DMA completes.  When a DMA is first set
-//! up, only this or dma_n_spikes can be 1 with the other being 0.
+//! \brief The number of rewires to do when the DMA completes.
+//! \details When a DMA is first set up, only this or ::dma_n_spikes can be 1
+//!     with the other being 0.
 static uint32_t dma_n_rewires;
 
-//! The number of spikes to do when the DMA completes.  When a DMA is first set
-//! up, only this or dma_n_rewires can be 1 with the other being 0.
+//! \brief The number of spikes to do when the DMA completes.
+//! \details When a DMA is first set up, only this or ::dma_n_rewires can be 1
+//!     with the other being 0.
 static uint32_t dma_n_spikes;
 
-//! the number of dma completes (used in provenance generation)
+//! The number of DMA completes (used in provenance generation)
 static uint32_t dma_complete_count = 0;
 
-//! the number of spikes that were processed (used in provenance generation)
+//! The number of spikes that were processed (used in provenance generation)
 static uint32_t spike_processing_count = 0;
 
 //! The number of successful rewires
@@ -422,7 +424,7 @@ uint32_t spike_processing_get_spike_processing_count(void) {
     return spike_processing_count;
 }
 
-//! \brief get the address of the circular buffer used for buffering received
+//! \brief Get the address of the circular buffer used for buffering received
 //!     spikes before processing them
 //! \return address of circular buffer
 circular_buffer get_circular_buffer(void) { // EXPORTED

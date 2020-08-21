@@ -113,9 +113,8 @@ static inline uint32_t get_direct_address(address_and_row_length entry) {
 }
 
 //! \brief Get the standard address out of an entry
-//!
-//! The address is in units of four words, so this multiplies by 16 (= up
-//! shifts by 4)
+//! \details The address is in units of four words, so this multiplies by 16
+//!     (= up shifts by 4)
 //! \param[in] entry: the table entry
 //! \return a row address
 static inline uint32_t get_address(address_and_row_length entry) {
@@ -146,9 +145,8 @@ static inline uint32_t get_neuron_id(
     return spike & ~entry.mask;
 }
 
-//! \brief Prints the master pop table.
-//!
-//! For debugging
+//! \brief Print the master pop table.
+//! \details For debugging
 static inline void print_master_population_table(void) {
     log_info("master_population\n");
     for (uint32_t i = 0; i < master_population_table_length; i++) {

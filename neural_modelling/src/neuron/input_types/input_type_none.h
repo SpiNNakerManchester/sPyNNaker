@@ -34,7 +34,7 @@
 struct input_type_t {
 };
 
-//! \brief Gets the actual input value. This allows any scaling to take place
+//! \brief Get the actual input value. This allows any scaling to take place
 //! \details Actually does nothing; no receptors
 //! \param[in,out] value: The array of the receptor-based values of the input
 //!     before scaling
@@ -49,7 +49,7 @@ static inline input_t *input_type_get_input_value(
     return 0;
 }
 
-//! \brief Converts an excitatory input into an excitatory current
+//! \brief Convert an excitatory input into an excitatory current
 //! \details Actually does nothing; no receptors
 //! \param[in,out] exc_input: Pointer to array of excitatory inputs from
 //!     different receptors this timestep. Note that this will already have
@@ -62,7 +62,7 @@ static inline void input_type_convert_excitatory_input_to_current(
         UNUSED state_t membrane_voltage) {
 }
 
-//! \brief Converts an inhibitory input into an inhibitory current
+//! \brief Convert an inhibitory input into an inhibitory current
 //! \details Actually does nothing; no receptors
 //! \param[in,out] inh_input: Pointer to array of inhibitory inputs from
 //!     different receptors this timestep. Note that this will already have

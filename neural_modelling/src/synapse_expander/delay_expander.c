@@ -46,15 +46,15 @@ struct delay_builder_config {
 
 /**
  * \brief Generate the data for a single connector
- * \param[in,out] in_region: The address to read the parameters from.  Should be
- *                           updated to the position just after the parameters
- *                           after calling.
- * \param[in,out] neuron_delay_stage_config: Bit fields into which to write the
- *                                           delay information
- * \param[in] post_slice_start: The start of the slice of the delay extension to
- *                              generate for
- * \param[in] post_slice_count: The number of neurons of the delay extension to
- *                              generate for
+ * \param[in,out] in_region:
+ *      The address to read the parameters from.  Should be updated to the
+ *      position just after the parameters after calling.
+ * \param[in,out] neuron_delay_stage_config:
+ *      Bit fields into which to write the delay information
+ * \param[in] post_slice_start:
+ *      The start of the slice of the delay extension to generate for
+ * \param[in] post_slice_count:
+ *      The number of neurons of the delay extension to generate for
  * \return True if the region was correctly generated, False if there was an
  *         error
  */
@@ -133,10 +133,10 @@ static bool read_delay_builder_region(address_t *in_region,
 
 /**
  * \brief Read the data for the generator
- * \param[in] delay_params_address: The address of the delay extension
- *                                  parameters
+ * \param[in] delay_params_address:
+ *      The address of the delay extension parameters
  * \param[in] params_address: The address of the expander parameters
- * \return True if the expander finished correctly, False if there was an
+ * \return True if the expander finished correctly, false if there was an
  *         error
  */
 static bool run_delay_expander(

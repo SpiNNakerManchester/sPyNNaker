@@ -35,7 +35,7 @@
 #include <common/neuron-typedefs.h>
 #include <spin1_api.h>
 
-//! \brief translate the data stored in the NEURON_PARAMS data region in SDRAM
+//! \brief Translate the data stored in the NEURON_PARAMS data region in SDRAM
 //!        and convert it into c based objects for use.
 //! \param[in] address: the absolute address in SDRAM for the start of the
 //!            NEURON_PARAMS data region in SDRAM
@@ -56,7 +56,7 @@ bool neuron_initialise(
         uint32_t *n_synapse_types_value, uint32_t *incoming_spike_buffer_size,
         uint32_t *timer_offset);
 
-//! \brief executes all the updates to neural parameters when a given timer
+//! \brief Execute all the updates to neural parameters when a given timer
 //!        period has occurred.
 //! \param[in] time: the timer tick value currently being executed
 //! \param[in] timer_count: used for detecting a wrapping timer
@@ -65,15 +65,15 @@ void neuron_do_timestep_update(
         timer_t time, uint timer_count, uint timer_period);
 
 //! \brief Prepare to resume simulation of the neurons
-//! \param[in] address: the address where the neuron parameters are stored
-//!                     in SDRAM
+//! \param[in] address:
+//!     the address where the neuron parameters are stored in SDRAM
 //! \return bool which is true if the resume was successful or not
 bool neuron_resume(address_t address);
 
 //! \brief Perform steps needed before pausing a simulation.
 //! \details Stores neuron parameters back into SDRAM.
-//! \param[in] address: the address where the neuron parameters are stored
-//!                     in SDRAM
+//! \param[in] address:
+//!     the address where the neuron parameters are stored in SDRAM
 void neuron_pause(address_t address);
 
 //! \brief Add inputs to the neuron

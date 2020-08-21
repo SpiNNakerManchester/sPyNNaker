@@ -35,6 +35,7 @@ static inline uint expected_spike_wait_time(uint timer_period) {
 //! \brief Determines whether a wait is needed
 //! \param[in] timer_count: The current time in simulation ticks
 //! \param[in] expected_time: The point when we expect to send
+//! \return Whether we need to wait before sending the next packet.
 static inline bool need_to_wait_for_send_time(
         uint timer_count, uint expected_time) {
     // Spin1 API ticks - to know when the timer wraps

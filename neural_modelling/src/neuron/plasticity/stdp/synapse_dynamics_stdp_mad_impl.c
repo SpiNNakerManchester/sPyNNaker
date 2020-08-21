@@ -473,7 +473,7 @@ bool synapse_dynamics_remove_neuron(uint32_t offset, synaptic_row_t row) {
     return true;
 }
 
-//! \brief packing all of the information into the required plastic control word
+//! \brief Pack all of the information into the required plastic control word
 //! \param[in] id: The spike ID
 //! \param[in] delay: The delay
 //! \param[in] type: The synapse type

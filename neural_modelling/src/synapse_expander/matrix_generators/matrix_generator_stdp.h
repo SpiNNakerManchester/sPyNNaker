@@ -57,7 +57,7 @@ struct matrix_generator_stdp {
 };
 
 /**
- * \brief How to initialise the STDP synaptic matrix generator
+ * \brief Initialise the STDP synaptic matrix generator
  * \param[in,out] region: Region to read parameters from.  Should be updated
  *                        to position just after parameters after calling.
  * \return A data item to be passed in to other functions later on
@@ -75,7 +75,7 @@ void *matrix_generator_stdp_initialize(address_t *region) {
 }
 
 /**
- * \brief How to free any data for the STDP synaptic matrix generator
+ * \brief Free any data for the STDP synaptic matrix generator
  * \param[in] generator: The generator to free
  */
 void matrix_generator_stdp_free(void *generator) {
@@ -83,7 +83,7 @@ void matrix_generator_stdp_free(void *generator) {
 }
 
 /**
- * \brief Build a fixed-plastic half-word from the components
+ * \brief Build a fixed-plastic half-word from its components
  * \param[in] delay: The delay of the synapse
  * \param[in] type: The synapse type
  * \param[in] post_index: The core-relative index of the target neuron
@@ -108,17 +108,17 @@ static uint16_t build_fixed_plastic_half_word(
 }
 
 /**
- * \brief How to generate a row of a STDP synaptic matrix
- * \param[in] generator: The data for the matrix generator, returned by the
- *                       initialise function
+ * \brief Generate a row of a STDP synaptic matrix
+ * \param[in] generator:
+ *      The data for the matrix generator, returned by the initialise function
  * \param[out] synaptic_matrix: The address of the synaptic matrix to write to
- * \param[out] delayed_synaptic_matrix: The address of the synaptic matrix to
- *                                      write delayed connections to
+ * \param[out] delayed_synaptic_matrix:
+ *      The address of the synaptic matrix to write delayed connections to
  * \param[in] n_pre_neurons: The number of pre neurons to generate for
  * \param[in] pre_neuron_index: The index of the first pre neuron
  * \param[in] max_row_n_words: The maximum number of words in a normal row
- * \param[in] max_delayed_row_n_words: The maximum number of words in a
- *                                     delayed row
+ * \param[in] max_delayed_row_n_words:
+ *      The maximum number of words in a delayed row
  * \param[in] synapse_type_bits: The number of bits used for the synapse type
  * \param[in] synapse_index_bits: The number of bits used for the neuron id
  * \param[in] synapse_type: The synapse type of each connection
