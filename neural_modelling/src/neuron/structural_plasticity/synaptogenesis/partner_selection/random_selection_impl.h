@@ -29,9 +29,8 @@
 //! \param[in] time: The time that the spike was received at
 //! \param[in] spike:
 //!     The spike that was received (includes the sending neuron ID)
-static inline void partner_spike_received(uint32_t time, spike_t spike) {
-    use(time);
-    use(spike);
+static inline void partner_spike_received(
+        UNUSED uint32_t time, UNUSED spike_t spike) {
 }
 
 //! \brief Convert a neuron ID into its subpopulation ID
@@ -63,16 +62,15 @@ static inline uint32_t pick_subpopulation(
 //! \param[out] m_pop_index: The master population table index.
 //! \return True if a choice was made
 static inline bool potential_presynaptic_partner(
-        uint32_t time, uint32_t *restrict population_id,
+        UNUSED uint32_t time, uint32_t *restrict population_id,
         uint32_t *restrict sub_population_id, uint32_t *restrict neuron_id,
         spike_t *restrict spike, uint32_t *restrict m_pop_index) {
     extern rewiring_data_t rewiring_data;
     extern pre_pop_info_table_t pre_info;
 
-    use(time);
     uint32_t pop_id = rand_int(pre_info.no_pre_pops, rewiring_data.local_seed);
     *population_id = pop_id;
-    pre_info_t *preapppop_info = pre_info.prepop_info[pop_id];
+    const pre_info_t *preapppop_info = pre_info.prepop_info[pop_id];
 
     // Select presynaptic sub-population
     uint32_t n_id = rand_int(preapppop_info->total_no_atoms,

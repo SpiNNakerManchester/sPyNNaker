@@ -32,8 +32,7 @@
  *                        to position just after parameters after calling.
  * \return A data item to be passed in to other functions later on
  */
-static void *matrix_generator_static_initialize(address_t *region) {
-    use(region);
+static void *matrix_generator_static_initialize(UNUSED address_t *region) {
     return NULL;
 }
 
@@ -41,8 +40,7 @@ static void *matrix_generator_static_initialize(address_t *region) {
  * \brief How to free any data for the static synaptic matrix generator
  * \param[in] generator: The data to free
  */
-static void matrix_generator_static_free(void *generator) {
-    use(generator);
+static void matrix_generator_static_free(UNUSED void *generator) {
 }
 
 /**
@@ -115,7 +113,7 @@ static uint32_t build_static_word(
  * \param[in] max_stage: The maximum delay stage to support
  */
 static void matrix_generator_static_write_row(
-        void *generator,
+        UNUSED void *generator,
         address_t synaptic_matrix, address_t delayed_synaptic_matrix,
         uint32_t n_pre_neurons, uint32_t pre_neuron_index,
         uint32_t max_row_n_words, uint32_t max_delayed_row_n_words,
@@ -123,8 +121,6 @@ static void matrix_generator_static_write_row(
         uint32_t synapse_type, uint32_t n_synapses,
         uint16_t *indices, uint16_t *delays, uint16_t *weights,
         uint32_t max_stage) {
-    use(generator);
-
     log_debug("Max stage = %u", max_stage);
 
     // Row address and position for each possible delay stage (including no

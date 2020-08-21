@@ -17,6 +17,10 @@
 
 /*! \file
  * \brief   Data type definitions for SpiNNaker Neuron-modelling
+ * \details Defines a spike with either a payload or not and implements the
+ *      functionality to extract the key and payload in both cases. If the
+ *      spike is compiled as not having a payload, the payload will always be
+ *      returned as 0.
  */
 
 #ifndef __NEURON_TYPEDEFS_H__
@@ -25,13 +29,11 @@
 #include <common-typedefs.h>
 #include "maths-util.h"
 
+#ifndef UNUSED
+#define UNUSED __attribute__((__unused__))
+#endif
+
 // Determine the type of a spike
-/*
- * defines a spike with either a pay load or not and implements the
- * functionality to extract the key and pay load in both cases. If the
- * spike is compiled as not having a pay load, the pay load will always be
- * returned as 0
- */
 #ifndef __SPIKE_T__
 
 //! The type of a SpiNNaker multicast message key word
@@ -87,8 +89,7 @@ static inline key_t spike_key(spike_t s) {
 //! \param[in] s: the spike to get the pay-load from
 //! \return payload_t: the pay-load from the spike (default-ly set to zero if
 //!                    the model is not compiled with SPIKES_WITH_PAYLOADS)
-static inline payload_t spike_payload(spike_t s) {
-    use(s);
+static inline payload_t spike_payload(UNUSED spike_t s) {
     return 0;
 }
 #endif /*SPIKES_WITH_PAYLOADS*/

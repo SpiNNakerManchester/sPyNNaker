@@ -42,9 +42,7 @@ struct elimination_params {
 static inline bool synaptogenesis_elimination_rule(
         current_state_t *restrict current_state,
         const elimination_params_t *params,
-        uint32_t time, synaptic_row_t restrict row) {
-    use(time);
-
+        UNUSED uint32_t time, synaptic_row_t restrict row) {
     // Note that this is really a long unsigned fract, but the operations
     // produce the same machine code when done with unsigned integers.
     uint32_t random_number = mars_kiss64_seed(*(current_state->local_seed));
