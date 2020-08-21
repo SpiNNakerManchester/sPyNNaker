@@ -43,7 +43,7 @@ struct input_type_t {
 //!     The size of the \p value array.
 //! \return Pointer to array of values of the receptor-based input after
 //!     scaling
-static input_t *input_type_get_input_value(
+static inline input_t *input_type_get_input_value(
         UNUSED input_t *restrict value, UNUSED const input_type_t *input_type,
         UNUSED uint16_t num_receptors) {
     return 0;
@@ -56,7 +56,7 @@ static input_t *input_type_get_input_value(
 //!     been scaled by input_type_get_input_value()
 //! \param[in] input_type: The input type pointer to the parameters
 //! \param[in] membrane_voltage: The membrane voltage to use for the input
-static void input_type_convert_excitatory_input_to_current(
+static inline void input_type_convert_excitatory_input_to_current(
         UNUSED input_t *restrict exc_input,
         UNUSED const input_type_t *input_type,
         UNUSED state_t membrane_voltage) {
@@ -69,7 +69,7 @@ static void input_type_convert_excitatory_input_to_current(
 //!     been scaled by input_type_get_input_value()
 //! \param[in] input_type: The input type pointer to the parameters
 //! \param[in] membrane_voltage: The membrane voltage to use for the input
-static void input_type_convert_inhibitory_input_to_current(
+static inline void input_type_convert_inhibitory_input_to_current(
         UNUSED input_t *restrict inh_input,
         UNUSED const input_type_t *input_type,
         UNUSED state_t membrane_voltage) {

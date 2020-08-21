@@ -88,7 +88,7 @@ static inline post_trace_t timing_get_initial_post_trace(void) {
 //! \param[in] last_trace: the post trace to update
 //! \return the updated post trace
 static inline post_trace_t timing_add_post_spike(
-        uint32_t time, uint32_t last_time, post_trace_t last_trace) {
+        uint32_t time, uint32_t last_time, UNUSED post_trace_t last_trace) {
     log_debug("\tdelta_time=%u", time - last_time);
 
     // Return new pre- synaptic event with decayed trace values with energy
