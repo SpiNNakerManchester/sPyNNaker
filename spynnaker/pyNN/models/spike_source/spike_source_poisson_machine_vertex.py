@@ -18,7 +18,8 @@ from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.graphs.machine import MachineVertex
 from spinn_front_end_common.abstract_models import (
-    AbstractSupportsDatabaseInjection, AbstractRecordable)
+    AbstractHasAssociatedBinary, AbstractSupportsDatabaseInjection,
+    AbstractRecordable)
 from spinn_front_end_common.interface.provenance import (
     ProvidesProvenanceDataFromMachineImpl)
 from spinn_front_end_common.interface.buffer_management.buffer_models import (
@@ -26,6 +27,7 @@ from spinn_front_end_common.interface.buffer_management.buffer_models import (
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
+from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.interface.profiling import AbstractHasProfileData
 from spinn_front_end_common.interface.profiling.profile_utils import (
     get_profiling_data)
@@ -36,7 +38,8 @@ from spynnaker.pyNN.utilities.constants import (
 class SpikeSourcePoissonMachineVertex(
         MachineVertex, AbstractReceiveBuffersToHost,
         ProvidesProvenanceDataFromMachineImpl, AbstractRecordable,
-        AbstractSupportsDatabaseInjection, AbstractHasProfileData):
+        AbstractSupportsDatabaseInjection, AbstractHasProfileData,
+        AbstractHasAssociatedBinary):
     __slots__ = [
         "__buffered_sdram_per_timestep",
         "__is_recording",
@@ -119,3 +122,11 @@ class SpikeSourcePoissonMachineVertex(
         return get_profiling_data(
             self.POISSON_SPIKE_SOURCE_REGIONS.PROFILER_REGION.value,
             self.PROFILE_TAG_LABELS, transceiver, placement)
+
+    @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
+    def get_binary_file_name(self):
+        return "spike_source_poisson.aplx"
+
+    @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
+    def get_binary_start_type(self):
+        return ExecutableType.USES_SIMULATION_INTERFACE

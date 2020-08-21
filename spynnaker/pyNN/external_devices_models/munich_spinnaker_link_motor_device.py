@@ -18,23 +18,22 @@ from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.constraints.key_allocator_constraints import (
     FixedMaskConstraint)
-from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.graphs.application import (
     ApplicationSpiNNakerLinkVertex, ApplicationVertex)
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
 from spinn_front_end_common.abstract_models import (
-    AbstractGeneratesDataSpecification, AbstractHasAssociatedBinary,
+    AbstractGeneratesDataSpecification,
     AbstractProvidesOutgoingPartitionConstraints,
     AbstractVertexWithEdgeToDependentVertices)
 from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl)
 from spinn_front_end_common.interface.simulation import simulation_utilities
-from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.utilities.constants import (
     SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES, BYTES_PER_WORD)
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.defaults import defaults
+from .machine_munich_motor_device import MachineMunichMotorDevice
 
 logger = logging.getLogger(__name__)
 MOTOR_PARTITION_ID = "MOTOR"
@@ -53,7 +52,7 @@ class _MunichMotorDevice(ApplicationSpiNNakerLinkVertex):
 @defaults
 class MunichMotorDevice(
         ApplicationVertex, AbstractVertexWithEdgeToDependentVertices,
-        AbstractGeneratesDataSpecification, AbstractHasAssociatedBinary,
+        AbstractGeneratesDataSpecification,
         AbstractProvidesOutgoingPartitionConstraints,
         ProvidesKeyToAtomMappingImpl):
     """ An Omnibot motor control device. This has a real vertex and an \
@@ -110,7 +109,7 @@ class MunichMotorDevice(
     @overrides(ApplicationVertex.create_machine_vertex)
     def create_machine_vertex(self, vertex_slice, resources_required,
                               label=None, constraints=None):
-        return SimpleMachineVertex(
+        return MachineMunichMotorDevice(
             resources_required, label, constraints, self, vertex_slice)
 
     @overrides(ApplicationVertex.get_resources_used_by_atoms)
@@ -153,7 +152,7 @@ class MunichMotorDevice(
         # handle simulation data
         spec.switch_write_focus(self.SYSTEM_REGION)
         spec.write_array(simulation_utilities.get_simulation_header_array(
-            self.get_binary_file_name(), machine_time_step,
+            placement.vertex.get_binary_file_name(), machine_time_step,
             time_scale_factor))
 
         # Get the key
@@ -175,14 +174,6 @@ class MunichMotorDevice(
 
         # End-of-Spec:
         spec.end_specification()
-
-    @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
-    def get_binary_file_name(self):
-        return "robot_motor_control.aplx"
-
-    @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
-    def get_binary_start_type(self):
-        return ExecutableType.USES_SIMULATION_INTERFACE
 
     def reserve_memory_regions(self, spec):
         """ Reserve SDRAM space for memory areas:

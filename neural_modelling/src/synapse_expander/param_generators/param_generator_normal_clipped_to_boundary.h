@@ -92,11 +92,8 @@ static void param_generator_normal_clipped_boundary_free(void *generator) {
  *      An array into which to place the values; will be \p n_indices in size
  */
 static void param_generator_normal_clipped_boundary_generate(
-        void *generator, uint32_t n_indices, uint32_t pre_neuron_index,
-        uint16_t *indices, accum *values) {
-    use(pre_neuron_index);
-    use(indices);
-
+        void *generator, uint32_t n_indices, UNUSED uint32_t pre_neuron_index,
+        UNUSED uint16_t *indices, accum *values) {
     // For each index, generate a normally distributed value, clipping
     // it to the given boundary
     struct param_generator_normal_clipped_boundary *obj = generator;

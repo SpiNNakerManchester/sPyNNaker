@@ -116,9 +116,8 @@ static void param_generator_kernel_free(void *generator) {
  */
 static void param_generator_kernel_generate(
         void *generator, uint32_t n_synapses,
-        uint32_t pre_neuron_index, uint16_t *indices, accum *values) {
-    use(pre_neuron_index);
-    use(indices);
+        UNUSED uint32_t pre_neuron_index, UNUSED uint16_t *indices,
+        accum *values) {
     struct all_kernel_params *obj = generator;
     struct param_generator_kernel *params = &obj->params;
     uint16_t pre_c = 0;

@@ -17,8 +17,7 @@
 
 /*! \file
  * \brief   Data type definitions for SpiNNaker Neuron-modelling
- * \details
- *      Defines a spike with either a payload or not and implements the
+ * \details Defines a spike with either a payload or not and implements the
  *      functionality to extract the key and payload in both cases. If the
  *      spike is compiled as not having a payload, the payload will always be
  *      returned as 0.
@@ -29,6 +28,10 @@
 
 #include <common-typedefs.h>
 #include "maths-util.h"
+
+#ifndef UNUSED
+#define UNUSED __attribute__((__unused__))
+#endif
 
 //! The type of a SpiNNaker multicast message key word.
 typedef uint32_t key_t;
