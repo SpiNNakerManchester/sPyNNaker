@@ -402,8 +402,8 @@ class FromListConnector(AbstractConnector):
         return self.__extra_parameter_names
 
     @overrides(AbstractConnector.could_connect)
-    def could_connect(self, synapse_info, pre_slice, post_slice):
-        return any((pre_slice.lo_atom <= self.__sources) &
-                   (self.__sources <= pre_slice.hi_atom) &
-                   (post_slice.lo_atom <= self.__targets) &
-                   (self.__targets <= post_slice.hi_atom))
+    def could_connect(self, _synapse_info, _pre_slice, _post_slice):
+        return any((_pre_slice.lo_atom <= self.__sources) &
+                   (self.__sources <= _pre_slice.hi_atom) &
+                   (_post_slice.lo_atom <= self.__targets) &
+                   (self.__targets <= _post_slice.hi_atom))
