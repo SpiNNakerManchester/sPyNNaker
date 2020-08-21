@@ -114,23 +114,19 @@ $(function() {
 <div class="line"><a name="l00060"></a><span class="lineno">   60</span>&#160;}</div>
 <div class="line"><a name="l00061"></a><span class="lineno">   61</span>&#160; </div>
 <div class="line"><a name="l00072"></a><span class="lineno"><a class="line" href="param__generator__constant_8h.html#a22265a38730d1027e422da52c55b1925">   72</a></span>&#160;<span class="keyword">static</span> <span class="keywordtype">void</span> <a class="code" href="param__generator__constant_8h.html#a22265a38730d1027e422da52c55b1925">param_generator_constant_generate</a>(</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;        <span class="keywordtype">void</span> *generator, uint32_t n_indices, uint32_t pre_neuron_index,</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;        uint16_t *indices, accum *values) {</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    <a class="codeRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#a93ae0dd742360abbf161f1d34f5e2831">use</a>(pre_neuron_index);</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    <a class="codeRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#a93ae0dd742360abbf161f1d34f5e2831">use</a>(indices);</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160; </div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    <span class="comment">// Generate a constant for each index</span></div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    <span class="keyword">struct </span><a class="code" href="param__generator__constant_8h.html#structparam__generator__constant">param_generator_constant</a> *<a class="code" href="synapse__dynamics__stdp__mad__impl_8c.html#a159669347528cd4f88c368d0d33e4670">params</a> = generator;</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    <span class="keywordflow">for</span> (uint32_t i = 0; i &lt; n_indices; i++) {</div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;        values[i] = <a class="code" href="synapse__dynamics__stdp__mad__impl_8c.html#a159669347528cd4f88c368d0d33e4670">params</a>-&gt;value;</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    }</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;}</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;        <span class="keywordtype">void</span> *generator, uint32_t n_indices, UNUSED uint32_t pre_neuron_index,</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;        UNUSED uint16_t *indices, accum *values) {</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    <span class="comment">// Generate a constant for each index</span></div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    <span class="keyword">struct </span><a class="code" href="param__generator__constant_8h.html#structparam__generator__constant">param_generator_constant</a> *<a class="code" href="synapse__dynamics__stdp__mad__impl_8c.html#a159669347528cd4f88c368d0d33e4670">params</a> = generator;</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;    <span class="keywordflow">for</span> (uint32_t i = 0; i &lt; n_indices; i++) {</div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;        values[i] = <a class="code" href="synapse__dynamics__stdp__mad__impl_8c.html#a159669347528cd4f88c368d0d33e4670">params</a>-&gt;value;</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    }</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;}</div>
 </div><!-- fragment --></div><!-- contents -->
 <div class="ttc" id="asynapse__dynamics__stdp__mad__impl_8c_html_a159669347528cd4f88c368d0d33e4670"><div class="ttname"><a href="synapse__dynamics__stdp__mad__impl_8c.html#a159669347528cd4f88c368d0d33e4670">params</a></div><div class="ttdeci">static stdp_params params</div><div class="ttdoc">Configuration parameters.</div><div class="ttdef"><b>Definition:</b> synapse_dynamics_stdp_mad_impl.c:59</div></div>
 <div class="ttc" id="aspin1__api_8h.html_html"><div class="ttname"><a href="http://spinnakermanchester.github.io/spinnaker_tools/spin1__api_8h.html">spin1_api.h</a></div></div>
 <div class="ttc" id="aparam__generator__constant_8h_html_a22265a38730d1027e422da52c55b1925"><div class="ttname"><a href="param__generator__constant_8h.html#a22265a38730d1027e422da52c55b1925">param_generator_constant_generate</a></div><div class="ttdeci">static void param_generator_constant_generate(void *generator, uint32_t n_indices, uint32_t pre_neuron_index, uint16_t *indices, accum *values)</div><div class="ttdoc">How to generate values with the constant parameter generator.</div><div class="ttdef"><b>Definition:</b> param_generator_constant.h:72</div></div>
-<div class="ttc" id="abit__field_8h_html_a93ae0dd742360abbf161f1d34f5e2831"><div class="ttname"><a href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#a93ae0dd742360abbf161f1d34f5e2831">use</a></div><div class="ttdeci">#define use(x)</div></div>
-<div class="ttc" id="aspike__source__poisson_8c_html_a1b9edddb3735d131c67e9e824f07c402"><div class="ttname"><a href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a></div><div class="ttdeci">region</div><div class="ttdoc">spike source array region IDs in human readable form</div><div class="ttdef"><b>Definition:</b> spike_source_poisson.c:79</div></div>
+<div class="ttc" id="aspike__source__poisson_8c_html_a1b9edddb3735d131c67e9e824f07c402"><div class="ttname"><a href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a></div><div class="ttdeci">region</div><div class="ttdoc">spike source array region IDs in human readable form</div><div class="ttdef"><b>Definition:</b> spike_source_poisson.c:83</div></div>
 <div class="ttc" id="asark_8h_html_a40ce895f48f22b29d2aefc923b38b280"><div class="ttname"><a href="http://spinnakermanchester.github.io/spinnaker_tools/sark_8h.html#a40ce895f48f22b29d2aefc923b38b280">sark_free</a></div><div class="ttdeci">void sark_free(void *ptr)</div></div>
 <div class="ttc" id="aparam__generator__constant_8h_html_ae74a9c20cfc678e6ddd497a11385af04"><div class="ttname"><a href="param__generator__constant_8h.html#ae74a9c20cfc678e6ddd497a11385af04">param_generator_constant_free</a></div><div class="ttdeci">static void param_generator_constant_free(void *generator)</div><div class="ttdoc">How to free any data for the constant parameter generator.</div><div class="ttdef"><b>Definition:</b> param_generator_constant.h:58</div></div>
 <div class="ttc" id="aparam__generator__constant_8h_html_structparam__generator__constant"><div class="ttname"><a href="param__generator__constant_8h.html#structparam__generator__constant">param_generator_constant</a></div><div class="ttdoc">The data for the constant value generation.</div><div class="ttdef"><b>Definition:</b> param_generator_constant.h:31</div></div>
@@ -140,7 +136,7 @@ $(function() {
 <div class="ttc" id="aparam__generator__constant_8h_html_a52720c983e24979540f5cf27d02b0c14"><div class="ttname"><a href="param__generator__constant_8h.html#a52720c983e24979540f5cf27d02b0c14">param_generator_constant_initialize</a></div><div class="ttdeci">static void * param_generator_constant_initialize(address_t *region)</div><div class="ttdoc">How to initialise the constant parameter generator.</div><div class="ttdef"><b>Definition:</b> param_generator_constant.h:41</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Aug 20 2020 23:29:21 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Aug 21 2020 15:25:15 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.17
 </small></address>
