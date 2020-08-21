@@ -39,6 +39,10 @@
 
 #include <common/spin1-wfi.h>
 
+#ifndef UNUSED
+#define UNUSED __attribute__((__unused__))
+#endif
+
 // ----------------------------------------------------------------------
 
 //! Spin1 API ticks, to know when the timer wraps
