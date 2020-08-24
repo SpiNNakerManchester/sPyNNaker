@@ -185,16 +185,12 @@ class PyNNPopulationCommon(object):
     @staticmethod
     def _process_additional_params(
             additional_parameters, population_parameters):
-        defaults = set(population_parameters.keys())
-        additions = set(additional_parameters.keys())
-        copy_of_additional_params = dict()
-        copy_of_additional_params.update(additional_parameters)
-        invalids = (defaults | additions) - defaults
-        for invalid in invalids:
-            logger.warning(
-                "additional_parameter {} will be ignored".format(invalid))
-            copy_of_additional_params.pop(invalid)
-        population_parameters.update(copy_of_additional_params)
+        for key in additional_parameters.keys():
+            if key in population_parameters:
+                population_parameters[key] = additional_parameters[key]
+            else:
+                logger.warning(
+                    "additional_parameter {} will be ignored".format(key))
         return population_parameters
 
     @property
