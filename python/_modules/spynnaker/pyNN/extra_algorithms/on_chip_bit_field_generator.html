@@ -127,6 +127,12 @@
 
     <span class="n">_BYTES_PER_FILTER</span> <span class="o">=</span> <span class="mi">12</span>
 
+    <span class="c1"># skip merged and redundant counts.</span>
+    <span class="n">_OFFSET_TO_N_BIT_FIELD_IN_BYTES</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
+
+    <span class="c1"># 1. merged bitfields, 2. redundant bitfields. 3 total bitfields</span>
+    <span class="n">_SIZE_OF_FILTER_REGION_IN_BYTES</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
+
     <span class="n">_ONE_WORDS</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">Struct</span><span class="p">(</span><span class="s2">&quot;&lt;I&quot;</span><span class="p">)</span>
 
     <span class="c1"># bit field report file name</span>
@@ -230,11 +236,15 @@
                             <span class="n">transceiver</span><span class="p">,</span> <span class="n">placement</span><span class="p">)</span>
 
                         <span class="c1"># read how many bitfields there are</span>
-                        <span class="n">n_bit_field_entries</span><span class="p">,</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span>
+                        <span class="n">n_bit_field_entries</span> <span class="o">=</span> <span class="n">struct</span><span class="o">.</span><span class="n">unpack</span><span class="p">(</span>
                             <span class="s2">&quot;&lt;I&quot;</span><span class="p">,</span> <span class="n">transceiver</span><span class="o">.</span><span class="n">read_memory</span><span class="p">(</span>
-                                <span class="n">placement</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">bit_field_address</span><span class="p">,</span>
+                                <span class="n">placement</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">placement</span><span class="o">.</span><span class="n">y</span><span class="p">,</span>
+                                <span class="n">bit_field_address</span> <span class="o">+</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">_OFFSET_TO_N_BIT_FIELD_IN_BYTES</span><span class="p">,</span>
                                 <span class="n">BYTES_PER_WORD</span><span class="p">))</span>
-                        <span class="n">reading_address</span> <span class="o">=</span> <span class="n">bit_field_address</span> <span class="o">+</span> <span class="n">BYTES_PER_WORD</span>
+                        <span class="n">reading_address</span> <span class="o">=</span> <span class="p">(</span>
+                            <span class="n">bit_field_address</span> <span class="o">+</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">_SIZE_OF_FILTER_REGION_IN_BYTES</span><span class="p">)</span>
 
                         <span class="c1"># read in each bitfield</span>
                         <span class="k">for</span> <span class="n">_bit_field_index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n_bit_field_entries</span><span class="p">):</span>
