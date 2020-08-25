@@ -165,7 +165,10 @@
                     <span class="s2">&quot;A population cannot have a negative or zero size.&quot;</span><span class="p">)</span>
             <span class="n">population_parameters</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">default_population_parameters</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">additional_parameters</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">population_parameters</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">additional_parameters</span><span class="p">)</span>
+                <span class="c1"># check that the additions are suitable. report wrong ones</span>
+                <span class="c1"># and ignore</span>
+                <span class="n">population_parameters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process_additional_params</span><span class="p">(</span>
+                    <span class="n">additional_parameters</span><span class="p">,</span> <span class="n">population_parameters</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__vertex</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">create_vertex</span><span class="p">(</span>
                 <span class="n">size</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">constraints</span><span class="p">,</span> <span class="o">**</span><span class="n">population_parameters</span><span class="p">)</span>
 
@@ -243,6 +246,17 @@
         <span class="k">if</span> <span class="n">initial_values</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">variable</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="n">initial_values</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_initialize</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_process_additional_params</span><span class="p">(</span>
+            <span class="n">additional_parameters</span><span class="p">,</span> <span class="n">population_parameters</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">additional_parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">population_parameters</span><span class="p">:</span>
+                <span class="n">population_parameters</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">additional_parameters</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;additional_parameter </span><span class="si">{}</span><span class="s2"> will be ignored&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">population_parameters</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">first_id</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
