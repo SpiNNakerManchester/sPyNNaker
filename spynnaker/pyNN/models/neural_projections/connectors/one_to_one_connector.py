@@ -180,44 +180,45 @@ class OneToOneConnector(AbstractGenerateConnectorOnMachine,
         return self._view_params_bytes
 
     @overrides(AbstractConnector.could_connect)
-    def could_connect(self, synapse_info, pre_slice, post_slice):
+    def could_connect(self, _synapse_info, _pre_slice, _post_slice):
         # Filter edge if both are views and outside limits
-        if (synapse_info.prepop_is_view and
-                synapse_info.postpop_is_view):
-            pre_lo = synapse_info.pre_population._indexes[0]
-            pre_hi = synapse_info.pre_population._indexes[-1]
-            post_lo = synapse_info.post_population._indexes[0]
-            post_hi = synapse_info.post_population._indexes[-1]
-            if ((pre_slice.hi_atom - pre_lo < post_slice.lo_atom - post_lo) or
-                    (pre_slice.lo_atom - pre_lo >
-                     post_slice.hi_atom - post_lo) or
-                    (pre_slice.hi_atom < pre_lo) or
-                    (pre_slice.lo_atom > pre_hi) or
-                    (post_slice.hi_atom < post_lo) or
-                    (post_slice.lo_atom > post_hi)):
+        if (_synapse_info.prepop_is_view and
+                _synapse_info.postpop_is_view):
+            pre_lo = _synapse_info.pre_population._indexes[0]
+            pre_hi = _synapse_info.pre_population._indexes[-1]
+            post_lo = _synapse_info.post_population._indexes[0]
+            post_hi = _synapse_info.post_population._indexes[-1]
+            if ((_pre_slice.hi_atom - pre_lo <
+                    _post_slice.lo_atom - post_lo) or
+                    (_pre_slice.lo_atom - pre_lo >
+                     _post_slice.hi_atom - post_lo) or
+                    (_pre_slice.hi_atom < pre_lo) or
+                    (_pre_slice.lo_atom > pre_hi) or
+                    (_post_slice.hi_atom < post_lo) or
+                    (_post_slice.lo_atom > post_hi)):
                 return False
         # Filter edge if pre-pop is outside limit and post_lo is bigger
         # than n_pre_neurons
-        elif synapse_info.prepop_is_view:
-            pre_lo = synapse_info.pre_population._indexes[0]
-            pre_hi = synapse_info.pre_population._indexes[-1]
-            if ((pre_slice.hi_atom - pre_lo < post_slice.lo_atom) or
-                    (pre_slice.lo_atom - pre_lo > post_slice.hi_atom) or
-                    (pre_slice.hi_atom < pre_lo) or
-                    (pre_slice.lo_atom > pre_hi)):
+        elif _synapse_info.prepop_is_view:
+            pre_lo = _synapse_info.pre_population._indexes[0]
+            pre_hi = _synapse_info.pre_population._indexes[-1]
+            if ((_pre_slice.hi_atom - pre_lo < _post_slice.lo_atom) or
+                    (_pre_slice.lo_atom - pre_lo > _post_slice.hi_atom) or
+                    (_pre_slice.hi_atom < pre_lo) or
+                    (_pre_slice.lo_atom > pre_hi)):
                 return False
         # Filter edge if post-pop is outside limit and pre_lo is bigger
         # than n_post_neurons
-        elif synapse_info.postpop_is_view:
-            post_lo = synapse_info.post_population._indexes[0]
-            post_hi = synapse_info.post_population._indexes[-1]
-            if ((pre_slice.hi_atom < post_slice.lo_atom - post_lo) or
-                    (pre_slice.lo_atom > post_slice.hi_atom - post_lo) or
-                    (post_slice.hi_atom < post_lo) or
-                    (post_slice.lo_atom > post_hi)):
+        elif _synapse_info.postpop_is_view:
+            post_lo = _synapse_info.post_population._indexes[0]
+            post_hi = _synapse_info.post_population._indexes[-1]
+            if ((_pre_slice.hi_atom < _post_slice.lo_atom - post_lo) or
+                    (_pre_slice.lo_atom > _post_slice.hi_atom - post_lo) or
+                    (_post_slice.hi_atom < post_lo) or
+                    (_post_slice.lo_atom > post_hi)):
                 return False
         # Filter edge in the usual scenario with normal populations
-        elif pre_slice.hi_atom < post_slice.lo_atom or \
-                pre_slice.lo_atom > post_slice.hi_atom:
+        elif _pre_slice.hi_atom < _post_slice.lo_atom or \
+                _pre_slice.lo_atom > _post_slice.hi_atom:
             return False
         return True

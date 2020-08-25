@@ -350,9 +350,7 @@ static void multicast_packet_received_callback(uint key, uint payload) {
 //! \brief Called when a DMA completes
 //! \param unused: unused
 //! \param[in] tag: What sort of DMA has finished?
-static void dma_complete_callback(uint unused, uint tag) {
-    use(unused);
-
+static void dma_complete_callback(UNUSED uint unused, uint tag) {
     // increment the dma complete count for provenance generation
     dma_complete_count++;
 
@@ -420,10 +418,7 @@ static void dma_complete_callback(uint unused, uint tag) {
 //! \brief Called when a user event is received
 //! \param unused0: unused
 //! \param unused1: unused
-void user_event_callback(uint unused0, uint unused1) {
-    use(unused0);
-    use(unused1);
-
+void user_event_callback(UNUSED uint unused0, UNUSED uint unused1) {
     // Reset the counters as this is a new process
     dma_n_rewires = 0;
     dma_n_spikes = 0;
