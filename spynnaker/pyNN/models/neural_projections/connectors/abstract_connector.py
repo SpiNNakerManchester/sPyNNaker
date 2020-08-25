@@ -554,7 +554,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         # pylint: disable=unused-argument
         return False
 
-    def could_connect(self, synapse_info, pre_slice, post_slice):
+    def could_connect(self, _synapse_info, _pre_slice, _post_slice):
         """
         Checks if a pre slice and a post slice could connect.
 
@@ -565,9 +565,9 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         note: This method should never return a false negative,
         but may return a false positives
 
-        :param ~pacman.model.graphs.common.Slice pre_slice:
-        :param ~pacman.model.graphs.common.Slice post_slice:
-        :param SynapseInformation synapse_info:
+        :param ~pacman.model.graphs.common.Slice _pre_slice:
+        :param ~pacman.model.graphs.common.Slice _post_slice:
+        :param SynapseInformation _synapse_info:
         """
         # Unless we know for sure we must say they could connect
         return True

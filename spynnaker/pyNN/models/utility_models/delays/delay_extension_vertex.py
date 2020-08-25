@@ -28,12 +28,11 @@ from pacman.model.resources import (
 from pacman.model.partitioner_interfaces import SplitterByAtoms
 from spinn_front_end_common.abstract_models import (
     AbstractGeneratesDataSpecification,
-    AbstractProvidesOutgoingPartitionConstraints, AbstractHasAssociatedBinary)
+    AbstractProvidesOutgoingPartitionConstraints)
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.utilities.constants import (
     SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES, BITS_PER_WORD,
     BYTES_PER_WORD)
-from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from .delay_block import DelayBlock
 from .delay_extension_machine_vertex import DelayExtensionMachineVertex
 from .delay_generator_data import DelayGeneratorData
@@ -57,8 +56,7 @@ _MAX_OFFSET_DENOMINATOR = 10
 
 class DelayExtensionVertex(
         ApplicationVertex, AbstractGeneratesDataSpecification,
-        AbstractHasAssociatedBinary, SplitterByAtoms,
-        AbstractProvidesOutgoingPartitionConstraints):
+        SplitterByAtoms, AbstractProvidesOutgoingPartitionConstraints):
     """ Provide delays to incoming spikes in multiples of the maximum delays\
         of a neuron (typically 16 or 32)
     """
@@ -243,7 +241,8 @@ class DelayExtensionVertex(
         vertex.reserve_provenance_data_region(spec)
 
         self._write_setup_info(
-            spec, self.__machine_time_step, self.__time_scale_factor)
+            spec, self.__machine_time_step, self.__time_scale_factor,
+            vertex.get_binary_file_name())
 
         spec.comment("\n*** Spec for Delay Extension Instance ***\n\n")
 
@@ -291,17 +290,18 @@ class DelayExtensionVertex(
         # End-of-Spec:
         spec.end_specification()
 
-    def _write_setup_info(self, spec, machine_time_step, time_scale_factor):
+    def _write_setup_info(
+            self, spec, machine_time_step, time_scale_factor, binary_name):
         """
         :param ~data_specification.DataSpecificationGenerator spec:
-        :param int machine_time_step:
-        :param int time_scale_factor:
+        :param int machine_time_step:v the machine time step
+        :param int time_scale_factor: the time scale factor
+        :param str binary_name: the binary name
         """
         # Write this to the system region (to be picked up by the simulation):
         spec.switch_write_focus(_DELEXT_REGIONS.SYSTEM.value)
         spec.write_array(simulation_utilities.get_simulation_header_array(
-            self.get_binary_file_name(), machine_time_step,
-            time_scale_factor))
+            binary_name, machine_time_step, time_scale_factor))
 
     def write_delay_parameters(
             self, spec, vertex_slice, key, incoming_key, incoming_mask,
@@ -441,14 +441,6 @@ class DelayExtensionVertex(
         """
         words_per_atom = 11 + 16
         return words_per_atom * BYTES_PER_WORD * vertex_slice.n_atoms
-
-    @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
-    def get_binary_file_name(self):
-        return "delay_extension.aplx"
-
-    @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
-    def get_binary_start_type(self):
-        return ExecutableType.USES_SIMULATION_INTERFACE
 
     @overrides(AbstractProvidesOutgoingPartitionConstraints.
                get_outgoing_partition_constraints)
