@@ -69,12 +69,9 @@ static inline post_trace_t timing_get_initial_post_trace(void) {
 //! \param[in] last_trace: the post trace to update
 //! \return the updated post trace
 static inline post_trace_t timing_add_post_spike(
-        uint32_t time, uint32_t last_time, post_trace_t last_trace) {
+        UNUSED uint32_t time, UNUSED uint32_t last_time,
+        UNUSED post_trace_t last_trace) {
     extern uint16_t post_exp_dist_lookup[STDP_FIXED_POINT_ONE];
-
-    use(&time);
-    use(&last_time);
-    use(&last_trace);
 
     // Pick random number and use to draw from exponential distribution
     uint32_t random = mars_kiss_fixed_point();
@@ -93,12 +90,9 @@ static inline post_trace_t timing_add_post_spike(
 //! \param[in] last_trace: the pre trace to update
 //! \return the updated pre trace
 static inline pre_trace_t timing_add_pre_spike(
-        uint32_t time, uint32_t last_time, pre_trace_t last_trace) {
+        UNUSED uint32_t time, UNUSED uint32_t last_time,
+        UNUSED pre_trace_t last_trace) {
     extern uint16_t pre_exp_dist_lookup[STDP_FIXED_POINT_ONE];
-
-    use(&time);
-    use(&last_time);
-    use(&last_trace);
 
     // Pick random number and use to draw from exponential distribution
     uint32_t random = mars_kiss_fixed_point();
@@ -121,13 +115,9 @@ static inline pre_trace_t timing_add_pre_spike(
 //! \param[in] previous_state: the state to update
 //! \return the updated state
 static inline update_state_t timing_apply_pre_spike(
-        uint32_t time, pre_trace_t trace, uint32_t last_pre_time,
-        pre_trace_t last_pre_trace, uint32_t last_post_time,
+        uint32_t time, UNUSED pre_trace_t trace, UNUSED uint32_t last_pre_time,
+        UNUSED pre_trace_t last_pre_trace, uint32_t last_post_time,
         post_trace_t last_post_trace, update_state_t previous_state) {
-    use(&trace);
-    use(&last_pre_time);
-    use(&last_pre_trace);
-
     // Get time of event relative to last post-synaptic event
     uint32_t time_since_last_post = time - last_post_time;
 
@@ -166,13 +156,9 @@ static inline update_state_t timing_apply_pre_spike(
 //! \param[in] previous_state: the state to update
 //! \return the updated state
 static inline update_state_t timing_apply_post_spike(
-        uint32_t time, post_trace_t trace, uint32_t last_pre_time,
-        pre_trace_t last_pre_trace, uint32_t last_post_time,
-        post_trace_t last_post_trace, update_state_t previous_state) {
-    use(&trace);
-    use(&last_post_time);
-    use(&last_post_trace);
-
+        uint32_t time, UNUSED post_trace_t trace, uint32_t last_pre_time,
+        pre_trace_t last_pre_trace, UNUSED uint32_t last_post_time,
+        UNUSED post_trace_t last_post_trace, update_state_t previous_state) {
     // Get time of event relative to last pre-synaptic event
     uint32_t time_since_last_pre = time - last_pre_time;
 

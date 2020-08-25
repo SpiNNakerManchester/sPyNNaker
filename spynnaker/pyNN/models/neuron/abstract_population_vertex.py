@@ -25,7 +25,7 @@ from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
 from spinn_front_end_common.abstract_models import (
     AbstractChangableAfterRun, AbstractProvidesIncomingPartitionConstraints,
-    AbstractProvidesOutgoingPartitionConstraints, AbstractHasAssociatedBinary,
+    AbstractProvidesOutgoingPartitionConstraints,
     AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification,
     AbstractCanReset)
 from spinn_front_end_common.abstract_models.impl import (
@@ -34,7 +34,6 @@ from spinn_front_end_common.utilities import (
     constants as common_constants, helpful_functions, globals_variables)
 from spinn_front_end_common.utilities.constants import (
     BYTES_PER_WORD, SYSTEM_BYTES_REQUIREMENT)
-from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.interface.simulation import simulation_utilities
 from spinn_front_end_common.interface.profiling import profile_utils
 from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
@@ -71,8 +70,8 @@ _MAX_OFFSET_DENOMINATOR = 10
 
 class AbstractPopulationVertex(
         ApplicationVertex, AbstractGeneratesDataSpecification,
-        AbstractHasAssociatedBinary, AbstractContainsUnits,
-        AbstractSpikeRecordable,  AbstractNeuronRecordable,
+        AbstractContainsUnits, AbstractSpikeRecordable,
+        AbstractNeuronRecordable,
         AbstractProvidesOutgoingPartitionConstraints,
         AbstractProvidesIncomingPartitionConstraints,
         AbstractPopulationInitializable, AbstractPopulationSettable,
@@ -259,7 +258,8 @@ class AbstractPopulationVertex(
         return PopulationMachineVertex(
             resources_required,
             self.__neuron_recorder.recorded_ids_by_slice(vertex_slice),
-            label, constraints, self, vertex_slice)
+            label, constraints, self, vertex_slice,
+            self._get_binary_file_name())
 
     def get_cpu_usage_for_atoms(self, vertex_slice):
         """
@@ -538,7 +538,7 @@ class AbstractPopulationVertex(
         # Write the setup region
         spec.switch_write_focus(POPULATION_BASED_REGIONS.SYSTEM.value)
         spec.write_array(simulation_utilities.get_simulation_header_array(
-            self.get_binary_file_name(), machine_time_step,
+            self._get_binary_file_name(), machine_time_step,
             time_scale_factor))
 
         # Write the neuron recording region
@@ -584,8 +584,7 @@ class AbstractPopulationVertex(
         # End the writing of this specification:
         spec.end_specification()
 
-    @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
-    def get_binary_file_name(self):
+    def _get_binary_file_name(self):
 
         # Split binary name into title and extension
         binary_title, binary_extension = os.path.splitext(
@@ -595,10 +594,6 @@ class AbstractPopulationVertex(
         return (binary_title +
                 self.__synapse_manager.vertex_executable_suffix +
                 binary_extension)
-
-    @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
-    def get_binary_start_type(self):
-        return ExecutableType.USES_SIMULATION_INTERFACE
 
     @overrides(AbstractSpikeRecordable.is_recording_spikes)
     def is_recording_spikes(self):
