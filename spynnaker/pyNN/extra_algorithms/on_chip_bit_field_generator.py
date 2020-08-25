@@ -62,6 +62,12 @@ class OnChipBitFieldGenerator(object):
 
     _BYTES_PER_FILTER = 12
 
+    # skip merged and redundant counts.
+    _OFFSET_TO_N_BIT_FIELD_IN_BYTES = 2 * BYTES_PER_WORD
+
+    # 1. merged bitfields, 2. redundant bitfields. 3 total bitfields
+    _SIZE_OF_FILTER_REGION_IN_BYTES = 3 * BYTES_PER_WORD
+
     _ONE_WORDS = struct.Struct("<I")
 
     # bit field report file name
@@ -165,11 +171,15 @@ class OnChipBitFieldGenerator(object):
                             transceiver, placement)
 
                         # read how many bitfields there are
-                        n_bit_field_entries, = struct.unpack(
+                        n_bit_field_entries = struct.unpack(
                             "<I", transceiver.read_memory(
-                                placement.x, placement.y, bit_field_address,
+                                placement.x, placement.y,
+                                bit_field_address +
+                                self._OFFSET_TO_N_BIT_FIELD_IN_BYTES,
                                 BYTES_PER_WORD))
-                        reading_address = bit_field_address + BYTES_PER_WORD
+                        reading_address = (
+                            bit_field_address +
+                            self._SIZE_OF_FILTER_REGION_IN_BYTES)
 
                         # read in each bitfield
                         for _bit_field_index in range(0, n_bit_field_entries):

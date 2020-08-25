@@ -261,10 +261,8 @@ void synapse_dynamics_process_neuromodulator_event(
         uint32_t synapse_type);
 
 input_t synapse_dynamics_get_intrinsic_bias(
-        uint32_t time, index_t neuron_index) {
-    use(time);
-    use(neuron_index);
-    return 0.0k;
+        UNUSED uint32_t time, UNUSED index_t neuron_index) {
+    return ZERO;
 }
 
 uint32_t synapse_dynamics_get_plastic_pre_synaptic_events(void) {
