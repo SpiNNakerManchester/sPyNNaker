@@ -437,7 +437,7 @@ class SynapticManager(object):
         if isinstance(self.__synapse_dynamics,
                       AbstractSynapseDynamicsStructural):
             return self.__synapse_dynamics\
-                .get_structural_parameters_sdram_usage_in_bytes(
+                .get_estimated_structural_parameters_sdram_usage_in_bytes(
                      app_graph, app_vertex, vertex_slice.n_atoms,
                      self.__n_synapse_types)
         else:
@@ -466,16 +466,12 @@ class SynapticManager(object):
             self._get_size_of_generator_information(in_edges))
 
     def _reserve_memory_regions(
-            self, spec, machine_vertex, vertex_slice, machine_graph,
-            all_syn_block_sz, application_graph, application_vertex):
+            self, spec, machine_vertex, machine_graph, all_syn_block_sz):
         """
         :param ~.DataSpecificationGenerator spec:
         :param ~.MachineVertex machine_vertex:
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
         :param ~.MachineGraph machine_graph:
         :param int all_syn_block_sz:
-        :param ~.ApplicationGraph application_graph:
-        :param ~.ApplicationVertex application_vertex:
         """
         spec.reserve_memory_region(
             region=self._synapse_params_region,
@@ -500,7 +496,7 @@ class SynapticManager(object):
 
         synapse_dynamics_sz = \
             self.__synapse_dynamics.get_parameters_sdram_usage_in_bytes(
-                vertex_slice.n_atoms, self.__n_synapse_types)
+                machine_vertex.vertex_slice.n_atoms, self.__n_synapse_types)
         if synapse_dynamics_sz != 0:
             spec.reserve_memory_region(
                 region=self._synapse_dynamics_region,
@@ -512,9 +508,8 @@ class SynapticManager(object):
 
             synapse_structural_dynamics_sz = (
                 self.__synapse_dynamics.
-                get_structural_parameters_sdram_usage_in_bytes(
-                    application_graph, application_vertex,
-                    vertex_slice.n_atoms, self.__n_synapse_types))
+                get_actual_structural_parameters_sdram_usage_in_bytes(
+                    machine_graph, machine_vertex, self.__n_synapse_types))
 
             if synapse_structural_dynamics_sz != 0:
                 spec.reserve_memory_region(
@@ -1170,17 +1165,11 @@ class SynapticManager(object):
         return self.__ring_buffer_shifts
 
     def write_data_spec(
-            self, spec, application_vertex, post_vertex_slice, machine_vertex,
-            placement, machine_graph, application_graph, routing_info,
+            self, spec, placement, machine_graph, application_graph, routing_info,
             weight_scale, machine_time_step):
         """
         :param ~data_specification.DataSpecificationGenerator spec:
             The data specification to write to
-        :param AbstractPopulationVertex application_vertex:
-            The vertex owning the synapses
-        :param ~pacman.model.graphs.common.Slice post_vertex_slice:
-            The part of the vertex we're dealing with
-        :param PopulationMachineVertex machine_vertex: The machine vertex
         :param ~pacman.model.placements.Placement placement:
             Where the vertex is placed
         :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
@@ -1193,6 +1182,8 @@ class SynapticManager(object):
         :param float weight_scale: How to scale the weights of the synapses
         :param int machine_time_step:
         """
+        machine_vertex = placement.vertex
+        application_vertex = machine_vertex.app_vertex
         # reset for this machine vertex
         self._host_generated_block_addr = 0
         self._on_chip_generated_block_addr = 0
@@ -1212,10 +1203,9 @@ class SynapticManager(object):
         in_edges = application_graph.get_edges_ending_at_vertex(
             application_vertex)
         all_syn_block_sz = self._get_synaptic_blocks_size(
-            post_vertex_slice, in_edges, machine_time_step)
+            machine_vertex.vertex_slice, in_edges, machine_time_step)
         self._reserve_memory_regions(
-            spec, machine_vertex, post_vertex_slice, machine_graph,
-            all_syn_block_sz, application_graph, application_vertex)
+            spec, machine_vertex, machine_graph, all_syn_block_sz)
 
         ring_buffer_shifts = self._get_ring_buffer_shifts(
             application_vertex, application_graph, machine_time_step,
@@ -1225,7 +1215,7 @@ class SynapticManager(object):
 
         gen_data = self._write_synaptic_matrix_and_master_population_table(
             spec, post_slices, post_slice_idx, machine_vertex,
-            post_vertex_slice, all_syn_block_sz, weight_scales,
+            machine_vertex.vertex_slice, all_syn_block_sz, weight_scales,
             routing_info, machine_graph, machine_time_step)
 
         if self.__synapse_dynamics is not None:
@@ -1238,12 +1228,13 @@ class SynapticManager(object):
                 self.__synapse_dynamics.write_structural_parameters(
                     spec, self._struct_dynamics_region, machine_time_step,
                     weight_scales, application_graph, application_vertex,
-                    post_vertex_slice, routing_info, self.__synapse_indices)
+                    machine_vertex.vertex_slice, routing_info,
+                    self.__synapse_indices)
 
         self.__weight_scales[placement] = weight_scales
 
         self._write_on_machine_data_spec(
-            spec, post_vertex_slice, weight_scales, gen_data)
+            spec, machine_vertex.vertex_slice, weight_scales, gen_data)
 
     def clear_connection_cache(self):
         """ Flush the cache of connection information.

@@ -22,7 +22,20 @@ from spinn_utilities.abstract_base import (
 class AbstractSynapseDynamicsStructural(object):
 
     @abstractmethod
-    def get_structural_parameters_sdram_usage_in_bytes(
+    def get_actual_structural_parameters_sdram_usage_in_bytes(
+            self, machine_graph, machine_vertex, n_synapse_types):
+        """ Get the size of the structural parameters
+
+        :param ~pacman.model.graphs.machine.MachineGraph \
+                application_graph:
+        :param _pacman.model.graphs.machine.MachineVertex.py machine_vertex:
+        :param int n_synapse_types: currently not used
+        :return: the size of the parameters, in bytes
+        :rtype: int
+        """
+
+    @abstractmethod
+    def get_estimated_structural_parameters_sdram_usage_in_bytes(
             self, application_graph, app_vertex, n_neurons, n_synapse_types):
         """ Get the size of the structural parameters
 

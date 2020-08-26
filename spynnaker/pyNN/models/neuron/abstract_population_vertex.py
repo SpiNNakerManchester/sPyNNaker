@@ -560,9 +560,8 @@ class AbstractPopulationVertex(
 
         # allow the synaptic matrix to write its data spec-able data
         self.__synapse_manager.write_data_spec(
-            spec, self, vertex_slice, vertex, placement, machine_graph,
-            application_graph, routing_info,
-            weight_scale, machine_time_step)
+            spec, placement, machine_graph, application_graph,
+            routing_info, weight_scale, machine_time_step)
         vertex.set_on_chip_generatable_area(
             self.__synapse_manager.host_written_matrix_size,
             self.__synapse_manager.on_chip_written_matrix_size)
