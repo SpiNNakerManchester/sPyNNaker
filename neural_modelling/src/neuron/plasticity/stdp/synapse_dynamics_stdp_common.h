@@ -180,7 +180,7 @@ bool synapse_dynamics_initialise(
     bool weight_result = synapse_dynamics_stdp_initialise(
     		address, n_neurons, n_synapse_types,
 			ring_buffer_to_input_buffer_left_shifts);
-    if (weight_result == NULL) {
+    if (!weight_result) {
         return false;
     }
 

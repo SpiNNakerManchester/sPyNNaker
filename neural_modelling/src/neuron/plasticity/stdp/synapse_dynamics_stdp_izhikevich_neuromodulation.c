@@ -64,12 +64,10 @@ static inline post_trace_t add_dopamine_spike(
 }
 
 static inline void correlation_apply_post_spike(
-        uint32_t time, post_trace_t trace, uint32_t last_pre_time,
+        uint32_t time, UNUSED post_trace_t trace, uint32_t last_pre_time,
         pre_trace_t last_pre_trace, int32_t last_dopamine_trace,
         uint32_t last_update_time, plastic_synapse_t *previous_state,
         bool dopamine, int32_t* weight_update) {
-
-    use(&trace);
 
     // Calculate EXP components of the weight update equation
     int32_t decay_eligibility_trace = DECAY_LOOKUP_TAU_C(
@@ -112,14 +110,10 @@ static inline void correlation_apply_post_spike(
 }
 
 static inline void correlation_apply_pre_spike(
-        uint32_t time, pre_trace_t trace, uint32_t last_post_time,
-        post_trace_t last_post_trace, int32_t last_dopamine_trace,
-        plastic_synapse_t *previous_state, bool dopamine,
+        uint32_t time, UNUSED pre_trace_t trace, uint32_t last_post_time,
+        UNUSED post_trace_t last_post_trace, int32_t last_dopamine_trace,
+        plastic_synapse_t *previous_state, UNUSED bool dopamine,
         int32_t* weight_update) {
-
-    use(&trace);
-    use(&last_post_trace);
-    use(dopamine);
 
     // Calculate EXP components of the weight update equation
     int32_t decay_eligibility_trace = DECAY_LOOKUP_TAU_C(

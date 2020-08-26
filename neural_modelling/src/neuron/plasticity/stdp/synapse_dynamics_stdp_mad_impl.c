@@ -140,12 +140,8 @@ static inline index_t sparse_axonal_delay(uint32_t x) {
 
 //---------------------------------------
 void synapse_dynamics_process_neuromodulator_event(
-        uint32_t time, int32_t concentration, uint32_t neuron_index,
-        uint32_t synapse_type) {
-    use(time);
-    use(concentration);
-    use(neuron_index);
-    use(synapse_type);
+        UNUSED uint32_t time, UNUSED int32_t concentration,
+        UNUSED uint32_t neuron_index, UNUSED uint32_t synapse_type) {
 }
 
 // can this be inlined?
