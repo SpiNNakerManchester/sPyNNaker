@@ -1165,8 +1165,8 @@ class SynapticManager(object):
         return self.__ring_buffer_shifts
 
     def write_data_spec(
-            self, spec, placement, machine_graph, application_graph, routing_info,
-            weight_scale, machine_time_step):
+            self, spec, placement, machine_graph, application_graph,
+            routing_info, weight_scale, machine_time_step):
         """
         :param ~data_specification.DataSpecificationGenerator spec:
             The data specification to write to
