@@ -467,10 +467,10 @@ class SynapticManager(object):
     def _reserve_memory_regions(
             self, spec, machine_vertex, machine_graph, all_syn_block_sz):
         """
-        :param ~.DataSpecificationGenerator spec:
-        :param ~.MachineVertex machine_vertex:
-        :param ~.MachineGraph machine_graph:
-        :param int all_syn_block_sz:
+        :param ~.DataSpecificationGenerator spec: data spec
+        :param ~.MachineVertex machine_vertex: machine vertex
+        :param ~.MachineGraph machine_graph: machine graph
+        :param int all_syn_block_sz: size all synaptic blocks take up.
         """
         spec.reserve_memory_region(
             region=self._synapse_params_region,
@@ -1181,13 +1181,12 @@ class SynapticManager(object):
         :param float weight_scale: How to scale the weights of the synapses
         :param int machine_time_step:
         """
-        machine_vertex = placement.vertex
-        application_vertex = machine_vertex.app_vertex
         # reset for this machine vertex
         self._host_generated_block_addr = 0
         self._on_chip_generated_block_addr = 0
 
         # Create an index of delay keys into this vertex
+        machine_vertex = placement.vertex
         for m_edge in machine_graph.get_edges_ending_at_vertex(machine_vertex):
             app_edge = m_edge.app_edge
             if isinstance(app_edge.pre_vertex, DelayExtensionVertex):
@@ -1195,6 +1194,7 @@ class SynapticManager(object):
                                        m_edge.pre_vertex.vertex_slice] = \
                     routing_info.get_routing_info_for_edge(m_edge)
 
+        application_vertex = machine_vertex.app_vertex
         post_slices = application_vertex.vertex_slices
         post_slice_idx = machine_vertex.index
 

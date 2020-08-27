@@ -312,14 +312,11 @@ class AbstractPopulationVertex(
             bit_field_utilities.exact_sdram_for_bit_field_builder_region())
         return sdram_requirement
 
-    def _reserve_memory_regions(
-            self, spec, vertex_slice, vertex, machine_graph, n_key_map):
+    def _reserve_memory_regions(self, spec, vertex, machine_graph, n_key_map):
         """ Reserve the DSG data regions.
 
         :param ~.DataSpecificationGenerator spec:
             the spec to write the DSG region to
-        :param ~pacman.model.graphs.common.Slice vertex_slice:
-            the slice of atoms from the application vertex
         :param ~.MachineVertex vertex: this vertex
         :param ~.MachineGraph machine_graph: machine graph
         :param n_key_map: nkey map
@@ -333,6 +330,7 @@ class AbstractPopulationVertex(
             size=common_constants.SIMULATION_N_BYTES,
             label='System')
 
+        vertex_slice = vertex.vertex_slice
         self._reserve_neuron_params_data_region(spec, vertex_slice)
 
         spec.reserve_memory_region(
@@ -517,15 +515,13 @@ class AbstractPopulationVertex(
         :param n_key_map: (injected)
         """
         # pylint: disable=too-many-arguments, arguments-differ
-        vertex = placement.vertex
 
         spec.comment("\n*** Spec for block of {} neurons ***\n".format(
             self.__neuron_impl.model_name))
-        vertex_slice = vertex.vertex_slice
 
         # Reserve memory regions
-        self._reserve_memory_regions(
-            spec, vertex_slice, vertex, machine_graph, n_key_map)
+        vertex = placement.vertex
+        self._reserve_memory_regions(spec, vertex, machine_graph, n_key_map)
 
         # Declare random number generators and distributions:
         # TODO add random distribution stuff
@@ -542,6 +538,7 @@ class AbstractPopulationVertex(
             time_scale_factor))
 
         # Write the neuron recording region
+        vertex_slice = vertex.vertex_slice
         self._neuron_recorder.write_neuron_recording_region(
             spec, POPULATION_BASED_REGIONS.NEURON_RECORDING.value,
             vertex_slice, data_n_time_steps)
