@@ -80,7 +80,8 @@
 
 <span class="kn">from</span> <span class="nn">spinn_front_end_common.interface.interface_functions</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">GraphDataSpecificationWriter</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.utility_models.delays</span> <span class="kn">import</span> <span class="n">DelayExtensionVertex</span>
+<span class="kn">from</span> <span class="nn">spynnaker.pyNN.models.utility_models.delays</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">DelayExtensionMachineVertex</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="SpynnakerDataSpecificationWriter"><a class="viewcode-back" href="../../../../spynnaker.pyNN.extra_algorithms.html#spynnaker.pyNN.extra_algorithms.spynnaker_data_specification_writer.SpynnakerDataSpecificationWriter">[docs]</a><span class="k">class</span> <span class="nc">SpynnakerDataSpecificationWriter</span><span class="p">(</span><span class="n">GraphDataSpecificationWriter</span><span class="p">):</span>
@@ -97,7 +98,7 @@
         <span class="n">delay_extensions</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
         <span class="n">placement_order</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">placement</span> <span class="ow">in</span> <span class="n">placements</span><span class="o">.</span><span class="n">placements</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">placement</span><span class="o">.</span><span class="n">vertex</span><span class="o">.</span><span class="n">app_vertex</span><span class="p">,</span> <span class="n">DelayExtensionVertex</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">placement</span><span class="o">.</span><span class="n">vertex</span><span class="p">,</span> <span class="n">DelayExtensionMachineVertex</span><span class="p">):</span>
                 <span class="n">delay_extensions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">placement</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">placement_order</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">placement</span><span class="p">)</span>
