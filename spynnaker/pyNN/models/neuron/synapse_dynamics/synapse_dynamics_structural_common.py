@@ -239,8 +239,8 @@ class SynapseDynamicsStructuralCommon(object):
                                   AbstractSynapseDynamicsStructural):
                         if found:
                             raise SynapticConfigurationException(
-                                "Only one SynapseInfo on an edge "
-                                "can use structural plasticity")
+                                "Only one Projection between each pair of "
+                                "Populations can use structural plasticity")
                         found = True
                         structural_edges.append((app_edge, synapse_info))
         return structural_edges
@@ -448,8 +448,8 @@ class SynapseDynamicsStructuralCommon(object):
                         if found_synapse_info and \
                                 found_synapse_info != synapse_info:
                             raise SynapticConfigurationException(
-                                "Only one SynapseInfo on each edge "
-                                "can use structural plasticity")
+                                "Only one Projection between each pair of "
+                                "Populations can use structural plasticity")
                         found_synapse_info = synapse_info
                 if found_synapse_info:
                     n_infos += 1
