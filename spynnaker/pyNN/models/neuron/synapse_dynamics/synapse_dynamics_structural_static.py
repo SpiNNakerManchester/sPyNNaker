@@ -17,16 +17,15 @@ import numpy
 from spinn_utilities.overrides import overrides
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
-from .synapse_dynamics_structural import (
-    SynapseDynamicsStructural)
+from spynnaker.pyNN.models.neuron.synapse_dynamics \
+    import SynapseDynamicsStructuralCommon as CommonSP
 from .synapse_dynamics_static import SynapseDynamicsStatic
 from .synapse_dynamics_stdp import SynapseDynamicsSTDP
 from .synapse_dynamics_structural_stdp import SynapseDynamicsStructuralSTDP
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 
 
-class SynapseDynamicsStructuralStatic(
-        SynapseDynamicsStatic, SynapseDynamicsStructural):
+class SynapseDynamicsStructuralStatic(SynapseDynamicsStatic, CommonSP):
     """ Class that enables synaptic rewiring in the absence of STDP.
 
         It acts as a wrapper around SynapseDynamicsStatic, meaning that \
@@ -71,10 +70,10 @@ class SynapseDynamicsStructuralStatic(
 
     def __init__(
             self, partner_selection, formation, elimination,
-            f_rew=SynapseDynamicsStructural.DEFAULT_F_REW,
-            initial_weight=SynapseDynamicsStructural.DEFAULT_INITIAL_WEIGHT,
-            initial_delay=SynapseDynamicsStructural.DEFAULT_INITIAL_DELAY,
-            s_max=SynapseDynamicsStructural.DEFAULT_S_MAX, seed=None,
+            f_rew=CommonSP.DEFAULT_F_REW,
+            initial_weight=CommonSP.DEFAULT_INITIAL_WEIGHT,
+            initial_delay=CommonSP.DEFAULT_INITIAL_DELAY,
+            s_max=CommonSP.DEFAULT_S_MAX, seed=None,
             weight=0.0, delay=1.0):
         """
         :param AbstractPartnerSelection partner_selection:
@@ -235,12 +234,12 @@ class SynapseDynamicsStructuralStatic(
         return self.__elimination
 
     @property
-    @overrides(SynapseDynamicsStructural.partner_selection)
+    @overrides(CommonSP.partner_selection)
     def partner_selection(self):
         return self.__partner_selection
 
     @property
-    @overrides(SynapseDynamicsStructural.connections)
+    @overrides(CommonSP.connections)
     def connections(self):
         return self.__connections
 
@@ -258,7 +257,7 @@ class SynapseDynamicsStructuralStatic(
             connector, synapse_info)
         return max(w_m, self.__initial_weight)
 
-    @overrides(SynapseDynamicsStructural.get_seeds)
+    @overrides(CommonSP.get_seeds)
     def get_seeds(self, app_vertex=None):
         if app_vertex:
             if app_vertex not in self.__seeds.keys():
