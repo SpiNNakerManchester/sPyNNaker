@@ -176,7 +176,7 @@ class OnChipBitFieldGenerator(object):
                                 placement.x, placement.y,
                                 bit_field_address +
                                 self._OFFSET_TO_N_BIT_FIELD_IN_BYTES,
-                                BYTES_PER_WORD))
+                                BYTES_PER_WORD))[0]
                         reading_address = (
                             bit_field_address +
                             self._SIZE_OF_FILTER_REGION_IN_BYTES)
