@@ -29,9 +29,7 @@ plasticity_weight_region_data_t *plasticity_weight_region_data;
 // Functions
 //---------------------------------------
 address_t weight_initialise(
-        address_t address, uint32_t n_synapse_types, REAL *min_weights) {
-    use(min_weights);
-
+        address_t address, uint32_t n_synapse_types, UNUSED REAL *min_weights) {
     log_debug("weight_initialise: starting");
     log_debug("\tSTDP additive two-term weight dependance");
 

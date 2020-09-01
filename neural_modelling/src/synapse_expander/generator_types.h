@@ -26,6 +26,10 @@
 #include <common-typedefs.h>
 #include <spin1_api.h>
 
+#ifndef UNUSED
+#define UNUSED __attribute__((__unused__))
+#endif
+
 /**
  * \brief The type of values used to indicate the subtype of generator to
  * create. Must match the constants on the Python side of the code.

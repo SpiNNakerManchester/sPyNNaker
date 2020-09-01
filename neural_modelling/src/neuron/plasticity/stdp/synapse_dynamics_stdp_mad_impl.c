@@ -412,9 +412,7 @@ void synapse_dynamics_process_post_synaptic_event(
 }
 
 input_t synapse_dynamics_get_intrinsic_bias(
-        uint32_t time, index_t neuron_index) {
-    use(time);
-    use(neuron_index);
+        UNUSED uint32_t time, UNUSED index_t neuron_index) {
     return ZERO;
 }
 
