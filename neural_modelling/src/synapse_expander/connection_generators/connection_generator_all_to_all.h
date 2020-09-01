@@ -87,12 +87,10 @@ static void connection_generator_all_to_all_free(void *generator) {
  * \return The number of connections generated
  */
 static uint32_t connection_generator_all_to_all_generate(
-        void *generator, uint32_t pre_slice_start, uint32_t pre_slice_count,
+        void *generator, UNUSED uint32_t pre_slice_start,
+        UNUSED uint32_t pre_slice_count,
         uint32_t pre_neuron_index, uint32_t post_slice_start,
         uint32_t post_slice_count, uint32_t max_row_length, uint16_t *indices) {
-    use(pre_slice_start);
-    use(pre_slice_count);
-
     log_debug("Generating for %u", pre_neuron_index);
 
     struct all_to_all *obj = generator;

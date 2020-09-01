@@ -88,11 +88,8 @@ static void param_generator_uniform_free(void *generator) {
  *                     \p n_indices in size
  */
 static void param_generator_uniform_generate(
-        void *generator, uint32_t n_indices, uint32_t pre_neuron_index,
-        uint16_t *indices, accum *values) {
-    use(pre_neuron_index);
-    use(indices);
-
+        void *generator, uint32_t n_indices, UNUSED uint32_t pre_neuron_index,
+        UNUSED uint16_t *indices, accum *values) {
     // For each index, generate a uniformly distributed value
     struct param_generator_uniform *obj = generator;
     accum range = obj->params.high - obj->params.low;

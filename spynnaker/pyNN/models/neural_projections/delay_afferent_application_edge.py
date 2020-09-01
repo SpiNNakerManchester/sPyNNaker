@@ -15,10 +15,11 @@
 
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationEdge
+from pacman.model.partitioner_interfaces import AbstractSlicesConnect
 from .delay_afferent_machine_edge import DelayAfferentMachineEdge
 
 
-class DelayAfferentApplicationEdge(ApplicationEdge):
+class DelayAfferentApplicationEdge(ApplicationEdge, AbstractSlicesConnect):
     __slots__ = ()
 
     def __init__(self, pre_vertex, delay_vertex, label=None):
@@ -33,3 +34,8 @@ class DelayAfferentApplicationEdge(ApplicationEdge):
     @overrides(ApplicationEdge._create_machine_edge)
     def _create_machine_edge(self, pre_vertex, post_vertex, label):
         return DelayAfferentMachineEdge(pre_vertex, post_vertex, label, self)
+
+    @overrides(AbstractSlicesConnect.could_connect)
+    def could_connect(self, pre_slice, post_slice):
+        return ((pre_slice.lo_atom == post_slice.lo_atom) and
+                (post_slice.hi_atom == pre_slice.hi_atom))
