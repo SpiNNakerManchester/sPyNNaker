@@ -39,7 +39,7 @@ static uint32_t synapse_type_mask;
 
 bool synapse_dynamics_initialise(
         UNUSED address_t address, uint32_t n_neurons, uint32_t n_synapse_types,
-        UNUSED uint32_t *ring_buffer_to_input_buffer_left_shifts) {
+        UNUSED REAL *min_weights) {
     uint32_t n_neurons_power_2 = n_neurons;
     uint32_t log_n_neurons = 1;
     if (n_neurons != 1) {
