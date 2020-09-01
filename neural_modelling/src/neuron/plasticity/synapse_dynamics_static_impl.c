@@ -86,7 +86,7 @@ input_t synapse_dynamics_get_intrinsic_bias(
 void synapse_dynamics_print_plastic_synapses(
         UNUSED address_t plastic_region_address,
         UNUSED address_t fixed_region_address,
-        UNUSED uint32_t *ring_buffer_to_input_left_shifts) {
+        UNUSED REAL *min_weights) {
 }
 
 uint32_t synapse_dynamics_get_plastic_pre_synaptic_events(void) {
