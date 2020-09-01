@@ -33,11 +33,9 @@ struct additional_input_t {
 //!     parameters
 //! \param[in] membrane_voltage: The membrane voltage of the neuron
 //! \return The value of the input after scaling
-static input_t additional_input_get_input_value_as_current(
-        struct additional_input_t *additional_input,
-        state_t membrane_voltage) {
-    use(additional_input);
-    use(membrane_voltage);
+static inline input_t additional_input_get_input_value_as_current(
+        UNUSED struct additional_input_t *additional_input,
+        UNUSED state_t membrane_voltage) {
     return 0;
 }
 
@@ -45,9 +43,8 @@ static input_t additional_input_get_input_value_as_current(
 //! \details Does nothing
 //! \param[in] additional_input: The additional input type pointer to the
 //!     parameters
-static void additional_input_has_spiked(
-        struct additional_input_t *additional_input) {
-    use(additional_input);
+static inline void additional_input_has_spiked(
+        UNUSED struct additional_input_t *additional_input) {
 }
 
 #endif // _ADDITIONAL_INPUT_TYPE_NONE_H_

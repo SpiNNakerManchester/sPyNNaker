@@ -143,12 +143,9 @@ static inline pre_trace_t timing_add_pre_spike(
 //! \param[in] previous_state: the state to update
 //! \return the updated state
 static inline update_state_t timing_apply_pre_spike(
-        uint32_t time, pre_trace_t trace, uint32_t last_pre_time,
-        pre_trace_t last_pre_trace, uint32_t last_post_time,
+        uint32_t time, pre_trace_t trace, UNUSED uint32_t last_pre_time,
+        UNUSED pre_trace_t last_pre_trace, uint32_t last_post_time,
         post_trace_t last_post_trace, update_state_t previous_state) {
-    use(last_pre_time);
-    use(&last_pre_trace);
-
     // Get time of event relative to last post-synaptic event
     uint32_t time_since_last_post = time - last_post_time;
     int32_t decayed_o1 = STDP_FIXED_MUL_16X16(last_post_trace.o1,
@@ -178,11 +175,8 @@ static inline update_state_t timing_apply_pre_spike(
 //! \return the updated state
 static inline update_state_t timing_apply_post_spike(
         uint32_t time, post_trace_t trace, uint32_t last_pre_time,
-        pre_trace_t last_pre_trace, uint32_t last_post_time,
-        post_trace_t last_post_trace, update_state_t previous_state) {
-    use(last_post_time);
-    use(&last_post_trace);
-
+        pre_trace_t last_pre_trace, UNUSED uint32_t last_post_time,
+        UNUSED post_trace_t last_post_trace, update_state_t previous_state) {
     // Get time of event relative to last pre-synaptic event
     uint32_t time_since_last_pre = time - last_pre_time;
     if (time_since_last_pre > 0) {

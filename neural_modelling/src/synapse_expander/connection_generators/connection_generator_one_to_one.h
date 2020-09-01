@@ -81,13 +81,10 @@ static void connection_generator_one_to_one_free(void *generator) {
  * \return The number of connections generated
  */
 static uint32_t connection_generator_one_to_one_generate(
-        void *generator, uint32_t pre_slice_start, uint32_t pre_slice_count,
-        uint32_t pre_neuron_index, uint32_t post_slice_start,
-        uint32_t post_slice_count, uint32_t max_row_length, uint16_t *indices) {
-    use(post_slice_count);
-    use(pre_slice_start);
-    use(pre_slice_count);
-
+        void *generator, UNUSED uint32_t pre_slice_start,
+        UNUSED uint32_t pre_slice_count, uint32_t pre_neuron_index,
+        uint32_t post_slice_start, UNUSED uint32_t post_slice_count,
+        uint32_t max_row_length, uint16_t *indices) {
     struct one_to_one *obj = generator;
     log_debug("pre_neuron_index %u", pre_neuron_index);
 
