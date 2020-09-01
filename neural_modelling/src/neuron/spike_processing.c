@@ -339,7 +339,7 @@ static void multicast_packet_received_callback(uint key, uint payload) {
     // cycle through the packet insertion
     for (uint count = 0; count < payload; count++) {
         if (! in_spikes_add_spike(key)) {
-            log_info("Could not add spike");
+            log_debug("Could not add spike");
         }
     }
 

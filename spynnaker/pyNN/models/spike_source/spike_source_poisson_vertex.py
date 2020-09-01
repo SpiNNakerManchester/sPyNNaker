@@ -779,7 +779,6 @@ class SpikeSourcePoissonVertex(
         final_data = numpy.concatenate([
             numpy.concatenate(([len(d), indices[i]], numpy.concatenate(d)))
             for i, d in enumerate(core_data_split[:-1])])
-        print(final_data)
         spec.write_array(final_data)
 
     @staticmethod
