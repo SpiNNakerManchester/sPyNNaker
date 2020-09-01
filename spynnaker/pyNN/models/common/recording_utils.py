@@ -19,25 +19,37 @@ import struct
 import numpy
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
 from spynnaker.pyNN.exceptions import MemReadException
 
 logger = logging.getLogger(__name__)
 _RECORDING_COUNT = struct.Struct("<I")
+_SEEK_END = 2  # Define here for Py2.7 compatibility
 
 
 def get_recording_region_size_in_bytes(
         n_machine_time_steps, bytes_per_timestep):
-    """ Get the size of a recording region in bytes
+    """ Get the size of a recording region in bytes.
+
+    :param int n_machine_time_steps:
+    :param int bytes_per_timestep:
+    :rtype: int
     """
     if n_machine_time_steps is None:
         raise Exception(
             "Cannot record this parameter without a fixed run time")
     return ((n_machine_time_steps * bytes_per_timestep) +
-            (n_machine_time_steps * 4))
+            (n_machine_time_steps * BYTES_PER_WORD))
 
 
 def get_data(transceiver, placement, region, region_size):
-    """ Get the recorded data from a region
+    """ Get the recorded data from a region.
+
+    :param ~spinnman.transceiver.Transceiver transceiver:
+    :param ~pacman.model.placements.Placement placement:
+    :param int region:
+    :param int region_size:
+    :rtype: tuple(bytearray, int)
     """
 
     region_base_address = locate_memory_region_for_placement(
@@ -45,10 +57,10 @@ def get_data(transceiver, placement, region, region_size):
     number_of_bytes_written = _RECORDING_COUNT.unpack_from(
         transceiver.read_memory(
             placement.x, placement.y, region_base_address,
-            _RECORDING_COUNT.size))[0]
+            BYTES_PER_WORD))[0]
 
     # Subtract 4 for the word representing the size itself
-    expected_size = region_size - _RECORDING_COUNT.size
+    expected_size = region_size - BYTES_PER_WORD
     if number_of_bytes_written > expected_size:
         raise MemReadException(
             "Expected {} bytes but read {}".format(
@@ -56,23 +68,24 @@ def get_data(transceiver, placement, region, region_size):
 
     return (
         transceiver.read_memory(
-            placement.x, placement.y, region_base_address + 4,
+            placement.x, placement.y, region_base_address + BYTES_PER_WORD,
             number_of_bytes_written),
         number_of_bytes_written)
 
 
 def pull_off_cached_lists(no_loads, cache_file):
-    """ Extracts numpy based data from a  file
+    """ Extracts numpy based data from a file
 
-    :param no_loads: the number of numpy elements in the file
-    :param cache_file: the file to extract from
+    :param int no_loads: the number of numpy elements in the file
+    :param ~io.FileIO cache_file: the file to extract from
     :return: The extracted data
+    :rtype: ~numpy.ndarray
     """
     cache_file.seek(0)
     if no_loads == 1:
         values = numpy.load(cache_file)
         # Seek to the end of the file (for windows compatibility)
-        cache_file.seek(0, 2)
+        cache_file.seek(0, _SEEK_END)
         return values
     elif no_loads == 0:
         return []
@@ -81,11 +94,17 @@ def pull_off_cached_lists(no_loads, cache_file):
     for _ in range(0, no_loads):
         lists.append(numpy.load(cache_file))
     # Seek to the end of the file (for windows compatibility)
-    cache_file.seek(0, 2)
+    cache_file.seek(0, _SEEK_END)
     return numpy.concatenate(lists)
 
 
 def needs_buffering(buffer_max, space_needed, enable_buffered_recording):
+    """
+    :param int buffer_max:
+    :param int space_needed:
+    :param bool enable_buffered_recording:
+    :rtype: bool
+    """
     if space_needed == 0:
         return False
     if not enable_buffered_recording:
@@ -96,6 +115,12 @@ def needs_buffering(buffer_max, space_needed, enable_buffered_recording):
 
 
 def get_buffer_sizes(buffer_max, space_needed, enable_buffered_recording):
+    """
+    :param int buffer_max:
+    :param int space_needed:
+    :param bool enable_buffered_recording:
+    :rtype: int
+    """
     if space_needed == 0:
         return 0
     if not enable_buffered_recording:
@@ -106,6 +131,10 @@ def get_buffer_sizes(buffer_max, space_needed, enable_buffered_recording):
 
 
 def make_missing_string(missing):
+    """
+    :param iterable(~pacman.model.placements.Placement) missing:
+    :rtype: str
+    """
     missing_str = ""
     separator = ""
     for placement in missing:

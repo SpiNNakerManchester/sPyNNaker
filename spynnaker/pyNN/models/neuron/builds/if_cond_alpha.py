@@ -20,6 +20,10 @@ from spynnaker.pyNN.models.defaults import defaults, default_initial_values
 @defaults
 class IFCondAlpha(object):
     """ Leaky integrate and fire neuron with an alpha-shaped current input.
+
+    .. warning::
+
+        Not currently supported by the tool chain.
     """
 
     # noinspection PyPep8Naming

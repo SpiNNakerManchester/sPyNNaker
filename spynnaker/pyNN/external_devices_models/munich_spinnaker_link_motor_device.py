@@ -18,23 +18,22 @@ from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.constraints.key_allocator_constraints import (
     FixedMaskConstraint)
-from pacman.model.graphs.machine import SimpleMachineVertex
 from pacman.model.graphs.application import (
     ApplicationSpiNNakerLinkVertex, ApplicationVertex)
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
 from spinn_front_end_common.abstract_models import (
-    AbstractGeneratesDataSpecification, AbstractHasAssociatedBinary,
+    AbstractGeneratesDataSpecification,
     AbstractProvidesOutgoingPartitionConstraints,
     AbstractVertexWithEdgeToDependentVertices)
 from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl)
 from spinn_front_end_common.interface.simulation import simulation_utilities
-from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.utilities.constants import (
-    SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES)
+    SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES, BYTES_PER_WORD)
 from spynnaker.pyNN.exceptions import SpynnakerException
 from spynnaker.pyNN.models.defaults import defaults
+from .machine_munich_motor_device import MachineMunichMotorDevice
 
 logger = logging.getLogger(__name__)
 MOTOR_PARTITION_ID = "MOTOR"
@@ -53,11 +52,11 @@ class _MunichMotorDevice(ApplicationSpiNNakerLinkVertex):
 @defaults
 class MunichMotorDevice(
         ApplicationVertex, AbstractVertexWithEdgeToDependentVertices,
-        AbstractGeneratesDataSpecification, AbstractHasAssociatedBinary,
+        AbstractGeneratesDataSpecification,
         AbstractProvidesOutgoingPartitionConstraints,
         ProvidesKeyToAtomMappingImpl):
-    """ An Omnibot motor control device - has a real vertex and an external\
-        device vertex
+    """ An Omnibot motor control device. This has a real vertex and an \
+        external device vertex.
     """
     __slots__ = [
         "__continue_if_not_different",
@@ -71,12 +70,24 @@ class MunichMotorDevice(
     SYSTEM_REGION = 0
     PARAMS_REGION = 1
 
-    PARAMS_SIZE = 7 * 4
+    PARAMS_SIZE = 7 * BYTES_PER_WORD
 
     def __init__(
             self, spinnaker_link_id, board_address=None, speed=30,
             sample_time=4096, update_time=512, delay_time=5,
             delta_threshold=23, continue_if_not_different=True, label=None):
+        """
+        :param int spinnaker_link_id:
+            The SpiNNaker link to which the motor is connected
+        :param str board_address:
+        :param int speed:
+        :param int sample_time:
+        :param int update_time:
+        :param int delay_time:
+        :param int delta_threshold:
+        :param bool continue_if_not_different:
+        :param str label:
+        """
         # pylint: disable=too-many-arguments
 
         super(MunichMotorDevice, self).__init__(label)
@@ -98,8 +109,8 @@ class MunichMotorDevice(
     @overrides(ApplicationVertex.create_machine_vertex)
     def create_machine_vertex(self, vertex_slice, resources_required,
                               label=None, constraints=None):
-        return SimpleMachineVertex(
-            resources_required, label, constraints)
+        return MachineMunichMotorDevice(
+            resources_required, label, constraints, self, vertex_slice)
 
     @overrides(ApplicationVertex.get_resources_used_by_atoms)
     def get_resources_used_by_atoms(self, vertex_slice):
@@ -141,7 +152,7 @@ class MunichMotorDevice(
         # handle simulation data
         spec.switch_write_focus(self.SYSTEM_REGION)
         spec.write_array(simulation_utilities.get_simulation_header_array(
-            self.get_binary_file_name(), machine_time_step,
+            placement.vertex.get_binary_file_name(), machine_time_step,
             time_scale_factor))
 
         # Get the key
@@ -164,19 +175,15 @@ class MunichMotorDevice(
         # End-of-Spec:
         spec.end_specification()
 
-    @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
-    def get_binary_file_name(self):
-        return "robot_motor_control.aplx"
-
-    @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
-    def get_binary_start_type(self):
-        return ExecutableType.USES_SIMULATION_INTERFACE
-
     def reserve_memory_regions(self, spec):
         """ Reserve SDRAM space for memory areas:
-        1) Area for information on what data to record
-        2) area for start commands
-        3) area for end commands
+
+        #. Area for information on what data to record
+        #. area for start commands
+        #. area for end commands
+
+        :param spec: The data specification to write to
+        :type spec: ~data_specification.DataSpecificationGenerator
         """
         spec.comment("\nReserving memory space for data regions:\n\n")
 

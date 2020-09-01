@@ -15,27 +15,48 @@
 
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationEdge
+from pacman.model.partitioner_interfaces import AbstractSlicesConnect
 from .delayed_machine_edge import DelayedMachineEdge
 
 
-class DelayedApplicationEdge(ApplicationEdge):
+class DelayedApplicationEdge(ApplicationEdge, AbstractSlicesConnect):
     __slots__ = [
         "__synapse_information"]
 
     def __init__(
             self, pre_vertex, post_vertex, synapse_information, label=None):
+        """
+        :param DelayExtensionVertex pre_vertex:
+        :param AbstractPopulationVertex post_vertex:
+        :param SynapseInformation synapse_information:
+        :param str label:
+        """
         super(DelayedApplicationEdge, self).__init__(
             pre_vertex, post_vertex, label=label)
         self.__synapse_information = [synapse_information]
 
     @property
     def synapse_information(self):
+        """
+        :rtype: list(SynapseInformation)
+        """
         return self.__synapse_information
 
     def add_synapse_information(self, synapse_information):
+        """
+        :param SynapseInformation synapse_information:
+        """
         self.__synapse_information.append(synapse_information)
 
-    @overrides(ApplicationEdge.create_machine_edge)
-    def create_machine_edge(self, pre_vertex, post_vertex, label):
+    @overrides(ApplicationEdge._create_machine_edge)
+    def _create_machine_edge(self, pre_vertex, post_vertex, label):
         return DelayedMachineEdge(
-            self.__synapse_information, pre_vertex, post_vertex, label)
+            self.__synapse_information, pre_vertex, post_vertex, self, label)
+
+    @overrides(AbstractSlicesConnect.could_connect)
+    def could_connect(self, pre_slice, post_slice):
+        for synapse_info in self.__synapse_information:
+            if synapse_info.connector.could_connect(
+                    synapse_info, pre_slice, post_slice):
+                return True
+        return False

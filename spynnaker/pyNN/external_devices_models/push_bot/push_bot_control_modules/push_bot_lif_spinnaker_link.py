@@ -23,6 +23,22 @@ logger = logging.getLogger(__name__)
 
 class PushBotLifSpinnakerLink(ExternalDeviceLifControl):
     """ Control module for a PushBot connected to a SpiNNaker Link
+
+    :param MunichIoSpiNNakerLinkProtocol protocol:
+        How to talk to the bot.
+    :param iterable(AbstractMulticastControllableDevice) devices:
+        The devices on the bot that we are interested in.
+    :param float tau_m: LIF neuron parameter (defaulted)
+    :param float cm: LIF neuron parameter (defaulted)
+    :param float v_rest: LIF neuron parameter (defaulted)
+    :param float v_reset: LIF neuron parameter (defaulted)
+    :param float tau_syn_E: LIF neuron parameter (defaulted)
+    :param float tau_syn_I: LIF neuron parameter (defaulted)
+    :param float tau_refrac: LIF neuron parameter (defaulted)
+    :param float i_offset: LIF neuron parameter (defaulted)
+    :param float v: LIF neuron parameter (defaulted)
+    :param float isyn_exc: LIF neuron parameter (defaulted)
+    :param float isyn_inh: LIF neuron parameter (defaulted)
     """
     __slots__ = []
 
@@ -33,7 +49,7 @@ class PushBotLifSpinnakerLink(ExternalDeviceLifControl):
             # default params for the neuron model type
             tau_m=20.0, cm=1.0, v_rest=0.0, v_reset=0.0, tau_syn_E=5.0,
             tau_syn_I=5.0, tau_refrac=0.1, i_offset=0.0, v=0.0,
-            isyn_inh=0.0, isyn_exc=0.0):
+            isyn_exc=0.0, isyn_inh=0.0):
         # pylint: disable=too-many-arguments, too-many-locals
 
         command_protocol = MunichIoSpiNNakerLinkProtocol(
@@ -44,4 +60,4 @@ class PushBotLifSpinnakerLink(ExternalDeviceLifControl):
         # Initialise the abstract LIF class
         super(PushBotLifSpinnakerLink, self).__init__(
             devices, True, None, tau_m, cm, v_rest, v_reset,
-            tau_syn_E, tau_syn_I, tau_refrac, i_offset, v, isyn_inh, isyn_exc)
+            tau_syn_E, tau_syn_I, tau_refrac, i_offset, v, isyn_exc, isyn_inh)

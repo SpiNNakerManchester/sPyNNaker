@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Spike processing API
 #ifndef _SPIKE_PROCESSING_H_
 #define _SPIKE_PROCESSING_H_
 
@@ -22,54 +24,46 @@
 #include <common/in_spikes.h>
 #include <spin1_api.h>
 
+//! \brief Initialise the spike processing system
+//! \param[in] row_max_n_bytes: The maximum size of a synaptic row
+//! \param[in] mc_packet_callback_priority:
+//!     Multicast packet receive interrupt priority
+//! \param[in] user_event_priority: User event interrupt priority
+//! \param[in] incoming_spike_buffer_size: Size of buffer for receiving spikes
+//! \return True if initialisation succeeded
 bool spike_processing_initialise(
         size_t row_max_n_bytes, uint mc_packet_callback_priority,
         uint user_event_priority, uint incoming_spike_buffer_size);
 
-void spike_processing_finish_write(uint32_t process_id);
-
-//! \brief returns the number of times the input buffer has overflowed
+//! \brief Gets the number of times the input buffer has overflowed
 //! \return the number of times the input buffer has overflowed
 uint32_t spike_processing_get_buffer_overflows(void);
 
-//! DMA buffer structure combines the row read from SDRAM with
-typedef struct dma_buffer {
-    // Address in SDRAM to write back plastic region to
-    address_t sdram_writeback_address;
+//! \brief Gets the number of ghost searches of the master population table
+//!     that occurred
+//! \return the number of times a ghost search occurred.
+uint32_t spike_processing_get_ghost_pop_table_searches(void);
 
-    // Key of originating spike
-    // (used to allow row data to be re-used for multiple spikes)
-    spike_t originating_spike;
+//! \brief Gets the number of DMA's that were completed
+//! \return the number of DMA's that were completed.
+uint32_t spike_processing_get_dma_complete_count(void);
 
-    uint32_t n_bytes_transferred;
+//! \brief Gets the number of spikes that were processed
+//! \return the number of spikes that were processed
+uint32_t spike_processing_get_spike_processing_count(void);
 
-    // Row data
-    uint32_t *row;
-} dma_buffer;
+//! \brief Gets the number of master population table searches that failed to
+//!     find a hit.
+//! \return the number of times a spike did not have a master pop table entry
+uint32_t spike_processing_get_invalid_master_pop_table_hits(void);
 
-//! \brief get the address of the circular buffer used for buffering received
-//! spikes before processing them
-//! \return address of circular buffer
-circular_buffer get_circular_buffer(void);
+//! \brief Gets the number of successful rewires performed
+//! \return the number of successful rewires
+uint32_t spike_processing_get_successful_rewires(void);
 
-//! \brief set the DMA status
-//! \param[in] busy: bool
-//! \return None
-void set_dma_busy(bool busy);
-
-//! \brief retrieve the DMA status
-//! \return bool
-bool get_dma_busy(void);
-
-//! \brief set the number of times spike_processing has to attempt rewiring
-//! \return bool: currently, always true
-bool do_rewiring(int number_of_rew);
-
-//! exposing this so that other classes can call it
-void setup_synaptic_dma_read(void);
-
-//! \brief has this core received any spikes since the last batch of rewires?
-//! \return bool
-bool received_any_spike(void);
+//! \brief Set the number of times spike_processing has to attempt rewiring.
+//! \param[in] number_of_rewires: The number of rewirings to perform
+//! \return currently always true
+bool spike_processing_do_rewiring(int number_of_rewires);
 
 #endif // _SPIKE_PROCESSING_H_

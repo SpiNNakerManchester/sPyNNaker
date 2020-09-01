@@ -13,10 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-try:
-    from collections.abc import OrderedDict
-except ImportError:
-    from collections import OrderedDict
+from collections import OrderedDict
 import logging
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
@@ -57,16 +54,24 @@ class ExternalDeviceLifControlVertex(
             ring_buffer_sigma=None, incoming_spike_buffer_size=None,
             constraints=None):
         """
-        :param n_neurons: The number of neurons in the population
-        :param devices:\
-            The AbstractMulticastControllableDevice instances to be controlled\
+        :param list(AbstractMulticastControllableDevice) devices:
+            The AbstractMulticastControllableDevice instances to be controlled
             by the population
-        :param create_edges:\
-            True if edges to the devices should be added by this dev (set\
+        :param bool create_edges:
+            True if edges to the devices should be added by this dev (set
             to False if using the dev over Ethernet using a translator)
-        :param translator:\
-            Translator to be used when used for Ethernet communication.  Must\
+        :param int max_atoms_per_core:
+        :param AbstractNeuronImpl neuron_impl:
+        :param pynn_model:
+        :param translator:
+            Translator to be used when used for Ethernet communication.  Must
             be provided if the dev is to be controlled over Ethernet.
+        :type translator: AbstractEthernetTranslator or None
+        :param float spikes_per_second:
+        :param str label:
+        :param float ring_buffer_sigma:
+        :param int incoming_spike_buffer_size:
+        :param list(~pacman.model.constraints.AbstractConstraint) constraints:
         """
         # pylint: disable=too-many-arguments, too-many-locals
 
@@ -77,6 +82,11 @@ class ExternalDeviceLifControlVertex(
         self.__partition_id_to_key = OrderedDict(
             (str(dev.device_control_partition_id), dev.device_control_key)
             for dev in devices)
+
+        # Check for same partition name
+        if len(self.__partition_id_to_key) != len(devices):
+            raise Exception(
+                "Partition names for each device must be different")
 
         # Create a partition to atom map
         self.__partition_id_to_atom = {

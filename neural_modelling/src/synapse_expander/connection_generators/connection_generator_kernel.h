@@ -16,8 +16,8 @@
  */
 
 /**
- *! \file
- *! \brief Kernel connection generator implementation
+ * \file
+ * \brief Kernel connection generator implementation
  */
 
 #include <stdbool.h>
@@ -25,40 +25,56 @@
 #include <synapse_expander/common_mem.h>
 #include <synapse_expander/generator_types.h>
 
-static initialize_func connection_generator_kernel_initialise;
-static free_func connection_generator_kernel_free;
-static generate_connection_func connection_generator_kernel_generate;
-
 /**
- *! \brief The parameters to be passed around for this connector
+ * \brief The parameters to be passed around for this connector
  */
 struct kernel {
 	// put in the relevant kernel connector parameters here
     uint16_t commonWidth;
     uint16_t commonHeight;
 
+    //! Prepopulation grid width
     uint16_t preWidth;
+    //! Prepopulation grid height
     uint16_t preHeight;
+    //! Postpopulation grid width
     uint16_t postWidth;
+    //! Postpopulation grid height
     uint16_t postHeight;
 
+    //! Prepopulation grid X offset
     uint16_t startPreWidth;
+    //! Prepopulation grid Y offset
     uint16_t startPreHeight;
+    //! Postpopulation grid X offset
     uint16_t startPostWidth;
+    //! Postpopulation grid Y offset
     uint16_t startPostHeight;
 
+    //! Prepopulation grid X step
     uint16_t stepPreWidth;
+    //! Prepopulation grid Y step
     uint16_t stepPreHeight;
+    //! Postpopulation grid X step
     uint16_t stepPostWidth;
+    //! Postpopulation grid Y step
     uint16_t stepPostHeight;
 
+    //! Convolution kernel grid width
     uint16_t kernelWidth;
+    //! Convolution kernel grid height
     uint16_t kernelHeight;
 
     // any further parameters required would go here
     // uint32_t allow_self_connections;
 };
 
+/**
+ * \brief Initialise the convolution-kernel connection generator
+ * \param[in,out] region: Region to read parameters from.  Should be updated
+ *                        to position just after parameters after calling.
+ * \return A data item to be passed in to other functions later on
+ */
 static void *connection_generator_kernel_initialise(address_t *region) {
     // Allocate the data structure for parameters
     struct kernel *obj = spin1_malloc(sizeof(struct kernel));
@@ -75,17 +91,38 @@ static void *connection_generator_kernel_initialise(address_t *region) {
     return obj;
 }
 
-static void connection_generator_kernel_free(void *data) {
-    sark_free(data);
+/**
+ * \brief Free the convolution-kernel connection generator
+ * \param[in] generator: The generator to free
+ */
+static void connection_generator_kernel_free(void *generator) {
+    sark_free(generator);
 }
 
+/**
+ * \brief Generate connections with the convolution-kernel connection generator
+ * \param[in] generator: The generator to use to generate connections
+ * \param[in] pre_slice_start: The start of the slice of the pre-population
+ *                             being generated
+ * \param[in] pre_slice_count: The number of neurons in the slice of the
+ *                             pre-population being generated
+ * \param[in] pre_neuron_index: The index of the neuron in the pre-population
+ *                              being generated
+ * \param[in] post_slice_start: The start of the slice of the post-population
+ *                              being generated
+ * \param[in] post_slice_count: The number of neurons in the slice of the
+ *                              post-population being generated
+ * \param[in] max_row_length: The maximum number of connections to generate
+ * \param[in,out] indices: An array into which the core-relative post-indices
+ *                         should be placed.  This will be initialised to be
+ *                         \p max_row_length in size
+ * \return The number of connections generated
+ */
 static uint32_t connection_generator_kernel_generate(
-        void *data, uint32_t pre_slice_start, uint32_t pre_slice_count,
+        void *generator, UNUSED uint32_t pre_slice_start,
+        UNUSED uint32_t pre_slice_count,
         uint32_t pre_neuron_index, uint32_t post_slice_start,
         uint32_t post_slice_count, uint32_t max_row_length, uint16_t *indices) {
-    use(pre_slice_start);
-    use(pre_slice_count);
-
     log_debug("Generating for %u", pre_neuron_index);
 
     // If no space, generate nothing
@@ -93,7 +130,7 @@ static uint32_t connection_generator_kernel_generate(
     	return 0;
     }
 
-    struct kernel *obj = data;
+    struct kernel *obj = generator;
 
     // start n_conns at zero
     uint32_t n_conns = 0;

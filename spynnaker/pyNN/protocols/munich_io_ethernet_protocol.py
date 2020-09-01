@@ -14,6 +14,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+def _clamp(a, b, c):
+    """ Force `b` to be between `a` and `c`. `a` must be no larger than `c`.
+    """
+    return max(a, min(b, c))
+
+
 def _active_time_for_frequency(frequency):
     if frequency > 0:
         return int(1000000.0 / float(frequency))
@@ -21,6 +27,9 @@ def _active_time_for_frequency(frequency):
 
 
 class MunichIoEthernetProtocol(object):
+    """ Implementation of the Munich robot IO protocol, communicating over
+        ethernet.
+    """
 
     def __init__(self):
         # Nothing to do here
@@ -28,11 +37,11 @@ class MunichIoEthernetProtocol(object):
 
     @staticmethod
     def enable_retina():
-        return "E+\n".encode("ascii")
+        return b"E+\n"
 
     @staticmethod
     def disable_retina():
-        return "E-\n".encode("ascii")
+        return b"E-\n"
 
     @staticmethod
     def set_retina_transmission(event_format):
@@ -40,43 +49,31 @@ class MunichIoEthernetProtocol(object):
 
     @staticmethod
     def disable_motor():
-        return "!M-\n".encode("ascii")
+        return b"!M-\n"
 
     @staticmethod
     def enable_motor():
-        return "!M+\n".encode("ascii")
+        return b"!M+\n"
 
     @staticmethod
     def motor_0_permanent_velocity(velocity):
-        if velocity >= 100:
-            velocity = 100
-        if velocity < -100:
-            velocity = -100
-        return "!MV0={}\n".format(velocity).encode("ascii")
+        return "!MV0={}\n".format(
+            _clamp(-100, velocity, 100)).encode("ascii")
 
     @staticmethod
     def motor_1_permanent_velocity(velocity):
-        if velocity >= 100:
-            velocity = 100
-        if velocity < -100:
-            velocity = -100
-        return "!MV1={}\n".format(velocity).encode("ascii")
+        return "!MV1={}\n".format(
+            _clamp(-100, velocity, 100)).encode("ascii")
 
     @staticmethod
     def motor_0_leaky_velocity(velocity):
-        if velocity >= 100:
-            velocity = 100
-        if velocity < -100:
-            velocity = -100
-        return "!MVD0={}\n".format(velocity).encode("ascii")
+        return "!MVD0={}\n".format(
+            _clamp(-100, velocity, 100)).encode("ascii")
 
     @staticmethod
     def motor_1_leaky_velocity(velocity):
-        if velocity >= 100:
-            velocity = 100
-        if velocity < -100:
-            velocity = -100
-        return "!MVD1={}\n".format(velocity).encode("ascii")
+        return "!MVD1={}\n".format(
+            _clamp(-100, velocity, 100)).encode("ascii")
 
     @staticmethod
     def led_total_period(total_period):

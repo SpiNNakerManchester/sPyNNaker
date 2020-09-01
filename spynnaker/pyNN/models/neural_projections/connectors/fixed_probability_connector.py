@@ -13,7 +13,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import decimal
 import math
 import numpy
 from spinn_utilities.overrides import overrides
@@ -23,9 +22,15 @@ from spynnaker.pyNN.utilities import utility_calls
 from .abstract_connector import AbstractConnector
 from .abstract_generate_connector_on_machine import (
     AbstractGenerateConnectorOnMachine, ConnectorIDs)
+from .abstract_connector_supports_views_on_machine import (
+    AbstractConnectorSupportsViewsOnMachine)
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+
+N_GEN_PARAMS = 6
 
 
-class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
+class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine,
+                                AbstractConnectorSupportsViewsOnMachine):
     """ For each pair of pre-post cells, the connection probability is constant.
     """
 
@@ -35,22 +40,24 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
 
     def __init__(
             self, p_connect, allow_self_connections=True, safe=True,
-            verbose=False, rng=None):
+            callback=None, verbose=False, rng=None):
         """
-        :param p_connect:
+        :param float p_connect:
             a float between zero and one. Each potential connection is created\
             with this probability.
-        :type p_connect: float
-        :param allow_self_connections:
+        :param bool allow_self_connections:
             if the connector is used to connect a Population to itself, this\
             flag determines whether a neuron is allowed to connect to itself,\
             or only to other neurons in the Population.
-        :type allow_self_connections: bool
-        :param `pyNN.Space` space:
-            a Space object, needed if you wish to specify distance-dependent\
-            weights or delays - not implemented
+        :param bool safe:
+        :param callable callback: Ignored
+        :param bool verbose:
+        :param rng:
+            Seeded random number generator, or None to make one when needed
+        :type rng: ~pyNN.random.NumpyRNG or None
         """
-        super(FixedProbabilityConnector, self).__init__(safe, verbose)
+        super(FixedProbabilityConnector, self).__init__(
+            safe, callback, verbose)
         self._p_connect = p_connect
         self.__allow_self_connections = allow_self_connections
         self._rng = rng
@@ -59,48 +66,52 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
                 "The probability must be between 0 and 1 (inclusive)")
 
     @overrides(AbstractConnector.get_delay_maximum)
-    def get_delay_maximum(self, delays):
+    def get_delay_maximum(self, synapse_info):
         n_connections = utility_calls.get_probable_maximum_selected(
-            self._n_pre_neurons * self._n_post_neurons,
-            self._n_pre_neurons * self._n_post_neurons, self._p_connect)
-        return self._get_delay_maximum(delays, n_connections)
+            synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
+            synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
+            self._p_connect)
+        return self._get_delay_maximum(synapse_info.delays, n_connections)
 
     @overrides(AbstractConnector.get_n_connections_from_pre_vertex_maximum)
     def get_n_connections_from_pre_vertex_maximum(
-            self, delays, post_vertex_slice, min_delay=None, max_delay=None):
+            self, post_vertex_slice, synapse_info, min_delay=None,
+            max_delay=None):
         # pylint: disable=too-many-arguments
         n_connections = utility_calls.get_probable_maximum_selected(
-            self._n_pre_neurons * self._n_post_neurons,
+            synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             post_vertex_slice.n_atoms, self._p_connect, chance=1.0/10000.0)
 
         if min_delay is None or max_delay is None:
             return int(math.ceil(n_connections))
 
         return self._get_n_connections_from_pre_vertex_with_delay_maximum(
-            delays, self._n_pre_neurons * self._n_post_neurons,
+            synapse_info.delays,
+            synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
             n_connections, min_delay, max_delay)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
-    def get_n_connections_to_post_vertex_maximum(self):
+    def get_n_connections_to_post_vertex_maximum(self, synapse_info):
         # pylint: disable=too-many-arguments
         n_connections = utility_calls.get_probable_maximum_selected(
-            self._n_pre_neurons * self._n_post_neurons,
-            self._n_pre_neurons, self._p_connect, chance=1.0/10000.0)
+            synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
+            synapse_info.n_pre_neurons, self._p_connect,
+            chance=1.0/10000.0)
         return n_connections
 
     @overrides(AbstractConnector.get_weight_maximum)
-    def get_weight_maximum(self, weights):
+    def get_weight_maximum(self, synapse_info):
         # pylint: disable=too-many-arguments
         n_connections = utility_calls.get_probable_maximum_selected(
-            self._n_pre_neurons * self._n_post_neurons,
-            self._n_pre_neurons * self._n_post_neurons, self._p_connect)
-        return self._get_weight_maximum(weights, n_connections)
+            synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
+            synapse_info.n_pre_neurons * synapse_info.n_post_neurons,
+            self._p_connect)
+        return self._get_weight_maximum(synapse_info.weights, n_connections)
 
     @overrides(AbstractConnector.create_synaptic_block)
     def create_synaptic_block(
-            self, weights, delays, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type):
+            self, pre_slices, pre_slice_index, post_slices, post_slice_index,
+            pre_vertex_slice, post_vertex_slice, synapse_type, synapse_info):
         # pylint: disable=too-many-arguments
         n_items = pre_vertex_slice.n_atoms * post_vertex_slice.n_atoms
         items = self._rng.next(n_items)
@@ -120,9 +131,11 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
         block["target"] = (
             (ids % post_vertex_slice.n_atoms) + post_vertex_slice.lo_atom)
         block["weight"] = self._generate_weights(
-            weights, n_connections, None, pre_vertex_slice, post_vertex_slice)
+            n_connections, None, pre_vertex_slice, post_vertex_slice,
+            synapse_info)
         block["delay"] = self._generate_delays(
-            delays, n_connections, None, pre_vertex_slice, post_vertex_slice)
+            n_connections, None, pre_vertex_slice, post_vertex_slice,
+            synapse_info)
         block["synapse_type"] = synapse_type
         return block
 
@@ -134,28 +147,25 @@ class FixedProbabilityConnector(AbstractGenerateConnectorOnMachine):
     def gen_connector_id(self):
         return ConnectorIDs.FIXED_PROBABILITY_CONNECTOR.value
 
-    @overrides(AbstractGenerateConnectorOnMachine.
-               gen_connector_params)
+    @overrides(AbstractGenerateConnectorOnMachine.gen_connector_params)
     def gen_connector_params(
-            self, pre_slices, pre_slice_index, post_slices,
-            post_slice_index, pre_vertex_slice, post_vertex_slice,
-            synapse_type):
-        prob_value = round(decimal.Decimal(
-            str(self._p_connect)) * DataType.U032.scale)
+            self, pre_slices, pre_slice_index, post_slices, post_slice_index,
+            pre_vertex_slice, post_vertex_slice, synapse_type, synapse_info):
+        params = self._basic_connector_params(synapse_info)
+        params.append(self.__allow_self_connections)
+
         # If prob=1.0 has been specified, take care when scaling value to
         # ensure that it doesn't wrap round to zero as an unsigned long fract
-        if (self._p_connect == 1.0):
-            prob_value = round(decimal.Decimal(
-                str(self._p_connect)) * (DataType.U032.scale - 1))
-        params = [
-            self.__allow_self_connections,
-            prob_value]
+        params.append(DataType.U032.encode_as_int(
+            DataType.U032.max if self._p_connect == 1.0 else self._p_connect))
+
         params.extend(self._get_connector_seed(
             pre_vertex_slice, post_vertex_slice, self._rng))
         return numpy.array(params, dtype="uint32")
 
     @property
-    @overrides(AbstractGenerateConnectorOnMachine.
-               gen_connector_params_size_in_bytes)
+    @overrides(
+        AbstractGenerateConnectorOnMachine.gen_connector_params_size_in_bytes)
     def gen_connector_params_size_in_bytes(self):
-        return 8 + 16
+        # view + params + seeds
+        return self._view_params_bytes + (N_GEN_PARAMS * BYTES_PER_WORD)

@@ -18,7 +18,8 @@ from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.graphs.machine import MachineVertex
 from spinn_front_end_common.abstract_models import (
-    AbstractSupportsDatabaseInjection, AbstractRecordable)
+    AbstractHasAssociatedBinary, AbstractSupportsDatabaseInjection,
+    AbstractRecordable)
 from spinn_front_end_common.interface.provenance import (
     ProvidesProvenanceDataFromMachineImpl)
 from spinn_front_end_common.interface.buffer_management.buffer_models import (
@@ -26,6 +27,7 @@ from spinn_front_end_common.interface.buffer_management.buffer_models import (
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
+from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.interface.profiling import AbstractHasProfileData
 from spinn_front_end_common.interface.profiling.profile_utils import (
     get_profiling_data)
@@ -36,21 +38,21 @@ from spynnaker.pyNN.utilities.constants import (
 class SpikeSourcePoissonMachineVertex(
         MachineVertex, AbstractReceiveBuffersToHost,
         ProvidesProvenanceDataFromMachineImpl, AbstractRecordable,
-        AbstractSupportsDatabaseInjection, AbstractHasProfileData):
-
+        AbstractSupportsDatabaseInjection, AbstractHasProfileData,
+        AbstractHasAssociatedBinary):
     __slots__ = [
         "__buffered_sdram_per_timestep",
         "__is_recording",
         "__minimum_buffer_sdram",
         "__resources"]
 
-    POISSON_SPIKE_SOURCE_REGIONS = Enum(
-        value="POISSON_SPIKE_SOURCE_REGIONS",
-        names=[('SYSTEM_REGION', 0),
-               ('POISSON_PARAMS_REGION', 1),
-               ('SPIKE_HISTORY_REGION', 2),
-               ('PROVENANCE_REGION', 3),
-               ('PROFILER_REGION', 4)])
+    class POISSON_SPIKE_SOURCE_REGIONS(Enum):
+        SYSTEM_REGION = 0
+        POISSON_PARAMS_REGION = 1
+        RATES_REGION = 2
+        SPIKE_HISTORY_REGION = 3
+        PROVENANCE_REGION = 4
+        PROFILER_REGION = 5
 
     PROFILE_TAG_LABELS = {
         0: "TIMER",
@@ -58,10 +60,11 @@ class SpikeSourcePoissonMachineVertex(
 
     def __init__(
             self, resources_required, is_recording, constraints=None,
-            label=None):
+            label=None, app_vertex=None, vertex_slice=None):
         # pylint: disable=too-many-arguments
         super(SpikeSourcePoissonMachineVertex, self).__init__(
-            label, constraints=constraints)
+            label, constraints=constraints, app_vertex=app_vertex,
+            vertex_slice=vertex_slice)
         self.__is_recording = is_recording
         self.__resources = resources_required
 
@@ -98,11 +101,14 @@ class SpikeSourcePoissonMachineVertex(
             self.POISSON_SPIKE_SOURCE_REGIONS.SPIKE_HISTORY_REGION.value,
             txrx)
 
+    @property
+    @overrides(AbstractSupportsDatabaseInjection.is_in_injection_mode)
+    def is_in_injection_mode(self):
+        # pylint: disable=no-value-for-parameter
+        return self._is_in_injection_mode()
+
     @inject_items({"graph": "MemoryMachineGraph"})
-    @overrides(
-        AbstractSupportsDatabaseInjection.is_in_injection_mode,
-        additional_arguments=["graph"])
-    def is_in_injection_mode(self, graph):
+    def _is_in_injection_mode(self, graph):
         # pylint: disable=arguments-differ
         in_edges = graph.get_edges_ending_at_vertex_with_partition_name(
             self, LIVE_POISSON_CONTROL_PARTITION_ID)
@@ -116,3 +122,11 @@ class SpikeSourcePoissonMachineVertex(
         return get_profiling_data(
             self.POISSON_SPIKE_SOURCE_REGIONS.PROFILER_REGION.value,
             self.PROFILE_TAG_LABELS, transceiver, placement)
+
+    @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
+    def get_binary_file_name(self):
+        return "spike_source_poisson.aplx"
+
+    @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
+    def get_binary_start_type(self):
+        return ExecutableType.USES_SIMULATION_INTERFACE

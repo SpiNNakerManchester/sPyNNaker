@@ -14,13 +14,23 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import numpy
+
+from data_specification.enums import DataType
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.neuron.input_types import InputTypeConductance
 from .abstract_neuron_impl import AbstractNeuronImpl
+from spinn_front_end_common.utilities import globals_variables
+from spinn_front_end_common.utilities.constants import BYTES_PER_WORD
+
+# The size of the n_steps_per_timestep parameter
+_N_STEPS_PER_TIMESTEP_SIZE = 1 * BYTES_PER_WORD
+
+# The default number of steps per timestep
+_DEFAULT_N_STEPS_PER_TIMESTEP = 1
 
 
 class NeuronImplStandard(AbstractNeuronImpl):
-    """ The standard neuron implementation, consisting of various components
+    """ The standard componentised neuron implementation.
     """
 
     __slots__ = [
@@ -31,13 +41,19 @@ class NeuronImplStandard(AbstractNeuronImpl):
         "__synapse_type",
         "__threshold_type",
         "__additional_input_type",
-        "__components"
+        "__components",
+        "__n_steps_per_timestep"
     ]
 
     _RECORDABLES = ["v", "gsyn_exc", "gsyn_inh"]
 
+    _RECORDABLE_DATA_TYPES = {
+        "v": DataType.S1615,
+        "gsyn_exc": DataType.S1615,
+        "gsyn_inh": DataType.S1615
+    }
+
     _RECORDABLE_UNITS = {
-        'spikes': 'spikes',
         'v': 'mV',
         'gsyn_exc': "uS",
         'gsyn_inh': "uS"}
@@ -45,6 +61,16 @@ class NeuronImplStandard(AbstractNeuronImpl):
     def __init__(
             self, model_name, binary, neuron_model, input_type,
             synapse_type, threshold_type, additional_input_type=None):
+        """
+        :param str model_name:
+        :param str binary:
+        :param AbstractNeuronModel neuron_model:
+        :param AbstractInputType input_type:
+        :param AbstractSynapseType synapse_type:
+        :param AbstractThresholdType threshold_type:
+        :param additional_input_type:
+        :type additional_input_type: AbstractAdditionalInput or None
+        """
         self.__model_name = model_name
         self.__binary = binary
         self.__neuron_model = neuron_model
@@ -52,12 +78,21 @@ class NeuronImplStandard(AbstractNeuronImpl):
         self.__synapse_type = synapse_type
         self.__threshold_type = threshold_type
         self.__additional_input_type = additional_input_type
+        self.__n_steps_per_timestep = _DEFAULT_N_STEPS_PER_TIMESTEP
 
         self.__components = [
             self.__neuron_model, self.__input_type, self.__threshold_type,
             self.__synapse_type]
         if self.__additional_input_type is not None:
             self.__components.append(self.__additional_input_type)
+
+    @property
+    def n_steps_per_timestep(self):
+        return self.__n_steps_per_timestep
+
+    @n_steps_per_timestep.setter
+    def n_steps_per_timestep(self, n_steps_per_timestep):
+        self.__n_steps_per_timestep = n_steps_per_timestep
 
     @property
     @overrides(AbstractNeuronImpl.model_name)
@@ -81,7 +116,8 @@ class NeuronImplStandard(AbstractNeuronImpl):
 
     @overrides(AbstractNeuronImpl.get_dtcm_usage_in_bytes)
     def get_dtcm_usage_in_bytes(self, n_neurons):
-        total = self.__neuron_model.get_dtcm_usage_in_bytes(n_neurons)
+        total = _N_STEPS_PER_TIMESTEP_SIZE
+        total += self.__neuron_model.get_dtcm_usage_in_bytes(n_neurons)
         total += self.__synapse_type.get_dtcm_usage_in_bytes(n_neurons)
         total += self.__input_type.get_dtcm_usage_in_bytes(n_neurons)
         total += self.__threshold_type.get_dtcm_usage_in_bytes(n_neurons)
@@ -92,7 +128,8 @@ class NeuronImplStandard(AbstractNeuronImpl):
 
     @overrides(AbstractNeuronImpl.get_sdram_usage_in_bytes)
     def get_sdram_usage_in_bytes(self, n_neurons):
-        total = self.__neuron_model.get_sdram_usage_in_bytes(n_neurons)
+        total = _N_STEPS_PER_TIMESTEP_SIZE
+        total += self.__neuron_model.get_sdram_usage_in_bytes(n_neurons)
         total += self.__synapse_type.get_sdram_usage_in_bytes(n_neurons)
         total += self.__input_type.get_sdram_usage_in_bytes(n_neurons)
         total += self.__threshold_type.get_sdram_usage_in_bytes(n_neurons)
@@ -125,6 +162,10 @@ class NeuronImplStandard(AbstractNeuronImpl):
     def get_recordable_units(self, variable):
         return self._RECORDABLE_UNITS[variable]
 
+    @overrides(AbstractNeuronImpl.get_recordable_data_types)
+    def get_recordable_data_types(self):
+        return self._RECORDABLE_DATA_TYPES
+
     @overrides(AbstractNeuronImpl.is_recordable)
     def is_recordable(self, variable):
         return variable in self._RECORDABLES
@@ -145,14 +186,19 @@ class NeuronImplStandard(AbstractNeuronImpl):
 
     @overrides(AbstractNeuronImpl.get_data)
     def get_data(self, parameters, state_variables, vertex_slice):
-        return numpy.concatenate([
-            component.get_data(parameters, state_variables, vertex_slice)
-            for component in self.__components
-        ])
+        # Work out the time step per step
+        ts = globals_variables.get_simulator().machine_time_step
+        ts /= self.__n_steps_per_timestep
+        items = [numpy.array([self.__n_steps_per_timestep], dtype="uint32")]
+        items.extend(
+            component.get_data(parameters, state_variables, vertex_slice, ts)
+            for component in self.__components)
+        return numpy.concatenate(items)
 
     @overrides(AbstractNeuronImpl.read_data)
     def read_data(
             self, data, offset, vertex_slice, parameters, state_variables):
+        offset += _N_STEPS_PER_TIMESTEP_SIZE
         for component in self.__components:
             offset = component.read_data(
                 data, offset, vertex_slice, parameters, state_variables)

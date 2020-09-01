@@ -15,41 +15,45 @@
 
 import logging
 from spinn_utilities.overrides import overrides
+from spinn_front_end_common.utilities.constants import (
+    BYTES_PER_WORD, MICRO_TO_MILLISECOND_CONVERSION)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
-    plasticity_helpers)
+    get_exp_lut_array)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence\
-    import (
-        AbstractTimingDependence)
+    import AbstractTimingDependence
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure\
-    import (
-        SynapseStructureWeightOnly)
+    import SynapseStructureWeightOnly
+from spinn_front_end_common.utilities.globals_variables import get_simulator
 
 logger = logging.getLogger(__name__)
 
-LOOKUP_TAU_PLUS_SIZE = 256
-LOOKUP_TAU_PLUS_SHIFT = 0
-LOOKUP_TAU_MINUS_SIZE = 256
-LOOKUP_TAU_MINUS_SHIFT = 0
-LOOKUP_TAU_X_SIZE = 256
-LOOKUP_TAU_X_SHIFT = 2
-LOOKUP_TAU_Y_SIZE = 256
-LOOKUP_TAU_Y_SHIFT = 2
-
 
 class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
+    """ A timing dependence STDP rule based on spike triplets.
+
+    Jean-Pascal Pfister, Wulfram Gerstner. Triplets of Spikes in a Model of
+    Spike Timing-Dependent Plasticity. *Journal of Neuroscience*,
+    20 September 2006, 26 (38) 9673-9682; DOI: 10.1523/JNEUROSCI.1425-06.2006
+    """
     __slots__ = [
         "__synapse_structure",
         "__tau_minus",
-        "__tau_minus_last_entry",
+        "__tau_minus_data",
         "__tau_plus",
-        "__tau_plus_last_entry",
+        "__tau_plus_data",
         "__tau_x",
-        "__tau_x_last_entry",
+        "__tau_x_data",
         "__tau_y",
-        "__tau_y_last_entry"]
+        "__tau_y_data"]
 
     # noinspection PyPep8Naming
     def __init__(self, tau_plus, tau_minus, tau_x, tau_y):
+        r"""
+        :param float tau_plus: :math:`\tau_+`
+        :param float tau_minus: :math:`\tau_-`
+        :param float tau_x: :math:`\tau_x`
+        :param float tau_y: :math:`\tau_y`
+        """
         self.__tau_plus = tau_plus
         self.__tau_minus = tau_minus
         self.__tau_x = tau_x
@@ -57,26 +61,43 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
 
         self.__synapse_structure = SynapseStructureWeightOnly()
 
-        # provenance data
-        self.__tau_plus_last_entry = None
-        self.__tau_minus_last_entry = None
-        self.__tau_x_last_entry = None
-        self.__tau_y_last_entry = None
+        ts = get_simulator().machine_time_step
+        ts = ts / MICRO_TO_MILLISECOND_CONVERSION
+        self.__tau_plus_data = get_exp_lut_array(ts, self.__tau_plus)
+        self.__tau_minus_data = get_exp_lut_array(ts, self.__tau_minus)
+        self.__tau_x_data = get_exp_lut_array(ts, self.__tau_x, shift=2)
+        self.__tau_y_data = get_exp_lut_array(ts, self.__tau_y, shift=2)
 
     @property
     def tau_plus(self):
+        r""" :math:`\tau_+`
+
+        :rtype: float
+        """
         return self.__tau_plus
 
     @property
     def tau_minus(self):
+        r""" :math:`\tau_-`
+
+        :rtype: float
+        """
         return self.__tau_minus
 
     @property
     def tau_x(self):
+        r""" :math:`\tau_x`
+
+        :rtype: float
+        """
         return self.__tau_x
 
     @property
     def tau_y(self):
+        r""" :math:`\tau_y`
+
+        :rtype: float
+        """
         return self.__tau_y
 
     @overrides(AbstractTimingDependence.is_same_as)
@@ -92,67 +113,52 @@ class TimingDependencePfisterSpikeTriplet(AbstractTimingDependence):
 
     @property
     def vertex_executable_suffix(self):
+        """ The suffix to be appended to the vertex executable for this rule
+
+        :rtype: str
+        """
         return "pfister_triplet"
 
     @property
     def pre_trace_n_bytes(self):
+        """ The number of bytes used by the pre-trace of the rule per neuron
 
+        :rtype: int
+        """
         # Triplet rule trace entries consists of two 16-bit traces - R1 and R2
-        return 4
+        return BYTES_PER_WORD
 
     @overrides(AbstractTimingDependence.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(self):
-        return (2 * (LOOKUP_TAU_PLUS_SIZE + LOOKUP_TAU_MINUS_SIZE +
-                     LOOKUP_TAU_X_SIZE + LOOKUP_TAU_Y_SIZE))
+        lut_array_words = (
+            len(self.__tau_plus_data) + len(self.__tau_minus_data) +
+            len(self.__tau_x_data) + len(self.__tau_y_data))
+        return lut_array_words * BYTES_PER_WORD
 
     @property
     def n_weight_terms(self):
+        """ The number of weight terms expected by this timing rule
+
+        :rtype: int
+        """
         return 2
 
     @overrides(AbstractTimingDependence.write_parameters)
     def write_parameters(self, spec, machine_time_step, weight_scales):
 
-        # Check timestep is valid
-        if machine_time_step != 1000:
-            raise NotImplementedError(
-                "STDP LUT generation currently only supports 1ms timesteps")
-
         # Write lookup tables
-        self.__tau_plus_last_entry = plasticity_helpers.write_exp_lut(
-            spec, self.__tau_plus, LOOKUP_TAU_PLUS_SIZE,
-            LOOKUP_TAU_PLUS_SHIFT)
-        self.__tau_minus_last_entry = plasticity_helpers.write_exp_lut(
-            spec, self.__tau_minus, LOOKUP_TAU_MINUS_SIZE,
-            LOOKUP_TAU_MINUS_SHIFT)
-        self.__tau_x_last_entry = plasticity_helpers.write_exp_lut(
-            spec, self.__tau_x, LOOKUP_TAU_X_SIZE, LOOKUP_TAU_X_SHIFT)
-        self.__tau_y_last_entry = plasticity_helpers.write_exp_lut(
-            spec, self.__tau_y, LOOKUP_TAU_Y_SIZE, LOOKUP_TAU_Y_SHIFT)
+        spec.write_array(self.__tau_plus_data)
+        spec.write_array(self.__tau_minus_data)
+        spec.write_array(self.__tau_x_data)
+        spec.write_array(self.__tau_y_data)
 
     @property
     def synaptic_structure(self):
-        return self.__synapse_structure
+        """ Get the synaptic structure of the plastic part of the rows
 
-    @overrides(AbstractTimingDependence.get_provenance_data)
-    def get_provenance_data(self, pre_population_label, post_population_label):
-        prov_data = list()
-        prov_data.append(plasticity_helpers.get_lut_provenance(
-            pre_population_label, post_population_label,
-            "PfisterSpikeTripletRule", "tau_plus_last_entry",
-            "tau_plus", self.__tau_plus_last_entry))
-        prov_data.append(plasticity_helpers.get_lut_provenance(
-            pre_population_label, post_population_label,
-            "PfisterSpikeTripletRule", "tau_minus_last_entry",
-            "tau_minus", self.__tau_minus_last_entry))
-        prov_data.append(plasticity_helpers.get_lut_provenance(
-            pre_population_label, post_population_label,
-            "PfisterSpikeTripletRule", "tau_x_last_entry",
-            "tau_x", self.__tau_x_last_entry))
-        prov_data.append(plasticity_helpers.get_lut_provenance(
-            pre_population_label, post_population_label,
-            "PfisterSpikeTripletRule", "tau_y_last_entry",
-            "tau_y", self.__tau_y_last_entry))
-        return prov_data
+        :rtype: AbstractSynapseStructure
+        """
+        return self.__synapse_structure
 
     @overrides(AbstractTimingDependence.get_parameter_names)
     def get_parameter_names(self):

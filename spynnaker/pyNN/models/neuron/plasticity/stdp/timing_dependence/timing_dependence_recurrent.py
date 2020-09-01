@@ -13,17 +13,23 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import math
+import numpy
+from spinn_front_end_common.utilities.constants import \
+    MICRO_TO_MILLISECOND_CONVERSION
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
+from spinn_front_end_common.utilities.constants import (
+    BYTES_PER_WORD, BYTES_PER_SHORT)
 from .abstract_timing_dependence import AbstractTimingDependence
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
     SynapseStructureWeightAccumulator)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
-    plasticity_helpers)
+    STDP_FIXED_POINT_ONE)
 
 
 class TimingDependenceRecurrent(AbstractTimingDependence):
+    """ A timing dependence STDP rule based on recurrences.
+    """
     __slots__ = [
         "__accumulator_depression_plus_one",
         "__accumulator_potentiation_minus_one",
@@ -70,26 +76,37 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
 
     @property
     def vertex_executable_suffix(self):
+        """ The suffix to be appended to the vertex executable for this rule
+
+        :rtype: str
+        """
         if self.__dual_fsm:
             return "recurrent_dual_fsm"
         return "recurrent_pre_stochastic"
 
     @property
     def pre_trace_n_bytes(self):
+        """ The number of bytes used by the pre-trace of the rule per neuron
 
+        :rtype: int
+        """
         # When using the separate FSMs, pre-trace contains window length,
         # otherwise it's in the synapse
-        return 2 if self.__dual_fsm else 0
+        return BYTES_PER_SHORT if self.__dual_fsm else 0
 
     @overrides(AbstractTimingDependence.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(self):
-
         # 2 * 32-bit parameters
         # 2 * LUTS with STDP_FIXED_POINT_ONE * 16-bit entries
-        return (4 * 2) + (2 * (2 * plasticity_helpers.STDP_FIXED_POINT_ONE))
+        return (2 * BYTES_PER_WORD) + (
+            2 * STDP_FIXED_POINT_ONE * BYTES_PER_SHORT)
 
     @property
     def n_weight_terms(self):
+        """ The number of weight terms expected by this timing rule
+
+        :rtype: int
+        """
         return 1
 
     @overrides(AbstractTimingDependence.write_parameters)
@@ -102,27 +119,34 @@ class TimingDependenceRecurrent(AbstractTimingDependence):
                          data_type=DataType.INT32)
 
         # Convert mean times into machine timesteps
-        mean_pre_timesteps = (float(self.__mean_pre_window) *
-                              (1000.0 / float(machine_time_step)))
-        mean_post_timesteps = (float(self.__mean_post_window) *
-                               (1000.0 / float(machine_time_step)))
+        mean_pre_timesteps = (
+            float(self.__mean_pre_window) *
+            (MICRO_TO_MILLISECOND_CONVERSION / float(machine_time_step)))
+        mean_post_timesteps = (
+            float(self.__mean_post_window) *
+            (MICRO_TO_MILLISECOND_CONVERSION / float(machine_time_step)))
 
         # Write lookup tables
         self._write_exp_dist_lut(spec, mean_pre_timesteps)
         self._write_exp_dist_lut(spec, mean_post_timesteps)
 
-    def _write_exp_dist_lut(self, spec, mean):
-        for x in range(plasticity_helpers.STDP_FIXED_POINT_ONE):
-
-            # Calculate inverse CDF
-            x_float = float(x) / float(plasticity_helpers.STDP_FIXED_POINT_ONE)
-            p_float = math.log(1.0 - x_float) * -mean
-
-            p = round(p_float)
-            spec.write_value(data=p, data_type=DataType.UINT16)
+    @staticmethod
+    def _write_exp_dist_lut(spec, mean):
+        """
+        :param .DataSpecificationGenerator spec:
+        :param float mean:
+        """
+        indices = numpy.arange(STDP_FIXED_POINT_ONE)
+        inv_cdf = numpy.log(1.0 - indices/float(STDP_FIXED_POINT_ONE)) * -mean
+        spec.write_array(
+            inv_cdf.astype(numpy.uint16), data_type=DataType.UINT16)
 
     @property
     def synaptic_structure(self):
+        """ Get the synaptic structure of the plastic part of the rows
+
+        :rtype: AbstractSynapseStructure
+        """
         return self.__synapse_structure
 
     @overrides(AbstractTimingDependence.get_parameter_names)

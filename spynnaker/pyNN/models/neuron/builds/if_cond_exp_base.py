@@ -25,6 +25,21 @@ from spynnaker.pyNN.models.neuron.threshold_types import ThresholdTypeStatic
 class IFCondExpBase(AbstractPyNNNeuronModelStandard):
     """ Leaky integrate and fire neuron with an exponentially decaying \
         conductance input.
+
+    :param float tau_m: :math:`\\tau_m`
+    :param float cm: :math:`C_m`
+    :param float v_rest: :math:`V_{rest}`
+    :param float v_reset: :math:`V_{reset}`
+    :param float v_thresh: :math:`V_{thresh}`
+    :param float tau_syn_E: :math:`\\tau^{syn}_e`
+    :param float tau_syn_I: :math:`\\tau^{syn}_i`
+    :param float tau_refrac: :math:`\\tau_{refrac}`
+    :param float i_offset: :math:`I_{offset}`
+    :param float e_rev_E: :math:`E^{rev}_e`
+    :param float e_rev_I: :math:`E^{rev}_i`
+    :param float v: :math:`V_{init}`
+    :param float isyn_exc: :math:`I^{syn}_e`
+    :param float isyn_inh: :math:`I^{syn}_i`
     """
     __slots__ = []
 

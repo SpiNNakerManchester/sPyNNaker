@@ -21,6 +21,7 @@ import subprocess
 from six import raise_from
 from spinnman.connections.abstract_classes import Listenable, Connection
 from spinnman.exceptions import SpinnmanIOException, SpinnmanTimeoutException
+from spinn_front_end_common.utilities.constants import BYTES_PER_KB
 
 logger = logging.getLogger(__name__)
 # A set of connections that have already been made
@@ -30,15 +31,14 @@ _existing_connections = dict()
 def get_pushbot_wifi_connection(remote_host, remote_port=56000):
     """ Get an existing connection to a PushBot, or make a new one.
 
-    :param remote_host: The IP address of the PushBot
-    :type remote_host: str
-    :param remote_port: The port number of the PushBot (default 56000)
-    :type remote_port: int
+    :param str remote_host: The IP address of the PushBot
+    :param int remote_port: The port number of the PushBot (default 56000)
     """
-    if (remote_host, remote_port) not in _existing_connections:
-        _existing_connections[(remote_host, remote_port)] = \
+    key = (remote_host, remote_port)
+    if key not in _existing_connections:
+        _existing_connections[key] = \
             PushBotWIFIConnection(remote_host, remote_port)
-    return _existing_connections[(remote_host, remote_port)]
+    return _existing_connections[key]
 
 
 class PushBotWIFIConnection(Connection, Listenable):
@@ -51,19 +51,19 @@ class PushBotWIFIConnection(Connection, Listenable):
         "__remote_port",
         "__socket"]
 
+    RECV_SIZE = 1 * BYTES_PER_KB
+
     def __init__(self, remote_host, remote_port=56000):
         """
-        :param remote_host: The IP address of the PushBot
-        :type remote_host: str
-        :param remote_port: The port number of the PushBot (default 56000)
-        :type remote_port: int
-        :raise spinnman.exceptions.SpinnmanIOException: \
+        :param str remote_host: The IP address of the PushBot
+        :param int remote_port: The port number of the PushBot (default 56000)
+        :raise SpinnmanIOException:
             If there is an error setting up the communication channel
         """
         try:
             # Create a TCP Socket
             self.__socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-except
             raise_from(SpinnmanIOException(
                 "Error setting up socket: {}".format(e)), e)
 
@@ -80,7 +80,7 @@ class PushBotWIFIConnection(Connection, Listenable):
                 (self.__remote_ip_address, self.__remote_port))
             logger.info("Succeeded in connecting to PushBot via Wi-Fi")
 
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-except
             raise_from(SpinnmanIOException(
                 "Error binding socket to {}:{}: {}".format(
                     self.__remote_ip_address, self.__remote_port, e)), e)
@@ -95,7 +95,7 @@ class PushBotWIFIConnection(Connection, Listenable):
             if (self.__local_ip_address is None
                     or self.__local_ip_address == ""):
                 self.__local_ip_address = "0.0.0.0"
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-except
             raise_from(SpinnmanIOException(
                 "Error querying socket: {}".format(e)), e)
 
@@ -104,7 +104,7 @@ class PushBotWIFIConnection(Connection, Listenable):
 
     def is_connected(self):
         """ See\
-            :py:meth:`spinnman.connections.Connection.is_connected`
+            :py:meth:`~spinnman.connections.Connection.is_connected`
         """
         if platform.platform().lower().startswith("windows"):
             cmd_args = "-n 1 -w 1"
@@ -127,11 +127,10 @@ class PushBotWIFIConnection(Connection, Listenable):
 
     @property
     def local_ip_address(self):
-        """ The local IP address to which the connection is bound.
+        """ The local IP address to which the connection is bound, \
+            as a dotted string, e.g. `0.0.0.0`
 
-        :return: The local IP address as a dotted string, e.g. `0.0.0.0`
         :rtype: str
-        :raise None: No known exceptions are thrown
         """
         return self.__local_ip_address
 
@@ -139,28 +138,25 @@ class PushBotWIFIConnection(Connection, Listenable):
     def local_port(self):
         """ The local port to which the connection is bound.
 
-        :return: The local port number
         :rtype: int
-        :raise None: No known exceptions are thrown
         """
         return self.__local_port
 
     @property
     def remote_ip_address(self):
-        """ The remote IP address to which the connection is connected.
+        """ The remote IP address to which the connection is connected, \
+            as a dotted string, or None if not connected remotely
 
-        :return: The remote IP address as a dotted string, or None if not\
-            connected remotely
-        :rtype: str
+        :rtype: str or None
         """
         return self.__remote_ip_address
 
     @property
     def remote_port(self):
-        """ The remote port to which the connection is connected.
+        """ The remote port to which the connection is connected, \
+            or None if not connected remotely
 
-        :return: The remote port, or None if not connected remotely
-        :rtype: int
+        :rtype: int or None
         """
         return self.__remote_port
 
@@ -170,29 +166,28 @@ class PushBotWIFIConnection(Connection, Listenable):
         :param timeout: The timeout, or None to wait forever
         :type timeout: float or None
         :return: The data received
-        :rtype: bytestring
-        :raise SpinnmanTimeoutException: \
+        :rtype: bytes
+        :raise SpinnmanTimeoutException:
             If a timeout occurs before any data is received
         :raise SpinnmanIOException: If an error occurs receiving the data
         """
         try:
             self.__socket.settimeout(timeout)
-            return self.__socket.recv(1024)
+            return self.__socket.recv(self.RECV_SIZE)
         except socket.timeout:
             raise SpinnmanTimeoutException("receive", timeout)
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-except
             raise_from(SpinnmanIOException(str(e)), e)
 
     def send(self, data):
         """ Send data down this connection
 
-        :param data: The data to be sent
-        :type data: bytestring
+        :param bytearray data: The data to be sent
         :raise SpinnmanIOException: If there is an error sending the data
         """
         try:
             self.__socket.send(data)
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-except
             raise_from(SpinnmanIOException(str(e)), e)
 
     def close(self):
@@ -201,7 +196,7 @@ class PushBotWIFIConnection(Connection, Listenable):
         """
         try:
             self.__socket.shutdown(socket.SHUT_WR)
-        except Exception:
+        except Exception:  # pylint: disable=broad-except
             pass
         self.__socket.close()
 

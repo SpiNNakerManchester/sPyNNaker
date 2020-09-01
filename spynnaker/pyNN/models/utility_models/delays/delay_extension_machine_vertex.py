@@ -18,34 +18,52 @@ from spinn_utilities.overrides import overrides
 from pacman.model.graphs.machine import MachineVertex
 from spinn_front_end_common.interface.provenance import (
     ProvidesProvenanceDataFromMachineImpl)
+from spinn_front_end_common.abstract_models import (
+    AbstractHasAssociatedBinary)
 from spinn_front_end_common.utilities.utility_objs import ProvenanceDataItem
+from spinn_front_end_common.utilities.utility_objs import ExecutableType
 
 
 class DelayExtensionMachineVertex(
-        MachineVertex, ProvidesProvenanceDataFromMachineImpl):
+        MachineVertex, ProvidesProvenanceDataFromMachineImpl,
+        AbstractHasAssociatedBinary):
     __slots__ = [
         "__resources"]
 
-    _DELAY_EXTENSION_REGIONS = Enum(
-        value="DELAY_EXTENSION_REGIONS",
-        names=[('SYSTEM', 0),
-               ('DELAY_PARAMS', 1),
-               ('PROVENANCE_REGION', 2),
-               ('EXPANDER_REGION', 3)])
+    class _DELAY_EXTENSION_REGIONS(Enum):
+        SYSTEM = 0
+        DELAY_PARAMS = 1
+        PROVENANCE_REGION = 2
+        EXPANDER_REGION = 3
 
-    EXTRA_PROVENANCE_DATA_ENTRIES = Enum(
-        value="EXTRA_PROVENANCE_DATA_ENTRIES",
-        names=[("N_PACKETS_RECEIVED", 0),
-               ("N_PACKETS_PROCESSED", 1),
-               ("N_PACKETS_ADDED", 2),
-               ("N_PACKETS_SENT", 3),
-               ("N_BUFFER_OVERFLOWS", 4),
-               ("N_DELAYS", 5)])
+    class EXTRA_PROVENANCE_DATA_ENTRIES(Enum):
+        N_PACKETS_RECEIVED = 0
+        N_PACKETS_PROCESSED = 1
+        N_PACKETS_ADDED = 2
+        N_PACKETS_SENT = 3
+        N_BUFFER_OVERFLOWS = 4
+        N_DELAYS = 5
+
     N_EXTRA_PROVENANCE_DATA_ENTRIES = len(EXTRA_PROVENANCE_DATA_ENTRIES)
 
-    def __init__(self, resources_required, label, constraints=None):
+    def __init__(self, resources_required, label, constraints=None,
+                 app_vertex=None, vertex_slice=None):
+        """
+        :param ~pacman.model.resources.ResourceContainer resources_required:
+            The resources required by the vertex
+        :param str label: The optional name of the vertex
+        :param iterable(AbstractConstraint) constraints:
+            The optional initial constraints of the vertex
+        :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
+            The application vertex that caused this machine vertex to be
+            created. If None, there is no such application vertex.
+        :param ~pacman.model.graphs.common.Slice vertex_slice:
+            The slice of the application vertex that this machine vertex
+            implements.
+        """
         super(DelayExtensionMachineVertex, self).__init__(
-            label, constraints=constraints)
+            label, constraints=constraints, app_vertex=app_vertex,
+            vertex_slice=vertex_slice)
         self.__resources = resources_required
 
     @property
@@ -128,3 +146,15 @@ class DelayExtensionMachineVertex(
             self._add_name(names, "Number_of_times_delayed_to_spread_traffic"),
             n_delays))
         return provenance_items
+
+    @overrides(MachineVertex.get_n_keys_for_partition)
+    def get_n_keys_for_partition(self, _partition):
+        return self._vertex_slice.n_atoms * self.app_vertex.n_delay_stages
+
+    @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
+    def get_binary_file_name(self):
+        return "delay_extension.aplx"
+
+    @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
+    def get_binary_start_type(self):
+        return ExecutableType.USES_SIMULATION_INTERFACE

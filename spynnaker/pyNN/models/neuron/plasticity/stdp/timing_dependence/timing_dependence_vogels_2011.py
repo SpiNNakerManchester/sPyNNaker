@@ -16,40 +16,58 @@
 import logging
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
+from spinn_front_end_common.utilities.constants import (
+    BYTES_PER_WORD, BYTES_PER_SHORT, MICRO_TO_MILLISECOND_CONVERSION)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.timing_dependence import (
     AbstractTimingDependence)
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure import (
     SynapseStructureWeightOnly)
+from spinn_front_end_common.utilities.globals_variables import get_simulator
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common import (
-    plasticity_helpers)
+    float_to_fixed, get_exp_lut_array)
 
 logger = logging.getLogger(__name__)
 
-# Constants
-LOOKUP_TAU_SIZE = 256
-LOOKUP_TAU_SHIFT = 0
-
 
 class TimingDependenceVogels2011(AbstractTimingDependence):
+    """ A timing dependence STDP rule due to Vogels (2011).
+    """
     __slots__ = [
         "__alpha",
         "__synapse_structure",
-        "__tau"]
+        "__tau",
+        "__tau_data"]
 
     default_parameters = {'tau': 20.0}
 
     def __init__(self, alpha, tau=default_parameters['tau']):
+        r"""
+        :param float alpha: :math:`\alpha`
+        :param float tau: :math:`\tau`
+        """
         self.__alpha = alpha
         self.__tau = tau
 
         self.__synapse_structure = SynapseStructureWeightOnly()
 
+        ts = get_simulator().machine_time_step
+        ts = ts / MICRO_TO_MILLISECOND_CONVERSION
+        self.__tau_data = get_exp_lut_array(ts, self.__tau)
+
     @property
     def alpha(self):
+        r""" :math:`\alpha`
+
+        :rtype: float
+        """
         return self.__alpha
 
     @property
     def tau(self):
+        r""" :math:`\tau`
+
+        :rtype: float
+        """
         return self.__tau
 
     @overrides(AbstractTimingDependence.is_same_as)
@@ -63,41 +81,49 @@ class TimingDependenceVogels2011(AbstractTimingDependence):
 
     @property
     def vertex_executable_suffix(self):
+        """ The suffix to be appended to the vertex executable for this rule
+
+        :rtype: str
+        """
         return "vogels_2011"
 
     @property
     def pre_trace_n_bytes(self):
+        """ The number of bytes used by the pre-trace of the rule per neuron
 
+        :rtype: int
+        """
         # Trace entries consist of a single 16-bit number
-        return 2
+        return BYTES_PER_SHORT
 
     @overrides(AbstractTimingDependence.get_parameters_sdram_usage_in_bytes)
     def get_parameters_sdram_usage_in_bytes(self):
-        return 4 + (2 * LOOKUP_TAU_SIZE)
+        return BYTES_PER_WORD + BYTES_PER_WORD * len(self.__tau_data)
 
     @property
     def n_weight_terms(self):
+        """ The number of weight terms expected by this timing rule
+
+        :rtype: int
+        """
         return 1
 
     @overrides(AbstractTimingDependence.write_parameters)
     def write_parameters(self, spec, machine_time_step, weight_scales):
 
-        # Check timestep is valid
-        if machine_time_step != 1000:
-            raise NotImplementedError("STDP LUT generation currently only "
-                                      "supports 1ms timesteps")
-
         # Write alpha to spec
-        fixed_point_alpha = plasticity_helpers.float_to_fixed(
-            self.__alpha, plasticity_helpers.STDP_FIXED_POINT_ONE)
+        fixed_point_alpha = float_to_fixed(self.__alpha)
         spec.write_value(data=fixed_point_alpha, data_type=DataType.INT32)
 
         # Write lookup table
-        plasticity_helpers.write_exp_lut(
-            spec, self.__tau, LOOKUP_TAU_SIZE, LOOKUP_TAU_SHIFT)
+        spec.write_array(self.__tau_data)
 
     @property
     def synaptic_structure(self):
+        """ Get the synaptic structure of the plastic part of the rows
+
+        :rtype: AbstractSynapseStructure
+        """
         return self.__synapse_structure
 
     @overrides(AbstractTimingDependence.get_parameter_names)

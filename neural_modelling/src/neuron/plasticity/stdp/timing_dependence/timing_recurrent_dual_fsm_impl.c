@@ -15,13 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Initialisation for timing_recurrent_dual_fsm_impl.h
 #include "timing_recurrent_dual_fsm_impl.h"
 
 //---------------------------------------
 // Globals
 //---------------------------------------
-// Exponential lookup-tables
+//! \brief Lookup table for picking exponentially distributed random value for
+//! pre-traces
 uint16_t pre_exp_dist_lookup[STDP_FIXED_POINT_ONE];
+//! \brief Lookup table for picking exponentially distributed random value for
+//! post-traces
 uint16_t post_exp_dist_lookup[STDP_FIXED_POINT_ONE];
 
 // Global plasticity parameter data
@@ -46,14 +51,13 @@ uint32_t *timing_initialise(address_t address) {
             plasticity_trace_region_data.accumulator_potentiation_minus_one + 1);
 
     // Copy LUTs from following memory
-    // **HACK** these aren't actually int16_t-based but this function will
-    // still work fine
-    address_t lut_address = maths_copy_int16_lut(
-            &address[2], STDP_FIXED_POINT_ONE, (int16_t *) &pre_exp_dist_lookup[0]);
-    lut_address = maths_copy_int16_lut(
-            lut_address, STDP_FIXED_POINT_ONE, (int16_t *) &post_exp_dist_lookup[0]);
+    uint32_t word_size = STDP_FIXED_POINT_ONE / 2;
+    spin1_memcpy(pre_exp_dist_lookup, &address[2],
+            STDP_FIXED_POINT_ONE * sizeof(uint16_t));
+    spin1_memcpy(post_exp_dist_lookup, &address[2 + word_size],
+            STDP_FIXED_POINT_ONE * sizeof(uint16_t));
 
     log_info("timing_initialise: completed successfully");
 
-    return lut_address;
+    return &address[2 + word_size + word_size];
 }

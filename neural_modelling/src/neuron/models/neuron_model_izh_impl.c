@@ -15,11 +15,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+//! \file
+//! \brief Izhekevich neuron implementation
 #include "neuron_model_izh_impl.h"
 
 #include <debug.h>
 
-static global_neuron_params_pointer_t global_params;
+//! The global parameters of the Izhekevich neuron model
+static const global_neuron_params_t *global_params;
 
 /*! \brief For linear membrane voltages, 1.5 is the correct value. However
  * with actual membrane voltage behaviour and tested over an wide range of
@@ -32,7 +35,7 @@ static const REAL SIMPLE_TQ_OFFSET = REAL_CONST(1.85);
 // definition for Izhikevich neuron
 static inline void neuron_ode(
         REAL t, REAL stateVar[], REAL dstateVar_dt[],
-        neuron_pointer_t neuron, REAL input_this_timestep) {
+        neuron_t *neuron, REAL input_this_timestep) {
     REAL V_now = stateVar[1];
     REAL U_now = stateVar[2];
     log_debug(" sv1 %9.4k  V %9.4k --- sv2 %9.4k  U %9.4k\n", stateVar[1],
@@ -49,16 +52,22 @@ static inline void neuron_ode(
 }
 #endif
 
+//! \brief The original model uses 0.04, but this (1 ULP larger?) gives better
+//! numeric stability.
+//!
+//! Thanks to Mantas Mikaitis for this!
+static const REAL MAGIC_MULTIPLIER = REAL_CONST(0.040008544921875);
+
 /*!
- * \brief Midpoint is best balance between speed and accuracy so far from
- * ODE solve comparison work paper shows that Trapezoid version gives better
- * accuracy at small speed cost
- * \param[in] h
- * \param[in] neuron
- * \param[in] input_this_timestep
+ * \brief Midpoint is best balance between speed and accuracy so far.
+ * \details From ODE solver comparison work, paper shows that Trapezoid version
+ *      gives better accuracy at small speed cost
+ * \param[in] h: threshold
+ * \param[in,out] neuron: The model being updated
+ * \param[in] input_this_timestep: the input
  */
 static inline void rk2_kernel_midpoint(
-        REAL h, neuron_pointer_t neuron, REAL input_this_timestep) {
+        REAL h, neuron_t *neuron, REAL input_this_timestep) {
     // to match Mathematica names
     REAL lastV1 = neuron->V;
     REAL lastU1 = neuron->U;
@@ -67,27 +76,27 @@ static inline void rk2_kernel_midpoint(
 
     REAL pre_alph = REAL_CONST(140.0) + input_this_timestep - lastU1;
     REAL alpha = pre_alph
-            + (REAL_CONST(5.0) + REAL_CONST(0.040008544921875) * lastV1) * lastV1;
+            + (REAL_CONST(5.0) + MAGIC_MULTIPLIER * lastV1) * lastV1;
     REAL eta = lastV1 + REAL_HALF(h * alpha);
 
     // could be represented as a long fract?
     REAL beta = REAL_HALF(h * (b * lastV1 - lastU1) * a);
 
     neuron->V += h * (pre_alph - beta
-            + (REAL_CONST(5.0) + REAL_CONST(0.040008544921875) * eta) * eta);
+            + (REAL_CONST(5.0) + MAGIC_MULTIPLIER * eta) * eta);
 
     neuron->U += a * h * (-lastU1 - beta + b * eta);
 }
 
 void neuron_model_set_global_neuron_params(
-        global_neuron_params_pointer_t params) {
+        const global_neuron_params_t *params) {
     global_params = params;
 }
 
 state_t neuron_model_state_update(
-        uint16_t num_excitatory_inputs, input_t* exc_input,
-		uint16_t num_inhibitory_inputs, input_t* inh_input,
-		input_t external_bias, neuron_pointer_t neuron) {
+        uint16_t num_excitatory_inputs, const input_t *exc_input,
+		uint16_t num_inhibitory_inputs, const input_t *inh_input,
+		input_t external_bias, neuron_t *restrict neuron) {
     REAL total_exc = 0;
     REAL total_inh = 0;
 
@@ -108,7 +117,7 @@ state_t neuron_model_state_update(
     return neuron->V;
 }
 
-void neuron_model_has_spiked(neuron_pointer_t neuron) {
+void neuron_model_has_spiked(neuron_t *restrict neuron) {
     // reset membrane voltage
     neuron->V = neuron->C;
 
@@ -119,16 +128,16 @@ void neuron_model_has_spiked(neuron_pointer_t neuron) {
     neuron->this_h = global_params->machine_timestep_ms * SIMPLE_TQ_OFFSET;
 }
 
-state_t neuron_model_get_membrane_voltage(neuron_pointer_t neuron) {
+state_t neuron_model_get_membrane_voltage(const neuron_t *neuron) {
     return neuron->V;
 }
 
-void neuron_model_print_state_variables(restrict neuron_pointer_t neuron) {
+void neuron_model_print_state_variables(const neuron_t *neuron) {
     log_debug("V = %11.4k ", neuron->V);
     log_debug("U = %11.4k ", neuron->U);
 }
 
-void neuron_model_print_parameters(restrict neuron_pointer_t neuron) {
+void neuron_model_print_parameters(const neuron_t *neuron) {
     log_debug("A = %11.4k ", neuron->A);
     log_debug("B = %11.4k ", neuron->B);
     log_debug("C = %11.4k ", neuron->C);

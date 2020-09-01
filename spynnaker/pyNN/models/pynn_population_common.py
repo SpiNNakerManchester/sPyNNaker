@@ -16,6 +16,7 @@
 import logging
 import numpy
 from six import string_types, iteritems
+from spinn_utilities.logger_utils import warn_once
 from spinn_utilities.log import FormatAdapter
 from pacman.model.constraints import AbstractConstraint
 from pacman.model.constraints.placer_constraints import ChipAndCoreConstraint
@@ -34,14 +35,20 @@ from .abstract_pynn_model import AbstractPyNNModel
 logger = FormatAdapter(logging.getLogger(__file__))
 
 
+def _we_dont_do_this_now(*args):  # pylint: disable=unused-argument
+    # pragma: no cover
+    raise NotImplementedError("sPyNNaker8 does not currently do this")
+
+
 class PyNNPopulationCommon(object):
+    """ Base class for PyNN populations.
+    """
     __slots__ = [
         "_all_ids",
         "__change_requires_mapping",
         "__delay_vertex",
         "__first_id",
         "__has_read_neuron_parameters_this_run",
-        "__label",
         "__last_id",
         "_positions",
         "__record_gsyn_file",
@@ -60,9 +67,31 @@ class PyNNPopulationCommon(object):
     def __init__(
             self, spinnaker_control, size, label, constraints, model,
             structure, initial_values, additional_parameters=None):
+        """
+        :param spinnaker_control: The simulator engine core.
+        :type spinnaker_control:
+            ~spinn_front_end_common.interface.abstract_spinnaker_base.AbstractSpinnakerBase
+        :param size: The size of the population; external devices may use None
+        :type size: int or float or None
+        :param label: The label for the population, or None for a default
+        :type label: str or None
+        :param list(~pacman.model.constraints.AbstractConstraint) constraints:
+            How do we constrain where to put things on SpiNNaker
+        :param model: What neuron model is being run by this population
+        :type model:
+            AbstractPyNNModel or
+            ~pacman.model.graphs.application.ApplicationVertex
+        :param structure: How the neurons are arranged in space
+        :type structure: ~pyNN.space.BaseStructure or None
+        :param initial_values: Initialisation for model variables.
+        :type initial_values: dict(str, Any) or None
+        :param additional_parameters:
+            Any extra parameters to pass to the model's vertex creation \
+            function.
+        :type additional_parameters: dict(str, Any) or None
+        """
         # pylint: disable=too-many-arguments
-        self.__label = label
-        size = self._roundsize(size)
+        size = self.__roundsize(size, label)
 
         # Use a provided model to create a vertex
         if isinstance(model, AbstractPyNNModel):
@@ -71,13 +100,10 @@ class PyNNPopulationCommon(object):
                     "A population cannot have a negative or zero size.")
             population_parameters = dict(model.default_population_parameters)
             if additional_parameters is not None:
-                population_parameters.update(additional_parameters)
-            if label is None:
-                simulator = globals_variables.get_simulator()
-                label = "Population {}".format(
-                    simulator.none_labelled_vertex_count)
-                simulator.increment_none_labelled_vertex_count()
-                self.__label = label
+                # check that the additions are suitable. report wrong ones
+                # and ignore
+                population_parameters = self._process_additional_params(
+                    additional_parameters, population_parameters)
             self.__vertex = model.create_vertex(
                 size, label, constraints, **population_parameters)
 
@@ -93,8 +119,8 @@ class PyNNPopulationCommon(object):
             elif size != self.__vertex.n_atoms:
                 raise ConfigurationException(
                     "Vertex size does not match Population size")
-            if label is None:
-                self.__label = self.__vertex.label
+            if label is not None:
+                self.__vertex.set_label(label)
             if constraints is not None:
                 self.__vertex.add_constraints(constraints)
 
@@ -127,7 +153,8 @@ class PyNNPopulationCommon(object):
 
         # add objects to the SpiNNaker control class
         self.__spinnaker_control.add_population(self)
-        self.__spinnaker_control.add_application_vertex(self.__vertex)
+        self.__spinnaker_control.add_application_vertex(
+            self.__vertex)
 
         # initialise common stuff
         self._size = size
@@ -155,24 +182,53 @@ class PyNNPopulationCommon(object):
             for variable, value in iteritems(initial_values):
                 self._initialize(variable, value)
 
+    @staticmethod
+    def _process_additional_params(
+            additional_parameters, population_parameters):
+        for key in additional_parameters.keys():
+            if key in population_parameters:
+                population_parameters[key] = additional_parameters[key]
+            else:
+                logger.warning(
+                    "additional_parameter {} will be ignored".format(key))
+        return population_parameters
+
     @property
     def first_id(self):
+        """ The ID of the first member of the population.
+
+        :rtype: int
+        """
         return self.__first_id
 
     @property
     def last_id(self):
+        """ The ID of the last member of the population.
+
+        :rtype: int
+        """
         return self.__last_id
 
     @property
     def _structure(self):
+        """
+        :rtype: ~pyNN.space.BaseStructure or None
+        """
         return self.__structure
 
     @property
     def _vertex(self):
+        """
+        :rtype: ~pacman.model.graphs.application.ApplicationVertex
+        """
         return self.__vertex
 
     @property
     def requires_mapping(self):
+        """ Whether this population requires mapping.
+
+        :rtype: bool
+        """
         return self.__change_requires_mapping
 
     @requires_mapping.setter
@@ -180,6 +236,8 @@ class PyNNPopulationCommon(object):
         self.__change_requires_mapping = new_value
 
     def mark_no_changes(self):
+        """ Mark this population as not having changes to be mapped.
+        """
         self.__change_requires_mapping = False
         self.__has_read_neuron_parameters_this_run = False
 
@@ -187,38 +245,39 @@ class PyNNPopulationCommon(object):
         """ Merges populations
         """
         # TODO: Make this add the neurons from another population to this one
-        raise NotImplementedError
-
-    def all(self):
-        """ Iterator over cell IDs on all nodes.
-        """
-        # TODO: Return the cells when we have such a thing
-        raise NotImplementedError
+        _we_dont_do_this_now(other)
 
     @property
     def conductance_based(self):
         """ True if the population uses conductance inputs
+
+        :rtype: bool
         """
         if hasattr(self.__vertex, "conductance_based"):
             return self.__vertex.conductance_based
         return False
 
-    def __getitem__(self, index_or_slice):
-        # Note: This is supported by sPyNNaker8
-        # TODO: Used to get a single cell - not yet supported
-        raise NotImplementedError
-
-    def get(self, parameter_names, gather=False):
+    def get(self, parameter_names, gather=True, simplify=True):
         """ Get the values of a parameter for every local cell in the\
             population.
 
         :param parameter_names: Name of parameter. This is either a single\
             string or a list of strings
+        :type parameter_names: str or iterable(str)
+        :param bool gather: pointless on sPyNNaker
+        :param bool simplify: ignored
         :return: A single list of values (or possibly a single value) if\
             paramter_names is a string, or a dict of these if parameter names\
             is a list.
         :rtype: str or list(str) or dict(str,str) or dict(str,list(str))
         """
+        if not gather:
+            warn_once(
+                logger, "sPyNNaker only supports gather=True. We will run "
+                "as if gather was set to True.")
+        if simplify is not True:
+            warn_once(
+                logger, "The simplify value is ignored if not set to true")
         if not self._vertex_population_settable:
             raise KeyError("Population does not support setting")
         if isinstance(parameter_names, string_types):
@@ -233,12 +292,13 @@ class PyNNPopulationCommon(object):
         """ Get the values of a parameter for the selected cell in the\
             population.
 
+        :param selector: a description of the subrange to accept. \
+            Or None for all. See: \
+            :py:meth:`~spinn_utilities.ranged.AbstractSized.selector_to_ids`
+        :type selector: slice or int or iterable(bool) or iterable(int)
         :param parameter_names: Name of parameter. This is either a\
             single string or a list of strings
-        :param selector: a description of the subrange to accept. \
-            Or None for all. \
-            See: _selector_to_ids in \
-            SpiNNUtils.spinn_utilities.ranged.abstract_sized.py
+        :type parameter_names: str or iterable(str)
         :return: A single list of values (or possibly a single value) if\
             paramter_names is a string or a dict of these if parameter names\
             is a list.
@@ -258,6 +318,13 @@ class PyNNPopulationCommon(object):
     def id_to_index(self, id):  # @ReservedAssignment
         """ Given the ID(s) of cell(s) in the Population, return its (their)\
             index (order in the Population).
+
+        Defined by
+        http://neuralensemble.org/docs/PyNN/reference/populations.html
+
+        :param id:
+        :type id: int or iterable(int)
+        :rtype: int or iterable(int)
         """
         # pylint: disable=redefined-builtin
         if not numpy.iterable(id):
@@ -271,6 +338,10 @@ class PyNNPopulationCommon(object):
     def index_to_id(self, index):
         """ Given the index (order in the Population) of cell(s) in the\
             Population, return their ID(s)
+
+        :param index:
+        :type index: int or iterable(int)
+        :rtype: int or iterable(int)
         """
         if not numpy.iterable(index):
             if index > self.__last_id - self.__first_id:
@@ -285,13 +356,24 @@ class PyNNPopulationCommon(object):
         """ Given the ID(s) of cell(s) in the Population, return its (their)\
             index (order in the Population), counting only cells on the local\
             MPI node.
+
+        Defined by
+        http://neuralensemble.org/docs/PyNN/reference/populations.html
+
+        :param cell_id:
+        :type cell_id: int or iterable(int)
+        :rtype: int or iterable(int)
         """
         # TODO: Need __getitem__
-        raise NotImplementedError
+        _we_dont_do_this_now(cell_id)
 
     def _initialize(self, variable, value):
         """ Set the initial value of one of the state variables of the neurons\
             in this population.
+
+        :param str variable:
+        :param value:
+        :type value: float or int or list(float) or list(int)
         """
         if not self._vertex_population_initializable:
             raise KeyError(
@@ -303,30 +385,14 @@ class PyNNPopulationCommon(object):
         self._read_parameters_before_set()
         self.__vertex.initialize(variable, value)
 
-    def can_record(self, variable):
-        """ Determine whether `variable` can be recorded from this population.
-
-        Note: This is supported by sPyNNaker8
-        """
-
-        # TODO: Needs a more precise recording mechanism (coming soon)
-        raise NotImplementedError
-
     def inject(self, current_source):
         """ Connect a current source to all cells in the Population.
+
+        Defined by
+        http://neuralensemble.org/docs/PyNN/reference/populations.html
         """
-
         # TODO:
-        raise NotImplementedError
-
-    def __iter__(self):
-        """ Iterate over local cells
-
-        Note: This is supported by sPyNNaker8
-        """
-
-        # TODO:
-        raise NotImplementedError
+        _we_dont_do_this_now(current_source)
 
     def __len__(self):
         """ Get the total number of cells in the population.
@@ -336,16 +402,22 @@ class PyNNPopulationCommon(object):
     @property
     def label(self):
         """ The label of the population
+
+        :rtype: str
         """
-        return self.__label
+        return self._vertex.label
 
     @label.setter
     def label(self, label):
-        self.__label = label
+        raise NotImplementedError(
+            "As label is used as an ID it can not be changed")
 
     @property
     def local_size(self):
         """ The number of local cells
+
+        Defined by
+        http://neuralensemble.org/docs/PyNN/reference/populations.html
         """
         # Doesn't make much sense on SpiNNaker
         return self._size
@@ -384,8 +456,8 @@ class PyNNPopulationCommon(object):
             p.set({'tau_m':20, 'v_rest':-65})
 
         :param parameter: the parameter to set
-        :type parameter: str or dict
-        :param value: the value of the parameter to set.
+        :type parameter: str or dict(str, Any)
+        :param Any value: the value of the parameter to set.
         """
         self._set_check(parameter, value)
 
@@ -410,10 +482,13 @@ class PyNNPopulationCommon(object):
             p.set("tau_m", 20.0).
             p.set({'tau_m':20, 'v_rest':-65})
 
-        :param selector: See RangedList.set_value_by_selector as this is just \
-            a pass through method
+        :param selector:
+            See :py:meth:`RangedList.set_value_by_selector` as this is just a
+            pass through method
         :param parameter: the parameter to set
+        :type parameter: str or dict(str, float or int)
         :param value: the value of the parameter to set.
+        :type value: float or int
         """
         self._set_check(parameter, value)
 
@@ -436,14 +511,9 @@ class PyNNPopulationCommon(object):
                 and self._vertex_read_parameters_before_set \
                 and not self.__has_read_neuron_parameters_this_run \
                 and not globals_variables.get_simulator().use_virtual_board:
-            # locate machine vertices from the application vertices
-            machine_vertices = globals_variables.get_simulator().graph_mapper\
-                .get_machine_vertices(self.__vertex)
-
             # go through each machine vertex and read the neuron parameters
             # it contains
-            for machine_vertex in machine_vertices:
-
+            for machine_vertex in self.__vertex.machine_vertices:
                 # tell the core to rewrite neuron params back to the
                 # SDRAM space.
                 placement = globals_variables.get_simulator().placements.\
@@ -451,14 +521,24 @@ class PyNNPopulationCommon(object):
 
                 self.__vertex.read_parameters_from_machine(
                     globals_variables.get_simulator().transceiver, placement,
-                    globals_variables.get_simulator().graph_mapper.get_slice(
-                        machine_vertex))
+                    machine_vertex.vertex_slice)
 
             self.__has_read_neuron_parameters_this_run = True
 
     def get_spike_counts(self, spikes, gather=True):
         """ Return the number of spikes for each neuron.
+
+        Defined by
+        http://neuralensemble.org/docs/PyNN/reference/populations.html
+
+        :param ~numpy.ndarray spikes:
+        :param gather: pointless on sPyNNaker
+        :rtype: dict(int,int)
         """
+        if not gather:
+            warn_once(
+                logger, "sPyNNaker only supports gather=True. We will run "
+                "as if gather was set to True.")
         n_spikes = {}
         counts = numpy.bincount(spikes[:, 0].astype(dtype=numpy.int32),
                                 minlength=self.__vertex.n_atoms)
@@ -481,6 +561,8 @@ class PyNNPopulationCommon(object):
     @property
     def structure(self):
         """ Return the structure for the population.
+
+        :rtype: ~pyNN.space.BaseStructure or None
         """
         return self.__structure
 
@@ -488,6 +570,8 @@ class PyNNPopulationCommon(object):
     def set_constraint(self, constraint):
         """ Apply a constraint to a population that restricts the processor\
             onto which its atoms will be placed.
+
+        :param ~pacman.model.constraints.AbstractConstraint constraint:
         """
         globals_variables.get_simulator().verify_not_running()
         if not isinstance(constraint, AbstractConstraint):
@@ -502,12 +586,9 @@ class PyNNPopulationCommon(object):
     def add_placement_constraint(self, x, y, p=None):
         """ Add a placement constraint
 
-        :param x: The x-coordinate of the placement constraint
-        :type x: int
-        :param y: The y-coordinate of the placement constraint
-        :type y: int
-        :param p: The processor ID of the placement constraint (optional)
-        :type p: int
+        :param int x: The x-coordinate of the placement constraint
+        :param int y: The y-coordinate of the placement constraint
+        :param int p: The processor ID of the placement constraint (optional)
         """
         globals_variables.get_simulator().verify_not_running()
         self.__vertex.add_constraint(ChipAndCoreConstraint(x, y, p))
@@ -519,9 +600,9 @@ class PyNNPopulationCommon(object):
     def set_mapping_constraint(self, constraint_dict):
         """ Add a placement constraint - for backwards compatibility
 
-        :param constraint_dict: A dictionary containing "x", "y" and\
-            optionally "p" as keys, and ints as values
-        :type constraint_dict: dict(str, int)
+        :param dict(str,int) constraint_dict:
+            A dictionary containing "x", "y" and optionally "p" as keys, and
+            ints as values
         """
         globals_variables.get_simulator().verify_not_running()
         self.add_placement_constraint(**constraint_dict)
@@ -533,7 +614,8 @@ class PyNNPopulationCommon(object):
     def set_max_atoms_per_core(self, max_atoms_per_core):
         """ Supports the setting of this population's max atoms per core
 
-        :param max_atoms_per_core: the new value for the max atoms per core.
+        :param int max_atoms_per_core:
+            the new value for the max atoms per core.
         """
         globals_variables.get_simulator().verify_not_running()
         self.__vertex.add_constraint(
@@ -544,15 +626,23 @@ class PyNNPopulationCommon(object):
     @property
     def size(self):
         """ The number of neurons in the population
+
+        :rtype: int
         """
         return self.__vertex.n_atoms
 
     @property
     def _get_vertex(self):
+        """
+        :rtype: ~pacman.model.graphs.application.ApplicationVertex
+        """
+        # Overridden by PopulationView
         return self.__vertex
 
     @property
     def _internal_delay_vertex(self):
+        """
+        """
         return self.__delay_vertex
 
     @_internal_delay_vertex.setter
@@ -563,27 +653,27 @@ class PyNNPopulationCommon(object):
     def _get_variable_unit(self, parameter_name):
         """ Helper method for getting units from a parameter used by the vertex
 
-        :param parameter_name: the parameter name to find the units for
+        :param str parameter_name: the parameter name to find the units for
         :return: the units in string form
+        :rtype: str
         """
         if self._vertex_contains_units:
             return self.__vertex.get_units(parameter_name)
         raise ConfigurationException(
             "This population does not support describing its units")
 
-    def _roundsize(self, size):
-        if isinstance(size, int):
-            return size
+    @staticmethod
+    def __roundsize(size, label):
         # External device population can have a size of None so accept for now
-        if size is None:
-            return None
+        if size is None or isinstance(size, int):
+            return size
         # Allow a float which has a near int value
         temp = int(round(size))
         if abs(temp - size) < 0.001:
             logger.warning("Size of the population rounded "
                            "from {} to {}. Please use int values for size",
-                           self.label, size, temp)
+                           label, size, temp)
             return temp
         raise ConfigurationException(
             "Size of a population with label {} must be an int,"
-            " received {}".format(self.label, size))
+            " received {}".format(label, size))
