@@ -72,9 +72,10 @@ class SynapseDynamicsStructuralSTDP(
             timing_dependence=None, weight_dependence=None,
             voltage_dependence=None, dendritic_delay_fraction=1.0,
             f_rew=SynapseDynamicsStructuralCommon.DEFAULT_F_REW,
-            initial_weight=
+            initial_weight=\
             SynapseDynamicsStructuralCommon.DEFAULT_INITIAL_WEIGHT,
-            initial_delay=SynapseDynamicsStructuralCommon.DEFAULT_INITIAL_DELAY,
+            initial_delay=\
+            SynapseDynamicsStructuralCommon.DEFAULT_INITIAL_DELAY,
             s_max=SynapseDynamicsStructuralCommon.DEFAULT_S_MAX, seed=None,
             weight=0.0, delay=1.0, backprop_delay=True):
         """
@@ -236,11 +237,6 @@ class SynapseDynamicsStructuralSTDP(
     @overrides(AbstractSynapseDynamicsStructural.elimination)
     def elimination(self):
         return self.__elimination
-
-    @property
-    @overrides(SynapseDynamicsStructuralCommon.partner_selection)
-    def partner_selection(self):
-        return self.__partner_selection
 
     @property
     @overrides(SynapseDynamicsStructuralCommon.connections)

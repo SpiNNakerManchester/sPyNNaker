@@ -26,7 +26,7 @@ from spynnaker.pyNN.exceptions import SynapticConfigurationException
 
 
 class SynapseDynamicsStructuralStatic(
-    SynapseDynamicsStatic, SynapseDynamicsStructuralCommon):
+        SynapseDynamicsStatic, SynapseDynamicsStructuralCommon):
     """ Class that enables synaptic rewiring in the absence of STDP.
 
         It acts as a wrapper around SynapseDynamicsStatic, meaning that \
@@ -72,9 +72,10 @@ class SynapseDynamicsStructuralStatic(
     def __init__(
             self, partner_selection, formation, elimination,
             f_rew=SynapseDynamicsStructuralCommon.DEFAULT_F_REW,
-            initial_weight=
+            initial_weight=\
             SynapseDynamicsStructuralCommon.DEFAULT_INITIAL_WEIGHT,
-            initial_delay=SynapseDynamicsStructuralCommon.DEFAULT_INITIAL_DELAY,
+            initial_delay=\
+            SynapseDynamicsStructuralCommon.DEFAULT_INITIAL_DELAY,
             s_max=SynapseDynamicsStructuralCommon.DEFAULT_S_MAX, seed=None,
             weight=0.0, delay=1.0):
         """
@@ -145,7 +146,6 @@ class SynapseDynamicsStructuralStatic(
 
         # Otherwise, it is static, so return ourselves
         return self
-
 
     def set_projection_parameter(self, param, value):
         """
@@ -240,11 +240,6 @@ class SynapseDynamicsStructuralStatic(
     @overrides(AbstractSynapseDynamicsStructural.elimination)
     def elimination(self):
         return self.__elimination
-
-    @property
-    @overrides(SynapseDynamicsStructuralCommon.partner_selection)
-    def partner_selection(self):
-        return self.__partner_selection
 
     @property
     @overrides(SynapseDynamicsStructuralCommon.connections)

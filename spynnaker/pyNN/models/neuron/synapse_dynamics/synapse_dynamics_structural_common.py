@@ -60,7 +60,6 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
     #: Default value for maximum fan-in per target layer neuron
     DEFAULT_S_MAX = 32
 
-
     def get_parameter_names(self):
         """
         :rtype: list(str)
@@ -320,7 +319,8 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
             numpy.concatenate(padded_rows).T, formats="u1, u1, u2").view("u4")
         spec.write_array(post_to_pre)
 
-    @overrides(AbstractSynapseDynamicsStructural.get_structural_parameters_sdram_usage_in_bytes)
+    @overrides(AbstractSynapseDynamicsStructural.
+               get_structural_parameters_sdram_usage_in_bytes)
     def get_structural_parameters_sdram_usage_in_bytes(
             self, application_graph, app_vertex, n_neurons, n_synapse_types):
         """ Get the size of SDRAM usage for the structural parameters
@@ -387,13 +387,6 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
              type(synapse_dynamics.formation)) and
             (type(self.elimination) ==
              type(synapse_dynamics.elimination)))
-
-    @abstractproperty
-    def partner_selection(self):
-        """ The partner selection rule
-
-        :rtype: AbstractPartnerSelection
-        """
 
     @abstractproperty
     def connections(self):
