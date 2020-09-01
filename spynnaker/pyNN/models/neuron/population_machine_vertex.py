@@ -24,21 +24,25 @@ from spinn_front_end_common.interface.buffer_management.buffer_models import (
 from spinn_front_end_common.utilities.helpful_functions import (
     locate_memory_region_for_placement)
 from spinn_front_end_common.abstract_models import (
-    AbstractRecordable, AbstractSupportsBitFieldGeneration,
+    AbstractHasAssociatedBinary, AbstractRecordable,
+    AbstractSupportsBitFieldGeneration,
     AbstractSupportsBitFieldRoutingCompression)
 from spinn_front_end_common.interface.profiling import AbstractHasProfileData
 from spinn_front_end_common.interface.profiling.profile_utils import (
     get_profiling_data)
+from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spynnaker.pyNN.utilities.constants import POPULATION_BASED_REGIONS
 
 
 class PopulationMachineVertex(
         MachineVertex, AbstractReceiveBuffersToHost,
-        ProvidesProvenanceDataFromMachineImpl, AbstractRecordable,
-        AbstractHasProfileData, AbstractSupportsBitFieldGeneration,
+        AbstractHasAssociatedBinary, ProvidesProvenanceDataFromMachineImpl,
+        AbstractRecordable, AbstractHasProfileData,
+        AbstractSupportsBitFieldGeneration,
         AbstractSupportsBitFieldRoutingCompression):
 
     __slots__ = [
+        "__binary_file_name",
         "__recorded_region_ids",
         "__resources",
         "__on_chip_generatable_area",
@@ -143,7 +147,7 @@ class PopulationMachineVertex(
 
     def __init__(
             self, resources_required, recorded_region_ids, label, constraints,
-            app_vertex, vertex_slice, drop_late_spikes):
+            app_vertex, vertex_slice, drop_late_spikes, binary_file_name):
         """
         :param ~pacman.model.resources.ResourceContainer resources_required:
         :param iterable(int) recorded_region_ids:
@@ -154,9 +158,11 @@ class PopulationMachineVertex(
             The associated application vertex
         :param ~pacman.model.graphs.common.Slice vertex_slice:
             The slice of the population that this implements
+        @param str binary_file_name: binary name to be run for this verte
         """
         MachineVertex.__init__(
             self, label, constraints, app_vertex, vertex_slice)
+        self.__binary_file_name = binary_file_name
         AbstractRecordable.__init__(self)
         self.__recorded_region_ids = recorded_region_ids
         self.__resources = resources_required
@@ -368,3 +374,11 @@ class PopulationMachineVertex(
         return get_profiling_data(
             POPULATION_BASED_REGIONS.PROFILING.value,
             self._PROFILE_TAG_LABELS, transceiver, placement)
+
+    @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
+    def get_binary_file_name(self):
+        return self.__binary_file_name
+
+    @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
+    def get_binary_start_type(self):
+        return ExecutableType.USES_SIMULATION_INTERFACE

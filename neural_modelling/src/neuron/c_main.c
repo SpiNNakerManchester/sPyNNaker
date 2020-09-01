@@ -285,10 +285,10 @@ void resume_callback(void) {
 //! \param[in] timer_count: the number of times this call back has been
 //!            executed since start of simulation
 //! \param[in] unused: unused parameter kept for API consistency
-void timer_callback(uint timer_count, uint unused) {
+void timer_callback(uint timer_count, UNUSED uint unused) {
     use(unused);
-    global_timer_count = timer_count;
 
+    global_timer_count = timer_count;
     profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
 
     time++;

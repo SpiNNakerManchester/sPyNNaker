@@ -40,6 +40,10 @@
 
 #include <common/spin1-wfi.h>
 
+#ifndef UNUSED
+#define UNUSED __attribute__((__unused__))
+#endif
+
 // ----------------------------------------------------------------------
 
 //! Spin1 API ticks, to know when the timer wraps
@@ -680,9 +684,7 @@ static void process_slow_source(
 //! \param[in] unused: for consistency sake of the API always returning two
 //!     parameters, this parameter has no semantics currently and thus
 //!     is set to 0
-static void timer_callback(uint timer_count, uint unused) {
-    use(unused);
-
+static void timer_callback(uint timer_count, UNUSED uint unused) {
     profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
 
     time++;

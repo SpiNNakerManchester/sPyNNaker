@@ -31,7 +31,7 @@ from spinn_front_end_common.abstract_models.impl.requires_tdma import \
     RequiresTDMA
 from spinn_front_end_common.abstract_models import (
     AbstractChangableAfterRun, AbstractProvidesOutgoingPartitionConstraints,
-    AbstractGeneratesDataSpecification, AbstractHasAssociatedBinary,
+    AbstractGeneratesDataSpecification,
     AbstractRewritesDataSpecification)
 from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl)
@@ -43,7 +43,6 @@ from spinn_front_end_common.utilities import (
 from spinn_front_end_common.utilities.constants import (
     SYSTEM_BYTES_REQUIREMENT, SIMULATION_N_BYTES, BYTES_PER_WORD,
     MICRO_TO_MILLISECOND_CONVERSION, MICRO_TO_SECOND_CONVERSION)
-from spinn_front_end_common.utilities.utility_objs import ExecutableType
 from spinn_front_end_common.utilities.exceptions import ConfigurationException
 from spinn_front_end_common.interface.profiling import profile_utils
 from spynnaker.pyNN.models.common import (
@@ -114,7 +113,7 @@ def _flatten(alist):
 
 class SpikeSourcePoissonVertex(
         ApplicationVertex, AbstractGeneratesDataSpecification,
-        AbstractHasAssociatedBinary, AbstractSpikeRecordable,
+        AbstractSpikeRecordable,
         AbstractProvidesOutgoingPartitionConstraints,
         AbstractChangableAfterRun, AbstractReadParametersBeforeSet,
         AbstractRewritesDataSpecification, SimplePopulationSettable,
@@ -779,7 +778,6 @@ class SpikeSourcePoissonVertex(
         final_data = numpy.concatenate([
             numpy.concatenate(([len(d), indices[i]], numpy.concatenate(d)))
             for i, d in enumerate(core_data_split[:-1])])
-        print(final_data)
         spec.write_array(final_data)
 
     @staticmethod
@@ -977,7 +975,7 @@ class SpikeSourcePoissonVertex(
         # write setup data
         spec.switch_write_focus(_REGIONS.SYSTEM_REGION.value)
         spec.write_array(simulation_utilities.get_simulation_header_array(
-            self.get_binary_file_name(), machine_time_step,
+            placement.vertex.get_binary_file_name(), machine_time_step,
             time_scale_factor))
 
         # write recording data
@@ -1008,14 +1006,6 @@ class SpikeSourcePoissonVertex(
 
         # End-of-Spec:
         spec.end_specification()
-
-    @overrides(AbstractHasAssociatedBinary.get_binary_file_name)
-    def get_binary_file_name(self):
-        return "spike_source_poisson.aplx"
-
-    @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
-    def get_binary_start_type(self):
-        return ExecutableType.USES_SIMULATION_INTERFACE
 
     @overrides(AbstractSpikeRecordable.get_spikes)
     def get_spikes(self, placements, buffer_manager, machine_time_step):
