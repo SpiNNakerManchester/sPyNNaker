@@ -215,10 +215,10 @@ class SynapseDynamicsStructuralCommon(object):
 
         # Write the component parameters
         self.__partner_selection.write_parameters(spec)
-        for _, synapse_info in structural_edges:
+        for synapse_info in structural_edges.values():
             dynamics = synapse_info.synapse_dynamics
             dynamics.formation.write_parameters(spec)
-        for _, synapse_info in structural_edges:
+        for synapse_info in structural_edges.values():
             dynamics = synapse_info.synapse_dynamics
             dynamics.elimination.write_parameters(
                 spec, weight_scales[synapse_info.synapse_type])
@@ -227,21 +227,19 @@ class SynapseDynamicsStructuralCommon(object):
         """
         :param ~pacman.model.graphs.application.ApplicationGraph app_graph:
         :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
-        :rtype: list(tuple(ProjectionApplicationEdge, SynapseInformation))
+        :rtype: dict(ProjectionApplicationEdge, SynapseInformation)
         """
-        structural_edges = list()
+        structural_edges = dict()
         for app_edge in app_graph.get_edges_ending_at_vertex(app_vertex):
             if isinstance(app_edge, ProjectionApplicationEdge):
-                found = False
                 for synapse_info in app_edge.synapse_information:
                     if isinstance(synapse_info.synapse_dynamics,
                                   AbstractSynapseDynamicsStructural):
-                        if found:
+                        if app_edge in structural_edges:
                             raise SynapticConfigurationException(
                                 "Only one Projection between each pair of "
                                 "Populations can use structural plasticity")
-                        found = True
-                        structural_edges.append((app_edge, synapse_info))
+                        structural_edges[app_edge] = synapse_info
         return structural_edges
 
     def __write_common_rewiring_data(
@@ -318,7 +316,7 @@ class SynapseDynamicsStructuralCommon(object):
         """
         pop_index = dict()
         index = 0
-        for app_edge, synapse_info in structural_edges:
+        for app_edge, synapse_info in structural_edges.items():
             pop_index[app_edge.pre_vertex, synapse_info] = index
             index += 1
             machine_edges = [
@@ -433,7 +431,7 @@ class SynapseDynamicsStructuralCommon(object):
         # for key_atom_info
         n_sub_edges = 0
         structural_edges = self.__get_structural_edges(
-            application_graph, app_vertex)
+            application_graph, app_vertex).items()
         # Also keep track of the parameter sizes
         param_sizes = self.__partner_selection\
             .get_parameters_sdram_usage_in_bytes()
