@@ -78,7 +78,7 @@ bool neuron_resume(address_t address) { // EXPORTED
 bool neuron_initialise(
         address_t address, address_t recording_address, // EXPORTED
         uint32_t *n_neurons_value, uint32_t *n_synapse_types_value,
-        uint32_t *incoming_spike_buffer_size, uint32_t *n_regions_used) {
+        uint32_t *incoming_spike_buffer_size, uint32_t *n_rec_regions_used) {
     log_debug("neuron_initialise: starting");
 
     // init the TDMA
@@ -124,7 +124,7 @@ bool neuron_initialise(
 
     // setup recording region
     if (!neuron_recording_initialise(
-            recording_address, &recording_flags, n_neurons, n_regions_used)) {
+            recording_address, &recording_flags, n_neurons, n_rec_regions_used)) {
         return false;
     }
 

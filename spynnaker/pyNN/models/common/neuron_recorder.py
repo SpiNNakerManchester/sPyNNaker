@@ -135,8 +135,9 @@ class NeuronRecorder(object):
             self.__sampling_rates[variable] = 0
             self.__indexes[variable] = None
             self.__region_ids[variable] = region_id
-        for ts_region_id, variable in enumerate(per_timestep_variables):
-            self.__region_ids[variable] = region_id + ts_region_id + 1
+        for ts_region_id, variable in enumerate(
+                per_timestep_variables, start=region_id + 1):
+            self.__region_ids[variable] = ts_region_id
 
     def _count_recording_per_slice(self, variable, vertex_slice):
         """
@@ -285,6 +286,7 @@ class NeuronRecorder(object):
             self, label, buffer_manager, placements, application_vertex,
             sampling_rate, data_type, variable, n_machine_time_steps):
         vertices = application_vertex.machine_vertices
+        region = self.__region_ids[variable]
         missing_str = ""
         pop_level_data = None
         sampling_interval = get_sampling_interval(sampling_rate)
@@ -305,7 +307,6 @@ class NeuronRecorder(object):
                 indexes.extend(neurons)
             else:
                 indexes.append(i)
-            region = self.__region_ids[variable]
             placement_data = self._get_placement_matrix_data(
                 placements, vertex, region, buffer_manager, expected_rows,
                 missing_str, sampling_rate, label, data_type,
