@@ -29,8 +29,8 @@ from .synapse_dynamics_structural_stdp import SynapseDynamicsStructuralSTDP
 __all__ = ["AbstractGenerateOnMachine", "AbstractPlasticSynapseDynamics",
            "AbstractStaticSynapseDynamics", "AbstractSynapseDynamics",
            "AbstractSynapseDynamicsStructural", "PyNNSynapseDynamics",
-           "SynapseDynamicsStructuralCommon",
            "SynapseDynamicsStatic", "SynapseDynamicsSTDP",
            # Structural plasticity
+           "SynapseDynamicsStructuralCommon",
            "SynapseDynamicsStructuralStatic",
            "SynapseDynamicsStructuralSTDP"]

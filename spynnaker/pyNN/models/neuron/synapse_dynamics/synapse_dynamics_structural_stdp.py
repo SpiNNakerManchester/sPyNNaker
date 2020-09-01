@@ -18,13 +18,13 @@ from spinn_utilities.overrides import overrides
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
 from .synapse_dynamics_stdp import SynapseDynamicsSTDP
-from spynnaker.pyNN.models.neuron.synapse_dynamics \
-    import SynapseDynamicsStructuralCommon as CommonSP
+from spynnaker.pyNN.models.neuron.synapse_dynamics import (
+    SynapseDynamicsStructuralCommon)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 
 
 class SynapseDynamicsStructuralSTDP(
-        SynapseDynamicsSTDP, CommonSP):
+        SynapseDynamicsSTDP, SynapseDynamicsStructuralCommon):
     """ Class that enables synaptic rewiring in the presence of STDP.
 
         It acts as a wrapper around SynapseDynamicsSTDP, meaning rewiring can\
@@ -71,10 +71,11 @@ class SynapseDynamicsStructuralSTDP(
             self, partner_selection, formation, elimination,
             timing_dependence=None, weight_dependence=None,
             voltage_dependence=None, dendritic_delay_fraction=1.0,
-            f_rew=CommonSP.DEFAULT_F_REW,
-            initial_weight=CommonSP.DEFAULT_INITIAL_WEIGHT,
-            initial_delay=CommonSP.DEFAULT_INITIAL_DELAY,
-            s_max=CommonSP.DEFAULT_S_MAX, seed=None,
+            f_rew=SynapseDynamicsStructuralCommon.DEFAULT_F_REW,
+            initial_weight=
+            SynapseDynamicsStructuralCommon.DEFAULT_INITIAL_WEIGHT,
+            initial_delay=SynapseDynamicsStructuralCommon.DEFAULT_INITIAL_DELAY,
+            s_max=SynapseDynamicsStructuralCommon.DEFAULT_S_MAX, seed=None,
             weight=0.0, delay=1.0, backprop_delay=True):
         """
         :param AbstractPartnerSelection partner_selection:
@@ -129,7 +130,8 @@ class SynapseDynamicsStructuralSTDP(
     def merge(self, synapse_dynamics):
         # If other is structural, check structural matches
         if isinstance(synapse_dynamics, AbstractSynapseDynamicsStructural):
-            if not CommonSP.is_same_as(self, synapse_dynamics):
+            if not SynapseDynamicsStructuralCommon.is_same_as(
+                    self, synapse_dynamics):
                 raise SynapticConfigurationException(
                     "Synapse dynamics must match exactly when using multiple"
                     " edges to the same population")
@@ -161,12 +163,14 @@ class SynapseDynamicsStructuralSTDP(
         if (isinstance(synapse_dynamics, SynapseDynamicsSTDP) and
                 not SynapseDynamicsSTDP.is_same_as(self, synapse_dynamics)):
             return False
-        return CommonSP.is_same_as(self, synapse_dynamics)
+        return SynapseDynamicsStructuralCommon.is_same_as(
+            self, synapse_dynamics)
 
     @overrides(SynapseDynamicsSTDP.get_vertex_executable_suffix)
     def get_vertex_executable_suffix(self):
         return SynapseDynamicsSTDP.get_vertex_executable_suffix(self) +\
-                CommonSP.get_vertex_executable_suffix(self)
+                SynapseDynamicsStructuralCommon.get_vertex_executable_suffix(
+                    self)
 
     @overrides(SynapseDynamicsSTDP.get_n_words_for_plastic_connections)
     def get_n_words_for_plastic_connections(self, n_connections):
@@ -190,7 +194,7 @@ class SynapseDynamicsStructuralSTDP(
     @overrides(SynapseDynamicsSTDP.get_parameter_names)
     def get_parameter_names(self):
         names = SynapseDynamicsSTDP.get_parameter_names(self)
-        names.extend(SynapseDynamicsStructural.get_parameter_names(self))
+        names.extend(SynapseDynamicsStructuralCommon.get_parameter_names(self))
         return names
 
     @property
@@ -234,12 +238,12 @@ class SynapseDynamicsStructuralSTDP(
         return self.__elimination
 
     @property
-    @overrides(CommonSP.partner_selection)
+    @overrides(SynapseDynamicsStructuralCommon.partner_selection)
     def partner_selection(self):
         return self.__partner_selection
 
     @property
-    @overrides(CommonSP.connections)
+    @overrides(SynapseDynamicsStructuralCommon.connections)
     def connections(self):
         return self.__connections
 
@@ -253,7 +257,7 @@ class SynapseDynamicsStructuralSTDP(
             connector, synapse_info)
         return max(w_max, self.__initial_weight)
 
-    @overrides(CommonSP.get_seeds)
+    @overrides(SynapseDynamicsStructuralCommon.get_seeds)
     def get_seeds(self, app_vertex=None):
         if app_vertex:
             if app_vertex not in self.__seeds.keys():
