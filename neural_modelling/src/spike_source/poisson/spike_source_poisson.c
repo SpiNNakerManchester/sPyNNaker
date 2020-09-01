@@ -33,11 +33,10 @@
 #include <bit_field.h>
 #include <stdfix-full-iso.h>
 #include <limits.h>
+#include <spin1-wfi.h>
 
 #include "profile_tags.h"
 #include <profiler.h>
-
-#include <common/spin1-wfi.h>
 
 #ifndef UNUSED
 #define UNUSED __attribute__((__unused__))
@@ -184,7 +183,7 @@ static uint32_t n_spike_buffer_words;
 static uint32_t spike_buffer_size;
 
 //! True if DMA recording is currently in progress
-static bool recording_in_progress = false;
+static volatile bool recording_in_progress = false;
 
 //! The timer period
 static uint32_t timer_period;

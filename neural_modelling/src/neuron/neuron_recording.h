@@ -24,7 +24,7 @@
 #include <common/neuron-typedefs.h>
 #include <bit_field.h>
 #include <recording.h>
-#include <common/spin1-wfi.h>
+#include <spin1-wfi.h>
 
 //! A struct of the different types of recorded data
 // Note data is just bytes here but actual type is used on writing
@@ -66,7 +66,7 @@ extern uint8_t **neuron_recording_indexes;
 extern uint8_t **bitfield_recording_indexes;
 
 //! The number of recordings outstanding
-extern uint32_t n_recordings_outstanding;
+extern volatile uint32_t n_recordings_outstanding;
 
 //! An array of recording information structures
 extern recording_info_t *recording_info;
@@ -211,7 +211,7 @@ static inline void neuron_recording_setup_for_next_recording(void) {
     // Wait until recordings have completed, to ensure the recording space
     // can be re-written
     while (n_recordings_outstanding > 0) {
-       spin1_wfi();
+        spin1_wfi();
     }
 
     // Reset the bitfields before starting if a beginning of recording
