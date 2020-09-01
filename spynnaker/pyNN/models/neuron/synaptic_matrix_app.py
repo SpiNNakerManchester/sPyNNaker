@@ -337,7 +337,7 @@ class SynapticMatrixApp(object):
 
         # Write a matrix for the whole application vertex
         block_addr = self.__poptable.write_padding(spec, block_addr)
-        self.__index = self.__poptable.update_master_population_table(
+        self.__index = self.__poptable.add_application_entry(
             block_addr,  self.__max_row_info.undelayed_max_words,
             self.__app_key_info.key_and_mask, self.__app_key_info.core_mask,
             self.__app_key_info.core_shift, self.__app_key_info.n_neurons)
@@ -378,7 +378,7 @@ class SynapticMatrixApp(object):
 
         # Write a matrix for the whole application vertex
         block_addr = self.__poptable.write_padding(spec, block_addr)
-        self.__delay_index = self.__poptable.update_master_population_table(
+        self.__delay_index = self.__poptable.add_application_entry(
             block_addr, self.__max_row_info.delayed_max_words,
             self.__delay_app_key_info.key_and_mask,
             self.__delay_app_key_info.core_mask,
@@ -485,7 +485,7 @@ class SynapticMatrixApp(object):
             return block_addr, SYN_REGION_UNUSED, None
 
         block_addr = self.__poptable.get_next_allowed_address(block_addr)
-        self.__index = self.__poptable.update_master_population_table(
+        self.__index = self.__poptable.add_application_entry(
             block_addr, self.__max_row_info.undelayed_max_words,
             self.__app_key_info.key_and_mask, self.__app_key_info.core_mask,
             self.__app_key_info.core_shift, self.__app_key_info.n_neurons)
@@ -507,7 +507,7 @@ class SynapticMatrixApp(object):
             return block_addr, SYN_REGION_UNUSED, None
 
         block_addr = self.__poptable.get_next_allowed_address(block_addr)
-        self.__delay_index = self.__poptable.update_master_population_table(
+        self.__delay_index = self.__poptable.add_application_entry(
             block_addr, self.__max_row_info.delayed_max_words,
             self.__delay_app_key_info.key_and_mask,
             self.__delay_app_key_info.core_mask,

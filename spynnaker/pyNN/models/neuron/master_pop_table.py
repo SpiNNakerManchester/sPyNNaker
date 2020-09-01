@@ -392,10 +392,27 @@ class MasterPopTableAsBinarySearch(object):
         self.__entries = dict()
         self.__n_addresses = 0
 
-    def update_master_population_table(
-            self, block_start_addr, row_length, key_and_mask, core_mask=0,
-            core_shift=0, n_neurons=0, is_single=False):
-        """ Add an entry in the binary search to deal with the synaptic matrix
+    def add_machine_entry(
+            self, block_start_addr, row_length, key_and_mask, is_single=False):
+        """ Add an entry for a machine-edge to the population table
+
+        :param int block_start_addr: where the synaptic matrix block starts
+        :param int row_length: how long in words each row is
+        :param ~pacman.model.routing_info.BaseKeyAndMask key_and_mask:
+            the key and mask for this master pop entry
+        :param bool is_single:
+            Flag that states if the entry is a direct entry for a single row.
+        :return: The index of the entry, to be used to retrieve it
+        :rtype: int
+        :raises SynapticConfigurationException: If a bad address is used.
+        """
+        return self.__update_master_population_table(
+            block_start_addr, row_length, key_and_mask, 0, 0, 0, is_single)
+
+    def add_application_entry(
+            self, block_start_addr, row_length, key_and_mask, core_mask,
+            core_shift, n_neurons):
+        """ Add an entry for an application-edge to the population table
 
         :param int block_start_addr: where the synaptic matrix block starts
         :param int row_length: how long in words each row is
@@ -423,6 +440,31 @@ class MasterPopTableAsBinarySearch(object):
             raise SynapticConfigurationException(
                 "The core mask of {} is too big (maximum {})".format(
                     core_mask, _MAX_CORE_MASK))
+
+        self.__update_master_population_table(
+            block_start_addr, row_length, key_and_mask, core_mask, core_shift,
+            n_neurons, False)
+
+    def __update_master_population_table(
+            self, block_start_addr, row_length, key_and_mask, core_mask,
+            core_shift, n_neurons, is_single):
+        """ Add an entry in the binary search to deal with the synaptic matrix
+
+        :param int block_start_addr: where the synaptic matrix block starts
+        :param int row_length: how long in words each row is
+        :param ~pacman.model.routing_info.BaseKeyAndMask key_and_mask:
+            the key and mask for this master pop entry
+        :param int core_mask:
+            Mask for the part of the key that identifies the core
+        :param int core_shift: The shift of the mask to get to the core_mask
+        :param int n_neurons:
+            The number of neurons in each machine vertex (bar the last)
+        :param bool is_single:
+            Flag that states if the entry is a direct entry for a single row.
+        :return: The index of the entry, to be used to retrieve it
+        :rtype: int
+        :raises SynapticConfigurationException: If a bad address is used.
+        """
 
         # pylint: disable=too-many-arguments, arguments-differ
         if key_and_mask.key not in self.__entries:
