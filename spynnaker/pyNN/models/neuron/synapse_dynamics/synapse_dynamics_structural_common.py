@@ -20,7 +20,8 @@ from data_specification.enums.data_type import DataType
 from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION, MICRO_TO_SECOND_CONVERSION,
     BYTES_PER_WORD, BYTES_PER_SHORT)
-from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
+from spynnaker.pyNN.models.neural_projections import (
+    ProjectionApplicationEdge, ProjectionMachineEdge)
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
@@ -172,7 +173,7 @@ class SynapseDynamicsStructuralCommon(object):
 
     def write_parameters(
             self, spec, region, machine_time_step, weight_scales,
-            application_graph, app_vertex, post_slice, routing_info,
+            application_graph, app_vertex, machine_graph, machine_vertex, post_slice, routing_info,
             synapse_indices):
         """ Write the synapse parameters to the spec.
 
@@ -199,7 +200,12 @@ class SynapseDynamicsStructuralCommon(object):
         # Get relevant edges
         structural_edges = self.__get_structural_edges(
             application_graph, app_vertex)
+        structural_edges2, machine_edges2 = self.__get_structural_edges2(
+            machine_graph, machine_vertex)
 
+        assert(structural_edges == structural_edges2)
+        assert(machine_vertex.vertex_slice == post_slice)
+        assert(machine_vertex.app_vertex == app_vertex)
         # Write the common part of the rewiring data
         self.__write_common_rewiring_data(
             spec, app_vertex, post_slice, machine_time_step,
@@ -207,7 +213,7 @@ class SynapseDynamicsStructuralCommon(object):
 
         # Write the pre-population info
         pop_index = self.__write_prepopulation_info(
-            spec, app_vertex, structural_edges, routing_info, weight_scales,
+            spec, app_vertex, structural_edges2, machine_edges2, routing_info, weight_scales,
             post_slice, synapse_indices, machine_time_step)
 
         # Write the post-to-pre table
@@ -241,6 +247,33 @@ class SynapseDynamicsStructuralCommon(object):
                                 "Populations can use structural plasticity")
                         structural_edges[app_edge] = synapse_info
         return structural_edges
+
+    def __get_structural_edges2(self, machine_graph, machine_vertex):
+        """
+        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
+        :param ~pacman.model.graphs.machine.MachineVertex machine_vertex:
+        :rtype: dict(ProjectionApplicationEdge, SynapseInformation)
+        """
+        structural_edges = dict()
+        machine_edges = collections.defaultdict(list)
+        for machine_edge in machine_graph.get_edges_ending_at_vertex(
+                machine_vertex):
+            if isinstance(machine_edge, ProjectionMachineEdge):
+                for synapse_info in machine_edge.synapse_information:
+                    if isinstance(synapse_info.synapse_dynamics,
+                                  AbstractSynapseDynamicsStructural):
+                        app_edge = machine_edge.app_edge
+                        if app_edge in structural_edges:
+                            if (structural_edges[machine_edge] !=
+                                    synapse_info):
+                               raise SynapticConfigurationException(
+                                    "Only one Projection between each pair of "
+                                    "Populations can use structural plasticity")
+                        else:
+                            structural_edges[app_edge] = \
+                                synapse_info
+                        machine_edges[app_edge].append(machine_edge)
+        return structural_edges, machine_edges
 
     def __write_common_rewiring_data(
             self, spec, app_vertex, post_slice, machine_time_step, n_pre_pops):
@@ -299,7 +332,7 @@ class SynapseDynamicsStructuralCommon(object):
         spec.write_value(data=n_pre_pops)
 
     def __write_prepopulation_info(
-            self, spec, app_vertex, structural_edges,
+            self, spec, app_vertex, structural_edges, machine_edges2,
             routing_info, weight_scales, post_slice, synapse_indices,
             machine_time_step):
         """
@@ -322,6 +355,8 @@ class SynapseDynamicsStructuralCommon(object):
             machine_edges = [
                 e for e in app_edge.machine_edges
                 if e.post_vertex.vertex_slice == post_slice]
+
+            assert ( machine_edges == machine_edges2[app_edge])
             dynamics = synapse_info.synapse_dynamics
 
             # Number of machine edges
@@ -349,7 +384,7 @@ class SynapseDynamicsStructuralCommon(object):
             # Total number of atoms in pre-vertex
             spec.write_value(app_edge.pre_vertex.n_atoms)
             # Machine edge information
-            for machine_edge in machine_edges:
+            for machine_edge in machine_edges2[app_edge]:
                 r_info = routing_info.get_routing_info_for_edge(machine_edge)
                 vertex_slice = machine_edge.pre_vertex.vertex_slice
                 spec.write_value(r_info.first_key)
