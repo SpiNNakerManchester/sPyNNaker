@@ -25,7 +25,7 @@ from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
 from spinn_front_end_common.abstract_models import (
     AbstractChangableAfterRun, AbstractProvidesOutgoingPartitionConstraints,
-    AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification, 
+    AbstractGeneratesDataSpecification, AbstractRewritesDataSpecification,
     AbstractCanReset)
 from spinn_front_end_common.abstract_models.impl import (
     ProvidesKeyToAtomMappingImpl)
