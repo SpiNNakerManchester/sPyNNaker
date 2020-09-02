@@ -34,8 +34,7 @@ static inline void lif_neuron_closed_form(
 }
 
 void neuron_model_set_global_neuron_params(
-        const global_neuron_params_t *params) {
-    use(params);
+        UNUSED const global_neuron_params_t *params) {
     // Does Nothing - no params
 }
 
