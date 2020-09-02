@@ -25,6 +25,14 @@ static uint32_t synapse_type_mask;
 uint32_t num_plastic_pre_synaptic_events = 0;
 uint32_t plastic_saturation_count = 0;
 
+//! The type of configuration parameters in SDRAM (written by host)
+typedef struct stdp_params {
+    //! The back-propagation delay, in basic simulation timesteps
+    uint32_t backprop_delay;
+} stdp_params;
+
+//! Configuration parameters
+static stdp_params params;
 //---------------------------------------
 // Macros
 //---------------------------------------
@@ -109,8 +117,8 @@ static inline final_state_t _plasticity_update_synapse(
     post_event_window_t post_window = post_events_get_window_delayed(
             post_event_history, window_begin_time, window_end_time);
 
-    log_debug("\tPerforming deferred synapse update at time:%u", time);
-    log_debug("\t\tbegin_time:%u, end_time:%u - prev_time:%u, num_events:%u",
+    log_info("\tPerforming deferred synapse update at time:%u", time);
+    log_info("\t\tbegin_time:%u, end_time:%u - prev_time:%u, num_events:%u",
         window_begin_time, window_end_time, post_window.prev_time,
         post_window.num_events);
 
@@ -266,9 +274,12 @@ static inline index_t _sparse_axonal_delay(uint32_t x) {
     return ((x >> synapse_delay_index_type_bits) & SYNAPSE_AXONAL_DELAY_MASK);
 }
 
-address_t synapse_dynamics_initialise(
+bool synapse_dynamics_initialise(
         address_t address, uint32_t n_neurons, uint32_t n_synapse_types,
         uint32_t *ring_buffer_to_input_buffer_left_shifts) {
+    stdp_params *sdram_params = (stdp_params *) address;
+    spin1_memcpy(&params, sdram_params, sizeof(stdp_params));
+    address = (address_t) &sdram_params[1];
 
     // Load timing dependence data
     address_t weight_region_address = timing_initialise(address);
@@ -281,12 +292,12 @@ address_t synapse_dynamics_initialise(
         weight_region_address, n_synapse_types,
         ring_buffer_to_input_buffer_left_shifts);
     if (weight_result == NULL) {
-        return NULL;
+        return false;
     }
 
     post_event_history = post_events_init_buffers(n_neurons);
     if (post_event_history == NULL) {
-        return NULL;
+        return false;
     }
 
     uint32_t n_neurons_power_2 = n_neurons;
@@ -312,7 +323,7 @@ address_t synapse_dynamics_initialise(
         SYNAPSE_DELAY_BITS + synapse_type_index_bits;
     synapse_type_mask = (1 << log_n_synapse_types) - 1;
 
-    return weight_result;
+    return true;
 }
 
 bool synapse_dynamics_process_plastic_synapses(

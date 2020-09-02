@@ -188,21 +188,6 @@ static inline post_event_window_t post_events_next_delayed(
 }
 
 //---------------------------------------
-static inline post_event_window_t post_events_next_delayed(
-        post_event_window_t window, uint32_t delayed_time) {
-    // Update previous time and increment next time
-    window.prev_time = delayed_time;
-    window.prev_trace = *window.next_trace++;
-
-    // Go onto next event
-    window.next_time++;
-
-    // Decrement remaining events
-    window.num_events--;
-    return window;
-}
-
-//---------------------------------------
 //! \brief Add a post-synaptic event to the history
 //! \param[in] time: the time of the event
 //! \param[in,out] events: the history to add to
@@ -228,15 +213,6 @@ static inline void post_events_add(
         events->times[MAX_POST_SYNAPTIC_EVENTS - 1] = time;
         events->traces[MAX_POST_SYNAPTIC_EVENTS - 1] = trace;
     }
-}
-
-// TODO This function is removed in master. Does this still serve any purpose?
-static inline void print_event_history(post_event_history_t *events) {
-	log_debug("		##  printing entire post event history  ##");
-	for (uint32_t i = 0; i <= events->count_minus_one; i++) {
-		log_debug("post event: %u, time: %u, trace: %u",
-		        i, events->times[i], events->traces[i]);
-	}
 }
 
 //! \brief Print the post-synaptic event history

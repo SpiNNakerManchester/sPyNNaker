@@ -28,7 +28,7 @@ typedef int16_t pre_trace_t;
 // Helper macros for looking up decays
 #define EXP_SIN_LOOKUP(time) \
     maths_lut_exponential_decay( \
-        time, TAU_PLUS_TIME_SHIFT, EXP_SIN_LUT_SIZE, exp_sin_lookup)
+        time, exp_sin_lookup)
 //#define DECAY_LOOKUP_TAU_MINUS(time) \
 //    maths_lut_exponential_decay( \
 //        time, TAU_MINUS_TIME_SHIFT, TAU_MINUS_SIZE, tau_minus_lookup)
@@ -37,6 +37,7 @@ typedef int16_t pre_trace_t;
 // Externals
 //---------------------------------------
 extern int16_t exp_sin_lookup[EXP_SIN_LUT_SIZE];
+//extern int16_lut *exp_sin_lookup;
 
 //---------------------------------------
 // Timing dependence inline functions
@@ -48,6 +49,10 @@ static inline post_trace_t timing_get_initial_post_trace() {
 //---------------------------------------
 static inline post_trace_t timing_add_post_spike(
         uint32_t time, uint32_t last_time, post_trace_t last_trace) {
+    use(time);
+    use(last_time);
+    use(&last_trace);
+
 	if (print_plasticity){
 		io_printf(IO_BUF, "Adding climbing fibre spike to post-event history (stored on neuron\n");
 	}
@@ -73,7 +78,9 @@ static inline post_trace_t timing_add_post_spike(
 //---------------------------------------
 static inline pre_trace_t timing_add_pre_spike(
         uint32_t time, uint32_t last_time, pre_trace_t last_trace) {
-
+    use(time);
+    use(last_time);
+    use(&last_trace);
 
     return (pre_trace_t) 0; //new_r1_trace;
 }
@@ -83,9 +90,12 @@ static inline update_state_t timing_apply_pre_spike(
         uint32_t time, pre_trace_t trace, uint32_t last_pre_time,
         pre_trace_t last_pre_trace, uint32_t last_post_time,
         post_trace_t last_post_trace, update_state_t previous_state) {
+    use(time);
     use(&trace);
     use(last_pre_time);
+    use(last_post_time);
     use(&last_pre_trace);
+    use(&last_post_trace);
 
     // Here we will potentiate by the fixed amount alpha
     if (print_plasticity){
@@ -125,8 +135,11 @@ static inline update_state_t timing_apply_post_spike(
         uint32_t time, post_trace_t trace, uint32_t last_pre_time,
         pre_trace_t last_pre_trace, uint32_t last_post_time,
         post_trace_t last_post_trace, update_state_t previous_state) {
+    use(time);
     use(&trace);
+    use(last_pre_time);
     use(last_post_time);
+    use(&last_pre_trace);
     use(&last_post_trace);
 
 

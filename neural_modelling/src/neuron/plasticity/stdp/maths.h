@@ -59,6 +59,7 @@ static inline int16_lut *maths_copy_int16_lut(address_t *address) {
     int16_lut *sdram_lut = (int16_lut *) *address;
     uint32_t size = sizeof(int16_lut) + (sdram_lut->size * sizeof(int16_t));
     int16_lut *lut = spin1_malloc(size);
+    log_info("lut size %d", size);
     if (lut == NULL) {
         log_error("Not enough space to allocate LUT.  Try reducing the timestep,"
             " the number of neurons per core, or the tau value");
@@ -71,6 +72,22 @@ static inline int16_lut *maths_copy_int16_lut(address_t *address) {
     *address += num_words + 1;
 
     return lut;
+}
+
+//---------------------------------------
+// Plasticity maths function inline implementation
+//---------------------------------------
+static inline address_t maths_copy_int16_lut_with_size(
+        address_t start_address, uint32_t num_entries, int16_t *lut) {
+    // Pad to number of words
+    const uint32_t num_words =
+            (num_entries / 2) + (((num_entries & 1) != 0) ? 1 : 0);
+
+    // Copy entries to LUT
+    spin1_memcpy(lut, start_address, sizeof(int16_t) * num_entries);
+
+    // Return address after words
+    return start_address + num_words;
 }
 
 //! \brief Get value from lookup table

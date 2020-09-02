@@ -92,7 +92,7 @@ class NeuronModelLeakyIntegrateAndFireTLast(AbstractNeuronModel):
         return variable in UNITS
 
     @inject_items({"ts": "MachineTimeStep"})
-    @overrides(AbstractNeuronModel.get_values, additional_arguments={'ts'})
+    @overrides(AbstractNeuronModel.get_values)
     def get_values(self, parameters, state_variables, vertex_slice, ts):
 
         # Add the rest of the data

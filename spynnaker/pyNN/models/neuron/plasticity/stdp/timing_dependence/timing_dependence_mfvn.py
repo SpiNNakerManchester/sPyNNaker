@@ -1,6 +1,6 @@
 from spinn_utilities.overrides import overrides
 from spynnaker.pyNN.models.neuron.plasticity.stdp.common \
-    import plasticity_helpers
+    import write_mfvn_lut, get_lut_provenance
 from .abstract_timing_dependence import AbstractTimingDependence
 from spynnaker.pyNN.models.neuron.plasticity.stdp.synapse_structure\
     import SynapseStructureWeightOnly
@@ -84,7 +84,7 @@ class TimingDependenceMFVN(AbstractTimingDependence):
                 "exp cos LUT generation currently only supports 1ms timesteps")
 
         # Write exp_sin lookup table
-        self._tau_plus_last_entry = plasticity_helpers.write_mfvn_lut(
+        self._tau_plus_last_entry = write_mfvn_lut(
             spec,
             sigma=self._sigma,
             beta=self._beta,
@@ -99,10 +99,10 @@ class TimingDependenceMFVN(AbstractTimingDependence):
     @overrides(AbstractTimingDependence.get_provenance_data)
     def get_provenance_data(self, pre_population_label, post_population_label):
         prov_data = list()
-        prov_data.append(plasticity_helpers.get_lut_provenance(
+        prov_data.append(get_lut_provenance(
             pre_population_label, post_population_label, "MFVNRule",
             "tau_plus_last_entry", "tau_plus", self._tau_plus_last_entry))
-        prov_data.append(plasticity_helpers.get_lut_provenance(
+        prov_data.append(get_lut_provenance(
             pre_population_label, post_population_label, "MFVNRule",
             "tau_minus_last_entry", "tau_minus", self._tau_minus_last_entry))
         return prov_data

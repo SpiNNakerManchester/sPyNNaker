@@ -81,6 +81,7 @@ static inline weight_state_t weight_one_term_apply_depression(
 //---------------------------------------
 static inline weight_state_t weight_one_term_apply_potentiation(
         weight_state_t state, int32_t potentiation) {
+    use(potentiation);
 
 	// add fixed amount
     state.a2_plus += state.weight_region->a2_plus;

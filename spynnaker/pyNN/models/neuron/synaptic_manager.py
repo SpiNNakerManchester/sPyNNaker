@@ -1165,11 +1165,23 @@ class SynapticManager(object):
         :param float weight_scale:
         :rtype: list(int)
         """
+        if (self.__ring_buffer_shifts is None and
+                hasattr(application_vertex, "rb_left_shifts")):
+            print("=" * 80)
+            print("Using given values for RB left shifts.")
+            self.__ring_buffer_shifts = application_vertex.rb_left_shifts
+            print("RB left shifts for {:20}".format(application_vertex.label),
+                  "=", self.__ring_buffer_shifts)
+            print("-" * 80)
         if self.__ring_buffer_shifts is None:
+            print("=" * 80)
+            print("Computing values for RB left shifts...")
             self.__ring_buffer_shifts = \
                 self._get_ring_buffer_to_input_left_shifts(
                     application_vertex, application_graph, machine_timestep,
                     weight_scale)
+            print("RB left shifts for {:20}".format(application_vertex.label),
+                  "=", self.__ring_buffer_shifts)
         return self.__ring_buffer_shifts
 
     def write_data_spec(
