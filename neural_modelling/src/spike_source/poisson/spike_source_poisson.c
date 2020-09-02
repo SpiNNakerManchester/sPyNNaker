@@ -33,10 +33,9 @@
 #include <bit_field.h>
 #include <stdfix-full-iso.h>
 #include <limits.h>
-#include <spin1-wfi.h>
-
 #include "profile_tags.h"
 #include <profiler.h>
+#include <wfi.h>
 
 #ifndef UNUSED
 #define UNUSED __attribute__((__unused__))
@@ -580,7 +579,7 @@ static void recording_complete_callback(void) {
 //! \param[in] time: the time to which these spikes are being recorded
 static inline void record_spikes(uint32_t time) {
     while (recording_in_progress) {
-        spin1_wfi();
+        wait_for_interrupt();
     }
     if ((spikes != NULL) && (spikes->n_buffers > 0)) {
         recording_in_progress = true;
