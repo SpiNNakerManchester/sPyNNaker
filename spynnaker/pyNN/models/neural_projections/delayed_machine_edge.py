@@ -13,14 +13,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from spinn_utilities.overrides import overrides
 from pacman.model.graphs.machine import MachineEdge
-from spynnaker.pyNN.models.neural_projections.connectors import (
-    OneToOneConnector)
-from spynnaker.pyNN.models.abstract_models import AbstractFilterableEdge
 
 
-class DelayedMachineEdge(MachineEdge, AbstractFilterableEdge):
+class DelayedMachineEdge(MachineEdge):
     __slots__ = [
         "__synapse_information",
         "__undelayed_edge"]
@@ -58,17 +54,3 @@ class DelayedMachineEdge(MachineEdge, AbstractFilterableEdge):
             The edge to set
         """
         self.__undelayed_edge = undelayed_edge
-
-    @overrides(AbstractFilterableEdge.filter_edge)
-    def filter_edge(self):
-        # Filter one-to-one connections that are out of range
-        return any(
-            isinstance(synapse_info.connector, OneToOneConnector)
-            for synapse_info in self.__synapse_information) \
-            and self.__no_overlap(self.pre_vertex, self.post_vertex)
-
-    @staticmethod
-    def __no_overlap(pre_vertex, post_vertex):
-        pre = pre_vertex.vertex_slice
-        post = post_vertex.vertex_slice
-        return pre.hi_atom < post.lo_atom or pre.lo_atom > post.hi_atom

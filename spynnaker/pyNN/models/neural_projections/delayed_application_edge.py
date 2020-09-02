@@ -15,10 +15,11 @@
 
 from spinn_utilities.overrides import overrides
 from pacman.model.graphs.application import ApplicationEdge
+from pacman.model.partitioner_interfaces import AbstractSlicesConnect
 from .delayed_machine_edge import DelayedMachineEdge
 
 
-class DelayedApplicationEdge(ApplicationEdge):
+class DelayedApplicationEdge(ApplicationEdge, AbstractSlicesConnect):
     __slots__ = [
         "__synapse_information",
         "__machine_edges_by_slices",
@@ -93,3 +94,11 @@ class DelayedApplicationEdge(ApplicationEdge):
         """
         return self.__machine_edges_by_slices.get(
             (pre_vertex.vertex_slice, post_vertex.vertex_slice))
+
+    @overrides(AbstractSlicesConnect.could_connect)
+    def could_connect(self, pre_slice, post_slice):
+        for synapse_info in self.__synapse_information:
+            if synapse_info.connector.could_connect(
+                    synapse_info, pre_slice, post_slice):
+                return True
+        return False

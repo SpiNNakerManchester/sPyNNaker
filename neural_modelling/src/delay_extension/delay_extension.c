@@ -303,9 +303,7 @@ static bool initialize(void) {
 //!
 //! \param[in] key: the key of the multicast message
 //! \param payload: ignored
-static void incoming_spike_callback(uint key, uint payload) {
-    use(payload);
-
+static void incoming_spike_callback(uint key, UNUSED uint payload) {
     log_debug("Received spike %x", key);
     n_in_spikes++;
 
@@ -365,9 +363,7 @@ static inline void spike_process(void) {
 //! \brief Main timer callback
 //! \param[in] timer_count: The current time
 //! \param unused1: unused
-static void timer_callback(uint timer_count, uint unused1) {
-    use(unused1);
-
+static void timer_callback(uint timer_count, UNUSED uint unused1) {
     // Process all the spikes from the last timestep
     spike_process();
 
