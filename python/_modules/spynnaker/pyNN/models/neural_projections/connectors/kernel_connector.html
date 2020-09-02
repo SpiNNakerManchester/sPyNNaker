@@ -323,22 +323,28 @@
                 <span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">,</span> <span class="n">pre_vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
             <span class="n">pre_r</span><span class="p">,</span> <span class="n">pre_c</span> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span><span class="n">pre_idx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pre_w</span><span class="p">)</span>
             <span class="n">coords</span><span class="p">[</span><span class="n">pre_idx</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="c1"># Test whether the coordinates should be included based on the</span>
+            <span class="c1"># step function (in the pre) and skip if not</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(((</span><span class="n">pre_r</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pre_start_h</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pre_step_h</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span>
+                    <span class="p">((</span><span class="n">pre_c</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pre_start_w</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pre_step_w</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)):</span>
+                <span class="k">continue</span>
+
             <span class="c1"># Loop over post-vertices</span>
             <span class="k">for</span> <span class="n">post_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span>
                     <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">lo_atom</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">hi_atom</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
 
                 <span class="c1"># convert to common coord system</span>
-                <span class="n">r</span> <span class="o">=</span> <span class="n">post_as_pre_r</span><span class="p">[</span><span class="n">post_idx</span> <span class="o">-</span> <span class="n">post_lo</span><span class="p">]</span>
-                <span class="n">c</span> <span class="o">=</span> <span class="n">post_as_pre_c</span><span class="p">[</span><span class="n">post_idx</span> <span class="o">-</span> <span class="n">post_lo</span><span class="p">]</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">r</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_common_h</span> <span class="ow">and</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">c</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_common_w</span><span class="p">):</span>
-                    <span class="k">continue</span>
+                <span class="n">pac_r</span> <span class="o">=</span> <span class="n">post_as_pre_r</span><span class="p">[</span><span class="n">post_idx</span> <span class="o">-</span> <span class="n">post_lo</span><span class="p">]</span>
+                <span class="n">pac_c</span> <span class="o">=</span> <span class="n">post_as_pre_c</span><span class="p">[</span><span class="n">post_idx</span> <span class="o">-</span> <span class="n">post_lo</span><span class="p">]</span>
 
-                <span class="n">r</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pre_as_post</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">c</span><span class="p">)</span>
+                <span class="c1"># now convert common to pre coords</span>
+                <span class="n">pap_r</span><span class="p">,</span> <span class="n">pap_c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pre_as_post</span><span class="p">(</span><span class="n">pac_r</span><span class="p">,</span> <span class="n">pac_c</span><span class="p">)</span>
 
                 <span class="c1"># Obtain coordinates to test against kernel sizes</span>
-                <span class="n">dr</span> <span class="o">=</span> <span class="n">r</span> <span class="o">-</span> <span class="n">pre_r</span>
+                <span class="n">dr</span> <span class="o">=</span> <span class="n">pap_r</span> <span class="o">-</span> <span class="n">pre_r</span>
                 <span class="n">kr</span> <span class="o">=</span> <span class="n">hh</span> <span class="o">-</span> <span class="n">dr</span>
-                <span class="n">dc</span> <span class="o">=</span> <span class="n">c</span> <span class="o">-</span> <span class="n">pre_c</span>
+                <span class="n">dc</span> <span class="o">=</span> <span class="n">pap_c</span> <span class="o">-</span> <span class="n">pre_c</span>
                 <span class="n">kc</span> <span class="o">=</span> <span class="n">hw</span> <span class="o">-</span> <span class="n">dc</span>
 
                 <span class="k">if</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">kr</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel_h</span> <span class="ow">and</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">kc</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel_w</span><span class="p">:</span>
@@ -378,26 +384,20 @@
 <div class="viewcode-block" id="KernelConnector.get_n_connections_from_pre_vertex_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.KernelConnector.get_n_connections_from_pre_vertex_maximum">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_connections_from_pre_vertex_maximum</span><span class="p">(</span>
             <span class="bp">self</span><span class="p">,</span> <span class="n">post_vertex_slice</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">,</span> <span class="n">min_delay</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">max_delay</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="c1"># This is clearly a cop-out, but it works at the moment:</span>
-        <span class="c1"># I haven&#39;t been able to make this break for &quot;standard usage&quot;</span>
-        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_kernel_h</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel_w</span> <span class="o">*</span> <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">,</span>
-            <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_kernel_h</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel_w</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>
+                          <span class="n">post_vertex_slice</span><span class="o">.</span><span class="n">n_atoms</span><span class="p">)</span></div>
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_n_connections_to_post_vertex_maximum</span><span class="p">)</span>
 <div class="viewcode-block" id="KernelConnector.get_n_connections_to_post_vertex_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.KernelConnector.get_n_connections_to_post_vertex_maximum">[docs]</a>    <span class="k">def</span> <span class="nf">get_n_connections_to_post_vertex_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
-        <span class="c1"># Again as above this is something of a cop-out and we can</span>
-        <span class="c1"># probably do better</span>
         <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_kernel_h</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel_w</span> <span class="o">*</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">n_pre_neurons</span><span class="p">,</span>
-            <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_kernel_h</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel_w</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span></div>
 
     <span class="nd">@overrides</span><span class="p">(</span><span class="n">AbstractConnector</span><span class="o">.</span><span class="n">get_weight_maximum</span><span class="p">)</span>
 <div class="viewcode-block" id="KernelConnector.get_weight_maximum"><a class="viewcode-back" href="../../../../../../spynnaker.pyNN.models.neural_projections.connectors.html#spynnaker.pyNN.models.neural_projections.connectors.KernelConnector.get_weight_maximum">[docs]</a>    <span class="k">def</span> <span class="nf">get_weight_maximum</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">synapse_info</span><span class="p">):</span>
         <span class="c1"># I think this is overestimated, but not by much</span>
         <span class="n">n_conns</span> <span class="o">=</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_pre_w</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pre_h</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel_w</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kernel_h</span><span class="p">)</span>
-        <span class="c1"># Use the kernel delays if user has supplied them</span>
+        <span class="c1"># Use the kernel weights if user has supplied them</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_krn_weights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_weight_maximum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_krn_weights</span><span class="p">,</span> <span class="n">n_conns</span><span class="p">)</span>
 
