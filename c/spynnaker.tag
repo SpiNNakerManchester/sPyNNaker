@@ -1393,18 +1393,6 @@
     </member>
   </compound>
   <compound kind="file">
-    <name>spin1-wfi.h</name>
-    <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/common/</path>
-    <filename>spin1-wfi_8h.html</filename>
-    <member kind="function">
-      <type>void</type>
-      <name>spin1_wfi</name>
-      <anchorfile>spin1-wfi_8h.html</anchorfile>
-      <anchor>ae35277172e3b42f22218009fe98a2402</anchor>
-      <arglist>(void)</arglist>
-    </member>
-  </compound>
-  <compound kind="file">
     <name>delay_extension.c</name>
     <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/delay_extension/</path>
     <filename>delay__extension_8c.html</filename>
@@ -3306,10 +3294,10 @@
       <arglist></arglist>
     </member>
     <member kind="variable">
-      <type>uint32_t</type>
+      <type>volatile uint32_t</type>
       <name>n_recordings_outstanding</name>
       <anchorfile>neuron__recording_8c.html</anchorfile>
-      <anchor>a68f284a99102ae7b420f1650e7d50a88</anchor>
+      <anchor>a629e0fd3d865713eb4c4ec5c0f0c5352</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable" static="yes">
@@ -3325,7 +3313,6 @@
     <path>/home/travis/build/SpiNNakerManchester/sPyNNaker/neural_modelling/src/neuron/</path>
     <filename>neuron__recording_8h.html</filename>
     <includes id="neuron-typedefs_8h" name="neuron-typedefs.h" local="no" imported="no">common/neuron-typedefs.h</includes>
-    <includes id="spin1-wfi_8h" name="spin1-wfi.h" local="no" imported="no">common/spin1-wfi.h</includes>
     <class kind="struct">recording_values_t</class>
     <class kind="struct">bitfield_values_t</class>
     <class kind="struct">recording_info_t</class>
@@ -3429,10 +3416,10 @@
       <arglist></arglist>
     </member>
     <member kind="variable">
-      <type>uint32_t</type>
+      <type>volatile uint32_t</type>
       <name>n_recordings_outstanding</name>
       <anchorfile>neuron__recording_8h.html</anchorfile>
-      <anchor>a68f284a99102ae7b420f1650e7d50a88</anchor>
+      <anchor>a629e0fd3d865713eb4c4ec5c0f0c5352</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable">
@@ -8180,7 +8167,6 @@
     <filename>spike__source__poisson_8c.html</filename>
     <includes id="maths-util_8h" name="maths-util.h" local="no" imported="no">common/maths-util.h</includes>
     <includes id="spike__source_2poisson_2profile__tags_8h" name="profile_tags.h" local="yes" imported="no">profile_tags.h</includes>
-    <includes id="spin1-wfi_8h" name="spin1-wfi.h" local="no" imported="no">common/spin1-wfi.h</includes>
     <class kind="struct">spike_source_t</class>
     <class kind="struct">timed_out_spikes</class>
     <class kind="struct">global_parameters</class>
@@ -8554,10 +8540,10 @@
       <arglist></arglist>
     </member>
     <member kind="variable" static="yes">
-      <type>static bool</type>
+      <type>static volatile bool</type>
       <name>recording_in_progress</name>
       <anchorfile>spike__source__poisson_8c.html</anchorfile>
-      <anchor>a79737d2f85cf79db57370f7734c60bba</anchor>
+      <anchor>a73b0389f0c75011bb1e3873ca01cd996</anchor>
       <arglist></arglist>
     </member>
     <member kind="variable" static="yes">

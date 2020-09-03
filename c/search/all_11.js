@@ -39,7 +39,7 @@ var searchData=
   ['recording_5fdata_5ft_1224',['recording_data_t',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/recording_8c.html',1,'']]],
   ['recording_5fdone_5fcallback_1225',['recording_done_callback',['../neuron__recording_8h.html#a4bbf0859d5fe0bbd7d4b3f63c0683608',1,'neuron_recording.h']]],
   ['recording_5fflags_1226',['recording_flags',['../neuron_8c.html#a9a97f21dc7fccaac8071bcd29894bccb',1,'recording_flags():&#160;neuron.c'],['../spike__source__poisson_8c.html#a9a97f21dc7fccaac8071bcd29894bccb',1,'recording_flags():&#160;spike_source_poisson.c']]],
-  ['recording_5fin_5fprogress_1227',['recording_in_progress',['../spike__source__poisson_8c.html#a79737d2f85cf79db57370f7734c60bba',1,'spike_source_poisson.c']]],
+  ['recording_5fin_5fprogress_1227',['recording_in_progress',['../spike__source__poisson_8c.html#a73b0389f0c75011bb1e3873ca01cd996',1,'spike_source_poisson.c']]],
   ['recording_5finfo_1228',['recording_info',['../neuron__recording_8c.html#a96a8e9a2f37a358a5264aadc6bb37263',1,'recording_info():&#160;neuron_recording.c'],['../neuron__recording_8h.html#a96a8e9a2f37a358a5264aadc6bb37263',1,'recording_info():&#160;neuron_recording.c']]],
   ['recording_5finfo_5ft_1229',['recording_info_t',['../neuron__recording_8h.html#structrecording__info__t',1,'']]],
   ['recording_5fvalues_1230',['recording_values',['../neuron__recording_8c.html#ac1ffd13a57545991775c1691ca0be09c',1,'recording_values():&#160;neuron_recording.c'],['../neuron__recording_8h.html#ac1ffd13a57545991775c1691ca0be09c',1,'recording_values():&#160;neuron_recording.c']]],

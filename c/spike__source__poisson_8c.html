@@ -92,7 +92,7 @@ $(function() {
 <code>#include &lt;limits.h&gt;</code><br />
 <code>#include &quot;<a class="el" href="spike__source_2poisson_2profile__tags_8h_source.html">profile_tags.h</a>&quot;</code><br />
 <code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/profiler_8h.html">profiler.h</a>&gt;</code><br />
-<code>#include &lt;<a class="el" href="spin1-wfi_8h_source.html">common/spin1-wfi.h</a>&gt;</code><br />
+<code>#include &lt;<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/wfi_8h.html">wfi.h</a>&gt;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Data Structures</h2></td></tr>
@@ -283,10 +283,10 @@ static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
 static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#afdae215608627a97110d1cd913398563">spike_buffer_size</a></td></tr>
 <tr class="memdesc:afdae215608627a97110d1cd913398563"><td class="mdescLeft">&#160;</td><td class="mdescRight">The size of each spike buffer in bytes. <br /></td></tr>
 <tr class="separator:afdae215608627a97110d1cd913398563"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a79737d2f85cf79db57370f7734c60bba"><td class="memItemLeft" align="right" valign="top"><a id="a79737d2f85cf79db57370f7734c60bba"></a>
-static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a79737d2f85cf79db57370f7734c60bba">recording_in_progress</a> = false</td></tr>
-<tr class="memdesc:a79737d2f85cf79db57370f7734c60bba"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if DMA recording is currently in progress. <br /></td></tr>
-<tr class="separator:a79737d2f85cf79db57370f7734c60bba"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a73b0389f0c75011bb1e3873ca01cd996"><td class="memItemLeft" align="right" valign="top"><a id="a73b0389f0c75011bb1e3873ca01cd996"></a>
+static volatile bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#a73b0389f0c75011bb1e3873ca01cd996">recording_in_progress</a> = false</td></tr>
+<tr class="memdesc:a73b0389f0c75011bb1e3873ca01cd996"><td class="mdescLeft">&#160;</td><td class="mdescRight">True if DMA recording is currently in progress. <br /></td></tr>
+<tr class="separator:a73b0389f0c75011bb1e3873ca01cd996"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac0c27301e134af3ce80814a553601074"><td class="memItemLeft" align="right" valign="top"><a id="ac0c27301e134af3ce80814a553601074"></a>
 static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="spike__source__poisson_8c.html#ac0c27301e134af3ce80814a553601074">timer_period</a></td></tr>
 <tr class="memdesc:ac0c27301e134af3ce80814a553601074"><td class="mdescLeft">&#160;</td><td class="mdescRight">The timer period. <br /></td></tr>
@@ -1420,7 +1420,7 @@ Array of rate descriptors. </td></tr>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed Sep 2 2020 23:35:40 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Sep 3 2020 15:59:30 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.17
 </small></address>
