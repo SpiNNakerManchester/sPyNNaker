@@ -871,7 +871,7 @@ class AbstractPopulationVertex(
         if variable == NeuronRecorder.SPIKES:
             return NeuronRecorder.SPIKES
         if variable == NeuronRecorder.PACKETS:
-            return ""
+            return "count"
         if self.__neuron_impl.is_recordable(variable):
             return self.__neuron_impl.get_recordable_units(variable)
         if variable not in self._parameters:
