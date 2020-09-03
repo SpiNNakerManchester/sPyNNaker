@@ -65,10 +65,10 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         :rtype: list(str)
         """
         names = ['initial_weight', 'initial_delay', 'f_rew', 'p_rew', 's_max']
+        # pylint: disable=no-member
         names.extend(self.partner_selection.get_parameter_names())
         names.extend(self.formation.get_parameter_names())
         names.extend(self.elimination.get_parameter_names())
-        # pylint: disable=no-member
         return names
 
     @property
@@ -125,8 +125,8 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         self.__write_post_to_pre_table(spec, pop_index, app_vertex, post_slice)
 
         # Write the component parameters
-        self.partner_selection.write_parameters(spec)
         # pylint: disable=no-member
+        self.partner_selection.write_parameters(spec)
         for _, synapse_info in structural_edges:
             dynamics = synapse_info.synapse_dynamics
             dynamics.formation.write_parameters(spec)
@@ -276,9 +276,9 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         :param AbstractPopulationVertex app_vertex:
         :param ~pacman.model.graphs.common.Slice post_slice:
         """
+        # pylint: disable=unsubscriptable-object
         # Get connections for this post slice
         slice_conns = self.connections[app_vertex, post_slice.lo_atom]
-        # pylint: disable=unsubscriptable-object
         # Make a single large array of connections
         connections = numpy.concatenate(
             [conn for (conn, _, _, _) in slice_conns])
@@ -343,9 +343,9 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         structural_edges = self.__get_structural_edges(
             application_graph, app_vertex)
         # Also keep track of the parameter sizes
+        # pylint: disable=no-member
         param_sizes = self.partner_selection\
             .get_parameters_sdram_usage_in_bytes()
-        # pylint: disable=no-member
         for (in_edge, synapse_info) in structural_edges:
             max_atoms = in_edge.pre_vertex.get_max_atoms_per_core()
             if in_edge.pre_vertex.n_atoms < max_atoms:
@@ -369,10 +369,10 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         :rtype: str
         """
         name = "_structural"
+        # pylint: disable=no-member
         name += self.partner_selection.vertex_executable_suffix
         name += self.formation.vertex_executable_suffix
         name += self.elimination.vertex_executable_suffix
-        # pylint: disable=no-member
         return name
 
     def is_same_as(self, synapse_dynamics):
