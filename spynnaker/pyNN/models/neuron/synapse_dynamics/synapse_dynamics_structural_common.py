@@ -29,6 +29,15 @@ from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 
+#: Default value for frequency of rewiring
+DEFAULT_F_REW = 10 ** 4
+#: Default value for initial weight on connection formation
+DEFAULT_INITIAL_WEIGHT = 0
+#: Default value for initial delay on connection formation
+DEFAULT_INITIAL_DELAY = 1
+#: Default value for maximum fan-in per target layer neuron
+DEFAULT_S_MAX = 32
+
 
 @add_metaclass(AbstractBase)
 class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
@@ -50,16 +59,6 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
     # 1 16-bit number (neuron_index)
     # + 2 8-bit numbers (sub_pop_index; pop_index)
     _POST_TO_PRE_ENTRY_SIZE = BYTES_PER_SHORT + (2 * 1)
-
-    #: Default value for frequency of rewiring
-    DEFAULT_F_REW = 10**4
-    #: Default value for initial weight on connection formation
-    DEFAULT_INITIAL_WEIGHT = 0
-    #: Default value for initial delay on connection formation
-    DEFAULT_INITIAL_DELAY = 1
-    #: Default value for maximum fan-in per target layer neuron
-    DEFAULT_S_MAX = 32
-
     def get_parameter_names(self):
         """
         :rtype: list(str)

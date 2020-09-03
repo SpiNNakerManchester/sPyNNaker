@@ -18,8 +18,10 @@ from spinn_utilities.overrides import overrides
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
 from .synapse_dynamics_stdp import SynapseDynamicsSTDP
-from spynnaker.pyNN.models.neuron.synapse_dynamics import (
-    SynapseDynamicsStructuralCommon)
+from spynnaker.pyNN.models.neuron.synapse_dynamics.\
+    synapse_dynamics_structural_common import (
+    DEFAULT_F_REW, DEFAULT_INITIAL_WEIGHT, DEFAULT_INITIAL_DELAY,
+    DEFAULT_S_MAX, SynapseDynamicsStructuralCommon)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 
 
@@ -71,13 +73,9 @@ class SynapseDynamicsStructuralSTDP(
             self, partner_selection, formation, elimination,
             timing_dependence=None, weight_dependence=None,
             voltage_dependence=None, dendritic_delay_fraction=1.0,
-            f_rew=SynapseDynamicsStructuralCommon.DEFAULT_F_REW,
-            initial_weight=\
-            SynapseDynamicsStructuralCommon.DEFAULT_INITIAL_WEIGHT,
-            initial_delay=\
-            SynapseDynamicsStructuralCommon.DEFAULT_INITIAL_DELAY,
-            s_max=SynapseDynamicsStructuralCommon.DEFAULT_S_MAX, seed=None,
-            weight=0.0, delay=1.0, backprop_delay=True):
+            f_rew=DEFAULT_F_REW, initial_weight=DEFAULT_INITIAL_WEIGHT,
+            initial_delay=DEFAULT_INITIAL_DELAY, s_max=DEFAULT_S_MAX,
+            seed=None, weight=0.0, delay=1.0, backprop_delay=True):
         """
         :param AbstractPartnerSelection partner_selection:
             The partner selection rule
