@@ -68,6 +68,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         names.extend(self.partner_selection.get_parameter_names())
         names.extend(self.formation.get_parameter_names())
         names.extend(self.elimination.get_parameter_names())
+        # pylint: disable=no-member
         return names
 
     @property
@@ -125,6 +126,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
 
         # Write the component parameters
         self.partner_selection.write_parameters(spec)
+        # pylint: disable=no-member
         for _, synapse_info in structural_edges:
             dynamics = synapse_info.synapse_dynamics
             dynamics.formation.write_parameters(spec)
@@ -276,6 +278,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         """
         # Get connections for this post slice
         slice_conns = self.connections[app_vertex, post_slice.lo_atom]
+        # pylint: disable=unsubscriptable-object
         # Make a single large array of connections
         connections = numpy.concatenate(
             [conn for (conn, _, _, _) in slice_conns])
@@ -342,6 +345,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         # Also keep track of the parameter sizes
         param_sizes = self.partner_selection\
             .get_parameters_sdram_usage_in_bytes()
+        # pylint: disable=no-member
         for (in_edge, synapse_info) in structural_edges:
             max_atoms = in_edge.pre_vertex.get_max_atoms_per_core()
             if in_edge.pre_vertex.n_atoms < max_atoms:
@@ -368,6 +372,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         name += self.partner_selection.vertex_executable_suffix
         name += self.formation.vertex_executable_suffix
         name += self.elimination.vertex_executable_suffix
+        # pylint: disable=no-member
         return name
 
     def is_same_as(self, synapse_dynamics):
