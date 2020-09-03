@@ -637,8 +637,7 @@ static void process_fast_source(
                 // Send spikes
                 const uint32_t spike_key = ssp_params.key | s_id;
                 tdma_processing_send_packet(
-                    s_id, spike_key, num_spikes, WITH_PAYLOAD,
-                    timer_period, timer_count,  ssp_params.n_spike_sources);
+                    spike_key, num_spikes, WITH_PAYLOAD, timer_count);
             }
         }
     }
@@ -661,8 +660,7 @@ static void process_slow_source(
             if (ssp_params.has_key) {
                 // Send package
                 tdma_processing_send_packet(
-                    s_id, ssp_params.key | s_id, 0, NO_PAYLOAD,
-                    timer_period, timer_count,  ssp_params.n_spike_sources);
+                    ssp_params.key | s_id, 0, NO_PAYLOAD, timer_count);
             }
 
             // Update time to spike (note, this might not get us back above

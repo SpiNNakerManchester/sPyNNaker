@@ -100,8 +100,7 @@ bool synapses_initialise(
 
 //! \brief Do all the synapse processing for a timestep.
 //! \param[in] time: the current simulation time
-//! \return the number of packets received this timer tick
-int synapses_do_timestep_update(timer_t time);
+void synapses_do_timestep_update(timer_t time);
 
 //! \brief process a synaptic row
 //! \param[in] time: the simulated time

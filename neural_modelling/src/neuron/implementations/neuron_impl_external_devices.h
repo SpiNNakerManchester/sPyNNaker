@@ -74,10 +74,8 @@ enum word_recording_indices {
     GSYN_EXC_RECORDING_INDEX = 1,
     //! Gsyn_inh (excitatory synaptic conductance/current) recording index
     GSYN_INH_RECORDING_INDEX = 2,
-    //! packet count recording region
-    PACKET_COUNT_RECORDING_INDEX = 3,
     //! Number of recorded word-sized state variables
-    N_RECORDED_VARS = 4
+    N_RECORDED_VARS = 3
 };
 
 //! Indices for recording of bitfields
@@ -345,7 +343,7 @@ SOMETIMES_UNUSED // Marked unused as only used sometimes
 //! \param[in] external_bias: External input to be applied to the neuron
 //! \return True if a spike has occurred
 static bool neuron_impl_do_timestep_update(index_t neuron_index,
-        input_t external_bias, int packets_this_time_step) {
+        input_t external_bias) {
     // Get the neuron itself
     neuron_t *this_neuron = &neuron_array[neuron_index];
 
@@ -400,10 +398,6 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
                     GSYN_EXC_RECORDING_INDEX, neuron_index, total_exc);
             neuron_recording_record_accum(
                     GSYN_INH_RECORDING_INDEX, neuron_index, total_inh);
-            // Record the number of packets received this timer tick
-            neuron_recording_record_int32(
-                PACKET_COUNT_RECORDING_INDEX, neuron_index,
-                packets_this_time_step);
         }
 
         // Call functions to convert exc_input and inh_input to current
@@ -443,16 +437,14 @@ static bool neuron_impl_do_timestep_update(index_t neuron_index,
                         the_packet_firing->key, payload);
 
                 tdma_processing_send_packet(
-                    neuron_index, the_packet_firing->key, payload,
-                    WITH_PAYLOAD, timer_period, global_timer_count,
-                    n_neurons);
+                    the_packet_firing->key, payload,
+                    WITH_PAYLOAD, global_timer_count);
             } else {
                 log_debug("Sending key=0x%08x", the_packet_firing->key);
 
                 tdma_processing_send_packet(
-                    neuron_index, the_packet_firing->key, 0,
-                    NO_PAYLOAD, timer_period, global_timer_count,
-                    n_neurons);
+                    the_packet_firing->key, 0,
+                    NO_PAYLOAD, global_timer_count);
             }
         }
 

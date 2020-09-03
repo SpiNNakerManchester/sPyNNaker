@@ -172,7 +172,8 @@ class AbstractPopulationVertex(
             self.__neuron_impl.get_recordable_data_types())
         self.__neuron_recorder = NeuronRecorder(
             recordable_variables, record_data_types, [NeuronRecorder.SPIKES],
-            n_neurons)
+            n_neurons, [NeuronRecorder.PACKETS],
+            {NeuronRecorder.PACKETS: NeuronRecorder.PACKETS_TYPE})
 
         # Set up synapse handling
         self.__synapse_manager = SynapticManager(
@@ -584,9 +585,8 @@ class AbstractPopulationVertex(
     def get_spikes(
             self, placements, buffer_manager, machine_time_step):
         return self.__neuron_recorder.get_spikes(
-            self.label, buffer_manager,
-            len(self.__neuron_impl.get_recordable_variables()),
-            placements, self, NeuronRecorder.SPIKES, machine_time_step)
+            self.label, buffer_manager, placements, self,
+            NeuronRecorder.SPIKES, machine_time_step)
 
     @overrides(AbstractNeuronRecordable.get_recordable_variables)
     def get_recordable_variables(self):
@@ -608,9 +608,8 @@ class AbstractPopulationVertex(
                  buffer_manager, machine_time_step):
         # pylint: disable=too-many-arguments
         return self.__neuron_recorder.get_matrix_data(
-            self.label, buffer_manager,
-            self.__neuron_impl.get_recordable_variable_index(variable),
-            placements, self, variable, n_machine_time_steps)
+            self.label, buffer_manager, placements, self, variable,
+            n_machine_time_steps)
 
     @overrides(AbstractNeuronRecordable.get_neuron_sampling_interval)
     def get_neuron_sampling_interval(self, variable):
@@ -871,6 +870,8 @@ class AbstractPopulationVertex(
     def get_units(self, variable):
         if variable == NeuronRecorder.SPIKES:
             return NeuronRecorder.SPIKES
+        if variable == NeuronRecorder.PACKETS:
+            return "count"
         if self.__neuron_impl.is_recordable(variable):
             return self.__neuron_impl.get_recordable_units(variable)
         if variable not in self._parameters:

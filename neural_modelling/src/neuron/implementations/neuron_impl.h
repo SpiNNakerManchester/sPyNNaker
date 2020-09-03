@@ -47,10 +47,9 @@ static void neuron_impl_load_neuron_parameters(
 //! \brief Do the timestep update for the particular implementation
 //! \param[in] neuron_index: The index of the neuron to update
 //! \param[in] external_bias: External input to be applied to the neuron
-//! \param[in] packets_this_time_step: the number of packets recieved this timestep
 //! \return True if a spike has occurred
 static bool neuron_impl_do_timestep_update(
-        index_t neuron_index, input_t external_bias, int packets_this_time_step);
+        index_t neuron_index, input_t external_bias);
 
 //! \brief Stores neuron parameters back into SDRAM
 //! \param[out] address: the address in SDRAM to start the store

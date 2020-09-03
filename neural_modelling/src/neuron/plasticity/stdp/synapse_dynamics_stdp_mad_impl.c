@@ -208,11 +208,10 @@ void synapse_dynamics_print_plastic_synapses(
     use(ring_buffer_to_input_buffer_left_shifts);
 
 #if LOG_LEVEL >= LOG_DEBUG
+    synapse_row_plastic_data_t *data_ptr = plastic_region_address;
 
     // Extract separate arrays of weights (from plastic region),
     // Control words (from fixed region) and number of plastic synapses
-    synapse_row_plastic_data_t *data_ptr =
-        (synapse_row_plastic_data_t*) plastic_region_address;
     const plastic_synapse_t *plastic_words = data_ptr->synapses;
     const control_t *control_words =
             synapse_row_plastic_controls(fixed_region_address);
@@ -267,10 +266,6 @@ bool synapse_dynamics_initialise(
 
     stdp_params *sdram_params = (stdp_params *) address;
     spin1_memcpy(&params, sdram_params, sizeof(stdp_params));
-
-    log_info("synapse dynamics stdp mad impl initialise");
-    log_info("backprop_delay = %d", sdram_params->backprop_delay);
-
     address = (address_t) &sdram_params[1];
 
     // Load timing dependence data
@@ -317,17 +312,6 @@ bool synapse_dynamics_initialise(
     synapse_delay_index_type_bits =
             SYNAPSE_DELAY_BITS + synapse_type_index_bits;
     synapse_type_mask = (1 << log_n_synapse_types) - 1;
-
-    log_info("n_synapse_types_power_2 = %d", n_synapse_types_power_2);
-    log_info("log_n_synapse_types = %d", log_n_synapse_types);
-    log_info("synapse_type_index_bits = %d", synapse_type_index_bits);
-    log_info("synapse_type_index_mask = %d", synapse_type_index_mask);
-    log_info("synapse_index_bits = %d", synapse_index_bits);
-    log_info("synapse_index_mask = %d", synapse_index_mask);
-    log_info(
-        "synapse_delay_index_type_bits = %d", synapse_delay_index_type_bits);
-    log_info("synapse_type_mask = %d", synapse_type_mask);
-
     return true;
 }
 

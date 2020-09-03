@@ -26,6 +26,7 @@
 #include <simulation.h>
 #include <debug.h>
 #include <common/in_spikes.h>
+#include <recording.h>
 
 //! DMA buffer structure combines the row read from SDRAM with information
 //! about the read.
@@ -82,39 +83,33 @@ static uint32_t dma_n_rewires;
 static uint32_t dma_n_spikes;
 
 //! the number of dma completes (used in provenance generation)
-static uint32_t dma_complete_count = 0;
+static uint32_t dma_complete_count;
 
 //! the number of spikes that were processed (used in provenance generation)
-static uint32_t spike_processing_count = 0;
+static uint32_t spike_processing_count;
 
 //! The number of successful rewires
-static uint32_t n_successful_rewires = 0;
+static uint32_t n_successful_rewires;
 
 //! count how many packets were lost from the input buffer because of late
 //! arrival
-uint32_t count_input_buffer_packets_late = 0;
+static uint32_t count_input_buffer_packets_late;
 
 //! tracker of how full the input buffer got.
-uint32_t biggest_fill_size_of_input_buffer = 0;
+static uint32_t biggest_fill_size_of_input_buffer;
 
 //! bool that governs if we should clear packets from the input buffer at the
 //! end of a timer tick.
-static bool clear_input_buffers_of_late_packets = false;
-
-//! cycles left on the timer when the last packet was received.
-static uint32_t time_left_when_last_packet_arrived = 0;
-
-//! bool saying if we received a packet this time step
-bool received_packet_this_step = false;
-
-//! the maximum number of packets in the in buffer over the simulation
-uint32_t max_packets_in_buffer_at_time = 0;
+static bool clear_input_buffers_of_late_packets;
 
 //! the number of packets received this time step
-int packets_this_time_step = 0;
+static struct {
+    uint32_t time;
+    uint32_t packets_this_time_step;
+} p_per_ts_struct;
 
-//! the number of packets with payloads received this time step
-int payload_packets_this_time_step = 0;
+//! the region to record the packets per timestep in
+static uint32_t p_per_ts_region;
 
 /* PRIVATE FUNCTIONS - static for inlining */
 
@@ -292,8 +287,29 @@ static inline void setup_synaptic_dma_write(
     }
 }
 
-//! \brief handles the interrupt stuff and prov data gathering
-static inline void packet_reception_post_processing(void) {
+//! \brief Called when a multicast packet is received
+//! \param[in] key: The key of the packet. The spike.
+//! \param payload: the payload of the packet. The count.
+static void multicast_packet_received_callback(uint key, uint payload) {
+    p_per_ts_struct.packets_this_time_step += 1;
+
+    // handle the 2 cases separately
+    if (payload == 0) {
+        log_debug(
+            "Received spike %x at %d, DMA Busy = %d", key, time, dma_busy);
+        // set to 1 to work with the loop.
+        payload = 1;
+    } else {
+        log_debug(
+            "Received spike %x with payload %d at %d, DMA Busy = %d",
+            key, payload, time, dma_busy);
+    }
+
+    // cycle through the packet insertion
+    for (uint count = payload; count > 0; count--) {
+        in_spikes_add_spike(key);
+    }
+
     // If we're not already processing synaptic DMAs,
     // flag pipeline as busy and trigger a feed event
     // NOTE: locking is not used here because this is assumed to be FIQ
@@ -305,52 +321,14 @@ static inline void packet_reception_post_processing(void) {
             log_warning("Could not trigger user event\n");
         }
     }
-
-    // prov updating
-    time_left_when_last_packet_arrived = tc[T1_COUNT];
-    received_packet_this_step = true;
-
-    // wonder if this can be done outside the mc callback somehow
-    if (in_spikes_size() > max_packets_in_buffer_at_time) {
-        max_packets_in_buffer_at_time = in_spikes_size();
-    }
-}
-
-//! \brief Called when a multicast packet is received
-//! \param[in] key: The key of the packet. The spike.
-//! \param payload: the payload of the packet. The count.
-static void multicast_packet_received_callback(uint key, uint payload) {
-
-    // handle the 2 cases separately
-    if (payload == 0) {
-        log_debug(
-            "Received spike %x at %d, DMA Busy = %d", key, time, dma_busy);
-        packets_this_time_step += 1;
-        // set to 1 to work with the loop.
-        payload = 1;
-    }
-    else {
-        log_debug(
-            "Received spike %x with payload %d at %d, DMA Busy = %d",
-            key, payload, time, dma_busy);
-        payload_packets_this_time_step += 1;
-    }
-
-    // cycle through the packet insertion
-    for (uint count = 0; count < payload; count++) {
-        if (! in_spikes_add_spike(key)) {
-            log_debug("Could not add spike");
-        }
-    }
-
-    // handle prov and interrupts
-    packet_reception_post_processing();
 }
 
 //! \brief Called when a DMA completes
 //! \param unused: unused
 //! \param[in] tag: What sort of DMA has finished?
 static void dma_complete_callback(UNUSED uint unused, uint tag) {
+    use(unused);
+
     // increment the dma complete count for provenance generation
     dma_complete_count++;
 
@@ -437,36 +415,26 @@ void user_event_callback(UNUSED uint unused0, UNUSED uint unused1) {
 /* INTERFACE FUNCTIONS - cannot be static */
 
 //! \brief clears the input buffer of packets and records them
-int spike_processing_clear_input_buffer(void) {
+void spike_processing_clear_input_buffer(timer_t time) {
 
-    // Record the number of packets received this timer tick
-    int to_return = packets_this_time_step;
-    packets_this_time_step = 0;
+    // Record the number of packets received last timer tick
+    p_per_ts_struct.time = time;
+    recording_record(p_per_ts_region, &p_per_ts_struct, sizeof(p_per_ts_struct));
+    p_per_ts_struct.packets_this_time_step = 0;
 
     // Record the count whether clearing or not for provenance
     count_input_buffer_packets_late += in_spikes_size();
-    //log_info(
-    //    "current lost packets = %d, max in buffer = %d",
-    //    count_input_buffer_packets_late, max_packets_in_buffer_at_time);
 
     if (clear_input_buffers_of_late_packets) {
-        log_debug("clearing buffer");
-        spike_t spike;
-        while (in_spikes_get_next_spike(&spike)) {
-            log_debug("late spike id %u", spike);
-        }
         in_spikes_clear();
     }
-
-    time_left_when_last_packet_arrived = 0;
-    received_packet_this_step = false;
-    return to_return;
 }
 
 bool spike_processing_initialise( // EXPORTED
         size_t row_max_n_words, uint mc_packet_callback_priority,
         uint user_event_priority, uint incoming_spike_buffer_size,
-        bool clear_input_buffers_of_late_packets_init) {
+        bool clear_input_buffers_of_late_packets_init,
+        uint32_t packets_per_timestep_region) {
     // Allocate the DMA buffers
     for (uint32_t i = 0; i < N_DMA_BUFFERS; i++) {
         dma_buffers[i].row = spin1_malloc(row_max_n_words * sizeof(uint32_t));
@@ -482,6 +450,7 @@ bool spike_processing_initialise( // EXPORTED
         clear_input_buffers_of_late_packets_init;
     next_buffer_to_fill = 0;
     buffer_being_read = N_DMA_BUFFERS;
+    p_per_ts_region = packets_per_timestep_region;
 
     // Allocate incoming spike buffer
     if (!in_spikes_initialize_spike_buffer(incoming_spike_buffer_size)) {
@@ -506,7 +475,7 @@ uint32_t spike_processing_get_buffer_overflows(void) { // EXPORTED
 }
 
 uint32_t spike_processing_get_ghost_pop_table_searches(void) {
-	return population_table_get_ghost_pop_table_searches();
+    return population_table_get_ghost_pop_table_searches();
 }
 
 uint32_t spike_processing_get_invalid_master_pop_table_hits(void) {

@@ -437,9 +437,8 @@ static void timer_callback(uint timer_count, UNUSED uint unused1) {
                             spike_key, delay_stage_spike_counters[n]);
 
                         tdma_processing_send_packet(
-                            neuron_index, spike_key,
-                            delay_stage_spike_counters[n], WITH_PAYLOAD,
-                            timer_period, timer_count, max_keys);
+                            spike_key, delay_stage_spike_counters[n],
+                            WITH_PAYLOAD, timer_count);
 
                         // update counter
                         n_spikes_sent += delay_stage_spike_counters[n];
@@ -447,8 +446,7 @@ static void timer_callback(uint timer_count, UNUSED uint unused1) {
                         log_debug("sending spike with key %d", spike_key);
 
                         tdma_processing_send_packet(
-                            neuron_index, spike_key, 0, NO_PAYLOAD,
-                            timer_period, timer_count, max_keys);
+                            spike_key, 0, NO_PAYLOAD, timer_count);
 
                         // update counter
                         n_spikes_sent++;

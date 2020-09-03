@@ -109,10 +109,5 @@ static bool bit_field_filter_initialise(address_t bitfield_region_address) {
         }
     }
     population_table_set_connectivity_bit_field(connectivity_bit_field);
-
-    log_info(
-        "was able to read %d bitfields into DTCM. Failed to read %d bitfields",
-        filter_region->n_redundancy_filters - failed_bit_field_reads,
-        failed_bit_field_reads);
     return true;
 }
