@@ -184,9 +184,7 @@ static inline void do_update(
 //!     to motor activity level.
 //! \param unused0: unused
 //! \param unused1: unused
-static void timer_callback(uint unused0, uint unused1) {
-    use(unused0);
-    use(unused1);
+static void timer_callback(UNUSED uint unused0, UNUSED uint unused1) {
     time++;
 
     log_debug("Timer tick %d", time);
@@ -261,9 +259,7 @@ static void read_parameters(motor_control_config_t *config_region) {
 //! \brief Add incoming spike message (in FIQ) to circular buffer
 //! \param[in] key: The received spike
 //! \param payload: ignored
-static void incoming_spike_callback(uint key, uint payload) {
-    use(payload);
-
+static void incoming_spike_callback(uint key, UNUSED uint payload) {
     log_debug("Received spike %x at time %d\n", key, time);
 
     // If there was space to add spike to incoming spike queue
