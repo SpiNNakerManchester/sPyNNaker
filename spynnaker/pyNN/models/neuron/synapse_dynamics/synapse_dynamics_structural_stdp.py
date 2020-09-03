@@ -99,11 +99,10 @@ class SynapseDynamicsStructuralSTDP(
     @overrides(AbstractSynapseDynamicsStructural.write_structural_parameters)
     def write_structural_parameters(
             self, spec, region, machine_time_step, weight_scales,
-            application_graph, app_vertex, machine_graph, machine_vertex, post_slice,
-            routing_info, synapse_indices):
+            machine_graph, machine_vertex, routing_info, synapse_indices):
         self.__common_sp.write_parameters(
-            spec, region, machine_time_step, weight_scales, application_graph,
-            app_vertex, machine_graph, machine_vertex, post_slice, routing_info, synapse_indices)
+            spec, region, machine_time_step, weight_scales, machine_graph,
+            machine_vertex, routing_info, synapse_indices)
 
     def set_projection_parameter(self, param, value):
         """

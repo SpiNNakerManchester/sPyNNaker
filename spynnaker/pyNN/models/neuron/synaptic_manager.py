@@ -1237,8 +1237,8 @@ class SynapticManager(object):
                           AbstractSynapseDynamicsStructural):
                 self.__synapse_dynamics.write_structural_parameters(
                     spec, self._struct_dynamics_region, machine_time_step,
-                    weight_scales, application_graph, application_vertex, machine_graph, machine_vertex,
-                    post_vertex_slice, routing_info, self.__synapse_indices)
+                    weight_scales, machine_graph, machine_vertex, routing_info,
+                    self.__synapse_indices)
 
         self.__weight_scales[placement] = weight_scales
 

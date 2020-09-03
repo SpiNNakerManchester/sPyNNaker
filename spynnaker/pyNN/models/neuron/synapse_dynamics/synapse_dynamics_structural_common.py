@@ -173,8 +173,7 @@ class SynapseDynamicsStructuralCommon(object):
 
     def write_parameters(
             self, spec, region, machine_time_step, weight_scales,
-            application_graph, app_vertex, machine_graph, machine_vertex, post_slice, routing_info,
-            synapse_indices):
+            machine_graph, machine_vertex, routing_info, synapse_indices):
         """ Write the synapse parameters to the spec.
 
         :param ~data_specification.DataSpecificationGenerator spec:
@@ -183,11 +182,10 @@ class SynapseDynamicsStructuralCommon(object):
         :param int machine_time_step: the duration of a machine time step (ms)
         :param dict(AbstractSynapseType,float) weight_scales:
             scaling the weights
-        :param ~pacman.model.graphs.application.ApplicationGraph\
-                application_graph:
-            the entire, highest level, graph of the network to be simulated
-        :param AbstractPopulationVertex app_vertex:
-            the highest level object of the post-synaptic population
+        :param ~pacman.model.graphs.machine.MachineVertex machine_vertex:
+            Full machine level network
+        :param MachineVertex machine_vertex:
+            the vertex for which data specs are being prepared
         :param ~pacman.model.graphs.common.Slice post_slice:
             the slice of the app vertex corresponding to this machine vertex
         :param ~pacman.model.routing_info.RoutingInfo routing_info:
@@ -198,26 +196,20 @@ class SynapseDynamicsStructuralCommon(object):
         spec.switch_write_focus(region)
 
         # Get relevant edges
-        structural_edges = self.__get_structural_edges(
-            application_graph, app_vertex)
-        structural_edges2, machine_edges2 = self.__get_structural_edges2(
+        structural_edges, machine_edges_by_app = self.__get_structural_edges2(
             machine_graph, machine_vertex)
 
-        assert(structural_edges == structural_edges2)
-        assert(machine_vertex.vertex_slice == post_slice)
-        assert(machine_vertex.app_vertex == app_vertex)
         # Write the common part of the rewiring data
         self.__write_common_rewiring_data(
-            spec, app_vertex, post_slice, machine_time_step,
-            len(structural_edges))
+            spec, machine_vertex, machine_time_step, len(structural_edges))
 
         # Write the pre-population info
         pop_index = self.__write_prepopulation_info(
-            spec, app_vertex, structural_edges2, machine_edges2, routing_info, weight_scales,
-            post_slice, synapse_indices, machine_time_step)
+            spec, machine_vertex, structural_edges, machine_edges_by_app,
+            routing_info, weight_scales, synapse_indices, machine_time_step)
 
         # Write the post-to-pre table
-        self.__write_post_to_pre_table(spec, pop_index, app_vertex, post_slice)
+        self.__write_post_to_pre_table(spec, pop_index, machine_vertex)
 
         # Write the component parameters
         self.__partner_selection.write_parameters(spec)
@@ -276,15 +268,13 @@ class SynapseDynamicsStructuralCommon(object):
         return structural_edges, machine_edges
 
     def __write_common_rewiring_data(
-            self, spec, app_vertex, post_slice, machine_time_step, n_pre_pops):
+            self, spec, machine_vertex, machine_time_step, n_pre_pops):
         """ Write the non-sub-population synapse parameters to the spec.
 
         :param ~data_specification.DataSpecificationGenerator spec:
             the data spec
-        :param AbstractPopulationVertex app_vertex:
-            the highest level object of the post-synaptic population
-        :param ~pacman.model.graphs.common.Slice post_slice:
-            the slice of the app vertex corresponding to this machine vertex
+        :param MachineVertex machine_vertex:
+            the vertex for which data specs are being prepared
         :param int machine_time_step: the duration of a machine time step (ms)
         :param int n_pre_pops: the number of pre-populations
         :return: None
@@ -306,8 +296,10 @@ class SynapseDynamicsStructuralCommon(object):
         # write s_max
         spec.write_value(data=int(self.__s_max))
         # write total number of atoms in the application vertex
+        app_vertex = machine_vertex.app_vertex
         spec.write_value(data=app_vertex.n_atoms)
         # write local low, high and number of atoms
+        post_slice = machine_vertex.vertex_slice
         spec.write_value(data=post_slice.n_atoms)
         spec.write_value(data=post_slice.lo_atom)
         spec.write_value(data=post_slice.hi_atom)
@@ -332,12 +324,13 @@ class SynapseDynamicsStructuralCommon(object):
         spec.write_value(data=n_pre_pops)
 
     def __write_prepopulation_info(
-            self, spec, app_vertex, structural_edges, machine_edges2,
-            routing_info, weight_scales, post_slice, synapse_indices,
+            self, spec, machine_vertex, structural_edges, machine_edges_by_app,
+            routing_info, weight_scales, synapse_indices,
             machine_time_step):
         """
         :param ~data_specification.DataSpecificationGenerator spec:
-        :param AbstractPopulationVertex app_vertex:
+        :param MachineVertex machine_vertex:
+            the vertex for which data specs are being prepared
         :param list(tuple(ProjectionApplicationEdge,SynapseInformation)) \
                 structural_edges:
         :param RoutingInfo routing_info:
@@ -352,17 +345,13 @@ class SynapseDynamicsStructuralCommon(object):
         for app_edge, synapse_info in structural_edges.items():
             pop_index[app_edge.pre_vertex, synapse_info] = index
             index += 1
-            machine_edges = [
-                e for e in app_edge.machine_edges
-                if e.post_vertex.vertex_slice == post_slice]
-
-            assert ( machine_edges == machine_edges2[app_edge])
+            machine_edges = machine_edges_by_app[app_edge]
             dynamics = synapse_info.synapse_dynamics
 
             # Number of machine edges
             spec.write_value(len(machine_edges), data_type=DataType.UINT16)
             # Controls - currently just if this is a self connection or not
-            self_connected = app_vertex == app_edge.pre_vertex
+            self_connected = machine_vertex.app_vertex == app_edge.pre_vertex
             spec.write_value(int(self_connected), data_type=DataType.UINT16)
             # Delay
             delay_scale = 1000.0 / machine_time_step
@@ -384,7 +373,7 @@ class SynapseDynamicsStructuralCommon(object):
             # Total number of atoms in pre-vertex
             spec.write_value(app_edge.pre_vertex.n_atoms)
             # Machine edge information
-            for machine_edge in machine_edges2[app_edge]:
+            for machine_edge in machine_edges:
                 r_info = routing_info.get_routing_info_for_edge(machine_edge)
                 vertex_slice = machine_edge.pre_vertex.vertex_slice
                 spec.write_value(r_info.first_key)
@@ -395,19 +384,21 @@ class SynapseDynamicsStructuralCommon(object):
                     synapse_indices[synapse_info, vertex_slice.lo_atom])
         return pop_index
 
-    def __write_post_to_pre_table(
-            self, spec, pop_index, app_vertex, post_slice):
+    def __write_post_to_pre_table(self, spec, pop_index, machine_vertex):
         """ Post to pre table is basically the transpose of the synaptic\
             matrix.
 
         :param ~data_specification.DataSpecificationGenerator spec:
         :param dict(tuple(AbstractPopulationVertex,SynapseInformation),int) \
                 pop_index:
-        :param AbstractPopulationVertex app_vertex:
+        :param MachineVertex machine_vertex:
+            the vertex for which data specs are being prepared
         :param ~pacman.model.graphs.common.Slice post_slice:
         """
         # Get connections for this post slice
-        slice_conns = self.__connections[app_vertex, post_slice.lo_atom]
+        post_slice = machine_vertex.vertex_slice
+        slice_conns = self.__connections[
+            machine_vertex.app_vertex, post_slice.lo_atom]
         # Make a single large array of connections
         connections = numpy.concatenate(
             [conn for (conn, _, _, _) in slice_conns])
