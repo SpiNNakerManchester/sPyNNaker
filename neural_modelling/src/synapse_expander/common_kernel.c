@@ -56,7 +56,11 @@ void pre_in_post_world(uint16_t in_row, uint16_t in_col, uint16_t start_row,
         *out_row = 1;
     } else if (d < 0) {
         d = (int16_t) uidiv((uint16_t) (-d), step_row, &r);
-        *out_row = -d + 1;
+        if (r == 0) {
+            *out_row = -d + 1;
+        } else {
+        	*out_row = -d; // Note: e.g. ((-1) // 4) is not the same as (- (1 // 4))
+        }
     } else {
         d = (int16_t) uidiv((uint16_t) d, step_row, &r);
         *out_row = d + 1;
@@ -67,7 +71,11 @@ void pre_in_post_world(uint16_t in_row, uint16_t in_col, uint16_t start_row,
         *out_col = 1;
     } else if (d < 0) {
         d = (int16_t) uidiv((uint16_t) (-d), step_col, &r);
-        *out_col = -d + 1;
+        if (r == 0) {
+        	*out_col = -d + 1;
+        } else {
+        	*out_col = -d; // Note: e.g. ((-1) // 4) is not the same as (- (1 // 4))
+        }
     } else {
         d = (int16_t) uidiv((uint16_t) d, step_col, &r);
         *out_col = d + 1;
