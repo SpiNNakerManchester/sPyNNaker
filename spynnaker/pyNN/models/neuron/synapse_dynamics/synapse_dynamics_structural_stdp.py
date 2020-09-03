@@ -20,8 +20,8 @@ from .abstract_synapse_dynamics_structural import (
 from .synapse_dynamics_stdp import SynapseDynamicsSTDP
 from spynnaker.pyNN.models.neuron.synapse_dynamics.\
     synapse_dynamics_structural_common import (
-    DEFAULT_F_REW, DEFAULT_INITIAL_WEIGHT, DEFAULT_INITIAL_DELAY,
-    DEFAULT_S_MAX, SynapseDynamicsStructuralCommon)
+        DEFAULT_F_REW, DEFAULT_INITIAL_WEIGHT, DEFAULT_INITIAL_DELAY,
+        DEFAULT_S_MAX, SynapseDynamicsStructuralCommon)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
 
 

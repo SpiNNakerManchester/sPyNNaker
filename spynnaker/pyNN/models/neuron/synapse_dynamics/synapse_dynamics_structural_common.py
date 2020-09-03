@@ -59,6 +59,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
     # 1 16-bit number (neuron_index)
     # + 2 8-bit numbers (sub_pop_index; pop_index)
     _POST_TO_PRE_ENTRY_SIZE = BYTES_PER_SHORT + (2 * 1)
+
     def get_parameter_names(self):
         """
         :rtype: list(str)

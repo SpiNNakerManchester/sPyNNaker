@@ -19,8 +19,8 @@ from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.models.neuron.synapse_dynamics.\
     synapse_dynamics_structural_common import (
-    DEFAULT_F_REW, DEFAULT_INITIAL_WEIGHT, DEFAULT_INITIAL_DELAY,
-    DEFAULT_S_MAX, SynapseDynamicsStructuralCommon)
+        DEFAULT_F_REW, DEFAULT_INITIAL_WEIGHT, DEFAULT_INITIAL_DELAY,
+        DEFAULT_S_MAX, SynapseDynamicsStructuralCommon)
 from .synapse_dynamics_static import SynapseDynamicsStatic
 from .synapse_dynamics_stdp import SynapseDynamicsSTDP
 from .synapse_dynamics_structural_stdp import SynapseDynamicsStructuralSTDP
@@ -53,7 +53,8 @@ class SynapseDynamicsStructuralStatic(
         "__connections",
         # Maximum synaptic row length for created synapses
         "__actual_row_max_length",
-        # The actual type of weights: static through the simulation or those        # that can be change through STDP
+        # The actual type of weights: static through the simulation or those
+        # that can be change through STDP
         "__weight_dynamics",
         # Shared RNG seed to be written on all cores
         "__seeds",
