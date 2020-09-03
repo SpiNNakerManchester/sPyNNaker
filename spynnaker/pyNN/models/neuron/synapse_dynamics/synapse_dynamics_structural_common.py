@@ -99,6 +99,9 @@ class SynapseDynamicsStructuralCommon(object):
     #: Default value for maximum fan-in per target layer neuron
     DEFAULT_S_MAX = 32
 
+    PAIR_ERROR = "Only one Projection between each pair of " \
+                 "Populations can use structural plasticity"
+
     def __init__(
             self, partner_selection, formation, elimination, f_rew,
             initial_weight, initial_delay, s_max, seed):
@@ -200,8 +203,9 @@ class SynapseDynamicsStructuralCommon(object):
         spec.switch_write_focus(region)
 
         # Get relevant edges
-        structural_edges, machine_edges_by_app = self.__get_structural_edges_by_machine(
-            machine_graph, machine_vertex)
+        structural_edges, machine_edges_by_app = \
+            self.__get_structural_edges_by_machine(
+                machine_graph, machine_vertex)
 
         # Write the common part of the rewiring data
         self.__write_common_rewiring_data(
@@ -239,8 +243,7 @@ class SynapseDynamicsStructuralCommon(object):
                                   AbstractSynapseDynamicsStructural):
                         if app_edge in structural_edges:
                             raise SynapticConfigurationException(
-                                "Only one Projection between each pair of "
-                                "Populations can use structural plasticity")
+                                self.PAIR_ERROR)
                         structural_edges[app_edge] = synapse_info
         return structural_edges
 
@@ -262,9 +265,8 @@ class SynapseDynamicsStructuralCommon(object):
                         if app_edge in structural_edges:
                             if (structural_edges[machine_edge] !=
                                     synapse_info):
-                               raise SynapticConfigurationException(
-                                    "Only one Projection between each pair of "
-                                    "Populations can use structural plasticity")
+                                raise SynapticConfigurationException(
+                                   self.PAIR_ERROR)
                         else:
                             structural_edges[app_edge] = \
                                 synapse_info
@@ -446,8 +448,7 @@ class SynapseDynamicsStructuralCommon(object):
             numpy.concatenate(padded_rows).T, formats="u1, u1, u2").view("u4")
         spec.write_array(post_to_pre)
 
-    def get_parameters_sdram_usage_in_bytes(
-            self, graph, vertex, n_neurons):
+    def get_parameters_sdram_usage_in_bytes(self, graph, vertex, n_neurons):
         """ Get SDRAM usage.
 
         Note: At the Application level this will be an estimate.
@@ -474,8 +475,8 @@ class SynapseDynamicsStructuralCommon(object):
             structural_edges, machine_edges_by_app = \
                 self.__get_structural_edges_by_machine(graph, vertex)
         else:
-            raise PacmanInvalidParameterException(
-                "Mismatch between {} and {}".format(graph, vertex))
+            raise PacmanInvalidParameterException("vertex", vertex,
+                "Not at the same level as graph")
         # Also keep track of the parameter sizes
         param_sizes = self.__partner_selection\
             .get_parameters_sdram_usage_in_bytes()
