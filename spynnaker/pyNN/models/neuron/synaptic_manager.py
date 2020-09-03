@@ -467,15 +467,13 @@ class SynapticManager(object):
 
     def _reserve_memory_regions(
             self, spec, machine_vertex, vertex_slice, machine_graph,
-            all_syn_block_sz, application_graph, application_vertex):
+            all_syn_block_sz):
         """
         :param ~.DataSpecificationGenerator spec:
         :param ~.MachineVertex machine_vertex:
         :param ~pacman.model.graphs.common.Slice vertex_slice:
         :param ~.MachineGraph machine_graph:
         :param int all_syn_block_sz:
-        :param ~.ApplicationGraph application_graph:
-        :param ~.ApplicationVertex application_vertex:
         """
         spec.reserve_memory_region(
             region=self._synapse_params_region,
@@ -513,7 +511,7 @@ class SynapticManager(object):
             synapse_structural_dynamics_sz = (
                 self.__synapse_dynamics.
                 get_structural_parameters_sdram_usage_in_bytes(
-                    application_graph, application_vertex,
+                    machine_graph, machine_vertex,
                     vertex_slice.n_atoms, self.__n_synapse_types))
 
             if synapse_structural_dynamics_sz != 0:
@@ -1215,7 +1213,7 @@ class SynapticManager(object):
             post_vertex_slice, in_edges, machine_time_step)
         self._reserve_memory_regions(
             spec, machine_vertex, post_vertex_slice, machine_graph,
-            all_syn_block_sz, application_graph, application_vertex)
+            all_syn_block_sz)
 
         ring_buffer_shifts = self._get_ring_buffer_shifts(
             application_vertex, application_graph, machine_time_step,

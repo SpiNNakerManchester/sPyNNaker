@@ -23,13 +23,15 @@ class AbstractSynapseDynamicsStructural(object):
 
     @abstractmethod
     def get_structural_parameters_sdram_usage_in_bytes(
-            self, application_graph, app_vertex, n_neurons, n_synapse_types):
+            self, graph, vertex, n_neurons, n_synapse_types):
         """ Get the size of the structural parameters
 
-        :param ~pacman.model.graphs.application.ApplicationGraph \
-                application_graph:
-        :param ~spynnaker.pyNN.models.neuron.AbstractPopulationVertex \
-                app_vertex:
+        Note: At the Application level this will be an estimate.
+
+        :param graph: Graph at same level as vertex.
+        :type graph: ApplicationGraph or MachineGraph
+        :param vertex: Vertex at the same level as the graph
+        :type vertex: ApplicationVertex or MachineVertex
         :param int n_neurons:
         :param int n_synapse_types:
         :return: the size of the parameters, in bytes

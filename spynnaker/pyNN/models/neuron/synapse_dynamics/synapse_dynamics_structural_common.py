@@ -17,6 +17,10 @@ import collections
 import math
 import numpy
 from data_specification.enums.data_type import DataType
+from pacman.model.graphs.application import (
+    ApplicationGraph, ApplicationVertex)
+from pacman.model.graphs.machine import (MachineGraph, MachineVertex)
+from pacman.exceptions import PacmanInvalidParameterException
 from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION, MICRO_TO_SECOND_CONVERSION,
     BYTES_PER_WORD, BYTES_PER_SHORT)
@@ -196,7 +200,7 @@ class SynapseDynamicsStructuralCommon(object):
         spec.switch_write_focus(region)
 
         # Get relevant edges
-        structural_edges, machine_edges_by_app = self.__get_structural_edges2(
+        structural_edges, machine_edges_by_app = self.__get_structural_edges_by_machine(
             machine_graph, machine_vertex)
 
         # Write the common part of the rewiring data
@@ -221,7 +225,7 @@ class SynapseDynamicsStructuralCommon(object):
             dynamics.elimination.write_parameters(
                 spec, weight_scales[synapse_info.synapse_type])
 
-    def __get_structural_edges(self, app_graph, app_vertex):
+    def __get_structural_edges_by_app(self, app_graph, app_vertex):
         """
         :param ~pacman.model.graphs.application.ApplicationGraph app_graph:
         :param ~pacman.model.graphs.application.ApplicationVertex app_vertex:
@@ -240,13 +244,13 @@ class SynapseDynamicsStructuralCommon(object):
                         structural_edges[app_edge] = synapse_info
         return structural_edges
 
-    def __get_structural_edges2(self, machine_graph, machine_vertex):
+    def __get_structural_edges_by_machine(self, machine_graph, machine_vertex):
         """
         :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
         :param ~pacman.model.graphs.machine.MachineVertex machine_vertex:
         :rtype: dict(ProjectionApplicationEdge, SynapseInformation)
         """
-        structural_edges = dict()
+        structural_edges = collections.OrderedDict()
         machine_edges = collections.defaultdict(list)
         for machine_edge in machine_graph.get_edges_ending_at_vertex(
                 machine_vertex):
@@ -443,30 +447,47 @@ class SynapseDynamicsStructuralCommon(object):
         spec.write_array(post_to_pre)
 
     def get_parameters_sdram_usage_in_bytes(
-            self, application_graph, app_vertex, n_neurons):
-        """ Get SDRAM usage
+            self, graph, vertex, n_neurons):
+        """ Get SDRAM usage.
 
-        :param ~pacman.model.graphs.application.ApplicationGraph \
-                application_graph:
-        :param AbstractPopulationVertex app_vertex:
+        Note: At the Application level this will be an estimate.
+
+        :param graph: Graph at same level as vertex.
+        :type graph: ApplicationGraph or MachineGraph
+        :param vertex: Vertex at the same level as the graph
+        :type vertex: ApplicationVertex or MachineVertex
         :param int n_neurons:
         :return: SDRAM usage
         :rtype: int
+        :raises PacmanInvalidParameterException
         """
         # Work out how many sub-edges we will end up with, as this is used
         # for key_atom_info
         n_sub_edges = 0
-        structural_edges = self.__get_structural_edges(
-            application_graph, app_vertex).items()
+        if (isinstance(graph, ApplicationGraph) and
+                isinstance(vertex, ApplicationVertex)):
+            structural_edges = self.__get_structural_edges_by_app(
+                graph, vertex)
+            machine_edges_by_app = None
+        elif (isinstance(graph, MachineGraph) and
+                isinstance(vertex, MachineVertex)):
+            structural_edges, machine_edges_by_app = \
+                self.__get_structural_edges_by_machine(graph, vertex)
+        else:
+            raise PacmanInvalidParameterException(
+                "Mismatch between {} and {}".format(graph, vertex))
         # Also keep track of the parameter sizes
         param_sizes = self.__partner_selection\
             .get_parameters_sdram_usage_in_bytes()
-        for (in_edge, synapse_info) in structural_edges:
-            max_atoms = in_edge.pre_vertex.get_max_atoms_per_core()
-            if in_edge.pre_vertex.n_atoms < max_atoms:
-                max_atoms = in_edge.pre_vertex.n_atoms
-            n_sub_edges += int(math.ceil(
-                float(in_edge.pre_vertex.n_atoms) / float(max_atoms)))
+        for (app_edge, synapse_info) in structural_edges.items():
+            if machine_edges_by_app:
+                n_sub_edges += len(machine_edges_by_app[app_edge])
+            else:
+                max_atoms = app_edge.pre_vertex.get_max_atoms_per_core()
+                if app_edge.pre_vertex.n_atoms < max_atoms:
+                    max_atoms = app_edge.pre_vertex.n_atoms
+                n_sub_edges += int(math.ceil(
+                    float(app_edge.pre_vertex.n_atoms) / float(max_atoms)))
             dynamics = synapse_info.synapse_dynamics
             param_sizes += dynamics.formation\
                 .get_parameters_sdram_usage_in_bytes()
