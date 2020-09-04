@@ -91,7 +91,9 @@ $(function() {
 <code>#include &quot;<a class="el" href="partner_8h_source.html">partner_selection/partner.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="elimination_8h_source.html">elimination/elimination.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="formation_8h_source.html">formation/formation.h</a>&quot;</code><br />
-</div><table class="memberdecls">
+</div>
+<p><a href="topographic__map__impl_8c_source.html">Go to the source code of this file.</a></p>
+<table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:aa905464bd5cc1eb8fa5b1b16b0d9b263"><td class="memItemLeft" align="right" valign="top"><a id="aa905464bd5cc1eb8fa5b1b16b0d9b263"></a>
@@ -148,6 +150,8 @@ static elimination_params_t **&#160;</td><td class="memItemRight" valign="bottom
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>This file contains the main functions for probabilistic synaptogenesis. </p>
 <dl class="section author"><dt>Author</dt><dd>Petrut Bogdan </dd></dl>
+
+<p class="definition">Definition in file <a class="el" href="topographic__map__impl_8c_source.html">topographic_map_impl.c</a>.</p>
 </div><h2 class="groupheader">Function Documentation</h2>
 <a id="adba45d439e3c65751b2508e6ae744e15"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#adba45d439e3c65751b2508e6ae744e15">&#9670;&nbsp;</a></span>synaptogenesis_dynamics_initialise()</h2>
@@ -173,6 +177,8 @@ static elimination_params_t **&#160;</td><td class="memItemRight" valign="bottom
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Whether we were successful. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="topographic__map__impl_8c_source.html#l00131">131</a> of file <a class="el" href="topographic__map__impl_8c_source.html">topographic_map_impl.c</a>.</p>
 
 </div>
 </div>
@@ -226,6 +232,8 @@ static elimination_params_t **&#160;</td><td class="memItemRight" valign="bottom
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if a row is to be transferred, false otherwise </dd></dl>
 
+<p class="definition">Definition at line <a class="el" href="topographic__map__impl_8c_source.html#l00189">189</a> of file <a class="el" href="topographic__map__impl_8c_source.html">topographic_map_impl.c</a>.</p>
+
 </div>
 </div>
 <a id="ac08559ca2e23561471aebd3f4097e348"></a>
@@ -264,6 +272,8 @@ static elimination_params_t **&#160;</td><td class="memItemRight" valign="bottom
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the row was changed and needs to be written back </dd></dl>
 
+<p class="definition">Definition at line <a class="el" href="topographic__map__impl_8c_source.html#l00261">261</a> of file <a class="el" href="topographic__map__impl_8c_source.html">topographic_map_impl.c</a>.</p>
+
 </div>
 </div>
 <a id="afa57eee149b8ef2c30e2239c22f0957e"></a>
@@ -285,6 +295,8 @@ static elimination_params_t **&#160;</td><td class="memItemRight" valign="bottom
 <p>retrieve the period of rewiring </p>
 <dl class="section return"><dt>Returns</dt><dd>Based on <a class="el" href="synaptogenesis__dynamics_8h.html#a0d2bd7f05bdc3f4c8ce1ccafc16feb4a" title="controls whether rewiring is attempted multiple times per timestep or after a number of timesteps.">synaptogenesis_is_fast()</a>, this can either be how many times rewiring happens in a timestep, or how many timesteps have to pass until rewiring happens. </dd></dl>
 
+<p class="definition">Definition at line <a class="el" href="topographic__map__impl_8c_source.html#l00298">298</a> of file <a class="el" href="topographic__map__impl_8c_source.html">topographic_map_impl.c</a>.</p>
+
 </div>
 </div>
 <a id="a0d2bd7f05bdc3f4c8ce1ccafc16feb4a"></a>
@@ -305,6 +317,8 @@ static elimination_params_t **&#160;</td><td class="memItemRight" valign="bottom
 
 <p>controls whether rewiring is attempted multiple times per timestep or after a number of timesteps. </p>
 <dl class="section return"><dt>Returns</dt><dd>true if the result of <a class="el" href="synaptogenesis__dynamics_8h.html#afa57eee149b8ef2c30e2239c22f0957e" title="retrieve the period of rewiring">synaptogenesis_rewiring_period()</a> is the number of attempts to try per timestep. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="topographic__map__impl_8c_source.html#l00302">302</a> of file <a class="el" href="topographic__map__impl_8c_source.html">topographic_map_impl.c</a>.</p>
 
 </div>
 </div>
@@ -341,6 +355,8 @@ static elimination_params_t **&#160;</td><td class="memItemRight" valign="bottom
   </dd>
 </dl>
 
+<p class="definition">Definition at line <a class="el" href="topographic__map__impl_8c_source.html#l00306">306</a> of file <a class="el" href="topographic__map__impl_8c_source.html">topographic_map_impl.c</a>.</p>
+
 </div>
 </div>
 <h2 class="groupheader">Variable Documentation</h2>
@@ -367,6 +383,8 @@ static elimination_params_t **&#160;</td><td class="memItemRight" valign="bottom
 <p>Current states in use. </p>
 <p><a class="el" href="topographic__map__impl_8c.html#ac08559ca2e23561471aebd3f4097e348" title="Performs the actual restructuring of a row.">synaptogenesis_row_restructure()</a> moves states from here to <a class="el" href="topographic__map__impl_8c.html#abe30d6dd9444f9a17ed9128f6682fa03" title="Free current states.">free_states</a> </p>
 
+<p class="definition">Definition at line <a class="el" href="topographic__map__impl_8c_source.html#l00067">67</a> of file <a class="el" href="topographic__map__impl_8c_source.html">topographic_map_impl.c</a>.</p>
+
 </div>
 </div>
 <a id="abe30d6dd9444f9a17ed9128f6682fa03"></a>
@@ -392,12 +410,14 @@ static elimination_params_t **&#160;</td><td class="memItemRight" valign="bottom
 <p>Free current states. </p>
 <p><a class="el" href="topographic__map__impl_8c.html#a1a8123da1bd797e82cb3193a0ce43847" title="Function called (usually on a timer from c_main()) to trigger the process of synaptic rewiring.">synaptogenesis_dynamics_rewire()</a> moves states from here to <a class="el" href="topographic__map__impl_8c.html#a617d5ccf1e27648321a85cfc2498eedf" title="Current states in use.">current_state_queue</a> </p>
 
+<p class="definition">Definition at line <a class="el" href="topographic__map__impl_8c_source.html#l00073">73</a> of file <a class="el" href="topographic__map__impl_8c_source.html">topographic_map_impl.c</a>.</p>
+
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Sep 3 2020 23:36:35 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Fri Sep 4 2020 14:19:28 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.17
 </small></address>
