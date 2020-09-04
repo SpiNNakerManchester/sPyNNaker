@@ -215,21 +215,21 @@ bool matrix_generator_generate(
                 max_n_synapses, indices);
         log_debug("Generated %u synapses", n_indices);
 
-        accum params[n_indices];
+        accum delay_params[n_indices], weight_params[n_indices];
         uint16_t delays[n_indices], weights[n_indices];
 
         // Generate delays for each index
         param_generator_generate(
-                delay_generator, n_indices, pre_neuron_index, indices, params);
+                delay_generator, n_indices, pre_neuron_index, indices, delay_params);
         for (uint32_t j = 0; j < n_indices; j++) {
-            delays[j] = rescale_delay(params[j], timestep_per_delay);
+            delays[j] = rescale_delay(delay_params[j], timestep_per_delay);
         }
 
         // Generate weights for each index
         param_generator_generate(
-                weight_generator, n_indices, pre_neuron_index, indices, params);
+                weight_generator, n_indices, pre_neuron_index, indices, weight_params);
         for (uint32_t j = 0; j < n_indices; j++) {
-            weights[j] = rescale_weight(params[j], weight_scales[synapse_type]);
+            weights[j] = rescale_weight(weight_params[j], weight_scales[synapse_type]);
         }
 
         // Write row

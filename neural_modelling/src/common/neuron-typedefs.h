@@ -29,10 +29,6 @@
 #include <common-typedefs.h>
 #include "maths-util.h"
 
-#ifndef UNUSED
-#define UNUSED __attribute__((__unused__))
-#endif
-
 //! The type of a SpiNNaker multicast message key word.
 typedef uint32_t key_t;
 

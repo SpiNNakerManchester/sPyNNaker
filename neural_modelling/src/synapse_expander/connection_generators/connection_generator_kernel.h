@@ -138,6 +138,12 @@ static uint32_t connection_generator_kernel_generate(
     uint16_t pre_c = 0;
     uint16_t pre_r = uidiv(pre_neuron_index, obj->preWidth, &pre_c);
 
+    // Check whether these coordinates should be included based on step functions
+    if (!(((pre_r - obj->startPreHeight) % obj->stepPreHeight == 0) &&
+    		((pre_c - obj->startPreWidth) % obj->stepPreWidth == 0))) {
+    	return 0;
+    }
+
     uint16_t hlf_kw = obj->kernelWidth >> 1;
     uint16_t hlf_kh = obj->kernelHeight >> 1;
     int16_t k_r, k_c;
@@ -148,13 +154,13 @@ static uint32_t connection_generator_kernel_generate(
         post_r = uidiv(post_slice_start + i, obj->postWidth, &post_c);
 
         //move post coords into common coordinate system
-        post_in_pre_world(post_r, post_c, obj->startPostHeight,
-                obj->startPostWidth, obj->stepPostHeight,
-                obj->stepPostWidth, &pac_r, &pac_c);
+        post_in_pre_world(
+        		post_r, post_c, obj->startPostHeight, obj->startPostWidth,
+				obj->stepPostHeight, obj->stepPostWidth, &pac_r, &pac_c);
 
         //move common to pre coords
         pre_in_post_world(
-                pac_r, pac_c, obj->startPreHeight, obj->startPreHeight,
+                pac_r, pac_c, obj->startPreHeight, obj->startPreWidth,
                 obj->stepPreHeight, obj->stepPreWidth, &pap_r, &pap_c);
 
         int16_t r_diff = (int16_t) pap_r - (int16_t) pre_r;

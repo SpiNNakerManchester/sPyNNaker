@@ -122,6 +122,11 @@ typedef struct {
 
 /* PRIVATE FUNCTIONS */
 
+// Mark a value as possibly unused while not using any instructions, guaranteed
+#ifndef __use
+#define __use(x)    do { (void) (x); } while (0)
+#endif
+
 //---------------------------------------
 //! \brief Synapse update loop core
 //! \param[in] time: The current time
@@ -139,7 +144,6 @@ static inline final_state_t plasticity_update_synapse(
         const pre_trace_t new_pre_trace, const uint32_t delay_dendritic,
         const uint32_t delay_axonal, update_state_t current_state,
         const post_event_history_t *post_event_history) {
-
     // Apply axonal delay to time of last presynaptic spike
     const uint32_t delayed_last_pre_time = last_pre_time + delay_axonal;
 
@@ -204,9 +208,9 @@ void synapse_dynamics_print_plastic_synapses(
         address_t plastic_region_address,
         synapse_row_fixed_part_t *fixed_region,
         uint32_t *ring_buffer_to_input_buffer_left_shifts) {
-    use(plastic_region_address);
-    use(fixed_region);
-    use(ring_buffer_to_input_buffer_left_shifts);
+    __use(plastic_region_address);
+    __use(fixed_region);
+    __use(ring_buffer_to_input_buffer_left_shifts);
 
 #if LOG_LEVEL >= LOG_DEBUG
     synapse_row_plastic_data_t *data_ptr = plastic_region_address;
@@ -253,7 +257,7 @@ void synapse_dynamics_print_plastic_synapses(
 static inline index_t sparse_axonal_delay(uint32_t x) {
 #if 1
     // No axonal delay, ever
-    use(x);
+    __use(x);
     return 0;
 #else
     return (x >> synapse_delay_index_type_bits) & SYNAPSE_AXONAL_DELAY_MASK;
@@ -263,7 +267,6 @@ static inline index_t sparse_axonal_delay(uint32_t x) {
 bool synapse_dynamics_initialise(
         address_t address, uint32_t n_neurons, uint32_t n_synapse_types,
         uint32_t *ring_buffer_to_input_buffer_left_shifts) {
-
     stdp_params *sdram_params = (stdp_params *) address;
     spin1_memcpy(&params, sdram_params, sizeof(stdp_params));
     address = (address_t) &sdram_params[1];
