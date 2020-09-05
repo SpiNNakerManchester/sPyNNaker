@@ -90,9 +90,9 @@ static inline int32_t convert_real_to_int(REAL value) {
 //---------------------------------------
 static inline weight_state_t weight_one_term_apply_update(weight_state_t state, REAL total_rate) {
 
-    io_printf(IO_BUF, "pre weight %k, learning rate %k\n", state.weight, state.weight_region->learning_rate);
+    //io_printf(IO_BUF, "pre weight %k, learning rate %k\n", state.weight, state.weight_region->learning_rate);
 
-    io_printf(IO_BUF, "learning rate * rate %k, shift %d\n", state.weight_region->learning_rate * total_rate, state.weight_shift);
+    //io_printf(IO_BUF, "learning rate * rate %k, shift %d\n", state.weight_region->learning_rate * total_rate, state.weight_shift);
 
     state.weight = state.weight + ((convert_real_to_int(state.weight_region->learning_rate * total_rate)) >> state.weight_shift);
 

@@ -286,7 +286,7 @@ bool synapse_dynamics_process_plastic_synapses(
     const REAL last_pre_rate = event_history->prev_time;
     //const pre_trace_t last_pre_trace = event_history->prev_trace;
 
-    io_printf(IO_BUF, "t %d prev %k\n", time, last_pre_rate);
+    //io_printf(IO_BUF, "t %d prev %k\n", time, last_pre_rate);
 
     REAL real_rate = convert_rate_to_input(rate);
 
@@ -358,9 +358,9 @@ bool synapse_dynamics_process_plastic_synapses(
 //        }
 
         //io_printf(IO_BUF, "right shift %d\n", weight_get_shift(current_state));
-        //io_printf(IO_BUF, "shift weight %k, rate %k\n", synapses_convert_weight_to_input(
-        //                synapse_structure_get_final_weight(final_state),
-        //                weight_get_shift(current_state)), real_rate);
+        io_printf(IO_BUF, "weight %k, rate %k\n", synapses_convert_weight_to_input(
+                        synapse_structure_get_final_weight(final_state),
+                        weight_get_shift(current_state)), real_rate);
         //io_printf(IO_BUF, "adding %k ", accumulation);
 
         ring_buffers[ring_buffer_index] = accumulation;

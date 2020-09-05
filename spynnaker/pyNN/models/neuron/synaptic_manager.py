@@ -163,7 +163,7 @@ class SynapticManager(object):
         elif not synapse_dynamics.is_same_as(self.__synapse_dynamics):
             raise SynapticConfigurationException(
                 "Synapse dynamics must match exactly when using multiple edges"
-                "to the same population")
+                " to the same population")
 
     @property
     def ring_buffer_sigma(self):

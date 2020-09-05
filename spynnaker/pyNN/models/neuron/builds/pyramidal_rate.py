@@ -28,9 +28,9 @@ class PyramidalRate(AbstractPyNNNeuronModelStandard):
 
     __slots__ = ["_rate_based"]
 
-    @default_initial_values({"u", "isyn_exc_soma", "isyn_inh_soma",
-                             "isyn_exc_dendrite", "isyn_inh_dendrite",
-                             "v", "starting_rate"})
+    @default_initial_values({"u", "isyn_exc_apical", "isyn_inh_apical",
+                             "isyn_exc_basal", "isyn_inh_basal",
+                             "v_A", "v_B", "starting_rate"})
     def __init__(
             self, cm=1.0, u_rest=0, v_reset=-50.0,
             v_thresh=10.0, i_offset=0.0, u=0.0,
