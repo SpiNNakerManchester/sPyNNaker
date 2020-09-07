@@ -99,8 +99,9 @@ class SynapseDynamicsStructuralCommon(object):
     #: Default value for maximum fan-in per target layer neuron
     DEFAULT_S_MAX = 32
 
-    PAIR_ERROR = "Only one Projection between each pair of " \
-                 "Populations can use structural plasticity"
+    PAIR_ERROR = (
+        "Only one Projection between each pair of Populations can use "
+        "structural plasticity")
 
     def __init__(
             self, partner_selection, formation, elimination, f_rew,
