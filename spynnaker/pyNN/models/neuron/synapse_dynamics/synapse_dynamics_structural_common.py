@@ -83,8 +83,8 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
     @overrides(AbstractSynapseDynamicsStructural.write_structural_parameters)
     def write_structural_parameters(
             self, spec, region, machine_time_step, weight_scales,
-            application_graph, app_vertex, post_slice,
-            routing_info, synapse_indices):
+            application_graph, app_vertex, post_slice, routing_info,
+            synapse_indices):
         """ Write structural plasticity parameters
 
         :param ~data_specification.DataSpecificationGenerator spec:
@@ -344,8 +344,8 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
             application_graph, app_vertex)
         # Also keep track of the parameter sizes
         # pylint: disable=no-member
-        param_sizes = self.partner_selection\
-            .get_parameters_sdram_usage_in_bytes()
+        param_sizes = (
+            self.partner_selection.get_parameters_sdram_usage_in_bytes())
         for (in_edge, synapse_info) in structural_edges:
             max_atoms = in_edge.pre_vertex.get_max_atoms_per_core()
             if in_edge.pre_vertex.n_atoms < max_atoms:

@@ -167,9 +167,9 @@ class SynapseDynamicsStructuralSTDP(
 
     @overrides(SynapseDynamicsSTDP.get_vertex_executable_suffix)
     def get_vertex_executable_suffix(self):
-        return SynapseDynamicsSTDP.get_vertex_executable_suffix(self) +\
+        return (SynapseDynamicsSTDP.get_vertex_executable_suffix(self) +
                 SynapseDynamicsStructuralCommon.get_vertex_executable_suffix(
-                    self)
+                    self))
 
     @overrides(SynapseDynamicsSTDP.get_n_words_for_plastic_connections)
     def get_n_words_for_plastic_connections(self, n_connections):

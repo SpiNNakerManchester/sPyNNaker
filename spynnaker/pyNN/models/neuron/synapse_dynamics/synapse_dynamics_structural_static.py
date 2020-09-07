@@ -165,9 +165,9 @@ class SynapseDynamicsStructuralStatic(
 
     @overrides(SynapseDynamicsStatic.get_vertex_executable_suffix)
     def get_vertex_executable_suffix(self):
-        return SynapseDynamicsStatic.get_vertex_executable_suffix(self) +\
+        return (SynapseDynamicsStatic.get_vertex_executable_suffix(self) +
                SynapseDynamicsStructuralCommon.get_vertex_executable_suffix(
-                   self)
+                   self))
 
     @overrides(SynapseDynamicsStatic.get_n_words_for_static_connections)
     def get_n_words_for_static_connections(self, n_connections):
