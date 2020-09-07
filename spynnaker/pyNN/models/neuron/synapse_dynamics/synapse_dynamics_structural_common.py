@@ -267,8 +267,7 @@ class SynapseDynamicsStructuralCommon(object):
                                 raise SynapticConfigurationException(
                                    self.PAIR_ERROR)
                         else:
-                            structural_edges[app_edge] = \
-                                synapse_info
+                            structural_edges[app_edge] = synapse_info
                         machine_edges[app_edge].append(machine_edge)
         return structural_edges, machine_edges
 
@@ -338,9 +337,10 @@ class SynapseDynamicsStructuralCommon(object):
             the vertex for which data specs are being prepared
         :param list(tuple(ProjectionApplicationEdge,SynapseInformation)) \
                 structural_edges:
+        :param dict(AppEdge, list(MachineEdge) machine_edges_by_app: \
+                map of app edge to associated machine edges
         :param RoutingInfo routing_info:
         :param dict(AbstractSynapseType,float) weight_scales:
-        :param ~pacman.model.graphs.common.Slice post_slice:
         :param dict(tuple(SynapseInformation,int),int) synapse_indices:
         :param int machine_time_step:
         :rtype: dict(tuple(AbstractPopulationVertex,SynapseInformation),int)
@@ -398,7 +398,6 @@ class SynapseDynamicsStructuralCommon(object):
                 pop_index:
         :param MachineVertex machine_vertex:
             the vertex for which data specs are being prepared
-        :param ~pacman.model.graphs.common.Slice post_slice:
         """
         # Get connections for this post slice
         post_slice = machine_vertex.vertex_slice
