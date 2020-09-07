@@ -475,8 +475,8 @@ class SynapseDynamicsStructuralCommon(object):
             structural_edges, machine_edges_by_app = \
                 self.__get_structural_edges_by_machine(graph, vertex)
         else:
-            raise PacmanInvalidParameterException("vertex", vertex,
-                "Not at the same level as graph")
+            raise PacmanInvalidParameterException(
+                "vertex", vertex, "Not at the same level as graph")
         # Also keep track of the parameter sizes
         param_sizes = self.__partner_selection\
             .get_parameters_sdram_usage_in_bytes()
