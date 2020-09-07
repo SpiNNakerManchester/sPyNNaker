@@ -190,12 +190,10 @@ class SynapseDynamicsStructuralCommon(object):
         :param int machine_time_step: the duration of a machine time step (ms)
         :param dict(AbstractSynapseType,float) weight_scales:
             scaling the weights
-        :param ~pacman.model.graphs.machine.MachineVertex machine_vertex:
+        :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
             Full machine level network
         :param MachineVertex machine_vertex:
             the vertex for which data specs are being prepared
-        :param ~pacman.model.graphs.common.Slice post_slice:
-            the slice of the app vertex corresponding to this machine vertex
         :param ~pacman.model.routing_info.RoutingInfo routing_info:
             All of the routing information on the network
         :param dict(tuple(SynapseInformation,int),int) synapse_indices:
@@ -204,9 +202,9 @@ class SynapseDynamicsStructuralCommon(object):
         spec.switch_write_focus(region)
 
         # Get relevant edges
-        structural_edges, machine_edges_by_app = \
+        structural_edges, machine_edges_by_app = (
             self.__get_structural_edges_by_machine(
-                machine_graph, machine_vertex)
+                machine_graph, machine_vertex))
 
         # Write the common part of the rewiring data
         self.__write_common_rewiring_data(
