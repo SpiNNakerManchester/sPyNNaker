@@ -99,7 +99,7 @@ static uint16_t items_to_go = 0;
 static uint32_t bit_field_filtered_packets = 0;
 
 //! The bitfield map
-bit_field_t *connectivity_bit_field;
+bit_field_t *connectivity_bit_field = NULL;
 
 //! \name Support functions
 //! \{
@@ -268,7 +268,8 @@ bool population_table_get_first_address(
     // check we have a entry in the bit field for this (possible not to due to
     // DTCM limitations or router table compression). If not, go to DMA check.
     log_debug("checking bit field");
-    if (connectivity_bit_field[position] != NULL) {
+    if (connectivity_bit_field != NULL &&
+            connectivity_bit_field[position] != NULL) {
         log_debug("can be checked, bitfield is allocated");
         // check that the bit flagged for this neuron id does hit a
         // neuron here. If not return false and avoid the DMA check.
