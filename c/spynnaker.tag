@@ -1508,6 +1508,13 @@
       <arglist>(void)</arglist>
     </member>
     <member kind="variable" static="yes">
+      <type>static bool</type>
+      <name>has_key</name>
+      <anchorfile>delay__extension_8c.html</anchorfile>
+      <anchor>aaa69ed97fd7f2c36209c6774a12ff447</anchor>
+      <arglist></arglist>
+    </member>
+    <member kind="variable" static="yes">
       <type>static uint32_t</type>
       <name>key</name>
       <anchorfile>delay__extension_8c.html</anchorfile>
@@ -10144,6 +10151,13 @@
     <name>delay_parameters</name>
     <filename>delay__extension_8h.html</filename>
     <anchor>structdelay__parameters</anchor>
+    <member kind="variable">
+      <type>uint32_t</type>
+      <name>has_key</name>
+      <anchorfile>delay__extension_8h.html</anchorfile>
+      <anchor>a6ed0cc408a479fad7dc7b01114816aa7</anchor>
+      <arglist></arglist>
+    </member>
     <member kind="variable">
       <type>uint32_t</type>
       <name>key</name>

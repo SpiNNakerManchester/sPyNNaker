@@ -109,7 +109,10 @@
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
-<span class="n">_DELAY_PARAM_HEADER_WORDS</span> <span class="o">=</span> <span class="mi">8</span>
+<span class="c1">#  1. has_key 2. key 3. incoming_key 4. incoming_mask 5. n_atoms</span>
+<span class="c1">#  6. n_delay_stages 7. random_backoff 8. time_between_spikes</span>
+<span class="c1">#  9. n_outgoing_edges</span>
+<span class="n">_DELAY_PARAM_HEADER_WORDS</span> <span class="o">=</span> <span class="mi">9</span>
 <span class="c1"># pylint: disable=protected-access</span>
 <span class="n">_DELEXT_REGIONS</span> <span class="o">=</span> <span class="n">DelayExtensionMachineVertex</span><span class="o">.</span><span class="n">_DELAY_EXTENSION_REGIONS</span>
 <span class="n">_EXPANDER_BASE_PARAMS_SIZE</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">BYTES_PER_WORD</span>
@@ -313,10 +316,6 @@
         <span class="n">key</span> <span class="o">=</span> <span class="n">routing_infos</span><span class="o">.</span><span class="n">get_first_key_from_pre_vertex</span><span class="p">(</span>
             <span class="n">vertex</span><span class="p">,</span> <span class="n">SPIKE_PARTITION_ID</span><span class="p">)</span>
 
-        <span class="c1"># Default to zero in cases of unconnected vertexes</span>
-        <span class="c1"># https://github.com/SpiNNakerManchester/sPyNNaker/issues/850</span>
-        <span class="k">if</span> <span class="n">key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">key</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">incoming_key</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">incoming_mask</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">incoming_edges</span> <span class="o">=</span> <span class="n">machine_graph</span><span class="o">.</span><span class="n">get_edges_ending_at_vertex</span><span class="p">(</span>
@@ -394,7 +393,12 @@
 
         <span class="c1"># Write header info to the memory region:</span>
         <span class="c1"># Write Key info for this core and the incoming key and mask:</span>
-        <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">incoming_key</span><span class="p">)</span>
         <span class="n">spec</span><span class="o">.</span><span class="n">write_value</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">incoming_mask</span><span class="p">)</span>
 
