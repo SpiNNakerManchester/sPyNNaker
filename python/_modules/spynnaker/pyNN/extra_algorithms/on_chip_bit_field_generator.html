@@ -168,7 +168,7 @@
 
         <span class="c1"># progress bar</span>
         <span class="n">progress</span> <span class="o">=</span> <span class="n">ProgressBar</span><span class="p">(</span>
-            <span class="nb">len</span><span class="p">(</span><span class="n">app_graph</span><span class="o">.</span><span class="n">vertices</span><span class="p">)</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="nb">len</span><span class="p">(</span><span class="n">app_graph</span><span class="o">.</span><span class="n">vertices</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">machine_graph</span><span class="o">.</span><span class="n">vertices</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
             <span class="s2">&quot;Running bitfield generation on chip&quot;</span><span class="p">)</span>
 
         <span class="c1"># get data</span>
