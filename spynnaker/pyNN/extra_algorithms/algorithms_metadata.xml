@@ -365,7 +365,7 @@
             <param_name>executable_finder</param_name>
             <param_name>provenance_file_path</param_name>
             <param_name>transceiver</param_name>
-            <param_name>read_bit_field_generator_iobuf</param_name>
+            <param_name>write_bit_field_generator_iobuf</param_name>
             <param_name>generating_bitfield_report</param_name>
             <param_name>generating_bit_field_summary_report</param_name>
             <param_name>default_report_folder</param_name>
