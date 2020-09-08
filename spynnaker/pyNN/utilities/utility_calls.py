@@ -290,7 +290,7 @@ def _validate_mars_kiss_64_seed(seed):
         seed[1] = ARBITRARY_Y
 
     # avoid z=c=0 and make < 698769069
-    seed[3] = seed[3] % MARS_C_MAX
+    seed[3] = seed[3] % MARS_C_MAX + 1
     return seed
 
 
