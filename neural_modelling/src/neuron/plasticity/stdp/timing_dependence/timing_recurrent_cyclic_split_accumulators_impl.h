@@ -233,7 +233,6 @@ static inline update_state_t timing_apply_pre_spike(
     // Param accum_decay_per_ts is actually per 32 time steps now, to avoid rounding to zero errors:
     int32_t acc_change = (recurrent_plasticity_params.accum_decay_per_ts * time_since_last_event>>5);
 
-
     // Decay pot_accumulator - THIS COULD BE WRONG TO DO HERE....
     previous_state.pot_accumulator -= acc_change;
     if (previous_state.pot_accumulator < 0) {
@@ -243,7 +242,7 @@ static inline update_state_t timing_apply_pre_spike(
     // Decay dep_accumulator
     previous_state.dep_accumulator += acc_change;
     if (previous_state.dep_accumulator > 0) {
-	previous_state.dep_accumulator = 0;
+    	previous_state.dep_accumulator = 0;
     }
 
 
@@ -441,10 +440,12 @@ static inline update_state_t timing_apply_post_spike(
                     //SD-X Mar31.2020 io_printf(IO_BUF, "+diff: %k, margin: %k\n", voltage_difference, v_diff_pot_threshold);
                     // Gate on voltage
                     if (voltage_difference > 900.0k) {
-                        io_printf(IO_BUF, "FF pot\n");
+                    	if (print_plasticity){
+                    		io_printf(IO_BUF, "FF pot\n");
+                    	}
                         // No teacher, so trigger feedforward-only potentiation:
                     	previous_state.lock = 1;
-			previous_state.pot_accumulator = 0;
+                    	previous_state.pot_accumulator = 0;
                         if (!locked_weights_unchanged) {
                             previous_state.weight_state.weight = previous_state.weight_state.weight + inc_FF_pot;
                         }
@@ -454,13 +455,16 @@ static inline update_state_t timing_apply_post_spike(
                     	}
 
                     } else if (voltage_difference < v_diff_pot_threshold) {
-                        io_printf(IO_BUF, "vdiff pot\n");
+                    	if (print_plasticity){
+                    		io_printf(IO_BUF, "vdiff pot\n");
+                    	}
                         // Teacher present, but in vdiff zone.
                         // Weight is to be used, but we don't want or need a full weight increment.
                         // Lock so this weight does not get used again until it decays:
-                        //io_printf(IO_BUF, "t: %k, T vdiff pot - Vdiff: %k, somaPot: %k\n", time, v_diff_pot_threshold, post_synaptic_mem_V);
+                        // io_printf(IO_BUF, "t: %k, T vdiff pot - Vdiff: %k, somaPot: %k\n", time, v_diff_pot_threshold, post_synaptic_mem_V);
+
                         previous_state.lock = 1;
-			previous_state.pot_accumulator = 0;
+                        previous_state.pot_accumulator = 0;
                         if (!locked_weights_unchanged) {
                     	    previous_state.weight_state.weight = previous_state.weight_state.weight + inc_vdiff_pot;
                         }

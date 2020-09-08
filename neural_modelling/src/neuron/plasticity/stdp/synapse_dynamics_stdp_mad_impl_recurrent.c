@@ -129,7 +129,8 @@ static inline final_state_t _plasticity_update_synapse(
         current_state = timing_apply_post_spike(
             delayed_post_time, *post_window.next_trace, delayed_last_pre_time,
             last_pre_trace, post_window.prev_time, post_window.prev_trace,
-            current_state,  syn_type, post_synaptic_neuron,
+            current_state, pwd
+			ynaptic_neuron,
 			post_synaptic_additional_input, post_synaptic_threshold,
 			*post_window.next_post_synaptic_v);
 

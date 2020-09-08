@@ -102,6 +102,9 @@ uint32_t *timing_initialise(address_t address) {
         lut_address, STDP_FIXED_POINT_ONE>>2, (int16_t*) &post_exp_dist_lookup_inhib2[0]);
 
     memcpy(recurrentSeed, lut_address, 4 * sizeof(uint32_t));
+
+
+
     lut_address += 4;
     validate_mars_kiss64_seed(recurrentSeed);
 
