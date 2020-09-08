@@ -21,6 +21,7 @@ from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION, MICRO_TO_SECOND_CONVERSION,
     BYTES_PER_WORD, BYTES_PER_SHORT)
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
+from spynnaker.pyNN.utilities.utility_calls import create_mars_kiss_seeds
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
@@ -285,8 +286,8 @@ class SynapseDynamicsStructuralCommon(object):
         # of the cores that have perform structural updates.
         # NOTE: it should be different between application vertices
         if app_vertex not in self.__seeds.keys():
-            self.__seeds[app_vertex] = \
-                [self.__rng.randint(0x7FFFFFFF) for _ in range(4)]
+            self.__seeds[app_vertex] = (
+                create_mars_kiss_seeds(self.__rng, self.__seed))
 
         # write the random seed (4 words), generated randomly,
         # but the same for all postsynaptic vertices!
@@ -294,8 +295,8 @@ class SynapseDynamicsStructuralCommon(object):
             spec.write_value(data=seed)
 
         # write local seed (4 words), generated randomly!
-        for _ in range(4):
-            spec.write_value(data=numpy.random.randint(0x7FFFFFFF))
+        for seed in create_mars_kiss_seeds(self.__rng, self.__seed):
+            spec.write_value(data=seed)
 
         # write the number of pre-populations
         spec.write_value(data=n_pre_pops)

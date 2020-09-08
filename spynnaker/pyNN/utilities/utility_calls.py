@@ -33,6 +33,13 @@ from spynnaker.pyNN.utilities.random_stats import (
 
 MAX_RATE = 2 ** 32 - 1  # To allow a unit32_t to be used to store the rate
 
+BASE_RANDOM_FOR_MARS_64 = 0x80000000
+CAP_RANDOM_FOR_MARS_64 = 0x7FFFFFFF
+# in order are x, y, z, c
+N_RANDOM_NUMBERS = 4
+ARBITRARY_Y = 13031301
+MARS_C_MAX = 698769068
+
 STATS_BY_NAME = {
     'binomial': RandomStatsBinomialImpl(),
     'gamma': RandomStatsGammaImpl(),
@@ -215,7 +222,7 @@ def get_probability_within_range(dist, lower, upper):
         a given RandomDistribution
     """
     stats = STATS_BY_NAME[dist.name]
-    return (stats.cdf(dist, upper) - stats.cdf(dist, lower))
+    return stats.cdf(dist, upper) - stats.cdf(dist, lower)
 
 
 def get_maximum_probable_value(dist, n_items, chance=(1.0 / 100.0)):
@@ -275,16 +282,25 @@ def low(dist):
     return stats.low(dist)
 
 
-def validate_mars_kiss_64_seed(seed):
+def _validate_mars_kiss_64_seed(seed):
     """ Update the seed to make it compatible with the RNG algorithm
     """
     if seed[1] == 0:
         # y (<- seed[1]) can't be zero so set to arbitrary non-zero if so
-        seed[1] = 13031301
+        seed[1] = ARBITRARY_Y
 
     # avoid z=c=0 and make < 698769069
-    seed[3] = seed[3] % 698769068 + 1
+    seed[3] = seed[3] % MARS_C_MAX
     return seed
+
+
+def create_mars_kiss_seeds(rng, seed):
+    if rng is None:
+        rng = numpy.random.RandomState(seed)
+    kiss_seed = _validate_mars_kiss_64_seed([
+        rng.randint(-BASE_RANDOM_FOR_MARS_64, CAP_RANDOM_FOR_MARS_64) +
+        BASE_RANDOM_FOR_MARS_64 for _ in range(N_RANDOM_NUMBERS)])
+    return kiss_seed
 
 
 def get_n_bits(n_values):
