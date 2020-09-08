@@ -615,10 +615,11 @@ class NeuronRecorder(object):
         :param iterable(int) remove_indexes:
         """
         # If a per-timestep variable, remove it and return
-        if variable in self.__per_timestep_recording:
+        if variable in self.__per_timestep_variables:
             self.__check_per_timestep_params(
                 variable, sampling_interval, remove_indexes)
-            self.__per_timestep_recording.remove(variable)
+            if variable in self.__per_timestep_recording:
+                self.__per_timestep_recording.remove(variable)
             return
 
         if self.__sampling_rates[variable] == 0:
