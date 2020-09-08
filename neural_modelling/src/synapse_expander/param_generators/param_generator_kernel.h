@@ -117,12 +117,16 @@ static void param_generator_kernel_free(void *generator) {
 static void param_generator_kernel_generate(
         void *generator, uint32_t n_synapses,
         uint32_t pre_neuron_index, uint16_t *indices, accum *values) {
-    use(pre_neuron_index);
-    use(indices);
     struct all_kernel_params *obj = generator;
     struct param_generator_kernel *params = &obj->params;
     uint16_t pre_c = 0;
     uint16_t pre_r = uidiv(pre_neuron_index, params->preWidth, &pre_c);
+
+    // Check whether these coordinates should be included based on step functions
+    if (!(((pre_r - params->startPreHeight) % params->stepPreHeight == 0) &&
+    		((pre_c - params->startPreWidth) % params->stepPreWidth == 0))) {
+    	return;
+    }
 
     uint16_t hlf_kw = params->kernelWidth >> 1;
     uint16_t hlf_kh = params->kernelHeight >> 1;
@@ -141,7 +145,7 @@ static void param_generator_kernel_generate(
 
         //move common to pre coords
         pre_in_post_world(
-                pac_r, pac_c, params->startPreHeight, params->startPreHeight,
+                pac_r, pac_c, params->startPreHeight, params->startPreWidth,
                 params->stepPreHeight, params->stepPreWidth, &pap_r, &pap_c);
 
         int16_t r_diff = (int16_t) pap_r - (int16_t) pre_r;

@@ -33,11 +33,13 @@
 #include <bit_field.h>
 #include <stdfix-full-iso.h>
 #include <limits.h>
-
 #include "profile_tags.h"
 #include <profiler.h>
+#include <wfi.h>
 
-#include <common/spin1-wfi.h>
+#ifndef UNUSED
+#define UNUSED __attribute__((__unused__))
+#endif
 
 // ----------------------------------------------------------------------
 
@@ -180,7 +182,7 @@ static uint32_t n_spike_buffer_words;
 static uint32_t spike_buffer_size;
 
 //! True if DMA recording is currently in progress
-static bool recording_in_progress = false;
+static volatile bool recording_in_progress = false;
 
 //! The timer period
 static uint32_t timer_period;
@@ -577,7 +579,7 @@ static void recording_complete_callback(void) {
 //! \param[in] time: the time to which these spikes are being recorded
 static inline void record_spikes(uint32_t time) {
     while (recording_in_progress) {
-        spin1_wfi();
+        wait_for_interrupt();
     }
     if ((spikes != NULL) && (spikes->n_buffers > 0)) {
         recording_in_progress = true;
@@ -677,9 +679,7 @@ static void process_slow_source(
 //! \param[in] unused: for consistency sake of the API always returning two
 //!     parameters, this parameter has no semantics currently and thus
 //!     is set to 0
-static void timer_callback(uint timer_count, uint unused) {
-    use(unused);
-
+static void timer_callback(uint timer_count, UNUSED uint unused) {
     profiler_write_entry_disable_irq_fiq(PROFILER_ENTER | PROFILER_TIMER);
 
     time++;
