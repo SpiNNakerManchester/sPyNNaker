@@ -40,7 +40,7 @@ uint8_t **recording_values;
 uint32_t **bitfield_values;
 
 //! The number of recordings outstanding
-uint32_t n_recordings_outstanding = 0;
+volatile uint32_t n_recordings_outstanding = 0;
 
 //! The address of the recording region to read on reset
 static void *reset_address;

@@ -60,6 +60,8 @@ struct delay_extension_provenance {
 };
 
 // Globals
+//! bool in int form for if there is a key
+static bool has_key;
 //! Base multicast key for sending messages
 static uint32_t key = 0;
 //! Key for receiving messages
@@ -154,6 +156,7 @@ static inline uint32_t round_to_next_pot(uint32_t v) {
 static bool read_parameters(struct delay_parameters *params) {
     log_debug("read_parameters: starting");
 
+    has_key = params->has_key;
     key = params->key;
     incoming_key = params->incoming_key;
     incoming_mask = params->incoming_mask;
@@ -431,25 +434,27 @@ static void timer_callback(uint timer_count, UNUSED uint unused1) {
                     }
 
                     // fire n spikes as payload, 1 as none payload.
-                    if (delay_stage_spike_counters[n] > 1) {
-                        log_debug(
-                            "seeing packet with key %d and payload %d",
-                            spike_key, delay_stage_spike_counters[n]);
+                    if (has_key) {
+                        if (delay_stage_spike_counters[n] > 1) {
+                            log_debug(
+                                "seeing packet with key %d and payload %d",
+                                spike_key, delay_stage_spike_counters[n]);
 
-                        tdma_processing_send_packet(
-                            spike_key, delay_stage_spike_counters[n],
-                            WITH_PAYLOAD, timer_count);
+                            tdma_processing_send_packet(
+                                spike_key, delay_stage_spike_counters[n],
+                                WITH_PAYLOAD, timer_count);
 
-                        // update counter
-                        n_spikes_sent += delay_stage_spike_counters[n];
-                    } else if (delay_stage_spike_counters[n]  == 1) {
-                        log_debug("sending spike with key %d", spike_key);
+                            // update counter
+                            n_spikes_sent += delay_stage_spike_counters[n];
+                        } else if (delay_stage_spike_counters[n]  == 1) {
+                            log_debug("sending spike with key %d", spike_key);
 
-                        tdma_processing_send_packet(
-                            spike_key, 0, NO_PAYLOAD, timer_count);
+                            tdma_processing_send_packet(
+                                spike_key, 0, NO_PAYLOAD, timer_count);
 
-                        // update counter
-                        n_spikes_sent++;
+                            // update counter
+                            n_spikes_sent++;
+                        }
                     }
                 }
             }

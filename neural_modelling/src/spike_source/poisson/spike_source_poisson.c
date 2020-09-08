@@ -37,8 +37,7 @@
 
 #include "profile_tags.h"
 #include <profiler.h>
-
-#include <common/spin1-wfi.h>
+#include <wfi.h>
 
 #ifndef UNUSED
 #define UNUSED __attribute__((__unused__))
@@ -186,7 +185,7 @@ static uint32_t n_spike_buffer_words;
 static uint32_t spike_buffer_size;
 
 //! True if DMA recording is currently in progress
-static bool recording_in_progress = false;
+static volatile bool recording_in_progress = false;
 
 //! The timer period
 static uint32_t timer_period;
@@ -584,7 +583,7 @@ static void recording_complete_callback(void) {
 //! \param[in] time: the time to which these spikes are being recorded
 static inline void record_spikes(uint32_t time) {
     while (recording_in_progress) {
-        spin1_wfi();
+        wait_for_interrupt();
     }
     if ((spikes != NULL) && (spikes->n_buffers > 0)) {
         recording_in_progress = true;
