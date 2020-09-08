@@ -19,16 +19,15 @@ import numpy
 import scipy.stats
 import struct
 
+from spinn_front_end_common.abstract_models.impl.\
+    tdma_aware_application_vertex import TDMAAwareApplicationVertex
 from spinn_utilities.overrides import overrides
 from data_specification.enums import DataType
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
-from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
-from spinn_front_end_common.abstract_models.impl.requires_tdma import \
-    RequiresTDMA
 from spinn_front_end_common.abstract_models import (
     AbstractChangableAfterRun, AbstractProvidesOutgoingPartitionConstraints,
     AbstractGeneratesDataSpecification,
@@ -112,12 +111,11 @@ def _flatten(alist):
 
 
 class SpikeSourcePoissonVertex(
-        ApplicationVertex, AbstractGeneratesDataSpecification,
-        AbstractSpikeRecordable,
-        AbstractProvidesOutgoingPartitionConstraints,
+        TDMAAwareApplicationVertex, AbstractGeneratesDataSpecification,
+        AbstractSpikeRecordable, AbstractProvidesOutgoingPartitionConstraints,
         AbstractChangableAfterRun, AbstractReadParametersBeforeSet,
         AbstractRewritesDataSpecification, SimplePopulationSettable,
-        ProvidesKeyToAtomMappingImpl, RequiresTDMA):
+        ProvidesKeyToAtomMappingImpl):
     """ A Poisson Spike source object
     """
     __slots__ = [
@@ -163,9 +161,8 @@ class SpikeSourcePoissonVertex(
         :param iterable of int duration:
         """
         # pylint: disable=too-many-arguments
-        ApplicationVertex.__init__(
+        TDMAAwareApplicationVertex.__init__(
             self, label, constraints, max_atoms_per_core)
-        RequiresTDMA.__init__(self)
 
         # atoms params
         self.__n_atoms = n_neurons
@@ -474,7 +471,7 @@ class SpikeSourcePoissonVertex(
         "machine_time_step": "MachineTimeStep"
     })
     @overrides(
-        ApplicationVertex.get_resources_used_by_atoms,
+        TDMAAwareApplicationVertex.get_resources_used_by_atoms,
         additional_arguments={"machine_time_step"}
     )
     def get_resources_used_by_atoms(self, vertex_slice, machine_time_step):
@@ -507,7 +504,7 @@ class SpikeSourcePoissonVertex(
     def n_atoms(self):
         return self.__n_atoms
 
-    @overrides(ApplicationVertex.create_machine_vertex)
+    @overrides(TDMAAwareApplicationVertex.create_machine_vertex)
     def create_machine_vertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):

@@ -17,15 +17,14 @@ from collections import defaultdict
 import logging
 import math
 
-from spinn_front_end_common.abstract_models.impl.requires_tdma import \
-    RequiresTDMA
+from spinn_front_end_common.abstract_models.impl.\
+    tdma_aware_application_vertex import TDMAAwareApplicationVertex
 from spinn_utilities.overrides import overrides
 from pacman.executor.injection_decorator import inject_items
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
 from pacman.model.constraints.partitioner_constraints import (
     SameAtomsAsVertexConstraint)
-from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
 from spinn_front_end_common.abstract_models import (
@@ -59,7 +58,7 @@ _MAX_OFFSET_DENOMINATOR = 10
 
 
 class DelayExtensionVertex(
-        ApplicationVertex, RequiresTDMA, AbstractGeneratesDataSpecification,
+        TDMAAwareApplicationVertex, AbstractGeneratesDataSpecification,
         AbstractProvidesOutgoingPartitionConstraints):
     """ Provide delays to incoming spikes in multiples of the maximum delays\
         of a neuron (typically 16 or 32)
@@ -95,8 +94,7 @@ class DelayExtensionVertex(
         :param str label: the vertex label
         """
         # pylint: disable=too-many-arguments
-        ApplicationVertex.__init__(self, label, constraints, 256)
-        RequiresTDMA.__init__(self)
+        TDMAAwareApplicationVertex.__init__(self, label, constraints, 256)
 
         self.__source_vertex = source_vertex
         self.__n_delay_stages = 0
@@ -116,7 +114,7 @@ class DelayExtensionVertex(
         self.add_constraint(
             SameAtomsAsVertexConstraint(source_vertex))
 
-    @overrides(ApplicationVertex.create_machine_vertex)
+    @overrides(TDMAAwareApplicationVertex.create_machine_vertex)
     def create_machine_vertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
@@ -126,7 +124,7 @@ class DelayExtensionVertex(
 
     @inject_items({
         "graph": "MemoryApplicationGraph"})
-    @overrides(ApplicationVertex.get_resources_used_by_atoms,
+    @overrides(TDMAAwareApplicationVertex.get_resources_used_by_atoms,
                additional_arguments={"graph"})
     def get_resources_used_by_atoms(self, vertex_slice, graph):
         """
@@ -142,7 +140,7 @@ class DelayExtensionVertex(
                 self.get_cpu_usage_for_atoms(vertex_slice)))
 
     @property
-    @overrides(ApplicationVertex.n_atoms)
+    @overrides(TDMAAwareApplicationVertex.n_atoms)
     def n_atoms(self):
         return self.__n_atoms
 

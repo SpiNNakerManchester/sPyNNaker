@@ -16,13 +16,12 @@
 import logging
 import os
 
-from spinn_front_end_common.abstract_models.impl.requires_tdma import \
-    RequiresTDMA
+from spinn_front_end_common.abstract_models.impl.\
+    tdma_aware_application_vertex import TDMAAwareApplicationVertex
 from spinn_utilities.overrides import overrides
 from pacman.model.constraints.key_allocator_constraints import (
     ContiguousKeyRangeContraint)
 from pacman.executor.injection_decorator import inject_items
-from pacman.model.graphs.application import ApplicationVertex
 from pacman.model.resources import (
     ConstantSDRAM, CPUCyclesPerTickResource, DTCMResource, ResourceContainer)
 from spinn_front_end_common.abstract_models import (
@@ -62,7 +61,7 @@ _NEURON_BASE_N_CPU_CYCLES = 10
 
 
 class AbstractPopulationVertex(
-        ApplicationVertex, RequiresTDMA, AbstractGeneratesDataSpecification,
+        TDMAAwareApplicationVertex, AbstractGeneratesDataSpecification,
         AbstractContainsUnits, AbstractSpikeRecordable,
         AbstractNeuronRecordable,
         AbstractProvidesOutgoingPartitionConstraints,
@@ -138,9 +137,8 @@ class AbstractPopulationVertex(
         """
 
         # pylint: disable=too-many-arguments, too-many-locals
-        ApplicationVertex.__init__(
+        TDMAAwareApplicationVertex.__init__(
             self, label, constraints, max_atoms_per_core)
-        RequiresTDMA.__init__(self)
 
         self.__n_atoms = n_neurons
         self.__n_subvertices = 0
@@ -191,7 +189,7 @@ class AbstractPopulationVertex(
             config, "Reports", "n_profile_samples")
 
     @property
-    @overrides(ApplicationVertex.n_atoms)
+    @overrides(TDMAAwareApplicationVertex.n_atoms)
     def n_atoms(self):
         return self.__n_atoms
 
@@ -204,7 +202,7 @@ class AbstractPopulationVertex(
         "machine_time_step": "MachineTimeStep"
     })
     @overrides(
-        ApplicationVertex.get_resources_used_by_atoms,
+        TDMAAwareApplicationVertex.get_resources_used_by_atoms,
         additional_arguments={
             "graph", "machine_time_step"
         }
@@ -244,7 +242,7 @@ class AbstractPopulationVertex(
         self.__change_requires_mapping = False
         self.__change_requires_data_generation = False
 
-    @overrides(ApplicationVertex.create_machine_vertex)
+    @overrides(TDMAAwareApplicationVertex.create_machine_vertex)
     def create_machine_vertex(
             self, vertex_slice, resources_required, label=None,
             constraints=None):
