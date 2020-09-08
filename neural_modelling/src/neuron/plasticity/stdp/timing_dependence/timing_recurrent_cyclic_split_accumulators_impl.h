@@ -2,7 +2,9 @@
 #define _TIMING_RECURRENT_CYCLIC_IMPL_H_
 
 #define print_plasticity false
+#define print_plasticity_sd true
 #define locked_weights_unchanged false
+
 
 //---------------------------------------
 // Typedefines
@@ -264,7 +266,12 @@ static inline update_state_t timing_apply_pre_spike(
         	}
 
             // If accumulator's not going to hit depression limit, decrement it
+            int32_t old_val = previous_state.dep_accumulator;
             previous_state.dep_accumulator = previous_state.dep_accumulator - (1<<ACCUM_SCALING);
+            if (print_plasticity_sd){
+                io_printf(IO_BUF, "%d  %d -> %d\n", time, old_val, previous_state.dep_accumulator);
+            }
+
 
             if (print_plasticity){
             	io_printf(IO_BUF, " to %d \n", previous_state.dep_accumulator);
@@ -272,13 +279,16 @@ static inline update_state_t timing_apply_pre_spike(
 
         } else {
         	if (syn_type == 0) {
-                        io_printf(IO_BUF, "DEP: t: %d, Vdiff: %k, histPot: %k    ", time, voltage_difference, post_synaptic_mem_V);
+                        if (print_plasticity_sd){
+                            //io_printf(IO_BUF, "DEP: t: %d, Vdiff: %k, histPot: %k    ", time, voltage_difference, post_synaptic_mem_V);
+                            io_printf(IO_BUF, "d! %d  was: %d\n", time, previous_state.dep_accumulator);
+                        }
         		if (print_plasticity){
         			io_printf(IO_BUF, "        Accumulator limit reached: Depressing\n");
         		}
         		if (previous_state.lock == 0){
                                 if (voltage_difference > 900.0k) {
-                                        io_printf(IO_BUF, "FF dep\n");
+                                        //io_printf(IO_BUF, "FF dep\n");
 					// Neuron fires by feedforward inout alone. No need for fuher change (but
                                         // may make small change to allow this state to be measured externally):
 					previous_state.lock = 1;
@@ -291,7 +301,7 @@ static inline update_state_t timing_apply_pre_spike(
 					}
 
 				} else if (voltage_difference < v_diff_pot_threshold) {
-                                        io_printf(IO_BUF, "vdiff dep\n");
+                                        //io_printf(IO_BUF, "vdiff dep\n");
 					// Weight is to be used, but we don't want or need a full weight decrement.
 					// Lock so this weight does not get used again until it decays:
 				        previous_state.lock = 1;
@@ -306,7 +316,7 @@ static inline update_state_t timing_apply_pre_spike(
 					// Otherwise, reset accumulator and apply depression
 					// Note: at present this is not gated on membrane potential
                                         //io_printf(IO_BUF, "t: %k, T full dep - Vdiff: %k, somaPot: %k\n", time, v_diff_pot_threshold, post_synaptic_mem_V);
-                                        io_printf(IO_BUF, "full dep\n");
+                                        //io_printf(IO_BUF, "full dep\n");
 					previous_state.lock = 1;
 					previous_state.dep_accumulator = 0;
 					previous_state.weight_state =
@@ -316,7 +326,7 @@ static inline update_state_t timing_apply_pre_spike(
 				        }
 				}
         		} else {
-                                io_printf(IO_BUF, "Dep LOCKED\n");
+                                //io_printf(IO_BUF, "Dep LOCKED\n");
         			if (print_plasticity){
         				io_printf(IO_BUF, "Synapse already locked, so cannot depress\n");
         			}
@@ -324,11 +334,11 @@ static inline update_state_t timing_apply_pre_spike(
 
                 // If synapse-type is Inhib-2, which is anti-Hebbian, apply potentiation:
         	} else if (syn_type == 3) {
-                    io_printf(IO_BUF, "SynType-3 - DEP: t: %d, Vdiff: %k, histSomaPot: %k\n", time, voltage_difference, post_synaptic_mem_V);
+                    //io_printf(IO_BUF, "SynType-3 - DEP: t: %d, Vdiff: %k, histSomaPot: %k\n", time, voltage_difference, post_synaptic_mem_V);
                     previous_state.weight_state = weight_one_term_apply_potentiation_sd( previous_state.weight_state,
                                                                          syn_type, STDP_FIXED_POINT_ONE);
             } else {
-                    io_printf(IO_BUF, "SynType-other - DEP: t: %d, Vdiff: %k, histSomaPot: %k\n", time, voltage_difference, post_synaptic_mem_V);
+                    //io_printf(IO_BUF, "SynType-other - DEP: t: %d, Vdiff: %k, histSomaPot: %k\n", time, voltage_difference, post_synaptic_mem_V);
 
             }
          }
@@ -416,12 +426,12 @@ static inline update_state_t timing_apply_post_spike(
              }
          } else {
              if (print_plasticity){
-            	 io_printf(IO_BUF, "        ACCUMULATOR Hit Threshold, entering "
-            		 "weight update for synapse of type: %u, lock state: %u \n", syn_type, previous_state.lock);
+            	 //io_printf(IO_BUF, "        ACCUMULATOR Hit Threshold, entering "
+            	//	 "weight update for synapse of type: %u, lock state: %u \n", syn_type, previous_state.lock);
              }
              // If synapse is inhib-2, which his anti-Hebbian, perform depression:
              if (syn_type == 3) {
-                 io_printf(IO_BUF, "SynType-3 - POT: t: %d, Vdiff: %k, histSomaPot: %k \n", time, voltage_difference, post_synaptic_mem_V);
+                 //io_printf(IO_BUF, "SynType-3 - POT: t: %d, Vdiff: %k, histSomaPot: %k \n", time, voltage_difference, post_synaptic_mem_V);
                  previous_state.weight_state = weight_one_term_apply_depression_sd(previous_state.weight_state,
                                                                       syn_type, STDP_FIXED_POINT_ONE);
                  if (print_plasticity){
@@ -432,7 +442,7 @@ static inline update_state_t timing_apply_post_spike(
 
              // If synapse is not type inhib-2, potentiate:
              if (syn_type == 0) {
-                 io_printf(IO_BUF, "POT: t: %d, Vdiff: %k, histSomaPot: %k    ", time, voltage_difference, post_synaptic_mem_V);
+                 //io_printf(IO_BUF, "POT: t: %d, Vdiff: %k, histSomaPot: %k    ", time, voltage_difference, post_synaptic_mem_V);
             	 if (print_plasticity){
             		   io_printf(IO_BUF, "Updating Type: 0 Synapse\n");
             	 }
@@ -441,7 +451,7 @@ static inline update_state_t timing_apply_post_spike(
                     //SD-X Mar31.2020 io_printf(IO_BUF, "+diff: %k, margin: %k\n", voltage_difference, v_diff_pot_threshold);
                     // Gate on voltage
                     if (voltage_difference > 900.0k) {
-                        io_printf(IO_BUF, "FF pot\n");
+                        //io_printf(IO_BUF, "FF pot\n");
                         // No teacher, so trigger feedforward-only potentiation:
                     	previous_state.lock = 1;
 			previous_state.pot_accumulator = 0;
@@ -454,7 +464,7 @@ static inline update_state_t timing_apply_post_spike(
                     	}
 
                     } else if (voltage_difference < v_diff_pot_threshold) {
-                        io_printf(IO_BUF, "vdiff pot\n");
+                        //io_printf(IO_BUF, "vdiff pot\n");
                         // Teacher present, but in vdiff zone.
                         // Weight is to be used, but we don't want or need a full weight increment.
                         // Lock so this weight does not get used again until it decays:
@@ -468,7 +478,7 @@ static inline update_state_t timing_apply_post_spike(
                     		io_printf(IO_BUF, "Voltage diff: %k, so lock at current weight\n", voltage_difference);
                     	}
                     } else {
-                        io_printf(IO_BUF, "full pot\n");
+                        //io_printf(IO_BUF, "full pot\n");
                         // Teacher triggers full potentiation:
                         previous_state.lock = 1;
 			previous_state.pot_accumulator = 0;
@@ -481,14 +491,14 @@ static inline update_state_t timing_apply_post_spike(
                     } // if voltage_diff > ... else
 
                 } else {
-                    io_printf(IO_BUF, "Pot LOCKED\n");
+                    //io_printf(IO_BUF, "Pot LOCKED\n");
                     if (print_plasticity){
                         io_printf(IO_BUF, "Synapse is already locked\n");
                     }
                 } // if prev_state.lock == 0, else clause
 
              } else { // syn_type excit 2 or inhib-1:
-                 io_printf(IO_BUF, "SynType-other - POT: t: %d, Vdiff: %k, histSomaPot: %k \n", time, voltage_difference, post_synaptic_mem_V);
+                 //io_printf(IO_BUF, "SynType-other - POT: t: %d, Vdiff: %k, histSomaPot: %k \n", time, voltage_difference, post_synaptic_mem_V);
 //                    previous_state.weight_state =
 //                    		weight_one_term_apply_potentiation_sd(
 //                    				previous_state.weight_state,
