@@ -231,7 +231,7 @@
             </parameter>
             <parameter>
                 <param_name>write_compressor_iobuf</param_name>
-                <param_type>RouterCompressorWithBitFieldReadIOBuf</param_type>
+                <param_type>WriteCompressorIobuf</param_type>
             </parameter>
             <parameter>
                 <param_name>machine_graph</param_name>
