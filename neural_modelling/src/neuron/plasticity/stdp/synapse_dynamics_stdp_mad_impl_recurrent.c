@@ -129,8 +129,7 @@ static inline final_state_t _plasticity_update_synapse(
         current_state = timing_apply_post_spike(
             delayed_post_time, *post_window.next_trace, delayed_last_pre_time,
             last_pre_trace, post_window.prev_time, post_window.prev_trace,
-            current_state, pwd
-			ynaptic_neuron,
+            current_state, syn_type, post_synaptic_neuron,
 			post_synaptic_additional_input, post_synaptic_threshold,
 			*post_window.next_post_synaptic_v);
 
@@ -322,7 +321,9 @@ bool synapse_dynamics_process_plastic_synapses(
     }
 
     // Update pre-synaptic trace
-//    io_printf(IO_BUF, "Adding pre-synaptic event to trace at time:%u\n", time);
+    if (print_plasticity){
+        io_printf(IO_BUF, "                Adding pre-synaptic event to trace at time:%u\n", time);
+    }
     event_history->prev_time = time;
     event_history->prev_trace = timing_add_pre_spike_sd(time, last_pre_time,
                                                      last_pre_trace, syn_type);
