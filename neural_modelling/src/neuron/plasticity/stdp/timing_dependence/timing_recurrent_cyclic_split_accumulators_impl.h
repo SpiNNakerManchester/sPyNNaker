@@ -222,8 +222,6 @@ static inline update_state_t timing_apply_pre_spike(
        uint32_t this_window_close_time = last_post_time + window_length;
 
 
-
-
        // Check if this post-spike extends the open window:
        if (previous_state.longest_post_pre_window_closing_time < this_window_close_time) {
           previous_state.longest_post_pre_window_closing_time = this_window_close_time;
@@ -234,6 +232,7 @@ static inline update_state_t timing_apply_pre_spike(
 
     // Param accum_decay_per_ts is actually per 32 time steps now, to avoid rounding to zero errors:
     int32_t acc_change = (recurrent_plasticity_params.accum_decay_per_ts * time_since_last_event>>5);
+
 
     // Decay pot_accumulator - THIS COULD BE WRONG TO DO HERE....
     previous_state.pot_accumulator -= acc_change;
