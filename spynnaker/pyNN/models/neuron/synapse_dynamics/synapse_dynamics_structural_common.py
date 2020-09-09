@@ -295,8 +295,7 @@ class SynapseDynamicsStructuralCommon(object):
             spec.write_value(data=seed)
 
         # write local seed (4 words), generated randomly!
-        for seed in create_mars_kiss_seeds(self.__rng, self.__seed):
-            spec.write_value(data=seed)
+        spec.write_array(create_mars_kiss_seeds(self.__rng, self.__seed))
 
         # write the number of pre-populations
         spec.write_value(data=n_pre_pops)
