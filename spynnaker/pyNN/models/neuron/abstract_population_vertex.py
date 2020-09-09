@@ -104,7 +104,7 @@ class AbstractPopulationVertex(
     #: The Buffer traffic type
     _TRAFFIC_IDENTIFIER = "BufferTraffic"
 
-    # 7 elements before the start of global parameters
+    # 5 elements before the start of global parameters
     # 1. has key, 2. key, 3. n atoms,
     # 4. n synapse types, 5. incoming spike buffer size.
     _BYTES_TILL_START_OF_GLOBAL_PARAMETERS = 5 * BYTES_PER_WORD
