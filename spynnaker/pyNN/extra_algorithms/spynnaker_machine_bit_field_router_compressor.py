@@ -39,7 +39,7 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
     def __call__(
             self, routing_tables, transceiver, machine, app_id,
             provenance_file_path, machine_graph,
-            placements, executable_finder, read_algorithm_iobuf,
+            placements, executable_finder, write_compressor_iobuf,
             produce_report, default_report_folder, target_length,
             routing_infos, time_to_try_for_each_iteration, use_timer_cut_off,
             machine_time_step, time_scale_factor, threshold_percentage,
@@ -73,7 +73,7 @@ class SpynnakerMachineBitFieldRouterCompressor(object):
                 provenance_file_path=provenance_file_path,
                 machine_graph=machine_graph,
                 placements=placements, executable_finder=executable_finder,
-                read_algorithm_iobuf=read_algorithm_iobuf,
+                write_compressor_iobuf=write_compressor_iobuf,
                 produce_report=produce_report,
                 default_report_folder=default_report_folder,
                 target_length=target_length, routing_infos=routing_infos,
