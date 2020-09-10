@@ -51,7 +51,7 @@ from spynnaker.pyNN.models.abstract_models import (
     AbstractReadParametersBeforeSet)
 from .spike_source_poisson_machine_vertex import (
     SpikeSourcePoissonMachineVertex)
-from spynnaker.pyNN.utilities.utility_calls import validate_mars_kiss_64_seed
+from spynnaker.pyNN.utilities.utility_calls import create_mars_kiss_seeds
 from spynnaker.pyNN.utilities.struct import Struct
 from spynnaker.pyNN.utilities.ranged.spynnaker_ranged_dict \
     import SpynnakerRangeDictionary
@@ -660,11 +660,8 @@ class SpikeSourcePoissonVertex(
 
         # Write the random seed (4 words), generated randomly!
         if vertex_slice not in self.__kiss_seed:
-            if self.__rng is None:
-                self.__rng = numpy.random.RandomState(self.__seed)
-            self.__kiss_seed[vertex_slice] = validate_mars_kiss_64_seed([
-                self.__rng.randint(-0x80000000, 0x7FFFFFFF) + 0x80000000
-                for _ in range(4)])
+            self.__kiss_seed[vertex_slice] = create_mars_kiss_seeds(
+                self.__rng, self.__seed)
         for value in self.__kiss_seed[vertex_slice]:
             spec.write_value(data=value)
 
