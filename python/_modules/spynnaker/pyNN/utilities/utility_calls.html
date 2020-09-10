@@ -98,6 +98,13 @@
 
 <span class="n">MAX_RATE</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">**</span> <span class="mi">32</span> <span class="o">-</span> <span class="mi">1</span>  <span class="c1"># To allow a unit32_t to be used to store the rate</span>
 
+<span class="n">BASE_RANDOM_FOR_MARS_64</span> <span class="o">=</span> <span class="mh">0x80000000</span>
+<span class="n">CAP_RANDOM_FOR_MARS_64</span> <span class="o">=</span> <span class="mh">0x7FFFFFFF</span>
+<span class="c1"># in order are x, y, z, c</span>
+<span class="n">N_RANDOM_NUMBERS</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">ARBITRARY_Y</span> <span class="o">=</span> <span class="mi">13031301</span>
+<span class="n">MARS_C_MAX</span> <span class="o">=</span> <span class="mi">698769068</span>
+
 <span class="n">STATS_BY_NAME</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s1">&#39;binomial&#39;</span><span class="p">:</span> <span class="n">RandomStatsBinomialImpl</span><span class="p">(),</span>
     <span class="s1">&#39;gamma&#39;</span><span class="p">:</span> <span class="n">RandomStatsGammaImpl</span><span class="p">(),</span>
@@ -280,7 +287,7 @@
 <span class="sd">        a given RandomDistribution</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">stats</span> <span class="o">=</span> <span class="n">STATS_BY_NAME</span><span class="p">[</span><span class="n">dist</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">stats</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">upper</span><span class="p">)</span> <span class="o">-</span> <span class="n">stats</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">lower</span><span class="p">))</span></div>
+    <span class="k">return</span> <span class="n">stats</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">upper</span><span class="p">)</span> <span class="o">-</span> <span class="n">stats</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">lower</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="get_maximum_probable_value"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.get_maximum_probable_value">[docs]</a><span class="k">def</span> <span class="nf">get_maximum_probable_value</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">n_items</span><span class="p">,</span> <span class="n">chance</span><span class="o">=</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="mf">100.0</span><span class="p">)):</span>
@@ -340,16 +347,35 @@
     <span class="k">return</span> <span class="n">stats</span><span class="o">.</span><span class="n">low</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="validate_mars_kiss_64_seed"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.validate_mars_kiss_64_seed">[docs]</a><span class="k">def</span> <span class="nf">validate_mars_kiss_64_seed</span><span class="p">(</span><span class="n">seed</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_validate_mars_kiss_64_seed</span><span class="p">(</span><span class="n">seed</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Update the seed to make it compatible with the RNG algorithm</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">seed</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
         <span class="c1"># y (&lt;- seed[1]) can&#39;t be zero so set to arbitrary non-zero if so</span>
-        <span class="n">seed</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">13031301</span>
+        <span class="n">seed</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">ARBITRARY_Y</span>
 
     <span class="c1"># avoid z=c=0 and make &lt; 698769069</span>
-    <span class="n">seed</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">seed</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">%</span> <span class="mi">698769068</span> <span class="o">+</span> <span class="mi">1</span>
-    <span class="k">return</span> <span class="n">seed</span></div>
+    <span class="n">seed</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">seed</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">%</span> <span class="n">MARS_C_MAX</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">seed</span>
+
+
+<div class="viewcode-block" id="create_mars_kiss_seeds"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.create_mars_kiss_seeds">[docs]</a><span class="k">def</span> <span class="nf">create_mars_kiss_seeds</span><span class="p">(</span><span class="n">rng</span><span class="p">,</span> <span class="n">seed</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; generates and checks that the seed values generated by the given</span>
+<span class="sd">    random number generator or seed to a random number generator are</span>
+<span class="sd">    suitable for use as a mars 64 kiss seed.</span>
+
+<span class="sd">    :param None or numpy.random.RandomState rng: the random number generator.</span>
+<span class="sd">    :param int seed: the seed to create a random number generator if not\</span>
+<span class="sd">        handed.</span>
+<span class="sd">    :return: a list of 4 ints which are used by the mars64 kiss random number \</span>
+<span class="sd">        generator for seeds.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">rng</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">rng</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">RandomState</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
+    <span class="n">kiss_seed</span> <span class="o">=</span> <span class="n">_validate_mars_kiss_64_seed</span><span class="p">([</span>
+        <span class="n">rng</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="o">-</span><span class="n">BASE_RANDOM_FOR_MARS_64</span><span class="p">,</span> <span class="n">CAP_RANDOM_FOR_MARS_64</span><span class="p">)</span> <span class="o">+</span>
+        <span class="n">BASE_RANDOM_FOR_MARS_64</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N_RANDOM_NUMBERS</span><span class="p">)])</span>
+    <span class="k">return</span> <span class="n">kiss_seed</span></div>
 
 
 <div class="viewcode-block" id="get_n_bits"><a class="viewcode-back" href="../../../../spynnaker.pyNN.utilities.html#spynnaker.pyNN.utilities.utility_calls.get_n_bits">[docs]</a><span class="k">def</span> <span class="nf">get_n_bits</span><span class="p">(</span><span class="n">n_values</span><span class="p">):</span>
