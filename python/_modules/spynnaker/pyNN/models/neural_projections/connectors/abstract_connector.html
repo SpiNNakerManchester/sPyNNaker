@@ -144,7 +144,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_rng</span> <span class="o">=</span> <span class="n">rng</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">__n_clipped_delays</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__n_clipped_delays</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">int64</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__min_delay</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__param_seeds</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
 
@@ -563,10 +563,10 @@
         <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;connector_</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
             <span class="n">synapse_info</span><span class="o">.</span><span class="n">pre_population</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
             <span class="n">synapse_info</span><span class="o">.</span><span class="n">post_population</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="c1"># Convert to native Python integer; provenance system assumption</span>
+        <span class="n">ncd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__n_clipped_delays</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">ProvenanceDataItem</span><span class="p">(</span>
-            <span class="p">[</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;Times_synaptic_delays_got_clipped&quot;</span><span class="p">],</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__n_clipped_delays</span><span class="p">,</span>
-            <span class="n">report</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__n_clipped_delays</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="p">[</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;Times_synaptic_delays_got_clipped&quot;</span><span class="p">],</span> <span class="n">ncd</span><span class="p">,</span> <span class="n">report</span><span class="o">=</span><span class="n">ncd</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span>
             <span class="n">message</span><span class="o">=</span><span class="p">(</span>
                 <span class="s2">&quot;The delays in the connector </span><span class="si">{}</span><span class="s2"> from </span><span class="si">{}</span><span class="s2"> to </span><span class="si">{}</span><span class="s2"> was clipped &quot;</span>
                 <span class="s2">&quot;to </span><span class="si">{}</span><span class="s2"> a total of </span><span class="si">{}</span><span class="s2"> times.  This can be avoided by reducing &quot;</span>
@@ -574,7 +574,7 @@
                 <span class="s2">&quot;timestep&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">synapse_info</span><span class="o">.</span><span class="n">pre_population</span><span class="o">.</span><span class="n">label</span><span class="p">,</span>
                     <span class="n">synapse_info</span><span class="o">.</span><span class="n">post_population</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__min_delay</span><span class="p">,</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">__n_clipped_delays</span><span class="p">)))]</span></div>
+                    <span class="n">ncd</span><span class="p">)))]</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">safe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
