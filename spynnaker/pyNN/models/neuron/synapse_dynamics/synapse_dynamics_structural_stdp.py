@@ -15,6 +15,7 @@
 
 import numpy
 from spinn_utilities.overrides import overrides
+from spynnaker.pyNN.utilities.utility_calls import create_mars_kiss_seeds
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
 from .synapse_dynamics_stdp import SynapseDynamicsSTDP
@@ -255,9 +256,8 @@ class SynapseDynamicsStructuralSTDP(
     def get_seeds(self, app_vertex=None):
         if app_vertex:
             if app_vertex not in self.__seeds.keys():
-                self.__seeds[app_vertex] = \
-                    [self.__rng.randint(0x7FFFFFFF) for _ in range(4)]
+                self.__seeds[app_vertex] = (
+                    create_mars_kiss_seeds(self.__rng, self.__seed))
             return self.__seeds[app_vertex]
         else:
-            seeds = [self.__rng.randint(0x7FFFFFFF) for _ in range(4)]
-            return seeds
+            return create_mars_kiss_seeds(self.__rng, self.__seed)

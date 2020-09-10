@@ -194,11 +194,11 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         spec.write_value(data=post_slice.lo_atom)
         spec.write_value(data=post_slice.hi_atom)
 
-        for seed in self.get_seeds(app_vertex):
-            spec.write_value(data=seed)
+        # write app level seeds
+        spec.write_array(data=self.get_seeds(app_vertex))
 
         # write local seed (4 words), generated randomly!
-        spec.write_array(create_mars_kiss_seeds(self.__rng, self.__seed))
+        spec.write_array(self.get_seeds())
 
         # write the number of pre-populations
         spec.write_value(data=n_pre_pops)
