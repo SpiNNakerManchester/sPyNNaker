@@ -194,7 +194,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         spec.write_value(data=post_slice.hi_atom)
 
         # write app level seeds
-        spec.write_array(data=self.get_seeds(app_vertex))
+        spec.write_array(self.get_seeds(app_vertex))
 
         # write local seed (4 words), generated randomly!
         spec.write_array(self.get_seeds())
