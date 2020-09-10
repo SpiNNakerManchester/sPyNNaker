@@ -258,22 +258,28 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
                 pre_vertex_slice.lo_atom, pre_vertex_slice.hi_atom + 1):
             pre_r, pre_c = divmod(pre_idx, self._pre_w)
             coords[pre_idx] = []
+
+            # Test whether the coordinates should be included based on the
+            # step function (in the pre) and skip if not
+            if not (((pre_r - self._pre_start_h) % self._pre_step_h == 0) and
+                    ((pre_c - self._pre_start_w) % self._pre_step_w == 0)):
+                continue
+
             # Loop over post-vertices
             for post_idx in range(
                     post_vertex_slice.lo_atom, post_vertex_slice.hi_atom + 1):
 
                 # convert to common coord system
-                r = post_as_pre_r[post_idx - post_lo]
-                c = post_as_pre_c[post_idx - post_lo]
-                if not (0 <= r < self._common_h and 0 <= c < self._common_w):
-                    continue
+                pac_r = post_as_pre_r[post_idx - post_lo]
+                pac_c = post_as_pre_c[post_idx - post_lo]
 
-                r, c = self.__pre_as_post(r, c)
+                # now convert common to pre coords
+                pap_r, pap_c = self.__pre_as_post(pac_r, pac_c)
 
                 # Obtain coordinates to test against kernel sizes
-                dr = r - pre_r
+                dr = pap_r - pre_r
                 kr = hh - dr
-                dc = c - pre_c
+                dc = pap_c - pre_c
                 kc = hw - dc
 
                 if 0 <= kr < self._kernel_h and 0 <= kc < self._kernel_w:
@@ -323,26 +329,20 @@ class KernelConnector(AbstractGenerateConnectorOnMachine):
     def get_n_connections_from_pre_vertex_maximum(
             self, post_vertex_slice, synapse_info, min_delay=None,
             max_delay=None):
-        # This is clearly a cop-out, but it works at the moment:
-        # I haven't been able to make this break for "standard usage"
-        return numpy.clip(
-            self._kernel_h * self._kernel_w * post_vertex_slice.n_atoms,
-            0, 255)
+        return numpy.clip(self._kernel_h * self._kernel_w, 0,
+                          post_vertex_slice.n_atoms)
 
     @overrides(AbstractConnector.get_n_connections_to_post_vertex_maximum)
     def get_n_connections_to_post_vertex_maximum(self, synapse_info):
-        # Again as above this is something of a cop-out and we can
-        # probably do better
         return numpy.clip(
-            self._kernel_h * self._kernel_w * synapse_info.n_pre_neurons,
-            0, 255)
+            self._kernel_h * self._kernel_w, 0, 255)
 
     @overrides(AbstractConnector.get_weight_maximum)
     def get_weight_maximum(self, synapse_info):
         # I think this is overestimated, but not by much
         n_conns = (
             self._pre_w * self._pre_h * self._kernel_w * self._kernel_h)
-        # Use the kernel delays if user has supplied them
+        # Use the kernel weights if user has supplied them
         if self._krn_weights is not None:
             return self._get_weight_maximum(self._krn_weights, n_conns)
 
