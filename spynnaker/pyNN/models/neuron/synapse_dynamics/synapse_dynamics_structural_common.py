@@ -25,7 +25,6 @@ from spinn_front_end_common.utilities.constants import (
     MICRO_TO_MILLISECOND_CONVERSION, MICRO_TO_SECOND_CONVERSION,
     BYTES_PER_WORD, BYTES_PER_SHORT)
 from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
-from spynnaker.pyNN.utilities.utility_calls import create_mars_kiss_seeds
 from .abstract_synapse_dynamics_structural import (
     AbstractSynapseDynamicsStructural)
 from spynnaker.pyNN.exceptions import SynapticConfigurationException
