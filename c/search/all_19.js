@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['zero_1834',['ZERO',['../maths-util_8h.html#ac328e551bde3d39b6d7b8cc9e048d941',1,'maths-util.h']]],
-  ['zero_5fspike_5fcounters_1835',['zero_spike_counters',['../delay__extension_8c.html#a5cc35d1e25ce49ad5799713dabd2abb9',1,'delay_extension.c']]]
+  ['y_5fcoord_2285',['y_coord',['http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/data__speed__up__packet__gatherer_8c.html#abd6b5514b7e2a8dbd313051113364683',1,'chip_key_data_t']]]
 ];
