@@ -132,7 +132,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         # Write the component parameters
         # pylint: disable=no-member
         self.partner_selection.write_parameters(spec)
-        for _, synapse_info in structural_edges:
+        for synapse_info in structural_edges.values():
             dynamics = synapse_info.synapse_dynamics
             dynamics.formation.write_parameters(spec)
         for synapse_info in structural_edges.values():
@@ -304,7 +304,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
         # pylint: disable=unsubscriptable-object
         # Get connections for this post slice
         post_slice = machine_vertex.vertex_slice
-        slice_conns = self.__connections[
+        slice_conns = self.connections[
             machine_vertex.app_vertex, post_slice.lo_atom]
         # Make a single large array of connections
         connections = numpy.concatenate(
