@@ -80,7 +80,7 @@ class OnChipBitFieldGenerator(object):
     def __call__(
             self, placements, app_graph, executable_finder,
             provenance_file_path, transceiver,
-            read_bit_field_generator_iobuf, generating_bitfield_report,
+            write_bit_field_generator_iobuf, generating_bitfield_report,
             default_report_folder, machine_graph, routing_infos,
             generating_bit_field_summary_report):
         """ loads and runs the bit field generator on chip
@@ -91,7 +91,7 @@ class OnChipBitFieldGenerator(object):
         :param provenance_file_path: the path to where provenance data items\
                                      is written
         :param transceiver: the SpiNNMan instance
-        :param read_bit_field_generator_iobuf: bool flag for report
+        :param write_bit_field_generator_iobuf: bool flag for report
         :param generating_bitfield_report: bool flag for report
         :param default_report_folder: the file path for reports
         :param machine_graph: the machine graph
@@ -103,7 +103,7 @@ class OnChipBitFieldGenerator(object):
 
         # progress bar
         progress = ProgressBar(
-            len(app_graph.vertices) * 2 + 1,
+            len(app_graph.vertices) + len(machine_graph.vertices) + 1,
             "Running bitfield generation on chip")
 
         # get data
@@ -118,7 +118,7 @@ class OnChipBitFieldGenerator(object):
         system_control_logic.run_system_application(
             expander_cores, bit_field_app_id, transceiver,
             provenance_file_path, executable_finder,
-            read_bit_field_generator_iobuf, self._check_for_success,
+            write_bit_field_generator_iobuf, self._check_for_success,
             [CPUState.FINISHED], False,
             "bit_field_expander_on_{}_{}_{}.txt", progress_bar=progress)
         # update progress bar
