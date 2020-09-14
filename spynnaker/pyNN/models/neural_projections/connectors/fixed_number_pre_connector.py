@@ -295,7 +295,7 @@ class FixedNumberPreConnector(AbstractGenerateConnectorOnMachine,
         params = self._basic_connector_params(synapse_info)
 
         # The same seed needs to be sent to each of the slices
-        key = id(post_vertex_slice)
+        key = (id(synapse_info), id(post_vertex_slice))
         if key not in self.__pre_connector_seed:
             self.__pre_connector_seed[key] = [
                 int(i * 0xFFFFFFFF) for i in self._rng.next(n=4)]
