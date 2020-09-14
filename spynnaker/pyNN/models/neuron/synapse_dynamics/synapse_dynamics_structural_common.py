@@ -174,7 +174,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
                                   AbstractSynapseDynamicsStructural):
                         app_edge = machine_edge.app_edge
                         if app_edge in structural_edges:
-                            if (structural_edges[machine_edge] !=
+                            if (structural_edges[app_edge] !=
                                     synapse_info):
                                 raise SynapticConfigurationException(
                                    self.PAIR_ERROR)
@@ -349,7 +349,9 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
             numpy.concatenate(padded_rows).T, formats="u1, u1, u2").view("u4")
         spec.write_array(post_to_pre)
 
-    def get_parameters_sdram_usage_in_bytes(self, graph, vertex, n_neurons):
+    @overrides(AbstractSynapseDynamicsStructural.get_structural_parameters_sdram_usage_in_bytes)
+    def get_structural_parameters_sdram_usage_in_bytes(
+            self, graph, vertex, n_neurons, n_synapse_types):
         """ Get SDRAM usage.
 
         Note: At the Application level this will be an estimate.
