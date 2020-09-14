@@ -349,7 +349,8 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
             numpy.concatenate(padded_rows).T, formats="u1, u1, u2").view("u4")
         spec.write_array(post_to_pre)
 
-    @overrides(AbstractSynapseDynamicsStructural.get_structural_parameters_sdram_usage_in_bytes)
+    @overrides(AbstractSynapseDynamicsStructural.
+               get_structural_parameters_sdram_usage_in_bytes)
     def get_structural_parameters_sdram_usage_in_bytes(
             self, graph, vertex, n_neurons, n_synapse_types):
         """ Get SDRAM usage.
@@ -381,7 +382,6 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
             raise PacmanInvalidParameterException(
                 "vertex", vertex, "Not at the same level as graph")
         # Also keep track of the parameter sizes
-
 
         # pylint: disable=no-member
         param_sizes = (
