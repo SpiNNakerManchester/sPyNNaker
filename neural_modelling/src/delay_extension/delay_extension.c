@@ -54,6 +54,8 @@ struct delay_extension_provenance {
 };
 
 // Globals
+//! bool in int form for if there is a key
+static bool has_key;
 //! Base multicast key for sending messages
 static uint32_t key = 0;
 //! Key for receiving messages
@@ -156,6 +158,7 @@ static inline uint32_t round_to_next_pot(uint32_t v) {
 static bool read_parameters(struct delay_parameters *params) {
     log_debug("read_parameters: starting");
 
+    has_key = params->has_key;
     key = params->key;
     incoming_key = params->incoming_key;
     incoming_mask = params->incoming_mask;
@@ -425,11 +428,15 @@ static void timer_callback(uint timer_count, UNUSED uint unused1) {
                     }
 
                     // Loop through counted spikes and send
-                    for (uint32_t s = 0; s < delay_stage_spike_counters[n]; s++) {
-                        while (!spin1_send_mc_packet(spike_key, 0, NO_PAYLOAD)) {
-                            spin1_delay_us(1);
+                    if (has_key) {
+                        for (uint32_t s = 0;
+                                s < delay_stage_spike_counters[n]; s++) {
+                            while (!spin1_send_mc_packet(
+                                    spike_key, 0, NO_PAYLOAD)) {
+                                spin1_delay_us(1);
+                            }
+                            n_spikes_sent++;
                         }
-                        n_spikes_sent++;
                     }
                 }
 
