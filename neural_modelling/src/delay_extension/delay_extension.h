@@ -44,6 +44,7 @@ typedef enum region_identifiers {
 //! \brief Delay configuration, as read from SDRAM where it was placed by DSG
 //! or by on-chip generation
 struct delay_parameters {
+    uint32_t has_key;             //!< bool for if this vertex has a key.
     uint32_t key;                 //!< Key to use for sending messages
     uint32_t incoming_key;        //!< Key to accept messages with
     uint32_t incoming_mask;       //!< Mask to filter delay_parameters::incoming_key
