@@ -29,7 +29,7 @@
 #include <spin1_api.h>
 #include <common/spike-send-delay.h>
 
-//! Tthe priority for each callback
+//! The priority for each callback
 enum delay_extension_callback_priorities {
     MC_PACKET = -1, //!< multicast packet reception uses FIQ
     SDP = 0,        //!< SDP handling is direct interrupt
@@ -56,6 +56,8 @@ struct delay_extension_provenance {
 };
 
 // Globals
+//! Whether there is a key
+static bool has_key;
 //! Base multicast key for sending messages
 static uint32_t key = 0;
 //! Key for receiving messages
@@ -153,6 +155,7 @@ static inline uint32_t round_to_next_pot(uint32_t v) {
 static bool read_parameters(struct delay_parameters *params) {
     log_debug("read_parameters: starting");
 
+    has_key = (params->has_key != 0);
     key = params->key;
     incoming_key = params->incoming_key;
     incoming_mask = params->incoming_mask;
@@ -392,11 +395,13 @@ static inline void process_delay_stage(uint now, uint32_t d) {
             }
 
             // Loop through counted spikes and send
-            for (uint32_t s = 0; s < spike_count; s++) {
-                while (!spin1_send_mc_packet(spike_key, 0, NO_PAYLOAD)) {
-                    spin1_delay_us(1);
+            if (has_key) {
+                for (uint32_t s = 0; s < spike_count; s++) {
+                    while (!spin1_send_mc_packet(spike_key, 0, NO_PAYLOAD)) {
+                        spin1_delay_us(1);
+                    }
+                    n_spikes_sent++;
                 }
-                n_spikes_sent++;
             }
         }
 

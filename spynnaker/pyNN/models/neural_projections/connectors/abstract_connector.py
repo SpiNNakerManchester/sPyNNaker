@@ -79,7 +79,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
 
         self._rng = rng
 
-        self.__n_clipped_delays = 0
+        self.__n_clipped_delays = numpy.int64(0)
         self.__min_delay = 0
         self.__param_seeds = dict()
 
@@ -498,10 +498,10 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
         name = "connector_{}_{}_{}".format(
             synapse_info.pre_population.label,
             synapse_info.post_population.label, self.__class__.__name__)
+        # Convert to native Python integer; provenance system assumption
+        ncd = self.__n_clipped_delays.item()
         return [ProvenanceDataItem(
-            [name, "Times_synaptic_delays_got_clipped"],
-            self.__n_clipped_delays,
-            report=self.__n_clipped_delays > 0,
+            [name, "Times_synaptic_delays_got_clipped"], ncd, report=ncd > 0,
             message=(
                 "The delays in the connector {} from {} to {} was clipped "
                 "to {} a total of {} times.  This can be avoided by reducing "
@@ -509,7 +509,7 @@ class AbstractConnector(with_metaclass(AbstractBase, object)):
                 "timestep".format(
                     self.__class__.__name__, synapse_info.pre_population.label,
                     synapse_info.post_population.label, self.__min_delay,
-                    self.__n_clipped_delays)))]
+                    ncd)))]
 
     @property
     def safe(self):
