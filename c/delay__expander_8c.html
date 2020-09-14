@@ -97,9 +97,9 @@ Data Structures</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ac2a97c4437a50fb351aad2db718cf7bf"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="delay__expander_8c.html#ac2a97c4437a50fb351aad2db718cf7bf">read_delay_builder_region</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> *in_region, <a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#a70e667669dab5c870f1f8f97d96b4abd">bit_field_t</a> *<a class="el" href="delay__extension_8c.html#ab7cc70efc4d7a8de402bb8c1d180abce">neuron_delay_stage_config</a>, uint32_t post_slice_start, uint32_t post_slice_count)</td></tr>
-<tr class="memdesc:ac2a97c4437a50fb351aad2db718cf7bf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate the data for a single connector.  <a href="delay__expander_8c.html#ac2a97c4437a50fb351aad2db718cf7bf">More...</a><br /></td></tr>
-<tr class="separator:ac2a97c4437a50fb351aad2db718cf7bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae335350371ddbd7a0c4da33ab032fcd5"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="delay__expander_8c.html#ae335350371ddbd7a0c4da33ab032fcd5">read_delay_builder_region</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> *in_region, <a class="elRef" href="http://spinnakermanchester.github.io/spinn_common/bit__field_8h.html#a70e667669dab5c870f1f8f97d96b4abd">bit_field_t</a> *<a class="el" href="delay__extension_8c.html#ab7cc70efc4d7a8de402bb8c1d180abce">neuron_delay_stage_config</a>, uint32_t pre_slice_start, uint32_t pre_slice_count)</td></tr>
+<tr class="memdesc:ae335350371ddbd7a0c4da33ab032fcd5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate the data for a single connector.  <a href="delay__expander_8c.html#ae335350371ddbd7a0c4da33ab032fcd5">More...</a><br /></td></tr>
+<tr class="separator:ae335350371ddbd7a0c4da33ab032fcd5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab8e8cac1b4ebc8d1fd0d665b9639988e"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="delay__expander_8c.html#ab8e8cac1b4ebc8d1fd0d665b9639988e">run_delay_expander</a> (void *delay_params_address, <a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> params_address)</td></tr>
 <tr class="memdesc:ab8e8cac1b4ebc8d1fd0d665b9639988e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Read the data for the generator.  <a href="delay__expander_8c.html#ab8e8cac1b4ebc8d1fd0d665b9639988e">More...</a><br /></td></tr>
 <tr class="separator:ab8e8cac1b4ebc8d1fd0d665b9639988e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -142,15 +142,15 @@ max_delayed_row_n_synapses</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a id="ae7dc189eb3efbed5b9e3836c7b728bc8"></a>uint32_t</td>
+<a id="a5e01b5817259dbfd08364484c91686dc"></a>uint32_t</td>
 <td class="fieldname">
-pre_slice_start</td>
+post_slice_start</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
-<a id="a515c2cc0b8276e96c0b5b8b494d2a840"></a>uint32_t</td>
+<a id="aaa5c8a0b992693c70ba3c652f3deed88"></a>uint32_t</td>
 <td class="fieldname">
-pre_slice_count</td>
+post_slice_count</td>
 <td class="fielddoc">
 </td></tr>
 <tr><td class="fieldtype">
@@ -182,8 +182,8 @@ delay_type</td>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="ac2a97c4437a50fb351aad2db718cf7bf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac2a97c4437a50fb351aad2db718cf7bf">&#9670;&nbsp;</a></span>read_delay_builder_region()</h2>
+<a id="ae335350371ddbd7a0c4da33ab032fcd5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae335350371ddbd7a0c4da33ab032fcd5">&#9670;&nbsp;</a></span>read_delay_builder_region()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -207,13 +207,13 @@ delay_type</td>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>post_slice_start</em>, </td>
+          <td class="paramname"><em>pre_slice_start</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">uint32_t&#160;</td>
-          <td class="paramname"><em>post_slice_count</em>&#160;</td>
+          <td class="paramname"><em>pre_slice_count</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -288,14 +288,14 @@ delay_type</td>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True if the expander finished correctly, False if there was an error </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="delay__expander_8c_source.html#l00142">142</a> of file <a class="el" href="delay__expander_8c_source.html">delay_expander.c</a>.</p>
+<p class="definition">Definition at line <a class="el" href="delay__expander_8c_source.html#l00140">140</a> of file <a class="el" href="delay__expander_8c_source.html">delay_expander.c</a>.</p>
 
 </div>
 </div>
 </div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Sep 13 2020 23:40:59 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Sep 14 2020 15:23:39 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.17
 </small></address>

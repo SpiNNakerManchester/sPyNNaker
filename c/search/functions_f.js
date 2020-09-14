@@ -2,7 +2,7 @@ var searchData=
 [
   ['rand_5fint_3076',['rand_int',['../sp__structs_8h.html#abfe9bbac4f366e370a68a174d26c0261',1,'sp_structs.h']]],
   ['read_5fconnection_5fbuilder_5fregion_3077',['read_connection_builder_region',['../synapse__expander_8c.html#a796837af1a5d205aa367196d5a7001bf',1,'synapse_expander.c']]],
-  ['read_5fdelay_5fbuilder_5fregion_3078',['read_delay_builder_region',['../delay__expander_8c.html#ac2a97c4437a50fb351aad2db718cf7bf',1,'delay_expander.c']]],
+  ['read_5fdelay_5fbuilder_5fregion_3078',['read_delay_builder_region',['../delay__expander_8c.html#ae335350371ddbd7a0c4da33ab032fcd5',1,'delay_expander.c']]],
   ['read_5fglobal_5fparameters_3079',['read_global_parameters',['../spike__source__poisson_8c.html#a571b747b9d964eb5af02496ce866130b',1,'spike_source_poisson.c']]],
   ['read_5fin_5faddresses_3080',['read_in_addresses',['../bit__field__expander_8c.html#a4a87539383a9998fa1063e982f63e0a3',1,'bit_field_expander.c']]],
   ['read_5fnext_5frates_3081',['read_next_rates',['../spike__source__poisson_8c.html#a5d93135c80cbb663f602737e639626ce',1,'spike_source_poisson.c']]],

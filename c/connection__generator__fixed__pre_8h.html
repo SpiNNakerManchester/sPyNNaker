@@ -98,15 +98,15 @@ Data Structures</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:a54a7a66e8fd8c26ab3c07eba79adec9b"><td class="memItemLeft" align="right" valign="top">static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="connection__generator__fixed__pre_8h.html#a54a7a66e8fd8c26ab3c07eba79adec9b">pre_random_in_range</a> (struct <a class="el" href="connection__generator__fixed__pre_8h.html#structfixed__pre">fixed_pre</a> *obj, uint32_t range)</td></tr>
+<tr class="memdesc:a54a7a66e8fd8c26ab3c07eba79adec9b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates a uniformly-distributed random number.  <a href="connection__generator__fixed__pre_8h.html#a54a7a66e8fd8c26ab3c07eba79adec9b">More...</a><br /></td></tr>
+<tr class="separator:a54a7a66e8fd8c26ab3c07eba79adec9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abe6fe758cca3bdf0ec27a3aef98d535a"><td class="memItemLeft" align="right" valign="top">static void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="connection__generator__fixed__pre_8h.html#abe6fe758cca3bdf0ec27a3aef98d535a">connection_generator_fixed_pre_initialise</a> (<a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> *<a class="el" href="spike__source__poisson_8c.html#a1b9edddb3735d131c67e9e824f07c402">region</a>)</td></tr>
 <tr class="memdesc:abe6fe758cca3bdf0ec27a3aef98d535a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialise the fixed-pre connection generator.  <a href="connection__generator__fixed__pre_8h.html#abe6fe758cca3bdf0ec27a3aef98d535a">More...</a><br /></td></tr>
 <tr class="separator:abe6fe758cca3bdf0ec27a3aef98d535a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac7bbf4bf4f70b6455cb935e57165a614"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="connection__generator__fixed__pre_8h.html#ac7bbf4bf4f70b6455cb935e57165a614">connection_generator_fixed_pre_free</a> (void *generator)</td></tr>
 <tr class="memdesc:ac7bbf4bf4f70b6455cb935e57165a614"><td class="mdescLeft">&#160;</td><td class="mdescRight">Free the fixed-pre connection generator.  <a href="connection__generator__fixed__pre_8h.html#ac7bbf4bf4f70b6455cb935e57165a614">More...</a><br /></td></tr>
 <tr class="separator:ac7bbf4bf4f70b6455cb935e57165a614"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a54a7a66e8fd8c26ab3c07eba79adec9b"><td class="memItemLeft" align="right" valign="top">static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="connection__generator__fixed__pre_8h.html#a54a7a66e8fd8c26ab3c07eba79adec9b">pre_random_in_range</a> (struct <a class="el" href="connection__generator__fixed__pre_8h.html#structfixed__pre">fixed_pre</a> *obj, uint32_t range)</td></tr>
-<tr class="memdesc:a54a7a66e8fd8c26ab3c07eba79adec9b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generates a uniformly-distributed random number.  <a href="connection__generator__fixed__pre_8h.html#a54a7a66e8fd8c26ab3c07eba79adec9b">More...</a><br /></td></tr>
-<tr class="separator:a54a7a66e8fd8c26ab3c07eba79adec9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a935e1c46d26b5ce26a6abaefc0fc004c"><td class="memItemLeft" align="right" valign="top">uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="connection__generator__fixed__pre_8h.html#a935e1c46d26b5ce26a6abaefc0fc004c">connection_generator_fixed_pre_generate</a> (void *generator, uint32_t pre_slice_start, uint32_t pre_slice_count, uint32_t pre_neuron_index, uint32_t post_slice_start, uint32_t post_slice_count, uint32_t max_row_length, uint16_t *indices)</td></tr>
 <tr class="memdesc:a935e1c46d26b5ce26a6abaefc0fc004c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate connections with the fixed-pre connection generator.  <a href="connection__generator__fixed__pre_8h.html#a935e1c46d26b5ce26a6abaefc0fc004c">More...</a><br /></td></tr>
 <tr class="separator:a935e1c46d26b5ce26a6abaefc0fc004c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -263,71 +263,6 @@ Whether <code>full_indices</code> is in SDRAM. </td></tr>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="abe6fe758cca3bdf0ec27a3aef98d535a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abe6fe758cca3bdf0ec27a3aef98d535a">&#9670;&nbsp;</a></span>connection_generator_fixed_pre_initialise()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">static void* connection_generator_fixed_pre_initialise </td>
-          <td>(</td>
-          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> *&#160;</td>
-          <td class="paramname"><em>region</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Initialise the fixed-pre connection generator. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">region</td><td>Region to read parameters from. Should be updated to position just after parameters after calling. </td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>A data item to be passed in to other functions later on </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="connection__generator__fixed__pre_8h_source.html#l00071">71</a> of file <a class="el" href="connection__generator__fixed__pre_8h_source.html">connection_generator_fixed_pre.h</a>.</p>
-
-</div>
-</div>
-<a id="ac7bbf4bf4f70b6455cb935e57165a614"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac7bbf4bf4f70b6455cb935e57165a614">&#9670;&nbsp;</a></span>connection_generator_fixed_pre_free()</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void connection_generator_fixed_pre_free </td>
-          <td>(</td>
-          <td class="paramtype">void *&#160;</td>
-          <td class="paramname"><em>generator</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Free the fixed-pre connection generator. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">generator</td><td>The generator to free </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="connection__generator__fixed__pre_8h_source.html#l00096">96</a> of file <a class="el" href="connection__generator__fixed__pre_8h_source.html">connection_generator_fixed_pre.h</a>.</p>
-
-</div>
-</div>
 <a id="a54a7a66e8fd8c26ab3c07eba79adec9b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a54a7a66e8fd8c26ab3c07eba79adec9b">&#9670;&nbsp;</a></span>pre_random_in_range()</h2>
 
@@ -372,7 +307,72 @@ Whether <code>full_indices</code> is in SDRAM. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>a random integer in the given input range. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="connection__generator__fixed__pre_8h_source.html#l00109">109</a> of file <a class="el" href="connection__generator__fixed__pre_8h_source.html">connection_generator_fixed_pre.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="connection__generator__fixed__pre_8h_source.html#l00072">72</a> of file <a class="el" href="connection__generator__fixed__pre_8h_source.html">connection_generator_fixed_pre.h</a>.</p>
+
+</div>
+</div>
+<a id="abe6fe758cca3bdf0ec27a3aef98d535a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abe6fe758cca3bdf0ec27a3aef98d535a">&#9670;&nbsp;</a></span>connection_generator_fixed_pre_initialise()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void* connection_generator_fixed_pre_initialise </td>
+          <td>(</td>
+          <td class="paramtype"><a class="elRef" href="http://spinnakermanchester.github.io/SpiNNFrontEndCommon/c/common-typedefs_8h.html#ac8dc08dd5f5827994d1b06351f925669">address_t</a> *&#160;</td>
+          <td class="paramname"><em>region</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Initialise the fixed-pre connection generator. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">region</td><td>Region to read parameters from. Should be updated to position just after parameters after calling. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A data item to be passed in to other functions later on </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="connection__generator__fixed__pre_8h_source.html#l00083">83</a> of file <a class="el" href="connection__generator__fixed__pre_8h_source.html">connection_generator_fixed_pre.h</a>.</p>
+
+</div>
+</div>
+<a id="ac7bbf4bf4f70b6455cb935e57165a614"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac7bbf4bf4f70b6455cb935e57165a614">&#9670;&nbsp;</a></span>connection_generator_fixed_pre_free()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void connection_generator_fixed_pre_free </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>generator</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Free the fixed-pre connection generator. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">generator</td><td>The generator to free </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="connection__generator__fixed__pre_8h_source.html#l00205">205</a> of file <a class="el" href="connection__generator__fixed__pre_8h_source.html">connection_generator_fixed_pre.h</a>.</p>
 
 </div>
 </div>
@@ -454,7 +454,7 @@ Whether <code>full_indices</code> is in SDRAM. </td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The number of connections generated </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="connection__generator__fixed__pre_8h_source.html#l00133">133</a> of file <a class="el" href="connection__generator__fixed__pre_8h_source.html">connection_generator_fixed_pre.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="connection__generator__fixed__pre_8h_source.html#l00230">230</a> of file <a class="el" href="connection__generator__fixed__pre_8h_source.html">connection_generator_fixed_pre.h</a>.</p>
 
 </div>
 </div>
@@ -492,7 +492,7 @@ Whether <code>full_indices</code> is in SDRAM. </td></tr>
 <div class="ttc" id="aspin1__api_8h_html_a070d2ce7b6bb7e5c05602aa8c308d0c4"><div class="ttname"><a href="http://spinnakermanchester.github.io/spinnaker_tools/spin1__api_8h.html#a070d2ce7b6bb7e5c05602aa8c308d0c4">NULL</a></div><div class="ttdeci">#define NULL</div></div>
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Sun Sep 13 2020 23:40:59 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Sep 14 2020 15:23:39 for sPyNNaker neural_modelling by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.17
 </small></address>

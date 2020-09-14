@@ -8817,6 +8817,13 @@
     <class kind="struct">fixed_pre</class>
     <class kind="struct">fixed_pre_globals_t</class>
     <member kind="function" static="yes">
+      <type>static uint32_t</type>
+      <name>pre_random_in_range</name>
+      <anchorfile>connection__generator__fixed__pre_8h.html</anchorfile>
+      <anchor>a54a7a66e8fd8c26ab3c07eba79adec9b</anchor>
+      <arglist>(struct fixed_pre *obj, uint32_t range)</arglist>
+    </member>
+    <member kind="function" static="yes">
       <type>static void *</type>
       <name>connection_generator_fixed_pre_initialise</name>
       <anchorfile>connection__generator__fixed__pre_8h.html</anchorfile>
@@ -8829,13 +8836,6 @@
       <anchorfile>connection__generator__fixed__pre_8h.html</anchorfile>
       <anchor>ac7bbf4bf4f70b6455cb935e57165a614</anchor>
       <arglist>(void *generator)</arglist>
-    </member>
-    <member kind="function" static="yes">
-      <type>static uint32_t</type>
-      <name>pre_random_in_range</name>
-      <anchorfile>connection__generator__fixed__pre_8h.html</anchorfile>
-      <anchor>a54a7a66e8fd8c26ab3c07eba79adec9b</anchor>
-      <arglist>(struct fixed_pre *obj, uint32_t range)</arglist>
     </member>
     <member kind="function">
       <type>uint32_t</type>
@@ -8998,8 +8998,8 @@
       <type>static bool</type>
       <name>read_delay_builder_region</name>
       <anchorfile>delay__expander_8c.html</anchorfile>
-      <anchor>ac2a97c4437a50fb351aad2db718cf7bf</anchor>
-      <arglist>(address_t *in_region, bit_field_t *neuron_delay_stage_config, uint32_t post_slice_start, uint32_t post_slice_count)</arglist>
+      <anchor>ae335350371ddbd7a0c4da33ab032fcd5</anchor>
+      <arglist>(address_t *in_region, bit_field_t *neuron_delay_stage_config, uint32_t pre_slice_start, uint32_t pre_slice_count)</arglist>
     </member>
     <member kind="function" static="yes">
       <type>static bool</type>
