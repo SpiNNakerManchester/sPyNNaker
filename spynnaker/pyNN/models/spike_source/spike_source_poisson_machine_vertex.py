@@ -130,3 +130,15 @@ class SpikeSourcePoissonMachineVertex(
     @overrides(AbstractHasAssociatedBinary.get_binary_start_type)
     def get_binary_start_type(self):
         return ExecutableType.USES_SIMULATION_INTERFACE
+
+    @property
+    def max_rate(self):
+        return self.app_vertex.max_rate
+
+    @property
+    def application_n_atoms(self):
+        """
+        The application level n_atoms
+        :return: The application level n_atoms
+        """
+        return self.app_vertex.n_atoms

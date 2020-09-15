@@ -28,13 +28,14 @@ from spinn_front_end_common.utilities.constants import (
 from spynnaker.pyNN.models.neuron.generator_data import GeneratorData
 from spynnaker.pyNN.models.neural_projections.connectors import (
     AbstractGenerateConnectorOnMachine)
-from spynnaker.pyNN.models.neural_projections import ProjectionApplicationEdge
+from spynnaker.pyNN.models.neural_projections import (
+    ProjectionApplicationEdge, ProjectionMachineEdge)
 from .synapse_dynamics import (
     AbstractSynapseDynamicsStructural,
     AbstractGenerateOnMachine, SynapseDynamicsStructuralSTDP)
 from spynnaker.pyNN.models.neuron.synapse_io import SynapseIORowBased
-from spynnaker.pyNN.models.spike_source.spike_source_poisson_vertex import (
-    SpikeSourcePoissonVertex)
+from spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex \
+    import SpikeSourcePoissonMachineVertex
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 from spynnaker.pyNN.utilities.constants import (
     POPULATION_BASED_REGIONS, POSSION_SIGMA_SUMMATION_LIMIT)
@@ -595,13 +596,13 @@ class SynapticManager(object):
                 (sigma * math.sqrt(poisson_variance + weight_variance)))
 
     def _get_ring_buffer_to_input_left_shifts(
-            self, application_vertex, application_graph, machine_timestep,
+            self, machine_vertex, machine_graph, machine_timestep,
             weight_scale):
         """ Get the scaling of the ring buffer to provide as much accuracy as\
             possible without too much overflow
 
-        :param .ApplicationVertex application_vertex:
-        :param .ApplicationGraph application_graph:
+        :param .MachineVertex machine_vertex:
+        :param .MachineGraph machine_graph:
         :param int machine_timestep:
         :param float weight_scale:
         :rtype: list(int)
@@ -616,10 +617,10 @@ class SynapticManager(object):
         rate_stats = [RunningStats() for _ in range(n_synapse_types)]
         steps_per_second = MICRO_TO_SECOND_CONVERSION / machine_timestep
 
-        for app_edge in application_graph.get_edges_ending_at_vertex(
-                application_vertex):
-            if isinstance(app_edge, ProjectionApplicationEdge):
-                for synapse_info in app_edge.synapse_information:
+        for machine_edge in machine_graph.get_edges_ending_at_vertex(
+                machine_vertex):
+            if isinstance(machine_edge, ProjectionMachineEdge):
+                for synapse_info in machine_edge.synapse_information:
                     synapse_type = synapse_info.synapse_type
                     synapse_dynamics = synapse_info.synapse_dynamics
                     connector = synapse_info.connector
@@ -648,9 +649,9 @@ class SynapticManager(object):
                     spikes_per_tick = max(
                         1.0, self.__spikes_per_second / steps_per_second)
                     spikes_per_second = self.__spikes_per_second
-                    if isinstance(app_edge.pre_vertex,
-                                  SpikeSourcePoissonVertex):
-                        rate = app_edge.pre_vertex.max_rate
+                    pre_vertex = machine_edge.pre_vertex
+                    if isinstance(pre_vertex, SpikeSourcePoissonMachineVertex):
+                        rate = pre_vertex.max_rate
                         # If non-zero rate then use it; otherwise keep default
                         if rate != 0:
                             spikes_per_second = rate
@@ -658,9 +659,10 @@ class SynapticManager(object):
                             spikes_per_second = numpy.max(spikes_per_second)
                         elif isinstance(spikes_per_second, RandomDistribution):
                             spikes_per_second = get_maximum_probable_value(
-                                spikes_per_second, app_edge.pre_vertex.n_atoms)
+                                spikes_per_second,
+                                pre_vertex.application_n_atoms)
                         prob = 1.0 - (
-                            (1.0 / 100.0) / app_edge.pre_vertex.n_atoms)
+                            (1.0 / 100.0) / pre_vertex.application_n_atoms)
                         spikes_per_tick = spikes_per_second / steps_per_second
                         spikes_per_tick = scipy.stats.poisson.ppf(
                             prob, spikes_per_tick)
@@ -1152,12 +1154,12 @@ class SynapticManager(object):
         return block_addr, single_addr, index
 
     def _get_ring_buffer_shifts(
-            self, application_vertex, application_graph, machine_timestep,
+            self, machine_vertex, machine_graph, machine_timestep,
             weight_scale):
         """ Get the ring buffer shifts for this vertex
 
-        :param .ApplicationVertex application_vertex:
-        :param .ApplicationGraph application_graph:
+        :param .MachineVertex machine_vertex:
+        :param .MachineGraph machine_graph:
         :param int machine_timestep:
         :param float weight_scale:
         :rtype: list(int)
@@ -1165,7 +1167,7 @@ class SynapticManager(object):
         if self.__ring_buffer_shifts is None:
             self.__ring_buffer_shifts = \
                 self._get_ring_buffer_to_input_left_shifts(
-                    application_vertex, application_graph, machine_timestep,
+                    machine_vertex, machine_graph, machine_timestep,
                     weight_scale)
         return self.__ring_buffer_shifts
 
@@ -1218,7 +1220,7 @@ class SynapticManager(object):
             all_syn_block_sz, application_graph, application_vertex)
 
         ring_buffer_shifts = self._get_ring_buffer_shifts(
-            application_vertex, application_graph, machine_time_step,
+            machine_vertex, machine_graph, machine_time_step,
             weight_scale)
         weight_scales = self._write_synapse_parameters(
             spec, ring_buffer_shifts, weight_scale)
