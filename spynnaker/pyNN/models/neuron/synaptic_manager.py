@@ -438,8 +438,7 @@ class SynapticManager(object):
                       AbstractSynapseDynamicsStructural):
             return self.__synapse_dynamics\
                 .get_structural_parameters_sdram_usage_in_bytes(
-                     app_graph, app_vertex, vertex_slice.n_atoms,
-                     self.__n_synapse_types)
+                     app_graph, app_vertex, vertex_slice.n_atoms)
         else:
             return self.__synapse_dynamics.get_parameters_sdram_usage_in_bytes(
                 vertex_slice.n_atoms, self.__n_synapse_types)
@@ -511,8 +510,7 @@ class SynapticManager(object):
             synapse_structural_dynamics_sz = (
                 self.__synapse_dynamics.
                 get_structural_parameters_sdram_usage_in_bytes(
-                    machine_graph, machine_vertex,
-                    vertex_slice.n_atoms, self.__n_synapse_types))
+                    machine_graph, machine_vertex, vertex_slice.n_atoms))
 
             if synapse_structural_dynamics_sz != 0:
                 spec.reserve_memory_region(

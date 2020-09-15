@@ -23,7 +23,7 @@ class AbstractSynapseDynamicsStructural(object):
 
     @abstractmethod
     def get_structural_parameters_sdram_usage_in_bytes(
-            self, graph, vertex, n_neurons, n_synapse_types):
+            self, graph, vertex, n_neurons):
         """ Get the size of the structural parameters
 
         Note: At the Application level this will be an estimate.
@@ -33,9 +33,9 @@ class AbstractSynapseDynamicsStructural(object):
         :param vertex: Vertex at the same level as the graph
         :type vertex: ApplicationVertex or MachineVertex
         :param int n_neurons:
-        :param int n_synapse_types:
         :return: the size of the parameters, in bytes
         :rtype: int
+        :raises PacmanInvalidParameterException
         """
 
     @abstractmethod
@@ -51,7 +51,6 @@ class AbstractSynapseDynamicsStructural(object):
         :type weight_scales: ~numpy.ndarray or list(float)
         :param ~pacman.model.graphs.machine.MachineGraph machine_graph:
         :param MachineVertex machine_vertex:
-        :param ~pacman.model.graphs.common.Slice post_slice:
         :param ~pacman.model.routing_info.RoutingInfo routing_info:
         :param dict(tuple(SynapseInformation,int),int) synapse_indices:
         """

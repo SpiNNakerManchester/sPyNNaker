@@ -174,8 +174,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
                                   AbstractSynapseDynamicsStructural):
                         app_edge = machine_edge.app_edge
                         if app_edge in structural_edges:
-                            if (structural_edges[app_edge] !=
-                                    synapse_info):
+                            if (structural_edges[app_edge] != synapse_info):
                                 raise SynapticConfigurationException(
                                    self.PAIR_ERROR)
                         else:
@@ -352,20 +351,7 @@ class SynapseDynamicsStructuralCommon(AbstractSynapseDynamicsStructural):
     @overrides(AbstractSynapseDynamicsStructural.
                get_structural_parameters_sdram_usage_in_bytes)
     def get_structural_parameters_sdram_usage_in_bytes(
-            self, graph, vertex, n_neurons, n_synapse_types):
-        """ Get SDRAM usage.
-
-        Note: At the Application level this will be an estimate.
-
-        :param graph: Graph at same level as vertex.
-        :type graph: ApplicationGraph or MachineGraph
-        :param vertex: Vertex at the same level as the graph
-        :type vertex: ApplicationVertex or MachineVertex
-        :param int n_neurons:
-        :return: the size of the parameters, in bytes
-        :rtype: int
-        :raises PacmanInvalidParameterException
-        """
+            self, graph, vertex, n_neurons):
         # Work out how many sub-edges we will end up with, as this is used
         # for key_atom_info
         n_sub_edges = 0
