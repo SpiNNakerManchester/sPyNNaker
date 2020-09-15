@@ -34,8 +34,7 @@ from .synapse_dynamics import (
     AbstractSynapseDynamicsStructural,
     AbstractGenerateOnMachine, SynapseDynamicsStructuralSTDP)
 from spynnaker.pyNN.models.neuron.synapse_io import SynapseIORowBased
-from spynnaker.pyNN.models.spike_source.spike_source_poisson_machine_vertex \
-    import SpikeSourcePoissonMachineVertex
+from spynnaker.pyNN.models.spike_source import SpikeSourcePoissonMachineVertex
 from spynnaker.pyNN.models.utility_models.delays import DelayExtensionVertex
 from spynnaker.pyNN.utilities.constants import (
     POPULATION_BASED_REGIONS, POSSION_SIGMA_SUMMATION_LIMIT)
