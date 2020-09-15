@@ -197,7 +197,7 @@ class DelayExtensionVertex(
         :param int max_stage:
         :param int machine_time_step:
         """
-        self.__delay_generator_data[post_vertex_slice].append(
+        self.__delay_generator_data[pre_vertex_slice].append(
             DelayGeneratorData(
                 max_row_n_synapses, max_delayed_row_n_synapses,
                 pre_slices, pre_slice_index, post_slices, post_slice_index,
