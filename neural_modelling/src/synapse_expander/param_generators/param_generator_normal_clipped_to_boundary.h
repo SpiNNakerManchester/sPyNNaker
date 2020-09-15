@@ -81,6 +81,18 @@ static void param_generator_normal_clipped_boundary_free(void *generator) {
     sark_free(generator);
 }
 
+static inline accum _clamp(
+        const struct param_generator_normal_clipped_boundary *obj,
+        accum value) {
+    if (value < obj->params.low) {
+        return obj->params.low;
+    }
+    if (value > obj->params.high) {
+        return obj->params.high;
+    }
+    return value;
+}
+
 /**
  * \brief Generate values with the clamped normal RNG parameter generator
  * \param[in] generator: The generator to use to generate values
@@ -99,12 +111,6 @@ static void param_generator_normal_clipped_boundary_generate(
     struct param_generator_normal_clipped_boundary *obj = generator;
     for (uint32_t i = 0; i < n_indices; i++) {
         accum value = rng_normal(obj->rng);
-        values[i] = obj->params.mu + (value * obj->params.sigma);
-        if (values[i] < obj->params.low) {
-            values[i] = obj->params.low;
-        }
-        if (values[i] > obj->params.high) {
-            values[i] = obj->params.high;
-        }
+        values[i] = _clamp(obj->params.mu + (value * obj->params.sigma), obj);
     }
 }

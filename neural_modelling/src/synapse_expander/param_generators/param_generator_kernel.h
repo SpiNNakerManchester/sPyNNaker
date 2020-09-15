@@ -130,9 +130,8 @@ static void param_generator_kernel_generate(
 
     uint16_t hlf_kw = params->kernelWidth >> 1;
     uint16_t hlf_kh = params->kernelHeight >> 1;
-    int16_t k_r, k_c;
     for (uint16_t i = 0; i < n_synapses; i++) {
-        uint16_t post_r, post_c; //post raw
+        uint16_t post_r, post_c; // post raw
         uint16_t pac_r, pac_c; // post as common
         int16_t pap_r, pap_c; // post as pre
         post_r = uidiv(params->post_slice_start + indices[i],
@@ -148,11 +147,10 @@ static void param_generator_kernel_generate(
                 pac_r, pac_c, params->startPreHeight, params->startPreWidth,
                 params->stepPreHeight, params->stepPreWidth, &pap_r, &pap_c);
 
-        int16_t r_diff = (int16_t) pap_r - (int16_t) pre_r;
-        int16_t c_diff = (int16_t) pap_c - (int16_t) pre_c;
-
-        k_r = hlf_kh - r_diff;
-        k_c = hlf_kw - c_diff;
+        int16_t r_diff = pap_r - (int16_t) pre_r;
+        int16_t c_diff = pap_c - (int16_t) pre_c;
+        int16_t k_r = hlf_kh - r_diff;
+        int16_t k_c = hlf_kw - c_diff;
 
         if ((0 <= k_r) && (k_r < params->kernelHeight) && (0 <= k_c)
                 && (k_c < params->kernelWidth)) {

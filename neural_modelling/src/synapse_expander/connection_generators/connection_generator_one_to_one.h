@@ -61,6 +61,10 @@ static void connection_generator_one_to_one_free(void *generator) {
     sark_free(generator);
 }
 
+static inline bool _in_range(uint32_t value, uint32_t lo, uint32_t hi) {
+    return (value >= lo) && (value <= hi);
+}
+
 /**
  * \brief Generate connections with the one-to-one connection generator
  * \param[in] generator: The generator to use to generate connections
@@ -94,25 +98,24 @@ static uint32_t connection_generator_one_to_one_generate(
     }
 
     // If not in the pre-population view range, then don't generate
-    if ((pre_neuron_index < obj->pre_lo) ||
-            (pre_neuron_index > obj->pre_hi)) {
+    if (!_in_range(pre_neuron_index, obj->pre_lo, obj->pre_hi)) {
         return 0;
     }
 
+    int32_t pre_to_post_delta = obj->post_lo - (int32_t) obj->pre_lo;
     // Post-index = view-relative pre-index
     // Note that this could be negative (but see later)
-    int post_neuron_index = pre_neuron_index - obj->pre_lo + obj->post_lo;
+    int post_neuron_index = pre_neuron_index + pre_to_post_delta;
 
     // If not in the post-population view range, then don't generate.
     // This will filter negatives
-    if ((post_neuron_index < (int) obj->post_lo) ||
-            (post_neuron_index > (int) obj->post_hi)) {
+    if (!_in_range((uint32_t) post_neuron_index, obj->post_lo, obj->post_hi)) {
         return 0;
     }
 
     // If out of range, don't generate anything
-    if ((post_neuron_index < (int) post_slice_start) ||
-            (post_neuron_index >= (int) (post_slice_start + post_slice_count))) {
+    if (!_in_range((uint32_t) post_neuron_index, post_slice_start,
+            post_slice_start + post_slice_count - 1)) {
         return 0;
     }
 

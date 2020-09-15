@@ -81,6 +81,11 @@ static void param_generator_normal_clipped_free(void *generator) {
     sark_free(generator);
 }
 
+static inline bool _in_range(
+        struct param_generator_normal_clipped *obj, accum value) {
+    return (value >= obj->params.low) && (value <= obj->params.high);
+}
+
 /**
  * \brief Generate values with the clipped normal RNG parameter generator
  * \param[in] generator: The generator to use to generate values
@@ -101,6 +106,6 @@ static void param_generator_normal_clipped_generate(
         do {
             accum value = rng_normal(obj->rng);
             values[i] = obj->params.mu + (value * obj->params.sigma);
-        } while (values[i] < obj->params.low || values[i] > obj->params.high);
+        } while (!_in_range(obj, values[i]));
     }
 }

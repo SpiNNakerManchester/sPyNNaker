@@ -66,7 +66,8 @@ static void *connection_generator_fixed_prob_initialise(address_t *region) {
     log_debug("Fixed Probability Connector, pre_lo = %u, pre_hi = %u, "
     		"post_lo = %u, post_hi = %u, allow self connections = %u, "
             "probability = %k",
-			obj->params.pre_lo, obj->params.pre_hi, obj->params.post_lo, obj->params.post_hi,
+			obj->params.pre_lo, obj->params.pre_hi,
+			obj->params.post_lo, obj->params.post_hi,
             obj->params.allow_self_connections,
             (accum) obj->params.probability);
     return obj;
@@ -122,15 +123,14 @@ static uint32_t connection_generator_fixed_prob_generate(
     // Randomly select connections to each post-neuron
     uint32_t n_conns = 0;
     for (uint32_t i = 0; i < post_slice_count; i++) {
+        uint32_t idx = post_slice_start + i;
         // Disallow self connections if configured
-        if (!obj->params.allow_self_connections &&
-                (pre_neuron_index == post_slice_start + i)) {
+        if (!obj->params.allow_self_connections && (pre_neuron_index == idx)) {
             continue;
         }
 
         // Don't generate if the value is not in the range of the post-population view
-        if ((i + post_slice_start < obj->params.post_lo) ||
-        	(i + post_slice_start > obj->params.post_hi)) {
+        if ((idx < obj->params.post_lo) || (idx > obj->params.post_hi)) {
         	continue;
         }
 
@@ -138,8 +138,7 @@ static uint32_t connection_generator_fixed_prob_generate(
         _probability_t value = ulrbits(rng_generator(obj->rng));
 
         // If less than our probability, generate a connection if possible
-        if ((value <= obj->params.probability) &&
-                (n_conns < max_row_length)) {
+        if ((value <= obj->params.probability) && (n_conns < max_row_length)) {
             indices[n_conns++] = i;
         } else if (n_conns >= max_row_length) {
             log_warning("Row overflow");
