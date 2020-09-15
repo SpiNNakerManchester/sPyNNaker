@@ -91,8 +91,8 @@ class DelayGeneratorData(object):
         items.append(numpy.array([
             self.__max_row_n_synapses,
             self.__max_delayed_row_n_synapses,
-            self.__pre_vertex_slice.lo_atom,
-            self.__pre_vertex_slice.n_atoms,
+            self.__post_vertex_slice.lo_atom,
+            self.__post_vertex_slice.n_atoms,
             self.__max_stage,
             DataType.S1615.encode_as_int(
                 MICRO_TO_MILLISECOND_CONVERSION / self.__machine_time_step),
